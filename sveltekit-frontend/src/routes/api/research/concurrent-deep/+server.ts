@@ -27,6 +27,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { runConcurrentResearch, formatGraphForClaudeCode } from '$lib/server/ai/langgraph-research.js';
 import type { ResearchDomain } from '$lib/server/ai/langgraph-research.js';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { db } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { COMPACT_DEFAULTS } from '$lib/server/ai/compact-budgets.js';
@@ -103,6 +104,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		entityType: 'concurrent-research',
 		queryHash,
 		workerCount,
+		runtime: resolveRuntimeConfig(),
 		cache: { l1: false, l2: false, l3: false },
 	});
 
@@ -135,6 +137,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		workerCount: graph.workerFindings.length,
 		durationMs:  graph.totalDurationMs,
 		totalChunks: graph.totalChunks,
+		runtime: resolveRuntimeConfig(),
 		cache: { l1: false, l2: false, l3: false },
 	});
 
@@ -177,6 +180,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		ok:              true,
 		compact,
 		query,
+		runtime:         graph.runtime,
 		domains:           graph.domains,
 		supervisorSummary: compact
 			? graph.supervisorSummary.slice(0, maxSummaryChars)
@@ -203,8 +207,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	return json({
 		endpoint:    'POST /api/research/concurrent-deep',
-		description: 'LangGraph concurrent codebase research — supervisor + parallel domain workers + Ollama synthesis',
+		description: 'LangGraph concurrent codebase research — supervisor + parallel domain workers + runtime truth layer + Ollama synthesis',
 		domains:     VALID_DOMAINS,
+		runtime:     resolveRuntimeConfig(),
 		cacheInfo:   'Worker results cached 10min, graph cached 5min, LLM calls via L1 Redis → L2 Bifrost → L3 Ollama',
 		formats:     ['json', 'markdown'],
 		mcpTool:     'codebase:concurrent_research',

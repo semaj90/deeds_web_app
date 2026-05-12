@@ -194,6 +194,12 @@ export interface ACEContext {
     somBmuCol?: number | null;
     /** Normalised composite authority score mirrored from GDS nightly job via Qdrant payload */
     graphAuthorityScore?: number | null;
+    /** 64d encoded similarity score from the autoencoder rerank lane */
+    encoded64Score?: number | null;
+    /** Optional cluster PageRank value if preloaded from Redis */
+    clusterPagerank?: number | null;
+    /** Optional Karpathy blend value if preloaded from Redis */
+    karpathyBlend?: number | null;
     /** Louvain communityId written by graphify:gds, mirrored via Qdrant payload patch */
     communityId?: string | null;
     /** Directory summary mirrored from AGENTS.md directory cards (L4 lane) */
@@ -328,6 +334,8 @@ export interface ACEContext {
   } | null;
   /** PostgreSQL schema context (tables, columns, types) for database reasoning */
   dbSchemaContext?: string;
+  /** Token-aware ACE context packet (if tokenAwarePacking was enabled) */
+  aceContextPacket?: import('./token-aware-context-packer.js').AceContextPacket;
 }
 
 export interface ACEPrompt {

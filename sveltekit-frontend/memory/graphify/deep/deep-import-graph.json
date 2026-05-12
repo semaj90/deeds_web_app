@@ -1,33 +1,33 @@
 {
-  "generatedAt": "2026-05-11T23:27:31.502Z",
+  "generatedAt": "2026-05-12T17:13:21.434Z",
   "sourceGraph": "docs/graph/codebase-graph.json",
   "stats": {
-    "generatedAt": "2026-05-11T23:27:31.502Z",
-    "nodeCount": 3935,
-    "edgeCount": 12928,
-    "resolvedEdges": 7621,
-    "unresolvedEdges": 814,
-    "externalEdges": 4307,
+    "generatedAt": "2026-05-12T17:13:21.434Z",
+    "nodeCount": 3966,
+    "edgeCount": 13048,
+    "resolvedEdges": 7707,
+    "unresolvedEdges": 816,
+    "externalEdges": 4339,
     "edgeTypeBreakdown": {
-      "imports_static": 5884,
-      "imports_dynamic": 511,
-      "env_dependency": 671,
+      "imports_static": 5964,
+      "imports_dynamic": 521,
+      "env_dependency": 676,
       "exports_from": 291,
-      "db_dependency": 970,
-      "redis_dependency": 426,
-      "qdrant_dependency": 176,
+      "db_dependency": 982,
+      "redis_dependency": 425,
+      "qdrant_dependency": 179,
       "test_covers_file": 2705,
-      "neo4j_dependency": 81,
+      "neo4j_dependency": 84,
       "mcp_tool_calls": 131,
-      "server_route_depends_on": 1081,
+      "server_route_depends_on": 1089,
       "svelte_route_uses_loader": 1
     },
     "zoneBreakdown": {
       "types": 127,
-      "client": 963,
-      "server": 774,
-      "test": 941,
-      "route": 1130
+      "client": 932,
+      "server": 801,
+      "test": 945,
+      "route": 1161
     },
     "hotspotCount": 50,
     "routeCount": 50,
@@ -302,11 +302,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 364,
+      "lineCount": 375,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 30,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "dd248d50"
     },
     {
@@ -360,6 +360,19 @@
       "directFanIn": 5,
       "directFanOut": 0,
       "hash": "232c5414"
+    },
+    {
+      "rel": "src/lib/ai/quant-config.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 58,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 3,
+      "directFanOut": 0,
+      "hash": "0e3f9fb9"
     },
     {
       "rel": "src/lib/ai/unified-generation.ts",
@@ -4544,7 +4557,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "7a7686d0"
     },
     {
@@ -5714,7 +5727,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 4,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "60aa626f"
     },
     {
@@ -6394,7 +6407,7 @@
       "hash": "5a2d4926"
     },
     {
-      "rel": "src/lib/components/ui/button/Button.svelte",
+      "rel": "src/lib/components/ui/enhanced-bits/Button.svelte",
       "zone": "client",
       "isRoute": false,
       "isSvelteComp": true,
@@ -6402,9 +6415,9 @@
       "lineCount": 39,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 4,
-      "directFanOut": 2,
-      "hash": "60aa626f"
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "e6dc9fd0"
     },
     {
       "rel": "src/lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte",
@@ -6871,7 +6884,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "397961d2"
     },
     {
@@ -6962,11 +6975,11 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "6a8d6fb1"
     },
     {
-      "rel": "src/lib/components/ui/gaming/n64/N64Progress.svelte",
+      "rel": "src/lib/components/ui/gaming/n64/N64ProgressBar.svelte",
       "zone": "client",
       "isRoute": false,
       "isSvelteComp": true,
@@ -6975,8 +6988,8 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
-      "hash": "6a8d6fb1"
+      "directFanOut": 1,
+      "hash": "82fad47b"
     },
     {
       "rel": "src/lib/components/ui/gaming/n64/N64Screen.svelte",
@@ -7083,7 +7096,7 @@
       "hash": "657bda70"
     },
     {
-      "rel": "src/lib/components/ui/gaming/n64/N64Checkbox.svelte",
+      "rel": "src/lib/components/ui/gaming/n64/N64Toggle.svelte",
       "zone": "client",
       "isRoute": false,
       "isSvelteComp": true,
@@ -7091,9 +7104,9 @@
       "lineCount": 6,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 2,
-      "hash": "397961d2"
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "19280432"
     },
     {
       "rel": "src/lib/components/ui/gaming/n64/ProgressBar.svelte",
@@ -8422,6 +8435,19 @@
       "hash": "d6ff4f83"
     },
     {
+      "rel": "src/lib/components/webgpu/SwarmManifoldVisualizer.svelte",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 264,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "6b4997fa"
+    },
+    {
       "rel": "src/lib/components/webgpu/WebGPUTopologyRenderer.svelte",
       "zone": "client",
       "isRoute": false,
@@ -8496,7 +8522,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "1a9cb5f3"
     },
     {
@@ -8508,7 +8534,7 @@
       "lineCount": 126,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 2,
       "directFanOut": 0,
       "hash": "f0ea0b67"
     },
@@ -8535,7 +8561,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 2,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "2f557803"
     },
     {
@@ -8548,7 +8574,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "686e5d91"
     },
     {
@@ -8587,7 +8613,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "97badeb4"
     },
     {
@@ -8625,7 +8651,7 @@
       "lineCount": 73,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 2,
       "directFanOut": 0,
       "hash": "f3f5da07"
     },
@@ -8703,7 +8729,7 @@
       "lineCount": 209,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 3,
+      "directFanIn": 2,
       "directFanOut": 0,
       "hash": "8b2d5864"
     },
@@ -8717,7 +8743,7 @@
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 6,
+      "directFanOut": 3,
       "hash": "51d0014f"
     },
     {
@@ -8756,7 +8782,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 4,
+      "directFanOut": 2,
       "hash": "dd84baf1"
     },
     {
@@ -8769,7 +8795,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 6,
+      "directFanOut": 3,
       "hash": "0a081f80"
     },
     {
@@ -8781,7 +8807,7 @@
       "lineCount": 281,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 2,
       "directFanOut": 0,
       "hash": "70a1bfc0"
     },
@@ -8794,7 +8820,7 @@
       "lineCount": 136,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 1,
       "directFanOut": 0,
       "hash": "2ba5d52f"
     },
@@ -8807,7 +8833,7 @@
       "lineCount": 152,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 1,
       "directFanOut": 0,
       "hash": "c4a78550"
     },
@@ -8912,7 +8938,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "be3f8c55"
     },
     {
@@ -9610,7 +9636,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 256,
+      "lineCount": 365,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
@@ -10406,7 +10432,7 @@
       "lineCount": 95,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 2,
+      "directFanIn": 1,
       "directFanOut": 0,
       "hash": "81ca99d9"
     },
@@ -10429,7 +10455,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 3989,
+      "lineCount": 3998,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 32,
@@ -10484,7 +10510,7 @@
       "lineCount": 63,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 1,
       "hash": "0e4a4c33"
     },
@@ -10684,6 +10710,19 @@
       "hash": "a133080d"
     },
     {
+      "rel": "src/lib/server/ace/token-aware-packer.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 301,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "faa9d765"
+    },
+    {
       "rel": "src/lib/server/ace/tool-response-summarizer.ts",
       "zone": "server",
       "isRoute": false,
@@ -10715,7 +10754,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 645,
+      "lineCount": 647,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 15,
@@ -10897,11 +10936,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1466,
+      "lineCount": 1494,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 7,
+      "directFanOut": 8,
       "hash": "303b43cb"
     },
     {
@@ -10992,7 +11031,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 6,
+      "directFanOut": 5,
       "hash": "edba6f2a"
     },
     {
@@ -11009,29 +11048,16 @@
       "hash": "c60fa095"
     },
     {
-      "rel": "src/lib/server/agent/tools/web-search-searxng.ts",
-      "zone": "server",
-      "isRoute": false,
-      "isSvelteComp": false,
-      "isTest": false,
-      "lineCount": 456,
-      "hasAuth": false,
-      "hasZod": true,
-      "directFanIn": 3,
-      "directFanOut": 1,
-      "hash": "693ea8d5"
-    },
-    {
       "rel": "src/lib/server/agent/tools/web-search.ts",
       "zone": "server",
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 274,
+      "lineCount": 455,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 0,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "b1ae4e9d"
     },
     {
@@ -11399,6 +11425,19 @@
       "hash": "af84e51d"
     },
     {
+      "rel": "src/lib/server/ai/backend-runtime-guards.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 22,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 4,
+      "directFanOut": 2,
+      "hash": "dbfee85d"
+    },
+    {
       "rel": "src/lib/server/ai/bifrost-cache-manager.ts",
       "zone": "server",
       "isRoute": false,
@@ -11443,7 +11482,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 301,
+      "lineCount": 308,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 29,
@@ -11499,7 +11538,7 @@
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 4,
-      "directFanOut": 11,
+      "directFanOut": 10,
       "hash": "4e83273b"
     },
     {
@@ -11508,10 +11547,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 56,
+      "lineCount": 77,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 3,
       "directFanOut": 0,
       "hash": "ae4ce6ed"
     },
@@ -11586,11 +11625,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 2050,
+      "lineCount": 2080,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 4,
-      "directFanOut": 26,
+      "directFanOut": 28,
       "hash": "cff1a8c0"
     },
     {
@@ -11633,16 +11672,263 @@
       "hash": "71bd527a"
     },
     {
+      "rel": "src/lib/server/ai/hermes/deep-research-dag.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 778,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 11,
+      "hash": "3ac5710c"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/dispatcher.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 186,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 3,
+      "directFanOut": 4,
+      "hash": "9d6627e8"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/batch.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 71,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "479edccb"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/codebase.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 101,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "e7afc3de"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/evidence.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 90,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "a160358a"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/gpu-acceleration.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 122,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "9d4ef446"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/graph.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 169,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "0bda898f"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/legal-case.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 184,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "85c55cb4"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/memory.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 141,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "04130493"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/registry.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 62,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 14,
+      "directFanOut": 13,
+      "hash": "661cc345"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/repair.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 71,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "22b4baeb"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/research.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 119,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "8c645013"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/simulation.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 74,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "12461641"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/system-audit.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 95,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 2,
+      "directFanOut": 1,
+      "hash": "e297d67a"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/ui-diagnostics.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 110,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "1c216626"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/skills/vector-cluster.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 107,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "8657c0eb"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/test-dispatcher.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 48,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "d6b16a20"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/tools/db-schema-tools.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 49,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "611fb7a5"
+    },
+    {
+      "rel": "src/lib/server/ai/hermes/tools/registry.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 827,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 2,
+      "directFanOut": 13,
+      "hash": "950d6794"
+    },
+    {
       "rel": "src/lib/server/ai/hermes-executor.ts",
       "zone": "server",
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 413,
+      "lineCount": 77,
       "hasAuth": false,
-      "hasZod": true,
+      "hasZod": false,
       "directFanIn": 2,
-      "directFanOut": 11,
+      "directFanOut": 2,
       "hash": "4fa0e0a6"
     },
     {
@@ -11651,11 +11937,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 364,
+      "lineCount": 374,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 4,
-      "directFanOut": 3,
+      "directFanIn": 5,
+      "directFanOut": 4,
       "hash": "9ace19bd"
     },
     {
@@ -11664,11 +11950,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 209,
+      "lineCount": 351,
       "hasAuth": false,
-      "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 3,
+      "hasZod": true,
+      "directFanIn": 2,
+      "directFanOut": 7,
       "hash": "f863f3c1"
     },
     {
@@ -11680,9 +11966,22 @@
       "lineCount": 273,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 8,
+      "directFanIn": 7,
       "directFanOut": 4,
       "hash": "3656b9ca"
+    },
+    {
+      "rel": "src/lib/server/ai/inference-configs.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 58,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 13,
+      "directFanOut": 2,
+      "hash": "302db1f0"
     },
     {
       "rel": "src/lib/server/ai/information-gain-validator.ts",
@@ -11703,7 +12002,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 218,
+      "lineCount": 230,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 4,
@@ -11755,11 +12054,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 690,
+      "lineCount": 705,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 6,
-      "directFanOut": 4,
+      "directFanIn": 7,
+      "directFanOut": 5,
       "hash": "11a6f05b"
     },
     {
@@ -11875,7 +12174,7 @@
       "lineCount": 233,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 2,
+      "directFanIn": 3,
       "directFanOut": 2,
       "hash": "90f5867a"
     },
@@ -11885,12 +12184,25 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 149,
+      "lineCount": 163,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 1,
+      "directFanOut": 3,
       "hash": "1c37f17e"
+    },
+    {
+      "rel": "src/lib/server/ai/model-security.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 87,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 3,
+      "hash": "568c4c3c"
     },
     {
       "rel": "src/lib/server/ai/multi-query-generator.ts",
@@ -11963,11 +12275,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 449,
+      "lineCount": 471,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 9,
-      "directFanOut": 9,
+      "directFanOut": 11,
       "hash": "63b24533"
     },
     {
@@ -12114,6 +12426,19 @@
       "hash": "befa2373"
     },
     {
+      "rel": "src/lib/server/ai/whisper.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 51,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "d9a7d462"
+    },
+    {
       "rel": "src/lib/server/analysis/analysis-jobs.ts",
       "zone": "server",
       "isRoute": false,
@@ -12229,6 +12554,19 @@
       "directFanIn": 2,
       "directFanOut": 0,
       "hash": "d51a45b6"
+    },
+    {
+      "rel": "src/lib/server/analysis/media-processing.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 158,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 2,
+      "directFanOut": 1,
+      "hash": "0de5ca85"
     },
     {
       "rel": "src/lib/server/analysis/summarizer.ts",
@@ -12379,7 +12717,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 675,
+      "lineCount": 674,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 2,
@@ -13370,7 +13708,7 @@
       "lineCount": 142,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 525,
+      "directFanIn": 531,
       "directFanOut": 7,
       "hash": "0d33d955"
     },
@@ -14207,6 +14545,19 @@
       "hash": "4d78cec0"
     },
     {
+      "rel": "src/lib/server/db/schema/models.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 25,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "6e85c72f"
+    },
+    {
       "rel": "src/lib/server/db/schema/page-artifacts.ts",
       "zone": "server",
       "isRoute": false,
@@ -14394,7 +14745,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 76,
+      "lineCount": 77,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
@@ -14667,10 +15018,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 147,
+      "lineCount": 148,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 98,
+      "directFanIn": 103,
       "directFanOut": 10,
       "hash": "dc051353"
     },
@@ -15009,7 +15360,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 2,
-      "directFanOut": 8,
+      "directFanOut": 4,
       "hash": "c3871837"
     },
     {
@@ -15052,7 +15403,7 @@
       "hash": "ab60a5ed"
     },
     {
-      "rel": "src/lib/server/embedding/ollama-embed.ts",
+      "rel": "src/lib/server/embeddings/ollama.ts",
       "zone": "server",
       "isRoute": false,
       "isSvelteComp": false,
@@ -15060,9 +15411,9 @@
       "lineCount": 70,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
-      "directFanOut": 8,
-      "hash": "c3871837"
+      "directFanIn": 0,
+      "directFanOut": 4,
+      "hash": "b6bbe4aa"
     },
     {
       "rel": "src/lib/server/endpoints.ts",
@@ -15112,7 +15463,7 @@
       "lineCount": 345,
       "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 470,
+      "directFanIn": 475,
       "directFanOut": 0,
       "hash": "2cfc0822"
     },
@@ -15798,11 +16149,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1475,
+      "lineCount": 1486,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 50,
-      "directFanOut": 1,
+      "directFanIn": 51,
+      "directFanOut": 2,
       "hash": "2449d0d6"
     },
     {
@@ -15853,7 +16204,7 @@
       "lineCount": 578,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 13,
+      "directFanIn": 14,
       "directFanOut": 0,
       "hash": "f6c34037"
     },
@@ -16045,7 +16396,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1487,
+      "lineCount": 1488,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 9,
@@ -16090,6 +16441,19 @@
       "directFanIn": 3,
       "directFanOut": 2,
       "hash": "237339bf"
+    },
+    {
+      "rel": "src/lib/server/graph/neo4j-jsonl-exporter.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 126,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "fe1f9a73"
     },
     {
       "rel": "src/lib/server/graph/neo4j-schema.ts",
@@ -16204,7 +16568,7 @@
       "lineCount": 910,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 96,
+      "directFanIn": 98,
       "directFanOut": 7,
       "hash": "0b5bb29d"
     },
@@ -16227,10 +16591,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 428,
+      "lineCount": 550,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 8,
+      "directFanIn": 9,
       "directFanOut": 5,
       "hash": "4754695d"
     },
@@ -16802,7 +17166,7 @@
       "lineCount": 279,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 3,
       "directFanOut": 2,
       "hash": "55461275"
     },
@@ -17722,11 +18086,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1372,
+      "lineCount": 1377,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 183,
-      "directFanOut": 11,
+      "directFanIn": 185,
+      "directFanOut": 12,
       "hash": "b3738cdc"
     },
     {
@@ -17969,7 +18333,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 647,
+      "lineCount": 662,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 7,
@@ -18008,7 +18372,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 2066,
+      "lineCount": 2227,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 28,
@@ -18323,7 +18687,7 @@
       "lineCount": 324,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 275,
+      "directFanIn": 274,
       "directFanOut": 1,
       "hash": "46ee6e0b"
     },
@@ -18713,7 +19077,7 @@
       "lineCount": 101,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 2,
       "directFanOut": 7,
       "hash": "fb776a61"
     },
@@ -18765,7 +19129,7 @@
       "lineCount": 251,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 3,
+      "directFanIn": 2,
       "directFanOut": 2,
       "hash": "64d6f974"
     },
@@ -18973,7 +19337,7 @@
       "lineCount": 121,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 5,
       "directFanOut": 1,
       "hash": "085c7bf4"
     },
@@ -19363,7 +19727,7 @@
       "lineCount": 121,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 26,
+      "directFanIn": 27,
       "directFanOut": 2,
       "hash": "93d54992"
     },
@@ -19516,7 +19880,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 275,
+      "lineCount": 308,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -19581,7 +19945,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 361,
+      "lineCount": 365,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 14,
@@ -20499,6 +20863,19 @@
       "hash": "8c8a526f"
     },
     {
+      "rel": "src/lib/server/vector/clustering-service.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 103,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "b78c62b9"
+    },
+    {
       "rel": "src/lib/server/vector/embedding-gemma.ts",
       "zone": "server",
       "isRoute": false,
@@ -20608,11 +20985,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 907,
+      "lineCount": 960,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 79,
-      "directFanOut": 9,
+      "directFanIn": 81,
+      "directFanOut": 10,
       "hash": "d5ba4aa4"
     },
     {
@@ -23515,17 +23892,17 @@
       "hash": "ec6a9a1b"
     },
     {
-      "rel": "src/lib/components/phase78/ErrorEventsList.svelte",
-      "zone": "client",
+      "rel": "src/routes/(admin)/error-brain/components/ErrorEventsList.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 148,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 2,
-      "hash": "7a7686d0"
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "58add69e"
     },
     {
       "rel": "src/routes/(admin)/error-brain/components/ErrorModal.svelte",
@@ -23576,7 +23953,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 6,
+      "directFanOut": 3,
       "hash": "85f23fa9"
     },
     {
@@ -23589,7 +23966,7 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "f0269012"
     },
     {
@@ -23615,7 +23992,7 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "35481355"
     },
     {
@@ -23641,7 +24018,7 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "ab21c49e"
     },
     {
@@ -23658,7 +24035,7 @@
       "hash": "f6a2dca2"
     },
     {
-      "rel": "src/routes/(analysis)/+layout.server.ts",
+      "rel": "src/routes/(analysis)@/+layout.server.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -23668,10 +24045,10 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "aa9c1383"
+      "hash": "7ed3e0eb"
     },
     {
-      "rel": "src/routes/(analysis)/+layout.svelte",
+      "rel": "src/routes/(analysis)@/+layout.svelte",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": true,
@@ -23680,11 +24057,11 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 6,
-      "hash": "85f23fa9"
+      "directFanOut": 3,
+      "hash": "4376a8a8"
     },
     {
-      "rel": "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
+      "rel": "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -23693,8 +24070,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
-      "hash": "f0269012"
+      "directFanOut": 1,
+      "hash": "a84b614d"
     },
     {
       "rel": "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
@@ -23710,7 +24087,7 @@
       "hash": "4793f458"
     },
     {
-      "rel": "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
+      "rel": "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -23719,8 +24096,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
-      "hash": "35481355"
+      "directFanOut": 1,
+      "hash": "5c693555"
     },
     {
       "rel": "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
@@ -23736,7 +24113,7 @@
       "hash": "15e07835"
     },
     {
-      "rel": "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
+      "rel": "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -23745,8 +24122,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
-      "hash": "ab21c49e"
+      "directFanOut": 1,
+      "hash": "0db531b8"
     },
     {
       "rel": "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte",
@@ -23931,7 +24308,7 @@
       "hash": "539f5b84"
     },
     {
-      "rel": "src/routes/(app)/admin/ai-dashboard/lab/+page.ts",
+      "rel": "src/routes/(app)/admin/ai-dashboard/operator/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -23941,7 +24318,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "2a4f07fb"
+      "hash": "180ba0e2"
     },
     {
       "rel": "src/routes/(app)/admin/all-routes/$types.d.ts",
@@ -24074,7 +24451,7 @@
       "hash": "5551824a"
     },
     {
-      "rel": "src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "rel": "src/routes/(app)/admin/cache/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -24084,7 +24461,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "97485d2b"
+      "hash": "4de551f8"
     },
     {
       "rel": "src/routes/(app)/admin/cache/+page.svelte",
@@ -24274,7 +24651,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 876,
+      "lineCount": 875,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
@@ -24425,7 +24802,7 @@
       "hash": "69f1bdd5"
     },
     {
-      "rel": "src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "rel": "src/routes/(app)/admin/error-brain/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -24435,7 +24812,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "97485d2b"
+      "hash": "c5d04484"
     },
     {
       "rel": "src/routes/(app)/admin/error-brain/+page.svelte",
@@ -24755,7 +25132,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 1593,
+      "lineCount": 1591,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
@@ -24932,7 +25309,7 @@
       "hash": "dcb17c17"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/+page.ts",
+      "rel": "src/routes/(app)/analysis-center/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -24942,7 +25319,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "95fa4278"
+      "hash": "8e694c9a"
     },
     {
       "rel": "src/routes/(app)/analysis-center/schema.ts",
@@ -25175,7 +25552,7 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 6,
+      "directFanOut": 1,
       "hash": "fac359e7"
     },
     {
@@ -25231,7 +25608,7 @@
       "hash": "4dc993ea"
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/cases/[id]/canvas/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -25240,8 +25617,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 6,
-      "hash": "fac359e7"
+      "directFanOut": 1,
+      "hash": "6c9a665f"
     },
     {
       "rel": "src/routes/(app)/cases/[id]/canvas/+page.svelte",
@@ -25270,7 +25647,7 @@
       "hash": "d8b99006"
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/cases/[id]/chat/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -25279,8 +25656,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 6,
-      "hash": "fac359e7"
+      "directFanOut": 1,
+      "hash": "8d4fbd0f"
     },
     {
       "rel": "src/routes/(app)/cases/[id]/chat/+page.svelte",
@@ -25413,7 +25790,7 @@
       "hash": "c17bba41"
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/cases/[id]/persons/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -25422,8 +25799,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 6,
-      "hash": "fac359e7"
+      "directFanOut": 1,
+      "hash": "7335ae97"
     },
     {
       "rel": "src/routes/(app)/cases/[id]/persons/+page.svelte",
@@ -25483,11 +25860,11 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 73,
+      "lineCount": 81,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 1,
+      "directFanOut": 3,
       "hash": "843707b8"
     },
     {
@@ -25539,7 +25916,7 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "6a00072f"
     },
     {
@@ -25808,11 +26185,11 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 157,
+      "lineCount": 343,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "6cc34ad4"
     },
     {
@@ -26193,7 +26570,7 @@
       "hash": "af10bca6"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26203,7 +26580,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "bba411d9"
     },
     {
       "rel": "src/routes/(app)/demos/ace-pipeline/+page.svelte",
@@ -26219,7 +26596,7 @@
       "hash": "5c42878d"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/ace-pipeline/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26229,7 +26606,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "c09382b3"
     },
     {
       "rel": "src/routes/(app)/demos/agent-chat/+page.svelte",
@@ -26245,7 +26622,7 @@
       "hash": "a046a202"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/agent-chat/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26255,7 +26632,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "0235e9ba"
     },
     {
       "rel": "src/routes/(app)/demos/agentic-errors/+layout.svelte",
@@ -26362,7 +26739,7 @@
       "hash": "e2350cb7"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/ai-assistant/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26372,7 +26749,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "015138a9"
     },
     {
       "rel": "src/routes/(app)/demos/ai-chat-test/+page.svelte",
@@ -26388,7 +26765,7 @@
       "hash": "cdde09cf"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/ai-chat-test/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26398,7 +26775,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "094b285b"
     },
     {
       "rel": "src/routes/(app)/demos/ai-file-upload/+page.svelte",
@@ -26414,7 +26791,7 @@
       "hash": "d1dc18b9"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/ai-file-upload/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26424,7 +26801,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "cce80103"
     },
     {
       "rel": "src/routes/(app)/demos/ask-ai/+page.svelte",
@@ -26440,7 +26817,7 @@
       "hash": "7dc7df8e"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/ask-ai/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26450,7 +26827,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "1384b800"
     },
     {
       "rel": "src/routes/(app)/demos/bento-dashboard/+page.svelte",
@@ -26479,7 +26856,7 @@
       "hash": "c8e39ec0"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/bits-ui/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26489,7 +26866,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "c3ef8cdd"
     },
     {
       "rel": "src/routes/(app)/demos/cache/+page.svelte",
@@ -26505,7 +26882,7 @@
       "hash": "e85b1de4"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/cache/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26515,7 +26892,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "47004aaf"
     },
     {
       "rel": "src/routes/(app)/demos/case-form/+page.svelte",
@@ -26531,7 +26908,7 @@
       "hash": "005d24ef"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/case-form/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26541,7 +26918,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "654a8630"
     },
     {
       "rel": "src/routes/(app)/demos/case-prediction/+page.svelte",
@@ -26583,7 +26960,7 @@
       "hash": "a61c1d7e"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/celestial-icons/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26593,7 +26970,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "8372a30f"
     },
     {
       "rel": "src/routes/(app)/demos/chat-messages/+page.svelte",
@@ -26609,7 +26986,7 @@
       "hash": "bf98130b"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/chat-messages/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26619,7 +26996,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "1c10d949"
     },
     {
       "rel": "src/routes/(app)/demos/chunks-ui/+page.svelte",
@@ -26648,7 +27025,7 @@
       "hash": "6f713098"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/citation-tools/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26658,7 +27035,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "84b04e94"
     },
     {
       "rel": "src/routes/(app)/demos/client-ai-chat/+page.svelte",
@@ -26674,7 +27051,7 @@
       "hash": "bcc83f0e"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/client-ai-chat/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26684,7 +27061,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "1c6eac06"
     },
     {
       "rel": "src/routes/(app)/demos/client-inference/+page.svelte",
@@ -26700,7 +27077,7 @@
       "hash": "b30abb2e"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/client-inference/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26710,7 +27087,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "d2461788"
     },
     {
       "rel": "src/routes/(app)/demos/codebase-graph/+page.svelte",
@@ -26739,7 +27116,7 @@
       "hash": "d1e4b913"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/collab-canvas/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26749,7 +27126,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "1b18cdcb"
     },
     {
       "rel": "src/routes/(app)/demos/context-menu/+page.svelte",
@@ -26765,7 +27142,7 @@
       "hash": "e3a4644c"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/context-menu/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26775,7 +27152,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "e756b111"
     },
     {
       "rel": "src/routes/(app)/demos/contextual-chat/+page.svelte",
@@ -26791,7 +27168,7 @@
       "hash": "9a69edac"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/contextual-chat/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26801,7 +27178,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "0fd04a46"
     },
     {
       "rel": "src/routes/(app)/demos/courtroom-sim/+page.server.ts",
@@ -26830,7 +27207,7 @@
       "hash": "1f88659e"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/courtroom-sim/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26840,7 +27217,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "a42bd50b"
     },
     {
       "rel": "src/routes/(app)/demos/crime-reconstruction/+page.svelte",
@@ -26882,7 +27259,7 @@
       "hash": "ad1f9af5"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/detective-command/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26892,7 +27269,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "f9b6f55f"
     },
     {
       "rel": "src/routes/(app)/demos/dialog-wrapper/+page.svelte",
@@ -26908,7 +27285,7 @@
       "hash": "ca287639"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/dialog-wrapper/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26918,7 +27295,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "392a21c1"
     },
     {
       "rel": "src/routes/(app)/demos/document-summarizer/+page.svelte",
@@ -26947,7 +27324,7 @@
       "hash": "eda9954f"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/embedding-stream/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26957,7 +27334,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "e1b96578"
     },
     {
       "rel": "src/routes/(app)/demos/enhanced-upload/+page.svelte",
@@ -26973,7 +27350,7 @@
       "hash": "a102098f"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/enhanced-upload/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -26983,7 +27360,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "6050672b"
     },
     {
       "rel": "src/routes/(app)/demos/evidence-canvas/+page.svelte",
@@ -26999,7 +27376,7 @@
       "hash": "ac460ffe"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/evidence-canvas/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27009,7 +27386,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "ad8eaac1"
     },
     {
       "rel": "src/routes/(app)/demos/evidence-dashboard/+page.svelte",
@@ -27025,7 +27402,7 @@
       "hash": "cba4c997"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/evidence-dashboard/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27035,7 +27412,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "eb41044f"
     },
     {
       "rel": "src/routes/(app)/demos/evidence-form/+page.svelte",
@@ -27051,7 +27428,7 @@
       "hash": "6b1dacc6"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/evidence-form/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27061,7 +27438,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "c1f69f1f"
     },
     {
       "rel": "src/routes/(app)/demos/gpu-cache/+page.svelte",
@@ -27077,7 +27454,7 @@
       "hash": "c4a1e0bd"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/gpu-cache/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27087,7 +27464,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "71af9e8c"
     },
     {
       "rel": "src/routes/(app)/demos/hover-card/+page.svelte",
@@ -27103,7 +27480,7 @@
       "hash": "3767bb78"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/hover-card/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27113,7 +27490,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "8ee50da4"
     },
     {
       "rel": "src/routes/(app)/demos/icons/+page.svelte",
@@ -27155,7 +27532,7 @@
       "hash": "cc25ce55"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/keyboard-shortcuts/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27165,7 +27542,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "e6d7de5a"
     },
     {
       "rel": "src/routes/(app)/demos/knowledge-graph/+page.svelte",
@@ -27194,7 +27571,7 @@
       "hash": "d091c7af"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/legal-layout/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27204,7 +27581,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "c45a6f5b"
     },
     {
       "rel": "src/routes/(app)/demos/legal-spellbook/+page.svelte",
@@ -27220,7 +27597,7 @@
       "hash": "46704d80"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/legal-spellbook/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27230,7 +27607,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "7572881c"
     },
     {
       "rel": "src/routes/(app)/demos/memory-palace/+page.server.ts",
@@ -27272,7 +27649,7 @@
       "hash": "8cbbdeb6"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/modals/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27282,7 +27659,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "4d7920dd"
     },
     {
       "rel": "src/routes/(app)/demos/modular-upload/+page.svelte",
@@ -27298,7 +27675,7 @@
       "hash": "08934ee1"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/modular-upload/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27308,7 +27685,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "30cbc4fa"
     },
     {
       "rel": "src/routes/(app)/demos/nes-bits-ui/+page.server.ts",
@@ -27402,7 +27779,7 @@
       "hash": "e437b48d"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/nes-toast/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27412,7 +27789,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "acfbc8ec"
     },
     {
       "rel": "src/routes/(app)/demos/nier-showcase/+page.svelte",
@@ -27428,7 +27805,7 @@
       "hash": "8b94eb8f"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/nier-showcase/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27438,7 +27815,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "eb2b827c"
     },
     {
       "rel": "src/routes/(app)/demos/notifications/+page.svelte",
@@ -27454,7 +27831,7 @@
       "hash": "99b01223"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/notifications/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27464,7 +27841,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "d91056c2"
     },
     {
       "rel": "src/routes/(app)/demos/page-layouts/+page.svelte",
@@ -27506,7 +27883,7 @@
       "hash": "9eb881df"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/phantom-code-lab/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27516,7 +27893,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "4c50d0d9"
     },
     {
       "rel": "src/routes/(app)/demos/prosecutor-dashboard/+page.svelte",
@@ -27532,7 +27909,7 @@
       "hash": "1eff7b5f"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/prosecutor-dashboard/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27542,7 +27919,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "7a64fbb6"
     },
     {
       "rel": "src/routes/(app)/demos/rag-documents/+page.svelte",
@@ -27584,7 +27961,7 @@
       "hash": "80ee3575"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/rich-text-editor/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27594,7 +27971,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "6d9bde25"
     },
     {
       "rel": "src/routes/(app)/demos/scene-intent-2d/+page.server.ts",
@@ -27636,7 +28013,7 @@
       "hash": "8f2f750e"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/search-tools/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27646,7 +28023,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "115a4d88"
     },
     {
       "rel": "src/routes/(app)/demos/smart-positioning/+page.svelte",
@@ -27675,7 +28052,7 @@
       "hash": "209ad723"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/source-drawer/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27685,7 +28062,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "ceadc58a"
     },
     {
       "rel": "src/routes/(app)/demos/spotlight/+page.svelte",
@@ -27714,7 +28091,7 @@
       "hash": "5c0aab24"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/stats-panel/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27724,7 +28101,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "2df76804"
     },
     {
       "rel": "src/routes/(app)/demos/streaming/+page.svelte",
@@ -27740,7 +28117,7 @@
       "hash": "8e94964d"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/streaming/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27750,7 +28127,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "6d78a55e"
     },
     {
       "rel": "src/routes/(app)/demos/svelte5-components/+page.svelte",
@@ -27792,7 +28169,7 @@
       "hash": "a18c198c"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/svelte5-primitives/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27802,7 +28179,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "15c53b69"
     },
     {
       "rel": "src/routes/(app)/demos/synthesis-chat/+page.svelte",
@@ -27818,7 +28195,7 @@
       "hash": "60be7b03"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/synthesis-chat/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27828,7 +28205,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "fde4c294"
     },
     {
       "rel": "src/routes/(app)/demos/theory-board/+page.svelte",
@@ -27844,7 +28221,7 @@
       "hash": "ed69d6f6"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/theory-board/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27854,7 +28231,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "771d2c6e"
     },
     {
       "rel": "src/routes/(app)/demos/toc-reader/+page.svelte",
@@ -27870,7 +28247,7 @@
       "hash": "206e5647"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/toc-reader/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27880,7 +28257,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "b40ba467"
     },
     {
       "rel": "src/routes/(app)/demos/ui-components/+page.svelte",
@@ -27896,7 +28273,7 @@
       "hash": "e0904d21"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/ui-components/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27906,7 +28283,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "b7b3e675"
     },
     {
       "rel": "src/routes/(app)/demos/unified-dashboard/+page.svelte",
@@ -27948,7 +28325,7 @@
       "hash": "9747c145"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/webgpu-memory-palace/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27958,7 +28335,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "24a82ea7"
     },
     {
       "rel": "src/routes/(app)/demos/webgpu-showcase/+page.svelte",
@@ -27974,7 +28351,7 @@
       "hash": "85602cb0"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/webgpu-showcase/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -27984,7 +28361,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "dd0a546b"
     },
     {
       "rel": "src/routes/(app)/demos/yorha/+page.svelte",
@@ -28000,7 +28377,7 @@
       "hash": "af225f98"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/yorha/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -28010,7 +28387,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "42ff5c62"
     },
     {
       "rel": "src/routes/(app)/demos/yorha/components/cases/CaseFilters.svelte",
@@ -28052,30 +28429,30 @@
       "hash": "9bf89efa"
     },
     {
-      "rel": "src/lib/components/yorha/CaseTheoryConstructor.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/CaseTheoryConstructor.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 758,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 2,
-      "hash": "1a9cb5f3"
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "87ffb16c"
     },
     {
-      "rel": "src/lib/components/yorha/ContradictionReveal.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/ContradictionReveal.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 126,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 1,
       "directFanOut": 0,
-      "hash": "f0ea0b67"
+      "hash": "86a4759a"
     },
     {
       "rel": "src/routes/(app)/demos/yorha/components/CrossExaminationAssistant.svelte",
@@ -28091,30 +28468,30 @@
       "hash": "11e52c8b"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/ActiveCasesWidget.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/dashboard/ActiveCasesWidget.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 174,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 2,
-      "directFanOut": 2,
-      "hash": "2f557803"
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "7659ded0"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/EvidenceStats.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/dashboard/EvidenceStats.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 168,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 2,
-      "hash": "686e5d91"
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "e69ae771"
     },
     {
       "rel": "src/routes/(app)/demos/yorha/components/dashboard/GPUMetrics.svelte",
@@ -28130,43 +28507,43 @@
       "hash": "4d1b9f00"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/dashboard/RecentActivity.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
       "lineCount": 1,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "9d64c167"
+      "hash": "35023e9d"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/SystemOverview.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/dashboard/SystemOverview.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 203,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 2,
-      "hash": "97badeb4"
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "5941ac4e"
     },
     {
-      "rel": "src/lib/components/yorha/DetectiveEvidenceMap.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/DetectiveEvidenceMap.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 531,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "26f9f3b0"
+      "hash": "9d55fa31"
     },
     {
       "rel": "src/routes/(app)/demos/yorha/components/EnhancedYoRHaAIAssistant.svelte",
@@ -28182,17 +28559,17 @@
       "hash": "5a247ebd"
     },
     {
-      "rel": "src/lib/components/yorha/evidence/EvidenceComparisonOverlay.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/evidence/EvidenceComparisonOverlay.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 73,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 1,
       "directFanOut": 0,
-      "hash": "f3f5da07"
+      "hash": "8098547a"
     },
     {
       "rel": "src/routes/(app)/demos/yorha/components/evidence/EvidenceFilters.svelte",
@@ -28234,17 +28611,17 @@
       "hash": "68f7645a"
     },
     {
-      "rel": "src/lib/components/yorha/EvidenceBoard.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/EvidenceBoard.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 336,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "abdb952f"
+      "hash": "14f98862"
     },
     {
       "rel": "src/routes/(app)/demos/yorha/components/JudicialAnalysisAgent.svelte",
@@ -28260,43 +28637,43 @@
       "hash": "4a25d7ff"
     },
     {
-      "rel": "src/lib/components/yorha/PhoenixEventMonitor.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/PhoenixEventMonitor.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 209,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": true,
-      "directFanIn": 3,
+      "directFanIn": 1,
       "directFanOut": 0,
-      "hash": "8b2d5864"
+      "hash": "4ce9e244"
     },
     {
-      "rel": "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/PhoenixProsecutorDashboard.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 655,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": true,
-      "directFanIn": 1,
-      "directFanOut": 6,
-      "hash": "51d0014f"
+      "directFanIn": 0,
+      "directFanOut": 3,
+      "hash": "33395455"
     },
     {
-      "rel": "src/lib/components/yorha/PoliceReportGenerator.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/PoliceReportGenerator.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 323,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "7949e173"
+      "hash": "57d4da38"
     },
     {
       "rel": "src/routes/(app)/demos/yorha/components/YoRHaAIChat.svelte",
@@ -28312,212 +28689,212 @@
       "hash": "10583f37"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaCommandCenter.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaCommandCenter.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 238,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 4,
-      "hash": "dd84baf1"
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "89600484"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDetectiveCommandCenter.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveCommandCenter.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 906,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 6,
-      "hash": "0a081f80"
+      "directFanIn": 0,
+      "directFanOut": 3,
+      "hash": "f3bbb9b6"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDetectiveForm.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveForm.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 281,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 1,
       "directFanOut": 0,
-      "hash": "70a1bfc0"
+      "hash": "884789b2"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDetectiveModal.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveModal.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 136,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 1,
       "directFanOut": 0,
-      "hash": "2ba5d52f"
+      "hash": "1582133e"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDetectiveNotification.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveNotification.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 152,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 1,
       "directFanOut": 0,
-      "hash": "c4a78550"
+      "hash": "02a4d06d"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDialog.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDialog.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 112,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "4b5c9c44"
+      "hash": "ea7f5efa"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaForm.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaForm.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 214,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "c310fc09"
+      "hash": "f1f83314"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaModal.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaModal.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 448,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "f2db3577"
+      "hash": "62bf5954"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaTable.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaTable.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 241,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "da93a139"
+      "hash": "7a078adf"
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaTerminal.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaTerminal.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 231,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "be57766d"
+      "hash": "7079018c"
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/CanvasBoard.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/CanvasBoard.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 497,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "dc153dc2"
+      "hash": "954f7d3d"
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/SystemStatus.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/SystemStatus.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 132,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "81bc45cf"
+      "hash": "4c5b14e6"
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/YoRHaCommandInterface.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/YoRHaCommandInterface.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 600,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
-      "directFanOut": 2,
-      "hash": "be3f8c55"
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "cf899991"
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/YoRHaDataViz.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/YoRHaDataViz.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 658,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "89550166"
+      "hash": "2c85c14f"
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/YoRHaSystemStatus.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/YoRHaSystemStatus.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 140,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "dbacda7b"
+      "hash": "7bf11833"
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/YoRHaTerminal.svelte",
-      "zone": "client",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/YoRHaTerminal.svelte",
+      "zone": "route",
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 244,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "17e8fe56"
+      "hash": "fe2a5b53"
     },
     {
       "rel": "src/routes/(app)/demos/yorha-assistant/+page.svelte",
@@ -28533,7 +28910,7 @@
       "hash": "1ba1ec9a"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/yorha-assistant/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -28543,7 +28920,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "7745eaec"
     },
     {
       "rel": "src/routes/(app)/demos/yorha-icons/+page.svelte",
@@ -28559,7 +28936,7 @@
       "hash": "1f40f8ef"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/yorha-icons/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -28569,7 +28946,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "e62ee6e4"
     },
     {
       "rel": "src/routes/(app)/demos/yorha-terminal/+page.svelte",
@@ -28585,7 +28962,7 @@
       "hash": "ec0dd171"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/yorha-terminal/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -28595,7 +28972,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "c54bc57f"
     },
     {
       "rel": "src/routes/(app)/error-brain/+page.server.ts",
@@ -28676,7 +29053,7 @@
       "hash": "c7f16bf2"
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/evidence/analyze/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -28685,8 +29062,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 6,
-      "hash": "fac359e7"
+      "directFanOut": 1,
+      "hash": "150c5cc0"
     },
     {
       "rel": "src/routes/(app)/evidence/analyze/+page.svelte",
@@ -28702,7 +29079,7 @@
       "hash": "8bc9e8c5"
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/evidence/hash/+page.server.ts",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": false,
@@ -28711,8 +29088,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 6,
-      "hash": "fac359e7"
+      "directFanOut": 1,
+      "hash": "58f2db6a"
     },
     {
       "rel": "src/routes/(app)/evidence/hash/+page.svelte",
@@ -28949,7 +29326,7 @@
       "hash": "7db28631"
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/global-search/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -28959,7 +29336,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "15776125"
+      "hash": "16a47039"
     },
     {
       "rel": "src/routes/(app)/gpu-evidence-graph/+page.server.ts",
@@ -29001,7 +29378,7 @@
       "hash": "cdfdadb3"
     },
     {
-      "rel": "src/routes/(app)/citations/+layout.svelte",
+      "rel": "src/routes/(app)/legal-corpus/+layout.svelte",
       "zone": "route",
       "isRoute": true,
       "isSvelteComp": true,
@@ -29010,8 +29387,8 @@
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
-      "hash": "6a00072f"
+      "directFanOut": 1,
+      "hash": "be09684a"
     },
     {
       "rel": "src/routes/(app)/legal-corpus/+page.server.ts",
@@ -29365,7 +29742,7 @@
       "hash": "90bb3428"
     },
     {
-      "rel": "src/routes/(app)/admin/codebase-viewer/+page.ts",
+      "rel": "src/routes/(app)/persons-of-interest/[id]/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -29375,7 +29752,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "d554f9c2"
+      "hash": "b9f366f3"
     },
     {
       "rel": "src/routes/(app)/rag-search/+page.svelte",
@@ -29586,7 +29963,7 @@
       "hash": "1db9c3ab"
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/terminal/+page.ts",
       "zone": "route",
       "isRoute": false,
       "isSvelteComp": false,
@@ -29596,7 +29973,7 @@
       "hasZod": false,
       "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "65bcc391"
+      "hash": "877a8667"
     },
     {
       "rel": "src/routes/(app)/webgpu-similarity/+page.svelte",
@@ -30479,7 +30856,7 @@
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 8,
+      "directFanOut": 7,
       "hash": "e8f2fadd"
     },
     {
@@ -30696,11 +31073,11 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 124,
+      "lineCount": 126,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "b60a5fa1"
     },
     {
@@ -30709,11 +31086,11 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 91,
+      "lineCount": 94,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
-      "directFanOut": 3,
+      "directFanOut": 4,
       "hash": "d4999bf9"
     },
     {
@@ -30722,7 +31099,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 103,
+      "lineCount": 107,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 1,
@@ -33647,9 +34024,9 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 45,
+      "lineCount": 56,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "directFanIn": 0,
       "directFanOut": 1,
       "hash": "88691e23"
@@ -34375,11 +34752,11 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 2321,
+      "lineCount": 2353,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 30,
+      "directFanOut": 31,
       "hash": "4379d202"
     },
     {
@@ -35057,6 +35434,19 @@
       "directFanIn": 1,
       "directFanOut": 3,
       "hash": "d2b213ce"
+    },
+    {
+      "rel": "src/routes/api/health/inference/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 36,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 3,
+      "hash": "d507eb9f"
     },
     {
       "rel": "src/routes/api/health/neo4j/+server.ts",
@@ -37105,11 +37495,11 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 213,
+      "lineCount": 218,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 2,
-      "directFanOut": 6,
+      "directFanOut": 7,
       "hash": "65c4d832"
     },
     {
@@ -37118,12 +37508,25 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 331,
+      "lineCount": 339,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 6,
+      "directFanOut": 7,
       "hash": "783f1f8c"
+    },
+    {
+      "rel": "src/routes/api/research/deep/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 47,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "0d53c013"
     },
     {
       "rel": "src/routes/api/research/encode/+server.ts",
@@ -38028,11 +38431,11 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 203,
-      "hasAuth": true,
-      "hasZod": true,
+      "lineCount": 36,
+      "hasAuth": false,
+      "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 1,
       "hash": "15a59a56"
     },
     {
@@ -38405,11 +38808,11 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 417,
+      "lineCount": 370,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 8,
+      "directFanOut": 9,
       "hash": "01033ad2"
     },
     {
@@ -38647,7 +39050,7 @@
       "hash": "f3a790dd"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
+      "rel": "src/shims/camelcase-compat.mjs",
       "zone": "client",
       "isRoute": false,
       "isSvelteComp": false,
@@ -38655,9 +39058,9 @@
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "9d64c167"
+      "hash": "2655d4d3"
     },
     {
       "rel": "src/stores/user.ts",
@@ -41533,17 +41936,17 @@
       "hash": "95e29de8"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "zone": "client",
+      "rel": "tests/is-ready.test.mjs",
+      "zone": "test",
       "isRoute": false,
       "isSvelteComp": false,
-      "isTest": false,
+      "isTest": true,
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "9d64c167"
+      "hash": "42083f80"
     },
     {
       "rel": "tests/kag-cluster-source.spec.ts",
@@ -50521,7 +50924,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": true,
-      "lineCount": 193,
+      "lineCount": 199,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
@@ -50529,17 +50932,17 @@
       "hash": "485809ab"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "zone": "client",
+      "rel": "tests/routes.spec.ts",
+      "zone": "test",
       "isRoute": false,
       "isSvelteComp": false,
-      "isTest": false,
+      "isTest": true,
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "9d64c167"
+      "hash": "8ebf28e8"
     },
     {
       "rel": "tests/rrf-fuse.spec.ts",
@@ -50646,17 +51049,17 @@
       "hash": "8381b0f7"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "zone": "client",
+      "rel": "tests/setup-db.ts",
+      "zone": "test",
       "isRoute": false,
       "isSvelteComp": false,
-      "isTest": false,
+      "isTest": true,
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "9d64c167"
+      "hash": "a68dc632"
     },
     {
       "rel": "tests/setup.ts",
@@ -51023,17 +51426,17 @@
       "hash": "cdde130d"
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "zone": "client",
+      "rel": "tests/uploadMachine.test.ts",
+      "zone": "test",
       "isRoute": false,
       "isSvelteComp": false,
-      "isTest": false,
+      "isTest": true,
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 0,
       "directFanOut": 0,
-      "hash": "9d64c167"
+      "hash": "beeb862c"
     },
     {
       "rel": "tests/user-case-creation.spec.ts",
@@ -51212,7 +51615,7 @@
       "downstreamTruncated": false
     },
     "src/lib/components/ui/Icon.svelte": {
-      "upstreamNodeCount": 311,
+      "upstreamNodeCount": 313,
       "downstreamNodeCount": 15,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -51225,7 +51628,7 @@
     },
     "src/lib/server/ollama.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 29,
+      "downstreamNodeCount": 31,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
@@ -51242,8 +51645,8 @@
       "downstreamTruncated": false
     },
     "src/lib/server/grpc/embedding-client.ts": {
-      "upstreamNodeCount": 460,
-      "downstreamNodeCount": 31,
+      "upstreamNodeCount": 464,
+      "downstreamNodeCount": 33,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51254,19 +51657,19 @@
       "downstreamTruncated": false
     },
     "src/lib/components/ui/Button.svelte": {
-      "upstreamNodeCount": 138,
+      "upstreamNodeCount": 139,
       "downstreamNodeCount": 1,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/vector/qdrant-manager.ts": {
-      "upstreamNodeCount": 444,
-      "downstreamNodeCount": 19,
+      "upstreamNodeCount": 453,
+      "downstreamNodeCount": 20,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/gpu/libtorch-bridge.ts": {
-      "upstreamNodeCount": 426,
+      "upstreamNodeCount": 451,
       "downstreamNodeCount": 3,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -51290,32 +51693,32 @@
       "downstreamTruncated": false
     },
     "src/lib/server/neo4j-driver.ts": {
-      "upstreamNodeCount": 500,
+      "upstreamNodeCount": 380,
       "downstreamNodeCount": 2,
-      "upstreamTruncated": true,
+      "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/ace/context-assembler.ts": {
       "upstreamNodeCount": 45,
-      "downstreamNodeCount": 116,
+      "downstreamNodeCount": 118,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/ai/model-ids.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 1,
+      "downstreamNodeCount": 2,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
     "src/lib/server/ai/code-intel-service.ts": {
       "upstreamNodeCount": 21,
-      "downstreamNodeCount": 37,
+      "downstreamNodeCount": 55,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/queue/rabbitmq-manager-fixed.ts": {
-      "upstreamNodeCount": 235,
-      "downstreamNodeCount": 46,
+      "upstreamNodeCount": 256,
+      "downstreamNodeCount": 51,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51327,7 +51730,7 @@
     },
     "src/lib/server/services/couchdb-client.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 29,
+      "downstreamNodeCount": 31,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
@@ -51339,12 +51742,12 @@
     },
     "src/routes/api/sse/chat/+server.ts": {
       "upstreamNodeCount": 4,
-      "downstreamNodeCount": 141,
+      "downstreamNodeCount": 142,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/cache.ts": {
-      "upstreamNodeCount": 264,
+      "upstreamNodeCount": 285,
       "downstreamNodeCount": 5,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -51369,13 +51772,13 @@
     },
     "src/lib/server/queue/dispatch-inline.ts": {
       "upstreamNodeCount": 67,
-      "downstreamNodeCount": 60,
+      "downstreamNodeCount": 65,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/agents/agents-card-store.ts": {
       "upstreamNodeCount": 101,
-      "downstreamNodeCount": 30,
+      "downstreamNodeCount": 32,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51392,8 +51795,8 @@
       "downstreamTruncated": false
     },
     "src/lib/server/indexer/karpathy-wiki.ts": {
-      "upstreamNodeCount": 49,
-      "downstreamNodeCount": 32,
+      "upstreamNodeCount": 54,
+      "downstreamNodeCount": 34,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51429,7 +51832,7 @@
     },
     "src/lib/server/agents/regen/loaders/types.ts": {
       "upstreamNodeCount": 20,
-      "downstreamNodeCount": 31,
+      "downstreamNodeCount": 33,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51457,6 +51860,12 @@
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
+    "src/lib/server/ai/hermes/skills/registry.ts": {
+      "upstreamNodeCount": 21,
+      "downstreamNodeCount": 14,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
     "src/lib/server/analysis/hmm-ace-analyzer.ts": {
       "upstreamNodeCount": 14,
       "downstreamNodeCount": 7,
@@ -51475,21 +51884,15 @@
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
-    "src/lib/server/research/web-research-ingester.ts": {
-      "upstreamNodeCount": 84,
-      "downstreamNodeCount": 37,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/services/error-analysis/types.ts": {
-      "upstreamNodeCount": 25,
+    "src/lib/server/gpu/pytorch-graph.ts": {
+      "upstreamNodeCount": 483,
       "downstreamNodeCount": 1,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
-    "src/routes/api/codebase-index/+server.ts": {
-      "upstreamNodeCount": 4,
-      "downstreamNodeCount": 30,
+    "src/lib/server/research/web-research-ingester.ts": {
+      "upstreamNodeCount": 84,
+      "downstreamNodeCount": 40,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51535,15 +51938,39 @@
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
+    "src/routes/(analysis)@/+layout.svelte": {
+      "upstreamNodeCount": 1,
+      "downstreamNodeCount": 19,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
+    "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts": {
+      "upstreamNodeCount": 1,
+      "downstreamNodeCount": 17,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
     "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte": {
       "upstreamNodeCount": 1,
       "downstreamNodeCount": 16,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
+    "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts": {
+      "upstreamNodeCount": 1,
+      "downstreamNodeCount": 17,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
     "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte": {
       "upstreamNodeCount": 1,
       "downstreamNodeCount": 16,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
+    "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts": {
+      "upstreamNodeCount": 1,
+      "downstreamNodeCount": 17,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51555,7 +51982,7 @@
     },
     "src/routes/(app)/+layout.svelte": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 82,
+      "downstreamNodeCount": 83,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51603,7 +52030,7 @@
     },
     "src/routes/(app)/admin/ai-dashboard/lab/+page.svelte": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 40,
+      "downstreamNodeCount": 41,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51627,13 +52054,13 @@
     },
     "src/routes/(app)/admin/api-testing/agentic-events/+server.ts": {
       "upstreamNodeCount": 2,
-      "downstreamNodeCount": 33,
+      "downstreamNodeCount": 35,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/routes/(app)/admin/api-testing/agentic-loop/+server.ts": {
       "upstreamNodeCount": 2,
-      "downstreamNodeCount": 33,
+      "downstreamNodeCount": 35,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -51650,6 +52077,12 @@
       "downstreamTruncated": false
     },
     "src/routes/(app)/admin/ast-topology/+page.svelte": {
+      "upstreamNodeCount": 1,
+      "downstreamNodeCount": 1,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
+    "src/routes/(app)/admin/cache/+page.server.ts": {
       "upstreamNodeCount": 1,
       "downstreamNodeCount": 1,
       "upstreamTruncated": false,
@@ -51747,49 +52180,19 @@
     },
     "src/routes/(app)/admin/document-search/+page.server.ts": {
       "upstreamNodeCount": 2,
-      "downstreamNodeCount": 33,
+      "downstreamNodeCount": 35,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/routes/(app)/admin/document-search/+page.svelte": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 34,
+      "downstreamNodeCount": 36,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/routes/(app)/admin/error-analysis/+page.server.ts": {
       "upstreamNodeCount": 1,
       "downstreamNodeCount": 3,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/ace/kag-dag-runner.test.ts": {
-      "upstreamNodeCount": 1,
-      "downstreamNodeCount": 19,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/analytics/web-research-crawler.test.ts": {
-      "upstreamNodeCount": 1,
-      "downstreamNodeCount": 60,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/evidence/docling-structure.test.ts": {
-      "upstreamNodeCount": 1,
-      "downstreamNodeCount": 11,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/gpu/autoencoder-scripts.test.ts": {
-      "upstreamNodeCount": 1,
-      "downstreamNodeCount": 8,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/gpu/autoencoder.test.ts": {
-      "upstreamNodeCount": 1,
-      "downstreamNodeCount": 7,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     }

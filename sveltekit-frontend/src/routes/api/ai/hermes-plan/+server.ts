@@ -8,6 +8,7 @@ import {
   inferPipelineGaps,
   buildFallbackPlan,
 } from '$lib/server/ai/hermes-planner';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 
 // ── Signals shape — shared by both input formats ──────────────────────────────
 
@@ -84,9 +85,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       let plan;
       let source: 'hermes' | 'fallback';
+      const runtime = resolveRuntimeConfig();
 
       try {
-        plan = await runHermesPlanner({ userQuery, aceMode, availableSignals });
+        plan = await runHermesPlanner({ userQuery, aceMode, availableSignals, runtime });
         source = 'hermes';
       } catch {
         // Hermes offline or returned invalid JSON — use deterministic local plan
@@ -94,7 +96,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         source = 'fallback';
       }
 
-      return json({ ok: true, source, plan });
+      return json({ ok: true, source, runtime, plan });
     }
 
     if (action === 'validate') {

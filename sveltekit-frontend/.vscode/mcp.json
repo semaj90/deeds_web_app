@@ -2,12 +2,11 @@
   "mcpServers": {
     "context7-multicore": {
       "command": "node",
-      "args": ["scripts/mcp-multicore-server.mjs"],
+      "args": ["scripts/start-trace-mcp-cluster.mjs", "2"],
       "env": {
-        "MCP_PORT": "3002",
-        "CONTEXT7_GPU_ENABLED": "true",
-        "CONTEXT7_MULTICORE": "true",
-        "NODE_OPTIONS": "--max-old-space-size=4096"
+        "TRACE_MCP_PORT": "8788",
+        "TRACE_MCP_HOST": "127.0.0.1",
+        "TRACE_MCP_WORKERS": "2"
       },
       "capabilities": [
         "file_operations",
@@ -22,14 +21,8 @@
       "timeout": 30000
     },
     "legal-ai-context": {
-      "command": "node",
-      "args": ["../scripts/mcp-multicore-server.mjs"],
-      "env": {
-        "MCP_PORT": "3003",
-        "LEGAL_AI_MODE": "true",
-        "CONTEXT7_LEGAL_DOCS": "true",
-        "GPU_ACCELERATION": "true"
-      },
+      "command": "npm",
+      "args": ["run", "mcp:stdio"],
       "capabilities": [
         "legal_document_analysis",
         "embedding_generation",

@@ -7,7 +7,7 @@
  * Idempotent — re-running updates the existing docs by _rev.
  */
 
-const RAW_URL = process.env.COUCHDB_URL || 'http://admin:legal_ai_pass@localhost:5984';
+const RAW_URL = process.env.COUCHDB_URL || 'http://admin:deeds123@localhost:5984';
 const DB      = 'karpathy_wiki';
 
 // Node fetch refuses URLs with embedded creds — split into base + Basic auth header.

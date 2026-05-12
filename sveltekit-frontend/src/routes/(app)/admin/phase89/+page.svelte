@@ -1,10 +1,8 @@
 <script lang="ts">
   let { data }: { data: PageData } = $props();
 
-	// Migrated to $effect
 	import type { PageData } from './$types';
 
-	// TODO: Convert to $props - // TODO: Convert to $props -
 
 	// Tabs state
 	let activeTab = $state<'search' | 'clusters' | 'graph' | 'pipeline' | 'analysis' | 'knowledge'>('search');

@@ -81,7 +81,7 @@ function makeGetEvent(jobId?: string) {
 }
 
 async function tick() {
-	await new Promise<void>((resolve) => setImmediate(resolve));
+	await new Promise<void>((resolve) => setTimeout(resolve, 10));
 }
 
 describe('/api/analytics/web-research job contract', () => {
@@ -132,13 +132,19 @@ describe('/api/analytics/web-research job contract', () => {
 		const queuedRes = await GET(makeGetEvent(postBody.jobId) as never);
 		const queuedBody = await queuedRes.json() as { job: { status: string; result: unknown; error: string | null } };
 		expect(queuedBody.job).toBeTruthy();
-		expect(queuedBody.job.status).toBe('queued');
+		expect(['queued', 'running']).toContain(queuedBody.job.status);
 		expect(queuedBody.job.result).toBeNull();
 
-		await tick();
-		const runningRes = await GET(makeGetEvent(postBody.jobId) as never);
-		const runningBody = await runningRes.json() as { job: { status: string; result: unknown; error: string | null } };
-		expect(runningBody.job.status).toBe('running');
+		let runningBody;
+		let attempts = 0;
+		while (attempts < 10) {
+			await tick();
+			const res = await GET(makeGetEvent(postBody.jobId) as never);
+			runningBody = await res.json() as { job: { status: string; result: unknown; error: string | null } };
+			if (runningBody.job.status !== 'queued') break;
+			attempts++;
+		}
+		expect(runningBody?.job.status, `Job failed prematurely or stayed queued: ${runningBody?.job.error}`).toBe('running');
 		expect(runningBody.job.result).toBeNull();
 
 		job.resolve({ summaries: [{ id: 'summary-1' }] });

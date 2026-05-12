@@ -25,13 +25,17 @@ skill that covers this layer?" → "what should we do?".
 | **Qdrant** | ✅ official v0.6.0 | [qdrant/mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant) | **Adopt** for generic `qdrant-store` / `qdrant-find`. Keep TRACE-specific tools (`topology.search_4d`, `context.build_kv_packet`) custom because they wrap our 4D manifold + ACE blend — generic Qdrant MCP doesn't know about that |
 | **Neo4j** | ✅ official, supports `NEO4J_READ_ONLY=true` | [neo4j-contrib/mcp-neo4j](https://github.com/neo4j-contrib/mcp-neo4j) | **Adopt read-only**. Mount with `NEO4J_READ_ONLY=true` so write-Cypher is hidden from the model. Replaces several custom Cypher tools we'd otherwise have to maintain |
 | **CouchDB** | ✅ community | [robertoamoreno/couchdb-mcp-server](https://github.com/robertoamoreno/couchdb-mcp-server) | **Adopt for read-only views**. Audit before exposing — community-maintained; pin a commit |
-| **Redis** | ✅ official | [redis/mcp-redis](https://github.com/redis/mcp-redis) | **Adopt for cache introspection** (read-only). Block destructive verbs (DEL/FLUSHDB) via Claude Code hook |
-| **Obsidian vault** | ✅ community (no official) | [bitbonsai/mcpvault](https://github.com/bitbonsai/mcpvault) | **Adopt MCPVault** — filesystem-native, no Obsidian.app required. Aligns with our "vault is a projection" rule (it can read regenerator output without Obsidian running) |
-| **TypeScript LSP** | ✅ multiple options + tsgo | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server), [@typescript/native-preview](https://www.npmjs.com/package/@typescript/native-preview) | **Adopt `mcp-language-server`** for symbol lookup / find references / diagnostics. Already running `tsgo` (TS 7 native preview) for batch typecheck — pair them |
+| **Redis** | ✅ official | [`@modelcontextprotocol/server-redis`](https://www.npmjs.com/package/@modelcontextprotocol/server-redis) | **Adopt for cache introspection** (read-only). Block destructive verbs (DEL/FLUSHDB) via Claude Code hook |
+| **Obsidian vault filesystem** | `npx -y @modelcontextprotocol/server-filesystem <vault-path>` | `@modelcontextprotocol/server-filesystem` | ✅ Official filesystem MCP server; supports read/write/list/search/metadata inside allowed directories |
+| **TypeScript language intelligence** | `tsgo --native-preview` / editor LSP | `@typescript/native-preview` / editor LSP | ✅ Use TypeScript native-preview language service directly; do not mount `mcp-language-server` unless a maintained package is verified |
 | **SvelteKit routes** | ⚠️ partial — Svelte MCP exists for docs, not routes | [sveltejs/ai-tools](https://github.com/sveltejs/ai-tools) | **Build** route-enumeration MCP ourselves — Svelte MCP doesn't introspect `+page.server.ts` / `+server.ts` shape |
 | **"Agentic OS" CLI for codebase ingestion → plan handoff** | ❌ none shipped | — | **Build** (per [synthesis-loop plan](../../../next_steps/active/2026-05-09_gemma4-mcp-synthesis-loop.md)). The user keeps asking — there's no off-the-shelf answer in 2026. Closest references: MindStudio's "agentic OS" pattern guide (concept only) |
 | **"Printing press" codebase→cards pipeline** | ❌ none shipped | — | **Keep our custom Karpathy + AGENTS.md spine** — operationally more complete than any 2026 OSS pattern |
 | **Plugin Marketplace** | ✅ released | [Claude Code changelog](https://claudefa.st/blog/guide/changelog) | **Use for distribution** — Phase E of synthesis-loop plan packages TRACE as a plugin; submit to marketplace once Phase D is stable |
+
+Package verification notes:
+- `mcpvault` is not a verified dependency here; use `@modelcontextprotocol/server-filesystem` for Obsidian vault access instead.
+- `mcp-language-server` is not mounted; use `tsgo --native-preview` / the normal TypeScript language service path directly unless a maintained MCP package is confirmed.
 
 ## "Adopt vs build" — the rule
 
@@ -85,8 +89,7 @@ Claude Code `PreToolUse` hook that denies write verbs.
     },
     "redis-readonly": {
       "command": "node",
-      "args": ["./node_modules/@redis/mcp-redis/dist/index.js"],
-      "env": { "REDIS_URL": "redis://localhost:6379", "READ_ONLY": "true" }
+      "args": ["-y", "@modelcontextprotocol/server-redis", "redis://localhost:6379"]
     },
     "postgres-readonly": {
       "command": "npx",
@@ -95,11 +98,11 @@ Claude Code `PreToolUse` hook that denies write verbs.
     },
     "obsidian-vault": {
       "command": "npx",
-      "args": ["-y", "mcpvault", "--vault", "./vault"]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "<vault-path>"]
     },
     "ts-lsp": {
       "command": "npx",
-      "args": ["-y", "@isaacphi/mcp-language-server", "--", "npx", "typescript-language-server", "--stdio"]
+      "args": ["-y", "@typescript/native-preview", "tsgo", "--lsp", "./sveltekit-frontend"]
     }
   }
 }
@@ -127,8 +130,8 @@ assumed we'd build ~10 `db.*` tools ourselves. Updated split:
 | Generic Neo4j Cypher (read-only), GDS procedure list | **Adopt official Neo4j MCP** with `NEO4J_READ_ONLY=true` |
 | Custom `graph.expand_neighborhood`, `graph.pagerank_top` from CodebaseFile graph | **Build (custom)** — wraps Karpathy authority blend |
 | Redis `GET`, `HGETALL`, `SCAN` | **Adopt official Redis MCP** read-only |
-| Obsidian vault traversal, BFS/DFS, frontmatter query | **Adopt MCPVault** |
-| TypeScript symbol lookup, find references, diagnostics | **Adopt mcp-language-server** |
+| Obsidian vault traversal, BFS/DFS, frontmatter query | **Adopt the official filesystem MCP server** |
+| TypeScript symbol lookup, find references, diagnostics | **Adopt `tsgo --lsp` via `@typescript/native-preview`** |
 | SvelteKit `+page.server.ts` route map, load-fn shape inspection | **Build (custom)** — no upstream equivalent |
 | AGENTS.md walk-up resolver, pathway/feature/timeline card lookup | **Build (custom)** — TRACE-specific |
 
@@ -170,7 +173,8 @@ The [synthesis-loop plan's Phase B](../../../next_steps/active/2026-05-09_gemma4
 becomes:
 
 1. **Mount official MCP servers** (Neo4j read-only, Qdrant, Redis
-   read-only, Postgres read-only, MCPVault, mcp-language-server) in
+   read-only, Postgres read-only, filesystem MCP, tsgo LSP via
+   `@typescript/native-preview`) in
    `.vscode/mcp.json` and `~/.claude/mcp.json`. Smoke each via
    `npx mcporter call <server>.<tool>`.
 2. **Add `PreToolUse` hook** that denies write-verb tools by

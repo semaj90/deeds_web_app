@@ -50,11 +50,14 @@ function spawnWorker(index) {
   const port = WORKER_BASE + index;
 
   const args = [SERVER_SCRIPT];
-  const proc = spawn(TSX, args, {
+  const launchCommand = process.platform === 'win32' ? 'cmd.exe' : TSX;
+  const launchArgs = process.platform === 'win32' ? ['/c', TSX, ...args] : args;
+  const proc = spawn(launchCommand, launchArgs, {
     env: {
       ...process.env,
       TRACE_MCP_PORT: String(port),
       TRACE_MCP_HOST: '127.0.0.1',
+      TRACE_MCP_URL: `http://127.0.0.1:${port}`,
       TRACE_MCP_WORKER_ID: String(index),
     },
     stdio: 'inherit',

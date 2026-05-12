@@ -33,6 +33,7 @@ const CHAT_MODEL  = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
 
 const REDIS_CENTROIDS_HASH = 'gpu:autoencoder:centroids_64';
 const REDIS_META_HASH      = 'gpu:autoencoder:centroids_64_meta';
+const REDIS_CLUSTER_AUTH   = 'gpu:karpathy:clusters';
 const COLLECTION           = 'codebase_chunks_768';
 const CHUNKS_PER_CLUSTER   = 12;  // representative chunks for LLM context
 const MIN_CLUSTER_SIZE     = 3;   // skip tiny clusters
@@ -74,7 +75,7 @@ async function qdrantScroll(filter, limit) {
 
 // ── LLM call ─────────────────────────────────────────────────────────────────
 
-async function summarizeCluster(clusterId, chunks) {
+async function summarizeCluster(clusterId, chunks, authorityLine = '') {
   const snippets = chunks
     .map((pt, i) => {
       const fp = pt.payload?.file_path ?? pt.payload?.path ?? 'unknown';
@@ -85,6 +86,12 @@ async function summarizeCluster(clusterId, chunks) {
 
   const prompt = `You are analyzing a cluster of code files grouped by semantic similarity.
 Cluster ID: ${clusterId}
+
+PageRank authority hints:
+${authorityLine || 'none available'}
+- Use these as representative examples.
+- Do not summarize only by keyword frequency.
+- Prefer structurally central code paths.
 
 Representative code snippets:
 ${snippets}
@@ -102,7 +109,9 @@ Be specific and concise. No bullet points.`;
       model: CHAT_MODEL,
       messages: [{ role: 'user', content: prompt }],
       stream: false,
-      options: { temperature: 0.2, num_predict: 512 },
+      // VLM-thinking models can spend most of a short budget on reasoning.
+      // Give them enough tokens to emit the final two-sentence summary.
+      options: { temperature: 0.2, num_predict: 1024 },
     }),
   });
   if (!res.ok) throw new Error(`Ollama ${res.status}: ${await res.text()}`);
@@ -156,6 +165,28 @@ async function writeNeo4jCluster(driver, clusterId, summary, filePaths, trainedA
     }
   } finally {
     await session.close();
+  }
+}
+
+async function loadClusterAuthority(clusterId) {
+  const byKey = await redis.get(`cluster:pagerank:${clusterId}`).catch(() => null);
+  const raw = byKey ?? await redis.hget(REDIS_CLUSTER_AUTH, String(clusterId)).catch(() => null);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+async function loadClusterTopFiles(clusterId) {
+  const raw = await redis.get(`cluster:pagerank:top5:${clusterId}`).catch(() => null);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
   }
 }
 
@@ -223,9 +254,20 @@ async function main() {
 
       // Generate summary
       let summary = `Cluster ${clusterId}: semantic group of ${points.length} code files.`;
+      const authority = await loadClusterAuthority(clusterId);
+      const topFiles = await loadClusterTopFiles(clusterId);
+      const authorityLine = authority
+        ? [
+            `- clusterAuthorityScore: ${Number(authority.clusterAuthorityScore ?? 0).toFixed(4)}`,
+            `- max PR: ${Number(authority.maxPageRank ?? authority.maxPr ?? 0).toFixed(4)}`,
+            `- avg PR: ${Number(authority.avgPageRank ?? authority.avgPr ?? 0).toFixed(4)}`,
+            `- memberCount: ${authority.memberCount ?? authority.totalFiles ?? 0}`,
+            `- top files: ${topFiles.length ? topFiles.map((f, i) => `${i + 1}. ${f.filePath} [PR ${Number(f.pageRank ?? 0).toFixed(4)}, blend ${Number(f.karpathyBlend ?? 0).toFixed(4)}]`).join(' | ') : 'none'}`,
+          ].join('\n')
+        : 'none available';
       if (!SKIP_LLM) {
         try {
-          summary = await summarizeCluster(clusterId, points);
+          summary = await summarizeCluster(clusterId, points, authorityLine);
         } catch (e) {
           console.warn(`\n[cluster ${clusterId}] LLM failed: ${e.message} — using fallback`);
         }
@@ -240,6 +282,8 @@ async function main() {
         clusterId,
         size: points.length,
         filePaths: filePaths.slice(0, 30),
+        authority,
+        pageRankTop5: topFiles,
         trainedAt,
         updatedAt: new Date().toISOString(),
       });

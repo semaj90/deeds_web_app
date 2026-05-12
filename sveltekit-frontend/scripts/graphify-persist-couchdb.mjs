@@ -45,7 +45,7 @@ function log(...args) {
 // ── Environment ───────────────────────────────────────────────────────────────
 
 const REDIS_URL   = process.env.REDIS_URL   ?? 'redis://127.0.0.1:6379';
-const COUCHDB_RAW = process.env.COUCHDB_URL ?? 'http://admin:password@127.0.0.1:5984';
+const COUCHDB_RAW = process.env.COUCHDB_URL ?? 'http://admin:deeds123@127.0.0.1:5984';
 const COUCHDB_DB  = 'codebase_graph';
 const BATCH_SIZE  = 50;
 

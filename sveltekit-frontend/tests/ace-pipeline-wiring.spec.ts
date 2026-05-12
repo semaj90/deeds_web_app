@@ -35,18 +35,31 @@ vi.mock('$lib/config/env.server.js', () => ({
 
 // ── Mock Redis ──────────────────────────────────────────────────────────
 const mockRedisGet = vi.fn();
+const mockRedis = {
+  get: (...args: any[]) => mockRedisGet(...args),
+  set: vi.fn(async () => 'OK'),
+  ping: vi.fn(async () => 'PONG'),
+  mget: vi.fn(async () => []),
+  smembers: vi.fn(async () => []),
+  exists: vi.fn(async () => 0),
+  pipeline: vi.fn(() => ({
+    setex: vi.fn().mockReturnThis(),
+    sadd: vi.fn().mockReturnThis(),
+    exec: vi.fn(async () => []),
+  })),
+};
 vi.mock('$lib/server/redis.js', () => ({
-	redis: {
-		get: (...args: any[]) => mockRedisGet(...args),
-		set: vi.fn(async () => 'OK'),
-		ping: vi.fn(async () => 'PONG'),
-	},
+  redis: mockRedis,
+  getRedis: vi.fn(() => mockRedis),
 }));
 
 // ── Mock DB ─────────────────────────────────────────────────────────────
 vi.mock('$lib/server/db/client', () => ({
   pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
-	db: { execute: vi.fn(async () => ({ rows: [] })) },
+	db: {
+    execute: vi.fn(async () => ({ rows: [] })),
+    insert: vi.fn(() => ({ values: vi.fn(async () => ({ rows: [] })) })),
+  },
 	pool: { query: vi.fn(async () => ({ rows: [] })) },
 }));
 
@@ -138,21 +151,36 @@ describe('ACE pipeline wiring', () => {
 	});
 
 	// ── 2. Context assembler accepts enableCodebaseContext ───────────────
-	describe('assembleACEContext', () => {
-		it('returns codebaseContext: null when enableCodebaseContext is false', async () => {
-			const { assembleACEContext } = await import('$lib/server/ace/context-assembler.js');
+		describe('assembleACEContext', () => {
+			it('returns codebaseContext: null when enableCodebaseContext is false', async () => {
+				const { assembleACEContext } = await import('$lib/server/ace/context-assembler.js');
 
 			const context = await assembleACEContext({
 				query: 'What is breach of contract?',
 				enableCodebaseContext: false,
 			});
 
-			expect(context).toHaveProperty('codebaseContext');
-			expect(context.codebaseContext).toBeNull();
-		});
+				expect(context).toHaveProperty('codebaseContext');
+				expect(context.codebaseContext).toBeNull();
+			});
 
-		it('returns codebaseContext: null when enableCodebaseContext is omitted', async () => {
-			const { assembleACEContext } = await import('$lib/server/ace/context-assembler.js');
+			it('attaches a token-aware packet when enabled', async () => {
+				const { assembleACEContext } = await import('$lib/server/ace/context-assembler.js');
+				const statsOut: Record<string, any> = {};
+
+				const context = await assembleACEContext({
+					query: 'encoded_64 rerank and Karpathy GraphRAG cluster summaries',
+					tokenAwarePacking: true,
+					statsOut,
+				});
+
+				expect(context).toHaveProperty('aceContextPacket');
+				expect(statsOut).toHaveProperty('tokenAwareContext');
+				expect(statsOut.tokenAwareContext.enabled).toBe(true);
+			});
+
+			it('returns codebaseContext: null when enableCodebaseContext is omitted', async () => {
+				const { assembleACEContext } = await import('$lib/server/ace/context-assembler.js');
 
 			const context = await assembleACEContext({
 				query: 'What is breach of contract?',

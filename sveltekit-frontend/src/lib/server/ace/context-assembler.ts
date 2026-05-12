@@ -627,6 +627,8 @@ export async function assembleACEContext(opts: {
    * relative to the repo root (e.g. `src/lib/server/ace/agent.ts`).
    */
   filePath?: string;
+  tokenAwarePacking?: boolean;
+  statsOut?: Record<string, any>;
 }): Promise<ACEContext> {
   return traceGraph(
     'ace-assembly',
@@ -1059,9 +1061,9 @@ export async function assembleACEContext(opts: {
             priorFix: multiLaneResult.priorFix,
             topFiles: multiLaneResult.topFiles,
             topSymbols: multiLaneResult.topSymbols,
-            lanesHit: multiLaneResult.lanes
-              .filter((l) => l.hits.length > 0)
-              .map((l) => l.lane),
+            lanesHit: (multiLaneResult.lanes || [])
+              .filter((l: any) => l.hits && l.hits.length > 0)
+              .map((l: any) => l.lane),
             synthesisBlock: multiLaneResult.synthesisBlock + communityAddendum,
             durationMs: multiLaneResult.durationMs,
           };
@@ -1104,12 +1106,12 @@ export async function assembleACEContext(opts: {
 
       // ── P4-A: Log multiLane context event to context_timeline ─────────
       if (multiLaneResult && pgPool) {
-        const mlLanesHit = multiLaneResult.lanes
-          .filter((l) => l.hits.length > 0 && !l.skipped)
-          .map((l) => l.lane);
-        const mlLanesSkipped = multiLaneResult.lanes
-          .filter((l) => l.skipped)
-          .map((l) => l.lane);
+        const mlLanesHit = (multiLaneResult.lanes || [])
+          .filter((l: any) => l.hits && l.hits.length > 0 && !l.skipped)
+          .map((l: any) => l.lane);
+        const mlLanesSkipped = (multiLaneResult.lanes || [])
+          .filter((l: any) => l.skipped)
+          .map((l: any) => l.lane);
         pgPool
           .query(
             `INSERT INTO context_timeline (event_type, pipeline, payload)
@@ -1122,8 +1124,8 @@ export async function assembleACEContext(opts: {
                 lanesHit:         mlLanesHit,
                 lanesSkipped:     mlLanesSkipped,
                 totalHits:        multiLaneResult.totalHits,
-                topFiles:         multiLaneResult.topFiles.slice(0, 5),
-                topSymbols:       multiLaneResult.topSymbols.slice(0, 5),
+                topFiles:         (multiLaneResult.topFiles || []).slice(0, 5),
+                topSymbols:       (multiLaneResult.topSymbols || []).slice(0, 5),
                 durationMs:       multiLaneResult.durationMs,
                 userId:           userId ?? null,
                 caseId:           caseId ?? null,
@@ -1241,7 +1243,7 @@ export async function assembleACEContext(opts: {
 
       // P3-B: boost ragChunks whose filePath appears in multiLane.topFiles
       // Files confirmed by ngram+symbol or ace_cache+symbol get +0.05 on top of existing score.
-      if (multiLaneResult && multiLaneResult.topFiles.length > 0 && baseContext.ragChunks?.length) {
+      if (multiLaneResult && multiLaneResult.topFiles && multiLaneResult.topFiles.length > 0 && baseContext.ragChunks?.length) {
         const boostedFiles = new Set(multiLaneResult.topFiles);
         const MULTILANE_BOOST = 0.05;
         baseContext.ragChunks = baseContext.ragChunks.map((chunk) =>
@@ -1510,6 +1512,132 @@ export async function assembleACEContext(opts: {
         recordLastQuery(userId, query)
           .then(prev => { if (prev) recordEngramTransition(prev, query).catch(() => {}); })
           .catch(() => {});
+      }
+
+      if (opts.tokenAwarePacking) {
+        const { packAceContext } = await import('./token-aware-context-packer.js');
+        const redis = getRedis();
+
+        const clusterContext = finalContext.clusterContext ?? [];
+        const clusterIds = Array.from(
+          new Set([
+            ...clusterContext.map((c) => c.clusterId),
+            ...(codebaseContext ?? []).flatMap((c) => [c.gpuCluster, c.somCluster]).filter((n): n is number => typeof n === 'number'),
+          ])
+        );
+
+        const [clusterPageranksRaw, clusterTop5Raw, karpathyClustersRaw, grpoHashes] = await Promise.all([
+          clusterIds.length ? Promise.all(clusterIds.map((id) => redis.get(`cluster:pagerank:${id}`))).catch(() => [] as Array<string | null>) : Promise.resolve([]),
+          clusterIds.length ? Promise.all(clusterIds.map((id) => redis.get(`cluster:pagerank:top5:${id}`))).catch(() => [] as Array<string | null>) : Promise.resolve([]),
+          redis.get('gpu:karpathy:clusters').catch(() => null),
+          redis.zrevrangebyscore('rl:memory:checkpoints', '+inf', '0.5', 'LIMIT', 0, 5).catch(() => [] as string[])
+        ]);
+        
+        const grpoCheckpointsRaw = grpoHashes.length > 0 ? await redis.mget(...grpoHashes.map((h) => `rl:memory:cp:${h}`)).catch(() => []) : [];
+        const grpoCheckpoints = grpoCheckpointsRaw.map(raw => {
+          if (!raw) return null;
+          try { return JSON.parse(raw); } catch { return null; }
+        }).filter(Boolean);
+
+        const parseMaybeNumber = (raw: string | null | undefined): number | undefined => {
+          if (!raw) return undefined;
+          try {
+            const parsed = JSON.parse(raw) as { score?: number; pagerank?: number; value?: number } | number;
+            if (typeof parsed === 'number') return parsed;
+            if (typeof parsed?.score === 'number') return parsed.score;
+            if (typeof parsed?.pagerank === 'number') return parsed.pagerank;
+            if (typeof parsed?.value === 'number') return parsed.value;
+          } catch {
+            const n = Number(raw);
+            if (Number.isFinite(n)) return n;
+          }
+          return undefined;
+        };
+
+        const parseMaybeStringArray = (raw: string | null | undefined): string[] | undefined => {
+          if (!raw) return undefined;
+          try {
+            const parsed = JSON.parse(raw) as unknown;
+            if (Array.isArray(parsed)) return parsed.map((v) => String(v));
+            if (parsed && typeof parsed === 'object') {
+              const values = Object.values(parsed as Record<string, unknown>).map((v) => String(v));
+              return values.length ? values : undefined;
+            }
+          } catch {
+            const parts = raw.split(/[\s,]+/).map((s) => s.trim()).filter(Boolean);
+            return parts.length ? parts : undefined;
+          }
+          return undefined;
+        };
+
+        const karpathyClusterSet = new Set<number>(
+          parseMaybeStringArray(karpathyClustersRaw)
+            ?.map((value) => Number(value))
+            .filter((value) => Number.isFinite(value)) ?? []
+        );
+
+        const clusterPagerankById = new Map<number, number>();
+        const clusterTopFilesById = new Map<number, string[]>();
+        clusterIds.forEach((id, index) => {
+          const pagerank = parseMaybeNumber(clusterPageranksRaw[index]);
+          if (pagerank != null) clusterPagerankById.set(id, pagerank);
+          const topFiles = parseMaybeStringArray(clusterTop5Raw[index]);
+          if (topFiles?.length) clusterTopFilesById.set(id, topFiles);
+        });
+
+        const packet = packAceContext({
+          query,
+          maxTokens: opts.maxTokens,
+          clusterSummaries: finalContext.clusterContext?.map(c => ({
+            clusterId: c.clusterId,
+            summary: c.synthesisSuggestion || c.summaryLens || '',
+            authorityScore: c.graphAuthorityScore ?? 0,
+            clusterPagerank: clusterPagerankById.get(c.clusterId),
+            karpathyBlend: karpathyClusterSet.has(c.clusterId) ? 1 : 0,
+            topFiles: c.topFiles?.length ? c.topFiles : clusterTopFilesById.get(c.clusterId),
+          })),
+          chunks: codebaseContext?.map(c => ({
+            id: c.filePath,
+            text: c.content,
+            filePath: c.filePath,
+            clusterId: c.gpuCluster || c.somCluster || 0,
+            qdrantScore: c.score,
+            pagerankScore: c.pageRankScore,
+            authorityScore: c.graphAuthorityScore ?? 0,
+            clusterPagerank: c.gpuCluster != null ? clusterPagerankById.get(c.gpuCluster) : undefined,
+            karpathyBlend: c.gpuCluster != null && karpathyClusterSet.has(c.gpuCluster) ? 1 : 0,
+            encoded64Score: c.encoded64Score ?? c.rerankBreakdown?.quaternion,
+            graphProximity: c.rerankBreakdown?.graph,
+            clusterSummaryHit: c.gpuCluster != null && finalContext.clusterContext?.some((cluster) => cluster.clusterId === c.gpuCluster) ? 1 : 0,
+          })),
+          wikiRows: [
+            ...(directoryKagContext ?? []).map((entry) => ({
+              id: `dir:${entry.dir}`,
+              text: entry.summary,
+              score: entry.score,
+              clusterId: entry.somBmuRow != null ? entry.somBmuRow * 100 + (entry.somBmuCol ?? 0) : undefined,
+            })),
+            ...(finalContext.kbChunks?.map((c) => ({ id: c.id, text: c.content, score: c.score })) ?? []),
+          ],
+          grpoCheckpoints: grpoCheckpoints.map(cp => ({
+            hyperedgeHash: cp.hyperedgeHash,
+            gradeScore: cp.gradeScore,
+            loraHint: cp.loraHint
+          }))
+        });
+
+        finalContext.aceContextPacket = packet;
+        
+        if (opts.statsOut) {
+          opts.statsOut.tokenAwareContext = {
+            enabled: true,
+            estimatedInputTokens: packet.tokenBudget.estimatedInputTokens,
+            selectedCount: packet.selectedSources.length,
+            excludedCount: packet.excludedSources.length,
+            activeClusterIds: packet.activeClusterIds,
+            topAuthorityClusters: packet.clusterLenses.map(c => c.clusterId).slice(0, 3)
+          };
+        }
       }
 
       return finalContext;
@@ -2089,55 +2217,64 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     confidenceFactors.userAnalytics = 0.5;
   }
 
-  // 14. Codebase/AST context (dual-vector code search results)
-  if (context.codebaseContext && context.codebaseContext.length > 0) {
-    const codeLines = context.codebaseContext
-      .slice(0, limits.codebaseContextCount)
-      .map((c) => {
-        const loc = c.lineStart ? `:${c.lineStart}${c.lineEnd ? `-${c.lineEnd}` : ''}` : '';
-        const meta = [
-          c.routeType ? `type:${c.routeType}` : '',
-          c.gpuCluster != null ? `cluster:${c.gpuCluster}` : '',
-          c.pageRankScore != null ? `rank:${c.pageRankScore.toFixed(2)}` : '',
-          c.hasAuthGuard ? 'auth-guarded' : '',
-        ]
-          .filter(Boolean)
-          .join(' ');
-        const header = `[${c.filePath}${loc}]${meta ? ` (${meta})` : ''} score:${c.score.toFixed(2)}`;
-        return `${header}\n${truncate(c.content, limits.chunkChars)}`;
-      })
-      .join('\n\n');
+  // 13b. Token-aware compressed ACE packet (when assembly enabled it)
+  if (context.aceContextPacket?.contextMarkdown) {
+    lines.push(`\n## Token-Aware ACE Context\n${context.aceContextPacket.contextMarkdown}`);
+    confidenceFactors.tokenAwareContext = Math.max(
+      0.75,
+      Math.min(0.98, context.aceContextPacket.selectedSources.length > 0 ? 0.9 : 0.75)
+    );
+  } else {
+    // 14. Codebase/AST context (dual-vector code search results)
+    if (context.codebaseContext && context.codebaseContext.length > 0) {
+      const codeLines = context.codebaseContext
+        .slice(0, limits.codebaseContextCount)
+        .map((c) => {
+          const loc = c.lineStart ? `:${c.lineStart}${c.lineEnd ? `-${c.lineEnd}` : ''}` : '';
+          const meta = [
+            c.routeType ? `type:${c.routeType}` : '',
+            c.gpuCluster != null ? `cluster:${c.gpuCluster}` : '',
+            c.pageRankScore != null ? `rank:${c.pageRankScore.toFixed(2)}` : '',
+            c.hasAuthGuard ? 'auth-guarded' : '',
+          ]
+            .filter(Boolean)
+            .join(' ');
+          const header = `[${c.filePath}${loc}]${meta ? ` (${meta})` : ''} score:${c.score.toFixed(2)}`;
+          return `${header}\n${truncate(c.content, limits.chunkChars)}`;
+        })
+        .join('\n\n');
 
-    // Step 6: prepend VLM cluster narrative when available
-    let clusterPrefix = '';
-    const acs = (
-      context as ACEContext & { activeClusterSummary?: ACEContext['activeClusterSummary'] }
-    ).activeClusterSummary;
-    if (acs?.summary) {
-      clusterPrefix =
-        `// CLUSTER ${acs.clusterId}: ${acs.purpose}\n` +
-        `// ${acs.summary}\n` +
-        (acs.patterns.length ? `// Patterns: ${acs.patterns.join(', ')}\n` : '') +
-        (acs.warnings.length ? `// Warnings: ${acs.warnings.join('; ')}\n` : '') +
-        '\n';
+      // Step 6: prepend VLM cluster narrative when available
+      let clusterPrefix = '';
+      const acs = (
+        context as ACEContext & { activeClusterSummary?: ACEContext['activeClusterSummary'] }
+      ).activeClusterSummary;
+      if (acs?.summary) {
+        clusterPrefix =
+          `// CLUSTER ${acs.clusterId}: ${acs.purpose}\n` +
+          `// ${acs.summary}\n` +
+          (acs.patterns.length ? `// Patterns: ${acs.patterns.join(', ')}\n` : '') +
+          (acs.warnings.length ? `// Warnings: ${acs.warnings.join('; ')}\n` : '') +
+          '\n';
+      }
+
+      lines.push(`\n## Codebase Context\n${clusterPrefix}${codeLines}`);
+      confidenceFactors.codebaseContext = Math.max(...context.codebaseContext.map((c) => c.score));
     }
 
-    lines.push(`\n## Codebase Context\n${clusterPrefix}${codeLines}`);
-    confidenceFactors.codebaseContext = Math.max(...context.codebaseContext.map((c) => c.score));
-  }
-
-  // 14b. NES cluster context — GPU cluster summary lenses for top retrieved files
-  if (context.clusterContext && context.clusterContext.length > 0) {
-    const clusterLines = context.clusterContext
-      .slice(0, 3)
-      .map((c) => {
-        const tags = c.topTags?.length ? `Tags: ${c.topTags.slice(0, 6).join(', ')}` : '';
-        const files = c.topFiles?.length ? `Files: ${c.topFiles.slice(0, 3).join(', ')}` : '';
-        return `**${c.clusterKey}** (${c.topoClass ?? c.topoLabel ?? 'unknown'}): ${c.summaryLens ?? ''}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
-      })
-      .join('\n');
-    lines.push(`\n## Codebase Clusters\n${clusterLines}`);
-    confidenceFactors.clusterContext = 0.7;
+    // 14b. NES cluster context — GPU cluster summary lenses for top retrieved files
+    if (context.clusterContext && context.clusterContext.length > 0) {
+      const clusterLines = context.clusterContext
+        .slice(0, 3)
+        .map((c) => {
+          const tags = c.topTags?.length ? `Tags: ${c.topTags.slice(0, 6).join(', ')}` : '';
+          const files = c.topFiles?.length ? `Files: ${c.topFiles.slice(0, 3).join(', ')}` : '';
+          return `**${c.clusterKey}** (${c.topoClass ?? c.topoLabel ?? 'unknown'}): ${c.summaryLens ?? ''}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
+        })
+        .join('\n');
+      lines.push(`\n## Codebase Clusters\n${clusterLines}`);
+      confidenceFactors.clusterContext = 0.7;
+    }
   }
 
   confidenceFactors.policy = policyDecision.confidence;

@@ -114,6 +114,12 @@ export abstract class QueueWorker<TMessage> {
 
 					// ACK handled by manager
 				} catch (err) {
+					const message = err instanceof Error ? err.message : String(err);
+					if (message.includes('module runner has been closed')) {
+						console.warn(`[Worker:${this.queue}] Environment closed during processing — skipping retry/ack`);
+						return;
+					}
+
 					const retryCount =
 						(amqpMsg.properties?.headers?.['x-retry-count'] as number) ?? 0;
 
@@ -314,15 +320,24 @@ export class CacheInvalidateWorker extends QueueWorker<{
 	readonly queue = 'cache.invalidate' as const;
 
 	async process(data: { key?: string; pattern?: string }): Promise<void> {
-		const { getRedis } = await import('$lib/server/redis.js');
-		const redis = getRedis();
-		if (!redis) return;
+		try {
+			const { getRedis } = await import('$lib/server/redis.js');
+			const redis = getRedis();
+			if (!redis) return;
 
-		if (data.key) {
-			await redis.del(data.key);
-		} else if (data.pattern) {
-			const keys = await redis.keys(data.pattern);
-			if (keys.length > 0) await redis.del(...keys);
+			if (data.key) {
+				await redis.del(data.key);
+			} else if (data.pattern) {
+				const keys = await redis.keys(data.pattern);
+				if (keys.length > 0) await redis.del(...keys);
+			}
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err);
+			if (message.includes('module runner has been closed')) {
+				// Expected during hot reload — return silently
+				return;
+			}
+			throw err;
 		}
 	}
 }

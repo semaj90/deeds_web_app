@@ -531,7 +531,39 @@ async function extractText(
 
   // Audio files: transcribe via Docling ASR → Whisper fallback
   if (isAudio) {
-    // Tier 1: Docling ASR
+    // Tier 1: Specialized MediaProcessing (faster-whisper GPU)
+    try {
+      const { transcribeAudio } = await import('$lib/server/analysis/media-processing.js');
+      const { writeFile: writeTmp, unlink: unlinkTmp } = await import('fs/promises');
+      const { tmpdir } = await import('os');
+      const { join } = await import('path');
+      const { randomUUID } = await import('crypto');
+      const ext = '.' + (fileName.split('.').pop()?.toLowerCase() ?? 'wav');
+      const tmpPath = join(tmpdir(), `transcribe-upload-${randomUUID()}${ext}`);
+      
+      await writeTmp(tmpPath, buffer);
+      try {
+        const result = await transcribeAudio(tmpPath, `upload-${Date.now()}`);
+        if (result.text.trim().length > 0) {
+          return { 
+            text: result.text, 
+            method: `faster-whisper-${result.language}`, 
+            doclingBlocks: result.chunks.map((c: any) => ({
+              type: 'transcript_segment',
+              text: c.text,
+              start: c.start,
+              end: c.end
+            }))
+          };
+        }
+      } finally {
+        await unlinkTmp(tmpPath).catch(() => {});
+      }
+    } catch (err) {
+      console.warn('[Upload] MediaProcessing ASR failed, trying Docling:', err);
+    }
+
+    // Tier 2: Docling ASR
     try {
       const { isDoclingAvailable, transcribeAudio } = await import('$lib/server/docling.js');
       if (await isDoclingAvailable()) {
@@ -542,7 +574,7 @@ async function extractText(
       }
     } catch (err) {
       console.warn(
-        '[Upload] Docling ASR failed, trying whisper:',
+        '[Upload] Docling ASR failed, trying nodejs-whisper:',
         err instanceof Error ? err.message : err
       );
     }

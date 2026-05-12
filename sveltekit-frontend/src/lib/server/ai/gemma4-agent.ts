@@ -28,19 +28,21 @@ import {
   bifrostChat,
   turboQuantChat,
 } from '$lib/server/ollama.js';
-import { generateEmbedding }                           from '$lib/server/grpc/embedding-client.js';
-import { qdrant }                                      from '$lib/server/vector/qdrant-manager.js';
-import { selectAdaptiveMemory, queryTopHyperedges }    from '$lib/server/graph/hypergraph-4d.js';
-import { queryTopology }                               from '$lib/server/retrieval/topology-search-client.js';
-import { db, pool }                                    from '$lib/server/db/client';
-import { contextTimeline }                             from '$lib/server/db/schema-postgres.js';
-import { trackTokenUsage }                             from '$lib/server/ai/token-tracker.js';
+import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { selectAdaptiveMemory, queryTopHyperedges } from '$lib/server/graph/hypergraph-4d.js';
+import { queryTopology } from '$lib/server/retrieval/topology-search-client.js';
+import { db, pool } from '$lib/server/db/client';
+import { contextTimeline } from '$lib/server/db/schema-postgres.js';
+import { logInference } from '$lib/server/observability/inference-log.js';
+import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
+import { canUseTurboQuant, gatePreferredBackend } from '$lib/server/ai/backend-runtime-guards.js';
 import { ENV } from '$lib/server/env.server.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { LinterService } from './linter-service.js';
 import { tieredLLMQuery } from '$lib/server/ai/tiered-llm-cache.js';
-import { logInference } from '$lib/server/observability/inference-log.js';
 import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
 import { getErrorFixMemory, saveErrorFixMemory } from '$lib/server/ai/error-fix-memory.js';
 import { buildAgentSystemPrompt } from '$lib/ai/prompts.js';
@@ -1522,8 +1524,10 @@ export interface AgentRunResult {
 // caller would silently corrupt state (side-effect cache poisoning).
 const SIDE_EFFECT_TOOLS = new Set(['apply_shadow_patch', 'revert_fix', 'verify_fix']);
 
-function getPreferredBackend(metadata?: Record<string, unknown>): 'bifrost' | 'turboquant' {
-  return metadata?.preferredBackend === 'turboquant' ? 'turboquant' : 'bifrost';
+function getPreferredBackend(metadata?: Record<string, unknown>, runtime?: ReturnType<typeof resolveRuntimeConfig>): 'bifrost' | 'turboquant' {
+  const config = runtime ?? resolveRuntimeConfig();
+  const isTurboRequested = metadata?.preferredBackend === 'turboquant';
+  return gatePreferredBackend(isTurboRequested ? 'turboquant' : undefined, config) as 'bifrost' | 'turboquant';
 }
 
 export async function runGemma4Agent(
@@ -1599,7 +1603,8 @@ export async function runGemma4Agent(
   let resultCacheMs:   number | undefined           = undefined;
   let totalPromptTokens     = 0;
   let totalCompletionTokens = 0;
-  const requestedBackend = getPreferredBackend(options?.metadata);
+  const runtime = resolveRuntimeConfig();
+  const requestedBackend = getPreferredBackend(options?.metadata, runtime);
   let inferenceBackend: AgentRunResult['inferenceBackend'] = requestedBackend;
   let backendFallbackReason: string | undefined;
 
@@ -1664,7 +1669,7 @@ export async function runGemma4Agent(
   const activeTools = isCodingPipeline ? LLAMA_TOOL_DEFINITIONS : AGENT_TOOLS;
 
   const runPreferredToolCall = async (currentMessages: OllamaMessage[]) => {
-    if (requestedBackend !== 'turboquant') {
+    if (requestedBackend !== 'turboquant' || !canUseTurboQuant(runtime)) {
       inferenceBackend = 'bifrost';
       return bifrostChat(currentMessages, TOOL_MODEL, {
         tools: activeTools,
@@ -1839,7 +1844,7 @@ export async function runGemma4Agent(
       },
     ];
 
-    if (requestedBackend === 'turboquant') {
+    if (requestedBackend === 'turboquant' && canUseTurboQuant(runtime)) {
       try {
         inferenceBackend = 'turboquant';
         const forced = await turboQuantChat(finalMessages, PLANNER_MODEL, {

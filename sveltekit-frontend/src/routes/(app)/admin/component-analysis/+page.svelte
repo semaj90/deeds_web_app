@@ -3,7 +3,6 @@
 
 	let { data }: { data: PageData } = $props();
 
-	// TODO: Convert to $props - // TODO: Convert to $props - 
 
 	// State
 	let components = $state<ComponentUnit[]>([]);

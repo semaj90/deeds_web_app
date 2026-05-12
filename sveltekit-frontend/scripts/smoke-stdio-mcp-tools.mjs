@@ -72,7 +72,7 @@ function getToolList(result) {
 console.log('\n=== Smoke: MCP stdio ===\n');
 
 const transport = new StdioClientTransport({
-  command: 'npx',
+  command: process.platform === 'win32' ? 'npx.cmd' : 'npx',
   args: ['tsx', 'src/mcp/server.ts'],
   env: { ...process.env },
 });

@@ -85,13 +85,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const related = hits
 			.map(hit => {
 				const p = (hit.payload ?? {}) as Record<string, unknown>;
-				const hitPath = ((p.relativePath ?? p.filePath ?? p.path ?? '') as string).replace(/\\/g, '/');
+				const hitPath = String(
+					p.relativePath ?? p.filePath ?? p.file_path ?? p.source_path ?? p.path ?? ''
+				).replace(/\\/g, '/');
 				return {
 					id: hit.id,
 					score: hit.score,
 					filePath: hitPath,
-					symbol: (p.symbol ?? '') as string,
-					kind: (p.kind ?? '') as string,
+					symbol: String(p.symbol ?? p.symbol_name ?? ''),
+					kind: String(p.kind ?? p.symbol_kind ?? ''),
 					content: ((p.content ?? p.text ?? '') as string).slice(0, 200),
 					signature: ((p.signature ?? '') as string).slice(0, 150),
 					language: (p.language ?? 'typescript') as string,
@@ -100,6 +102,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				};
 			})
 			.filter(hit => {
+				if (!hit.filePath) return false;
 				// Deduplicate by file path
 				const normPath = hit.filePath.replace(/^src\//, '');
 				if (seenPaths.has(hit.filePath) || seenPaths.has(normPath)) return false;

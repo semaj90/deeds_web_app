@@ -23,7 +23,7 @@ export const RESEARCH_SKILLS: Record<string, SkillRecipe> = {
     id: 'web_fallback',
     family: 'Research',
     description: 'Fallback to web search when internal data is missing',
-    tools: [{ name: 'http:fetch' }, { name: 'llm:generate' }]
+    tools: [{ name: 'web:search' }, { name: 'llm:generate' }]
   },
   compare_sources: {
     id: 'compare_sources',
@@ -54,5 +54,65 @@ export const RESEARCH_SKILLS: Record<string, SkillRecipe> = {
     family: 'Research',
     description: 'Suggest follow-up questions for further research',
     tools: [{ name: 'llm:generate' }]
+  },
+  trend_analysis: {
+    id: 'trend_analysis',
+    family: 'Research',
+    description: 'Identify emerging trends and patterns across research corpora',
+    tools: [{ name: 'search:vector' }, { name: 'llm:generate' }]
+  },
+  source_provenance_audit: {
+    id: 'source_provenance_audit',
+    family: 'Research',
+    description: 'Verify the origin and reliability of research sources',
+    tools: [{ name: 'search:sql' }, { name: 'llm:generate' }]
+  },
+  multi_perspective_synthesis: {
+    id: 'multi_perspective_synthesis',
+    family: 'Research',
+    description: 'Synthesize research findings from multiple specialized perspectives',
+    tools: [{ name: 'batch:run' }, { name: 'llm:generate' }]
+  },
+  identify_knowledge_gaps: {
+    id: 'identify_knowledge_gaps',
+    family: 'Research',
+    description: 'Analyze research progress to identify missing critical information',
+    tools: [{ name: 'llm:generate' }]
+  },
+  hypothesis_generator: {
+    id: 'hypothesis_generator',
+    family: 'Research',
+    description: 'Generate testable hypotheses based on initial research findings',
+    tools: [{ name: 'llm:generate' }]
+  },
+  fact_check_claims: {
+    id: 'fact_check_claims',
+    family: 'Research',
+    description: 'Fact-check specific claims against a trusted knowledge base',
+    tools: [{ name: 'search:vector' }, { name: 'llm:generate' }]
+  },
+  literature_review_builder: {
+    id: 'literature_review_builder',
+    family: 'Research',
+    description: 'Automate the creation of a comprehensive literature review',
+    tools: [{ name: 'batch:run' }, { name: 'llm:generate' }]
+  },
+  detect_research_redundancy: {
+    id: 'detect_research_redundancy',
+    family: 'Research',
+    description: 'Identify redundant research efforts within the swarm',
+    tools: [{ name: 'llm:generate' }]
+  },
+  cross_domain_mapping: {
+    id: 'cross_domain_mapping',
+    family: 'Research',
+    description: 'Map research findings from one domain to another (e.g., tech to legal)',
+    tools: [{ name: 'llm:generate' }]
+  },
+  automated_citation_validation: {
+    id: 'automated_citation_validation',
+    family: 'Research',
+    description: 'Verify that all citations in a research report are valid and reachable',
+    tools: [{ name: 'search:sql' }, { name: 'shell:run' }]
   }
 };

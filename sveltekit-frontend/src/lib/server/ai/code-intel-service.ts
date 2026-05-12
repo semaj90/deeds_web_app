@@ -3,13 +3,14 @@ import { kagDagRuns, topologySnapshots, memoryGainAudits, qdrantCentroidClusters
 import { tensorAnalysisCache } from '$lib/server/db/schema/topology.js';
 import { desc, count, eq, sql, avg } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { getGraphMLStatus } from '$lib/server/grpc/graph-ml-client.js';
 
 /**
  * Code Intel Service: Aggregates statistics and health metrics for the
  * TRACE KAG-DAG pipeline and Karpathy Indexer.
  */
 export async function getCodeIntelHealth() {
-	const [latestRun, memoryStats, clusterCount, traceRuns, checks] = await Promise.all([
+	const [latestRun, memoryStats, clusterCount, traceRuns, checks, graphMl] = await Promise.all([
 		db.select().from(topologySnapshots).orderBy(desc(topologySnapshots.createdAt)).limit(1),
 		db.select({
 			total: count(),
@@ -19,6 +20,7 @@ export async function getCodeIntelHealth() {
 		db.select({ value: count() }).from(qdrantCentroidClusters),
 		db.select({ value: count() }).from(kagDagRuns),
 		checkSystemHealth(),
+		getGraphMLStatus(),
 	]);
 
 	const allOk = Object.values(checks.checks).every(s => s === 'ok');
@@ -34,7 +36,8 @@ export async function getCodeIntelHealth() {
 		clusters: clusterCount[0]?.value || 0,
 		totalTraceRuns: traceRuns[0]?.value || 0,
 		checks: checks.checks,
-		status: allOk ? 'healthy' : 'degraded',
+		graphMl,
+		status: (allOk && graphMl.cuda) ? 'healthy' : 'degraded',
 	};
 }
 
@@ -237,32 +240,36 @@ export async function checkSystemHealth() {
 		}
 	}
 
-	async function redisOk(): Promise<boolean> {
-		try {
-			const { getRedis } = await import('../redis.js');
-			const r = getRedis();
-			const pong = await r.ping();
-			return pong === 'PONG';
-		} catch {
-			return false;
-		}
+	async function mediaOk(): Promise<{ ytdlp: boolean; whisper: boolean; ffmpeg: boolean }> {
+		const { existsSync } = await import('node:fs');
+		const { spawnSync } = await import('node:child_process');
+		
+		const ytdlp = existsSync('../.venv/Scripts/yt-dlp.exe');
+		const ffmpeg = spawnSync('ffmpeg', ['-version']).status === 0;
+		const whisper = spawnSync('../.venv/Scripts/python.exe', ['-c', 'import faster_whisper; print("ok")']).status === 0;
+		
+		return { ytdlp, whisper, ffmpeg };
 	}
 
-	const [qdrant, ollama, pg, redis] = await Promise.all([
+	const [qdrant, ollama, pg, redis, media] = await Promise.all([
 		probe(`${ENV.QDRANT_URL}/collections`),
 		probe(`${ENV.OLLAMA_BASE_URL}/api/tags`),
 		postgresOk(),
 		redisOk(),
+		mediaOk(),
 	]);
 
+	const mediaStatus = media.ytdlp && media.whisper && media.ffmpeg;
+
 	return {
-		ok: qdrant && ollama && pg && redis,
+		ok: qdrant && ollama && pg && redis && mediaStatus,
 		durationMs: Date.now() - t0,
 		checks: {
 			qdrant:   qdrant   ? 'ok' : 'failed',
 			ollama:   ollama   ? 'ok' : 'failed',
 			postgres: pg       ? 'ok' : 'failed',
 			redis:    redis    ? 'ok' : 'failed',
+			media:    mediaStatus ? 'ok' : (media.ytdlp ? (media.whisper ? 'ffmpeg_missing' : 'whisper_missing') : 'ytdlp_missing'),
 		},
 	};
 }
@@ -295,6 +302,5 @@ export async function generateClaudePlan(params: { goal: string; scope: string }
 		patchPolicy: 'propose_only'
 	};
 }
-
 
 

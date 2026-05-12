@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod';
+import { resolveRuntimeConfig, type QuantRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -60,35 +61,26 @@ export type GapRepairPlan = z.infer<typeof GapRepairPlanSchema>;
 
 const TOOL_POLICY: Record<string, string[]> = {
   search: [
-    'deep_research',
-    'source_summarize',
-    'citation_builder',
-    'qdrant_search',
-    'cluster_summary_lenses',
-    'neo4j_expand_neighborhood',
-    'couchdb_view_query'
+    'deep_research', 'source_summarize', 'citation_builder', 'web_fallback', 'compare_sources',
+    'qdrant_search', 'cluster_summary_lenses', 'topological_graph_filter', 'multi_collection_fusion',
+    'search_related_wiki_cards', 'trend_analysis', 'fact_check_claims', 'summarize_statutory_framework'
   ],
   debug: [
-    'search_codebase',
-    'trace_imports',
-    'check_services',
-    'infer_pipeline_gaps',
-    'stack_health_report',
-    'redis_cache_lookup'
+    'search_codebase', 'trace_imports', 'stack_health_report', 'redis_cache_lookup',
+    'gpu_vram_audit', 'client_side_error_log_audit', 'measure_cold_start_latency',
+    'monitor_worker_thread_pool_saturation', 'verify_simdjson_hotpath_dispatch',
+    'audit_api_route_auth_guards', 'check_redis_memory_fragmentation'
   ],
   repair: [
-    'infer_pipeline_gaps',
-    'repair_missing_summary',
-    'retry_failed_jobs',
-    'check_services'
+    'auto_fix_lint_errors', 'repair_broken_wiki_links', 'database_index_rebuild',
+    'reconcile_missing_vector_payloads', 'self_heal_broken_dependencies',
+    'fix_orphaned_file_metadata', 'reset_hung_background_tasks', 'vram_fragmentation_defrag'
   ],
   analyze: [
-    'deep_research',
-    'opinion_summarizer',
-    'issue_spotter',
-    'case_intake',
-    'batch_summarize',
-    'batch_export_jsonl'
+    'opinion_summarizer', 'issue_spotter', 'case_intake', 'prior_case_crossref',
+    'elements_checker', 'precedent_search', 'discovery_gap_analysis',
+    'admissibility_checker', 'settlement_value_estimator', 'cross_jurisdictional_analysis',
+    'detect_legal_bias', 'identify_influence_nodes', 'semantic_overlap_map'
   ],
 };
 
@@ -98,7 +90,8 @@ const TOOL_POLICY: Record<string, string[]> = {
 
 function buildPlannerSystemPrompt(
   aceMode: string,
-  availableSignals: AvailableSignals
+  availableSignals: AvailableSignals,
+  runtime: QuantRuntimeConfig
 ): string {
   const allowed = TOOL_POLICY[aceMode] ?? TOOL_POLICY.search;
   return `You are Hermes, the dispatcher for a legal-AI platform.
@@ -114,21 +107,30 @@ Available signals:
 - Neo4j graph: ${availableSignals.hasNeo4j}
 - CouchDB MapReduce views: ${availableSignals.hasCouchViews}
 
+Runtime truth:
+- profile: ${runtime.profile}
+- backend: ${runtime.backend}
+- turboQuant: ${runtime.turboQuant}
+- rotorQuantKv: ${runtime.rotorQuantKv}
+- runtimeAvailable: ${runtime.runtimeAvailable}
+- requiresFork: ${runtime.requiresFork}
+
 Mode: ${aceMode}
 
 Core Skill Families to choose from:
-- Research (deep_research, source_summarize, citation_builder, etc.)
-- Evidence (ingest_pdf, transcribe_audio, build_timeline, etc.)
-- Codebase (search_codebase, explain_file, trace_imports, etc.)
-- Graph (deep_import_graph_expand, neo4j_expand_neighborhood, find_missing_edges, etc.)
-- Vector/Cluster (qdrant_search, cluster_summary_lenses, etc.)
-- Memory (couchdb_view_query, redis_cache_lookup, etc.)
-- Batch (batch_ingest_folder, batch_summarize, etc.)
-- Repair (check_services, infer_pipeline_gaps, suggest_commands, etc.)
-- Legal/Case (case_intake, issue_spotter, opinion_summarizer, etc.)
-- Simulation (mock_trial, prosecutor_argument, judge_questions, etc.)
-- GPU/Acceleration (embedding_batch, rerank_batch, etc.)
-- UI/Diagnostics (route_smoke_test, stack_health_report, etc.)
+- Research (deep_research, source_summarize, trend_analysis, fact_check_claims, etc.)
+- Evidence (ingest_pdf, transcribe_audio, build_timeline, witness_crossref, etc.)
+- Codebase (search_codebase, explain_file, trace_imports, detect_leaks, etc.)
+- Graph (neo4j_expand_neighborhood, identify_influence_nodes, detect_orphans, etc.)
+- Vector/Cluster (qdrant_search, cluster_summary_lenses, vector_drift_analysis, etc.)
+- Memory (couchdb_view_query, redis_cache_lookup, write_session_summary, etc.)
+- Batch (batch_metadata_extraction, scheduled_backup_sync, token_audit, etc.)
+- Repair (auto_fix_lint_errors, self_heal_dependencies, json_repair, etc.)
+- Legal/Case (case_intake, issue_spotter, precedent_search, legal_bias_detection, etc.)
+- Simulation (mock_trial, prosecutor_argument, outcome_probability_matrix, etc.)
+- GPU/Acceleration (gpu_vram_audit, autonomous_model_tier_selection, rerank_batch, etc.)
+- UI/Diagnostics (route_smoke_test, stack_health_report, accessibility_audit, etc.)
+- SystemAudit (audit_api_route_auth_guards, check_redis_fragmentation, qdrant_integrity_check, etc.)
 
 Your plan should list the SKILL names in the "tools" array.
 
@@ -200,8 +202,13 @@ export async function runHermesPlanner(input: {
   userQuery: string;
   aceMode: 'search' | 'debug' | 'repair' | 'analyze';
   availableSignals: AvailableSignals;
+  runtime?: QuantRuntimeConfig;
 }): Promise<HermesPlan> {
-  const systemPrompt = buildPlannerSystemPrompt(input.aceMode, input.availableSignals);
+  const systemPrompt = buildPlannerSystemPrompt(
+    input.aceMode,
+    input.availableSignals,
+    input.runtime ?? resolveRuntimeConfig()
+  );
   const raw = await callHermesJsonMode(systemPrompt, input.userQuery);
 
   let parsed: unknown;

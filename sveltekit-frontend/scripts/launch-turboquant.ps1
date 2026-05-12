@@ -72,6 +72,24 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# ── Load .env if present ──────────────────────────────────────────────────
+$envPath = Join-Path $PSScriptRoot "..\" ".env"
+if (Test-Path $envPath) {
+    Get-Content $envPath | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
+        $name, $value = $_.Split('=', 2)
+        if ($name -and $value) {
+            $name = $name.Trim()
+            $value = $value.Trim().Trim('"').Trim("'")
+            if (-not [string]::IsNullOrWhiteSpace($name)) {
+                # Only set if not already present in the environment (allows shell overrides)
+                if (-not (Test-Path "env:$name")) {
+                    [System.Environment]::SetEnvironmentVariable($name, $value)
+                }
+            }
+        }
+    }
+}
+
 # ── Resolve paths and ports ──────────────────────────────────────────────
 $llama   = if ($env:LLAMA_SERVER_PATH) { $env:LLAMA_SERVER_PATH } else { 'C:\Users\james\Desktop\llama-server-cuda\llama-server.exe' }
 # ROTORQUANT_MODEL_PATH overrides TURBO_MODEL_PATH when set.
@@ -85,7 +103,7 @@ if ($env:ROTORQUANT_MODEL_PATH) {
   Write-Host 'Model: RotorQuant GGUF (weight-quantised, stock binary OK)' -ForegroundColor Cyan
 }
 $mmproj  = if ($env:TURBO_MMPROJ_PATH) { $env:TURBO_MMPROJ_PATH } else { Join-Path $env:USERPROFILE 'Downloads\gemma4-mmproj\mmproj-BF16.gguf' }
-$port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
+$port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8080' }
 $ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '4096' }
 $ngl     = if ($env:TURBO_NGL)         { $env:TURBO_NGL }         else { '99' }
 
@@ -100,7 +118,7 @@ switch ($kvProfile) {
   'stock'           { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
   'turboquant'      { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo3' }
   'turboquant-safe' { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
-  'atomicbot'       { $kvProfileK = 'turbo3'; $kvProfileV = 'turbo3' }
+  'atomicbot'       { $kvProfileK = 'q8_0'; $kvProfileV = 'q8_0' }
 }
 
 $explicitK = [bool]$env:TURBO_KV_K
@@ -203,6 +221,16 @@ $baseArgs = @(
   '-ctv',   $kvV,
   '-c',     $ctxLen
 )
+
+if ($kvProfile -eq 'atomicbot') {
+    # Enable TriAttention v2 (2026) for Gemma 4
+    $baseArgs = $baseArgs + @(
+      '--triattention-budget', '4096',
+      '--triattention-window', '128',
+      '--triattention-mode', 'per-kv-head',
+      '--triattention-normalize'
+    )
+}
 if (-not $TextOnly -and (Test-Path $mmproj)) {
   $baseArgs = @('-m', $model, '--mmproj', $mmproj) + $baseArgs[2..($baseArgs.Length - 1)]
 }
@@ -234,6 +262,17 @@ if ($kvProfile -eq 'atomicbot') {
     $baseArgs = $baseArgs + @('--mtp-head', $mtpPath)
   } else {
     Write-Host ("AtomicBot: MTP sidecar not found at $mtpPath — running without --mtp-head (set MTP_HEAD_PATH to fix)") -ForegroundColor Yellow
+  }
+}
+
+# ── Speculative Decoding: inject --model-draft for accelerated throughput ──
+if ($env:DRAFT_MODEL_PATH) {
+  if (Test-Path $env:DRAFT_MODEL_PATH) {
+    $draftN = if ($env:DRAFT_N) { $env:DRAFT_N } else { '5' }
+    Write-Host ("Speculative Decoding: --model-draft enabled ($($env:DRAFT_MODEL_PATH))") -ForegroundColor Cyan
+    $baseArgs = $baseArgs + @('--model-draft', $env:DRAFT_MODEL_PATH, '--draft', $draftN, '--n-gpu-layers-draft', '99')
+  } else {
+    Write-Host ("Speculative Decoding: DRAFT_MODEL_PATH set but file not found at $($env:DRAFT_MODEL_PATH) — skipping") -ForegroundColor Yellow
   }
 }
 

@@ -36,6 +36,7 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 import { extractStructured } from '$lib/server/ai/lang-extract.js';
+import { resolveRuntimeConfig, type QuantRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 
 // ── Domain taxonomy ────────────────────────────────────────────────────────────
 // Matches the karpathy semantic tag vocabulary in codebase_chunks_768.
@@ -133,6 +134,7 @@ export interface WorkerFinding {
 export interface ResearchGraph {
 	query:             string;
 	domains:           ResearchDomain[];
+	runtime:           QuantRuntimeConfig;
 	workerFindings:    WorkerFinding[];
 	supervisorSummary: string;
 	keyFindings:       string[];   // cross-domain insights from supervisor
@@ -140,6 +142,7 @@ export interface ResearchGraph {
 	totalChunks:       number;
 	totalDurationMs:   number;
 	cacheKey:          string;     // stable digest — expose for cache busting
+	queryEmbedding?:   number[];   // 768d vector used for initial Qdrant search
 }
 
 // ── Zod schemas for structured LLM outputs ────────────────────────────────────
@@ -399,7 +402,7 @@ async function supervisorPlan(query: string): Promise<ResearchDomain[]> {
  * Searches Qdrant, synthesizes findings via Ollama, returns WorkerFinding.
  * Results are Redis-cached for 10 minutes by (domain + queryHash).
  */
-async function runWorker(domain: ResearchDomain, query: string, limit: number): Promise<WorkerFinding> {
+async function runWorker(domain: ResearchDomain, query: string, limit: number, queryVector?: number[]): Promise<WorkerFinding> {
 	const t0      = performance.now();
 	const qHash   = _ck(query);
 	const cacheKey = `lg:worker:${domain}:${qHash}:${limit}`;
@@ -416,8 +419,14 @@ async function runWorker(domain: ResearchDomain, query: string, limit: number): 
 	const vecName = (useErrorVector && await qdrantHasNamedVector('error')) ? 'error' : 'content';
 
 	// 1. Embed domain-augmented query (vector steering for domain relevance)
-	const augmentedQuery = queryPrefix ? `${queryPrefix} — ${query}` : query;
-	const vector = await embedText(augmentedQuery);
+	// If queryVector is provided, use it (possibly skipping augmented embedding for now)
+	// or re-embed if domain prefix is present.
+	let vector = queryVector;
+	if (queryPrefix || !vector) {
+		const augmentedQuery = queryPrefix ? `${queryPrefix} — ${query}` : query;
+		vector = await embedText(augmentedQuery) ?? undefined;
+	}
+
 	if (!vector) {
 		return { domain, chunks: [], summary: 'Embedding failed', keyInsights: [], relevantPaths: [], durationMs: performance.now() - t0, source: 'degraded', cached: false };
 	}
@@ -583,17 +592,20 @@ export async function runConcurrentResearch(
 		? options.domains
 		: await supervisorPlan(query);
 
+	// Step 1.5: Embed base query
+	const queryEmbedding = await embedText(query);
+
 	// Step 2: Concurrent workers
 	const settled = await Promise.allSettled(
-		domains.map(domain =>
-			Promise.race([
-				runWorker(domain, query, limit),
-				// Per-worker timeout — degraded finding on timeout
-				new Promise<WorkerFinding>((_, reject) =>
-					setTimeout(() => reject(new Error('worker timeout')), options?.timeoutMs ?? 45_000)
-				),
-			])
-		)
+	  domains.map(domain =>
+	    Promise.race([
+	      runWorker(domain, query, limit, queryEmbedding ?? undefined),
+	      // Per-worker timeout — degraded finding on timeout
+	      new Promise<WorkerFinding>((_, reject) =>
+	        setTimeout(() => reject(new Error('worker timeout')), options?.timeoutMs ?? 45_000)
+	      ),
+	    ])
+	  )
 	);
 
 	const workerFindings: WorkerFinding[] = settled.map((r, i) =>
@@ -620,6 +632,7 @@ export async function runConcurrentResearch(
 	const graph: ResearchGraph = {
 		query,
 		domains,
+		runtime:         resolveRuntimeConfig(),
 		workerFindings,
 		supervisorSummary,
 		keyFindings,
@@ -627,6 +640,7 @@ export async function runConcurrentResearch(
 		totalChunks,
 		totalDurationMs: Math.round(performance.now() - t0),
 		cacheKey:        graphCacheKey.slice(-16),
+		queryEmbedding:  queryEmbedding ?? undefined,
 	};
 
 	// Cache the full graph result (5 min) for repeated MCP calls with same query
@@ -649,6 +663,7 @@ export function formatGraphForClaudeCode(graph: ResearchGraph): string {
 		`# Codebase Research: ${graph.query}`,
 		``,
 		`> Domains: ${graph.domains.join(', ')} | Chunks: ${graph.totalChunks} | ${graph.totalDurationMs}ms`,
+		`> Runtime: ${graph.runtime.profile} | backend=${graph.runtime.backend} | turboQuant=${graph.runtime.turboQuant} | rotorQuantKv=${graph.runtime.rotorQuantKv}`,
 		``,
 		`## Summary`,
 		graph.supervisorSummary,

@@ -1,7 +1,7 @@
 # AGENTS.md — `tests/routes/auto/api/glossary`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-11T23:28:38.745Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-12T03:12:15.164Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests/routes/auto/api/glossary
 

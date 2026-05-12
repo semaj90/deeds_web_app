@@ -158,9 +158,9 @@ export async function buildResearchGraph(): Promise<GraphBuildResult> {
 	const matrix = buildEmbeddingMatrix(summaries);
 	const n      = summaries.length;
 
-	// 3. GPU k-means (synchronous — N-API or CPU fallback)
+	// 3. GPU k-means (async — RTX 3060 Ti CUDA → gRPC → CPU JS fallback)
 	const k  = Math.min(GRAPH_CLUSTERS, Math.floor(n / 2) || 1);
-	const km = runKMeans(matrix, n, DIM, k);
+	const km = await runKMeans(matrix, n, DIM, k);
 
 	// 4. Build sparse cosine adjacency for PageRank
 	const adjEdges: { from: number; to: number }[] = [];
@@ -178,8 +178,8 @@ export async function buildResearchGraph(): Promise<GraphBuildResult> {
 		}
 	}
 
-	// 5. GPU PageRank (synchronous)
-	const pr = runPageRank(adjFlat, n, PAGERANK_DAMPING, PAGERANK_ITERS);
+	// 5. GPU PageRank (async)
+	const pr = await runPageRank(adjFlat, n, PAGERANK_DAMPING, PAGERANK_ITERS);
 
 	// 6. Assemble clusters with member IDs + centroid + cluster-level pagerank
 	const clusterMap: Map<number, { memberIds: string[]; pageRankSum: number }> = new Map();
@@ -359,7 +359,7 @@ export async function computeRlPolicy(): Promise<RlPolicyWeights> {
 		// Combine as a reward signal vector (query + generated pseudo-response)
 		const queryVec = new Float32Array(DIM).fill(fbRate);
 		const respVec  = new Float32Array(DIM).fill(qlora);
-		const reward   = scoreGRPOReward(queryVec, respVec, DIM).reward;
+		const { reward } = await scoreGRPOReward(queryVec, respVec, DIM);
 
 		// Clamp to [0.05, 2.0] so no pipeline is completely suppressed
 		weights[pipeline] = Math.min(2.0, Math.max(0.05, (reward + fbRate + qlora) / 3 * 2));
@@ -432,9 +432,9 @@ export async function searchWithTagEmbedding(
 		}
 	}
 
-	// 3. scoreAttention: query vector vs candidate matrix (synchronous)
+	// 3. scoreAttention: query vector vs candidate matrix (async)
 	const queryVec = l2Norm(new Float32Array(queryEmbedding));
-	const attn     = scoreAttention(queryVec, DIM, mat, n);
+	const attn     = await scoreAttention(queryVec, DIM, mat, n);
 
 	// 4. Load graph metadata from Redis (optional enrichment)
 	const clusterById: Map<string, { cluster: number; pageRank: number }> = new Map();
@@ -575,11 +575,10 @@ async function nodeEvaluate(state: ResearchRlStateType): Promise<Partial<Researc
 		return { rewardScore: 0 };
 	}
 	try {
-		const qv  = l2Norm(new Float32Array(state.queryEmbedding));
-		const av  = l2Norm(new Float32Array(state.answerEmbedding));
-		// scoreGRPOReward expects gen, ref, n=1, dim
-		const res = rewardScoreGPU(av, qv, 1, DIM);
-		return { rewardScore: res.scores[0] ?? 0 };
+		const qv  = new Float32Array(state.queryEmbedding);
+		const av  = new Float32Array(state.answerEmbedding);
+		const { reward } = await scoreGRPOReward(av, qv, DIM);
+		return { rewardScore: reward };
 	} catch {
 		return { rewardScore: 0 };
 	}

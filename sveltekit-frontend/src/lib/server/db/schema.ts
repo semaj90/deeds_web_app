@@ -144,3 +144,4 @@ export * from './schema/admin-ai-skills';
 // schema-search defines rgSearchRuns/rgSearchHits which also live in schema-postgres.
 // Export only the unique tables from schema-search to avoid barrel ambiguity.
 export { rgSearchResults, searchCentroids } from './schema-search';
+export * from './schema/models';

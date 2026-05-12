@@ -1,0 +1,21 @@
+FROM C:\Users\james\Downloads\gemma4-e4b-legal-ollama\gemma4-e4b-legal.Q4_K_M.gguf
+
+PARAMETER temperature 0.3
+PARAMETER top_p 0.9
+PARAMETER top_k 40
+PARAMETER repeat_penalty 1.1
+PARAMETER num_ctx 8192
+PARAMETER stop "<end_of_turn>"
+PARAMETER stop "<eos>"
+
+TEMPLATE """<start_of_turn>system
+You are a legal AI assistant specialized in U.S. law. Provide accurate legal analysis with proper Bluebook citations. Structure responses with clear headings, numbered elements, and relevant statutory/case references.
+<end_of_turn>
+<start_of_turn>user
+{{ .Prompt }}
+<end_of_turn>
+<start_of_turn>model
+{{ .Response }}
+<end_of_turn>"""
+
+SYSTEM """You are a legal AI assistant fine-tuned on U.S. federal and state law. Always cite statutes (U.S.C., CFR) and case law in Bluebook format. Identify relevant legal elements, potential defenses, and procedural considerations."""

@@ -25,6 +25,8 @@ import type {
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { turboQuantChat, bifrostChat } from '$lib/server/ollama.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
+import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
 import { compressToHCACard } from '$lib/server/ai/hca-compressor.js';
 import { buildDevContextPlan, isCodingPrompt } from '$lib/server/ai/dev-context-planner.js';
 import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
@@ -108,6 +110,8 @@ export async function runChatCompletion(
   const startMs       = Date.now();
   const internalModel = resolveInternalModel(req.model);
   const { query, history, systemPreamble } = splitMessages(req.messages);
+  const runtime = resolveRuntimeConfig();
+  const canUseTurboQuantNow = canUseTurboQuant(runtime);
 
   if (!query) {
     throw new Error('No user query found in messages — last message must be role:user');
@@ -120,15 +124,23 @@ export async function runChatCompletion(
       role:    m.role === 'tool' ? 'user' as const : m.role,
       content: m.content ?? '',
     }));
-    // Try TurboQuant first (78 tok/s GPU), fall back to bifrostChat
+    // Try TurboQuant only when runtime truth says it is live.
     let text: string;
-    try {
-      const content = await turboQuantChat(mappedMsgs, internalModel, {
-        temperature: req.temperature,
-        maxTokens: req.max_tokens,
-      });
-      text = typeof content === 'string' ? content : (content as { content: string }).content;
-    } catch {
+    if (canUseTurboQuantNow) {
+      try {
+        const content = await turboQuantChat(mappedMsgs, internalModel, {
+          temperature: req.temperature,
+          maxTokens: req.max_tokens,
+        });
+        text = typeof content === 'string' ? content : (content as { content: string }).content;
+      } catch {
+        const content = await bifrostChat(mappedMsgs, internalModel, {
+          temperature: req.temperature,
+          maxTokens: req.max_tokens,
+        });
+        text = typeof content === 'string' ? content : (content as { content: string }).content;
+      }
+    } else {
       const content = await bifrostChat(mappedMsgs, internalModel, {
         temperature: req.temperature,
         maxTokens: req.max_tokens,
@@ -292,15 +304,23 @@ export async function runChatCompletion(
     { role: 'user',   content: query },
   ];
 
-  // Try TurboQuant first (78 tok/s GPU), fall back to bifrostChat
+  // Try TurboQuant only when runtime truth says it is live.
   let text: string;
-  try {
-    const result = await turboQuantChat(messages, internalModel, {
-      temperature: req.temperature,
-      maxTokens:   req.max_tokens,
-    });
-    text = typeof result === 'string' ? result : (result as { content: string }).content;
-  } catch {
+    if (canUseTurboQuantNow) {
+      try {
+        const result = await turboQuantChat(messages, internalModel, {
+          temperature: req.temperature,
+        maxTokens:   req.max_tokens,
+      });
+      text = typeof result === 'string' ? result : (result as { content: string }).content;
+    } catch {
+      const result = await bifrostChat(messages, internalModel, {
+        temperature: req.temperature,
+        maxTokens:   req.max_tokens,
+      });
+      text = typeof result === 'string' ? result : (result as { content: string }).content;
+    }
+  } else {
     const result = await bifrostChat(messages, internalModel, {
       temperature: req.temperature,
       maxTokens:   req.max_tokens,

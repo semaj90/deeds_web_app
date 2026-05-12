@@ -13,6 +13,8 @@
  */
 
 import type { BackendName } from './model-loader.js';
+import { resolveRuntimeConfig } from './inference-configs.js';
+import { canUseTurboQuant } from './backend-runtime-guards.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -100,6 +102,8 @@ export function routeQuery(query: string, opts: RoutingInput = {}): RoutingDecis
   const legal  = isLegalQuery(query);
   const simple = isSimpleQuery(query);
   const fast   = latencyBudgetMs > 0 && latencyBudgetMs < 2000;
+  const runtime = resolveRuntimeConfig();
+  const runtimePreferredBackend: BackendName = canUseTurboQuant(runtime) ? 'turboquant' : 'bifrost';
 
   // Vision path — always use the VLM model
   if (hasImage) {
@@ -116,9 +120,14 @@ export function routeQuery(query: string, opts: RoutingInput = {}): RoutingDecis
 
   // Fast path — simple non-legal query with tight latency budget
   if (fast && !legal && simple) {
+    const requested = preferredBackend ?? runtimePreferredBackend;
+    const safeBackend: BackendName = requested === 'turboquant' && !canUseTurboQuant(runtime)
+      ? 'bifrost'
+      : requested;
+
     return {
       model: MODELS.FAST,
-      backend: preferredBackend ?? 'bifrost',
+      backend: safeBackend,
       useCache: isCacheable(temperature),
       useAce: false,
       isLegal: false,
@@ -128,9 +137,14 @@ export function routeQuery(query: string, opts: RoutingInput = {}): RoutingDecis
   }
 
   // Default: legal or complex query → full pipeline
+  const requested = preferredBackend ?? runtimePreferredBackend;
+  const safeBackend: BackendName = requested === 'turboquant' && !canUseTurboQuant(runtime)
+    ? 'bifrost'
+    : requested;
+
   return {
     model: MODELS.LEGAL_VLM,
-    backend: preferredBackend ?? 'turboquant',
+    backend: safeBackend,
     useCache: isCacheable(temperature),
     useAce: legal,
     isLegal: legal,

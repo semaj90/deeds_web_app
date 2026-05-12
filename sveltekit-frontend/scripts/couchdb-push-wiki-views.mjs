@@ -11,9 +11,17 @@
  * Safe to re-run after adding new views.
  */
 
-const COUCH_URL = process.env.COUCHDB_URL ?? 'http://admin:legal_ai_pass@127.0.0.1:5984';
+const COUCH_RAW = process.env.COUCHDB_URL ?? 'http://admin:deeds123@127.0.0.1:5984';
 const DB        = 'karpathy_wiki';
 const DESIGN_ID = '_design/wiki';
+
+// Node 18+ fetch() rejects URLs with embedded credentials — extract to header
+const _parsed   = new URL(COUCH_RAW);
+const COUCH_AUTH = _parsed.username
+  ? { Authorization: `Basic ${Buffer.from(`${decodeURIComponent(_parsed.username)}:${decodeURIComponent(_parsed.password)}`).toString('base64')}` }
+  : {};
+_parsed.username = ''; _parsed.password = '';
+const COUCH_URL = _parsed.origin;
 const DRY_RUN   = process.argv.includes('--dry-run');
 
 // ── MapReduce view functions ──────────────────────────────────────────────────
@@ -167,7 +175,7 @@ const DESIGN_DOC = {
 // ── HTTP helpers ──────────────────────────────────────────────────────────────
 
 async function couchGet(path) {
-  const res = await fetch(`${COUCH_URL}/${DB}/${path}`);
+  const res = await fetch(`${COUCH_URL}/${DB}/${path}`, { headers: { ...COUCH_AUTH } });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`GET ${path} → ${res.status}: ${await res.text()}`);
   return res.json();
@@ -176,7 +184,7 @@ async function couchGet(path) {
 async function couchPut(path, body) {
   const res = await fetch(`${COUCH_URL}/${DB}/${path}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...COUCH_AUTH },
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`PUT ${path} → ${res.status}: ${await res.text()}`);
@@ -186,10 +194,10 @@ async function couchPut(path, body) {
 // ── Ensure the database exists ────────────────────────────────────────────────
 
 async function ensureDb() {
-  const res = await fetch(`${COUCH_URL}/${DB}`, { method: 'HEAD' });
+  const res = await fetch(`${COUCH_URL}/${DB}`, { method: 'HEAD', headers: { ...COUCH_AUTH } });
   if (res.status === 404) {
     console.log(`[wiki-views] Creating database: ${DB}`);
-    const cr = await fetch(`${COUCH_URL}/${DB}`, { method: 'PUT' });
+    const cr = await fetch(`${COUCH_URL}/${DB}`, { method: 'PUT', headers: { ...COUCH_AUTH } });
     if (!cr.ok && cr.status !== 412) throw new Error(`Create DB → ${cr.status}`);
   }
 }

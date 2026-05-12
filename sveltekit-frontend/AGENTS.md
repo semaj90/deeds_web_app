@@ -1,7 +1,7 @@
 # AGENTS.md — `sveltekit-frontend/` (LLM directory wiki)
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-11T23:28:38.745Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-12T03:12:15.164Z · agents.md spec · regen: npm run agents:write -->
 
 > SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > Per-directory AGENTS.md files are scattered throughout `src/` — agents walk UP from any file to the nearest one. **This file is the directory index** so agents (and humans) can quickly jump to a dir's KAG slug or fire the right tool call.
@@ -230,12 +230,12 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/schemas` | 5 | — | C29 | `src_lib_schemas` | `agents_md({ path: "src/lib/schemas" })` |
 | `src/lib/schemas/tools` | 8 | — | C32 | `src_lib_schemas_tools` | `agents_md({ path: "src/lib/schemas/tools" })` |
 
-### `src/lib/server/` (120 dirs)
+### `src/lib/server/` (123 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 | `src/lib/server` | 63 | — | C90 | `src_lib_server` | `agents_md({ path: "src/lib/server" })` |
-| `src/lib/server/ace` | 35 | — | C72 | `src_lib_server_ace` | `agents_md({ path: "src/lib/server/ace" })` |
+| `src/lib/server/ace` | 36 | — | C72 | `src_lib_server_ace` | `agents_md({ path: "src/lib/server/ace" })` |
 | `src/lib/server/admin` | 8 | — | — | `src_lib_server_admin` | `agents_md({ path: "src/lib/server/admin" })` |
 | `src/lib/server/agent` | 3 | — | C74 | `src_lib_server_agent` | `agents_md({ path: "src/lib/server/agent" })` |
 | `src/lib/server/agent/tools` | 8 | — | — | `src_lib_server_agent_tools` | `agents_md({ path: "src/lib/server/agent/tools" })` |
@@ -245,6 +245,9 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/agents/regen/loaders` | 10 | — | — | `src_lib_server_agents_regen_loaders` | `agents_md({ path: "src/lib/server/agents/regen/loaders" })` |
 | `src/lib/server/agents/regen/writers` | 3 | — | — | `src_lib_server_agents_regen_writers` | `agents_md({ path: "src/lib/server/agents/regen/writers" })` |
 | `src/lib/server/ai` | 57 | — | C19 | `src_lib_server_ai` | `agents_md({ path: "src/lib/server/ai" })` |
+| `src/lib/server/ai/hermes` | 2 | — | — | `src_lib_server_ai_hermes` | `agents_md({ path: "src/lib/server/ai/hermes" })` |
+| `src/lib/server/ai/hermes/skills` | 13 | — | — | `src_lib_server_ai_hermes_skills` | `agents_md({ path: "src/lib/server/ai/hermes/skills" })` |
+| `src/lib/server/ai/hermes/tools` | 2 | — | — | `src_lib_server_ai_hermes_tools` | `agents_md({ path: "src/lib/server/ai/hermes/tools" })` |
 | `src/lib/server/analysis` | 12 | — | C54 | `src_lib_server_analysis` | `agents_md({ path: "src/lib/server/analysis" })` |
 | `src/lib/server/analytics` | 15 | — | C60 | `src_lib_server_analytics` | `agents_md({ path: "src/lib/server/analytics" })` |
 | `src/lib/server/atlas` | 4 | — | — | `src_lib_server_atlas` | `agents_md({ path: "src/lib/server/atlas" })` |
@@ -269,7 +272,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/ff1/cli` | 2 | — | — | `src_lib_server_ff1_cli` | `agents_md({ path: "src/lib/server/ff1/cli" })` |
 | `src/lib/server/glyph` | 2 | — | — | `src_lib_server_glyph` | `agents_md({ path: "src/lib/server/glyph" })` |
 | `src/lib/server/gpu` | 17 | — | C20 | `src_lib_server_gpu` | `agents_md({ path: "src/lib/server/gpu" })` |
-| `src/lib/server/graph` | 21 | — | C73 | `src_lib_server_graph` | `agents_md({ path: "src/lib/server/graph" })` |
+| `src/lib/server/graph` | 22 | — | C73 | `src_lib_server_graph` | `agents_md({ path: "src/lib/server/graph" })` |
 | `src/lib/server/grpc` | 10 | — | C82 | `src_lib_server_grpc` | `agents_md({ path: "src/lib/server/grpc" })` |
 | `src/lib/server/helpers` | 2 | — | — | `src_lib_server_helpers` | `agents_md({ path: "src/lib/server/helpers" })` |
 | `src/lib/server/hypergraph` | 5 | — | — | `src_lib_server_hypergraph` | `agents_md({ path: "src/lib/server/hypergraph" })` |
@@ -308,7 +311,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/types` | 10 | — | C73 | `src_lib_server_types` | `agents_md({ path: "src/lib/server/types" })` |
 | `src/lib/server/utils` | 13 | — | C19 | `src_lib_server_utils` | `agents_md({ path: "src/lib/server/utils" })` |
 | `src/lib/server/validation` | 2 | — | C43 | `src_lib_server_validation` | `agents_md({ path: "src/lib/server/validation" })` |
-| `src/lib/server/vector` | 12 | — | C18 | `src_lib_server_vector` | `agents_md({ path: "src/lib/server/vector" })` |
+| `src/lib/server/vector` | 13 | — | C18 | `src_lib_server_vector` | `agents_md({ path: "src/lib/server/vector" })` |
 | `src/lib/server/wiki` | 7 | — | — | `src_lib_server_wiki` | `agents_md({ path: "src/lib/server/wiki" })` |
 | `src/lib/server/workers` | 5 | — | C24 | `src_lib_server_workers` | `agents_md({ path: "src/lib/server/workers" })` |
 

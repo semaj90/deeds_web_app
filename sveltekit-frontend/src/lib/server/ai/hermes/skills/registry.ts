@@ -19,7 +19,7 @@ export interface SkillRecipe {
 export const SKILL_FAMILIES = [
   'Research', 'Evidence', 'Codebase', 'Graph', 'Vector / Cluster',
   'Memory', 'Batch', 'Repair', 'Legal / Case', 'Simulation',
-  'GPU / Acceleration', 'UI / Diagnostics'
+  'GPU / Acceleration', 'UI / Diagnostics', 'SystemAudit'
 ] as const;
 
 import { RESEARCH_SKILLS } from './research.js';
@@ -34,6 +34,7 @@ import { BATCH_SKILLS } from './batch.js';
 import { REPAIR_SKILLS } from './repair.js';
 import { GPU_ACCELERATION_SKILLS } from './gpu-acceleration.js';
 import { UI_DIAGNOSTICS_SKILLS } from './ui-diagnostics.js';
+import { SYSTEM_AUDIT_SKILLS } from './system-audit.js';
 
 export const HERMES_SKILLS: Record<string, SkillRecipe> = {
   ...RESEARCH_SKILLS,
@@ -48,6 +49,7 @@ export const HERMES_SKILLS: Record<string, SkillRecipe> = {
   ...REPAIR_SKILLS,
   ...GPU_ACCELERATION_SKILLS,
   ...UI_DIAGNOSTICS_SKILLS,
+  ...SYSTEM_AUDIT_SKILLS,
 };
 
 /**

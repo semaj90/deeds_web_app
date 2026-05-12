@@ -176,7 +176,88 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
   }
   matC[row * params.N + col] = sum;
 }
-`;
+\`;
+
+// ─── Cross-Attention Reranker ────────────────────────────────────────────────
+
+/**
+ * Cross-Attention Reranker kernel
+ * Computes query-to-candidate attention scores for re-ranking.
+ * Query is 768-dim, candidates are N × 768-dim.
+ */
+export const CROSS_ATTENTION_RERANK_WGSL = /* wgsl */ \`
+struct Params {
+  dimension: u32,
+  count: u32,
+  scale: f32,
+  _pad: u32,
+}
+
+@group(0) @binding(0) var<uniform> params: Params;
+@group(0) @binding(1) var<storage, read> query: array<f32>;
+@group(0) @binding(2) var<storage, read> candidates: array<f32>;
+@group(0) @binding(3) var<storage, read_write> scores: array<f32>;
+
+@compute @workgroup_size(256)
+fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
+  let idx = gid.x;
+  if (idx >= params.count) { return; }
+
+  let dim = params.dimension;
+  let offset = idx * dim;
+
+  var dot: f32 = 0.0;
+  for (var i: u32 = 0u; i < dim; i = i + 1u) {
+    dot += query[i] * candidates[offset + i];
+  }
+
+  scores[idx] = dot * params.scale;
+}
+\`;
+
+// ─── Topological Manifold Filter ───────────────────────────────────────────
+
+/**
+ * Topological Manifold Filter kernel
+ * Computes min-distance to a set of centroids for manifold projection.
+ * Used to filter outliers and prioritize "on-manifold" retrieval hits.
+ */
+export const TOPOLOGICAL_FILTER_WGSL = /* wgsl */ \`
+struct Params {
+  dimension: u32,
+  candidateCount: u32,
+  centroidCount: u32,
+  threshold: f32,
+}
+
+@group(0) @binding(0) var<uniform> params: Params;
+@group(0) @binding(1) var<storage, read> candidates: array<f32>;
+@group(0) @binding(2) var<storage, read> centroids: array<f32>;
+@group(0) @binding(3) var<storage, read_write> distances: array<f32>;
+
+@compute @workgroup_size(256)
+fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
+  let idx = gid.x;
+  if (idx >= params.candidateCount) { return; }
+
+  let dim = params.dimension;
+  let candOffset = idx * dim;
+
+  var min_dist: f32 = 1e10;
+
+  for (var c: u32 = 0u; c < params.centroidCount; c = c + 1u) {
+    let centOffset = c * dim;
+    var dist: f32 = 0.0;
+    for (var i: u32 = 0u; i < dim; i = i + 1u) {
+      let diff = candidates[candOffset + i] - centroids[centOffset + i];
+      dist += diff * diff;
+    }
+    min_dist = min(min_dist, dist);
+  }
+
+  distances[idx] = min_dist;
+}
+\`;
 
 // ─── Shader Registry ──────────────────────────────────────────────────────────
 
@@ -242,6 +323,34 @@ export const SHADER_REGISTRY: ShaderSpec[] = [
 		vectorDim: 0,
 		cudaMirror: 'pageRankGPU (pytorch-graph.ts)',
 		specRef: 'W3C WebGPU Spec § 11.1'
+	},
+	{
+		id: 'cross_attention_rerank',
+		name: 'Cross-Attention Reranker',
+		description: 'WebGPU-accelerated cross-attention scoring for retrieval re-ranking. Query (768d) vs N candidates.',
+		source: CROSS_ATTENTION_RERANK_WGSL,
+		workgroupSize: [256],
+		bindings: [
+			{ binding: 0, type: 'uniform', name: 'params', description: 'Params { dimension: u32, count: u32, scale: f32 }' },
+			{ binding: 1, type: 'storage-read', name: 'query', description: 'Query embedding (768 floats)' },
+			{ binding: 2, type: 'storage-read', name: 'candidates', description: 'Candidate embeddings (N × 768 floats)' },
+			{ binding: 3, type: 'storage-read-write', name: 'scores', description: 'Output attention scores (N floats)' }
+		],
+		vectorDim: 768
+	},
+	{
+		id: 'topological_filter',
+		name: 'Topological Manifold Filter',
+		description: 'High-speed topological distance filtering. Projects candidates onto a manifold defined by K-means centroids.',
+		source: TOPOLOGICAL_FILTER_WGSL,
+		workgroupSize: [256],
+		bindings: [
+			{ binding: 0, type: 'uniform', name: 'params', description: 'Params { dimension: u32, candidateCount: u32, centroidCount: u32, threshold: f32 }' },
+			{ binding: 1, type: 'storage-read', name: 'candidates', description: 'Candidate embeddings (N × 768 floats)' },
+			{ binding: 2, type: 'storage-read', name: 'centroids', description: 'Manifold centroids (K × 768 floats)' },
+			{ binding: 3, type: 'storage-read-write', name: 'distances', description: 'Min-distance to manifold (N floats)' }
+		],
+		vectorDim: 768
 	}
 ];
 

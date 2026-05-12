@@ -5,6 +5,7 @@
 
 import {
     index,
+    integer,
     pgEnum,
     pgTable,
     text,
@@ -24,7 +25,7 @@ export const chatMessageRoleEnum = pgEnum('chat_message_role', ['user', 'assista
 export const chatMessages = pgTable('chat_messages', {
 	id: varchar('id', { length: 255 }).primaryKey(), // msg_1735123456789_abc123
 	chatId: varchar('chat_id', { length: 255 }).notNull(), // Groups messages by conversation
-	userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }), // Nullable for anonymous (pre-migration)
+	userId: integer('user_id').references(() => users.id, { onDelete: 'cascade' }), // Nullable for anonymous (pre-migration)
 	caseId: uuid('case_id').references(() => cases.id, { onDelete: 'set null' }), // FK to cases — nullable (non-case chats)
 	role: chatMessageRoleEnum('role').notNull(), // 'user' | 'assistant' | 'system'
 	content: text('content').notNull(), // Message text
@@ -52,7 +53,7 @@ export type NewChatMessage = typeof chatMessages.$inferInsert;
  */
 export const chatMetadata = pgTable('chat_metadata', {
 	chatId: varchar('chat_id', { length: 255 }).primaryKey(),
-	userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+	userId: integer('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
 	title: varchar('title', { length: 500 }), // Auto-generated or user-provided
 	caseId: uuid('case_id').references(() => cases.id, { onDelete: 'set null' }), // FK to cases table
 	messageCount: varchar('message_count', { length: 50 }).default('0'),
