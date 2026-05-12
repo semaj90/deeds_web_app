@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { useMachine } from '$lib/utils/xstate-svelte5.svelte.js';
   import { fromPromise } from 'xstate';
   import { chatMachine } from '$lib/stores/admin-chat-machine.js';
@@ -20,11 +21,11 @@
         })
       }
     }),
-    { input: { chatId } }
+    { input: { chatId: untrack(() => chatId) } }
   );
 
   let inputVal = $state('');
-  let scrollContainer: HTMLElement;
+  let scrollContainer = $state<HTMLElement | undefined>();
 
   function handleSubmit() {
     if (!inputVal.trim() || snapshot.matches('thinking')) return;

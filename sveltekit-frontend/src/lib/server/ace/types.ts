@@ -196,6 +196,10 @@ export interface ACEContext {
     graphAuthorityScore?: number | null;
     /** Louvain communityId written by graphify:gds, mirrored via Qdrant payload patch */
     communityId?: string | null;
+    /** Directory summary mirrored from AGENTS.md directory cards (L4 lane) */
+    dirSummary?: string | null;
+    /** Resolved AGENTS.md card ID (agents:dir:*) */
+    agentsCardId?: string | null;
     rerankBreakdown?: RerankBreakdown | null;
     /** Stable content-addressed key for this chunk (used by code-intel/search) */
     stableKey?: string | null;
@@ -322,6 +326,8 @@ export interface ACEContext {
     synthesisBlock: string;
     durationMs: number;
   } | null;
+  /** PostgreSQL schema context (tables, columns, types) for database reasoning */
+  dbSchemaContext?: string;
 }
 
 export interface ACEPrompt {

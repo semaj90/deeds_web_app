@@ -18,8 +18,8 @@
  *
  * Returns exit 0 even on skip; only fails on policy violation or unhandled error.
  */
-import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { execFileSync, spawnSync, spawn } from 'node:child_process';
+import { mkdirSync, writeFileSync, readFileSync, existsSync, openSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Redis from 'ioredis';
@@ -110,6 +110,71 @@ async function probeGpuWarm() {
   return gate.requireBoth ? (tq && ol) : (tq || ol);
 }
 
+async function probeServices() {
+  async function hit(url, timeoutMs = 2500) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+      return res.ok ? 'up' : `http-${res.status}`;
+    } catch { return 'down'; }
+  }
+  const [caddy, bifrost, goRetrieval, traceMcp, turboQuant] = await Promise.all([
+    hit('http://127.0.0.1:5178/health'),          // Caddy QUIC proxy
+    hit('http://127.0.0.1:3040/health'),           // Bifrost semantic cache
+    hit('http://127.0.0.1:8100/health'),           // Go retrieval gRPC/HTTP
+    hit('http://127.0.0.1:8788/health'),           // TRACE MCP
+    hit('http://127.0.0.1:8090/health'),           // TurboQuant llama-server
+  ]);
+  return { caddy, bifrost, goRetrieval, traceMcp, turboQuant };
+}
+
+async function ensureDevServer() {
+  // Probe /api/health for a real "backend services ready" signal, not just
+  // "vite compiled" — hypergraph.search needs the full SvelteKit request stack.
+  const HEALTH_URL = 'http://127.0.0.1:5173/api/health';
+  const READY_TIMEOUT_MS = 90_000;  // dev:everything boots Docker + TurboQuant first
+  const POLL_MS = 2_000;
+
+  async function probe() {
+    try {
+      const res = await fetch(HEALTH_URL, { signal: AbortSignal.timeout(2000) });
+      return res.ok;
+    } catch { return false; }
+  }
+
+  if (await probe()) {
+    log.devServer = { status: 'already-up' };
+    return;
+  }
+
+  // Spawn dev:everything detached. The startup lock prevents the nested
+  // startup:ace:detached inside dev:everything from re-entering this script.
+  const logDir = resolve(ROOT, 'logs/task-output/pipeline-test');
+  mkdirSync(logDir, { recursive: true });
+  const out = openSync(resolve(logDir, 'dev-everything.out.log'), 'a');
+  const err = openSync(resolve(logDir, 'dev-everything.err.log'), 'a');
+  const child = spawn('npm', ['run', 'dev:everything'], {
+    cwd: ROOT,
+    detached: true,
+    stdio: ['ignore', out, err],
+    shell: process.platform === 'win32',
+  });
+  child.unref();
+  log.devServer = { status: 'spawned', pid: child.pid, script: 'dev:everything' };
+  console.log(`[startup] dev:everything spawned pid=${child.pid} → logs/task-output/pipeline-test/dev-everything.{out,err}.log`);
+
+  const deadline = Date.now() + READY_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, POLL_MS));
+    if (await probe()) {
+      log.devServer.status = 'healthy';
+      console.log('[startup] /api/health OK — stack ready at :5173');
+      return;
+    }
+  }
+  log.devServer.status = 'timeout';
+  console.warn('[startup] /api/health did not respond within 90s — smoke P1.8 may fail');
+}
+
 function classifyChanges(changed) {
   const triggers = POLICY.thresholds?.schemaChangeTriggers ?? [];
   const isSchemaChange = changed.some(f => triggers.some(t => f.startsWith(t) || f === t));
@@ -153,70 +218,84 @@ async function runIncrementalLane(redis) {
     log.relevantCount = relevant.length;
     log.changeClass = classifyChanges(relevant);
 
-    if (relevant.length === 0 && !FORCE) {
+    const hasChanges = relevant.length > 0 || FORCE;
+
+    if (!hasChanges) {
       log.status = 'skipped';
       log.reason = 'no relevant changed files';
-      // Still update sha so next run sees a fresh baseline
-      if (head !== 'unknown') await redis.set(POLICY.redisStateKeys.lastSha, head);
-      console.log('[startup] incremental: no relevant changes, sha advanced');
-      return;
+      console.log('[startup] incremental: no relevant changes — skipping indexing, running health checks');
     }
 
-    // ── Indexing loop (upstream of every other step) ─────────────────────────
-    // index:codebase:fast:resume — incremental AST scan with gradient
-    // checkpoint that skips unchanged files. Writes to code_relations +
-    // qdrant_cluster_members, which are the exact upstream tables the
-    // hypergraph seeder + atlas builder consume. Without this step, the
-    // downstream seeders work against stale data after every refactor.
-    //
-    // Cost: ~1-3s when nothing changed (gradient checkpoint short-circuit),
-    // up to ~30s when many files changed. The agents:pipeline below depends
-    // on fresh code_relations data, so this MUST run first.
-    runStep('codebase index resume', 'index:codebase:fast:resume', {
-      required: false, timeout: 60_000,
-    });
+    // ── Indexing loop — only when files changed ───────────────────────────────
+    if (hasChanges) {
+      // index:codebase:fast:resume — incremental AST scan with gradient
+      // checkpoint that skips unchanged files. Writes to code_relations +
+      // qdrant_cluster_members, which are the exact upstream tables the
+      // hypergraph seeder + atlas builder consume. Without this step, the
+      // downstream seeders work against stale data after every refactor.
+      //
+      // Cost: ~1-3s when nothing changed (gradient checkpoint short-circuit),
+      // up to ~30s when many files changed. The agents:pipeline below depends
+      // on fresh code_relations data, so this MUST run first.
+      runStep('codebase index resume', 'index:codebase:fast:resume', {
+        required: false, timeout: 60_000,
+      });
 
-    runStep('agents pipeline dry-run', 'agents:pipeline:dry', { timeout: 180_000 });
+      runStep('agents pipeline dry-run', 'agents:pipeline:dry', { timeout: 180_000 });
 
-    if (!DRY) {
-      runStep('agents pipeline safe', 'agents:pipeline:safe', { timeout: 240_000 });
+      if (!DRY) {
+        runStep('agents pipeline safe', 'agents:pipeline:safe', { timeout: 240_000 });
+      }
+
+      runStep('topology validate', 'topology:validate', { required: false, timeout: 120_000 });
+      runStep('graph synthesize', 'graph:synthesize', { required: false, timeout: 240_000 });
+
+      // atlas:index — rebuild atlas dir cards (ace:atlas:dir:*) and
+      // ace:atlas:dirs index from the fresh code_relations + agent_context_files
+      // data the steps above just refreshed. Adaptive (skips dirs without
+      // changed files), so re-runs are cheap. Must come AFTER agents:pipeline
+      // and graph:synthesize so the dir cards reflect the latest envelope +
+      // synthesis state.
+      runStep('atlas index rebuild', 'atlas:index', { required: false, timeout: 60_000 });
+
+      // ace:hit-demand — refresh chunk_hit_log → Redis demand hash on every
+      // folder open. Cheap (~3s), idempotent (HSET atomic replace), 1h TTL so
+      // stale entries self-evict if startup misses. Reads append-only Postgres
+      // table, never destructive. Empty hit-log is handled (logs "no recent
+      // hits" and exits clean) so this is safe even on a cold dev machine.
+      runStep('ace hit-demand refresh', 'ace:hit-demand', { required: false, timeout: 60_000 });
+
+      // hypergraph:seed — promote qdrant_cluster_members → hypergraph_edges with
+      // SOM cell + manifold4 + topo_class enrichment. Adaptive-guarded
+      // (per-edge edge_hash skip when membership unchanged), so re-runs are
+      // sub-second when nothing changed. Snapshots the existing edge set to
+      // hypergraph:edges:archive:{day} (30d TTL) before any mutation —
+      // operator can recover via scripts/restore-hypergraph-archive.mjs without
+      // re-running the 20+ min AST/GPU upstream chain.
+      runStep('hypergraph seed', 'hypergraph:seed', { required: false, timeout: 120_000 });
+
+      // archive:llm — daily snapshot of every LLM-generated summary into Redis
+      // hash llm:summaries:archive:{YYYY-MM-DD} (30d TTL). Same defensive
+      // pattern as the hypergraph snapshot: lets the operator recover a bad
+      // synthesis pass without re-running the 20+ min upstream chain.
+      // Captures: codebase-todo, karpathy-gpu, agent-timeline, atlas-latest,
+      //           latest synthesis run files, all screenshot captions (24h).
+      // Idempotent — same-day re-runs atomically replace.
+      runStep('archive llm summaries', 'archive:llm', { required: false, timeout: 60_000 });
     }
 
-    runStep('topology validate', 'topology:validate', { required: false, timeout: 120_000 });
-    runStep('graph synthesize', 'graph:synthesize', { required: false, timeout: 240_000 });
+    // ── Health + smoke — always run regardless of whether files changed ───────
+    // Ensures the stack is up on every folder-open, even cold starts with no
+    // git changes. ensureDevServer spawns dev:everything if :5173 is cold.
+    await ensureDevServer();
 
-    // atlas:index — rebuild atlas dir cards (ace:atlas:dir:*) and
-    // ace:atlas:dirs index from the fresh code_relations + agent_context_files
-    // data the steps above just refreshed. Adaptive (skips dirs without
-    // changed files), so re-runs are cheap. Must come AFTER agents:pipeline
-    // and graph:synthesize so the dir cards reflect the latest envelope +
-    // synthesis state.
-    runStep('atlas index rebuild', 'atlas:index', { required: false, timeout: 60_000 });
-
-    // ace:hit-demand — refresh chunk_hit_log → Redis demand hash on every
-    // folder open. Cheap (~3s), idempotent (HSET atomic replace), 1h TTL so
-    // stale entries self-evict if startup misses. Reads append-only Postgres
-    // table, never destructive. Empty hit-log is handled (logs "no recent
-    // hits" and exits clean) so this is safe even on a cold dev machine.
-    runStep('ace hit-demand refresh', 'ace:hit-demand', { required: false, timeout: 60_000 });
-
-    // hypergraph:seed — promote qdrant_cluster_members → hypergraph_edges with
-    // SOM cell + manifold4 + topo_class enrichment. Adaptive-guarded
-    // (per-edge edge_hash skip when membership unchanged), so re-runs are
-    // sub-second when nothing changed. Snapshots the existing edge set to
-    // hypergraph:edges:archive:{day} (30d TTL) before any mutation —
-    // operator can recover via scripts/restore-hypergraph-archive.mjs without
-    // re-running the 20+ min AST/GPU upstream chain.
-    runStep('hypergraph seed', 'hypergraph:seed', { required: false, timeout: 120_000 });
-
-    // archive:llm — daily snapshot of every LLM-generated summary into Redis
-    // hash llm:summaries:archive:{YYYY-MM-DD} (30d TTL). Same defensive
-    // pattern as the hypergraph snapshot: lets the operator recover a bad
-    // synthesis pass without re-running the 20+ min upstream chain.
-    // Captures: codebase-todo, karpathy-gpu, agent-timeline, atlas-latest,
-    //           latest synthesis run files, all screenshot captions (24h).
-    // Idempotent — same-day re-runs atomically replace.
-    runStep('archive llm summaries', 'archive:llm', { required: false, timeout: 60_000 });
+    // Probe ancillary services started by dev:everything and log their status.
+    // Non-blocking — failures are recorded in log.services but don't abort the lane.
+    log.services = await probeServices();
+    const svcSummary = Object.entries(log.services)
+      .map(([k, v]) => `${k}:${v}`)
+      .join(' ');
+    console.log(`[startup] services → ${svcSummary}`);
 
     // smoke:atlas — final regression gate. Runs the 16-check atlas-context
     // smoke: contextForFile shape + provenance, hypergraph.search returns
@@ -230,18 +309,19 @@ async function runIncrementalLane(redis) {
     // logs/task-output/pipeline-test/smoke-atlas-latest.json.
     runStep('atlas smoke gate', 'smoke:atlas', { required: false, timeout: 60_000 });
 
+    // Update Redis state and sha baseline.
+    if (head !== 'unknown') await redis.set(POLICY.redisStateKeys.lastSha, head);
     await redis.hset('ace:startup:latest', {
       head,
       changedCount: String(relevant.length),
       changeClass: log.changeClass,
-      status: 'PASS',
+      status: hasChanges ? 'PASS' : 'skipped',
       mode: log.mode,
       updatedAt: new Date().toISOString(),
     });
-    if (head !== 'unknown') await redis.set(POLICY.redisStateKeys.lastSha, head);
-    log.status = 'PASS';
+    if (hasChanges) log.status = 'PASS';
   } finally {
-    if (acquired === true) await redis.del(lockKey).catch(() => {});
+    if (acquired === 'OK') await redis.del(lockKey).catch(() => {});
   }
 }
 
@@ -283,7 +363,7 @@ async function runHeavyLane(redis) {
     log.heavyLane.ran = true;
     await redis.set(POLICY.redisStateKeys.heavyLastRun, new Date().toISOString());
   } finally {
-    if (lock === true) await redis.del(lockKey).catch(() => {});
+    if (lock === 'OK') await redis.del(lockKey).catch(() => {});
   }
 }
 

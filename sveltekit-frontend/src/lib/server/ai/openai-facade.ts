@@ -43,6 +43,7 @@ interface RunOpts {
 function resolveInternalModel(requested: string): string {
   // Drop any trailing `:latest` to normalise comparisons
   const m = requested.toLowerCase().replace(/:latest$/, '');
+  if (m === 'yorha-hermes') return 'yorha-hermes'; // hermes composer path in openai-facade
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
     return 'gemma4-legal-vlm:latest';
   }
@@ -442,6 +443,7 @@ export const ADVERTISED_MODELS = [
   { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-legal-vlm (direct, no ACE)
   { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-legal-vlm (alias)
   { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
+  { id: 'yorha-hermes',   owned_by: 'yorha' },   // → hermes composer (HERMES_API_URL → bifrostChat gemma4-legal)
   { id: 'gemma4-legal',   owned_by: 'yorha' },   // → gemma4-legal-vlm explicit
   { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },

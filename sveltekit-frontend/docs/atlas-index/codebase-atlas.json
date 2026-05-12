@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "generated_at": "2026-05-11T03:12:31.867Z",
+  "generated_at": "2026-05-11T23:31:44.055Z",
   "hours_window": 168,
   "schema": [
     "f",
@@ -104494,7 +104494,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/dashboard",
       0,
       6,
       0
@@ -109254,7 +109254,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/register",
       0,
       6,
       0
@@ -128448,7 +128448,6 @@
         7799,
         7800,
         7801,
-        7802,
         7803,
         7804,
         7805,
@@ -128495,7 +128494,6 @@
         7330,
         7341,
         7422,
-        7462,
         7463,
         7464,
         7465,
@@ -128998,6 +128996,9 @@
         7460,
         7461
       ],
+      "src/routes/(app)/dashboard": [
+        7462
+      ],
       "src/routes/(app)/demos/agentic-errors": [
         7467,
         7471,
@@ -129261,6 +129262,9 @@
         7796,
         7797
       ],
+      "src/routes/register": [
+        7802
+      ],
       "src/types": [
         7812,
         7813,
@@ -129304,9 +129308,9 @@
     "files": 7843,
     "clusters": 154,
     "topo_classes": 8,
-    "agents_dirs": 277,
+    "agents_dirs": 279,
     "with_authority": 0,
     "with_hits": 0,
-    "build_ms": 12126
+    "build_ms": 14523
   }
 }

@@ -66,15 +66,14 @@
 	let aiPanelVisible = $state(false);
 	$effect(() => { aiPanelVisible = showAIAssistant; });
 
-	// Selected evidence IDs passed to AIAssistantPanel — derived from board's existing selectedNodes
-	let selectedEvidenceIdsForAI = $derived(Array.from(selectedNodes));
-
 	// Board state — Svelte 5 runes (no writable stores)
 	let nodes = $state<EvidenceNodeType[]>([]);
 	let connections = $state<EvidenceConnection[]>([]);
 	let boardMode = $state<BoardMode>('grid');
 	let linkMode = $state(false);
 	let selectedNodes = $state<Set<string>>(new Set());
+	// Selected evidence IDs passed to AIAssistantPanel — derived from board's existing selectedNodes
+	let selectedEvidenceIdsForAI = $derived(Array.from(selectedNodes));
 	let pendingLinkSource: string | null = $state(null);
 	let selectedEvidenceForInspector = $state<string | null>(null);
 	let selectedRelationshipType = $state('supports');
@@ -767,14 +766,19 @@
 			// Check if node already exists by label
 			if (nodes.some(existing => existing.title === n.label)) return;
 
+			const nx = 400 + Math.random() * 200;
+			const ny = 300 + Math.random() * 200;
 			newNodes.push({
 				id: `ai-${n.id}-${Date.now()}-${i}`,
+				caseId: activeCaseId ?? caseId,
 				title: n.label,
 				description: `Extracted ${n.type} entity.`,
 				evidenceType: typeMap[n.type] || 'other',
-				x: 400 + Math.random() * 200,
-				y: 300 + Math.random() * 200,
-				metadata: { ai_generated: true, entity_type: n.type }
+				canvasPosition: { x: nx, y: ny },
+				x: nx,
+				y: ny,
+				uploadedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
 			});
 		});
 

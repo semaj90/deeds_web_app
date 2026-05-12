@@ -56,6 +56,7 @@ import { applyTopologicalBoostAsync } from '../retrieval/topological-search.js';
 import { queryBmuCached } from '$lib/server/gpu/libtorch-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from './policy.js';
+import { fetchDbSchemaContext } from '$lib/server/ai/hermes/tools/db-schema-tools.js';
 import {
   recordChunkHits,
   recordQueryLog,
@@ -112,6 +113,7 @@ import {
 import { buildRetrievalEdge, insertHyperedge } from '$lib/server/hypergraph/hypergraph-builder.js';
 import { recordLastQuery, recordEngramTransition } from '$lib/server/search/engram-bigram.js';
 import { tokenizeBowQuery, weightedBowOverlapScore, boundedBowBoost } from '$lib/server/search/bow-utils.js';
+import { encodedClusterPrefilter } from '$lib/server/retrieval/encoded-cluster-prefilter.js';
 
 // ── Cluster tags artifact reader (shared with multi-lane-retrieval) ──────────
 import {
@@ -667,6 +669,7 @@ export async function assembleACEContext(opts: {
         acpKnowledgeResults,
         graphIntelContext,
         multiLaneResult,
+        dbSchemaContext,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -701,6 +704,7 @@ export async function assembleACEContext(opts: {
           () => [] as Awaited<ReturnType<typeof getDirectoryKAGContext>>
         ),
         fetchACPKnowledgeResults(query, ACP_MAX_RESULTS, 'codebase_chunks_768').catch(() => null),
+        fetchDbSchemaContext().catch(() => ''),
         // Fast-AST graph intel: top relevant files + audit hotspots from codebase-graph.json
         getGraphIntelContext(query).catch(() => null),
         // P1-A: Error-aware multi-lane search (hash exact + n-gram + graph + ace-cache).
@@ -1945,6 +1949,12 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
       .join('\n');
     lines.push(`\n## Legal Definitions\n${glossaryText}`);
     confidenceFactors.glossary = 0.8;
+  }
+  
+  // 5b. Database Schema Context (Phase 6 DB Lane)
+  if (context.dbSchemaContext) {
+    lines.push(`\n## Database Schema Context\n${context.dbSchemaContext}`);
+    confidenceFactors.dbSchema = 0.95;
   }
 
   // 6. Retrieved context — tiered (KB corpus first, then case evidence)
@@ -3327,6 +3337,45 @@ export async function fetchCodebaseContext(
       }
     } catch { /* non-fatal — proceed without topo prefilter */ }
 
+
+    // ── Stage 1B: Encoded-cluster pre-filter (Stage A0 optimization) ────────
+    // Modes (ACE_ENCODED_PREFILTER_MODE):
+    //   off     — disabled (default until centroids are trained)
+    //   shadow  — runs prefilter, records trace, does NOT apply filter to Qdrant
+    //   boost   — runs prefilter, records trace (used=true), scores feed reranker but NO hard Qdrant filter
+    //   enforce — applies top-K cluster filter to Qdrant ANN search
+    const acePrefilterMode = ENV.ACE_ENCODED_PREFILTER_MODE;
+    let encodedClusterFilter: Record<string, any> | undefined;
+    // Hoisted so the boost step (after reranking) can access clusterIds + scores in boost mode.
+    let _prefilterResult: import('$lib/server/retrieval/encoded-cluster-prefilter.js').PrefilterResult | undefined;
+    if (acePrefilterMode !== 'off') {
+      try {
+        _prefilterResult = await encodedClusterPrefilter(query, { topK: 5, forceEnable: true });
+        // Check clusterIds directly — in shadow/boost mode applied=false but scores are still valid
+        if (_prefilterResult.clusterIds.length > 0) {
+          if (acePrefilterMode === 'enforce' && _prefilterResult.filter) {
+            encodedClusterFilter = _prefilterResult.filter;
+          }
+          if (statsOut) {
+            statsOut.topoPrefilter = statsOut.topoPrefilter ?? {
+              used: acePrefilterMode === 'enforce' || acePrefilterMode === 'boost',
+              topoClass: -1,
+              queryClass: 'encoded-cluster',
+              cacheHit: false,
+              candidateCount: _prefilterResult.clusterIds.length,
+              queryHash: topoQueryHash(query),
+              candidateReduction: _prefilterResult.clusterIds.length,
+              mode: acePrefilterMode,
+              encodedScores: _prefilterResult.scores,
+              durationMs: _prefilterResult.durationMs,
+            } as any;
+          }
+        }
+      } catch (err) {
+        console.warn('[ACE encoded-cluster] prefilter failed:', err);
+      }
+    }
+
     // ── Stage 2: centroid-based GPU-cluster pre-filter (embedding-space) ──────
     // Resolves query embedding once → Redis MGET nearest centroid (O(k)).
     // Falls back gracefully when centroids aren't seeded.
@@ -3365,11 +3414,12 @@ export async function fetchCodebaseContext(
       }
     } catch { /* non-fatal */ }
 
-    // Merge: topo (must) + centroid cluster (must) + BoW clusters (should).
+    // Merge: topo (must) + encoded-cluster (must) + centroid cluster (must) + BoW clusters (should).
     // Qdrant: `should` boosts scores of matching docs without restricting the set.
     const mustClauses: unknown[] = [
-      ...(topoFilter   ? (topoFilter.must   as unknown[]) : []),
-      ...(clusterFilter ? (clusterFilter.must as unknown[]) : []),
+      ...(topoFilter           ? (topoFilter.must           as unknown[]) : []),
+      ...(encodedClusterFilter ? (encodedClusterFilter.must as unknown[]) : []),
+      ...(clusterFilter         ? (clusterFilter.must         as unknown[]) : []),
     ];
     const combinedFilter: Record<string, unknown> | undefined =
       mustClauses.length > 0 || bowClusterShould.length > 0
@@ -3440,6 +3490,8 @@ export async function fetchCodebaseContext(
       // Pre-computed by nightly GDS job; avoids Neo4j RTT per ACE call
       graphAuthorityScore: r.chunk.graph_authority_score != null ? Number(r.chunk.graph_authority_score) : null,
       communityId: r.chunk.communityId != null ? String(r.chunk.communityId) : null,
+      dirSummary: r.chunk.dir_summary != null ? String(r.chunk.dir_summary) : null,
+      agentsCardId: r.chunk.agents_card_id != null ? String(r.chunk.agents_card_id) : null,
     });
 
     // Seed topo cache on miss (fire-and-forget) — stableKey + score from Qdrant results
@@ -3591,6 +3643,40 @@ export async function fetchCodebaseContext(
                   };
                 })
                 .catch(() => {});
+            }
+          }
+
+          // ── clusterPriorScore boost (boost mode only) ──────────────────
+          // Adds weight × clusterCosineSim to chunks whose som_cluster matches
+          // one of the top-K encoded clusters. Does NOT restrict results — purely
+          // additive to allow softer reranking before Karpathy authority pass.
+          if (acePrefilterMode === 'boost' && ENV.ACE_ENCODED_RERANK_ENABLED && _prefilterResult?.clusterIds.length) {
+            const weight = ENV.ACE_ENCODED_RERANK_WEIGHT; // default 0.05, recommended 0.15
+            const clusterSimMap = new Map(
+              _prefilterResult.clusterIds.map((id, i) => [id, _prefilterResult!.scores[i]])
+            );
+            let boostApplied = 0;
+            for (const chunk of boosted) {
+              const c = chunk as unknown as Record<string, unknown>;
+              const somCluster = c.somCluster != null ? Number(c.somCluster) : null;
+              if (somCluster != null) {
+                const sim = clusterSimMap.get(somCluster);
+                if (sim != null) {
+                  c.score = ((c.score as number) ?? 0) + weight * sim;
+                  c.clusterPriorScore = weight * sim;
+                  boostApplied++;
+                }
+              }
+            }
+            if (boostApplied > 0) {
+              boosted.sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0));
+              if (statsOut) {
+                (statsOut as any).encodedClusterBoost = {
+                  applied: boostApplied,
+                  weight,
+                  topClusterIds: _prefilterResult.clusterIds.slice(0, 3),
+                };
+              }
             }
           }
 

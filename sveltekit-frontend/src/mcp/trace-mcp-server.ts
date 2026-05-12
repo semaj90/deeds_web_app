@@ -36,6 +36,13 @@
  *   hypergraph.explain_activation — why a hyperedge was activated for query terms
  *   hypergraph.expand_members    — edges sharing members with a given edge
  *   knowledge.get_minified_map   — compact map: top edges + AGENTS.md for a directory
+ *   legal.get_transcript         — fetch Whisper transcript for an evidence item
+ *   legal.find_precedents        — semantic + FTS search across legal precedents
+ *   legal.search_recordings      — timestamp-aware audio segment search
+ *   legal.cross_examine          — generate cross-examination questions via Gemma4
+ *   legal.score_case             — evidence-weighted case strength score (0-100)
+ *   legal.similar_cases          — find cases similar to a reference case
+ *   legal.batch_ingest           — publish document URLs to document.embed queue
  *
  * Architecture note — tools are READ-ONLY except the four ops.* tools which require an
  * operator_token to execute. Batch writes flow through graphify:* npm scripts outside the ACE hot path.
@@ -74,6 +81,7 @@ const HOST      = TRACE_URL.hostname;
 import { registerNewTools } from './new_tools.js';
 import { registerAdminTools } from './admin_tools.js';
 import { registerSkillTools } from './skill_tools.js';
+import { registerLegalSkillsTools } from './tools/legal-skills.tool.js';
 import { registerCodebaseTools } from './codebase_tools.js';
 import { registerResearchTools } from './research_tools.js';
 import { searchNotecards } from '../lib/server/kb/search-logic.js';
@@ -115,6 +123,7 @@ const ENABLE_OPTIONAL_REGISTRIES = process.env.MCP_OPTIONAL_REGISTRIES === 'true
 registerNewTools(server, { rerankUrl: RERANK_URL }, ENABLE_LEGACY_ALIASES);
 registerAdminTools(server);
 registerSkillTools(server);
+registerLegalSkillsTools(server);
 if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server);
   registerResearchTools(server);

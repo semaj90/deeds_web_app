@@ -85,6 +85,7 @@ export class RabbitMQManager extends EventEmitter {
     analytics: 'analytics.events',
     codebase_indexing: 'codebase.indexing',
     audio_processing: 'audio.processing',
+    media_processing: 'media.processing',
     dlx: 'dlx.dead-letter',
   };
 
@@ -104,6 +105,8 @@ export class RabbitMQManager extends EventEmitter {
     audio_process: 'audio.process',
     glyph_tile_rebuild: 'glyph.tile.rebuild',
     qlora_distill: 'qlora.distill',
+    media_download: 'media.download',
+    media_transcribe: 'media.transcribe',
   };
 
   constructor() {
@@ -320,6 +323,16 @@ export class RabbitMQManager extends EventEmitter {
       this.exchanges.document_processing,
       'glyph.tile.rebuild'
     );
+    await this.bindQueue(
+      this.queues.media_download,
+      this.exchanges.media_processing,
+      'media.download'
+    );
+    await this.bindQueue(
+      this.queues.media_transcribe,
+      this.exchanges.media_processing,
+      'media.transcribe'
+    );
 
     console.log('✅ Queue bindings configured (with DLQ)');
   }
@@ -350,8 +363,10 @@ export class RabbitMQManager extends EventEmitter {
     await this.consume(this.queues.knowledge_backfill, this.handleKnowledgeBackfill.bind(this)); // medium (web search + embed)
     await this.consume(this.queues.glyph_tile_rebuild, this.handleGlyphTileRebuild.bind(this)); // slow (GPU kMeans)
     await this.consume(this.queues.qlora_distill, this.handleQLoRADistill.bind(this)); // slow (DB + CouchDB)
+    await this.consume(this.queues.media_download, this.handleMediaDownload.bind(this)); // slow (yt-dlp sidecar)
+    await this.consume(this.queues.media_transcribe, this.handleMediaTranscribe.bind(this)); // slow (Whisper GPU)
 
-    console.log('👂 All 13 RabbitMQ consumers started (prefetch: 10)');
+    console.log('👂 All 15 RabbitMQ consumers started (prefetch: 10)');
 
     // Start DLQ consumers — drain dead-lettered messages for logging/monitoring
     await this.startDLQConsumers();
@@ -1948,6 +1963,93 @@ export class RabbitMQManager extends EventEmitter {
       });
     } catch {
       return [];
+    }
+  }
+
+  // ── Media pipeline handlers (yt-dlp → Whisper → embed → Qdrant) ──────────────
+
+  private async handleMediaDownload(msg: AmqpMessage): Promise<void> {
+    const channel = this.channel;
+    if (!msg || !channel) return;
+    try {
+      const data = this.parseMessage(msg) ?? {};
+      const { jobId, url, caseId } = data as { jobId?: string; url?: string; caseId?: string };
+      if (!jobId || !url) {
+        console.warn('[media.download] Missing jobId or url — nacking');
+        channel.nack(msg, false, false);
+        return;
+      }
+      console.log(`[media.download] Received job ${jobId}: ${String(url).slice(0, 80)}`);
+
+      // Update job status in Redis so the MCP tool poller can see progress
+      const { getRedis } = await import('../redis.js');
+      const redis = getRedis();
+      await redis.setex(
+        `hermes:job:${jobId}`,
+        3600,
+        JSON.stringify({ status: 'downloading', url, caseId, receivedAt: new Date().toISOString() })
+      );
+
+      // TODO: invoke yt-dlp Python sidecar via child_process once implemented.
+      // For now log and complete so the queue drains cleanly.
+      console.log(`[media.download] Job ${jobId} queued for yt-dlp sidecar (not yet wired)`);
+      await redis.setex(
+        `hermes:job:${jobId}`,
+        3600,
+        JSON.stringify({ status: 'pending_sidecar', url, caseId, updatedAt: new Date().toISOString() })
+      );
+
+      channel.ack(msg);
+    } catch (err) {
+      console.error('[media.download] Handler error:', err);
+      channel.nack(msg, false, false);
+    }
+  }
+
+  private async handleMediaTranscribe(msg: AmqpMessage): Promise<void> {
+    const channel = this.channel;
+    if (!msg || !channel) return;
+    try {
+      const data = this.parseMessage(msg) ?? {};
+      const { jobId, audioPath, caseId, timestampChunking } = data as {
+        jobId?: string;
+        audioPath?: string;
+        caseId?: string;
+        timestampChunking?: boolean;
+      };
+      if (!jobId || !audioPath) {
+        console.warn('[media.transcribe] Missing jobId or audioPath — nacking');
+        channel.nack(msg, false, false);
+        return;
+      }
+      console.log(`[media.transcribe] Received job ${jobId}: ${String(audioPath).slice(0, 80)}`);
+
+      const { getRedis } = await import('../redis.js');
+      const redis = getRedis();
+      await redis.setex(
+        `hermes:job:${jobId}`,
+        3600,
+        JSON.stringify({
+          status: 'transcribing',
+          audioPath,
+          caseId,
+          timestampChunking: timestampChunking ?? false,
+          receivedAt: new Date().toISOString(),
+        })
+      );
+
+      // TODO: invoke faster-whisper Python sidecar once implemented.
+      console.log(`[media.transcribe] Job ${jobId} queued for Whisper sidecar (not yet wired)`);
+      await redis.setex(
+        `hermes:job:${jobId}`,
+        3600,
+        JSON.stringify({ status: 'pending_whisper', audioPath, caseId, updatedAt: new Date().toISOString() })
+      );
+
+      channel.ack(msg);
+    } catch (err) {
+      console.error('[media.transcribe] Handler error:', err);
+      channel.nack(msg, false, false);
     }
   }
 

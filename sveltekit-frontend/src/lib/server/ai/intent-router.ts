@@ -41,10 +41,12 @@ export const IntentResultSchema = z.object({
 });
 
 export interface RouterContext {
-	userId:    number;
-	sessionId: string;
-	caseId?:   string;
-	filePath?: string;
+	userId:       number;
+	sessionId:    string;
+	caseId?:      string;
+	filePath?:    string;
+	parentTaskId?: string;
+	runId?:        string;
 }
 
 export interface OperatorChainStep {
@@ -175,6 +177,9 @@ export interface ExecuteChainOptions {
 	stepTimeoutMs?: number;
 	/** Injection point for tests. */
 	callTool?: typeof callTraceMcp;
+	/** Traceability IDs for sub-agent loops */
+	parentTaskId?: string;
+	runId?:        string;
 }
 
 /**
@@ -201,7 +206,14 @@ export async function executeChain(
 			args = { ...step.args, priorResult: results[step.takeFrom] ?? null };
 		}
 
-		const r = await callTool(step.tool, args, { timeoutMs: stepTimeoutMs });
+		// Merge traceability context if present
+		const callArgs = {
+			...args,
+			parentTaskId: options.parentTaskId,
+			runId:        options.runId,
+		};
+
+		const r = await callTool(step.tool, callArgs, { timeoutMs: stepTimeoutMs });
 
 		trace.push({ tool: step.tool, ms: r.ms, ok: r.ok, error: r.error });
 		results[i] = r.data;

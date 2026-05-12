@@ -2,10 +2,11 @@
   import { superForm } from 'sveltekit-superforms/client';
   import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod';
+  import { page } from '$app/stores';
   import type { PageData } from './$types';
   import type { SearchResult } from './+page.server';
 
-  let { data }: { data: PageData & { results?: SearchResult[]; query?: string; collection?: string; elapsedMs?: number; error?: string } } = $props();
+  let { data }: { data: PageData } = $props();
 
   const searchSchema = z.object({
     query: z.string().min(1).max(1000),
@@ -14,12 +15,13 @@
     collection: z.enum(['evidence', 'legal_documents', 'kb_notecards']).default('evidence'),
   });
 
+  // svelte-ignore state_referenced_locally
   const { form, errors, enhance, submitting } = superForm(data.form, {
     validators: zodClient(searchSchema),
     dataType: 'json',
   });
 
-  let results: SearchResult[] = $derived((data as any).results ?? []);
+  let results: SearchResult[] = $derived(($page.form?.results ?? []) as SearchResult[]);
   let expandedDocs = $state<Set<string>>(new Set());
 
   function toggleDoc(id: string) {
@@ -106,9 +108,9 @@
   </form>
 
   <!-- Error -->
-  {#if (data as any).error}
+  {#if $page.form?.error}
     <div class="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-      {(data as any).error}
+      {$page.form.error}
     </div>
   {/if}
 
@@ -117,8 +119,8 @@
     <div class="space-y-1">
       <p class="text-xs text-gray-500">
         {results.length} document{results.length !== 1 ? 's' : ''} matched
-        "{(data as any).query}"
-        in <strong>{(data as any).collection}</strong>
+        "{$page.form?.query}"
+        in <strong>{$page.form?.collection}</strong>
       </p>
 
       {#each results as doc (doc.evidence_id)}
@@ -182,9 +184,9 @@
         </div>
       {/each}
     </div>
-  {:else if (data as any).query}
+  {:else if $page.form?.query}
     <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500">
-      No documents matched "{(data as any).query}" in {(data as any).collection}.
+      No documents matched "{$page.form.query}" in {$page.form.collection}.
       <br/><span class="text-xs mt-1 block">Try a broader query or check that documents have been uploaded and indexed.</span>
     </div>
   {/if}

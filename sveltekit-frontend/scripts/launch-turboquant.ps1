@@ -31,16 +31,28 @@
 .ENV
   LLAMA_SERVER_PATH    default: C:\Users\james\Desktop\llama-server-cuda\llama-server.exe
   TURBO_MODEL_PATH     default: %USERPROFILE%\.ollama\blobs\sha256-a79de882...
+  ROTORQUANT_MODEL_PATH  optional: path to a RotorQuant GGUF (e.g. gemma-4-E4B-RotorQuant-GGUF-IQ4_XS.gguf
+                           from majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS on HuggingFace).
+                           When set, overrides TURBO_MODEL_PATH. Weight-quantised; runs on the
+                           stock llama-server.exe without any TurboQuant binary.
   TURBO_MMPROJ_PATH    default: %USERPROFILE%\Downloads\gemma4-mmproj\mmproj-BF16.gguf
   TURBO_PORT           default: 8090
   TURBO_PROFILE        default: stock
                          stock           K=q8_0  V=q8_0   (works on stock llama.cpp)
                          turboquant      K=q8_0  V=turbo3 (TurboQuant-enabled binary required)
                          turboquant-safe K=q8_0  V=q8_0   (parity-safe, keep large TURBO_CTX)
+                         atomicbot       K=turbo3 V=turbo3 (AtomicBot binary + --mtp-head required;
+                                          download AtomicBot-ai/atomic-llama-cpp-turboquant-binaries,
+                                          set LLAMA_SERVER_PATH; +30-50% throughput on short prompts;
+                                          requires MTP_HEAD_PATH sidecar .mtp file)
   TURBO_KV_K           overrides profile K (must be in the known KV allowlist)
   TURBO_KV_V           overrides profile V (must be in the known KV allowlist)
   TURBO_CTX            default: 4096
   TURBO_NGL            default: 99
+  MTP_HEAD_PATH        optional: path to .mtp sidecar file for AtomicBot --mtp-head speculative decoding
+  LEGAL_LORA_PATH      optional: path to legal LoRA adapter GGUF (--lora injection for base-model GGUFs
+                         like majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS that ship without the fine-tune)
+  LEGAL_LORA_SCALE     optional: LoRA strength 0.0-1.0 (default 0.8; lower = more base, higher = more adapter)
 
   Failure semantics:
     - If TURBO_KV_K / TURBO_KV_V are set explicitly to an unknown name,
@@ -62,7 +74,16 @@ $ErrorActionPreference = 'Stop'
 
 # ── Resolve paths and ports ──────────────────────────────────────────────
 $llama   = if ($env:LLAMA_SERVER_PATH) { $env:LLAMA_SERVER_PATH } else { 'C:\Users\james\Desktop\llama-server-cuda\llama-server.exe' }
-$model   = if ($env:TURBO_MODEL_PATH)  { $env:TURBO_MODEL_PATH }  else { Join-Path $env:USERPROFILE '.ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43' }
+# ROTORQUANT_MODEL_PATH overrides TURBO_MODEL_PATH when set.
+# Download majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS from HuggingFace, then:
+#   $env:ROTORQUANT_MODEL_PATH = 'C:\path\to\gemma-4-E4B-RotorQuant-GGUF-IQ4_XS.gguf'
+# Works on the stock llama-server.exe — no TurboQuant binary required.
+$model   = if ($env:ROTORQUANT_MODEL_PATH) { $env:ROTORQUANT_MODEL_PATH } `
+           elseif ($env:TURBO_MODEL_PATH)  { $env:TURBO_MODEL_PATH } `
+           else { Join-Path $env:USERPROFILE '.ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43' }
+if ($env:ROTORQUANT_MODEL_PATH) {
+  Write-Host 'Model: RotorQuant GGUF (weight-quantised, stock binary OK)' -ForegroundColor Cyan
+}
 $mmproj  = if ($env:TURBO_MMPROJ_PATH) { $env:TURBO_MMPROJ_PATH } else { Join-Path $env:USERPROFILE 'Downloads\gemma4-mmproj\mmproj-BF16.gguf' }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
 $ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '4096' }
@@ -71,14 +92,15 @@ $ngl     = if ($env:TURBO_NGL)         { $env:TURBO_NGL }         else { '99' }
 # ── Profile shortcut: TURBO_PROFILE expands to (kvK, kvV) defaults. ──────
 # Explicit TURBO_KV_K / TURBO_KV_V env vars override the profile.
 $kvProfile = if ($env:TURBO_PROFILE) { $env:TURBO_PROFILE.ToLower() } else { 'stock' }
-$validProfiles = @('stock', 'turboquant', 'turboquant-safe')
+$validProfiles = @('stock', 'turboquant', 'turboquant-safe', 'atomicbot')
 if ($validProfiles -notcontains $kvProfile) {
   throw "Invalid TURBO_PROFILE '$kvProfile' — choose one of: $($validProfiles -join ', ')"
 }
 switch ($kvProfile) {
-  'stock'           { $kvProfileK = 'q8_0';  $kvProfileV = 'q8_0' }
-  'turboquant'      { $kvProfileK = 'q8_0';  $kvProfileV = 'turbo3' }
-  'turboquant-safe' { $kvProfileK = 'q8_0';  $kvProfileV = 'q8_0' }
+  'stock'           { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
+  'turboquant'      { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo3' }
+  'turboquant-safe' { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
+  'atomicbot'       { $kvProfileK = 'turbo3'; $kvProfileV = 'turbo3' }
 }
 
 $explicitK = [bool]$env:TURBO_KV_K
@@ -152,7 +174,7 @@ if (-not $NoEvict) {
 # resolved to turbo (impossible today, but kept symmetric for future
 # profiles), soft-fallback is acceptable.
 $turboRequested = ($turboKv -contains $kvK) -or ($turboKv -contains $kvV)
-$turboExplicit  = $turboRequested -and ($explicitK -or $explicitV -or $kvProfile -eq 'turboquant')
+$turboExplicit  = $turboRequested -and ($explicitK -or $explicitV -or $kvProfile -eq 'turboquant' -or $kvProfile -eq 'atomicbot')
 if ($turboRequested) {
   $help = & $llama -h 2>&1 | Out-String
   $binaryAcceptsTurbo = $help -match 'turbo[234]|tbq[34]_0'
@@ -183,6 +205,36 @@ $baseArgs = @(
 )
 if (-not $TextOnly -and (Test-Path $mmproj)) {
   $baseArgs = @('-m', $model, '--mmproj', $mmproj) + $baseArgs[2..($baseArgs.Length - 1)]
+}
+
+# ── Legal LoRA adapter injection (Path A — runtime LoRA over base-model GGUFs) ──
+# Use when ROTORQUANT_MODEL_PATH points at a base-model GGUF (e.g. majentik IQ4_XS)
+# that lacks the legal fine-tune. The merged Ollama blob already has the LoRA baked
+# in, so set LEGAL_LORA_PATH only when running a non-merged GGUF.
+# Path B (re-quantize merged model) produces better quality — see memory card.
+if ($env:LEGAL_LORA_PATH) {
+  if (Test-Path $env:LEGAL_LORA_PATH) {
+    $loraScale = if ($env:LEGAL_LORA_SCALE) { $env:LEGAL_LORA_SCALE } else { '0.8' }
+    Write-Host ("Legal LoRA: --lora $($env:LEGAL_LORA_PATH) --lora-scale $loraScale") -ForegroundColor Cyan
+    $baseArgs = $baseArgs + @('--lora', $env:LEGAL_LORA_PATH, '--lora-scale', $loraScale)
+  } else {
+    Write-Host ("Legal LoRA: LEGAL_LORA_PATH set but file not found at $($env:LEGAL_LORA_PATH) — skipping") -ForegroundColor Yellow
+  }
+}
+
+# ── AtomicBot: inject --mtp-head for Multi-Token Prediction speculative decode ──
+# AtomicBot-ai/atomic-llama-cpp-turboquant-binaries ships Gemma 4 D=256/512 support
+# + MTP (multi-token prediction) for +30-50% throughput on short-prompt workloads.
+# Requires a .mtp sidecar file alongside the main GGUF (usually same basename + .mtp).
+# Set MTP_HEAD_PATH to override; defaults to model path with .mtp extension.
+if ($kvProfile -eq 'atomicbot') {
+  $mtpPath = if ($env:MTP_HEAD_PATH) { $env:MTP_HEAD_PATH } else { [System.IO.Path]::ChangeExtension($model, '.mtp') }
+  if (Test-Path $mtpPath) {
+    Write-Host ("AtomicBot: --mtp-head enabled ($mtpPath)") -ForegroundColor Cyan
+    $baseArgs = $baseArgs + @('--mtp-head', $mtpPath)
+  } else {
+    Write-Host ("AtomicBot: MTP sidecar not found at $mtpPath — running without --mtp-head (set MTP_HEAD_PATH to fix)") -ForegroundColor Yellow
+  }
 }
 
 # ── Foreground branch ────────────────────────────────────────────────────

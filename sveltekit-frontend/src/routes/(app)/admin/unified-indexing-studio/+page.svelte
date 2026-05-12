@@ -15,13 +15,13 @@
 
   const stats = $derived(data.stats);
 
-  const transportLanes = [
+  const transportLanes = $derived([
     { name: 'QUIC / HTTP3', status: 'Active', port: 5178, icon: 'i-carbon-flow-stream' },
     { name: 'TRACE MCP', status: stats.services.traceMcp.status, port: 8788, icon: 'i-carbon-chip' },
     { name: 'Reranker', status: stats.services.rerank.status, port: 8090, icon: 'i-carbon-scan-alt' },
     { name: 'TurboQuant', status: stats.services.turboquant.status, port: 8080, icon: 'i-carbon-machine-learning-model' },
     { name: 'RabbitMQ', status: 'Healthy', port: 5672, icon: 'i-carbon-queue' }
-  ];
+  ]);
 
   function statusTone(ok: boolean) {
     return ok ? 'text-emerald-400' : 'text-amber-300';

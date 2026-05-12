@@ -36,6 +36,13 @@ import {
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 
+function cosineSim64(a: Float32Array, b: Float32Array): number {
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+  const denom = Math.sqrt(na) * Math.sqrt(nb);
+  return denom < 1e-10 ? 0 : dot / denom;
+}
+
 // -- Types --------------------------------------------------------------------
 
 export interface ChunkMetadata {
@@ -593,21 +600,49 @@ export async function loadCodebaseContext(query: string): Promise<{
     const { scoreBatchTriton } = await import('$lib/server/retrieval/triton-reranker');
     const marcoScores = await scoreBatchTriton(query, finalChunks.map(c => c.content));
 
+    // -- P5: 64d encoded similarity for decision-tree f8 signal ----------------
+    let queryEncoded64: Float32Array | undefined;
+    const encoded64Map = new Map<string, Float32Array>();
+    try {
+      if (multiVectorResult.queryVector?.length === 768) {
+        const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
+        queryEncoded64 = await encode768to64(new Float32Array(multiVectorResult.queryVector));
+        const ids = finalChunks.map(c => c.qdrantId).filter(Boolean) as (string | number)[];
+        if (ids.length > 0) {
+          const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
+          const pts = await qdrantMgr.client.retrieve('codebase_chunks_768', {
+            ids,
+            with_vector: ['encoded_64'],
+          }).catch(() => []);
+          for (const pt of pts) {
+            const vec = (pt.vector as Record<string, number[]>)?.['encoded_64'] as number[] | undefined;
+            if (vec) encoded64Map.set(String(pt.id), new Float32Array(vec));
+          }
+        }
+      }
+    } catch { /* non-fatal — encodedSimilarity stays undefined */ }
+
     const contextChunks = await Promise.all(finalChunks.map(async (chunk, idx) => {
         const dirPath = chunk.relativePath.split('/').slice(0, -1).join('/');
         const card = cardMap.get(dirPath);
-        
+
         // Calculate Wiki Signal
         const wikiScore = card ? (
-            (card.auditStatus === 'SHIPPED' ? 0.3 : 0.1) + 
+            (card.auditStatus === 'SHIPPED' ? 0.3 : 0.1) +
             (Math.min(card.activityScore || 0, 100) / 200) // max 0.5 boost from activity
         ) : 0;
+
+        const docEncoded = chunk.qdrantId ? encoded64Map.get(String(chunk.qdrantId)) : undefined;
+        const encodedSimilarity = queryEncoded64 && docEncoded
+          ? cosineSim64(queryEncoded64, docEncoded)
+          : undefined;
 
         const signals = await combineRerankSignals(query, {
             gemmaScore: chunk.score,
             marcoScore: marcoScores[idx],
             wikiScore: Math.min(1.0, wikiScore),
-            activityScore: card?.activityScore || 0
+            activityScore: card?.activityScore || 0,
+            encodedSimilarity,
         }, chunk.content);
 
         return {

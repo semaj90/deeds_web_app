@@ -827,7 +827,11 @@ export function parseToolRequest(content: string): OllamaToolCall[] {
 // Non-fatal: returns null if the server is not running.
 const TRACE_MCP_URL = ENV.TRACE_MCP_URL;
 
-async function callTraceMcp(toolName: string, toolArgs: Record<string, unknown>): Promise<unknown> {
+async function callTraceMcp(
+  toolName: string,
+  toolArgs: Record<string, unknown>,
+  traceContext?: { parentTaskId?: string; runId?: string }
+): Promise<unknown> {
   try {
     const res = await fetch(`${TRACE_MCP_URL}/mcp`, {
       method:  'POST',
@@ -836,7 +840,14 @@ async function callTraceMcp(toolName: string, toolArgs: Record<string, unknown>)
         jsonrpc: '2.0',
         id:      1,
         method:  'tools/call',
-        params:  { name: toolName, arguments: toolArgs },
+        params:  {
+          name: toolName,
+          arguments: {
+            ...toolArgs,
+            parentTaskId: traceContext?.parentTaskId,
+            runId:        traceContext?.runId,
+          }
+        },
       }),
       signal: AbortSignal.timeout(15_000),
     });
@@ -863,12 +874,22 @@ type GoHit = { clusterKey?: string; topoClass?: string; path?: string; score?: n
 async function dispatchTool(
   name: string,
   args: Record<string, unknown>,
-  goRetrievalHits?: GoHit[],
+  options?: {
+    goRetrievalHits?: GoHit[];
+    parentTaskId?:    string;
+    runId?:           string;
+  }
 ): Promise<ToolResult> {
   try {
     if (name.startsWith('kb_') || name.startsWith('kb.')) {
       const toolName = name.replace(/_/g, '.'); // kb_search_cards -> kb.search_cards
-      return { tool: name, result: await callTraceMcp(toolName, args) };
+      return {
+        tool: name,
+        result: await callTraceMcp(toolName, args, {
+          parentTaskId: options?.parentTaskId,
+          runId:        options?.runId,
+        })
+      };
     }
 
     if (name === 'rag_search') {
@@ -1771,7 +1792,11 @@ export async function runGemma4Agent(
       toolsUsed.push(name);
       if (SIDE_EFFECT_TOOLS.has(name)) hasSideEffect = true;
 
-      const result = await dispatchTool(name, tArgs ?? {}, goRetrievalHits);
+      const result = await dispatchTool(name, tArgs ?? {}, {
+        goRetrievalHits,
+        parentTaskId: options?.metadata?.parentTaskId as string | undefined,
+        runId:        options?.metadata?.runId        as string | undefined,
+      });
       if (Array.isArray(result.result)) sources.push(...result.result);
 
       // Ollama expects role:"tool" messages with the result as content

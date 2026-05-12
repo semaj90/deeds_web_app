@@ -625,7 +625,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
     if (use_hybrid) {
       for (const collection of BM42_COLLECTIONS) {
         try {
-          const hybridResult = await qdrant.sparseHybridSearch({
+          const hybridResult = await qdrant.hybridSearch({
             query,
             queryEmbedding: embedding,
             collection,

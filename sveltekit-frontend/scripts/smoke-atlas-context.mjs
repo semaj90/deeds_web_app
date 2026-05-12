@@ -41,7 +41,7 @@ mkdirSync(LOG_DIR, { recursive: true });
 const PROBE_FILE = 'src/lib/server/db/client.ts';
 
 const results = [];
-let passed = 0, failed = 0, warned = 0;
+let passed = 0, failed = 0, warned = 0, skipped = 0;
 
 async function callMcp(name, args, timeoutMs = 15_000) {
   const res = await fetch(MCP_URL, {
@@ -94,6 +94,12 @@ async function check(name, fn) {
     if (status === 'WARN') warned++; else failed++;
     if (!JSON_OUT) console.log(`  ${status} ${name} — ${msg}`);
   }
+}
+
+function skip(name, reason) {
+  results.push({ name, status: 'SKIP', detail: reason });
+  skipped++;
+  if (!JSON_OUT) console.log(`  SKIP ${name} — ${reason}`);
 }
 
 // ── P1.7 — atlas:prompt:smoke ────────────────────────────────────────────────
@@ -176,8 +182,22 @@ await check('hitDemand path present (null OK if cold)', () => {
 });
 
 // ── P1.8 — hypergraph.search regression ──────────────────────────────────────
+// hypergraph.search proxies through SvelteKit (:5173). When the dev server is
+// cold the MCP returns a connection-refused error — that is an infrastructure
+// state, not a test regression. Pre-probe :5173 and SKIP (not FAIL) if down.
+
+let devServerUp = false;
+for (const base of SVELTEKIT_BASES) {
+  try {
+    const r = await fetch(`${base}/api/health`, { signal: AbortSignal.timeout(5000) });
+    if (r.ok) { devServerUp = true; break; }
+  } catch { /* unreachable */ }
+}
 
 if (!JSON_OUT) console.log('\n=== P1.8 — hypergraph.search regression ===');
+if (!JSON_OUT && !devServerUp) {
+  console.log('  NOTE dev server unreachable — P1.8 checks skipped (not a regression)');
+}
 
 const SEARCH_QUERIES = [
   { q: 'agentic',  minHits: 1, label: 'common code term' },
@@ -185,43 +205,57 @@ const SEARCH_QUERIES = [
   { q: 'svelte',   minHits: 1, label: 'framework keyword' },
 ];
 
-for (const probe of SEARCH_QUERIES) {
-  const r = await callMcp('hypergraph.search', { query: probe.q, limit: 5 }, 15_000)
-    .catch((err) => ({ error: err.message }));
-  await check(`search '${probe.q}' (${probe.label})`, () => {
-    if (r.error) throw new Error(r.error);
-    const matched = r.totalMatched ?? r.results?.length ?? 0;
-    if (matched < probe.minHits) {
-      throw new Error(`expected ≥${probe.minHits} hits, got ${matched} — hypergraph_edges may be empty (run npm run hypergraph:seed)`);
-    }
-    const top = r.results?.[0]?.edge;
-    return `${matched} hits, top: ${top?.label ?? top?.title ?? '?'} grade=${top?.gradeLabel ?? top?.grade_label ?? '?'}`;
-  });
+if (devServerUp) {
+  for (const probe of SEARCH_QUERIES) {
+    const r = await callMcp('hypergraph.search', { query: probe.q, limit: 5 }, 15_000)
+      .catch((err) => ({ error: err.message }));
+    await check(`search '${probe.q}' (${probe.label})`, () => {
+      if (r.error) throw new Error(r.error);
+      const matched = r.totalMatched ?? r.results?.length ?? 0;
+      if (matched < probe.minHits) {
+        throw new Error(`expected ≥${probe.minHits} hits, got ${matched} — hypergraph_edges may be empty (run npm run hypergraph:seed)`);
+      }
+      const top = r.results?.[0]?.edge;
+      return `${matched} hits, top: ${top?.label ?? top?.title ?? '?'} grade=${top?.gradeLabel ?? top?.grade_label ?? '?'}`;
+    });
+  }
+} else {
+  for (const probe of SEARCH_QUERIES) {
+    skip(`search '${probe.q}' (${probe.label})`, 'dev server down');
+  }
 }
 
 // ── Cluster edge type filter (must work post-seed) ────────────────────────────
-const ctxOnly = await callMcp('hypergraph.search', { query: 'src', limit: 3, edge_types: ['cluster_context'] }, 10_000)
-  .catch((err) => ({ error: err.message }));
-await check('edge_type filter cluster_context', () => {
-  if (ctxOnly.error) throw new Error(ctxOnly.error);
-  const matched = ctxOnly.totalMatched ?? ctxOnly.results?.length ?? 0;
-  if (matched === 0) throw new Error('WARN: 0 cluster_context edges matched — seeder may need re-run');
-  return `${matched} hits`;
-});
+if (devServerUp) {
+  const ctxOnly = await callMcp('hypergraph.search', { query: 'src', limit: 3, edge_types: ['cluster_context'] }, 10_000)
+    .catch((err) => ({ error: err.message }));
+  await check('edge_type filter cluster_context', () => {
+    if (ctxOnly.error) throw new Error(ctxOnly.error);
+    const matched = ctxOnly.totalMatched ?? ctxOnly.results?.length ?? 0;
+    if (matched === 0) throw new Error('WARN: 0 cluster_context edges matched — seeder may need re-run');
+    return `${matched} hits`;
+  });
+} else {
+  skip('edge_type filter cluster_context', 'dev server down');
+}
 
 // Lane B regression — shared_resource edges from code_relations. Probe with
 // a query that should hit at least one of the producer/consumer cohorts
 // (Redis/Postgres/Qdrant/Neo4j adjacency). 0 hits = Lane B was never run
 // or the seeder regressed.
-const sharedRes = await callMcp('hypergraph.search', { query: 'redis', limit: 3, edge_types: ['shared_resource'] }, 10_000)
-  .catch((err) => ({ error: err.message }));
-await check('edge_type filter shared_resource (Lane B)', () => {
-  if (sharedRes.error) throw new Error(sharedRes.error);
-  const matched = sharedRes.totalMatched ?? sharedRes.results?.length ?? 0;
-  if (matched === 0) throw new Error('WARN: 0 shared_resource edges matched — run npm run hypergraph:seed:lane-b');
-  const top = sharedRes.results?.[0]?.edge;
-  return `${matched} hits, top: ${top?.label ?? top?.title ?? '?'}`;
-});
+if (devServerUp) {
+  const sharedRes = await callMcp('hypergraph.search', { query: 'redis', limit: 3, edge_types: ['shared_resource'] }, 10_000)
+    .catch((err) => ({ error: err.message }));
+  await check('edge_type filter shared_resource (Lane B)', () => {
+    if (sharedRes.error) throw new Error(sharedRes.error);
+    const matched = sharedRes.totalMatched ?? sharedRes.results?.length ?? 0;
+    if (matched === 0) throw new Error('WARN: 0 shared_resource edges matched — run npm run hypergraph:seed:lane-b');
+    const top = sharedRes.results?.[0]?.edge;
+    return `${matched} hits, top: ${top?.label ?? top?.title ?? '?'}`;
+  });
+} else {
+  skip('edge_type filter shared_resource (Lane B)', 'dev server down');
+}
 
 // ── /api/ace/recommendations HTTP wrapper ────────────────────────────────────
 
@@ -259,7 +293,7 @@ await check('GET /api/ace/recommendations responds', async () => {
 // ── Output ───────────────────────────────────────────────────────────────────
 
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-const summary = { passed, failed, warned, total: results.length };
+const summary = { passed, failed, warned, skipped, total: results.length };
 const out = { runAt: new Date().toISOString(), summary, results };
 writeFileSync(resolve(LOG_DIR, `smoke-atlas-${stamp}.json`), JSON.stringify(out, null, 2));
 writeFileSync(resolve(LOG_DIR, 'smoke-atlas-latest.json'), JSON.stringify(out, null, 2));
@@ -268,7 +302,7 @@ if (JSON_OUT) {
   console.log(JSON.stringify(out, null, 2));
 } else {
   console.log('');
-  console.log(`  ${passed}/${results.length} pass${warned ? `, ${warned} warn` : ''}${failed ? `, ${failed} fail` : ''}`);
+  console.log(`  ${passed}/${results.length} pass${skipped ? `, ${skipped} skip` : ''}${warned ? `, ${warned} warn` : ''}${failed ? `, ${failed} fail` : ''}`);
   console.log(`  → logs/task-output/pipeline-test/smoke-atlas-latest.json`);
 }
 

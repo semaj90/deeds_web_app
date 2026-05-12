@@ -151,7 +151,7 @@ Query: `SELECT feature_key, feature_name, status FROM feature_implementations OR
 | G10 | Drizzle schema refs (70+ tables, 14 enums in schema-postgres.ts) |
 | G11 | DB client import = `db/client` (NOT `db/index`) — `rg "from.*db/index" src/ --type ts` must be 0 |
 | G12 | Vector/Qdrant collection coupling |
-| G13 | Docker service ports (5432/6379/6333/9000/5672) |
+| G13 | Docker service ports (5432/6379/6333/8333 SeaweedFS-S3/9333 SeaweedFS-master/5672) — MinIO port 9000 deprecated |
 
 ### Tier C — Infrastructure (G14–G17)
 

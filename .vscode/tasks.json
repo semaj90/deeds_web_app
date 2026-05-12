@@ -322,6 +322,25 @@
       "detail": "Recompute GPU-assisted authority blend for ranked codebase recommendations. GPU is used after candidate pruning for ranking semantics."
     },
     {
+      "label": "Retrieval Plane: Semantic Clustering (Qdrant)",
+      "type": "shell",
+      "command": "node scripts/qdrant-cluster-collection.mjs codebase_chunks_768 100",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run GPU-accelerated k-means clustering on the codebase vector store. Updates cluster_id metadata in Qdrant to drive the Atlas Topological Map."
+    },
+    {
       "label": "Agentic Error Fixing: Plan Only",
       "type": "shell",
       "command": "npm run agent:fix:plan",
@@ -9979,13 +9998,19 @@
     {
       "label": "🦉 Hermes: Dashboard (web UI :9119)",
       "type": "shell",
-      "command": "hermes dashboard",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "command": "bash",
+      "args": [
+        "-c",
+        "mkdir -p '${workspaceFolder}/logs/hermes' && hermes dashboard 2>&1 | tee '${workspaceFolder}/logs/hermes/dashboard.log'"
+      ],
       "isBackground": true,
       "group": "build",
-      "detail": "Launch Hermes Agent web UI at http://127.0.0.1:9119 with sveltekit-frontend as workspace context. Talks to Ollama at :11434 — start that first if not running.",
+      "detail": "Launch Hermes Agent dashboard at http://127.0.0.1:9119 — Skills/Sessions/Memory/Jobs/Cron. Logs to logs/hermes/dashboard.log. Run alongside gateway :8642 for the full stack.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
-      "problemMatcher": []
+      "problemMatcher": {
+        "pattern": { "regexp": "^.*(ERROR|error|Error|failed).*$", "message": 0 },
+        "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "Listening|listening|started|ready|Running" }
+      }
     },
     {
       "label": "🦉 Hermes: Interactive Shell",
@@ -10041,6 +10066,66 @@
       "dependsOrder": "sequence",
       "group": "build",
       "detail": "Compound task — starts Ollama (GPU layers tuned) then the Hermes dashboard. Both stay alive; use 'Terminate Task' to stop them.",
+      "problemMatcher": []
+    },
+    {
+      "label": "🦉 Hermes: Gateway run (HTTP API :8642)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "mkdir -p '${workspaceFolder}/logs/hermes' && hermes gateway run 2>&1 | tee '${workspaceFolder}/logs/hermes/gateway.log'"
+      ],
+      "isBackground": true,
+      "group": "build",
+      "detail": "Starts the Hermes messaging gateway — HTTP API at :8642. Routes workspace → Ollama :11434/v1 (gemma4-hermes-64k). Sessions, memory, and TRACE MCP :8788 tools unlock automatically. Logs to logs/hermes/gateway.log. API_SERVER_ENABLED=true lives in AppData/Local/hermes/.env (NOT ~/.hermes/.env). Use --replace to restart a running instance.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": {
+        "pattern": { "regexp": "^.*(ERROR|error|Error).*$", "message": 0 },
+        "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "Listening|listening|started|ready" }
+      }
+    },
+    {
+      "label": "🦉 Hermes: Workspace dev (:3001)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "cd '${userHome}/Downloads/Hermes-Ollama/hermes-workspace' && mkdir -p '${workspaceFolder}/logs/hermes' && pnpm install 2>&1 | tee -a '${workspaceFolder}/logs/hermes/workspace-install.log' && node_modules/.bin/vite dev --port 3001 2>&1 | tee '${workspaceFolder}/logs/hermes/workspace-dev.log'"
+      ],
+      "isBackground": true,
+      "group": "build",
+      "detail": "Starts Hermes Workspace UI at http://localhost:3001 (React/TanStack). Port 3001 avoids conflict with other vite processes on :3000. Uses pnpm install (allowBuilds in pnpm-workspace.yaml approves esbuild/electron) + explicit vite --port 3001. Reads AppData/Local/hermes/workspace-overrides.json at runtime. Logs to logs/hermes/workspace-dev.log.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": {
+        "pattern": { "regexp": "^.*(ERROR|error|Error|failed|FAILED).*$", "message": 0 },
+        "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "Local.*http|started on port|ready in" }
+      }
+    },
+    {
+      "label": "🦉🚀 Hermes Stack: Full (Gateway + Workspace + MCP)",
+      "dependsOn": [
+        "🤖 Ollama: Start with GPU Layers",
+        "🦉 Hermes: Gateway run (HTTP API :8642)",
+        "🦉 Hermes: Dashboard (web UI :9119)",
+        "🦉 Hermes: Workspace dev (:3001)"
+      ],
+      "dependsOrder": "parallel",
+      "runOptions": { "runOn": "folderOpen" },
+      "group": "build",
+      "detail": "AUTO-STARTS on folder open — full Hermes stack in parallel: Ollama GPU + gateway :8642 + workspace :3001. TRACE MCP :8788 auto-loaded from AppData/Local/hermes/mcp.json. API_SERVER_ENABLED=true in AppData/Local/hermes/.env. gRPC :50051/:50053 is SvelteKit-internal only. Logs in logs/hermes/.",
+      "problemMatcher": []
+    },
+    
+    {
+      "label": "🦉 Hermes Stack: Gateway + Dashboard",
+      "dependsOn": [
+        "🦉 Hermes: Gateway run (HTTP API :8642)",
+        "🦉 Hermes: Dashboard (web UI :9119)"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "detail": "Minimal Hermes pair: gateway :8642 (JSON plans) + dashboard :9119 (Skills/Sessions/Memory). Use this when you don't need the Workspace React UI.",
       "problemMatcher": []
     },
     {
@@ -10100,6 +10185,40 @@
         "clear": true
       },
       "detail": "Execute the full 10-stage search pipeline: (1) rg lexical sweep, (2) multi-query expansion, (3) Qdrant union, (4) Karpathy rerank, (5) MS-MARCO cross-encoder, (6) LangExtract GRPO validation, (7) Cosine final blend, (8) Postgres persistence."
+    },
+    {
+      "label": "🦉 Hermes: Smoke — /api/ai/hermes-run",
+      "type": "shell",
+      "command": "Invoke-RestMethod -Method POST -Uri http://localhost:5173/api/ai/hermes-run -ContentType 'application/json' -Headers @{ Cookie = \"${input:devSessionCookie}\" } -Body ('{\"userQuery\":\"What retrieval tools are healthy?\",\"aceMode\":\"debug\"}' | ConvertTo-Json -Compress) | ConvertTo-Json -Depth 6",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "POST a fixed debug query to /api/ai/hermes-run and pretty-print the response. Verifies planner → executor → synthesizer pipeline end-to-end. Dev server must be running on :5173. Set devSessionCookie to 'auth_session=<value>' from browser DevTools."
+    },
+    {
+      "label": "🦉 Hermes: Run Query (plan → execute → synth)",
+      "type": "shell",
+      "command": "$body = ConvertTo-Json @{ userQuery = '${input:hermesQuery}'; aceMode = '${input:hermesAceMode}' } -Compress; Invoke-RestMethod -Method POST -Uri http://localhost:5173/api/ai/hermes-run -ContentType 'application/json' -Headers @{ Cookie = \"${input:devSessionCookie}\" } -Body $body | ConvertTo-Json -Depth 8",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Interactive Hermes run: prompts for a query + ACE mode, POSTs to /api/ai/hermes-run, returns { plan, execution, context, synthesis }. Dev server must be running. Useful for manual end-to-end testing of the planner→executor→synth pipeline."
     }
   ],
   "inputs": [
@@ -10478,6 +10597,25 @@
       "type": "promptString",
       "description": "RG-Atlas Search Query (Regex for stage 1, NL for semantic stages)",
       "default": "UploadZone"
+    },
+    {
+      "id": "hermesQuery",
+      "type": "promptString",
+      "description": "Hermes query (natural language — sent to plan→execute→synth pipeline)",
+      "default": "What retrieval tools are healthy and what cluster summaries are available?"
+    },
+    {
+      "id": "hermesAceMode",
+      "type": "pickString",
+      "description": "ACE mode for the Hermes run",
+      "options": ["search", "debug", "repair", "analyze"],
+      "default": "search"
+    },
+    {
+      "id": "devSessionCookie",
+      "type": "promptString",
+      "description": "Session cookie for auth (copy 'auth_session=<value>' from browser DevTools → Application → Cookies)",
+      "default": "auth_session="
     }
   ]
 }

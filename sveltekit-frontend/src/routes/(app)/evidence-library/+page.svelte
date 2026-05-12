@@ -27,8 +27,9 @@
 	let showRichCards = $state(false);
 	let showRagDocuments = $state(false);
 
+	// svelte-ignore state_referenced_locally
 	let evidenceItems = $state(data.evidenceItems || []);
-	
+
 	// Synchronize with server data when it changes
 	$effect(() => {
 		evidenceItems = data.evidenceItems || [];

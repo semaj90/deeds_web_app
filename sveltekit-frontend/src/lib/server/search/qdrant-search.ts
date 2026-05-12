@@ -5,6 +5,7 @@
 
 import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { ENV } from '$lib/server/env.server.js';
+import { encodedClusterPrefilter } from '$lib/server/retrieval/encoded-cluster-prefilter.js';
 
 export interface QdrantCodeResult {
   stable_key: string;
@@ -33,9 +34,25 @@ export async function searchQdrantCode(
 ): Promise<QdrantCodeResult[]> {
   try {
     const mgr = getManager();
-    const filter = topoClass
-      ? { must: [{ key: 'topo_class', match: { value: topoClass } }] }
-      : undefined;
+    const mustConditions: any[] = [];
+    
+    if (topoClass) {
+      mustConditions.push({ key: 'topo_class', match: { value: topoClass } });
+    }
+
+    // Apply encoded-cluster prefilter (Stage A0) if enabled
+    if (ENV.ACE_ENCODED_PREFILTER_ENABLED === 'true') {
+      try {
+        const pre = await encodedClusterPrefilter(new Float32Array(embedding));
+        if (pre && pre.filter && pre.filter.should) {
+          mustConditions.push({ should: pre.filter.should });
+        }
+      } catch (err) {
+        console.warn('[searchQdrantCode] Encoded prefilter failed:', err);
+      }
+    }
+
+    const filter = mustConditions.length > 0 ? { must: mustConditions } : undefined;
 
     const res = await mgr.hybridSearch({
       collection: 'codebase_chunks_768',

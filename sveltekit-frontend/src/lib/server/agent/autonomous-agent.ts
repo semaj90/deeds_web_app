@@ -17,6 +17,7 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { HumanMessage } from '@langchain/core/messages';
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { createHash } from 'crypto';
 import { assembleACEContext } from '$lib/server/ace/context-assembler.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
@@ -1087,6 +1088,33 @@ export class AutonomousAgent {
               `${AGENT_API_BASE()}/infrastructure/status`
             );
             return JSON.stringify(await response.json());
+          } catch (error) {
+            return JSON.stringify({ error: String(error) });
+          }
+        },
+      })
+    );
+
+    // 33. ACE Context Cached Tool
+    tools.push(
+      new DynamicStructuredTool({
+        name: 'ace_context_cached',
+        description: 'Get pre-ranked ACE context for a query (Redis-cached, no GPU cost)',
+        schema: z.object({
+          query: z.string().describe('Search query'),
+          topK: z.number().optional().default(10).describe('Number of results'),
+        }),
+        func: async ({ query, topK }) => {
+          try {
+            const { getRedis } = await import('$lib/server/redis.js');
+            const redis = getRedis();
+            const hash = createHash('sha256').update(query).digest('hex').slice(0, 16);
+            const cached = await redis.get(`ace:context:${hash}`);
+            if (cached) return cached;
+            
+            // Fallback to full ACE context assembly if not cached
+            const context = await assembleACEContext({ query, userId: 'agent', caseId: 'auto' });
+            return JSON.stringify(context);
           } catch (error) {
             return JSON.stringify({ error: String(error) });
           }

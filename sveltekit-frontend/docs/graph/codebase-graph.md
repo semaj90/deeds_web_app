@@ -1,30 +1,31 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-11T08:39:28.288Z
+> Generated: 2026-05-12T00:30:14.884Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 3889 |
-| Routes | 993 |
+| Files | 3955 |
+| Routes | 1000 |
 | Components | 882 |
-| API handlers | 672 |
-| TODOs | 16 |
-| Dirs | 405 |
+| API handlers | 678 |
+| TODOs | 18 |
+| Dirs | 411 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
 | G4 No auth | 9 |
-| G5 No Zod  | 0 |
-| G11 Localhost | 14 |
+| G5 No Zod  | 1 |
+| G11 Localhost | 18 |
 | G14 Svelte4 | 0 |
 | G15 SSR unsafe | 2 |
-| G16 No test | 40 |
-| G20 Cyclic | 0 |
+| G16 No test | 44 |
+| G20 Cyclic | 1 |
 
 ## Files with TODO/FIXME
 - `src/lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte` — 2 marker(s)
+- `src/lib/server/queue/rabbitmq-manager-fixed.ts` — 2 marker(s)
 - `src/lib/workers/embedding-worker-enhanced.js` — 2 marker(s)
 - `src/routes/(app)/admin/component-analysis/+page.svelte` — 2 marker(s)
 - `src/routes/(app)/admin/phase89/+page.svelte` — 2 marker(s)

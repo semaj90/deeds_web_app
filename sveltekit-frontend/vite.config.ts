@@ -6,6 +6,33 @@ import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 // vscodeErrorLogger was archived — stub it to no-op
 const vscodeErrorLogger = (_opts?: { enabled?: boolean }) => null;
+
+// ── Dev request logger — logs /api/* hits + 4xx/5xx to terminal ───────────
+function devRequestLoggerPlugin(enabled: boolean) {
+  if (!enabled) return null;
+  return {
+    name: 'dev-request-logger',
+    configureServer(server: import('vite').ViteDevServer) {
+      server.middlewares.use((req: import('http').IncomingMessage, res: import('http').ServerResponse, next: () => void) => {
+        const url  = req.url ?? '';
+        const method = req.method ?? 'GET';
+        const start = Date.now();
+        res.on('finish', () => {
+          const ms     = Date.now() - start;
+          const status = res.statusCode;
+          const isApi  = url.startsWith('/api/') || url.includes('hermes') || url.includes('stream');
+          const isErr  = status >= 400;
+          if (!isApi && !isErr) return;
+          const color  = status >= 500 ? '\x1b[31m' : status >= 400 ? '\x1b[33m' : status >= 300 ? '\x1b[36m' : '\x1b[32m';
+          const reset  = '\x1b[0m';
+          const dim    = '\x1b[2m';
+          console.log(`${color}[vite:api] ${method} ${url} → ${status}${reset} ${dim}${ms}ms${reset}`);
+        });
+        next();
+      });
+    },
+  };
+}
 // import { bitsUiIntegrityPlugin } from './scripts/vite-plugin-bits-ui-integrity.mjs';
 
 const require = createRequire(import.meta.url);
@@ -150,6 +177,7 @@ export default defineConfig(({ mode }) => {
       }),
       UnoCSS(),
       vscodeErrorLogger({ enabled: mode === 'development' }),
+      devRequestLoggerPlugin(mode === 'development'),
     ].filter(Boolean),
     server: {
       port: 5173,

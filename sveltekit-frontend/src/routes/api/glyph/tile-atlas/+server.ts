@@ -54,7 +54,7 @@ export const GET: RequestHandler = async (event) => {
     return json({ atlas: null, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { url } = event;
+
   const parsed = _getSchema.safeParse({
     caseId:    url.searchParams.get('caseId') ?? '',
     skipCache: url.searchParams.get('skipCache') ?? undefined,

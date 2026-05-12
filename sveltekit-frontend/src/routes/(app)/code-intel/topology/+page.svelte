@@ -168,6 +168,51 @@
 		filterLabel = null;
 	}
 
+	// ── Cluster overlay ───────────────────────────────────────────────────────
+
+	interface ClusterCentroid {
+		clusterId: number;
+		label: string;
+		summary: string;
+		size: number;
+		x: number;
+		y: number;
+	}
+
+	let showClusters  = $state(false);
+	let clusters      = $state<ClusterCentroid[]>([]);
+	let clusterLoading = $state(false);
+
+	const maxClusterSize = $derived(Math.max(1, ...clusters.map((c) => c.size)));
+
+	async function loadClusters() {
+		if (clusters.length > 0) return;
+		clusterLoading = true;
+		try {
+			const res = await fetch('/api/topology/centroids', { signal: AbortSignal.timeout(15_000) });
+			const data = await res.json();
+			clusters = data.clusters ?? [];
+		} catch (e) {
+			console.error('[topology] Cluster overlay failed:', e);
+		} finally {
+			clusterLoading = false;
+		}
+	}
+
+	function toggleClusters() {
+		showClusters = !showClusters;
+		if (showClusters) loadClusters();
+	}
+
+	function filterByCluster(c: ClusterCentroid) {
+		filteredView = nodes.filter((n) => n.som_cluster === c.clusterId);
+		filterLabel = `SOM cluster ${c.clusterId} — ${c.label}`;
+	}
+
+	function clusterDiameter(size: number): number {
+		return Math.round(36 + 64 * Math.sqrt(size / maxClusterSize));
+	}
+
 	/** Fetch ego-graph neighbors for the selected node via the traverse API. */
 	async function searchNearNode() {
 		if (!selectedNode) return;
@@ -221,6 +266,13 @@
 						class:active={colorMode === 'type'}
 						onclick={() => { colorMode = 'type'; }}
 					>Node Type</button>
+					<div class="mode-sep"></div>
+					<button
+						class="mode-btn cluster-toggle"
+						class:active={showClusters}
+						onclick={toggleClusters}
+						title="Overlay 87 SOM cluster centroids"
+					>{clusterLoading ? '…' : '⬡ Clusters'}</button>
 				</div>
 
 				<!-- Topo-class legend -->
@@ -256,6 +308,22 @@
 				{/if}
 
 				<div class="canvas">
+					{#if showClusters}
+						{#each clusters as c}
+							{@const d = clusterDiameter(c.size)}
+							<button
+								class="cluster-ring"
+								style:left="{c.x * 100}%"
+								style:top="{c.y * 100}%"
+								style:width="{d}px"
+								style:height="{d}px"
+								title="Cluster {c.clusterId}: {c.label} ({c.size} files)"
+								onclick={() => filterByCluster(c)}
+							>
+								<span class="cluster-ring-label">{c.label.slice(0, 28)}</span>
+							</button>
+						{/each}
+					{/if}
 					{#each displayNodes as node}
 						<button
 							class="node"
@@ -852,5 +920,57 @@
 		color: #64748b;
 		text-align: center;
 		font-style: italic;
+	}
+
+	/* ── Cluster overlay separator ──────────────────────────────── */
+	.mode-sep {
+		width: 1px;
+		background: #334155;
+		margin: 2px 2px;
+		align-self: stretch;
+	}
+
+	.cluster-toggle.active {
+		background: #4c1d9540;
+		color: #c084fc;
+	}
+
+	/* ── Cluster rings ──────────────────────────────────────────── */
+	.cluster-ring {
+		position: absolute;
+		transform: translate(-50%, -50%);
+		border-radius: 50%;
+		border: 2px solid #a855f780;
+		background: #a855f710;
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		padding-bottom: 4px;
+		cursor: pointer;
+		z-index: 0;
+		transition: border-color 0.15s, background 0.15s;
+		pointer-events: all;
+	}
+
+	.cluster-ring:hover {
+		border-color: #c084fc;
+		background: #a855f722;
+		z-index: 5;
+	}
+
+	.cluster-ring-label {
+		font-size: 0.55rem;
+		color: #c084fc99;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 90%;
+		text-align: center;
+		pointer-events: none;
+		line-height: 1;
+	}
+
+	.cluster-ring:hover .cluster-ring-label {
+		color: #e9d5ff;
 	}
 </style>

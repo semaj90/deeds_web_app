@@ -32,10 +32,12 @@ import { inferIntent } from '$lib/intent/regex-intent';
 import { routeIntent, executeChain } from '$lib/server/ai/intent-router';
 
 const bodySchema = z.object({
-	text:      z.string().min(1).max(4000),
-	sessionId: z.string().min(1).max(120).optional(),
-	caseId:    z.string().uuid().optional(),
-	filePath:  z.string().max(512).optional(),
+	text:         z.string().min(1).max(4000),
+	sessionId:    z.string().min(1).max(120).optional(),
+	caseId:       z.string().uuid().optional(),
+	filePath:     z.string().max(512).optional(),
+	parentTaskId: z.string().uuid().optional(),
+	runId:        z.string().max(64).optional(),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -57,15 +59,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		);
 	}
 
-	const { text, sessionId, caseId, filePath } = parsed.data;
+	const { text, sessionId, caseId, filePath, parentTaskId, runId } = parsed.data;
 	const userId = Number(locals.user.id) || 0;
-	const ctx = { userId, sessionId: sessionId ?? '', caseId, filePath };
+	const ctx = { userId, sessionId: sessionId ?? '', caseId, filePath, parentTaskId, runId };
 
 	// Defense-in-depth: re-run inferIntent on the server. The client may have
 	// hinted intent but the server's classification is source of truth.
 	const intent    = inferIntent(text);
 	const decision  = routeIntent(intent, text, ctx);
-	const execution = await executeChain(decision, ctx);
+	const execution = await executeChain(decision, ctx, { parentTaskId, runId });
 
 	// Fire-and-forget context_timeline write. Don't await — UX latency matters.
 	db.insert(contextTimeline)
@@ -84,6 +86,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				chain:      decision.chain.map((s) => s.tool),
 				trace:      execution.trace,
 				route:      filePath ?? null,
+				parentTaskId,
+				runId,
 			},
 		})
 		.catch((err: unknown) => {

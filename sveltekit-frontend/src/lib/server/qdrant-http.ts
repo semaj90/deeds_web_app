@@ -9,7 +9,7 @@ const QDRANT_TIMEOUT = 10_000;
 
 export type QdrantPoint = {
   id: string;
-  vector: number[];
+  vector: number[] | Record<string, number[]>;
   payload?: Record<string, any>;
 };
 
@@ -29,6 +29,18 @@ export async function getCollections(): Promise<string[]> {
   if (!r.ok) throw new Error(`Qdrant getCollections failed: ${r.status}`);
   const data = await r.json();
   return (data?.result?.collections ?? []).map((c: any) => c.name);
+}
+
+/**
+ * Get collection info
+ */
+export async function getCollection(name: string): Promise<any> {
+  const r = await fetch(`${QDRANT_URL}/collections/${name}`, {
+    signal: AbortSignal.timeout(QDRANT_TIMEOUT),
+  });
+  if (!r.ok) throw new Error(`Qdrant getCollection failed: ${r.status} ${await r.text()}`);
+  const data = await r.json();
+  return data?.result;
 }
 
 /**

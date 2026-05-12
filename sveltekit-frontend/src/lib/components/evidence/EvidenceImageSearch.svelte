@@ -188,7 +188,7 @@
 		{#if previewUrl}
 			<img
 				src={previewUrl}
-				alt="Search image"
+				alt="Search preview"
 				class="max-h-32 max-w-full rounded object-contain"
 			/>
 			{#if !searching}
@@ -302,6 +302,7 @@
 					</div>
 
 					<!-- Feedback buttons -->
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 					<div class="shrink-0 flex gap-1" onclick={(e) => e.stopPropagation()} role="group" aria-label="Feedback">
 						<button
 							class="p-1.5 rounded hover:bg-green-500/20 transition-colors {fb === true ? 'text-green-400' : 'text-gray-500'}"
