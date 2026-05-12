@@ -75,6 +75,7 @@
     aria-labelledby="ai-analysis-title"
     tabindex="-1"
   >
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
       class="w-[640px] max-w-[95vw] max-h-[80vh] overflow-hidden rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl flex flex-col"
       transition:scale={{ duration: 180, start: 0.95 }}

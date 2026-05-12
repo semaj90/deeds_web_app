@@ -12,6 +12,25 @@
   "src/lib/server/evidence/docling-structure.ts": [
     "src/lib/server/evidence/docling-structure.test.ts"
   ],
+  "src/lib/server/gpu/autoencoder-weights.ts": [
+    "src/lib/server/gpu/autoencoder-scripts.test.ts",
+    "src/lib/server/gpu/autoencoder.test.ts",
+    "tests/autoencoder-encoded64.spec.ts",
+    "tests/autoencoder-encoded64.spec.ts",
+    "tests/autoencoder-encoded64.spec.ts",
+    "tests/autoencoder-encoded64.spec.ts",
+    "tests/autoencoder-encoded64.spec.ts",
+    "tests/autoencoder-encoded64.spec.ts",
+    "tests/autoencoder-encoded64.spec.ts"
+  ],
+  "src/lib/server/gpu/encode-768-to-64.ts": [
+    "src/lib/server/gpu/autoencoder-scripts.test.ts",
+    "src/lib/server/gpu/autoencoder.test.ts",
+    "src/lib/server/retrieval/prefilter.test.ts",
+    "tests/autoencoder-encoded64.spec.ts",
+    "tests/autoencoder-encoded64.spec.ts",
+    "tests/autoencoder-encoded64.spec.ts"
+  ],
   "src/lib/server/grpc/retrieval-client.ts": [
     "src/lib/server/grpc/retrieval-client.test.ts",
     "src/lib/server/grpc/retrieval-client.test.ts"
@@ -19,6 +38,9 @@
   "src/lib/server/retrieval/context-buffer.ts": [
     "src/lib/server/retrieval/context-buffer.test.ts",
     "src/lib/server/retrieval/context-buffer.test.ts"
+  ],
+  "src/lib/server/retrieval/encoded-cluster-prefilter.ts": [
+    "src/lib/server/retrieval/prefilter.test.ts"
   ],
   "src/routes/api/codebase-index/deep-research/+server.ts": [
     "src/routes/api/codebase-index/deep-research/server.route.test.ts",
@@ -124,7 +146,9 @@
     "tests/admin-observability.spec.ts"
   ],
   "src/lib/server/agents/agents-card-store.ts": [
-    "tests/agents-index.spec.ts"
+    "tests/agents-index.spec.ts",
+    "tests/agents-regen-markdown.spec.ts",
+    "tests/agents-regen-writers.spec.ts"
   ],
   "src/lib/server/ace/agents-context-source.ts": [
     "tests/agents-index.spec.ts"
@@ -156,16 +180,29 @@
   "src/lib/server/agents/regen/loaders/path-aliases.ts": [
     "tests/agents-regen-loaders.spec.ts"
   ],
+  "src/lib/server/agents/regen/markdown/auto-blocks.ts": [
+    "tests/agents-regen-markdown.spec.ts"
+  ],
+  "src/lib/server/agents/regen/writers/markdown-writer.ts": [
+    "tests/agents-regen-markdown.spec.ts"
+  ],
   "src/lib/server/agents/regen/loaders/types.ts": [
     "tests/agents-regen-pg-loaders.spec.ts",
     "tests/agents-regen-run.spec.ts",
     "tests/agents-regen-section-builders.spec.ts"
   ],
   "src/lib/server/agents/regen/run.ts": [
-    "tests/agents-regen-run.spec.ts"
+    "tests/agents-regen-run.spec.ts",
+    "tests/agents-regen-telemetry.spec.ts"
   ],
   "src/lib/server/agents/regen/section-builders.ts": [
     "tests/agents-regen-section-builders.spec.ts"
+  ],
+  "src/lib/server/agents/regen/telemetry.ts": [
+    "tests/agents-regen-telemetry.spec.ts"
+  ],
+  "src/lib/server/agents/regen/writers/couchdb-writer.ts": [
+    "tests/agents-regen-writers.spec.ts"
   ],
   "tests/utils/seed-cases.ts": [
     "tests/ai-analysis-pipeline.spec.ts",
@@ -561,14 +598,28 @@
     "tests/e2e/route-forensic/evidence-view.diagnostic.spec.ts",
     "tests/e2e/route-forensic/global-search.diagnostic.spec.ts",
     "tests/e2e/route-forensic/homepage.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/legal-corpus-detail.diagnostic.spec.ts",
     "tests/e2e/route-forensic/legal-corpus.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/library-detail.diagnostic.spec.ts",
     "tests/e2e/route-forensic/library.diagnostic.spec.ts",
     "tests/e2e/route-forensic/login.diagnostic.spec.ts",
     "tests/e2e/route-forensic/persons-of-interest.diagnostic.spec.ts",
     "tests/e2e/route-forensic/poi-detail.diagnostic.spec.ts",
     "tests/e2e/route-forensic/rag-search.diagnostic.spec.ts",
     "tests/e2e/route-forensic/register.diagnostic.spec.ts",
-    "tests/e2e/route-forensic/reports.diagnostic.spec.ts"
+    "tests/e2e/route-forensic/reports.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/_helpers.ts"
+  ],
+  "tests/e2e/route-forensic/fixtures/forensic-page.ts": [
+    "tests/e2e/route-forensic/fixtures/authed-page.ts",
+    "tests/e2e/route-forensic/fixtures/db.ts",
+    "tests/e2e/route-forensic/helpers/forensic.ts"
+  ],
+  "tests/e2e/route-forensic/fixtures/db.ts": [
+    "tests/e2e/route-forensic/fixtures/forensic-page.ts"
+  ],
+  "tests/e2e/route-forensic/index.ts": [
+    "tests/e2e/route-forensic/index.ts"
   ],
   "src/lib/server/search/engram-bigram.ts": [
     "tests/engram-dym.spec.ts"
@@ -959,6 +1010,22 @@
   "src/lib/server/cache/dag-cache.ts": [
     "tests/retrieval-path-wiring.spec.ts",
     "tests/retrieval-path-wiring.spec.ts"
+  ],
+  "src/lib/server/rg-atlas/cosine-blend.ts": [
+    "tests/rg-atlas.spec.ts",
+    "tests/rg-atlas.spec.ts",
+    "tests/rg-atlas.spec.ts"
+  ],
+  "src/lib/server/rg-atlas/multi-query.ts": [
+    "tests/rg-atlas.spec.ts",
+    "tests/rg-atlas.spec.ts"
+  ],
+  "src/lib/server/rg-atlas/persist.ts": [
+    "tests/rg-atlas.spec.ts",
+    "tests/rg-atlas.spec.ts"
+  ],
+  "src/lib/server/ollama-cached.ts": [
+    "tests/rg-atlas.spec.ts"
   ],
   "src/lib/server/ace/ace-wiki.ts": [
     "tests/routes/ace-wiki-graph-index.test.ts",
@@ -2950,9 +3017,6 @@
     "tests/unit/chat-memory.test.ts",
     "tests/unit/chat-memory.test.ts",
     "tests/unit/chat-memory.test.ts"
-  ],
-  "src/lib/services/report-auto-populator.ts": [
-    "tests/unit/templates.test.ts"
   ],
   "src/lib/server/obsidian/markdown-wiki-note.ts": [
     "tests/wiki-vault-watcher.spec.ts"

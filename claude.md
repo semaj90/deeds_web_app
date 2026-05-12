@@ -623,10 +623,11 @@ docker exec legal-ai-minio mc mirror --overwrite local/legal-evidence/ \
 
 **Deprecation timeline:**
 1. ✅ 2026-05-11 — cutover env vars set; new uploads go to SeaweedFS
-2. ⏳ Pending operator decision — mirror existing MinIO objects to SeaweedFS
-3. ⏳ Pending operator decision — `docker stop legal-ai-minio` once mirror complete
-4. ⏳ Pending operator decision — remove `legal-ai-minio` service from `docker-compose.yml`
-5. ⏳ Pending operator decision — rename `MINIO_*` env vars to `S3_*` (cosmetic; the SDK doesn't care)
+2. ✅ 2026-05-11 — `/api/health` probes SeaweedFS master (:9333/cluster/status) instead of MinIO `/minio/health/live`; `SEAWEED_MASTER_PORT` + `SEAWEED_FILER_PORT` exported from `env.server.ts`
+3. ⏳ Pending operator decision — mirror existing MinIO objects to SeaweedFS
+4. ⏳ Pending operator decision — `docker stop legal-ai-minio` once mirror complete
+5. ⏳ Pending operator decision — remove `legal-ai-minio` service from `docker-compose.yml`
+6. ⏳ Pending operator decision — rename `MINIO_*` env vars to `S3_*` (cosmetic; the SDK doesn't care)
 
 **Do NOT:**
 - Use `mc admin policy` / MinIO-specific admin commands going forward — they don't translate to SeaweedFS
@@ -845,8 +846,8 @@ rg "collection.*$MODULE\|$MODULE.*collection" src/ --type ts
 # TIER C: INFRASTRUCTURE (run for service/infra changes)
 # ══════════════════════════════════════════════════════════════
 
-# G13: Docker service ports (5432 PG, 6379 Redis, 6333 Qdrant, 9000 MinIO, 5672 RabbitMQ)
-rg "5432\|6379\|6333\|9000\|5672\|50051\|4222\|8095" src/lib/server/ --type ts -l
+# G13: Docker service ports (5432 PG, 6379 Redis, 6333 Qdrant, 8333 SeaweedFS-S3, 9333 SeaweedFS-master, 5672 RabbitMQ)
+rg "5432\|6379\|6333\|8333\|9333\|5672\|50051\|4222\|8095" src/lib/server/ --type ts -l
 
 # G14: Native addon — .node binary via createRequire (libtorch-bridge, astVectorizer, simdjson)
 rg "\.node['\")]\|createRequire" src/ --type ts -l   # 3 known consumers
@@ -1187,6 +1188,9 @@ bash scripts/audit/backend-infrastructure-audit.sh
 | Ollama | 11434 | `curl localhost:11434/api/tags` |
 | RabbitMQ | 5672, 15672 | `curl -u guest:guest localhost:15672/api/overview` |
 | Langfuse | 3030 | `curl localhost:3030` |
+| SeaweedFS S3 | 8333 | `curl localhost:9333/cluster/status` (probe via master) |
+| SeaweedFS Master | 9333 | `curl localhost:9333/cluster/status` |
+| SeaweedFS Filer | 8382 | `curl localhost:8382/` |
 
 **Expected performance baselines** (from your RTX 3060 Ti setup):
 | Metric | Value | Acceptable Range |

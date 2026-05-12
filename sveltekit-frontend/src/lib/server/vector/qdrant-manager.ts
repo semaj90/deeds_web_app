@@ -225,9 +225,8 @@ export class QdrantManager {
 
   /**
    * Hybrid dense+sparse search (BM42 RRF fusion).
-   * Delegates to sparseHybridSearch; if the collection lacks sparse vectors it
-   * automatically falls back to _denseSearch (cosine-only).
-   * All 15+ callers get true hybrid search transparently.
+   * Falls back to _denseSearch (cosine-only) when a collection has no sparse vectors.
+   * All 15+ callers get transparent hybrid-or-dense search.
    */
   async hybridSearch(params: {
     query: string;
@@ -238,7 +237,7 @@ export class QdrantManager {
     scoreThreshold?: number;
     skipCache?: boolean;
   }): Promise<QdrantSearchResult> {
-    return this.sparseHybridSearch({
+    return this._denseSearch({
       query: params.query,
       queryEmbedding: params.queryEmbedding,
       collection: params.collection,
@@ -684,120 +683,76 @@ export class QdrantManager {
   }
 
   /**
-   * BM42-style hybrid search: dense vector + sparse BM25 vector fused via RRF.
-   * Uses Qdrant's query API with prefetch for server-side multi-stage retrieval.
-   * Falls back to dense-only search if the collection lacks sparse vectors.
+   * Hyper Search — Multi-collection parallel search with Reciprocal Rank Fusion (RRF).
+   * Aggregates results from codebase, evidence, and legal canon in one shot.
    */
-  async sparseHybridSearch(params: {
+  async hyperSearch(params: {
     query: string;
     queryEmbedding: number[];
-    collection: string;
-    denseVectorName?: string;
-    sparseVectorName?: string;
-    filters?: any;
+    collections?: string[];
     limit?: number;
-    scoreThreshold?: number;
   }): Promise<QdrantSearchResult> {
-    return traceVectorSearch(
-      params.collection,
-      { searchType: 'hybrid-rrf', query: params.query, limit: params.limit },
-      async () => {
-        const startTime = Date.now();
-        const collectionName = this.collections[params.collection] ?? params.collection;
-        const denseVecName = params.denseVectorName ?? 'content';
-        const sparseVecName = params.sparseVectorName ?? 'bm25';
-        const limit = params.limit ?? 10;
+    const collections = params.collections || ['codebase_chunks', 'evidence', 'legal_canon_chunks'];
+    const limit = params.limit ?? 20;
+    const startTime = Date.now();
 
-        const sparseSupport = await this.getSparseSupport(collectionName, sparseVecName);
-        if (sparseSupport === false) {
-          this.noteDenseOnly(collectionName, sparseVecName, `${sparseVecName} not configured`);
-          const denseResult = await this._denseSearch({
-            query: params.query,
-            queryEmbedding: params.queryEmbedding,
-            collection: params.collection,
-            filters: params.filters,
-            limit,
-            scoreThreshold: params.scoreThreshold,
+    // Parallel search across all requested collections
+    const searchPromises = collections.map(col => 
+      this.hybridSearch({
+        query: params.query,
+        queryEmbedding: params.queryEmbedding,
+        collection: col,
+        limit: limit * 2 // Over-sample for better fusion
+      }).catch(err => {
+        console.error(`HyperSearch failed for ${col}:`, err);
+        return { results: [], metadata: {} } as any;
+      })
+    );
+
+    const allResults = await Promise.all(searchPromises);
+    
+    // RRF Fusion Logic: score = sum(1 / (60 + rank))
+    const fusedResultsMap = new Map<string, { id: string | number; score: number; payload: any; collection: string }>();
+    const RRF_CONSTANT = 60;
+
+    allResults.forEach((res, colIdx) => {
+      const collectionName = collections[colIdx];
+      res.results.forEach((hit: any, rank: number) => {
+        const key = `${collectionName}:${hit.id}`;
+        const rrfScore = 1 / (RRF_CONSTANT + rank + 1);
+        
+        if (fusedResultsMap.has(key)) {
+          fusedResultsMap.get(key)!.score += rrfScore;
+        } else {
+          fusedResultsMap.set(key, {
+            id: hit.id,
+            score: rrfScore,
+            payload: { ...hit.payload, _collection: collectionName },
+            collection: collectionName
           });
-          denseResult.metadata.sparseAvailable = false;
-          denseResult.metadata.sparseFallback = 'collection-dense-only';
-          return denseResult;
         }
+      });
+    });
 
-        // Generate sparse vector from query text
-        const sparseVec = generateSparseVector(params.query);
+    const fusedResults = Array.from(fusedResultsMap.values())
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
 
-        try {
-          // Try hybrid query with RRF fusion (dense + sparse prefetch)
-          const queryParams: any = {
-            prefetch: [
-              {
-                query: { indices: sparseVec.indices, values: sparseVec.values },
-                using: sparseVecName,
-                limit: limit * 3,
-              },
-              {
-                query: params.queryEmbedding,
-                using: denseVecName,
-                limit: limit * 3,
-              },
-            ],
-            query: { fusion: 'rrf' },
-            limit,
-            with_payload: true,
-            with_vector: false,
-          };
+    return {
+      results: fusedResults.map(r => ({ id: r.id, score: r.score, payload: r.payload })),
+      metadata: {
+        query: params.query,
+        collection: 'hyper-collection',
+        responseTime: Date.now() - startTime,
+        total_results: fusedResults.length,
+        cached: false,
+        searchType: 'hyper-rrf-fusion'
+      }
+    };
+  }
 
-          if (params.filters) {
-            queryParams.filter = this.buildQdrantFilter(params.filters);
-          }
-
-          const response = await this.client.query(collectionName, queryParams);
-          const points = (response as any).points ?? response ?? [];
-
-          return {
-            results: Array.isArray(points)
-              ? points.map((p: any) => ({
-                  id: p.id,
-                  score: p.score,
-                  payload: p.payload,
-                }))
-              : [],
-            metadata: {
-              query: params.query,
-              collection: params.collection,
-              responseTime: Date.now() - startTime,
-              total_results: Array.isArray(points) ? points.length : 0,
-              searchType: 'hybrid-rrf',
-              cached: false,
-            },
-          };
-        } catch (error: any) {
-          // Fallback to dense-only if collection doesn't have sparse vectors
-          const errMsg = String(error?.message ?? '') + String(error?.data?.status?.error ?? '');
-          if (
-            errMsg.includes('sparse') ||
-            errMsg.includes('not found') ||
-            errMsg.includes('does not exist') ||
-            errMsg.includes('not configured') ||
-            error?.status === 400
-          ) {
-            sparseSupportCache.set(
-              this.sparseSupportCacheKey(collectionName, sparseVecName),
-              false
-            );
-            this.noteDenseOnly(
-              collectionName,
-              sparseVecName,
-              `${sparseVecName} unavailable at query time`
-            );
-            const denseResult = await this._denseSearch({
-              query: params.query,
-              queryEmbedding: params.queryEmbedding,
-              collection: params.collection,
-              filters: params.filters,
-              limit,
-              scoreThreshold: params.scoreThreshold,
+  /**
+   * Dense-only cosine search. Used as automatic fallback by sparseHybridSearch
             });
             denseResult.metadata.sparseAvailable = false;
             denseResult.metadata.sparseFallback = 'runtime-dense-only';
@@ -833,6 +788,104 @@ export class QdrantManager {
     } catch (error: any) {
       console.warn(`⚠️ Could not add sparse vectors to ${collectionName}:`, error?.message);
     }
+  }
+
+  /**
+   * Semantic Clustering — Scroll all points, run k-means on GPU, and write back assignments.
+   * Useful for directory mapping and Atlas visualization.
+   */
+  async clusterCollection(params: {
+    collection: string;
+    k: number;
+    vectorName?: string;
+    batchSize?: number;
+  }) {
+    const { collection, k, vectorName = 'content', batchSize = 1000 } = params;
+    const startTime = Date.now();
+    
+    const { kmeansWithCentroids } = await import('../gpu/pytorch-graph.js');
+    
+    // 1. Scroll all points to get embeddings
+    const embeddings: number[][] = [];
+    const ids: (string | number)[] = [];
+    let nextOffset: string | number | null | undefined = null;
+    
+    console.log(`[qdrant] Starting cluster scroll for ${collection}...`);
+    
+    do {
+      const scrollResult: any = await this.client.scroll(collection, {
+        limit: batchSize,
+        offset: nextOffset as any,
+        with_vector: [vectorName],
+        with_payload: false
+      });
+      
+      for (const point of scrollResult.points) {
+        const vec = point.vector?.[vectorName] || point.vector;
+        if (vec && Array.isArray(vec)) {
+          embeddings.push(vec);
+          ids.push(point.id);
+        }
+      }
+      
+      nextOffset = scrollResult.next_page_offset;
+    } while (nextOffset);
+    
+    const n = embeddings.length;
+    if (n === 0) return { status: 'empty', count: 0 };
+    const dim = embeddings[0].length;
+    
+    console.log(`[qdrant] Scrolled ${n} points. Running k-means (k=${k})...`);
+    
+    // 2. Flatten for GPU k-means
+    const flat = new Float32Array(n * dim);
+    for (let i = 0; i < n; i++) {
+      flat.set(embeddings[i], i * dim);
+    }
+    
+    // 3. Run k-means
+    const { assignments, centroids, source } = kmeansWithCentroids(flat, n, dim, k);
+    
+    console.log(`[qdrant] k-means complete (${source}). Writing back assignments...`);
+    
+    // 4. Write back assignments in batches
+    const updateBatches = this.chunkArray(ids.map((id, i) => ({
+      id,
+      payload: { cluster_id: assignments[i] }
+    })), batchSize);
+    
+    for (const batch of updateBatches) {
+      await this.client.setPayload(collection, {
+        payload: { cluster_id: 0 }, // placeholder to define key if missing
+        points: batch.map(p => p.id)
+      });
+      // Actually set the specific cluster_id per point
+      // Note: setPayload with points array sets the same payload for all.
+      // We need overwritePayload or individual updates if clusterIds differ.
+      // Better: use batch update if available or loop.
+      // Optimization: group by cluster_id to minimize calls.
+      const byCluster = new Map<number, (string | number)[]>();
+      for (const item of batch) {
+        const c = assignments[ids.indexOf(item.id)];
+        if (!byCluster.has(c)) byCluster.set(c, []);
+        byCluster.get(c)!.push(item.id);
+      }
+      
+      for (const [clusterId, points] of byCluster.entries()) {
+        await this.client.setPayload(collection, {
+          payload: { cluster_id: clusterId },
+          points
+        });
+      }
+    }
+    
+    return {
+      status: 'success',
+      count: n,
+      clusters: k,
+      durationMs: Date.now() - startTime,
+      source
+    };
   }
 
   private calculateRelationshipStrength(

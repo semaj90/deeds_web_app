@@ -165,6 +165,16 @@ async function main() {
 	};
 	console.log(`[agents:index] summary=${JSON.stringify(machineSummary)}`);
 
+	if (FLAGS.dryRun) {
+		// Safety invariant: if dryRun is true, all write counters MUST be zero.
+		const leaked = Object.entries(machineSummary)
+			.filter(([k, v]) => k.endsWith('Writes') && v > 0);
+		if (leaked.length > 0) {
+			console.error(`[FATAL] Dry-run violation! Leaked writes: ${leaked.map(([k,v])=>`${k}=${v}`).join(', ')}`);
+			process.exit(2);
+		}
+	}
+
 	console.log('\nDone.');
 }
 

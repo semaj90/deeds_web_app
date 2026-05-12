@@ -23,6 +23,8 @@ import { existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { Worker } from 'worker_threads';
+import { createHash } from 'crypto';
+import { getRedis } from '$lib/server/redis.js';
 
 const esmRequire = createRequire(import.meta.url);
 
@@ -902,6 +904,32 @@ export async function attentionScoreChunks(
   queryEmbedding: number[],
   chunkEmbeddings: number[][]
 ): Promise<number[]> {
+  const n = chunkEmbeddings.length;
+  if (n === 0) return [];
+  const dim = queryEmbedding.length;
+
+  try {
+    const redis = getRedis();
+    const queryHash = createHash('sha256').update(JSON.stringify(queryEmbedding)).digest('hex').slice(0, 16);
+    const setHash = createHash('sha256').update(JSON.stringify(chunkEmbeddings.slice(0, 5))).digest('hex').slice(0, 12);
+    const cacheKey = `gpu:attn:${queryHash}:${setHash}`;
+    const cached = await redis.get(cacheKey);
+    if (cached) return JSON.parse(cached);
+  } catch {}
+
+  // REDIS CACHED VERSION
+  try {
+    const redis = getRedis();
+    const queryHash = createHash('sha256').update(JSON.stringify(queryEmbedding)).digest('hex').slice(0, 16);
+    const setHash = createHash('sha256').update(JSON.stringify(chunkEmbeddings.slice(0, 5))).digest('hex').slice(0, 12);
+    const cacheKey = `gpu:attn:${queryHash}:${setHash}`;
+    const cached = await redis.get(cacheKey);
+    if (cached) return JSON.parse(cached);
+  } catch {}
+
+
+
+
   const n = chunkEmbeddings.length;
   if (n === 0) return [];
   const dim = queryEmbedding.length;

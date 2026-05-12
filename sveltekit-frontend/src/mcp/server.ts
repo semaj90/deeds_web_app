@@ -1311,6 +1311,21 @@ export function setupToolHandlers() {
         },
       },
       {
+        name: 'clusters.get_summary_lenses',
+        description:
+          'Return LLM-generated semantic summaries for all 87 SOM/GPU clusters stored in Redis. ' +
+          'Each lens includes clusterId, label, summary, size, and representative filePaths. ' +
+          'Use to identify which semantic neighbourhood a query falls into before Qdrant ANN search. ' +
+          'Optional topK limits results; optional query filters by keyword match in summary.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            topK:  { type: 'number', description: 'Max clusters to return (default: all)', default: 87 },
+            query: { type: 'string', description: 'Keyword filter — only clusters whose summary contains this string (case-insensitive).' },
+          },
+        },
+      },
+      {
         name: 'chunk.lookup',
         description:
           'Look up a single codebase chunk by its Qdrant ID. Returns path, kind, domain, cluster, semantic tags.',
@@ -1770,6 +1785,7 @@ export function setupToolHandlers() {
     'codebase:file_intel',
     'codebase:export_bundle',
     'cluster.summary.get',
+    'clusters.get_summary_lenses',
     'chunk.lookup',
     'rag:search',
     'gpu:similarity',
@@ -3929,6 +3945,72 @@ export function setupToolHandlers() {
         return {
           content: [{ type: 'text', text: JSON.stringify(result) }],
         };
+      }
+
+      case 'clusters.get_summary_lenses': {
+        const { topK, query } = args as { topK?: number; query?: string };
+        const redis = await getMcpRedis();
+        try {
+          // Scan all cluster:summary:* keys
+          const keys: string[] = [];
+          let cursor = '0';
+          do {
+            const [next, batch] = await redis.scan(cursor, 'MATCH', 'cluster:summary:*', 'COUNT', 200);
+            keys.push(...(batch as string[]));
+            cursor = next;
+          } while (cursor !== '0');
+
+          const lenses: {
+            clusterId: number;
+            label: string;
+            summary: string;
+            size: number;
+            filePaths: string[];
+            trainedAt: string;
+          }[] = [];
+
+          for (const key of keys) {
+            const raw = await redis.get(key);
+            if (!raw) continue;
+            try {
+              const rec = JSON.parse(raw);
+              if (typeof rec.clusterId !== 'number') continue;
+              const summary: string = rec.summary ?? '';
+              if (query && !summary.toLowerCase().includes(query.toLowerCase())) continue;
+              const firstSentence = summary.match(/^[^.!?\n]+[.!?]?/)?.[0]?.trim() ?? summary;
+              lenses.push({
+                clusterId:  rec.clusterId,
+                label:      firstSentence.length > 80 ? firstSentence.slice(0, 77) + '…' : firstSentence || `Cluster ${rec.clusterId}`,
+                summary,
+                size:       rec.size ?? 0,
+                filePaths:  (rec.filePaths ?? []).slice(0, 5),
+                trainedAt:  rec.trainedAt ?? '',
+              });
+            } catch { /* skip malformed */ }
+          }
+
+          lenses.sort((a, b) => a.clusterId - b.clusterId);
+          const result = topK ? lenses.slice(0, topK) : lenses;
+
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                total:  lenses.length,
+                returned: result.length,
+                query:  query ?? null,
+                lenses: result,
+              }),
+            }],
+          };
+        } catch (err) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({ error: err instanceof Error ? err.message : String(err), lenses: [] }),
+            }],
+          };
+        }
       }
 
       case 'chunk.lookup': {

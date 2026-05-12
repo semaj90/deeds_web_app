@@ -79,7 +79,7 @@ curl -X POST http://localhost:5173/api/evidence/upload \
 
 **Dependencies:**
 - ✅ YOLO (Python script available)
-- ✅ Ollama VLM (gemma3-legal multimodal)
+- ✅ Ollama VLM (gemma4-vlm container running, port 11434)
 - ✅ `/api/vision/analyze` endpoint
 
 **Expected Response:**
@@ -157,7 +157,8 @@ curl -X POST http://localhost:5173/api/evidence/upload \
    I, John Doe, hereby swear that...
    Signed under oath, John Doe
    ```
-2. Check if evidence_type refined from `documentary` → `testimonial`
+2. Check if evidence_type
+refined from `documentary` → `testimonial`
 
 **Expected Response:**
 - `evidence_type`: `"testimonial"` or `"witness_statement"`

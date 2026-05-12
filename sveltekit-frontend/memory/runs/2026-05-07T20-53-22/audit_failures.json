@@ -1,11 +1,41 @@
 {
-  "generatedAt": "2026-05-11T03:12:18.396Z",
+  "generatedAt": "2026-05-11T23:31:28.668Z",
   "runId": "2026-05-07T20-53-22",
-  "failureCount": 11,
+  "failureCount": 10,
   "failures": [
     {
       "gate": "G17",
+      "file": "src/lib/server/ai/hermes-executor.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
       "file": "src/lib/server/admin/subagent-orchestrator.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/agents/regen/writers/qdrant-backfill.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/agents/regen/writers/couchdb-writer.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ai/hermes-synth.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ai/hermes-planner.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/agents/regen/loaders/existing-card.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -20,42 +50,7 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/services/qdrant-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/vector/image-search.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ai/web-search-utils.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/services/error-analysis/RAGRetriever.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/services/couchdb-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/services/error-analysis/OllamaService.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/services/error-analysis/KAGTraverser.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/services/error-analysis/MetricsCollector.ts",
+      "file": "src/lib/server/search/marco-reranker.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     }
   ]

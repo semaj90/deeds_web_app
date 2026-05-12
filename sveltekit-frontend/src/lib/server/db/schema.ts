@@ -141,4 +141,6 @@ export * from './schema/topology';
 export * from './schema/graph-pathway-cards';
 export * from './schema/admin-chat';
 export * from './schema/admin-ai-skills';
-export * from './schema-search';
+// schema-search defines rgSearchRuns/rgSearchHits which also live in schema-postgres.
+// Export only the unique tables from schema-search to avoid barrel ambiguity.
+export { rgSearchResults, searchCentroids } from './schema-search';

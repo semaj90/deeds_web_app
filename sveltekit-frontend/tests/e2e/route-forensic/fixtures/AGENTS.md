@@ -1,7 +1,7 @@
 # AGENTS.md — `tests/e2e/route-forensic/fixtures`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-11T16:36:43.574Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-11T23:28:38.745Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/e2e/route-forensic/fixtures
 

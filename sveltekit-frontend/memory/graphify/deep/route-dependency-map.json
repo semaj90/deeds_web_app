@@ -253,8 +253,8 @@
   },
   "src/routes/(app)/admin/document-search/+page.server.ts": {
     "zone": "route",
-    "directDeps": 2,
-    "serverDeps": 2,
+    "directDeps": 3,
+    "serverDeps": 3,
     "dbDeps": 0
   },
   "src/routes/(app)/admin/document-search/+page.svelte": {
@@ -535,9 +535,9 @@
   },
   "src/routes/(app)/cases/[id]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(app)/cases/[id]/+page.svelte": {
     "zone": "route",
@@ -589,7 +589,7 @@
   },
   "src/routes/(app)/cases/[id]/evidence/+page.svelte": {
     "zone": "route",
-    "directDeps": 6,
+    "directDeps": 7,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -607,9 +607,9 @@
   },
   "src/routes/(app)/cases/[id]/notes/+page.server.ts": {
     "zone": "route",
-    "directDeps": 2,
-    "serverDeps": 2,
-    "dbDeps": 2
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
   },
   "src/routes/(app)/cases/[id]/notes/+page.svelte": {
     "zone": "route",
@@ -910,6 +910,12 @@
     "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
+  },
+  "src/routes/(app)/dashboard/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(app)/dashboard/+page.svelte": {
     "zone": "route",
@@ -2285,6 +2291,18 @@
     "serverDeps": 3,
     "dbDeps": 0
   },
+  "src/routes/api/ai/hermes-plan/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/api/ai/hermes-run/+server.ts": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 3,
+    "dbDeps": 0
+  },
   "src/routes/api/ai/intent-dispatch/+server.ts": {
     "zone": "route",
     "directDeps": 4,
@@ -3629,6 +3647,12 @@
     "serverDeps": 1,
     "dbDeps": 0
   },
+  "src/routes/api/collaboration/broadcast/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
   "src/routes/api/comfyui/health/+server.ts": {
     "zone": "route",
     "directDeps": 1,
@@ -3676,6 +3700,12 @@
     "directDeps": 3,
     "serverDeps": 3,
     "dbDeps": 2
+  },
+  "src/routes/api/couchdb/view/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
   },
   "src/routes/api/courtroom/models/+server.ts": {
     "zone": "route",
@@ -4435,8 +4465,8 @@
   },
   "src/routes/api/knowledge/document/[id]/+server.ts": {
     "zone": "route",
-    "directDeps": 3,
-    "serverDeps": 2,
+    "directDeps": 4,
+    "serverDeps": 3,
     "dbDeps": 0
   },
   "src/routes/api/knowledge/lint/+server.ts": {
@@ -4447,20 +4477,20 @@
   },
   "src/routes/api/knowledge/search/+server.ts": {
     "zone": "route",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 5,
+    "serverDeps": 5,
     "dbDeps": 0
   },
   "src/routes/api/knowledge/stats/+server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
+    "directDeps": 2,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/knowledge/stream/+server.ts": {
     "zone": "route",
-    "directDeps": 4,
-    "serverDeps": 4,
+    "directDeps": 5,
+    "serverDeps": 5,
     "dbDeps": 0
   },
   "src/routes/api/knowledge/youtube/+server.ts": {
@@ -5243,6 +5273,12 @@
     "serverDeps": 2,
     "dbDeps": 0
   },
+  "src/routes/api/rg-atlas/search/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
   "src/routes/api/route-operations/log/+server.ts": {
     "zone": "route",
     "directDeps": 1,
@@ -5627,6 +5663,12 @@
     "serverDeps": 2,
     "dbDeps": 1
   },
+  "src/routes/api/topology/centroids/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
   "src/routes/api/topology/stream/+server.ts": {
     "zone": "route",
     "directDeps": 3,
@@ -5873,10 +5915,16 @@
     "serverDeps": 1,
     "dbDeps": 0
   },
+  "src/routes/register/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 4,
+    "serverDeps": 3,
+    "dbDeps": 3
+  },
   "src/routes/register/+page.svelte": {
     "zone": "route",
     "directDeps": 2,
     "serverDeps": 0,
-    "dbDeps": 0
+    "dbDeps": 1
   }
 }

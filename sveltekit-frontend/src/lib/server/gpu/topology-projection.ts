@@ -38,6 +38,9 @@ export type ProjectionOptions = {
   maxN?: number;
 };
 
+/** Autoencoder variant — outDim is an arbitrary hidden dimension, not restricted to 2|3|4. */
+export type AutoencoderOptions = Omit<ProjectionOptions, 'outDim'> & { outDim: number };
+
 export type ProjectionResult = {
   ok: boolean;
   source: 'gpu' | 'cpu-fallback';
@@ -179,7 +182,7 @@ export async function autoencoderEncode(
   data: Float32Array,
   W: Float32Array,
   b: Float32Array,
-  opts: ProjectionOptions
+  opts: AutoencoderOptions
 ): Promise<ProjectionResult> {
   const { n, dim: inputDim, outDim: hidden, preferGpu = true, maxN = 32_768 } = opts;
   const t0 = performance.now();

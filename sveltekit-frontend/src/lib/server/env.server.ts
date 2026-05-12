@@ -285,6 +285,12 @@ export const ENV = {
   DEV_BYPASS_AUTH: (privateEnv.DEV_BYPASS_AUTH ?? 'false') === 'true',
   /** ACE Stage A0 encoded-cluster prefilter (Phase 1-4) */
   ACE_ENCODED_PREFILTER_ENABLED: privateEnv.ACE_ENCODED_PREFILTER_ENABLED ?? 'false',
+  /** ACE Stage A0 prefilter mode: off | shadow (measure) | boost (score only, no hard filter) | enforce (Qdrant filter). Default: off */
+  ACE_ENCODED_PREFILTER_MODE: (privateEnv.ACE_ENCODED_PREFILTER_MODE ?? 'off') as 'off' | 'shadow' | 'boost' | 'enforce',
+  /** Enable encoded-cluster similarity as a rerank boost signal (default: false) */
+  ACE_ENCODED_RERANK_ENABLED: (privateEnv.ACE_ENCODED_RERANK_ENABLED ?? 'false') === 'true',
+  /** Weight for encoded-cluster similarity in decision-tree reranker (default: 0.05) */
+  ACE_ENCODED_RERANK_WEIGHT: parseFloat(privateEnv.ACE_ENCODED_RERANK_WEIGHT ?? '0.05'),
 };
 
 

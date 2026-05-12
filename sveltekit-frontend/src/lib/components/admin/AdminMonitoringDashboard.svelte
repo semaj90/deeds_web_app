@@ -9,24 +9,24 @@
   import { fade, slide } from 'svelte/transition';
   import Icon from '$lib/components/ui/Icon.svelte';
 
-  let stats: any = null;
-  let raptorSummaries: any[] = [];
-  let loading = true;
-  let error: string | null = null;
-  let activeJobs: any[] = [];
-  let recommendations: any[] = [];
-  let inferenceLane: any = null;
-  let currentRepair: any = null;
-  let strategyQuery = '';
-  let currentStrategy: any = null;
-  let promoting: string | null = null;
+  let stats: any = $state(null);
+  let raptorSummaries: any[] = $state([]);
+  let loading = $state(true);
+  let error: string | null = $state(null);
+  let activeJobs: any[] = $state([]);
+  let recommendations: any[] = $state([]);
+  let inferenceLane: any = $state(null);
+  let currentRepair: any = $state(null);
+  let strategyQuery = $state('');
+  let currentStrategy: any = $state(null);
+  let promoting: string | null = $state(null);
 
 
 
 
 
-  let rebuildingRaptor = false;
-  let discoveringCitations = false;
+  let rebuildingRaptor = $state(false);
+  let discoveringCitations = $state(false);
 
 
 

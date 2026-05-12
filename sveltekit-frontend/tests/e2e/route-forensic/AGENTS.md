@@ -1,18 +1,18 @@
 # AGENTS.md — `tests/e2e/route-forensic`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-11T05:31:27.766Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-11T23:28:38.745Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/e2e/route-forensic
 
 ## Snapshot
 
-- module directory with 26 files, 0 API handlers
+- module directory with 31 files, 0 API handlers
 - Audit score: **85/100**
 - 🟠 hardcoded localhost: 1
-- Tags: `tests` `e2e` `route-forensic` `test`
+- Tags: `tests` `e2e` `route-forensic` `test` `auth`
 
-## Files (26)
+## Files (31)
 
 - `tests/e2e/route-forensic/active-cases.diagnostic.spec.ts`
 - `tests/e2e/route-forensic/analysis-center.diagnostic.spec.ts`
@@ -39,12 +39,12 @@
 
 | Gate | Status | Detail |
 |------|--------|--------|
-| G17 | ❌ FAIL | 1/26 files — use env.server.ts getters |
+| G17 | ❌ FAIL | 1/31 files — use env.server.ts getters |
 
 _Gates checked: G17. Run `npm run index:codebase:fast && npm run agents:write` to refresh._
 ## Todos + Enhancements
 
-- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 1/26 files — use env.server.ts getters
+- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 1/31 files — use env.server.ts getters
 - **[MED]** Hardcoded localhost refs
 
 _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
@@ -54,7 +54,7 @@ _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/26 files have paired tests
+- **Paired tests**: 1/31 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

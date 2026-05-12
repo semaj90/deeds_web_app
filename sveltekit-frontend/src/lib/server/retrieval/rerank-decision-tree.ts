@@ -1,5 +1,6 @@
 import { traceGraph } from '$lib/server/observability/langfuse.js';
 import { extractEntitiesNative } from '../langextract/native.js';
+import { ENV } from '$lib/server/env.server.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -9,16 +10,21 @@ export interface RerankSignals {
 	langScore?: number;
 	wikiScore?: number;
 	activityScore?: number;
+	/** f8: 64d cosine similarity between query encoding and doc encoding. */
+	encodedSimilarity?: number;
+	/** GRPO reward signal: query's top cluster matched this doc's som_cluster. */
+	encodedClusterHit?: boolean;
 	finalScore: number;
 }
 
-// Default weights
+// Default weights — must sum to 1.0
 const DEFAULT_WEIGHTS = {
-	gemma: 0.35,
-	marco: 0.15,
-	lang:  0.15,
-	wiki:  0.25,
-	activity: 0.1
+	gemma:    0.35,
+	marco:    0.15,
+	lang:     0.15,
+	wiki:     0.25,
+	activity: 0.05,
+	encoded:  0.05,
 };
 
 /**
@@ -36,7 +42,7 @@ function loadWeights() {
 	} catch (err) {
 		// Fallback to defaults
 	}
-	return DEFAULT_WEIGHTS;
+	return { ...DEFAULT_WEIGHTS };
 }
 
 /**
@@ -63,13 +69,17 @@ export async function combineRerankSignals(
 		}
 
 		const weights = loadWeights();
-		
-		const finalScore = 
+		if (ENV.ACE_ENCODED_RERANK_ENABLED) {
+			weights.encoded = ENV.ACE_ENCODED_RERANK_WEIGHT;
+		}
+
+		const finalScore =
 			(signals.gemmaScore * weights.gemma) +
 			((signals.marcoScore ?? 0.5) * weights.marco) +
 			((langScore ?? 0.5) * weights.lang) +
 			((signals.wikiScore ?? 0.5) * weights.wiki) +
-			((signals.activityScore ?? 0.0) * (weights.activity ?? 0.0));
+			((signals.activityScore  ?? 0.0) * (weights.activity ?? 0.0)) +
+			((signals.encodedSimilarity ?? 0.0) * (weights.encoded  ?? 0.0));
 
 		return {
 			...signals,

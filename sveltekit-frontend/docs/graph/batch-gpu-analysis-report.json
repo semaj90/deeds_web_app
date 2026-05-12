@@ -1,26 +1,26 @@
 {
-  "generatedAt": "2026-05-05T13:36:44.270Z",
+  "generatedAt": "2026-05-11T22:12:07.933Z",
   "dryRun": false,
   "skipLlm": false,
   "graph": {
-    "files": 3374,
-    "directories": 365,
-    "clusters": 93,
-    "missingCluster": 3001,
-    "missingSom": 3001
+    "files": 3930,
+    "directories": 410,
+    "clusters": 20,
+    "missingCluster": 3930,
+    "missingSom": 3930
   },
   "pageRank": {
     "source": "fanin",
-    "entries": 1377
+    "entries": 1690
   },
   "glyphs": {
-    "processed": 1,
-    "ok": 1,
-    "failed": 0,
+    "processed": 1371,
+    "ok": 1149,
+    "failed": 222,
     "tagsUpdated": 0,
-    "agentsWritten": 1217,
-    "clusterSummaries": 70,
-    "codeLlmWritten": 1217,
+    "agentsWritten": 315,
+    "clusterSummaries": 0,
+    "codeLlmWritten": 315,
     "turboUsed": true
   },
   "topDirectoriesByPageRank": [
@@ -79,6 +79,12 @@
       "source": "fanin"
     },
     {
+      "dir": "src/lib/collaboration",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
       "dir": "src/lib/components",
       "avg": 0,
       "max": 0,
@@ -107,20 +113,68 @@
       "avg": 0,
       "max": 0,
       "source": "fanin"
-    },
-    {
-      "dir": "src/lib/components/ai/CaseScoringDashboard",
-      "avg": 0,
-      "max": 0,
-      "source": "fanin"
     }
   ],
   "hotDirectories": [
     {
-      "dir": "src/routes/api/codebase/index",
+      "dir": "src",
+      "files": 17,
+      "ssrRisk": 0,
+      "pairedPct": 6
+    },
+    {
+      "dir": "src/lib/ai",
+      "files": 14,
+      "ssrRisk": 0,
+      "pairedPct": 7
+    },
+    {
+      "dir": "src/lib/ai/e2b",
+      "files": 2,
+      "ssrRisk": 0,
+      "pairedPct": 50
+    },
+    {
+      "dir": "src/lib/ai/onnx",
+      "files": 2,
+      "ssrRisk": 0,
+      "pairedPct": 50
+    },
+    {
+      "dir": "src/lib",
+      "files": 11,
+      "ssrRisk": 0,
+      "pairedPct": 9
+    },
+    {
+      "dir": "src/lib/cache",
+      "files": 5,
+      "ssrRisk": 0,
+      "pairedPct": 0
+    },
+    {
+      "dir": "src/lib/client/db",
       "files": 1,
       "ssrRisk": 0,
-      "pairedPct": 100
+      "pairedPct": 0
+    },
+    {
+      "dir": "src/lib/client",
+      "files": 6,
+      "ssrRisk": 0,
+      "pairedPct": 17
+    },
+    {
+      "dir": "src/lib/client/ui",
+      "files": 2,
+      "ssrRisk": 0,
+      "pairedPct": 0
+    },
+    {
+      "dir": "src/lib/collaboration",
+      "files": 1,
+      "ssrRisk": 0,
+      "pairedPct": 0
     }
   ]
 }

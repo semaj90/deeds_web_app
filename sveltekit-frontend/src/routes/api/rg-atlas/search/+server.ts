@@ -27,7 +27,7 @@ export async function POST({ request, locals }) {
 
         const result = await runRgSearchAtlas({
             ...validated.data,
-            userId: locals.user.id
+            userId: Number(locals.user.id)
         });
 
         return json(result);
