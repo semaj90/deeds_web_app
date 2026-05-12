@@ -245,7 +245,10 @@ async function main() {
 	log('Stage 5: aggregating clusters' + (FLAGS.withLlm ? ' (with Gemma4 summaries)...' : ' (deterministic concat)...'));
 	const dagNodes = [];
 	let llmFails = 0;
+	let i = 0;
 	for (const [key, cell] of cells) {
+		i++;
+		if (!FLAGS.quiet) console.log(`  [${i}/${cells.size}] Summarising cluster ${key}...`);
 		const agg = aggregateCluster(cell.members);
 		let summary = `Cluster ${key} (${cell.members.length} dirs). Top tags: ${agg.topTags.join(', ') || '∅'}. Top features: ${agg.topFeatures.join(', ') || '∅'}.\nMembers:\n${agg.summaries.join('\n').slice(0, 2000)}`;
 		if (FLAGS.withLlm) {

@@ -643,6 +643,7 @@ export async function loadCodebaseContext(query: string): Promise<{
             wikiScore: Math.min(1.0, wikiScore),
             activityScore: card?.activityScore || 0,
             encodedSimilarity,
+            pagerankScore: chunk.pageRankScore ?? 0,
         }, chunk.content);
 
         return {

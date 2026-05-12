@@ -275,7 +275,7 @@ export async function buildGlyphTileAtlas(
     }
 
     // N-API kMeans (GPU → CPU fallback inside pytorch-graph addon)
-    const kmResult = runKMeans(embeddings, n, DIM, k);
+    const kmResult = await runKMeans(embeddings, n, DIM, k);
     const { centroids, assignments, source } = kmResult;
 
     // Aggregate entity lists per cluster
@@ -359,11 +359,11 @@ export async function buildGlyphTileAtlas(
  * @param atlas          - tile atlas to search
  * @param topK           - number of nearest tiles to return (default 3)
  */
-export function searchGlyphTiles(
+export async function searchGlyphTiles(
   queryEmbedding: Float32Array | number[],
   atlas: GlyphTileAtlas,
   topK = 3
-): GlyphTile[] {
+): Promise<GlyphTile[]> {
   if (atlas.tiles.length === 0) return [];
 
   const query =
@@ -380,7 +380,7 @@ export function searchGlyphTiles(
   }
 
   // Scaled dot-product attention — GPU path via N-API, CPU fallback inside addon
-  const { scores } = scoreAttention(query, DIM, keys, k);
+  const { scores } = await scoreAttention(query, DIM, keys, k);
 
   // Return top-K tiles by descending attention score
   const ranked = atlas.tiles

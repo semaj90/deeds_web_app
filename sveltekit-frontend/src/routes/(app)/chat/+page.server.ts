@@ -1,6 +1,8 @@
 import * as amqp from 'amqplib';
 import { getRabbitMQUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types';
+import { db } from '$lib/server/db/client';
+import { chatMessages } from '$lib/server/db/schema';
 
 /**
  * Phase 79: Graceful Auth Fallback for Chat
@@ -51,10 +53,16 @@ export const actions: Actions = {
             await ch.close();
             await conn.close();
 
-            // If authenticated, optionally save to legal_ai_db
+            // If authenticated, save to legal_ai_db
             if (locals.user) {
-                // TODO: Save chat message to database for persistence
-                // await db.insert(chatMessages).values({ ... });
+                await db.insert(chatMessages).values({
+                    id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                    chatId,
+                    userId: locals.user.id,
+                    role: 'user',
+                    content: text,
+                    timestamp: new Date()
+                }).catch(e => console.error('Failed to persist chat message:', e));
             }
 
             return {

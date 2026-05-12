@@ -927,7 +927,7 @@ export const POST: RequestHandler = async (event) => {
         const n = chunkVecs.length;
         const keysMatrix = new Float32Array(n * DIM);
         chunkVecs.forEach((v, i) => keysMatrix.set(v.slice(0, DIM), i * DIM));
-        const attn = scoreAttention(queryVec, DIM, keysMatrix, n);
+        const attn = await scoreAttention(queryVec, DIM, keysMatrix, n);
         const ranked = context.ragChunks
           .map((c, i) => ({ c, attnScore: attn.scores[i] ?? 0 }))
           .sort((a, b) => b.attnScore - a.attnScore);
@@ -964,7 +964,7 @@ export const POST: RequestHandler = async (event) => {
       const embedResult = await generateEmbeddings([query, answer.slice(0, 512)]);
       const queryVec = new Float32Array(embedResult.vectors[0]);
       const answerVec = new Float32Array(embedResult.vectors[1]);
-      const reward = scoreGRPOReward(answerVec, queryVec, DIM);
+      const reward = await scoreGRPOReward(answerVec, queryVec, DIM);
       grpoRewardScore = reward.reward;
       timer.mark('grpo-reward');
     } catch {

@@ -482,8 +482,8 @@ export async function buildGlyphMatrixGpu(
         for (let j = 0; j < DIM; j++) mat[i * DIM + j] = vec[j] / norm;
       }
 
-      // GPU attention score: query vs block matrix (N-API synchronous)
-      const attn = scoreAttention(queryVec, DIM, mat, n);
+      // GPU attention score: query vs block matrix (N-API or gRPC)
+      const attn = await scoreAttention(queryVec, DIM, mat, n);
       for (let i = 0; i < n; i++) {
         scores[start + i] = attn.scores[i] ?? 0;
       }

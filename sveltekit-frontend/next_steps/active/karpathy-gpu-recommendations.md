@@ -1,6 +1,6 @@
 # Karpathy GPU Authority Blend — Recommendations
 
-> Run: 2026-05-11T03:28:43.283Z
+> Run: 2026-05-12T19:12:18.320Z
 > Mode: `topN` · candidates: 44 · embedded: 9 · skipped: 35
 > GPU: encode=true · attention=true
 

@@ -97,6 +97,7 @@
     "src/lib/components/ui/Dropdown.svelte",
     "src/lib/components/ui/DropdownMenu.svelte",
     "src/lib/components/ui/EmptyState.svelte",
+    "src/lib/components/ui/enhanced-bits/Button.svelte",
     "src/lib/components/ui/enhanced-bits.svelte",
     "src/lib/components/ui/ErrorBoundary.svelte",
     "src/lib/components/ui/ExpandGrid.svelte",
@@ -153,6 +154,7 @@
     "src/lib/components/ui/tooltip.ts",
     "src/lib/components/ui/TooltipTrigger.svelte",
     "src/lib/components/video/VideoAnalysisView.svelte",
+    "src/lib/components/webgpu/SwarmManifoldVisualizer.svelte",
     "src/lib/components/webgpu/WebGPUTopologyRenderer.svelte",
     "src/lib/components/yorha/EvidenceBoard.svelte",
     "src/lib/components/yorha/YoRHaDetectiveModal.svelte",
@@ -165,6 +167,7 @@
     "src/lib/types/global.ts",
     "src/lib/types/svelte5-api-types.d.ts",
     "src/routes/(analysis)/+layout.svelte",
+    "src/routes/(analysis)@/+layout.svelte",
     "src/routes/(app)/+layout.svelte",
     "src/routes/(app)/admin/+layout.svelte",
     "src/routes/(app)/admin/+page.svelte",
@@ -197,6 +200,13 @@
     "src/routes/(app)/demos/particles/+page.svelte",
     "src/routes/(app)/demos/webgpu-memory-palace/+page.svelte",
     "src/routes/(app)/demos/webgpu-showcase/+page.svelte",
+    "src/routes/(app)/demos/yorha/components/EvidenceBoard.svelte",
+    "src/routes/(app)/demos/yorha/components/YoRHaDetectiveModal.svelte",
+    "src/routes/(app)/demos/yorha/components/YoRHaDialog.svelte",
+    "src/routes/(app)/demos/yorha/components/YoRHaModal.svelte",
+    "src/routes/(app)/demos/yorha/components/YoRHaTable.svelte",
+    "src/routes/(app)/demos/yorha/components/YoRHaTerminal.svelte",
+    "src/routes/(app)/demos/yorha/components/_simulations/YoRHaTerminal.svelte",
     "src/routes/(app)/evidence/hash/+page.svelte",
     "src/routes/(app)/evidence/realtime/+page.svelte",
     "src/routes/(app)/library/[documentId]/reader/+page.svelte",
@@ -234,7 +244,6 @@
     "src/lib/server/agent/tools/extract-pattern.ts",
     "src/lib/server/agent/tools/find-files.ts",
     "src/lib/server/agent/tools/ripgrep-search.ts",
-    "src/lib/server/agent/tools/web-search-searxng.ts",
     "src/lib/server/agent/tools/web-search.ts",
     "src/lib/server/agents/agents-card-store.ts",
     "src/lib/server/agents-md/schema.ts",
@@ -495,6 +504,7 @@
     "src/routes/api/codeintel/clusters/[id]/+server.ts",
     "src/routes/api/codeintel/fix/+server.ts",
     "src/routes/api/codeintel/wiki/+server.ts",
+    "src/routes/api/collaboration/broadcast/+server.ts",
     "src/routes/api/comfyui/render/+server.ts",
     "src/routes/api/contextual/chat/+server.ts",
     "src/routes/api/contextual/predictions/+server.ts",
@@ -681,6 +691,7 @@
     "src/routes/api/reports/[id]/export/+server.ts",
     "src/routes/api/research/concurrent-deep/+server.ts",
     "src/routes/api/research/concurrent-deep/stream/+server.ts",
+    "src/routes/api/research/deep/+server.ts",
     "src/routes/api/research/encode/+server.ts",
     "src/routes/api/research/external-deep/+server.ts",
     "src/routes/api/research/ingest/+server.ts",
@@ -780,13 +791,18 @@
     "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
+    "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+    "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
+    "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(app)/+layout.server.ts",
     "src/routes/(app)/admin/ai-dashboard/+page.server.ts",
     "src/routes/(app)/admin/all-routes/$types.d.ts",
     "src/routes/(app)/admin/api-testing/agentic-loop/+server.ts",
     "src/routes/(app)/admin/api-testing/ast-topology/+server.ts",
+    "src/routes/(app)/admin/cache/+page.server.ts",
     "src/routes/(app)/admin/chat-memory/+page.server.ts",
     "src/routes/(app)/admin/document-search/+page.server.ts",
+    "src/routes/(app)/admin/error-brain/+page.server.ts",
     "src/routes/(app)/admin/knowledge-search/+page.server.ts",
     "src/routes/(app)/admin/memory-inspector/+page.server.ts",
     "src/routes/(app)/admin/phase78/+page.server.ts",
@@ -800,9 +816,12 @@
     "src/routes/(app)/cases/[id]/+layout.server.ts",
     "src/routes/(app)/cases/[id]/+page.server.ts",
     "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+    "src/routes/(app)/cases/[id]/canvas/+page.server.ts",
+    "src/routes/(app)/cases/[id]/chat/+page.server.ts",
     "src/routes/(app)/cases/[id]/evidence/upload/+page.server.ts",
     "src/routes/(app)/cases/[id]/notes/+page.server.ts",
     "src/routes/(app)/cases/[id]/overview/+page.server.ts",
+    "src/routes/(app)/cases/[id]/persons/+page.server.ts",
     "src/routes/(app)/cases/[id]/reports/+page.server.ts",
     "src/routes/(app)/chat/[id]/+page.server.ts",
     "src/routes/(app)/citations/law/[citation]/+page.server.ts",
@@ -820,6 +839,8 @@
     "src/routes/(app)/error-brain/+page.server.ts",
     "src/routes/(app)/evidence/+page.server.ts",
     "src/routes/(app)/evidence/+server.ts",
+    "src/routes/(app)/evidence/analyze/+page.server.ts",
+    "src/routes/(app)/evidence/hash/+page.server.ts",
     "src/routes/(app)/evidence/realtime/+page.server.ts",
     "src/routes/(app)/evidence/upload/+page.server.ts",
     "src/routes/(app)/evidence/[id]/view/+page.server.ts",
@@ -1222,6 +1243,7 @@
     "src/routes/api/health/circuit-breakers/+server.ts",
     "src/routes/api/health/database/+server.ts",
     "src/routes/api/health/gpu/+server.ts",
+    "src/routes/api/health/inference/+server.ts",
     "src/routes/api/health/neo4j/+server.ts",
     "src/routes/api/health/obsidian/+server.ts",
     "src/routes/api/health/ocr/+server.ts",
@@ -1379,6 +1401,7 @@
     "src/routes/api/reports/[id]/publish/+server.ts",
     "src/routes/api/research/concurrent-deep/+server.ts",
     "src/routes/api/research/concurrent-deep/stream/+server.ts",
+    "src/routes/api/research/deep/+server.ts",
     "src/routes/api/research/encode/+server.ts",
     "src/routes/api/research/external-deep/+server.ts",
     "src/routes/api/research/ingest/+server.ts",
@@ -1511,8 +1534,12 @@
     "src/lib/server/ai/agentic-diagnostic.ts",
     "src/lib/server/ai/code-intel-service.ts",
     "src/lib/server/ai/external-research-agent.ts",
+    "src/lib/server/ai/hermes/deep-research-dag.ts",
+    "src/lib/server/ai/hermes/dispatcher.ts",
+    "src/lib/server/ai/hermes/tools/registry.ts",
     "src/lib/server/ai/hypergraph-store.ts",
     "src/lib/server/ai/mcp-tool-dispatch.ts",
+    "src/lib/server/ai/model-security.ts",
     "src/lib/server/ai/token-tracker.ts",
     "src/lib/server/analysis/analysis-jobs.ts",
     "src/lib/server/analysis/evidence-analysis-pipeline.ts",
@@ -1590,6 +1617,7 @@
     "src/lib/server/gpu/background-analyzer.ts",
     "src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
     "src/lib/server/graph/ingestion-buffer-builder.ts",
+    "src/lib/server/graph/neo4j-jsonl-exporter.ts",
     "src/lib/server/graph/pg-neo4j-sync.ts",
     "src/lib/server/indexer/karpathy-persistence.ts",
     "src/lib/server/indexer/web-search-indexer.ts",
@@ -1985,17 +2013,21 @@
     "src/lib/components/ui/Notifications.svelte",
     "src/lib/components/ui/tabs/TabsContent.svelte",
     "src/lib/components/ui/Tooltip.svelte",
+    "src/lib/components/webgpu/SwarmManifoldVisualizer.svelte",
     "src/lib/components/yorha/EnhancedYoRHaAIAssistant.svelte",
     "src/lib/components/yorha/YoRHaDialog.svelte",
     "src/lib/components/yorha/YoRHaModal.svelte",
     "src/lib/machines/AIAssistantMachineComponent.svelte",
     "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
     "src/routes/(app)/cases/[id]/reports/+page.svelte",
+    "src/routes/(app)/code-intel/subagents/+page.svelte",
     "src/routes/(app)/demos/case-prediction/+page.svelte",
     "src/routes/(app)/demos/keyboard-shortcuts/+page.svelte",
     "src/routes/(app)/demos/smart-positioning/+page.svelte",
     "src/routes/(app)/demos/spotlight/+page.svelte",
     "src/routes/(app)/demos/yorha/components/EnhancedYoRHaAIAssistant.svelte",
+    "src/routes/(app)/demos/yorha/components/YoRHaDialog.svelte",
+    "src/routes/(app)/demos/yorha/components/YoRHaModal.svelte",
     "src/routes/(app)/evidence-library/+page.svelte",
     "src/routes/(app)/persons-of-interest/+page.svelte",
     "src/routes/(dev)/odin/+page.svelte",
@@ -2025,6 +2057,7 @@
     "src/lib/components/ui/bits/Svelte5Button.svelte",
     "src/lib/components/ui/bits/Svelte5Dialog.svelte",
     "src/lib/components/ui/button/Button.svelte",
+    "src/lib/components/ui/enhanced-bits/Button.svelte",
     "src/lib/components/ui/FeedbackButtons.svelte",
     "src/lib/components/ui/gaming/n64/N643DButton.svelte",
     "src/lib/components/ui/HoverCard.svelte",
@@ -2058,6 +2091,7 @@
     "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
     "src/routes/(app)/demos/smart-positioning/+page.svelte",
     "src/routes/(app)/demos/spotlight/+page.svelte",
+    "src/routes/(app)/demos/yorha/components/YoRHaModal.svelte",
     "src/routes/(app)/evidence-library/+page.svelte"
   ],
   "EXTERNAL:$lib/types/upload": [
@@ -2071,7 +2105,8 @@
     "src/routes/(app)/admin/case-graph/+page.svelte",
     "src/routes/(app)/couchdb-analytics/DependencyChart.svelte",
     "src/routes/(app)/couchdb-analytics/ErrorPropagationGraph.svelte",
-    "src/routes/(app)/demos/+page.svelte"
+    "src/routes/(app)/demos/+page.svelte",
+    "src/routes/(app)/demos/yorha/components/DetectiveEvidenceMap.svelte"
   ],
   "EXTERNAL:svelte-dnd-action": [
     "src/lib/components/detective/DetectiveBoard.svelte"
@@ -2147,6 +2182,7 @@
     "src/lib/components/ui/card/CardFooter.svelte",
     "src/lib/components/ui/card/CardHeader.svelte",
     "src/lib/components/ui/card/CardTitle.svelte",
+    "src/lib/components/ui/enhanced-bits/Button.svelte",
     "src/lib/components/ui/input/Input.svelte",
     "src/lib/components/ui/label/Label.svelte",
     "src/lib/components/ui/select/SelectContent.svelte",
@@ -2238,10 +2274,12 @@
     "src/lib/components/ui/tooltip.ts"
   ],
   "EXTERNAL:$lib/components/evidence-graph/LegalHUD.svelte": [
-    "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte"
+    "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+    "src/routes/(app)/demos/yorha/components/PhoenixProsecutorDashboard.svelte"
   ],
   "EXTERNAL:$lib/components/visualizations/WebGPUEvidenceGraphVisualization": [
-    "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte"
+    "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+    "src/routes/(app)/demos/yorha/components/PhoenixProsecutorDashboard.svelte"
   ],
   "EXTERNAL:ioredis": [
     "src/lib/config/redis-config.ts",
@@ -2386,6 +2424,7 @@
     "src/lib/server/db/schema/library-document-versions.ts",
     "src/lib/server/db/schema/library-documents.ts",
     "src/lib/server/db/schema/metadata-spine.ts",
+    "src/lib/server/db/schema/models.ts",
     "src/lib/server/db/schema/page-artifacts.ts",
     "src/lib/server/db/schema/persons.ts",
     "src/lib/server/db/schema/reports.ts",
@@ -2522,7 +2561,9 @@
     "src/lib/server/agent/tools/analyze-file.ts",
     "src/lib/server/ai/gemma4-agent.ts",
     "src/lib/server/ai/linter-service.ts",
+    "src/lib/server/ai/model-security.ts",
     "src/lib/server/ai/onnx-server.ts",
+    "src/lib/server/analysis/media-processing.ts",
     "src/lib/server/api-metadata-extractor.ts",
     "src/lib/server/db/legal-db-init.ts",
     "src/lib/server/db/migrate.ts",
@@ -2547,6 +2588,7 @@
     "src/lib/server/graph/codebase-neo4j-sync.ts",
     "src/lib/server/graph/codebase-scanner-v2.ts",
     "src/lib/server/graph/codebase-scanner.ts",
+    "src/lib/server/graph/neo4j-jsonl-exporter.ts",
     "src/lib/server/grpc/chr97-agent-client.ts",
     "src/lib/server/grpc/embedding-client.ts",
     "src/lib/server/grpc/graph-ml-client.ts",
@@ -2634,6 +2676,7 @@
     "src/lib/server/ace/mini-active-cache.ts",
     "src/lib/server/ace/retrieval-lanes.ts",
     "src/lib/server/agents/regen/writers/markdown-writer.ts",
+    "src/lib/server/ai/code-intel-service.ts",
     "src/lib/server/graph/glyph-atlas-builder.ts",
     "src/lib/server/graph/graph-intel.ts",
     "src/lib/server/graph/graph-remote-functions.ts",
@@ -2793,6 +2836,7 @@
     "src/lib/server/ace/ngram-retrieval.ts",
     "src/lib/server/ace/retrieval-lanes.ts",
     "src/lib/server/adapters/service-integrations.ts",
+    "src/lib/server/ai/hermes/tools/db-schema-tools.ts",
     "src/lib/server/db/client.ts",
     "src/lib/server/db/connections.ts",
     "src/lib/server/db/seed-citations.ts",
@@ -2846,9 +2890,13 @@
   "EXTERNAL:crypto": [
     "src/lib/server/ace/hmm-wiki-logger.ts",
     "src/lib/server/ace/tool-response-summarizer.ts",
+    "src/lib/server/agent/autonomous-agent.ts",
     "src/lib/server/ai/caching-layer.ts",
     "src/lib/server/ai/gemma4-tool-controller.ts",
+    "src/lib/server/ai/hermes/tools/registry.ts",
+    "src/lib/server/ai/hermes-synth.ts",
     "src/lib/server/ai/information-gain-validator.ts",
+    "src/lib/server/ai/model-security.ts",
     "src/lib/server/analysis/entity-extraction.ts",
     "src/lib/server/analysis/evidence-analysis-pipeline.ts",
     "src/lib/server/analysis/vlm-evidence-analyzer.ts",
@@ -2876,6 +2924,7 @@
     "src/lib/server/ff1/cli/ff1-propose.ts",
     "src/lib/server/ff1/planner.ts",
     "src/lib/server/ff1/storage/redis-cache.ts",
+    "src/lib/server/gpu/libtorch-bridge.ts",
     "src/lib/server/graph/gpu-graph-analysis.ts",
     "src/lib/server/grpc/embedding-client.ts",
     "src/lib/server/indexer/chunk-id.ts",
@@ -3757,6 +3806,7 @@
     "src/lib/server/acp/tools/phase89.ts",
     "src/lib/server/agent/tools/ripgrep-search.ts",
     "src/lib/server/ai/linter-service.ts",
+    "src/lib/server/analysis/media-processing.ts",
     "src/lib/server/analytics/codebase-research.ts",
     "src/lib/server/audit/gpu-audit-orchestrator.ts",
     "src/lib/server/ff1/agent/tool-registry.ts",
@@ -3826,13 +3876,17 @@
   ],
   "EXTERNAL:@langchain/langgraph": [
     "src/lib/server/agent/supervisor.ts",
+    "src/lib/server/ai/hermes/deep-research-dag.ts",
     "src/lib/server/analytics/research-graph-rl.ts"
   ],
   "EXTERNAL:fs/promises": [
     "src/lib/server/agent/tools/analyze-file.ts",
     "src/lib/server/agent/tools/find-files.ts",
     "src/lib/server/ai/gemma4-agent.ts",
+    "src/lib/server/ai/model-security.ts",
+    "src/lib/server/analysis/media-processing.ts",
     "src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
+    "src/lib/server/graph/neo4j-jsonl-exporter.ts",
     "src/lib/server/indexer/ast-chunker.ts",
     "src/lib/server/minio/client.ts",
     "src/lib/server/workers/audio-processor.ts",
@@ -3871,6 +3925,9 @@
   "EXTERNAL:fast-glob": [
     "src/lib/server/agent/tools/find-files.ts"
   ],
+  "UNRESOLVED:./web-search-searxng.js": [
+    "src/lib/server/agent/tools/index.ts"
+  ],
   "EXTERNAL:node:fs/promises": [
     "src/lib/server/agents/regen/loaders/graph.ts",
     "src/lib/server/agents/regen/loaders/path-aliases.ts",
@@ -3901,12 +3958,41 @@
   "EXTERNAL:zlib": [
     "src/lib/server/ai/caching-layer.ts"
   ],
+  "EXTERNAL:node:child_process": [
+    "src/lib/server/ai/code-intel-service.ts",
+    "src/lib/server/indexer/rg-search-utility.ts",
+    "src/lib/server/indexer/web-search-indexer.ts",
+    "src/lib/server/inference/inference-router.ts",
+    "src/mcp/admin_tools.ts",
+    "src/mcp/codebase_tools.ts",
+    "src/mcp/trace-mcp-server.ts",
+    "src/routes/api/error-brain/verify-fix/+server.ts",
+    "tests/agents-cache-cli.spec.ts",
+    "tests/agents-index-cli.spec.ts",
+    "tests/agents-regen-cli.spec.ts",
+    "tests/agents-smoke-all-cli.spec.ts",
+    "tests/phase94-cli.spec.ts",
+    "tests/unit/ensure-dev-runtime.test.ts"
+  ],
+  "EXTERNAL:$lib/server/agent/tools/web-search-searxng.js": [
+    "src/lib/server/ai/contextual-tools.ts",
+    "src/routes/api/agents/chat/+server.ts"
+  ],
   "EXTERNAL:node:module": [
     "src/lib/server/ai/cuda-graph-manager.ts",
     "src/lib/server/ai/libtorch-reranker.ts",
     "src/lib/utils/simd-markdown-parser.ts",
     "src/mcp/trace-mcp-server.ts",
     "tests/build-codebase-relationships.spec.ts"
+  ],
+  "EXTERNAL:uuid": [
+    "src/lib/server/ai/hermes/deep-research-dag.ts",
+    "src/lib/server/ai/hermes/dispatcher.ts",
+    "src/lib/server/ml/user-history.ts",
+    "src/lib/server/rg-atlas/run.ts",
+    "src/lib/server/services/error-analysis/EscalationService.ts",
+    "src/lib/server/services/error-analysis/ExperienceRecorder.ts",
+    "src/routes/api/v1/vector/store/+server.ts"
   ],
   "EXTERNAL:util": [
     "src/lib/server/ai/linter-service.ts",
@@ -4026,7 +4112,6 @@
   ],
   "EXTERNAL:nodejs-whisper": [
     "src/lib/server/document-processor.ts",
-    "src/routes/api/evidence/upload/+server.ts",
     "src/routes/api/whisper/transcribe/+server.ts"
   ],
   "EXTERNAL:protobufjs": [
@@ -4144,21 +4229,6 @@
     "src/lib/server/ollama.ts",
     "src/routes/api/health/obsidian/+server.ts"
   ],
-  "EXTERNAL:node:child_process": [
-    "src/lib/server/indexer/rg-search-utility.ts",
-    "src/lib/server/indexer/web-search-indexer.ts",
-    "src/lib/server/inference/inference-router.ts",
-    "src/mcp/admin_tools.ts",
-    "src/mcp/codebase_tools.ts",
-    "src/mcp/trace-mcp-server.ts",
-    "src/routes/api/error-brain/verify-fix/+server.ts",
-    "tests/agents-cache-cli.spec.ts",
-    "tests/agents-index-cli.spec.ts",
-    "tests/agents-regen-cli.spec.ts",
-    "tests/agents-smoke-all-cli.spec.ts",
-    "tests/phase94-cli.spec.ts",
-    "tests/unit/ensure-dev-runtime.test.ts"
-  ],
   "EXTERNAL:node:readline": [
     "src/lib/server/kb/search-logic.ts"
   ],
@@ -4168,13 +4238,6 @@
   ],
   "EXTERNAL:@modelcontextprotocol/sdk/client/sse.js": [
     "src/lib/server/mcp-client.ts"
-  ],
-  "EXTERNAL:uuid": [
-    "src/lib/server/ml/user-history.ts",
-    "src/lib/server/rg-atlas/run.ts",
-    "src/lib/server/services/error-analysis/EscalationService.ts",
-    "src/lib/server/services/error-analysis/ExperienceRecorder.ts",
-    "src/routes/api/v1/vector/store/+server.ts"
   ],
   "EXTERNAL:web-push": [
     "src/lib/server/notifications/push-service.ts"
@@ -4219,6 +4282,9 @@
   ],
   "EXTERNAL:simdjson": [
     "src/lib/server/utils/json-fast.ts"
+  ],
+  "EXTERNAL:$lib/server/gpu/tensorrt-bridge.js": [
+    "src/lib/server/vector/clustering-service.ts"
   ],
   "EXTERNAL:pdf-parse/lib/pdf-parse.js": [
     "src/lib/server/workers/document-embed-consumer.ts"
@@ -4319,8 +4385,13 @@
     "src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte",
     "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte",
+    "src/routes/(analysis)@/+layout.server.ts",
+    "src/routes/(analysis)@/+layout.svelte",
+    "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
+    "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
+    "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte",
     "src/routes/(app)/+layout.svelte",
     "src/routes/(app)/active-cases/+page.server.ts",
@@ -4331,6 +4402,7 @@
     "src/routes/(app)/admin/api-testing/agentic-loop/+server.ts",
     "src/routes/(app)/admin/api-testing/ast-topology/+server.ts",
     "src/routes/(app)/admin/ast-topology/+page.server.ts",
+    "src/routes/(app)/admin/cache/+page.server.ts",
     "src/routes/(app)/admin/cache/+page.svelte",
     "src/routes/(app)/admin/cache/+page.ts",
     "src/routes/(app)/admin/chat-memory/+page.server.ts",
@@ -4343,6 +4415,7 @@
     "src/routes/(app)/admin/document-search/+page.svelte",
     "src/routes/(app)/admin/error-analysis/+page.server.ts",
     "src/routes/(app)/admin/error-analysis/+page.svelte",
+    "src/routes/(app)/admin/error-brain/+page.server.ts",
     "src/routes/(app)/admin/gpu-evidence-graph/+page.server.ts",
     "src/routes/(app)/admin/gpu-evidence-graph/+page.svelte",
     "src/routes/(app)/admin/kag-notebook/+page.server.ts",
@@ -4367,12 +4440,15 @@
     "src/routes/(app)/cases/[id]/ai/+page.server.ts",
     "src/routes/(app)/cases/[id]/board/+page.server.ts",
     "src/routes/(app)/cases/[id]/board/+page.svelte",
+    "src/routes/(app)/cases/[id]/canvas/+page.server.ts",
+    "src/routes/(app)/cases/[id]/chat/+page.server.ts",
     "src/routes/(app)/cases/[id]/evidence/+page.server.ts",
     "src/routes/(app)/cases/[id]/evidence/+page.svelte",
     "src/routes/(app)/cases/[id]/notes/+page.server.ts",
     "src/routes/(app)/cases/[id]/notes/+page.svelte",
     "src/routes/(app)/cases/[id]/overview/+page.server.ts",
     "src/routes/(app)/cases/[id]/overview/+page.svelte",
+    "src/routes/(app)/cases/[id]/persons/+page.server.ts",
     "src/routes/(app)/cases/[id]/reports/+page.server.ts",
     "src/routes/(app)/chat/+page.server.ts",
     "src/routes/(app)/chat/[id]/+page.server.ts",
@@ -4410,6 +4486,8 @@
     "src/routes/(app)/demos/scene-intent-2d/+page.svelte",
     "src/routes/(app)/evidence/+page.server.ts",
     "src/routes/(app)/evidence/+page.svelte",
+    "src/routes/(app)/evidence/analyze/+page.server.ts",
+    "src/routes/(app)/evidence/hash/+page.server.ts",
     "src/routes/(app)/evidence/manage/+page.server.ts",
     "src/routes/(app)/evidence/manage/+page.svelte",
     "src/routes/(app)/evidence/realtime/+page.server.ts",
@@ -4912,6 +4990,7 @@
     "src/routes/api/reports/[id]/publish/+server.ts",
     "src/routes/api/research/concurrent-deep/+server.ts",
     "src/routes/api/research/concurrent-deep/stream/+server.ts",
+    "src/routes/api/research/deep/+server.ts",
     "src/routes/api/research/external-deep/+server.ts",
     "src/routes/api/research/ingest/+server.ts",
     "src/routes/api/research/search/+server.ts",

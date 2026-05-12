@@ -35,13 +35,18 @@ export const CODEBASE_SKILLS: Record<string, SkillRecipe> = {
     id: 'summarize_directory',
     family: 'Codebase',
     description: 'Generate high-level overview of a directory architecture',
-    tools: [{ name: 'shell:run' }, { name: 'llm:generate' }]
+    tools: [
+      { name: 'shell:run', args: (input) => ({ command: `rg --files src/${input.directory || ''} | head -n 50` }) },
+      { name: 'llm:generate' }
+    ]
   },
   inspect_routes: {
     id: 'inspect_routes',
     family: 'Codebase',
     description: 'Map SvelteKit routes and their API endpoints',
-    tools: [{ name: 'shell:run' }]
+    tools: [
+      { name: 'shell:run', args: () => ({ command: 'rg --files src/routes' }) }
+    ]
   },
   find_env_usage: {
     id: 'find_env_usage',
@@ -80,7 +85,7 @@ export const CODEBASE_SKILLS: Record<string, SkillRecipe> = {
     family: 'Codebase',
     description: 'Aggregate all TODO, FIXME, and HACK comments across the codebase',
     tools: [
-      { name: 'shell:run', args: () => ({ command: 'grep -rE "TODO|FIXME|HACK" sveltekit-frontend/src' }) }
+      { name: 'shell:run', args: () => ({ command: 'rg -i "TODO|FIXME|HACK" src' }) }
     ]
   },
   generate_fix_plan: {

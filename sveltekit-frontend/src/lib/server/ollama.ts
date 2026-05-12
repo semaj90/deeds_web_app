@@ -66,8 +66,9 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
 import crypto from 'node:crypto';
-import * as Hypergraph from './ai/hypergraph-store.js';
 import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
+import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -188,7 +189,8 @@ function logOllamaDiagnostics(
   meta: ReturnType<typeof extractOllamaRequestMeta>,
   durationMs: number,
   status?: number,
-  error?: unknown
+  error?: unknown,
+  backend: 'ollama' | 'turboquant' = 'ollama'
 ): void {
   if (!OLLAMA_DIAGNOSTICS_ENABLED) return;
 
@@ -198,6 +200,8 @@ function logOllamaDiagnostics(
       ? new Date(Date.now() + keepAliveMs).toISOString()
       : null;
   const details = [
+    `backend=${backend}`,
+    `profile=${runtimeConfig.profile}`,
     `endpoint=${meta.endpoint}`,
     `model=${meta.model ?? 'unknown'}`,
     `keep_alive=${String(meta.keepAlive ?? 'unset')}`,
@@ -255,11 +259,12 @@ function logBifrostCacheTrace(
 
 // ── TurboQuant Intercept ──────────────────────────────────────────────────
 // When enabled, ollamaFetch() transparently routes /api/chat and /api/generate
-// through TurboQuant llama-server (:8090) for ~78 tok/s GPU inference.
+// through TurboQuant llama-server (:8080) for ~78 tok/s GPU inference.
 // Ollama remains as automatic fallback when TurboQuant is unavailable.
 // Toggle: TURBOQUANT_INTERCEPT=false to disable.
+const runtimeConfig = resolveRuntimeConfig();
 const TURBOQUANT_INTERCEPT_ENABLED =
-  (process.env?.TURBOQUANT_INTERCEPT ?? 'true') === 'true';
+  (process.env?.TURBOQUANT_INTERCEPT ?? 'true') === 'true' && canUseTurboQuant(runtimeConfig);
 
 /** Cached health status to avoid hitting /health on every single request */
 let _turboHealthy = false;
@@ -492,9 +497,9 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
   const startedAt = Date.now();
 
   // TurboQuant intercept: route /api/chat and /api/generate through GPU llama-server
-  const turboResponse = await tryTurboQuantIntercept(url, init);
+    const turboResponse = await tryTurboQuantIntercept(url, init);
   if (turboResponse && turboResponse.ok) {
-    logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200);
+    logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200, undefined, 'turboquant');
     return turboResponse;
   }
 
@@ -515,7 +520,7 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
       ...init,
       dispatcher: ollamaDispatcher,
     } as RequestInit);
-    logOllamaDiagnostics('success', meta, Date.now() - startedAt, response.status);
+    logOllamaDiagnostics('success', meta, Date.now() - startedAt, response.status, undefined, 'ollama');
     return response;
   } catch (error) {
     const duration = Date.now() - startedAt;

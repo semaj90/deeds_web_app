@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import IORedis from 'ioredis';
 import { ENV } from '$lib/server/env.server.js';
 import type { RequestHandler } from './$types';
@@ -13,15 +14,25 @@ function getPublisher() {
 	return publisher;
 }
 
+const BroadcastSchema = z.object({
+	caseId: z.string().uuid(),
+	type: z.string(),
+	payload: z.any(),
+	timestamp: z.number().optional()
+});
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
-		const { caseId, type, payload, timestamp } = await request.json();
+		const body = await request.json();
+		const parsed = BroadcastSchema.safeParse(body);
 		
-		if (!caseId) {
-			return json({ error: 'Missing caseId' }, { status: 400 });
+		if (!parsed.success) {
+			return json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 });
 		}
+
+		const { caseId, type, payload, timestamp } = parsed.data;
 
 		const pub = getPublisher();
 		const message = JSON.stringify({

@@ -109,6 +109,8 @@ export class RabbitMQManager extends EventEmitter {
     media_transcribe: 'media.transcribe',
   };
 
+  private mediaProcessing: any = null;
+
   constructor() {
     super();
     this.url = ENV.RABBITMQ_URL;
@@ -160,6 +162,13 @@ export class RabbitMQManager extends EventEmitter {
 
       // Initialize embeddings if needed (mock or load)
       // this.embeddings = ...
+
+      try {
+        const mediaModule = await import('../analysis/media-processing.js');
+        this.mediaProcessing = mediaModule;
+      } catch (e) {
+        console.warn('⚠️ Media processing failed:', this.formatError(e));
+      }
 
       console.log('✅ Services loaded (partial/full)');
     } catch (error) {
@@ -231,7 +240,11 @@ export class RabbitMQManager extends EventEmitter {
       this.attachChannelListeners(this.channel);
 
       this.connection.on('error', (err: unknown) => {
-        console.error('❌ RabbitMQ connection error:', (err as Error)?.message ?? err);
+        const message = this.formatError(err);
+        // Silence "Vite module runner has been closed" during reloads
+        if (message.includes('module runner has been closed')) return;
+        
+        console.error('❌ RabbitMQ connection error:', message);
         this.emit('connection_lost');
       });
       this.connection.on('close', () => {
@@ -240,7 +253,9 @@ export class RabbitMQManager extends EventEmitter {
 
       console.log('✅ RabbitMQ connected');
     } catch (error) {
-      throw new Error(`RabbitMQ connection failed: ${this.formatError(error)}`);
+      const message = this.formatError(error);
+      if (message.includes('module runner has been closed')) return;
+      throw new Error(`RabbitMQ connection failed: ${message}`);
     }
   }
 
@@ -292,6 +307,16 @@ export class RabbitMQManager extends EventEmitter {
       this.queues.codebase_index,
       this.exchanges.codebase_indexing,
       'codebase.index.*'
+    );
+    await this.bindQueue(
+      this.queues.media_download,
+      this.exchanges.media_processing,
+      'media.download'
+    );
+    await this.bindQueue(
+      this.queues.media_transcribe,
+      this.exchanges.media_processing,
+      'media.transcribe'
     );
     await this.bindQueue(
       this.queues.ace_evaluate,
@@ -374,7 +399,21 @@ export class RabbitMQManager extends EventEmitter {
 
   async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>, noAck = false) {
     if (this.channel) {
-      await this.channel.consume(queue, (msg) => handler(msg), { noAck });
+      await this.channel.consume(queue, async (msg) => {
+        try {
+          await handler(msg);
+        } catch (err) {
+          const message = this.formatError(err);
+          // If the environment is closing, don't log as fatal
+          if (message.includes('module runner has been closed')) {
+            console.warn(`[RabbitMQ] Environment closed during processing (queue: ${queue})`);
+            return;
+          }
+          console.error(`[RabbitMQ] Handler error (queue: ${queue}):`, message);
+          // Manager handlers usually have their own try/catch/ack/nack
+          // but we catch here to prevent unhandled promise rejections
+        }
+      }, { noAck });
     } else {
       throw new Error(`RabbitMQ channel not ready (queue: ${queue})`);
     }
@@ -1623,13 +1662,26 @@ export class RabbitMQManager extends EventEmitter {
     }
   }
 
-  private formatError(err: any): string {
-    if (err instanceof Error) return err.message;
-    return String(err);
+  private formatError(error: unknown): string {
+    if (error instanceof Error) return error.message;
+    return String(error);
   }
 
   isReady(): boolean {
     return this?.isInitialized && !!this.channel;
+  }
+
+  async close(): Promise<void> {
+    try {
+      if (this.channel) await this.channel.close();
+      if (this.connection) await this.connection.close();
+      this.channel = null;
+      this.connection = null;
+      this.isInitialized = false;
+      console.log('🔌 RabbitMQ connection closed');
+    } catch (err) {
+      console.error('❌ RabbitMQ close error:', this.formatError(err));
+    }
   }
 
   private async attemptReconnect(): Promise<void> {
@@ -1990,14 +2042,41 @@ export class RabbitMQManager extends EventEmitter {
         JSON.stringify({ status: 'downloading', url, caseId, receivedAt: new Date().toISOString() })
       );
 
-      // TODO: invoke yt-dlp Python sidecar via child_process once implemented.
-      // For now log and complete so the queue drains cleanly.
-      console.log(`[media.download] Job ${jobId} queued for yt-dlp sidecar (not yet wired)`);
-      await redis.setex(
-        `hermes:job:${jobId}`,
-        3600,
-        JSON.stringify({ status: 'pending_sidecar', url, caseId, updatedAt: new Date().toISOString() })
-      );
+      // Invoke yt-dlp via MediaProcessing service
+      if (this.mediaProcessing) {
+        try {
+          const result = await this.mediaProcessing.downloadMedia(url, jobId);
+          console.log(`[media.download] Job ${jobId} download complete: ${result.audioPath}`);
+          
+          await redis.setex(
+            `hermes:job:${jobId}`,
+            3600,
+            JSON.stringify({ 
+              status: 'downloaded', 
+              audioPath: result.audioPath, 
+              metadata: result.metadata,
+              caseId, 
+              updatedAt: new Date().toISOString() 
+            })
+          );
+
+          // Chain to transcription
+          await this.publish(this.exchanges.media_processing, 'media.transcribe', {
+            jobId,
+            audioPath: result.audioPath,
+            caseId
+          });
+        } catch (downloadErr) {
+          console.error(`[media.download] Download failed for job ${jobId}:`, downloadErr);
+          await redis.setex(
+            `hermes:job:${jobId}`,
+            3600,
+            JSON.stringify({ status: 'failed', error: String(downloadErr), updatedAt: new Date().toISOString() })
+          );
+        }
+      } else {
+        console.warn(`[media.download] MediaProcessing service not available for job ${jobId}`);
+      }
 
       channel.ack(msg);
     } catch (err) {
@@ -2038,13 +2117,49 @@ export class RabbitMQManager extends EventEmitter {
         })
       );
 
-      // TODO: invoke faster-whisper Python sidecar once implemented.
-      console.log(`[media.transcribe] Job ${jobId} queued for Whisper sidecar (not yet wired)`);
-      await redis.setex(
-        `hermes:job:${jobId}`,
-        3600,
-        JSON.stringify({ status: 'pending_whisper', audioPath, caseId, updatedAt: new Date().toISOString() })
-      );
+      // Invoke faster-whisper via MediaProcessing service
+      if (this.mediaProcessing) {
+        try {
+          const result = await this.mediaProcessing.transcribeAudio(audioPath, jobId);
+          console.log(`[media.transcribe] Job ${jobId} transcription complete: ${result.text.slice(0, 50)}...`);
+          
+          await redis.setex(
+            `hermes:job:${jobId}`,
+            3600,
+            JSON.stringify({ 
+              status: 'completed', 
+              text: result.text, 
+              chunks: result.chunks,
+              language: result.language,
+              caseId, 
+              updatedAt: new Date().toISOString() 
+            })
+          );
+
+          // Publish to document embedding queue for search indexing
+          await this.publish(this.exchanges.document_processing, 'document.embed', {
+            documentId: jobId, // Use jobId as temp doc ID
+            text: result.text,
+            collection: 'evidence_items',
+            metadata: { 
+              jobId, 
+              caseId, 
+              source: 'media_transcription',
+              language: result.language
+            }
+          });
+
+        } catch (transcribeErr) {
+          console.error(`[media.transcribe] Transcription failed for job ${jobId}:`, transcribeErr);
+          await redis.setex(
+            `hermes:job:${jobId}`,
+            3600,
+            JSON.stringify({ status: 'failed', error: String(transcribeErr), updatedAt: new Date().toISOString() })
+          );
+        }
+      } else {
+        console.warn(`[media.transcribe] MediaProcessing service not available for job ${jobId}`);
+      }
 
       channel.ack(msg);
     } catch (err) {
@@ -2053,13 +2168,28 @@ export class RabbitMQManager extends EventEmitter {
     }
   }
 
-  async close() {
-    if (this.channel) await this.channel.close();
-    if (this.connection) await this.connection.close();
-  }
 }
 
-// Singleton
-export const rabbitmq = new RabbitMQManager();
+// ── Singleton Export ─────────────────────────────────────────────────────────
+
+declare global {
+	// eslint-disable-next-line no-var
+	var __RABBITMQ_MANAGER__: RabbitMQManager | undefined;
+}
+
+/**
+ * Canonical RabbitMQ manager instance.
+ * In development, persists across hot reloads using globalThis to prevent
+ * duplicate consumers and "module runner closed" artifacts.
+ */
+export const rabbitmq = (function () {
+	if (typeof globalThis !== 'undefined') {
+		if (!globalThis.__RABBITMQ_MANAGER__) {
+			globalThis.__RABBITMQ_MANAGER__ = new RabbitMQManager();
+		}
+		return globalThis.__RABBITMQ_MANAGER__;
+	}
+	return new RabbitMQManager();
+})();
 
 

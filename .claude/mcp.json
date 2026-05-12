@@ -24,13 +24,13 @@
     },
     "postgres": {
       "_purpose": "Read-only Postgres queries. CRITICAL: connect with a role that has SELECT-only on the target schemas (create dedicated `claude_readonly` user — do NOT use legal_admin).",
-      "command": "uvx",
-      "args": ["mcp-server-postgres", "postgresql://claude_readonly:${PG_RO_PASSWORD}@127.0.0.1:5434/legal_ai_db"]
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://claude_readonly:${PG_RO_PASSWORD}@127.0.0.1:5434/legal_ai_db"]
     },
     "redis": {
       "_purpose": "Read-only Redis introspection (KEYS / GET / TYPE only). Use the official Redis MCP with read-only ACL user.",
-      "command": "uvx",
-      "args": ["mcp-redis"],
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-redis", "redis://127.0.0.1:6379"],
       "env": {
         "REDIS_HOST": "127.0.0.1",
         "REDIS_PORT": "6379",
@@ -39,21 +39,14 @@
       }
     },
     "obsidian": {
-      "_purpose": "Filesystem-native Obsidian vault access — reads docs/obsidian-vault. mcpvault community server.",
+      "_purpose": "Filesystem-native Obsidian vault access — reads docs/obsidian-vault via the official filesystem MCP server.",
       "command": "npx",
-      "args": ["-y", "mcpvault"],
-      "env": {
-        "VAULT_PATH": "./sveltekit-frontend/docs/obsidian-vault"
-      }
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./sveltekit-frontend/docs/obsidian-vault"]
     },
     "ts-lsp": {
-      "_purpose": "TypeScript Language Server Protocol bridge — go-to-definition / find-references / hover / type info. Uses the @typescript/native-preview already in deps.",
+      "_purpose": "TypeScript code intelligence bridge — definitions / references / hover / rename / diagnostics for the SvelteKit project.",
       "command": "npx",
-      "args": ["-y", "mcp-language-server"],
-      "env": {
-        "WORKSPACE": "./sveltekit-frontend",
-        "LSP_COMMAND": "npx tsgo --lsp"
-      }
+      "args": ["-y", "@typescript/native-preview", "tsgo", "--lsp", "./sveltekit-frontend"]
     },
     "context7": {
       "_purpose": "Hosted Upstash Context7 MCP — fetches up-to-date library docs by name (e.g. get-library-docs(name='svelte', topic='runes')). Third lane in the docs-fetching cascade: TS LSP (in-process, free) → readability crawler (existing web-research-crawler.ts, free) → Context7 (hosted, free tier). Use Context7 when LSP doesn't expose a package's docs AND the docs site is JS-rendered so direct fetch returns empty HTML. Free tier: 100 requests/day. Set CONTEXT7_API_KEY env var for higher tiers.",

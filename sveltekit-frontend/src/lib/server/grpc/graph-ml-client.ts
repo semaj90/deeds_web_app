@@ -120,47 +120,71 @@ async function getGrpcClient(): Promise<any> {
 
 /**
  * K-means clustering with centroid output.
- * Tries N-API GPU first; falls through to CPU JS fallback inside pytorch-graph.
- *
- * @param embeddings - Flat Float32Array [n × dim], row-major
- * @param n          - Number of data points
- * @param dim        - Embedding dimension
- * @param k          - Number of clusters
- * @param maxIters   - Maximum Lloyd iterations (default 100)
+ * Priority: 1. Local N-API GPU, 2. Remote gRPC, 3. Local CPU JS.
  */
-export function runKMeans(
+export async function runKMeans(
   embeddings: Float32Array,
   n: number,
   dim: number,
   k: number,
   maxIters = 100
-): GraphMLKMeansResult {
+): Promise<GraphMLKMeansResult> {
   const t0 = performance.now();
-  const result = kmeansWithCentroids(embeddings, n, dim, k, maxIters);
+
+  // 1. Try local path first
+  const local = kmeansWithCentroids(embeddings, n, dim, k, maxIters);
+  if (local.source === 'gpu') {
+    return {
+      assignments: local.assignments,
+      centroids: local.centroids,
+      source: 'gpu',
+      durationMs: Math.round(performance.now() - t0),
+    };
+  }
+
+  // 2. Try gRPC path if enabled
+  if (ENV.GRAPH_ML_GRPC_ENABLED) {
+    const client = await getGrpcClient();
+    if (client) {
+      try {
+        const response = await new Promise<any>((resolve, reject) => {
+          client.RunKMeans(
+            {
+              embeddings: Array.from(embeddings),
+              n,
+              dim,
+              k,
+              maxIters,
+            },
+            (err: Error | null, resp: any) => (err ? reject(err) : resolve(resp))
+          );
+        });
+        return {
+          assignments: new Int32Array(response.assignments),
+          centroids: new Float32Array(response.centroids),
+          source: 'grpc',
+          durationMs: Math.round(performance.now() - t0),
+        };
+      } catch (err) {
+        console.warn('[graph-ml-client] gRPC RunKMeans failed, falling back to CPU:', (err as Error).message);
+      }
+    }
+  }
+
+  // 3. Fallback to CPU result (already computed in local step)
   return {
-    assignments: result.assignments,
-    centroids: result.centroids,
-    source: result.source, // 'gpu' | 'cpu' — set by pytorch-graph
+    assignments: local.assignments,
+    centroids: local.centroids,
+    source: 'cpu',
     durationMs: Math.round(performance.now() - t0),
   };
 }
 
 /**
  * Kohonen Self-Organizing Map training.
- * Returns trained neuron weights and BMU index for each input.
- *
- * @param embeddings - Flat Float32Array [n × dim]
- * @param n          - Number of data points
- * @param dim        - Embedding dimension
- * @param gridW      - SOM grid width
- * @param gridH      - SOM grid height (total neurons = gridW × gridH)
- * @param iters      - Training iterations (default 1000)
- * @param lrInit     - Initial learning rate (default 0.1)
- * @param lrFinal    - Final learning rate (default 0.01)
- * @param radInit    - Initial neighbourhood radius (default max(gridW, gridH) / 2)
- * @param radFinal   - Final neighbourhood radius (default 1.0)
+ * Priority: 1. Local N-API GPU, 2. Remote gRPC, 3. Local CPU JS.
  */
-export function runSOM(
+export async function runSOM(
   embeddings: Float32Array,
   n: number,
   dim: number,
@@ -171,89 +195,171 @@ export function runSOM(
   lrFinal = 0.01,
   radInit = Math.max(gridW, gridH) / 2,
   radFinal = 1.0
-): GraphMLSOMResult {
+): Promise<GraphMLSOMResult> {
   const t0 = performance.now();
-  const result = trainSOM(
-    embeddings,
-    n,
-    dim,
-    gridW,
-    gridH,
-    iters,
-    lrInit,
-    lrFinal,
-    radInit,
-    radFinal
-  );
+
+  // 1. Try local
+  const local = trainSOM(embeddings, n, dim, gridW, gridH, iters, lrInit, lrFinal, radInit, radFinal);
+  if (local.source === 'gpu') {
+    return {
+      weights: local.weights,
+      bmu: local.bmu,
+      source: 'gpu',
+      durationMs: Math.round(performance.now() - t0),
+    };
+  }
+
+  // 2. Try gRPC
+  if (ENV.GRAPH_ML_GRPC_ENABLED) {
+    const client = await getGrpcClient();
+    if (client) {
+      try {
+        const response = await new Promise<any>((resolve, reject) => {
+          client.RunSOM(
+            {
+              embeddings: Array.from(embeddings),
+              n,
+              dim,
+              gridW,
+              gridH,
+              iters,
+              lrInit,
+              lrFinal,
+              radInit,
+              radFinal,
+            },
+            (err: Error | null, resp: any) => (err ? reject(err) : resolve(resp))
+          );
+        });
+        return {
+          weights: new Float32Array(response.weights),
+          bmu: new Int32Array(response.bmu),
+          source: 'grpc',
+          durationMs: Math.round(performance.now() - t0),
+        };
+      } catch (err) {
+        console.warn('[graph-ml-client] gRPC RunSOM failed:', (err as Error).message);
+      }
+    }
+  }
+
   return {
-    weights: result.weights,
-    bmu: result.bmu,
-    source: result.source,
+    weights: local.weights,
+    bmu: local.bmu,
+    source: 'cpu',
     durationMs: Math.round(performance.now() - t0),
   };
 }
 
 /**
- * Scaled dot-product attention weights for ACE context chunk ranking.
- * Returns softmax weights over the n key vectors.
- *
- * @param query - Float32Array of length dim
- * @param dim   - Query/key dimension
- * @param keys  - Flat Float32Array [n × dim], row-major
- * @param n     - Number of key vectors
+ * Scaled dot-product attention weights.
  */
-export function scoreAttention(
+export async function scoreAttention(
   query: Float32Array,
   dim: number,
   keys: Float32Array,
   n: number
-): GraphMLAttentionResult {
-  const result = attentionScoreGPU(query, dim, keys, n);
+): Promise<GraphMLAttentionResult> {
+  // 1. Try local
+  const local = attentionScoreGPU(query, dim, keys, n);
+  if (local.source === 'gpu') {
+    return {
+      scores: local.weights,
+      source: 'gpu',
+    };
+  }
+
+  // 2. Try gRPC
+  if (ENV.GRAPH_ML_GRPC_ENABLED) {
+    const client = await getGrpcClient();
+    if (client) {
+      try {
+        const response = await new Promise<any>((resolve, reject) => {
+          client.ScoreAttention(
+            {
+              query: Array.from(query),
+              dim,
+              keys: Array.from(keys),
+              n,
+            },
+            (err: Error | null, resp: any) => (err ? reject(err) : resolve(resp))
+          );
+        });
+        return {
+          scores: new Float32Array(response.scores),
+          source: 'grpc',
+        };
+      } catch (err) {
+        console.warn('[graph-ml-client] gRPC ScoreAttention failed:', (err as Error).message);
+      }
+    }
+  }
+
   return {
-    scores: result.weights,
-    source: result.source,
+    scores: local.weights,
+    source: 'cpu',
   };
 }
 
 /**
  * GPU power-iteration PageRank for code dependency graphs.
- * Returns normalised rank scores summing to 1.0.
- *
- * @param adj     - Flat Float32Array [n × n] adjacency matrix, row-major
- * @param n       - Number of nodes
- * @param damping - Damping factor (default 0.85)
- * @param iters   - Power iterations (default 50)
  */
-export function runPageRank(
+export async function runPageRank(
   adj: Float32Array,
   n: number,
   damping = 0.85,
   iters = 50
-): GraphMLPageRankResult {
-  const result = pageRankGPU(adj, n, damping, iters);
+): Promise<GraphMLPageRankResult> {
+  // 1. Try local
+  const local = pageRankGPU(adj, n, damping, iters);
+  if (local.source === 'gpu') {
+    return {
+      scores: local.scores,
+      source: 'gpu',
+    };
+  }
+
+  // 2. Try gRPC
+  if (ENV.GRAPH_ML_GRPC_ENABLED) {
+    const client = await getGrpcClient();
+    if (client) {
+      try {
+        const response = await new Promise<any>((resolve, reject) => {
+          client.RunPageRank(
+            {
+              adj: Array.from(adj),
+              n,
+              damping,
+              iters,
+            },
+            (err: Error | null, resp: any) => (err ? reject(err) : resolve(resp))
+          );
+        });
+        return {
+          scores: new Float32Array(response.scores),
+          source: 'grpc',
+        };
+      } catch (err) {
+        console.warn('[graph-ml-client] gRPC RunPageRank failed:', (err as Error).message);
+      }
+    }
+  }
+
   return {
-    scores: result.scores,
-    source: result.source,
+    scores: local.scores,
+    source: 'cpu',
   };
 }
 
 /**
  * GRPO reward score for LangGraph synthesis evaluation.
- * Computes cosine similarity between generated-answer and query embeddings.
- * Reward ∈ [-1, 1] — higher = more query-aligned answer.
- *
- * Called after every L3 synthesis run; score is persisted to synthesis_runs
- * for QLoRA fine-tuning and GRPO reward-model training.
- *
- * @param genEmbedding   Float32Array of length dim (generated answer)
- * @param queryEmbedding Float32Array of length dim (query / reference)
- * @param dim            Embedding dimension (768 for embeddinggemma)
  */
-export function scoreGRPOReward(
+export async function scoreGRPOReward(
   genEmbedding: Float32Array,
   queryEmbedding: Float32Array,
   dim: number
-): { reward: number; source: 'gpu' | 'cpu' } {
+): Promise<{ reward: number; source: 'gpu' | 'cpu' }> {
+  // Note: gRPC service currently does not expose RewardScore, stays local.
   const result = rewardScoreGPU(genEmbedding, queryEmbedding, 1, dim);
   return { reward: result.scores[0] ?? 0, source: result.source };
 }
@@ -414,7 +520,7 @@ export async function conditionGlyphAtlas(
     const slice = c.length >= dim ? c.subarray(0, dim) : c;
     keys.set(slice, i * dim);
   });
-  const { scores, source } = scoreAttention(queryVec, dim, keys, centroids.length);
+  const { scores, source } = await scoreAttention(queryVec, dim, keys, centroids.length);
   // Weighted sum of centroids as conditioning vector
   const condVec = new Float32Array(dim);
   for (let i = 0; i < centroids.length; i++) {

@@ -85,7 +85,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     let weights: Float32Array;
     let attentionSource: string;
     try {
-      const result = scoreAttention(queryVec, dim, keysMatrix, n);
+      const result = await scoreAttention(queryVec, dim, keysMatrix, n);
       weights = result.scores;
       attentionSource = result.source;
     } catch (gpuErr) {

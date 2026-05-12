@@ -35,7 +35,7 @@ const flag = (name, def) => {
 };
 const hasFlag = (name) => args.includes(name);
 
-const PORT    = flag('--port', process.env.TURBO_PORT ?? '8090');
+const PORT    = flag('--port', process.env.TURBO_PORT ?? '8080');
 const LABEL   = flag('--label', `run-${Date.now()}`);
 const N       = parseInt(flag('--n', '5'), 10);
 const COMPARE = hasFlag('--compare');

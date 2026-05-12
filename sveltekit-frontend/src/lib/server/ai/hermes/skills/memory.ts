@@ -82,5 +82,59 @@ export const MEMORY_SKILLS: Record<string, SkillRecipe> = {
         })
       }
     ]
+  },
+  'forget_stale_context': {
+    id: 'forget_stale_context',
+    family: 'Memory',
+    description: 'Prune low-importance or outdated context from the active session memory',
+    tools: [{ name: 'llm:generate' }]
+  },
+  'merge_duplicate_memories': {
+    id: 'merge_duplicate_memories',
+    family: 'Memory',
+    description: 'Identify and consolidate redundant memory entries in CouchDB',
+    tools: [{ name: 'search:couchdb' }, { name: 'llm:generate' }]
+  },
+  'extract_entities_for_long_term': {
+    id: 'extract_entities_for_long_term',
+    family: 'Memory',
+    description: 'Extract key entities and relationships for persistent long-term storage',
+    tools: [{ name: 'extract:metadata' }, { name: 'memory:write_note' }]
+  },
+  'cross_session_insight_discovery': {
+    id: 'cross_session_insight_discovery',
+    family: 'Memory',
+    description: 'Analyze historical sessions to find recurring patterns or insights',
+    tools: [{ name: 'search:vector', args: (input) => ({ collection: 'chat_messages', query: input.query }) }]
+  },
+  'memory_consistency_check': {
+    id: 'memory_consistency_check',
+    family: 'Memory',
+    description: 'Validate synchronization between Redis cache and Postgres session storage',
+    tools: [{ name: 'diagnostics:health' }]
+  },
+  'archive_inactive_sessions': {
+    id: 'archive_inactive_sessions',
+    family: 'Memory',
+    description: 'Move historical sessions to cold storage to free up database resources',
+    tools: [{ name: 'shell:run' }]
+  },
+  'update_importance_weights': {
+    id: 'update_importance_weights',
+    family: 'Memory',
+    description: 'Recalculate importance scores for memories based on recent retrieval frequency',
+    tools: [{ name: 'search:redis' }]
+  },
+  'search_related_wiki_cards': {
+    id: 'search_related_wiki_cards',
+    family: 'Memory',
+    description: 'Find wiki cards semantically related to the current context',
+    tools: [{ name: 'search:couchdb' }, { name: 'search:vector' }]
+  },
+  'audit_privacy_compliance': {
+    id: 'audit_privacy_compliance',
+    family: 'Memory',
+    description: 'Scan memories for PII or sensitive data that requires redaction',
+    tools: [{ name: 'llm:generate' }]
   }
 };

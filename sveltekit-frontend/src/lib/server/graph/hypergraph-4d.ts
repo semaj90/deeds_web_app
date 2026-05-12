@@ -44,6 +44,7 @@ import { contextTimeline }       from '$lib/server/db/schema-postgres.js';
 import { bifrostChat }           from '$lib/server/ollama.js';
 import {
   runKMeans,
+  runSOM,
   runPageRank,
   scoreAttention,
   scoreGRPOReward,
@@ -454,7 +455,7 @@ async function computeSomCoords(
   try {
     const flat = flatF32(embeddings);
     const n = embeddings.length;
-    const result = trainSOM(
+    const result = await runSOM(
       flat, n, DIM,
       SOM_GRID_W, SOM_GRID_H,
       200, 0.5, 0.01, 3.0, 0.5,
@@ -485,8 +486,8 @@ async function runGpuKmeans(
   k: number,
 ): Promise<KMeansResult> {
   try {
-    const { assignments, centroids } = kmeansWithCentroids(flat, n, DIM, k, 100);
-    return { centroids: new Float32Array(centroids), labels: new Uint32Array(assignments) };
+    const { assignments, centroids } = await runKMeans(flat, n, DIM, k, 100);
+    return { centroids, labels: new Uint32Array(assignments) };
   } catch {
     // CPU fallback: deterministic round-robin
     const labels = new Uint32Array(n);
@@ -518,24 +519,24 @@ async function runGpuKmeans(
  *   D_v[i]      — node degree (how many hyperedges)
  *   D_e[j]      — hyperedge degree (how many members)
  */
-function buildIncidenceMatrix(
+async function buildIncidenceMatrix(
   embeddings: Float32Array,
   centroids: Float32Array,
   n: number,
   k: number,
-): {
+): Promise<{
   members:   number[][];
   nodeEdges: number[][];
   D_v:       number[];
   D_e:       number[];
-} {
+}> {
   const members:   number[][] = Array.from({ length: k }, () => []);
   const nodeEdges: number[][] = Array.from({ length: n }, () => []);
 
   for (let j = 0; j < k; j++) {
     const centroid = centroids.slice(j * DIM, (j + 1) * DIM);
-    // attentionScoreGPU: query=centroid vs keys=all embeddings → softmax weights
-    const { weights } = attentionScoreGPU(centroid, DIM, embeddings, n);
+    // scoreAttention: query=centroid vs keys=all embeddings
+    const { scores: weights } = await scoreAttention(centroid, DIM, embeddings, n);
     // Threshold: include nodes whose attention weight > INCIDENCE_THRESH / n
     const threshold = INCIDENCE_THRESH / n;
     for (let i = 0; i < n; i++) {
@@ -983,7 +984,7 @@ export async function buildHypergraph4D(): Promise<HypergraphBuildResult> {
   }
 
   // ── Step 5: Build incidence matrix H ────────────────────────────────────────
-  const { members, D_e } = buildIncidenceMatrix(flat, centroids, n, k);
+  const { members, D_e } = await buildIncidenceMatrix(flat, centroids, n, k);
 
   // ── Step 6: HGNN edge weights from softmax of per-cluster reward scores ─────
   const clusterRewards = new Float32Array(k);

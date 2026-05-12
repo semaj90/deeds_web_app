@@ -62,25 +62,27 @@ rg "SIMILAR_TOPOLOGY" src/lib/server/ --type ts
 
 <!-- /AGENTS-ENRICH -->
 
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-11T23:28:38.745Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-12T03:12:15.164Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/vector
 
 ## Snapshot
 
-- server module directory with 12 files, 0 API handlers, 1 Drizzle refs
+- server module directory with 13 files, 0 API handlers, 1 Drizzle refs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `lib` `server` `zod` `db-schema`
 
-## Files (12)
+## Files (13)
 
 - `src/lib/server/vector/agentic-search.ts`
 - `src/lib/server/vector/bm42-sparse.ts`
+- `src/lib/server/vector/clustering-service.ts`
 - `src/lib/server/vector/embedding-gemma.ts`
 - `src/lib/server/vector/image-search.ts`
-- `src/lib/server/vector/metadata-encoder.ts`
 
 ## Hypergraph cluster
 
@@ -116,7 +118,7 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 18 for full digest.
 - **Cluster**: C18 — type chunks in `src/lib/types` (tag: embedding)
 - **BoW texture key**: `texture:bow:cluster:18` (Redis 1h TTL)
 - **Qdrant tags**: `embedding` `types` `auth` `api-route` `analytics`
-- **Paired tests**: 0/12 files have paired tests
+- **Paired tests**: 0/13 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

@@ -917,23 +917,6 @@ export async function attentionScoreChunks(
     if (cached) return JSON.parse(cached);
   } catch {}
 
-  // REDIS CACHED VERSION
-  try {
-    const redis = getRedis();
-    const queryHash = createHash('sha256').update(JSON.stringify(queryEmbedding)).digest('hex').slice(0, 16);
-    const setHash = createHash('sha256').update(JSON.stringify(chunkEmbeddings.slice(0, 5))).digest('hex').slice(0, 12);
-    const cacheKey = `gpu:attn:${queryHash}:${setHash}`;
-    const cached = await redis.get(cacheKey);
-    if (cached) return JSON.parse(cached);
-  } catch {}
-
-
-
-
-  const n = chunkEmbeddings.length;
-  if (n === 0) return [];
-  const dim = queryEmbedding.length;
-
   const native = getAddonInternal();
   if (native?.attentionScoreGPU) {
     try {

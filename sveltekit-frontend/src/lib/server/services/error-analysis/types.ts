@@ -239,9 +239,13 @@ export interface SystemMetrics {
 	policyUpdateFrequency: number;
 	serviceAvailability: {
 		redis: boolean;
-	qdrant: boolean;
+		qdrant: boolean;
 		neo4j: boolean;
-	ollama: boolean;
+		ollama: boolean;
+		turboquant: boolean;
+		reranker: boolean;
+		bifrost: boolean;
+		vlm: boolean;
 	};
 	performance: {
 	embeddingGenerationTime: number; // ms

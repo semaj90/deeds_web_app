@@ -1,72 +1,60 @@
-/**
- * inference-configs.ts — Quantization & Runtime Truth Layer
- * 
- * Centralized registry for verified inference backends. 
- * Distinguishes between stock binaries and specialized forks.
- */
+import type { QuantRuntimeConfig, RuntimeBackend } from '$lib/ai/quant-config.js';
+import { VERIFIED_QUANT_CONFIGS } from '$lib/ai/quant-config.js';
 
-export type RuntimeBackend =
-  | 'stock-llama-cpp-cuda'
-  | 'ollama'
-  | 'atomicbot-turboquant'
-  | 'rotorquant-fork'
-  | 'tensorrt-llm';
-
-export interface QuantRuntimeConfig {
-  backend: RuntimeBackend;
-  modelPath?: string;
-  llamaServerPath?: string;
-  weightQuant?: 'IQ4_XS' | 'Q4_K_M' | 'Q8_0' | 'F16' | 'TQ4_1S' | 'TQ3_1S';
-  kvCacheTypeK?: 'f16' | 'q8_0' | 'q4_0' | 'turbo3' | 'turbo4' | 'iso3' | 'planar3';
-  kvCacheTypeV?: 'f16' | 'q8_0' | 'q4_0' | 'turbo3' | 'turbo4' | 'iso3' | 'planar3';
-  mtpHeadPath?: string;
-  runtimeAvailable: boolean;
-  requiresFork: boolean;
-  notes: string;
-}
+export type InferenceRuntimeConfig = QuantRuntimeConfig & {
+	profile: string;
+	turboQuant: boolean;
+	rotorQuantKv: boolean;
+};
 
 /** 
  * Stock GGUF on stock llama-server.exe. 
- * Note: IQ4_XS GGUF works, but specialized KV cache types (iso3) will not.
  */
-export const STOCK_CUDA_IQ4_XS: QuantRuntimeConfig = {
-  backend: 'stock-llama-cpp-cuda',
-  weightQuant: 'IQ4_XS',
-  kvCacheTypeK: 'q8_0',
-  kvCacheTypeV: 'q8_0',
-  runtimeAvailable: true,
-  requiresFork: false,
-  notes: 'Runs standard GGUF on stock llama.cpp CUDA. Does not enable RotorQuant KV cache.'
+export const STOCK_CUDA_IQ4_XS: InferenceRuntimeConfig = {
+	...VERIFIED_QUANT_CONFIGS['production-stable'],
+	profile: 'stock-cuda-iq4_xs',
+	weightQuant: 'IQ4_XS',
+	modelPath: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH ?? process.env.TURBOQUANT_MODEL_PATH,
+	llamaServerPath: process.env.LLAMA_SERVER_PATH ?? process.env.TURBOQUANT_EXE_PATH,
+	turboQuant: false,
+	rotorQuantKv: false,
+	notes: 'Stock llama.cpp CUDA + IQ4_XS weight-quantized GGUF. No TurboQuant KV, RotorQuant KV, AtomicBot, or MTP enabled.',
 };
 
 /** 
  * AtomicBot fork with turbo3/turbo4 KV cache and --mtp-head support.
  */
-export const ATOMICBOT_TURBO3_MTP: QuantRuntimeConfig = {
-  backend: 'atomicbot-turboquant',
-  weightQuant: 'Q4_K_M',
-  kvCacheTypeK: 'turbo3',
-  kvCacheTypeV: 'turbo3',
-  runtimeAvailable: false,
-  requiresFork: true,
-  notes: 'Requires AtomicBot llama.cpp fork with turbo3/turbo3 and optional --mtp-head.'
+export const ATOMICBOT_TURBO3_MTP: InferenceRuntimeConfig = {
+	...VERIFIED_QUANT_CONFIGS['atomicbot-high-throughput'],
+	profile: 'atomicbot-turboquant',
+	modelPath: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH ?? process.env.TURBOQUANT_MODEL_PATH,
+	llamaServerPath: process.env.LLAMA_SERVER_PATH ?? process.env.TURBOQUANT_EXE_PATH,
+	mtpHeadPath: process.env.MTP_HEAD_PATH,
+	turboQuant: true,
+	rotorQuantKv: false,
 };
 
 /** 
  * RotorQuant fork with Clifford rotors for extreme KV cache compression.
  */
-export const ROTORQUANT_ISO3: QuantRuntimeConfig = {
-  backend: 'rotorquant-fork',
-  weightQuant: 'IQ4_XS',
-  kvCacheTypeK: 'iso3',
-  kvCacheTypeV: 'iso3',
-  runtimeAvailable: false,
-  requiresFork: true,
-  notes: 'Requires RotorQuant-capable fork. Stock llama.cpp cannot use iso3/planar3 KV cache.'
+export const ROTORQUANT_ISO3: InferenceRuntimeConfig = {
+	...VERIFIED_QUANT_CONFIGS['rotorquant-experimental'],
+	profile: 'rotorquant-fork',
+	modelPath: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH ?? process.env.TURBOQUANT_MODEL_PATH,
+	llamaServerPath: process.env.LLAMA_SERVER_PATH ?? process.env.TURBOQUANT_EXE_PATH,
+	turboQuant: true,
+	rotorQuantKv: true,
 };
 
-export const RUNTIME_CONFIGS: Record<string, QuantRuntimeConfig> = {
-  'stock-cuda': STOCK_CUDA_IQ4_XS,
-  'atomicbot': ATOMICBOT_TURBO3_MTP,
-  'rotorquant': ROTORQUANT_ISO3
+export const RUNTIME_CONFIGS: Record<string, InferenceRuntimeConfig> = {
+	'stock-cuda': STOCK_CUDA_IQ4_XS,
+	'atomicbot': ATOMICBOT_TURBO3_MTP,
+	'rotorquant': ROTORQUANT_ISO3
 };
+
+export function resolveRuntimeConfig(): InferenceRuntimeConfig {
+	const profile = (process.env.TURBO_PROFILE ?? 'stock').toLowerCase();
+	if (profile === 'atomicbot') return ATOMICBOT_TURBO3_MTP;
+	if (profile === 'rotorquant') return ROTORQUANT_ISO3;
+	return STOCK_CUDA_IQ4_XS;
+}

@@ -54,6 +54,11 @@ export interface RetrievalPacket {
   query:              string;
   budget:             TokenBudget;
   tokenUsed:          number;
+  activeClusterIds:   number[];
+  telemetry: {
+    selectedSourceIds: string[];
+    excludedSourceIds: Array<{ id: string; reason: string }>;
+  };
   context: {
     directEvidence:   EvidenceSlot[];
     clusterSummaries: ClusterSummarySlot[];
@@ -153,13 +158,17 @@ function buildCouchViewGroups(
 
 // ── Budget-aware greedy packer ─────────────────────────────────────────────────
 
-function greedyPack<T extends { score: number; tokenCost: number }>(
+function greedyPack<T extends { score: number; tokenCost: number; id?: string }>(
   items:     T[],
-  remaining: { tokens: number }
+  remaining: { tokens: number },
+  excluded:  Array<{ id: string; reason: string }>
 ): T[] {
   const selected: T[] = [];
   for (const item of items.sort((a, b) => b.score - a.score)) {
-    if (remaining.tokens - item.tokenCost < 0) break;
+    if (remaining.tokens - item.tokenCost < 0) {
+      if (item.id) excluded.push({ id: item.id, reason: 'token_budget_exceeded' });
+      continue;
+    }
     selected.push(item);
     remaining.tokens -= item.tokenCost;
   }
@@ -171,6 +180,7 @@ function greedyPack<T extends { score: number; tokenCost: number }>(
 export interface PackerInput {
   query:         string;
   budget:        TokenBudget;
+  activeClusterIds?: number[];
 
   // Raw tool results — all optional (packer is tolerant of missing lanes)
   qdrantHits?:       Array<{ filePath?: string; content?: string; score?: number; somCluster?: number }>;
@@ -187,6 +197,7 @@ export interface PackerInput {
 export function packContext(input: PackerInput): RetrievalPacket {
   const available = input.budget.maxInputTokens - input.budget.reservedOutputTokens;
   const remaining = { tokens: Math.max(available, 0) };
+  const excludedSourceIds: Array<{ id: string; reason: string }> = [];
 
   // Per-slot cluster score map for cross-signal boosting
   const clusterScoreMap = new Map<number, number>(
@@ -208,11 +219,11 @@ export function packContext(input: PackerInput): RetrievalPacket {
   }));
 
   // Greedy fill: summaries → triples → couchdb groups → evidence chunks → prior cases
-  const clusterSummaries = greedyPack(summarySlots, remaining);
-  const graphTriples     = greedyPack(tripleSlots, remaining);
-  const couchViewGroups  = greedyPack(couchGroups, remaining);
-  const directEvidence   = greedyPack(evidenceCandidates, remaining);
-  const priorCaseSummaries = greedyPack(priorCases, remaining);
+  const clusterSummaries = greedyPack(summarySlots, remaining, excludedSourceIds);
+  const graphTriples     = greedyPack(tripleSlots, remaining, excludedSourceIds);
+  const couchViewGroups  = greedyPack(couchGroups, remaining, excludedSourceIds);
+  const directEvidence   = greedyPack(evidenceCandidates, remaining, excludedSourceIds);
+  const priorCaseSummaries = greedyPack(priorCases, remaining, excludedSourceIds);
 
   const tokenUsed = available - remaining.tokens;
 
@@ -220,6 +231,11 @@ export function packContext(input: PackerInput): RetrievalPacket {
     query:     input.query,
     budget:    input.budget,
     tokenUsed,
+    activeClusterIds: input.activeClusterIds ?? [],
+    telemetry: {
+      selectedSourceIds: directEvidence.map(e => e.id),
+      excludedSourceIds,
+    },
     context: {
       directEvidence,
       clusterSummaries,

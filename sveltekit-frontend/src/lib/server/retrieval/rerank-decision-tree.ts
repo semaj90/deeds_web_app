@@ -14,17 +14,19 @@ export interface RerankSignals {
 	encodedSimilarity?: number;
 	/** GRPO reward signal: query's top cluster matched this doc's som_cluster. */
 	encodedClusterHit?: boolean;
+	pagerankScore?: number;
 	finalScore: number;
 }
 
-// Default weights — must sum to 1.0
+// Default weights — must sum to 1.0 (approximated based on user config)
 const DEFAULT_WEIGHTS = {
-	gemma:    0.35,
-	marco:    0.15,
-	lang:     0.15,
-	wiki:     0.25,
+	gemma:    0.30,
+	marco:    0.10,
+	lang:     0.10,
+	wiki:     0.15,
 	activity: 0.05,
-	encoded:  0.05,
+	encoded:  0.15,
+	pagerank: 0.15,
 };
 
 /**
@@ -79,7 +81,8 @@ export async function combineRerankSignals(
 			((langScore ?? 0.5) * weights.lang) +
 			((signals.wikiScore ?? 0.5) * weights.wiki) +
 			((signals.activityScore  ?? 0.0) * (weights.activity ?? 0.0)) +
-			((signals.encodedSimilarity ?? 0.0) * (weights.encoded  ?? 0.0));
+			((signals.encodedSimilarity ?? 0.0) * (weights.encoded  ?? 0.0)) +
+			((signals.pagerankScore ?? 0.0) * (weights.pagerank ?? 0.15));
 
 		return {
 			...signals,

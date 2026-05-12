@@ -35,6 +35,7 @@ import {
 	formatGraphForClaudeCode,
 } from '$lib/server/ai/langgraph-research.js';
 import type { ResearchDomain, WorkerFinding } from '$lib/server/ai/langgraph-research.js';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { db } from '$lib/server/db/client';
 import { researchSummaries, contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { COMPACT_DEFAULTS } from '$lib/server/ai/compact-budgets.js';
@@ -166,6 +167,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					queryHash,
 					workerCount: explicitDomains?.length ?? 0,
 					mode: 'stream',
+					runtime: resolveRuntimeConfig(),
 					cache: { l1: false, l2: false, l3: false },
 				});
 
@@ -243,6 +245,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					totalChunks,
 					durationMs:  Math.round(performance.now() - t0),
 					mode: 'stream',
+					runtime: resolveRuntimeConfig(),
 					cache: { l1: false, l2: false, l3: false },
 				});
 
@@ -274,6 +277,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						totalChunks,
 						durationMs:  Math.round(performance.now() - t0),
 						mode: 'stream',
+						runtime: resolveRuntimeConfig(),
 					}, persistedId);
 				}
 
@@ -285,17 +289,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					actionItems:   actionItems.slice(0, maxActionItems),
 					totalChunks,
 					totalDurationMs: Math.round(performance.now() - t0),
+					runtime: resolveRuntimeConfig(),
 					persistedId,
 					compact,
 					// Inline markdown for direct Claude Code ingestion
 					markdown: compact
 						? undefined
 						: formatGraphForClaudeCode({
-								query,
-								domains,
-								workerFindings,
-								supervisorSummary,
-								keyFindings,
+							query,
+							domains,
+							runtime: resolveRuntimeConfig(),
+							workerFindings,
+							supervisorSummary,
+							keyFindings,
 								actionItems,
 								totalChunks,
 								totalDurationMs: Math.round(performance.now() - t0),
@@ -311,6 +317,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					queryHash,
 					error: (err as Error).message,
 					mode: 'stream',
+					runtime: resolveRuntimeConfig(),
 					cache: { l1: false, l2: false, l3: false },
 				});
 				send('error', { message: (err as Error).message ?? 'Research pipeline failed' });

@@ -9,6 +9,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
 import { runRgSearchAtlas } from '$lib/server/rg-atlas/run.js';
 import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
+import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
 
 export const server = new Server(
   {
@@ -1764,6 +1765,7 @@ export function setupToolHandlers() {
           required: ['sourceCode', 'targetLanguages'],
         },
       },
+      ...REPAIR_TOOLS_SCHEMAS as any[],
     ],
   }));
 
@@ -1861,6 +1863,9 @@ export function setupToolHandlers() {
   }
 
   async function _handleToolCallInner(name: string, args: Record<string, any>): Promise<any> {
+    const repairResult = await handleRepairToolCall(name, args);
+    if (repairResult) return repairResult;
+
     switch (name) {
       case 'cases:load': {
         const result = await mcpTools.cases.loadCases(args);

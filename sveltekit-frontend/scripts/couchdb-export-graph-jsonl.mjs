@@ -21,8 +21,16 @@
 import { createWriteStream } from 'fs';
 import { resolve } from 'path';
 
-const COUCH_URL = process.env.COUCHDB_URL ?? 'http://admin:legal_ai_pass@127.0.0.1:5984';
+const COUCH_RAW = process.env.COUCHDB_URL ?? 'http://admin:deeds123@127.0.0.1:5984';
 const DB        = 'karpathy_wiki';
+
+// Node 18+ fetch() rejects URLs with embedded credentials — extract to header
+const _parsed   = new URL(COUCH_RAW);
+const COUCH_AUTH = _parsed.username
+  ? { Authorization: `Basic ${Buffer.from(`${decodeURIComponent(_parsed.username)}:${decodeURIComponent(_parsed.password)}`).toString('base64')}` }
+  : {};
+_parsed.username = ''; _parsed.password = '';
+const COUCH_URL = _parsed.origin;
 const DRY_RUN   = process.argv.includes('--dry-run');
 const NO_NEO4J  = process.argv.includes('--no-neo4j');
 
@@ -34,7 +42,7 @@ const OUT_PATH  = outArgIdx >= 0 ? process.argv[outArgIdx + 1] : `logs/graph-exp
 async function viewRows(view, params = {}) {
   const qs = new URLSearchParams({ limit: '1000', ...params }).toString();
   const url = `${COUCH_URL}/${DB}/_design/wiki/_view/${view}?${qs}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+  const res = await fetch(url, { headers: { ...COUCH_AUTH }, signal: AbortSignal.timeout(30_000) });
   if (res.status === 404) {
     console.warn(`[export] View ${view} not found — run couchdb-push-wiki-views.mjs first`);
     return [];
@@ -48,13 +56,13 @@ async function allDocs(type) {
   const url = `${COUCH_URL}/${DB}/_find`;
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...COUCH_AUTH },
     body: JSON.stringify({ selector: { type }, limit: 2000 }),
     signal: AbortSignal.timeout(30_000),
   });
   if (!res.ok) {
     // Fallback to _all_docs if Mango is unavailable
-    const all = await fetch(`${COUCH_URL}/${DB}/_all_docs?include_docs=true&limit=2000`);
+    const all = await fetch(`${COUCH_URL}/${DB}/_all_docs?include_docs=true&limit=2000`, { headers: { ...COUCH_AUTH } });
     const d = await all.json();
     return (d.rows ?? []).map((r) => r.doc).filter((d) => d?.type === type);
   }

@@ -1,4 +1,10 @@
 /**
+ * Centralized Model and Endpoint Registry for the YorHA AI Stack.
+ */
+import { VERIFIED_QUANT_CONFIGS } from './quant-config.js';
+export type { QuantRuntimeConfig, RuntimeBackend } from './quant-config.js';
+
+/**
  * Centralized Model IDs — Single source of truth for all inference paths.
  *
  * Client inference tiers (priority order):
@@ -304,7 +310,7 @@ export const VLM_BASE_URL =
 /** TurboQuant llama-server endpoint (OpenAI-compatible, runs alongside Ollama) */
 export const TURBOQUANT_BASE_URL = 
   (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
-  `http://${['127', '0', '0', '1'].join('.')}:8090`;
+  `http://${['127', '0', '0', '1'].join('.')}:8080`;
 export const TURBOQUANT_MODEL = 'gemma4-legal';
 
 /** TurboQuant KV cache quantization levels */
@@ -326,7 +332,7 @@ export const BIFROST_BASE_URL_CLIENT = '/api/cache/bifrost';
 /** TurboQuant — client-side endpoint (for future direct browser calls if needed) */
 export const TURBOQUANT_BASE_URL_CLIENT = 
   (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
-  `http://${['127', '0', '0', '1'].join('.')}:8090`;
+  `http://${['127', '0', '0', '1'].join('.')}:8080`;
 
 // ── Qdrant collection names ──────────────────────────────────────────────
 // These MUST match VECTOR_CONFIG.COLLECTIONS in src/lib/server/config/vector-config.ts
@@ -346,6 +352,11 @@ export const QDRANT_COLLECTIONS = {
 // ── ONNX Runtime execution providers (priority order) ────────────────────
 
 export const ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm', 'cpu'] as const;
+
+
+// ── Quantization Runtime Configuration ──────────────────────────────────
+export const ACTIVE_QUANT_PROFILE = VERIFIED_QUANT_CONFIGS['production-stable'];
+export const INFERENCE_RUNTIME_TRUTH = VERIFIED_QUANT_CONFIGS;
 
 // ── Inference source tags (for SSE chunk attribution) ────────────────────
 

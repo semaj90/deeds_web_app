@@ -5,6 +5,7 @@ import type { RequestHandler } from './$types';
 import { runHermesPlanner, buildFallbackPlan } from '$lib/server/ai/hermes-planner.js';
 import { executeHermesPlan } from '$lib/server/ai/hermes-executor.js';
 import { assembleContext, synthesize } from '$lib/server/ai/hermes-synth.js';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 
 // ── Input schema ──────────────────────────────────────────────────────────────
 
@@ -44,6 +45,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   const { userQuery, aceMode, availableSignals, caseId } = parsed.data;
+  const runtime = resolveRuntimeConfig();
 
   // Signals default to "nothing available" if caller omits them — planner will
   // choose the minimal safe tool set (Qdrant + Redis only).
@@ -59,7 +61,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   let source: 'hermes' | 'fallback';
 
   try {
-    plan   = await runHermesPlanner({ userQuery, aceMode, availableSignals: signals });
+    plan   = await runHermesPlanner({ userQuery, aceMode, availableSignals: signals, runtime });
     source = 'hermes';
   } catch {
     plan   = buildFallbackPlan(aceMode, userQuery, signals);
@@ -82,6 +84,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   return json({
     ok:        true,
     source,
+    runtime,
     plan,
     execution,
     context,

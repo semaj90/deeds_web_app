@@ -137,8 +137,21 @@ export class MetricsCollector {
 		qdrant: boolean;
 		neo4j: boolean;
 		ollama: boolean;
+		turboquant: boolean;
+		reranker: boolean;
+		bifrost: boolean;
+		vlm: boolean;
 	}> {
-		const health = { redis: false, qdrant: false, neo4j: false, ollama: false };
+		const health = {
+			redis: false,
+			qdrant: false,
+			neo4j: false,
+			ollama: false,
+			turboquant: false,
+			reranker: false,
+			bifrost: false,
+			vlm: false
+		};
 		if (!this.config.enableServiceHealthChecks) return health;
 
 		try {
@@ -160,6 +173,26 @@ export class MetricsCollector {
 			const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2000) });
 			health.ollama = response.ok;
 		} catch { health.ollama = false; }
+
+		try {
+			const response = await fetch(`${ENV.TURBOQUANT_BASE_URL}/health`, { signal: AbortSignal.timeout(2000) });
+			health.turboquant = response.ok;
+		} catch { health.turboquant = false; }
+
+		try {
+			const response = await fetch(`${ENV.RERANK_BASE_URL}/health`, { signal: AbortSignal.timeout(2000) });
+			health.reranker = response.ok;
+		} catch { health.reranker = false; }
+
+		try {
+			const response = await fetch(`${ENV.BIFROST_URL}/health`, { signal: AbortSignal.timeout(2000) });
+			health.bifrost = response.ok;
+		} catch { health.bifrost = false; }
+
+		try {
+			const response = await fetch(`${ENV.VLM_BASE_URL}/health`, { signal: AbortSignal.timeout(2000) });
+			health.vlm = response.ok;
+		} catch { health.vlm = false; }
 
 		return health;
 	}

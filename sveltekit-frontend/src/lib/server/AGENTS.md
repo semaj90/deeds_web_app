@@ -66,14 +66,16 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-11T23:28:38.745Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-12T03:12:15.164Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server
 
 ## Snapshot
 
-- server module directory with 63 files, 3 API handlers, 177 Drizzle refs, 2 TODOs
+- server module directory with 63 files, 3 API handlers, 181 Drizzle refs, 2 TODOs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `lib` `server` `db-schema` `zod` `test`
@@ -95,6 +97,12 @@ This directory is part of cluster **C90** — function chunks in \`src/lib/serve
 
 See `docs/graph/hypergraph-clusters.md` § Cluster 90 for full digest.
 
+## Constraints
+
+> Forbidden / risky patterns. Derived from audit warnings + gate FAILs.
+
+- ⚠️ Hardcoded localhost refs
+
 ## Tools
 
 > MCP tools the Gemma4 agent should reach for inside this directory.
@@ -110,6 +118,11 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 90 for full digest.
 - auth
 - api
 - server
+## Todos + Enhancements
+
+- **[MED]** Hardcoded localhost refs
+
+_Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 
 ## Retrieval / Rerank Hints
 

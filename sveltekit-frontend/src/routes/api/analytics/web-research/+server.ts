@@ -279,8 +279,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     researchJobs.set(jobId, baseJob);
     void persistResearchJob(baseJob);
 
-    setImmediate(() => {
-      void (async () => {
+    // Run in background
+    (async () => {
         try {
           const runningJob: ResearchJob = {
             ...baseJob,
@@ -290,39 +290,39 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             updatedAt: new Date().toISOString(),
           };
           researchJobs.set(jobId, runningJob);
-          void persistResearchJob(runningJob);
+          await persistResearchJob(runningJob);
+
           const result = await runResearchAction(action, selfPrompts, pipeline, maxResults);
+          
           const completedJob: ResearchJob = {
             ...runningJob,
             status: 'completed',
             progress: 100,
             message: result.message,
             updatedAt: new Date().toISOString(),
-            totalSummaries: typeof result.totalSummaries === 'number' ? result.totalSummaries : 0,
-            indexedAt:
-              typeof result.indexedAt === 'string' ? result.indexedAt : new Date().toISOString(),
-            source: typeof result.source === 'string' ? result.source : undefined,
-            batches: Array.isArray(result.batches) ? result.batches : undefined,
+            totalSummaries: result.totalSummaries,
+            indexedAt: result.indexedAt,
+            source: result.source,
+            batches: result.batches,
             result: result.result,
             error: null,
           };
           researchJobs.set(jobId, completedJob);
-          void persistResearchJob(completedJob);
-        } catch (err) {
+          await persistResearchJob(completedJob);
+        } catch (err: any) {
           const failedJob: ResearchJob = {
             ...baseJob,
             status: 'failed',
             progress: 100,
-            message: 'Research job failed',
+            message: err.message || 'Research job failed',
             updatedAt: new Date().toISOString(),
             result: null,
-            error: 'Research job failed',
+            error: err.message || 'Research job failed',
           };
           researchJobs.set(jobId, failedJob);
-          void persistResearchJob(failedJob);
+          await persistResearchJob(failedJob);
         }
-      })();
-    });
+    })();
 
     return json({ jobId, status: 'queued' }, { status: 202 });
   }

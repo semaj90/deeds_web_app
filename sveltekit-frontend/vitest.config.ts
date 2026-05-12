@@ -57,6 +57,7 @@ export default defineConfig({
       'tests/cases-sub-routes.spec.ts',
       'tests/retrieval-path-wiring.spec.ts',
       'tests/ace-pipeline-wiring.spec.ts',
+      'tests/ace-token-aware-context-packer.spec.ts',
       'tests/library-upload-ingest.spec.ts',
       'tests/codebase-indexer.spec.ts',
       'tests/routes/all-routes-page-server.test.ts',
