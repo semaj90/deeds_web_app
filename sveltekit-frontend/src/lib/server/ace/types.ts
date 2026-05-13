@@ -78,7 +78,7 @@ export interface ACEPolicyDecision {
 
 export type ACECachePlannerTrace = {
   hit: boolean;
-  source: 'redis' | 'postgres' | 'local' | 'miss';
+  source: 'redis' | 'postgres' | 'local-json' | 'miss';
   cacheKey: string;
   contextHash: string;
   deltaFields: string[];

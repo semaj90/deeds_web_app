@@ -15,12 +15,12 @@
  */
 
 import type { AgentsDirectoryCard } from '../../agents-card-store.js';
-import { ENV } from '../../../../env.server.js';
+import { ENV } from '../../../env.server.js';
 
 const DEFAULT_COUCHDB_URL  = ENV.COUCHDB_URL;
 const DEFAULT_COUCHDB_DB   = process.env.COUCHDB_AGENTS_DB    ?? 'karpathy_wiki';
-const DEFAULT_COUCHDB_USER = ENV.COUCHDB_USER;
-const DEFAULT_COUCHDB_PASS = ENV.COUCHDB_PASSWORD;
+const DEFAULT_COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
+const DEFAULT_COUCHDB_PASS = process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
 const REQUEST_TIMEOUT_MS = 5_000;
 
 export interface CouchWriteOptions {

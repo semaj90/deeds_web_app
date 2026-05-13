@@ -1,7 +1,7 @@
 # AGENTS.md — `scripts/comfyui`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T18:24:25.300Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T22:18:48.377Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: scripts/comfyui
 
@@ -12,7 +12,7 @@
 - no audit signals
 - Tags: `mjs` `scripts` `comfyui` `smoke-comfyui-client.mjs` `submit-workflow-smoke.mjs` `zod`
 
-## Files (2)
+## Files (3)
 
 - `scripts/comfyui/smoke-comfyui-client.mjs`
 - `scripts/comfyui/submit-workflow-smoke.mjs`
@@ -32,7 +32,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/2 files have paired tests
+- **Paired tests**: 0/3 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

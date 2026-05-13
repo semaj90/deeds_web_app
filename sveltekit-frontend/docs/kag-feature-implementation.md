@@ -1,6 +1,6 @@
 # KAG Feature Implementation — Atlas Context, Hyperedges, and Adaptive Pipelines
 
-**Last updated:** 2026-05-08
+**Last updated:** 2026-05-13
 **Status:** Production-wired, smoke-gated, adaptive
 **Companion docs:** [`ace-kag-howto.md`](./ace-kag-howto.md) (operator how-to), [`trace-kag-pipeline.md`](./trace-kag-pipeline.md) (TRACE architecture overview)
 
@@ -366,3 +366,120 @@ See `next_steps/active/2026-05-08_master-pipeline-todo.md` for the live priority
 - **Schema consolidation roadmap:** [`next_steps/active/2026-05-08_schema-consolidation-production-ready.md`](../next_steps/active/2026-05-08_schema-consolidation-production-ready.md)
 - **Master pipeline todo:** [`next_steps/active/2026-05-08_master-pipeline-todo.md`](../next_steps/active/2026-05-08_master-pipeline-todo.md)
 - **Claude Code skill:** [`.claude/skills/codebase-indexing-agentic-error-fixing.md`](../../.claude/skills/codebase-indexing-agentic-error-fixing.md)
+
+---
+
+## 15. LLM-Wiki + evidence ingestion roadmap
+
+This is the planned expansion lane for the SvelteKit wiki and evidence workflow. The source-of-truth layers stay unchanged:
+
+- Postgres for durable evidence and audit records
+- SeaweedFS for binary files
+- Qdrant for primary semantic retrieval
+- Neo4j for graph relations and GraphRAG
+- Redis for hot cache only
+- CouchDB / Karpathy wiki for notes and page snapshots
+- Gemma4 for planning and synthesis
+- TurboVec only as an optional local accelerator lane, not the canonical evidence store
+
+### Phase 0 — foundation and safety
+
+- Keep Qdrant primary for semantic retrieval
+- Keep Postgres primary for durable evidence and audit records
+- Keep SeaweedFS primary for binary files
+- Keep Neo4j primary for graph relations
+- Keep Redis as hot cache only
+- Keep TurboVec as optional local accelerator
+- Do not run `drizzle push`
+- Do not change `cases.user_id` identity strategy
+- Do not run the `buildHypergraph4D` write job
+
+### Phase 1 — LLM-Wiki / Karpathy wiki manager
+
+- Route: `src/routes/(app)/admin/knowledge-base/+page.svelte`
+- API routes:
+  - `GET /api/wiki/status`
+  - `POST /api/wiki/search`
+  - `POST /api/wiki/refresh-directory`
+  - `GET /api/wiki/page/[id]`
+- Dashboard panels:
+  - Wiki Status
+  - Search
+  - Directory Card Inspector
+  - FeatureMap / NES Glyph Preview
+  - Graph Links
+  - Stale Pages
+  - Recent Activity
+  - Agentic Workflow Runs
+  - Evidence Notes
+
+### Phase 2 — evidence registration
+
+- Register original media first
+- Compute sha256
+- Store the original binary in SeaweedFS
+- Create the Postgres evidence row
+- Mark the job status as queued
+- Track workflow metadata such as `workflow_id`, `source_type`, `source_id`, `status`, `current_step`, `started_at`, `finished_at`, `duration_ms`, `warnings`, `errors`, `cache_keys`, `qdrant_point_ids`, `neo4j_node_ids`, and `wiki_page_id`
+
+### Phase 3 — transcript-first video ingestion
+
+- Add `src/lib/server/evidence/video/video-ingest-types.ts`
+- Add `src/lib/server/evidence/video/video-ingest-service.ts`
+- Add `src/lib/server/evidence/video/transcript-service.ts`
+- Add `src/lib/server/evidence/video/video-summary-service.ts`
+- Add `src/routes/api/evidence/video/ingest/+server.ts`
+- Add `scripts/smoke-video-ingest.mjs`
+- Pipeline: store original -> extract audio with FFmpeg -> transcribe with Whisper/faster-whisper/whisper.cpp -> split transcript into timestamped segments -> summarize -> embed transcript chunks -> store chunks in Qdrant -> write a CouchDB/Karpathy wiki video note
+- Treat transcript segments as evidence candidates, not ground truth
+
+### Phase 4 — every-10-second video frames
+
+- Extract one frame every 10 seconds with FFmpeg
+- Cap at 60 frames per video initially
+- Store frames in SeaweedFS
+- Create `evidence_frames` rows
+- Run VLM captioning on frames
+- OCR visible text
+- Embed frame captions into Qdrant
+- Link frame timestamps to transcript segments by time overlap
+- Match on `frame.timestamp_ms BETWEEN transcript.start_ms AND transcript.end_ms`
+
+### Phase 5 — Qdrant collections
+
+- `evidence_text_chunks`
+- `evidence_visual_chunks`
+- `evidence_summaries`
+
+### Phase 6 — TurboVec lane
+
+- Store canonical vectors in Qdrant
+- Store durable rows in Postgres
+- Optionally export Qdrant vectors to a TurboVec sidecar index
+- Use TurboVec for fast local encoded64 search, offline similarity smoke tests, and feature/video/frame cluster experiments
+- Do not make TurboVec own evidence metadata or permissions
+
+### Phase 7 — Neo4j evidence GraphRAG
+
+- Nodes: `Evidence`, `TranscriptSegment`, `Frame`, `Image`, `DocumentChunk`, `Entity`, `Tag`, `Case`, `Person`, `Location`, `Event`
+- Edges: `HAS_EVIDENCE`, `HAS_SEGMENT`, `HAS_FRAME`, `MENTIONS`, `DEPICTS`, `ALIGNS_WITH`, `TAGGED`, `SUPPORTS`, `CONFLICTS_WITH`
+
+### Phase 8 — CouchDB / Karpathy wiki notes
+
+- Write a wiki note per evidence item
+- Cache the note in Redis keys such as `wiki:evidence:{evidenceId}`, `evidence:summary:{evidenceId}`, and `evidence:timeline:{evidenceId}`
+
+### Phase 9 — hyper-semantic multi-query search
+
+- Planner expands a query into semantic, exact keyword, entity, timeline, and visual queries
+- Search Qdrant first, then expand via Neo4j
+- Use Redis for hot summaries and query-plan caching
+- RRF merge, rerank, then produce an ACE compact context pack
+
+### Phase 10 — agentic workflow tracking
+
+- Track run states such as queued, running, waiting_for_operator, completed, failed, skipped, and degraded
+- Track steps such as register_original, extract_audio, transcribe_audio, split_transcript, extract_frames, caption_frames, embed_text, embed_visual, write_qdrant, write_neo4j, write_wiki_note, and quality_check
+- Dashboard should show current step, duration, warnings, errors, cache hits, Qdrant writes, Neo4j writes, wiki note link, and a retry action
+
+Best first implementation: transcript-first ingestion plus workflow tracking, then frames every 10 seconds, then multi-query search, then Neo4j GraphRAG, then TurboVec sidecar acceleration.

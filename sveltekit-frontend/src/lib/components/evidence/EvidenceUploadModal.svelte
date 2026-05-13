@@ -127,7 +127,15 @@
 			const formData = new FormData();
 			formData.append('file', selectedFile);
 			if (caseId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
-			formData.append('caseId', caseId);
+			if (caseId) {
+				formData.append('case_id', caseId);
+				formData.append('case_id', caseId);
+				formData.append('caseId', caseId);
+			}
+			formData.append('enableAiAnalysis', 'true');
+			formData.append('enableOcr', 'true');
+			formData.append('enableEmbeddings', 'true');
+			formData.append('enableSummarization', 'true');
 		}
 			formData.append('title', selectedFile.name);
 			formData.append('evidenceType', isImageFile(selectedFile) ? 'photo' : 'document');

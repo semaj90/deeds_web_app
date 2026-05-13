@@ -77,6 +77,7 @@ import {
   loadAceContextPlannerHit,
   storeAceContextPlannerHit,
 } from './context-cache-planner.js';
+import { recallPastChats } from './chat-memory.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
 import type { ACPKnowledgeSearchResult } from '$lib/server/services/knowledge-search/ACPToolRegistry.js';
@@ -770,7 +771,10 @@ export async function assembleACEContext(opts: {
         lane3Research,
         communityContext,
         directoryKagContext,
-        dbSchemaContext,
+        acpKnowledgeResults,
+        dbSchemaRows,
+        graphIntelContext,
+        multiLaneResult,
         qdrantDocsResults,
         relationshipContext,
         featureWikiPacket,
@@ -813,7 +817,7 @@ export async function assembleACEContext(opts: {
           () => [] as Awaited<ReturnType<typeof getDirectoryKAGContext>>
         ),
         fetchACPKnowledgeResults(query, ACP_MAX_RESULTS, 'codebase_chunks_768').catch(() => null),
-        fetchDbSchemaContext().catch(() => ''),
+        fetchDbSchemaContext(['users', 'cases', 'evidence', 'documents']).catch(() => []),
         // Fast-AST graph intel: top relevant files + audit hotspots from codebase-graph.json
         getGraphIntelContext(query).catch(() => null),
         // P1-A: Error-aware multi-lane search (hash exact + n-gram + graph + ace-cache).
@@ -840,6 +844,10 @@ export async function assembleACEContext(opts: {
           ? Promise.resolve(acePlannerHit.packet)
           : fetchACEContextPacket(query).catch(() => null),
       ]);
+
+      const dbSchemaContext = Array.isArray(dbSchemaRows)
+        ? dbSchemaRows.map((entry) => entry.content).join('\n\n')
+        : '';
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
 
@@ -1108,6 +1116,7 @@ export async function assembleACEContext(opts: {
         evidenceConnections,
         userAnalyticsContext: userAnalyticsContext ?? null,
         codebaseContext: codebaseContext ?? null,
+        dbSchemaContext: dbSchemaContext || null,
         policyDecision: null,
         cachePlanner: cachePlannerTrace,
         retrievalTrace: (() => {
@@ -2553,7 +2562,8 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
       const docLines = context.docChunks
         .slice(0, 3)
         .map((c) => {
-          const header = `[DOC: ${c.title ?? c.id}] score:${c.score.toFixed(2)}`;
+          const docLabel = c.sourceId ?? c.id;
+          const header = `[DOC: ${docLabel}] score:${c.score.toFixed(2)}`;
           return `${header}\n${truncate(c.content, 500)}`;
         })
         .join('\n\n');
@@ -4590,7 +4600,9 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
         summary: payload.summary ?? fm?.description ?? '',
         topFiles: payloadPaths?.services?.slice(0, 8) ?? featurePaths?.services?.slice(0, 8) ?? [],
         topTriples: (fm?.graphTriples as [string, string, string][] | undefined)?.slice(0, 8) ?? [],
-        selectedSourceIds: (stick?.selectedIds ?? []).slice(0, 8),
+        selectedSourceIds: Array.isArray(stick?.selectedIds)
+          ? (stick.selectedIds as string[]).slice(0, 8)
+          : [],
         cacheKeys: cacheKeys.slice(0, 8),
         warnings: [],
       };

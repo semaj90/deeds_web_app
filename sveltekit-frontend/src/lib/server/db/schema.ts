@@ -4,6 +4,7 @@
 // This is the canonical schema for the legal AI application
 
 export * from './schema-postgres';
+export * from './schema/evidence-multi-modal';
 
 // Evidence CRUD + RAG Integration tables
 export {

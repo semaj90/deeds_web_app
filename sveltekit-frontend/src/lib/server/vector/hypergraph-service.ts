@@ -1,4 +1,4 @@
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { enhancedGraphMappings } from '$lib/server/db/schema/graph-mappings.js';
 import { sql, eq, inArray } from 'drizzle-orm';
 import { QdrantManager } from './qdrant-manager.js';
@@ -43,10 +43,10 @@ export class HypergraphService {
       query: params.query,
       queryEmbedding: params.queryEmbedding,
       collection: 'codebase_chunks',
-      limit: limit
+      limit: limit,
     });
 
-    const seedIds = semanticResults.results.map(r => r.payload?.id as string).filter(Boolean);
+    const seedIds = semanticResults.results.map((r) => r.payload?.id as string).filter(Boolean);
     if (seedIds.length === 0) return { results: [], metadata: { total: 0 } };
 
     // 2. Star Graph Expansion (Postgres JSONB)
@@ -58,14 +58,14 @@ export class HypergraphService {
 
     // 4. Multi-Query Refinement (Star Graph Centric)
     // We can also perform semantic searches for the labels of the neighbors to see if they match the query intent.
-    
+
     return {
       query: params.query,
       seeds: starGraphs,
       metadata: {
         totalSeeds: seedIds.length,
-        responseTime: semanticResults.metadata.responseTime
-      }
+        responseTime: semanticResults.metadata.responseTime,
+      },
     };
   }
 
@@ -84,39 +84,42 @@ export class HypergraphService {
     limit?: number;
   }): Promise<any> {
     const limit = params.limit ?? 5;
-    
+
     // Pillar 1: Semantic Seed
     const semanticResults = await this.qdrant.hybridSearch({
       query: params.query,
       queryEmbedding: params.queryEmbedding,
       collection: 'codebase_chunks',
-      limit: limit
+      limit: limit,
     });
 
-    const seeds = semanticResults.results.map(r => r.payload?.id as string).filter(Boolean);
+    const seeds = semanticResults.results.map((r) => r.payload?.id as string).filter(Boolean);
     if (seeds.length === 0) return { pentagon: [], metadata: { hops: 5 } };
 
     // Pillar 2 & 3: Star Graph Expansion (Implementation & Dependency)
     const starGraphs = await this.getStarGraphs(seeds);
-    
+
     // Pillar 4 & 5: Deep Interface & Schema Resolution
     const deepResults = [];
     for (const star of starGraphs) {
-      const neighbors = star.neighbors.map(n => n.id);
-      
+      const neighbors = star.neighbors.map((n) => n.id);
+
       // Fetch neighbors' details to find Protos and Schemas
-      const neighborDetails = await db.select()
+      const neighborDetails = await db
+        .select()
         .from(enhancedGraphMappings)
         .where(inArray(enhancedGraphMappings.id, neighbors));
 
-      const protocols = neighborDetails.filter(n => n.kind === 'proto' || n.kind === 'grpc_method');
-      const schemas = neighborDetails.filter(n => n.kind === 'schema' || n.kind === 'redis_key');
+      const protocols = neighborDetails.filter(
+        (n) => n.kind === 'proto' || n.kind === 'grpc_method'
+      );
+      const schemas = neighborDetails.filter((n) => n.kind === 'schema' || n.kind === 'redis_key');
 
       deepResults.push({
         ...star,
-        protocols: protocols.map(p => ({ id: p.id, label: p.label })),
-        schemas: schemas.map(s => ({ id: s.id, label: s.label })),
-        recommendations: this.generateRecommendations(star, protocols, schemas)
+        protocols: protocols.map((p) => ({ id: p.id, label: p.label })),
+        schemas: schemas.map((s) => ({ id: s.id, label: s.label })),
+        recommendations: this.generateRecommendations(star, protocols, schemas),
       });
     }
 
@@ -125,8 +128,8 @@ export class HypergraphService {
       pentagon: deepResults,
       metadata: {
         hops: 5,
-        pillar: 'arch-traversal'
-      }
+        pillar: 'arch-traversal',
+      },
     };
   }
 
@@ -134,7 +137,8 @@ export class HypergraphService {
     const recs = [];
     if (protos.length > 0) recs.push(`Review ${protos[0].label} for interface alignment.`);
     if (schemas.length > 0) recs.push(`Verify ${schemas[0].label} JSONB schema consistency.`);
-    if (star.kind === 'file' && star.label.endsWith('.ts')) recs.push('Check for Svelte 5 runes compliance.');
+    if (star.kind === 'file' && star.label.endsWith('.ts'))
+      recs.push('Check for Svelte 5 runes compliance.');
     return recs;
   }
 
@@ -143,20 +147,23 @@ export class HypergraphService {
    */
   async getStarGraphs(ids: string[]): Promise<StarGraph[]> {
     return traceDB('getStarGraphs', { idCount: ids.length }, async () => {
-      const nodes = await db.select().from(enhancedGraphMappings).where(inArray(enhancedGraphMappings.id, ids));
-      
+      const nodes = await db
+        .select()
+        .from(enhancedGraphMappings)
+        .where(inArray(enhancedGraphMappings.id, ids));
+
       const results: StarGraph[] = [];
 
       for (const node of nodes) {
         // Neighbors are stored in the JSONB 'edges' field
         const neighbors: StarGraph['neighbors'] = [];
-        for (const edge of (node.edges || [])) {
+        for (const edge of node.edges || []) {
           for (const target of edge.targets) {
             neighbors.push({
               id: target,
               kind: 'unknown', // We'd need another query or join to get full info
               label: target,
-              relation: edge.relation
+              relation: edge.relation,
             });
           }
         }
@@ -168,7 +175,7 @@ export class HypergraphService {
           summary: node.summary,
           neighbors,
           scores: node.scores,
-          metadata: node.metadata
+          metadata: node.metadata,
         });
       }
 

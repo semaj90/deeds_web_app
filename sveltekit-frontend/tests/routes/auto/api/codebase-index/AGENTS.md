@@ -1,7 +1,7 @@
 # AGENTS.md — `tests/routes/auto/api/codebase-index`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T18:24:25.300Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T22:18:48.377Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests/routes/auto/api/codebase-index
 

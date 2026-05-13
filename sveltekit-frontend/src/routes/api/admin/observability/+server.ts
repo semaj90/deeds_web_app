@@ -12,8 +12,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
-// @ts-expect-error tsgo pre-stable: $lib alias not resolved for named db export (tsc/svelte-check see it correctly)
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
@@ -33,6 +32,8 @@ const GO_RETRIEVAL  = ENV.RETRIEVAL_HTTP_URL;
 const GO_SEARCH     = ENV.GO_SEARCH_URL;
 const TOPO_URL      = ENV.TOPOLOGY_SEARCH_URL;
 const TURBO_URL     = ENV.TURBOQUANT_BASE_URL;
+const TURBOVEC_URL = process.env.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8099';
+const HYPERRAG_LOGS = resolve(CWD, 'logs/hyperrag-stream');
 
 // ── Service probe helpers ─────────────────────────────────────────────────────
 
@@ -137,19 +138,63 @@ function fileAgeLabel(path: string): string | null {
 async function getAceRedisStats() {
   try {
     const redis = getRedis();
-    const [topk, hits, auth] = await Promise.race([
+    const [topk, hits, auth, manifold, som] = await Promise.race([
       Promise.all([
-        redis.keys('ace:topk:*').then(ks => ks.length).catch(() => 0),
-        redis.keys('ace:hits:*').then(ks => ks.length).catch(() => 0),
+        redis
+          .keys('ace:topk:*')
+          .then((ks) => ks.length)
+          .catch(() => 0),
+        redis
+          .keys('ace:hits:*')
+          .then((ks) => ks.length)
+          .catch(() => 0),
         redis.exists('ace:authority:top').catch(() => 0),
+        redis
+          .get('cluster:kmeans:k20:manifold4:all')
+          .then((d) => (d ? JSON.parse(d).length : 0))
+          .catch(() => 0),
+        redis.exists('som:weights').catch(() => 0),
       ]),
-      new Promise<[number, number, number]>((_, r) =>
+      new Promise<[number, number, number, number, number]>((_, r) =>
         setTimeout(() => r(new Error('timeout') as never), 2500)
       ),
     ]);
-    return { aceTopkCount: topk, aceHitsCount: hits, aceAuthorityPresent: auth > 0 };
+    return {
+      aceTopkCount: topk,
+      aceHitsCount: hits,
+      aceAuthorityPresent: auth > 0,
+      manifoldClusterCount: manifold,
+      somWeightsPresent: som > 0,
+    };
   } catch {
-    return { aceTopkCount: 0, aceHitsCount: 0, aceAuthorityPresent: false };
+    return {
+      aceTopkCount: 0,
+      aceHitsCount: 0,
+      aceAuthorityPresent: false,
+      manifoldClusterCount: 0,
+      somWeightsPresent: false,
+    };
+  }
+}
+
+async function getTopologicalStats() {
+  try {
+    const res = await db.execute(sql`
+      SELECT
+        COUNT(DISTINCT gpu_cluster) as clusters,
+        COUNT(DISTINCT (som_bmu_row, som_bmu_col)) as som_nodes,
+        COUNT(*) as total_summaries
+      FROM embedded_summaries
+    `);
+    const row = (res.rows?.[0] ?? res[0]) as any;
+    return {
+      coveredClusters: Number(row.clusters ?? 0),
+      coveredSomNodes: Number(row.som_nodes ?? 0),
+      totalSummaries: Number(row.total_summaries ?? 0),
+    };
+  } catch (e) {
+    console.warn('[observability] Failed to fetch topological stats:', e);
+    return { coveredClusters: 0, coveredSomNodes: 0, totalSummaries: 0 };
   }
 }
 
@@ -173,19 +218,44 @@ async function getCollectionInfo(name: string): Promise<number | null> {
 export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-  const [redis, pg, qdrant, neo4j, mcp, goRetrieval, goSearch, topology, turboQuant, aceStats] =
-    await Promise.all([
-      probeRedis(),
-      probePostgres(),
-      probeQdrant(),
-      probeNeo4j(),
-      probeHttp(MCP_URL),
-      probeHttp(GO_RETRIEVAL),
-      probeHttp(GO_SEARCH),
-      probeHttp(TOPO_URL),
-      probeHttp(TURBO_URL),
-      getAceRedisStats(),
-    ]);
+  const [
+    redis,
+    pg,
+    qdrant,
+    neo4j,
+    mcp,
+    goRetrieval,
+    goSearch,
+    topology,
+    turboQuant,
+    turbovec,
+    aceStats,
+    topoStats,
+  ] = await Promise.all([
+    probeRedis(),
+    probePostgres(),
+    probeQdrant(),
+    probeNeo4j(),
+    probeHttp(MCP_URL),
+    probeHttp(GO_RETRIEVAL),
+    probeHttp(GO_SEARCH),
+    probeHttp(TOPO_URL),
+    probeHttp(TURBO_URL),
+    probeHttp(TURBOVEC_URL),
+    getAceRedisStats(),
+    getTopologicalStats(),
+  ]);
+
+  // ── HyperRAG latest log ──────────────────────────────────────────────────
+  let latestHyperRag = null;
+  try {
+    const latestPath = resolve(HYPERRAG_LOGS, 'latest.json');
+    if (existsSync(latestPath)) {
+      latestHyperRag = JSON.parse(readFileSync(latestPath, 'utf8'));
+    }
+  } catch (e) {
+    // skip
+  }
 
   // ── graphify state ──────────────────────────────────────────────────────────
 
@@ -208,11 +278,11 @@ export const GET: RequestHandler = async ({ locals }) => {
   // ── Qdrant collections ──────────────────────────────────────────────────────
 
   const collections = qdrant.collections;
-  const hasCodebaseChunks  = collections.includes('codebase_chunks_768');
+  const hasCodebaseChunks = collections.includes('codebase_chunks_768');
   const hasSynthesisMemory = collections.includes('synthesis_memory_768');
 
   const [codebaseCount, synthesisCount] = await Promise.all([
-    hasCodebaseChunks  ? getCollectionInfo('codebase_chunks_768')  : Promise.resolve(null),
+    hasCodebaseChunks ? getCollectionInfo('codebase_chunks_768') : Promise.resolve(null),
     hasSynthesisMemory ? getCollectionInfo('synthesis_memory_768') : Promise.resolve(null),
   ]);
 
@@ -225,11 +295,11 @@ export const GET: RequestHandler = async ({ locals }) => {
   }
 
   const recs = readDocJson<RecsJson>('recommendations.json');
-  const topRecs = (recs?.recommendations ?? []).slice(0, 5).map(r => ({
-    id:       r.id,
+  const topRecs = (recs?.recommendations ?? []).slice(0, 5).map((r) => ({
+    id: r.id,
     category: r.category,
     severity: r.severity,
-    title:    r.title,
+    title: r.title,
   }));
 
   return json({
@@ -237,70 +307,122 @@ export const GET: RequestHandler = async ({ locals }) => {
     generatedAt: new Date().toISOString(),
 
     services: {
-      redis:       { up: redis.up,       latencyMs: redis.latencyMs,       ...(redis.error       ? { error: redis.error }       : {}) },
-      postgres:    { up: pg.up,          latencyMs: pg.latencyMs,          ...(pg.error          ? { error: pg.error }          : {}) },
-      qdrant:      { up: qdrant.up,      latencyMs: qdrant.latencyMs,      ...(qdrant.error      ? { error: qdrant.error }      : {}) },
-      neo4j:       { up: neo4j.up,       latencyMs: neo4j.latencyMs,       ...(neo4j.error       ? { error: neo4j.error }       : {}) },
-      mcp:         { up: mcp.up,         latencyMs: mcp.latencyMs,         ...(mcp.error         ? { error: mcp.error }         : {}) },
-      goRetrieval: { up: goRetrieval.up, latencyMs: goRetrieval.latencyMs, ...(goRetrieval.error ? { error: goRetrieval.error } : {}) },
-      goSearch:    { up: goSearch.up,    latencyMs: goSearch.latencyMs,    ...(goSearch.error    ? { error: goSearch.error }    : {}) },
-      topology:    { up: topology.up,    latencyMs: topology.latencyMs,    ...(topology.error    ? { error: topology.error }    : {}) },
-      turboQuant:  { up: turboQuant.up,  latencyMs: turboQuant.latencyMs,  ...(turboQuant.error  ? { error: turboQuant.error }  : {}) },
+      redis: {
+        up: redis.up,
+        latencyMs: redis.latencyMs,
+        ...(redis.error ? { error: redis.error } : {}),
+      },
+      postgres: { up: pg.up, latencyMs: pg.latencyMs, ...(pg.error ? { error: pg.error } : {}) },
+      qdrant: {
+        up: qdrant.up,
+        latencyMs: qdrant.latencyMs,
+        ...(qdrant.error ? { error: qdrant.error } : {}),
+      },
+      neo4j: {
+        up: neo4j.up,
+        latencyMs: neo4j.latencyMs,
+        ...(neo4j.error ? { error: neo4j.error } : {}),
+      },
+      mcp: { up: mcp.up, latencyMs: mcp.latencyMs, ...(mcp.error ? { error: mcp.error } : {}) },
+      goRetrieval: {
+        up: goRetrieval.up,
+        latencyMs: goRetrieval.latencyMs,
+        ...(goRetrieval.error ? { error: goRetrieval.error } : {}),
+      },
+      goSearch: {
+        up: goSearch.up,
+        latencyMs: goSearch.latencyMs,
+        ...(goSearch.error ? { error: goSearch.error } : {}),
+      },
+      topology: {
+        up: topology.up,
+        latencyMs: topology.latencyMs,
+        ...(topology.error ? { error: topology.error } : {}),
+      },
+      turboQuant: {
+        up: turboQuant.up,
+        latencyMs: turboQuant.latencyMs,
+        ...(turboQuant.error ? { error: turboQuant.error } : {}),
+      },
+      turboVec: {
+        up: turbovec.up,
+        latencyMs: turbovec.latencyMs,
+        ...(turbovec.error ? { error: turbovec.error } : {}),
+      },
     },
 
     graphify: {
-      codebaseGraphExists:   existsSync(resolve(DOCS_GRAPH, 'codebase-graph.json')),
-      codebaseMapExists:     existsSync(resolve(DOCS_GRAPH, 'codebase-map.md')),
+      codebaseGraphExists: existsSync(resolve(DOCS_GRAPH, 'codebase-graph.json')),
+      codebaseMapExists: existsSync(resolve(DOCS_GRAPH, 'codebase-map.md')),
       authorityScoresExists: aceStats.aceAuthorityPresent,
-      rerankPayloadsExists:  qdrant.up && hasCodebaseChunks,
+      rerankPayloadsExists: qdrant.up && hasCodebaseChunks,
       dailyLogAge,
       graphJsonAge,
       healthSnapshot: graphHealth
         ? {
-            generatedAt:     graphHealth.generatedAt ?? null,
-            wikiNoteCount:   graphHealth.wikiNoteCount ?? 0,
-            glyphCount:      graphHealth.glyphCount ?? 0,
-            agentsMdCount:   graphHealth.agentsMdCount ?? 0,
-            gemma4Coverage:  graphHealth.gemma4Coverage ?? 0,
+            generatedAt: graphHealth.generatedAt ?? null,
+            wikiNoteCount: graphHealth.wikiNoteCount ?? 0,
+            glyphCount: graphHealth.glyphCount ?? 0,
+            agentsMdCount: graphHealth.agentsMdCount ?? 0,
+            gemma4Coverage: graphHealth.gemma4Coverage ?? 0,
             bowClusterTiles: graphHealth.bowClusterTiles ?? 0,
             qdrantReachable: graphHealth.qdrantReachable ?? false,
-            aceSmokeWikiOk:  graphHealth.aceSmokeWikiOk ?? false,
+            aceSmokeWikiOk: graphHealth.aceSmokeWikiOk ?? false,
             aceSmokeGlyphOk: graphHealth.aceSmokeGlyphOk ?? false,
           }
         : null,
     },
 
     qdrantFeedback: {
-      codebaseChunksPresent:  hasCodebaseChunks,
-      codebaseChunkCount:     codebaseCount,
+      codebaseChunksPresent: hasCodebaseChunks,
+      codebaseChunkCount: codebaseCount,
       authorityWritebackNote: aceStats.aceAuthorityPresent
         ? 'ace:authority:top key present in Redis'
         : 'ace:authority:top missing — run graphify:authority',
-      rerankFeedbackNote: 'Populated by qdrant:rerank-feedback after chunk_hit_log accumulates hits',
-      missingColumns: hasCodebaseChunks && codebaseCount === 0
-        ? ['codebase_chunks_768 collection is empty']
-        : [],
+      rerankFeedbackNote:
+        'Populated by qdrant:rerank-feedback after chunk_hit_log accumulates hits',
+      missingColumns:
+        hasCodebaseChunks && codebaseCount === 0 ? ['codebase_chunks_768 collection is empty'] : [],
     },
 
     ace: {
       aceTopkCachedQueries: aceStats.aceTopkCount,
       aceHitsCachedQueries: aceStats.aceHitsCount,
-      aceAuthorityPresent:  aceStats.aceAuthorityPresent,
+      aceAuthorityPresent: aceStats.aceAuthorityPresent,
+      manifoldClusterCount: aceStats.manifoldClusterCount,
+      somWeightsPresent: aceStats.somWeightsPresent,
+      coveredClusters: topoStats.coveredClusters,
+      coveredSomNodes: topoStats.coveredSomNodes,
+      totalSummaries: topoStats.totalSummaries,
       lanesAvailable: [
-        'redis_ace', 'postgres_trigram', 'qdrant_vector',
-        'ast_symbol', 'neo4j_graph', 'som_topology', 'web_research',
+        'redis_ace',
+        'postgres_trigram',
+        'qdrant_vector',
+        'ast_symbol',
+        'neo4j_graph',
+        'som_topology',
+        'web_research',
+        'turbovec_ann',
+        'bitfrost_summary',
       ],
-      glyphClusterLanePresent: existsSync(resolve(CWD, 'src/lib/server/ace/multi-lane-retrieval.ts')),
+      glyphClusterLanePresent: existsSync(
+        resolve(CWD, 'src/lib/server/ace/multi-lane-retrieval.ts')
+      ),
     },
 
     synthesisMemory: {
-      collection:       'synthesis_memory_768',
-      available:        hasSynthesisMemory,
+      collection: 'synthesis_memory_768',
+      available: hasSynthesisMemory,
       approximateCount: synthesisCount,
     },
 
     recommendations: topRecs,
-    recsTotal:       recs?.totalRecommendations ?? 0,
+    recsTotal: recs?.totalRecommendations ?? 0,
     recsGeneratedAt: recs?.generatedAt ?? null,
+
+    hyperrag: {
+      latest: latestHyperRag,
+      logAge: fileAgeLabel(resolve(HYPERRAG_LOGS, 'latest.json')),
+    },
   });
 };

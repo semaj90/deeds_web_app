@@ -49,6 +49,10 @@
     "tests/routes/auto/api/codebase-index/deep-research.test.ts",
     "tests/routes/auto/api/codebase-index/deep-research.test.ts"
   ],
+  "src/routes/api/rag/hyperrag/+server.ts": [
+    "src/routes/api/rag/hyperrag/server.route.test.ts",
+    "src/routes/api/rag/hyperrag/server.route.test.ts"
+  ],
   "src/routes/api/rag/search/+server.ts": [
     "src/routes/api/rag/search/server.route.test.ts",
     "tests/rag-search-ace-route.spec.ts",
@@ -3201,6 +3205,13 @@
     "tests/unit/chat-memory.test.ts",
     "tests/unit/chat-memory.test.ts",
     "tests/unit/chat-memory.test.ts"
+  ],
+  "src/lib/server/ace/context-cache-planner.ts": [
+    "tests/unit/context-cache-planner.test.ts",
+    "tests/unit/context-cache-planner.test.ts"
+  ],
+  "src/lib/server/ace/llm-context-cache.ts": [
+    "tests/unit/llm-context-cache.test.ts"
   ],
   "src/lib/server/obsidian/markdown-wiki-note.ts": [
     "tests/wiki-vault-watcher.spec.ts"

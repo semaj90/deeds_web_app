@@ -1,18 +1,18 @@
 # AGENTS.md — `scripts`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T18:24:25.300Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T22:18:48.377Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: scripts
 
 ## Snapshot
 
-- 305 file(s), 0 handler(s)
+- 307 file(s), 0 handler(s)
 - Audit score: _(no GPU audit)_
 - 🟠 hardcoded localhost: 47 · TODOs: 2
 
 
-## Files (305)
+## Files (307)
 
 - `ace-policy-synthesis.ts`
 - `agent-diagnose.mjs`
@@ -36,12 +36,12 @@
 
 | Gate | Status | Detail |
 |------|--------|--------|
-| G17 | ❌ FAIL | 47/305 files — use env.server.ts getters |
+| G17 | ❌ FAIL | 47/307 files — use env.server.ts getters |
 
 _Gates checked: G17. Run `npm run index:codebase:fast && npm run agents:write` to refresh._
 ## Todos + Enhancements
 
-- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 47/305 files — use env.server.ts getters
+- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 47/307 files — use env.server.ts getters
 - **[LOW]** [TODO] `enrich-agents-md.mjs`: TODO
 - **[LOW]** [TODO] `run-authority-scores.mjs`: TODO
 
@@ -52,7 +52,7 @@ _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 1/305 files have paired tests
+- **Paired tests**: 1/307 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

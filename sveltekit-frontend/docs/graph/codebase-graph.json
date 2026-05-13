@@ -1,21 +1,21 @@
 {
   "mode": "fast-ast",
-  "createdAt": "2026-05-13T18:24:17.858Z",
+  "createdAt": "2026-05-13T21:46:52.575Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
-  "fileCount": 4961,
-  "routeCount": 1011,
+  "fileCount": 4970,
+  "routeCount": 1012,
   "componentCount": 884,
-  "apiCount": 703,
-  "dbTableMentions": 473,
+  "apiCount": 704,
+  "dbTableMentions": 475,
   "todoCount": 49,
-  "dirCount": 451,
+  "dirCount": 454,
   "qdrantUpserted": false,
   "graphJsonPath": "docs/graph/codebase-graph.json",
   "codebaseMapPath": "docs/graph/codebase-map.md",
   "gateStats": {
-    "routesWithAuth": 773,
+    "routesWithAuth": 774,
     "routesWithoutAuth": 0,
-    "routesWithZod": 536,
+    "routesWithZod": 537,
     "routesWithoutZod": 0,
     "filesWithLocalhost": 127,
     "filesWithLocalhostBreaks": 8,
@@ -25,9 +25,9 @@
     "sv4DispatchCount": 0,
     "runeInTsCount": 10,
     "ssrUnsafeCount": 0,
-    "routesWithTest": 712,
-    "routesWithoutTest": 2,
-    "routesWithErrorHandling": 686,
+    "routesWithTest": 717,
+    "routesWithoutTest": 3,
+    "routesWithErrorHandling": 687,
     "cyclicPairCount": 0
   },
   "files": [
@@ -19820,7 +19820,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/ui/button/Button.svelte",
+      "rel": "src/lib/components/ui/enhanced-bits/Button.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
@@ -21544,7 +21544,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/ui/gaming/n64/N64Progress.svelte",
+      "rel": "src/lib/components/ui/gaming/n64/N64ProgressBar.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
@@ -21890,7 +21890,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/ui/gaming/n64/N64Checkbox.svelte",
+      "rel": "src/lib/components/ui/gaming/n64/N64Toggle.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
@@ -32320,7 +32320,105 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 4395,
+      "lineCount": 4603,
+      "hasAuth": false,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/ace/context-cache-planner.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "",
+      "imports": [
+        "$lib/server/cache-keys.js",
+        "./token-aware-context-packer.js",
+        "./llm-context-cache.js"
+      ],
+      "exports": [
+        "AceContextPlannerState",
+        "AceContextPlannerMeta",
+        "AceContextPlannerHit",
+        "buildAceContextPlannerState",
+        "loadAceContextPlannerHit",
+        "storeAceContextPlannerHit"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 313,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/ace/context-cache-registry.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "db-schema",
+        "zod"
+      ],
+      "summary": "",
+      "imports": [
+        "drizzle-orm",
+        "$lib/server/db/client.js",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/cache-config.js",
+        "$lib/server/cache-keys.js",
+        "$lib/server/redis.js",
+        "./token-aware-context-packer.js",
+        "$lib/server/features/feature-map.types.js"
+      ],
+      "exports": [
+        "AceContextRegistryPacket",
+        "buildAceContextRegistryPacket",
+        "toFeatureWikiPacket",
+        "writeAceContextRegistry",
+        "readAceContextRegistry"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [
+        "drizzle"
+      ],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 107,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -32698,6 +32796,66 @@
       "lineCount": 174,
       "hasAuth": false,
       "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/ace/llm-context-cache.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "db-schema",
+        "zod"
+      ],
+      "summary": "",
+      "imports": [
+        "node:crypto",
+        "node:fs",
+        "node:path",
+        "drizzle-orm",
+        "$lib/server/cache-keys.js",
+        "$lib/server/db/client.js",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/redis.js"
+      ],
+      "exports": [
+        "ContextCacheIdentity",
+        "ContextPack",
+        "ContextCacheLookupResult",
+        "buildContextCacheKey",
+        "getContextCachePath",
+        "normalizeContextPack",
+        "getContextCache",
+        "resolveContextCacheSources",
+        "resolveContextCacheSourcesWithSource",
+        "getContextCacheWithSource",
+        "setContextCache",
+        "bumpContextCacheHit"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [
+        "drizzle"
+      ],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 352,
+      "hasAuth": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
@@ -33272,6 +33430,7 @@
       ],
       "exports": [
         "AceContextPacket",
+        "FeatureWikiPacket",
         "estimateTokens",
         "scoreContextCandidate",
         "PackerInput",
@@ -33286,7 +33445,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 302,
+      "lineCount": 379,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -33459,6 +33618,7 @@
         "ACEParameterCompletion",
         "ACEBudgetProfile",
         "ACEPolicyDecision",
+        "ACECachePlannerTrace",
         "RerankBreakdown",
         "ACEContext",
         "ClusterContextPacket",
@@ -33470,8 +33630,7 @@
         "LaneId",
         "LANE_DEFAULT_TRUST_TIER",
         "TRUST_SCORE_MULTIPLIER",
-        "TOKEN_BUDGET",
-        "ACEPrompt"
+        "TOKEN_BUDGET"
       ],
       "dynImports": [],
       "reExports": [],
@@ -33482,7 +33641,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 454,
+      "lineCount": 514,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -34092,6 +34251,7 @@
         "zod",
         "crypto",
         "$lib/server/ace/context-assembler.js",
+        "$lib/server/ace/llm-context-cache.js",
         "$lib/server/analysis/entity-extraction.js",
         "$lib/server/analysis/forensics.js",
         "$lib/server/ace/auto-tagger.js",
@@ -34110,8 +34270,7 @@
         "fs",
         "path",
         "fs",
-        "path",
-        "$lib/server/redis.js"
+        "path"
       ],
       "reExports": [],
       "routeHandlers": [],
@@ -34123,7 +34282,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1494,
+      "lineCount": 1519,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -37545,7 +37704,8 @@
       "summary": "Hermes Planner — structured tool-call router / dispatcher brain.",
       "imports": [
         "zod",
-        "$lib/server/ai/inference-configs.js"
+        "$lib/server/ai/inference-configs.js",
+        "$lib/server/env.server.js"
       ],
       "exports": [
         "HermesPlanSchema",
@@ -37576,7 +37736,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 373,
+      "lineCount": 377,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -38027,7 +38187,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 705,
+      "lineCount": 708,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -38808,7 +38968,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 471,
+      "lineCount": 481,
       "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -42365,7 +42525,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 153,
+      "lineCount": 159,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -48374,7 +48534,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 4459,
+      "lineCount": 4491,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -50112,7 +50272,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/server/embedding/ollama-embed.ts",
+      "rel": "src/lib/server/embeddings/ollama.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -50147,7 +50307,7 @@
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
-      "hasPairedTest": false,
+      "hasPairedTest": true,
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
@@ -50311,7 +50471,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 345,
+      "lineCount": 346,
       "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -51617,6 +51777,8 @@
         "../db/schema/features.js",
         "../redis.js",
         "../vector/qdrant-manager.js",
+        "../cache-keys.js",
+        "../ace/context-cache-registry.js",
         "./feature-map.types.js"
       ],
       "exports": [
@@ -51635,7 +51797,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 257,
+      "lineCount": 253,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -54312,7 +54474,7 @@
       "summary": "",
       "imports": [
         "pg",
-        "$lib/server/cache/redis.js",
+        "$lib/server/redis.js",
         "$lib/server/db/client.js"
       ],
       "exports": [
@@ -57229,7 +57391,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 520,
+      "lineCount": 542,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -70319,7 +70481,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 180,
+      "lineCount": 187,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -79569,14 +79731,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/phase78/ErrorEventsList.svelte",
+      "rel": "src/routes/(admin)/error-brain/components/ErrorEventsList.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(admin)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -79593,7 +79756,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 148,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -80047,13 +80210,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(analysis)/+layout.server.ts",
+      "rel": "src/routes/(analysis)@/+layout.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
         "src",
         "routes",
-        "(analysis)",
+        "(analysis)@",
         "auth"
       ],
       "summary": "",
@@ -80086,13 +80249,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(analysis)/+layout.svelte",
+      "rel": "src/routes/(analysis)@/+layout.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
         "routes",
-        "(analysis)",
+        "(analysis)@",
         "route",
         "component"
       ],
@@ -80134,13 +80297,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
+      "rel": "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
         "src",
         "routes",
-        "(analysis)",
+        "(analysis)@",
         "route",
         "auth"
       ],
@@ -80223,13 +80386,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
+      "rel": "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
         "src",
         "routes",
-        "(analysis)",
+        "(analysis)@",
         "route",
         "auth"
       ],
@@ -80312,13 +80475,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
+      "rel": "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
         "src",
         "routes",
-        "(analysis)",
+        "(analysis)@",
         "route",
         "auth"
       ],
@@ -81055,7 +81218,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/ai-dashboard/lab/+page.ts",
+      "rel": "src/routes/(app)/admin/ai-dashboard/operator/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -81550,7 +81713,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "rel": "src/routes/(app)/admin/cache/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -81583,7 +81746,7 @@
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
-      "hasPairedTest": false,
+      "hasPairedTest": true,
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 5,
@@ -82741,7 +82904,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "rel": "src/routes/(app)/admin/error-brain/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -83299,7 +83462,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 630,
+      "lineCount": 655,
       "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -84539,7 +84702,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/+page.ts",
+      "rel": "src/routes/(app)/analysis-center/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -85628,7 +85791,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/cases/[id]/canvas/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -85662,7 +85825,7 @@
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
-      "hasPairedTest": false,
+      "hasPairedTest": true,
       "fanIn": 0,
       "routeParams": [
         "id"
@@ -85748,7 +85911,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/cases/[id]/chat/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -85782,7 +85945,7 @@
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
-      "hasPairedTest": false,
+      "hasPairedTest": true,
       "fanIn": 0,
       "routeParams": [
         "id"
@@ -86258,7 +86421,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/cases/[id]/persons/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -86292,7 +86455,7 @@
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
-      "hasPairedTest": false,
+      "hasPairedTest": true,
       "fanIn": 0,
       "routeParams": [
         "id"
@@ -86513,7 +86676,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 81,
+      "lineCount": 84,
       "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -88896,7 +89059,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -88976,7 +89139,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/ace-pipeline/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -89054,7 +89217,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/agent-chat/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -89416,7 +89579,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/ai-assistant/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -89494,7 +89657,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/ai-chat-test/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -89572,7 +89735,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/ai-file-upload/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -89650,7 +89813,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/ask-ai/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -89785,7 +89948,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/bits-ui/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -89863,7 +90026,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/cache/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -89943,7 +90106,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/case-form/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90102,7 +90265,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/celestial-icons/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90183,7 +90346,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/chat-messages/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90306,7 +90469,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/citation-tools/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90384,7 +90547,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/client-ai-chat/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90466,7 +90629,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/client-inference/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90587,7 +90750,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/collab-canvas/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90668,7 +90831,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/context-menu/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90746,7 +90909,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/contextual-chat/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -90882,7 +91045,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/courtroom-sim/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91042,7 +91205,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/detective-command/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91124,7 +91287,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/dialog-wrapper/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91245,7 +91408,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/embedding-stream/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91323,7 +91486,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/enhanced-upload/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91429,7 +91592,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/evidence-canvas/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91510,7 +91673,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/evidence-dashboard/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91588,7 +91751,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/evidence-form/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91666,7 +91829,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/gpu-cache/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91748,7 +91911,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/hover-card/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -91916,7 +92079,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/keyboard-shortcuts/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -92035,7 +92198,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/legal-layout/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -92113,7 +92276,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/legal-spellbook/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -92290,7 +92453,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/modals/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -92369,7 +92532,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/modular-upload/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -92690,7 +92853,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/nes-toast/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -92796,7 +92959,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/nier-showcase/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -92877,7 +93040,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/notifications/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -93041,7 +93204,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/phantom-code-lab/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -93119,7 +93282,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/prosecutor-dashboard/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -93282,7 +93445,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/rich-text-editor/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -93451,7 +93614,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/search-tools/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -93577,7 +93740,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/source-drawer/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -93701,7 +93864,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/stats-panel/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -93779,7 +93942,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/streaming/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -93968,7 +94131,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/svelte5-primitives/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -94046,7 +94209,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/synthesis-chat/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -94124,7 +94287,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/theory-board/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -94202,7 +94365,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/toc-reader/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -94302,7 +94465,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/ui-components/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -94467,7 +94630,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/webgpu-memory-palace/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -94549,7 +94712,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/webgpu-showcase/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -94629,7 +94792,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/yorha/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -94774,14 +94937,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/CaseTheoryConstructor.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/CaseTheoryConstructor.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -94800,7 +94964,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 758,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -94813,14 +94977,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/ContradictionReveal.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/ContradictionReveal.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -94835,7 +95000,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 126,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -94886,14 +95051,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/ActiveCasesWidget.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/dashboard/ActiveCasesWidget.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -94910,7 +95076,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 174,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -94923,14 +95089,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/EvidenceStats.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/dashboard/EvidenceStats.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -94947,7 +95114,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 168,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95007,13 +95174,14 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/dashboard/RecentActivity.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components"
+        "routes",
+        "(app)",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -95028,7 +95196,7 @@
       "isSvelteComp": false,
       "isTest": false,
       "lineCount": 1,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95041,14 +95209,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/SystemOverview.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/dashboard/SystemOverview.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95065,7 +95234,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 203,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95078,14 +95247,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/DetectiveEvidenceMap.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/DetectiveEvidenceMap.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95105,7 +95275,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 531,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95162,14 +95332,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/evidence/EvidenceComparisonOverlay.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/evidence/EvidenceComparisonOverlay.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -95184,7 +95355,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 73,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95305,14 +95476,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/EvidenceBoard.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/EvidenceBoard.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95332,7 +95504,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 336,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95383,14 +95555,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/PhoenixEventMonitor.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/PhoenixEventMonitor.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
+        "routes",
+        "(app)",
         "component",
+        "auth",
         "zod"
       ],
       "summary": "",
@@ -95406,7 +95579,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 209,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95419,14 +95592,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/PhoenixProsecutorDashboard.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
+        "routes",
+        "(app)",
         "component",
+        "auth",
         "zod"
       ],
       "summary": "",
@@ -95451,7 +95625,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 655,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95464,14 +95638,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/PoliceReportGenerator.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/PoliceReportGenerator.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -95488,7 +95663,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 323,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95545,14 +95720,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaCommandCenter.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaCommandCenter.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "Fetch cluster health metrics",
       "imports": [
@@ -95572,7 +95748,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 238,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95585,14 +95761,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDetectiveCommandCenter.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveCommandCenter.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95616,7 +95793,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 906,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95629,14 +95806,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDetectiveForm.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveForm.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -95651,7 +95829,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 281,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95664,14 +95842,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDetectiveModal.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveModal.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95688,7 +95867,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 136,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95701,14 +95880,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDetectiveNotification.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveNotification.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -95723,7 +95903,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 152,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95736,14 +95916,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaDialog.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaDialog.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95761,7 +95942,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 112,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95774,14 +95955,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaForm.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaForm.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -95798,7 +95980,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 214,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95811,14 +95993,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaModal.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaModal.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95839,7 +96022,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 448,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95852,14 +96035,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaTable.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaTable.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95879,7 +96063,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 241,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95892,14 +96076,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/YoRHaTerminal.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/YoRHaTerminal.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -95919,7 +96104,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 231,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95932,14 +96117,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/CanvasBoard.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/CanvasBoard.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -95957,7 +96143,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 497,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -95970,14 +96156,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/SystemStatus.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/SystemStatus.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -95992,7 +96179,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 132,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -96005,14 +96192,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/YoRHaCommandInterface.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/YoRHaCommandInterface.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -96031,7 +96219,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 600,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -96044,14 +96232,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/YoRHaDataViz.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/YoRHaDataViz.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -96068,7 +96257,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 658,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -96081,14 +96270,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/YoRHaSystemStatus.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/YoRHaSystemStatus.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [],
@@ -96103,7 +96293,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 140,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -96116,14 +96306,15 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/_simulations/YoRHaTerminal.svelte",
+      "rel": "src/routes/(app)/demos/yorha/components/_simulations/YoRHaTerminal.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
         "src",
-        "lib",
-        "components",
-        "component"
+        "routes",
+        "(app)",
+        "component",
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -96143,7 +96334,7 @@
       "isSvelteComp": true,
       "isTest": false,
       "lineCount": 244,
-      "hasAuth": false,
+      "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -96197,7 +96388,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/yorha-assistant/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -96278,7 +96469,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/demos/yorha-icons/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -96359,7 +96550,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/demos/yorha-terminal/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -96704,7 +96895,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/evidence/analyze/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -96738,12 +96929,10 @@
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
-      "hasPairedTest": false,
+      "hasPairedTest": true,
       "fanIn": 0,
-      "routeParams": [
-        "id"
-      ],
-      "routeDepth": 6,
+      "routeParams": [],
+      "routeDepth": 5,
       "localhostRefs": [],
       "localhostBreaks": false
     },
@@ -96794,7 +96983,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/cases/[id]/ai/+page.server.ts",
+      "rel": "src/routes/(app)/evidence/hash/+page.server.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -96830,10 +97019,8 @@
       "runeInTs": false,
       "hasPairedTest": false,
       "fanIn": 0,
-      "routeParams": [
-        "id"
-      ],
-      "routeDepth": 6,
+      "routeParams": [],
+      "routeDepth": 5,
       "localhostRefs": [],
       "localhostBreaks": false
     },
@@ -97695,7 +97882,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
+      "rel": "src/routes/(app)/global-search/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -97857,7 +98044,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/citations/+layout.svelte",
+      "rel": "src/routes/(app)/legal-corpus/+layout.svelte",
       "ext": ".svelte",
       "tags": [
         "svelte",
@@ -99149,7 +99336,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/codebase-viewer/+page.ts",
+      "rel": "src/routes/(app)/persons-of-interest/[id]/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -99934,7 +100121,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/routes/(app)/admin/library/+page.ts",
+      "rel": "src/routes/(app)/terminal/+page.ts",
       "ext": ".ts",
       "tags": [
         "ts",
@@ -116172,7 +116359,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 141,
+      "lineCount": 151,
       "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -122638,7 +122825,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 179,
+      "lineCount": 180,
       "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -128215,6 +128402,97 @@
       "localhostBreaks": false
     },
     {
+      "rel": "src/routes/api/rag/hyperrag/+server.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod"
+      ],
+      "summary": "",
+      "imports": [
+        "@sveltejs/kit",
+        "./$types",
+        "zod",
+        "$lib/server/env.server.js",
+        "$lib/server/grpc/embedding-client.js",
+        "$lib/server/vector/qdrant-manager.js",
+        "$lib/server/redis.js",
+        "$lib/server/wiki/wiki-couchdb-client.js"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [
+        "POST"
+      ],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 318,
+      "hasAuth": true,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 5,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/routes/api/rag/hyperrag/server.route.test.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [
+        "./+server.js",
+        "./+server.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 136,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/routes/api/rag/process/+server.ts",
       "ext": ".ts",
       "tags": [
@@ -131128,7 +131406,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 2604,
+      "lineCount": 2611,
       "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -131501,7 +131779,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 53,
+      "lineCount": 55,
       "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -135868,13 +136146,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "ext": ".svelte",
+      "rel": "src/shims/camelcase-compat.mjs",
+      "ext": ".mjs",
       "tags": [
-        "svelte",
+        "mjs",
         "src",
-        "lib",
-        "components"
+        "shims",
+        "camelcase-compat.mjs"
       ],
       "summary": "",
       "imports": [],
@@ -140297,7 +140575,7 @@
       "localhostBreaks": false
     },
     {
-      "rel": "scripts/comfyui/workflows/dev-workflow-api.json",
+      "rel": "scripts/comfyui/workflow_api.example.json",
       "ext": ".json",
       "tags": [
         "json"
@@ -141712,19 +141990,17 @@
       "imports": [
         "fs/promises",
         "path",
-        "glob",
         "child_process",
+        "readline",
         "@babel/parser",
         "@babel/traverse",
         "xml2js",
-        "@grpc/proto-loader",
         "drizzle-orm"
       ],
       "exports": [],
       "dynImports": [
         "../src/lib/server/db/client.js",
-        "../src/lib/server/db/schema/graph-mappings.js",
-        "../src/lib/server/types/graph-mapping.js"
+        "../src/lib/server/db/schema/graph-mappings.js"
       ],
       "reExports": [],
       "routeHandlers": [],
@@ -141736,7 +142012,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 319,
+      "lineCount": 396,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -143483,7 +143759,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 198,
+      "lineCount": 210,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -143841,7 +144117,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 542,
+      "lineCount": 543,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -143880,7 +144156,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 324,
+      "lineCount": 327,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -144236,6 +144512,48 @@
       "isSvelteComp": false,
       "isTest": false,
       "lineCount": 74,
+      "hasAuth": false,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "scripts/hyperrag-dense-multiquery.mjs",
+      "ext": ".mjs",
+      "tags": [
+        "mjs",
+        "scripts",
+        "hyperrag-dense-multiquery.mjs",
+        "zod"
+      ],
+      "summary": "scripts/hyperrag-dense-multiquery.mjs",
+      "imports": [
+        "node:module",
+        "node:path",
+        "node:url",
+        "node:fs",
+        "node:path"
+      ],
+      "exports": [],
+      "dynImports": [
+        "ioredis"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 448,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -170028,33 +170346,41 @@
       "tags": [
         "mjs",
         "scripts",
-        "smoke-knowledge-phase38.mjs"
+        "smoke-knowledge-phase38.mjs",
+        "db-schema",
+        "zod"
       ],
       "summary": "",
       "imports": [
-        "../src/lib/server/features/feature-map-compiler.js",
+        "node:child_process",
         "../src/lib/server/kb/wiki-logic.js",
         "../src/lib/server/kb/pentagon-search.js",
+        "../src/lib/server/vector/qdrant-manager.js",
         "../src/lib/server/redis.js",
         "../src/lib/server/db/client.js",
         "../src/lib/server/db/schema/graph-mappings.js",
+        "../src/lib/server/db/schema/features.js",
         "../src/lib/server/neo4j-driver.js",
         "node:fs",
-        "node:path"
+        "node:path",
+        "node:url",
+        "drizzle-orm"
       ],
       "exports": [],
       "dynImports": [],
       "reExports": [],
       "routeHandlers": [],
-      "drizzleRefs": [],
+      "drizzleRefs": [
+        "drizzle"
+      ],
       "todos": [],
       "components": [],
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 146,
+      "lineCount": 213,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
@@ -170668,7 +170994,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 413,
+      "lineCount": 448,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -170684,7 +171010,8 @@
         "http://127.0.0.1:8100",
         "http://127.0.0.1:8788",
         "http://127.0.0.1:8090",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8099"
       ],
       "localhostBreaks": false
     },
@@ -175986,6 +176313,39 @@
       "lineCount": 44,
       "hasAuth": false,
       "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "scripts/_patch-semantic-cluster.cjs",
+      "ext": ".cjs",
+      "tags": [
+        "cjs",
+        "scripts",
+        "_patch-semantic-cluster.cjs"
+      ],
+      "summary": "",
+      "imports": [],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 39,
+      "hasAuth": false,
+      "hasZod": false,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "runeInTs": false,
@@ -183913,13 +184273,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "ext": ".svelte",
+      "rel": "tests/is-ready.test.mjs",
+      "ext": ".mjs",
       "tags": [
-        "svelte",
-        "src",
-        "lib",
-        "components"
+        "mjs",
+        "tests",
+        "is-ready.test.mjs",
+        "test"
       ],
       "summary": "",
       "imports": [],
@@ -183932,7 +184292,7 @@
       "components": [],
       "isRoute": false,
       "isSvelteComp": false,
-      "isTest": false,
+      "isTest": true,
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
@@ -214097,13 +214457,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "ext": ".svelte",
+      "rel": "tests/routes.spec.ts",
+      "ext": ".ts",
       "tags": [
-        "svelte",
-        "src",
-        "lib",
-        "components"
+        "ts",
+        "tests",
+        "routes.spec.ts",
+        "test"
       ],
       "summary": "",
       "imports": [],
@@ -214116,7 +214476,7 @@
       "components": [],
       "isRoute": false,
       "isSvelteComp": false,
-      "isTest": false,
+      "isTest": true,
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
@@ -214450,13 +214810,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "ext": ".svelte",
+      "rel": "tests/setup-db.ts",
+      "ext": ".ts",
       "tags": [
-        "svelte",
-        "src",
-        "lib",
-        "components"
+        "ts",
+        "tests",
+        "setup-db.ts",
+        "test"
       ],
       "summary": "",
       "imports": [],
@@ -214469,7 +214829,7 @@
       "components": [],
       "isRoute": false,
       "isSvelteComp": false,
-      "isTest": false,
+      "isTest": true,
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
@@ -215493,6 +215853,46 @@
       "localhostBreaks": false
     },
     {
+      "rel": "tests/unit/context-cache-planner.test.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "unit",
+        "context-cache-planner.test.ts",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [
+        "$lib/server/ace/context-cache-planner.js",
+        "$lib/server/ace/context-cache-planner.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 114,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "tests/unit/ensure-dev-runtime.test.ts",
       "ext": ".ts",
       "tags": [
@@ -215519,6 +215919,44 @@
       "isSvelteComp": false,
       "isTest": true,
       "lineCount": 19,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/unit/llm-context-cache.test.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "unit",
+        "llm-context-cache.test.ts",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest",
+        "$lib/server/ace/llm-context-cache.js"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 99,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -215608,13 +216046,13 @@
       "localhostBreaks": false
     },
     {
-      "rel": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
-      "ext": ".svelte",
+      "rel": "tests/uploadMachine.test.ts",
+      "ext": ".ts",
       "tags": [
-        "svelte",
-        "src",
-        "lib",
-        "components"
+        "ts",
+        "tests",
+        "uploadMachine.test.ts",
+        "test"
       ],
       "summary": "",
       "imports": [],
@@ -215627,7 +216065,7 @@
       "components": [],
       "isRoute": false,
       "isSvelteComp": false,
-      "isTest": false,
+      "isTest": true,
       "lineCount": 1,
       "hasAuth": false,
       "hasZod": false,
@@ -216624,17 +217062,17 @@
       "fileCount": 56,
       "todos": 6,
       "routes": 0,
-      "components": 612,
+      "components": 584,
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 47,
-      "lines": 174412,
+      "zod": 45,
+      "lines": 165472,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 1,
-      "tryCatch": 233,
+      "tryCatch": 218,
       "dynImports": 12,
       "fanInTotal": 0
     },
@@ -216783,7 +217221,7 @@
     {
       "dir": "src/lib/components/yorha",
       "score": 83,
-      "summary": "shared library directory with 72 files, 0 API handlers, 1 TODOs",
+      "summary": "shared library directory with 39 files, 0 API handlers, 1 TODOs",
       "tagList": [
         "src",
         "lib",
@@ -216792,20 +217230,20 @@
         "has-todo",
         "zod"
       ],
-      "fileCount": 72,
+      "fileCount": 39,
       "todos": 1,
       "routes": 0,
-      "components": 65,
+      "components": 38,
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 5,
-      "lines": 20756,
+      "zod": 3,
+      "lines": 11964,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 0,
-      "tryCatch": 35,
+      "tryCatch": 20,
       "dynImports": 1,
       "fanInTotal": 0
     },
@@ -217703,7 +218141,7 @@
     {
       "dir": "src/routes/(app)/demos",
       "score": 88,
-      "summary": "route handler directory with 104 files, 0 API handlers, 3 Drizzle refs, 1 TODOs",
+      "summary": "route handler directory with 186 files, 0 API handlers, 3 Drizzle refs, 1 TODOs",
       "tagList": [
         "src",
         "routes",
@@ -217712,20 +218150,20 @@
         "component",
         "auth"
       ],
-      "fileCount": 104,
+      "fileCount": 186,
       "todos": 1,
       "routes": 89,
-      "components": 95,
+      "components": 122,
       "db": 3,
       "apis": 0,
-      "auth": 104,
-      "zod": 5,
-      "lines": 19979,
+      "auth": 186,
+      "zod": 7,
+      "lines": 28874,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 5,
       "localhostRefs": 2,
-      "tryCatch": 21,
+      "tryCatch": 36,
       "dynImports": 4,
       "fanInTotal": 0
     },
@@ -218906,22 +219344,22 @@
     {
       "dir": "src/lib/components/phase78",
       "score": 90,
-      "summary": "shared library directory with 4 files, 0 API handlers",
+      "summary": "shared library directory with 3 files, 0 API handlers",
       "tagList": [
         "src",
         "lib",
         "components",
         "component"
       ],
-      "fileCount": 4,
+      "fileCount": 3,
       "todos": 0,
       "routes": 0,
-      "components": 4,
+      "components": 3,
       "db": 0,
       "apis": 0,
       "auth": 0,
       "zod": 0,
-      "lines": 776,
+      "lines": 628,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -220024,6 +220462,32 @@
       "noTest": 0,
       "localhostRefs": 0,
       "tryCatch": 0,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/server/embeddings",
+      "score": 90,
+      "summary": "server module directory with 1 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "server"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 70,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 1,
       "dynImports": 0,
       "fanInTotal": 0
     },
@@ -221514,7 +221978,7 @@
     {
       "dir": "src/routes/(admin)/error-brain",
       "score": 90,
-      "summary": "route handler directory with 2 files, 0 API handlers",
+      "summary": "route handler directory with 3 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
@@ -221522,15 +221986,15 @@
         "component",
         "auth"
       ],
-      "fileCount": 2,
+      "fileCount": 3,
       "todos": 0,
       "routes": 0,
-      "components": 2,
+      "components": 3,
       "db": 0,
       "apis": 0,
-      "auth": 2,
+      "auth": 3,
       "zod": 0,
-      "lines": 484,
+      "lines": 632,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -221542,7 +222006,7 @@
     {
       "dir": "src/routes/(analysis)",
       "score": 90,
-      "summary": "route handler directory with 4 files, 0 API handlers",
+      "summary": "route handler directory with 2 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
@@ -221551,27 +222015,27 @@
         "route",
         "component"
       ],
-      "fileCount": 4,
+      "fileCount": 2,
       "todos": 0,
-      "routes": 11,
-      "components": 5,
+      "routes": 7,
+      "components": 4,
       "db": 0,
       "apis": 0,
-      "auth": 8,
+      "auth": 4,
       "zod": 0,
-      "lines": 3236,
+      "lines": 2990,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 6,
+      "noTest": 3,
       "localhostRefs": 0,
-      "tryCatch": 9,
-      "dynImports": 2,
+      "tryCatch": 6,
+      "dynImports": 1,
       "fanInTotal": 0
     },
     {
       "dir": "src/routes/(analysis)/audio-analysis",
       "score": 90,
-      "summary": "route handler directory with 3 files, 0 API handlers",
+      "summary": "route handler directory with 2 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
@@ -221580,27 +222044,27 @@
         "auth",
         "component"
       ],
-      "fileCount": 3,
+      "fileCount": 2,
       "todos": 0,
-      "routes": 3,
+      "routes": 2,
       "components": 1,
       "db": 0,
       "apis": 0,
-      "auth": 2,
+      "auth": 1,
       "zod": 0,
-      "lines": 985,
+      "lines": 929,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 2,
+      "noTest": 1,
       "localhostRefs": 0,
-      "tryCatch": 3,
+      "tryCatch": 2,
       "dynImports": 0,
       "fanInTotal": 0
     },
     {
       "dir": "src/routes/(analysis)/document-analysis",
       "score": 90,
-      "summary": "route handler directory with 3 files, 0 API handlers",
+      "summary": "route handler directory with 2 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
@@ -221609,27 +222073,27 @@
         "auth",
         "component"
       ],
-      "fileCount": 3,
+      "fileCount": 2,
       "todos": 0,
-      "routes": 3,
+      "routes": 2,
       "components": 1,
       "db": 0,
       "apis": 0,
-      "auth": 2,
+      "auth": 1,
       "zod": 0,
-      "lines": 990,
+      "lines": 935,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 2,
+      "noTest": 1,
       "localhostRefs": 0,
-      "tryCatch": 3,
+      "tryCatch": 2,
       "dynImports": 0,
       "fanInTotal": 0
     },
     {
       "dir": "src/routes/(analysis)/video-analysis",
       "score": 90,
-      "summary": "route handler directory with 3 files, 0 API handlers",
+      "summary": "route handler directory with 2 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
@@ -221638,104 +222102,136 @@
         "auth",
         "component"
       ],
-      "fileCount": 3,
+      "fileCount": 2,
       "todos": 0,
-      "routes": 3,
+      "routes": 2,
       "components": 1,
       "db": 0,
       "apis": 0,
-      "auth": 2,
+      "auth": 1,
       "zod": 0,
-      "lines": 1103,
+      "lines": 1047,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 2,
+      "noTest": 1,
       "localhostRefs": 0,
-      "tryCatch": 3,
+      "tryCatch": 2,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/(analysis)@",
+      "score": 90,
+      "summary": "route handler directory with 2 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "(analysis)@",
+        "auth",
+        "route",
+        "component"
+      ],
+      "fileCount": 2,
+      "todos": 0,
+      "routes": 7,
+      "components": 4,
+      "db": 0,
+      "apis": 0,
+      "auth": 4,
+      "zod": 0,
+      "lines": 2717,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 3,
+      "localhostRefs": 0,
+      "tryCatch": 6,
+      "dynImports": 1,
       "fanInTotal": 0
     },
     {
       "dir": "src/routes/(analysis)@/audio-analysis",
       "score": 90,
-      "summary": "route handler directory with 1 files, 0 API handlers",
+      "summary": "route handler directory with 2 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
         "(analysis)@",
         "route",
+        "auth",
         "component"
       ],
-      "fileCount": 1,
+      "fileCount": 2,
       "todos": 0,
-      "routes": 1,
+      "routes": 2,
       "components": 1,
       "db": 0,
       "apis": 0,
-      "auth": 0,
+      "auth": 1,
       "zod": 0,
-      "lines": 782,
+      "lines": 838,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 0,
+      "noTest": 1,
       "localhostRefs": 0,
-      "tryCatch": 1,
+      "tryCatch": 2,
       "dynImports": 0,
       "fanInTotal": 0
     },
     {
       "dir": "src/routes/(analysis)@/document-analysis",
       "score": 90,
-      "summary": "route handler directory with 1 files, 0 API handlers",
+      "summary": "route handler directory with 2 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
         "(analysis)@",
         "route",
+        "auth",
         "component"
       ],
-      "fileCount": 1,
+      "fileCount": 2,
       "todos": 0,
-      "routes": 1,
+      "routes": 2,
       "components": 1,
       "db": 0,
       "apis": 0,
-      "auth": 0,
+      "auth": 1,
       "zod": 0,
-      "lines": 746,
+      "lines": 801,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 0,
+      "noTest": 1,
       "localhostRefs": 0,
-      "tryCatch": 1,
+      "tryCatch": 2,
       "dynImports": 0,
       "fanInTotal": 0
     },
     {
       "dir": "src/routes/(analysis)@/video-analysis",
       "score": 90,
-      "summary": "route handler directory with 1 files, 0 API handlers",
+      "summary": "route handler directory with 2 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
         "(analysis)@",
         "route",
+        "auth",
         "component"
       ],
-      "fileCount": 1,
+      "fileCount": 2,
       "todos": 0,
-      "routes": 1,
+      "routes": 2,
       "components": 1,
       "db": 0,
       "apis": 0,
-      "auth": 0,
+      "auth": 1,
       "zod": 0,
-      "lines": 943,
+      "lines": 999,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 0,
+      "noTest": 1,
       "localhostRefs": 0,
-      "tryCatch": 1,
+      "tryCatch": 2,
       "dynImports": 0,
       "fanInTotal": 0
     },
@@ -221873,7 +222369,7 @@
       "apis": 0,
       "auth": 4,
       "zod": 1,
-      "lines": 873,
+      "lines": 876,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 1,
@@ -221885,7 +222381,7 @@
     {
       "dir": "src/routes/(app)/citations",
       "score": 90,
-      "summary": "route handler directory with 10 files, 0 API handlers",
+      "summary": "route handler directory with 9 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
@@ -221894,15 +222390,15 @@
         "component",
         "auth"
       ],
-      "fileCount": 10,
+      "fileCount": 9,
       "todos": 0,
-      "routes": 9,
-      "components": 6,
+      "routes": 8,
+      "components": 5,
       "db": 0,
       "apis": 0,
-      "auth": 10,
+      "auth": 9,
       "zod": 0,
-      "lines": 2393,
+      "lines": 2383,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 3,
@@ -222058,7 +222554,7 @@
     {
       "dir": "src/routes/(app)/global-search",
       "score": 90,
-      "summary": "route handler directory with 1 files, 0 API handlers",
+      "summary": "route handler directory with 2 files, 0 API handlers",
       "tagList": [
         "src",
         "routes",
@@ -222067,15 +222563,15 @@
         "component",
         "auth"
       ],
-      "fileCount": 1,
+      "fileCount": 2,
       "todos": 0,
       "routes": 1,
       "components": 1,
       "db": 0,
       "apis": 0,
-      "auth": 1,
+      "auth": 2,
       "zod": 0,
-      "lines": 2392,
+      "lines": 2394,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -222997,7 +223493,7 @@
       "apis": 1,
       "auth": 1,
       "zod": 1,
-      "lines": 179,
+      "lines": 180,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -223848,6 +224344,33 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/shims",
+      "score": 90,
+      "summary": "module directory with 1 files, 0 API handlers",
+      "tagList": [
+        "mjs",
+        "src",
+        "shims",
+        "camelcase-compat.mjs"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 1,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 0,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/stores",
       "score": 90,
       "summary": "module directory with 1 files, 0 API handlers",
@@ -224071,7 +224594,7 @@
     {
       "dir": "scripts/comfyui",
       "score": 90,
-      "summary": "module directory with 2 files, 0 API handlers",
+      "summary": "module directory with 3 files, 0 API handlers",
       "tagList": [
         "mjs",
         "scripts",
@@ -224080,7 +224603,7 @@
         "submit-workflow-smoke.mjs",
         "zod"
       ],
-      "fileCount": 2,
+      "fileCount": 3,
       "todos": 0,
       "routes": 0,
       "components": 0,
@@ -224100,11 +224623,11 @@
     {
       "dir": "scripts/comfyui/workflows",
       "score": 90,
-      "summary": "module directory with 2 files, 0 API handlers",
+      "summary": "module directory with 1 files, 0 API handlers",
       "tagList": [
         "json"
       ],
-      "fileCount": 2,
+      "fileCount": 1,
       "todos": 0,
       "routes": 0,
       "components": 0,
@@ -224112,7 +224635,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 0,
-      "lines": 84,
+      "lines": 42,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -224897,7 +225420,7 @@
     {
       "dir": "tests/unit",
       "score": 90,
-      "summary": "module directory with 6 files, 0 API handlers",
+      "summary": "module directory with 8 files, 0 API handlers",
       "tagList": [
         "tests",
         "unit",
@@ -224906,7 +225429,7 @@
         "test",
         "board-persistence-server.test.ts"
       ],
-      "fileCount": 6,
+      "fileCount": 8,
       "todos": 0,
       "routes": 0,
       "components": 0,
@@ -224914,13 +225437,13 @@
       "apis": 0,
       "auth": 0,
       "zod": 3,
-      "lines": 1248,
+      "lines": 1461,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 0,
       "tryCatch": 0,
-      "dynImports": 3,
+      "dynImports": 4,
       "fanInTotal": 0
     },
     {
@@ -225115,7 +225638,7 @@
       "apis": 2,
       "auth": 2,
       "zod": 1,
-      "lines": 102,
+      "lines": 104,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -225289,7 +225812,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 1,
-      "lines": 449,
+      "lines": 484,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -225736,7 +226259,7 @@
     {
       "dir": "src/routes/api/rag",
       "score": 99,
-      "summary": "route handler directory with 11 files, 10 API handlers, 5 Drizzle refs",
+      "summary": "route handler directory with 13 files, 11 API handlers, 5 Drizzle refs",
       "tagList": [
         "src",
         "routes",
@@ -225745,21 +226268,21 @@
         "api-handler",
         "db-schema"
       ],
-      "fileCount": 11,
+      "fileCount": 13,
       "todos": 0,
-      "routes": 10,
+      "routes": 11,
       "components": 0,
       "db": 5,
-      "apis": 10,
-      "auth": 10,
-      "zod": 9,
-      "lines": 2493,
+      "apis": 11,
+      "auth": 11,
+      "zod": 10,
+      "lines": 2947,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 0,
+      "noTest": 1,
       "localhostRefs": 0,
-      "tryCatch": 10,
-      "dynImports": 9,
+      "tryCatch": 11,
+      "dynImports": 10,
       "fanInTotal": 0
     },
     {
@@ -225794,7 +226317,7 @@
     {
       "dir": "src/lib",
       "score": 100,
-      "summary": "module directory with 11 files, 3 API handlers, 206 Drizzle refs, 9 TODOs",
+      "summary": "module directory with 11 files, 3 API handlers, 208 Drizzle refs, 9 TODOs",
       "tagList": [
         "src",
         "lib",
@@ -225806,17 +226329,17 @@
       "fileCount": 11,
       "todos": 9,
       "routes": 0,
-      "components": 634,
-      "db": 206,
+      "components": 606,
+      "db": 208,
       "apis": 3,
       "auth": 13,
       "zod": 305,
-      "lines": 428905,
+      "lines": 421188,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 3,
-      "tryCatch": 851,
+      "tryCatch": 839,
       "dynImports": 189,
       "fanInTotal": 0
     },
@@ -225960,7 +226483,7 @@
     {
       "dir": "src/lib/server",
       "score": 100,
-      "summary": "server module directory with 63 files, 3 API handlers, 189 Drizzle refs",
+      "summary": "server module directory with 63 files, 3 API handlers, 191 Drizzle refs",
       "tagList": [
         "src",
         "lib",
@@ -225973,23 +226496,23 @@
       "todos": 0,
       "routes": 0,
       "components": 0,
-      "db": 189,
+      "db": 191,
       "apis": 3,
       "auth": 10,
-      "zod": 214,
-      "lines": 195527,
+      "zod": 216,
+      "lines": 196750,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 0,
-      "tryCatch": 501,
+      "tryCatch": 504,
       "dynImports": 160,
       "fanInTotal": 0
     },
     {
       "dir": "src/lib/server/ace",
       "score": 100,
-      "summary": "server module directory with 38 files, 0 API handlers, 6 Drizzle refs",
+      "summary": "server module directory with 41 files, 0 API handlers, 8 Drizzle refs",
       "tagList": [
         "src",
         "lib",
@@ -225998,20 +226521,20 @@
         "zod",
         "test"
       ],
-      "fileCount": 38,
+      "fileCount": 41,
       "todos": 0,
       "routes": 0,
       "components": 0,
-      "db": 6,
+      "db": 8,
       "apis": 0,
       "auth": 0,
-      "zod": 18,
-      "lines": 14218,
+      "zod": 20,
+      "lines": 15335,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 0,
-      "tryCatch": 27,
+      "tryCatch": 30,
       "dynImports": 7,
       "fanInTotal": 0
     },
@@ -226090,7 +226613,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 7,
-      "lines": 3931,
+      "lines": 3956,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -226147,7 +226670,7 @@
       "apis": 0,
       "auth": 3,
       "zod": 23,
-      "lines": 17885,
+      "lines": 17902,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -226344,7 +226867,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 4,
-      "lines": 18876,
+      "lines": 18908,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -226356,7 +226879,7 @@
     {
       "dir": "src/lib/server/embedding",
       "score": 100,
-      "summary": "server module directory with 9 files, 0 API handlers, 1 Drizzle refs",
+      "summary": "server module directory with 8 files, 0 API handlers, 1 Drizzle refs",
       "tagList": [
         "src",
         "lib",
@@ -226364,7 +226887,7 @@
         "db-schema",
         "zod"
       ],
-      "fileCount": 9,
+      "fileCount": 8,
       "todos": 0,
       "routes": 0,
       "components": 0,
@@ -226372,12 +226895,12 @@
       "apis": 0,
       "auth": 0,
       "zod": 1,
-      "lines": 1122,
+      "lines": 1052,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 0,
-      "tryCatch": 5,
+      "tryCatch": 4,
       "dynImports": 0,
       "fanInTotal": 0
     },
@@ -226485,7 +227008,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 1,
-      "lines": 926,
+      "lines": 922,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -226600,7 +227123,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 5,
-      "lines": 1569,
+      "lines": 1591,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -226988,7 +227511,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 1,
-      "lines": 2153,
+      "lines": 2160,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -227113,7 +227636,7 @@
     {
       "dir": "src/routes",
       "score": 100,
-      "summary": "module directory with 6 files, 680 API handlers, 260 Drizzle refs, 2 TODOs",
+      "summary": "module directory with 6 files, 681 API handlers, 260 Drizzle refs, 2 TODOs",
       "tagList": [
         "src",
         "routes",
@@ -227124,19 +227647,19 @@
       ],
       "fileCount": 6,
       "todos": 2,
-      "routes": 1011,
-      "components": 250,
+      "routes": 1012,
+      "components": 278,
       "db": 260,
-      "apis": 680,
-      "auth": 1106,
-      "zod": 565,
-      "lines": 221517,
+      "apis": 681,
+      "auth": 1136,
+      "zod": 568,
+      "lines": 230954,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 70,
+      "noTest": 66,
       "localhostRefs": 6,
-      "tryCatch": 812,
-      "dynImports": 185,
+      "tryCatch": 828,
+      "dynImports": 186,
       "fanInTotal": 0
     },
     {
@@ -227154,17 +227677,17 @@
       "fileCount": 2,
       "todos": 1,
       "routes": 305,
-      "components": 227,
+      "components": 254,
       "db": 32,
       "apis": 4,
-      "auth": 424,
-      "zod": 44,
-      "lines": 108036,
+      "auth": 452,
+      "zod": 46,
+      "lines": 116851,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 61,
+      "noTest": 56,
       "localhostRefs": 4,
-      "tryCatch": 177,
+      "tryCatch": 192,
       "dynImports": 22,
       "fanInTotal": 0
     },
@@ -227229,7 +227752,7 @@
     {
       "dir": "src/routes/(app)/admin",
       "score": 100,
-      "summary": "route handler directory with 140 files, 3 API handlers, 3 Drizzle refs",
+      "summary": "route handler directory with 82 files, 3 API handlers, 3 Drizzle refs",
       "tagList": [
         "src",
         "routes",
@@ -227238,18 +227761,18 @@
         "component",
         "auth"
       ],
-      "fileCount": 140,
+      "fileCount": 82,
       "todos": 0,
       "routes": 66,
       "components": 39,
       "db": 3,
       "apis": 3,
-      "auth": 140,
+      "auth": 82,
       "zod": 15,
-      "lines": 28746,
+      "lines": 28654,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 16,
+      "noTest": 15,
       "localhostRefs": 1,
       "tryCatch": 45,
       "dynImports": 8,
@@ -227258,7 +227781,7 @@
     {
       "dir": "src/routes/(app)/analysis-center",
       "score": 100,
-      "summary": "route handler directory with 4 files, 0 API handlers, 1 Drizzle refs",
+      "summary": "route handler directory with 5 files, 0 API handlers, 1 Drizzle refs",
       "tagList": [
         "src",
         "routes",
@@ -227267,15 +227790,15 @@
         "component",
         "auth"
       ],
-      "fileCount": 4,
+      "fileCount": 5,
       "todos": 0,
       "routes": 3,
       "components": 2,
       "db": 1,
       "apis": 0,
-      "auth": 4,
+      "auth": 5,
       "zod": 2,
-      "lines": 1576,
+      "lines": 1578,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 1,
@@ -227287,7 +227810,7 @@
     {
       "dir": "src/routes/(app)/cases",
       "score": 100,
-      "summary": "route handler directory with 39 files, 0 API handlers, 9 Drizzle refs",
+      "summary": "route handler directory with 37 files, 0 API handlers, 9 Drizzle refs",
       "tagList": [
         "src",
         "routes",
@@ -227296,18 +227819,18 @@
         "db-schema",
         "auth"
       ],
-      "fileCount": 39,
+      "fileCount": 37,
       "todos": 0,
-      "routes": 29,
+      "routes": 27,
       "components": 14,
       "db": 9,
       "apis": 0,
-      "auth": 39,
+      "auth": 37,
       "zod": 10,
-      "lines": 10602,
+      "lines": 10574,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 9,
+      "noTest": 4,
       "localhostRefs": 0,
       "tryCatch": 19,
       "dynImports": 4,
@@ -227374,7 +227897,7 @@
     {
       "dir": "src/routes/(app)/evidence",
       "score": 100,
-      "summary": "route handler directory with 17 files, 1 API handlers, 4 Drizzle refs",
+      "summary": "route handler directory with 19 files, 1 API handlers, 4 Drizzle refs",
       "tagList": [
         "src",
         "routes",
@@ -227383,18 +227906,18 @@
         "component",
         "auth"
       ],
-      "fileCount": 17,
+      "fileCount": 19,
       "todos": 0,
-      "routes": 14,
+      "routes": 16,
       "components": 8,
       "db": 4,
       "apis": 1,
-      "auth": 17,
+      "auth": 19,
       "zod": 5,
-      "lines": 3885,
+      "lines": 3913,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 1,
+      "noTest": 2,
       "localhostRefs": 0,
       "tryCatch": 12,
       "dynImports": 1,
@@ -227432,24 +227955,24 @@
     {
       "dir": "src/routes/(app)/legal-corpus",
       "score": 100,
-      "summary": "route handler directory with 6 files, 0 API handlers, 2 Drizzle refs",
+      "summary": "route handler directory with 7 files, 0 API handlers, 2 Drizzle refs",
       "tagList": [
         "src",
         "routes",
         "(app)",
         "route",
-        "db-schema",
+        "component",
         "auth"
       ],
-      "fileCount": 6,
+      "fileCount": 7,
       "todos": 0,
-      "routes": 4,
-      "components": 2,
+      "routes": 5,
+      "components": 3,
       "db": 2,
       "apis": 0,
-      "auth": 6,
+      "auth": 7,
       "zod": 0,
-      "lines": 3369,
+      "lines": 3379,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 2,
@@ -227461,7 +227984,7 @@
     {
       "dir": "src/routes/(app)/persons-of-interest",
       "score": 100,
-      "summary": "route handler directory with 7 files, 0 API handlers, 2 Drizzle refs",
+      "summary": "route handler directory with 8 files, 0 API handlers, 2 Drizzle refs",
       "tagList": [
         "src",
         "routes",
@@ -227470,15 +227993,15 @@
         "db-schema",
         "auth"
       ],
-      "fileCount": 7,
+      "fileCount": 8,
       "todos": 0,
       "routes": 6,
       "components": 3,
       "db": 2,
       "apis": 0,
-      "auth": 7,
+      "auth": 8,
       "zod": 1,
-      "lines": 3090,
+      "lines": 3093,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 2,
@@ -227548,7 +228071,7 @@
     {
       "dir": "src/routes/(app)/terminal",
       "score": 100,
-      "summary": "route handler directory with 2 files, 0 API handlers, 1 Drizzle refs",
+      "summary": "route handler directory with 3 files, 0 API handlers, 1 Drizzle refs",
       "tagList": [
         "src",
         "routes",
@@ -227557,15 +228080,15 @@
         "db-schema",
         "auth"
       ],
-      "fileCount": 2,
+      "fileCount": 3,
       "todos": 0,
       "routes": 2,
       "components": 1,
       "db": 1,
       "apis": 0,
-      "auth": 2,
+      "auth": 3,
       "zod": 1,
-      "lines": 1121,
+      "lines": 1123,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 1,
@@ -227797,7 +228320,7 @@
       "apis": 1,
       "auth": 1,
       "zod": 1,
-      "lines": 141,
+      "lines": 151,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -228319,7 +228842,7 @@
       "apis": 2,
       "auth": 2,
       "zod": 2,
-      "lines": 2783,
+      "lines": 2790,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -228909,7 +229432,9 @@
       "src/lib/server/ace/ace-error-kag.ts",
       "src/lib/server/ace/codeintel-datastore.ts",
       "src/lib/server/ace/context-assembler.ts",
+      "src/lib/server/ace/context-cache-registry.ts",
       "src/lib/server/ace/kag-dag-runner.ts",
+      "src/lib/server/ace/llm-context-cache.ts",
       "src/lib/server/ace/retrieval-lanes.ts",
       "src/lib/server/ace/tag-sync.ts",
       "src/lib/server/adapters/service-integrations.ts",
@@ -228936,9 +229461,7 @@
       "src/lib/server/analysis/evidence-analysis-pipeline.ts",
       "src/lib/server/analytics/event-logger.ts",
       "src/lib/server/analytics/minified-research-cache.ts",
-      "src/lib/server/analytics/research-graph-rl.ts",
-      "src/lib/server/analytics/research-summaries-db.ts",
-      "src/lib/server/analytics/web-research-crawler.ts"
+      "src/lib/server/analytics/research-graph-rl.ts"
     ],
     "zod": [
       "src/global.d.ts",
@@ -229014,16 +229537,17 @@
       "src/lib/utils/security.ts",
       "src/lib/utils/telemetry.ts",
       "src/mcp/server.ts",
+      "src/routes/(admin)/error-brain/components/ErrorEventsList.svelte",
       "src/routes/(admin)/error-brain/components/ErrorModal.svelte",
       "src/routes/(admin)/error-brain/components/SuggestionsList.svelte",
       "src/routes/(analysis)/+layout.server.ts",
       "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
-      "src/routes/(analysis)/+layout.server.ts",
-      "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
-      "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
-      "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/+layout.server.ts",
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(app)/+layout.server.ts",
       "src/routes/(app)/+layout.svelte",
       "src/routes/(app)/acp/+page.svelte",
@@ -229037,7 +229561,7 @@
       "src/routes/(app)/admin/ai-dashboard/lab/+page.svelte",
       "src/routes/(app)/admin/ai-dashboard/lab/+page.ts",
       "src/routes/(app)/admin/ai-dashboard/operator/+page.svelte",
-      "src/routes/(app)/admin/ai-dashboard/lab/+page.ts",
+      "src/routes/(app)/admin/ai-dashboard/operator/+page.ts",
       "src/routes/(app)/admin/all-routes/$types.d.ts",
       "src/routes/(app)/admin/all-routes/+page.server.ts",
       "src/routes/(app)/admin/all-routes/+page.svelte",
@@ -229047,8 +229571,7 @@
       "src/routes/(app)/admin/api-testing/ast-topology/+server.ts",
       "src/routes/(app)/admin/ast-topology/+page.server.ts",
       "src/routes/(app)/admin/ast-topology/+page.svelte",
-      "src/routes/(app)/admin/ast-topology/+page.ts",
-      "src/routes/(app)/admin/ai-dashboard/+page.server.ts"
+      "src/routes/(app)/admin/ast-topology/+page.ts"
     ],
     "lib": [
       "src/lib/ai/base64-fp32-quantizer.ts",
@@ -229392,7 +229915,7 @@
       "scripts/audit-schema-drift.snapshot.json",
       "scripts/batch-fix-results.json",
       "scripts/comfyui/workflows/dev-workflow-api.json",
-      "scripts/comfyui/workflows/dev-workflow-api.json",
+      "scripts/comfyui/workflow_api.example.json",
       "scripts/core-focus.json",
       "scripts/dry-run-analysis.json",
       "scripts/graphify-intelligence-manifest.json",
@@ -229560,6 +230083,8 @@
       "src/lib/server/ace/cluster-tags-cache.ts",
       "src/lib/server/ace/codeintel-datastore.ts",
       "src/lib/server/ace/context-assembler.ts",
+      "src/lib/server/ace/context-cache-planner.ts",
+      "src/lib/server/ace/context-cache-registry.ts",
       "src/lib/server/ace/error-fingerprint.ts",
       "src/lib/server/ace/error-kag-writer.ts",
       "src/lib/server/ace/gemma4-codeintel.ts",
@@ -229568,6 +230093,7 @@
       "src/lib/server/ace/kag-cluster-source.ts",
       "src/lib/server/ace/kag-dag-runner.test.ts",
       "src/lib/server/ace/kag-dag-runner.ts",
+      "src/lib/server/ace/llm-context-cache.ts",
       "src/lib/server/ace/mini-active-cache.ts",
       "src/lib/server/ace/multi-lane-retrieval.ts",
       "src/lib/server/ace/ngram-retrieval.ts",
@@ -229594,10 +230120,7 @@
       "src/lib/server/admin/ai-chat-service.ts",
       "src/lib/server/admin/browser-context-sanitizer.ts",
       "src/lib/server/admin/intent-orchestrator.ts",
-      "src/lib/server/admin/model-manager.ts",
-      "src/lib/server/admin/recommendation-engine.ts",
-      "src/lib/server/admin/skills-service.ts",
-      "src/lib/server/admin/subagent-orchestrator.ts"
+      "src/lib/server/admin/model-manager.ts"
     ],
     "test": [
       "src/lib/server/ace/kag-dag-runner.test.ts",
@@ -229612,6 +230135,7 @@
       "src/lib/server/retrieval/prefilter.test.ts",
       "src/routes/api/codebase-index/deep-research/server.route.test.ts",
       "src/routes/api/playwright/run-health-check/+server.ts",
+      "src/routes/api/rag/hyperrag/server.route.test.ts",
       "src/routes/api/rag/search/server.route.test.ts",
       "src/routes/api/test/cache-demo/+server.ts",
       "src/routes/api/test/cache-simple/+server.ts",
@@ -229648,8 +230172,7 @@
       "scripts/tests/smoke-graphify.mjs",
       "scripts/tests/smoke-kag-note-roundtrip.mjs",
       "scripts/tests/smoke-prior-answer-cache.mjs",
-      "scripts/tests/smoke-production-hardened.mjs",
-      "scripts/tests/smoke-rust-native.mjs"
+      "scripts/tests/smoke-production-hardened.mjs"
     ],
     "mjs": [
       "src/lib/server/gpu/mapreduce-runner.mjs",
@@ -229657,6 +230180,7 @@
       "src/lib/workers/ast-graph-worker.mjs",
       "src/lib/workers/compute-worker.mjs",
       "src/lib/workers/gpu-worker.mjs",
+      "src/shims/camelcase-compat.mjs",
       "scripts/activity/log-developer-activity.mjs",
       "scripts/agent-diagnose.mjs",
       "scripts/agentic-batch-fix.mjs",
@@ -229700,8 +230224,7 @@
       "scripts/backup-consolidation/tests/run-all-tests.mjs",
       "scripts/backup-consolidation/tests/scan-resilience.test.mjs",
       "scripts/backup-db-to-seaweedfs.mjs",
-      "scripts/batch-merger-fixer-v2.mjs",
-      "scripts/batch-upsert-codeintel.mjs"
+      "scripts/batch-merger-fixer-v2.mjs"
     ],
     "api-handler": [
       "src/lib/server/indexer/ast-chunker.ts",
@@ -229780,7 +230303,8 @@
       "src/lib/shims/os-browser-shim.js",
       "src/lib/shims/piper-expressions-shim.js",
       "src/lib/shims/svelte-env-shim.d.ts",
-      "src/lib/shims/worker-threads-browser-shim.js"
+      "src/lib/shims/worker-threads-browser-shim.js",
+      "src/shims/camelcase-compat.mjs"
     ],
     "stores": [
       "src/lib/stores/admin-chat-assistant.svelte.ts",
@@ -230073,6 +230597,7 @@
       "src/qdrant-client.ts"
     ],
     "routes": [
+      "src/routes/(admin)/error-brain/components/ErrorEventsList.svelte",
       "src/routes/(admin)/error-brain/components/ErrorModal.svelte",
       "src/routes/(admin)/error-brain/components/SuggestionsList.svelte",
       "src/routes/(analysis)/+layout.server.ts",
@@ -230083,13 +230608,13 @@
       "src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte",
       "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte",
-      "src/routes/(analysis)/+layout.server.ts",
-      "src/routes/(analysis)/+layout.svelte",
-      "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/+layout.server.ts",
+      "src/routes/(analysis)@/+layout.svelte",
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
-      "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
-      "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte",
       "src/routes/(app)/+layout.server.ts",
       "src/routes/(app)/+layout.svelte",
@@ -230104,7 +230629,7 @@
       "src/routes/(app)/admin/ai-dashboard/lab/+page.svelte",
       "src/routes/(app)/admin/ai-dashboard/lab/+page.ts",
       "src/routes/(app)/admin/ai-dashboard/operator/+page.svelte",
-      "src/routes/(app)/admin/ai-dashboard/lab/+page.ts",
+      "src/routes/(app)/admin/ai-dashboard/operator/+page.ts",
       "src/routes/(app)/admin/all-routes/$types.d.ts",
       "src/routes/(app)/admin/all-routes/+page.server.ts",
       "src/routes/(app)/admin/all-routes/+page.svelte",
@@ -230115,16 +230640,16 @@
       "src/routes/(app)/admin/ast-topology/+page.server.ts",
       "src/routes/(app)/admin/ast-topology/+page.svelte",
       "src/routes/(app)/admin/ast-topology/+page.ts",
-      "src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "src/routes/(app)/admin/cache/+page.server.ts",
       "src/routes/(app)/admin/cache/+page.svelte",
       "src/routes/(app)/admin/cache/+page.ts",
       "src/routes/(app)/admin/case-graph/+page.svelte",
       "src/routes/(app)/admin/chat-memory/+page.server.ts",
       "src/routes/(app)/admin/chat-memory/+page.svelte",
-      "src/routes/(app)/admin/codebase-graph/+page.svelte",
-      "src/routes/(app)/admin/codebase-index/+page.server.ts"
+      "src/routes/(app)/admin/codebase-graph/+page.svelte"
     ],
     "(admin)": [
+      "src/routes/(admin)/error-brain/components/ErrorEventsList.svelte",
       "src/routes/(admin)/error-brain/components/ErrorModal.svelte",
       "src/routes/(admin)/error-brain/components/SuggestionsList.svelte"
     ],
@@ -230136,12 +230661,7 @@
       "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte",
       "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
-      "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte",
-      "src/routes/(analysis)/+layout.server.ts",
-      "src/routes/(analysis)/+layout.svelte",
-      "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
-      "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
-      "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts"
+      "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte"
     ],
     "route": [
       "src/routes/(analysis)/+layout.svelte",
@@ -230151,12 +230671,12 @@
       "src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte",
       "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte",
-      "src/routes/(analysis)/+layout.svelte",
-      "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/+layout.svelte",
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
-      "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
-      "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte",
       "src/routes/(app)/+layout.svelte",
       "src/routes/(app)/acp/+page.svelte",
@@ -230175,7 +230695,7 @@
       "src/routes/(app)/admin/api-testing/ast-topology/+server.ts",
       "src/routes/(app)/admin/ast-topology/+page.server.ts",
       "src/routes/(app)/admin/ast-topology/+page.svelte",
-      "src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "src/routes/(app)/admin/cache/+page.server.ts",
       "src/routes/(app)/admin/cache/+page.svelte",
       "src/routes/(app)/admin/case-graph/+page.svelte",
       "src/routes/(app)/admin/chat-memory/+page.server.ts",
@@ -230196,8 +230716,13 @@
       "src/routes/(app)/admin/error-analysis/+page.server.ts"
     ],
     "(analysis)@": [
+      "src/routes/(analysis)@/+layout.server.ts",
+      "src/routes/(analysis)@/+layout.svelte",
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
+      "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
+      "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
       "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte"
     ],
     "(app)": [
@@ -230214,7 +230739,7 @@
       "src/routes/(app)/admin/ai-dashboard/lab/+page.svelte",
       "src/routes/(app)/admin/ai-dashboard/lab/+page.ts",
       "src/routes/(app)/admin/ai-dashboard/operator/+page.svelte",
-      "src/routes/(app)/admin/ai-dashboard/lab/+page.ts",
+      "src/routes/(app)/admin/ai-dashboard/operator/+page.ts",
       "src/routes/(app)/admin/all-routes/$types.d.ts",
       "src/routes/(app)/admin/all-routes/+page.server.ts",
       "src/routes/(app)/admin/all-routes/+page.svelte",
@@ -230225,7 +230750,7 @@
       "src/routes/(app)/admin/ast-topology/+page.server.ts",
       "src/routes/(app)/admin/ast-topology/+page.svelte",
       "src/routes/(app)/admin/ast-topology/+page.ts",
-      "src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "src/routes/(app)/admin/cache/+page.server.ts",
       "src/routes/(app)/admin/cache/+page.svelte",
       "src/routes/(app)/admin/cache/+page.ts",
       "src/routes/(app)/admin/case-graph/+page.svelte",
@@ -230360,6 +230885,9 @@
     ],
     "service-worker.ts": [
       "src/service-worker.ts"
+    ],
+    "camelcase-compat.mjs": [
+      "src/shims/camelcase-compat.mjs"
     ],
     "user.ts": [
       "src/stores/user.ts"
@@ -230641,7 +231169,8 @@
       "scripts/phase73-signature-fixer.cjs",
       "scripts/phase74-batch-import-fixer.cjs",
       "scripts/prepare-batch10.cjs",
-      "scripts/smart-file-fixer.cjs"
+      "scripts/smart-file-fixer.cjs",
+      "scripts/_patch-semantic-cluster.cjs"
     ],
     "analyze_errors_v3.cjs": [
       "scripts/analyze_errors_v3.cjs"
@@ -231155,6 +231684,9 @@
     ],
     "hypergraph-topology-writer.mjs": [
       "scripts/hypergraph-topology-writer.mjs"
+    ],
+    "hyperrag-dense-multiquery.mjs": [
+      "scripts/hyperrag-dense-multiquery.mjs"
     ],
     "index-agents-md.mjs": [
       "scripts/index-agents-md.mjs"
@@ -232217,6 +232749,9 @@
     "_deep-audit-rollup.mjs": [
       "scripts/_deep-audit-rollup.mjs"
     ],
+    "_patch-semantic-cluster.cjs": [
+      "scripts/_patch-semantic-cluster.cjs"
+    ],
     "_tmp_check.mjs": [
       "scripts/_tmp_check.mjs"
     ],
@@ -232791,6 +233326,9 @@
     "regex-intent.spec.ts": [
       "tests/intent/regex-intent.spec.ts"
     ],
+    "is-ready.test.mjs": [
+      "tests/is-ready.test.mjs"
+    ],
     "kag-cluster-source.spec.ts": [
       "tests/kag-cluster-source.spec.ts"
     ],
@@ -233119,6 +233657,9 @@
     "web-research-job-contract.test.ts": [
       "tests/routes/web-research-job-contract.test.ts"
     ],
+    "routes.spec.ts": [
+      "tests/routes.spec.ts"
+    ],
     "rrf-fuse.spec.ts": [
       "tests/rrf-fuse.spec.ts"
     ],
@@ -233148,6 +233689,9 @@
     ],
     "playwright-setup.ts": [
       "tests/setup/playwright-setup.ts"
+    ],
+    "setup-db.ts": [
+      "tests/setup-db.ts"
     ],
     "simple-ux-test.spec.ts": [
       "tests/simple-ux-test.spec.ts"
@@ -233216,7 +233760,9 @@
       "tests/unit/agents-md-quick-hit.test.ts",
       "tests/unit/board-persistence-server.test.ts",
       "tests/unit/chat-memory.test.ts",
+      "tests/unit/context-cache-planner.test.ts",
       "tests/unit/ensure-dev-runtime.test.ts",
+      "tests/unit/llm-context-cache.test.ts",
       "tests/unit/normalize-repo-path.test.ts",
       "tests/unit/templates.test.ts"
     ],
@@ -233229,14 +233775,23 @@
     "chat-memory.test.ts": [
       "tests/unit/chat-memory.test.ts"
     ],
+    "context-cache-planner.test.ts": [
+      "tests/unit/context-cache-planner.test.ts"
+    ],
     "ensure-dev-runtime.test.ts": [
       "tests/unit/ensure-dev-runtime.test.ts"
+    ],
+    "llm-context-cache.test.ts": [
+      "tests/unit/llm-context-cache.test.ts"
     ],
     "normalize-repo-path.test.ts": [
       "tests/unit/normalize-repo-path.test.ts"
     ],
     "templates.test.ts": [
       "tests/unit/templates.test.ts"
+    ],
+    "uploadMachine.test.ts": [
+      "tests/uploadMachine.test.ts"
     ],
     "user-case-creation.spec.ts": [
       "tests/user-case-creation.spec.ts"
@@ -233274,9 +233829,9 @@
   },
   "audit": {
     "gateStats": {
-      "routesWithAuth": 773,
+      "routesWithAuth": 774,
       "routesWithoutAuth": 0,
-      "routesWithZod": 536,
+      "routesWithZod": 537,
       "routesWithoutZod": 0,
       "filesWithLocalhost": 127,
       "filesWithLocalhostBreaks": 8,
@@ -233286,9 +233841,9 @@
       "sv4DispatchCount": 0,
       "runeInTsCount": 10,
       "ssrUnsafeCount": 0,
-      "routesWithTest": 712,
-      "routesWithoutTest": 2,
-      "routesWithErrorHandling": 686,
+      "routesWithTest": 717,
+      "routesWithoutTest": 3,
+      "routesWithErrorHandling": 687,
       "cyclicPairCount": 0
     },
     "cyclicPairs": [],
@@ -233299,11 +233854,11 @@
       },
       {
         "mod": "$lib/server/env.server.js",
-        "n": 466
+        "n": 468
       },
       {
         "mod": "$lib/server/redis.js",
-        "n": 262
+        "n": 265
       },
       {
         "mod": "$lib/components/ui/Icon.svelte",
@@ -233319,7 +233874,7 @@
       },
       {
         "mod": "$lib/server/db/schema-postgres.js",
-        "n": 158
+        "n": 160
       },
       {
         "mod": "$lib/server/middleware/cache-headers.js",
@@ -233331,7 +233886,7 @@
       },
       {
         "mod": "$lib/server/grpc/embedding-client.js",
-        "n": 89
+        "n": 90
       },
       {
         "mod": "$lib/components/ui/Button.svelte",
@@ -233339,7 +233894,7 @@
       },
       {
         "mod": "$lib/server/vector/qdrant-manager.js",
-        "n": 81
+        "n": 82
       },
       {
         "mod": "$lib/server/db/schema",
@@ -233398,6 +233953,10 @@
         "n": 25
       },
       {
+        "mod": "$lib/server/cache-keys.js",
+        "n": 23
+      },
+      {
         "mod": "$lib/ai/model-ids.js",
         "n": 22
       },
@@ -233407,10 +233966,6 @@
       },
       {
         "mod": "$lib/server/cache.js",
-        "n": 21
-      },
-      {
-        "mod": "$lib/server/ai/graph-reranker.js",
         "n": 21
       }
     ]

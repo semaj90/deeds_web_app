@@ -4,6 +4,7 @@ export * from '../schema-prosecutor.js';
 // Core Application Tables (legal-cases.js is canonical for 'cases' table + relations)
 export * from './citations.js';
 export * from './evidence.js';
+export * from './evidence-multi-modal.js';
 export * from './legal-cases.js';
 export * from './persons.js';
 export * from './reports.js';

@@ -1,4 +1,4 @@
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { enhancedGraphMappings } from '$lib/server/db/schema/graph-mappings.js';
 import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js';
 import { getRedis } from '$lib/server/redis.js';
@@ -119,14 +119,16 @@ export class WikiMcpService {
    */
   async explainPage(id: string) {
     // 1. Fetch Core Mapping
-    const [mapping] = await db.select()
+    const [mapping] = await db
+      .select()
       .from(enhancedGraphMappings)
       .where(eq(enhancedGraphMappings.id, id));
 
     if (!mapping) return null;
 
     // 2. Check for related FeatureMap
-    const [feature] = await db.select()
+    const [feature] = await db
+      .select()
       .from(featureMaps)
       .where(eq(featureMaps.id, id.startsWith('feature:') ? id : `feature:${id}`));
 
@@ -134,26 +136,33 @@ export class WikiMcpService {
     const wikiCard = await readWikiCard(id);
 
     // 4. Fetch GRPO Memory Sticks
-    const memorySticks = await db.select()
+    const memorySticks = await db
+      .select()
       .from(grpoMemorySticks)
       .where(eq(grpoMemorySticks.featureId, feature?.id || id))
       .limit(5);
 
     return {
       mapping,
-      feature: feature ? {
-        id: feature.id,
-        name: feature.name,
-        glyph: feature.glyph,
-        status: feature.status
-      } : null,
+      feature: feature
+        ? {
+            id: feature.id,
+            name: feature.name,
+            glyph: feature.glyph,
+            status: feature.status,
+          }
+        : null,
       wikiCard,
-      memorySticks: memorySticks.map(s => ({
+      memorySticks: memorySticks.map((s) => ({
         id: s.id,
         queryHash: s.queryHash,
-        rewardSignals: s.rewardSignals
+        rewardSignals: s.rewardSignals,
       })),
-      recommendations: mapping.metadata?.recommendations || []
+      recommendations: (() => {
+        const metadata = mapping.metadata as Record<string, unknown> | null | undefined;
+        const recs = metadata?.recommendations;
+        return Array.isArray(recs) ? recs : [];
+      })(),
     };
   }
 
@@ -171,8 +180,8 @@ export class WikiMcpService {
         proposedChanges: [
           `Update AGENTS.md metadata for ${path}`,
           `Recalculate pagerank for child files`,
-          `Sync ${path} to Neo4j`
-        ]
+          `Sync ${path} to Neo4j`,
+        ],
       };
     }
 
@@ -180,7 +189,7 @@ export class WikiMcpService {
     return {
       path,
       status: 'completed',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }

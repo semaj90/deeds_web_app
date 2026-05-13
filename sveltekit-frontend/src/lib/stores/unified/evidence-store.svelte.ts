@@ -128,6 +128,11 @@ class EvidenceStore {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('caseId', metadata.caseId);
+      formData.append('case_id', metadata.caseId);
+      formData.append('enableAiAnalysis', 'true');
+      formData.append('enableOcr', 'true');
+      formData.append('enableEmbeddings', 'true');
+      formData.append('enableSummarization', 'true');
       formData.append('type', metadata.type);
       if (metadata.tags) formData.append('tags', JSON.stringify(metadata.tags));
       if (metadata.description) formData.append('description', metadata.description);

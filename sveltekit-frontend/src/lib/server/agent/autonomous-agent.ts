@@ -1107,21 +1107,38 @@ export class AutonomousAgent {
         }),
         func: async ({ query, topK }) => {
           try {
+            const queryHash = createHash('sha256').update(query).digest('hex').slice(0, 16);
             const cacheKey = buildContextCacheKey({
+              queryHash,
               modelName: 'gemma4-legal-vlm:latest',
               modelQuant: 'iq4_xs',
               backend: 'gemma4-agent',
               tokenizerHash: 'embeddinggemma:latest:768',
-              systemPromptHash: createHash('sha256').update('system:yorha-legal').digest('hex').slice(0, 16),
-              toolDefinitionsHash: createHash('sha256').update('ace-tools:v1').digest('hex').slice(0, 16),
+              systemPromptHash: createHash('sha256')
+                .update('system:yorha-legal')
+                .digest('hex')
+                .slice(0, 16),
+              toolDefinitionsHash: createHash('sha256')
+                .update('ace-tools:v1')
+                .digest('hex')
+                .slice(0, 16),
               repoGitSha: process.env.GIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
               corpusHash: 'codebase-graph:unknown',
+              evidenceBundleHash: 'evidence:none',
               ragBundleHash: createHash('sha256').update(query).digest('hex').slice(0, 16),
               graphSnapshotHash: 'graph:none',
+              retrievalModeHash: 'agent:default',
+              sectionTypesHash: 'sections:none',
+              personaKey: 'agent',
+              tokenAwarePacking: true,
+              userId: 'agent',
+              caseId: 'auto',
+              conversationId: 'agent-context',
+              filePath: undefined,
             });
             const cached = await getContextCache(cacheKey);
             if (cached) return JSON.stringify(cached);
-            
+
             // Fallback to full ACE context assembly if not cached
             const context = await assembleACEContext({
               query,

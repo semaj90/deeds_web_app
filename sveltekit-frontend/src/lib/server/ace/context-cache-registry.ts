@@ -1,5 +1,5 @@
 import { desc, sql } from 'drizzle-orm';
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { aceContextCache } from '$lib/server/db/schema-postgres.js';
 import { getCachePolicy } from '$lib/server/cache-config.js';
 import { aceContextKey } from '$lib/server/cache-keys.js';

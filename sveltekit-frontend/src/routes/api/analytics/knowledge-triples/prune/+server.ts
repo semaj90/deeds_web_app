@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { enhancedGraphMappings } from '$lib/server/db/schema/graph-mappings.js';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
@@ -11,7 +11,7 @@ const pruneSchema = z.object({
 
 /**
  * POST /api/analytics/knowledge-triples/prune
- * 
+ *
  * Removes all graph edges with confidence below the specified threshold.
  * Body: { threshold: number } (default 0.5)
  */
@@ -21,13 +21,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		const body = await request.json().catch(() => ({}));
 		const parsed = pruneSchema.safeParse(body);
-		
+
 		if (!parsed.success) {
 			return json({ error: 'Invalid threshold', details: parsed.error.format() }, { status: 400 });
 		}
 
 		const { threshold } = parsed.data;
-		
+
 		console.log(`🧹 [Prune-Triples] Removing edges with confidence < ${threshold}...`);
 
 		// We use a raw SQL update to filter the edges array for all rows
@@ -50,11 +50,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			WHERE edges IS NULL;
 		`);
 
+		const processedRows = (result as { rowCount?: number }).rowCount ?? 0;
+
 		return json({
-			success: true,
-			threshold,
-			message: `Pruning complete. Processed rows: ${result.length}`
-		});
+      success: true,
+      threshold,
+      message: `Pruning complete. Processed rows: ${processedRows}`,
+    });
 	} catch (error) {
 		console.error('[knowledge-triples:prune] Failed:', error);
 		return json({ error: 'Internal Server Error' }, { status: 500 });

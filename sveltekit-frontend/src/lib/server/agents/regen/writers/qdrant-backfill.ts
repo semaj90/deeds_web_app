@@ -14,7 +14,7 @@
  */
 
 import type { AgentsDirectoryCard } from '../../agents-card-store.js';
-import { ENV } from '../../../../env.server.js';
+import { ENV } from '../../../env.server.js';
 
 const DEFAULT_QDRANT_URL = ENV.QDRANT_URL;
 const DEFAULT_COLLECTION = process.env.QDRANT_CODEBASE_COLLECTION ?? 'codebase_chunks_768';

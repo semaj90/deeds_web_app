@@ -161,7 +161,13 @@
         formData.append('tags', fileData.tags);
         formData.append('isAdmissible', fileData.isAdmissible.toString());
         formData.append('admissibilityNotes', fileData.admissibilityNotes);
+        formData.append('enableAiAnalysis', 'true');
+        formData.append('enableOcr', 'true');
+        formData.append('enableEmbeddings', 'true');
+        formData.append('enableSummarization', 'true');
         if (caseId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
+          formData.append('case_id', caseId);
+          formData.append('case_id', caseId);
           formData.append('caseId', caseId);
         }
 

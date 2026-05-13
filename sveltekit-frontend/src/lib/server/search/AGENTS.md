@@ -102,12 +102,12 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 | Commit | Timestamp | Subject |
 |--------|-----------|---------|
+| `906ff5cea0` | 2026-05-13T14:05 | 5_13_26 |
 | `d2b954da45` | 2026-05-13T03:23 | feat(api): add knowledge triples and pruning endpoints |
 | `19515cfa76` | 2026-05-12T18:28 | stub docs: add codebase documentation, project agent markers, and testing utilities for core system modules |
 | `10d9f7df0a` | 2026-05-11T17:49 | 5_11_26 |
 | `618dee240c` | 2026-05-11T01:39 | 59_26_agents_master_hermes_quest |
 | `2dccb6c40c` | 2026-05-10T19:57 | fix(audit-p1): clear remaining 15 tsgo errors (15 → 0) |
-| `d98e5f8864` | 2026-05-09T19:52 | chore(graphify): second regeneration pass — obsidian indexes, memory atlas, AGENTS.md hierarchy |
 
 <!-- /AGENTS-ENRICH -->
 

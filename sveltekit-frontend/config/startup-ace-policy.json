@@ -89,6 +89,8 @@
     "tasks": [
       "graphify:authority",
       "graphify:gds",
+      "graphify:som",
+      "hypergraph:build:4d",
       "graphify:cluster-summaries",
       "graphify:bow-tiles",
       "topology:validate",

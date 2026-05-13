@@ -49,6 +49,11 @@ async function redisStats(redis) {
 
   const bowChunkKeys   = await redis.keys('texture:bow:chunk:*');
   const bowClusterKeys = await redis.keys('texture:bow:cluster:*');
+  
+  const manifoldRaw    = await redis.get('cluster:kmeans:k20:manifold4:all');
+  const manifoldCount  = manifoldRaw ? JSON.parse(manifoldRaw).length : 0;
+  // Check for various SOM grid key formats
+  const somWeights     = (await redis.exists('som:weights')) || (await redis.exists('cluster:kmeans:k20:som:grid'));
 
   return {
     wikiNoteCount:       wikiKeys.length,
@@ -58,6 +63,8 @@ async function redisStats(redis) {
       : 0,
     bowChunkTiles:       bowChunkKeys.length,
     bowClusterTiles:     bowClusterKeys.length,
+    manifoldClusterCount: manifoldCount,
+    somWeightsPresent:    somWeights > 0,
   };
 }
 
@@ -169,6 +176,8 @@ function formatMd(h) {
 | Graph JSON nodes | ${h.graphNodeCount} | ${graphStatus} |
 | Graph JSON edges | ${h.graphEdgeCount} | ${graphStatus} |
 | AGENTS.md mirrors | ${h.agentsMdCount} | ${agentsStatus} |
+| Manifold clusters | ${h.manifoldClusterCount} | ${h.manifoldClusterCount > 0 ? '✅' : '⚠️'} |
+| SOM Weights | ${h.somWeightsPresent ? '✅' : '❌'} | ${h.somWeightsPresent ? '✅' : '❌'} |
 
 ## Graphify Tiers
 
@@ -206,6 +215,7 @@ const [rStats, qStats] = await Promise.all([
   redis ? redisStats(redis) : Promise.resolve({
     wikiNoteCount: 0, gemma4SummaryCount: 0, gemma4Coverage: 0,
     bowChunkTiles: 0, bowClusterTiles: 0,
+    manifoldClusterCount: 0, somWeightsPresent: false,
   }),
   qdrantStats(),
 ]);
@@ -225,6 +235,8 @@ const health = {
   gemma4Coverage:       rStats.gemma4Coverage,
   bowChunkTiles:        rStats.bowChunkTiles,
   bowClusterTiles:      rStats.bowClusterTiles,
+  manifoldClusterCount: rStats.manifoldClusterCount,
+  somWeightsPresent:    rStats.somWeightsPresent,
   // Qdrant
   glyphCount:           qStats.glyphCount,
   qdrantReachable:      qStats.qdrantReachable,
@@ -261,6 +273,7 @@ log(`  BoW chunk tiles: ${health.bowChunkTiles}`);
 log(`  BoW cluster:     ${health.bowClusterTiles}`);
 log(`  Glyph atlas:     ${health.glyphCount} pts`);
 log(`  Graph nodes:     ${health.graphNodeCount}`);
+log(`  Manifold cls:    ${health.manifoldClusterCount} (SOM: ${health.somWeightsPresent ? 'OK' : 'MISSING'})`);
 log(`  AGENTS.md files: ${health.agentsMdCount}`);
 log('');
 log(`  ✓ Wrote ${jsonPath}`);

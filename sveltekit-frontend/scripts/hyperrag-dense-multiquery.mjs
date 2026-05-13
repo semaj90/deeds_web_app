@@ -96,7 +96,7 @@ try {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ model: EMBED_MODEL, prompt: QUERY }),
-    signal: AbortSignal.timeout(15_000),
+    signal: AbortSignal.timeout(60_000),
   });
   if (!embedRes.ok) throw new Error(`HTTP ${embedRes.status}`);
   const embedJson = await embedRes.json();
@@ -151,11 +151,11 @@ if (redisOk) {
           const centroids = JSON.parse(centroidsRaw);
           let bestCluster = 0, bestSim = -Infinity;
           for (let i = 0; i < centroids.length; i++) {
-            const c = centroids[i];
-            if (!c || c.length !== queryVector.length) continue;
+            const cVec = centroids[i];
+            if (!cVec || cVec.length !== queryVector.length) continue;
             // Dot product (vectors are normalized by Ollama)
             let dot = 0;
-            for (let d = 0; d < queryVector.length; d++) dot += queryVector[d] * c[d];
+            for (let d = 0; d < queryVector.length; d++) dot += queryVector[d] * cVec[d];
             if (dot > bestSim) { bestSim = dot; bestCluster = i; }
           }
           activeClusterFilter = bestCluster;

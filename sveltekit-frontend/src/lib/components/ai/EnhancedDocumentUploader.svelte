@@ -232,7 +232,14 @@
 
 		const formData = new FormData();
 		formData.append('file', uploadFile.file);
-		if (caseId) formData.append('caseId', caseId);
+		if (caseId) {
+			formData.append('case_id', caseId);
+			formData.append('caseId', caseId);
+		}
+		formData.append('enableAiAnalysis', 'true');
+		formData.append('enableOcr', 'true');
+		formData.append('enableEmbeddings', 'true');
+		formData.append('enableSummarization', 'true');
 		if (uploadFile.metadata.title) formData.append('title', uploadFile.metadata.title);
 		if (uploadFile.metadata.description) formData.append('description', uploadFile.metadata.description);
 		if (uploadFile.metadata.documentType) formData.append('evidenceType', uploadFile.metadata.documentType);
