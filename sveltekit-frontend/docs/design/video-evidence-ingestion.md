@@ -2,6 +2,8 @@
 
 This document outlines the architecture for the multi-modal evidence ingestion pipeline, specifically focused on the V1 implementation: transcript-first video ingestion.
 
+Related phase note: [`video_phase1.md`](./video_phase1.md)
+
 ## Core Philosophy
 - **Postgres as Truth**: Source of truth for audit, metadata, and relations.
 - **SeaweedFS for Blobs**: Video files, audio clips, and frames are stored in S3-compatible storage.
