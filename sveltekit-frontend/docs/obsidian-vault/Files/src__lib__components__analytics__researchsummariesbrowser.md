@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/components/analytics/ResearchSummariesBrowser.svelte"
 aliases: ["ResearchSummariesBrowser.svelte","src/lib/components/analytics/ResearchSummariesBrowser.svelte"]
-clusterId: 92
+clusterId: -1
 ext: ".svelte"
 lineCount: 565
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 1
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/analytics/ResearchSummariesBrowser.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-92]]"]
+up: []
 imports: []
-tags: ["file","ext/svelte","cluster/92","svelte","t/svelte","t/src","t/lib"]
+tags: ["file","ext/svelte","svelte","t/svelte","t/src","t/lib"]
 ---
 
 # `src/lib/components/analytics/ResearchSummariesBrowser.svelte`
 ## For future Claude
 > ResearchSummariesBrowser — unified paginated browser for all research_summaries content.
-cluster:: [[Clusters/cluster-92]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 565

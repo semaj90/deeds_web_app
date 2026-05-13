@@ -1,0 +1,1 @@
+syntax = "proto3"; service TestService { rpc Call(TestRequest) returns (TestResponse); } message TestRequest { string id = 1; }

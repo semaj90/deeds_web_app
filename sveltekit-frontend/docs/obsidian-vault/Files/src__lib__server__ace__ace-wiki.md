@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/ace/ace-wiki.ts"
 aliases: ["ace-wiki.ts","src/lib/server/ace/ace-wiki.ts"]
-clusterId: 72
+clusterId: -1
 ext: ".ts"
 lineCount: 782
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 4
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ace/ace-wiki.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-72]]"]
+up: []
 imports: ["[[Files/codeintel-datastore]]","[[Files/gemma4-codeintel]]","[[Files/grpc__retrieval-client]]","[[Files/retrieval__codebase-context]]"]
-tags: ["file","ext/ts","cluster/72","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/ace/ace-wiki.ts`
 ## For future Claude
 > ace-wiki.ts — Generate wiki-style articles from ACE codebase context.
-cluster:: [[Clusters/cluster-72]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 782

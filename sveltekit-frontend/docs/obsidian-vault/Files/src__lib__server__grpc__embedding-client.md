@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/grpc/embedding-client.ts"
 aliases: ["embedding-client.ts","src/lib/server/grpc/embedding-client.ts"]
-clusterId: 82
+clusterId: -1
 ext: ".ts"
 lineCount: 910
 pagerank: 0.213436
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 4
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/grpc/embedding-client.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-82]]"]
+up: []
 imports: ["[[Files/client-options]]"]
-tags: ["file","ext/ts","cluster/82","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/grpc/embedding-client.ts`
 ## For future Claude
 > Multi-Protocol Embedding Client — server-only.
-cluster:: [[Clusters/cluster-82]]
 pagerank:: 0.213436
 blend:: 0.000000
 lines:: 910

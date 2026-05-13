@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-05-11T23:31:28.666Z",
+  "generatedAt": "2026-05-13T00:22:41.727Z",
   "runId": "2026-05-07T20-53-22",
   "gates": {
     "g11_wrong_db_client": 0,
-    "g17_localhost_hardcoded": 10,
+    "g17_localhost_hardcoded": 11,
     "g18_missing_auth": 0,
     "g19_missing_zod": 1,
     "g21_svelte4_props": 0,
     "g22_svelte4_reactive": 0,
     "g23_svelte4_events": 0,
-    "g25_runes_in_plain_ts": 0,
+    "g25_runes_in_plain_ts": 1,
     "g27_pass": true,
-    "g27_kmeans_consumers": 9,
+    "g27_kmeans_consumers": 11,
     "g27_som_consumers": 7,
     "g40_glyph_cache_pass": true
   },

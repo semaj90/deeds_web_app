@@ -11,6 +11,16 @@
  * States mirror LegalHMM.STATES from the Python model exactly so
  * hmmStateToGlyphSection() maps them without modification.
  */
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+// Native Rust HMM Engine
+let rustHMM: any = null;
+try {
+	rustHMM = require('../../../../../simd-bridge/rust/hmm-repair/index.js');
+} catch (err) {
+	console.warn('[hmm-section-classifier] Rust HMM engine not loaded:', (err as Error).message);
+}
 
 export type HMMRawState =
   | 'PARTIES'
@@ -170,6 +180,22 @@ export function predictChunk(text: string): HMMPrediction {
     ) as Record<HMMRawState, number>;
     zeroProbabilities['FACTS'] = 1;
     return { primaryState: 'FACTS', confidence: 0, stateProbabilities: zeroProbabilities, stateSequence: [] };
+  }
+
+	// Rust Acceleration
+	const rustPredict = rustHMM?.predictChunkRust ?? rustHMM?.predict_chunk_rust;
+	if (typeof rustPredict === 'function') {
+		try {
+			const rustResult = rustPredict(text);
+			return {
+				primaryState: (rustResult.primaryState || rustResult.primary_state) as HMMRawState,
+				confidence: rustResult.confidence,
+				stateProbabilities: (rustResult.stateProbabilities || rustResult.state_probabilities) as Record<HMMRawState, number>,
+        stateSequence: (rustResult.stateSequence || rustResult.state_sequence) as HMMRawState[]
+      };
+    } catch (err) {
+      console.warn('[hmm-section-classifier] Rust HMM prediction failed, falling back:', (err as Error).message);
+    }
   }
 
   const { path, logProb } = viterbi(tokens);

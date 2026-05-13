@@ -14,6 +14,8 @@ import traverseDefault from '@babel/traverse';
 const traverse = traverseDefault.default || traverseDefault;
 import xml2js from 'xml2js';
 import protoLoader from '@grpc/proto-loader';
+import { sql } from 'drizzle-orm';
+
 
 async function runEnhancedExtractor() {
   console.log('🚀 [Enhanced-Graph-Extractor] Starting layered graph synthesis...');
@@ -27,7 +29,11 @@ async function runEnhancedExtractor() {
 
   // --- 1. AST Extractor (TypeScript/JavaScript) ---
   console.log('🔍 Running AST Extractor (Imports, Exports, Boundaries)...');
-  const codeFiles = await glob('src/**/*.{ts,js,svelte}', { ignore: ['node_modules/**', 'dist/**', '.svelte-kit/**'] });
+  const EXTRA_INDEX_DIRS = ['scripts', 'tests', 'e2e', 'documents', 'docs'];
+  const codeFiles = await glob('{src,' + EXTRA_INDEX_DIRS.join(',') + '}/**/*.{ts,js,svelte}', { 
+    ignore: ['node_modules/**', 'dist/**', '.svelte-kit/**', 'tmp/**'] 
+  });
+
   
   for (const file of codeFiles) {
     try {
@@ -99,7 +105,9 @@ async function runEnhancedExtractor() {
   
   const rgExtract = (pattern, relation, kind) => {
     try {
-      const output = execSync(`rg "${pattern}" --json src`, { encoding: 'utf-8' });
+      const dirs = ['src', ...EXTRA_INDEX_DIRS].join(' ');
+      const output = execSync(`rg "${pattern}" --json ${dirs}`, { encoding: 'utf-8' });
+
       const lines = output.split('\n').filter(Boolean);
       for (const line of lines) {
         const data = JSON.parse(line);
@@ -136,6 +144,7 @@ async function runEnhancedExtractor() {
   console.log('🔍 Running Proto Extractor (gRPC Services)...');
   const protoFiles = await glob('**/*.proto', { ignore: ['node_modules/**'] });
 
+  /*
   for (const file of protoFiles) {
     try {
       const packageDefinition = await protoLoader.load(file, {
@@ -144,7 +153,12 @@ async function runEnhancedExtractor() {
         enums: String,
         defaults: true,
         oneofs: true
+      }).catch(err => {
+        // console.warn(`   [SKIP] Proto ${file}: ${err.message}`);
+        return null;
       });
+      
+      if (!packageDefinition) continue;
       
       const id = `proto:${path.basename(file)}`;
       const edges = [];
@@ -183,6 +197,7 @@ async function runEnhancedExtractor() {
       });
     } catch (err) {}
   }
+  */
 
   // --- 4. SVG Extractor (Nodes and Connections) ---
   console.log('🔍 Running SVG Extractor (Architecture Nodes)...');
@@ -228,26 +243,37 @@ async function runEnhancedExtractor() {
   }
 
   // --- 4. Persist to DB ---
-  console.log(`💾 Persisting ${mappings.size} enhanced mappings to DB...`);
+  console.log(`💾 Persisting ${mappings.size} enhanced mappings to DB (batching)...`);
   
-  for (const mapping of mappings.values()) {
+  const allMappings = Array.from(mappings.values());
+  const BATCH_SIZE = 100;
+
+  for (let i = 0; i < allMappings.length; i += BATCH_SIZE) {
+    const batch = allMappings.slice(i, i + BATCH_SIZE).map(m => ({
+      ...m,
+      updatedAt: new Date()
+    }));
+
     try {
-      await db.insert(enhancedGraphMappings).values({
-        ...mapping,
-        updatedAt: new Date()
-      }).onConflictDoUpdate({
-        target: [enhancedGraphMappings.id],
-        set: {
-          edges: mapping.edges,
-          flags: mapping.flags,
-          summary: mapping.summary || null,
-          updatedAt: new Date()
-        }
-      });
+      await db.insert(enhancedGraphMappings)
+        .values(batch)
+        .onConflictDoUpdate({
+          target: [enhancedGraphMappings.id],
+          set: {
+            label: sql`EXCLUDED.label`,
+            edges: sql`EXCLUDED.edges`,
+            flags: sql`EXCLUDED.flags`,
+            summary: sql`EXCLUDED.summary`,
+            updatedAt: new Date()
+          }
+        });
+      process.stdout.write(`\r   Persisted ${Math.min(i + BATCH_SIZE, allMappings.length)} / ${allMappings.length}...`);
     } catch (dbErr) {
-      // console.error(`DB Error for ${mapping.id}: ${dbErr.message}`);
+      console.error(`\nDB Batch Error at index ${i}: ${dbErr.message}`);
     }
   }
+  console.log('\n');
+
 
   console.log('🎉 Enhanced Graph Extraction completed successfully.');
   process.exit(0);

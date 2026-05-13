@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/components/Phase72ErrorBrain.svelte"
 aliases: ["Phase72ErrorBrain.svelte","src/lib/components/Phase72ErrorBrain.svelte"]
-clusterId: 92
+clusterId: -1
 ext: ".svelte"
 lineCount: 561
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 1
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/Phase72ErrorBrain.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-92]]"]
+up: []
 imports: []
-tags: ["file","ext/svelte","cluster/92","svelte","zod","t/svelte","t/src","t/lib"]
+tags: ["file","ext/svelte","svelte","zod","t/svelte","t/src","t/lib"]
 ---
 
 # `src/lib/components/Phase72ErrorBrain.svelte`
 ## For future Claude
 > Phase 72 Error Brain Modal
-cluster:: [[Clusters/cluster-92]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 561

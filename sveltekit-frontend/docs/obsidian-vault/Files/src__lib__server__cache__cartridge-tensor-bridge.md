@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/cache/cartridge-tensor-bridge.ts"
 aliases: ["cartridge-tensor-bridge.ts","src/lib/server/cache/cartridge-tensor-bridge.ts"]
-clusterId: 22
+clusterId: -1
 ext: ".ts"
 lineCount: 531
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 7
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/cache/cartridge-tensor-bridge.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-22]]"]
+up: []
 imports: ["[[Files/redis-service]]","[[Files/cartridge__chr97-builder]]","[[Files/analysis__concurrency-gate]]","[[Files/grpc__embedding-client]]"]
-tags: ["file","ext/ts","cluster/22","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/cache/cartridge-tensor-bridge.ts`
 ## For future Claude
 > Cartridge-Tensor Bridge — Redis ↔ CHR-ROM97 ↔ GPU Tensor ↔ NES Adaptive Memory
-cluster:: [[Clusters/cluster-22]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 531

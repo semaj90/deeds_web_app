@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-11T03:30:12.213Z",
-  "graphFiles": 3820,
+  "generatedAt": "2026-05-13T00:29:47.974Z",
+  "graphFiles": 4036,
   "gates": {
     "D9": {
       "name": "Likely orphans (0 fanIn, no dynImport ref)",
-      "count": 174,
+      "count": 180,
       "findings": [
         {
           "file": "src/lib/ai/base64-fp32-quantizer.ts",
@@ -162,6 +162,16 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "src/lib/server/ace/kag-cluster-source.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "src/lib/server/ace/mini-active-cache.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "src/lib/server/ace/tool-response-summarizer.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -207,12 +217,12 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "src/lib/server/ai/libtorch-reranker.ts",
+          "file": "src/lib/server/ai/hermes/test-dispatcher.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "src/lib/server/ai/quant-config.ts",
+          "file": "src/lib/server/ai/libtorch-reranker.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -487,6 +497,16 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "src/lib/server/features/feature-map-compiler.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "src/lib/server/features/feature-storage.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "src/lib/server/ff1/agent/tool-registry.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -508,6 +528,11 @@
         },
         {
           "file": "src/lib/server/indexer/directory-summarizer.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "src/lib/server/indexer/karpathy-search-loop.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -642,7 +667,12 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "src/lib/services/report-auto-populator.ts",
+          "file": "src/lib/server/search/marco-reranker.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "src/lib/server/services/report-auto-populator.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -658,6 +688,11 @@
         },
         {
           "file": "src/lib/server/training/query-logger.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "src/lib/server/types/graph-mapping.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -723,11 +758,6 @@
         },
         {
           "file": "src/lib/server/wiki/wiki-gap-analyzer.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/wiki/wiki-neo4j-sync.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },

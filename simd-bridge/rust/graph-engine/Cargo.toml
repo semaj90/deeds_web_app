@@ -1,0 +1,17 @@
+[package]
+name = "graph-engine"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "2.12.2", features = ["async", "napi4"] }
+napi-derive = "2.12.2"
+petgraph = "0.6.4"
+rand = "0.8.5"
+rayon = "1.8.0"
+
+[build-dependencies]
+napi-build = "2.0.1"

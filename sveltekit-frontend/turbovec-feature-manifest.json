@@ -1,0 +1,21 @@
+{
+  "features": [
+    {
+      "id": "feature:turbovec-graph-synthesis",
+      "title": "TurboVec Graph Synthesis",
+      "description": "High-performance Rust-accelerated graph extraction and vector quantization for codebase indexing.",
+      "status": "implemented",
+      "category": "core:indexing",
+      "tags": ["rust", "python", "graph", "vector"],
+      "paths": {
+        "source": ["turbovec/"],
+        "extraction": ["scripts/enhanced_graph_synthesis.py"],
+        "persistence": ["src/lib/server/features/feature-storage.ts"]
+      },
+      "metadata": {
+        "version": "0.3.0",
+        "wheel": "vendor/wheels/turbovec-0.3.0-cp39-abi3-win_amd64.whl"
+      }
+    }
+  ]
+}

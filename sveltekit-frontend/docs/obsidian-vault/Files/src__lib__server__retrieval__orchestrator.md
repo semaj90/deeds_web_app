@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/retrieval/orchestrator.ts"
 aliases: ["orchestrator.ts","src/lib/server/retrieval/orchestrator.ts"]
-clusterId: 58
+clusterId: -1
 ext: ".ts"
 lineCount: 469
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 13
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/retrieval/orchestrator.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-58]]"]
+up: []
 imports: ["[[Files/codebase-context]]","[[Files/graph-context]]","[[Files/graph-informed-retrieval]]","[[Files/authority-chain]]","[[Files/document-dag]]","[[Files/document-dag]]"]
-tags: ["file","ext/ts","cluster/58","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/retrieval/orchestrator.ts`
 ## For future Claude
 > Retrieval Orchestrator — canonical retrieval pipeline entry point.
-cluster:: [[Clusters/cluster-58]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 469

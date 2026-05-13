@@ -7,7 +7,20 @@ import { getRedis } from '$lib/server/redis.js';
  * Exposes the SOM centroids (64d) for client-side WebGPU visualization.
  * These centroids represent the topological backbone of the codebase.
  */
-export async function GET() {
+export async function GET({ locals }) {
+  if (!locals.user) {
+    return json({
+      error: 'Unauthorized',
+      centroids: [],
+      meta: {
+        count: 0,
+        dim: 64,
+        gridRows: 0,
+        gridCols: 0
+      }
+    }, { status: 401 });
+  }
+
   const redis = getRedis();
   
   const [centroidsRaw, meta] = await Promise.all([

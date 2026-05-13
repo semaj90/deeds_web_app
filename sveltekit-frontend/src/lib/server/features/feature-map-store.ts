@@ -1,139 +1,136 @@
-import type { FeatureMap, FeatureCompileResult } from './feature-map.types.js';
+import { db } from '$lib/server/db/client.js';
+import { sql } from 'drizzle-orm';
+import { getRedis } from '$lib/server/redis.js';
+import type { FeatureCompileResult, FeatureMap, GrpoMemoryStick } from './feature-map.types.js';
 
-export interface FeatureMapStoreWrites {
+export type FeatureStoreWrites = {
   postgresJsonb: {
-    table: 'enhanced_graph_mappings';
-    row: Record<string, unknown>;
+    row: {
+      id: string;
+      kind: string;
+      label: string;
+      path?: string | null;
+      summary?: string | null;
+      edges: unknown[];
+      scores: Record<string, unknown>;
+      flags: number;
+      vectors: Record<string, unknown>;
+      metadata: FeatureMap;
+      updatedAt: Date;
+    };
   };
-  redisHotKeys: Array<{ key: string; value: string; ttlSeconds: number }>;
+  redisHotKeys: Array<{
+    key: string;
+    value: string;
+    ttlSeconds: number;
+  }>;
   qdrantFeatureSummaryPoint: {
     collection: string;
     id: string;
     vector: number[];
     payload: Record<string, unknown>;
   };
-  neo4jJsonl: {
-    nodes: string[];
-    edges: string[];
-  };
-  couchdbSnapshot: {
-    id: string;
-    doc: Record<string, unknown>;
-  };
-}
+  neo4jJsonl: string[];
+};
 
-function toJsonSafe(value: unknown): unknown {
-  if (value === null || value === undefined) return value;
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return value;
-  if (value instanceof Uint8Array || ArrayBuffer.isView(value)) return Array.from(value as ArrayLike<number>);
-  if (Array.isArray(value)) return value.map((item) => toJsonSafe(item));
-  if (typeof value === 'object') {
-    const out: Record<string, unknown> = {};
-    for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
-      if (/pointer|native|handle|ptr/i.test(key)) continue;
-      const sanitized = toJsonSafe(entry);
-      if (typeof sanitized === 'function' || typeof sanitized === 'symbol' || typeof sanitized === 'bigint') continue;
-      out[key] = sanitized;
-    }
-    return out;
+export function prepareStoreWrites(result: FeatureCompileResult): FeatureStoreWrites {
+  const { featureMap } = result;
+  const ttlSeconds = 7 * 24 * 60 * 60;
+  const redisHotKeys = [
+    { key: `feature:summary:${featureMap.featureId}`, value: featureMap.summaries.short, ttlSeconds },
+    { key: `feature:glyph:${featureMap.featureId}`, value: JSON.stringify(featureMap.glyph), ttlSeconds },
+    { key: `feature:map:${featureMap.featureId}`, value: JSON.stringify(featureMap), ttlSeconds },
+  ];
+
+  if (result.grpoMemoryStick) {
+    redisHotKeys.push({
+      key: `grpo:memory:${result.grpoMemoryStick.queryHash}`,
+      value: JSON.stringify(result.grpoMemoryStick),
+      ttlSeconds
+    });
   }
-  return String(value);
-}
-
-function featureVectorFromGlyph(map: FeatureMap): number[] {
-  return Array.from(map.glyph.glyph, (n) => (n ?? 0) / 255);
-}
-
-export function buildFeatureMapStoreWrites(result: FeatureCompileResult): FeatureMapStoreWrites {
-  const map = result.featureMap;
-  const safeMap = toJsonSafe(map) as Record<string, unknown>;
-  const featureId = map.featureId;
-  const vector = featureVectorFromGlyph(map);
-  const redisPayload = JSON.stringify({
-    featureId,
-    featureName: map.featureName,
-    tokenEstimate: map.tokenEstimate,
-    pathCount: map.sourcePaths.length,
-    graphTripleCount: map.graphTriples.length,
-    memoryStick: map.memoryStick,
-  });
-
-  const postgresJsonb = {
-    table: 'enhanced_graph_mappings' as const,
-    row: {
-      id: featureId,
-      kind: 'cluster',
-      label: map.featureName,
-      path: map.sourcePaths[0] ?? null,
-      summary: map.description,
-      edges: map.graphEdges.map((edge) => ({
-        relation: edge.relation,
-        targets: [edge.to],
-        confidence: edge.confidence,
-        source: edge.source,
-      })),
-      scores: {
-        attentionScore: map.glyph.bits.flags,
-        grpoReward: map.memoryStick.rewardSignals[0]?.value ?? 0,
-      },
-      vectors: {
-        encoded64: vector.slice(0, 64),
-      },
-      metadata: {
-        ...safeMap,
-        graphTriples: map.graphTriples,
-        sourcePaths: map.sourcePaths,
-        aceContextPacketDraft: toJsonSafe(map.aceContextPacketDraft),
-      },
-    },
-  };
 
   return {
-    postgresJsonb,
-    redisHotKeys: [
-      { key: `feature-map:${featureId}`, value: redisPayload, ttlSeconds: 3600 },
-      { key: `feature-map:${featureId}:glyph`, value: map.glyph.svg, ttlSeconds: 3600 },
-      { key: `feature-map:${featureId}:memory-stick`, value: JSON.stringify(map.memoryStick), ttlSeconds: 3600 },
-    ],
+    postgresJsonb: {
+      row: {
+        id: featureMap.featureId,
+        kind: 'feature',
+        label: featureMap.title,
+        path: featureMap.paths.featureNote ?? null,
+        summary: featureMap.summaries.short,
+        edges: featureMap.edges,
+        scores: featureMap.scores ?? {},
+        flags: featureMap.glyph.mask,
+        vectors: featureMap.vectors ?? {},
+        metadata: featureMap,
+        updatedAt: new Date()
+      }
+    },
+    redisHotKeys,
     qdrantFeatureSummaryPoint: {
-      collection: 'feature_map_summaries',
-      id: featureId,
-      vector,
+      collection: 'feature_maps',
+      id: featureMap.featureId,
+      vector: featureMap.vectors?.encoded64 ?? Array.from({ length: 64 }, () => 0),
       payload: {
-        featureId,
-        featureName: map.featureName,
-        description: map.description,
-        pathGroups: map.pathGroups,
-        graphTripleCount: map.graphTriples.length,
-        tokenEstimate: map.tokenEstimate,
-        glyphBits: map.glyph.bits,
-      },
+        featureId: featureMap.featureId,
+        title: featureMap.title,
+        status: featureMap.status,
+        glyphMask: featureMap.glyph.mask,
+        graphTriples: featureMap.graphTriples.length,
+        cacheKeys: featureMap.cache
+      }
     },
-    neo4jJsonl: {
-      nodes: [
-        JSON.stringify({ id: featureId, label: map.featureName, kind: 'feature', tokenEstimate: map.tokenEstimate }),
-        ...map.sourcePaths.map((path) => JSON.stringify({ id: path, label: path, kind: 'source-path' })),
-      ],
-      edges: map.graphTriples.map((triple) => JSON.stringify({ from: triple[0], relation: triple[1], to: triple[2] })),
-    },
-    couchdbSnapshot: {
-      id: featureId,
-      doc: {
-        featureId,
-        featureName: map.featureName,
-        featureSlug: map.featureSlug,
-        description: map.description,
-        sourcePaths: map.sourcePaths,
-        pathGroups: map.pathGroups,
-        graphTriples: map.graphTriples,
-        glyph: {
-          bits: map.glyph.bits,
-          grid: Array.from(map.glyph.glyph),
-          debugText: map.glyph.debugText,
-        },
-        memoryStick: map.memoryStick,
-        tokenEstimate: map.tokenEstimate,
-      },
-    },
+    neo4jJsonl: featureMap.graphTriples.map(([source, relation, target]) => JSON.stringify({
+      source,
+      relation,
+      target,
+      featureId: featureMap.featureId
+    }))
   };
+}
+
+/**
+ * Persists FeatureMap and GRPO memory sticks to Postgres and Redis.
+ */
+export async function persistFeatureCompileResult(result: FeatureCompileResult): Promise<void> {
+  const { featureMap, grpoMemoryStick } = result;
+
+  // 1. Postgres Persistence (Durable JSONB)
+  await db.execute(sql`
+    INSERT INTO enhanced_graph_mappings (id, kind, label, metadata, updated_at)
+    VALUES (${featureMap.featureId}, 'feature', ${featureMap.title}, ${JSON.stringify(featureMap)}::jsonb, NOW())
+    ON CONFLICT (id) DO UPDATE SET
+      label = EXCLUDED.label,
+      metadata = EXCLUDED.metadata,
+      updated_at = NOW()
+  `);
+
+  if (grpoMemoryStick) {
+    await db.execute(sql`
+      INSERT INTO enhanced_graph_mappings (id, kind, label, metadata, updated_at)
+      VALUES (${grpoMemoryStick.id}, 'grpo_memory', ${grpoMemoryStick.featureId ?? 'global'}, ${JSON.stringify(grpoMemoryStick)}::jsonb, NOW())
+      ON CONFLICT (id) DO UPDATE SET
+        metadata = EXCLUDED.metadata,
+        updated_at = NOW()
+    `);
+  }
+
+  // 2. Redis Hot Cache
+  try {
+    const redis = getRedis();
+    const pipe = redis.pipeline();
+    const TTL = 7 * 24 * 60 * 60; // 7 days
+
+    pipe.set(`feature:summary:${featureMap.featureId}`, featureMap.summaries.short, 'EX', TTL);
+    pipe.set(`feature:glyph:${featureMap.featureId}`, JSON.stringify(featureMap.glyph), 'EX', TTL);
+    pipe.set(`feature:map:${featureMap.featureId}`, JSON.stringify(featureMap), 'EX', TTL);
+    
+    if (grpoMemoryStick) {
+      pipe.set(`grpo:memory:${grpoMemoryStick.queryHash}`, JSON.stringify(grpoMemoryStick), 'EX', TTL);
+    }
+
+    await pipe.exec();
+  } catch (err) {
+    console.warn('[feature-map-store] Redis persistence failed:', (err as Error).message);
+  }
 }

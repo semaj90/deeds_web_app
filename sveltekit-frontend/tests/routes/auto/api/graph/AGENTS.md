@@ -1,18 +1,18 @@
 # AGENTS.md — `tests/routes/auto/api/graph`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-12T03:12:15.164Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests/routes/auto/api/graph
 
 ## Snapshot
 
-- 14 file(s), 0 handler(s)
+- 17 file(s), 0 handler(s)
 - Audit score: _(no GPU audit)_
 - no audit signals
 
 
-## Files (14)
+## Files (17)
 
 - `analyze.test.ts`
 - `bow-texture.test.ts`
@@ -20,8 +20,8 @@
 - `cluster-summaries.test.ts`
 - `colab-export.test.ts`
 - `connections.test.ts`
-- `glyph-atlas.test.ts`
-- `hypergraph.test.ts`
+- `docstore.test.ts`
+- `fetch-rerank.test.ts`
 
 ## Tools
 
@@ -38,7 +38,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/14 files have paired tests
+- **Paired tests**: 0/17 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/workers/compute-worker.mjs"
 aliases: ["compute-worker.mjs","src/lib/workers/compute-worker.mjs"]
-clusterId: 57
+clusterId: -1
 ext: ".mjs"
 lineCount: 650
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/workers/compute-worker.mjs"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-57]]"]
+up: []
 imports: []
-tags: ["file","ext/mjs","cluster/57","t/mjs","t/src","t/lib"]
+tags: ["file","ext/mjs","t/mjs","t/src","t/lib"]
 ---
 
 # `src/lib/workers/compute-worker.mjs`
 ## For future Claude
 > Compute Worker — runs CPU-bound tasks off the main event loop.
-cluster:: [[Clusters/cluster-57]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 650

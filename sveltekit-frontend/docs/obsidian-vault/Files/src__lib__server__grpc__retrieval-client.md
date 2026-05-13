@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/grpc/retrieval-client.ts"
 aliases: ["retrieval-client.ts","src/lib/server/grpc/retrieval-client.ts"]
-clusterId: 58
+clusterId: -1
 ext: ".ts"
 lineCount: 1042
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 5
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/grpc/retrieval-client.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-58]]"]
+up: []
 imports: ["[[Files/client-options]]"]
-tags: ["file","ext/ts","cluster/58","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/grpc/retrieval-client.ts`
 ## For future Claude
 > gRPC Retrieval Client — server-only.
-cluster:: [[Clusters/cluster-58]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 1042

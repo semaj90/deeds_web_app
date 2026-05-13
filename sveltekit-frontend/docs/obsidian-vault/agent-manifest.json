@@ -1,5 +1,5 @@
 {
-  "vault_version": "2026-05-11T03:30:09.005Z",
+  "vault_version": "2026-05-13T00:29:45.067Z",
   "generated_by": "graphify-obsidian-vault.mjs",
   "collections": {
     "files": "Files/",
@@ -78,7 +78,7 @@
   },
   "stats": {
     "file_notes": 500,
-    "cluster_notes": 100,
+    "cluster_notes": 0,
     "index_notes": 4
   }
 }

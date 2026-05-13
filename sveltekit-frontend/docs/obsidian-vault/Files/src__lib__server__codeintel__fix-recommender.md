@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/codeintel/fix-recommender.ts"
 aliases: ["fix-recommender.ts","src/lib/server/codeintel/fix-recommender.ts"]
-clusterId: 6
+clusterId: -1
 ext: ".ts"
 lineCount: 498
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 5
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/codeintel/fix-recommender.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-6]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/6","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/codeintel/fix-recommender.ts`
 ## For future Claude
 > fix-recommender.ts — CodeIntel-aware error-fix recommendation engine
-cluster:: [[Clusters/cluster-6]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 498

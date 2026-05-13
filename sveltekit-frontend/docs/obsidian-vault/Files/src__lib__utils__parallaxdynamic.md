@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/utils/parallaxDynamic.js"
 aliases: ["parallaxDynamic.js","src/lib/utils/parallaxDynamic.js"]
-clusterId: 1
+clusterId: -1
 ext: ".js"
 lineCount: 647
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/lib/utils/parallaxDynamic.js"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-1]]"]
+up: []
 imports: []
-tags: ["file","ext/js","cluster/1","t/js","t/src","t/lib"]
+tags: ["file","ext/js","t/js","t/src","t/lib"]
 ---
 
 # `src/lib/utils/parallaxDynamic.js`
 ## For future Claude
 > Dynamic Parallax Helper - WebGPU Enhanced
-cluster:: [[Clusters/cluster-1]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 647

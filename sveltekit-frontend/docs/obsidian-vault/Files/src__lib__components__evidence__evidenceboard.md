@@ -2,33 +2,32 @@
 type: "file"
 path: "src/lib/components/evidence/EvidenceBoard.svelte"
 aliases: ["EvidenceBoard.svelte","src/lib/components/evidence/EvidenceBoard.svelte"]
-clusterId: 59
+clusterId: -1
 ext: ".svelte"
-lineCount: 1291
+lineCount: 2229
 pagerank: 0
 blend: 0
 isRoute: false
 isSvelteComp: true
 isTest: false
 hasAuth: false
-hasZod: false
-importCount: 8
+hasZod: true
+importCount: 13
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/evidence/EvidenceBoard.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "medium"
-up: ["[[Clusters/cluster-59]]"]
+up: []
 imports: ["[[Files/evidenceconnections]]","[[Files/evidencenode]]","[[Files/relationshipinspector]]","[[Files/boardsearchoverlay]]","[[Files/boardminimap]]","[[Files/board-history]]","[[Files/board-persistence]]"]
-tags: ["file","ext/svelte","cluster/59","svelte","t/svelte","t/src","t/lib"]
+tags: ["file","ext/svelte","svelte","zod","t/svelte","t/src","t/lib"]
 ---
 
 # `src/lib/components/evidence/EvidenceBoard.svelte`
 ## For future Claude
-> .svelte at src/lib/components/evidence/EvidenceBoard.svelte (1291 lines), Svelte component.
-cluster:: [[Clusters/cluster-59]]
+> .svelte at src/lib/components/evidence/EvidenceBoard.svelte (2229 lines), Svelte component.
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 1291
+lines:: 2229
 ## Imports
 
 - imports:: [[Files/evidenceconnections]] `./EvidenceConnections.svelte`

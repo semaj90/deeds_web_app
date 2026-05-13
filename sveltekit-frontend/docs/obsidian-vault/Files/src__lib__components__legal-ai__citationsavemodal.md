@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/components/legal-ai/CitationSaveModal.svelte"
 aliases: ["CitationSaveModal.svelte","src/lib/components/legal-ai/CitationSaveModal.svelte"]
-clusterId: 35
+clusterId: -1
 ext: ".svelte"
 lineCount: 391
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/legal-ai/CitationSaveModal.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "medium"
-up: ["[[Clusters/cluster-35]]"]
+up: []
 imports: []
-tags: ["file","ext/svelte","cluster/35","svelte","t/svelte","t/src","t/lib"]
+tags: ["file","ext/svelte","svelte","t/svelte","t/src","t/lib"]
 ---
 
 # `src/lib/components/legal-ai/CitationSaveModal.svelte`
 ## For future Claude
 > .svelte at src/lib/components/legal-ai/CitationSaveModal.svelte (391 lines), Svelte component.
-cluster:: [[Clusters/cluster-35]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 391

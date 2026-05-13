@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/api-metadata-extractor.ts"
 aliases: ["api-metadata-extractor.ts","src/lib/server/api-metadata-extractor.ts"]
-clusterId: 6
+clusterId: -1
 ext: ".ts"
 lineCount: 757
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: true
 hasZod: false
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/api-metadata-extractor.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-6]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/6","auth","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","auth","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/api-metadata-extractor.ts`
 ## For future Claude
 > Comprehensive Route Metadata Extractor
-cluster:: [[Clusters/cluster-6]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 757

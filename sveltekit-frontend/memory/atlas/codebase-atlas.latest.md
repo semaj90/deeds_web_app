@@ -1,6 +1,6 @@
 # Directory Atlas Recommendations
 
-> Generated: 2026-05-11T23:31:44.055Z · 1135 directories · 7843 files
+> Generated: 2026-05-13T00:23:13.996Z · 1135 directories · 7843 files
 
 ## `src/lib/server/db`
 
@@ -32,16 +32,6 @@
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/config/env.server.ts`, `src/lib/config/env.server.ts`, `src/lib/config/AGENTS.md`
 
-## `src`
-
-- Rank: **0.254** · files=18 · hits=0 · dirty=0
-- AGENTS: `agents:src/AGENTS.md`
-- Authority max=0 avg=0, PageRank max=0, Karpathy blend=0.95
-- Topo classes: `unclassified`, `graph-gpu-topology`
-- Clusters: `general`, `gpu:57`, `gpu:86`, `unclassified:27`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/AGENTS.md`, `src/ambient-legacy.d.ts`, `src/app.d.ts`
-
 ## `src/lib/server/ai`
 
 - Rank: **0.249** · files=54 · hits=0 · dirty=0
@@ -71,6 +61,16 @@
 - Clusters: `general`, `unclassified:82`, `gpu:75`, `gpu:82`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/server/grpc/embedding-client.ts`, `src/lib/server/grpc/embedding-client.ts`, `src/lib/server/grpc/AGENTS.md`
+
+## `src`
+
+- Rank: **0.200** · files=18 · hits=0 · dirty=0
+- AGENTS: `agents:src/AGENTS.md`
+- Authority max=0 avg=0, PageRank max=0, Karpathy blend=0
+- Topo classes: `unclassified`, `graph-gpu-topology`
+- Clusters: `general`, `gpu:57`, `gpu:86`, `unclassified:27`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/AGENTS.md`, `src/ambient-legacy.d.ts`, `src/app.d.ts`
 
 ## `src/lib`
 

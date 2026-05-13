@@ -1,21 +1,23 @@
 # AGENTS.md — `tests/routes/auto/api/research`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-12T03:12:15.164Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests/routes/auto/api/research
 
 ## Snapshot
 
-- 4 file(s), 0 handler(s)
+- 6 file(s), 0 handler(s)
 - Audit score: _(no GPU audit)_
 - no audit signals
 
 
-## Files (4)
+## Files (6)
 
 - `concurrent-deep.test.ts`
+- `deep.test.ts`
 - `encode.test.ts`
+- `external-deep.test.ts`
 - `ingest.test.ts`
 - `search.test.ts`
 
@@ -34,7 +36,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/4 files have paired tests
+- **Paired tests**: 0/6 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

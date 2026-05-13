@@ -31,6 +31,23 @@ import {
 } from '$lib/server/gpu/pytorch-graph.js';
 import { couchdb } from '$lib/server/services/couchdb-client.js';
 import { createHash } from 'crypto';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+// Native Rust Engine
+let rustEngine: any = null;
+try {
+	rustEngine = require('../../../../../simd-bridge/rust/graph-engine/index.js');
+} catch (err) {
+	console.warn('[gpu-graph-analysis] Rust graph engine not loaded:', (err as Error).message);
+}
+
+function detectCommunitiesRust(nodes: string[], edgesFrom: string[], edgesTo: string[], maxIter: number) {
+	const fn = rustEngine?.detectCommunitiesRust ?? rustEngine?.detect_communities_rust;
+	if (typeof fn !== 'function') return null;
+	return fn(nodes, edgesFrom, edgesTo, maxIter);
+}
+
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -292,7 +309,32 @@ function detectCommunities(
     }
   }
 
-  // Label propagation
+	// Label propagation
+	const rustResults = detectCommunitiesRust(
+		nodes.map(n => n.nodeId),
+		edges.map(e => e.from),
+		edges.map(e => e.to),
+		20
+	);
+	if (rustResults) {
+		try {
+			return rustResults.map((c: any) => ({
+				communityId: c.communityId,
+				size: c.size,
+				members: c.nodeIds.map((id: string) => {
+					const node = nodes.find(n => n.nodeId === id);
+          return {
+            nodeId: id,
+            label: node?.label ?? 'Unknown',
+            title: node?.title ?? ''
+					};
+				})
+			}));
+		} catch (err) {
+			console.warn('[gpu-graph-analysis] Rust community detection failed, falling back:', (err as Error).message);
+		}
+	}
+
   const labels = Array.from({ length: n }, (_, i) => i);
   const maxIter = 20;
 

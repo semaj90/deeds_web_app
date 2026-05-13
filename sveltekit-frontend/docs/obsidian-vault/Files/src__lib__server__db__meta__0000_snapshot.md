@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/db/meta/0000_snapshot.json"
 aliases: ["0000_snapshot.json","src/lib/server/db/meta/0000_snapshot.json"]
-clusterId: 6
+clusterId: -1
 ext: ".json"
 lineCount: 2985
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/db/meta/0000_snapshot.json"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "medium"
-up: ["[[Clusters/cluster-6]]"]
+up: []
 imports: []
-tags: ["file","ext/json","cluster/6","t/json","t/src","t/lib"]
+tags: ["file","ext/json","t/json","t/src","t/lib"]
 ---
 
 # `src/lib/server/db/meta/0000_snapshot.json`
 ## For future Claude
 > .json at src/lib/server/db/meta/0000_snapshot.json (2985 lines).
-cluster:: [[Clusters/cluster-6]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 2985
