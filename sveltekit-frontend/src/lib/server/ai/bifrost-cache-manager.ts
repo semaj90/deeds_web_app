@@ -44,6 +44,28 @@ export class BifrostCacheManager {
   }
 
   /**
+   * Get a cached KAG context packet from the Bifrost (Redis) hot-path.
+   */
+  static async getKagContext(cacheKey: string): Promise<any | null> {
+    const redis = getRedis();
+    const raw = await redis.get(`bifrost:kag:${cacheKey}`);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Register a KAG context packet in the Bifrost hot-path.
+   */
+  static async registerKagContext(cacheKey: string, packet: any): Promise<void> {
+    const redis = getRedis();
+    await redis.set(`bifrost:kag:${cacheKey}`, JSON.stringify(packet), 'EX', this.TTL);
+  }
+
+  /**
    * Optimize a message list by identifying shareable prefixes.
    */
   static async optimizeMessages(messages: any[]): Promise<{ optimized: any[], cacheToken?: string }> {
