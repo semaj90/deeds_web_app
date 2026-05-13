@@ -1325,13 +1325,13 @@ async function dispatchTool(
       });
       // Accumulate hits for cluster context injection before final synthesis
       const topoNorm = data as { ok?: boolean; hits?: Array<Record<string, unknown>> };
-      if (goRetrievalHits && topoNorm?.ok && Array.isArray(topoNorm.hits)) {
+      if (options?.goRetrievalHits && topoNorm?.ok && Array.isArray(topoNorm.hits)) {
         for (const h of topoNorm.hits.slice(0, 20)) {
-          goRetrievalHits.push({
+          options.goRetrievalHits.push({
             clusterKey: h.clusterKey != null ? String(h.clusterKey) : undefined,
-            topoClass:  h.topoClass  != null ? String(h.topoClass)  : undefined,
-            path:       h.path       != null ? String(h.path)       : undefined,
-            score:      h.score      != null ? Number(h.score)      : undefined,
+            topoClass: h.topoClass != null ? String(h.topoClass) : undefined,
+            path: h.path != null ? String(h.path) : undefined,
+            score: h.score != null ? Number(h.score) : undefined,
           });
         }
       }
@@ -1352,13 +1352,13 @@ async function dispatchTool(
       });
       // Accumulate hits for cluster context injection before final synthesis
       const goNorm = data as { ok?: boolean; hits?: Array<Record<string, unknown>> };
-      if (goRetrievalHits && goNorm?.ok && Array.isArray(goNorm.hits)) {
+      if (options?.goRetrievalHits && goNorm?.ok && Array.isArray(goNorm.hits)) {
         for (const h of goNorm.hits.slice(0, 20)) {
-          goRetrievalHits.push({
+          options.goRetrievalHits.push({
             clusterKey: h.clusterKey != null ? String(h.clusterKey) : undefined,
-            topoClass:  h.topoClass  != null ? String(h.topoClass)  : undefined,
-            path:       h.path       != null ? String(h.path)       : undefined,
-            score:      h.score      != null ? Number(h.score)      : undefined,
+            topoClass: h.topoClass != null ? String(h.topoClass) : undefined,
+            path: h.path != null ? String(h.path) : undefined,
+            score: h.score != null ? Number(h.score) : undefined,
           });
         }
       }
@@ -2004,12 +2004,12 @@ export async function runGemma4Agent(
   if (finalAnswer.length > 500 && !finalAnswer.includes('I don\'t know') && !finalAnswer.includes('error')) {
     try {
       const { validateInformationGain, heuristicQualityCheck } = await import('./information-gain-validator.js');
-      
+
       if (heuristicQualityCheck(finalAnswer)) {
         // 1. Look up existing memory for this query
         const emb = await generateEmbedding(query).catch(() => null);
         let existingText = '';
-        
+
         if (emb) {
           const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
           const existing = await qdrant.hybridSearch({
@@ -2044,11 +2044,11 @@ export async function runGemma4Agent(
             content: finalAnswer,
             source: `chat:${options?.sessionId ?? 'anon'}`,
             tags: toolsUsed,
-            metadata: { 
-              gainScore: validation.gainScore, 
+            metadata: {
+              gainScore: validation.gainScore,
               reasoning: validation.reasoning,
-              validated_at: new Date().toISOString()
-            }
+              validated_at: new Date().toISOString(),
+            },
           });
           yorhaMetadata.memoryEncoded = true;
           console.log(`[agent] High-gain memory encoded: ${query.slice(0, 30)}... (Gain: ${validation.gainScore})`);

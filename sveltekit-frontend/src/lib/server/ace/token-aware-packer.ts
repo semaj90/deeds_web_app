@@ -209,13 +209,19 @@ function greedyPack<T extends { score: number; tokenCost: number; id?: string }>
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export interface PackerInput {
-  query:         string;
-  budget:        TokenBudget;
+  query: string;
+  budget: TokenBudget;
   activeClusterIds?: number[];
 
   // Raw tool results — all optional (packer is tolerant of missing lanes).
-  qdrantHits?:       Array<{ filePath?: string; content?: string; score?: number; somCluster?: number }>;
-  chunks?:           Array<{
+  qdrantHits?: Array<{
+    filePath?: string;
+    content?: string;
+    score?: number;
+    clusterId?: number;
+    somCluster?: number;
+  }>;
+  chunks?: Array<{
     id: string;
     text: string;
     filePath?: string;
@@ -236,12 +242,12 @@ export interface PackerInput {
     karpathyBlend?: number;
     topFiles?: string[];
   }>;
-  graphTriples?:     Array<[string, string, string]>;
-  couchRows?:        Array<{ view: string; rows: Array<{ key: unknown; value: unknown }> }>;
-  priorCaseTexts?:   Array<{ id: string; text: string; score: number }>;
-  wikiRows?:         Array<{ id: string; text: string; score?: number; clusterId?: number }>;
-  rawCode?:          Array<{ id: string; text: string; score?: number }>;
-  grpoCheckpoints?:  Array<{ hyperedgeHash: string; gradeScore: number; loraHint?: string }>;
+  graphTriples?: Array<[string, string, string]>;
+  couchRows?: Array<{ view: string; rows: Array<{ key: unknown; value: unknown }> }>;
+  priorCaseTexts?: Array<{ id: string; text: string; score: number }>;
+  wikiRows?: Array<{ id: string; text: string; score?: number; clusterId?: number }>;
+  rawCode?: Array<{ id: string; text: string; score?: number }>;
+  grpoCheckpoints?: Array<{ hyperedgeHash: string; gradeScore: number; loraHint?: string }>;
 }
 
 /**

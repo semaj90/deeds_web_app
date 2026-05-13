@@ -176,7 +176,10 @@ const sessionSeed =
  if (userId) formData.set('userId', userId);
  formData.set('enableFunctions', 'true');
 
- if (aceContextCaseId) formData.set('caseId', aceContextCaseId);
+ if (aceContextCaseId) {
+ formData.set('case_id', aceContextCaseId);
+ formData.set('caseId', aceContextCaseId);
+ }
  const aceCtx = buildAceContext();
  if (aceCtx) formData.set('aceContext', aceCtx);
 
@@ -306,12 +309,17 @@ const sessionSeed =
  evidenceStatus = { state: 'running' };
  const formData = new FormData();
  formData.set('caseId', evidenceForm.caseId);
+ formData.set('case_id', evidenceForm.caseId);
  formData.set('title', evidenceForm.title || evidenceFile.name);
  formData.set('description', evidenceForm.description || chatInput || 'Uploaded via contextual assistant');
  formData.set('evidenceType', evidenceForm.evidenceType);
  formData.set('tags', evidenceForm.tags);
  formData.set('file', evidenceFile);
  formData.set('isAdmissible', 'true');
+ formData.set('enableAiAnalysis', 'true');
+ formData.set('enableOcr', 'true');
+ formData.set('enableEmbeddings', 'true');
+ formData.set('enableSummarization', 'true');
  try {
  const response = await fetch('/api/evidence/upload', {
  method: 'POST',

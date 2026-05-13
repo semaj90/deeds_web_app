@@ -86,7 +86,15 @@
 			// Stage 1: Upload to MinIO via evidence API
 			const formData = new FormData();
 			formData.append('file', uploadedFile);
-			if (caseId) formData.append('caseId', caseId);
+			if (caseId) {
+				formData.append('case_id', caseId);
+				formData.append('case_id', caseId);
+				formData.append('caseId', caseId);
+			}
+			formData.append('enableAiAnalysis', 'true');
+			formData.append('enableOcr', 'true');
+			formData.append('enableEmbeddings', 'true');
+			formData.append('enableSummarization', 'true');
 			formData.append('title', uploadedFile.name);
 			formData.append('description', `Uploaded via Smart Document Form`);
 			formData.append('evidenceType', selectedDocumentType === 'auto' ? 'document' : selectedDocumentType);

@@ -77,7 +77,14 @@ const uploadEvidence = fromPromise(async ({ input }: { input: { file: File; case
 	const start = performance.now();
 	const formData = new FormData();
 	formData.append('file', input.file);
-	if (input.caseId) formData.append('caseId', input.caseId);
+	if (input.caseId) {
+    formData.append('case_id', input.caseId);
+    formData.append('caseId', input.caseId);
+  }
+  formData.append('enableAiAnalysis', 'true');
+  formData.append('enableOcr', 'true');
+  formData.append('enableEmbeddings', 'true');
+  formData.append('enableSummarization', 'true');
 
 	const res = await fetch('/api/evidence/upload', {
 		method: 'POST',

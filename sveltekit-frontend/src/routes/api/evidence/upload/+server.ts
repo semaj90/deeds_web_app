@@ -235,7 +235,8 @@ async function setCachedExtraction(
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
   const devBypass = ENV.DEV_BYPASS_AUTH;
-  const uploaderUserId = locals.user?.id ?? (devBypass ? '00000000-0000-0000-0000-000000000001' : null);
+  const uploaderUserId =
+    locals.user?.id ?? (devBypass ? '00000000-0000-0000-0000-000000000001' : null);
 
   // Auth guard: reject unauthenticated uploads unless dev bypass is enabled
   if (!uploaderUserId) {
@@ -292,7 +293,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const formFields = {
       title: formData.get('title')?.toString()?.trim() || undefined,
       description: formData.get('description')?.toString()?.trim() || undefined,
-      caseId: formData.get('caseId')?.toString()?.trim() || undefined,
+      caseId:
+        formData.get('caseId')?.toString()?.trim() ||
+        formData.get('case_id')?.toString()?.trim() ||
+        undefined,
       evidenceType: formData.get('evidenceType')?.toString()?.trim() || undefined,
     };
     const parsed = evidenceUploadSchema.safeParse(formFields);
@@ -309,6 +313,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const autoType = detectEvidenceType(file.type, file.name);
     const evidenceType = userType && userType !== 'UNKNOWN' ? userType : autoType;
     const caseId = await resolveEvidenceCaseId(requestedCaseId, uploaderUserId);
+    const parseBooleanField = (key: string, defaultValue: boolean = false): boolean => {
+      const val = formData.get(key);
+      if (val === null) return defaultValue;
+      const s = String(val).toLowerCase();
+      return s === 'on' || s === 'true' || s === '1';
+    };
+    const enableAiAnalysis = parseBooleanField('enableAiAnalysis', true);
+    const enableOcr = parseBooleanField('enableOcr', true);
+    const enableEmbeddings = parseBooleanField('enableEmbeddings', true);
+    const enableSummarization = parseBooleanField('enableSummarization', true);
 
     if (file.size > MAX_FILE_SIZE) {
       return json(
@@ -395,6 +409,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           extractionMethod: null,
           extractionStatus: 'pending',
           uploadedVia: 'api',
+          analysisRequested: enableAiAnalysis,
+          processingOptions: {
+            enableAiAnalysis,
+            enableOcr,
+            enableEmbeddings,
+            enableSummarization,
+          },
         },
         uploadedBy: uploaderIntId,
       })
@@ -540,20 +561,20 @@ async function extractText(
       const { randomUUID } = await import('crypto');
       const ext = '.' + (fileName.split('.').pop()?.toLowerCase() ?? 'wav');
       const tmpPath = join(tmpdir(), `transcribe-upload-${randomUUID()}${ext}`);
-      
+
       await writeTmp(tmpPath, buffer);
       try {
         const result = await transcribeAudio(tmpPath, `upload-${Date.now()}`);
         if (result.text.trim().length > 0) {
-          return { 
-            text: result.text, 
-            method: `faster-whisper-${result.language}`, 
+          return {
+            text: result.text,
+            method: `faster-whisper-${result.language}`,
             doclingBlocks: result.chunks.map((c: any) => ({
               type: 'transcript_segment',
               text: c.text,
               start: c.start,
-              end: c.end
-            }))
+              end: c.end,
+            })),
           };
         }
       } finally {
@@ -730,7 +751,9 @@ async function extractText(
         const dataUrl = `data:image/png;base64,${buffer.toString('base64')}`;
         const embedded = extractLegalMetadata(dataUrl);
         if (embedded?.analysis_results) {
-          console.log(`[Upload] Recovered embedded LegalAI metadata from PNG (evidence_id=${embedded.evidence_id})`);
+          console.log(
+            `[Upload] Recovered embedded LegalAI metadata from PNG (evidence_id=${embedded.evidence_id})`
+          );
           // Surface the prior analysis as a fast-path; OCR still runs below for fresh text.
           // Caller can compare freshOcr vs embedded.analysis_results to detect tampering.
         }

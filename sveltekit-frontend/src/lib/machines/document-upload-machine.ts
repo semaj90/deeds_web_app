@@ -129,6 +129,10 @@ const uploadFiles = fromPromise(async ({ input }: { input: DocumentUploadContext
   for (const file of input.files) {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('enableAiAnalysis', 'true');
+    formData.append('enableOcr', 'true');
+    formData.append('enableEmbeddings', 'true');
+    formData.append('enableSummarization', 'true');
 
     const response = await fetch('/api/evidence/upload', {
       method: 'POST',

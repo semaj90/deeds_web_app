@@ -13,7 +13,7 @@ vi.mock('$lib/server/ace/llm-context-cache.js', () => ({
   getContextCacheWithSource: (...args: unknown[]) => mockGetContextCacheWithSource(...args),
   setContextCache: vi.fn(async () => {}),
   bumpContextCacheHit: (...args: unknown[]) => mockBumpContextCacheHit(...args),
-  normalizeContextPack: <T>(pack: T) => pack,
+  normalizeCachedContextPacket: <T>(pack: T) => pack,
 }));
 
 describe('context-cache-planner', () => {
@@ -38,25 +38,25 @@ describe('context-cache-planner', () => {
     });
 
     mockGetContextCacheWithSource.mockResolvedValue({
-      source: 'local',
+      source: 'local-json',
       pack: {
         summary: 'cached summary',
-        chunk_ids: ['chunk-1'],
-        graph_paths: ['a | b | c'],
-        tool_policy: { allowWriteTools: false },
-        prefix_tokens_estimated: 42,
-        cache_hit: true,
-        retrieval_skipped: true,
+        chunkIds: ['chunk-1'],
+        graphPaths: ['a | b | c'],
+        toolPolicy: { allowWriteTools: false },
+        prefixTokensEstimated: 42,
+        cacheHit: true,
+        retrievalSkipped: true,
         backend: state.backend,
-        model_name: state.modelName,
-        model_quant: state.modelQuant,
-        tokenizer_hash: state.tokenizerHash,
-        system_prompt_hash: state.systemPromptHash,
-        tool_definitions_hash: state.toolDefinitionsHash,
-        repo_git_sha: 'repo-a',
-        corpus_hash: state.corpusHash,
-        rag_bundle_hash: state.ragBundleHash,
-        graph_snapshot_hash: state.graphSnapshotHash,
+        modelName: state.modelName,
+        modelQuant: state.modelQuant,
+        tokenizerHash: state.tokenizerHash,
+        systemPromptHash: state.systemPromptHash,
+        toolDefinitionsHash: state.toolDefinitionsHash,
+        repoGitSha: 'repo-a',
+        corpusHash: state.corpusHash,
+        ragBundleHash: state.ragBundleHash,
+        graphSnapshotHash: state.graphSnapshotHash,
         featureId: 'ace-context',
         glyphMask: 0,
         topFiles: ['context-assembler.ts'],
@@ -64,7 +64,7 @@ describe('context-cache-planner', () => {
         selectedSourceIds: ['chunk-1'],
         cacheKeys: ['key-1'],
         warnings: [],
-        planner_state: {
+        plannerState: {
           queryHash: state.queryHash,
           modelName: state.modelName,
           modelQuant: state.modelQuant,
@@ -92,7 +92,7 @@ describe('context-cache-planner', () => {
     const hit = await loadAceContextPlannerHit(state);
 
     expect(hit).not.toBeNull();
-    expect(hit?.meta.source).toBe('local');
+    expect(hit?.meta.source).toBe('local-json');
     expect(hit?.meta.deltaFields).toEqual(['repoGitSha']);
     expect(hit?.packet.toolPolicy).toEqual({ allowWriteTools: false });
     expect(mockBumpContextCacheHit).toHaveBeenCalledWith(state.cacheKey);

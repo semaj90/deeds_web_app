@@ -9,8 +9,10 @@
  *   topKIndicesGPU    — top-k index selection (retrieval ranking)
  *
  * All functions fall back to CPU if CUDA is unavailable.
- * Return codes: 0 = success, -1 = bad args, -2 = runtime error.
+ * Return codes: 0 = success, see gpu_error_codes.h.
  */
+
+#include "gpu_error_codes.h"
 
 #include <torch/torch.h>
 #include <cstring>
@@ -61,8 +63,11 @@ extern "C" int pageRankGPU(
 
         auto cpu_r = r.squeeze().to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_r.data_ptr<float>(), n * sizeof(float));
-        return 0;
-    } catch (...) { return -2; }
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
 }
 
 // ── attentionScoreGPU ────────────────────────────────────────────────────────
@@ -95,8 +100,11 @@ extern "C" int attentionScoreGPU(
 
         auto cpu_w = weights.to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_w.data_ptr<float>(), n * sizeof(float));
-        return 0;
-    } catch (...) { return -2; }
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
 }
 
 // ── rewardScoreGPU ───────────────────────────────────────────────────────────
@@ -129,8 +137,11 @@ extern "C" int rewardScoreGPU(
 
         auto cpu_s = scores.to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_s.data_ptr<float>(), n * sizeof(float));
-        return 0;
-    } catch (...) { return -2; }
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
 }
 
 // ── softmaxGPU ───────────────────────────────────────────────────────────────
@@ -154,8 +165,11 @@ extern "C" int softmaxGPU(
 
         auto cpu_s = s.to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_s.data_ptr<float>(), n * sizeof(float));
-        return 0;
-    } catch (...) { return -2; }
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
 }
 
 #include "gpu_error_codes.h"
@@ -310,8 +324,11 @@ extern "C" int trainSOM(
         std::memcpy(weights_out, cpu_W.data_ptr<float>(), neurons * dim * sizeof(float));
         std::memcpy(bmu_out, bmu_all.data_ptr<int32_t>(), n * sizeof(int32_t));
 
-        return 0;
-    } catch (...) { return -3; }
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
 }
 
 // ── autoencoderEncodeGPU ─────────────────────────────────────────────────────
@@ -455,6 +472,9 @@ extern "C" int topKIndicesGPU(
         // Convert int64 indices to int32 for N-API compatibility
         auto cpu_idx = indices.to(torch::kCPU).to(torch::kInt32).contiguous();
         std::memcpy(out, cpu_idx.data_ptr<int32_t>(), k * sizeof(int32_t));
-        return 0;
-    } catch (...) { return -2; }
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
 }

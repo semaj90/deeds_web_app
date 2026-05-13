@@ -274,7 +274,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       payload: payloadMap.get(id) ?? {},
     }));
 
-  const wikiHits = await enrichWiki(ranked as LaneHit[]);
+  const wikiHits = await enrichWiki(ranked as unknown as LaneHit[]);
 
   const packet = {
     query,

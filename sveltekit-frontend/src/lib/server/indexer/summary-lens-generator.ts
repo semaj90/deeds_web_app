@@ -16,6 +16,7 @@ export async function generateSummaryLenses(params: {
 	somBmuRow?: number;
 	somBmuCol?: number;
 	manifold4?: number[];
+	gpuCluster?: number;
 }) {
 	const qdrant = new QdrantManager();
 	const results = [];
@@ -41,6 +42,7 @@ export async function generateSummaryLenses(params: {
 				somBmuRow: params.somBmuRow,
 				somBmuCol: params.somBmuCol,
 				manifold4: params.manifold4,
+				gpuCluster: params.gpuCluster,
 				updatedAt: new Date()
 			}).onConflictDoUpdate({
 				target: [embeddedSummaries.chunkId, embeddedSummaries.sourceHash, embeddedSummaries.summaryType],
@@ -61,6 +63,7 @@ export async function generateSummaryLenses(params: {
 						som_bmu_row: params.somBmuRow,
 						som_bmu_col: params.somBmuCol,
 						manifold4: params.manifold4,
+						gpu_cluster: params.gpuCluster,
 						generated_at: new Date().toISOString()
 					}
 				}]

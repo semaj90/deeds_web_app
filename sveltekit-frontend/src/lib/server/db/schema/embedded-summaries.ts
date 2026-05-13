@@ -35,6 +35,7 @@ export const embeddedSummaries = pgTable(
 		confidence: doublePrecision('confidence').default(0.75).notNull(),
 		
 		// Topological grounding (4D manifold)
+		gpuCluster: integer('gpu_cluster'),
 		somBmuRow: integer('som_bmu_row'),
 		somBmuCol: integer('som_bmu_col'),
 		manifold4: real('manifold4').array(),

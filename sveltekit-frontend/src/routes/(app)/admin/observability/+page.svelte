@@ -44,6 +44,11 @@
 			aceTopkCachedQueries: number;
 			aceHitsCachedQueries: number;
 			aceAuthorityPresent: boolean;
+			manifoldClusterCount: number;
+			somWeightsPresent: boolean;
+			coveredClusters: number;
+			coveredSomNodes: number;
+			totalSummaries: number;
 			lanesAvailable: string[];
 			glyphClusterLanePresent: boolean;
 		};
@@ -51,6 +56,17 @@
 			collection: string;
 			available: boolean;
 			approximateCount: number | null;
+		};
+		hyperrag: {
+			latest: {
+				query: string;
+				ts: string;
+				cluster: { id: number; label: string } | null;
+				turbovecPrefilter: boolean;
+				results: Array<{ id: string; score: number; lanes: string[]; filePath: string }>;
+				bitfrostSummary?: string;
+			} | null;
+			logAge: string | null;
 		};
 		recommendations: Array<{ id: number; category: string; severity: string; title: string }>;
 		recsTotal: number;
@@ -76,6 +92,7 @@
 		goSearch:    'Go Search',
 		topology:    'Topology',
 		turboQuant:  'TurboQuant',
+		turboVec:    'TurboVec RTX',
 	};
 
 	// ── Fetch ─────────────────────────────────────────────────────────────────
@@ -275,18 +292,83 @@
 				</ul>
 				<div class="stat-row mt-2">
 					<div class="stat-item">
-						<span class="stat-val">{data.ace.aceTopkCachedQueries}</span>
-						<span class="stat-lbl">topk cache</span>
+						<span class="stat-val">{data.ace.manifoldClusterCount}</span>
+						<span class="stat-lbl">manifold clusters</span>
 					</div>
 					<div class="stat-item">
-						<span class="stat-val">{data.ace.aceHitsCachedQueries}</span>
-						<span class="stat-lbl">24hr hits</span>
+						<span class="stat-val {data.ace.somWeightsPresent ? 'ok' : 'fail'}">{data.ace.somWeightsPresent ? 'YES' : 'NO'}</span>
+						<span class="stat-lbl">SOM grid</span>
 					</div>
 					<div class="stat-item">
 						<span class="stat-val {data.ace.aceAuthorityPresent ? 'ok' : 'fail'}">{data.ace.aceAuthorityPresent ? 'YES' : 'NO'}</span>
 						<span class="stat-lbl">authority</span>
 					</div>
 				</div>
+				<div class="stat-row mt-2">
+					<div class="stat-item" title="Manifold clusters with at least one summary">
+						<span class="stat-val">{data.ace.coveredClusters}</span>
+						<span class="stat-lbl">covered clusters</span>
+					</div>
+					<div class="stat-item" title="SOM grid nodes with at least one summary">
+						<span class="stat-val">{data.ace.coveredSomNodes}</span>
+						<span class="stat-lbl">covered nodes</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-val">{data.ace.totalSummaries.toLocaleString()}</span>
+						<span class="stat-lbl">summaries</span>
+					</div>
+				</div>
+			</section>
+
+			<!-- ── HyperRAG & RTX Sidecar ──────────────────────────────────── -->
+			<section class="card card-wide">
+				<h2 class="card-title">
+					<Icon name="zap" class="w-4 h-4" />
+					HyperRAG & RTX Sidecar
+					{#if data.hyperrag.logAge}
+						<span class="badge neutral">latest {data.hyperrag.logAge}</span>
+					{/if}
+				</h2>
+				{#if data.hyperrag.latest}
+					<div class="hyperrag-summary">
+						<div class="query-box">
+							<span class="muted">Latest Query:</span>
+							<code class="query-text">"{data.hyperrag.latest.query}"</code>
+						</div>
+						<div class="hyperrag-stats">
+							<div class="stat-item">
+								<span class="stat-val {data.hyperrag.latest.turbovecPrefilter ? 'ok' : 'fail'}">
+									{data.hyperrag.latest.turbovecPrefilter ? 'ACTIVE' : 'OFF'}
+								</span>
+								<span class="stat-lbl">TurboVec</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-val">{data.hyperrag.latest.cluster?.id ?? 'none'}</span>
+								<span class="stat-lbl">manifold cluster</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-val">{data.hyperrag.latest.results.length}</span>
+								<span class="stat-lbl">retrieved</span>
+							</div>
+						</div>
+					</div>
+					<div class="mini-results mt-2">
+						{#each data.hyperrag.latest.results.slice(0, 3) as res}
+							<div class="mini-res-row">
+								<span class="score">{res.score.toFixed(3)}</span>
+								<span class="lanes">{res.lanes.join('+')}</span>
+								<span class="path truncate">{res.filePath.split('/').pop()}</span>
+							</div>
+						{/each}
+					</div>
+					{#if data.hyperrag.latest.bitfrostSummary}
+						<div class="bitfrost-box mt-3">
+							<p class="bitfrost-text">{data.hyperrag.latest.bitfrostSummary}</p>
+						</div>
+					{/if}
+				{:else}
+					<p class="muted">No HyperRAG logs found. Run hyperrag-dense-multiquery to populate.</p>
+				{/if}
 			</section>
 
 			<!-- ── Synthesis Memory ────────────────────────────────────────── -->
@@ -410,6 +492,18 @@
 	.lane-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
 	.lane-tag { font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(212,199,163,0.08); border: 1px solid rgba(212,199,163,0.15); font-family: monospace; }
 
+	/* hyperrag */
+	.hyperrag-summary { display: flex; flex-direction: column; gap: 0.75rem; }
+	.query-box { background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 4px; border: 1px solid rgba(212,199,163,0.1); }
+	.query-text { font-size: 0.75rem; color: #d4c7a3; }
+	.hyperrag-stats { display: flex; gap: 1rem; }
+	.mini-results { display: flex; flex-direction: column; gap: 0.2rem; background: rgba(0,0,0,0.1); padding: 0.4rem; border-radius: 4px; }
+	.mini-res-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.7rem; font-family: monospace; }
+	.score { color: #4ade80; font-weight: 700; width: 45px; }
+	.lanes { color: #fbbf24; width: 100px; }
+	.path { opacity: 0.6; }
+	.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 	/* recs */
 	.rec-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
 	.rec-row { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.78rem; }
@@ -425,4 +519,19 @@
 	.footer-note { font-size: 0.68rem; margin-top: 1.5rem; text-align: center; }
 	.text-xs { font-size: 0.68rem; }
 	.mt-1 { margin-top: 0.25rem; }
+	.mt-3 { margin-top: 0.75rem; }
+
+	.bitfrost-box {
+		background: rgba(56, 189, 248, 0.05);
+		border-left: 2px solid #38bdf8;
+		padding: 0.75rem;
+		border-radius: 0 4px 4px 0;
+	}
+	.bitfrost-text {
+		font-size: 0.82rem;
+		line-height: 1.5;
+		color: #e2e8f0;
+		font-style: italic;
+		margin: 0;
+	}
 </style>

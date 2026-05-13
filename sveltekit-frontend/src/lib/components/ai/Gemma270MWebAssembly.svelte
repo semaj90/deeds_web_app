@@ -190,7 +190,15 @@
 				analysisStep = 'uploading';
 				const formData = new FormData();
 				formData.append('file', selectedFile);
-				if (caseId) formData.append('caseId', caseId);
+				if (caseId) {
+					formData.append('case_id', caseId);
+					formData.append('case_id', caseId);
+					formData.append('caseId', caseId);
+				}
+				formData.append('enableAiAnalysis', 'true');
+				formData.append('enableOcr', 'true');
+				formData.append('enableEmbeddings', 'true');
+				formData.append('enableSummarization', 'true');
 				formData.append('title', selectedFile.name);
 				formData.append('evidenceType', 'photo');
 

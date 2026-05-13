@@ -138,7 +138,11 @@
 
 			const formData = new FormData();
 			formData.append('file', file);
-			formData.append('caseId', caseId);
+			formData.append('case_id', caseId);
+			formData.append('enableAiAnalysis', 'true');
+			formData.append('enableOcr', 'true');
+			formData.append('enableEmbeddings', 'true');
+			formData.append('enableSummarization', 'true');
 
 			const xhr = new XMLHttpRequest();
 

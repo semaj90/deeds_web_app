@@ -359,7 +359,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const resolvedCaseId = sessionMeta[0]?.caseId ?? caseId ?? null;
 
 		// Trigger AI response generation
-		await generateAIResponse(sessionId, message, locals.user.id, resolvedCaseId);
+    await generateAIResponse(sessionId, message, Number(locals.user.id), resolvedCaseId);
 
 		return new Response(JSON.stringify({ success: true, sessionId, caseId: resolvedCaseId }), {
 			headers: { 'Content-Type': 'application/json' }
@@ -375,138 +375,136 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  * Case-aware: injects case context into prompts for relevant responses
  */
 async function generateAIResponse(
-	sessionId: string,
-	userMessage: string,
-	userId: string,
-	caseId: string | null
+  sessionId: string,
+  userMessage: string,
+  userId: number,
+  caseId: string | null
 ) {
-	try {
-		// Load case context
-		let caseContext = '';
-		if (caseId) {
-			const ctx = await loadCaseContext(caseId, userId);
-			if (ctx) caseContext = ctx;
-		}
+  try {
+    // Load case context
+    let caseContext = '';
+    if (caseId) {
+      const ctx = await loadCaseContext(caseId, String(userId));
+      if (ctx) caseContext = ctx;
+    }
 
-		// Build case-aware prompt
-		const prompt = caseContext
-			? `${caseContext}\n\n## User Question\n${userMessage}`
-			: userMessage;
+    // Build case-aware prompt
+    const prompt = caseContext ? `${caseContext}\n\n## User Question\n${userMessage}` : userMessage;
 
-		// Import streaming utilities
-		const { streamRAGResponse } = await import('$lib/server/streaming/chunked-response');
+    // Import streaming utilities
+    const { streamRAGResponse } = await import('$lib/server/streaming/chunked-response');
 
-		let fullResponse = '';
-		let chunkCount = 0;
-		const assistantMsgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    let fullResponse = '';
+    let chunkCount = 0;
+    const assistantMsgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-		for await (const chunk of streamRAGResponse(prompt)) {
-			if (chunk.type === 'content' && chunk.content) {
-				fullResponse += chunk.content;
-				chunkCount++;
+    for await (const chunk of streamRAGResponse(prompt)) {
+      if (chunk.type === 'content' && chunk.content) {
+        fullResponse += chunk.content;
+        chunkCount++;
 
-				// Save every 10 chunks for real-time updates
-				if (chunkCount % 10 === 0) {
-					await db
-						.insert(chatMessages)
-						.values({
-							id: assistantMsgId,
-							chatId: sessionId,
-							userId,
-							role: 'assistant',
-							content: fullResponse,
-							metadata: JSON.stringify({
-								streaming: true,
-								chunks: chunkCount,
-								caseId,
-								confidence: chunk.metadata?.confidence ?? 0.8
-							})
-						})
-						.onConflictDoUpdate({
-							target: chatMessages.id,
-							set: {
-								content: fullResponse,
-								metadata: JSON.stringify({
-									streaming: true,
-									chunks: chunkCount,
-									caseId,
-									confidence: chunk.metadata?.confidence ?? 0.8
-								}),
-								updatedAt: new Date()
-							}
-						});
-				}
-			} else if (chunk.type === 'done') {
-				// Final save with complete response
-				await db
-					.insert(chatMessages)
-					.values({
-						id: assistantMsgId,
-						chatId: sessionId,
-						userId,
-						role: 'assistant',
-						content: fullResponse,
-						metadata: JSON.stringify({
-							streaming: false,
-							chunks: chunkCount,
-							caseId,
-							confidence: chunk.metadata?.confidence ?? 0.8,
-							sources: chunk.metadata?.sources || []
-						})
-					})
-					.onConflictDoUpdate({
-						target: chatMessages.id,
-						set: {
-							content: fullResponse,
-							metadata: JSON.stringify({
-								streaming: false,
-								chunks: chunkCount,
-								caseId,
-								confidence: chunk.metadata?.confidence ?? 0.8,
-								sources: chunk.metadata?.sources || []
-							}),
-							updatedAt: new Date()
-						}
-					});
+        // Save every 10 chunks for real-time updates
+        if (chunkCount % 10 === 0) {
+          await db
+            .insert(chatMessages)
+            .values({
+              id: assistantMsgId,
+              chatId: sessionId,
+              userId,
+              role: 'assistant',
+              content: fullResponse,
+              metadata: JSON.stringify({
+                streaming: true,
+                chunks: chunkCount,
+                caseId,
+                confidence: chunk.metadata?.confidence ?? 0.8,
+              }),
+            })
+            .onConflictDoUpdate({
+              target: chatMessages.id,
+              set: {
+                content: fullResponse,
+                metadata: JSON.stringify({
+                  streaming: true,
+                  chunks: chunkCount,
+                  caseId,
+                  confidence: chunk.metadata?.confidence ?? 0.8,
+                }),
+                updatedAt: new Date(),
+              },
+            });
+        }
+      } else if (chunk.type === 'done') {
+        // Final save with complete response
+        await db
+          .insert(chatMessages)
+          .values({
+            id: assistantMsgId,
+            chatId: sessionId,
+            userId,
+            role: 'assistant',
+            content: fullResponse,
+            metadata: JSON.stringify({
+              streaming: false,
+              chunks: chunkCount,
+              caseId,
+              confidence: chunk.metadata?.confidence ?? 0.8,
+              sources: chunk.metadata?.sources || [],
+            }),
+          })
+          .onConflictDoUpdate({
+            target: chatMessages.id,
+            set: {
+              content: fullResponse,
+              metadata: JSON.stringify({
+                streaming: false,
+                chunks: chunkCount,
+                caseId,
+                confidence: chunk.metadata?.confidence ?? 0.8,
+                sources: chunk.metadata?.sources || [],
+              }),
+              updatedAt: new Date(),
+            },
+          });
 
-				// Update chat metadata message count
-				await db
-					.update(chatMetadata)
-					.set({
-						lastMessageAt: new Date(),
-						updatedAt: new Date()
-					})
-					.where(eq(chatMetadata.chatId, sessionId));
+        // Update chat metadata message count
+        await db
+          .update(chatMetadata)
+          .set({
+            lastMessageAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(chatMetadata.chatId, sessionId));
 
-				// Queue embedding generation via RabbitMQ (async, non-critical)
-				try {
-					const { publishToQueue } = await import('$lib/server/rabbitmq');
-					await publishToQueue('embedding.generation', {
-						type: 'chat_message',
-						sessionId,
-						userId,
-						caseId,
-						message: fullResponse
-					});
-				} catch {
-					// RabbitMQ not available - non-critical
-				}
-			}
-		}
-	} catch (error) {
-		console.error('AI response generation failed:', error);
-		const errorMsgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-		await db.insert(chatMessages).values({
-			id: errorMsgId,
-			chatId: sessionId,
-			userId,
-			role: 'assistant',
-			content: 'Sorry, I encountered an error processing your request.',
-			metadata: JSON.stringify({
-				error: true,
-				caseId,
-				message: 'Stream error'
-			})
-		});
-	}
+        // Queue embedding generation via RabbitMQ (async, non-critical)
+        try {
+          const { publishToQueue } = await import('$lib/server/rabbitmq');
+          await publishToQueue('embedding.generation', {
+            type: 'chat_message',
+            sessionId,
+            userId,
+            caseId,
+            message: fullResponse,
+          });
+        } catch {
+          // RabbitMQ not available - non-critical
+        }
+      }
+    }
+  } catch (error) {
+    console.error('AI response generation failed:', error);
+    const errorMsgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    await db.insert(chatMessages).values({
+      id: errorMsgId,
+      chatId: sessionId,
+      userId,
+      role: 'assistant',
+      content: 'Sorry, I encountered an error processing your request.',
+      metadata: JSON.stringify({
+        error: true,
+        caseId,
+        message: 'Stream error',
+      }),
+    });
+  }
 }

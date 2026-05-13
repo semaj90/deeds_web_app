@@ -45,8 +45,13 @@
 			const formData = new FormData();
 			formData.append('file', file);
 			if (selectedCaseId) {
+				formData.append('case_id', selectedCaseId);
 				formData.append('caseId', selectedCaseId);
 			}
+			formData.append('enableAiAnalysis', 'true');
+			formData.append('enableOcr', 'true');
+			formData.append('enableEmbeddings', 'true');
+			formData.append('enableSummarization', 'true');
 
 			const response = await fetch('/api/evidence/upload', {
 				method: 'POST',

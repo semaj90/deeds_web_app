@@ -5,8 +5,8 @@ import {
   getContextCacheWithSource,
   setContextCache,
   bumpContextCacheHit,
-  normalizeContextPack,
-  type ContextPack,
+  normalizeCachedContextPacket,
+  type CachedContextPacket,
 } from './llm-context-cache.js';
 
 export type AceContextPlannerState = {
@@ -35,7 +35,7 @@ export type AceContextPlannerState = {
 };
 
 export type AceContextPlannerMeta = {
-  source: 'redis' | 'postgres' | 'local' | 'miss';
+  source: 'redis' | 'postgres' | 'local-json' | 'miss';
   retrievedAt: string;
   deltaFields: string[];
   estimatedPrefixTokens: number;
@@ -104,13 +104,13 @@ function toContextPack(
   state: AceContextPlannerState,
   packet: FeatureWikiPacket,
   meta: AceContextPlannerMeta
-): ContextPack {
+): CachedContextPacket {
   const normalized = normalizePacket(packet);
-  return normalizeContextPack({
+  return normalizeCachedContextPacket({
     summary: normalized.summary,
-    chunk_ids: normalized.selectedSourceIds.slice(0, 8),
-    graph_paths: normalized.topTriples.slice(0, 8).map((triple) => triple.join(' | ')),
-    tool_policy: {
+    chunkIds: normalized.selectedSourceIds.slice(0, 8),
+    graphPaths: normalized.topTriples.slice(0, 8).map((triple) => triple.join(' | ')),
+    toolPolicy: {
       featureId: normalized.featureId,
       glyphMask: normalized.glyphMask,
       topFiles: normalized.topFiles.slice(0, 8),
@@ -118,20 +118,20 @@ function toContextPack(
       cacheKeys: normalized.cacheKeys.slice(0, 8),
       warnings: normalized.warnings.slice(0, 8),
     },
-    prefix_tokens_estimated: meta.estimatedPrefixTokens,
-    cache_hit: meta.source !== 'miss',
-    retrieval_skipped: meta.source !== 'miss',
+    prefixTokensEstimated: meta.estimatedPrefixTokens,
+    cacheHit: meta.source !== 'miss',
+    retrievalSkipped: meta.source !== 'miss',
     backend: state.backend,
-    model_name: state.modelName,
-    model_quant: state.modelQuant,
-    tokenizer_hash: state.tokenizerHash,
-    system_prompt_hash: state.systemPromptHash,
-    tool_definitions_hash: state.toolDefinitionsHash,
-    repo_git_sha: state.repoGitSha,
-    corpus_hash: state.corpusHash,
-    rag_bundle_hash: state.ragBundleHash,
-    graph_snapshot_hash: state.graphSnapshotHash,
-    cache_key: state.cacheKey,
+    modelName: state.modelName,
+    modelQuant: state.modelQuant,
+    tokenizerHash: state.tokenizerHash,
+    systemPromptHash: state.systemPromptHash,
+    toolDefinitionsHash: state.toolDefinitionsHash,
+    repoGitSha: state.repoGitSha,
+    corpusHash: state.corpusHash,
+    ragBundleHash: state.ragBundleHash,
+    graphSnapshotHash: state.graphSnapshotHash,
+    cacheKey: state.cacheKey,
     featureId: normalized.featureId,
     glyphMask: normalized.glyphMask,
     topFiles: normalized.topFiles.slice(0, 8),
@@ -139,7 +139,7 @@ function toContextPack(
     selectedSourceIds: normalized.selectedSourceIds.slice(0, 8),
     cacheKeys: normalized.cacheKeys.slice(0, 8),
     warnings: normalized.warnings.slice(0, 8),
-    planner_state: {
+    plannerState: {
       queryHash: state.queryHash,
       modelName: state.modelName,
       modelQuant: state.modelQuant,
@@ -164,18 +164,18 @@ function toContextPack(
   });
 }
 
-function toFeatureWikiPacket(pack: ContextPack): FeatureWikiPacket {
+function toFeatureWikiPacket(pack: CachedContextPacket): FeatureWikiPacket {
   return {
-    featureId: pack.featureId ?? pack.cache_key ?? 'ace-context',
+    featureId: pack.featureId ?? pack.cacheKey ?? 'ace-context',
     glyphMask: pack.glyphMask ?? 0,
     summary: pack.summary,
     topFiles: pack.topFiles ?? [],
     topTriples: pack.topTriples ?? [],
-    selectedSourceIds: pack.selectedSourceIds ?? pack.chunk_ids ?? [],
+    selectedSourceIds: pack.selectedSourceIds ?? pack.chunkIds ?? [],
     cacheKeys: pack.cacheKeys ?? [],
     warnings: pack.warnings ?? [],
     topGraphTriples: pack.topTriples ?? [],
-    toolPolicy: pack.tool_policy ?? {},
+    toolPolicy: pack.toolPolicy ?? {},
   };
 }
 
@@ -274,7 +274,7 @@ export async function loadAceContextPlannerHit(state: AceContextPlannerState): P
     if (pack) {
       const packet = toFeatureWikiPacket(pack);
       void bumpContextCacheHit(state.cacheKey).catch(() => {});
-      const deltaFields = diffPlannerState(state, pack.planner_state as Partial<AceContextPlannerState> | undefined);
+      const deltaFields = diffPlannerState(state, pack.plannerState as Partial<AceContextPlannerState> | undefined);
       return {
         cacheKey: state.cacheKey,
         contextHash: state.cacheKey,
@@ -284,7 +284,7 @@ export async function loadAceContextPlannerHit(state: AceContextPlannerState): P
           source,
           retrievedAt,
           deltaFields,
-          estimatedPrefixTokens: pack.prefix_tokens_estimated ?? estimateTokens(JSON.stringify(packet)),
+          estimatedPrefixTokens: pack.prefixTokensEstimated ?? estimateTokens(JSON.stringify(packet)),
         },
       };
     }

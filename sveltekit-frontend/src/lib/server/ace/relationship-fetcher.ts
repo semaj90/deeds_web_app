@@ -1,4 +1,4 @@
-import { pool } from '$lib/server/db/client.js';
+import { pool } from '$lib/server/db/client';
 
 export async function fetchCommunityRelationships(): Promise<string> {
   try {
@@ -8,13 +8,14 @@ export async function fetchCommunityRelationships(): Promise<string> {
       ORDER BY weight DESC
       LIMIT 10
     `);
-    
+
     if (rows.length === 0) return '';
-    
-    const lines = rows.map(r => 
-      `**Community ${r.src_community} → Community ${r.dst_community}** (${r.purpose}, weight=${r.weight})\n  ${r.summary}`
+
+    const lines = rows.map(
+      (r) =>
+        `**Community ${r.src_community} → Community ${r.dst_community}** (${r.purpose}, weight=${r.weight})\n  ${r.summary}`
     );
-    
+
     return `\n## Inter-Community Relationships (GraphRAG Connections)\n` + lines.join('\n\n');
   } catch (err) {
     console.warn('[ACE context] relationship fetch failed:', (err as Error)?.message);

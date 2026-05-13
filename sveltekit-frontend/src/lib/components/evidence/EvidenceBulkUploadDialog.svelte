@@ -96,7 +96,18 @@
 					if (!files.length) return;
 					const formData = new FormData();
 					for (const f of files) formData.append('file', f);
-					if (activeCaseId) formData.append('caseId', activeCaseId);
+					if (activeCaseId) {
+						formData.append('case_id', activeCaseId);
+						formData.append('caseId', activeCaseId);
+					}
+					if (activeCaseId) {
+						formData.append('case_id', activeCaseId);
+						formData.append('caseId', activeCaseId);
+					}
+					formData.append('enableAiAnalysis', 'true');
+					formData.append('enableOcr', 'true');
+					formData.append('enableEmbeddings', 'true');
+					formData.append('enableSummarization', 'true');
 					try {
 						const res = await fetch('?/upload', { method: 'POST', body: formData });
 						if (res.ok) handleComplete();

@@ -1,12 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { enhancedGraphMappings } from '$lib/server/db/schema/graph-mappings.js';
 import { desc, sql } from 'drizzle-orm';
 
 /**
  * GET /api/analytics/knowledge-triples
- * 
+ *
  * Returns recent knowledge triples from the enhanced graph mappings.
  */
 export const GET: RequestHandler = async ({ url, locals }) => {

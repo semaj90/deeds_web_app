@@ -61,6 +61,27 @@ User Query
   - Keys include model, backend, tokenizer, system prompt, repo SHA, and retrieval hashes
   - Tracks cache source so hot paths can tell which layer answered
 
+## NanoFlow-style ACE context reuse
+
+This cache stores logical context packs, not raw model KV tensors.
+
+It is safe because cache keys include:
+- model/backend/tokenizer identity
+- system prompt hash
+- tool definition hash
+- repo SHA
+- corpus hash
+- RAG bundle hash
+- graph snapshot hash
+
+A cache hit reuses:
+- summary
+- chunk IDs
+- graph paths
+- tool policy
+
+It does not serialize llama-server KV cache, GPU tensors, native pointers, or hidden reasoning.
+
 ### Integration Points
 
 **SSE Chat Endpoint** (`/api/sse/chat/+server.ts`):

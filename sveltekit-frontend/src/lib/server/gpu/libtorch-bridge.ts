@@ -496,9 +496,10 @@ function cpuWeightedEmbedding(weights: number[], embeddings: number[][]): number
 // copy-back, which saturates the 8 GB GPU budget alongside model weights.
 // C++ hard cap is MAX_N_SIMILARITY=4096 (libtorch_graph.cc:61); TS cap is stricter.
 export const GRAPH_SIM_MAX_N = 2048;
+export const GRAPH_CLUSTERING_MAX_N = 16384;
 
 export async function graphSimilarity(embeddings: number[][]): Promise<SimilarityResult> {
-	const n = embeddings.length;
+  const n = embeddings.length;
   const dim = embeddings[0]?.length ?? 0;
 
   if (n === 0 || dim === 0) return { matrix: [], n: 0, source: 'cpu' };
@@ -507,7 +508,7 @@ export async function graphSimilarity(embeddings: number[][]): Promise<Similarit
   if (n > GRAPH_SIM_MAX_N) {
     throw new RangeError(
       `[libtorch-bridge] graphSimilarity: n=${n} exceeds hard cap ${GRAPH_SIM_MAX_N}. ` +
-      `Slice your input or use batchCosineSimilarity for pairwise scores instead.`
+        `Slice your input or use batchCosineSimilarity for pairwise scores instead.`
     );
   }
 
@@ -525,7 +526,9 @@ export async function graphSimilarity(embeddings: number[][]): Promise<Similarit
         }
         return { matrix, n, source: 'gpu' };
       } catch (err) {
-        console.warn(`[libtorch-bridge] graphSimilarity GPU failed (${(err as Error)?.message ?? err}), falling back to CPU`);
+        console.warn(
+          `[libtorch-bridge] graphSimilarity GPU failed (${(err as Error)?.message ?? err}), falling back to CPU`
+        );
       } finally {
         releaseFloat32(flat);
       }
@@ -544,7 +547,7 @@ export async function graphSimilarity(embeddings: number[][]): Promise<Similarit
         `(need ~${(cpuBytes / 1e6).toFixed(0)} MB)`
     );
   }
-	return { matrix: cpuCosineSimilarity(embeddings), n, source: 'cpu' };
+  return { matrix: cpuCosineSimilarity(embeddings), n, source: 'cpu' };
 }
 
 /**
@@ -552,19 +555,39 @@ export async function graphSimilarity(embeddings: number[][]): Promise<Similarit
  * GPU: libtorch CUDA K-means. CPU: 8× unrolled, Float32 centroid storage.
  */
 export async function clusterEmbeddings(embeddings: number[][], k: number): Promise<ClusterResult> {
-	const n = embeddings.length;
-	const dim = embeddings[0]?.length ?? 0;
+  const n = embeddings.length;
+  const dim = embeddings[0]?.length ?? 0;
 
   // P0: k > n would leave empty clusters with undefined centroids → NaN propagation
   if (n === 0 || dim === 0) return { assignments: [], k: 0, source: 'cpu' };
   const effectiveK = Math.max(1, Math.min(k, n));
+
+  if (n > GRAPH_CLUSTERING_MAX_N) {
+    throw new RangeError(
+      `[libtorch-bridge] clusterEmbeddings: n=${n} exceeds hard cap ${GRAPH_CLUSTERING_MAX_N}. Sub-sample your data or use mini-batch k-means instead.`
+    );
+  }
+
   if (effectiveK !== k) {
     console.warn(`[libtorch-bridge] clusterEmbeddings: k=${k} clamped to ${effectiveK} (n=${n})`);
   }
 
-	const native = getAddonInternal();
-	if (native?.clusterEmbeddings) {
-		const mb = vramNeededMB(n, dim);
+  if (n >= GPU_ASYNC_THRESHOLD_N) {
+    // Flatten and offload
+    const flat = new Float32Array(n * dim);
+    for (let i = 0; i < n; i++) flat.set(embeddings[i], i * dim);
+    const res = await kmeansWithCentroidsAsync(flat, n, dim, effectiveK, 100);
+    const assignments = Array.from(res.assignments);
+    const centroids: number[][] = [];
+    for (let c = 0; c < effectiveK; c++) {
+      centroids.push(Array.from(res.centroids.subarray(c * dim, (c + 1) * dim)));
+    }
+    return { assignments, centroids, k: effectiveK, source: res.source };
+  }
+
+  const native = getAddonInternal();
+  if (native?.clusterEmbeddings) {
+    const mb = vramNeededMB(n, dim);
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
       const flat = acquireFloat32(n * dim);
       try {
@@ -572,27 +595,24 @@ export async function clusterEmbeddings(embeddings: number[][], k: number): Prom
         const result = native.clusterEmbeddings(flat, n, dim, effectiveK, 100);
         const assignments = Array.from(result);
 
-        // P0: validate GPU result — NaN or out-of-range assignments indicate
-        // empty cluster → uninitialized centroid → silent NaN propagation.
+        // P0: validate GPU result
         const hasInvalid = assignments.some((a) => !Number.isFinite(a) || a < 0 || a >= effectiveK);
         if (hasInvalid) {
           console.warn(
-            `[libtorch-bridge] clusterEmbeddings: GPU returned invalid assignments (empty cluster?), ` +
-            `falling back to CPU k-means`
+            '[libtorch-bridge] clusterEmbeddings: GPU returned invalid assignments (empty cluster?), falling back to CPU k-means'
           );
-          // fall through to CPU
         } else {
           return { assignments, k: effectiveK, source: 'gpu' };
         }
       } catch (err) {
-        console.warn(`[libtorch-bridge] clusterEmbeddings GPU failed (${(err as Error)?.message ?? err}), falling back to CPU`);
+        console.warn('[libtorch-bridge] clusterEmbeddings GPU failed, falling back to CPU', err);
       } finally {
         releaseFloat32(flat);
       }
     }
-	}
+  }
 
-	return { assignments: cpuKMeans(embeddings, effectiveK), k: effectiveK, source: 'cpu' };
+  return { assignments: cpuKMeans(embeddings, effectiveK), k: effectiveK, source: 'cpu' };
 }
 
 /**
