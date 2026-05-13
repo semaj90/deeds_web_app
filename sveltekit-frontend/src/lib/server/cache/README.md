@@ -56,6 +56,11 @@ User Query
   - `warmUpDomain()` — Pre-populate specific domain (evidence, torts, etc.)
   - 100+ queries across 5 domains (evidence, civil-procedure, torts, contracts, criminal)
 
+- **`ace/llm-context-cache.ts`** — ACE context-pack cache
+  - Reuses planner packets across Redis, Postgres, and local NVMe JSON
+  - Keys include model, backend, tokenizer, system prompt, repo SHA, and retrieval hashes
+  - Tracks cache source so hot paths can tell which layer answered
+
 ### Integration Points
 
 **SSE Chat Endpoint** (`/api/sse/chat/+server.ts`):
@@ -127,6 +132,15 @@ curl -X POST http://localhost:5173/api/cache/warm-up \
 Available at: [http://localhost:5173/cache-monitor](http://localhost:5173/cache-monitor)
 
 ## Configuration
+
+## NanoFlow-style Context Reuse
+
+ACE now supports a NanoFlow-inspired logical cache lane for context reuse without changing the active LLM backend or attempting raw KV serialization.
+
+- The cache unit is a compact context pack: summary, selected chunk IDs, graph paths, and tool-policy metadata.
+- Cache identity is derived from the request contract: query hash, backend/model settings, system prompt, tool definitions, repo/corpus/RAG/graph hashes, and retrieval-mode flags.
+- On a hit, ACE reuses the packed context and planner metadata first, then continues normal generation.
+- This is not GPU KV offload and does not replace `llama-server`; it is safe context-pack reuse across Redis, Postgres, and local NVMe JSON.
 
 ### Cache Key Generation
 

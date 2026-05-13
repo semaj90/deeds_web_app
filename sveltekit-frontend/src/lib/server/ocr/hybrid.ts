@@ -7,9 +7,16 @@ import path from 'path';
 import { createWorker } from 'tesseract.js';
 import os from 'os';
 
+/** VLM OCR endpoints — tries llama-server VLM first, then Ollama as fallback */
+const VLM_BASE_URL = process.env.VLM_BASE_URL ?? 'http://localhost:8085';
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const VLM_MODEL_NAME = process.env.VLM_MODEL ?? 'gemma4-legal-vlm';
+/** Confidence threshold below which Tesseract result triggers VLM supplement */
+const VLM_OCR_THRESHOLD = 0.6;
+
 export interface OcrResult {
     text: string;
-    method: 'native' | 'tesseractjs' | 'fallback' | 'native-from-pdf' | 'tesseractjs-from-pdf' | 'pdf-conversion-failed';
+    method: 'native' | 'tesseractjs' | 'fallback' | 'native-from-pdf' | 'tesseractjs-from-pdf' | 'pdf-conversion-failed' | 'vlm-ocr' | 'vlm-ocr-from-pdf';
     confidence: number;
     error?: string;
 }
@@ -52,6 +59,106 @@ function sanitizeFilename(filename: string): string {
     return safe.substring(0, 255);
 }
 
+type DocType = 'general' | 'table' | 'handwriting' | 'scan';
+
+const VLM_OCR_PROMPTS: Record<DocType, string> = {
+    general: 'This is a page from a legal document. Extract ALL text exactly as it appears, preserving formatting, paragraph breaks, numbering, and section headings. Output only the extracted text without commentary.',
+    table: 'This document page contains a table or structured data. Extract all text preserving rows and columns. Use | to separate columns, newlines for rows. Output only the extracted content.',
+    handwriting: 'This document page contains handwritten text. Transcribe ALL handwritten text as precisely as possible. Mark unclear words with [?]. Preserve line breaks and paragraph structure. Output only the transcription.',
+    scan: 'This is a scanned document page that may have noise or low quality. Extract ALL legible text. Mark truly unreadable sections with [...]. Preserve formatting as much as possible. Output only the extracted text.',
+};
+
+/**
+ * Classify document type by asking the VLM to inspect the image.
+ * Returns 'general' on any error (safe default).
+ */
+async function classifyDocType(imageBase64: string): Promise<DocType> {
+    const classifyPrompt = 'What type of document is shown in this image? Reply with exactly one word from: general (normal text/paragraphs), table (grids/spreadsheets/structured data), handwriting (handwritten text), scan (degraded/low-quality scan). Single word only.';
+
+    const attempt = async (baseUrl: string, model: string): Promise<DocType | null> => {
+        try {
+            const res = await fetch(`${baseUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model,
+                    messages: [{ role: 'user', content: [
+                        { type: 'image_url', image_url: { url: `data:image/png;base64,${imageBase64}` } },
+                        { type: 'text', text: classifyPrompt },
+                    ] }],
+                    temperature: 0.1,
+                    max_tokens: 8,
+                }),
+                signal: AbortSignal.timeout(15_000),
+            });
+            if (!res.ok) return null;
+            const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+            const word = json.choices?.[0]?.message?.content?.trim().toLowerCase() ?? '';
+            const valid: DocType[] = ['general', 'table', 'handwriting', 'scan'];
+            return valid.includes(word as DocType) ? (word as DocType) : null;
+        } catch {
+            return null;
+        }
+    };
+
+    return (await attempt(VLM_BASE_URL, VLM_MODEL_NAME))
+        ?? (await attempt(OLLAMA_BASE_URL, `${VLM_MODEL_NAME}:latest`))
+        ?? 'general';
+}
+
+/**
+ * Extract text from an image buffer using the Gemma 4 VLM (gemma4-legal-vlm).
+ * Two-step: classify document type, then apply a type-specific extraction prompt.
+ * Tries llama-server :8085 first, falls back to Ollama :11434.
+ */
+async function extractTextVlm(imageBuffer: Buffer, isPdf: boolean): Promise<OcrResult> {
+    const imageBase64 = imageBuffer.toString('base64');
+    const docType = await classifyDocType(imageBase64);
+    const extractPrompt = VLM_OCR_PROMPTS[docType];
+
+    const attempt = async (baseUrl: string, model: string): Promise<string | null> => {
+        try {
+            const res = await fetch(`${baseUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model,
+                    messages: [{ role: 'user', content: [
+                        { type: 'image_url', image_url: { url: `data:image/png;base64,${imageBase64}` } },
+                        { type: 'text', text: extractPrompt },
+                    ] }],
+                    temperature: 0.1,
+                    max_tokens: 4096,
+                }),
+                signal: AbortSignal.timeout(90_000),
+            });
+            if (!res.ok) return null;
+            const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+            return json.choices?.[0]?.message?.content?.trim() ?? null;
+        } catch {
+            return null;
+        }
+    };
+
+    const text = (await attempt(VLM_BASE_URL, VLM_MODEL_NAME))
+        ?? (await attempt(OLLAMA_BASE_URL, `${VLM_MODEL_NAME}:latest`));
+
+    if (!text) {
+        return {
+            text: '',
+            method: isPdf ? 'vlm-ocr-from-pdf' : 'vlm-ocr',
+            confidence: 0,
+            error: 'VLM OCR: both endpoints unavailable',
+        };
+    }
+
+    return {
+        text,
+        method: isPdf ? 'vlm-ocr-from-pdf' : 'vlm-ocr',
+        confidence: calculateOcrConfidence(text),
+    };
+}
+
 /**
  * Render a single PDF page to a PNG buffer using pdfjs-dist + @napi-rs/canvas.
  * This enables OCR on scanned PDFs by converting the first page to an image.
@@ -73,7 +180,11 @@ async function renderPdfPageToImage(pdfBuffer: Buffer, pageNumber: number): Prom
     }
 
     const page = await pdfDoc.getPage(pageNumber);
-    const viewport = page.getViewport({ scale: 2.0 }); // 2x scale for better OCR accuracy
+    const viewport1 = page.getViewport({ scale: 1.0 });
+    const maxDim = Math.max(viewport1.width, viewport1.height);
+    // Cap rendered image at 1536px max dimension — Gemma 4 vision silently degrades above this
+    const scale = Math.min(2.0, 1536 / maxDim);
+    const viewport = page.getViewport({ scale });
     const canvas = createCanvas(Math.floor(viewport.width), Math.floor(viewport.height));
     const ctx = canvas.getContext('2d');
 
@@ -103,16 +214,43 @@ export async function extractTextHybrid(imageBuffer: Buffer, filename: string): 
 
     if (isPdf) {
         try {
-            console.log('[OCR Hybrid] PDF detected, converting first page to image for OCR');
-            // Convert first page of PDF to PNG using pdfjs-dist + @napi-rs/canvas
-            processBuffer = await renderPdfPageToImage(imageBuffer, 1);
-        } catch (pdfErr) {
+            console.log('[OCR Hybrid] PDF detected, performing multi-page VLM OCR');
+            const pdfjsPath = ['pdfjs-dist', 'legacy', 'build', 'pdf.mjs'].join('/');
+            const { getDocument } = await import(/* @vite-ignore */ pdfjsPath);
+            const pdfDoc = await getDocument({ data: new Uint8Array(imageBuffer) }).promise;
+            
+            const numPages = Math.min(pdfDoc.numPages, 10); // Cap at 10 pages for performance
+            const pageTexts: string[] = [];
+            let totalConfidence = 0;
+
+            for (let i = 1; i <= numPages; i++) {
+                console.log(`[OCR Hybrid] Processing page ${i}/${numPages}...`);
+                const pageBuffer = await renderPdfPageToImage(imageBuffer, i);
+                const pageResult = await extractTextVlm(pageBuffer, true);
+                pageTexts.push(`--- Page ${i} ---\n${pageResult.text}`);
+                totalConfidence += pageResult.confidence;
+            }
+
+            pdfDoc.destroy();
+
             return {
-                text: '',
-                method: 'pdf-conversion-failed',
-                confidence: 0,
-                error: pdfErr instanceof Error ? pdfErr.message : 'Failed to convert PDF to image',
+                text: pageTexts.join('\n\n'),
+                method: 'vlm-ocr-from-pdf',
+                confidence: totalConfidence / numPages
             };
+        } catch (pdfErr) {
+            console.warn('[OCR Hybrid] Multi-page VLM OCR failed, falling back to page 1:', pdfErr);
+            // Fallback to single page if multi-page fails
+            try {
+                processBuffer = await renderPdfPageToImage(imageBuffer, 1);
+            } catch (innerErr) {
+                return {
+                    text: '',
+                    method: 'pdf-conversion-failed',
+                    confidence: 0,
+                    error: innerErr instanceof Error ? innerErr.message : 'Failed to convert PDF to image',
+                };
+            }
         }
     }
 
@@ -121,12 +259,19 @@ export async function extractTextHybrid(imageBuffer: Buffer, filename: string): 
         const nativeAvailable = await isTesseractAvailable();
         if (nativeAvailable) {
             const result = await extractTextFromImageNative(processBuffer, safeFilename);
-            return {
+            const nativeResult: OcrResult = {
                 text: result.text,
                 method: isPdf ? 'native-from-pdf' : 'native',
                 confidence: calculateOcrConfidence(result.text),
                 error: result.error,
             };
+            if (nativeResult.confidence >= VLM_OCR_THRESHOLD) return nativeResult;
+            try {
+                console.log(`[OCR Hybrid] Tesseract confidence ${nativeResult.confidence.toFixed(2)} < ${VLM_OCR_THRESHOLD}, trying VLM OCR`);
+                const vlmResult = await extractTextVlm(processBuffer, isPdf);
+                if (vlmResult.confidence > nativeResult.confidence) return vlmResult;
+            } catch { /* retain Tesseract result */ }
+            return nativeResult;
         }
     } catch (error) {
         console.warn('Native Tesseract failed, trying tesseract.js:', error);
@@ -150,20 +295,34 @@ export async function extractTextHybrid(imageBuffer: Buffer, filename: string): 
         await fs.unlink(tempFile).catch(() => {});
 
         const trimmedText = text.trim();
-        return {
+        const jsResult: OcrResult = {
             text: trimmedText,
             method: isPdf ? 'tesseractjs-from-pdf' : 'tesseractjs',
             confidence: calculateOcrConfidence(trimmedText),
         };
+        if (jsResult.confidence >= VLM_OCR_THRESHOLD) return jsResult;
+        try {
+            console.log(`[OCR Hybrid] tesseract.js confidence ${jsResult.confidence.toFixed(2)} < ${VLM_OCR_THRESHOLD}, trying VLM OCR`);
+            const vlmResult = await extractTextVlm(processBuffer, isPdf);
+            if (vlmResult.confidence > jsResult.confidence) return vlmResult;
+        } catch { /* retain tesseract.js result */ }
+        return jsResult;
     } catch (error) {
         console.error('tesseract.js OCR failed:', error);
+
+        // VLM OCR as last resort before giving up
+        try {
+            console.log('[OCR Hybrid] Both Tesseract methods failed, attempting VLM OCR');
+            const vlmResult = await extractTextVlm(processBuffer, isPdf);
+            if (vlmResult.text) return vlmResult;
+        } catch { /* fall through to final fallback */ }
 
         // Final fallback: return empty text
         return {
             text: '',
             method: 'fallback',
             confidence: 0,
-            error: 'Both OCR methods failed',
+            error: 'All OCR methods failed',
         };
     }
 }

@@ -168,17 +168,17 @@
         "lineEnd": 38
       }
     ],
-    "somRow": 0,
-    "somCol": 2,
-    "somCluster": 2,
+    "somRow": 3,
+    "somCol": 0,
+    "somCluster": 24,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.2741,
+      "maxBlend": 1.2747,
       "maxPr": 2.7145,
-      "avgBlend": 1.2741,
+      "avgBlend": 1.2747,
       "avgPr": 2.7145,
-      "totalBlend": 2.5481,
+      "totalBlend": 2.5494,
       "clusterAuthorityScore": 2.7145,
       "scoredFiles": 2,
       "totalFiles": 8,
@@ -186,28 +186,18 @@
         {
           "filePath": "src/lib/config/env.server.ts",
           "pageRank": 2.714539,
-          "karpathyBlend": 1.274073
-        },
-        {
-          "filePath": "src/lib/config/env.server.ts",
-          "pageRank": 2.714539,
-          "karpathyBlend": 1.274073
+          "karpathyBlend": 1.274721
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/config/env.server.ts",
           "pageRank": 2.714539,
-          "karpathyBlend": 1.274073
-        },
-        {
-          "filePath": "src/lib/config/env.server.ts",
-          "pageRank": 2.714539,
-          "karpathyBlend": 1.274073
+          "karpathyBlend": 1.274721
         }
       ]
     },
-    "clusterBlend": 1.2741
+    "clusterBlend": 1.2747
   },
   {
     "id": 88,
@@ -370,17 +360,17 @@
         "lineEnd": 90
       }
     ],
-    "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somRow": 1,
+    "somCol": 7,
+    "somCluster": 15,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.0875,
+      "maxBlend": 1.0871,
       "maxPr": 1.8347,
-      "avgBlend": 1.0875,
+      "avgBlend": 1.0871,
       "avgPr": 1.8347,
-      "totalBlend": 1.0875,
+      "totalBlend": 1.0871,
       "clusterAuthorityScore": 1.8347,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -388,18 +378,18 @@
         {
           "filePath": "src/lib/server/db/relations.ts",
           "pageRank": 1.834658,
-          "karpathyBlend": 1.087468
+          "karpathyBlend": 1.087144
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/relations.ts",
           "pageRank": 1.834658,
-          "karpathyBlend": 1.087468
+          "karpathyBlend": 1.087144
         }
       ]
     },
-    "clusterBlend": 1.0875
+    "clusterBlend": 1.0871
   },
   {
     "id": 46,
@@ -476,17 +466,17 @@
         "lineEnd": 48
       }
     ],
-    "somRow": 5,
+    "somRow": 1,
     "somCol": 3,
-    "somCluster": 43,
+    "somCluster": 11,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.8622,
+      "maxBlend": 0.8631,
       "maxPr": 1.5968,
-      "avgBlend": 0.8622,
+      "avgBlend": 0.8631,
       "avgPr": 1.5968,
-      "totalBlend": 0.8622,
+      "totalBlend": 0.8631,
       "clusterAuthorityScore": 1.5968,
       "scoredFiles": 1,
       "totalFiles": 2,
@@ -494,18 +484,18 @@
         {
           "filePath": "src/lib/server/ai/langgraph-client.ts",
           "pageRank": 1.596809,
-          "karpathyBlend": 0.862203
+          "karpathyBlend": 0.863105
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/ai/langgraph-client.ts",
           "pageRank": 1.596809,
-          "karpathyBlend": 0.862203
+          "karpathyBlend": 0.863105
         }
       ]
     },
-    "clusterBlend": 0.8622
+    "clusterBlend": 0.8631
   },
   {
     "id": 20,
@@ -680,17 +670,17 @@
         "lineEnd": 331
       }
     ],
-    "somRow": 3,
+    "somRow": 0,
     "somCol": 4,
-    "somCluster": 28,
+    "somCluster": 4,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7954,
+      "maxBlend": 0.7952,
       "maxPr": 1.7873,
-      "avgBlend": 0.7954,
+      "avgBlend": 0.7952,
       "avgPr": 1.7873,
-      "totalBlend": 0.7954,
+      "totalBlend": 0.7952,
       "clusterAuthorityScore": 1.7873,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -698,18 +688,18 @@
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.78728,
-          "karpathyBlend": 0.795356
+          "karpathyBlend": 0.795164
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.78728,
-          "karpathyBlend": 0.795356
+          "karpathyBlend": 0.795164
         }
       ]
     },
-    "clusterBlend": 0.7954
+    "clusterBlend": 0.7952
   },
   {
     "id": 57,
@@ -884,17 +874,17 @@
         "lineEnd": 145
       }
     ],
-    "somRow": 2,
-    "somCol": 5,
-    "somCluster": 21,
+    "somRow": 6,
+    "somCol": 6,
+    "somCluster": 54,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7954,
+      "maxBlend": 0.7952,
       "maxPr": 1.7873,
-      "avgBlend": 0.7954,
+      "avgBlend": 0.7952,
       "avgPr": 1.7873,
-      "totalBlend": 0.7954,
+      "totalBlend": 0.7952,
       "clusterAuthorityScore": 1.7873,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -902,18 +892,18 @@
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.78728,
-          "karpathyBlend": 0.795356
+          "karpathyBlend": 0.795164
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.78728,
-          "karpathyBlend": 0.795356
+          "karpathyBlend": 0.795164
         }
       ]
     },
-    "clusterBlend": 0.7954
+    "clusterBlend": 0.7952
   },
   {
     "id": 0,
@@ -967,9 +957,9 @@
         "lineEnd": 181
       }
     ],
-    "somRow": 7,
-    "somCol": 1,
-    "somCluster": 57,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -1135,9 +1125,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 4,
-    "somCol": 3,
-    "somCluster": 35,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -1242,9 +1232,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 6,
-    "somCluster": 54,
+    "somRow": 7,
+    "somCol": 0,
+    "somCluster": 56,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -1385,9 +1375,9 @@
         "lineEnd": 1
       }
     ],
-    "somRow": 4,
+    "somRow": 7,
     "somCol": 7,
-    "somCluster": 39,
+    "somCluster": 63,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -1565,9 +1555,9 @@
         "lineEnd": 26
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 4,
+    "somCol": 0,
+    "somCluster": 32,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -1746,8 +1736,8 @@
       }
     ],
     "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somCol": 0,
+    "somCluster": 56,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -1930,8 +1920,8 @@
       }
     ],
     "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somCol": 5,
+    "somCluster": 21,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -2022,9 +2012,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 5,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -2194,9 +2184,9 @@
         "lineEnd": 216
       }
     ],
-    "somRow": 4,
-    "somCol": 7,
-    "somCluster": 39,
+    "somRow": 7,
+    "somCol": 2,
+    "somCluster": 58,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -2346,9 +2336,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 3,
-    "somCluster": 51,
+    "somRow": 1,
+    "somCol": 0,
+    "somCluster": 8,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -2425,9 +2415,9 @@
         "lineEnd": 202
       }
     ],
-    "somRow": 2,
+    "somRow": 0,
     "somCol": 6,
-    "somCluster": 22,
+    "somCluster": 6,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -2557,9 +2547,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 4,
-    "somCol": 3,
-    "somCluster": 35,
+    "somRow": 3,
+    "somCol": 0,
+    "somCluster": 24,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -2689,9 +2679,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
-    "somCol": 2,
-    "somCluster": 18,
+    "somRow": 6,
+    "somCol": 0,
+    "somCluster": 48,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -2869,9 +2859,9 @@
         "lineEnd": 126
       }
     ],
-    "somRow": 4,
+    "somRow": 1,
     "somCol": 7,
-    "somCluster": 39,
+    "somCluster": 15,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -2940,9 +2930,9 @@
         "lineEnd": 213
       }
     ],
-    "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somRow": 6,
+    "somCol": 0,
+    "somCluster": 48,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -3068,9 +3058,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
+    "somRow": 0,
     "somCol": 6,
-    "somCluster": 22,
+    "somCluster": 6,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -3140,8 +3130,8 @@
       }
     ],
     "somRow": 4,
-    "somCol": 0,
-    "somCluster": 32,
+    "somCol": 2,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -3319,9 +3309,9 @@
         "lineEnd": 669
       }
     ],
-    "somRow": 3,
-    "somCol": 0,
-    "somCluster": 24,
+    "somRow": 4,
+    "somCol": 2,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -3499,9 +3489,9 @@
         "lineEnd": 44
       }
     ],
-    "somRow": 7,
-    "somCol": 4,
-    "somCluster": 60,
+    "somRow": 0,
+    "somCol": 1,
+    "somCluster": 1,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -3679,9 +3669,9 @@
         "lineEnd": 26
       }
     ],
-    "somRow": 7,
-    "somCol": 3,
-    "somCluster": 59,
+    "somRow": 0,
+    "somCol": 2,
+    "somCluster": 2,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -3875,9 +3865,9 @@
         "lineEnd": 207
       }
     ],
-    "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somRow": 7,
+    "somCol": 0,
+    "somCluster": 56,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -4047,9 +4037,9 @@
         "lineEnd": 249
       }
     ],
-    "somRow": 1,
-    "somCol": 2,
-    "somCluster": 10,
+    "somRow": 3,
+    "somCol": 4,
+    "somCluster": 28,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -4243,9 +4233,9 @@
         "lineEnd": 75
       }
     ],
-    "somRow": 6,
-    "somCol": 4,
-    "somCluster": 52,
+    "somRow": 0,
+    "somCol": 1,
+    "somCluster": 1,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -4391,9 +4381,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
-    "somCol": 2,
-    "somCluster": 18,
+    "somRow": 3,
+    "somCol": 5,
+    "somCluster": 29,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -4575,9 +4565,9 @@
         "lineEnd": 48
       }
     ],
-    "somRow": 4,
-    "somCol": 7,
-    "somCluster": 39,
+    "somRow": 7,
+    "somCol": 4,
+    "somCluster": 60,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -4699,9 +4689,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
+    "somRow": 7,
     "somCol": 3,
-    "somCluster": 19,
+    "somCluster": 59,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -4879,9 +4869,9 @@
         "lineEnd": 155
       }
     ],
-    "somRow": 4,
-    "somCol": 6,
-    "somCluster": 38,
+    "somRow": 7,
+    "somCol": 4,
+    "somCluster": 60,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -5020,8 +5010,8 @@
       }
     ],
     "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -5211,9 +5201,9 @@
         "lineEnd": 228
       }
     ],
-    "somRow": 5,
-    "somCol": 5,
-    "somCluster": 45,
+    "somRow": 1,
+    "somCol": 0,
+    "somCluster": 8,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -5280,9 +5270,9 @@
         "lineEnd": 72
       }
     ],
-    "somRow": 7,
-    "somCol": 6,
-    "somCluster": 62,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -5404,9 +5394,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
+    "somRow": 7,
     "somCol": 3,
-    "somCluster": 19,
+    "somCluster": 59,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -5588,9 +5578,9 @@
         "lineEnd": 112
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 4,
+    "somCol": 3,
+    "somCluster": 35,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -5651,9 +5641,9 @@
         "lineEnd": 190
       }
     ],
-    "somRow": 7,
-    "somCol": 4,
-    "somCluster": 60,
+    "somRow": 2,
+    "somCol": 0,
+    "somCluster": 16,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -5787,9 +5777,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 7,
-    "somCluster": 55,
+    "somRow": 5,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -5963,9 +5953,9 @@
         "lineEnd": 93
       }
     ],
-    "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somRow": 7,
+    "somCol": 0,
+    "somCluster": 56,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -6070,9 +6060,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 4,
-    "somCluster": 28,
+    "somRow": 5,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -6187,9 +6177,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 4,
-    "somCol": 3,
-    "somCluster": 35,
+    "somRow": 7,
+    "somCol": 2,
+    "somCluster": 58,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -6339,9 +6329,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 0,
-    "somCol": 4,
-    "somCluster": 4,
+    "somRow": 2,
+    "somCol": 0,
+    "somCluster": 16,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -6479,9 +6469,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
-    "somCol": 0,
-    "somCluster": 16,
+    "somRow": 3,
+    "somCol": 2,
+    "somCluster": 26,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -6596,8 +6586,8 @@
       }
     ],
     "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -6702,9 +6692,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 5,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -6781,8 +6771,8 @@
       }
     ],
     "somRow": 4,
-    "somCol": 0,
-    "somCluster": 32,
+    "somCol": 2,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -6965,8 +6955,8 @@
       }
     ],
     "somRow": 4,
-    "somCol": 1,
-    "somCluster": 33,
+    "somCol": 3,
+    "somCluster": 35,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -7148,9 +7138,9 @@
         "lineEnd": 106
       }
     ],
-    "somRow": 4,
-    "somCol": 7,
-    "somCluster": 39,
+    "somRow": 7,
+    "somCol": 4,
+    "somCluster": 60,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -7230,8 +7220,8 @@
       }
     ],
     "somRow": 2,
-    "somCol": 2,
-    "somCluster": 18,
+    "somCol": 3,
+    "somCluster": 19,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -7421,9 +7411,9 @@
         "lineEnd": 372
       }
     ],
-    "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somRow": 7,
+    "somCol": 1,
+    "somCluster": 57,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -7597,9 +7587,9 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 1,
-    "somCol": 3,
-    "somCluster": 11,
+    "somRow": 3,
+    "somCol": 7,
+    "somCluster": 31,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -7691,9 +7681,9 @@
         "lineEnd": 29
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 3,
+    "somCol": 5,
+    "somCluster": 29,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -7863,9 +7853,9 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 5,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -8003,9 +7993,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
-    "somCol": 2,
-    "somCluster": 18,
+    "somRow": 0,
+    "somCol": 7,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -8183,9 +8173,9 @@
         "lineEnd": 312
       }
     ],
-    "somRow": 0,
-    "somCol": 4,
-    "somCluster": 4,
+    "somRow": 6,
+    "somCol": 6,
+    "somCluster": 54,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -8367,9 +8357,9 @@
         "lineEnd": 22
       }
     ],
-    "somRow": 7,
-    "somCol": 3,
-    "somCluster": 59,
+    "somRow": 1,
+    "somCol": 6,
+    "somCluster": 14,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -8490,9 +8480,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
-    "somCol": 0,
-    "somCluster": 16,
+    "somRow": 3,
+    "somCol": 2,
+    "somCluster": 26,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -8670,9 +8660,9 @@
         "lineEnd": 3150
       }
     ],
-    "somRow": 2,
-    "somCol": 2,
-    "somCluster": 18,
+    "somRow": 1,
+    "somCol": 7,
+    "somCluster": 15,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -8834,9 +8824,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 4,
-    "somCluster": 60,
+    "somCluster": 4,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9014,9 +9004,9 @@
         "lineEnd": 994
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 3,
+    "somCol": 7,
+    "somCluster": 31,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9158,9 +9148,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 0,
-    "somCluster": 48,
+    "somRow": 3,
+    "somCol": 5,
+    "somCluster": 29,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9335,8 +9325,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
+    "somCol": 5,
+    "somCluster": 5,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9397,9 +9387,9 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somRow": 6,
+    "somCol": 7,
+    "somCluster": 55,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9468,9 +9458,9 @@
         "lineEnd": 169
       }
     ],
-    "somRow": 7,
-    "somCol": 1,
-    "somCluster": 57,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9579,9 +9569,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somRow": 7,
+    "somCol": 7,
+    "somCluster": 63,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9703,9 +9693,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
-    "somCol": 6,
-    "somCluster": 46,
+    "somRow": 7,
+    "somCol": 3,
+    "somCluster": 59,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9782,9 +9772,9 @@
         "lineEnd": 1560
       }
     ],
-    "somRow": 2,
-    "somCol": 2,
-    "somCluster": 18,
+    "somRow": 7,
+    "somCol": 7,
+    "somCluster": 63,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9954,9 +9944,9 @@
         "lineEnd": 42
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 4,
+    "somCol": 3,
+    "somCluster": 35,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10112,9 +10102,9 @@
         "lineEnd": 127
       }
     ],
-    "somRow": 0,
-    "somCol": 4,
-    "somCluster": 4,
+    "somRow": 4,
+    "somCol": 0,
+    "somCluster": 32,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10276,9 +10266,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 4,
-    "somCol": 7,
-    "somCluster": 39,
+    "somRow": 7,
+    "somCol": 3,
+    "somCluster": 59,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10464,9 +10454,9 @@
         "lineEnd": 138
       }
     ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
+    "somRow": 6,
+    "somCol": 4,
+    "somCluster": 52,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10531,9 +10521,9 @@
         "lineEnd": 43
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 5,
+    "somCol": 5,
+    "somCluster": 45,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10719,9 +10709,9 @@
         "lineEnd": 621
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 3,
+    "somCol": 5,
+    "somCluster": 29,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10907,9 +10897,9 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 7,
-    "somCol": 2,
-    "somCluster": 58,
+    "somRow": 1,
+    "somCol": 4,
+    "somCluster": 12,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11087,9 +11077,9 @@
         "lineEnd": 20
       }
     ],
-    "somRow": 7,
-    "somCol": 3,
-    "somCluster": 59,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11166,9 +11156,9 @@
         "lineEnd": 825
       }
     ],
-    "somRow": 2,
-    "somCol": 2,
-    "somCluster": 18,
+    "somRow": 0,
+    "somCol": 6,
+    "somCluster": 6,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11346,9 +11336,9 @@
         "lineEnd": 21
       }
     ],
-    "somRow": 7,
-    "somCol": 3,
-    "somCluster": 59,
+    "somRow": 0,
+    "somCol": 1,
+    "somCluster": 1,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11530,9 +11520,9 @@
         "lineEnd": 9
       }
     ],
-    "somRow": 6,
-    "somCol": 4,
-    "somCluster": 52,
+    "somRow": 0,
+    "somCol": 1,
+    "somCluster": 1,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11588,9 +11578,9 @@
         "lineEnd": 31
       }
     ],
-    "somRow": 7,
-    "somCol": 3,
-    "somCluster": 59,
+    "somRow": 1,
+    "somCol": 2,
+    "somCluster": 10,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11732,9 +11722,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 4,
+    "somCol": 3,
+    "somCluster": 35,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12044,9 +12034,9 @@
         "lineEnd": 657
       }
     ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
+    "somRow": 3,
+    "somCol": 5,
+    "somCluster": 29,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12224,9 +12214,9 @@
         "lineEnd": 8
       }
     ],
-    "somRow": 2,
-    "somCol": 3,
-    "somCluster": 19,
+    "somRow": 6,
+    "somCol": 1,
+    "somCluster": 49,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12404,9 +12394,9 @@
         "lineEnd": 84
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 3,
+    "somCol": 5,
+    "somCluster": 29,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12584,9 +12574,9 @@
         "lineEnd": 100
       }
     ],
-    "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somRow": 7,
+    "somCol": 4,
+    "somCluster": 60,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12768,9 +12758,9 @@
         "lineEnd": 256
       }
     ],
-    "somRow": 7,
-    "somCol": 6,
-    "somCluster": 62,
+    "somRow": 0,
+    "somCol": 2,
+    "somCluster": 2,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12892,9 +12882,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 0,
-    "somCol": 2,
-    "somCluster": 2,
+    "somRow": 6,
+    "somCol": 7,
+    "somCluster": 55,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13011,9 +13001,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somRow": 7,
+    "somCol": 0,
+    "somCluster": 56,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13191,9 +13181,9 @@
         "lineEnd": 129
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 4,
+    "somCol": 7,
+    "somCluster": 39,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13371,9 +13361,9 @@
         "lineEnd": 3606
       }
     ],
-    "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somRow": 1,
+    "somCol": 7,
+    "somCluster": 15,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13555,9 +13545,9 @@
         "lineEnd": 140
       }
     ],
-    "somRow": 7,
-    "somCol": 6,
-    "somCluster": 62,
+    "somRow": 5,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13618,9 +13608,9 @@
         "lineEnd": 45
       }
     ],
-    "somRow": 7,
-    "somCol": 3,
-    "somCluster": 59,
+    "somRow": 0,
+    "somCol": 2,
+    "somCluster": 2,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13806,9 +13796,9 @@
         "lineEnd": 284
       }
     ],
-    "somRow": 0,
-    "somCol": 2,
-    "somCluster": 2,
+    "somRow": 3,
+    "somCol": 5,
+    "somCluster": 29,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13986,9 +13976,9 @@
         "lineEnd": 156
       }
     ],
-    "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somRow": 1,
+    "somCol": 7,
+    "somCluster": 15,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14174,9 +14164,9 @@
         "lineEnd": 92
       }
     ],
-    "somRow": 6,
-    "somCol": 4,
-    "somCluster": 52,
+    "somRow": 0,
+    "somCol": 3,
+    "somCluster": 3,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14294,9 +14284,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 5,
+    "somCol": 0,
+    "somCluster": 40,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14417,9 +14407,9 @@
         "lineEnd": 198
       }
     ],
-    "somRow": 2,
+    "somRow": 0,
     "somCol": 6,
-    "somCluster": 22,
+    "somCluster": 6,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14533,9 +14523,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
-    "somCol": 2,
-    "somCluster": 18,
+    "somRow": 0,
+    "somCol": 4,
+    "somCluster": 4,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {

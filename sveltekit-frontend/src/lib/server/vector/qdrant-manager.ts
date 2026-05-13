@@ -224,9 +224,95 @@ export class QdrantManager {
   }
 
   /**
+   * Universal Multi-Query Search — Combines multiple sub-queries (dense, sparse, filtered)
+   * into a single retrieval pass using Qdrant's Universal Query API (prefetch + fusion).
+   *
+   * Replaces legacy manual RRF fusion with server-side fusion for better performance.
+   */
+  async multiQuerySearch(params: {
+    queries: Array<{
+      query?: string;
+      vector?: number[] | SparseVector;
+      vectorName?: string;
+      filter?: any;
+      limit?: number;
+      weight?: number;
+    }>;
+    collection: string;
+    fusion?: 'rrf' | 'dbsf';
+    limit?: number;
+    scoreThreshold?: number;
+    skipCache?: boolean;
+  }): Promise<QdrantSearchResult> {
+    return traceVectorSearch(
+      params.collection,
+      { searchType: 'multi-query-fusion', queryCount: params.queries.length, limit: params.limit },
+      async () => {
+        const startTime = Date.now();
+        const collectionName =
+          this.collections[params.collection as keyof typeof this.collections] ?? params.collection;
+
+        // Build prefetch sub-queries
+        const prefetches = params.queries.map((q) => {
+          const prefetch: any = {
+            limit: q.limit ?? params.limit ?? 20,
+          };
+          if (q.vector) {
+            if (Array.isArray(q.vector)) {
+              // Dense vector
+              prefetch.query = q.vector;
+              if (q.vectorName) prefetch.using = q.vectorName;
+            } else {
+              // Sparse vector (Indices/Values)
+              prefetch.query = {
+                indices: q.vector.indices,
+                values: q.vector.values,
+              };
+              prefetch.using = q.vectorName ?? 'bm25';
+            }
+          }
+          if (q.filter) {
+            prefetch.filter = this.buildQdrantFilter(q.filter);
+          }
+          return prefetch;
+        });
+
+        const searchRequest: any = {
+          prefetch: prefetches,
+          query: {
+            fusion: params.fusion ?? 'rrf',
+          },
+          limit: params.limit ?? 10,
+          score_threshold: params.scoreThreshold ?? 0.01, // Let fusion decide final scores
+          with_payload: true,
+        };
+
+        const results = (await this.client.query(collectionName, searchRequest)) as any;
+        const responseTime = Date.now() - startTime;
+
+        return {
+          results: results.points.map((p: any) => ({
+            id: p.id,
+            score: p.score,
+            payload: p.payload,
+          })),
+          metadata: {
+            query: 'multi-query-fusion',
+            collection: params.collection,
+            responseTime,
+            total_results: results.points.length,
+            cached: false,
+            searchType: 'multi-query-fusion',
+            fusion: params.fusion ?? 'rrf',
+          },
+        };
+      }
+    );
+  }
+
+  /**
    * Hybrid dense+sparse search (BM42 RRF fusion).
-   * Falls back to _denseSearch (cosine-only) when a collection has no sparse vectors.
-   * All 15+ callers get transparent hybrid-or-dense search.
+   * Now uses the native Universal Query API for multi-lane retrieval.
    */
   async hybridSearch(params: {
     query: string;
@@ -237,13 +323,36 @@ export class QdrantManager {
     scoreThreshold?: number;
     skipCache?: boolean;
   }): Promise<QdrantSearchResult> {
-    return this._denseSearch({
-      query: params.query,
-      queryEmbedding: params.queryEmbedding,
+    const sparseAvailable = await this.getSparseSupport(params.collection, 'bm25');
+
+    if (!sparseAvailable) {
+      return this._denseSearch(params);
+    }
+
+    const sparseVector = await generateSparseVector(params.query);
+
+    return this.multiQuerySearch({
       collection: params.collection,
-      filters: params.filters,
+      queries: [
+        {
+          vector: params.queryEmbedding,
+          vectorName: 'default',
+          limit: params.limit ?? 20,
+          weight: 1.0,
+          filter: params.filters,
+        },
+        {
+          vector: sparseVector,
+          vectorName: 'bm25',
+          limit: params.limit ?? 20,
+          weight: 1.0,
+          filter: params.filters,
+        },
+      ],
+      fusion: 'rrf',
       limit: params.limit,
       scoreThreshold: params.scoreThreshold,
+      skipCache: params.skipCache,
     });
   }
 

@@ -445,7 +445,7 @@
   },
   "src/routes/(app)/admin/search-intelligence/+page.svelte": {
     "zone": "route",
-    "directDeps": 5,
+    "directDeps": 6,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -2203,8 +2203,8 @@
   },
   "src/routes/api/agents/chat/+server.ts": {
     "zone": "route",
-    "directDeps": 7,
-    "serverDeps": 7,
+    "directDeps": 8,
+    "serverDeps": 8,
     "dbDeps": 0
   },
   "src/routes/api/ai/agent/+server.ts": {
@@ -2464,6 +2464,18 @@
     "directDeps": 5,
     "serverDeps": 5,
     "dbDeps": 0
+  },
+  "src/routes/api/analytics/knowledge-triples/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
+  },
+  "src/routes/api/analytics/knowledge-triples/prune/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/api/analytics/mapreduce-matrix/+server.ts": {
     "zone": "route",
@@ -5877,6 +5889,18 @@
     "zone": "route",
     "directDeps": 3,
     "serverDeps": 3,
+    "dbDeps": 0
+  },
+  "src/routes/api/wiki/page/[id]/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/api/wiki/refresh-directory/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "src/routes/api/wiki/search/+server.ts": {

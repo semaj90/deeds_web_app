@@ -720,7 +720,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
     name: 'hermes:spawn_subagent',
     description: 'Spawn a sub-agent to handle a recursive sub-task',
     handler: async (args, ctx) => {
-      const res = await fetch(`${ENV.PUBLIC_API_URL || 'http://localhost:5173'}/api/ai/agent`, {
+      const res = await fetch(`${ENV.PUBLIC_API_URL}/api/ai/agent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

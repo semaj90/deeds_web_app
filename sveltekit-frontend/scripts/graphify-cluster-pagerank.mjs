@@ -23,6 +23,17 @@ const ROOT = resolve(__dirname, '..');
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const HYPERGRAPH_PATH = resolve(ROOT, 'docs/graph/hypergraph-clusters.json');
 
+function uniqueByFilePath(rows) {
+  const seen = new Set();
+  const out = [];
+  for (const row of rows) {
+    if (!row?.filePath || seen.has(row.filePath)) continue;
+    seen.add(row.filePath);
+    out.push(row);
+  }
+  return out;
+}
+
 async function createRedis() {
   const req = createRequire(import.meta.url);
   let Redis;
@@ -119,14 +130,14 @@ async function main() {
       clusterAuthorityScore,
       scoredFiles: scoredMembers,
       totalFiles: paths.length,
-      topPrFiles: scored
+      topPrFiles: uniqueByFilePath(scored
         .slice()
         .sort((a, b) => b.pageRank - a.pageRank || b.karpathyBlend - a.karpathyBlend)
-        .slice(0, 5),
-      topBlendFiles: scored
+      ).slice(0, 5),
+      topBlendFiles: uniqueByFilePath(scored
         .slice()
         .sort((a, b) => b.karpathyBlend - a.karpathyBlend || b.pageRank - a.pageRank)
-        .slice(0, 5),
+      ).slice(0, 5),
     };
     
     // Set a primary blend score for the cluster for sorting
@@ -195,3 +206,4 @@ main().catch(err => {
   console.error('Fatal:', err);
   process.exit(1);
 });
+

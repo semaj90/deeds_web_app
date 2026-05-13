@@ -3,11 +3,11 @@
   import { onMount } from 'svelte';
   import { fade, slide, fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
-  
+
   let { data }: { data: PageData } = $props();
   let mounted = $state(false);
-  let initialStatus = $derived(data.status);
-  let status = $state(initialStatus);
+  let status = $state<PageData['status'] | null>(null);
+  let currentStatus = $derived(status ?? data.status);
   let searchQuery = $state('');
   let searchResults = $state([]);
   let searching = $state(false);
@@ -15,6 +15,15 @@
   let selectedId = $state<string | null>(null);
   let cardDetails = $state<any>(null);
   let loadingDetails = $state(false);
+  let degradedLaneMessages = $derived([
+    currentStatus.qdrant.pointCount === 0 ? 'Qdrant vector lane unavailable' : null,
+    currentStatus.neo4j.agentsCardCount === 0 ? 'Neo4j graph lane unavailable' : null,
+    currentStatus.featureMap?.dryRunOnly ? 'FeatureMap dry-run only' : null,
+  ].filter(Boolean) as string[]);
+
+  $effect(() => {
+    status = data.status;
+  });
 
   onMount(() => {
     mounted = true;
@@ -112,7 +121,7 @@
           Monitor Karpathy cards, AGENTS directory parity, and FeatureMap compilation health.
         </p>
       </div>
-      <button 
+      <button
         onclick={refreshStatus}
         disabled={refreshing}
         class="px-6 py-3 rounded-xl bg-accent/10 hover:bg-accent/20 text-accent text-sm font-bold flex items-center gap-2 transition-all active:scale-95 border border-accent/20"
@@ -128,7 +137,7 @@
     <div class="stat-card" in:fly={{ y: 20, delay: 100, duration: 600 }}>
       <div class="stat-icon i-carbon-document text-blue-400"></div>
       <div class="stat-label">Synthesis Pages</div>
-      <div class="stat-value">{status.pageCount.toLocaleString()}</div>
+      <div class="stat-value">{currentStatus.pageCount.toLocaleString()}</div>
       <div class="stat-sub">Enhanced Mappings</div>
       <div class="stat-glow bg-blue-500/10"></div>
     </div>
@@ -137,8 +146,8 @@
     <div class="stat-card" in:fly={{ y: 20, delay: 200, duration: 600 }}>
       <div class="stat-icon i-carbon-vector text-emerald-400"></div>
       <div class="stat-label">Qdrant Points</div>
-      <div class="stat-value">{status.qdrant.pointCount.toLocaleString()}</div>
-      <div class="stat-sub">{status.qdrant.collection ?? 'codebase_chunks_768'}</div>
+      <div class="stat-value">{currentStatus.qdrant.pointCount.toLocaleString()}</div>
+      <div class="stat-sub">{currentStatus.qdrant.collection ?? 'codebase_chunks_768'}</div>
       <div class="stat-glow bg-emerald-500/10"></div>
     </div>
 
@@ -146,7 +155,7 @@
     <div class="stat-card" in:fly={{ y: 20, delay: 250, duration: 600 }}>
       <div class="stat-icon i-carbon-data-base text-cyan-400"></div>
       <div class="stat-label">CouchDB Wiki Docs</div>
-      <div class="stat-value">{(status.couchdb?.docCount ?? status.couchdbWikiDocCount ?? 0).toLocaleString()}</div>
+      <div class="stat-value">{(currentStatus.couchdb?.docCount ?? currentStatus.couchdbWikiDocCount ?? 0).toLocaleString()}</div>
       <div class="stat-sub">Durable wiki layer</div>
       <div class="stat-glow bg-cyan-500/10"></div>
     </div>
@@ -155,7 +164,7 @@
     <div class="stat-card" in:fly={{ y: 20, delay: 300, duration: 600 }}>
       <div class="stat-icon i-carbon-network-4 text-magenta-400"></div>
       <div class="stat-label">Graph Nodes</div>
-      <div class="stat-value">{status.neo4j.agentsCardCount.toLocaleString()}</div>
+      <div class="stat-value">{currentStatus.neo4j.agentsCardCount.toLocaleString()}</div>
       <div class="stat-sub">Neo4j AgentsCards</div>
       <div class="stat-glow bg-magenta-500/10"></div>
     </div>
@@ -164,8 +173,8 @@
     <div class="stat-card" in:fly={{ y: 20, delay: 400, duration: 600 }}>
       <div class="stat-icon i-carbon-flash text-amber-400"></div>
       <div class="stat-label">Active Cards</div>
-      <div class="stat-value">{status.redis.agentsCards + status.redis.wikiPages}</div>
-      <div class="stat-sub">{status.redis.agentsCards} Dir / {status.redis.wikiPages} Page</div>
+      <div class="stat-value">{currentStatus.redis.agentsCards + currentStatus.redis.wikiPages}</div>
+      <div class="stat-sub">{currentStatus.redis.agentsCards} Dir / {currentStatus.redis.wikiPages} Page</div>
       <div class="stat-glow bg-amber-500/10"></div>
     </div>
 
@@ -173,11 +182,27 @@
     <div class="stat-card" in:fly={{ y: 20, delay: 500, duration: 600 }}>
       <div class="stat-icon i-carbon-time text-emerald-400"></div>
       <div class="stat-label">Last Graphify</div>
-      <div class="stat-value text-xl!">{status.lastGraphify ? new Date(status.lastGraphify).toLocaleDateString() : 'N/A'}</div>
-      <div class="stat-sub">{status.lastGraphify ? new Date(status.lastGraphify).toLocaleTimeString() : 'Never'}</div>
+      <div class="stat-value text-xl!">{currentStatus.lastGraphify ? new Date(currentStatus.lastGraphify).toLocaleDateString() : 'N/A'}</div>
+      <div class="stat-sub">{currentStatus.lastGraphify ? new Date(currentStatus.lastGraphify).toLocaleTimeString() : 'Never'}</div>
       <div class="stat-glow bg-emerald-500/10"></div>
     </div>
   </div>
+
+  {#if degradedLaneMessages.length > 0}
+    <section class="mb-10 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-5 text-amber-100" in:fade>
+      <div class="flex items-start gap-3">
+        <span class="i-carbon-warning-alt text-xl mt-0.5"></span>
+        <div class="space-y-2">
+          <p class="font-semibold">Operational with degraded lane:</p>
+          <ul class="space-y-1 text-sm text-amber-100/90">
+            {#each degradedLaneMessages as message}
+              <li>- {message}</li>
+            {/each}
+          </ul>
+        </div>
+      </div>
+    </section>
+  {/if}
 
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
     <!-- Left: Search & Results -->
@@ -188,14 +213,14 @@
           Knowledge Search
         </h2>
         <div class="relative group">
-          <input 
-            type="text" 
+          <input
+            type="text"
             bind:value={searchQuery}
             onkeydown={handleKeydown}
             placeholder="Search summaries, paths, or labels..."
             class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-accent/40 transition-all placeholder:opacity-30 shadow-2xl"
           />
-          <button 
+          <button
             onclick={performSearch}
             class="absolute right-3 top-3 p-2 rounded-xl bg-accent text-black hover:bg-accent/80 transition-all active:scale-90"
           >
@@ -211,8 +236,8 @@
           </div>
           <div class="grid grid-cols-1 gap-4">
             {#each searchResults as res, i}
-              <button 
-                class="result-row group text-left w-full" 
+              <button
+                class="result-row group text-left w-full"
                 onclick={() => inspectCard(res.id)}
                 in:fly={{ y: 10, delay: i * 50 }}
               >
@@ -249,7 +274,7 @@
           <span class="i-carbon-document-view opacity-50"></span>
           Card Inspector
         </h2>
-        
+
         {#if loadingDetails}
           <div class="glass-panel p-10 text-center space-y-4">
             <div class="i-carbon-renew animate-spin text-3xl text-accent mx-auto"></div>
@@ -392,19 +417,19 @@
         </h2>
         <div class="glass-panel p-6 space-y-4">
           <p class="text-xs text-white/40 leading-relaxed">
-            Nodes present in the codebase graph but missing from the hot-cache. 
+            Nodes present in the codebase graph but missing from the hot-cache.
           </p>
           <div class="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-            {#each status.staleDirectories as dir}
+            {#each currentStatus.staleDirectories as dir}
               <div class="flex items-center justify-between text-xs p-2 rounded bg-white/5 hover:bg-white/10 transition-colors group">
                 <span class="font-mono truncate max-w-[150px] opacity-70">{dir}</span>
-                <button 
+                <button
                   onclick={() => syncNode(dir)}
                   class="text-accent hover:underline opacity-0 group-hover:opacity-100 transition-opacity"
                 >Preview</button>
               </div>
             {/each}
-            {#if status.staleDirectories.length === 0}
+            {#if currentStatus.staleDirectories.length === 0}
               <div class="text-emerald-400 text-xs flex items-center gap-2 py-2">
                 <span class="i-carbon-checkmark-filled"></span>
                 All nodes hydrated
@@ -449,7 +474,7 @@
 <style>
   :global(body) {
     background-color: #05070a;
-    background-image: 
+    background-image:
       radial-gradient(circle at 0% 0%, rgba(31, 58, 138, 0.15) 0%, transparent 50%),
       radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
   }

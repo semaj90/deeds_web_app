@@ -57,6 +57,13 @@
     "tests/rag-search-ace-route.spec.ts",
     "tests/routes/auto/api/rag/search.test.ts"
   ],
+  "scripts/backup-consolidation/comparison.mjs": [
+    "scripts/backup-consolidation/tests/comparison-engine.test.mjs"
+  ],
+  "scripts/backup-consolidation/config.mjs": [
+    "scripts/backup-consolidation/tests/comparison-engine.test.mjs",
+    "scripts/backup-consolidation/tests/pattern-matching.test.mjs"
+  ],
   "tests/accessibility/accessibility-tester.ts": [
     "tests/accessibility/accessibility.test.ts"
   ],
@@ -142,6 +149,12 @@
     "tests/routes/auto/api/ace/summarize.test.ts"
   ],
   "src/lib/server/ace/token-aware-context-packer.ts": [
+    "tests/ace-token-aware-context-packer.spec.ts"
+  ],
+  "src/lib/server/ace/token-aware-packer.ts": [
+    "tests/ace-token-aware-context-packer.spec.ts"
+  ],
+  "src/lib/server/ai/hermes-synth.ts": [
     "tests/ace-token-aware-context-packer.spec.ts"
   ],
   "src/routes/api/admin/observability/+server.ts": [
@@ -361,6 +374,10 @@
     "tests/cuda-async.spec.ts",
     "tests/cuda-hardening.spec.ts"
   ],
+  "scripts/graph/build-codebase-relationships.mjs": [
+    "tests/build-codebase-relationships.spec.ts",
+    "tests/unit/normalize-repo-path.test.ts"
+  ],
   "src/routes/api/cache/+server.ts": [
     "tests/cache-recommendations-ml-sys-routes.spec.ts",
     "tests/cache-recommendations-ml-sys-routes.spec.ts",
@@ -415,9 +432,6 @@
     "tests/cases-sub-routes.spec.ts",
     "tests/cases-sub-routes.spec.ts",
     "tests/cases-sub-routes.spec.ts",
-    "tests/routes/auto/api/cases/__id/connections.test.ts",
-    "tests/routes/auto/api/cases/__id/connections.test.ts",
-    "tests/routes/auto/api/cases/__id/connections.test.ts",
     "tests/routes/auto/api/cases/__id/connections.test.ts"
   ],
   "src/routes/api/cases/[id]/persons/+server.ts": [
@@ -581,8 +595,7 @@
     "tests/setup/playwright-setup.ts"
   ],
   "tests/fixtures/demo-auth.ts": [
-    "tests/e2e/demo-seed.spec.ts",
-    "tests/fixtures/demo-auth.ts"
+    "tests/e2e/demo-seed.spec.ts"
   ],
   "tests/e2e/route-forensic/_helpers.ts": [
     "tests/e2e/route-forensic/active-cases.diagnostic.spec.ts",
@@ -611,19 +624,14 @@
     "tests/e2e/route-forensic/poi-detail.diagnostic.spec.ts",
     "tests/e2e/route-forensic/rag-search.diagnostic.spec.ts",
     "tests/e2e/route-forensic/register.diagnostic.spec.ts",
-    "tests/e2e/route-forensic/reports.diagnostic.spec.ts",
-    "tests/e2e/route-forensic/_helpers.ts"
+    "tests/e2e/route-forensic/reports.diagnostic.spec.ts"
   ],
   "tests/e2e/route-forensic/fixtures/forensic-page.ts": [
     "tests/e2e/route-forensic/fixtures/authed-page.ts",
-    "tests/e2e/route-forensic/fixtures/db.ts",
     "tests/e2e/route-forensic/helpers/forensic.ts"
   ],
   "tests/e2e/route-forensic/fixtures/db.ts": [
     "tests/e2e/route-forensic/fixtures/forensic-page.ts"
-  ],
-  "tests/e2e/route-forensic/index.ts": [
-    "tests/e2e/route-forensic/index.ts"
   ],
   "src/lib/server/search/engram-bigram.ts": [
     "tests/engram-dym.spec.ts"
@@ -711,6 +719,15 @@
     "tests/evidence-workflow-integration.test.ts"
   ],
   "src/lib/server/features/feature-map-compiler.ts": [
+    "tests/feature-map.integrity.spec.ts"
+  ],
+  "src/lib/server/features/feature-glyph-encoder.ts": [
+    "tests/feature-map.integrity.spec.ts"
+  ],
+  "src/lib/server/features/grpo-memory-stick.ts": [
+    "tests/feature-map.integrity.spec.ts"
+  ],
+  "src/lib/server/features/feature-map-store.ts": [
     "tests/feature-map.integrity.spec.ts"
   ],
   "src/lib/server/ai/dev-context-planner.ts": [
@@ -2939,6 +2956,9 @@
   "src/routes/api/tools/stream/+server.ts": [
     "tests/routes/auto/api/tools/stream.test.ts"
   ],
+  "src/routes/api/topology/centroids/+server.ts": [
+    "tests/routes/auto/api/topology/centroids.test.ts"
+  ],
   "src/routes/api/topology/stream/+server.ts": [
     "tests/routes/auto/api/topology/stream.test.ts"
   ],
@@ -3017,8 +3037,23 @@
   "src/routes/api/whisper/transcribe/+server.ts": [
     "tests/routes/auto/api/whisper/transcribe.test.ts"
   ],
+  "src/routes/api/wiki/encyclopedia/+server.ts": [
+    "tests/routes/auto/api/wiki/encyclopedia.test.ts"
+  ],
   "src/routes/api/wiki/moc/+server.ts": [
     "tests/routes/auto/api/wiki/moc.test.ts"
+  ],
+  "src/routes/api/wiki/page/[id]/+server.ts": [
+    "tests/routes/auto/api/wiki/page/__id.test.ts"
+  ],
+  "src/routes/api/wiki/refresh-directory/+server.ts": [
+    "tests/routes/auto/api/wiki/refresh-directory.test.ts"
+  ],
+  "src/routes/api/wiki/search/+server.ts": [
+    "tests/routes/auto/api/wiki/search.test.ts"
+  ],
+  "src/routes/api/wiki/status/+server.ts": [
+    "tests/routes/auto/api/wiki/status.test.ts"
   ],
   "src/routes/api/wiki/sync-to-obsidian/+server.ts": [
     "tests/routes/auto/api/wiki/sync-to-obsidian.test.ts"
@@ -3056,6 +3091,9 @@
     "tests/yorha-v1-routes.spec.ts",
     "tests/yorha-v1-routes.spec.ts",
     "tests/yorha-v1-routes.spec.ts"
+  ],
+  "src/routes/(app)/admin/knowledge-base/+page.server.ts": [
+    "tests/routes/auto/app/admin/knowledge-base.test.ts"
   ],
   "src/routes/(app)/evidence/+server.ts": [
     "tests/routes/auto/evidence.test.ts",

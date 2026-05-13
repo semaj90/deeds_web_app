@@ -40,7 +40,14 @@
     "seed:hypergraph:lane-b",
     "seed:hypergraph:lane-c",
     "seed:hypergraph:lane-d",
-    "smoke:hypergraph:vault"
+    "smoke:hypergraph:vault",
+    "turbovec:sidecar:detached",
+    "graphify:semantic-cluster",
+    "graphify:semantic-cluster:force",
+    "hyperrag:multiquery:dry",
+    "hyperrag:multiquery",
+    "smoke:hyperrag",
+    "smoke:hyperrag:skip-mcp"
   ],
   "thresholds": {
     "smallChangeMaxFiles": 20,
@@ -89,6 +96,8 @@
       "hypergraph:seed",
       "ace:hit-demand",
       "graphify:obsidian:incremental",
+      "graphify:semantic-cluster",
+      "hyperrag:multiquery:dry",
       "audit:full-pipeline"
     ],
     "logKey": "ace:startup:heavy_log"

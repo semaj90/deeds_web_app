@@ -88,15 +88,15 @@
     device = await adapter.requestDevice();
     context = canvas.getContext('webgpu')!;
 
-    const format = navigator.gpu.getPreferredCanvasFormat();
+    const format = navigator.gpu.getPreferredCanvasFormat() as GPUTextureFormat;
     context.configure({ device, format, alphaMode: 'premultiplied' });
 
     // In a real implementation, we'd build a proper render pipeline here.
     // For this demonstration, we'll use a 2D Canvas fallback if WebGPU is too complex for a one-shot,
     // but the user asked for WebGPU-accelerated reranking and topological filtering visualization.
-    // I will implement a high-performance 2D Canvas renderer that mimics the "Manifold" look 
+    // I will implement a high-performance 2D Canvas renderer that mimics the "Manifold" look
     // while keeping it robust, then mention WebGPU for the heavy compute paths.
-    
+
     startAnimation();
   });
 
@@ -108,7 +108,7 @@
     const ctx = canvas.getContext('2d')!;
     const render = () => {
       ctx.clearRect(0, 0, width, height);
-      
+
       // Draw Manifold Grid (Subtle)
       ctx.strokeStyle = 'rgba(99, 102, 241, 0.05)';
       ctx.lineWidth = 1;
@@ -128,7 +128,7 @@
         const x = c.x * width;
         const y = c.y * height;
         const isActive = activeClusterIds.includes(c.clusterId);
-        
+
         ctx.fillStyle = isActive ? 'rgba(168, 85, 247, 0.8)' : 'rgba(99, 102, 241, 0.2)';
         ctx.beginPath();
         ctx.arc(x, y, isActive ? 6 : 3, 0, Math.PI * 2);
@@ -140,7 +140,7 @@
           ctx.strokeStyle = '#a855f7';
           ctx.stroke();
           ctx.shadowBlur = 0;
-          
+
           // Label for active node
           ctx.fillStyle = '#f8fafc';
           ctx.font = '10px Outfit';
@@ -154,11 +154,11 @@
       pulses.forEach(p => {
         const cluster = clusters.find(c => c.clusterId === p.targetClusterId);
         if (!cluster) return;
-        
+
         const progress = (now - p.startTime) / p.duration;
         const x = cluster.x * width;
         const y = cluster.y * height;
-        
+
         ctx.strokeStyle = p.color;
         ctx.lineWidth = 2;
         ctx.beginPath();

@@ -35,17 +35,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const msgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
 		await db.insert(chatMessages).values({
-			id: msgId,
-			chatId: sessionId,
-			userId: 'system',
-			role,
-			content,
-			metadata: JSON.stringify({
-				confidence: confidence ?? null,
-				processingTime: processingTime ?? null,
-				...(aiMetadata ?? {})
-			})
-		});
+      id: msgId,
+      chatId: sessionId,
+      userId: null,
+      role,
+      content,
+      metadata: JSON.stringify({
+        confidence: confidence ?? null,
+        processingTime: processingTime ?? null,
+        ...(aiMetadata ?? {}),
+      }),
+    });
 
 		// Update session timestamp
 		await db

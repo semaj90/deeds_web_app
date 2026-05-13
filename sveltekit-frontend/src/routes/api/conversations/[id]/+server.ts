@@ -37,7 +37,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
       .where(eq(chatMetadata.chatId, conversationId))
       .limit(1);
 
-    if (existingConversation && existingConversation.userId !== locals.user.id) {
+    if (existingConversation && existingConversation.userId !== Number(locals.user.id)) {
       return json({ message: 'Conversation not found' }, { status: 404 });
     }
 
@@ -54,37 +54,37 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 
 		// Upsert chat metadata
 		await db
-			.insert(chatMetadata)
-			.values({
-				chatId: conversationId,
-				userId: locals.user.id,
-				title: title ?? `Conversation ${new Date().toLocaleDateString()}`,
-				createdAt: new Date(),
-				updatedAt: new Date()
-			})
-			.onConflictDoUpdate({
-				target: chatMetadata.chatId,
-				set: {
-					updatedAt: new Date(),
-					lastMessageAt: new Date(),
-					...(title ? { title } : {})
-				}
-			});
+      .insert(chatMetadata)
+      .values({
+        chatId: conversationId,
+        userId: Number(locals.user.id),
+        title: title ?? `Conversation ${new Date().toLocaleDateString()}`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: chatMetadata.chatId,
+        set: {
+          updatedAt: new Date(),
+          lastMessageAt: new Date(),
+          ...(title ? { title } : {}),
+        },
+      });
 
 		// Persist messages if provided
 		if (messages && messages.length > 0) {
 			for (const msg of messages) {
 				const msgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 				await db
-					.insert(chatMessages)
-					.values({
-						id: msgId,
-						chatId: conversationId,
-						userId: locals.user.id,
-						role: msg.role,
-						content: msg.content
-					})
-					.onConflictDoNothing();
+          .insert(chatMessages)
+          .values({
+            id: msgId,
+            chatId: conversationId,
+            userId: Number(locals.user.id),
+            role: msg.role,
+            content: msg.content,
+          })
+          .onConflictDoNothing();
 			}
 		}
 
@@ -111,7 +111,12 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		const [existingConversation] = await db
       .select({ chatId: chatMetadata.chatId })
       .from(chatMetadata)
-      .where(and(eq(chatMetadata.chatId, conversationId), eq(chatMetadata.userId, locals.user.id)))
+      .where(
+        and(
+          eq(chatMetadata.chatId, conversationId),
+          eq(chatMetadata.userId, Number(locals.user.id))
+        )
+      )
       .limit(1);
 
     if (!existingConversation) {
@@ -121,17 +126,22 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		// Delete messages first (FK constraint)
 		await db
       .delete(chatMessages)
-      .where(and(eq(chatMessages.chatId, conversationId), eq(chatMessages.userId, locals.user.id)));
+      .where(
+        and(
+          eq(chatMessages.chatId, conversationId),
+          eq(chatMessages.userId, Number(locals.user.id))
+        )
+      );
 
 		// Delete metadata
 		await db
-			.delete(chatMetadata)
-			.where(
-				and(
-					eq(chatMetadata.chatId, conversationId),
-					eq(chatMetadata.userId, locals.user.id)
-				)
-			);
+      .delete(chatMetadata)
+      .where(
+        and(
+          eq(chatMetadata.chatId, conversationId),
+          eq(chatMetadata.userId, Number(locals.user.id))
+        )
+      );
 
 		return json({ success: true });
 	} catch (err) {

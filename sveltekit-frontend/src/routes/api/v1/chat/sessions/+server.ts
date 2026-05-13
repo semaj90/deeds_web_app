@@ -30,13 +30,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const chatId = `chat_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
 		await db.insert(chatMetadata).values({
-			chatId,
-			userId,
-			caseId: caseId ?? null,
-			title: title ?? `Chat - ${new Date().toLocaleDateString()}`,
-			createdAt: new Date(),
-			updatedAt: new Date()
-		});
+      chatId,
+      userId: Number(userId),
+      caseId: caseId ?? null,
+      title: title ?? `Chat - ${new Date().toLocaleDateString()}`,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
 		return json({
 			id: chatId,

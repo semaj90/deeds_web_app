@@ -19,6 +19,7 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { createHash } from 'crypto';
 import { assembleACEContext } from '$lib/server/ace/context-assembler.js';
+import { buildContextCacheKey, getContextCache } from '$lib/server/ace/llm-context-cache.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { autoTagDocument } from '$lib/server/ace/auto-tagger.js';
@@ -1106,14 +1107,37 @@ export class AutonomousAgent {
         }),
         func: async ({ query, topK }) => {
           try {
-            const { getRedis } = await import('$lib/server/redis.js');
-            const redis = getRedis();
-            const hash = createHash('sha256').update(query).digest('hex').slice(0, 16);
-            const cached = await redis.get(`ace:context:${hash}`);
-            if (cached) return cached;
+            const cacheKey = buildContextCacheKey({
+              modelName: 'gemma4-legal-vlm:latest',
+              modelQuant: 'iq4_xs',
+              backend: 'gemma4-agent',
+              tokenizerHash: 'embeddinggemma:latest:768',
+              systemPromptHash: createHash('sha256').update('system:yorha-legal').digest('hex').slice(0, 16),
+              toolDefinitionsHash: createHash('sha256').update('ace-tools:v1').digest('hex').slice(0, 16),
+              repoGitSha: process.env.GIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
+              corpusHash: 'codebase-graph:unknown',
+              ragBundleHash: createHash('sha256').update(query).digest('hex').slice(0, 16),
+              graphSnapshotHash: 'graph:none',
+            });
+            const cached = await getContextCache(cacheKey);
+            if (cached) return JSON.stringify(cached);
             
             // Fallback to full ACE context assembly if not cached
-            const context = await assembleACEContext({ query, userId: 'agent', caseId: 'auto' });
+            const context = await assembleACEContext({
+              query,
+              userId: 'agent',
+              caseId: 'auto',
+              modelName: 'gemma4-legal-vlm:latest',
+              modelQuant: 'iq4_xs',
+              backend: 'gemma4-agent',
+              tokenizerHash: 'embeddinggemma:latest:768',
+              systemPromptHash: 'system:yorha-legal',
+              toolDefinitionsHash: 'ace-tools:v1',
+              repoGitSha: process.env.GIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
+              corpusHash: 'codebase-graph:unknown',
+              ragBundleHash: createHash('sha256').update(query).digest('hex').slice(0, 16),
+              graphSnapshotHash: 'graph:none',
+            });
             return JSON.stringify(context);
           } catch (error) {
             return JSON.stringify({ error: String(error) });

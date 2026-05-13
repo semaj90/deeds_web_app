@@ -1,7 +1,7 @@
 # AGENTS.md — `sveltekit-frontend/` (LLM directory wiki)
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T18:24:25.300Z · agents.md spec · regen: npm run agents:write -->
 
 > SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > Per-directory AGENTS.md files are scattered throughout `src/` — agents walk UP from any file to the nearest one. **This file is the directory index** so agents (and humans) can quickly jump to a dir's KAG slug or fire the right tool call.
@@ -34,8 +34,8 @@ These tools are wired in-process in [`src/lib/server/ai/gemma4-agent.ts`](./src/
 
 | Gate | Status |
 |------|--------|
-| G4  Auth on API routes | 771✅ / 0❌ |
-| G5  Zod on body-parsing routes | 534✅ / 0❌ |
+| G4  Auth on API routes | 773✅ / 0❌ |
+| G5  Zod on body-parsing routes | 536✅ / 0❌ |
 | G15 SSR-unsafe globals | 0❌ |
 | G16 Routes without tests | 2❌ |
 | G20 Cyclic import pairs | 0 |
@@ -236,7 +236,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 | `src/lib/server` | 63 | — | — | `src_lib_server` | `agents_md({ path: "src/lib/server" })` |
-| `src/lib/server/ace` | 37 | — | — | `src_lib_server_ace` | `agents_md({ path: "src/lib/server/ace" })` |
+| `src/lib/server/ace` | 38 | — | — | `src_lib_server_ace` | `agents_md({ path: "src/lib/server/ace" })` |
 | `src/lib/server/admin` | 8 | — | — | `src_lib_server_admin` | `agents_md({ path: "src/lib/server/admin" })` |
 | `src/lib/server/agent` | 3 | — | — | `src_lib_server_agent` | `agents_md({ path: "src/lib/server/agent" })` |
 | `src/lib/server/agent/tools` | 7 | — | — | `src_lib_server_agent_tools` | `agents_md({ path: "src/lib/server/agent/tools" })` |
@@ -249,7 +249,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/ai/hermes` | 3 | — | — | `src_lib_server_ai_hermes` | `agents_md({ path: "src/lib/server/ai/hermes" })` |
 | `src/lib/server/ai/hermes/skills` | 14 | — | — | `src_lib_server_ai_hermes_skills` | `agents_md({ path: "src/lib/server/ai/hermes/skills" })` |
 | `src/lib/server/ai/hermes/tools` | 2 | — | — | `src_lib_server_ai_hermes_tools` | `agents_md({ path: "src/lib/server/ai/hermes/tools" })` |
-| `src/lib/server/analysis` | 13 | — | — | `src_lib_server_analysis` | `agents_md({ path: "src/lib/server/analysis" })` |
+| `src/lib/server/analysis` | 14 | — | — | `src_lib_server_analysis` | `agents_md({ path: "src/lib/server/analysis" })` |
 | `src/lib/server/analytics` | 15 | — | — | `src_lib_server_analytics` | `agents_md({ path: "src/lib/server/analytics" })` |
 | `src/lib/server/atlas` | 4 | — | — | `src_lib_server_atlas` | `agents_md({ path: "src/lib/server/atlas" })` |
 | `src/lib/server/audit` | 4 | — | — | `src_lib_server_audit` | `agents_md({ path: "src/lib/server/audit" })` |
@@ -274,7 +274,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/ff1/cli` | 2 | — | — | `src_lib_server_ff1_cli` | `agents_md({ path: "src/lib/server/ff1/cli" })` |
 | `src/lib/server/glyph` | 2 | — | — | `src_lib_server_glyph` | `agents_md({ path: "src/lib/server/glyph" })` |
 | `src/lib/server/gpu` | 17 | — | — | `src_lib_server_gpu` | `agents_md({ path: "src/lib/server/gpu" })` |
-| `src/lib/server/graph` | 22 | — | — | `src_lib_server_graph` | `agents_md({ path: "src/lib/server/graph" })` |
+| `src/lib/server/graph` | 23 | — | — | `src_lib_server_graph` | `agents_md({ path: "src/lib/server/graph" })` |
 | `src/lib/server/grpc` | 10 | — | — | `src_lib_server_grpc` | `agents_md({ path: "src/lib/server/grpc" })` |
 | `src/lib/server/helpers` | 2 | — | — | `src_lib_server_helpers` | `agents_md({ path: "src/lib/server/helpers" })` |
 | `src/lib/server/hypergraph` | 5 | — | — | `src_lib_server_hypergraph` | `agents_md({ path: "src/lib/server/hypergraph" })` |
@@ -536,7 +536,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 
-### `src/routes/api/` (669 dirs)
+### `src/routes/api/` (671 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|

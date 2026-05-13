@@ -176,7 +176,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
   }
   matC[row * params.N + col] = sum;
 }
-\`;
+`;
 
 // ─── Cross-Attention Reranker ────────────────────────────────────────────────
 
@@ -185,7 +185,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
  * Computes query-to-candidate attention scores for re-ranking.
  * Query is 768-dim, candidates are N × 768-dim.
  */
-export const CROSS_ATTENTION_RERANK_WGSL = /* wgsl */ \`
+export const CROSS_ATTENTION_RERANK_WGSL = /* wgsl */ `
 struct Params {
   dimension: u32,
   count: u32,
@@ -213,7 +213,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
 
   scores[idx] = dot * params.scale;
 }
-\`;
+`;
 
 // ─── Topological Manifold Filter ───────────────────────────────────────────
 
@@ -222,7 +222,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
  * Computes min-distance to a set of centroids for manifold projection.
  * Used to filter outliers and prioritize "on-manifold" retrieval hits.
  */
-export const TOPOLOGICAL_FILTER_WGSL = /* wgsl */ \`
+export const TOPOLOGICAL_FILTER_WGSL = /* wgsl */ `
 struct Params {
   dimension: u32,
   candidateCount: u32,
@@ -257,7 +257,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
 
   distances[idx] = min_dist;
 }
-\`;
+`;
 
 // ─── Shader Registry ──────────────────────────────────────────────────────────
 

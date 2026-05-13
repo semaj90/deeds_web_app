@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-13T09:14:16.679Z
+> Generated: 2026-05-13T18:24:17.858Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,7 +8,7 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 4952 |
+| Files scanned | 4961 |
 | Directories analysed | 451 |
 | Route files | 1011 |
 | Svelte components | 884 |
@@ -30,14 +30,14 @@
 | Gate | Check | Pass | Fail |
 |------|-------|------|------|
 | G4  | Auth guard on API routes | 773 | 0 |
-| G5  | Zod validation on API routes | 535 | 0 |
-| G11 | No hardcoded localhost (excl env.server) | 4825 | 127 |
-| G14a | No `export let` (Svelte 4 props) | 4952 | 0 |
-| G14b | No `$:` reactive declarations | 4952 | 0 |
-| G14c | No `on:event=` directives | 4952 | 0 |
-| G14d | No `createEventDispatcher()` | 4952 | 0 |
-| G14e | No runes in plain `.ts` files | 4942 | 10 |
-| G15 | No SSR-unsafe globals (unguarded) | 4952 | 0 |
+| G5  | Zod validation on API routes | 536 | 0 |
+| G11 | No hardcoded localhost (excl env.server) | 4834 | 127 |
+| G14a | No `export let` (Svelte 4 props) | 4961 | 0 |
+| G14b | No `$:` reactive declarations | 4961 | 0 |
+| G14c | No `on:event=` directives | 4961 | 0 |
+| G14d | No `createEventDispatcher()` | 4961 | 0 |
+| G14e | No runes in plain `.ts` files | 4951 | 10 |
+| G15 | No SSR-unsafe globals (unguarded) | 4961 | 0 |
 | G16 | Server routes have test pairing | 712 | 2 |
 | G17 | Server routes have error handling | 686 | 96 |
 | G20 | Cyclic import pairs | — | 0 |
@@ -185,7 +185,7 @@
 | ✅ | `src/lib/server/ast` | 90 | 1 | 313 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/atlas` | 90 | 4 | 1002 | 0 | 0/4 | 0 | — |
 | ✅ | `src/lib/server/auth` | 90 | 1 | 41 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/cache` | 90 | 14 | 4544 | 0 | 0/9 | 0 | — |
+| ✅ | `src/lib/server/cache` | 90 | 14 | 4545 | 0 | 0/9 | 0 | — |
 | ✅ | `src/lib/server/cartridge` | 90 | 5 | 1614 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/chrrom` | 90 | 3 | 408 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/clients` | 90 | 1 | 8 | 0 | 0/0 | 0 | — |
@@ -214,7 +214,7 @@
 | ✅ | `src/lib/server/notifications` | 90 | 1 | 210 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/observability` | 90 | 3 | 1042 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/obsidian` | 90 | 2 | 384 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/ocr` | 90 | 3 | 392 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/ocr` | 90 | 3 | 551 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/optimize` | 90 | 1 | 42 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/orchestrators` | 90 | 1 | 39 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/pdf` | 90 | 2 | 314 | 0 | 0/0 | 0 | — |
@@ -243,12 +243,12 @@
 | ✅ | `src/lib/shared` | 90 | 3 | 284 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/shared/schemas` | 90 | 1 | 32 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/shared/types` | 90 | 1 | 14 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/stores` | 90 | 17 | 5081 | 0 | 0/6 | 0 | — |
+| ✅ | `src/lib/stores` | 90 | 17 | 5101 | 0 | 0/6 | 0 | — |
 | ✅ | `src/lib/stores/dashboard` | 90 | 3 | 654 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/stores/unified` | 90 | 7 | 1328 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/test-utils` | 90 | 1 | 11 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/webgpu` | 90 | 20 | 5784 | 0 | 0/0 | 0 | — |
-| ✅ | `src/mcp/tools` | 90 | 8 | 2320 | 0 | 0/7 | 0 | — |
+| ✅ | `src/mcp/tools` | 90 | 8 | 2321 | 0 | 0/7 | 0 | — |
 | ✅ | `src/mcp/zod-to-json-schema-bridge` | 90 | 2 | 93 | 0 | 0/1 | 0 | — |
 | ✅ | `src/routes/(admin)/error-brain` | 90 | 2 | 484 | 0 | 2/0 | 0 | — |
 | ✅ | `src/routes/(analysis)` | 90 | 4 | 3236 | 0 | 8/0 | 0 | ⬜notest |
@@ -272,7 +272,7 @@
 | ✅ | `src/routes/(app)/global-search` | 90 | 1 | 2392 | 0 | 1/0 | 0 | — |
 | ✅ | `src/routes/(app)/gpu-evidence-graph` | 90 | 1 | 6 | 0 | 1/0 | 0 | ⬜notest |
 | ✅ | `src/routes/(app)/indexing` | 90 | 1 | 960 | 0 | 1/0 | 0 | — |
-| ✅ | `src/routes/(app)/knowledge` | 90 | 1 | 517 | 0 | 1/0 | 0 | — |
+| ✅ | `src/routes/(app)/knowledge` | 90 | 1 | 575 | 0 | 1/0 | 0 | — |
 | ✅ | `src/routes/(app)/legal-corpus-premium` | 90 | 1 | 1155 | 0 | 1/0 | 0 | — |
 | ✅ | `src/routes/(app)/library` | 90 | 13 | 4516 | 0 | 13/0 | 0 | ⬜notest |
 | ✅ | `src/routes/(app)/rag-search` | 90 | 2 | 376 | 0 | 2/0 | 0 | — |
@@ -378,10 +378,9 @@
 | ✅ | `src/routes/api/internal` | 93 | 2 | 114 | 2 | 2/1 | 0 | — |
 | ✅ | `src/routes/api/stream` | 93 | 2 | 102 | 2 | 2/1 | 0 | — |
 | ✅ | `src/routes/api/library` | 94 | 21 | 2864 | 21 | 21/12 | 0 | — |
-| ✅ | `src/lib/server/ai` | 95 | 80 | 17885 | 0 | 3/23 | 0 | 🟠lh |
-| ✅ | `src/routes/api/admin` | 95 | 32 | 3350 | 32 | 32/21 | 0 | — |
+| ✅ | `src/routes/api/admin` | 95 | 32 | 3357 | 32 | 32/22 | 0 | — |
 | ✅ | `src/routes/api/errors` | 95 | 3 | 253 | 3 | 3/2 | 0 | — |
-| ✅ | `scripts/graph` | 95 | 6 | 2323 | 0 | 1/6 | 0 | 🟠lh |
+| ✅ | `scripts/graph` | 95 | 10 | 2608 | 0 | 1/7 | 0 | 🟠lh |
 | ✅ | `scripts/smoke` | 95 | 16 | 2749 | 0 | 0/9 | 0 | 🟠lh |
 | ✅ | `scripts/startup` | 95 | 2 | 449 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `scripts/tests` | 95 | 57 | 12995 | 0 | 4/17 | 0 | 🟠lh |
@@ -401,19 +400,20 @@
 | ✅ | `src/routes/api/ai` | 99 | 33 | 3467 | 33 | 33/31 | 0 | — |
 | ✅ | `src/routes/api/rag` | 99 | 11 | 2493 | 10 | 10/9 | 0 | — |
 | ✅ | `src/routes/api/v1` | 99 | 19 | 1584 | 19 | 19/18 | 0 | — |
-| ✅ | `src/lib` | 100 | 11 | 428215 | 3 | 13/304 | 9 | 🟠lh |
+| ✅ | `src/lib` | 100 | 11 | 428905 | 3 | 13/305 | 9 | 🟠lh |
 | ✅ | `src/lib/data` | 100 | 5 | 1682 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/db` | 100 | 4 | 2892 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/db/queries` | 100 | 2 | 881 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/db/schema` | 100 | 6 | 890 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/intent` | 100 | 1 | 137 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server` | 100 | 63 | 194857 | 3 | 10/213 | 0 | 🟠lh |
-| ✅ | `src/lib/server/ace` | 100 | 37 | 14103 | 0 | 0/18 | 0 | — |
+| ✅ | `src/lib/server` | 100 | 63 | 195527 | 3 | 10/214 | 0 | — |
+| ✅ | `src/lib/server/ace` | 100 | 38 | 14218 | 0 | 0/18 | 0 | — |
 | ✅ | `src/lib/server/adapters` | 100 | 1 | 650 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/admin` | 100 | 8 | 1064 | 0 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/agent` | 100 | 10 | 3931 | 0 | 0/7 | 0 | — |
 | ✅ | `src/lib/server/agents` | 100 | 23 | 3285 | 0 | 0/7 | 0 | — |
-| ✅ | `src/lib/server/analysis` | 100 | 13 | 3173 | 0 | 0/5 | 0 | — |
+| ✅ | `src/lib/server/ai` | 100 | 80 | 17885 | 0 | 3/23 | 0 | — |
+| ✅ | `src/lib/server/analysis` | 100 | 14 | 3344 | 0 | 0/6 | 0 | — |
 | ✅ | `src/lib/server/analytics` | 100 | 15 | 6771 | 0 | 0/10 | 0 | — |
 | ✅ | `src/lib/server/audit` | 100 | 4 | 1415 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/cases` | 100 | 1 | 189 | 0 | 0/0 | 0 | — |
@@ -426,7 +426,7 @@
 | ✅ | `src/lib/server/evidence` | 100 | 15 | 1230 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/features` | 100 | 8 | 926 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/gpu` | 100 | 17 | 5379 | 0 | 0/3 | 0 | — |
-| ✅ | `src/lib/server/graph` | 100 | 22 | 9898 | 0 | 1/7 | 0 | — |
+| ✅ | `src/lib/server/graph` | 100 | 23 | 9984 | 0 | 1/7 | 0 | — |
 | ✅ | `src/lib/server/indexer` | 100 | 26 | 7329 | 1 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/kb` | 100 | 9 | 1569 | 0 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/legal` | 100 | 9 | 2766 | 0 | 0/0 | 0 | — |
@@ -441,14 +441,14 @@
 | ✅ | `src/lib/server/trace` | 100 | 1 | 344 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/types` | 100 | 11 | 1204 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/unified` | 100 | 1 | 284 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/vector` | 100 | 14 | 3520 | 0 | 0/2 | 0 | — |
+| ✅ | `src/lib/server/vector` | 100 | 14 | 3629 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/wiki` | 100 | 9 | 2153 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/workers` | 100 | 5 | 1771 | 0 | 0/4 | 0 | — |
 | ✅ | `src/lib/shims` | 100 | 11 | 1235 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/types` | 100 | 53 | 7093 | 0 | 0/5 | 0 | — |
-| ✅ | `src/mcp` | 100 | 14 | 14085 | 0 | 1/19 | 0 | — |
-| ✅ | `src/routes` | 100 | 6 | 221452 | 680 | 1106/564 | 2 | 🟠lh ⬜notest |
-| ✅ | `src/routes/(app)` | 100 | 2 | 107978 | 4 | 424/44 | 1 | 🟠lh ⬜notest |
+| ✅ | `src/mcp` | 100 | 14 | 14086 | 0 | 1/19 | 0 | — |
+| ✅ | `src/routes` | 100 | 6 | 221517 | 680 | 1106/565 | 2 | 🟠lh ⬜notest |
+| ✅ | `src/routes/(app)` | 100 | 2 | 108036 | 4 | 424/44 | 1 | 🟠lh ⬜notest |
 | ✅ | `src/routes/(app)/acp` | 100 | 1 | 615 | 0 | 1/1 | 0 | — |
 | ✅ | `src/routes/(app)/active-cases` | 100 | 2 | 1155 | 0 | 2/0 | 0 | ⬜notest |
 | ✅ | `src/routes/(app)/admin` | 100 | 140 | 28746 | 3 | 140/15 | 0 | 🟠lh ⬜notest |
@@ -612,7 +612,6 @@ _No unguarded SSR-unsafe globals. ✅_
 
 ## G11 — Hardcoded Localhost References (127 files)
 - `src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte` · http://localhost:11434
-- `src/lib/server/ai/hermes/tools/registry.ts` · http://localhost:5173
 - `src/lib/utils/api-endpoints.ts` · http://localhost:8080, http://localhost:11434
 - `src/lib/utils/simd-json-parser.ts` · http://localhost:8097
 - `src/routes/(app)/admin/library/+page.svelte` · http://localhost:5173, http://localhost:5173
@@ -631,6 +630,7 @@ _No unguarded SSR-unsafe globals. ✅_
 - `scripts/deep-audit-ast.mjs` · http://localhost:8095
 - `scripts/dev-everything.mjs` · http://127.0.0.1:11434, http://127.0.0.1:6333
 - `scripts/diagnose/probe-tools-list-by-module.mjs` · http://localhost:0
+- `scripts/diagnostics/playwright-live-recorder.mjs` · http://127.0.0.1:5173
 
 ---
 
@@ -674,7 +674,26 @@ _No unguarded SSR-unsafe globals. ✅_
 ## G19 — Top Module Fan-In (most imported `$lib` paths)
 | Module | Import Count |
 |--------|-------------|
-
+| `$lib/server/db/client` | 574 |
+| `$lib/server/env.server.js` | 466 |
+| `$lib/server/redis.js` | 262 |
+| `$lib/components/ui/Icon.svelte` | 257 |
+| `$lib/server/ollama.js` | 183 |
+| `$lib/types` | 180 |
+| `$lib/server/db/schema-postgres.js` | 158 |
+| `$lib/server/middleware/cache-headers.js` | 111 |
+| `$lib/server/validation.js` | 95 |
+| `$lib/server/grpc/embedding-client.js` | 89 |
+| `$lib/components/ui/Button.svelte` | 87 |
+| `$lib/server/vector/qdrant-manager.js` | 81 |
+| `$lib/server/db/schema` | 61 |
+| `$lib/server/observability/langfuse.js` | 48 |
+| `$lib/server/db/schema-postgres` | 45 |
+| `$lib/server/gpu/simdjson-bridge.js` | 40 |
+| `$lib/server/gpu/libtorch-bridge.js` | 38 |
+| `$lib/server/analytics/search-analytics.js` | 38 |
+| `$lib/server/ace/context-assembler.js` | 33 |
+| `$lib/server/ace/chat-memory.js` | 33 |
 
 ---
 
@@ -686,65 +705,65 @@ _No cyclic imports detected. ✅_
 ## Svelte Components (60 shown of 884)
 | File | Sub-components | Key `$lib` Imports |
 |------|---------------|---------------------|
-| `src/lib/client/ui/POIPhotoModal.svelte` | POIPhotoModalImpl |  |
+| `src/lib/client/ui/POIPhotoModal.svelte` | POIPhotoModalImpl | $lib/components/POIPhotoModal.svelte |
 | `src/lib/client/ui/POIPhotoUploader.svelte` | Button |  |
 | `src/lib/components/ActionPopup.svelte` |  |  |
-| `src/lib/components/admin/AdminChatAssistant.svelte` | HTMLElement |  |
-| `src/lib/components/admin/AdminMonitoringDashboard.svelte` | Icon |  |
-| `src/lib/components/admin/AiAnalysisPopup.svelte` | AiAnalysisPopup |  |
+| `src/lib/components/admin/AdminChatAssistant.svelte` | HTMLElement | $lib/utils/xstate-svelte5.svelte.js, $lib/stores/admin-chat-machine.js |
+| `src/lib/components/admin/AdminMonitoringDashboard.svelte` | Icon | $lib/components/ui/Icon.svelte |
+| `src/lib/components/admin/AiAnalysisPopup.svelte` | AiAnalysisPopup | $lib/components/admin/AiAnalysisPopup.svelte, $lib/stores/admin-chat-assistant.svelte.js, $lib/stores/admin-chat-assistant.svelte.js |
 | `src/lib/components/admin/BundlePreview.svelte` | BundleResponse |  |
-| `src/lib/components/admin/ContextualAssistantModal.svelte` |  |  |
+| `src/lib/components/admin/ContextualAssistantModal.svelte` |  | $lib/utils/xstate-svelte5.svelte.js, $lib/stores/admin-chat-machine.js, $lib/utils/ui-recon.js |
 | `src/lib/components/admin/EvidenceDataGrid.svelte` |  |  |
 | `src/lib/components/admin/EvidenceDrawer.svelte` |  |  |
 | `src/lib/components/admin/PipelineProgress.svelte` |  |  |
-| `src/lib/components/admin/SummarizeButton.svelte` | SummarizeButton |  |
+| `src/lib/components/admin/SummarizeButton.svelte` | SummarizeButton | $lib/stores/admin-chat-assistant.svelte.js |
 | `src/lib/components/admin/TagSelector.svelte` |  |  |
 | `src/lib/components/admin/TraceCopilotPanel.svelte` | HTMLDivElement |  |
-| `src/lib/components/agent/AutonomousInvestigator.svelte` | InvestigationResult, AgentCapabilities, Icon, Button |  |
-| `src/lib/components/agentic/AgentChat.svelte` |  |  |
+| `src/lib/components/agent/AutonomousInvestigator.svelte` | InvestigationResult, AgentCapabilities, Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
+| `src/lib/components/agentic/AgentChat.svelte` |  | $lib/types/agent.js |
 | `src/lib/components/agentic/AgenticController.svelte` | AgenticStatus, File |  |
 | `src/lib/components/ai/ACEContextBubble.svelte` |  |  |
-| `src/lib/components/ai/AIAssistantButton.svelte` | Badge |  |
-| `src/lib/components/ai/AIAssistantPanel.svelte` | Button |  |
+| `src/lib/components/ai/AIAssistantButton.svelte` | Badge | $lib/components/ui/badge/Badge.svelte, $lib/utils |
+| `src/lib/components/ai/AIAssistantPanel.svelte` | Button | $lib/components/ui/Button.svelte, $lib/stores/unified/ai-assistant-store.svelte.js |
 | `src/lib/components/ai/AIButton.svelte` | HTMLButtonElement |  |
-| `src/lib/components/ai/AIChatWidget.svelte` | Button, Icon, SimpleWorkingChat |  |
-| `src/lib/components/ai/AIRecommendation.svelte` | Icon |  |
+| `src/lib/components/ai/AIChatWidget.svelte` | Button, Icon, SimpleWorkingChat | $lib/components/ui/Button.svelte, $lib/components/ui/Icon.svelte |
+| `src/lib/components/ai/AIRecommendation.svelte` | Icon | $lib/ai/client-cache.js, $lib/components/ui/Icon.svelte |
 | `src/lib/components/ai/AIStatusIndicator.svelte` |  |  |
 | `src/lib/components/ai/AskAI.svelte` | HTMLTextAreaElement, HTMLDivElement |  |
-| `src/lib/components/ai/AuditResults.svelte` | Icon, Button |  |
+| `src/lib/components/ai/AuditResults.svelte` | Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
 | `src/lib/components/ai/AutomatedLegalResearch.svelte` |  |  |
 | `src/lib/components/ai/CachePerformanceDashboard.svelte` |  |  |
 | `src/lib/components/ai/CaseScoringDashboard/CaseScoringDashboard.svelte` |  |  |
-| `src/lib/components/ai/CaseScoringDashboard.svelte` | Icon |  |
-| `src/lib/components/ai/ChatFeedback.svelte` | Icon |  |
-| `src/lib/components/ai/ChatMessage.svelte` | HTMLDivElement, FeedbackButtons, Button |  |
+| `src/lib/components/ai/CaseScoringDashboard.svelte` | Icon | $lib/components/ui/Icon.svelte |
+| `src/lib/components/ai/ChatFeedback.svelte` | Icon | $lib/components/ui/Icon.svelte |
+| `src/lib/components/ai/ChatMessage.svelte` | HTMLDivElement, FeedbackButtons, Button | $lib/components/ui/Button.svelte, $lib/components/ui/FeedbackButtons.svelte |
 | `src/lib/components/ai/ClientSideAIChat.svelte` | Badge |  |
-| `src/lib/components/ai/ContextualChatDemo.svelte` | ContextualState |  |
-| `src/lib/components/ai/ContextualEvidenceChatModal.svelte` | File, FeedbackButtons |  |
-| `src/lib/components/ai/DeedAnalysis.svelte` | Icon |  |
-| `src/lib/components/ai/DocumentUploadSimulator.svelte` | Icon, Button |  |
-| `src/lib/components/ai/EnhancedAIChatTest.svelte` | DialogRoot, Button, DialogOverlay, DialogContent |  |
-| `src/lib/components/ai/EnhancedDocumentUploader.svelte` | UploadFile, HTMLInputElement, HTMLDivElement, Progress |  |
-| `src/lib/components/ai/EnhancedFileUpload.svelte` | WebSocket |  |
+| `src/lib/components/ai/ContextualChatDemo.svelte` | ContextualState | $lib/types/sharedTypes |
+| `src/lib/components/ai/ContextualEvidenceChatModal.svelte` | File, FeedbackButtons | $lib/types/sharedTypes, $lib/components/ui/FeedbackButtons.svelte |
+| `src/lib/components/ai/DeedAnalysis.svelte` | Icon | $lib/components/ui/Icon.svelte |
+| `src/lib/components/ai/DocumentUploadSimulator.svelte` | Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
+| `src/lib/components/ai/EnhancedAIChatTest.svelte` | DialogRoot, Button, DialogOverlay, DialogContent | $lib/types, $lib/types, $lib/components/ui/dialog |
+| `src/lib/components/ai/EnhancedDocumentUploader.svelte` | UploadFile, HTMLInputElement, HTMLDivElement, Progress | $lib/components/ui/Button.svelte, $lib/components/ui/Progress.svelte |
+| `src/lib/components/ai/EnhancedFileUpload.svelte` | WebSocket | $lib/types, $lib/machines/uploadMachine, $lib/types/upload |
 | `src/lib/components/ai/EnhancedInlineEditor.svelte` | HTMLDivElement |  |
-| `src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte` | Date, Button, TypewriterResponse |  |
-| `src/lib/components/ai/FloatingChatModal.svelte` | File, HTMLElement |  |
-| `src/lib/components/ai/GamingAIButton.svelte` |  |  |
-| `src/lib/components/ai/Gemma270MWebAssembly.svelte` | File, Float32Array |  |
-| `src/lib/components/ai/GPUAIAssistant.svelte` | Icon, Button |  |
+| `src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte` | Date, Button, TypewriterResponse | $lib/components/ui/Button.svelte, $lib/components/ui/Icon.svelte, $lib/utils/ollama |
+| `src/lib/components/ai/FloatingChatModal.svelte` | File, HTMLElement | $lib/models/ChatSession.svelte.js |
+| `src/lib/components/ai/GamingAIButton.svelte` |  | $lib/components/ui/Icon.svelte |
+| `src/lib/components/ai/Gemma270MWebAssembly.svelte` | File, Float32Array | $lib/ai/client-embed.js, $lib/ai/onnx/session.js, $lib/ai/client-cache.js |
+| `src/lib/components/ai/GPUAIAssistant.svelte` | Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
 | `src/lib/components/ai/IntelligentModelOrchestrator.svelte` |  |  |
-| `src/lib/components/ai/LegalDocumentDrafting.svelte` | DocCategory, Icon, Button |  |
-| `src/lib/components/ai/LegalDocumentSummarizer.svelte` | SummarizationResponse, Button |  |
-| `src/lib/components/ai/LLMSelector.svelte` | Icon, Button |  |
-| `src/lib/components/ai/LocalImageGenerator.svelte` | ImageResult, Icon, Button |  |
-| `src/lib/components/ai/ProactiveAIAssistant.svelte` | Icon |  |
-| `src/lib/components/ai/QLoRAMonitoringDashboard.svelte` | TrainingStatus, Icon, Button |  |
-| `src/lib/components/ai/RAGAssistantChat.svelte` | HTMLDivElement, Icon |  |
+| `src/lib/components/ai/LegalDocumentDrafting.svelte` | DocCategory, Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
+| `src/lib/components/ai/LegalDocumentSummarizer.svelte` | SummarizationResponse, Button | $lib/components/ui/card/Card.svelte, $lib/components/ui/card/CardHeader.svelte, $lib/components/ui/card/CardTitle.svelte |
+| `src/lib/components/ai/LLMSelector.svelte` | Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte, $lib/utils/ollama |
+| `src/lib/components/ai/LocalImageGenerator.svelte` | ImageResult, Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
+| `src/lib/components/ai/ProactiveAIAssistant.svelte` | Icon | $lib/components/ui/Icon.svelte |
+| `src/lib/components/ai/QLoRAMonitoringDashboard.svelte` | TrainingStatus, Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
+| `src/lib/components/ai/RAGAssistantChat.svelte` | HTMLDivElement, Icon | $lib/components/ui/Icon.svelte, $lib/utils |
 | `src/lib/components/ai/RAGPipelineChart.svelte` |  |  |
 | `src/lib/components/ai/RecommendationEngine.svelte` | Recommendation |  |
-| `src/lib/components/ai/SimpleWorkingChat.svelte` | ChatSession, CommandFeedback, Icon, TypewriterResponse |  |
-| `src/lib/components/ai/SmartSearchInterface.svelte` | Icon, Button |  |
-| `src/lib/components/ai/ThinkingStyleToggle.svelte` | Button, Icon |  |
+| `src/lib/components/ai/SimpleWorkingChat.svelte` | ChatSession, CommandFeedback, Icon, TypewriterResponse | $lib/models/ChatSession.svelte.js, $lib/components/ai/TypewriterResponse.svelte, $lib/components/ai/ChatFeedback.svelte |
+| `src/lib/components/ai/SmartSearchInterface.svelte` | Icon, Button | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
+| `src/lib/components/ai/ThinkingStyleToggle.svelte` | Button, Icon | $lib/components/ui/Icon.svelte, $lib/components/ui/Button.svelte |
 | `src/lib/components/ai/TypewriterResponse.svelte` |  |  |
 
 ---
@@ -752,7 +771,36 @@ _No cyclic imports detected. ✅_
 ## Top External Module Imports
 | Module | Consumer Count |
 |--------|----------------|
-
+| `vitest` | 833 |
+| `@sveltejs/kit` | 782 |
+| `zod` | 563 |
+| `$lib/server/db/client` | 440 |
+| `$lib/server/env.server.js` | 432 |
+| `drizzle-orm` | 408 |
+| `$lib/components/ui/Icon.svelte` | 257 |
+| `node:path` | 240 |
+| `svelte` | 236 |
+| `path` | 200 |
+| `$lib/types` | 180 |
+| `$lib/server/redis.js` | 175 |
+| `node:fs` | 171 |
+| `$lib/server/ollama.js` | 155 |
+| `@playwright/test` | 151 |
+| `fs` | 142 |
+| `node:url` | 142 |
+| `crypto` | 141 |
+| `pg` | 137 |
+| `$lib/server/db/schema-postgres.js` | 137 |
+| `$app/environment` | 117 |
+| `$lib/server/middleware/cache-headers.js` | 110 |
+| `node:crypto` | 106 |
+| `ioredis` | 96 |
+| `$lib/server/validation.js` | 95 |
+| `drizzle-orm/pg-core` | 92 |
+| `$lib/components/ui/Button.svelte` | 87 |
+| `url` | 68 |
+| `dotenv` | 66 |
+| `$app/navigation` | 65 |
 
 ---
 

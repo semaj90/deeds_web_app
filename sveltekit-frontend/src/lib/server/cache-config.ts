@@ -22,6 +22,7 @@
 export type CacheDomain =
   | 'llm'
   | 'ace'
+  | 'ace-context'
   | 'rag-kb'
   | 'rag-case'
   | 'embedding'
@@ -55,6 +56,11 @@ const POLICIES: Record<CacheDomain, CachePolicy> = {
     ttlSeconds: 120,        // 2min — ACE prompt fingerprint (context-assembler.ts)
     keyPrefix:  'ace:prompt',
     description: 'ACE context fingerprint → compiled prompt cache',
+  },
+  'ace-context': {
+    ttlSeconds: 48 * 60 * 60, // 48h — packed ACE context packets (feature-map-store.ts)
+    keyPrefix:  'ace:context',
+    description: 'Packed ACE context packet registry',
   },
   'rag-kb': {
     ttlSeconds: 600,        // 10min — KB retrieval bundle (stable corpus)

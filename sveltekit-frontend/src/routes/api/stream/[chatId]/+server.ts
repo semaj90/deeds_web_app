@@ -16,7 +16,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   const [session] = await db
     .select({ chatId: chatMetadata.chatId })
     .from(chatMetadata)
-    .where(and(eq(chatMetadata.chatId, params.chatId), eq(chatMetadata.userId, locals.user.id)))
+    .where(
+      and(eq(chatMetadata.chatId, params.chatId), eq(chatMetadata.userId, Number(locals.user.id)))
+    )
     .limit(1);
 
   if (!session) {

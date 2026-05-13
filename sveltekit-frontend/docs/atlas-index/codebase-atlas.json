@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "generated_at": "2026-05-13T00:23:13.996Z",
+  "generated_at": "2026-05-13T18:30:11.087Z",
   "hours_window": 168,
   "schema": [
     "f",
@@ -68419,7 +68419,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/ace-agent.ts",
@@ -68433,7 +68433,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/ace-error-kag.ts",
@@ -68447,7 +68447,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/ace-hit-tagger.ts",
@@ -68461,7 +68461,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/ace-wiki.ts",
@@ -68475,7 +68475,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/ace-wiki.ts",
@@ -68489,7 +68489,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/adaptive-prefetch.ts",
@@ -68503,7 +68503,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/AGENTS.md",
@@ -68517,7 +68517,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/auto-tagger.ts",
@@ -68531,7 +68531,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/cache-keys.ts",
@@ -68545,7 +68545,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/chat-memory.ts",
@@ -68559,7 +68559,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/chat-memory.ts",
@@ -68573,7 +68573,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/cluster-tags-cache.ts",
@@ -68587,7 +68587,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/codeintel-datastore.ts",
@@ -68601,7 +68601,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/codeintel-datastore.ts",
@@ -68615,7 +68615,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/context-assembler.ts",
@@ -68629,7 +68629,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/context-assembler.ts",
@@ -68643,7 +68643,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/error-fingerprint.ts",
@@ -68657,7 +68657,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/error-kag-writer.ts",
@@ -68671,7 +68671,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/error-kag-writer.ts",
@@ -68685,7 +68685,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/gemma4-codeintel.ts",
@@ -68699,7 +68699,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/gemma4-codeintel.ts",
@@ -68713,7 +68713,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/graph-expander.ts",
@@ -68727,7 +68727,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/hmm-wiki-logger.ts",
@@ -68741,7 +68741,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace-ingest-progress.ts",
@@ -68783,7 +68783,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/kag-dag-runner.ts",
@@ -68797,7 +68797,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/multi-lane-retrieval.ts",
@@ -68811,7 +68811,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/ngram-retrieval.ts",
@@ -68825,7 +68825,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/policy.ts",
@@ -68839,7 +68839,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/policy.ts",
@@ -68853,7 +68853,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/practice-templates.ts",
@@ -68867,7 +68867,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/retrieval-lanes.ts",
@@ -68881,7 +68881,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/self-prompt.ts",
@@ -68895,7 +68895,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/self-prompt.ts",
@@ -68909,7 +68909,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/style-adapter.ts",
@@ -68923,7 +68923,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/tag-generator.ts",
@@ -68937,7 +68937,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/tag-sync.ts",
@@ -68951,7 +68951,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/tag-sync.ts",
@@ -68965,7 +68965,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/tool-response-summarizer.ts",
@@ -68979,7 +68979,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/types.ts",
@@ -68993,7 +68993,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/types.ts",
@@ -69007,7 +69007,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/user-analytics-context.ts",
@@ -69021,7 +69021,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/ace/user-analytics-context.ts",
@@ -69035,7 +69035,7 @@
       "src/lib/server/ace",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/acp/phase90-tools.ts",
@@ -70617,7 +70617,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/AGENTS.md",
@@ -70631,7 +70631,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/architectural-guard.ts",
@@ -70645,7 +70645,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/architectural-guard.ts",
@@ -70659,7 +70659,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/codebase-research.ts",
@@ -70673,7 +70673,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/codebase-research.ts",
@@ -70687,7 +70687,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/deep-research.ts",
@@ -70701,7 +70701,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/deep-research.ts",
@@ -70715,7 +70715,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/event-logger.ts",
@@ -70729,7 +70729,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/mapreduce-matrix-analysis.ts",
@@ -70743,7 +70743,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/mapreduce-matrix-analysis.ts",
@@ -70757,7 +70757,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/minified-research-cache.ts",
@@ -70771,7 +70771,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/minified-research-cache.ts",
@@ -70785,7 +70785,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/research-cache.ts",
@@ -70799,7 +70799,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/research-cache.ts",
@@ -70813,7 +70813,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/research-graph-rl.ts",
@@ -70827,7 +70827,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/research-graph-rl.ts",
@@ -70841,7 +70841,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/research-refiner.ts",
@@ -70855,7 +70855,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/research-refiner.ts",
@@ -70869,7 +70869,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/research-summaries-db.ts",
@@ -70883,7 +70883,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/research-summaries-db.ts",
@@ -70897,7 +70897,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/search-analytics.ts",
@@ -70911,7 +70911,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/search-analytics.ts",
@@ -70925,7 +70925,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/unified-research-query.ts",
@@ -70939,7 +70939,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/unified-research-query.ts",
@@ -70953,7 +70953,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/web-research-crawler.test.ts",
@@ -70967,7 +70967,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/web-research-crawler.test.ts",
@@ -70981,7 +70981,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/web-research-crawler.ts",
@@ -70995,7 +70995,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/analytics/web-research-crawler.ts",
@@ -71009,7 +71009,7 @@
       "src/lib/server/analytics",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/api-metadata-extractor.ts",
@@ -71765,7 +71765,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cartridge/chr97-builder.ts",
@@ -71779,7 +71779,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cartridge/glyph-mappers.ts",
@@ -71793,7 +71793,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cartridge/glyph-mappers.ts",
@@ -71807,7 +71807,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cartridge/glyph-record.ts",
@@ -71821,7 +71821,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cartridge/glyph-tile-engine.ts",
@@ -71835,7 +71835,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cartridge/glyph-tile-engine.ts",
@@ -71849,7 +71849,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cartridge/index.ts",
@@ -71863,7 +71863,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cartridge/index.ts",
@@ -71877,7 +71877,7 @@
       "src/lib/server/cartridge",
       0,
       6,
-      2
+      0
     ],
     [
       "src/lib/server/cases/caseSynthesis.ts",
@@ -76539,7 +76539,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/codebase-cluster-detection.ts",
@@ -76553,7 +76553,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/codebase-cluster-detection.ts",
@@ -76567,7 +76567,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/codebase-neo4j-sync.ts",
@@ -76581,7 +76581,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/codebase-neo4j-sync.ts",
@@ -76595,7 +76595,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/codebase-scanner.ts",
@@ -76609,7 +76609,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/codebase-scanner.ts",
@@ -76623,7 +76623,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/codebase-scanner-v2.ts",
@@ -76637,7 +76637,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/codebase-scanner-v2.ts",
@@ -76651,7 +76651,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/community-graph.ts",
@@ -76665,7 +76665,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/couchdb-pagerank.ts",
@@ -76679,7 +76679,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/couchdb-pagerank.ts",
@@ -76693,7 +76693,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/evidence-graph-service.ts",
@@ -76707,7 +76707,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/gpu-graph-analysis.ts",
@@ -76721,7 +76721,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/gpu-graph-analysis.ts",
@@ -76735,7 +76735,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/graph-centrality.ts",
@@ -76749,7 +76749,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/graph-centrality.ts",
@@ -76763,7 +76763,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/graph-intel.ts",
@@ -76777,7 +76777,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/graph-remote-functions.ts",
@@ -76791,7 +76791,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/hypergraph-4d.ts",
@@ -76805,7 +76805,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/hypergraph-4d.ts",
@@ -76819,7 +76819,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/ingestion-buffer-builder.ts",
@@ -76833,7 +76833,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/missing-import-recommendations.ts",
@@ -76847,7 +76847,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/missing-import-recommendations.ts",
@@ -76861,7 +76861,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/neo4j-gds.ts",
@@ -76875,7 +76875,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/neo4j-schema.ts",
@@ -76889,7 +76889,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/pg-neo4j-sync.ts",
@@ -76903,7 +76903,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/pg-neo4j-sync.ts",
@@ -76917,7 +76917,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/relationship-extractor.ts",
@@ -76931,7 +76931,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/som-topology-pipeline.ts",
@@ -76945,7 +76945,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/som-topology-pipeline.ts",
@@ -76959,7 +76959,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/graph/user-interaction-sync.ts",
@@ -76973,7 +76973,7 @@
       "src/lib/server/graph",
       0,
       6,
-      5
+      0
     ],
     [
       "src/lib/server/grpc/AGENTS.md",
@@ -129311,6 +129311,6 @@
     "agents_dirs": 279,
     "with_authority": 0,
     "with_hits": 0,
-    "build_ms": 8660
+    "build_ms": 14834
   }
 }

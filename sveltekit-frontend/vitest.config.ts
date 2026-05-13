@@ -96,6 +96,8 @@ export default defineConfig({
       'tests/routes/cases-canvas.test.ts',
       'tests/unit/chat-memory.test.ts',
       'tests/unit/board-persistence-server.test.ts',
+      'tests/unit/llm-context-cache.test.ts',
+      'tests/unit/context-cache-planner.test.ts',
       'tests/lane-latency-benchmark.spec.ts',
       'tests/lane-latency-integration.spec.ts',
       'tests/hypergraph-research-grounding.spec.ts',

@@ -3572,6 +3572,38 @@ export const aceContextCache = pgTable('ace_context_cache', {
 export type AceContextCache = typeof aceContextCache.$inferSelect;
 export type NewAceContextCache = typeof aceContextCache.$inferInsert;
 
+// === LLM CONTEXT CACHE ===
+export const llmContextCache = pgTable('llm_context_cache', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  cacheKey: text('cache_key').notNull(),
+  modelName: text('model_name').notNull(),
+  modelQuant: text('model_quant'),
+  backend: text('backend').notNull(),
+  tokenizerHash: text('tokenizer_hash').notNull(),
+  systemPromptHash: text('system_prompt_hash').notNull(),
+  toolDefinitionsHash: text('tool_definitions_hash').notNull(),
+  repoGitSha: text('repo_git_sha'),
+  corpusHash: text('corpus_hash'),
+  ragBundleHash: text('rag_bundle_hash'),
+  graphSnapshotHash: text('graph_snapshot_hash'),
+  contextPackJson: jsonb('context_pack_json').notNull(),
+  summary: text('summary').notNull(),
+  chunkIds: jsonb('chunk_ids').notNull().default(sql`'[]'::jsonb`),
+  graphPaths: jsonb('graph_paths').notNull().default(sql`'[]'::jsonb`),
+  toolPolicy: jsonb('tool_policy').notNull().default(sql`'{}'::jsonb`),
+  estimatedPrefixTokens: integer('estimated_prefix_tokens').notNull().default(0),
+  hitCount: integer('hit_count').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+  lastUsedAt: timestamp('last_used_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+  cacheKeyIdx: index('llm_context_cache_key_idx').on(table.cacheKey),
+  cacheKeyUnique: unique('llm_context_cache_key_unique').on(table.cacheKey),
+  modelBackendIdx: index('llm_context_cache_model_backend_idx').on(table.modelName, table.backend),
+  graphSnapshotIdx: index('llm_context_cache_graph_snapshot_idx').on(table.graphSnapshotHash),
+}));
+export type LlmContextCache = typeof llmContextCache.$inferSelect;
+export type NewLlmContextCache = typeof llmContextCache.$inferInsert;
+
 // === KNOWLEDGE ARTIFACTS ===
 export const knowledgeArtifacts = pgTable('knowledge_artifacts', {
   id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),

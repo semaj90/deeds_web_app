@@ -55,14 +55,17 @@ export const actions: Actions = {
 
             // If authenticated, save to legal_ai_db
             if (locals.user) {
-                await db.insert(chatMessages).values({
+                await db
+                  .insert(chatMessages)
+                  .values({
                     id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
                     chatId,
-                    userId: locals.user.id,
+                    userId: Number(locals.user.id),
                     role: 'user',
                     content: text,
-                    timestamp: new Date()
-                }).catch(e => console.error('Failed to persist chat message:', e));
+                    timestamp: new Date(),
+                  })
+                  .catch((e) => console.error('Failed to persist chat message:', e));
             }
 
             return {

@@ -36,7 +36,10 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 import { extractStructured } from '$lib/server/ai/lang-extract.js';
-import { resolveRuntimeConfig, type QuantRuntimeConfig } from '$lib/server/ai/inference-configs.js';
+import {
+  resolveRuntimeConfig,
+  type InferenceRuntimeConfig,
+} from '$lib/server/ai/inference-configs.js';
 
 // ── Domain taxonomy ────────────────────────────────────────────────────────────
 // Matches the karpathy semantic tag vocabulary in codebase_chunks_768.
@@ -132,17 +135,17 @@ export interface WorkerFinding {
 }
 
 export interface ResearchGraph {
-	query:             string;
-	domains:           ResearchDomain[];
-	runtime:           QuantRuntimeConfig;
-	workerFindings:    WorkerFinding[];
-	supervisorSummary: string;
-	keyFindings:       string[];   // cross-domain insights from supervisor
-	actionItems:       string[];   // concrete next steps for Claude Code
-	totalChunks:       number;
-	totalDurationMs:   number;
-	cacheKey:          string;     // stable digest — expose for cache busting
-	queryEmbedding?:   number[];   // 768d vector used for initial Qdrant search
+  query: string;
+  domains: ResearchDomain[];
+  runtime: InferenceRuntimeConfig;
+  workerFindings: WorkerFinding[];
+  supervisorSummary: string;
+  keyFindings: string[]; // cross-domain insights from supervisor
+  actionItems: string[]; // concrete next steps for Claude Code
+  totalChunks: number;
+  totalDurationMs: number;
+  cacheKey: string; // stable digest — expose for cache busting
+  queryEmbedding?: number[]; // 768d vector used for initial Qdrant search
 }
 
 // ── Zod schemas for structured LLM outputs ────────────────────────────────────

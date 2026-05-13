@@ -29,16 +29,33 @@ type WikiSearchHit = {
 };
 
 export async function getWikiStatus() {
-  const [mappingCount, redisStats, couchStats, qdrantStats, neo4jStats] = await Promise.all([
-    safe('postgres:mapping-count', async () => {
-      const [row] = await db.select({ value: count() }).from(enhancedGraphMappings);
-      return Number(row?.value ?? 0);
-    }, 0),
-    getRedisStats(),
-    getCouchDbStats(),
-    getQdrantStats(),
-    getNeo4jStats(),
-  ]);
+  const [mappingCount, featureStats, redisStats, couchStats, qdrantStats, neo4jStats] =
+    await Promise.all([
+      safe(
+        'postgres:mapping-count',
+        async () => {
+          const [row] = await db.select({ value: count() }).from(enhancedGraphMappings);
+          return Number(row?.value ?? 0);
+        },
+        0
+      ),
+      safe(
+        'postgres:feature-map-count',
+        async () => {
+          const [featureMapRow] = await db.select({ value: count() }).from(featureMaps);
+          const [memoryStickRow] = await db.select({ value: count() }).from(grpoMemorySticks);
+          return {
+            mapCount: Number(featureMapRow?.value ?? 0),
+            memoryStickCount: Number(memoryStickRow?.value ?? 0),
+          };
+        },
+        { mapCount: 0, memoryStickCount: 0 }
+      ),
+      getRedisStats(),
+      getCouchDbStats(),
+      getQdrantStats(),
+      getNeo4jStats(),
+    ]);
 
   const graph = readCodebaseGraph();
   const graphDirs = getGraphDirectories(graph);
@@ -65,6 +82,11 @@ export async function getWikiStatus() {
     couchdb: couchStats,
     qdrant: qdrantStats,
     neo4j: neo4jStats,
+    featureMap: {
+      mapCount: featureStats.mapCount,
+      memoryStickCount: featureStats.memoryStickCount,
+      dryRunOnly: featureStats.mapCount === 0,
+    },
     directoryCount: graphDirs.length,
     generatedAt: new Date().toISOString(),
   };

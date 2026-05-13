@@ -288,14 +288,11 @@ function extractMeta(filePath, src) {
     };
   }
 
-  // Strip comments and strings for runtime import/re-export extraction (G1, G2, G3)
-  // to avoid false positives in documentation blocks or examples.
+  // Strip comments for runtime import/re-export extraction (G1, G2, G3)
+  // to avoid false positives in documentation blocks.
   const codeOnly = src
     .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/(^|[^:\\])\/\/[^\n]*/g, '$1')
-    .replace(/`(?:\\.|[^`\\])*`/g, '``')
-    .replace(/'(?:\\.|[^'\\])*'/g, "''")
-    .replace(/"(?:\\.|[^"\\])*"/g, '""');
+    .replace(/(^|[^:\\])\/\/[^\n]*/g, '$1');
 
   // G1 — static imports
   const imports = [...codeOnly.matchAll(RE_IMPORT)].map(m => m[1]);
@@ -466,7 +463,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v21'; // bumped 2026-05-13 — stricter isRoute/isServerRoute scoping to src/routes/
+const META_CACHE_VERSION = 'v22'; // bumped 2026-05-13 — fix ESM import extraction bug (preserved strings)
 
 let processed = 0;
 for (const filePath of walk(scanRoot)) {

@@ -1,12 +1,12 @@
 # TODO — Codebase Enhancement Synthesis
 
-> Generated: 2026-05-13T00:21:03Z from 43 directories, 0 hotspot files
+> Generated: 2026-05-13T18:25:48Z from 32 directories, 29 hotspot files
 > Source: Redis ACE hits (code:graph:node:* + code:graph:hotspot:*) + 55-gate audit system
 
-> ⚠️ **Data stale** — Redis has only 66 node entries (expect ≥3000 after `graphify:full`). Sections 1 and 2 below may be sparse or empty.
+> ⚠️ **Data stale** — Redis has only 111 node entries (expect ≥3000 after `graphify:full`). Sections 1 and 2 below may be sparse or empty.
 > Run: `npm run graphify:full && npm run agents:enrich` to repopulate (5-10 min GPU).
 
-- [ ] **data:refresh** `npm run graphify:full && npm run agents:enrich` — last enriched 2026-05-13T00:21:03Z with 66 nodes / 0 hotspots (full graph has ≥3000 files)
+- [ ] **data:refresh** `npm run graphify:full && npm run agents:enrich` — last enriched 2026-05-13T18:25:48Z with 111 nodes / 29 hotspots (full graph has ≥3000 files)
 
 ## 1. Critical Hotspots (High Fan-In → High Risk)
 
@@ -15,6 +15,35 @@ Files with the most dependents — changes here cascade widely. Each needs:
 
 | File | Fan-In | Zone | Action |
 |------|--------|------|--------|
+| `src/global.d.ts` | 0 | types | 🟡 MODERATE — add paired test |
+| `src/env.d.ts` | 0 | types | 🟡 MODERATE — add paired test |
+| `src/custom-modules.d.ts` | 0 | types | 🟡 MODERATE — add paired test |
+| `src/lib/ai/onnx/session.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/hypergraph.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/app.d.ts` | 0 | types | 🟡 MODERATE — add paired test |
+| `src/lib/ai/e2b/session.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/auth-store.svelte.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/ollama-config.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/emotion-context.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/e2b/inference.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/gemma4-e2b-client.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/cache/cache-invalidation.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/hooks.server.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/ambient-legacy.d.ts` | 0 | types | 🟡 MODERATE — add paired test |
+| `src/lib/ai/citation-cache.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/client-cache.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/prompts.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/client-quality.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/quant-config.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/base64-fp32-quantizer.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/client-router.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/onnx/inference.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ambient-events.d.ts` | 0 | types | 🟡 MODERATE — add paired test |
+| `src/lib/cache/cache-service.svelte.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/hooks.client.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/unified-generation.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/client-llm-synthesis.ts` | 0 | client | 🟡 MODERATE — add paired test |
+| `src/lib/ai/client-embed.ts` | 0 | client | 🟡 MODERATE — add paired test |
 
 ## 2. Test Coverage Gaps (fanIn ≥ 15, no paired test)
 
