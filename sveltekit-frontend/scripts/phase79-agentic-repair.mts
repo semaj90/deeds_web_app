@@ -26,7 +26,7 @@ const __dirname = path.dirname(__filename);
 // Configuration
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDUFnEXDcyhys7aKLHpHFZjmJB0Yhsoxt0';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const MODEL = process.env.SUGGESTION_MODEL || 'gemma3-legal:latest';
 
@@ -507,12 +507,27 @@ async function processOneSuggestion(suggestion: Suggestion): Promise<boolean> {
 // 🚀 MAIN AGENT LOOP
 // ═══════════════════════════════════════════════════════════════════════════
 
-async function runAgent(maxIterations = 10) {
+async function runAgent(maxIterations = 10, isDryRun = false) {
   console.log('\n' + '═'.repeat(60));
   console.log('🤖 Phase 79: Agentic Repair Loop');
   console.log('═'.repeat(60));
   console.log(`Started at: ${new Date().toISOString()}`);
-  console.log(`Max iterations: ${maxIterations}`);
+  console.log(`Max iterations: ${maxIterations}${isDryRun ? ' (DRY RUN)' : ''}`);
+
+  if (isDryRun) {
+    const suggestions = await fetchPendingSuggestions(maxIterations);
+    if (suggestions.length === 0) {
+      console.log('\n✅ No pending suggestions found.');
+    } else {
+      console.log(`\n📋 DRY RUN — would process ${suggestions.length} suggestion(s):`);
+      suggestions.forEach((s, i) => {
+        console.log(`  ${i + 1}. [${s.risk_level}] ${s.summary?.substring(0, 80)}`);
+        console.log(`     File: ${s.file_path || s.route_path || 'unknown'}`);
+      });
+    }
+    await sql.end();
+    return;
+  }
 
   let successCount = 0;
   let failCount = 0;
@@ -539,7 +554,7 @@ async function runAgent(maxIterations = 10) {
     }
 
     // Brief pause between iterations
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 1000));
   }
 
   // Summary
@@ -548,7 +563,9 @@ async function runAgent(maxIterations = 10) {
   console.log('═'.repeat(60));
   console.log(`✅ Successful fixes: ${successCount}`);
   console.log(`❌ Failed attempts: ${failCount}`);
-  console.log(`📈 Success rate: ${((successCount / (successCount + failCount)) * 100 || 0).toFixed(1)}%`);
+  console.log(
+    `📈 Success rate: ${((successCount / (successCount + failCount)) * 100 || 0).toFixed(1)}%`
+  );
   console.log(`Completed at: ${new Date().toISOString()}`);
 
   // Log session to file
@@ -557,7 +574,7 @@ async function runAgent(maxIterations = 10) {
     iterations: iteration,
     successCount,
     failCount,
-    successRate: successCount / (successCount + failCount) || 0
+    successRate: successCount / (successCount + failCount) || 0,
   };
 
   await fs.writeFile(
@@ -573,9 +590,23 @@ async function runAgent(maxIterations = 10) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const args = process.argv.slice(2);
-const maxIterations = parseInt(args[0]) || 10;
 
-runAgent(maxIterations).catch(err => {
+// Parse named flags sent by run-phase79-agent.ps1 (--dry-run, --limit=N)
+// Also accept a bare positional integer for backwards-compat (e.g. "npx tsx ... 5")
+const dryRunFlag = args.includes('--dry-run');
+const limitFlag = args.find((a) => a.startsWith('--limit='));
+const positionalLimit = args.find((a) => /^\d+$/.test(a));
+const maxIterations = limitFlag
+  ? parseInt(limitFlag.split('=')[1], 10) || 10
+  : positionalLimit
+    ? parseInt(positionalLimit, 10)
+    : 10;
+
+if (dryRunFlag) {
+  console.log('\n⚠️  DRY RUN mode — no files will be modified\n');
+}
+
+runAgent(maxIterations, dryRunFlag).catch((err) => {
   console.error('❌ Agent crashed:', err);
   sql.end();
   process.exit(1);

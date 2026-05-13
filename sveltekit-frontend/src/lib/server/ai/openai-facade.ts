@@ -229,6 +229,16 @@ export async function runChatCompletion(
     filePath:              req.file_path,
     enableCodebaseContext: true,
     enableWebSearch:       false,
+    modelName:             internalModel,
+    modelQuant:            runtime.profile,
+    backend:               canUseTurboQuantNow ? 'turboquant' : 'bifrost',
+    tokenizerHash:         createHash('sha256').update('embeddinggemma:latest:768').digest('hex').slice(0, 16),
+    systemPromptHash:      createHash('sha256').update(systemPreamble ?? 'SYSTEM_YORHA_LEGAL').digest('hex').slice(0, 16),
+    toolDefinitionsHash:   createHash('sha256').update(JSON.stringify(req.tools ?? [])).digest('hex').slice(0, 16),
+    repoGitSha:            process.env.GIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
+    corpusHash:            'codebase-graph:unknown',
+    ragBundleHash:         createHash('sha256').update(query.slice(0, 512)).digest('hex').slice(0, 16),
+    graphSnapshotHash:     createHash('sha256').update(req.case_id ?? req.file_path ?? 'graph:none').digest('hex').slice(0, 16),
   });
   acePromise.catch(() => {}); // prevent UnhandledPromiseRejection if race abandons it
 

@@ -60,41 +60,41 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		for (const msg of messages) {
 			const msgId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 			const [saved] = await db
-				.insert(chatMessages)
-				.values({
-					id: msgId,
-					userId: user.id,
-					chatId,
-					role: msg.role,
-					content: msg.content,
-					metadata: msg.metadata ? JSON.stringify(msg.metadata) : null,
-					timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date()
-				})
-				.onConflictDoNothing()
-				.returning();
+        .insert(chatMessages)
+        .values({
+          id: msgId,
+          userId: Number(user.id),
+          chatId,
+          role: msg.role,
+          content: msg.content,
+          metadata: msg.metadata ? JSON.stringify(msg.metadata) : null,
+          timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+        })
+        .onConflictDoNothing()
+        .returning();
 
 			if (saved) savedMessages.push(saved);
 		}
 
 		// Update chat metadata
 		await db
-			.insert(chatMetadata)
-			.values({
-				chatId,
-				userId: user.id,
-				caseId: id,
-				messageCount: messages.length.toString(),
-				lastMessageAt: new Date(),
-				tags: metadata ? JSON.stringify(metadata) : null
-			})
-			.onConflictDoUpdate({
-				target: chatMetadata.chatId,
-				set: {
-					messageCount: messages.length.toString(),
-					lastMessageAt: new Date(),
-					tags: metadata ? JSON.stringify(metadata) : null
-				}
-			});
+      .insert(chatMetadata)
+      .values({
+        chatId,
+        userId: Number(user.id),
+        caseId: id,
+        messageCount: messages.length.toString(),
+        lastMessageAt: new Date(),
+        tags: metadata ? JSON.stringify(metadata) : null,
+      })
+      .onConflictDoUpdate({
+        target: chatMetadata.chatId,
+        set: {
+          messageCount: messages.length.toString(),
+          lastMessageAt: new Date(),
+          tags: metadata ? JSON.stringify(metadata) : null,
+        },
+      });
 
 		return json({
 			success: true,
@@ -137,10 +137,10 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
 
 		// Fetch messages for this chat
 		const rawMessages = await db
-			.select()
-			.from(chatMessages)
-			.where(and(eq(chatMessages.chatId, chatId), eq(chatMessages.userId, user.id)))
-			.orderBy(chatMessages.timestamp);
+      .select()
+      .from(chatMessages)
+      .where(and(eq(chatMessages.chatId, chatId), eq(chatMessages.userId, Number(user.id))))
+      .orderBy(chatMessages.timestamp);
 
 		// Parse metadata JSON strings
 		const messages = rawMessages.map(msg => ({
@@ -155,7 +155,7 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
       .where(
         and(
           eq(chatMetadata.chatId, chatId),
-          eq(chatMetadata.userId, user.id),
+          eq(chatMetadata.userId, Number(user.id)),
           eq(chatMetadata.caseId, id)
         )
       )

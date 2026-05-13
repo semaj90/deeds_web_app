@@ -2,6 +2,81 @@
 
 This guide clarifies the **actual** state of your orchestration and provides the manual for your unified development workflow.
 
+## 🧭 Clean Stack Map
+
+The current stack is best treated as a planner-driven retrieval system with three inference lanes:
+
+```text
+User request
+  ↓
+SvelteKit route / UI action
+  ↓
+ACE planner
+  ├─ hash current request state
+  ├─ check Redis hot context pack
+  ├─ check Postgres durable context registry
+  └─ reuse cached pack or fetch deltas only
+  ↓
+Retrieval layers
+  ├─ RAPTOR = hierarchical summaries
+  ├─ GraphRAG = entities, paths, relations
+  ├─ Qdrant = vector recall
+  └─ Neo4j = graph / Pentagon / KAG paths
+  ↓
+Context pack assembly
+  ├─ system prompt
+  ├─ tool definitions
+  ├─ legal / evidence / code chunks
+  ├─ feature/wiki packets
+  └─ retrieval trace + cache metadata
+  ↓
+Inference backend
+  ├─ llama-server = primary controllable backend
+  ├─ Ollama = convenience / model management lane
+  └─ TurboQuant / RotorQuant / Gemma 4 MTP = experimental speed lanes
+  ↓
+Generation + trace writeback
+  ├─ answer
+  ├─ trace summary
+  └─ cache registry update
+```
+
+### Layer Roles
+
+| Layer | Role | Notes |
+|---|---|---|
+| `llama-server` | Main inference backend | Best place to test low-level GPU, KV, and prompt-cache behavior |
+| `Ollama` | Convenience backend | Good for pulls, demos, and simple API integration |
+| `TurboQuant` / `RotorQuant` | Compression lane | Experimental KV/weight compression, not a required dependency |
+| `Gemma 4 MTP` | Decode-speed lane | Helps after prefill; does not replace ACE cache planning |
+| `RAPTOR` | Hierarchical memory | Tree summaries for long docs, cases, and conversation state |
+| `GraphRAG` | Relational memory | Paths, entities, evidence links, file/symbol/test relationships |
+| `ACE` | Brain / router / cache planner | Decides whether to reuse, delta-fetch, or rebuild context |
+| `Redis` | Hot memory | Context packs, trace state, locks, lane health, short-lived cache |
+| `Postgres` | Durable truth | Context registry, trace audit, summary records, cache metadata |
+| `Qdrant` | Vector recall | Semantic retrieval and rerank support |
+| `Neo4j` | Graph recall | Graph paths, Pentagon, KAG and topology queries |
+| `NVMe` | Cold artifact store | Context pack snapshots, graph snapshots, future KV artifacts |
+
+### Runtime Flow
+
+1. Compute a stable cache key from request state, model state, tool state, corpus state, and graph state.
+2. Check Redis for a hot context pack.
+3. If Redis misses, check the durable Postgres registry.
+4. If a cached pack is valid, reuse it and retrieve only deltas.
+5. If not, rebuild via RAPTOR and GraphRAG, then pack the context once.
+6. Send the packed prompt to `llama-server` or the selected backend lane.
+7. Write back answer summary, trace metadata, and cache registry entries.
+
+### GPU Acceleration Split
+
+| Capability | What it helps | Where it belongs |
+|---|---|---|
+| CUDA streams | Overlap GPU work | Embedding batches, rerank batches, concurrent lane work |
+| CUDA graphs | Reduce repeated kernel launch overhead | Repeated decode shapes, stable prompt/session patterns |
+| GPU layer/KV offload | Fit more model state on RTX | `llama-server` / backend serving lane |
+| TurboQuant / RotorQuant | Reduce KV or weight pressure | Experimental backend capabilities, not planner logic |
+
 ## 🛠️ The Unified Orchestrator: `npm run dev:agent`
 We have unified the disparate GPU and research scripts into a single entry point.
 - **Command**: `npm run dev:agent`

@@ -16,6 +16,11 @@ export interface ClusterTagsEntry {
   topTags: Array<{ tag: string; count: number }>;
   topFiles: (string | null)[];
   clusterSrc?: string;
+  // Synthesized metadata from GraphRAG/Raptor
+  summary?: string;
+  purpose?: string;
+  risk_level?: string;
+  mitigation_protocols?: string[];
 }
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -35,8 +40,35 @@ export function readLatestQdrantClusterTags(): ClusterTagsEntry[] {
       .sort();
     if (!entries.length) { _cache = []; _cacheAt = now; return []; }
     const latest = entries[entries.length - 1];
-    const raw = readFileSync(join(runsDir, latest, 'qdrant_cluster_tags.json'), 'utf-8');
-    _cache = JSON.parse(raw) as ClusterTagsEntry[];
+    const latestDir = join(runsDir, latest);
+    const raw = readFileSync(join(latestDir, 'qdrant_cluster_tags.json'), 'utf-8');
+    const tags = JSON.parse(raw) as ClusterTagsEntry[];
+
+    // Optional: merge synthesis summary
+    try {
+      const synPath = join(latestDir, 'synthesis_summary.json');
+      const synRaw = readFileSync(synPath, 'utf-8');
+      const synData = JSON.parse(synRaw) as Array<{
+        cluster_id: number;
+        summary: string;
+        purpose: string;
+        risk_level?: string;
+        mitigation_protocols?: string[];
+      }>;
+      const synMap = new Map(synData.map(s => [`cluster:gpu:${s.cluster_id}`, s]));
+      
+      for (const t of tags) {
+        const s = synMap.get(t.clusterKey);
+        if (s) {
+          t.summary = s.summary;
+          t.purpose = s.purpose;
+          t.risk_level = s.risk_level;
+          t.mitigation_protocols = s.mitigation_protocols;
+        }
+      }
+    } catch { /* skip synthesis enrichment if file missing */ }
+
+    _cache = tags;
     _cacheAt = now;
     return _cache;
   } catch {

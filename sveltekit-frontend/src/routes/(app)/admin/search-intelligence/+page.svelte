@@ -665,7 +665,7 @@
 	let tlNextCursor  = $state<string | null>(null);
 	let tlEventType   = $state('');
 	let tlPipeline    = $state('');
-	
+
 	let atlasManifest = $state<any>(null);
 	let atlasBase64   = $state<string | null>(null);
 	let atlasLoading  = $state(false);
@@ -673,7 +673,7 @@
 	let triples       = $state<any[]>([]);
 	let triplesLoading = $state(false);
 	let tripleFilter  = $state('');
-	
+
 	let filteredTriples = $derived(
 		tripleFilter ? triples.filter(t => t.relation.toLowerCase().includes(tripleFilter.toLowerCase()) || t.source.label.toLowerCase().includes(tripleFilter.toLowerCase())) : triples
 	);
@@ -3269,7 +3269,7 @@
 			</div>
 		{/if}
 	</section>
-	
+
 	<!-- ── Glyph Atlas & Density ────────────────────────────────────────── -->
 	<section class="panel span2">
 		<div class="panel-hdr">
@@ -3287,15 +3287,15 @@
 			<span class="panel-title"><Icon name="network" class="w-4 h-4" /> Neo4j Knowledge Triples</span>
 			<span class="panel-sub">Raw relational triples extracted from the latest synthesis run.</span>
 			<div class="hdr-actions" style="margin-left: auto; display: flex; gap: 0.5rem;">
-				<input 
-					type="text" 
-					class="ctrl-select" 
-					placeholder="Filter triples..." 
+				<input
+					type="text"
+					class="ctrl-select"
+					placeholder="Filter triples..."
 					bind:value={tripleFilter}
 					style="width: 150px;"
 				/>
-				<button 
-					class="btn-sm btn-ghost" 
+				<button
+					class="btn-sm btn-ghost"
 					style="color: #f87171;"
 					onclick={async () => {
 						if (confirm('Prune all triples with confidence < 50%?')) {
@@ -3307,7 +3307,7 @@
 						}
 					}}
 				>
-					<Icon name="trash-2" class="w-3.5 h-3.5" /> Prune < 50%
+					<Icon name="trash-2" class="w-3.5 h-3.5" /> Prune &lt; 50%
 				</button>
 			</div>
 		</div>

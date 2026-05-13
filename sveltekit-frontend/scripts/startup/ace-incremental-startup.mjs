@@ -292,6 +292,41 @@ async function runIncrementalLane(redis) {
     // Probe ancillary services started by dev:everything and log their status.
     // Non-blocking — failures are recorded in log.services but don't abort the lane.
     log.services = await probeServices();
+
+    // ── TurboVec ANN sidecar (fire-and-forget, :8099) ────────────────────────
+    // Spawn the Python TurboVec 4-bit ANN sidecar if it's not already alive.
+    // Uses a 30-min Redis cooldown so it doesn't respawn on every folder-open.
+    // Feeds hyperrag:multiquery prefilter — optional, degrades gracefully if down.
+    const tvCooldownKey = 'startup:turbovec-sidecar:last_spawn';
+    const tvStampRaw = await redis.get(tvCooldownKey).catch(() => null);
+    const tvAge = tvStampRaw ? (Date.now() - new Date(tvStampRaw).getTime()) / 60_000 : Infinity;
+    let tvHealthy = false;
+    try {
+      const tvProbe = await fetch('http://127.0.0.1:8099/health', { signal: AbortSignal.timeout(1500) });
+      tvHealthy = tvProbe.ok;
+    } catch {}
+
+    if (!tvHealthy && tvAge > 30) {
+      const pyExe = 'C:\\Users\\james\\AppData\\Local\\Programs\\Python\\Python311\\python.exe';
+      const sidecarScript = resolve(ROOT, 'scripts/turbovec-sidecar.py');
+      const tvOut = openSync(resolve(LOG_DIR, 'turbovec-sidecar.out.log'), 'a');
+      const tvErr = openSync(resolve(LOG_DIR, 'turbovec-sidecar.err.log'), 'a');
+      const tvChild = spawn(pyExe, [sidecarScript], {
+        cwd: ROOT,
+        detached: true,
+        stdio: ['ignore', tvOut, tvErr],
+      });
+      tvChild.unref();
+      log.turbovecSidecar = { status: 'spawned', pid: tvChild.pid };
+      console.log(`[startup] TurboVec sidecar spawned pid=${tvChild.pid} → logs/task-output/pipeline-test/turbovec-sidecar.{out,err}.log`);
+      await redis.set(tvCooldownKey, new Date().toISOString(), 'EX', 3600).catch(() => {});
+    } else if (tvHealthy) {
+      log.turbovecSidecar = { status: 'already-up' };
+      console.log('[startup] TurboVec sidecar already healthy on :8099');
+    } else {
+      log.turbovecSidecar = { status: 'cooldown', ageMin: tvAge.toFixed(1) };
+    }
+
     const svcSummary = Object.entries(log.services)
       .map(([k, v]) => `${k}:${v}`)
       .join(' ');

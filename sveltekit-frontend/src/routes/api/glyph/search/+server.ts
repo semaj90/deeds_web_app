@@ -79,7 +79,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       const atlas = await buildGlyphTileAtlas(caseId, [], 16, 16, false);
       atlasSource = atlas.source;
       if (atlas.tiles.length > 0) {
-        const matched = searchGlyphTiles(queryEmb, atlas, Math.ceil(topK / 2));
+        const matched = await searchGlyphTiles(queryEmb, atlas, Math.ceil(topK / 2));
         tileMatches = matched.map(t => t.clusterId);
       }
       metrics.atlasMs = Math.round(performance.now() - t1);

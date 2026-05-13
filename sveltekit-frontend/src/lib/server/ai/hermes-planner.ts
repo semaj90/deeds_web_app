@@ -14,7 +14,11 @@
  */
 
 import { z } from 'zod';
-import { resolveRuntimeConfig, type QuantRuntimeConfig } from '$lib/server/ai/inference-configs.js';
+import {
+  resolveRuntimeConfig,
+  type InferenceRuntimeConfig,
+} from '$lib/server/ai/inference-configs.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -91,7 +95,7 @@ const TOOL_POLICY: Record<string, string[]> = {
 function buildPlannerSystemPrompt(
   aceMode: string,
   availableSignals: AvailableSignals,
-  runtime: QuantRuntimeConfig
+  runtime: InferenceRuntimeConfig
 ): string {
   const allowed = TOOL_POLICY[aceMode] ?? TOOL_POLICY.search;
   return `You are Hermes, the dispatcher for a legal-AI platform.
@@ -201,7 +205,7 @@ export async function runHermesPlanner(input: {
   userQuery: string;
   aceMode: 'search' | 'debug' | 'repair' | 'analyze';
   availableSignals: AvailableSignals;
-  runtime?: QuantRuntimeConfig;
+  runtime?: InferenceRuntimeConfig;
 }): Promise<HermesPlan> {
   const systemPrompt = buildPlannerSystemPrompt(
     input.aceMode,

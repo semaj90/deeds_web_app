@@ -1,8 +1,14 @@
 <script lang="ts">
   import { KnowledgeSearchStore } from '$lib/stores/knowledge-search.svelte';
 
+  import { onMount } from 'svelte';
+
   // Svelte 5: Create reactive store instance
   const search = new KnowledgeSearchStore();
+
+  onMount(() => {
+    search.fetchStatus();
+  });
 
   // Sample queries
   const sampleQueries = [
@@ -42,6 +48,29 @@
 			Search across {search.metadata?.totalResults ?? 13} documentation sources with AI-powered synthesis
 		</p>
 	</div>
+
+	{#if search.status}
+		<div class="lane-status">
+			{#if search.status.qdrant?.pointCount === 0}
+				<div class="status-warning degraded">
+					<span class="icon">⚠️</span>
+					Operational with degraded lane: Qdrant vector lane unavailable
+				</div>
+			{/if}
+			{#if search.status.neo4j?.agentsCardCount === 0}
+				<div class="status-warning degraded">
+					<span class="icon">⚠️</span>
+					Operational with degraded lane: Neo4j graph lane unavailable
+				</div>
+			{/if}
+			{#if search.status.pageCount === 0}
+				<div class="status-warning warning">
+					<span class="icon">⚠️</span>
+					FeatureMap dry-run only: No enhanced graph mappings found
+				</div>
+			{/if}
+		</div>
+	{/if}
 
 	<!-- Search Bar -->
 	<div class="search-bar">
@@ -508,6 +537,35 @@
 
 	.fallback-notice .icon {
 		font-size: 1.1rem;
+	}
+
+	.lane-status {
+		margin-bottom: 2rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.status-warning {
+		padding: 0.75rem 1rem;
+		border-radius: 8px;
+		font-size: 0.95rem;
+		font-weight: 500;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.status-warning.degraded {
+		background: #fff5f5;
+		color: #c53030;
+		border: 1px solid #feb2b2;
+	}
+
+	.status-warning.warning {
+		background: #fffaf0;
+		color: #9c4221;
+		border: 1px solid #fbd38d;
 	}
 </style>
 

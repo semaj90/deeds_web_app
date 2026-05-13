@@ -2,7 +2,10 @@
   "EXTERNAL:lucia": [
     "src/app.d.ts",
     "src/lib/server/auth.ts",
-    "src/lib/server/lucia.ts"
+    "src/lib/server/lucia.ts",
+    "scripts/phase104-backups/src/ai-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/ai-service.ts"
   ],
   "EXTERNAL:svelte": [
     "src/app.d.ts",
@@ -125,7 +128,6 @@
     "src/lib/components/ui/modal/Modal.svelte",
     "src/lib/components/ui/Modal.svelte",
     "src/lib/components/ui/modular/types.ts",
-    "src/lib/components/ui/NESElementsShowcase.svelte",
     "src/lib/components/ui/PerformanceMonitor.svelte",
     "src/lib/components/ui/Portal.svelte",
     "src/lib/components/ui/progress/ProgressRoot.svelte",
@@ -201,6 +203,7 @@
     "src/routes/(app)/demos/webgpu-showcase/+page.svelte",
     "src/routes/(app)/evidence/hash/+page.svelte",
     "src/routes/(app)/evidence/realtime/+page.svelte",
+    "src/routes/(app)/knowledge/+page.svelte",
     "src/routes/(app)/library/[documentId]/reader/+page.svelte",
     "src/routes/(app)/persons-of-interest/[id]/+page.svelte",
     "src/routes/(app)/rag-search/+page.svelte",
@@ -211,7 +214,9 @@
     "src/routes/(app)/terminal/+page.svelte",
     "src/routes/+layout.svelte",
     "src/types/components.d.ts",
-    "src/types/ui-components.d.ts"
+    "src/types/ui-components.d.ts",
+    "scripts/lib/phase89-sse-stream.mjs",
+    "scripts/phase104-backups/src/lib/types/global.ts"
   ],
   "EXTERNAL:zod": [
     "src/global.d.ts",
@@ -246,6 +251,7 @@
     "src/lib/server/ai/langgraph-research.ts",
     "src/lib/server/ai/openai-types.ts",
     "src/lib/server/analysis/entity-extraction.ts",
+    "src/lib/server/analysis/holistic-synthesizer.ts",
     "src/lib/server/atlas/types.ts",
     "src/lib/server/audit/gemma-tool-router.ts",
     "src/lib/server/concurrency/queue-manager.ts",
@@ -319,6 +325,7 @@
     "src/routes/api/admin/repair/+server.ts",
     "src/routes/api/admin/seed-knowledge/+server.ts",
     "src/routes/api/admin/telemetry/batch/+server.ts",
+    "src/routes/api/admin/topology/recompute/+server.ts",
     "src/routes/api/admin/weights/+server.ts",
     "src/routes/api/agent/investigate/+server.ts",
     "src/routes/api/agents/chat/+server.ts",
@@ -362,6 +369,7 @@
     "src/routes/api/analytics/file-activity/+server.ts",
     "src/routes/api/analytics/focus/+server.ts",
     "src/routes/api/analytics/generate-todos/+server.ts",
+    "src/routes/api/analytics/knowledge-triples/prune/+server.ts",
     "src/routes/api/analytics/mapreduce-matrix/+server.ts",
     "src/routes/api/analytics/panel-activity/+server.ts",
     "src/routes/api/analytics/patterns/+server.ts",
@@ -758,6 +766,7 @@
     "src/routes/api/whisper/transcribe/+server.ts",
     "src/routes/api/wiki/encyclopedia/+server.ts",
     "src/routes/api/wiki/moc/+server.ts",
+    "src/routes/api/wiki/refresh-directory/+server.ts",
     "src/routes/api/wiki/search/+server.ts",
     "src/routes/api/wiki/sync-to-obsidian/+server.ts",
     "src/routes/api/worker/autotag/trigger/+server.ts",
@@ -766,6 +775,12 @@
     "src/routes/api/yorha/search/+server.ts",
     "src/routes/login/schema.ts",
     "src/routes/register/schema.ts",
+    "scripts/phase104-backups/src/lib/services/enhanced-api-client.ts",
+    "scripts/phase104-backups/src/routes_parked/(tools)_disabled/search/+page.server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/ai/search/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/detective/patterns/+server.ts",
+    "scripts/smoke/smoke-mcp-tools-list-bisect.mjs",
+    "scripts/__fixtures__/audit-fail.ts",
     "tests/routes/get-degraded-shape-pass-a.test.ts"
   ],
   "EXTERNAL:@sveltejs/kit": [
@@ -774,14 +789,12 @@
     "src/lib/components/forms/ProgressiveForm.svelte",
     "src/lib/server/api/response-helper.ts",
     "src/lib/server/api-response.ts",
-    "src/lib/server/auth-guard.js",
     "src/lib/server/auth-helpers.ts",
     "src/lib/server/auth.ts",
     "src/lib/server/error-brain/middleware.ts",
     "src/lib/server/lucia.ts",
     "src/lib/server/middleware/rate-limit.ts",
     "src/lib/server/middleware/validate-and-rate.ts",
-    "src/lib/types/server.d.ts",
     "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
     "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
@@ -930,6 +943,8 @@
     "src/routes/api/analytics/focus/+server.ts",
     "src/routes/api/analytics/generate-todos/+server.ts",
     "src/routes/api/analytics/health/+server.ts",
+    "src/routes/api/analytics/knowledge-triples/+server.ts",
+    "src/routes/api/analytics/knowledge-triples/prune/+server.ts",
     "src/routes/api/analytics/mapreduce-matrix/+server.ts",
     "src/routes/api/analytics/mirror-health/+server.ts",
     "src/routes/api/analytics/panel-activity/+server.ts",
@@ -1488,6 +1503,8 @@
     "src/routes/api/whisper/transcribe/+server.ts",
     "src/routes/api/wiki/encyclopedia/+server.ts",
     "src/routes/api/wiki/moc/+server.ts",
+    "src/routes/api/wiki/page/[id]/+server.ts",
+    "src/routes/api/wiki/refresh-directory/+server.ts",
     "src/routes/api/wiki/search/+server.ts",
     "src/routes/api/wiki/status/+server.ts",
     "src/routes/api/wiki/sync-to-obsidian/+server.ts",
@@ -1499,7 +1516,24 @@
     "src/routes/api/yorha/search/+server.ts",
     "src/routes/login/+page.server.ts",
     "src/routes/minio/[...path]/+server.ts",
-    "src/routes/register/+page.server.ts"
+    "src/routes/register/+page.server.ts",
+    "scripts/phase104-backups/src/lib/middleware/binary-encoding.ts",
+    "scripts/phase104-backups/src/lib/routing/route-guards.ts",
+    "scripts/phase104-backups/src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts",
+    "scripts/phase104-backups/src/lib/services/cuda-vector-integration.ts",
+    "scripts/phase104-backups/src/routes/api/ace/summarize-clusters/+server.ts",
+    "scripts/phase104-backups/src/routes/api/codebase/apply-patch/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/ai/search/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/ai/summarize/cache/[key]/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/documents/process/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/error-brain/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/legal-ai/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/phase72/suggest-fix/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/phase82/upgrade-route/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/citations/verify/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/detective/insights/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/detective/patterns/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/yorha/enhanced-rag/+server.ts"
   ],
   "EXTERNAL:drizzle-orm": [
     "src/hooks.server.ts",
@@ -1545,7 +1579,6 @@
     "src/lib/server/db/cases.ts",
     "src/lib/server/db/drizzle-cache.ts",
     "src/lib/server/db/drizzle.ts",
-    "src/lib/server/db/enhanced-legal-schema.ts",
     "src/lib/server/db/index.ts",
     "src/lib/server/db/jsonb-legal-schema.ts",
     "src/lib/server/db/legal-db-init.ts",
@@ -1592,7 +1625,6 @@
     "src/lib/server/db/seed.ts",
     "src/lib/server/db/setup-database.ts",
     "src/lib/server/db/unified-client.ts",
-    "src/lib/server/db/unified-schema.ts",
     "src/lib/server/db/utils.ts",
     "src/lib/server/db/vector-operations.ts",
     "src/lib/server/db/vector-schema.ts",
@@ -1603,17 +1635,16 @@
     "src/lib/server/engagement/idle-reengagement.ts",
     "src/lib/server/error-brain/knowledge-base.ts",
     "src/lib/server/evidence/services/drizzle-stub.ts",
-    "src/lib/server/features/feature-map-store.ts",
     "src/lib/server/features/feature-storage.ts",
     "src/lib/server/glyph-diffusion-service.ts",
     "src/lib/server/gpu/background-analyzer.ts",
     "src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
     "src/lib/server/graph/ingestion-buffer-builder.ts",
-    "src/lib/server/graph/neo4j-jsonl-exporter.ts",
     "src/lib/server/graph/pg-neo4j-sync.ts",
     "src/lib/server/indexer/karpathy-persistence.ts",
     "src/lib/server/indexer/web-search-indexer.ts",
     "src/lib/server/indexer/workspace-metadata-extractor.ts",
+    "src/lib/server/kb/pentagon-search.ts",
     "src/lib/server/kb/wiki-logic.ts",
     "src/lib/server/legal/citation-service.ts",
     "src/lib/server/llm/contextual-chat.ts",
@@ -1629,7 +1660,9 @@
     "src/lib/server/tensor/tensor-analysis-cache.ts",
     "src/lib/server/trace/trace-collector.ts",
     "src/lib/server/unified/legal-ai-service.ts",
+    "src/lib/server/vector/hypergraph-service.ts",
     "src/lib/server/vector/PgVectorService.ts",
+    "src/lib/server/wiki/wiki-mcp-service.ts",
     "src/lib/server/workers/audio-processor.ts",
     "src/lib/server/workers/document-embed-consumer.ts",
     "src/lib/server/workers/video-vlm-processor.ts",
@@ -1683,6 +1716,8 @@
     "src/routes/api/analysis/page-context/+server.ts",
     "src/routes/api/analytics/context-timeline/+server.ts",
     "src/routes/api/analytics/events/+server.ts",
+    "src/routes/api/analytics/knowledge-triples/+server.ts",
+    "src/routes/api/analytics/knowledge-triples/prune/+server.ts",
     "src/routes/api/analytics/research-summaries/+server.ts",
     "src/routes/api/analytics/research-summaries/[id]/+server.ts",
     "src/routes/api/analyze-file/+server.ts",
@@ -1883,6 +1918,53 @@
     "src/routes/api/yorha/search/+server.ts",
     "src/routes/login/+page.server.ts",
     "src/routes/register/+page.server.ts",
+    "scripts/count-mappings.mjs",
+    "scripts/create-enhanced-graph-table.mjs",
+    "scripts/extract-enhanced-graph.mjs",
+    "scripts/fix-queue-worker.cjs",
+    "scripts/fix-rabbitmq-worker.cjs",
+    "scripts/ingest-enhanced-jsonl.mjs",
+    "scripts/list-db-users.ts",
+    "scripts/phase104-backups/src/ai-service.ts",
+    "scripts/phase104-backups/src/integrated-rag-service.ts",
+    "scripts/phase104-backups/src/lib/db/queries/nes-command-center-archive.ts",
+    "scripts/phase104-backups/src/lib/db/schema-example-legal.ts",
+    "scripts/phase104-backups/src/lib/performance/optimizations.ts",
+    "scripts/phase104-backups/src/lib/server/ai/pgvector-indexing-service.ts",
+    "scripts/phase104-backups/src/lib/server/cases/caseSynthesis.ts",
+    "scripts/phase104-backups/src/lib/server/chat/history-service.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema/ai_chat.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema/poi.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema-test-rag.ts",
+    "scripts/phase104-backups/src/lib/server/db/unified-client-backup.ts",
+    "scripts/phase104-backups/src/lib/server/db/vector-operations.ts",
+    "scripts/phase104-backups/src/lib/server/error-brain/knowledge-base.ts",
+    "scripts/phase104-backups/src/lib/server/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-ingestion-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-prefetch-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/unified-vector-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/user-recommendation-service.ts",
+    "scripts/phase104-backups/src/lib/services/ace-web/ace-context-service.ts",
+    "scripts/phase104-backups/src/lib/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/aiAutoTagging.ts",
+    "scripts/phase104-backups/src/lib/services/error-pattern-rag.ts",
+    "scripts/phase104-backups/src/lib/services/nomic-embedding-service.ts",
+    "scripts/phase104-backups/src/lib/services/vector-service.ts",
+    "scripts/phase104-backups/src/lib/services/yorha-detective-service.ts",
+    "scripts/phase104-backups/src/lib/workers/queue-worker.ts",
+    "scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts",
+    "scripts/phase104-backups/src/pgvector-indexing-service.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/citations/verify/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/detective/insights/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/yorha/enhanced-rag/+server.ts",
+    "scripts/phase90-backfill-content-hash.ts",
+    "scripts/smoke/smoke-external-research.mjs",
+    "scripts/smoke-compute-worker.mjs",
+    "scripts/test-db.ts",
+    "scripts/test-kag-dag.ts",
+    "scripts/test-pentagon-search.ts",
+    "scripts/verify-db-connection.ts",
+    "scripts/verify-drizzle-runtime.ts",
     "tests/indexer-worker-tasks.spec.ts",
     "tests/insert-test.ts"
   ],
@@ -1898,7 +1980,11 @@
     "src/lib/client/db/loki-client.ts",
     "src/lib/components/evidence/board-persistence.svelte.ts",
     "src/lib/webgpu/som-webgpu-cache.ts",
-    "src/localDocs.svelte.ts"
+    "src/localDocs.svelte.ts",
+    "scripts/phase104-backups/src/integrated-rag-service.ts",
+    "scripts/phase104-backups/src/lib/cache/loki-redis-integration.ts",
+    "scripts/phase104-backups/src/lib/services/multiLayerCache.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/global-loki-store.ts"
   ],
   "EXTERNAL:fuse.js": [
     "src/lib/ai/citation-cache.ts",
@@ -1911,7 +1997,15 @@
     "src/lib/server/retrieval/codebase-context.ts",
     "src/lib/utils/fuse-index.ts",
     "src/routes/(app)/cases/[id]/board/+page.svelte",
-    "src/routes/api/codebase/recall/+server.ts"
+    "src/routes/api/codebase/recall/+server.ts",
+    "scripts/phase104-backups/src/integrated-rag-service.ts",
+    "scripts/phase104-backups/src/lib/search/local-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/advanced-simd-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/end-to-end-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/enhancedRAGPipeline.ts",
+    "scripts/phase104-backups/src/lib/services/instant-search-engine.ts",
+    "scripts/phase104-backups/src/lib/services/multiLayerCache.ts",
+    "scripts/phase104-backups/src/lib/ui/autocomplete/indexeddb-cache.ts"
   ],
   "EXTERNAL:@huggingface/transformers": [
     "src/lib/ai/client-embed.ts",
@@ -1924,17 +2018,13 @@
     "src/lib/ai/client-embed.ts",
     "src/lib/ai/onnx/session.ts",
     "src/lib/components/ClientGemmaInference.svelte",
-    "src/lib/models/ChatSession.svelte.ts"
+    "src/lib/models/ChatSession.svelte.ts",
+    "scripts/phase104-backups/src/lib/ClientEmbeddingGemma.ts",
+    "scripts/phase104-backups/src/lib/ClientEmbeddingService.ts"
   ],
   "EXTERNAL:idb-keyval": [
     "src/lib/cache/indexdb-cache.svelte.ts",
     "src/lib/cache/offline-fetch.ts"
-  ],
-  "EXTERNAL:loki-indexed-adapter": [
-    "src/lib/client/db/loki-client.ts"
-  ],
-  "EXTERNAL:yjs": [
-    "src/lib/collaboration/yjs-provider.ts"
   ],
   "EXTERNAL:xstate": [
     "src/lib/components/admin/AdminChatAssistant.svelte",
@@ -1960,6 +2050,28 @@
     "src/lib/stores/admin-chat-machine.ts",
     "src/lib/utils/xstate-svelte5.svelte.ts",
     "src/routes/login/+page.svelte",
+    "scripts/phase104-backups/src/lib/machines/aiAssistantMachine.minimal.ts",
+    "scripts/phase104-backups/src/lib/machines/case-workflow-machine.ts",
+    "scripts/phase104-backups/src/lib/machines/legalAIMachine.ts",
+    "scripts/phase104-backups/src/lib/machines/predictive-typing-machine.ts",
+    "scripts/phase104-backups/src/lib/orchestration/complete-legal-ai-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts",
+    "scripts/phase104-backups/src/lib/server/services/clustering/orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/enhancedRAGPipeline.ts",
+    "scripts/phase104-backups/src/lib/services/minio-upload-service.ts",
+    "scripts/phase104-backups/src/lib/services/production-pipeline-integration.ts",
+    "scripts/phase104-backups/src/lib/services/webasm-inference-rag.ts",
+    "scripts/phase104-backups/src/lib/services/xstate-utils.ts",
+    "scripts/phase104-backups/src/lib/state/crewAIOrchestrationMachine.ts",
+    "scripts/phase104-backups/src/lib/state/evidence-processing-machine-corrupted.ts",
+    "scripts/phase104-backups/src/lib/state/evidence-processing-machine.ts",
+    "scripts/phase104-backups/src/lib/state/evidenceCustodyMachine.ts",
+    "scripts/phase104-backups/src/lib/stores/machines/types.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-case.svelte.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-platform-integration.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/types.ts",
+    "scripts/phase104-backups/src/lib/types/evidence.ts",
     "tests/evidence-workflow-integration.test.ts"
   ],
   "EXTERNAL:svelte/transition": [
@@ -2023,7 +2135,8 @@
     "src/routes/(app)/evidence-library/+page.svelte",
     "src/routes/(app)/persons-of-interest/+page.svelte",
     "src/routes/(dev)/odin/+page.svelte",
-    "src/routes/register/+page.svelte"
+    "src/routes/register/+page.svelte",
+    "scripts/phase104-backups/src/lib/utils/transitions.ts"
   ],
   "EXTERNAL:bits-ui": [
     "src/lib/components/admin/ContextualAssistantModal.svelte",
@@ -2052,7 +2165,6 @@
     "src/lib/components/ui/FeedbackButtons.svelte",
     "src/lib/components/ui/gaming/n64/N643DButton.svelte",
     "src/lib/components/ui/HoverCard.svelte",
-    "src/lib/components/ui/index.ts",
     "src/lib/components/ui/label/Label.svelte",
     "src/lib/components/ui/scrollarea/ScrollArea.svelte",
     "src/lib/components/ui/select/SelectContent.svelte",
@@ -2096,7 +2208,8 @@
     "src/routes/(app)/admin/case-graph/+page.svelte",
     "src/routes/(app)/couchdb-analytics/DependencyChart.svelte",
     "src/routes/(app)/couchdb-analytics/ErrorPropagationGraph.svelte",
-    "src/routes/(app)/demos/+page.svelte"
+    "src/routes/(app)/demos/+page.svelte",
+    "scripts/lib/phase89-graph-visualizer.mjs"
   ],
   "EXTERNAL:svelte-dnd-action": [
     "src/lib/components/detective/DetectiveBoard.svelte"
@@ -2105,7 +2218,8 @@
     "src/lib/components/detective/DetectiveBoard.svelte"
   ],
   "UNRESOLVED:./ContextMenu.svelte": [
-    "src/lib/components/detective/index.ts"
+    "src/lib/components/detective/index.ts",
+    "scripts/phase104-backups/src/lib/components/detective/index.ts"
   ],
   "EXTERNAL:@tiptap/core": [
     "src/lib/components/editor/TipTapEditor.svelte",
@@ -2145,7 +2259,8 @@
     "src/routes/(app)/persons-of-interest/create/+page.server.ts",
     "src/routes/login/+page.server.ts",
     "src/routes/register/+page.server.ts",
-    "src/routes/register/+page.svelte"
+    "src/routes/register/+page.svelte",
+    "scripts/phase104-backups/src/routes_parked/(tools)_disabled/search/+page.server.ts"
   ],
   "EXTERNAL:pdfjs-dist": [
     "src/lib/components/legal/PDFViewer.svelte"
@@ -2155,9 +2270,6 @@
     "src/routes/(app)/cases/new/+page.svelte",
     "src/routes/(app)/reports/new/+page.svelte",
     "src/routes/+layout.svelte"
-  ],
-  "EXTERNAL:$lib/services/unified-service-registry": [
-    "src/lib/components/RAGSearchComponent.svelte"
   ],
   "EXTERNAL:svelte-tiptap": [
     "src/lib/components/TipTapEditor.svelte"
@@ -2220,9 +2332,6 @@
   "UNRESOLVED:./Card/CardDescription.svelte": [
     "src/lib/components/ui/Card.js"
   ],
-  "UNRESOLVED:./context-menu/index.js": [
-    "src/lib/components/ui/context-menu.js"
-  ],
   "UNRESOLVED:./8bit/NES8BitDialog.svelte": [
     "src/lib/components/ui/gaming/index.ts"
   ],
@@ -2233,15 +2342,6 @@
     "src/lib/components/ui/gaming/index.ts"
   ],
   "UNRESOLVED:./8bit/NES8BitBadge.svelte": [
-    "src/lib/components/ui/gaming/index.ts"
-  ],
-  "UNRESOLVED:./16bit/SNES16BitContainer.svelte": [
-    "src/lib/components/ui/gaming/index.ts"
-  ],
-  "UNRESOLVED:./16bit/SNES16BitDialog.svelte": [
-    "src/lib/components/ui/gaming/index.ts"
-  ],
-  "UNRESOLVED:./16bit/SNES16BitProgress.svelte": [
     "src/lib/components/ui/gaming/index.ts"
   ],
   "EXTERNAL:svelte/animate": [
@@ -2261,12 +2361,6 @@
   ],
   "UNRESOLVED:./TooltipProvider.svelte": [
     "src/lib/components/ui/tooltip.ts"
-  ],
-  "EXTERNAL:$lib/components/evidence-graph/LegalHUD.svelte": [
-    "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte"
-  ],
-  "EXTERNAL:$lib/components/visualizations/WebGPUEvidenceGraphVisualization": [
-    "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte"
   ],
   "EXTERNAL:ioredis": [
     "src/lib/config/redis-config.ts",
@@ -2302,7 +2396,6 @@
     "src/lib/server/retrieval/prefilter.test.ts",
     "src/lib/server/search/hybrid-search.ts",
     "src/lib/server/workers/audio-processor.ts",
-    "src/mcp/server.ts",
     "src/mcp/trace-mcp-server.ts",
     "src/routes/(app)/chat/[id]/+page.server.ts",
     "src/routes/api/admin/pipeline/events/+server.ts",
@@ -2321,6 +2414,90 @@
     "src/routes/api/simulation/[sessionId]/+server.ts",
     "src/routes/api/simulation/[sessionId]/keyframes/+server.ts",
     "src/routes/api/sse/[id]/+server.ts",
+    "scripts/ace-policy-synthesis.ts",
+    "scripts/agentic-error-fix.mjs",
+    "scripts/archive-llm-summaries.mjs",
+    "scripts/atlas-10q-demo.mjs",
+    "scripts/autoencoder-backfill-qdrant.mjs",
+    "scripts/autoencoder-centroids.mjs",
+    "scripts/backfill-activity-scores.ts",
+    "scripts/build-atlas-index.mjs",
+    "scripts/build-bow-tiles.mjs",
+    "scripts/build-codebase-recommendations.mjs",
+    "scripts/build-deep-import-graph.mjs",
+    "scripts/build-topology-taxonomy.mjs",
+    "scripts/check-all-tools.mjs",
+    "scripts/codebase-semantic-indexer.ts",
+    "scripts/enrich-agents-md.mjs",
+    "scripts/export-cluster-summaries.mjs",
+    "scripts/generate-agents-md.mjs",
+    "scripts/generate-file-summaries.mjs",
+    "scripts/graph/ingest-to-kag-notes.mjs",
+    "scripts/graph/wire-synthesis-grpo.mjs",
+    "scripts/graphify-authority.mjs",
+    "scripts/graphify-batch-gpu-analysis.mjs",
+    "scripts/graphify-cluster-summaries.mjs",
+    "scripts/graphify-deep-imports.mjs",
+    "scripts/graphify-neo4j-clusters.mjs",
+    "scripts/graphify-semantic-cluster.mjs",
+    "scripts/graphify-som-cluster-summaries.mjs",
+    "scripts/index-agents-md.mjs",
+    "scripts/index-codebase-fast.mjs",
+    "scripts/kag-error.mjs",
+    "scripts/karpathy-ace-hits.mjs",
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/kb/generate-module-cartridges.mjs",
+    "scripts/mcp/tail-and-ingest-errors.mjs",
+    "scripts/neo4j-graph-enrich.mjs",
+    "scripts/phase104-backups/src/lib/cache/chr-rom-pattern-cache.ts",
+    "scripts/phase104-backups/src/lib/performance/optimizations.ts",
+    "scripts/phase104-backups/src/lib/server/database/redis-client.ts",
+    "scripts/phase104-backups/src/lib/server/knowledge-cache.ts",
+    "scripts/phase104-backups/src/lib/server/services/unified-vector-service.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/diffs/RedisCache.ts",
+    "scripts/phase104-backups/src/lib/services/go-microservices-client.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/qlora-rl-training-service.ts",
+    "scripts/phase104-backups/src/lib/services/queue-service.ts",
+    "scripts/phase104-backups/src/lib/services/redis-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/global-loki-store.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/global-loki.ts",
+    "scripts/phase104-backups/src/lib/utils/rag-cache.ts",
+    "scripts/phase104-backups/src/lib/workers/embedding-worker-enhanced.ts",
+    "scripts/restore-hypergraph-archive.mjs",
+    "scripts/restore-llm-summaries.mjs",
+    "scripts/run-hypergraph.ts",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/run-pagerank.ts",
+    "scripts/run-tensor-topology-mapreduce.mjs",
+    "scripts/seed-ace-hits-for-synthesis.ts",
+    "scripts/seed-hit-demand.mjs",
+    "scripts/seed-hypergraph-edges-lane-b.mjs",
+    "scripts/seed-hypergraph-edges-lane-c.mjs",
+    "scripts/seed-hypergraph-edges-lane-d.mjs",
+    "scripts/seed-hypergraph-edges.mjs",
+    "scripts/seed-llm-output-index.mjs",
+    "scripts/skills/codebase-todo-aggregator.mjs",
+    "scripts/smoke-hybrid-search.mjs",
+    "scripts/smoke-kag-ingest-memory-directory.mjs",
+    "scripts/smoke-neo4j-graph-enrich.mjs",
+    "scripts/startup/ace-incremental-startup.mjs",
+    "scripts/summarize-clusters-pg.ts",
+    "scripts/summarize-codebase-llm.mjs",
+    "scripts/sync-cluster-summaries-to-qdrant.mjs",
+    "scripts/tests/nes-arch/inspect-agents-md.mjs",
+    "scripts/tests/nes-arch/inspect-kag-notes.mjs",
+    "scripts/tests/smoke-prior-answer-cache.mjs",
+    "scripts/tests/smoke-tensor-analysis-cache.mjs",
+    "scripts/train-autoencoder.mjs",
+    "scripts/triage-d9-shallow-dynamic.mjs",
+    "scripts/wiki/analyze-wiki-gaps.mjs",
+    "scripts/wiki/backfill-error-fingerprints.mjs",
+    "scripts/wiki/index-codebase-to-docstore.mjs",
+    "scripts/wiki/ingest-kag-notes.mjs",
+    "scripts/wiki/run-mapreduce-pipeline.mjs",
+    "scripts/wiki/wiki-gpu-gap-analysis.mjs",
     "tests/engram-graph-rerank.spec.ts",
     "tests/multi-lane-retrieval.spec.ts"
   ],
@@ -2332,10 +2509,12 @@
     "src/lib/courtroom/courtroom-scene.svelte.ts"
   ],
   "EXTERNAL:drizzle-orm/table": [
-    "src/lib/data/types.ts"
+    "src/lib/data/types.ts",
+    "scripts/phase104-backups/src/lib/data/types.ts"
   ],
   "EXTERNAL:dexie": [
-    "src/lib/db/client-db.ts"
+    "src/lib/db/client-db.ts",
+    "scripts/phase104-backups/src/lib/db/client-db.ts"
   ],
   "EXTERNAL:drizzle-orm/postgres-js": [
     "src/lib/db/pool.ts",
@@ -2347,7 +2526,11 @@
     "src/lib/server/db/migrate.ts",
     "src/lib/server/db/pg.ts",
     "src/lib/server/db/unified-client.ts",
-    "src/lib/types/enhanced-svelte5-types.ts"
+    "src/lib/types/enhanced-svelte5-types.ts",
+    "scripts/fix-queue-worker.cjs",
+    "scripts/phase104-backups/src/integrated-rag-service.ts",
+    "scripts/phase104-backups/src/lib/workers/comprehensive-worker.ts",
+    "scripts/phase104-backups/src/lib/workers/queue-worker.ts"
   ],
   "EXTERNAL:postgres": [
     "src/lib/db/pool.ts",
@@ -2362,7 +2545,9 @@
     "src/routes/api/indexing/+server.ts",
     "src/routes/api/phase89/graph/+server.ts",
     "src/routes/api/phase89/node/[id]/docs/+server.ts",
-    "src/routes/api/phase89/node/[id]/similar/+server.ts"
+    "src/routes/api/phase89/node/[id]/similar/+server.ts",
+    "scripts/phase104-backups/src/integrated-rag-service.ts",
+    "scripts/phase104-backups/src/lib/database/drizzle-compatibility-fix.ts"
   ],
   "EXTERNAL:drizzle-orm/pg-core": [
     "src/lib/db/schema/ace-web.ts",
@@ -2374,9 +2559,7 @@
     "src/lib/db/schema.ts",
     "src/lib/db/vite-error-schema.ts",
     "src/lib/server/db/additional-tables.ts",
-    "src/lib/server/db/enhanced-legal-schema.ts",
     "src/lib/server/db/jsonb-legal-schema.ts",
-    "src/lib/server/db/legal-schema.ts",
     "src/lib/server/db/lucia-schema.ts",
     "src/lib/server/db/schema/ace-web-crawl.ts",
     "src/lib/server/db/schema/admin-ai-skills.ts",
@@ -2429,11 +2612,9 @@
     "src/lib/server/db/schema-canvas.ts",
     "src/lib/server/db/schema-charges.ts",
     "src/lib/server/db/schema-chat.ts",
-    "src/lib/server/db/schema-enhanced.ts",
     "src/lib/server/db/schema-evidence-crud.ts",
     "src/lib/server/db/schema-gpu-cache.ts",
     "src/lib/server/db/schema-ingestion.ts",
-    "src/lib/server/db/schema-pgvector-512.ts",
     "src/lib/server/db/schema-phase78.ts",
     "src/lib/server/db/schema-phase89-preserved.ts",
     "src/lib/server/db/schema-postgres.ts",
@@ -2443,39 +2624,29 @@
     "src/lib/server/db/schema-timeline.ts",
     "src/lib/server/db/schema-web.ts",
     "src/lib/server/db/schema-week3-kb.ts",
-    "src/lib/server/db/unified-schema.ts",
     "src/lib/server/db/utils.ts",
     "src/lib/server/db/vector-schema.ts",
     "src/lib/server/db/warden-schema.ts",
-    "src/types/pgvector-drizzle.d.ts"
+    "src/types/pgvector-drizzle.d.ts",
+    "scripts/phase104-backups/src/lib/db/schema-example-legal.ts",
+    "scripts/phase104-backups/src/lib/server/database/vector-schema-simple.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema/ai_chat.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema/gpu-cache-schema.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema/poi.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema-poi.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema-test-rag.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/validation-service.ts"
   ],
   "EXTERNAL:pgvector/drizzle-orm": [
     "src/lib/db/schema.ts",
     "src/lib/server/db/additional-tables.ts",
     "src/lib/server/db/schema-actual.ts",
     "src/lib/server/db/schema-gpu-cache.ts",
-    "src/lib/server/db/schema-test-rag.ts"
+    "src/lib/server/db/schema-test-rag.ts",
+    "scripts/phase104-backups/src/lib/server/db/schema-test-rag.ts"
   ],
   "EXTERNAL:drizzle-zod": [
     "src/lib/db/schema.ts"
-  ],
-  "UNRESOLVED:./services/enhanced-api-client.js": [
-    "src/lib/index.ts"
-  ],
-  "UNRESOLVED:./components/index.js": [
-    "src/lib/index.ts"
-  ],
-  "UNRESOLVED:./services/enhanced-file-upload.js": [
-    "src/lib/index.ts"
-  ],
-  "UNRESOLVED:./services/localStorage-file-fallback.js": [
-    "src/lib/index.ts"
-  ],
-  "UNRESOLVED:./services/ollama-integration-layer.js": [
-    "src/lib/index.ts"
-  ],
-  "EXTERNAL:$lib/utils/xstate-svelte5": [
-    "src/lib/machines/evidence-analysis-machine.ts"
   ],
   "EXTERNAL:fs": [
     "src/lib/phase72/routeGraphAdapter.ts",
@@ -2522,6 +2693,93 @@
     "src/routes/api/ingest-constitution/+server.ts",
     "src/routes/api/library/ingest-codebase-docs/+server.ts",
     "src/routes/api/library/ingest-dev-docs/+server.ts",
+    "scripts/agent-diagnose.mjs",
+    "scripts/ast-repair.ts",
+    "scripts/backup-consolidation/analyze-bulk-delete.mjs",
+    "scripts/backup-consolidation/analyze-differences.mjs",
+    "scripts/backup-consolidation/bulk-delete.mjs",
+    "scripts/backup-consolidation/deep-analysis.mjs",
+    "scripts/backup-consolidation/delete-truly-safe.mjs",
+    "scripts/backup-consolidation/find-truly-safe.mjs",
+    "scripts/backup-consolidation/show-diff-samples.mjs",
+    "scripts/backup-consolidation/tests/scan-resilience.test.mjs",
+    "scripts/backup-db-to-seaweedfs.mjs",
+    "scripts/batch-merger-fixer-v2.mjs",
+    "scripts/benchmark-whisper-cuda.mjs",
+    "scripts/ci-smoke-hypergraph.mjs",
+    "scripts/classify-unreachable.ts",
+    "scripts/codebase-semantic-indexer.ts",
+    "scripts/couchdb-export-graph-jsonl.mjs",
+    "scripts/diagnostics/audit-dead-npm-scripts.mjs",
+    "scripts/diagnostics/clean-dead-npm-scripts.mjs",
+    "scripts/diff/applier.mjs",
+    "scripts/diff/generator.mjs",
+    "scripts/diff/reporter.mjs",
+    "scripts/enrich-wiki-with-audit-signals.mjs",
+    "scripts/export-embeddings-qdrant.mjs",
+    "scripts/export-langfuse-jsonl.mjs",
+    "scripts/export-qlora-dataset.mjs",
+    "scripts/fix-cases-sub.mjs",
+    "scripts/fix-import-colons.ts",
+    "scripts/fix-import-corruption.ts",
+    "scripts/fix-ollama-mock.mjs",
+    "scripts/fix-pgrows-mock.mjs",
+    "scripts/generate-smoke-embeddings.mjs",
+    "scripts/graphify-cluster-pagerank.mjs",
+    "scripts/graphify-deep-imports.mjs",
+    "scripts/graphify-health.mjs",
+    "scripts/graphify-som-topology.mjs",
+    "scripts/health/grpc-health.ts",
+    "scripts/hypergraph-build.mjs",
+    "scripts/hypergraph-tag-qdrant.mjs",
+    "scripts/hypergraph-topology-writer.mjs",
+    "scripts/index-codebase-fast.mjs",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/ingest-constitution.ts",
+    "scripts/ingest-grpo-log.mjs",
+    "scripts/knowledge-base-builder.ts",
+    "scripts/lang-extract.mjs",
+    "scripts/maintain-repo.mjs",
+    "scripts/mcp/agent-orchestrator.mjs",
+    "scripts/mcp/contextual-prompt-engineer.mjs",
+    "scripts/mcp/demo-svelte5-query.mjs",
+    "scripts/mcp/query-db-for-svelte5-errors.mjs",
+    "scripts/mcp/svelte5-migration-tools.mjs",
+    "scripts/mcp/upload-svelte-docs-to-minio.mjs",
+    "scripts/phase104-backups/src/lib/server/document-processor.ts",
+    "scripts/phase104-backups/src/lib/server/utils/avatar-upload.ts",
+    "scripts/phase104-backups/src/lib/server/yolo.ts",
+    "scripts/phase104-backups/src/lib/vite/vscode-error-logger.ts",
+    "scripts/phase104-backups/src/routes_parked/api/documents/process/+server.ts",
+    "scripts/propagate-manifold4-db.mjs",
+    "scripts/reachability-analysis.ts",
+    "scripts/repair-services.ts",
+    "scripts/run-karpathy-hook.mjs",
+    "scripts/scale-turbovec-state.mjs",
+    "scripts/seed-feature-atlas.mjs",
+    "scripts/smoke/smoke-hyperrag.mjs",
+    "scripts/smoke-compute-worker-gpu.mjs",
+    "scripts/smoke-gpu-hardening.mjs",
+    "scripts/smoke-graphify-deep-imports.mjs",
+    "scripts/smoke-trace-cache-reuse.mjs",
+    "scripts/smoke-trace-full-loop.mjs",
+    "scripts/subsystem-classifier.ts",
+    "scripts/test-migration.ts",
+    "scripts/tests/deep-directory-audit.mjs",
+    "scripts/tests/fix-phantom-icons.mjs",
+    "scripts/tests/generate-codebase-directory-map.mjs",
+    "scripts/tests/screenshot-evidence-upload-flow.mjs",
+    "scripts/tests/take-report-screenshots.mjs",
+    "scripts/tests/test-audio-pipeline.mjs",
+    "scripts/tests/test-evidence-upload-flow.mjs",
+    "scripts/tests/test-evidence-uploads.mjs",
+    "scripts/tests/test-production-readiness.mjs",
+    "scripts/tests/test-screenshots.mjs",
+    "scripts/turboquant/bench-model.mjs",
+    "scripts/turboquant/bench-suite.mjs",
+    "scripts/validate-agents-memory.mjs",
+    "scripts/validate-demo-setup.mjs",
     "tests/ai-chat-live.spec.ts",
     "tests/e2e/chat.spec.ts",
     "tests/e2e/client-inference.spec.ts",
@@ -2581,7 +2839,6 @@
     "src/lib/server/grpc/chr97-agent-client.ts",
     "src/lib/server/grpc/embedding-client.ts",
     "src/lib/server/grpc/graph-ml-client.ts",
-    "src/lib/server/grpc/retrieval-client.ts",
     "src/lib/server/grpc/tool-calling-client.ts",
     "src/lib/server/grpc/tool-router-client.ts",
     "src/lib/server/indexer/ast-chunker.ts",
@@ -2630,6 +2887,102 @@
     "src/routes/api/v1/agentic/tool-loop/+server.ts",
     "src/routes/api/whisper/transcribe/+server.ts",
     "src/tests/setup.ts",
+    "scripts/agent-diagnose.mjs",
+    "scripts/ast-repair.ts",
+    "scripts/backup-consolidation/analyze-bulk-delete.mjs",
+    "scripts/backup-consolidation/analyze-differences.mjs",
+    "scripts/backup-consolidation/bulk-delete.mjs",
+    "scripts/backup-consolidation/deep-analysis.mjs",
+    "scripts/backup-consolidation/delete-truly-safe.mjs",
+    "scripts/backup-consolidation/find-truly-safe.mjs",
+    "scripts/backup-consolidation/show-diff-samples.mjs",
+    "scripts/backup-consolidation/tests/run-all-tests.mjs",
+    "scripts/backup-consolidation/tests/scan-resilience.test.mjs",
+    "scripts/backup-db-to-seaweedfs.mjs",
+    "scripts/batch-merger-fixer-v2.mjs",
+    "scripts/benchmark-whisper-cuda.mjs",
+    "scripts/build-hypergraph-stream.mjs",
+    "scripts/classify-unreachable.ts",
+    "scripts/codebase-semantic-indexer.ts",
+    "scripts/couchdb-export-graph-jsonl.mjs",
+    "scripts/diff/applier.mjs",
+    "scripts/diff/generator.mjs",
+    "scripts/diff/reporter.mjs",
+    "scripts/enrich-wiki-with-audit-signals.mjs",
+    "scripts/export-embeddings-qdrant.mjs",
+    "scripts/export-langfuse-jsonl.mjs",
+    "scripts/export-qlora-dataset.mjs",
+    "scripts/extract-enhanced-graph.mjs",
+    "scripts/fix-implicit-any.ts",
+    "scripts/fix-import-corruption.ts",
+    "scripts/fix-missing-imports-enhanced.ts",
+    "scripts/fix-missing-imports.ts",
+    "scripts/fix-type-imports-usage.ts",
+    "scripts/graph/synthesize-semantic-edges.mjs",
+    "scripts/graphify-cluster-pagerank.mjs",
+    "scripts/graphify-cluster-summaries.mjs",
+    "scripts/graphify-deep-imports.mjs",
+    "scripts/graphify-health.mjs",
+    "scripts/graphify-som-topology.mjs",
+    "scripts/graphify-svg-architecture.mjs",
+    "scripts/health/grpc-health.ts",
+    "scripts/hypergraph-build-4d.ts",
+    "scripts/index-codebase-fast.mjs",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/ingest-constitution.ts",
+    "scripts/ingest-govinfo-federal.ts",
+    "scripts/ingest-grpo-log.mjs",
+    "scripts/karpathy-indexer.mjs",
+    "scripts/knowledge-base-builder.ts",
+    "scripts/maintain-repo.mjs",
+    "scripts/mcp/contextual-prompt-engineer.mjs",
+    "scripts/mcp/svelte5-migration-tools.mjs",
+    "scripts/phase104-backups/src/lib/server/document-processor.ts",
+    "scripts/phase104-backups/src/lib/server/ingest/worker-pool.ts",
+    "scripts/phase104-backups/src/lib/server/utils/avatar-upload.ts",
+    "scripts/phase104-backups/src/lib/server/utils/logger.ts",
+    "scripts/phase104-backups/src/lib/server/yolo.ts",
+    "scripts/phase104-backups/src/lib/utils/todo-autogen.ts",
+    "scripts/phase104-backups/src/lib/vite/vscode-error-logger.ts",
+    "scripts/phase104-backups/src/routes_parked/api/documents/process/+server.ts",
+    "scripts/propagate-manifold4-db.mjs",
+    "scripts/reachability-analysis.ts",
+    "scripts/reembed-missing-chunks.ts",
+    "scripts/repair-services.ts",
+    "scripts/run-karpathy-hook.mjs",
+    "scripts/run-tensor-topology-mapreduce.ts",
+    "scripts/scale-turbovec-state.mjs",
+    "scripts/seed-feature-atlas.mjs",
+    "scripts/smoke/smoke-hyperrag.mjs",
+    "scripts/smoke-compute-worker-gpu.mjs",
+    "scripts/smoke-compute-worker.mjs",
+    "scripts/smoke-gpu-hardening.mjs",
+    "scripts/smoke-graphify-deep-imports.mjs",
+    "scripts/smoke-hmm-rust.mjs",
+    "scripts/smoke-som-bmu.mjs",
+    "scripts/smoke-topology-projection.mjs",
+    "scripts/smoke-trace-cache-reuse.mjs",
+    "scripts/smoke-trace-full-loop.mjs",
+    "scripts/subsystem-classifier.ts",
+    "scripts/test-migration.ts",
+    "scripts/tests/deep-directory-audit.mjs",
+    "scripts/tests/export-transcription.mjs",
+    "scripts/tests/fix-phantom-icons.mjs",
+    "scripts/tests/screenshot-evidence-upload-flow.mjs",
+    "scripts/tests/smoke-rust-native.mjs",
+    "scripts/tests/take-report-screenshots.mjs",
+    "scripts/tests/test-audio-pipeline.mjs",
+    "scripts/tests/test-evidence-upload-flow.mjs",
+    "scripts/tests/test-evidence-uploads.mjs",
+    "scripts/tests/test-pdf-extraction.mjs",
+    "scripts/tests/test-production-readiness.mjs",
+    "scripts/tests/test-real-audio.mjs",
+    "scripts/tests/test-screenshots.mjs",
+    "scripts/turboquant/bench-model.mjs",
+    "scripts/turboquant/bench-suite.mjs",
+    "scripts/validate-agents-memory.mjs",
+    "scripts/validate-demo-setup.mjs",
     "tests/ai-chat-live.spec.ts",
     "tests/cases-page.spec.ts",
     "tests/e2e/chat.spec.ts",
@@ -2667,12 +3020,14 @@
     "src/lib/server/agents/regen/writers/markdown-writer.ts",
     "src/lib/server/ai/code-intel-service.ts",
     "src/lib/server/features/feature-map-compiler.ts",
+    "src/lib/server/features/feature-map-store.ts",
     "src/lib/server/features/proto-extractor.ts",
     "src/lib/server/features/svg-extractor.ts",
     "src/lib/server/graph/glyph-atlas-builder.ts",
     "src/lib/server/graph/graph-intel.ts",
     "src/lib/server/graph/graph-remote-functions.ts",
     "src/lib/server/graph/relationship-extractor.ts",
+    "src/lib/server/kb/pentagon-search.ts",
     "src/lib/server/kb/rerank-weight-loader.ts",
     "src/lib/server/kb/search-logic.ts",
     "src/lib/server/kb/wiki-logic.ts",
@@ -2689,6 +3044,140 @@
     "src/routes/api/codebase-index/agents-write/+server.ts",
     "src/routes/api/codebase-index/summarize-dirs/+server.ts",
     "src/routes/api/test/webgpu-modules/+server.ts",
+    "scripts/ace-policy-synthesis.ts",
+    "scripts/activity/log-developer-activity.mjs",
+    "scripts/agentic-batch-fix.mjs",
+    "scripts/agents/build-agents-index.mjs",
+    "scripts/agents/build-mini-active-cache.mjs",
+    "scripts/agents/qdrant-payload-backfill.mjs",
+    "scripts/agents/som-cluster-cards.mjs",
+    "scripts/analyze-graph-ai.mjs",
+    "scripts/analyze-graph.mjs",
+    "scripts/audit-build-risk.ts",
+    "scripts/audit-mcp-tool-surface.mjs",
+    "scripts/audit-schema-drift.mjs",
+    "scripts/backup-consolidation/comparison.mjs",
+    "scripts/build-bow-tiles.mjs",
+    "scripts/build-codebase-recommendations.mjs",
+    "scripts/build-deep-import-graph.mjs",
+    "scripts/check-all-tools.mjs",
+    "scripts/claude-context-plan.mjs",
+    "scripts/comfyui/submit-workflow-smoke.mjs",
+    "scripts/dev/run-with-analytics.mjs",
+    "scripts/dev-everything.mjs",
+    "scripts/diagnostics/playwright-live-recorder.mjs",
+    "scripts/enrich-agents-md.mjs",
+    "scripts/ensure-dev-runtime.mjs",
+    "scripts/ensure-kb-retrieval-server.mjs",
+    "scripts/ensure-llama-server.mjs",
+    "scripts/ensure-mcp-server.mjs",
+    "scripts/ensure-search-engine.mjs",
+    "scripts/error-brain-fix.ts",
+    "scripts/export-cluster-summaries.mjs",
+    "scripts/features/compile-feature-map.ts",
+    "scripts/features/record-feature-implementation.ts",
+    "scripts/fetch-uscode.ts",
+    "scripts/fix-g17-localhost.mjs",
+    "scripts/fix-mcp-remaining.mjs",
+    "scripts/fix-mcp-tool-schemas.mjs",
+    "scripts/generate-agent-timeline.mjs",
+    "scripts/generate-agents-md.mjs",
+    "scripts/generate-file-summaries.mjs",
+    "scripts/generate-route-test-stubs.mjs",
+    "scripts/generate-schema-manifest.mjs",
+    "scripts/generate-timeline-synthesis.mjs",
+    "scripts/graph/build-cluster-agents-index.mjs",
+    "scripts/graph/build-codebase-relationships.mjs",
+    "scripts/graph/debug-gds-lookup.mjs",
+    "scripts/graph/ingest-to-kag-notes.mjs",
+    "scripts/graph/prune-graph-triples.mjs",
+    "scripts/graph/synthesize-next-actions.mjs",
+    "scripts/graph/wire-synthesis-grpo.mjs",
+    "scripts/graphify-batch-gpu-analysis.mjs",
+    "scripts/graphify-deep-ingest.mjs",
+    "scripts/graphify-obsidian-vault.mjs",
+    "scripts/hypergraph-cluster-digest.mjs",
+    "scripts/index-agents-md.mjs",
+    "scripts/index-qdrant-docs.mjs",
+    "scripts/index-vault-md.mjs",
+    "scripts/ingest-uscode.ts",
+    "scripts/kag-error.mjs",
+    "scripts/karpathy-ace-hits.mjs",
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/kb/build-embedding-jobs.mjs",
+    "scripts/kb/export-lane-router-training-set.mjs",
+    "scripts/kb/generate-module-cartridges.mjs",
+    "scripts/kb/graph-jsonl-to-cards.mjs",
+    "scripts/kb/rank-graph-cards.mjs",
+    "scripts/kb/run-embedding-jobs.mjs",
+    "scripts/kb/search-graph-cards.mjs",
+    "scripts/kb/search-graph-cards.ts",
+    "scripts/kb/seed-notecards-qdrant.ts",
+    "scripts/kb/validate-knowledge-cards.mjs",
+    "scripts/lib/bounded-output.mjs",
+    "scripts/lib/reference-verifier.mjs",
+    "scripts/mcp/tail-and-ingest-errors.mjs",
+    "scripts/neo4j-graph-enrich.mjs",
+    "scripts/node-ts-loader.mjs",
+    "scripts/parse-uscode.ts",
+    "scripts/phase104-backups/src/lib/server/docling.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-storage-service.ts",
+    "scripts/phase104-backups/src/lib/services/autosuggester-service.ts",
+    "scripts/pr2-rewrite-imports.mjs",
+    "scripts/project-codebase-topology.mjs",
+    "scripts/proto-from-zod.mjs",
+    "scripts/rg-atlas/run-rg.mjs",
+    "scripts/run-authority-scores.mjs",
+    "scripts/run-test-stubs-progress.mjs",
+    "scripts/schema-drift-check.mjs",
+    "scripts/screenshots/caption-screenshots-gemma4.mjs",
+    "scripts/screenshots/enrich-screenshots.mjs",
+    "scripts/seed-llm-output-index.mjs",
+    "scripts/skills/codebase-todo-aggregator.mjs",
+    "scripts/smoke-atlas-context.mjs",
+    "scripts/smoke-feature-map-integrity.mjs",
+    "scripts/smoke-gemma4-go-retrieval-tools.mjs",
+    "scripts/smoke-hyperrag.mjs",
+    "scripts/smoke-kag-ingest-memory-directory.mjs",
+    "scripts/smoke-knowledge-phase38.mjs",
+    "scripts/smoke-neo4j-graph-enrich.mjs",
+    "scripts/smoke-pentagon-search.mjs",
+    "scripts/smoke-stdio-mcp-tools.mjs",
+    "scripts/smoke-trace-mcp-tools.mjs",
+    "scripts/start-dev-stack.mjs",
+    "scripts/startup/ace-incremental-startup.mjs",
+    "scripts/startup/run-detached.mjs",
+    "scripts/startup-analysis.mjs",
+    "scripts/startup-plan.mjs",
+    "scripts/summarize-codebase-llm.mjs",
+    "scripts/swap-lora-adapter.mjs",
+    "scripts/sync-cluster-summaries-to-qdrant.mjs",
+    "scripts/synth/export-cartridge-binary.mjs",
+    "scripts/test-error-brain-simple.ts",
+    "scripts/tests/audit-gitignore-vs-indexer.mjs",
+    "scripts/tests/bounded-output.mjs",
+    "scripts/tests/ensure-inference.mjs",
+    "scripts/tests/smoke-fast-ast-ace.mjs",
+    "scripts/tests/smoke-graphify.mjs",
+    "scripts/tests/smoke-prior-answer-cache.mjs",
+    "scripts/tests/validate-vscode-tasks-jsonc.mjs",
+    "scripts/train-autoencoder.mjs",
+    "scripts/triage-d9-orphans.mjs",
+    "scripts/triage-d9-shallow-dynamic.mjs",
+    "scripts/triage-orphans-vs-next-steps.mjs",
+    "scripts/tsgo-diagnostics-to-jsonb.mjs",
+    "scripts/turboquant/stability-test.mjs",
+    "scripts/unwrap-optional-registries.mjs",
+    "scripts/validate-nes-glyph-architecture.mjs",
+    "scripts/wiki/backfill-qdrant-cluster-keys.mjs",
+    "scripts/wiki/extract-code-relations.mjs",
+    "scripts/wiki/index-codebase-to-docstore.mjs",
+    "scripts/wiki/ingest-kag-notes.mjs",
+    "scripts/wiki/run-mapreduce-pipeline.mjs",
+    "scripts/wiki/wiki-gpu-gap-analysis.mjs",
+    "scripts/wiki/writeback-rerank-to-qdrant.mjs",
+    "scripts/_check-langextract-usage.mjs",
+    "scripts/_deep-audit-rollup.mjs",
     "tests/admin-observability.spec.ts",
     "tests/agents-build-index-flags.spec.ts",
     "tests/e2e/route-forensic/fixtures/authed-page.ts",
@@ -2715,11 +3204,13 @@
     "src/lib/server/agents/regen/writers/markdown-writer.ts",
     "src/lib/server/atlas/atlas-loader.ts",
     "src/lib/server/features/feature-map-compiler.ts",
+    "src/lib/server/features/feature-map-store.ts",
     "src/lib/server/graph/community-graph.ts",
     "src/lib/server/graph/glyph-atlas-builder.ts",
     "src/lib/server/graph/graph-intel.ts",
     "src/lib/server/graph/graph-remote-functions.ts",
     "src/lib/server/graph/relationship-extractor.ts",
+    "src/lib/server/kb/pentagon-search.ts",
     "src/lib/server/kb/rerank-weight-loader.ts",
     "src/lib/server/kb/search-logic.ts",
     "src/lib/server/kb/wiki-logic.ts",
@@ -2742,6 +3233,187 @@
     "src/routes/api/error-brain/auto-patch/+server.ts",
     "src/routes/api/test/webgpu-modules/+server.ts",
     "src/routes/api/wiki/moc/+server.ts",
+    "scripts/ace-policy-synthesis.ts",
+    "scripts/activity/log-developer-activity.mjs",
+    "scripts/agentic-batch-fix.mjs",
+    "scripts/agentic-error-fix.mjs",
+    "scripts/agents/build-agents-index.mjs",
+    "scripts/agents/build-mini-active-cache.mjs",
+    "scripts/agents/qdrant-payload-backfill.mjs",
+    "scripts/agents/som-cluster-cards.mjs",
+    "scripts/agents-smoke-all.mjs",
+    "scripts/analyze-graph-ai.mjs",
+    "scripts/analyze-graph.mjs",
+    "scripts/archive-llm-summaries.mjs",
+    "scripts/audit-build-risk.ts",
+    "scripts/audit-mcp-tool-surface.mjs",
+    "scripts/audit-schema-drift.mjs",
+    "scripts/backup-consolidation/analyze-report.mjs",
+    "scripts/backup-consolidation/comparison.mjs",
+    "scripts/backup-consolidation/delete-safe.mjs",
+    "scripts/backup-consolidation/executor.mjs",
+    "scripts/backup-consolidation/index.mjs",
+    "scripts/backup-consolidation/manifest.mjs",
+    "scripts/backup-consolidation/quick-test.mjs",
+    "scripts/backup-consolidation/scanner.mjs",
+    "scripts/build-atlas-index.mjs",
+    "scripts/build-bow-tiles.mjs",
+    "scripts/build-codebase-recommendations.mjs",
+    "scripts/build-deep-import-graph.mjs",
+    "scripts/check-all-tools.mjs",
+    "scripts/claude-context-plan.mjs",
+    "scripts/comfyui/smoke-comfyui-client.mjs",
+    "scripts/comfyui/submit-workflow-smoke.mjs",
+    "scripts/deep-audit-ast.mjs",
+    "scripts/dev/run-with-analytics.mjs",
+    "scripts/dev-everything.mjs",
+    "scripts/diagnose/find-non-zod-tool-schemas.mjs",
+    "scripts/diagnostics/playwright-live-recorder.mjs",
+    "scripts/enrich-agents-md.mjs",
+    "scripts/enrich-evidence-image-tags.mjs",
+    "scripts/ensure-dev-runtime.mjs",
+    "scripts/ensure-kb-retrieval-server.mjs",
+    "scripts/ensure-llama-server.mjs",
+    "scripts/ensure-mcp-server.mjs",
+    "scripts/ensure-search-engine.mjs",
+    "scripts/error-brain-fix.ts",
+    "scripts/export-cluster-summaries.mjs",
+    "scripts/features/compile-feature-map.ts",
+    "scripts/features/record-feature-implementation.ts",
+    "scripts/fetch-uscode.ts",
+    "scripts/fix-g17-localhost.mjs",
+    "scripts/fix-mcp-remaining.mjs",
+    "scripts/fix-mcp-tool-schemas.mjs",
+    "scripts/generate-agent-timeline.mjs",
+    "scripts/generate-agents-md.mjs",
+    "scripts/generate-file-summaries.mjs",
+    "scripts/generate-route-test-stubs.mjs",
+    "scripts/generate-schema-manifest.mjs",
+    "scripts/generate-timeline-synthesis.mjs",
+    "scripts/graph/build-cluster-agents-index.mjs",
+    "scripts/graph/build-codebase-relationships.mjs",
+    "scripts/graph/debug-gds-lookup.mjs",
+    "scripts/graph/ingest-to-kag-notes.mjs",
+    "scripts/graph/prune-graph-triples.mjs",
+    "scripts/graph/synthesize-next-actions.mjs",
+    "scripts/graph/wire-synthesis-grpo.mjs",
+    "scripts/graphify-batch-gpu-analysis.mjs",
+    "scripts/graphify-deep-ingest.mjs",
+    "scripts/graphify-obsidian-vault.mjs",
+    "scripts/graphify-semantic-cluster.mjs",
+    "scripts/hypergraph-cluster-digest.mjs",
+    "scripts/index-agents-md.mjs",
+    "scripts/index-qdrant-docs.mjs",
+    "scripts/index-vault-md.mjs",
+    "scripts/ingest-enhanced-jsonl.mjs",
+    "scripts/ingest-uscode.ts",
+    "scripts/kag-error.mjs",
+    "scripts/karpathy-ace-hits.mjs",
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/kb/build-embedding-jobs.mjs",
+    "scripts/kb/export-lane-router-training-set.mjs",
+    "scripts/kb/generate-module-cartridges.mjs",
+    "scripts/kb/graph-jsonl-to-cards.mjs",
+    "scripts/kb/rank-graph-cards.mjs",
+    "scripts/kb/run-embedding-jobs.mjs",
+    "scripts/kb/search-graph-cards.mjs",
+    "scripts/kb/search-graph-cards.ts",
+    "scripts/kb/seed-notecards-qdrant.ts",
+    "scripts/kb/validate-knowledge-cards.mjs",
+    "scripts/lib/bounded-output.mjs",
+    "scripts/lib/reference-verifier.mjs",
+    "scripts/mapreduce/map-worker.mjs",
+    "scripts/mcp/tail-and-ingest-errors.mjs",
+    "scripts/mirror-qdrant-clusters-to-postgres.mjs",
+    "scripts/neo4j-graph-enrich.mjs",
+    "scripts/node-ts-loader.mjs",
+    "scripts/parse-uscode.ts",
+    "scripts/phase104-backups/src/lib/server/docling.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-storage-service.ts",
+    "scripts/phase104-backups/src/lib/services/ai-error-fixer.ts",
+    "scripts/phase104-backups/src/lib/services/api-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/comprehensive-database-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/concurrent-indexeddb-search.ts",
+    "scripts/phase104-backups/src/lib/services/couchdb-client.ts",
+    "scripts/phase104-backups/src/lib/utils/simd-markdown-parser.ts",
+    "scripts/pr2-rewrite-imports.mjs",
+    "scripts/project-codebase-topology.mjs",
+    "scripts/proto-from-zod.mjs",
+    "scripts/qdrant/write-rerank-feedback.mjs",
+    "scripts/reconstruction/compile-demo-scene.mjs",
+    "scripts/reconstruction/emit-aesthetic-preset.mjs",
+    "scripts/refresh-turbovec-graph.mjs",
+    "scripts/repair-unknown-paths.ts",
+    "scripts/restore-llm-summaries.mjs",
+    "scripts/rg-atlas/run-rg.mjs",
+    "scripts/run-authority-scores.mjs",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/run-tensor-topology-mapreduce.mjs",
+    "scripts/run-test-stubs-progress.mjs",
+    "scripts/schema-drift-check.mjs",
+    "scripts/screenshots/enrich-screenshots.mjs",
+    "scripts/screenshots/index-screenshots.mjs",
+    "scripts/seed-llm-output-index.mjs",
+    "scripts/skills/codebase-todo-aggregator.mjs",
+    "scripts/smoke/smoke-browser-context-sanitizer.mjs",
+    "scripts/smoke/smoke-mcp-tools-list-bisect.mjs",
+    "scripts/smoke-admin-ai-chat.mjs",
+    "scripts/smoke-atlas-context.mjs",
+    "scripts/smoke-atlas-prompt-mapper.mjs",
+    "scripts/smoke-feature-map-compiler.mjs",
+    "scripts/smoke-feature-map-integrity.mjs",
+    "scripts/smoke-gemma4-go-retrieval-tools.mjs",
+    "scripts/smoke-hyperrag.mjs",
+    "scripts/smoke-kag-ingest-memory-directory.mjs",
+    "scripts/smoke-knowledge-phase38.mjs",
+    "scripts/smoke-neo4j-graph-enrich.mjs",
+    "scripts/smoke-pentagon-search.mjs",
+    "scripts/smoke-stdio-mcp-tools.mjs",
+    "scripts/smoke-trace-mcp-tools.mjs",
+    "scripts/start-dev-stack.mjs",
+    "scripts/start-trace-mcp-cluster.mjs",
+    "scripts/startup/ace-incremental-startup.mjs",
+    "scripts/startup/run-detached.mjs",
+    "scripts/startup-analysis.mjs",
+    "scripts/startup-plan.mjs",
+    "scripts/summarize-codebase-llm.mjs",
+    "scripts/swap-lora-adapter.mjs",
+    "scripts/sync-cluster-summaries-to-qdrant.mjs",
+    "scripts/synth/export-cartridge-binary.mjs",
+    "scripts/synth/handoff-to-claude.mjs",
+    "scripts/synth/run-loop.mjs",
+    "scripts/test-error-brain-simple.ts",
+    "scripts/tests/audit-gates.mjs",
+    "scripts/tests/audit-gitignore-vs-indexer.mjs",
+    "scripts/tests/bounded-output.mjs",
+    "scripts/tests/ensure-inference.mjs",
+    "scripts/tests/generate-codebase-directory-map.mjs",
+    "scripts/tests/smoke-fast-ast-ace.mjs",
+    "scripts/tests/smoke-graphify.mjs",
+    "scripts/tests/smoke-kag-note-roundtrip.mjs",
+    "scripts/tests/smoke-prior-answer-cache.mjs",
+    "scripts/tests/smoke-vault-walker.mjs",
+    "scripts/tests/validate-vscode-tasks-jsonc.mjs",
+    "scripts/train-autoencoder.mjs",
+    "scripts/triage-d9-shallow-dynamic.mjs",
+    "scripts/triage-orphans-vs-next-steps.mjs",
+    "scripts/tsgo-diagnostics-to-jsonb.mjs",
+    "scripts/turboquant/stability-test.mjs",
+    "scripts/unwrap-optional-registries.mjs",
+    "scripts/validate/dev-server-monitor.mjs",
+    "scripts/validate/full-system.mjs",
+    "scripts/validate-nes-glyph-architecture.mjs",
+    "scripts/wiki/analyze-wiki-gaps.mjs",
+    "scripts/wiki/backfill-error-fingerprints.mjs",
+    "scripts/wiki/backfill-qdrant-cluster-keys.mjs",
+    "scripts/wiki/backfill-rerank-scores.mjs",
+    "scripts/wiki/extract-code-relations.mjs",
+    "scripts/wiki/index-codebase-to-docstore.mjs",
+    "scripts/wiki/ingest-kag-notes.mjs",
+    "scripts/wiki/run-mapreduce-pipeline.mjs",
+    "scripts/wiki/setup-couchdb-mapreduce.mjs",
+    "scripts/wiki/wiki-gpu-gap-analysis.mjs",
+    "scripts/wiki/writeback-rerank-to-qdrant.mjs",
     "tests/agents-build-index-flags.spec.ts",
     "tests/agents-cache-cli.spec.ts",
     "tests/agents-index-cli.spec.ts",
@@ -2766,6 +3438,138 @@
     "src/lib/server/ace/context-assembler.ts",
     "src/routes/(app)/demos/scene-intent-2d/+page.server.ts",
     "src/routes/api/admin/pipeline/events/+server.ts",
+    "scripts/agents/build-mini-active-cache.mjs",
+    "scripts/agents/som-cluster-cards.mjs",
+    "scripts/agents-smoke-all.mjs",
+    "scripts/analyze-graph-ai.mjs",
+    "scripts/analyze-graph.mjs",
+    "scripts/archive-llm-summaries.mjs",
+    "scripts/audit-mcp-tool-surface.mjs",
+    "scripts/audit-schema-drift.mjs",
+    "scripts/backup-consolidation/analyze-report.mjs",
+    "scripts/backup-consolidation/delete-safe.mjs",
+    "scripts/backup-consolidation/index.mjs",
+    "scripts/backup-consolidation/quick-test.mjs",
+    "scripts/build-atlas-index.mjs",
+    "scripts/build-bow-tiles.mjs",
+    "scripts/build-codebase-recommendations.mjs",
+    "scripts/build-deep-import-graph.mjs",
+    "scripts/check-all-tools.mjs",
+    "scripts/comfyui/smoke-comfyui-client.mjs",
+    "scripts/comfyui/submit-workflow-smoke.mjs",
+    "scripts/dev/run-with-analytics.mjs",
+    "scripts/dev-everything.mjs",
+    "scripts/diagnostics/playwright-live-recorder.mjs",
+    "scripts/enrich-agents-md.mjs",
+    "scripts/enrich-wiki-with-audit-signals.mjs",
+    "scripts/ensure-dev-runtime.mjs",
+    "scripts/ensure-kb-retrieval-server.mjs",
+    "scripts/ensure-llama-server.mjs",
+    "scripts/ensure-mcp-server.mjs",
+    "scripts/ensure-search-engine.mjs",
+    "scripts/error-brain-fix.ts",
+    "scripts/export-cluster-summaries.mjs",
+    "scripts/fix-g17-localhost.mjs",
+    "scripts/fix-mcp-remaining.mjs",
+    "scripts/fix-mcp-tool-schemas.mjs",
+    "scripts/generate-agent-timeline.mjs",
+    "scripts/generate-agents-md.mjs",
+    "scripts/generate-file-summaries.mjs",
+    "scripts/generate-route-test-stubs.mjs",
+    "scripts/generate-schema-manifest.mjs",
+    "scripts/generate-timeline-synthesis.mjs",
+    "scripts/graph/build-cluster-agents-index.mjs",
+    "scripts/graph/build-codebase-relationships.mjs",
+    "scripts/graph/debug-gds-lookup.mjs",
+    "scripts/graph/ingest-to-kag-notes.mjs",
+    "scripts/graph/prune-graph-triples.mjs",
+    "scripts/graph/synthesize-next-actions.mjs",
+    "scripts/graph/wire-synthesis-grpo.mjs",
+    "scripts/graphify-batch-gpu-analysis.mjs",
+    "scripts/graphify-deep-ingest.mjs",
+    "scripts/graphify-obsidian-vault.mjs",
+    "scripts/graphify-semantic-cluster.mjs",
+    "scripts/index-agents-md.mjs",
+    "scripts/index-qdrant-docs.mjs",
+    "scripts/index-vault-md.mjs",
+    "scripts/kag-error.mjs",
+    "scripts/karpathy-ace-hits.mjs",
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/kb/build-embedding-jobs.mjs",
+    "scripts/kb/export-lane-router-training-set.mjs",
+    "scripts/kb/generate-module-cartridges.mjs",
+    "scripts/kb/graph-jsonl-to-cards.mjs",
+    "scripts/kb/rank-graph-cards.mjs",
+    "scripts/kb/run-embedding-jobs.mjs",
+    "scripts/kb/search-graph-cards.mjs",
+    "scripts/kb/search-graph-cards.ts",
+    "scripts/kb/validate-knowledge-cards.mjs",
+    "scripts/mapreduce/map-worker.mjs",
+    "scripts/mcp/tail-and-ingest-errors.mjs",
+    "scripts/mirror-qdrant-clusters-to-postgres.mjs",
+    "scripts/neo4j-graph-enrich.mjs",
+    "scripts/node-ts-loader.mjs",
+    "scripts/pr2-rewrite-imports.mjs",
+    "scripts/project-codebase-topology.mjs",
+    "scripts/proto-from-zod.mjs",
+    "scripts/qdrant/write-rerank-feedback.mjs",
+    "scripts/reconstruction/compile-demo-scene.mjs",
+    "scripts/reconstruction/emit-aesthetic-preset.mjs",
+    "scripts/restore-llm-summaries.mjs",
+    "scripts/run-authority-scores.mjs",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/run-tensor-topology-mapreduce.mjs",
+    "scripts/run-test-stubs-progress.mjs",
+    "scripts/schema-drift-check.mjs",
+    "scripts/screenshots/enrich-screenshots.mjs",
+    "scripts/screenshots/index-screenshots.mjs",
+    "scripts/seed-llm-output-index.mjs",
+    "scripts/skills/codebase-todo-aggregator.mjs",
+    "scripts/smoke/smoke-browser-context-sanitizer.mjs",
+    "scripts/smoke/smoke-mcp-tools-list-bisect.mjs",
+    "scripts/smoke-atlas-context.mjs",
+    "scripts/smoke-atlas-prompt-mapper.mjs",
+    "scripts/smoke-gemma4-go-retrieval-tools.mjs",
+    "scripts/smoke-hyperrag.mjs",
+    "scripts/smoke-kag-ingest-memory-directory.mjs",
+    "scripts/smoke-neo4j-graph-enrich.mjs",
+    "scripts/smoke-stdio-mcp-tools.mjs",
+    "scripts/smoke-trace-mcp-tools.mjs",
+    "scripts/start-dev-stack.mjs",
+    "scripts/start-trace-mcp-cluster.mjs",
+    "scripts/startup/ace-incremental-startup.mjs",
+    "scripts/startup/run-detached.mjs",
+    "scripts/startup-analysis.mjs",
+    "scripts/startup-plan.mjs",
+    "scripts/summarize-codebase-llm.mjs",
+    "scripts/swap-lora-adapter.mjs",
+    "scripts/sync-cluster-summaries-to-qdrant.mjs",
+    "scripts/synth/export-cartridge-binary.mjs",
+    "scripts/synth/handoff-to-claude.mjs",
+    "scripts/synth/run-loop.mjs",
+    "scripts/tests/audit-gitignore-vs-indexer.mjs",
+    "scripts/tests/smoke-fast-ast-ace.mjs",
+    "scripts/tests/smoke-graphify.mjs",
+    "scripts/tests/smoke-kag-note-roundtrip.mjs",
+    "scripts/tests/smoke-prior-answer-cache.mjs",
+    "scripts/tests/validate-vscode-tasks-jsonc.mjs",
+    "scripts/train-autoencoder.mjs",
+    "scripts/turboquant/stability-test.mjs",
+    "scripts/unwrap-optional-registries.mjs",
+    "scripts/validate/dev-server-monitor.mjs",
+    "scripts/validate/full-system.mjs",
+    "scripts/validate-nes-glyph-architecture.mjs",
+    "scripts/wiki/analyze-wiki-gaps.mjs",
+    "scripts/wiki/backfill-error-fingerprints.mjs",
+    "scripts/wiki/backfill-qdrant-cluster-keys.mjs",
+    "scripts/wiki/backfill-rerank-scores.mjs",
+    "scripts/wiki/extract-code-relations.mjs",
+    "scripts/wiki/index-codebase-to-docstore.mjs",
+    "scripts/wiki/ingest-kag-notes.mjs",
+    "scripts/wiki/run-mapreduce-pipeline.mjs",
+    "scripts/wiki/setup-couchdb-mapreduce.mjs",
+    "scripts/wiki/wiki-gpu-gap-analysis.mjs",
+    "scripts/wiki/writeback-rerank-to-qdrant.mjs",
     "tests/agents-build-index-flags.spec.ts",
     "tests/build-codebase-relationships.spec.ts",
     "tests/chat-attachment-floating-modal.spec.ts",
@@ -2825,6 +3629,61 @@
     "src/routes/api/codebase-index/deep-research/+server.ts",
     "src/routes/api/evidence/search/+server.ts",
     "src/routes/api/evidence/search-by-image/feedback/+server.ts",
+    "scripts/agentic-error-fix.mjs",
+    "scripts/agents/build-agents-index.mjs",
+    "scripts/agents/qdrant-payload-backfill.mjs",
+    "scripts/archive-llm-summaries.mjs",
+    "scripts/backfill-agents-md-envelope.mjs",
+    "scripts/backup-consolidation/comparison.mjs",
+    "scripts/build-bow-tiles.mjs",
+    "scripts/build-codebase-recommendations.mjs",
+    "scripts/build-deep-import-graph.mjs",
+    "scripts/enrich-agents-md.mjs",
+    "scripts/enrich-evidence-image-tags.mjs",
+    "scripts/generate-agent-timeline.mjs",
+    "scripts/generate-file-summaries.mjs",
+    "scripts/graphify-batch-gpu-analysis.mjs",
+    "scripts/graphify-semantic-cluster.mjs",
+    "scripts/index-agents-md.mjs",
+    "scripts/index-vault-md.mjs",
+    "scripts/kag-error.mjs",
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/kb/build-embedding-jobs.mjs",
+    "scripts/kb/generate-module-cartridges.mjs",
+    "scripts/kb/graph-jsonl-to-cards.mjs",
+    "scripts/kb/run-embedding-jobs.mjs",
+    "scripts/lib/phase89-cache.mjs",
+    "scripts/lib/reference-verifier.mjs",
+    "scripts/mapreduce/map-worker.mjs",
+    "scripts/mcp/tail-and-ingest-errors.mjs",
+    "scripts/mirror-qdrant-to-postgres.ts",
+    "scripts/neo4j-graph-enrich.mjs",
+    "scripts/normalize-cluster-keys.mjs",
+    "scripts/phase104-backups/src/lib/server/docling.ts",
+    "scripts/phase104-backups/src/lib/server/rag/cache.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/diffs/RedisCache.ts",
+    "scripts/phase79-agentic-indexer.mjs",
+    "scripts/project-codebase-topology.mjs",
+    "scripts/reconstruction/emit-aesthetic-preset.mjs",
+    "scripts/restore-llm-summaries.mjs",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/run-tensor-topology-mapreduce.mjs",
+    "scripts/seed-hypergraph-edges-lane-b.mjs",
+    "scripts/seed-hypergraph-edges-lane-c.mjs",
+    "scripts/seed-hypergraph-edges-lane-d.mjs",
+    "scripts/seed-hypergraph-edges.mjs",
+    "scripts/seed-llm-output-index.mjs",
+    "scripts/skills/codebase-todo-aggregator.mjs",
+    "scripts/smoke/embeddinggemma-smoke.mjs",
+    "scripts/smoke-gemma4-mcp-tools.mjs",
+    "scripts/smoke-kag-ingest-memory-directory.mjs",
+    "scripts/summarize-clusters-pg.ts",
+    "scripts/summarize-codebase-llm.mjs",
+    "scripts/tests/test-research-chat-runtime-smoke.mjs",
+    "scripts/tsgo-diagnostics-to-jsonb.mjs",
+    "scripts/validate/full-system.mjs",
+    "scripts/wiki/backfill-error-fingerprints.mjs",
+    "scripts/wiki/wiki-gpu-gap-analysis.mjs",
     "tests/ace-hits-cache.spec.ts",
     "tests/agents-md-ingest.spec.ts"
   ],
@@ -2841,6 +3700,7 @@
     "src/lib/server/db/seed.ts",
     "src/lib/server/fixer/fixer-memory.ts",
     "src/lib/server/gpu/mapreduce-worker.mjs",
+    "src/lib/server/graph/relationship-synthesizer.ts",
     "src/lib/server/hypergraph/hypergraph-builder.ts",
     "src/lib/server/hypergraph/hypergraph-search.ts",
     "src/lib/server/retrieval/sparse-bm25.ts",
@@ -2858,6 +3718,115 @@
     "src/routes/api/hypergraph/search/+server.ts",
     "src/routes/api/rag/search/+server.ts",
     "src/routes/api/rag/search-fused/+server.ts",
+    "scripts/ace-policy-synthesis.ts",
+    "scripts/agents-db-verify.mjs",
+    "scripts/alter-evidence-type-enum.ts",
+    "scripts/archive-llm-summaries.mjs",
+    "scripts/atlas-10q-demo.mjs",
+    "scripts/audit-parity.mjs",
+    "scripts/backfill-activity-scores.ts",
+    "scripts/backfill-agents-md-envelope.mjs",
+    "scripts/backfill-research-embeddings.mjs",
+    "scripts/batch-upsert-codeintel.mjs",
+    "scripts/build-agents-md-relations.mjs",
+    "scripts/build-atlas-index.mjs",
+    "scripts/build-topology-taxonomy.mjs",
+    "scripts/check-all-tools.mjs",
+    "scripts/check-db-tables.ts",
+    "scripts/check-qdrant-counts.mjs",
+    "scripts/check-users-columns.ts",
+    "scripts/debug-kag-runtime.mjs",
+    "scripts/enrich-codeintel-heuristic.mjs",
+    "scripts/enrich-wiki-with-audit-signals.mjs",
+    "scripts/export-cluster-summaries.mjs",
+    "scripts/export-qlora-dataset.mjs",
+    "scripts/generate-file-summaries.mjs",
+    "scripts/generate-timeline-synthesis.mjs",
+    "scripts/graph/prune-graph-triples.mjs",
+    "scripts/index-agents-md.mjs",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/index-vault-md.mjs",
+    "scripts/ingest-govinfo-federal.ts",
+    "scripts/ingest-grpo-log.mjs",
+    "scripts/kag-error.mjs",
+    "scripts/karpathy-ace-hits.mjs",
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/karpathy-tag-parallel.mjs",
+    "scripts/karpathy-tag.mjs",
+    "scripts/kb/export-lane-router-training-set.mjs",
+    "scripts/lib/phase89-sse-stream.mjs",
+    "scripts/mcp/query-db-for-svelte5-errors.mjs",
+    "scripts/mirror-qdrant-clusters-to-postgres.mjs",
+    "scripts/mirror-qdrant-to-postgres.ts",
+    "scripts/neo4j-graph-enrich.mjs",
+    "scripts/normalize-cluster-keys.mjs",
+    "scripts/patch-cluster-embeddings.ts",
+    "scripts/patch-qdrant-topology-payloads.mjs",
+    "scripts/phase104-backups/src/lib/server/ai/graph-rag-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts",
+    "scripts/phase79-agentic-indexer.mjs",
+    "scripts/preflight.ts",
+    "scripts/propagate-manifold4-db.mjs",
+    "scripts/qdrant/write-rerank-feedback.mjs",
+    "scripts/reembed-missing-chunks.ts",
+    "scripts/repair-unknown-paths.ts",
+    "scripts/restore-hypergraph-archive.mjs",
+    "scripts/run-hypergraph.ts",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/run-tensor-topology-mapreduce.mjs",
+    "scripts/screenshots/caption-screenshots-gemma4.mjs",
+    "scripts/screenshots/enrich-screenshots.mjs",
+    "scripts/screenshots/index-screenshots.mjs",
+    "scripts/seed-ace-hits-for-synthesis.ts",
+    "scripts/seed-ai-skills.mjs",
+    "scripts/seed-docker-pg.mjs",
+    "scripts/seed-evidence.ts",
+    "scripts/seed-feature-atlas.mjs",
+    "scripts/seed-graph-and-vectors.mjs",
+    "scripts/seed-hit-demand.mjs",
+    "scripts/seed-hypergraph-edges-lane-b.mjs",
+    "scripts/seed-hypergraph-edges-lane-c.mjs",
+    "scripts/seed-hypergraph-edges-lane-d.mjs",
+    "scripts/seed-hypergraph-edges.mjs",
+    "scripts/seed-llm-output-index.mjs",
+    "scripts/skills/codebase-todo-aggregator.mjs",
+    "scripts/smoke/hypergraph-search-smoke.mjs",
+    "scripts/smoke/hypergraph-vault-smoke.mjs",
+    "scripts/smoke/rg-atlas-smoke.mjs",
+    "scripts/smoke/smoke-hyperrag.mjs",
+    "scripts/smoke-hybrid-search.mjs",
+    "scripts/smoke-hypergraph-rag.mjs",
+    "scripts/smoke-hyperrag.mjs",
+    "scripts/smoke-neo4j-graph-enrich.mjs",
+    "scripts/smoke-postgres-fts.mjs",
+    "scripts/summarize-clusters-pg.ts",
+    "scripts/sync-cluster-summaries-to-qdrant.mjs",
+    "scripts/sync-code-retrieval-chunks.mjs",
+    "scripts/sync-manifold4-neo4j.mjs",
+    "scripts/synth/export-cartridge-binary.mjs",
+    "scripts/synth/handoff-to-claude.mjs",
+    "scripts/test-kag-direct.mjs",
+    "scripts/test-library-search.ts",
+    "scripts/tests/smoke-prior-answer-cache.mjs",
+    "scripts/tests/smoke-tensor-analysis-cache.mjs",
+    "scripts/tests/test-chat-document-context.mjs",
+    "scripts/tests/test-document-upload-v2.mjs",
+    "scripts/tests/test-evidence-pipeline.mjs",
+    "scripts/tests/test-library-upload.mjs",
+    "scripts/tests/test-real-audio.mjs",
+    "scripts/topology-search-server.mjs",
+    "scripts/validate-demo-setup.mjs",
+    "scripts/verify-db-connection.ts",
+    "scripts/verify-ingestion.ts",
+    "scripts/wiki/backfill-error-fingerprints.mjs",
+    "scripts/wiki/backfill-qdrant-cluster-keys.mjs",
+    "scripts/wiki/backfill-rerank-scores.mjs",
+    "scripts/wiki/extract-code-relations.mjs",
+    "scripts/wiki/run-mapreduce-pipeline.mjs",
+    "scripts/wiki/writeback-rerank-to-qdrant.mjs",
+    "scripts/_tmp_check.mjs",
     "tests/analysis-uis.spec.ts",
     "tests/auth-api.spec.ts",
     "tests/auth-ui-flow.spec.ts",
@@ -2982,6 +3951,55 @@
     "src/routes/api/tools/stream/+server.ts",
     "src/routes/api/vision/analyze/+server.ts",
     "src/routes/api/whisper/transcribe/+server.ts",
+    "scripts/backup-consolidation/analyze-differences.mjs",
+    "scripts/codebase-semantic-indexer.ts",
+    "scripts/diff/generator.mjs",
+    "scripts/enrich-wiki-with-audit-signals.mjs",
+    "scripts/graphify-cluster-summaries.mjs",
+    "scripts/graphify-deep-imports.mjs",
+    "scripts/graphify-svg-architecture.mjs",
+    "scripts/index-codebase-fast.mjs",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/ingest-govinfo-federal.ts",
+    "scripts/ingest-grpo-log.mjs",
+    "scripts/karpathy-indexer.mjs",
+    "scripts/knowledge-base-builder.ts",
+    "scripts/lib/phase89-adaptive-chunker.mjs",
+    "scripts/phase104-backups/src/ai-service.ts",
+    "scripts/phase104-backups/src/lib/cache/loki-redis-integration.ts",
+    "scripts/phase104-backups/src/lib/logic/Report.ts",
+    "scripts/phase104-backups/src/lib/polyfills/sveltekit2-universal-polyfill.ts",
+    "scripts/phase104-backups/src/lib/server/ai/qdrant-vector-store.ts",
+    "scripts/phase104-backups/src/lib/server/authUtils.ts",
+    "scripts/phase104-backups/src/lib/server/chat/history-service.ts",
+    "scripts/phase104-backups/src/lib/server/concurrency/advisory-locks.ts",
+    "scripts/phase104-backups/src/lib/server/knowledge-cache.ts",
+    "scripts/phase104-backups/src/lib/server/rag/cache-old.ts",
+    "scripts/phase104-backups/src/lib/server/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/conversation-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/unified-search-service.ts",
+    "scripts/phase104-backups/src/lib/server/utils/avatar-upload.ts",
+    "scripts/phase104-backups/src/lib/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/ai-worker-manager.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/CacheService.ts",
+    "scripts/phase104-backups/src/lib/services/glyph-diffusion-service.ts",
+    "scripts/phase104-backups/src/lib/services/keyboard-shortcuts-service.ts",
+    "scripts/phase104-backups/src/lib/services/multiLayerCache.ts",
+    "scripts/phase104-backups/src/lib/services/real-ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/redis-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/state/evidenceCustodyMachine.ts",
+    "scripts/phase104-backups/src/lib/storage/vector-quantization.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/ai-agent.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/enhancedLokiStore.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/lokiStore.ts",
+    "scripts/phase104-backups/src/lib/utils/security.ts",
+    "scripts/phase104-backups/src/qdrant-vector-store.ts",
+    "scripts/phase90-backfill-content-hash.ts",
+    "scripts/run-tensor-topology-mapreduce.ts",
+    "scripts/seed-docker-pg.mjs",
+    "scripts/seed-graph-and-vectors.mjs",
     "tests/ace-code-cache.spec.ts"
   ],
   "EXTERNAL:vitest": [
@@ -2998,6 +4016,8 @@
     "src/routes/api/codebase-index/deep-research/server.route.test.ts",
     "src/routes/api/rag/search/server.route.test.ts",
     "src/tests/setup.ts",
+    "scripts/generate-route-test-stubs.mjs",
+    "scripts/phase104-backups/src/lib/services/healthUpdates.batch.test.ts",
     "tests/ace-code-cache.spec.ts",
     "tests/ace-context-glossary.spec.ts",
     "tests/ace-hit-tagger.spec.ts",
@@ -3721,6 +4741,7 @@
     "tests/routes/auto/api/tools/execute.test.ts",
     "tests/routes/auto/api/tools/list.test.ts",
     "tests/routes/auto/api/tools/stream.test.ts",
+    "tests/routes/auto/api/topology/centroids.test.ts",
     "tests/routes/auto/api/topology/stream.test.ts",
     "tests/routes/auto/api/topology.test.ts",
     "tests/routes/auto/api/user/preferences.test.ts",
@@ -3749,7 +4770,12 @@
     "tests/routes/auto/api/web/search.test.ts",
     "tests/routes/auto/api/websearch.test.ts",
     "tests/routes/auto/api/whisper/transcribe.test.ts",
+    "tests/routes/auto/api/wiki/encyclopedia.test.ts",
     "tests/routes/auto/api/wiki/moc.test.ts",
+    "tests/routes/auto/api/wiki/page/__id.test.ts",
+    "tests/routes/auto/api/wiki/refresh-directory.test.ts",
+    "tests/routes/auto/api/wiki/search.test.ts",
+    "tests/routes/auto/api/wiki/status.test.ts",
     "tests/routes/auto/api/wiki/sync-to-obsidian.test.ts",
     "tests/routes/auto/api/wiki/watch.test.ts",
     "tests/routes/auto/api/worker/autotag/trigger.test.ts",
@@ -3758,6 +4784,7 @@
     "tests/routes/auto/api/yorha/cases.test.ts",
     "tests/routes/auto/api/yorha/cluster-health.test.ts",
     "tests/routes/auto/api/yorha/search.test.ts",
+    "tests/routes/auto/app/admin/knowledge-base.test.ts",
     "tests/routes/auto/evidence.test.ts",
     "tests/routes/auto/minio/__...path.test.ts",
     "tests/routes/cache-stats.test.ts",
@@ -3846,7 +4873,21 @@
     "src/routes/api/rag/unified/+server.ts",
     "src/routes/api/v1/legal/compare-pdf/+server.ts",
     "src/routes/api/v1/vector/store/+server.ts",
-    "src/routes/api/vector-search/+server.ts"
+    "src/routes/api/vector-search/+server.ts",
+    "scripts/index-qdrant-docs.mjs",
+    "scripts/kb/seed-notecards-qdrant.ts",
+    "scripts/knowledge-base-builder.ts",
+    "scripts/phase104-backups/src/integrated-rag-service.ts",
+    "scripts/phase104-backups/src/lib/server/ai/qdrant-vector-store.ts",
+    "scripts/phase104-backups/src/lib/server/db/qdrant-sync.ts",
+    "scripts/phase104-backups/src/lib/server/db/unified-client-backup.ts",
+    "scripts/phase104-backups/src/lib/server/rag-query.ts",
+    "scripts/phase104-backups/src/lib/server/rag-sync.ts",
+    "scripts/phase104-backups/src/lib/server/services/qdrant-service.ts",
+    "scripts/phase104-backups/src/lib/server/vector/qdrant-optimized.ts",
+    "scripts/phase104-backups/src/lib/services/real-vector-search-service.ts",
+    "scripts/phase104-backups/src/qdrant-vector-store.ts",
+    "scripts/scale-turbovec-state.mjs"
   ],
   "EXTERNAL:child_process": [
     "src/lib/server/acp/tools/phase89.ts",
@@ -3875,6 +4916,26 @@
     "src/routes/api/phase89/agentic-fix/+server.ts",
     "src/routes/api/phase89/fix/+server.ts",
     "src/routes/api/phase89/pipeline/+server.ts",
+    "scripts/agent-diagnose.mjs",
+    "scripts/backup-consolidation/analyze-differences.mjs",
+    "scripts/backup-consolidation/tests/run-all-tests.mjs",
+    "scripts/backup-db-to-seaweedfs.mjs",
+    "scripts/batch-merger-fixer-v2.mjs",
+    "scripts/benchmark-whisper-cuda.mjs",
+    "scripts/ci-smoke-hypergraph.mjs",
+    "scripts/extract-enhanced-graph.mjs",
+    "scripts/graphify-health.mjs",
+    "scripts/index-codebase-fast.mjs",
+    "scripts/maintain-repo.mjs",
+    "scripts/mcp/contextual-prompt-engineer.mjs",
+    "scripts/phase104-backups/src/lib/server/ai/llm-orchestrator-bridge.ts",
+    "scripts/phase104-backups/src/lib/server/yolo.ts",
+    "scripts/runtime-proof-pipeline.mjs",
+    "scripts/test-migration.ts",
+    "scripts/tests/deep-directory-audit.mjs",
+    "scripts/tests/test-production-readiness.mjs",
+    "scripts/tests/test-real-audio.mjs",
+    "scripts/tests/verify-sprint4b-infrastructure.mjs",
     "tests/e2e/vlm-inference-vision.spec.ts",
     "tests/evidence-upload-modal.spec.ts",
     "tests/helpers/port-detector.ts",
@@ -3890,22 +4951,52 @@
     "src/lib/server/minio.ts",
     "src/lib/server/storage/.phase105-backup/1768605014945-minio-service.ts",
     "src/mcp/server.ts",
-    "src/minio.ts"
+    "src/minio.ts",
+    "scripts/backup-db-to-seaweedfs.mjs",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/ingest-govinfo-federal.ts",
+    "scripts/phase104-backups/src/integrated-rag-service.ts"
   ],
   "EXTERNAL:neo4j-driver": [
     "src/lib/server/adapters/service-integrations.ts",
     "src/lib/server/ai/mcp-tool-dispatch.ts",
     "src/lib/server/graph/community-graph.ts",
     "src/lib/server/graph/gpu-graph-analysis.ts",
+    "src/lib/server/graph/relationship-synthesizer.ts",
     "src/lib/server/indexer/directory-summarizer.ts",
     "src/lib/server/wiki/wiki-neo4j-sync.ts",
     "src/mcp/tools/graph-analysis.tool.ts",
-    "src/mcp/tools/trace-kag.tool.ts"
+    "src/mcp/tools/trace-kag.tool.ts",
+    "scripts/build-deep-import-graph.mjs",
+    "scripts/couchdb-export-graph-jsonl.mjs",
+    "scripts/graph/prune-graph-triples.mjs",
+    "scripts/graphify-authority.mjs",
+    "scripts/graphify-neo4j-clusters.mjs",
+    "scripts/graphify-som-cluster-summaries.mjs",
+    "scripts/phase104-backups/src/lib/client/ocr-tensor-processor.ts",
+    "scripts/phase104-backups/src/lib/server/ai/som-bitmap-visualizer.ts",
+    "scripts/phase104-backups/src/lib/server/db/unified-client-backup.ts",
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts",
+    "scripts/phase104-backups/src/lib/server/rag-sync.ts",
+    "scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts",
+    "scripts/phase104-backups/src/lib/services/enhanced-api-client.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-som-embeddings.ts",
+    "scripts/phase104-backups/src/lib/services/simd-json-acceleration.ts",
+    "scripts/run-authority-scores.mjs",
+    "scripts/run-pagerank.ts",
+    "scripts/sync-manifold4-neo4j.mjs",
+    "scripts/wiki/analyze-wiki-gaps.mjs",
+    "scripts/wiki/extract-code-relations.mjs"
   ],
   "EXTERNAL:@langchain/ollama": [
     "src/lib/server/agent/autonomous-agent.ts",
     "src/lib/server/agent/subagents.ts",
-    "src/lib/server/agent/supervisor.ts"
+    "src/lib/server/agent/supervisor.ts",
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts",
+    "scripts/phase104-backups/src/lib/services/nomic-embedding-service.ts",
+    "scripts/phase104-backups/src/lib/services/real-vector-search-service.ts"
   ],
   "EXTERNAL:@langchain/langgraph/prebuilt": [
     "src/lib/server/agent/autonomous-agent.ts",
@@ -3913,7 +5004,8 @@
   ],
   "EXTERNAL:@langchain/core/messages": [
     "src/lib/server/agent/autonomous-agent.ts",
-    "src/lib/server/agent/supervisor.ts"
+    "src/lib/server/agent/supervisor.ts",
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts"
   ],
   "EXTERNAL:@langchain/core/tools": [
     "src/lib/server/agent/autonomous-agent.ts",
@@ -3959,20 +5051,31 @@
     "src/routes/api/v1/agentic/tool-loop/+server.ts",
     "src/routes/api/whisper/transcribe/+server.ts",
     "src/workers/embedding-worker.ts",
+    "scripts/build-hypergraph-stream.mjs",
+    "scripts/extract-enhanced-graph.mjs",
+    "scripts/graph/synthesize-semantic-edges.mjs",
+    "scripts/graphify-svg-architecture.mjs",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/karpathy-indexer.mjs",
+    "scripts/mcp/query-db-for-svelte5-errors.mjs",
+    "scripts/phase104-backups/src/lib/server/ingest/ingest-worker.ts",
+    "scripts/phase104-backups/src/lib/server/utils/logger.ts",
+    "scripts/phase104-backups/src/lib/utils/todo-autogen.ts",
+    "scripts/repair-services.ts",
+    "scripts/tests/deep-directory-audit.mjs",
+    "scripts/tests/export-transcription.mjs",
+    "scripts/tests/generate-codebase-directory-map.mjs",
+    "scripts/tests/test-pdf-extraction.mjs",
+    "scripts/tests/test-production-readiness.mjs",
+    "scripts/tests/test-real-audio.mjs",
     "tests/global-setup.ts",
     "tests/global-teardown.ts",
     "tests/phase97-authenticated-streaming.spec.ts",
     "tests/research-evidence-e2e.spec.ts",
     "tests/vision-gpu-tools-topology-routes.spec.ts"
   ],
-  "EXTERNAL:package": [
-    "src/lib/server/agent/tools/analyze-imports.ts"
-  ],
   "EXTERNAL:fast-glob": [
     "src/lib/server/agent/tools/find-files.ts"
-  ],
-  "UNRESOLVED:./web-search-searxng.js": [
-    "src/lib/server/agent/tools/index.ts"
   ],
   "EXTERNAL:node:fs/promises": [
     "src/lib/server/agents/regen/loaders/graph.ts",
@@ -3996,13 +5099,50 @@
     "src/routes/api/error-brain/apply-fix/+server.ts",
     "src/routes/api/error-brain/auto-patch/+server.ts",
     "src/routes/api/wiki/moc/+server.ts",
+    "scripts/agentic-batch-fix.mjs",
+    "scripts/agentic-error-fix.mjs",
+    "scripts/archive-llm-summaries.mjs",
+    "scripts/backup-consolidation/analyze-report.mjs",
+    "scripts/backup-consolidation/comparison.mjs",
+    "scripts/backup-consolidation/delete-safe.mjs",
+    "scripts/backup-consolidation/executor.mjs",
+    "scripts/backup-consolidation/manifest.mjs",
+    "scripts/backup-consolidation/scanner.mjs",
+    "scripts/build-atlas-index.mjs",
+    "scripts/deep-audit-ast.mjs",
+    "scripts/diagnose/find-non-zod-tool-schemas.mjs",
+    "scripts/enrich-evidence-image-tags.mjs",
+    "scripts/generate-file-summaries.mjs",
+    "scripts/graph/synthesize-next-actions.mjs",
+    "scripts/graph/wire-synthesis-grpo.mjs",
+    "scripts/graphify-obsidian-vault.mjs",
+    "scripts/index-vault-md.mjs",
+    "scripts/ingest-enhanced-jsonl.mjs",
+    "scripts/phase104-backups/src/lib/server/docling.ts",
+    "scripts/reconstruction/compile-demo-scene.mjs",
+    "scripts/reconstruction/emit-aesthetic-preset.mjs",
+    "scripts/restore-llm-summaries.mjs",
+    "scripts/screenshots/enrich-screenshots.mjs",
+    "scripts/screenshots/index-screenshots.mjs",
+    "scripts/smoke-admin-ai-chat.mjs",
+    "scripts/smoke-feature-map-compiler.mjs",
+    "scripts/swap-lora-adapter.mjs",
+    "scripts/synth/handoff-to-claude.mjs",
+    "scripts/synth/run-loop.mjs",
+    "scripts/tests/audit-gates.mjs",
+    "scripts/tests/smoke-vault-walker.mjs",
+    "scripts/validate/dev-server-monitor.mjs",
+    "scripts/validate/full-system.mjs",
+    "scripts/wiki/analyze-wiki-gaps.mjs",
+    "scripts/wiki/backfill-error-fingerprints.mjs",
     "tests/agents-regen-loaders.spec.ts",
     "tests/routes/all-routes-page-server.test.ts",
     "tests/routes/codebase-index-summarize-dirs.test.ts",
     "tests/runes/svelte5-rune-compliance.test.ts"
   ],
   "EXTERNAL:zlib": [
-    "src/lib/server/ai/caching-layer.ts"
+    "src/lib/server/ai/caching-layer.ts",
+    "scripts/phase104-backups/src/lib/services/advanced-simd-pipeline.ts"
   ],
   "EXTERNAL:node:child_process": [
     "src/lib/server/ai/code-intel-service.ts",
@@ -4010,10 +5150,55 @@
     "src/lib/server/indexer/rg-search-utility.ts",
     "src/lib/server/indexer/web-search-indexer.ts",
     "src/lib/server/inference/inference-router.ts",
+    "src/lib/server/kb/wiki-logic.ts",
     "src/mcp/admin_tools.ts",
     "src/mcp/codebase_tools.ts",
     "src/mcp/trace-mcp-server.ts",
     "src/routes/api/error-brain/verify-fix/+server.ts",
+    "scripts/activity/log-developer-activity.mjs",
+    "scripts/agentic-error-fix.mjs",
+    "scripts/agents-smoke-all.mjs",
+    "scripts/audit-build-risk.ts",
+    "scripts/backup-consolidation/comparison.mjs",
+    "scripts/backup-consolidation/executor.mjs",
+    "scripts/backup-consolidation/scanner.mjs",
+    "scripts/check-all-tools.mjs",
+    "scripts/claude-context-plan.mjs",
+    "scripts/dev/run-with-analytics.mjs",
+    "scripts/dev-everything.mjs",
+    "scripts/enrich-agents-md.mjs",
+    "scripts/ensure-dev-runtime.mjs",
+    "scripts/ensure-kb-retrieval-server.mjs",
+    "scripts/ensure-llama-server.mjs",
+    "scripts/ensure-mcp-server.mjs",
+    "scripts/ensure-search-engine.mjs",
+    "scripts/features/record-feature-implementation.ts",
+    "scripts/generate-agent-timeline.mjs",
+    "scripts/graph/synthesize-next-actions.mjs",
+    "scripts/graphify-deep-ingest.mjs",
+    "scripts/lib/reference-verifier.mjs",
+    "scripts/phase104-backups/src/lib/server/docling.ts",
+    "scripts/phase104-backups/src/routes_parked/api/phase82/upgrade-route/+server.ts",
+    "scripts/refresh-turbovec-graph.mjs",
+    "scripts/rg-atlas/run-rg.mjs",
+    "scripts/run-test-stubs-progress.mjs",
+    "scripts/smoke/smoke-adopted-mcp.mjs",
+    "scripts/smoke-atlas-prompt-mapper.mjs",
+    "scripts/start-dev-stack.mjs",
+    "scripts/start-trace-mcp-cluster.mjs",
+    "scripts/startup/ace-incremental-startup.mjs",
+    "scripts/startup/run-detached.mjs",
+    "scripts/startup-analysis.mjs",
+    "scripts/startup-plan.mjs",
+    "scripts/tests/audit-gitignore-vs-indexer.mjs",
+    "scripts/tests/ensure-inference.mjs",
+    "scripts/tests/smoke-fast-ast-ace.mjs",
+    "scripts/triage-orphans-vs-next-steps.mjs",
+    "scripts/tsgo-diagnostics-to-jsonb.mjs",
+    "scripts/turboquant/stability-test.mjs",
+    "scripts/validate/dev-server-monitor.mjs",
+    "scripts/validate/full-system.mjs",
+    "scripts/verify-trace-startup.mjs",
     "tests/agents-cache-cli.spec.ts",
     "tests/agents-index-cli.spec.ts",
     "tests/agents-regen-cli.spec.ts",
@@ -4021,15 +5206,20 @@
     "tests/phase94-cli.spec.ts",
     "tests/unit/ensure-dev-runtime.test.ts"
   ],
-  "EXTERNAL:$lib/server/agent/tools/web-search-searxng.js": [
-    "src/lib/server/ai/contextual-tools.ts",
-    "src/routes/api/agents/chat/+server.ts"
-  ],
   "EXTERNAL:node:module": [
     "src/lib/server/ai/cuda-graph-manager.ts",
     "src/lib/server/ai/libtorch-reranker.ts",
     "src/lib/utils/simd-markdown-parser.ts",
     "src/mcp/trace-mcp-server.ts",
+    "scripts/graphify-semantic-cluster.mjs",
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/mapreduce/map-worker.mjs",
+    "scripts/phase104-backups/src/lib/utils/simd-markdown-parser.ts",
+    "scripts/reconstruction/compile-demo-scene.mjs",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/run-tensor-topology-mapreduce.mjs",
+    "scripts/train-autoencoder.mjs",
+    "scripts/wiki/extract-code-relations.mjs",
     "tests/build-codebase-relationships.spec.ts"
   ],
   "EXTERNAL:uuid": [
@@ -4039,7 +5229,8 @@
     "src/lib/server/rg-atlas/run.ts",
     "src/lib/server/services/error-analysis/EscalationService.ts",
     "src/lib/server/services/error-analysis/ExperienceRecorder.ts",
-    "src/routes/api/v1/vector/store/+server.ts"
+    "src/routes/api/v1/vector/store/+server.ts",
+    "scripts/seed-ace-hits-for-synthesis.ts"
   ],
   "EXTERNAL:util": [
     "src/lib/server/ai/linter-service.ts",
@@ -4049,6 +5240,9 @@
     "src/routes/api/analyze-file/+server.ts",
     "src/routes/api/codebase-index/ingest-errors/+server.ts",
     "src/routes/api/generate-cluster-summaries/+server.ts",
+    "scripts/graphify-persist-couchdb.mjs",
+    "scripts/tests/test-real-audio.mjs",
+    "scripts/tests/verify-sprint4b-infrastructure.mjs",
     "tests/codebase-indexer.spec.ts",
     "tests/helpers/port-detector.ts"
   ],
@@ -4061,7 +5255,8 @@
     "src/lib/server/indexer/web-search-indexer.ts",
     "src/lib/server/legal/html-normalizer.ts",
     "src/lib/server/research/normalize-html.ts",
-    "src/routes/api/knowledge/+server.ts"
+    "src/routes/api/knowledge/+server.ts",
+    "scripts/knowledge-base-builder.ts"
   ],
   "EXTERNAL:p-limit": [
     "src/lib/server/analysis/batch-error-analysis.ts",
@@ -4078,7 +5273,28 @@
     "src/lib/server/gpu/pytorch-graph.ts",
     "src/lib/server/gpu/simdjson-bridge.ts",
     "src/lib/server/graph/gpu-graph-analysis.ts",
-    "src/lib/workers/gpu-worker.mjs"
+    "src/lib/workers/gpu-worker.mjs",
+    "scripts/ci-smoke-hypergraph.mjs",
+    "scripts/graphify-cluster-pagerank.mjs",
+    "scripts/graphify-persist-couchdb.mjs",
+    "scripts/hypergraph-build.mjs",
+    "scripts/hypergraph-lookup-server.mjs",
+    "scripts/hypergraph-topology-writer.mjs",
+    "scripts/run-hypergraph.ts",
+    "scripts/run-tensor-topology-mapreduce.ts",
+    "scripts/smoke-compute-worker-gpu.mjs",
+    "scripts/smoke-gpu-hardening.mjs",
+    "scripts/smoke-hmm-rust.mjs",
+    "scripts/smoke-rust-graph.mjs",
+    "scripts/smoke-som-bmu.mjs",
+    "scripts/smoke-topology-projection.mjs",
+    "scripts/tests/audit-icons.mjs",
+    "scripts/tests/export-transcription.mjs",
+    "scripts/tests/process-real-audio-direct.mjs",
+    "scripts/tests/smoke-rust-native.mjs",
+    "scripts/tests/test-all-analysis-uis.mjs",
+    "scripts/tests/test-audio-analysis-ui.mjs",
+    "scripts/tests/trigger-audio-via-rabbitmq.mjs"
   ],
   "EXTERNAL:@mendable/firecrawl-js": [
     "src/lib/server/analytics/unified-research-query.ts",
@@ -4090,7 +5306,8 @@
     "src/lib/server/auth.ts",
     "src/lib/server/db/seed-simple.ts",
     "src/lib/server/db/seed.ts",
-    "src/lib/server/lucia.ts"
+    "src/lib/server/lucia.ts",
+    "scripts/phase104-backups/src/lib/server/authUtils.ts"
   ],
   "EXTERNAL:@lucia-auth/adapter-drizzle": [
     "src/lib/server/auth.ts",
@@ -4099,12 +5316,10 @@
   "EXTERNAL:node:events": [
     "src/lib/server/cache/cache-events.ts"
   ],
-  "EXTERNAL:process": [
-    "src/lib/server/cases/caseSynthesis.ts"
-  ],
   "EXTERNAL:net": [
     "src/lib/server/config/dynamic-ports.ts",
-    "src/routes/api/health/+server.ts"
+    "src/routes/api/health/+server.ts",
+    "scripts/tests/generate-codebase-directory-map.mjs"
   ],
   "EXTERNAL:amqplib": [
     "src/lib/server/connections/connection-pool.ts",
@@ -4123,7 +5338,8 @@
     "src/lib/server/db/client.ts",
     "src/lib/server/db/seed-citations.ts",
     "src/lib/server/db/seed.ts",
-    "src/lib/shims/drizzle-node-postgres.ts"
+    "src/lib/shims/drizzle-node-postgres.ts",
+    "scripts/verify-db-connection.ts"
   ],
   "EXTERNAL:drizzle-orm/cache/core": [
     "src/lib/server/db/drizzle-cache.ts"
@@ -4134,27 +5350,94 @@
   "EXTERNAL:dotenv": [
     "src/lib/server/db/index-new.ts",
     "src/mcp/tools/vault-walker.tool.ts",
-    "src/tests/setup.ts"
+    "src/tests/setup.ts",
+    "scripts/agents/qdrant-payload-backfill.mjs",
+    "scripts/agents-db-verify.mjs",
+    "scripts/archive-llm-summaries.mjs",
+    "scripts/atlas-10q-demo.mjs",
+    "scripts/autoencoder-backfill-qdrant.mjs",
+    "scripts/autoencoder-centroids.mjs",
+    "scripts/backfill-agents-md-envelope.mjs",
+    "scripts/build-agents-md-relations.mjs",
+    "scripts/build-atlas-index.mjs",
+    "scripts/build-topology-taxonomy.mjs",
+    "scripts/check-all-tools.mjs",
+    "scripts/codebase-semantic-indexer.ts",
+    "scripts/enrich-evidence-image-tags.mjs",
+    "scripts/export-langfuse-jsonl.mjs",
+    "scripts/export-qlora-dataset.mjs",
+    "scripts/generate-file-summaries.mjs",
+    "scripts/graph/ingest-to-kag-notes.mjs",
+    "scripts/graph/prune-graph-triples.mjs",
+    "scripts/graphify-neo4j-clusters.mjs",
+    "scripts/graphify-som-cluster-summaries.mjs",
+    "scripts/health/grpc-health.ts",
+    "scripts/hypergraph-build-4d.ts",
+    "scripts/index-agents-md.mjs",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/index-vault-md.mjs",
+    "scripts/ingest-govinfo-federal.ts",
+    "scripts/ingest-grpo-log.mjs",
+    "scripts/karpathy-ace-hits.mjs",
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/knowledge-base-builder.ts",
+    "scripts/mirror-qdrant-clusters-to-postgres.mjs",
+    "scripts/neo4j-graph-enrich.mjs",
+    "scripts/normalize-cluster-keys.mjs",
+    "scripts/patch-qdrant-topology-payloads.mjs",
+    "scripts/phase104-backups/src/lib/server/ai/llm-orchestrator-bridge.ts",
+    "scripts/phase104-backups/src/lib/server/database/redis-client.ts",
+    "scripts/phase79-agentic-indexer.mjs",
+    "scripts/qdrant/write-rerank-feedback.mjs",
+    "scripts/reembed-missing-chunks.ts",
+    "scripts/restore-hypergraph-archive.mjs",
+    "scripts/restore-llm-summaries.mjs",
+    "scripts/run-authority-scores.mjs",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/run-tensor-topology-mapreduce.mjs",
+    "scripts/run-tensor-topology-mapreduce.ts",
+    "scripts/screenshots/caption-screenshots-gemma4.mjs",
+    "scripts/screenshots/enrich-screenshots.mjs",
+    "scripts/screenshots/index-screenshots.mjs",
+    "scripts/seed-hit-demand.mjs",
+    "scripts/seed-hypergraph-edges-lane-b.mjs",
+    "scripts/seed-hypergraph-edges-lane-c.mjs",
+    "scripts/seed-hypergraph-edges-lane-d.mjs",
+    "scripts/seed-hypergraph-edges.mjs",
+    "scripts/skills/codebase-todo-aggregator.mjs",
+    "scripts/smoke/hypergraph-search-smoke.mjs",
+    "scripts/smoke/hypergraph-vault-smoke.mjs",
+    "scripts/smoke/rg-atlas-smoke.mjs",
+    "scripts/smoke/smoke-graph-pathway-materialization.mjs",
+    "scripts/smoke/smoke-hyperrag.mjs",
+    "scripts/smoke-hypergraph-rag.mjs",
+    "scripts/smoke-neo4j-graph-enrich.mjs",
+    "scripts/sync-manifold4-neo4j.mjs",
+    "scripts/test-web-search.mjs",
+    "scripts/tests/smoke-tensor-analysis-cache.mjs",
+    "scripts/train-autoencoder.mjs",
+    "scripts/verify-db-connection.ts",
+    "scripts/wiki/backfill-qdrant-cluster-keys.mjs",
+    "scripts/wiki/backfill-rerank-scores.mjs",
+    "scripts/wiki/extract-code-relations.mjs",
+    "scripts/wiki/ingest-kag-notes.mjs",
+    "scripts/wiki/run-mapreduce-pipeline.mjs",
+    "scripts/wiki/setup-couchdb-mapreduce.mjs",
+    "scripts/wiki/writeback-rerank-to-qdrant.mjs"
   ],
   "EXTERNAL:drizzle-orm/postgres-js/migrator": [
     "src/lib/server/db/migrate.ts",
     "src/lib/server/db/unified-client.ts"
   ],
   "EXTERNAL:@aws-sdk/client-s3": [
-    "src/lib/server/db/mirror-query.ts"
-  ],
-  "UNRESOLVED:./couchdb": [
-    "src/lib/server/db/mirror-query.ts"
+    "src/lib/server/db/mirror-query.ts",
+    "scripts/mcp/upload-svelte-docs-to-minio.mjs",
+    "scripts/phase104-backups/src/lib/server/db/mirror-query.ts"
   ],
   "EXTERNAL:drizzle-orm/relations": [
     "src/lib/server/db/relations.ts",
     "src/lib/server/db/schema-postgres.ts"
-  ],
-  "EXTERNAL:drizzle-orm/sqlite-core": [
-    "src/lib/server/db/schema-sqlite.ts"
-  ],
-  "EXTERNAL:@paralleldrive/cuid2": [
-    "src/lib/server/db/unified-schema.ts"
   ],
   "EXTERNAL:pdf-parse": [
     "src/lib/server/document-processor.ts",
@@ -4165,14 +5448,21 @@
     "src/routes/api/ingest/+server.ts",
     "src/routes/api/knowledge/+server.ts",
     "src/routes/api/rag/process/+server.ts",
-    "src/routes/api/v1/legal/compare-pdf/+server.ts"
+    "src/routes/api/v1/legal/compare-pdf/+server.ts",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/ingest-govinfo-federal.ts",
+    "scripts/tests/test-pdf-extraction.mjs"
   ],
   "EXTERNAL:nodejs-whisper": [
     "src/lib/server/document-processor.ts",
     "src/routes/api/whisper/transcribe/+server.ts"
   ],
   "EXTERNAL:protobufjs": [
-    "src/lib/server/evidence/proto-serializer.ts"
+    "src/lib/server/evidence/proto-serializer.ts",
+    "scripts/phase104-backups/src/lib/services/complete-gpu-error-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/cross-encoder-reranker.ts",
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts"
   ],
   "EXTERNAL:@xenova/transformers": [
     "src/lib/server/evidence/services/embedding.ts",
@@ -4184,10 +5474,29 @@
     "src/lib/server/ff1/planner.ts",
     "src/lib/server/ff1/storage/redis-cache.ts",
     "src/lib/server/services/error-analysis/RAGRetriever.ts",
-    "src/mcp/tools/cluster-lenses.tool.ts"
+    "src/mcp/tools/cluster-lenses.tool.ts",
+    "scripts/agents/som-cluster-cards.mjs",
+    "scripts/dev/run-with-analytics.mjs",
+    "scripts/generate-agent-timeline.mjs",
+    "scripts/generate-timeline-synthesis.mjs",
+    "scripts/graph/build-cluster-agents-index.mjs",
+    "scripts/graphify-health.mjs",
+    "scripts/graphify-som-topology.mjs",
+    "scripts/lib/phase89-cache.mjs",
+    "scripts/phase104-backups/src/integrated-rag-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/persistence/redis-json-schema.ts",
+    "scripts/phase104-backups/src/lib/services/enhanced-caching-optimizer.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/CacheService.ts",
+    "scripts/preflight.ts",
+    "scripts/tests/fix-cluster4.mjs",
+    "scripts/tests/test-ace-graphify-retrieval.mjs",
+    "scripts/warm-forest-clusters.mjs"
   ],
   "EXTERNAL:readline": [
-    "src/lib/server/ff1/audit/diagnostic-collector.ts"
+    "src/lib/server/ff1/audit/diagnostic-collector.ts",
+    "scripts/hypergraph-build.mjs",
+    "scripts/hypergraph-tag-qdrant.mjs",
+    "scripts/ingest-grpo-log.mjs"
   ],
   "EXTERNAL:node:zlib": [
     "src/lib/server/glyph-prompt-cache.ts",
@@ -4198,6 +5507,60 @@
     "src/lib/server/gpu/libtorch-bridge.ts",
     "src/lib/server/gpu/mapreduce-runner.mjs",
     "src/lib/server/training/query-logger.ts",
+    "scripts/agent-diagnose.mjs",
+    "scripts/backup-consolidation/analyze-bulk-delete.mjs",
+    "scripts/backup-consolidation/analyze-differences.mjs",
+    "scripts/backup-consolidation/bulk-delete.mjs",
+    "scripts/backup-consolidation/deep-analysis.mjs",
+    "scripts/backup-consolidation/delete-truly-safe.mjs",
+    "scripts/backup-consolidation/find-truly-safe.mjs",
+    "scripts/backup-consolidation/show-diff-samples.mjs",
+    "scripts/backup-consolidation/tests/run-all-tests.mjs",
+    "scripts/batch-merger-fixer-v2.mjs",
+    "scripts/diff/applier.mjs",
+    "scripts/diff/generator.mjs",
+    "scripts/diff/reporter.mjs",
+    "scripts/export-langfuse-jsonl.mjs",
+    "scripts/export-qlora-dataset.mjs",
+    "scripts/graph/synthesize-semantic-edges.mjs",
+    "scripts/graphify-cluster-pagerank.mjs",
+    "scripts/graphify-cluster-summaries.mjs",
+    "scripts/graphify-deep-imports.mjs",
+    "scripts/graphify-health.mjs",
+    "scripts/graphify-som-topology.mjs",
+    "scripts/index-codebase-fast.mjs",
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/ingest-govinfo-federal.ts",
+    "scripts/mcp/agent-orchestrator.mjs",
+    "scripts/mcp/contextual-prompt-engineer.mjs",
+    "scripts/mcp/svelte5-migration-tools.mjs",
+    "scripts/mcp/upload-svelte-docs-to-minio.mjs",
+    "scripts/reembed-missing-chunks.ts",
+    "scripts/scale-turbovec-state.mjs",
+    "scripts/seed-feature-atlas.mjs",
+    "scripts/smoke/smoke-hyperrag.mjs",
+    "scripts/smoke-compute-worker-gpu.mjs",
+    "scripts/smoke-compute-worker.mjs",
+    "scripts/smoke-gpu-hardening.mjs",
+    "scripts/smoke-graphify-deep-imports.mjs",
+    "scripts/smoke-hmm-rust.mjs",
+    "scripts/smoke-som-bmu.mjs",
+    "scripts/smoke-topology-projection.mjs",
+    "scripts/smoke-trace-cache-reuse.mjs",
+    "scripts/smoke-trace-full-loop.mjs",
+    "scripts/tests/deep-directory-audit.mjs",
+    "scripts/tests/fix-phantom-icons.mjs",
+    "scripts/tests/generate-codebase-directory-map.mjs",
+    "scripts/tests/screenshot-evidence-upload-flow.mjs",
+    "scripts/tests/smoke-rust-native.mjs",
+    "scripts/tests/test-audio-pipeline.mjs",
+    "scripts/tests/test-evidence-upload-flow.mjs",
+    "scripts/tests/test-evidence-uploads.mjs",
+    "scripts/tests/test-pdf-extraction.mjs",
+    "scripts/tests/test-production-readiness.mjs",
+    "scripts/tests/test-screenshots.mjs",
+    "scripts/turboquant/bench-model.mjs",
     "tests/ai-chat-live.spec.ts",
     "tests/e2e/vlm-inference-vision.spec.ts",
     "tests/evidence-pipeline-e2e.spec.ts",
@@ -4220,46 +5583,77 @@
     "src/lib/server/yolo.ts",
     "src/routes/api/evidence/upload/+server.ts",
     "src/routes/api/system/health/+server.ts",
-    "src/routes/api/whisper/transcribe/+server.ts"
+    "src/routes/api/whisper/transcribe/+server.ts",
+    "scripts/backup-consolidation/tests/scan-resilience.test.mjs",
+    "scripts/benchmark-whisper-cuda.mjs",
+    "scripts/phase104-backups/src/lib/server/ai/contextual-understanding-service.ts",
+    "scripts/phase104-backups/src/lib/server/ai/mcp-context7-embedding-integration.ts",
+    "scripts/phase104-backups/src/lib/server/db/mirror-query.ts",
+    "scripts/phase104-backups/src/lib/server/db/qdrant-sync.ts",
+    "scripts/phase104-backups/src/lib/server/ibm-vision.ts",
+    "scripts/phase104-backups/src/lib/server/ingest/worker-pool.ts",
+    "scripts/phase104-backups/src/lib/server/services/adaptive-index-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/server/yolo.ts",
+    "scripts/phase104-backups/src/lib/services/ai-evidence-analyzer.ts",
+    "scripts/phase104-backups/src/lib/services/xstate-utils.ts",
+    "scripts/phase104-backups/src/routes_parked/api/documents/process/+server.ts"
   ],
   "EXTERNAL:worker_threads": [
     "src/lib/server/gpu/libtorch-bridge.ts",
     "src/lib/server/gpu/mapreduce-runner.mjs",
     "src/lib/server/gpu/mapreduce-worker.mjs",
     "src/lib/server/workers/compute-pool.ts",
-    "src/lib/shims/worker-threads-browser-shim.js",
     "src/lib/workers/ast-graph-worker.mjs",
     "src/lib/workers/compute-worker.mjs",
     "src/lib/workers/gpu-worker.mjs",
-    "src/workers/embedding-worker.ts"
+    "src/workers/embedding-worker.ts",
+    "scripts/phase104-backups/src/lib/server/ingest/ingest-worker.ts",
+    "scripts/phase104-backups/src/lib/server/ingest/worker-pool.ts",
+    "scripts/smoke-compute-worker-gpu.mjs",
+    "scripts/smoke-compute-worker.mjs"
   ],
   "EXTERNAL:glob": [
     "src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
-    "src/lib/server/kb/wiki-logic.ts",
-    "src/routes/api/indexing/+server.ts"
+    "src/routes/api/indexing/+server.ts",
+    "scripts/deep-audit-ast.mjs",
+    "scripts/extract-enhanced-graph.mjs",
+    "scripts/fix-import-colons.ts",
+    "scripts/fix-ollama-mock.mjs",
+    "scripts/graphify-svg-architecture.mjs"
   ],
   "EXTERNAL:ts-morph": [
     "src/lib/server/graph/codebase-scanner-v2.ts",
     "src/lib/server/indexer/ast-chunker.ts",
-    "src/lib/server/indexer/workspace-metadata-extractor.ts"
+    "src/lib/server/indexer/workspace-metadata-extractor.ts",
+    "scripts/ast-repair.ts",
+    "scripts/features/record-feature-implementation.ts",
+    "scripts/fix-implicit-any.ts",
+    "scripts/fix-import-corruption.ts",
+    "scripts/fix-missing-imports-enhanced.ts",
+    "scripts/fix-missing-imports.ts",
+    "scripts/fix-type-imports-usage.ts"
+  ],
+  "EXTERNAL:$lib/server/cache/redis.js": [
+    "src/lib/server/graph/relationship-synthesizer.ts"
   ],
   "EXTERNAL:@grpc/grpc-js": [
     "src/lib/server/grpc/chr97-agent-client.ts",
     "src/lib/server/grpc/embedding-client.ts",
     "src/lib/server/grpc/graph-ml-client.ts",
-    "src/lib/server/grpc/retrieval-client.ts",
     "src/lib/server/grpc/tool-calling-client.ts",
     "src/lib/server/grpc/tool-router-client.ts",
-    "src/routes/api/search/+server.ts"
+    "src/routes/api/search/+server.ts",
+    "scripts/health/grpc-health.ts"
   ],
   "EXTERNAL:@grpc/proto-loader": [
     "src/lib/server/grpc/chr97-agent-client.ts",
     "src/lib/server/grpc/embedding-client.ts",
     "src/lib/server/grpc/graph-ml-client.ts",
-    "src/lib/server/grpc/retrieval-client.ts",
     "src/lib/server/grpc/tool-calling-client.ts",
     "src/lib/server/grpc/tool-router-client.ts",
-    "src/routes/api/search/+server.ts"
+    "src/routes/api/search/+server.ts",
+    "scripts/extract-enhanced-graph.mjs",
+    "scripts/health/grpc-health.ts"
   ],
   "EXTERNAL:nats": [
     "src/lib/server/grpc/embedding-client.ts"
@@ -4267,24 +5661,40 @@
   "EXTERNAL:stream": [
     "src/lib/server/grpc/generation-client.ts",
     "src/lib/server/minio-client.ts",
-    "src/minio.ts"
+    "src/minio.ts",
+    "scripts/lib/phase89-sse-stream.mjs",
+    "scripts/phase104-backups/src/lib/optimization/simd-json-parser-bridge.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-orchestration-service.ts"
   ],
   "EXTERNAL:sharp": [
     "src/lib/server/image/resize-for-vlm.ts",
-    "src/routes/api/persons-of-interest/[id]/photos/+server.ts"
+    "src/routes/api/persons-of-interest/[id]/photos/+server.ts",
+    "scripts/phase104-backups/src/lib/server/services/adaptive-index-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts",
+    "scripts/phase104-backups/src/lib/services/go-microservice-client.ts",
+    "scripts/screenshots/caption-screenshots-gemma4.mjs",
+    "scripts/screenshots/enrich-screenshots.mjs"
   ],
   "EXTERNAL:undici": [
     "src/lib/server/indexer/karpathy-wiki.ts",
     "src/lib/server/integrations/obsidian-client.ts",
     "src/lib/server/ollama.ts",
-    "src/routes/api/health/obsidian/+server.ts"
+    "src/routes/api/health/obsidian/+server.ts",
+    "scripts/tests/test-library-upload.mjs"
   ],
   "EXTERNAL:node:readline": [
-    "src/lib/server/kb/search-logic.ts"
+    "src/lib/server/kb/search-logic.ts",
+    "scripts/error-brain-fix.ts",
+    "scripts/hypergraph-cluster-digest.mjs",
+    "scripts/kb/graph-jsonl-to-cards.mjs",
+    "scripts/mcp/gemma4-offload-mcp.mjs",
+    "scripts/phase76-acp-cli.mjs"
   ],
   "EXTERNAL:@modelcontextprotocol/sdk/client/index.js": [
     "src/lib/server/mcp-client.ts",
-    "src/lib/server/research/github-mcp.ts"
+    "src/lib/server/research/github-mcp.ts",
+    "scripts/smoke/smoke-graph-pathway-materialization.mjs",
+    "scripts/smoke-stdio-mcp-tools.mjs"
   ],
   "EXTERNAL:@modelcontextprotocol/sdk/client/sse.js": [
     "src/lib/server/mcp-client.ts"
@@ -4296,45 +5706,51 @@
     "src/lib/server/notifications/push-service.ts"
   ],
   "EXTERNAL:langfuse": [
-    "src/lib/server/observability/langfuse.ts"
+    "src/lib/server/observability/langfuse.ts",
+    "scripts/agentic-error-fix.mjs"
   ],
   "EXTERNAL:chokidar": [
-    "src/lib/server/obsidian/wiki-vault-watcher.ts"
+    "src/lib/server/obsidian/wiki-vault-watcher.ts",
+    "scripts/mcp/tail-and-ingest-errors.mjs"
   ],
   "EXTERNAL:tesseract.js": [
     "src/lib/server/ocr/extractText.ts",
-    "src/lib/server/ocr/hybrid.ts"
-  ],
-  "UNRESOLVED:./vector-quantization.js": [
-    "src/lib/server/optimize/benchmark.ts"
-  ],
-  "UNRESOLVED:./query-cache.js": [
-    "src/lib/server/optimize/benchmark.ts"
+    "src/lib/server/ocr/hybrid.ts",
+    "scripts/phase104-backups/src/lib/client/ocr-tensor-processor.ts"
   ],
   "EXTERNAL:perf_hooks": [
-    "src/lib/server/optimize/benchmark.ts"
+    "src/lib/server/optimize/benchmark.ts",
+    "scripts/turboquant/bench-model.mjs"
   ],
   "EXTERNAL:pdf-lib": [
     "src/lib/server/pdf/generateLegalPacketPDF.ts",
-    "src/lib/server/pdf/legalPacketGenerator.ts"
+    "src/lib/server/pdf/legalPacketGenerator.ts",
+    "scripts/tests/test-library-upload.mjs"
   ],
   "EXTERNAL:events": [
-    "src/lib/server/queue/rabbitmq-manager-fixed.ts"
+    "src/lib/server/queue/rabbitmq-manager-fixed.ts",
+    "scripts/phase104-backups/src/lib/cache/loki-redis-integration.ts",
+    "scripts/phase104-backups/src/lib/polyfills/sveltekit2-universal-polyfill.ts",
+    "scripts/phase104-backups/src/lib/server/ai/legal-bert-onnx-service.ts",
+    "scripts/phase104-backups/src/lib/server/ai/streaming-service.ts",
+    "scripts/phase104-backups/src/lib/server/ingest/worker-pool.ts",
+    "scripts/phase104-backups/src/lib/server/message-queue.ts",
+    "scripts/phase104-backups/src/lib/services/comprehensive-database-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/enhanced-caching-optimizer.ts",
+    "scripts/phase104-backups/src/lib/services/instant-search-engine.ts",
+    "scripts/phase104-backups/src/lib/services/providers/ollama/streaming.ts",
+    "scripts/phase104-backups/src/lib/utils/security.ts"
   ],
   "EXTERNAL:@modelcontextprotocol/sdk/client/stdio.js": [
-    "src/lib/server/research/github-mcp.ts"
+    "src/lib/server/research/github-mcp.ts",
+    "scripts/smoke-stdio-mcp-tools.mjs"
   ],
   "EXTERNAL:youtube-transcript": [
-    "src/lib/server/retrieval/youtube-transcript.ts"
-  ],
-  "UNRESOLVED:../../../../scripts/rg-atlas/run-rg.mjs": [
-    "src/lib/server/rg-atlas/run.ts"
+    "src/lib/server/retrieval/youtube-transcript.ts",
+    "scripts/knowledge-base-builder.ts"
   ],
   "EXTERNAL:simdjson": [
     "src/lib/server/utils/json-fast.ts"
-  ],
-  "EXTERNAL:$lib/server/gpu/tensorrt-bridge.js": [
-    "src/lib/server/vector/clustering-service.ts"
   ],
   "EXTERNAL:pdf-parse/lib/pdf-parse.js": [
     "src/lib/server/workers/document-embed-consumer.ts"
@@ -4345,15 +5761,8 @@
   "EXTERNAL:piper-wasm": [
     "src/lib/services/tts.ts"
   ],
-  "UNRESOLVED:...": [
-    "src/lib/stores/admin-chat-assistant.svelte.ts",
-    "src/routes/api/codebase-index/graph/+server.ts"
-  ],
   "EXTERNAL:@tensorflow/tfjs": [
     "src/lib/types/missing-modules.d.ts"
-  ],
-  "EXTERNAL:$lib/types/server": [
-    "src/lib/types/server.d.ts"
   ],
   "EXTERNAL:svelte/action": [
     "src/lib/utils/accessibleClick.ts"
@@ -4384,17 +5793,30 @@
     "src/mcp/skill_tools.ts",
     "src/mcp/tools/legal-skills.tool.ts",
     "src/mcp/topology_mgmt_tools.ts",
-    "src/mcp/trace-mcp-server.ts"
+    "src/mcp/trace-mcp-server.ts",
+    "scripts/diagnose/probe-tools-list-by-module.mjs",
+    "scripts/smoke/smoke-mcp-tools-list-bisect.mjs"
   ],
   "EXTERNAL:node:util": [
     "src/mcp/admin_tools.ts",
     "src/mcp/codebase_tools.ts",
     "src/mcp/trace-mcp-server.ts",
-    "src/routes/api/error-brain/verify-fix/+server.ts"
+    "src/routes/api/error-brain/verify-fix/+server.ts",
+    "scripts/backup-consolidation/index.mjs",
+    "scripts/smoke/embeddinggemma-smoke.mjs",
+    "scripts/smoke/gemma4-tool-call-smoke.mjs",
+    "scripts/smoke/llama-openai-smoke.mjs",
+    "scripts/smoke/retrieval-cascade-smoke.mjs",
+    "scripts/smoke-agentic-tools.mjs",
+    "scripts/smoke-hybrid-search.mjs",
+    "scripts/smoke-postgres-fts.mjs",
+    "scripts/sync-code-retrieval-chunks.mjs"
   ],
   "EXTERNAL:node:http": [
     "src/mcp/kb-retrieval-server.ts",
-    "src/mcp/trace-mcp-server.ts"
+    "src/mcp/trace-mcp-server.ts",
+    "scripts/start-trace-mcp-cluster.mjs",
+    "scripts/topology-search-server.mjs"
   ],
   "EXTERNAL:@modelcontextprotocol/sdk/server/streamableHttp.js": [
     "src/mcp/kb-retrieval-server.ts",
@@ -4414,16 +5836,21 @@
     "src/mcp/server.ts"
   ],
   "EXTERNAL:playwright": [
-    "src/mcp/server.ts"
+    "src/mcp/server.ts",
+    "scripts/diagnostics/playwright-live-recorder.mjs",
+    "scripts/tests/screenshot-evidence-upload-flow.mjs",
+    "scripts/tests/take-report-screenshots.mjs",
+    "scripts/tests/test-reports.mjs",
+    "scripts/tests/test-screenshots.mjs"
   ],
   "EXTERNAL:form-data": [
     "src/mcp/server.ts"
   ],
-  "EXTERNAL:zod-to-json-schema": [
-    "src/mcp/zod-to-json-schema-bridge/index.js"
-  ],
   "EXTERNAL:node-fetch": [
     "src/qdrant-client.ts",
+    "scripts/graphify-authority.mjs",
+    "scripts/phase104-backups/src/lib/server/ai/mcp-context7-embedding-integration.ts",
+    "scripts/smoke-new-mcp-tools.mjs",
     "tests/scripts/verify-routes-quick.mjs"
   ],
   "UNRESOLVED:./$types": [
@@ -4637,6 +6064,8 @@
     "src/routes/api/analytics/feedback/+server.ts",
     "src/routes/api/analytics/generate-todos/+server.ts",
     "src/routes/api/analytics/health/+server.ts",
+    "src/routes/api/analytics/knowledge-triples/+server.ts",
+    "src/routes/api/analytics/knowledge-triples/prune/+server.ts",
     "src/routes/api/analytics/mapreduce-matrix/+server.ts",
     "src/routes/api/analytics/mirror-health/+server.ts",
     "src/routes/api/analytics/panel-activity/+server.ts",
@@ -5119,7 +6548,9 @@
     "src/routes/login/+page.server.ts",
     "src/routes/minio/[...path]/+server.ts",
     "src/routes/register/+page.server.ts",
-    "src/routes/register/+page.svelte"
+    "src/routes/register/+page.svelte",
+    "scripts/phase104-backups/src/routes/api/ace/summarize-clusters/+server.ts",
+    "scripts/phase104-backups/src/routes/api/codebase/apply-patch/+server.ts"
   ],
   "UNRESOLVED:./$types.js": [
     "src/routes/(app)/+layout.server.ts",
@@ -5193,8 +6624,19 @@
     "src/routes/api/system/health/+server.ts",
     "src/routes/api/system/phase78/apply-patch/+server.ts",
     "src/routes/api/system/phase78/status/+server.ts",
+    "src/routes/api/wiki/page/[id]/+server.ts",
+    "src/routes/api/wiki/refresh-directory/+server.ts",
     "src/routes/api/wiki/search/+server.ts",
-    "src/routes/api/wiki/status/+server.ts"
+    "src/routes/api/wiki/status/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/(tools)_disabled/search/+page.server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/ai/search/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/documents/process/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/phase72/suggest-fix/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/phase82/upgrade-route/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/citations/verify/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/detective/insights/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/ws/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/yorha/enhanced-rag/+server.ts"
   ],
   "EXTERNAL:sveltekit-superforms/server": [
     "src/routes/(app)/admin/document-search/+page.server.ts",
@@ -5208,18 +6650,1259 @@
     "src/routes/register/+page.server.ts"
   ],
   "EXTERNAL:node:buffer": [
-    "src/routes/(app)/evidence/+page.server.ts"
+    "src/routes/(app)/evidence/+page.server.ts",
+    "scripts/phase104-backups/src/lib/services/advanced-simd-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/comprehensive-integration.ts",
+    "scripts/phase104-backups/src/lib/services/couchdb-client.ts",
+    "scripts/phase104-backups/src/lib/services/end-to-end-pipeline.ts"
   ],
   "EXTERNAL:@babel/parser": [
-    "src/routes/api/admin/routes/+server.ts"
+    "src/routes/api/admin/routes/+server.ts",
+    "scripts/extract-enhanced-graph.mjs"
   ],
   "EXTERNAL:@babel/traverse": [
-    "src/routes/api/admin/routes/+server.ts"
+    "src/routes/api/admin/routes/+server.ts",
+    "scripts/extract-enhanced-graph.mjs"
   ],
   "EXTERNAL:$lib/services/latency-logger": [
     "src/types/webgpu-shims.d.ts"
   ],
+  "EXTERNAL:${spec}": [
+    "scripts/audit-build-risk.ts"
+  ],
+  "EXTERNAL:fast-check": [
+    "scripts/backup-consolidation/tests/comparison-engine.test.mjs",
+    "scripts/backup-consolidation/tests/pattern-matching.test.mjs",
+    "scripts/backup-consolidation/tests/scan-resilience.test.mjs",
+    "scripts/phase104-backups/src/lib/server/ai/qdrant-vector-store.ts",
+    "scripts/phase104-backups/src/lib/server/services/adaptive-index-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/server/services/user-recommendation-service.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/validation-service.ts",
+    "scripts/phase104-backups/src/lib/services/error-handler.ts",
+    "scripts/phase104-backups/src/lib/services/error-pattern-rag.ts",
+    "scripts/phase104-backups/src/lib/services/error-resolution-engine.ts",
+    "scripts/phase104-backups/src/lib/services/gemma-embedding.ts",
+    "scripts/phase104-backups/src/lib/services/glyph-diffusion-service.ts",
+    "scripts/phase104-backups/src/lib/services/go-microservices-client.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-som-embeddings.ts",
+    "scripts/phase104-backups/src/lib/services/keyboard-shortcuts-service.ts",
+    "scripts/phase104-backups/src/lib/services/legal-ai-integration.ts",
+    "scripts/phase104-backups/src/lib/services/logging-aggregation-service.ts",
+    "scripts/phase104-backups/src/lib/services/mcp-gpu-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/minio-upload-service.ts",
+    "scripts/phase104-backups/src/lib/services/multi-embedding-vector-service.ts",
+    "scripts/phase104-backups/src/lib/services/neo4jGraphService.ts",
+    "scripts/phase104-backups/src/lib/services/postgresql-vector-service.ts",
+    "scripts/phase104-backups/src/lib/services/production-monitoring-dashboard.ts",
+    "scripts/phase104-backups/src/lib/services/quic-tensor-client.ts",
+    "scripts/phase104-backups/src/lib/services/rag-pipeline-integrator.ts",
+    "scripts/phase104-backups/src/lib/services/real-vector-search-service.ts",
+    "scripts/phase104-backups/src/lib/services/semantic-search.ts",
+    "scripts/phase104-backups/src/lib/services/simd-json-acceleration.ts",
+    "scripts/phase104-backups/src/lib/services/types/service-types.ts",
+    "scripts/phase104-backups/src/lib/services/unified-inference-integration.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-orchestration-service.ts",
+    "scripts/phase104-backups/src/lib/services/unified-wasm-gpu-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/upload-telemetry-service.ts",
+    "scripts/phase104-backups/src/lib/services/webgpu-som-error-fixer.ts",
+    "tests/phase76-acp-tools.property.test.ts",
+    "tests/setup.ts"
+  ],
+  "EXTERNAL:node:worker_threads": [
+    "scripts/build-bow-tiles.mjs",
+    "scripts/mapreduce/map-worker.mjs",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/wiki/run-mapreduce-pipeline.mjs"
+  ],
+  "UNRESOLVED:../src/lib/services/couchdb-client.js": [
+    "scripts/cluster-summarize.ts"
+  ],
+  "EXTERNAL:tsx/esm/api": [
+    "scripts/comfyui/smoke-comfyui-client.mjs",
+    "scripts/comfyui/submit-workflow-smoke.mjs",
+    "scripts/reconstruction/compile-demo-scene.mjs",
+    "scripts/reconstruction/emit-aesthetic-preset.mjs",
+    "scripts/smoke/smoke-browser-context-sanitizer.mjs",
+    "scripts/smoke/smoke-mcp-tools-list-bisect.mjs"
+  ],
+  "EXTERNAL:node:net": [
+    "scripts/dev-everything.mjs",
+    "scripts/tests/smoke-fast-ast-ace.mjs",
+    "scripts/tests/smoke-graphify.mjs",
+    "scripts/tests/smoke-kag-note-roundtrip.mjs",
+    "scripts/tests/test-research-chat-runtime-smoke.mjs"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk/server/zod-compat.js": [
+    "scripts/diagnose/probe-tools-list-by-module.mjs"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk/server/zod-json-schema-compat.js": [
+    "scripts/diagnose/probe-tools-list-by-module.mjs"
+  ],
+  "UNRESOLVED:../src/lib/services/get-ollama-endpoint": [
+    "scripts/diagnostics/log-ollama-response.ts"
+  ],
+  "UNRESOLVED:../src/lib/error-brain/analyze/ingest.js": [
+    "scripts/error-brain-fix.ts",
+    "scripts/test-error-brain-simple.ts"
+  ],
+  "UNRESOLVED:../src/lib/error-brain/analyze/propose.js": [
+    "scripts/error-brain-fix.ts",
+    "scripts/test-error-brain-simple.ts"
+  ],
+  "UNRESOLVED:../src/lib/error-brain/config.js": [
+    "scripts/error-brain-fix.ts"
+  ],
+  "UNRESOLVED:../src/lib/error-brain/diff/apply.js": [
+    "scripts/error-brain-fix.ts"
+  ],
+  "UNRESOLVED:../src/lib/error-brain/report-writer.js": [
+    "scripts/error-brain-fix.ts"
+  ],
+  "UNRESOLVED:../src/lib/error-brain/run-id.js": [
+    "scripts/error-brain-fix.ts"
+  ],
+  "EXTERNAL:xml2js": [
+    "scripts/extract-enhanced-graph.mjs",
+    "scripts/parse-uscode.ts"
+  ],
+  "EXTERNAL:axios": [
+    "scripts/fetch-uscode.ts"
+  ],
+  "EXTERNAL:$lib/server/cache/redis": [
+    "scripts/fix-queue-worker.cjs",
+    "scripts/phase104-backups/src/lib/server/ai/legal-bert-onnx-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/neo4j-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/unified-search-service.ts",
+    "scripts/phase104-backups/src/lib/services/advanced-simd-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/end-to-end-pipeline.ts",
+    "scripts/phase104-backups/src/lib/workers/comprehensive-worker.ts",
+    "scripts/phase104-backups/src/lib/workers/queue-worker.ts"
+  ],
+  "EXTERNAL:$lib/stores/global-loki": [
+    "scripts/fix-queue-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/queue-worker.ts"
+  ],
+  "EXTERNAL:$lib/server/embedding-gateway": [
+    "scripts/fix-queue-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/queue-worker.ts"
+  ],
+  "EXTERNAL:$lib/workers/job-state": [
+    "scripts/fix-queue-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/queue-worker.ts"
+  ],
+  "UNRESOLVED:../services/rabbitmq-connection.js": [
+    "scripts/fix-rabbitmq-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts"
+  ],
+  "UNRESOLVED:../config/rabbitmq-config.js": [
+    "scripts/fix-rabbitmq-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts"
+  ],
+  "UNRESOLVED:../services/embedding-service.js": [
+    "scripts/fix-rabbitmq-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts"
+  ],
+  "UNRESOLVED:../server/db/unified-client.js": [
+    "scripts/fix-rabbitmq-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts"
+  ],
+  "UNRESOLVED:../server/schema/documents.js": [
+    "scripts/fix-rabbitmq-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts"
+  ],
+  "UNRESOLVED:../server/redis.js": [
+    "scripts/fix-rabbitmq-worker.cjs",
+    "scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts"
+  ],
+  "EXTERNAL:${importPath}": [
+    "scripts/generate-route-test-stubs.mjs"
+  ],
+  "UNRESOLVED:../src/lib/server/utils/simdjson-bridge.js": [
+    "scripts/graphify-svg-architecture.mjs"
+  ],
+  "EXTERNAL:http": [
+    "scripts/hypergraph-lookup-server.mjs",
+    "scripts/phase104-backups/src/lib/services/aiAutoTagging.ts",
+    "scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts",
+    "scripts/phase104-backups/src/lib/services/go-microservice-client.ts",
+    "scripts/phase104-backups/src/lib/services/rag-pipeline-integrator.ts",
+    "scripts/phase104-backups/src/lib/services/yorha-detective-service.ts"
+  ],
+  "EXTERNAL:@langchain/textsplitters": [
+    "scripts/index-lawpdfs-to-rag.ts",
+    "scripts/index-legal-pdfs.ts",
+    "scripts/ingest-govinfo-federal.ts"
+  ],
+  "UNRESOLVED:../src/lib/server/services/embedding-service": [
+    "scripts/ingest-uscode.ts"
+  ],
+  "EXTERNAL:node:process": [
+    "scripts/karpathy-gpu-enrich.mjs",
+    "scripts/phase104-backups/src/lib/services/api-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/chr-rom-precomputation-service.ts",
+    "scripts/phase104-backups/src/lib/services/complete-gpu-error-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/couchdb-client.ts",
+    "scripts/phase104-backups/src/lib/services/cross-encoder-reranker.ts",
+    "scripts/phase104-backups/src/lib/services/documentUpdateLoop.ts",
+    "scripts/phase104-backups/src/lib/services/end-to-end-pipeline.ts",
+    "scripts/tests/test-cache-benchmark.mjs",
+    "scripts/tests/test-cache-stack.mjs",
+    "scripts/tests/test-research-chat-runtime-smoke.mjs",
+    "scripts/topology-search-server.mjs"
+  ],
+  "EXTERNAL:node:perf_hooks": [
+    "scripts/kb/generate-module-cartridges.mjs"
+  ],
+  "EXTERNAL:node:timers/promises": [
+    "scripts/kb/run-embedding-jobs.mjs"
+  ],
+  "EXTERNAL:@typescript-eslint/typescript-estree": [
+    "scripts/lib/phase89-adaptive-chunker.mjs"
+  ],
+  "EXTERNAL:ollama": [
+    "scripts/lib/phase89-embed.mjs"
+  ],
+  "EXTERNAL:@svelte/element": [
+    "scripts/mcp/svelte5-migration-tools.mjs"
+  ],
+  "EXTERNAL:canvas": [
+    "scripts/mcp/svelte5-migration-tools.mjs",
+    "scripts/phase104-backups/src/lib/services/gpu-cluster-acceleration.ts"
+  ],
+  "EXTERNAL:adm-zip": [
+    "scripts/parse-uscode.ts"
+  ],
+  "EXTERNAL:$lib/services/ollamaService.js": [
+    "scripts/phase104-backups/src/ai-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/ai-service.ts"
+  ],
+  "UNRESOLVED:../db/schema-postgres.js": [
+    "scripts/phase104-backups/src/ai-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-ingestion-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-prefetch-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/user-recommendation-service.ts",
+    "scripts/phase104-backups/src/lib/services/ai-service.ts"
+  ],
+  "UNRESOLVED:../database/index.js": [
+    "scripts/phase104-backups/src/ai-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/ai-service.ts"
+  ],
+  "UNRESOLVED:./svelte-check-analyzer.js": [
+    "scripts/phase104-backups/src/lib/ast/error-vectorizer.ts"
+  ],
+  "EXTERNAL:$lib/wasm/simd-json-wrapper": [
+    "scripts/phase104-backups/src/lib/cache/chr-rom-pattern-cache.ts"
+  ],
+  "UNRESOLVED:./parallel-cache-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/cache/glyph-shader-cache-bridge.ts"
+  ],
+  "UNRESOLVED:../ai/som-neural-network.js": [
+    "scripts/phase104-backups/src/lib/caching/multi-dimensional-image-cache.ts"
+  ],
+  "UNRESOLVED:../ai/graph-pattern-autoencoder.js": [
+    "scripts/phase104-backups/src/lib/caching/multi-dimensional-image-cache.ts"
+  ],
+  "UNRESOLVED:../gpu/nes-gpu-memory-bridge.js": [
+    "scripts/phase104-backups/src/lib/caching/multi-dimensional-image-cache.ts",
+    "scripts/phase104-backups/src/lib/wasm/ultra-json-parser.ts"
+  ],
+  "UNRESOLVED:./phase72/command-center-restructure-tasks.js": [
+    "scripts/phase104-backups/src/lib/command-center-manifest.ts"
+  ],
+  "EXTERNAL:$lib/gpu/legal-texture-pipeline": [
+    "scripts/phase104-backups/src/lib/components/headless/texture-streaming.svelte.ts"
+  ],
+  "UNRESOLVED:../server/db/schema-postgres.js": [
+    "scripts/phase104-backups/src/lib/data/types.ts"
+  ],
+  "EXTERNAL:svelte/store": [
+    "scripts/phase104-backups/src/lib/db/client-db.ts",
+    "scripts/phase104-backups/src/lib/detective-mode/comprehensive-integration.ts",
+    "scripts/phase104-backups/src/lib/logic/Report.ts",
+    "scripts/phase104-backups/src/lib/machines/legalAIMachine.ts",
+    "scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/optimization/context7-mcp-integration.ts",
+    "scripts/phase104-backups/src/lib/orchestration/master-cognitive-hub.ts",
+    "scripts/phase104-backups/src/lib/services/chr-rom-precomputation-service.ts",
+    "scripts/phase104-backups/src/lib/services/comprehensive-integration.ts",
+    "scripts/phase104-backups/src/lib/services/context7-mcp-integration.ts",
+    "scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts",
+    "scripts/phase104-backups/src/lib/services/contextual-memory-chat-service.ts",
+    "scripts/phase104-backups/src/lib/services/error-resolution-engine.ts",
+    "scripts/phase104-backups/src/lib/services/go-microservice-client.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-cluster-acceleration.ts",
+    "scripts/phase104-backups/src/lib/services/keyboard-shortcuts-service.ts",
+    "scripts/phase104-backups/src/lib/services/knowledge-search/RedisCacheService.ts",
+    "scripts/phase104-backups/src/lib/services/logging-aggregation-service.ts",
+    "scripts/phase104-backups/src/lib/services/minio-upload-service.ts",
+    "scripts/phase104-backups/src/lib/services/neo4jGraphService.ts",
+    "scripts/phase104-backups/src/lib/services/nomic-embedding-service.ts",
+    "scripts/phase104-backups/src/lib/services/production-pipeline-integration.ts",
+    "scripts/phase104-backups/src/lib/services/quic-client.ts",
+    "scripts/phase104-backups/src/lib/services/real-vector-search-service.ts",
+    "scripts/phase104-backups/src/lib/services/recommendation-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/types/service-types.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-orchestration-service.ts",
+    "scripts/phase104-backups/src/lib/services/unified-wasm-gpu-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/user-analytics-rl-integration.ts",
+    "scripts/phase104-backups/src/lib/state/phase13StateMachine.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/ai-agent.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/barrel-store-manager.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/component-adapter-store.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-platform-integration.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-reports.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/lokiStore.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/vector-search.ts"
+  ],
+  "UNRESOLVED:../pool.js": [
+    "scripts/phase104-backups/src/lib/db/queries/nes-command-center-archive.ts"
+  ],
+  "EXTERNAL:$lib/types/legal-types": [
+    "scripts/phase104-backups/src/lib/embedding/client-embedding-generator.ts",
+    "scripts/phase104-backups/src/lib/services/ollama-service.ts"
+  ],
+  "UNRESOLVED:../services/context7-multicore.js": [
+    "scripts/phase104-backups/src/lib/integrations/comprehensive-agent-orchestration.ts",
+    "scripts/phase104-backups/src/lib/integrations/full-stack-workflow.ts",
+    "scripts/phase104-backups/src/lib/integrations/revolutionary-multicore-bridge.ts"
+  ],
+  "UNRESOLVED:./context7-multicore.js": [
+    "scripts/phase104-backups/src/lib/integrations/flashattention-multicore-bridge.ts"
+  ],
+  "EXTERNAL:$lib/services/flashattention2-rtx3060.js": [
+    "scripts/phase104-backups/src/lib/integrations/flashattention-multicore-bridge.ts"
+  ],
+  "EXTERNAL:function Object() { [native code] }": [
+    "scripts/phase104-backups/src/lib/integrations/flashattention-multicore-bridge.ts",
+    "scripts/phase104-backups/src/lib/middleware/binary-encoding.ts",
+    "scripts/phase104-backups/src/lib/services/glyph-diffusion-service.ts",
+    "scripts/phase104-backups/src/lib/services/mcp-gpu-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/simd/simd-json-worker-client.js": [
+    "scripts/phase104-backups/src/lib/integrations/redis-webgpu-simd-integration.ts"
+  ],
+  "EXTERNAL:$lib/orchestration/optimized-rabbitmq-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/integrations/redis-webgpu-simd-integration.ts"
+  ],
+  "UNRESOLVED:../services/enhanced-caching-revolutionary-bridge.js": [
+    "scripts/phase104-backups/src/lib/integrations/revolutionary-multicore-bridge.ts"
+  ],
+  "UNRESOLVED:../services/flashattention2-rtx3060.js": [
+    "scripts/phase104-backups/src/lib/integrations/revolutionary-multicore-bridge.ts"
+  ],
+  "UNRESOLVED:../services/revolutionary-ai-integration.js": [
+    "scripts/phase104-backups/src/lib/integrations/revolutionary-multicore-bridge.ts"
+  ],
+  "EXTERNAL:simdjson-node": [
+    "scripts/phase104-backups/src/lib/json/fastjson.ts"
+  ],
+  "UNRESOLVED:../utils/ultra-json-parser.js": [
+    "scripts/phase104-backups/src/lib/json/fastjson.ts"
+  ],
+  "UNRESOLVED:../services/case-memory-engine.js": [
+    "scripts/phase104-backups/src/lib/machines/case-workflow-machine.ts"
+  ],
+  "UNRESOLVED:../services/unified-legal-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/machines/case-workflow-machine.ts"
+  ],
+  "EXTERNAL:$lib/ai/topology-predictive-analytics-engine.js": [
+    "scripts/phase104-backups/src/lib/machines/predictive-typing-machine.ts"
+  ],
+  "EXTERNAL:$lib/ai/enhanced-rag-glyph-system.js": [
+    "scripts/phase104-backups/src/lib/machines/predictive-typing-machine.ts"
+  ],
+  "EXTERNAL:cbor": [
+    "scripts/phase104-backups/src/lib/middleware/binary-encoding.ts"
+  ],
+  "EXTERNAL:@msgpack/msgpack": [
+    "scripts/phase104-backups/src/lib/middleware/binary-encoding.ts"
+  ],
+  "UNRESOLVED:../cache/headless-ui-cache.js": [
+    "scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts"
+  ],
+  "UNRESOLVED:../webgpu/webgpu-rag-service.js": [
+    "scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/orchestration/master-cognitive-hub.ts"
+  ],
+  "UNRESOLVED:../ai/enhanced-neo4j-reranker.js": [
+    "scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts"
+  ],
+  "UNRESOLVED:../gpu/universal-runtime.js": [
+    "scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/wasm/qlora-wasm-loader": [
+    "scripts/phase104-backups/src/lib/orchestration/autoencoder-context-switcher.ts"
+  ],
+  "UNRESOLVED:./qlora-ollama-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/orchestration/autoencoder-context-switcher.ts"
+  ],
+  "EXTERNAL:$lib/services/predictive-asset-engine": [
+    "scripts/phase104-backups/src/lib/orchestration/autoencoder-context-switcher.ts"
+  ],
+  "UNRESOLVED:../services/qlora-rl-langextract-integration.js": [
+    "scripts/phase104-backups/src/lib/orchestration/complete-legal-ai-orchestrator.ts"
+  ],
+  "UNRESOLVED:../services/unified-vector-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/orchestration/complete-legal-ai-orchestrator.ts"
+  ],
+  "UNRESOLVED:../memory/nes-memory-architecture.js": [
+    "scripts/phase104-backups/src/lib/orchestration/complete-legal-ai-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/wasm/ultra-json-parser.ts"
+  ],
+  "UNRESOLVED:../webgpu/som-webgpu-cache.js": [
+    "scripts/phase104-backups/src/lib/orchestration/complete-legal-ai-orchestrator.ts"
+  ],
+  "UNRESOLVED:./cognitive-routing-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/orchestration/master-cognitive-hub.ts"
+  ],
+  "UNRESOLVED:../caching/reinforcement-learning-cache.js": [
+    "scripts/phase104-backups/src/lib/orchestration/master-cognitive-hub.ts"
+  ],
+  "UNRESOLVED:../routing/multidimensional-routing-matrix.js": [
+    "scripts/phase104-backups/src/lib/orchestration/master-cognitive-hub.ts"
+  ],
+  "UNRESOLVED:../gpu/physics-aware-gpu-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/orchestration/master-cognitive-hub.ts"
+  ],
+  "EXTERNAL:$lib/wasm/llvm-wasm-bridge": [
+    "scripts/phase104-backups/src/lib/polyfills/sveltekit2-universal-polyfill.ts"
+  ],
+  "EXTERNAL:$lib/cache/loki-redis-integration": [
+    "scripts/phase104-backups/src/lib/polyfills/sveltekit2-universal-polyfill.ts",
+    "scripts/phase104-backups/src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts"
+  ],
+  "EXTERNAL:$lib/types/wasm-types": [
+    "scripts/phase104-backups/src/lib/polyfills/sveltekit2-universal-polyfill.ts"
+  ],
+  "UNRESOLVED:./dynamic-route-generator.js": [
+    "scripts/phase104-backups/src/lib/routing/index.ts",
+    "scripts/phase104-backups/src/lib/routing/route-guards.ts"
+  ],
+  "UNRESOLVED:./route-registry.js": [
+    "scripts/phase104-backups/src/lib/routing/index.ts"
+  ],
+  "UNRESOLVED:./dynamic-navigation.js": [
+    "scripts/phase104-backups/src/lib/routing/index.ts"
+  ],
+  "EXTERNAL:$lib/data/routes-config": [
+    "scripts/phase104-backups/src/lib/routing/route-guards.ts"
+  ],
+  "EXTERNAL:drizzle-orm/gel-core": [
+    "scripts/phase104-backups/src/lib/server/ai/config.ts",
+    "scripts/phase104-backups/src/lib/server/ai/legal-bert-onnx-service.ts",
+    "scripts/phase104-backups/src/lib/server/ai/orchestrator-test.ts",
+    "scripts/phase104-backups/src/lib/server/ai/qdrant-vector-store.ts",
+    "scripts/phase104-backups/src/lib/server/ai/types.ts",
+    "scripts/phase104-backups/src/lib/server/db/vector-operations.ts",
+    "scripts/phase104-backups/src/lib/server/monitoring/logger.ts",
+    "scripts/phase104-backups/src/lib/server/rag/cache-old.ts",
+    "scripts/phase104-backups/src/lib/server/services/adaptive-index-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/ai-evidence-analyzer.ts",
+    "scripts/phase104-backups/src/lib/services/ai-worker-manager.ts",
+    "scripts/phase104-backups/src/lib/services/complete-gpu-error-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/crud-client.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/diffs/RedisCache.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/error-brain-api.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/validation-service.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/mcp-gpu-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/minio-upload-service.ts",
+    "scripts/phase104-backups/src/lib/services/upload-telemetry-service.ts"
+  ],
+  "EXTERNAL:process": [
+    "scripts/phase104-backups/src/lib/server/ai/config.ts",
+    "scripts/phase104-backups/src/lib/server/auth/utils.ts",
+    "scripts/phase104-backups/src/lib/server/cases/caseSynthesis.ts",
+    "scripts/phase104-backups/src/lib/server/db/mirror-query.ts",
+    "scripts/phase104-backups/src/lib/server/db/qdrant-sync.ts",
+    "scripts/phase104-backups/src/lib/server/db/vector-operations.ts",
+    "scripts/phase104-backups/src/lib/server/services/adaptive-index-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/cross-encoder-reranker.ts",
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts",
+    "scripts/phase104-backups/src/lib/services/rag-pipeline-integrator.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts"
+  ],
+  "UNRESOLVED:./hmm-state-machine.js": [
+    "scripts/phase104-backups/src/lib/server/ai/contextual-understanding-service.ts"
+  ],
+  "EXTERNAL:stream/consumers": [
+    "scripts/phase104-backups/src/lib/server/ai/contextual-understanding-service.ts",
+    "scripts/phase104-backups/src/lib/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/aiAutoTagging.ts",
+    "scripts/phase104-backups/src/lib/services/cross-encoder-reranker.ts",
+    "scripts/phase104-backups/src/lib/services/glyph-diffusion-service.ts",
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts",
+    "scripts/phase104-backups/src/lib/services/postgresql-vector-service.ts",
+    "scripts/phase104-backups/src/lib/services/real-vector-search-service.ts"
+  ],
+  "EXTERNAL:node: buffer": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/server/ai/som-bitmap-visualizer.ts"
+  ],
+  "EXTERNAL:node: crypto": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/server/ai/som-bitmap-visualizer.ts"
+  ],
+  "UNRESOLVED:../logger.js": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/services/xstate-integration": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/services/mcp-registry": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts"
+  ],
+  "UNRESOLVED:./hmm-transition-predictor.js": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts"
+  ],
+  "UNRESOLVED:./cluster-stream.js": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts"
+  ],
+  "UNRESOLVED:./cluster-service.js": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts"
+  ],
+  "UNRESOLVED:./endpoints.js": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/server/queue/rabbitmq-workers": [
+    "scripts/phase104-backups/src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts"
+  ],
+  "UNRESOLVED:../logger": [
+    "scripts/phase104-backups/src/lib/server/ai/feedback-loop.ts",
+    "scripts/phase104-backups/src/lib/server/ai/llm-orchestrator-bridge.ts",
+    "scripts/phase104-backups/src/lib/server/ai/streaming-service.ts"
+  ],
+  "UNRESOLVED:./gemma-embedding-service.js": [
+    "scripts/phase104-backups/src/lib/server/ai/mcp-context7-embedding-integration.ts"
+  ],
+  "EXTERNAL:console": [
+    "scripts/phase104-backups/src/lib/server/ai/orchestrator-test.ts",
+    "scripts/phase104-backups/src/lib/server/search/vector-search.ts",
+    "scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts",
+    "scripts/phase104-backups/src/lib/services/gemma-embedding.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/mcp-gpu-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/production-pipeline-integration.ts",
+    "scripts/phase104-backups/src/lib/services/real-vector-search-service.ts",
+    "scripts/phase104-backups/src/lib/services/webgpu-som-error-fixer.ts"
+  ],
+  "EXTERNAL:drizzle-orm/postgres-js/driver": [
+    "scripts/phase104-backups/src/lib/server/ai/pgvector-indexing-service.ts",
+    "scripts/phase104-backups/src/pgvector-indexing-service.ts"
+  ],
+  "EXTERNAL:$lib/services/enhanced-rag-pagerank": [
+    "scripts/phase104-backups/src/lib/server/ai/qdrant-vector-store.ts"
+  ],
+  "EXTERNAL:$lib/services/nodejs-orchestrator": [
+    "scripts/phase104-backups/src/lib/server/ai/qdrant-vector-store.ts"
+  ],
+  "EXTERNAL:minimatch": [
+    "scripts/phase104-backups/src/lib/server/ai/qdrant-vector-store.ts"
+  ],
+  "EXTERNAL:$lib/machines/legalAIMachine.v5": [
+    "scripts/phase104-backups/src/lib/server/ai/streaming-service.ts"
+  ],
+  "EXTERNAL:jsonwebtoken": [
+    "scripts/phase104-backups/src/lib/server/authUtils.ts"
+  ],
+  "EXTERNAL:$lib/services/qlora-rl-langextract-integration": [
+    "scripts/phase104-backups/src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts"
+  ],
+  "UNRESOLVED:../../memory/nes-memory-architecture.js": [
+    "scripts/phase104-backups/src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts"
+  ],
+  "UNRESOLVED:../../webgpu/som-webgpu-cache.js": [
+    "scripts/phase104-backups/src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts"
+  ],
+  "EXTERNAL:$lib/database/connection": [
+    "scripts/phase104-backups/src/lib/server/concurrency/advisory-locks.ts"
+  ],
+  "UNRESOLVED:./api-ssr-helpers.js": [
+    "scripts/phase104-backups/src/lib/server/database-api-bridge.ts"
+  ],
+  "UNRESOLVED:./couchdb": [
+    "scripts/phase104-backups/src/lib/server/db/mirror-query.ts"
+  ],
+  "UNRESOLVED:./postgres-knowledge": [
+    "scripts/phase104-backups/src/lib/server/db/mirror-query.ts",
+    "scripts/phase104-backups/src/lib/server/db/qdrant-sync.ts"
+  ],
+  "UNRESOLVED:./client.ts": [
+    "scripts/phase104-backups/src/lib/server/db/vector-operations.ts"
+  ],
+  "UNRESOLVED:./schema-postgres.ts": [
+    "scripts/phase104-backups/src/lib/server/db/vector-operations.ts"
+  ],
+  "EXTERNAL:node:os": [
+    "scripts/phase104-backups/src/lib/server/docling.ts",
+    "scripts/run-mapreduce-full.mjs",
+    "scripts/smoke-feature-map-integrity.mjs",
+    "scripts/start-dev-stack.mjs",
+    "scripts/start-trace-mcp-cluster.mjs",
+    "tests/agents-regen-loaders.spec.ts",
+    "tests/feature-map.integrity.spec.ts",
+    "tests/relation-extractor.spec.ts"
+  ],
+  "EXTERNAL:$lib/server/ibm-vision": [
+    "scripts/phase104-backups/src/lib/server/document-processor.ts"
+  ],
+  "EXTERNAL:$lib/server/onnx": [
+    "scripts/phase104-backups/src/lib/server/document-processor.ts"
+  ],
+  "UNRESOLVED:./ollama-service": [
+    "scripts/phase104-backups/src/lib/server/gemma3-vlm-embedder.ts"
+  ],
+  "UNRESOLVED:../services/rabbitmq-service.js": [
+    "scripts/phase104-backups/src/lib/server/index.ts"
+  ],
+  "UNRESOLVED:./minio.js": [
+    "scripts/phase104-backups/src/lib/server/ingest/ingest-worker.ts"
+  ],
+  "UNRESOLVED:./extractors.js": [
+    "scripts/phase104-backups/src/lib/server/ingest/ingest-worker.ts"
+  ],
+  "UNRESOLVED:./embed.js": [
+    "scripts/phase104-backups/src/lib/server/ingest/ingest-worker.ts"
+  ],
+  "UNRESOLVED:../db/client.js": [
+    "scripts/phase104-backups/src/lib/server/ingest/ingest-worker.ts"
+  ],
+  "UNRESOLVED:../db/unified-schema.js": [
+    "scripts/phase104-backups/src/lib/server/ingest/ingest-worker.ts"
+  ],
+  "EXTERNAL:$lib/server/services/embedding-service": [
+    "scripts/phase104-backups/src/lib/server/ingest/worker-pool.ts",
+    "scripts/phase104-backups/src/lib/services/real-vector-search-service.ts"
+  ],
+  "UNRESOLVED:./ollama-service.js": [
+    "scripts/phase104-backups/src/lib/server/keyword-extractor.ts",
+    "scripts/phase104-backups/src/lib/server/vlm-document-analyzer.ts"
+  ],
+  "UNRESOLVED:../services/CaseRankingService.js": [
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts"
+  ],
+  "UNRESOLVED:../ai/cache.js": [
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts"
+  ],
+  "UNRESOLVED:./index.js": [
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts"
+  ],
+  "EXTERNAL:$lib/types/scoring": [
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts"
+  ],
+  "EXTERNAL:$lib/server/utils/env": [
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts"
+  ],
+  "EXTERNAL:inspector": [
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts"
+  ],
+  "EXTERNAL:vitest/dist/chunks/suite.d.FvehnV49.js": [
+    "scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts",
+    "scripts/phase104-backups/src/lib/services/glyph-diffusion-service.ts",
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts",
+    "scripts/phase104-backups/src/lib/services/mcp-gpu-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/vector-service.ts"
+  ],
+  "UNRESOLVED:../redis.js": [
+    "scripts/phase104-backups/src/lib/server/rag/cache-old.ts"
+  ],
+  "UNRESOLVED:./embedding-service": [
+    "scripts/phase104-backups/src/lib/server/rag-query.ts"
+  ],
+  "UNRESOLVED:./db.js": [
+    "scripts/phase104-backups/src/lib/server/rag-sync.ts"
+  ],
+  "UNRESOLVED:./embedding-service.js": [
+    "scripts/phase104-backups/src/lib/server/rag-sync.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-ingestion-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-prefetch-service.ts"
+  ],
+  "UNRESOLVED:./rag/qdrant.js": [
+    "scripts/phase104-backups/src/lib/server/rag-sync.ts"
+  ],
+  "UNRESOLVED:./rag/tag-extractor.js": [
+    "scripts/phase104-backups/src/lib/server/rag-sync.ts"
+  ],
+  "UNRESOLVED:./rag/tag-persist.js": [
+    "scripts/phase104-backups/src/lib/server/rag-sync.ts"
+  ],
+  "UNRESOLVED:./ai-analytics-service.js": [
+    "scripts/phase104-backups/src/lib/server/services/adaptive-index-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/api/production-service-client": [
+    "scripts/phase104-backups/src/lib/server/services/adaptive-index-orchestrator.ts",
+    "scripts/phase104-backups/src/routes_parked/(tools)_disabled/search/+page.server.ts"
+  ],
+  "EXTERNAL:@opentelemetry/api": [
+    "scripts/phase104-backups/src/lib/server/services/adaptive-index-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/context7-mcp-integration.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts"
+  ],
+  "UNRESOLVED:./audit.service.js": [
+    "scripts/phase104-backups/src/lib/server/services/citation-library.service.ts"
+  ],
+  "UNRESOLVED:./xstate-machine.js": [
+    "scripts/phase104-backups/src/lib/server/services/clustering/orchestrator.ts"
+  ],
+  "UNRESOLVED:../persistence/redis-state.js": [
+    "scripts/phase104-backups/src/lib/server/services/clustering/orchestrator.ts"
+  ],
+  "UNRESOLVED:../production-logger.js": [
+    "scripts/phase104-backups/src/lib/server/services/conversation-service.ts",
+    "scripts/phase104-backups/src/lib/server/vector/qdrant-optimized.ts"
+  ],
+  "EXTERNAL:$lib/server/database/redis-client": [
+    "scripts/phase104-backups/src/lib/server/services/conversation-service.ts"
+  ],
+  "EXTERNAL:$env /dynamic/private": [
+    "scripts/phase104-backups/src/lib/server/services/neo4j-client.ts",
+    "scripts/phase104-backups/src/lib/services/tensorrt-llm-service.ts"
+  ],
+  "EXTERNAL:$lib/services/job-tracker": [
+    "scripts/phase104-backups/src/lib/server/services/neo4j-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/unified-search-service.ts"
+  ],
+  "EXTERNAL:$env /static/private": [
+    "scripts/phase104-backups/src/lib/server/services/qdrant-service.ts"
+  ],
+  "UNRESOLVED:./error-handler.service.js": [
+    "scripts/phase104-backups/src/lib/server/services/recovery.service.ts"
+  ],
+  "UNRESOLVED:./pgvector-search.js": [
+    "scripts/phase104-backups/src/lib/server/services/search/search-orchestrator.ts"
+  ],
+  "UNRESOLVED:./elasticsearch-search.js": [
+    "scripts/phase104-backups/src/lib/server/services/search/search-orchestrator.ts"
+  ],
+  "UNRESOLVED:../db/index.js": [
+    "scripts/phase104-backups/src/lib/server/services/statute-ingestion-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/statute-prefetch-service.ts",
+    "scripts/phase104-backups/src/lib/server/services/user-recommendation-service.ts"
+  ],
+  "UNRESOLVED:./rag.service.js": [
+    "scripts/phase104-backups/src/lib/server/services/statute-search.service.ts"
+  ],
+  "UNRESOLVED:./graph.service.js": [
+    "scripts/phase104-backups/src/lib/server/services/statute-search.service.ts"
+  ],
+  "UNRESOLVED:../minio.js": [
+    "scripts/phase104-backups/src/lib/server/services/statute-storage-service.ts"
+  ],
+  "UNRESOLVED:../db/drizzle.js": [
+    "scripts/phase104-backups/src/lib/server/services/unified-vector-service.ts"
+  ],
+  "EXTERNAL:$lib/shims/pg-compat": [
+    "scripts/phase104-backups/src/lib/server/thread-safe-postgres.ts"
+  ],
+  "UNRESOLVED:../services/cognitive-cache-integration.js": [
+    "scripts/phase104-backups/src/lib/server/thread-safe-postgres.ts"
+  ],
+  "EXTERNAL:$lib/server/redis-client": [
+    "scripts/phase104-backups/src/lib/server/vector/EnhancedVectorService.ts",
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/tensorrt-llm-service.ts"
+  ],
+  "UNRESOLVED:../ai/embeddings-simple.js": [
+    "scripts/phase104-backups/src/lib/server/vector/qdrant-optimized.ts"
+  ],
+  "UNRESOLVED:./embedding-cache-middleware.js": [
+    "scripts/phase104-backups/src/lib/server/webgpu-langchain-bridge.ts",
+    "scripts/phase104-backups/src/webgpu-langchain-bridge.ts"
+  ],
+  "UNRESOLVED:./webgpu-redis-optimizer.js": [
+    "scripts/phase104-backups/src/lib/server/webgpu-langchain-bridge.ts",
+    "scripts/phase104-backups/src/webgpu-langchain-bridge.ts"
+  ],
+  "EXTERNAL:$lib/services/langextract-ollama-service.js": [
+    "scripts/phase104-backups/src/lib/server/webgpu-langchain-bridge.ts",
+    "scripts/phase104-backups/src/webgpu-langchain-bridge.ts"
+  ],
+  "EXTERNAL:$lib/services/nodejs-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/server/webgpu-langchain-bridge.ts"
+  ],
+  "EXTERNAL:bullmq": [
+    "scripts/phase104-backups/src/lib/server/workers/citation-extraction.worker.ts"
+  ],
+  "EXTERNAL:$lib/server/services/citation.service": [
+    "scripts/phase104-backups/src/lib/server/workers/citation-extraction.worker.ts"
+  ],
+  "EXTERNAL:$lib/server/services/audit.service": [
+    "scripts/phase104-backups/src/lib/server/workers/citation-extraction.worker.ts"
+  ],
+  "EXTERNAL:$lib/machines/ingestion-workflow-machine.js": [
+    "scripts/phase104-backups/src/lib/server/workflows/ingestion-service.ts"
+  ],
+  "EXTERNAL:$lib/services/job-tracker.js": [
+    "scripts/phase104-backups/src/lib/server/workflows/ingestion-service.ts"
+  ],
+  "EXTERNAL:$lib/db": [
+    "scripts/phase104-backups/src/lib/services/ace-web/ace-context-service.ts",
+    "scripts/phase104-backups/src/lib/services/caseService.ts",
+    "scripts/phase104-backups/src/lib/services/real-ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/vector-service.ts",
+    "scripts/phase104-backups/src/lib/services/vectorRankingService.ts",
+    "scripts/phase104-backups/src/lib/services/yorha-detective-service.ts"
+  ],
+  "UNRESOLVED:../error-analysis/embedding-service.js": [
+    "scripts/phase104-backups/src/lib/services/ace-web/ace-context-service.ts"
+  ],
+  "UNRESOLVED:./qdrant-service.js": [
+    "scripts/phase104-backups/src/lib/services/ace-web/ace-context-service.ts"
+  ],
+  "UNRESOLVED:../error-analysis/types.js": [
+    "scripts/phase104-backups/src/lib/services/ace-web/ace-context-service.ts"
+  ],
+  "EXTERNAL:$lib/server/vector/EnhancedVectorService": [
+    "scripts/phase104-backups/src/lib/services/advanced-simd-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/end-to-end-pipeline.ts"
+  ],
+  "EXTERNAL:$lib/utils/loki-evidence": [
+    "scripts/phase104-backups/src/lib/services/advanced-simd-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/end-to-end-pipeline.ts"
+  ],
+  "EXTERNAL:$lib/db/index.js": [
+    "scripts/phase104-backups/src/lib/services/ai-service.ts",
+    "scripts/phase104-backups/src/lib/services/minio-upload-service.ts",
+    "scripts/phase104-backups/src/lib/services/rag-pipeline-integrator.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/server/services/embedding-service.js": [
+    "scripts/phase104-backups/src/lib/services/ai-service.ts"
+  ],
+  "EXTERNAL:$lib/services/types/service-types.js": [
+    "scripts/phase104-backups/src/lib/services/ai-worker-manager.ts"
+  ],
+  "EXTERNAL:$lib/server/db/drizzle-client": [
+    "scripts/phase104-backups/src/lib/services/aiAutoTagging.ts",
+    "scripts/phase104-backups/src/lib/services/error-pattern-rag.ts"
+  ],
+  "EXTERNAL:$lib/ast/ast-processor": [
+    "scripts/phase104-backups/src/lib/services/autosuggester-service.ts"
+  ],
+  "EXTERNAL:node:stream": [
+    "scripts/phase104-backups/src/lib/services/caseService.ts"
+  ],
+  "UNRESOLVED:./native-windows-service-manager.js": [
+    "scripts/phase104-backups/src/lib/services/complete-gpu-error-pipeline.ts"
+  ],
+  "UNRESOLVED:./flashattention-gpu-error-processor.js": [
+    "scripts/phase104-backups/src/lib/services/complete-gpu-error-pipeline.ts"
+  ],
+  "EXTERNAL:vitest/dist/chunks/reporters.d.BFLkQcL6.js": [
+    "scripts/phase104-backups/src/lib/services/comprehensive-database-orchestrator.ts",
+    "scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts",
+    "scripts/phase104-backups/src/lib/services/glyph-diffusion-service.ts",
+    "scripts/phase104-backups/src/lib/services/production-monitoring-dashboard.ts"
+  ],
+  "UNRESOLVED:./automated-barrel-store-generator": [
+    "scripts/phase104-backups/src/lib/services/context-aware-ai-memory-types.ts"
+  ],
+  "EXTERNAL:$lib/types/automated-resolution": [
+    "scripts/phase104-backups/src/lib/services/context7-mcp-integration.ts"
+  ],
+  "EXTERNAL:$lib/optimization/comprehensive-orchestrator": [
+    "scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts"
+  ],
+  "UNRESOLVED:./stateless-api-coordinator.js": [
+    "scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts"
+  ],
+  "UNRESOLVED:./automated-barrel-store-generator.js": [
+    "scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts"
+  ],
+  "EXTERNAL:$lib/server/ai/rag-pipeline-enhanced": [
+    "scripts/phase104-backups/src/lib/services/enhanced-api-client.ts"
+  ],
+  "EXTERNAL:zod/v4/locales": [
+    "scripts/phase104-backups/src/lib/services/enhanced-api-client.ts"
+  ],
+  "EXTERNAL:$lib/ai/langchain-rag.js": [
+    "scripts/phase104-backups/src/lib/services/enhanced-rag-service.ts"
+  ],
+  "EXTERNAL:$lib/services/context7Service.js": [
+    "scripts/phase104-backups/src/lib/services/enhanced-rag-service.ts"
+  ],
+  "UNRESOLVED:./ollamaService.js": [
+    "scripts/phase104-backups/src/lib/services/enhancedRAGPipeline.ts"
+  ],
+  "UNRESOLVED:./ai-auto-tagging-service.js": [
+    "scripts/phase104-backups/src/lib/services/enhancedRAGPipeline.ts"
+  ],
+  "EXTERNAL:$lib/services/ai/OllamaService": [
+    "scripts/phase104-backups/src/lib/services/enhancedRAGPipeline.ts"
+  ],
+  "UNRESOLVED:./types.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/CacheService.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/error-brain-api.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/MetricsCollector.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/validation-service.ts",
+    "scripts/phase104-backups/src/lib/services/knowledge-search/RedisCacheService.ts"
+  ],
+  "UNRESOLVED:./ToolInvoker.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts"
+  ],
+  "UNRESOLVED:./FixSynthesizer.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts"
+  ],
+  "UNRESOLVED:./ExperienceRecorder.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/MetricsCollector.ts"
+  ],
+  "UNRESOLVED:./GRPOPolicy.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/DecisionEngine.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/MetricsCollector.ts"
+  ],
+  "UNRESOLVED:./base-service.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/error-brain-api.ts",
+    "scripts/phase104-backups/src/lib/services/error-analysis/validation-service.ts"
+  ],
+  "UNRESOLVED:./error-analysis-pipeline.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/error-brain-api.ts"
+  ],
+  "UNRESOLVED:./feature-flags.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/error-brain-api.ts"
+  ],
+  "UNRESOLVED:./error-brain-middleware.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/error-brain-api.ts"
+  ],
+  "UNRESOLVED:./EscalationService.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/MetricsCollector.ts"
+  ],
+  "UNRESOLVED:./LearningPipeline.js": [
+    "scripts/phase104-backups/src/lib/services/error-analysis/MetricsCollector.ts"
+  ],
+  "UNRESOLVED:./enhanced-rag-pagerank": [
+    "scripts/phase104-backups/src/lib/services/error-pattern-rag.ts",
+    "scripts/phase104-backups/src/lib/services/gemma-embedding.ts",
+    "scripts/phase104-backups/src/lib/services/multi-embedding-vector-service.ts",
+    "scripts/phase104-backups/src/lib/services/quic-client.ts"
+  ],
+  "UNRESOLVED:./master-service-coordinator.js": [
+    "scripts/phase104-backups/src/lib/services/error-resolution-engine.ts"
+  ],
+  "UNRESOLVED:./tensor-upscaler-service.js": [
+    "scripts/phase104-backups/src/lib/services/glyph-diffusion-service.ts"
+  ],
+  "EXTERNAL:node:test": [
+    "scripts/phase104-backups/src/lib/services/go-microservice-client.ts"
+  ],
+  "EXTERNAL:node: events": [
+    "scripts/phase104-backups/src/lib/services/gpu-cluster-acceleration.ts"
+  ],
+  "EXTERNAL:node: worker_threads": [
+    "scripts/phase104-backups/src/lib/services/gpu-cluster-acceleration.ts"
+  ],
+  "EXTERNAL:node: cluster": [
+    "scripts/phase104-backups/src/lib/services/gpu-cluster-acceleration.ts"
+  ],
+  "UNRESOLVED:./nintendo-memory-manager.js": [
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts"
+  ],
+  "EXTERNAL:assert": [
+    "scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
+    "scripts/phase104-backups/src/lib/services/rag-pipeline-integrator.ts",
+    "tests/index.js"
+  ],
+  "UNRESOLVED:./healthUpdates.js": [
+    "scripts/phase104-backups/src/lib/services/healthUpdates.batch.test.ts"
+  ],
+  "EXTERNAL:langchain/chains": [
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts"
+  ],
+  "EXTERNAL:langchain/memory": [
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts"
+  ],
+  "EXTERNAL:@langchain/core/prompts": [
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts"
+  ],
+  "EXTERNAL:@langchain/core/runnables": [
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts"
+  ],
+  "EXTERNAL:@langchain/core/output_parsers": [
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts"
+  ],
+  "EXTERNAL:@langchain/core/language_models/base": [
+    "scripts/phase104-backups/src/lib/services/langchain-config-service.ts"
+  ],
+  "EXTERNAL:$lib/3d/memory-palace-engine": [
+    "scripts/phase104-backups/src/lib/services/legal-ai-integration.ts"
+  ],
+  "EXTERNAL:$lib/api/production-client": [
+    "scripts/phase104-backups/src/lib/services/neo4jGraphService.ts"
+  ],
+  "EXTERNAL:langchain/vectorstores/memory": [
+    "scripts/phase104-backups/src/lib/services/nomic-embedding-service.ts"
+  ],
+  "EXTERNAL:langchain/text_splitter": [
+    "scripts/phase104-backups/src/lib/services/nomic-embedding-service.ts"
+  ],
+  "UNRESOLVED:../config/local-llm.js": [
+    "scripts/phase104-backups/src/lib/services/ollama-service.ts"
+  ],
+  "UNRESOLVED:./enhanced-ai-analysis.js": [
+    "scripts/phase104-backups/src/lib/services/precedent-analysis-engine.ts"
+  ],
+  "UNRESOLVED:./grpc-ai-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/services/production-monitoring-dashboard.ts"
+  ],
+  "UNRESOLVED:./legal-document-stream.js": [
+    "scripts/phase104-backups/src/lib/services/production-monitoring-dashboard.ts"
+  ],
+  "UNRESOLVED:./enterprise-vector-search.js": [
+    "scripts/phase104-backups/src/lib/services/production-monitoring-dashboard.ts"
+  ],
+  "EXTERNAL:$lib/types/legal.js": [
+    "scripts/phase104-backups/src/lib/services/production-monitoring-dashboard.ts"
+  ],
+  "EXTERNAL:typescript": [
+    "scripts/phase104-backups/src/lib/services/production-monitoring-dashboard.ts"
+  ],
+  "EXTERNAL:$lib/server/logger": [
+    "scripts/phase104-backups/src/lib/services/providers/ollama/streaming.ts"
+  ],
+  "EXTERNAL:@langchain/core/tracers/log_stream": [
+    "scripts/phase104-backups/src/lib/services/providers/ollama/streaming.ts"
+  ],
+  "EXTERNAL:$lib/ai/bitmap-hmm-som-predictor.js": [
+    "scripts/phase104-backups/src/lib/services/qlora-rl-training-service.ts"
+  ],
+  "EXTERNAL:$lib/server/summarizeCache.js": [
+    "scripts/phase104-backups/src/lib/services/qlora-rl-training-service.ts"
+  ],
+  "EXTERNAL:$lib/rabbitmq": [
+    "scripts/phase104-backups/src/lib/services/queue-service.ts"
+  ],
+  "EXTERNAL:$lib/server/db/vector-search.js": [
+    "scripts/phase104-backups/src/lib/services/semantic-search.ts"
+  ],
+  "EXTERNAL:$lib/types/vector-search.js": [
+    "scripts/phase104-backups/src/lib/services/semantic-search.ts"
+  ],
+  "UNRESOLVED:./rag-minio-gpu-som-cache.js": [
+    "scripts/phase104-backups/src/lib/services/system-integration.ts"
+  ],
+  "EXTERNAL:$lib/config/unified-config": [
+    "scripts/phase104-backups/src/lib/services/types/service-types.ts"
+  ],
+  "UNRESOLVED:../enhanced-rag-pagerank": [
+    "scripts/phase104-backups/src/lib/services/types/service-types.ts"
+  ],
+  "EXTERNAL:$lib/services/gpu-tensor-cache-worker": [
+    "scripts/phase104-backups/src/lib/services/unified-inference-integration.ts"
+  ],
+  "EXTERNAL:$lib/services/webasm-inference-service": [
+    "scripts/phase104-backups/src/lib/services/unified-inference-integration.ts"
+  ],
+  "UNRESOLVED:./enhanced-rag-pagerank.js": [
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts"
+  ],
+  "UNRESOLVED:./error-analysis/diffs/unifiedDiff.js": [
+    "scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/orchestration/optimized-rabbitmq-orchestrator": [
+    "scripts/phase104-backups/src/lib/services/unified-legal-orchestration-service.ts"
+  ],
+  "EXTERNAL:$lib/types/rabbitmq-types": [
+    "scripts/phase104-backups/src/lib/services/unified-legal-orchestration-service.ts"
+  ],
+  "UNRESOLVED:./nes-gpu-bridge.js": [
+    "scripts/phase104-backups/src/lib/services/unified-wasm-gpu-orchestrator.ts"
+  ],
+  "UNRESOLVED:./gpu-service-integration.js": [
+    "scripts/phase104-backups/src/lib/services/unified-wasm-gpu-orchestrator.ts"
+  ],
+  "UNRESOLVED:./qlora-training-service.js": [
+    "scripts/phase104-backups/src/lib/services/user-analytics-rl-integration.ts"
+  ],
+  "UNRESOLVED:../ai/moogle-graph-synthesizer.js": [
+    "scripts/phase104-backups/src/lib/services/user-analytics-rl-integration.ts"
+  ],
+  "UNRESOLVED:./minio-service.js": [
+    "scripts/phase104-backups/src/lib/services/vector-search-index.ts"
+  ],
+  "EXTERNAL:$lib/utils/mcp-helpers": [
+    "scripts/phase104-backups/src/lib/services/vector-service.ts"
+  ],
+  "UNRESOLVED:../messaging/rabbitmq-xstate-integration.js": [
+    "scripts/phase104-backups/src/lib/services/webasm-inference-rag.ts"
+  ],
+  "UNRESOLVED:./postgresql-qdrant-sync.js": [
+    "scripts/phase104-backups/src/lib/services/webasm-inference-rag.ts"
+  ],
+  "UNRESOLVED:./vertex-buffer-image-analyzer.js": [
+    "scripts/phase104-backups/src/lib/services/webasm-inference-rag.ts"
+  ],
+  "UNRESOLVED:./gpu-cache-orchestrator.js": [
+    "scripts/phase104-backups/src/lib/services/webgpu-som-error-fixer.ts"
+  ],
+  "EXTERNAL:$lib/services/png-embed-extractor.js": [
+    "scripts/phase104-backups/src/lib/state/evidence-processing-machine-corrupted.ts"
+  ],
+  "EXTERNAL:$lib/services/glyph-diffusion-service.js": [
+    "scripts/phase104-backups/src/lib/state/evidence-processing-machine-corrupted.ts"
+  ],
+  "EXTERNAL:$lib/server/db/complete-introspected-schema": [
+    "scripts/phase104-backups/src/lib/state/evidenceCustodyMachine.ts"
+  ],
+  "EXTERNAL:$lib/engines/neural-sprite-engine": [
+    "scripts/phase104-backups/src/lib/state/phase13StateMachine.ts"
+  ],
+  "EXTERNAL:$lib/services/real-ai-service": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/ai-agent.ts"
+  ],
+  "UNRESOLVED:./redis-component-store.js": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/component-metadata-cache.ts",
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/evidence-cache-service.ts"
+  ],
+  "EXTERNAL:$lib/types/legal-types.js": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/evidence-cache-service.ts"
+  ],
+  "EXTERNAL:$lib/ai/browser-local-ai.js": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/evidence-global-store.svelte.ts"
+  ],
+  "EXTERNAL:$lib/compat/lokijs": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/global-loki.ts"
+  ],
+  "EXTERNAL:$lib/state/legal-case-machine": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-case.svelte.ts"
+  ],
+  "EXTERNAL:$lib/utils/simd-json-cache": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-reports.ts"
+  ],
+  "EXTERNAL:$lib/workers/legal-ai-worker-pool": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-reports.ts"
+  ],
+  "UNRESOLVED:./legal-citations.js": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-reports.ts"
+  ],
+  "UNRESOLVED:./enhanced-saved-notes.js": [
+    "scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-reports.ts"
+  ],
+  "EXTERNAL:$lib/constants/local-llm-config": [
+    "scripts/phase104-backups/src/lib/utils/llm-retry-wrapper.ts",
+    "scripts/phase104-backups/src/lib/utils/todo-autogen.ts"
+  ],
+  "UNRESOLVED:./redis-helper.js": [
+    "scripts/phase104-backups/src/lib/utils/rag-cache.ts"
+  ],
+  "EXTERNAL:$lib/types/user": [
+    "scripts/phase104-backups/src/lib/utils/security.ts"
+  ],
+  "EXTERNAL:vite": [
+    "scripts/phase104-backups/src/lib/vite/vscode-error-logger.ts"
+  ],
+  "UNRESOLVED:./clustering-wasm.js": [
+    "scripts/phase104-backups/src/lib/wasm/ultra-json-parser.ts"
+  ],
+  "UNRESOLVED:./gpu-wasm-init.js": [
+    "scripts/phase104-backups/src/lib/wasm/ultra-json-parser.ts"
+  ],
+  "EXTERNAL:rxjs": [
+    "scripts/phase104-backups/src/lib/webgpu/graph-texture-layout.ts"
+  ],
+  "EXTERNAL:$lib/api/services/cache-service.js": [
+    "scripts/phase104-backups/src/lib/workers/embedding-worker-enhanced.ts"
+  ],
+  "EXTERNAL:$lib/stores/global-loki-store.js": [
+    "scripts/phase104-backups/src/lib/workers/embedding-worker-enhanced.ts"
+  ],
+  "UNRESOLVED:./production-service-client.js": [
+    "scripts/phase104-backups/src/mcp-gpu-orchestrator.ts"
+  ],
+  "EXTERNAL:$lib/server/ai/ollama-service.js": [
+    "scripts/phase104-backups/src/routes/api/ace/summarize-clusters/+server.ts"
+  ],
+  "EXTERNAL:$lib/services/couchdb-client.js": [
+    "scripts/phase104-backups/src/routes/api/ace/summarize-clusters/+server.ts",
+    "tests/analytics-tags-nlp-prefs-routes.spec.ts",
+    "tests/karpathy-persistence.spec.ts"
+  ],
+  "EXTERNAL:sveltekit-superforms": [
+    "scripts/phase104-backups/src/routes_parked/(tools)_disabled/search/+page.server.ts"
+  ],
+  "EXTERNAL:$lib/server/services/ai-service.js": [
+    "scripts/phase104-backups/src/routes_parked/api/ai/search/+server.ts"
+  ],
+  "EXTERNAL:$lib/middleware/redis-orchestrator-middleware": [
+    "scripts/phase104-backups/src/routes_parked/api/ai/search/+server.ts"
+  ],
+  "EXTERNAL:$lib/middleware/featureFlagEnforcer": [
+    "scripts/phase104-backups/src/routes_parked/api/error-brain/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/legal-ai/+server.ts"
+  ],
+  "EXTERNAL:$lib/middleware/authSeparation": [
+    "scripts/phase104-backups/src/routes_parked/api/error-brain/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/legal-ai/+server.ts"
+  ],
+  "EXTERNAL:$lib/services/featureLogger": [
+    "scripts/phase104-backups/src/routes_parked/api/error-brain/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/legal-ai/+server.ts"
+  ],
+  "EXTERNAL:$lib/services/dataIsolation": [
+    "scripts/phase104-backups/src/routes_parked/api/error-brain/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/legal-ai/+server.ts"
+  ],
+  "EXTERNAL:$lib/ai/custom-reranker": [
+    "scripts/phase104-backups/src/routes_parked/api/v1/citations/verify/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/v1/detective/insights/+server.ts",
+    "scripts/phase104-backups/src/routes_parked/api/yorha/enhanced-rag/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/api/makeHttpError": [
+    "scripts/phase104-backups/src/routes_parked/api/v1/detective/patterns/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/services/user-scoped-crud": [
+    "scripts/phase104-backups/src/routes_parked/api/v1/detective/patterns/+server.ts"
+  ],
+  "EXTERNAL:socket.io": [
+    "scripts/phase104-backups/src/routes_parked/api/ws/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/shutdown": [
+    "scripts/phase104-backups/src/routes_parked/api/ws/+server.ts"
+  ],
+  "UNRESOLVED:../src/lib/utils/syntax-repair/multi-pass-processor": [
+    "scripts/repair-services.ts"
+  ],
+  "UNRESOLVED:../src/lib/utils/syntax-repair/file-processor": [
+    "scripts/repair-services.ts"
+  ],
+  "UNRESOLVED:../src/lib/utils/syntax-repair/patterns/index": [
+    "scripts/repair-services.ts"
+  ],
+  "UNRESOLVED:../src/lib/utils/syntax-repair/validation-engine": [
+    "scripts/repair-services.ts"
+  ],
+  "UNRESOLVED:../src/lib/utils/syntax-repair/pattern-matcher": [
+    "scripts/repair-services.ts"
+  ],
+  "EXTERNAL:node:assert": [
+    "scripts/smoke/smoke-browser-context-lane.mjs"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk/client/streamableHttp.js": [
+    "scripts/smoke/smoke-graph-pathway-materialization.mjs"
+  ],
+  "EXTERNAL:zod-to-json-schema": [
+    "scripts/smoke/smoke-mcp-tools-list-bisect.mjs"
+  ],
+  "EXTERNAL:node:assert/strict": [
+    "scripts/smoke-admin-ai-chat.mjs",
+    "scripts/smoke-feature-map-integrity.mjs",
+    "scripts/smoke-hmm-rust.mjs",
+    "scripts/smoke-rust-graph.mjs",
+    "tests/feature-map.integrity.spec.ts"
+  ],
   "EXTERNAL:@playwright/test": [
+    "scripts/tests/probes/probe-case.spec.ts",
+    "scripts/tests/probes/probe-evidence.spec.ts",
+    "scripts/tests/probes/probe-legal-corpus.spec.ts",
+    "scripts/validate/full-system.mjs",
     "tests/accessibility/accessibility-tester.ts",
     "tests/accessibility/accessibility.test.ts",
     "tests/admin-lab-upload-analysis.spec.ts",
@@ -5367,17 +8050,18 @@
     "tests/vector-search-rag.spec.ts",
     "tests/yorha-bw-theme.spec.ts"
   ],
-  "EXTERNAL:node:os": [
-    "tests/agents-regen-loaders.spec.ts",
-    "tests/feature-map.integrity.spec.ts",
-    "tests/relation-extractor.spec.ts"
+  "UNRESOLVED:./route-forensic/_helpers": [
+    "scripts/tests/probes/probe-case.spec.ts"
   ],
-  "EXTERNAL:$lib/services/couchdb-client.js": [
-    "tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    "tests/karpathy-persistence.spec.ts"
+  "EXTERNAL:jsonc-parser": [
+    "scripts/tests/smoke-fast-ast-ace.mjs",
+    "scripts/tests/validate-vscode-tasks-jsonc.mjs"
   ],
-  "UNRESOLVED:../scripts/graph/build-codebase-relationships.mjs": [
-    "tests/build-codebase-relationships.spec.ts"
+  "UNRESOLVED:...filename": [
+    "scripts/triage-d9-shallow-dynamic.mjs"
+  ],
+  "EXTERNAL:${ROOT}/src/lib/server/graph/relationship-extractor.ts": [
+    "scripts/wiki/extract-code-relations.mjs"
   ],
   "EXTERNAL:/src/lib/ai/client-embed.ts": [
     "tests/e2e/client-inference.spec.ts"
@@ -5394,30 +8078,11 @@
   "EXTERNAL:/src/lib/ai/client-llm-synthesis.ts": [
     "tests/e2e/e2b-client-inference.spec.ts"
   ],
-  "UNRESOLVED:./fixtures/authed-page": [
-    "tests/e2e/route-forensic/fixtures/authed-page.ts"
-  ],
-  "UNRESOLVED:./fixtures/forensic-page": [
-    "tests/e2e/route-forensic/fixtures/forensic-page.ts"
-  ],
   "EXTERNAL:@testing-library/svelte": [
     "tests/evidence-view-modal.spec.ts"
   ],
-  "EXTERNAL:node:assert/strict": [
-    "tests/feature-map.integrity.spec.ts"
-  ],
-  "EXTERNAL:assert": [
-    "tests/index.js"
-  ],
   "UNRESOLVED:../build/debug.js": [
     "tests/index.js"
-  ],
-  "UNRESOLVED:../../scripts/mapreduce/reduce-neo4j.mjs": [
-    "tests/mapreduce/reduce-neo4j.spec.ts"
-  ],
-  "EXTERNAL:fast-check": [
-    "tests/phase76-acp-tools.property.test.ts",
-    "tests/setup.ts"
   ],
   "UNRESOLVED:../src/lib/services/knowledge-search/ACPToolRegistry": [
     "tests/phase76-acp-tools.property.test.ts"
@@ -5431,14 +8096,8 @@
   "EXTERNAL:$lib/../routes/api/research/concurrent-deep/+server.js": [
     "tests/research-pipeline-smoke.spec.ts"
   ],
-  "EXTERNAL:$lib/services/error-analysis/KAGTraverser.js": [
-    "tests/routes/kag-ingest-notebook-contract.test.ts"
-  ],
   "EXTERNAL:/src/lib/stores/index.ts": [
     "tests/stores-smoke-test.spec.ts"
-  ],
-  "UNRESOLVED:../../scripts/graph/build-codebase-relationships.mjs": [
-    "tests/unit/normalize-repo-path.test.ts"
   ],
   "EXTERNAL:$lib/services/report-auto-populator": [
     "tests/unit/templates.test.ts"

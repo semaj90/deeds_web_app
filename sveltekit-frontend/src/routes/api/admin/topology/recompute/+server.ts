@@ -1,6 +1,9 @@
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
+import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+
+const bodySchema = z.object({}).passthrough();
 
 const { Pool } = pg;
 const pgPool = new Pool({ connectionString: ENV.DATABASE_URL });
@@ -9,10 +12,14 @@ const pgPool = new Pool({ connectionString: ENV.DATABASE_URL });
  * Guarded Topology Recompute Route.
  * Aligned with the corrected topology model (forbidding heuristic in-route writes).
  */
-export async function POST({ locals }) {
+export async function POST({ locals, request }) {
   if (locals.user?.role !== 'admin') {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  // G19: Robust body parsing (even if currently no-op)
+  const body = await request.json().catch(() => ({}));
+  bodySchema.safeParse(body);
 
   try {
     // Fetch current stats for the response

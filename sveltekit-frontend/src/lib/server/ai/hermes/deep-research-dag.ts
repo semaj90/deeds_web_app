@@ -4,7 +4,7 @@ import { db } from '$lib/server/db/client';
 import { kagDagRuns, kagDagNodes } from '$lib/server/db/schema';
 import { sql } from 'drizzle-orm';
 import { runHermesPlanner, buildFallbackPlan, type HermesPlan } from '../hermes-planner.js';
-import { resolveRuntimeConfig, type QuantRuntimeConfig } from '../inference-configs.js';
+import { resolveRuntimeConfig, type InferenceRuntimeConfig } from '../inference-configs.js';
 import { synthesize } from '../hermes-synth.js';
 import { writeNote } from '$lib/server/integrations/obsidian-client.js';
 import { runConcurrentResearch, formatGraphForClaudeCode } from '../langgraph-research.js';
@@ -35,7 +35,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   detect_research_redundancy: ['qdrant', 'skillExecution'],
   cross_domain_mapping: ['qdrant', 'skillExecution'],
   automated_citation_validation: ['qdrant', 'skillExecution'],
-  
+
   // Codebase
   search_codebase: ['qdrant', 'deepImport', 'skillExecution'],
   explain_file: ['qdrant', 'skillExecution'],
@@ -50,7 +50,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   detect_circular_imports: ['deepImport', 'skillExecution'],
   scan_todo_comments: ['deepImport', 'skillExecution'],
   generate_fix_plan: ['qdrant', 'clusters', 'skillExecution'],
-  
+
   // Graph
   deep_import_graph_expand: ['deepImport', 'neo4j'],
   neo4j_expand_neighborhood: ['neo4j'],
@@ -78,7 +78,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   pathway_feasibility_check: ['neo4j'],
   graph_backed_recommendation: ['neo4j'],
   identify_weak_links: ['neo4j'],
-  
+
   // Evidence
   ingest_pdf: ['qdrant'],
   ingest_video: ['qdrant'],
@@ -92,7 +92,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   cluster_evidence_by_topic: ['qdrant', 'clusters'],
   cross_reference_witnesses: ['qdrant'],
   find_missing_evidence: ['qdrant'],
-  
+
   // Vector/Cluster
   qdrant_search: ['qdrant'],
   encoded64_rerank: ['qdrant', 'cudaPrefilter'],
@@ -111,7 +111,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   semantic_search_with_boost: ['qdrant'],
   cluster_label_regenerator: ['clusters'],
   detect_duplicate_vectors: ['qdrant'],
-  
+
   // Memory
   couchdb_view_query: ['couchdb'],
   redis_cache_lookup: ['qdrant'],
@@ -127,7 +127,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   update_importance_weights: ['qdrant'],
   search_related_wiki_cards: ['couchdb', 'qdrant'],
   audit_privacy_compliance: ['qdrant'],
-  
+
   // Batch
   batch_metadata_extraction: ['qdrant'],
   background_report_generation: ['qdrant'],
@@ -140,7 +140,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   bulk_tag_update: ['couchdb'],
   parallel_translation_pipeline: ['qdrant'],
   batch_link_validation: ['couchdb'],
-  
+
   // Repair
   auto_fix_lint_errors: ['deepImport'],
   repair_broken_wiki_links: ['couchdb'],
@@ -153,7 +153,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   reset_hung_background_tasks: ['qdrant'],
   refresh_stale_mcp_configs: ['qdrant'],
   sync_missing_minio_objects: ['qdrant'],
-  
+
   // Legal/Case
   case_intake: ['qdrant'],
   issue_spotter: ['qdrant', 'neo4j'],
@@ -183,7 +183,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   discovery_request_generator: ['qdrant'],
   predict_judicial_disposition: ['qdrant'],
   rebuttal_strategy_planner: ['qdrant'],
-  
+
   // Simulation
   mock_trial: ['qdrant', 'skillExecution'],
   prosecutor_argument: ['qdrant', 'skillExecution'],
@@ -195,7 +195,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   outcome_probability_matrix: ['qdrant', 'skillExecution'],
   witness_coaching_report: ['qdrant', 'skillExecution'],
   evidence_impact_analysis: ['qdrant', 'skillExecution'],
-  
+
   // GPU / Acceleration
   gpu_vram_audit: ['cudaPrefilter'],
   evict_unused_resident_models: ['cudaPrefilter'],
@@ -216,7 +216,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   vram_fragmentation_defrag: ['cudaPrefilter'],
   multi_gpu_load_balancer: ['cudaPrefilter'],
   inference_cost_audit: ['cudaPrefilter'],
-  
+
   // UI / Diagnostics
   route_smoke_test: ['deepImport'],
   stack_health_report: ['qdrant', 'couchdb', 'neo4j', 'clusters'],
@@ -230,7 +230,7 @@ const SKILL_STAGE_MAP: Record<string, ResearchStage[]> = {
   trace_request_timeline: ['qdrant', 'couchdb', 'neo4j'],
   database_migration_status: ['qdrant'],
   automated_lighthouse_scan: ['deepImport'],
-  
+
   // SystemAudit
   check_redis_memory_fragmentation: ['qdrant'],
   qdrant_collection_integrity_check: ['qdrant'],
@@ -266,7 +266,7 @@ export type ResearchState = {
   runId: string;
   parentTaskId?: string;
 
-  runtime?: QuantRuntimeConfig;
+  runtime?: InferenceRuntimeConfig;
   plan?: HermesPlan;
   stageMask?: Record<ResearchStage, boolean>;
 
@@ -296,7 +296,7 @@ export interface DeepResearchArtifacts {
 export interface DeepResearchResult {
   runId: string;
   plan: HermesPlan;
-  runtime: QuantRuntimeConfig;
+  runtime: InferenceRuntimeConfig;
   activeClusterIds: number[];
   contextPacket: ResearchContextPacket;
   answer: string;
@@ -334,7 +334,7 @@ type CudaPrefilterSummary = {
 type ResearchContextPacket = {
   query: string;
   mode: string;
-  runtime?: QuantRuntimeConfig;
+  runtime?: InferenceRuntimeConfig;
   plan?: HermesPlan;
   queryHmm: QueryHmmSummary;
   qdrantHits: CompactHitSummary[];
@@ -731,10 +731,10 @@ async function cudaTopologyPrefilterNode(state: ResearchState) {
   };
 
   await logNode(state.runId, 'cudaPrefilter', 'gpu-accelerated-rerank', { hitCount: rankedHits.length, source: prefilterBackend }, cudaPrefilter);
-  
+
   // Merge active cluster IDs
   const combinedClusterIds = [...new Set([...(state.activeClusterIds || []), ...activeClusterIdsFromTopo])];
-  
+
   return { cudaPrefilter, qdrantHits: rankedHits, activeClusterIds: combinedClusterIds };
 }
 
@@ -748,11 +748,11 @@ async function skillExecutionNode(state: ResearchState) {
     // If the skill is NOT one of the primary retrieval stages, execute it here
     const stages = SKILL_STAGE_MAP[tool.name] || [];
     if (stages.includes('skillExecution')) {
-      const result = await hermesDispatcher.executeSkill(tool.name, tool.arguments, { 
-        userId: state.userId, 
+      const result = await hermesDispatcher.executeSkill(tool.name, tool.arguments, {
+        userId: state.userId,
         runId: state.runId,
         userQuery: state.query,
-        parentTaskId: state.runId // Treat this node as parent for the skill execution
+        parentTaskId: state.runId, // Treat this node as parent for the skill execution
       });
       skillResults[tool.name] = result;
     }

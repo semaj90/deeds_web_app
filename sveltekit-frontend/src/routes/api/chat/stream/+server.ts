@@ -54,14 +54,14 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		.where(eq(chatMetadata.chatId, sessionId))
 		.limit(1);
 
-	if (sessionMeta.length > 0 && sessionMeta[0].userId !== locals.user.id) {
-		return new Response('Session not found or unauthorized', { status: 404 });
-	}
+	if (sessionMeta.length > 0 && sessionMeta[0].userId !== Number(locals.user.id)) {
+    return new Response('Session not found or unauthorized', { status: 404 });
+  }
 
 	// Get case association from metadata
 	const sessionCaseId = sessionMeta[0]?.caseId ?? caseId ?? null;
 
-	return handleSessionMode(sessionId, sessionCaseId, locals.user.id);
+	return handleSessionMode(sessionId, sessionCaseId, Number(locals.user.id));
 };
 
 /**
@@ -218,7 +218,7 @@ function handleQueryMode(
 /**
  * Session Mode: Full chat history + streaming with case context
  */
-function handleSessionMode(sessionId: string, caseId: string | null, userId: string): Response {
+function handleSessionMode(sessionId: string, caseId: string | null, userId: number): Response {
   let pollIntervalId: ReturnType<typeof setInterval>;
   let keepAliveId: ReturnType<typeof setInterval>;
 
@@ -321,33 +321,33 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Ensure chat metadata exists (upsert session with case association)
 		await db
-			.insert(chatMetadata)
-			.values({
-				chatId: sessionId,
-				userId: locals.user.id,
-				caseId: caseId ?? null,
-				title: message.slice(0, 100),
-				createdAt: new Date(),
-				updatedAt: new Date()
-			})
-			.onConflictDoUpdate({
-				target: chatMetadata.chatId,
-				set: {
-					updatedAt: new Date(),
-					lastMessageAt: new Date(),
-					...(caseId ? { caseId } : {})
-				}
-			});
+      .insert(chatMetadata)
+      .values({
+        chatId: sessionId,
+        userId: Number(locals.user.id),
+        caseId: caseId ?? null,
+        title: message.slice(0, 100),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: chatMetadata.chatId,
+        set: {
+          updatedAt: new Date(),
+          lastMessageAt: new Date(),
+          ...(caseId ? { caseId } : {}),
+        },
+      });
 
 		// Save user message
 		const msgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 		await db.insert(chatMessages).values({
-			id: msgId,
-			chatId: sessionId,
-			userId: locals.user.id,
-			role: 'user',
-			content: message
-		});
+      id: msgId,
+      chatId: sessionId,
+      userId: Number(locals.user.id),
+      role: 'user',
+      content: message,
+    });
 
 		// Load case context for AI response
 		const sessionMeta = await db

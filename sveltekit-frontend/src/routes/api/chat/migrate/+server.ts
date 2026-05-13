@@ -41,7 +41,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const { sessionId, chats } = parsed.data;
-	const userId = locals.user.id;
+	const userId = Number(locals.user.id);
 
   // Redis dedup: skip if this (userId, sessionId) pair was already migrated recently
   try {

@@ -1519,6 +1519,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         })),
         kbChunks: [],
         caseChunks: [],
+        docChunks: [],
         kagNeighbors:
           graphContext?.neighbors?.map((n) => ({
             nodeId: n.nodeId,
@@ -1566,23 +1567,24 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // knowledge anchors. Fire-and-forget warm happens inside buildAndWarmPrefix.
       let graphAwarePrefix = '';
       try {
-        const { buildAndWarmPrefix } = await import(
-          '$lib/server/inference/turbo-prefix-cache.js'
-        );
+        const { buildAndWarmPrefix } = await import('$lib/server/inference/turbo-prefix-cache.js');
         graphAwarePrefix = await Promise.race([
           buildAndWarmPrefix(message, { caseContext: caseContext ?? undefined }),
           new Promise<string>((_, reject) => setTimeout(reject, 150)),
         ]);
-      } catch { /* non-fatal — proceed without graph context */ }
+      } catch {
+        /* non-fatal — proceed without graph context */
+      }
 
       // Base role instructions. If we got a graph-aware prefix (which already
       // includes the base role instructions), use it directly; otherwise fall
       // back to the hardcoded base so the prompt is never empty.
-      let systemPrompt = graphAwarePrefix ||
+      let systemPrompt =
+        graphAwarePrefix ||
         'You are a legal AI assistant specialized in prosecutor and detective workflows. ' +
-        'Provide accurate, detailed, and actionable legal analysis. ' +
-        'Always cite relevant statutes and case law when possible. ' +
-        'When retrieved source context is provided, answer from that context first, quote or summarize the strongest source directly, and do not claim that you lack access to the provided materials.';
+          'Provide accurate, detailed, and actionable legal analysis. ' +
+          'Always cite relevant statutes and case law when possible. ' +
+          'When retrieved source context is provided, answer from that context first, quote or summarize the strongest source directly, and do not claim that you lack access to the provided materials.';
 
       if (message.includes('[ATTACHMENT SOURCE START]')) {
         systemPrompt +=
@@ -1725,9 +1727,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // stable graph-aware prefix. Only fall back here if the prefix build
       // timed out so the GPU slot still gets warmed with the ACE system prompt.
       if (!graphAwarePrefix) {
-        import('$lib/server/inference/turbo-prefix-cache.js').then(({ warmTurboQuantKvCache }) => {
-          warmTurboQuantKvCache(systemPrompt).catch(() => {});
-        }).catch(() => {});
+        import('$lib/server/inference/turbo-prefix-cache.js')
+          .then(({ warmTurboQuantKvCache }) => {
+            warmTurboQuantKvCache(systemPrompt).catch(() => {});
+          })
+          .catch(() => {});
       }
 
       let fullResponse = '';
@@ -2218,6 +2222,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   codebaseContext: null,
                   kbChunks: [],
                   caseChunks: [],
+                  docChunks: [],
                   policyDecision: null,
                 },
                 backend: inferenceBackend,
@@ -2542,7 +2547,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             const modules = await selectAdaptiveMemory(cachedEmb, 1).catch(() => []);
             topHyperedgeHash = modules[0]?.hyperedgeHash;
           }
-        } catch { /* non-fatal — feedback still fires without hash */ }
+        } catch {
+          /* non-fatal — feedback still fires without hash */
+        }
 
         send({
           id,

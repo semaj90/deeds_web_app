@@ -28,6 +28,7 @@ export interface LLMSynthesis {
 	caseRelevance: string;
 	suggestedConnections: Array<{ targetType: string; reason: string; confidence: number }>;
 	escalationReason: string;
+	triples?: Array<{ subject: string; predicate: string; object: string; context?: string }>;
 }
 
 export interface AnalysisPipelineResult {
@@ -115,7 +116,28 @@ export async function runEvidenceAnalysisPipeline(
 	if (shouldEscalate) {
 		llmEscalated = true;
 		try {
-			llmSynthesis = await synthesizeWithLLM(input, yoloResult, tags);
+			const { synthesizeHolisticDocument } = await import('$lib/server/analysis/holistic-synthesizer.js');
+			if (input.existingText && input.existingText.length > 2000) {
+				const holistic = await synthesizeHolisticDocument(input.existingText);
+				if (holistic) {
+					llmSynthesis = {
+						summary: holistic.globalSummary,
+						keyFindings: holistic.keyTakeaways,
+						caseRelevance: 'Derived from holistic document analysis',
+						suggestedConnections: holistic.triples.map(t => ({
+							targetType: t.object,
+							reason: `${t.subject} ${t.predicate} ${t.object}`,
+							confidence: 0.9
+						})),
+						escalationReason: 'Holistic long-context synthesis triggered',
+						triples: holistic.triples
+					};
+				}
+			}
+			
+			if (!llmSynthesis) {
+				llmSynthesis = await synthesizeWithLLM(input, yoloResult, tags);
+			}
 			if (llmSynthesis) {
 				tags.push('llm:synthesized');
 				for (const finding of llmSynthesis.keyFindings) {
@@ -355,10 +377,12 @@ async function createGraphConnections(
 	if (synthesis?.suggestedConnections) {
 		for (const conn of synthesis.suggestedConnections) {
 			if (conn.confidence < 0.5) continue;
-			// Find matching sibling by type
+			// Find matching sibling by type or name
 			const match = siblingRows.find((s: any) => {
 				const tags: string[] = Array.isArray(s.ai_tags) ? s.ai_tags : [];
-				return tags.some((t: string) => t.toLowerCase().includes(conn.targetType.toLowerCase()));
+				const title = String(s.title ?? '').toLowerCase();
+				const target = conn.targetType.toLowerCase();
+				return tags.some((t: string) => t.toLowerCase().includes(target)) || title.includes(target);
 			});
 			if (match) {
 				await db.execute(
@@ -377,6 +401,36 @@ async function createGraphConnections(
 				);
 				created++;
 			}
+		}
+	}
+
+	// Persist triples to Neo4j via sidecar if available
+	if (synthesis?.triples && synthesis.triples.length > 0) {
+		try {
+			const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
+			const driver = getNeo4jDriver();
+			const session = driver.session();
+			for (const t of synthesis.triples) {
+				await session.run(
+					`MATCH (e:Evidence {id: $evidenceId})
+					 MERGE (s:Entity {name: $subject})
+					 MERGE (o:Entity {name: $object})
+					 MERGE (s)-[r:RELATION {type: $predicate}]->(o)
+					 SET r.evidenceId = $evidenceId, r.context = $context
+					 MERGE (e)-[:MENTIONS]->(s)
+					 MERGE (e)-[:MENTIONS]->(o)`,
+					{
+						evidenceId,
+						subject: t.subject,
+						predicate: t.predicate.replace(/\s+/g, '_').toUpperCase(),
+						object: t.object,
+						context: t.context ?? ''
+					}
+				);
+			}
+			await session.close();
+		} catch (err) {
+			console.warn('[AnalysisPipeline] Neo4j triple sync failed:', err);
 		}
 	}
 

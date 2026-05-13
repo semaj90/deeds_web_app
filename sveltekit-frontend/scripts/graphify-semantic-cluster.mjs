@@ -200,16 +200,17 @@ async function scrollCollection(collection, withVector = true) {
   const collected = [];
   let off = null;
   while (true) {
-    const body = { limit: SCROLL_BATCH, with_payload: true, with_vector: withVector };
-    if (off) body.offset = off;
-    // Filter: only points that have gemma4Summary or clusterId in payload
-    body.filter = {
-      must: [{ key: 'gemma4Summary', match: { text: '' } }]   // non-empty string match
+    const body = {
+      limit: SCROLL_BATCH,
+      with_payload: ['dir', 'directoryPath', 'filePath', 'gemma4Summary'],
+      with_vector: withVector,
+      filter: { must_not: [{ is_empty: { key: 'gemma4Summary' } }] },
+      ...(off ? { offset: off } : {})
     };
     const res = await fetch(`${QDRANT_URL}/collections/${collection}/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit: SCROLL_BATCH, with_payload: true, with_vector: withVector, ...(off ? { offset: off } : {}) }),
+      body: JSON.stringify(body),
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) { warn(`  Qdrant scroll ${collection} HTTP ${res.status}`); break; }

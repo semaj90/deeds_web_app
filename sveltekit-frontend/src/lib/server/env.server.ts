@@ -165,6 +165,7 @@ export const ENV = {
   TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8080`,
   // Alias — admin/inference-lane route references ENV.TURBOQUANT_URL; mirror BASE_URL.
   TURBOQUANT_URL: privateEnv.TURBOQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8080`,
+  TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR ?? `http://${LOOPBACK_IP}:8099`,
   RERANK_BASE_URL: privateEnv.RERANK_BASE_URL ?? privateEnv.RERANK_URL ?? `http://${LOOPBACK_IP}:8090`,
   RERANK_URL: privateEnv.RERANK_URL ?? privateEnv.RERANK_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
   VLM_BASE_URL: privateEnv.VLM_BASE_URL ?? `http://${LOOPBACK_IP}:8085`,

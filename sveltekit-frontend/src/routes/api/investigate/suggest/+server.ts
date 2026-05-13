@@ -68,6 +68,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         codebaseContext: null,
         kbChunks: [],
         caseChunks: [],
+        docChunks: [],
         policyDecision: null,
       },
       backend: 'ollama',

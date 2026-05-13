@@ -227,6 +227,101 @@
       "detail": "Bring up the orchestration plane (MCP), inference plane (TurboQuant llama-server), and retrieval topology plane. Use before Gemma4 agentic tool-calling tests."
     },
     {
+      "label": "RTX Pipeline: TurboVec ANN Sidecar (detached)",
+      "type": "shell",
+      "command": "node scripts/startup/run-detached.mjs turbovec:sidecar",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Spawn TurboVec Python ANN sidecar on :8099 (detached). Scrolls codebase_chunks_768 from Qdrant, builds 4-bit quantized index for ultra-fast HyperRAG candidate prefilter. Logs → logs/task-output/pipeline-test/turbovec-sidecar.{out,err}.log. Health: GET http://127.0.0.1:8099/health"
+    },
+    {
+      "label": "RTX Pipeline: Semantic Cluster (4D Manifold to Redis)",
+      "type": "shell",
+      "command": "npm run graphify:semantic-cluster",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run GPU k-means on glyph_atlas Qdrant collection → write cluster centroids + 4D manifold topology to Redis (cluster:kmeans:k20:*). Required to activate cluster-prefiltered HyperRAG multi-query. OOM-hardened: server-side Qdrant filter + minimal payload fields."
+    },
+    {
+      "label": "RTX Pipeline: HyperRAG Multi-Query (dry-run)",
+      "type": "shell",
+      "command": "node scripts/hyperrag-dense-multiquery.mjs --query \"retrieval context assembler pipeline\" --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run HyperRAG dense multi-query: embed → TurboVec ANN prefilter → 4D manifold cluster filter → Qdrant semantic+kag lanes → RRF merge + PageRank boost → CouchDB wiki enrichment. Output: logs/hyperrag-stream/latest.json (Bitfrost/rotorquant feed)."
+    },
+    {
+      "label": "RTX Pipeline: HyperRAG Custom Query",
+      "type": "shell",
+      "command": "node scripts/hyperrag-dense-multiquery.mjs --query \"${input:hyperragQuery}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run HyperRAG dense multi-query with a custom query string. Prompts for query text. Result feeds Bitfrost via logs/hyperrag-stream/latest.json."
+    },
+    {
+      "label": "RTX Pipeline: Full Startup (TurboVec + Cluster + Smoke)",
+      "dependsOn": [
+        "RTX Pipeline: TurboVec ANN Sidecar (detached)",
+        "RTX Pipeline: Semantic Cluster (4D Manifold to Redis)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Full RTX pipeline startup: spawn TurboVec sidecar (detached), then rebuild 4D manifold cluster topology in Redis. After this, hyperrag:multiquery will use ANN prefilter + cluster routing automatically."
+    },
+    {
       "label": "Topology Search: Ensure",
       "type": "shell",
       "command": "npm run topology:search:ensure",
@@ -10616,6 +10711,12 @@
       "type": "promptString",
       "description": "Session cookie for auth (copy 'auth_session=<value>' from browser DevTools → Application → Cookies)",
       "default": "auth_session="
+    },
+    {
+      "id": "hyperragQuery",
+      "type": "promptString",
+      "description": "HyperRAG dense search query — TurboVec ANN prefilter -> Qdrant multi-lane -> RRF -> CouchDB wiki enrichment",
+      "default": "context assembler retrieval kag pipeline"
     }
   ]
 }

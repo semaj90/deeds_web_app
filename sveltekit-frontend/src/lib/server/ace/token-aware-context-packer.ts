@@ -38,6 +38,19 @@ export type AceContextPacket = {
   packedContextJSON: string;
 };
 
+export type FeatureWikiPacket = {
+  featureId: string;
+  glyphMask: number;
+  summary: string;
+  topFiles: string[];
+  topTriples: [string, string, string][];
+  topGraphTriples?: [string, string, string][];
+  selectedSourceIds: string[];
+  cacheKeys: string[];
+  warnings: string[];
+  toolPolicy?: Record<string, unknown>;
+};
+
 export function estimateTokens(text: string): number {
   if (!text) return 0;
   return Math.ceil(text.length / 4);
@@ -131,6 +144,7 @@ export interface PackerInput {
     cacheFreshness?: number;
     [key: string]: any;
   }>;
+  featureWikiPacket?: FeatureWikiPacket | null;
   rawCode?: Array<{
     id: string;
     text: string;
@@ -256,6 +270,41 @@ export function packAceContext(input: PackerInput): AceContextPacket {
       markdownSections.push(`- ${triple[0]} ${triple[1]} ${triple[2]}`);
     }
   }
+  if (input.featureWikiPacket) {
+    const topTriples =
+      input.featureWikiPacket.topTriples ?? input.featureWikiPacket.topGraphTriples ?? [];
+    markdownSections.push('## Feature Wiki Packet');
+    markdownSections.push(`- Feature: ${input.featureWikiPacket.featureId}`);
+    markdownSections.push(`- Glyph mask: ${input.featureWikiPacket.glyphMask}`);
+    markdownSections.push(`- Summary: ${input.featureWikiPacket.summary}`);
+    if (input.featureWikiPacket.topFiles.length) {
+      markdownSections.push(
+        `- Top files: ${input.featureWikiPacket.topFiles.slice(0, 5).join(', ')}`
+      );
+    }
+    if (topTriples.length) {
+      markdownSections.push('- Top triples:');
+      for (const triple of topTriples.slice(0, 5)) {
+        markdownSections.push(`  - ${triple[0]} ${triple[1]} ${triple[2]}`);
+      }
+    }
+    if (input.featureWikiPacket.selectedSourceIds.length) {
+      markdownSections.push(
+        `- Selected source ids: ${input.featureWikiPacket.selectedSourceIds.slice(0, 8).join(', ')}`
+      );
+    }
+    if (input.featureWikiPacket.cacheKeys.length) {
+      markdownSections.push(
+        `- Cache keys: ${input.featureWikiPacket.cacheKeys.slice(0, 5).join(', ')}`
+      );
+    }
+    if (input.featureWikiPacket.warnings.length) {
+      markdownSections.push(`- Warnings: ${input.featureWikiPacket.warnings.join('; ')}`);
+    }
+    if (input.featureWikiPacket.toolPolicy && Object.keys(input.featureWikiPacket.toolPolicy).length) {
+      markdownSections.push(`- Tool policy: ${JSON.stringify(input.featureWikiPacket.toolPolicy)}`);
+    }
+  }
   if (packet.selectedSources.length) {
     markdownSections.push('## Selected Sources');
     for (const source of packet.selectedSources) {
@@ -288,9 +337,37 @@ export function packAceContext(input: PackerInput): AceContextPacket {
   packet.packedContextJSON = JSON.stringify({
     // Preserve the compact legacy cache payload for downstream consumers.
     c: packet.activeClusterIds,
-    grpo: input.grpoCheckpoints?.map((cp) => ({ id: cp.hyperedgeHash, r: cp.gradeScore, l: cp.loraHint })) || [],
+    feature: input.featureWikiPacket
+      ? {
+          id: input.featureWikiPacket.featureId,
+          glyphMask: input.featureWikiPacket.glyphMask,
+          topFiles: input.featureWikiPacket.topFiles.slice(0, 8),
+          topTriples: (
+            input.featureWikiPacket.topTriples ??
+            input.featureWikiPacket.topGraphTriples ??
+            []
+          ).slice(0, 8),
+          selectedSourceIds: input.featureWikiPacket.selectedSourceIds.slice(0, 8),
+          toolPolicy: input.featureWikiPacket.toolPolicy ?? {},
+        }
+      : null,
+    grpo:
+      input.grpoCheckpoints?.map((cp) => ({
+        id: cp.hyperedgeHash,
+        r: cp.gradeScore,
+        l: cp.loraHint,
+      })) || [],
     srcs: packet.selectedSources.map((s) => ({
-      t: s.type === 'cluster_summary' ? 'sum' : s.type === 'wiki_note' ? 'wiki' : s.type === 'graph_triple' ? 'tri' : s.type === 'chunk' ? 'chk' : 'file',
+      t:
+        s.type === 'cluster_summary'
+          ? 'sum'
+          : s.type === 'wiki_note'
+            ? 'wiki'
+            : s.type === 'graph_triple'
+              ? 'tri'
+              : s.type === 'chunk'
+                ? 'chk'
+                : 'file',
       id: s.id,
       s: Number(s.score.toFixed(3)),
     })),

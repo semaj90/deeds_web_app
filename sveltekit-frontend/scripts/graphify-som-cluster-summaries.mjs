@@ -317,7 +317,10 @@ async function main() {
   await redis.quit().catch(() => {});
 }
 
-main().catch(e => {
-  console.error('[fatal]', e);
-  process.exit(1);
-});
+main()
+  .then(() => process.exit(0))
+  .catch(e => {
+    console.error('[fatal]', e);
+    process.exit(1);
+  });
+

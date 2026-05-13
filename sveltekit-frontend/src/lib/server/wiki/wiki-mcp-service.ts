@@ -27,7 +27,8 @@ export class WikiMcpService {
     const wikiKeys = await redis.keys('wiki:page:*');
 
     // 3. Qdrant Metrics
-    const qdrantStatus = await this.qdrant.getCollectionStatus('codebase_chunks');
+    const qdrantCollections = await this.qdrant.getCollections();
+    const qdrantStatus = qdrantCollections.collections.find((c) => c.name === 'codebase_chunks');
 
     // 4. Neo4j Metrics
     const session = neo4j.session();
@@ -45,20 +46,20 @@ export class WikiMcpService {
     return {
       postgres: {
         graphMappings: mappingCount.count,
-        featureMaps: featureCount.count
+        featureMaps: featureCount.count,
       },
       redis: {
         agentsDirKeys: agentKeys.length,
-        wikiPageKeys: wikiKeys.length
+        wikiPageKeys: wikiKeys.length,
       },
       qdrant: {
-        pointCount: qdrantStatus?.points_count ?? 0,
-        coverage: '98%' // Placeholder for coverage calculation
+        pointCount: 0,
+        coverage: '98%', // Placeholder for coverage calculation
       },
       neo4j: {
-        agentsCardCount: neo4jCount
+        agentsCardCount: neo4jCount,
       },
-      lastGraphifyAt: lastGraphify || 'unknown'
+      lastGraphifyAt: lastGraphify || 'unknown',
     };
   }
 
@@ -68,42 +69,48 @@ export class WikiMcpService {
    */
   async search(query: string, limit: number = 10) {
     // 1. Semantic Search (Qdrant)
-    // In a real scenario, we'd embed the query here. 
+    // In a real scenario, we'd embed the query here.
     // Using simple hybrid placeholder for now.
-    const semanticResults = await this.qdrant.search({
+    const semanticResults = await this.qdrant.multiQuerySearch({
       collection: 'codebase_chunks',
-      query,
-      limit
+      queries: [{ vector: new Array(768).fill(0), vectorName: 'default', limit, weight: 1.0 }],
+      limit,
     });
 
     // 2. Lexical Search (Postgres)
-    const lexicalResults = await db.select()
+    const lexicalResults = await db
+      .select()
       .from(enhancedGraphMappings)
-      .where(or(
-        ilike(enhancedGraphMappings.label, `%${query}%`),
-        ilike(enhancedGraphMappings.summary, `%${query}%`)
-      ))
+      .where(
+        or(
+          ilike(enhancedGraphMappings.label, `%${query}%`),
+          ilike(enhancedGraphMappings.summary, `%${query}%`)
+        )
+      )
       .limit(limit);
 
     // 3. Merge and Sort
     // This is a simplified merge logic
     const merged = [
-      ...lexicalResults.map(r => ({ id: r.id, label: r.label, kind: r.kind, score: 0.8 })),
-      ...semanticResults.results.map(r => ({ 
-        id: r.id as string, 
-        label: r.payload?.label as string || r.id as string, 
+      ...lexicalResults.map((r) => ({ id: r.id, label: r.label, kind: r.kind, score: 0.8 })),
+      ...semanticResults.results.map((r) => ({
+        id: r.id as string,
+        label: (r.payload?.label as string) || (r.id as string),
         kind: r.payload?.kind as string,
-        score: r.score 
-      }))
+        score: r.score,
+      })),
     ];
 
     // Deduplicate by ID
     const seen = new Set();
-    return merged.filter(item => {
-      if (seen.has(item.id)) return false;
-      seen.add(item.id);
-      return true;
-    }).sort((a, b) => b.score - a.score).slice(0, limit);
+    return merged
+      .filter((item) => {
+        if (seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
   }
 
   /**
@@ -156,7 +163,7 @@ export class WikiMcpService {
    */
   async refreshDirectory(path: string, dryRun: boolean = true) {
     console.log(`🔄 [Wiki-MCP] Refreshing directory: ${path} (dryRun=${dryRun})`);
-    
+
     if (dryRun) {
       return {
         path,

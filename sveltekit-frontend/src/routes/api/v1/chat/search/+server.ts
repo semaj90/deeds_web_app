@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// Search messages by content (ilike for case-insensitive partial match)
 		const conditions = [ilike(chatMessages.content, `%${query}%`)];
 		if (userId) {
-			conditions.push(eq(chatMessages.userId, userId));
+				conditions.push(eq(chatMessages.userId, Number(userId)));
 		}
 
 		const results = await db

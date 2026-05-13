@@ -4,6 +4,8 @@ import { db } from '../db/client.js';
 import { featureMaps, grpoMemorySticks } from '../db/schema/features.js';
 import { getRedis } from '../redis.js';
 import { QdrantManager } from '../vector/qdrant-manager.js';
+import { aceContextKey } from '../cache-keys.js';
+import { buildAceContextRegistryPacket, writeAceContextRegistry } from '../ace/context-cache-registry.js';
 import type { FeatureCompileResult, FeatureMap, GrpoMemoryStick } from './feature-map.types.js';
 
 const FEATURE_TTL_SECONDS = 48 * 60 * 60;
@@ -71,6 +73,7 @@ export function prepareStoreWrites(result: FeatureCompileResult): FeatureMapStor
 
   let grpoMemoryStickRow: typeof grpoMemorySticks.$inferInsert | undefined;
   if (grpoMemoryStick) {
+    const acePacket = buildAceContextRegistryPacket(featureMap, grpoMemoryStick);
     grpoMemoryStickRow = {
       id: grpoMemoryStick.id,
       featureId: grpoMemoryStick.featureId,
@@ -85,8 +88,9 @@ export function prepareStoreWrites(result: FeatureCompileResult): FeatureMapStor
     };
     redisHotKeys.push(
       { key: `grpo:memory:${grpoMemoryStick.queryHash}`, value: JSON.stringify(grpoMemoryStick), ttlSeconds: GRPO_TTL_SECONDS },
-      { key: `ace:context:${grpoMemoryStick.contextPacketHash}`, value: JSON.stringify(toAceContextPacket(featureMap, grpoMemoryStick)), ttlSeconds: FEATURE_TTL_SECONDS }
+      { key: aceContextKey.packet(grpoMemoryStick.contextPacketHash), value: JSON.stringify(acePacket), ttlSeconds: FEATURE_TTL_SECONDS }
     );
+    void writeAceContextRegistry(acePacket).catch(() => null);
   }
 
   return {
@@ -209,22 +213,14 @@ export async function storeGrpoMemoryStick(stick: GrpoMemoryStick, prepared?: Fe
 
   const redis = getRedis();
   await redis.set(`grpo:memory:${stick.queryHash}`, JSON.stringify(stick), 'EX', GRPO_TTL_SECONDS);
-  await redis.set(`ace:context:${stick.contextPacketHash}`, JSON.stringify({ featureId: stick.featureId, cacheKeys: stick.cacheKeys }), 'EX', FEATURE_TTL_SECONDS);
+  await redis.set(
+    aceContextKey.packet(stick.contextPacketHash),
+    JSON.stringify({ featureId: stick.featureId, cacheKeys: stick.cacheKeys }),
+    'EX',
+    FEATURE_TTL_SECONDS
+  );
 
   return { success: true, stickId: stick.id };
-}
-
-function toAceContextPacket(featureMap: FeatureMap, stick: GrpoMemoryStick) {
-  // Project the feature map into the compact ACE packet cache shape.
-  return {
-    featureId: featureMap.featureId,
-    summary: featureMap.summaries.short,
-    glyphMask: featureMap.glyph.mask,
-    topFiles: stick.selectedSourceIds.slice(0, 8),
-    topGraphTriples: featureMap.graphTriples.slice(0, 8),
-    cacheKeys: featureMap.cache.redisKeys,
-    warnings: []
-  };
 }
 
 function buildNeo4jJsonl(featureMap: FeatureMap): string[] {

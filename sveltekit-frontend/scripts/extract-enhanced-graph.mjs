@@ -1,48 +1,142 @@
 /**
  * scripts/extract-enhanced-graph.mjs
- * 
+ *
  * Layered extractor for Enhanced Graph Mappings.
- * Combines AST, rg/awk, SVG, and Proto parsing.
+ * Optimized for low memory (Phase 3.8 OOM Hardening).
+ * Uses streaming ripgrep and batched DB persistence.
  */
 
 import fs from 'fs/promises';
 import path from 'path';
-import { glob } from 'glob';
-import { execSync } from 'child_process';
+import { spawn } from 'child_process';
+import readline from 'readline';
 import parser from '@babel/parser';
 import traverseDefault from '@babel/traverse';
-const traverse = traverseDefault.default || traverseDefault;
 import xml2js from 'xml2js';
-import protoLoader from '@grpc/proto-loader';
 import { sql } from 'drizzle-orm';
 
+const traverse = traverseDefault.default || traverseDefault;
+
+// Mock NodeFlags if types not available during run
+const NodeFlags = {
+  HAS_STATIC_IMPORTS: 1,
+  HAS_DYNAMIC_IMPORTS: 2,
+  SERVER_ONLY: 4,
+  CLIENT_SAFE: 8,
+  HAS_ROUTE: 16,
+  HAS_TEST: 32,
+  USES_REDIS: 64,
+  USES_QDRANT: 128,
+  HAS_SCHEMA: 256,
+  HAS_SVG_MAPPING: 512,
+};
 
 async function runEnhancedExtractor() {
-  console.log('🚀 [Enhanced-Graph-Extractor] Starting layered graph synthesis...');
+  console.log('🚀 [Enhanced-Graph-Extractor] Starting layered graph synthesis (OOM-Hardened)...');
 
-  // Late imports for DB and Types
   const { db } = await import('../src/lib/server/db/client.js');
   const { enhancedGraphMappings } = await import('../src/lib/server/db/schema/graph-mappings.js');
-  const { NodeFlags } = await import('../src/lib/server/types/graph-mapping.js');
 
-  const mappings = new Map();
-
-  // --- 1. AST Extractor (TypeScript/JavaScript) ---
-  console.log('🔍 Running AST Extractor (Imports, Exports, Boundaries)...');
   const EXTRA_INDEX_DIRS = ['scripts', 'tests', 'e2e', 'documents', 'docs'];
-  const codeFiles = await glob('{src,' + EXTRA_INDEX_DIRS.join(',') + '}/**/*.{ts,js,svelte}', { 
-    ignore: ['node_modules/**', 'dist/**', '.svelte-kit/**', 'tmp/**'] 
-  });
+  const SCAN_DIRS = ['src', ...EXTRA_INDEX_DIRS];
+  const DB_BATCH_SIZE = parseInt(process.env.GRAPH_BATCH_SIZE || '100', 10);
 
-  
-  for (const file of codeFiles) {
+  const pending = new Map();
+  let persisted = 0;
+
+  function mergeMappings(base, patch) {
+    return {
+      ...base,
+      ...patch,
+      flags: (base.flags ?? 0) | (patch.flags ?? 0),
+      edges: [...(base.edges ?? []), ...(patch.edges ?? [])],
+      metadata: { ...(base.metadata ?? {}), ...(patch.metadata ?? {}) },
+      scores: { ...(base.scores ?? {}), ...(patch.scores ?? {}) },
+      vectors: { ...(base.vectors ?? {}), ...(patch.vectors ?? {}) },
+      manifold4: patch.manifold4 ?? base.manifold4,
+    };
+  }
+
+  function queueMapping(mapping) {
+    const existing = pending.get(mapping.id);
+    pending.set(mapping.id, existing ? mergeMappings(existing, mapping) : mapping);
+  }
+
+  async function flushMappings() {
+    if (pending.size === 0) return;
+
+    const batch = Array.from(pending.values()).map((m) => ({
+      ...m,
+      updatedAt: new Date(),
+    }));
+
+    pending.clear();
+
+    await db
+      .insert(enhancedGraphMappings)
+      .values(batch)
+      .onConflictDoUpdate({
+        target: [enhancedGraphMappings.id],
+        set: {
+          kind: sql`COALESCE(EXCLUDED.kind, enhanced_graph_mappings.kind)`,
+          label: sql`COALESCE(EXCLUDED.label, enhanced_graph_mappings.label)`,
+          path: sql`COALESCE(EXCLUDED.path, enhanced_graph_mappings.path)`,
+          summary: sql`COALESCE(EXCLUDED.summary, enhanced_graph_mappings.summary)`,
+          edges: sql`COALESCE(enhanced_graph_mappings.edges, '[]'::jsonb) || COALESCE(EXCLUDED.edges, '[]'::jsonb)`,
+          scores: sql`COALESCE(enhanced_graph_mappings.scores, '{}'::jsonb) || COALESCE(EXCLUDED.scores, '{}'::jsonb)`,
+          flags: sql`COALESCE(enhanced_graph_mappings.flags, 0) | COALESCE(EXCLUDED.flags, 0)`,
+          vectors: sql`COALESCE(enhanced_graph_mappings.vectors, '{}'::jsonb) || COALESCE(EXCLUDED.vectors, '{}'::jsonb)`,
+          manifold4: sql`COALESCE(EXCLUDED.manifold4, enhanced_graph_mappings.manifold4)`,
+          metadata: sql`COALESCE(enhanced_graph_mappings.metadata, '{}'::jsonb) || COALESCE(EXCLUDED.metadata, '{}'::jsonb)`,
+          updatedAt: new Date(),
+        },
+      });
+
+    persisted += batch.length;
+  }
+
+  async function* streamFiles(dirs, includeGlobs) {
+    const args = ['--files', '--hidden', '--no-messages'];
+
+    for (const dir of dirs) args.push(dir);
+    for (const glob of includeGlobs) args.push('-g', glob);
+    for (const ignore of ['!node_modules/**', '!.svelte-kit/**', '!dist/**', '!tmp/**']) {
+      args.push('-g', ignore);
+    }
+
+    const proc = spawn('rg', args, { stdio: ['ignore', 'pipe', 'inherit'] });
+    const rl = readline.createInterface({ input: proc.stdout });
+
+    try {
+      for await (const line of rl) {
+        const file = line.trim();
+        if (file) yield file;
+      }
+    } finally {
+      await new Promise((resolve, reject) => {
+        proc.on('error', reject);
+        proc.on('close', (code) => {
+          if (code === 0 || code === 1) resolve();
+          else reject(new Error(`rg --files exited with code ${code}`));
+        });
+      });
+    }
+  }
+
+  // --- 1. AST Extractor ---
+  console.log('🔍 Running AST Extractor (Imports, Exports, Boundaries)...');
+
+  let astProcessed = 0;
+  for await (const file of streamFiles(SCAN_DIRS, ['*.ts', '*.js', '*.svelte'])) {
+    astProcessed++;
+    if (astProcessed % 500 === 0) process.stdout.write(`\r   Processed ${astProcessed} files...`);
+
     try {
       const content = await fs.readFile(file, 'utf-8');
       let flags = 0;
       const edges = [];
 
       if (file.endsWith('.svelte')) {
-        // Simple regex for svelte since babel might struggle with .svelte files directly
         if (content.includes('import')) flags |= NodeFlags.HAS_STATIC_IMPORTS;
         if (content.includes('await import')) flags |= NodeFlags.HAS_DYNAMIC_IMPORTS;
       } else {
@@ -59,7 +153,7 @@ async function runEnhancedExtractor() {
                 relation: 'STATIC_IMPORTS',
                 targets: [p.node.source.value],
                 confidence: 1.0,
-                source: 'ast'
+                source: 'ast',
               });
             },
             CallExpression(p) {
@@ -70,14 +164,13 @@ async function runEnhancedExtractor() {
                     relation: 'DYNAMIC_IMPORTS',
                     targets: [p.node.arguments[0].value],
                     confidence: 1.0,
-                    source: 'ast'
+                    source: 'ast',
                   });
                 }
               }
-            }
+            },
           });
-        } catch (astErr) {
-          // If AST fails, fallback to regex for basic flags
+        } catch {
           if (content.includes('import')) flags |= NodeFlags.HAS_STATIC_IMPORTS;
         }
       }
@@ -87,135 +180,95 @@ async function runEnhancedExtractor() {
       if (file.includes('+page') || file.includes('+server')) flags |= NodeFlags.HAS_ROUTE;
       if (file.includes('.test.') || file.includes('.spec.')) flags |= NodeFlags.HAS_TEST;
 
-      mappings.set(`file:${file}`, {
+      queueMapping({
         id: `file:${file}`,
         kind: 'file',
         label: path.basename(file),
         path: file,
         flags,
-        edges
+        edges,
       });
-    } catch (err) {
-      // console.warn(`Could not process ${file}: ${err.message}`);
+    } catch {}
+
+    if (pending.size >= DB_BATCH_SIZE) {
+      await flushMappings();
+    }
+  }
+  console.log(`\n✅ AST pass complete: ${astProcessed} files.`);
+
+  // --- 2. Ripgrep Extractor (Streaming) ---
+  console.log('🔍 Running Streaming Ripgrep Extractor...');
+
+  const patterns = [
+    { pattern: "redis\\.get\\(['\"]([^'\"]+)['\"]", relation: 'USES_REDIS_KEY', kind: 'redis_key', flag: NodeFlags.USES_REDIS },
+    { pattern: "redis\\.set\\(['\"]([^'\"]+)['\"]", relation: 'USES_REDIS_KEY', kind: 'redis_key', flag: NodeFlags.USES_REDIS },
+    { pattern: "qdrant\\.search\\(['\"]([^'\"]+)['\"]", relation: 'USES_QDRANT_COLLECTION', kind: 'qdrant_collection', flag: NodeFlags.USES_QDRANT },
+    { pattern: "qdrant\\.upsert\\(['\"]([^'\"]+)['\"]", relation: 'USES_QDRANT_COLLECTION', kind: 'qdrant_collection', flag: NodeFlags.USES_QDRANT },
+    { pattern: 'ENV\\.([A-Z0-9_]+)', relation: 'USES_ENV_VAR', kind: 'env_var', flag: 0 },
+    { pattern: "fetch\\(['\"]\\/api\\/([^'\"]+)['\"]", relation: 'CALLS_API', kind: 'api_path', flag: 0 },
+    { pattern: 'TODO:', relation: 'HAS_TODO', kind: 'todo', flag: 0 },
+  ];
+
+  for (const { pattern, relation, kind, flag } of patterns) {
+    console.log(`   Searching for ${relation}...`);
+    const rg = spawn('rg', [pattern, '--json', ...SCAN_DIRS], { stdio: ['ignore', 'pipe', 'inherit'] });
+    const rl = readline.createInterface({ input: rg.stdout });
+
+    try {
+      for await (const line of rl) {
+        try {
+          const data = JSON.parse(line);
+          if (data.type !== 'match') continue;
+
+          const filePath = data.data.path.text;
+          const matchText = data.data.submatches[0].match.text;
+          const targetMatch = matchText.match(/['"]([^'"]+)['"]/)?.[1] || matchText;
+
+          queueMapping({
+            id: `file:${filePath}`,
+            kind: 'file',
+            label: path.basename(filePath),
+            path: filePath,
+            flags: flag,
+            edges: [
+              {
+                relation,
+                targets: [`${kind}:${targetMatch}`],
+                confidence: 0.8,
+                source: 'rg',
+              },
+            ],
+          });
+
+          if (pending.size >= DB_BATCH_SIZE) {
+            await flushMappings();
+          }
+        } catch {}
+      }
+    } finally {
+      await new Promise((resolve, reject) => {
+        rg.on('error', reject);
+        rg.on('close', (code) => {
+          if (code === 0 || code === 1) resolve();
+          else reject(new Error(`rg exited with code ${code}`));
+        });
+      });
     }
   }
 
-  // --- 2. Ripgrep Extractor (Redis, Qdrant, Protos) ---
-  console.log('🔍 Running Ripgrep Extractor (Redis keys, Qdrant collections)...');
-  
-  const rgExtract = (pattern, relation, kind) => {
-    try {
-      const dirs = ['src', ...EXTRA_INDEX_DIRS].join(' ');
-      const output = execSync(`rg "${pattern}" --json ${dirs}`, { encoding: 'utf-8' });
-
-      const lines = output.split('\n').filter(Boolean);
-      for (const line of lines) {
-        const data = JSON.parse(line);
-        if (data.type === 'match') {
-          const file = data.data.path.text;
-          const match = data.data.submatches[0].match.text;
-          const target = match.match(/['"]([^'"]+)['"]/)?.[1] || match;
-          
-          const mapping = mappings.get(`file:${file}`);
-          if (mapping) {
-            mapping.edges.push({
-              relation,
-              targets: [`${kind}:${target}`],
-              confidence: 0.8,
-              source: 'rg'
-            });
-            if (kind === 'redis_key') mapping.flags |= NodeFlags.USES_REDIS;
-            if (kind === 'qdrant_collection') mapping.flags |= NodeFlags.USES_QDRANT;
-          }
-        }
-      }
-    } catch (err) { /* ignore rg errors */ }
-  };
-
-  rgExtract("redis\\.get\\(['\"]([^'\"]+)['\"]", 'USES_REDIS_KEY', 'redis_key');
-  rgExtract("redis\\.set\\(['\"]([^'\"]+)['\"]", 'USES_REDIS_KEY', 'redis_key');
-  rgExtract("qdrant\\.search\\(['\"]([^'\"]+)['\"]", 'USES_QDRANT_COLLECTION', 'qdrant_collection');
-  rgExtract("qdrant\\.upsert\\(['\"]([^'\"]+)['\"]", 'USES_QDRANT_COLLECTION', 'qdrant_collection');
-  rgExtract("ENV\\.([A-Z0-9_]+)", 'USES_ENV_VAR', 'env_var');
-  rgExtract("fetch\\(['\"]\\/api\\/([^'\"]+)['\"]", 'CALLS_API', 'api_path');
-  rgExtract("TODO:", 'HAS_TODO', 'todo');
-
-  // --- 3. Proto Extractor (Services and Methods) ---
-  console.log('🔍 Running Proto Extractor (gRPC Services)...');
-  const protoFiles = await glob('**/*.proto', { ignore: ['node_modules/**'] });
-
-  /*
-  for (const file of protoFiles) {
-    try {
-      const packageDefinition = await protoLoader.load(file, {
-        keepCase: true,
-        longs: String,
-        enums: String,
-        defaults: true,
-        oneofs: true
-      }).catch(err => {
-        // console.warn(`   [SKIP] Proto ${file}: ${err.message}`);
-        return null;
-      });
-      
-      if (!packageDefinition) continue;
-      
-      const id = `proto:${path.basename(file)}`;
-      const edges = [];
-      
-      for (const [key, value] of Object.entries(packageDefinition)) {
-        if (value.format === 'Protocol Buffer Service Descriptor') {
-          const serviceName = key.split('.').pop();
-          edges.push({
-            relation: 'EXPORTS',
-            targets: [`grpc_service:${serviceName}`],
-            confidence: 1.0,
-            source: 'proto'
-          });
-          
-          for (const [methodName, methodValue] of Object.entries(value)) {
-            if (typeof methodValue === 'object' && methodValue.path) {
-              edges.push({
-                relation: 'EXPORTS',
-                targets: [`grpc_method:${methodName}`],
-                confidence: 1.0,
-                source: 'proto'
-              });
-            }
-          }
-        }
-      }
-
-      mappings.set(id, {
-        id,
-        kind: 'proto',
-        label: path.basename(file),
-        path: file,
-        flags: NodeFlags.HAS_SCHEMA,
-        edges,
-        summary: `gRPC Protocol definition: ${path.basename(file)}`
-      });
-    } catch (err) {}
-  }
-  */
-
-  // --- 4. SVG Extractor (Nodes and Connections) ---
-  console.log('🔍 Running SVG Extractor (Architecture Nodes)...');
-  const svgFiles = await glob('{src,static}/**/*.svg');
+  // --- 3. SVG Extractor ---
+  console.log('🔍 Running SVG Extractor...');
   const svgParser = new xml2js.Parser();
 
-  for (const file of svgFiles) {
+  for await (const file of streamFiles(['src', 'static'], ['*.svg'])) {
     try {
       const content = await fs.readFile(file, 'utf-8');
       const result = await svgParser.parseStringPromise(content);
-      
       const id = `svg:${path.basename(file)}`;
-      const edges = [];
-      
-      // Simple XML traversal to find text labels
+
       const findText = (obj) => {
-        let texts = [];
-        if (typeof obj !== 'object') return texts;
+        const texts = [];
+        if (typeof obj !== 'object' || obj === null) return texts;
         for (const key in obj) {
           if (key === 'text' || key === '_') {
             if (typeof obj[key] === 'string') texts.push(obj[key]);
@@ -228,90 +281,114 @@ async function runEnhancedExtractor() {
       };
 
       const labels = findText(result);
-      
-      mappings.set(id, {
+      queueMapping({
         id,
         kind: 'svg',
         label: path.basename(file),
         path: file,
         flags: NodeFlags.HAS_SVG_MAPPING,
-        edges,
-        summary: `SVG Architecture diagram containing: ${labels.slice(0, 10).join(', ')}`,
-        metadata: { labels }
+        edges: [],
+        summary: `SVG Architecture diagram: ${labels.slice(0, 10).join(', ')}`,
+        metadata: { labels },
       });
-    } catch (err) {}
+    } catch {}
+
+    if (pending.size >= DB_BATCH_SIZE) {
+      await flushMappings();
+    }
   }
 
-  // --- 5. AGENTS.md Context Extractor (Recommendations & Protocols) ---
-  console.log('🔍 Running AGENTS.md Extractor (Context & Recommendations)...');
-  const agentsFiles = await glob('**/AGENTS.md', { ignore: ['node_modules/**'] });
+  // --- 3b. Proto Extractor ---
+  console.log('🔍 Running Proto Extractor...');
+  for await (const file of streamFiles(['proto', 'src/lib/server/grpc'], ['*.proto'])) {
+    try {
+      const content = await fs.readFile(file, 'utf-8');
+      const services = [...content.matchAll(/service\s+(\w+)/g)].map((m) => m[1]);
+      const rpcs = [...content.matchAll(/rpc\s+(\w+)\s*\(/g)].map((m) => m[1]);
+      const messages = [...content.matchAll(/message\s+(\w+)/g)].map((m) => m[1]);
 
-  for (const file of agentsFiles) {
+      queueMapping({
+        id: `proto:${file}`,
+        kind: 'proto',
+        label: path.basename(file),
+        path: file,
+        flags: 0,
+        edges: [
+          ...services.map((service) => ({
+            relation: 'DECLARES_SERVICE',
+            targets: [`grpc_service:${service}`],
+            confidence: 0.9,
+            source: 'proto',
+          })),
+          ...rpcs.map((rpc) => ({
+            relation: 'DECLARES_RPC',
+            targets: [`grpc_method:${rpc}`],
+            confidence: 0.9,
+            source: 'proto',
+          })),
+        ],
+        summary: [
+          `services: ${services.slice(0, 5).join(', ') || 'none'}`,
+          `rpcs: ${rpcs.slice(0, 5).join(', ') || 'none'}`,
+          `messages: ${messages.slice(0, 5).join(', ') || 'none'}`,
+        ].join(' | '),
+        metadata: { services, rpcs, messages },
+      });
+    } catch {}
+
+    if (pending.size >= DB_BATCH_SIZE) {
+      await flushMappings();
+    }
+  }
+
+  // --- 4. AGENTS.md Extractor ---
+  console.log('🔍 Running AGENTS.md Extractor...');
+  for await (const file of streamFiles(['.'], ['AGENTS.md'])) {
     try {
       const content = await fs.readFile(file, 'utf-8');
       const dir = path.dirname(file);
       const id = `dir:${dir === '.' ? 'root' : dir}`;
-      
-      // Basic extraction of features and protocols from AGENTS.md
+
       const features = content.match(/## (Features|Repo at a glance)([\s\S]*?)##/i)?.[2] || '';
       const protocols = content.match(/## (Protocols|Critical conventions)([\s\S]*?)##/i)?.[2] || '';
-      
-      const mapping = mappings.get(id) || {
+
+      const existing = pending.get(id) || {
         id,
         kind: 'directory',
         label: path.basename(dir) || 'root',
         path: dir,
         flags: 0,
         edges: [],
-        metadata: {}
+        metadata: {},
       };
 
-      mapping.summary = content.split('\n').slice(0, 5).join('\n'); // Top 5 lines as summary
-      mapping.metadata = {
-        ...mapping.metadata,
-        agentsContext: true,
-        extractedFeatures: features.trim(),
-        criticalConventions: protocols.trim()
-      };
+      queueMapping({
+        ...existing,
+        summary: content.split('\n').slice(0, 5).join('\n'),
+        metadata: {
+          ...existing.metadata,
+          agentsContext: true,
+          extractedFeatures: features.trim(),
+          criticalConventions: protocols.trim(),
+        },
+      });
+    } catch {}
 
-      mappings.set(id, mapping);
-    } catch (err) {}
-  }
-
-  // --- 6. Persist to DB ---
-  console.log(`💾 Persisting ${mappings.size} enhanced mappings to DB (batching)...`);
-  
-  const allMappings = Array.from(mappings.values());
-  const BATCH_SIZE = 100;
-
-  for (let i = 0; i < allMappings.length; i += BATCH_SIZE) {
-    const batch = allMappings.slice(i, i + BATCH_SIZE).map(m => ({
-      ...m,
-      updatedAt: new Date()
-    }));
-
-    try {
-      await db.insert(enhancedGraphMappings)
-        .values(batch)
-        .onConflictDoUpdate({
-          target: [enhancedGraphMappings.id],
-          set: {
-            label: sql`EXCLUDED.label`,
-            edges: sql`EXCLUDED.edges`,
-            flags: sql`EXCLUDED.flags`,
-            summary: sql`EXCLUDED.summary`,
-            updatedAt: new Date()
-          }
-        });
-      process.stdout.write(`\r   Persisted ${Math.min(i + BATCH_SIZE, allMappings.length)} / ${allMappings.length}...`);
-    } catch (dbErr) {
-      console.error(`\nDB Batch Error at index ${i}: ${dbErr.message}`);
+    if (pending.size >= DB_BATCH_SIZE) {
+      await flushMappings();
     }
   }
-  console.log('\n');
 
+  // --- 5. Persist to DB ---
+  console.log('💾 Persisting enhanced mappings to DB...');
 
-  console.log('🎉 Enhanced Graph Extraction completed successfully.');
+  try {
+    await flushMappings();
+  } catch (dbErr) {
+    console.error(`\nDB batch error: ${dbErr.message}`);
+  }
+
+  console.log(`\n✅ Persistence complete. ${persisted} rows written.`);
   process.exit(0);
 }
 

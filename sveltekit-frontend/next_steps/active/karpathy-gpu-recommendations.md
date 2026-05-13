@@ -1,6 +1,6 @@
 # Karpathy GPU Authority Blend — Recommendations
 
-> Run: 2026-05-12T19:12:18.320Z
+> Run: 2026-05-13T20:54:26.619Z
 > Mode: `topN` · candidates: 44 · embedded: 9 · skipped: 35
 > GPU: encode=true · attention=true
 
@@ -11,13 +11,13 @@ Composite = 0.4·PageRank + 0.3·AttentionScore + 0.3·GraphAuthority
 | Rank | File | PageRank | Attention | Authority | Blend | Community |
 |------|------|----------|-----------|-----------|-------|-----------|
 | 1 | `src/lib/server/db/client.ts` | 7.062 | 0.747 | 0.555 | **3.215** | 1305 |
-| 2 | `src/lib/server/env.server.ts` | 5.278 | 0.510 | 0.374 | **2.376** | 608 |
+| 2 | `src/lib/server/env.server.ts` | 5.278 | 0.512 | 0.374 | **2.377** | 1305 |
 | 3 | `src/lib/server/redis.ts` | 3.904 | 0.110 | 0.306 | **1.686** | 1305 |
-| 4 | `src/lib/server/ollama.ts` | 3.413 | 0.623 | 0.324 | **1.649** | 1305 |
-| 5 | `src/lib/config/env.server.ts` | 2.715 | 0.431 | 0.197 | **1.274** | 1305 |
-| 6 | `src/lib/server/db/relations.ts` | 1.835 | 0.926 | 0.253 | **1.087** | 608 |
+| 4 | `src/lib/server/ollama.ts` | 3.413 | 0.624 | 0.324 | **1.650** | 1305 |
+| 5 | `src/lib/config/env.server.ts` | 2.715 | 0.433 | 0.197 | **1.275** | 1305 |
+| 6 | `src/lib/server/db/relations.ts` | 1.835 | 0.925 | 0.253 | **1.087** | 1305 |
 | 7 | `src/lib/server/grpc/embedding-client.ts` | 1.851 | 0.671 | 0.216 | **1.006** | 1910 |
-| 8 | `src/lib/server/ai/langgraph-client.ts` | 1.597 | 0.560 | 0.185 | **0.862** | 1305 |
+| 8 | `src/lib/server/ai/langgraph-client.ts` | 1.597 | 0.563 | 0.185 | **0.863** | 1305 |
 | 9 | `src/lib/server/gpu/libtorch-bridge.ts` | 1.787 | 0.061 | 0.207 | **0.795** | 1305 |
 
 ## Recommended Actions

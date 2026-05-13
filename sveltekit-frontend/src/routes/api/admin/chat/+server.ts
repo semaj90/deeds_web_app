@@ -25,7 +25,7 @@ const chatSchema = z.object({
 export const POST: RequestHandler = async ({ request, locals }) => {
   const body = await request.json();
   const { message, history, chatId, systemContext } = chatSchema.parse(body);
-  const userId = locals.user?.id;
+  const userId = locals.user?.id ? Number(locals.user.id) : undefined;
 
   // 1. Log User Message
   const userMsgId = `msg_${Date.now()}_u`;
@@ -39,15 +39,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   });
 
   // 2. Prepare Context (Indexing Studio Context + RabbitMQ Health)
-  const systemPrompt = `You are the TRACE Indexing Assistant. 
+  const systemPrompt = `You are the TRACE Indexing Assistant.
   You help admins manage the N8-N10 Knowledge Retrieval pipeline.
-  
+
   CURRENT SYSTEM STATUS:
   - RabbitMQ: ${systemContext?.rabbit?.pending ?? 0} pending, ${systemContext?.rabbit?.failed ?? 0} failed.
   - Postgres: ${systemContext?.postgres?.summary_count ?? 0} snippets.
   - Neo4j: ${systemContext?.neo4j?.nodes ?? 0} nodes.
   - Qdrant: ${systemContext?.qdrant?.collectionCount ?? 0} collections.
-  
+
   If RabbitMQ "failed" count is > 0, prioritize explaining potential worker bottlenecks (GPU exhaustion or SIMD-bridge crashes).
   Provide technical, precise, and concise answers.`;
 

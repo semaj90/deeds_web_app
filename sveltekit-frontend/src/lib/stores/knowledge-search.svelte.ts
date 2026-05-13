@@ -54,6 +54,8 @@ export class KnowledgeSearchStore {
   metadata = $state<SearchMetadata | undefined>(undefined);
   synthesizeEnabled = $state(false);
   provider = $state<LLMProvider>('ollama');
+  status = $state<any>(null);
+  statusLoading = $state(false);
 
   // Derived values (automatically recompute when dependencies change)
   get hasResults() {
@@ -109,6 +111,24 @@ export class KnowledgeSearchStore {
       this.error = `❌ ${err instanceof Error ? err.message : 'Unknown error'}`;
     } finally {
       this.loading = false;
+    }
+  }
+
+  /**
+   * Fetch backend status
+   */
+  async fetchStatus() {
+    this.statusLoading = true;
+    try {
+      const response = await fetch('/api/wiki/status');
+      if (response.ok) {
+        const data = await response.json();
+        this.status = data.status;
+      }
+    } catch (err) {
+      console.warn('Failed to fetch wiki status:', err);
+    } finally {
+      this.statusLoading = false;
     }
   }
 
