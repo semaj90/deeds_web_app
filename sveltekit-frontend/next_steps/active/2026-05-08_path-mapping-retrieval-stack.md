@@ -14,6 +14,7 @@ Create the canonical path-mapping layer that lets the agent pull the right repo,
 - `scripts/index-vault-md.mjs`
 - `scripts/kb/search-graph-cards.mjs`
 - `src/lib/phase72/routeGraphAdapter.ts`
+- `docs/design/2026-05-13_daily-activity-atlas.md`
 
 ## What Already Exists
 
@@ -28,6 +29,7 @@ Create the canonical path-mapping layer that lets the agent pull the right repo,
 - AGENTS.md envelopes
 - KnowledgeCards from codebase graph and legal/admin docs
 - Vault markdown and session notes
+- Daily activity atlas entries and date-indexed workflow summaries
 - Web sources via Firecrawl or search
 - GitHub/MCP metadata when needed
 
@@ -45,9 +47,10 @@ Create the canonical path-mapping layer that lets the agent pull the right repo,
 
 1. Normalize path lookup into one shared helper shape.
 2. Feed repo/docs/web/MCP sources into the same retrieval ladder.
-3. Keep read-only context extraction separate from mutation paths.
-4. Reuse `context_for_file` everywhere before adding new tools.
-5. Only then expand to broader agentic error fixing.
+3. Add daily activity atlas lookups for date-scoped workflow context.
+4. Keep read-only context extraction separate from mutation paths.
+5. Reuse `context_for_file` everywhere before adding new tools.
+6. Only then expand to broader agentic error fixing.
 
 ## Checklist
 
@@ -62,4 +65,5 @@ Create the canonical path-mapping layer that lets the agent pull the right repo,
 
 - The agent can answer “what owns this file?” quickly.
 - The agent can find the nearest doc, card, and route context.
+- The agent can pull today/yesterday workflow context from the daily atlas.
 - The same path map works for code, docs, and legal/admin sources.

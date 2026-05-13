@@ -174,7 +174,7 @@ Cache keys are SHA-256 hashes of:
 Messages are normalized to improve cache hit rates:
 - Trimmed whitespace
 - Collapsed multiple spaces
-- Normalized quotes (`"` → `"`, `'` → `'`)
+- Normalized quotes (`\"` → `\"`, `'` → `'`)
 
 ### TTL Settings
 
