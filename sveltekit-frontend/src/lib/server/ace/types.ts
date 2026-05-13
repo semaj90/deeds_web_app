@@ -334,7 +334,7 @@ export interface ACEContext {
   } | null;
   /** PostgreSQL schema context (tables, columns, types) for database reasoning */
   dbSchemaContext?: string;
-  /** Token-aware ACE context packet (if tokenAwarePacking was enabled) */
+  /** Packed ACE context payload used by token-aware assembly paths */
   aceContextPacket?: import('./token-aware-context-packer.js').AceContextPacket;
 }
 

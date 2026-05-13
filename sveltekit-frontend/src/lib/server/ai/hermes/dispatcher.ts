@@ -64,6 +64,13 @@ export class HermesDispatcher {
 
     const toolResults: ToolResult[] = [];
 
+    const resolveToolArgs = (toolReq: SkillRecipe['tools'][number]) => {
+      if (!toolReq.args) return {};
+      return typeof toolReq.args === 'function'
+        ? toolReq.args({ ...input, ...ctx, results: toolResults })
+        : toolReq.args;
+    };
+
     if (recipe.parallel) {
       // Parallel execution
       const promises = recipe.tools.map(async (toolReq, idx) => {
@@ -78,7 +85,7 @@ export class HermesDispatcher {
         }
 
         try {
-          const args = toolReq.args ? toolReq.args({ ...input, ...ctx, results: toolResults }) : {};
+          const args = resolveToolArgs(toolReq);
           const data = await toolDef.handler(args, ctx);
           const duration = performance.now() - toolStart;
           const tr = { tool: toolReq.name, ok: true, data, durationMs: duration };
@@ -108,7 +115,7 @@ export class HermesDispatcher {
         }
 
         try {
-          const args = toolReq.args ? toolReq.args({ ...input, ...ctx, results: toolResults }) : {};
+          const args = resolveToolArgs(toolReq);
           const data = await toolDef.handler(args, ctx);
           const duration = performance.now() - toolStart;
           

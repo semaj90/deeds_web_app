@@ -43,14 +43,24 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/features
 
 ## Snapshot
 
-- server module directory with 8 files, 0 API handlers, 2 Drizzle refs
+- server module directory with 8 files, 0 API handlers, 1 Drizzle refs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `lib` `server` `db-schema` `zod`

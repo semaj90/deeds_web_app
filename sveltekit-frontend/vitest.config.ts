@@ -214,6 +214,7 @@ export default defineConfig({
       'tests/rg-atlas.spec.ts',
       // P1: autoencoder weights + 768→64 encode chain (2026-05-11)
       'tests/autoencoder-encoded64.spec.ts',
+      'tests/feature-map.integrity.spec.ts',
     ],
     exclude: [
       'node_modules/**',

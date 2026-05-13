@@ -234,7 +234,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
     name: 'web:search',
     description: 'Live web search via SearXNG',
     handler: async (args, ctx) => {
-      const { webSearch } = await import('../tools/web-search.js');
+      const { webSearch } = await import('$lib/server/agent/tools/web-search.js');
       const query = args.query || ctx.userQuery;
       return await webSearch({
         query,
@@ -275,7 +275,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
       try {
         const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
         const collections = await qdrant.getCollections();
-        results.qdrant = { status: 'healthy', collections: collections.length };
+        results.qdrant = { status: 'healthy', collections: collections.collections.length };
       } catch (e) { results.qdrant = { status: 'unreachable', error: String(e) }; }
 
       // gRPC Services (Check ports)
@@ -419,9 +419,9 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
   },
 
   // --- Diagnostics ---
-  'diagnostics:health': {
-    name: 'diagnostics:health',
-    description: 'Check service availability (Redis, Qdrant, etc.)',
+  'diagnostics:metrics_health': {
+    name: 'diagnostics:metrics_health',
+    description: 'Check service availability via Error Metrics Collector (Redis, Qdrant, etc.)',
     handler: async () => {
       const { getMetricsCollector } = await import('$lib/server/services/error-analysis/index.js');
       const metrics = getMetricsCollector();
@@ -534,11 +534,12 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
     }
   },
 
-  // --- Token-aware ACE context packer ---
+  // ACE pack_context tool bridge.
   'ace:pack_context': {
     name: 'ace:pack_context',
     description: 'Compress all retrieval results into a token-safe RetrievalPacket for Gemma4. Never exceeds budget.',
     handler: async (args) => {
+      // Thin tool bridge: normalize tool arguments, then hand off to the canonical packer.
       const { packContext, serializePacket } = await import('$lib/server/ace/token-aware-packer.js');
       const packet = packContext({
         query:           String(args.query ?? ''),
@@ -719,7 +720,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
     name: 'hermes:spawn_subagent',
     description: 'Spawn a sub-agent to handle a recursive sub-task',
     handler: async (args, ctx) => {
-      const res = await fetch(`http://localhost:5173/api/ai/agent`, {
+      const res = await fetch(`${ENV.PUBLIC_API_URL || 'http://localhost:5173'}/api/ai/agent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

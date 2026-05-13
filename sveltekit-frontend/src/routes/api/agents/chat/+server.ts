@@ -113,7 +113,7 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 		const timeout = TOOL_TIMEOUT_MS[name] ?? 5_000;
 		switch (name) {
 			case 'web_search': {
-				const { webSearch, formatWebSearchResults } = await import('$lib/server/agent/tools/web-search-searxng.js');
+				const { webSearch, formatWebSearchResults } = await import('$lib/server/agent/tools/web-search.js');
 				const searchResult = await Promise.race([
 					webSearch({ query, maxResults: Number(args.maxResults ?? 5), searchType: (args.searchType as 'general' | 'stackoverflow' | 'github' | 'docs') || 'general' }),
 					new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))

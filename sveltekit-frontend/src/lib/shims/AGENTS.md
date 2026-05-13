@@ -54,17 +54,27 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/shims
 
 ## Snapshot
 
-- shared library directory with 11 files, 0 API handlers, 1 Drizzle refs, 1 SSR-unsafe
-- Audit score: **90/100**
-- 🔴 SSR-unsafe: 1
-- Tags: `src` `lib` `shims` `db-schema` `zod` `ssr-unsafe`
+- shared library directory with 11 files, 0 API handlers, 1 Drizzle refs
+- Audit score: **100/100**
+- no audit signals
+- Tags: `src` `lib` `shims` `db-schema` `zod`
 
 ## Files (11)
 
@@ -73,12 +83,6 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 - `src/lib/shims/drizzle-node-postgres.ts`
 - `src/lib/shims/fs-browser-shim.js`
 - `src/lib/shims/ioredis-browser-shim.js`
-
-## Constraints
-
-> Forbidden / risky patterns. Derived from audit warnings + gate FAILs.
-
-- ⚠️ 1 SSR-unsafe globals
 
 ## Tools
 
@@ -89,11 +93,6 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 - clusters.get_members
 - context.build_kv_packet
 - taxonomy.children
-## Todos + Enhancements
-
-- **[MED]** 1 SSR-unsafe globals
-
-_Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 
 ## Retrieval / Rerank Hints
 

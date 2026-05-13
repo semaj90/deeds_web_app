@@ -18,6 +18,10 @@
  *   ace:rank:demand   — 1h TTL, hit-demand hash (from chunk_hit_log)
  *   ace:authority:top — 6h TTL, top entries from graphify:gds
  *   ace:code:*        — Codebase context cache
+ *   gpu:*             — Small reusable tensor results (encoded64, topk, rerank)
+ *   cluster:*         — Cluster summary and membership artifacts
+ *   graph:*           — Graph expansion / triple packets
+ *   ace:context:*     — Packed ACE context packet
  *   taxonomy:clusters — SOM/K-means cluster centroids
  *   gpu:karpathy:*    — GPU rank/scoring metadata
  */
@@ -173,6 +177,31 @@ export const centroidKey = {
   cluster: (clusterId: number) => `taxonomy:clusters:gpu:${clusterId}`,
   /** centroid:som:{x}:{y} — SOM cell centroid vector */
   som: (x: number, y: number) => `taxonomy:clusters:som:${x}:${y}`,
+};
+
+// ── Redis Tensor Cache Artifacts ─────────────────────────────────────────────
+
+/**
+ * Compact reusable tensor results. These are small cacheable outputs, not raw VRAM state.
+ */
+export const tensorCacheKey = {
+  encoded64: (queryHash: string) => `gpu:encoded64:${queryHash}`,
+  topkClusters: (queryHash: string) => `gpu:topk_clusters:${queryHash}`,
+  rerankScores: (queryHash: string) => `gpu:rerank_scores:${queryHash}`,
+};
+
+export const clusterTensorKey = {
+  summary: (clusterId: number) => `cluster:summary:${clusterId}`,
+  members: (clusterId: number) => `cluster:members:${clusterId}`,
+};
+
+export const graphPacketKey = {
+  expand: (hash: string) => `neo4j:expand:${hash}`,
+  triples: (hash: string) => `graph:triples:${hash}`,
+};
+
+export const aceContextKey = {
+  packet: (contextHash: string) => `ace:context:${contextHash}`,
 };
 
 // ── Analytics & Ranking Keys (G17) ───────────────────────────────────────────

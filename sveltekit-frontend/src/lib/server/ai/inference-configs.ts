@@ -1,6 +1,8 @@
 import type { QuantRuntimeConfig, RuntimeBackend } from '$lib/ai/quant-config.js';
 import { VERIFIED_QUANT_CONFIGS } from '$lib/ai/quant-config.js';
 
+export type { QuantRuntimeConfig, RuntimeBackend } from '$lib/ai/quant-config.js';
+
 export type InferenceRuntimeConfig = QuantRuntimeConfig & {
 	profile: string;
 	turboQuant: boolean;

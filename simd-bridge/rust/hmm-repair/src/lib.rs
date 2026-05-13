@@ -122,8 +122,14 @@ impl Model {
 
         for (state, words) in emissions_data {
             let mut e = HashMap::new();
+            let alpha = 0.001;
+            let v = 5000.0; // Estimated legal vocabulary size
+            let total_prob: f64 = words.iter().map(|(_, p)| p).sum();
+            
+            // Re-normalize with Laplace smoothing
             for (word, prob) in words {
-                e.insert(word.to_string(), prob);
+                let smoothed = (prob + alpha) / (total_prob + alpha * v);
+                e.insert(word.to_string(), smoothed);
             }
             emissions.insert(state, e);
         }
@@ -132,11 +138,16 @@ impl Model {
     }
 
     fn log_emit(&self, state: HmmState, word: &str) -> f64 {
+        let alpha = 0.001;
+        let v = 5000.0;
+        let total_prob = 1.0; // Base normalized sum
+
         let prob = self.emissions.get(&state)
             .and_then(|e| e.get(word))
             .cloned()
-            .unwrap_or(0.01);
-        (prob + 1e-10).ln()
+            .unwrap_or(alpha / (total_prob + alpha * v));
+            
+        (prob + 1e-12).ln()
     }
 
     fn log_trans(&self, from: HmmState, to: HmmState) -> f64 {
@@ -144,7 +155,7 @@ impl Model {
             .and_then(|t| t.get(&to))
             .cloned()
             .unwrap_or(1.0 / 7.0);
-        (prob + 1e-10).ln()
+        (prob + 1e-12).ln()
     }
 }
 

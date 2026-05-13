@@ -36,10 +36,11 @@ vi.mock('$lib/config/env.server.js', () => ({
 // ── Mock Redis ──────────────────────────────────────────────────────────
 const mockRedisGet = vi.fn();
 const mockRedis = {
-  get: (...args: any[]) => mockRedisGet(...args),
+  get: (...args: any[]) => Promise.resolve(mockRedisGet(...args)),
   set: vi.fn(async () => 'OK'),
   ping: vi.fn(async () => 'PONG'),
   mget: vi.fn(async () => []),
+  zrevrangebyscore: vi.fn(async () => []),
   smembers: vi.fn(async () => []),
   exists: vi.fn(async () => 0),
   pipeline: vi.fn(() => ({

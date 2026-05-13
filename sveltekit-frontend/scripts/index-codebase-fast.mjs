@@ -235,16 +235,18 @@ const RE_SV4_EVENT   = /\bon:[a-z][a-z]+=\s*\{/;
 const RE_SV4_DISPATCH= /createEventDispatcher\(\)/;
 const RE_RUNE_IN_TS  = /\$(?:state|derived|effect|props)\s*[(<]/;
 // G15 — SSR unsafe globals
-// Match true global identifier usage: not preceded by `.`, alphanum, or `-` (so `document-embed`, `documents:`, `myDocument` don't match).
-// Must be followed by access syntax (.X, [...], (...), ` =`, `==`, comparison) — typical global-access patterns.
+// Match true global identifier usage: not preceded by `.` (property access like `dom.window.x` or string
+// literals like `'test-document.pdf'`), alphanum, or `-` (so `document-embed`, `documents:`, `myDocument` don't match).
+// Negative lookbehind (?<![.\w]) prevents `dom.window.x`, `dom.document.x`, etc. from triggering.
 // Reject `?:` (TS optional field marker) and `:` (TS type annotation) which produce false positives like
 // `document?: DocumentInfo` and `interface Foo { document: any }`.
-const RE_SSR_UNSAFE  = /\b(window|document|localStorage|indexedDB|navigator)\.[a-zA-Z_$]/;
+const RE_SSR_UNSAFE  = /(?<![.\w])(window|document|localStorage|indexedDB|navigator)\.[a-zA-Z_$]/;
 // Recognized SSR-safe markers: explicit guards, lifecycle hooks (run only in browser),
 // reactive runes ($effect runs only browser-side), event handler functions ("function ... {" preceding window/document refs).
 const RE_SSR_GUARD   = /typeof\s+(?:window|document|localStorage|sessionStorage|indexedDB|IndexedDB|navigator)\s*[!=]==?\s*['"]undefined['"]|\bonMount\b|\$effect\b|\bafterUpdate\b|\btick\s*\(|\bbrowser\s*[&|?]|import\.meta\.env\.SSR|from\s+['"]\$app\/environment['"]|export\s+const\s+ssr\s*=\s*false|window\.location\.href\s*=|setTimeout\s*\(\s*\(\s*\)\s*=>/;
-// Server-only files cannot run in browser SSR context — they ARE the server
-const RE_SERVER_ONLY = /(?:^|\/)(?:hooks\.server\.ts|.+\.server\.(?:ts|js)|\+server\.ts|lib\/server\/)/;
+// Server-only files cannot run in browser SSR context — they ARE the server.
+// Also excludes scripts/ — those are Node.js build/test scripts, not SSR components.
+const RE_SERVER_ONLY = /(?:^|\/)(?:hooks\.server\.ts|.+\.server\.(?:ts|js)|\+server\.ts|lib\/server\/|scripts\/)/;
 // G17 — error handling
 const RE_TRY_CATCH   = /\btry\s*\{/;
 const RE_SAFE_FN     = /\bsafe\s*\(|\bloadError\b/;
@@ -265,11 +267,11 @@ function extractMeta(filePath, src) {
   const isTest = /(?:^|\/)(?:tests?|e2e|integration|playwright)\//.test(rel)
               || rel.includes('.test.')
               || rel.includes('.spec.');
-  const isRoute = rel.includes('/routes/') && (
+  const isRoute = rel.startsWith('src/routes/') && (
     rel.endsWith('+server.ts') || rel.endsWith('+page.server.ts') ||
     rel.endsWith('+page.svelte') || rel.endsWith('+layout.svelte')
   );
-  const isServerRoute = rel.endsWith('+server.ts') || rel.endsWith('+page.server.ts');
+  const isServerRoute = isRoute && (rel.endsWith('+server.ts') || rel.endsWith('+page.server.ts'));
   const isSvelteComp  = ext === '.svelte' && RE_SVELTE_SCRIPT.test(src);
 
   // Simplified extraction for JSON files — skip expensive code-stripping regex
@@ -464,7 +466,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v20'; // bumped 2026-05-13 — added scripts directory indexing + JSON optimization
+const META_CACHE_VERSION = 'v21'; // bumped 2026-05-13 — stricter isRoute/isServerRoute scoping to src/routes/
 
 let processed = 0;
 for (const filePath of walk(scanRoot)) {
@@ -700,9 +702,9 @@ for (const [rel, deps] of Object.entries(importMap)) {
       ? path.relative(ROOT, path.resolve(path.dirname(path.join(ROOT, rel)), dep)).replace(/\\/g, '/').replace(/\.(ts|js)$/, '')
       : null;
     if (!depRel) continue;
-    
+
     // Efficient lookup: exact, then common extensions, then index.ts
-    const depFull = relToFile.get(depRel) 
+    const depFull = relToFile.get(depRel)
       ?? relToFile.get(depRel + '.ts')
       ?? relToFile.get(depRel + '.js')
       ?? relToFile.get(depRel + '.svelte')
@@ -877,11 +879,11 @@ console.log(`📦 Directory wiki notes → ${dirRows.length} dirs written to Red
 const gateStats = {
   // G4
   routesWithAuth:     files.filter(f => f.isServerRoute && f.hasAuth).length,
-  routesWithoutAuth:  files.filter(f => f.isServerRoute && !f.hasAuth && f.routeHandlers.length).length,
+  routesWithoutAuth:  files.filter(f => f.isServerRoute && !f.hasAuth && f.routeHandlers.length && !f.rel.includes('/auth/') && !f.rel.includes('.well-known')).length,
   // G5
   routesWithZod:      files.filter(f => f.isServerRoute && f.hasZod).length,
   // Only flag routes that actually parse a body — pure GET handlers don't need body validation
-  routesWithoutZod:   files.filter(f => f.isServerRoute && !f.hasZod && f.routeHandlers.length && f.parsesBody).length,
+  routesWithoutZod:   files.filter(f => f.isServerRoute && !f.hasZod && f.routeHandlers.length && f.parsesBody && !f.rel.includes('/auth/') && !f.rel.includes('.well-known')).length,
   // G11
   filesWithLocalhost:       files.filter(f => f.localhostRefs.length && !f.rel.includes('env.server')).length,
   filesWithLocalhostBreaks: files.filter(f => f.localhostBreaks).length,
@@ -892,7 +894,7 @@ const gateStats = {
   sv4DispatchCount:   files.filter(f => f.sv4Dispatch).length,
   runeInTsCount:      files.filter(f => f.runeInTs).length,
   // G15
-  ssrUnsafeCount:     files.filter(f => f.ssrUnsafe).length,
+  ssrUnsafeCount:     files.filter(f => f.ssrUnsafe && f.rel.startsWith('src/')).length,
   // G16
   routesWithTest:     files.filter(f => f.isServerRoute && f.hasPairedTest).length,
   routesWithoutTest:  files.filter(f => f.isServerRoute && !f.hasPairedTest && f.routeHandlers.length).length,
@@ -961,7 +963,7 @@ console.log(`📄 Graph JSON → ${path.relative(ROOT, graphJsonPath)}`);
 const apiFiles   = files.filter(f => f.isServerRoute && f.routeHandlers.length > 0);
 const noAuthApis = apiFiles.filter(f => !f.hasAuth);
 const noZodApis  = apiFiles.filter(f => !f.hasZod && f.parsesBody);
-const ssrUnsafeFiles = files.filter(f => f.ssrUnsafe && !f.isTest);
+const ssrUnsafeFiles = files.filter(f => f.ssrUnsafe && !f.isTest && f.rel.startsWith('src/'));
 const sv4Files   = files.filter(f => f.sv4Props || f.sv4Reactive || f.sv4Events || f.sv4Dispatch);
 const lhFiles    = files.filter(f => f.localhostRefs.length && !f.rel.includes('env.server'));
 const noTestRoutes = files.filter(f => f.isServerRoute && !f.hasPairedTest && f.routeHandlers.length);

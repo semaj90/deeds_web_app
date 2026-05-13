@@ -16,11 +16,12 @@
 import { cardIdForDir, readCardFromRedis, agentsDirectoryCardSchema } from '../../agents-card-store.js';
 import type { AgentsDirectoryCard } from '../../agents-card-store.js';
 import type { LoadExistingCardResult } from './types.js';
+import { ENV } from '../../../../env.server.js';
 
-const COUCHDB_URL  = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+const COUCHDB_URL  = ENV.COUCHDB_URL;
 const COUCHDB_DB   = process.env.COUCHDB_AGENTS_DB ?? 'karpathy_wiki';
-const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
-const COUCHDB_PASS = process.env.COUCHDB_PASSWORD ?? 'deeds123';
+const COUCHDB_USER = ENV.COUCHDB_USER;
+const COUCHDB_PASS = ENV.COUCHDB_PASSWORD;
 const COUCHDB_TIMEOUT_MS = 2_000;
 
 export async function loadExistingCard(dirPath: string): Promise<LoadExistingCardResult> {

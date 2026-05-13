@@ -20,27 +20,36 @@ import path from 'path';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT = path.resolve(__dirname, '../../..'); // scripts/tests/ → sveltekit-frontend → repo root
 
 const NO_QDRANT = process.argv.includes('--no-qdrant');
-const STRICT    = process.argv.includes('--strict');
+const STRICT = process.argv.includes('--strict');
 
-const QDRANT_URL        = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
 
 const c = {
-  green:  s => `\x1b[32m${s}\x1b[0m`,
-  yellow: s => `\x1b[33m${s}\x1b[0m`,
-  red:    s => `\x1b[31m${s}\x1b[0m`,
-  cyan:   s => `\x1b[36m${s}\x1b[0m`,
-  bold:   s => `\x1b[1m${s}\x1b[0m`,
-  dim:    s => `\x1b[2m${s}\x1b[0m`,
+  green: (s) => `\x1b[32m${s}\x1b[0m`,
+  yellow: (s) => `\x1b[33m${s}\x1b[0m`,
+  red: (s) => `\x1b[31m${s}\x1b[0m`,
+  cyan: (s) => `\x1b[36m${s}\x1b[0m`,
+  bold: (s) => `\x1b[1m${s}\x1b[0m`,
+  dim: (s) => `\x1b[2m${s}\x1b[0m`,
 };
 
-let failed = 0, skipped = 0;
-const ok   = (msg, detail = '') => console.log(`  ${c.green('✓')} ${msg}${detail ? c.dim('  ' + detail) : ''}`);
-const warn = (msg, hint  = '') => { console.log(`  ${c.yellow('○')} ${msg}${hint ? c.dim('  ' + hint) : ''}`); skipped++; if (STRICT) failed++; };
-const bad  = (msg, e     = '') => { console.log(`  ${c.red('✗')} ${msg}${e ? '  ' + c.red(String(e)) : ''}`); failed++; };
+let failed = 0,
+  skipped = 0;
+const ok = (msg, detail = '') =>
+  console.log(`  ${c.green('✓')} ${msg}${detail ? c.dim('  ' + detail) : ''}`);
+const warn = (msg, hint = '') => {
+  console.log(`  ${c.yellow('○')} ${msg}${hint ? c.dim('  ' + hint) : ''}`);
+  skipped++;
+  if (STRICT) failed++;
+};
+const bad = (msg, e = '') => {
+  console.log(`  ${c.red('✗')} ${msg}${e ? '  ' + c.red(String(e)) : ''}`);
+  failed++;
+};
 
 // ── Pillar 1: Rust graph-engine ───────────────────────────────────────────────
 console.log(c.cyan('\n🦀 Pillar 1 — Rust graph-engine (community detection)\n'));
@@ -61,15 +70,33 @@ if (graphEngine) {
     ok('detectCommunitiesRust exported');
 
     // Codebase-style graph: 3 clusters (api routes, lib server, lib client)
-    const nodes    = ['api/chat', 'api/evidence', 'api/graph', 'api/sse',
-                      'lib/server/retrieval', 'lib/server/embedding', 'lib/server/neo4j',
-                      'lib/client/stores', 'lib/client/components'];
-    const from     = ['api/chat', 'api/evidence', 'api/graph',
-                      'lib/server/retrieval', 'lib/server/embedding',
-                      'lib/client/stores'];
-    const to       = ['api/evidence', 'api/graph', 'api/sse',
-                      'lib/server/embedding', 'lib/server/neo4j',
-                      'lib/client/components'];
+    const nodes = [
+      'api/chat',
+      'api/evidence',
+      'api/graph',
+      'api/sse',
+      'lib/server/retrieval',
+      'lib/server/embedding',
+      'lib/server/neo4j',
+      'lib/client/stores',
+      'lib/client/components',
+    ];
+    const from = [
+      'api/chat',
+      'api/evidence',
+      'api/graph',
+      'lib/server/retrieval',
+      'lib/server/embedding',
+      'lib/client/stores',
+    ];
+    const to = [
+      'api/evidence',
+      'api/graph',
+      'api/sse',
+      'lib/server/embedding',
+      'lib/server/neo4j',
+      'lib/client/components',
+    ];
 
     try {
       const communities = fn(nodes, from, to, 40);
@@ -88,11 +115,11 @@ if (graphEngine) {
       const communityOf = {};
       for (const comm of communities) {
         const id = comm.communityId ?? comm.community_id;
-        for (const m of (comm.nodeIds ?? comm.node_ids ?? [])) communityOf[m] = id;
+        for (const m of comm.nodeIds ?? comm.node_ids ?? []) communityOf[m] = id;
       }
-      const apiComm   = communityOf['api/chat'];
-      const srvComm   = communityOf['lib/server/retrieval'];
-      const cliComm   = communityOf['lib/client/stores'];
+      const apiComm = communityOf['api/chat'];
+      const srvComm = communityOf['lib/server/retrieval'];
+      const cliComm = communityOf['lib/client/stores'];
       if (apiComm !== srvComm) {
         ok(`api/* and lib/server/* in separate communities (C${apiComm} vs C${srvComm})`);
       } else {
@@ -119,29 +146,37 @@ try {
 }
 
 if (hmmEngine) {
-  const fn = hmmEngine.predictChunk ?? hmmEngine.predict_chunk;
+  const fn = hmmEngine.predictChunkRust ?? hmmEngine.predictChunk ?? hmmEngine.predict_chunk;
   if (typeof fn !== 'function') {
     bad(`predictChunk not found  exports: ${Object.keys(hmmEngine).join(', ')}`);
   } else {
     ok('predictChunk exported');
 
     const VECTORS = [
-      { text: 'The plaintiff filed a complaint in the district court alleging negligence.',
-        label: 'negligence complaint' },
-      { text: 'Pursuant to 28 U.S.C. § 1331, this Court has federal question jurisdiction.',
-        label: 'jurisdiction + statute' },
-      { text: 'John Smith, as plaintiff, and XYZ Corporation, as defendant, are the parties.',
-        label: 'parties' },
-      { text: 'WHEREFORE, plaintiff prays for judgment and an award of compensatory damages.',
-        label: 'prayer for relief' },
+      {
+        text: 'The plaintiff filed a complaint in the district court alleging negligence.',
+        label: 'negligence complaint',
+      },
+      {
+        text: 'Pursuant to 28 U.S.C. § 1331, this Court has federal question jurisdiction.',
+        label: 'jurisdiction + statute',
+      },
+      {
+        text: 'John Smith, as plaintiff, and XYZ Corporation, as defendant, are the parties.',
+        label: 'parties',
+      },
+      {
+        text: 'WHEREFORE, plaintiff prays for judgment and an award of compensatory damages.',
+        label: 'prayer for relief',
+      },
     ];
 
     for (const { text, label } of VECTORS) {
       try {
         const result = fn(text);
-        const primary    = result.primaryState   ?? result.primary_state   ?? '?';
-        const confidence = result.confidence      ?? 0;
-        const seqLen     = (result.stateSequence ?? result.state_sequence  ?? []).length;
+        const primary = result.primaryState ?? result.primary_state ?? '?';
+        const confidence = result.confidence ?? 0;
+        const seqLen = (result.stateSequence ?? result.state_sequence ?? []).length;
         ok(`${label}  →  ${primary}  conf=${confidence.toFixed(4)}  seq=${seqLen}`);
       } catch (e) {
         bad(`predictChunk failed on "${label}"`, e);

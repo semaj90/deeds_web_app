@@ -20,6 +20,7 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import { clusterTensorKey } from '$lib/server/cache-keys.js';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ function cosineSim(a: Float32Array, b: Float32Array): number {
 async function getClusterSummaryText(clusterId: number): Promise<string | null> {
   try {
     const redis = getRedis();
-    const raw = await redis.get(`cluster:summary:${clusterId}`);
+    const raw = await redis.get(clusterTensorKey.summary(clusterId));
     if (!raw) return null;
     const data = JSON.parse(raw) as Record<string, unknown>;
     if (typeof data.summary     === 'string' && data.summary.length     > 5) return data.summary;

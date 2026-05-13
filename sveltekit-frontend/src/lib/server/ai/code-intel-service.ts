@@ -4,6 +4,7 @@ import { tensorAnalysisCache } from '$lib/server/db/schema/topology.js';
 import { desc, count, eq, sql, avg } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { getGraphMLStatus } from '$lib/server/grpc/graph-ml-client.js';
+import { getRedis } from '$lib/server/redis.js';
 
 /**
  * Code Intel Service: Aggregates statistics and health metrics for the
@@ -231,10 +232,18 @@ export async function checkSystemHealth() {
 		}
 	}
 
-	async function postgresOk(): Promise<boolean> {
+  async function postgresOk(): Promise<boolean> {
 		try {
 			await db.execute(sql`SELECT 1`);
 			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	async function redisOk(): Promise<boolean> {
+		try {
+			return (await getRedis().ping()) === 'PONG';
 		} catch {
 			return false;
 		}
@@ -302,5 +311,4 @@ export async function generateClaudePlan(params: { goal: string; scope: string }
 		patchPolicy: 'propose_only'
 	};
 }
-
 

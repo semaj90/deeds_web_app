@@ -4,7 +4,7 @@ import { traceMcpClient } from '$lib/server/mcp-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { eq } from 'drizzle-orm';
 
-const MODEL_URL = ENV.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8080';
+const MODEL_URL = ENV.TURBOQUANT_BASE_URL;
 
 export interface SubagentMission {
   skillName: string;

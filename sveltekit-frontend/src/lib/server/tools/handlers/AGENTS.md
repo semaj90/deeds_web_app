@@ -54,8 +54,18 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: src/lib/server/tools/handlers
 

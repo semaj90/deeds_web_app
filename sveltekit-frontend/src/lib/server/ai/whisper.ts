@@ -10,7 +10,7 @@ export async function transcribeViaServer(
 	language: string = 'auto',
 	translate: boolean = false,
 ): Promise<{ ok: true; text: string; language: string | null; segments?: any[] } | null> {
-	const serverUrl = ENV.WHISPER_SERVER_URL ?? 'http://127.0.0.1:8080';
+	const serverUrl = ENV.WHISPER_SERVER_URL;
 
 	// Health check first (fast fail)
 	try {

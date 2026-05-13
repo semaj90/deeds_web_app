@@ -1,10 +1,6 @@
-import * as crypto from 'node:crypto';
+import crypto from 'node:crypto';
 import type { GrpoMemoryStick } from './feature-map.types.js';
 
-/**
- * Creates a GRPO (Group Relative Policy Optimization) memory stick for synthesis evaluation.
- * Stores what helped (selectedSourceIds) and what didn't (rejectedSourceIds).
- */
 export function createGrpoMemoryStick(input: {
   featureId?: string;
   query: string;
@@ -16,7 +12,7 @@ export function createGrpoMemoryStick(input: {
   cacheKeys?: Partial<GrpoMemoryStick['cacheKeys']>;
 }): GrpoMemoryStick {
   const queryHash = crypto.createHash('sha256').update(input.query).digest('hex');
-  
+
   return {
     id: `grpo:${queryHash.slice(0, 16)}:${input.contextPacketHash.slice(0, 12)}`,
     featureId: input.featureId,

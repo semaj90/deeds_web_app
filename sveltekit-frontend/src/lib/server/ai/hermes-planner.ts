@@ -7,7 +7,7 @@
  *   - Routing ACE queries to the right store
  *   - Detecting missing pipeline states (HMM gap inference)
  *   - Producing repair plans for broken graph/cluster state
- *   - Validating ACE context packets before Gemma4 sees them
+  *   - Validating packed ACE context before Gemma4 sees it
  *
  * Gemma4/TurboQuant handles final legal/code reasoning and user-facing prose.
  * Hermes is the air traffic controller; Gemma4 is the pilot.
@@ -147,8 +147,7 @@ Return ONLY valid JSON matching this schema exactly:
 // Hermes gateway client
 // ---------------------------------------------------------------------------
 
-const HERMES_GATEWAY_URL =
-  process.env.HERMES_API_URL ?? 'http://127.0.0.1:8642';
+const HERMES_GATEWAY_URL = ENV.HERMES_API_URL;
 
 export interface AvailableSignals {
   hasEncoded64: boolean;
@@ -265,7 +264,7 @@ export function buildFallbackPlan(
 }
 
 /**
- * Ask Hermes to validate an assembled ACE context packet before sending to Gemma4.
+ * Ask Hermes to validate packed ACE context before sending it to Gemma4.
  */
 export async function validateAceContextPacket(contextPacket: string): Promise<AceContextValidation> {
   const systemPrompt = `You are a strict JSON validator for RAG context packets.

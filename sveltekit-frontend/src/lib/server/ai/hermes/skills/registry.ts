@@ -12,7 +12,7 @@ export interface SkillRecipe {
   parallel?: boolean;      // Execute tools in parallel
   tools: Array<{
     name: string;
-    args?: (input: any) => Record<string, any>;
+    args?: Record<string, any> | ((input: any) => Record<string, any>);
   }>;
 }
 
@@ -58,4 +58,3 @@ export const HERMES_SKILLS: Record<string, SkillRecipe> = {
 export function registerSkill(recipe: SkillRecipe) {
   HERMES_SKILLS[recipe.id] = recipe;
 }
-

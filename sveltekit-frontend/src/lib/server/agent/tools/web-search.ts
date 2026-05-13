@@ -64,7 +64,7 @@ export async function webSearch(input: WebSearchInput): Promise<WebSearchResult>
 	}
 
 	// Try SearXNG first
-	const searxngUrl = ENV.SEARXNG_URL || 'http://localhost:8888';
+	const searxngUrl = ENV.SEARXNG_URL;
 	try {
 		const searxngResults = await searchViaSearXNG(searxngUrl, searchQuery, maxResults);
 		if (searxngResults.length > 0) {
@@ -206,14 +206,14 @@ function getCuratedResults(query: string, searchType: string): SearchResult[] {
 				title: 'Svelte 5 Documentation - Runes',
 				url: 'https://svelte.dev/docs/svelte/overview',
 				snippet:
-					'Runes are symbols that provide instructions to the Svelte compiler. $state, $derived, $effect, and $props are the main runes.',
+					'Runes are symbols that provide instructions to the Svelte compiler. state, derived, effect, and props are the main runes (prefixed with $ in code).',
 				source: 'svelte.dev'
 			},
 			{
 				title: 'Svelte 5 Migration Guide',
 				url: 'https://svelte.dev/docs/svelte/v5-migration-guide',
 				snippet:
-					'Guide for migrating from Svelte 4 to Svelte 5: export let → $props(), $: → $derived(), on:click → onclick',
+					'Guide for migrating from Svelte 4 to Svelte 5: export let becomes props, $: becomes derived, on:click becomes onclick.',
 				source: 'svelte.dev'
 			}
 		);
@@ -394,7 +394,7 @@ export async function multiSourceSearch(
  * Check if SearXNG is available
  */
 export async function isSearXNGAvailable(): Promise<boolean> {
-	const searxngUrl = ENV.SEARXNG_URL || 'http://localhost:8888';
+	const searxngUrl = ENV.SEARXNG_URL;
 
 	try {
 		const response = await fetch(`${searxngUrl}/`, {

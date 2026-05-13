@@ -44,10 +44,12 @@ try {
 // 2. Check export
 const fn = engine?.predictChunkRust ?? engine?.predict_chunk_rust ?? engine?.predictChunk ?? engine?.predict_chunk;
 if (typeof fn !== 'function') {
-  bad(`predictChunk not exported  (got: ${Object.keys(engine ?? {}).join(', ')})`);
+  bad(`predictChunkRust not exported  (got: ${Object.keys(engine ?? {}).join(', ')})`);
   process.exit(1);
 }
-ok('predictChunk exported');
+ok(
+  `predictChunkRust exported  ${c.dim('(alias: ' + (engine.predictChunkRust ? 'predictChunkRust' : 'predictChunk') + ')')}`
+);
 
 // 3. Test vectors — known legal sentences → expected states
 const TESTS = [

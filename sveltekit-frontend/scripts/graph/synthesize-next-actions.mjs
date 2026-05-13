@@ -299,9 +299,9 @@ async function callLLM(prompt) {
         backend:   'agent-api',
       };
     }
-  } catch { /* fallthrough */ }
+  } catch (err) { console.error(`[llm] agent-api failed: ${err.message}`); }
 
-  // 2. TurboQuant direct :8090 (GGUF llama-server, KV q8_0, FA on — preferred over raw Ollama)
+  // 2. TurboQuant direct :8090
   const turboPort = process.env.TURBO_PORT ?? '8090';
   try {
     const ctrl  = new AbortController();
@@ -324,29 +324,40 @@ async function callLLM(prompt) {
       const text = d.choices?.[0]?.message?.content ?? '';
       if (text) return { answer: text, toolsUsed: [], rounds: 1, backend: 'turboquant' };
     }
-  } catch { /* fallthrough */ }
+  } catch (err) { /* quiet fallback */ }
 
-  // 3. Ollama direct :11434 (final fallback — no KV cache, slower)
+  // 3. Ollama direct :11434
   try {
     const ctrl  = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 60_000);
+    const timer = setTimeout(() => ctrl.abort(), 600_000);
     const res   = await fetch('http://localhost:11434/api/chat', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:    'gemma4-legal-vlm:latest',
+        model:    'gemma4-legal:latest',
         messages: [{ role: 'user', content: prompt }],
         stream:   false,
-        options:  { temperature: 0.3, num_predict: 450 },
+        options:  { temperature: 0.1, num_predict: 512 },
       }),
       signal:  ctrl.signal,
     });
     clearTimeout(timer);
     if (res.ok) {
       const d = await res.json();
-      return { answer: d.message?.content ?? '', toolsUsed: [], rounds: 1, backend: 'ollama-direct' };
+      let answer = (d.message?.content || '').trim();
+      if (!answer && d.message?.thinking) {
+        // If content is empty but thinking has value, use thinking but strip the internal monologue if possible
+        answer = d.message.thinking.split('\n\n').slice(-1)[0].trim();
+        if (answer.length < 50) answer = d.message.thinking.trim(); // fallback
+      }
+      if (!answer) answer = (d.response || '').trim();
+      return { answer, toolsUsed: [], rounds: 1, backend: 'ollama-direct' };
+    } else {
+      console.error(`[llm] ollama-direct error: ${res.status} ${res.statusText}`);
     }
-  } catch { /* fallthrough */ }
+  } catch (err) {
+    console.error(`[llm] ollama-direct failed: ${err.message}`);
+  }
 
   return { answer: '_(synthesis unavailable — start dev server or Ollama)_', toolsUsed: [], rounds: 0, backend: 'none' };
 }
@@ -686,6 +697,11 @@ In 3–4 sentences: what is the most likely root-cause pattern driving the risk 
     process.stdout.write(`[synth] ${priority} ${cluster.cluster_key}... `);
     const result = await callLLM(prompt);
     console.log(`done (${result.backend ?? 'unknown'}, ${result.rounds} round(s))`);
+    if (!result.answer || result.answer.startsWith('_')) {
+      console.warn(`[synth] Warning: empty or placeholder answer for ${cluster.cluster_key}`);
+    } else {
+      console.log(`[synth] Answer snippet: ${result.answer.slice(0, 50)}...`);
+    }
     return result;
   }
 

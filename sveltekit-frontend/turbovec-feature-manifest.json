@@ -9,7 +9,7 @@
       "tags": ["rust", "python", "graph", "vector"],
       "paths": {
         "source": ["turbovec/"],
-        "extraction": ["scripts/enhanced_graph_synthesis.py"],
+        "extraction": ["scripts/extract-enhanced-graph.mjs"],
         "persistence": ["src/lib/server/features/feature-storage.ts"]
       },
       "metadata": {
