@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/models/ChatSession.svelte.ts"
 aliases: ["ChatSession.svelte.ts","src/lib/models/ChatSession.svelte.ts"]
-clusterId: 57
+clusterId: -1
 ext: ".ts"
 lineCount: 1389
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 9
 embedding_id: "qdrant://codebase_chunks_768/src/lib/models/ChatSession.svelte.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-57]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/57","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/models/ChatSession.svelte.ts`
 ## For future Claude
 > Phase 76: ChatSession Reactive Class (Svelte 5 Runes)
-cluster:: [[Clusters/cluster-57]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 1389

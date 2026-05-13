@@ -748,8 +748,7 @@ sveltekit-frontend/count-excluded.ps1
 sveltekit-frontend/evidence-upload-result.png
 sveltekit-frontend/evidence-upload-test.png
 sveltekit-frontend/thoughts.md
-sveltekit-frontend/scripts/analyze-unreachable-domains.mjs
-sveltekit-frontend/scripts/cross-ref-imports.mjs
+
 
 # VS Code Performance Fix - Ignore large backup/archive directories
 sveltekit-frontend/build-debug/Debug/WardenNet.lib

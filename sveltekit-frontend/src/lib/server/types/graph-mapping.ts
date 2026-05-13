@@ -27,6 +27,7 @@ export type EnhancedGraphMapping = {
     | 'symbol'
     | 'route'
     | 'schema'
+    | 'feature'
     | 'svg'
     | 'proto'
     | 'redis_key'

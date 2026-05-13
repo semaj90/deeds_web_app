@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/courtroom/courtroom-scene.svelte.ts"
 aliases: ["courtroom-scene.svelte.ts","src/lib/courtroom/courtroom-scene.svelte.ts"]
-clusterId: 57
+clusterId: -1
 ext: ".ts"
 lineCount: 1071
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/courtroom/courtroom-scene.svelte.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-57]]"]
+up: []
 imports: ["[[Files/courtroom-types]]","[[Files/crt-postprocess]]"]
-tags: ["file","ext/ts","cluster/57","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/courtroom/courtroom-scene.svelte.ts`
 ## For future Claude
 > Phoenix Wright-style 3D courtroom scene manager.
-cluster:: [[Clusters/cluster-57]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 1071

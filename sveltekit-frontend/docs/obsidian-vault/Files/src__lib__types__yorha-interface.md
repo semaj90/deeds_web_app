@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/types/yorha-interface.ts"
 aliases: ["yorha-interface.ts","src/lib/types/yorha-interface.ts"]
-clusterId: 19
+clusterId: -1
 ext: ".ts"
 lineCount: 661
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/lib/types/yorha-interface.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-19]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/19","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/types/yorha-interface.ts`
 ## For future Claude
 > Reactive state wrapper for YoRHa system metrics
-cluster:: [[Clusters/cluster-19]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 661

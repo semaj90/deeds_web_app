@@ -1,0 +1,17 @@
+{
+  "name": "graph-engine",
+  "version": "0.1.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "graph-engine",
+    "triples": {
+      "defaults": true,
+      "additional": []
+    }
+  },
+  "scripts": {
+    "build": "napi build --release",
+    "build:debug": "napi build"
+  }
+}

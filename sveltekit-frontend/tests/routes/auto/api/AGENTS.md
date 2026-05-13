@@ -1,13 +1,13 @@
 # AGENTS.md — `tests/routes/auto/api`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-12T03:12:15.164Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/routes/auto/api
 
 ## Snapshot
 
-- route handler directory with 586 files, 0 API handlers
+- route handler directory with 632 files, 0 API handlers
 - Audit score: **90/100**
 - no audit signals
 - Tags: `tests` `routes` `auto` `auth` `test`

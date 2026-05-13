@@ -179,10 +179,10 @@ _Run ID: 2026-05-07T20-53-22_
 | Field | Value |
 |-------|-------|
 | Run ID | `2026-05-07T20-53-22` |
-| Synthesized at | 2026-05-11T23:31:28.663Z |
+| Synthesized at | 2026-05-13T00:22:41.724Z |
 | tsgo diagnostics loaded | 0 |
-| Shallow-wired files | 363 |
+| Shallow-wired files | 364 |
 | P0 clusters | 0 |
-| P1 clusters | 1 |
+| P1 clusters | 2 |
 | LLM backend | gemma4/bifrost |
 | Spec fetch | enabled |

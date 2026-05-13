@@ -239,10 +239,10 @@ const RE_RUNE_IN_TS  = /\$(?:state|derived|effect|props)\s*[(<]/;
 // Must be followed by access syntax (.X, [...], (...), ` =`, `==`, comparison) — typical global-access patterns.
 // Reject `?:` (TS optional field marker) and `:` (TS type annotation) which produce false positives like
 // `document?: DocumentInfo` and `interface Foo { document: any }`.
-const RE_SSR_UNSAFE  = /\b(window|document|localStorage|indexedDB|navigator)\./;
+const RE_SSR_UNSAFE  = /\b(window|document|localStorage|indexedDB|navigator)\.[a-zA-Z_$]/;
 // Recognized SSR-safe markers: explicit guards, lifecycle hooks (run only in browser),
 // reactive runes ($effect runs only browser-side), event handler functions ("function ... {" preceding window/document refs).
-const RE_SSR_GUARD   = /typeof\s+(?:window|document|localStorage|sessionStorage|indexedDB|IndexedDB)\s*[!=]==?\s*['"]undefined['"]|\bonMount\b|\$effect\b|\bafterUpdate\b|\btick\s*\(|\bbrowser\s*[&|?]|import\.meta\.env\.SSR|from\s+['"]\$app\/environment['"]|export\s+const\s+ssr\s*=\s*false|window\.location\.href\s*=|setTimeout\s*\(\s*\(\s*\)\s*=>/;
+const RE_SSR_GUARD   = /typeof\s+(?:window|document|localStorage|sessionStorage|indexedDB|IndexedDB|navigator)\s*[!=]==?\s*['"]undefined['"]|\bonMount\b|\$effect\b|\bafterUpdate\b|\btick\s*\(|\bbrowser\s*[&|?]|import\.meta\.env\.SSR|from\s+['"]\$app\/environment['"]|export\s+const\s+ssr\s*=\s*false|window\.location\.href\s*=|setTimeout\s*\(\s*\(\s*\)\s*=>/;
 // Server-only files cannot run in browser SSR context — they ARE the server
 const RE_SERVER_ONLY = /(?:^|\/)(?:hooks\.server\.ts|.+\.server\.(?:ts|js)|\+server\.ts|lib\/server\/)/;
 // G17 — error handling
@@ -272,15 +272,38 @@ function extractMeta(filePath, src) {
   const isServerRoute = rel.endsWith('+server.ts') || rel.endsWith('+page.server.ts');
   const isSvelteComp  = ext === '.svelte' && RE_SVELTE_SCRIPT.test(src);
 
+  // Simplified extraction for JSON files — skip expensive code-stripping regex
+  if (ext === '.json') {
+    return {
+      rel, ext, isRoute: false, isServerRoute: false, isSvelteComp: false, isTest: false,
+      imports: [], dynImports: [], hasViteIgnore: false, reExports: [], typeImports: new Set(),
+      hasAuth: false, hasZod: false, parsesBody: false, routeHandlers: [], drizzleRefs: [],
+      todos: [], lineCount: src.split('\n').length, components: [], localhostRefs: [],
+      localhostBreaks: false, hasRawPort: false, typeImportCount: 0, exportedNames: [],
+      sv4Props: false, sv4Reactive: false, sv4Events: false, sv4Dispatch: false, runeInTs: false,
+      ssrUnsafe: false, hasTryCatch: false, hasSafeFn: false, routeParams: [], routeDepth: 0,
+      summary: 'JSON data file', tags: ['json'],
+    };
+  }
+
+  // Strip comments and strings for runtime import/re-export extraction (G1, G2, G3)
+  // to avoid false positives in documentation blocks or examples.
+  const codeOnly = src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:\\])\/\/[^\n]*/g, '$1')
+    .replace(/`(?:\\.|[^`\\])*`/g, '``')
+    .replace(/'(?:\\.|[^'\\])*'/g, "''")
+    .replace(/"(?:\\.|[^"\\])*"/g, '""');
+
   // G1 — static imports
-  const imports = [...src.matchAll(RE_IMPORT)].map(m => m[1]);
+  const imports = [...codeOnly.matchAll(RE_IMPORT)].map(m => m[1]);
   // G1b — type-only imports (compile-time erased, cannot form runtime cycles)
-  const typeImports = new Set([...src.matchAll(RE_TYPE_IMPORT_PATH)].map(m => m[1]));
+  const typeImports = new Set([...codeOnly.matchAll(RE_TYPE_IMPORT_PATH)].map(m => m[1]));
   // G2 — dynamic imports
-  const dynImports    = [...src.matchAll(RE_DYN_IMPORT)].map(m => m[1]);
-  const hasViteIgnore = RE_DYN_VAR.test(src);
+  const dynImports    = [...codeOnly.matchAll(RE_DYN_IMPORT)].map(m => m[1]);
+  const hasViteIgnore = RE_DYN_VAR.test(codeOnly);
   // G3 — barrel re-exports
-  const reExports = [...src.matchAll(RE_REEXPORT)].map(m => m[1]);
+  const reExports = [...codeOnly.matchAll(RE_REEXPORT)].map(m => m[1]);
   // G4 — auth (inline guard OR layout-level protection)
   const hasAuth = RE_AUTH.test(src) || isLayoutGuarded(rel);
   // G5 — zod
@@ -441,9 +464,16 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v17'; // bumped 2026-05-04 — G15 brace-depth check: all-matches-inside-function-body counts as guarded (event handlers fire only browser-side)
+const META_CACHE_VERSION = 'v20'; // bumped 2026-05-13 — added scripts directory indexing + JSON optimization
 
+let processed = 0;
 for (const filePath of walk(scanRoot)) {
+  processed++;
+  if (processed % 100 === 0) process.stdout.write(`\r   Indexed ${processed} files...`);
+
+
+
+
   let src;
   try { src = fs.readFileSync(filePath, 'utf8'); } catch { continue; }
 
@@ -510,12 +540,16 @@ for (const filePath of walk(scanRoot)) {
 // pairing detection — useful for G16 metrics, but the files don't show up in
 // the graph anywhere else.
 
-const EXTRA_INDEX_DIRS = ['tests', 'test', 'e2e', 'integration', 'playwright'];
+const EXTRA_INDEX_DIRS = ['scripts', 'tests', 'test', 'e2e', 'integration', 'playwright'];
 let extraIndexed = 0;
 for (const dirName of EXTRA_INDEX_DIRS) {
   const dir = path.resolve(ROOT, dirName);
   if (!fs.existsSync(dir)) continue;
   for (const filePath of walk(dir)) {
+    processed++;
+    if (processed % 100 === 0) process.stdout.write(`\r   Indexed ${processed} files...`);
+
+
     let src;
     try { src = fs.readFileSync(filePath, 'utf8'); } catch { continue; }
     const contentHash = createHash('sha1').update(src).digest('hex').slice(0, 16);
@@ -532,10 +566,11 @@ for (const dirName of EXTRA_INDEX_DIRS) {
     }
     files.push(meta);
     extraIndexed++;
-    if (meta.routeHandlers.length) apiCount++;     // unlikely but possible
+    if (meta.routeHandlers.length) apiCount++;
     todoCount += meta.todos.length;
   }
 }
+
 if (extraIndexed > 0 && !process.argv.includes('--quiet')) {
   console.log(`   + ${extraIndexed} test files indexed from ${EXTRA_INDEX_DIRS.join(', ')}`);
 }
@@ -648,7 +683,11 @@ for (const f of files) {
 // them produced false positives — e.g. dispatch-inline.ts ↔ queue-worker.ts
 // where both sides only cross-imported via await import() lazy loads.
 const importMap = {};
+console.log('\n🔍 Pass 3: Analyzing cyclic import risks…');
+
+const relToFile = new Map();
 for (const f of files) {
+  relToFile.set(f.rel, f);
   const ti = f.typeImports ?? new Set();
   importMap[f.rel] = new Set(f.imports.filter(i => !ti.has(i)));
 }
@@ -661,7 +700,15 @@ for (const [rel, deps] of Object.entries(importMap)) {
       ? path.relative(ROOT, path.resolve(path.dirname(path.join(ROOT, rel)), dep)).replace(/\\/g, '/').replace(/\.(ts|js)$/, '')
       : null;
     if (!depRel) continue;
-    const depFull = files.find(f => f.rel === depRel || f.rel.startsWith(depRel + '.') || f.rel === depRel + '/index.ts');
+    
+    // Efficient lookup: exact, then common extensions, then index.ts
+    const depFull = relToFile.get(depRel) 
+      ?? relToFile.get(depRel + '.ts')
+      ?? relToFile.get(depRel + '.js')
+      ?? relToFile.get(depRel + '.svelte')
+      ?? relToFile.get(depRel + '/index.ts')
+      ?? relToFile.get(depRel + '/index.js');
+
     if (!depFull || depFull.rel === rel) continue; // skip self-loops
     // Strict mutual: B's imports must contain a relative path that resolves back to A
     const reverseDeps = importMap[depFull.rel] ?? new Set();

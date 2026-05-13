@@ -2,9 +2,9 @@
 type: "file"
 path: "src/lib/server/types/retrieval.ts"
 aliases: ["retrieval.ts","src/lib/server/types/retrieval.ts"]
-clusterId: 73
+clusterId: -1
 ext: ".ts"
-lineCount: 405
+lineCount: 422
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,21 +14,20 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/types/retrieval.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-73]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/73","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/types/retrieval.ts`
 ## For future Claude
 > Canonical retrieval result type shared across all knowledge sources.
-cluster:: [[Clusters/cluster-73]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 405
+lines:: 422
 ## Summary
 
 Canonical retrieval result type shared across all knowledge sources.

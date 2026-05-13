@@ -1,15 +1,15 @@
 {
   "src/routes/(analysis)/+layout.svelte": {
     "zone": "route",
-    "directDeps": 3,
+    "directDeps": 6,
     "serverDeps": 0,
     "dbDeps": 0
   },
   "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -19,9 +19,9 @@
   },
   "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -31,9 +31,9 @@
   },
   "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -41,41 +41,17 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(analysis)@/+layout.svelte": {
-    "zone": "route",
-    "directDeps": 3,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
-  },
-  "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
   },
   "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -180,12 +156,6 @@
     "dbDeps": 0
   },
   "src/routes/(app)/admin/ast-topology/+page.svelte": {
-    "zone": "route",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "src/routes/(app)/admin/cache/+page.server.ts": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -311,12 +281,6 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(app)/admin/error-brain/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
   "src/routes/(app)/admin/error-brain/+page.svelte": {
     "zone": "route",
     "directDeps": 13,
@@ -360,6 +324,18 @@
     "dbDeps": 0
   },
   "src/routes/(app)/admin/kag-notebook/+page.svelte": {
+    "zone": "route",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "src/routes/(app)/admin/knowledge-base/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/(app)/admin/knowledge-base/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -583,9 +559,9 @@
   },
   "src/routes/(app)/cases/[id]/ai/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
+    "directDeps": 6,
+    "serverDeps": 6,
+    "dbDeps": 6
   },
   "src/routes/(app)/cases/[id]/ai/+page.svelte": {
     "zone": "route",
@@ -605,23 +581,11 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(app)/cases/[id]/canvas/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(app)/cases/[id]/canvas/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
-  },
-  "src/routes/(app)/cases/[id]/chat/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
   },
   "src/routes/(app)/cases/[id]/chat/+page.svelte": {
     "zone": "route",
@@ -677,12 +641,6 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(app)/cases/[id]/persons/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(app)/cases/[id]/persons/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
@@ -727,7 +685,7 @@
   },
   "src/routes/(app)/citations/+layout.svelte": {
     "zone": "route",
-    "directDeps": 1,
+    "directDeps": 2,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -1541,23 +1499,11 @@
     "serverDeps": 1,
     "dbDeps": 0
   },
-  "src/routes/(app)/evidence/analyze/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(app)/evidence/analyze/+page.svelte": {
     "zone": "route",
     "directDeps": 2,
     "serverDeps": 0,
     "dbDeps": 0
-  },
-  "src/routes/(app)/evidence/hash/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
   },
   "src/routes/(app)/evidence/hash/+page.svelte": {
     "zone": "route",
@@ -1668,12 +1614,6 @@
     "dbDeps": 0
   },
   "src/routes/(app)/knowledge/+page.svelte": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "src/routes/(app)/legal-corpus/+layout.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
@@ -5927,10 +5867,28 @@
     "serverDeps": 9,
     "dbDeps": 0
   },
+  "src/routes/api/wiki/encyclopedia/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
   "src/routes/api/wiki/moc/+server.ts": {
     "zone": "route",
     "directDeps": 3,
     "serverDeps": 3,
+    "dbDeps": 0
+  },
+  "src/routes/api/wiki/search/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/api/wiki/status/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "src/routes/api/wiki/sync-to-obsidian/+server.ts": {

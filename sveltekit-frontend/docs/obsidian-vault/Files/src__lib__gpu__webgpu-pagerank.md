@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/gpu/webgpu-pagerank.ts"
 aliases: ["webgpu-pagerank.ts","src/lib/gpu/webgpu-pagerank.ts"]
-clusterId: 17
+clusterId: -1
 ext: ".ts"
 lineCount: 422
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 3
 embedding_id: "qdrant://codebase_chunks_768/src/lib/gpu/webgpu-pagerank.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-17]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/17","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/gpu/webgpu-pagerank.ts`
 ## For future Claude
 > WebGPU PageRank Bridge — browser-side power-iteration
-cluster:: [[Clusters/cluster-17]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 422

@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/components/poi/POIForm.svelte"
 aliases: ["POIForm.svelte","src/lib/components/poi/POIForm.svelte"]
-clusterId: 92
+clusterId: -1
 ext: ".svelte"
 lineCount: 416
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 5
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/poi/POIForm.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "medium"
-up: ["[[Clusters/cluster-92]]"]
+up: []
 imports: []
-tags: ["file","ext/svelte","cluster/92","svelte","zod","t/svelte","t/src","t/lib"]
+tags: ["file","ext/svelte","svelte","zod","t/svelte","t/src","t/lib"]
 ---
 
 # `src/lib/components/poi/POIForm.svelte`
 ## For future Claude
 > .svelte at src/lib/components/poi/POIForm.svelte (416 lines), Svelte component.
-cluster:: [[Clusters/cluster-92]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 416

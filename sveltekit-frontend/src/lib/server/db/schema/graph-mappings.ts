@@ -9,7 +9,7 @@ export const enhancedGraphMappings = pgTable(
   'enhanced_graph_mappings',
   {
     id: text('id').primaryKey(), // e.g. 'file:src/app.ts', 'svg:ace-pipeline'
-    kind: text('kind').notNull(), // 'file', 'symbol', 'route', 'schema', 'svg', 'proto', 'redis_key', 'qdrant_collection', 'grpc_method', 'chunk', 'cluster'
+    kind: text('kind').notNull(), // 'file', 'symbol', 'route', 'schema', 'feature', 'svg', 'proto', 'redis_key', 'qdrant_collection', 'grpc_method', 'chunk', 'cluster'
     label: text('label').notNull(),
     path: text('path'),
     summary: text('summary'),

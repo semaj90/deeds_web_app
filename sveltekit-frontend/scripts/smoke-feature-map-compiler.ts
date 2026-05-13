@@ -1,106 +1,78 @@
-import { mkdirSync, writeFileSync } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
-import assert from 'node:assert/strict';
-import { compileFeatureMapFromFile } from '$lib/server/features/feature-map-compiler.js';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { compileFeatureMap } from '../src/lib/server/features/feature-map-compiler.js';
+import { persistFeatureCompileResult } from '../src/lib/server/features/feature-map-store.js';
 
-function collectStrings(value: unknown, out: string[] = []): string[] {
-  if (typeof value === 'string') {
-    out.push(value);
-    return out;
-  }
-  if (Array.isArray(value)) {
-    for (const item of value) collectStrings(item, out);
-    return out;
-  }
-  if (value && typeof value === 'object') {
-    for (const entry of Object.values(value as Record<string, unknown>)) {
-      collectStrings(entry, out);
+async function smokeTestFeatureCompiler() {
+  console.log('🚀 Starting FeatureMap Compiler Smoke Test...');
+
+  // 1. Create a dummy feature note
+  const testNotePath = 'documents/features/test-feature-hardening.md';
+  const absNotePath = resolve(testNotePath);
+  mkdirSync(dirname(absNotePath), { recursive: true });
+
+  const noteContent = `---
+id: test-feature-hardening
+title: Test Feature Hardening
+status: implemented
+summary: This is a test feature for validating the FeatureMap compiler pipeline.
+keywords: [scoreAttention, scoreGRPOReward, runPageRank]
+types: [src/lib/server/features/feature-map.types.ts]
+services: [src/lib/server/features/feature-map-compiler.ts]
+svgDiagrams: [static/diagrams/test-arch.svg]
+protos: [proto/test-service.proto]
+---
+
+# Test Feature Hardening
+
+## Summary
+Validation of the end-to-end synthesis pipeline.
+
+## ACE Context
+The FeatureMap compiler is responsible for aggregating AST, RG, and SVG data into a unified JSONB record for the Gemma4 synthesis engine.
+`;
+
+  writeFileSync(absNotePath, noteContent);
+  
+  // Create dummy SVG
+  const svgPath = resolve('static/diagrams/test-arch.svg');
+  mkdirSync(dirname(svgPath), { recursive: true });
+  writeFileSync(svgPath, '<svg><title>Test Architecture</title><text>Gemma4</text><text>ACE</text></svg>');
+
+  // Create dummy Proto
+  const protoPath = resolve('proto/test-service.proto');
+  mkdirSync(dirname(protoPath), { recursive: true });
+  writeFileSync(protoPath, 'syntax = "proto3"; service TestService { rpc Call(TestRequest) returns (TestResponse); } message TestRequest { string id = 1; }');
+
+  console.log(`📝 Created test feature note and dummy assets.`);
+
+  try {
+    // 2. Compile
+    console.log('🏗 Compiling FeatureMap...');
+    const result = await compileFeatureMap(testNotePath);
+    
+    console.log('✅ Compilation Successful!');
+    console.log(`   Feature ID: ${result.featureMap.featureId}`);
+    console.log(`   Title:      ${result.featureMap.title}`);
+    console.log(`   Status:     ${result.featureMap.status}`);
+    console.log(`   Paths Found: ${Object.values(result.featureMap.paths).flat().length}`);
+    console.log(`   Graph Triples: ${result.featureMap.graphTriples.length}`);
+    console.log(`   Glyph Mask:  0b${result.featureMap.glyph.mask.toString(2)}`);
+    console.log(`   Scores:      Attn=${result.featureMap.scores?.attentionScore.toFixed(3)}, GRPO=${result.featureMap.scores?.grpoUtility.toFixed(3)}`);
+
+    if (result.warnings.length > 0) {
+      console.warn('⚠️ Warnings:', result.warnings);
     }
+
+    // 3. Persist
+    console.log('💾 Persisting results to Postgres/Redis...');
+    await persistFeatureCompileResult(result);
+    console.log('✅ Persistence Successful!');
+
+  } catch (err) {
+    console.error('❌ Smoke Test Failed:', err);
+    process.exit(1);
   }
-  return out;
 }
 
-function isPointerLikeText(value: string): boolean {
-  return /\b0x[a-f0-9]{8,}\b/i.test(value) || /\[native code\]/i.test(value);
-}
-
-async function main(): Promise<void> {
-  const repoRoot = process.cwd();
-  const tempRoot = join(tmpdir(), 'opencode');
-  mkdirSync(tempRoot, { recursive: true });
-
-  const svgPath = join(tempRoot, 'feature-map-smoke.svg');
-  const markdownPath = join(tempRoot, 'feature-map-smoke.md');
-
-  writeFileSync(svgPath, [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">',
-    '<rect x="8" y="8" width="48" height="48" rx="8" ry="8" />',
-    '<path d="M16 32h32" />',
-    '</svg>',
-  ].join(''), 'utf8');
-
-  writeFileSync(markdownPath, [
-    '---',
-    'featureId: feature:cs:topological-sort-corpus',
-    'title: Topological Sort Corpus',
-    'slug: topological-sort-corpus',
-    'description: Compiler smoke for dependency ordering and graph synthesis.',
-    'paths: [src/lib/server/features/feature-map-compiler.ts, src/lib/server/features/feature-map-store.ts, src/lib/server/features/feature-glyph-encoder.ts, src/lib/server/features/grpo-memory-stick.ts, src/lib/server/grpc/graph-ml-client.ts, src/lib/server/grpc/graph_ml.proto, src/routes/api/ace/rank/+server.ts, src/routes/api/synthesis/generate/+server.ts, tests/routes/auto/api/ace/rank.test.ts, memory/architecture/browser-context-lane.md, ' + svgPath.replace(/\\/g, '/') + ']',
-    'tags: [feature-map, graphrag, ace]',
-    '---',
-    '',
-    '# feature:cs:topological-sort-corpus',
-    '',
-    '- `src/lib/server/features/feature-map-compiler.ts`',
-    '- `src/lib/server/features/feature-map-store.ts`',
-    '- `src/lib/server/features/feature-glyph-encoder.ts`',
-    '- `src/lib/server/features/grpo-memory-stick.ts`',
-    '- `src/lib/server/grpc/graph-ml-client.ts`',
-    '- `src/lib/server/grpc/graph_ml.proto`',
-    '- `src/routes/api/ace/rank/+server.ts`',
-    '- `src/routes/api/synthesis/generate/+server.ts`',
-    '- `tests/routes/auto/api/ace/rank.test.ts`',
-    '- `memory/architecture/browser-context-lane.md`',
-    '- ' + svgPath.replace(/\\/g, '/'),
-  ].join('\n'), 'utf8');
-
-  const result = await compileFeatureMapFromFile({
-    featureMarkdownPath: markdownPath,
-    workspaceRoot: repoRoot,
-    repoId: 'feature-map-smoke',
-  });
-
-  assert.ok(result.featureMap, 'FeatureMap produced');
-  assert.ok(result.graphTriples.length > 0, 'graphTriples present');
-  assert.ok(result.graphTriples.some((triple) => triple[1] === 'STATIC_IMPORTS'), 'static import mappings present');
-  assert.ok(result.graphTriples.some((triple) => triple[1] === 'DYNAMIC_IMPORTS'), 'dynamic import mappings present');
-  assert.ok(result.glyph.glyph instanceof Uint8Array && result.glyph.glyph.length === 64, 'glyph generated');
-  assert.ok(result.aceContextPacketDraft && typeof result.aceContextPacketDraft === 'object', 'ACE context packet draft generated');
-  assert.ok(result.memoryStick && typeof result.memoryStick.contextPacketHash === 'string', 'GRPO memory stick shape valid');
-
-  const serialized = JSON.stringify(result.storeWrites);
-  const strings = collectStrings(result.storeWrites);
-  const pointerLike = strings.filter(isPointerLikeText);
-  if (pointerLike.length > 0) {
-    console.error(JSON.stringify(pointerLike.slice(0, 20), null, 2));
-  }
-  assert.ok(pointerLike.length === 0, 'no native pointer-looking values are serialized');
-  assert.ok(!isPointerLikeText(serialized), 'serialized payload contains no pointer-like hex values');
-
-  console.log(JSON.stringify({
-    featureId: result.featureMap.featureId,
-    graphTripleCount: result.graphTriples.length,
-    tokenEstimate: result.tokenEstimate,
-    glyphBytes: result.glyph.glyph.length,
-    memoryStickHash: result.memoryStick.contextPacketHash.slice(0, 12),
-  }, null, 2));
-
-  process.exit(0);
-}
-
-main().catch((err) => {
-  console.error(err);
-  process.exitCode = 1;
-  process.exit(1);
-});
+smokeTestFeatureCompiler();

@@ -10,6 +10,8 @@ import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, sear
 import { runRgSearchAtlas } from '$lib/server/rg-atlas/run.js';
 import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
 import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
+import { getWikiStatus, searchWiki, explainWikiPage } from '$lib/server/kb/wiki-logic.js';
+
 
 export const server = new Server(
   {
@@ -1765,7 +1767,36 @@ export function setupToolHandlers() {
           required: ['sourceCode', 'targetLanguages'],
         },
       },
+      {
+        name: 'wiki.status',
+        description: 'Returns high-level status of the codebase knowledge base (Karpathy/AGENTS). includes page count, last updated, and stale directories.',
+        inputSchema: { type: 'object', properties: {} },
+      },
+      {
+        name: 'wiki.search',
+        description: 'Searches the codebase wiki (Karpathy/AGENTS) using a hybrid approach: lexical ripgrep, graph metadata, and semantic Qdrant. Returns ranked pages with summaries and confidence.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Search query' },
+            limit: { type: 'number', description: 'Max results', default: 10 },
+          },
+          required: ['query'],
+        },
+      },
+      {
+        name: 'wiki.explain_page',
+        description: 'Returns a detailed explanation of a specific wiki page (directory or feature), including related files, imports, clusters, and activity scores.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: 'Wiki page ID (e.g. agents:dir:src-lib-server)' },
+          },
+          required: ['id'],
+        },
+      },
       ...REPAIR_TOOLS_SCHEMAS as any[],
+
     ],
   }));
 
@@ -1802,6 +1833,9 @@ export function setupToolHandlers() {
     'kb.expand_neighbors',
     'kb.explain_retrieval',
     'kb.rg_atlas_search',
+    'wiki.status',
+    'wiki.search',
+    'wiki.explain_page',
   ]);
 
   const MCP_CACHE_TTL = parseInt(process.env.MCP_CACHE_TTL_SECONDS ?? '3600', 10);
@@ -1867,7 +1901,25 @@ export function setupToolHandlers() {
     if (repairResult) return repairResult;
 
     switch (name) {
+      case 'wiki.status': {
+        const result = await getWikiStatus();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'wiki.search': {
+        const { query, limit } = args as { query: string; limit?: number };
+        const result = await searchWiki(query, { limit });
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'wiki.explain_page': {
+        const { id } = args as { id: string };
+        const result = await explainWikiPage(id);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
       case 'cases:load': {
+
         const result = await mcpTools.cases.loadCases(args);
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }

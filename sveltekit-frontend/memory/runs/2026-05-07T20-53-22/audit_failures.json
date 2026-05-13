@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-05-11T23:31:28.668Z",
+  "generatedAt": "2026-05-13T00:22:41.728Z",
   "runId": "2026-05-07T20-53-22",
-  "failureCount": 10,
+  "failureCount": 12,
   "failures": [
     {
       "gate": "G17",
-      "file": "src/lib/server/ai/hermes-executor.ts",
+      "file": "src/lib/server/admin/subagent-orchestrator.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/admin/subagent-orchestrator.ts",
+      "file": "src/lib/server/agent/tools/web-search.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -25,7 +25,7 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/ai/hermes-synth.ts",
+      "file": "src/lib/server/fixer/fixer-memory.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -35,12 +35,17 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/agents/regen/loaders/existing-card.ts",
+      "file": "src/lib/server/ai/whisper.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/fixer/fixer-memory.ts",
+      "file": "src/lib/server/ai/hermes/tools/registry.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/agents/regen/loaders/existing-card.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -52,6 +57,11 @@
       "gate": "G17",
       "file": "src/lib/server/search/marco-reranker.ts",
       "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G25",
+      "file": "src/lib/server/agent/tools/web-search.ts",
+      "msg": "$state/$derived in plain .ts"
     }
   ]
 }

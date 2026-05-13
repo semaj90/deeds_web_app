@@ -1,0 +1,17 @@
+{
+  "name": "hmm-repair",
+  "version": "0.1.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "hmm-repair",
+    "binaryName": "hmm-repair",
+    "targets": [
+      "x86_64-pc-windows-msvc"
+    ]
+  },
+  "scripts": {
+    "build": "napi build --release",
+    "build:debug": "napi build"
+  }
+}

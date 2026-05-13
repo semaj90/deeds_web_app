@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/workers/audio-processor.ts"
 aliases: ["audio-processor.ts","src/lib/server/workers/audio-processor.ts"]
-clusterId: 24
+clusterId: -1
 ext: ".ts"
 lineCount: 616
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 9
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/workers/audio-processor.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-24]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/24","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/workers/audio-processor.ts`
 ## For future Claude
 > Audio Processing Worker
-cluster:: [[Clusters/cluster-24]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 616

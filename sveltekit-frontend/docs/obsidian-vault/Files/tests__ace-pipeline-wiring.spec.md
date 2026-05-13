@@ -4,7 +4,7 @@ path: "tests/ace-pipeline-wiring.spec.ts"
 aliases: ["ace-pipeline-wiring.spec.ts","tests/ace-pipeline-wiring.spec.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 374
+lineCount: 402
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 1
 embedding_id: "qdrant://codebase_chunks_768/tests/ace-pipeline-wiring.spec.ts"
-last_updated_by_llm: "2026-05-08T16:50:32.855Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","test","auth","zod","t/ts","t/tests","t/ace-pipeline-wiri
 > ACE Pipeline Wiring Tests
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 374
+lines:: 402
 ## Summary
 
 ACE Pipeline Wiring Tests

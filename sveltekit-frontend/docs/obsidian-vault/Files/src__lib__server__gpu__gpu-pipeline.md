@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/gpu/gpu-pipeline.ts"
 aliases: ["gpu-pipeline.ts","src/lib/server/gpu/gpu-pipeline.ts"]
-clusterId: 20
+clusterId: -1
 ext: ".ts"
 lineCount: 554
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/gpu/gpu-pipeline.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-20]]"]
+up: []
 imports: ["[[Files/libtorch-bridge]]"]
-tags: ["file","ext/ts","cluster/20","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/gpu/gpu-pipeline.ts`
 ## For future Claude
 > GPU Pipeline — stream-aware async queuing + Redis shape-cache for MCP tool calls.
-cluster:: [[Clusters/cluster-20]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 554

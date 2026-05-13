@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/components/ai/EnhancedAIChatTest.svelte"
 aliases: ["EnhancedAIChatTest.svelte","src/lib/components/ai/EnhancedAIChatTest.svelte"]
-clusterId: 5
+clusterId: -1
 ext: ".svelte"
 lineCount: 515
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 13
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/ai/EnhancedAIChatTest.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "medium"
-up: ["[[Clusters/cluster-5]]"]
+up: []
 imports: []
-tags: ["file","ext/svelte","cluster/5","svelte","zod","t/svelte","t/src","t/lib"]
+tags: ["file","ext/svelte","svelte","zod","t/svelte","t/src","t/lib"]
 ---
 
 # `src/lib/components/ai/EnhancedAIChatTest.svelte`
 ## For future Claude
 > .svelte at src/lib/components/ai/EnhancedAIChatTest.svelte (515 lines), Svelte component.
-cluster:: [[Clusters/cluster-5]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 515

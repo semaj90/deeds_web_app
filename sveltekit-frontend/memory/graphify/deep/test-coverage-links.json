@@ -71,6 +71,7 @@
     "tests/ace-pipeline-wiring.spec.ts",
     "tests/ace-pipeline-wiring.spec.ts",
     "tests/ace-pipeline-wiring.spec.ts",
+    "tests/ace-pipeline-wiring.spec.ts",
     "tests/ace-rerank-spine.spec.ts",
     "tests/postgres-fts-fallback.spec.ts",
     "tests/postgres-fts-fallback.spec.ts",
@@ -103,7 +104,6 @@
     "tests/ace-pipeline-wiring.spec.ts"
   ],
   "src/routes/api/synthesis/evaluation/[id]/+server.ts": [
-    "tests/ace-pipeline-wiring.spec.ts",
     "tests/ace-pipeline-wiring.spec.ts",
     "tests/ace-pipeline-wiring.spec.ts",
     "tests/routes/auto/api/synthesis/evaluation/__id.test.ts"
@@ -141,9 +141,13 @@
     "tests/ace-summarize-route.spec.ts",
     "tests/routes/auto/api/ace/summarize.test.ts"
   ],
+  "src/lib/server/ace/token-aware-context-packer.ts": [
+    "tests/ace-token-aware-context-packer.spec.ts"
+  ],
   "src/routes/api/admin/observability/+server.ts": [
     "tests/admin-observability.spec.ts",
-    "tests/admin-observability.spec.ts"
+    "tests/admin-observability.spec.ts",
+    "tests/routes/auto/api/admin/observability.test.ts"
   ],
   "src/lib/server/agents/agents-card-store.ts": [
     "tests/agents-index.spec.ts",
@@ -706,6 +710,9 @@
   "src/lib/machines/evidence-processing-machine.ts": [
     "tests/evidence-workflow-integration.test.ts"
   ],
+  "src/lib/server/features/feature-map-compiler.ts": [
+    "tests/feature-map.integrity.spec.ts"
+  ],
   "src/lib/server/ai/dev-context-planner.ts": [
     "tests/gemma4-dev-context-loop.spec.ts",
     "tests/gemma4-dev-context-loop.spec.ts",
@@ -1097,6 +1104,15 @@
   "src/routes/api/admin/agent/fix/+server.ts": [
     "tests/routes/auto/api/admin/agent/fix.test.ts"
   ],
+  "src/routes/api/admin/ai-chat/subagent/launch/+server.ts": [
+    "tests/routes/auto/api/admin/ai-chat/subagent/launch.test.ts"
+  ],
+  "src/routes/api/admin/ai-chat/summarize-panel/+server.ts": [
+    "tests/routes/auto/api/admin/ai-chat/summarize-panel.test.ts"
+  ],
+  "src/routes/api/admin/ai-chat/[sessionId]/+server.ts": [
+    "tests/routes/auto/api/admin/ai-chat/__sessionId.test.ts"
+  ],
   "src/routes/api/admin/audit/+server.ts": [
     "tests/routes/auto/api/admin/audit.test.ts",
     "tests/routes/auto/api/admin/audit.test.ts",
@@ -1111,11 +1127,29 @@
     "tests/routes/cache-stats.test.ts",
     "tests/routes/cache-stats.test.ts"
   ],
+  "src/routes/api/admin/citations/discover/+server.ts": [
+    "tests/routes/auto/api/admin/citations/discover.test.ts"
+  ],
+  "src/routes/api/admin/inference-lane/+server.ts": [
+    "tests/routes/auto/api/admin/inference-lane.test.ts"
+  ],
   "src/routes/api/admin/inference-stats/+server.ts": [
     "tests/routes/auto/api/admin/inference-stats.test.ts"
   ],
+  "src/routes/api/admin/jobs/+server.ts": [
+    "tests/routes/auto/api/admin/jobs.test.ts"
+  ],
   "src/routes/api/admin/knowledge/+server.ts": [
     "tests/routes/auto/api/admin/knowledge.test.ts"
+  ],
+  "src/routes/api/admin/legal-strategy/+server.ts": [
+    "tests/routes/auto/api/admin/legal-strategy.test.ts"
+  ],
+  "src/routes/api/admin/model/promote-weights/+server.ts": [
+    "tests/routes/auto/api/admin/model/promote-weights.test.ts"
+  ],
+  "src/routes/api/admin/model/upload-weights/+server.ts": [
+    "tests/routes/auto/api/admin/model/upload-weights.test.ts"
   ],
   "src/routes/api/admin/model/validate-checkpoint/+server.ts": [
     "tests/routes/auto/api/admin/model/validate-checkpoint.test.ts",
@@ -1125,12 +1159,25 @@
     "tests/routes/auto/api/admin/qlora.test.ts",
     "tests/routes/auto/api/admin/qlora.test.ts"
   ],
+  "src/routes/api/admin/raptor-atlas/+server.ts": [
+    "tests/routes/auto/api/admin/raptor-atlas.test.ts"
+  ],
+  "src/routes/api/admin/repair/+server.ts": [
+    "tests/routes/auto/api/admin/repair.test.ts"
+  ],
   "src/routes/api/admin/routes/stream/+server.ts": [
     "tests/routes/auto/api/admin/routes/stream.test.ts"
   ],
   "src/routes/api/admin/seed-knowledge/+server.ts": [
     "tests/routes/auto/api/admin/seed-knowledge.test.ts",
     "tests/routes/auto/api/admin/seed-knowledge.test.ts"
+  ],
+  "src/routes/api/admin/topology/recompute/+server.ts": [
+    "tests/routes/auto/api/admin/topology/recompute.test.ts"
+  ],
+  "src/routes/api/admin/weights/+server.ts": [
+    "tests/routes/auto/api/admin/weights.test.ts",
+    "tests/routes/auto/api/admin/weights.test.ts"
   ],
   "src/routes/api/agent/investigate/+server.ts": [
     "tests/routes/auto/api/agent/investigate.test.ts",
@@ -1181,6 +1228,12 @@
   "src/routes/api/ai/generate-report/[scope]/+server.ts": [
     "tests/routes/auto/api/ai/generate-report/__scope.test.ts"
   ],
+  "src/routes/api/ai/hermes-plan/+server.ts": [
+    "tests/routes/auto/api/ai/hermes-plan.test.ts"
+  ],
+  "src/routes/api/ai/hermes-run/+server.ts": [
+    "tests/routes/auto/api/ai/hermes-run.test.ts"
+  ],
   "src/routes/api/ai/judge/+server.ts": [
     "tests/routes/auto/api/ai/judge.test.ts"
   ],
@@ -1226,6 +1279,9 @@
     "tests/routes/auto/api/analytics/feedback.test.ts",
     "tests/routes/auto/api/analytics/feedback.test.ts"
   ],
+  "src/routes/api/analytics/file-activity/+server.ts": [
+    "tests/routes/auto/api/analytics/file-activity.test.ts"
+  ],
   "src/routes/api/analytics/focus/+server.ts": [
     "tests/routes/auto/api/analytics/focus.test.ts"
   ],
@@ -1244,6 +1300,9 @@
   ],
   "src/routes/api/analytics/mirror-health/+server.ts": [
     "tests/routes/auto/api/analytics/mirror-health.test.ts"
+  ],
+  "src/routes/api/analytics/panel-activity/+server.ts": [
+    "tests/routes/auto/api/analytics/panel-activity.test.ts"
   ],
   "src/routes/api/analytics/prompt-leaderboard/+server.ts": [
     "tests/routes/auto/api/analytics/prompt-leaderboard.test.ts"
@@ -1341,6 +1400,11 @@
   ],
   "src/routes/api/auth/session/+server.ts": [
     "tests/routes/auto/api/auth/session.test.ts"
+  ],
+  "src/routes/api/browser-context/snapshot/+server.ts": [
+    "tests/routes/auto/api/browser-context/snapshot.test.ts",
+    "tests/routes/auto/api/browser-context/snapshot.test.ts",
+    "tests/routes/auto/api/browser-context/snapshot.test.ts"
   ],
   "src/routes/api/cache/bifrost/check/+server.ts": [
     "tests/routes/auto/api/cache/bifrost/check.test.ts"
@@ -1616,9 +1680,45 @@
   "src/routes/api/code-intel/claude-plan/+server.ts": [
     "tests/routes/auto/api/code-intel/claude-plan.test.ts"
   ],
+  "src/routes/api/code-intel/clusters/[clusterKey]/lenses/+server.ts": [
+    "tests/routes/auto/api/code-intel/clusters/__clusterKey/lenses.test.ts"
+  ],
+  "src/routes/api/code-intel/clusters/[clusterKey]/+server.ts": [
+    "tests/routes/auto/api/code-intel/clusters/__clusterKey.test.ts"
+  ],
   "src/routes/api/code-intel/graph/gds-status/+server.ts": [
     "tests/routes/auto/api/code-intel/graph/gds-status.test.ts",
     "tests/routes/auto/api/code-intel/graph/gds-status.test.ts"
+  ],
+  "src/routes/api/code-intel/graph/impact/+server.ts": [
+    "tests/routes/auto/api/code-intel/graph/impact.test.ts"
+  ],
+  "src/routes/api/code-intel/latest-index/+server.ts": [
+    "tests/routes/auto/api/code-intel/latest-index.test.ts"
+  ],
+  "src/routes/api/code-intel/memory-gain/rejected/+server.ts": [
+    "tests/routes/auto/api/code-intel/memory-gain/rejected.test.ts"
+  ],
+  "src/routes/api/code-intel/memory-gain/+server.ts": [
+    "tests/routes/auto/api/code-intel/memory-gain.test.ts"
+  ],
+  "src/routes/api/code-intel/research-memory/+server.ts": [
+    "tests/routes/auto/api/code-intel/research-memory.test.ts"
+  ],
+  "src/routes/api/code-intel/research-provenance/[id]/+server.ts": [
+    "tests/routes/auto/api/code-intel/research-provenance/__id.test.ts"
+  ],
+  "src/routes/api/code-intel/retrieval-runs/[id]/+server.ts": [
+    "tests/routes/auto/api/code-intel/retrieval-runs/__id.test.ts"
+  ],
+  "src/routes/api/code-intel/retrieval-runs/+server.ts": [
+    "tests/routes/auto/api/code-intel/retrieval-runs.test.ts"
+  ],
+  "src/routes/api/code-intel/topology/node/[stableKey]/+server.ts": [
+    "tests/routes/auto/api/code-intel/topology/node/__stableKey.test.ts"
+  ],
+  "src/routes/api/code-intel/wiki-status/+server.ts": [
+    "tests/routes/auto/api/code-intel/wiki-status.test.ts"
   ],
   "src/routes/api/codebase/analyze/+server.ts": [
     "tests/routes/auto/api/codebase/analyze.test.ts",
@@ -1875,6 +1975,12 @@
   "src/routes/api/codeintel/semantic-health/+server.ts": [
     "tests/routes/auto/api/codeintel/semantic-health.test.ts"
   ],
+  "src/routes/api/collaboration/broadcast/+server.ts": [
+    "tests/routes/auto/api/collaboration/broadcast.test.ts"
+  ],
+  "src/routes/api/comfyui/render/+server.ts": [
+    "tests/routes/auto/api/comfyui/render.test.ts"
+  ],
   "src/routes/api/consolidation/status/+server.ts": [
     "tests/routes/auto/api/consolidation/status.test.ts"
   ],
@@ -1884,6 +1990,9 @@
   "src/routes/api/conversations/[id]/+server.ts": [
     "tests/routes/auto/api/conversations/__id.test.ts",
     "tests/routes/auto/api/conversations/__id.test.ts"
+  ],
+  "src/routes/api/couchdb/view/+server.ts": [
+    "tests/routes/auto/api/couchdb/view.test.ts"
   ],
   "src/routes/api/courtroom/models/+server.ts": [
     "tests/routes/auto/api/courtroom/models.test.ts",
@@ -1970,11 +2079,17 @@
     "tests/routes/auto/api/evidence/relationships.test.ts",
     "tests/routes/auto/api/evidence/relationships.test.ts"
   ],
+  "src/routes/api/evidence/search-by-image/+server.ts": [
+    "tests/routes/auto/api/evidence/search-by-image.test.ts"
+  ],
   "src/routes/api/evidence/search/+server.ts": [
     "tests/routes/auto/api/evidence/search.test.ts"
   ],
   "src/routes/api/evidence/summary/[id]/approve/+server.ts": [
     "tests/routes/auto/api/evidence/summary/__id/approve.test.ts"
+  ],
+  "src/routes/api/evidence/tags/[id]/+server.ts": [
+    "tests/routes/auto/api/evidence/tags/__id.test.ts"
   ],
   "src/routes/api/evidence/upload-test/+server.ts": [
     "tests/routes/auto/api/evidence/upload-test.test.ts"
@@ -2075,6 +2190,12 @@
   "src/routes/api/graph/colab-export/+server.ts": [
     "tests/routes/auto/api/graph/colab-export.test.ts"
   ],
+  "src/routes/api/graph/docstore/+server.ts": [
+    "tests/routes/auto/api/graph/docstore.test.ts"
+  ],
+  "src/routes/api/graph/fetch-rerank/+server.ts": [
+    "tests/routes/auto/api/graph/fetch-rerank.test.ts"
+  ],
   "src/routes/api/graph/glyph-atlas/+server.ts": [
     "tests/routes/auto/api/graph/glyph-atlas.test.ts",
     "tests/routes/auto/api/graph/glyph-atlas.test.ts"
@@ -2097,6 +2218,9 @@
   "src/routes/api/graph/timeline/+server.ts": [
     "tests/routes/auto/api/graph/timeline.test.ts"
   ],
+  "src/routes/api/graph/topology-neighbors/+server.ts": [
+    "tests/routes/auto/api/graph/topology-neighbors.test.ts"
+  ],
   "src/routes/api/graph/traverse/+server.ts": [
     "tests/routes/auto/api/graph/traverse.test.ts"
   ],
@@ -2111,6 +2235,9 @@
   ],
   "src/routes/api/health/gpu/+server.ts": [
     "tests/routes/auto/api/health/gpu.test.ts"
+  ],
+  "src/routes/api/health/inference/+server.ts": [
+    "tests/routes/auto/api/health/inference.test.ts"
   ],
   "src/routes/api/health/ocr/+server.ts": [
     "tests/routes/auto/api/health/ocr.test.ts",
@@ -2131,6 +2258,9 @@
   ],
   "src/routes/api/health/system/+server.ts": [
     "tests/routes/auto/api/health/system.test.ts"
+  ],
+  "src/routes/api/hypergraph/edge/[id]/+server.ts": [
+    "tests/routes/auto/api/hypergraph/edge/__id.test.ts"
   ],
   "src/routes/api/hypergraph/lookup/+server.ts": [
     "tests/routes/auto/api/hypergraph/lookup.test.ts",
@@ -2509,6 +2639,9 @@
   "src/routes/api/rag/process/+server.ts": [
     "tests/routes/auto/api/rag/process.test.ts"
   ],
+  "src/routes/api/rag/search-fused/+server.ts": [
+    "tests/routes/auto/api/rag/search-fused.test.ts"
+  ],
   "src/routes/api/rag/suggestions/+server.ts": [
     "tests/routes/auto/api/rag/suggestions.test.ts"
   ],
@@ -2537,6 +2670,13 @@
   "src/routes/api/recommendations/+server.ts": [
     "tests/routes/auto/api/recommendations.test.ts",
     "tests/routes/auto/api/recommendations.test.ts"
+  ],
+  "src/routes/api/reconstruction/compile/+server.ts": [
+    "tests/routes/auto/api/reconstruction/compile.test.ts"
+  ],
+  "src/routes/api/reconstruction/scene-intent/+server.ts": [
+    "tests/routes/auto/api/reconstruction/scene-intent.test.ts",
+    "tests/routes/auto/api/reconstruction/scene-intent.test.ts"
   ],
   "src/routes/api/reports/batch-export/+server.ts": [
     "tests/routes/auto/api/reports/batch-export.test.ts"
@@ -2572,8 +2712,14 @@
     "tests/routes/auto/api/research/concurrent-deep.test.ts",
     "tests/routes/auto/api/research/concurrent-deep.test.ts"
   ],
+  "src/routes/api/research/deep/+server.ts": [
+    "tests/routes/auto/api/research/deep.test.ts"
+  ],
   "src/routes/api/research/encode/+server.ts": [
     "tests/routes/auto/api/research/encode.test.ts"
+  ],
+  "src/routes/api/research/external-deep/+server.ts": [
+    "tests/routes/auto/api/research/external-deep.test.ts"
   ],
   "src/routes/api/research/ingest/+server.ts": [
     "tests/routes/auto/api/research/ingest.test.ts"

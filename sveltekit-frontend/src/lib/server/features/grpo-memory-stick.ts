@@ -1,65 +1,36 @@
-/**
- * src/lib/server/features/grpo-memory-stick.ts
- *
- * Implements the GRPO Memory Stick persistence layer for RL-weighted inference.
- */
-
-import { queryHash as computeQueryHash } from '../analytics/search-analytics.js';
+import * as crypto from 'node:crypto';
 import type { GrpoMemoryStick } from './feature-map.types.js';
-import { getRedis } from '$lib/server/redis.js';
 
-const GRPO_STICK_PREFIX = 'grpo:memory:';
-const GRPO_STICK_TTL = 30 * 24 * 3600; // 30 days
-
-export async function createGrpoMemoryStick(opts: {
-  featureId: string;
+/**
+ * Creates a GRPO (Group Relative Policy Optimization) memory stick for synthesis evaluation.
+ * Stores what helped (selectedSourceIds) and what didn't (rejectedSourceIds).
+ */
+export function createGrpoMemoryStick(input: {
+  featureId?: string;
   query: string;
-  contextPacketJSON: string;
+  contextPacketHash: string;
   selectedSourceIds: string[];
   rejectedSourceIds: string[];
-  rewardSignals: Array<{ name: string; value: number; source?: string }>;
-  cacheKeys: string[];
-}): Promise<GrpoMemoryStick> {
-  const queryHash = computeQueryHash(opts.query);
+  rewardSignals?: GrpoMemoryStick['rewardSignals'];
+  scores?: GrpoMemoryStick['scores'];
+  cacheKeys?: Partial<GrpoMemoryStick['cacheKeys']>;
+}): GrpoMemoryStick {
+  const queryHash = crypto.createHash('sha256').update(input.query).digest('hex');
   
-  const crypto = await import('crypto');
-  const contextPacketHash = crypto.createHash('sha256')
-    .update(opts.contextPacketJSON)
-    .digest('hex')
-    .slice(0, 16);
-
-  const timestamp = new Date().toISOString();
-  const cacheKey = `${GRPO_STICK_PREFIX}${opts.featureId}:${contextPacketHash}`;
-
-  const stick: GrpoMemoryStick = {
-    featureId: opts.featureId,
+  return {
+    id: `grpo:${queryHash.slice(0, 16)}:${input.contextPacketHash.slice(0, 12)}`,
+    featureId: input.featureId,
     queryHash,
-    contextPacketHash,
-    selectedSourceIds: opts.selectedSourceIds,
-    rejectedSourceIds: opts.rejectedSourceIds,
-    rewardSignals: opts.rewardSignals,
-    cacheKeys: opts.cacheKeys,
-    createdAt: timestamp,
+    contextPacketHash: input.contextPacketHash,
+    selectedSourceIds: input.selectedSourceIds,
+    rejectedSourceIds: input.rejectedSourceIds,
+    rewardSignals: input.rewardSignals ?? {},
+    scores: input.scores ?? {},
+    cacheKeys: {
+      redis: input.cacheKeys?.redis ?? [],
+      bitfrost: input.cacheKeys?.bitfrost ?? [],
+      qdrant: input.cacheKeys?.qdrant ?? [],
+      neo4j: input.cacheKeys?.neo4j ?? []
+    }
   };
-
-  // Persist to Redis (fire-and-forget but awaited for return)
-  const redis = getRedis();
-  await redis.set(cacheKey, JSON.stringify(stick), 'EX', GRPO_STICK_TTL);
-  
-  // Also push to a rolling log for batch processing
-  await redis.lpush('grpo:memory:rolling', JSON.stringify({
-    hash: contextPacketHash,
-    reward: opts.rewardSignals[0]?.value ?? 0,
-    ts: timestamp
-  }));
-  await redis.ltrim('grpo:memory:rolling', 0, 9999);
-
-  return stick;
-}
-
-export async function getGrpoMemoryStick(queryHash: string, contextPacketHash: string): Promise<GrpoMemoryStick | null> {
-  const redis = getRedis();
-  const raw = await redis.get(`${GRPO_STICK_PREFIX}${queryHash}:${contextPacketHash}`);
-  if (!raw) return null;
-  return JSON.parse(raw) as GrpoMemoryStick;
 }

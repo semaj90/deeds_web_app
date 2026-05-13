@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/components/evidence/WebGPUTextureStreamingDemo.svelte"
 aliases: ["WebGPUTextureStreamingDemo.svelte","src/lib/components/evidence/WebGPUTextureStreamingDemo.svelte"]
-clusterId: 59
+clusterId: -1
 ext: ".svelte"
 lineCount: 517
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 3
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/evidence/WebGPUTextureStreamingDemo.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-59]]"]
+up: []
 imports: []
-tags: ["file","ext/svelte","cluster/59","svelte","t/svelte","t/src","t/lib"]
+tags: ["file","ext/svelte","svelte","t/svelte","t/src","t/lib"]
 ---
 
 # `src/lib/components/evidence/WebGPUTextureStreamingDemo.svelte`
 ## For future Claude
 > WebGPU Texture Streaming Demo — NES-Inspired Evidence Visualization
-cluster:: [[Clusters/cluster-59]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 517

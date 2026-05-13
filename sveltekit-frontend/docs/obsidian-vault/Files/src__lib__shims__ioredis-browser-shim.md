@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/shims/ioredis-browser-shim.js"
 aliases: ["ioredis-browser-shim.js","src/lib/shims/ioredis-browser-shim.js"]
-clusterId: 57
+clusterId: -1
 ext: ".js"
 lineCount: 416
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/lib/shims/ioredis-browser-shim.js"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-57]]"]
+up: []
 imports: []
-tags: ["file","ext/js","cluster/57","zod","t/js","t/src","t/lib"]
+tags: ["file","ext/js","zod","t/js","t/src","t/lib"]
 ---
 
 # `src/lib/shims/ioredis-browser-shim.js`
 ## For future Claude
 > IORedis Browser Shim for Legal AI Platform
-cluster:: [[Clusters/cluster-57]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 416

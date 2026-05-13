@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/gpu/simdjson-bridge.ts"
 aliases: ["simdjson-bridge.ts","src/lib/server/gpu/simdjson-bridge.ts"]
-clusterId: 20
+clusterId: -1
 ext: ".ts"
 lineCount: 418
 pagerank: 0.213555
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: true
 importCount: 3
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/gpu/simdjson-bridge.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-20]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/20","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/gpu/simdjson-bridge.ts`
 ## For future Claude
 > simdjson N-API Bridge — server-only.
-cluster:: [[Clusters/cluster-20]]
 pagerank:: 0.213555
 blend:: 0.000000
 lines:: 418

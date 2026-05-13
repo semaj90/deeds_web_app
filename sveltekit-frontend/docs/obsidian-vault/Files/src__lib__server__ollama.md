@@ -2,9 +2,9 @@
 type: "file"
 path: "src/lib/server/ollama.ts"
 aliases: ["ollama.ts","src/lib/server/ollama.ts"]
-clusterId: 6
+clusterId: -1
 ext: ".ts"
-lineCount: 1372
+lineCount: 1377
 pagerank: 0.368352
 blend: 0
 isRoute: false
@@ -12,30 +12,26 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: true
-importCount: 11
+importCount: 12
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ollama.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-6]]"]
-imports: ["[[Files/ai__hypergraph-store]]"]
-tags: ["file","ext/ts","cluster/6","zod","t/ts","t/src","t/lib"]
+up: []
+imports: []
+tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/ollama.ts`
 ## For future Claude
 > Ollama Integration Service — canonical Ollama client.
-cluster:: [[Clusters/cluster-6]]
 pagerank:: 0.368352
 blend:: 0.000000
-lines:: 1372
+lines:: 1377
 ## Summary
 
 Ollama Integration Service — canonical Ollama client.
 
-## Imports
-
-- imports:: [[Files/ai__hypergraph-store]] `./ai/hypergraph-store.js`
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;

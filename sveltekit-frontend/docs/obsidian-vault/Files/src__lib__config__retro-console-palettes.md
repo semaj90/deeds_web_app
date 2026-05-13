@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/config/retro-console-palettes.ts"
 aliases: ["retro-console-palettes.ts","src/lib/config/retro-console-palettes.ts"]
-clusterId: 75
+clusterId: -1
 ext: ".ts"
 lineCount: 516
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/lib/config/retro-console-palettes.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-75]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/75","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/config/retro-console-palettes.ts`
 ## For future Claude
 > 🎮 Retro Console Color Palettes for Legal AI
-cluster:: [[Clusters/cluster-75]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 516

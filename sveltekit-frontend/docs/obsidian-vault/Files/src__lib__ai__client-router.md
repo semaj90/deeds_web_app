@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/ai/client-router.ts"
 aliases: ["client-router.ts","src/lib/ai/client-router.ts"]
-clusterId: 14
+clusterId: -1
 ext: ".ts"
 lineCount: 506
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/ai/client-router.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-14]]"]
+up: []
 imports: ["[[Files/model-ids]]","[[Files/model-ids]]"]
-tags: ["file","ext/ts","cluster/14","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/ai/client-router.ts`
 ## For future Claude
 > Client Inference Router — 5-tier routing with Gemma 4 on-device inference.
-cluster:: [[Clusters/cluster-14]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 506

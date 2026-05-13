@@ -1,27 +1,27 @@
 # AGENTS.md — `tests/routes/auto/api/health`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-12T03:12:15.164Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests/routes/auto/api/health
 
 ## Snapshot
 
-- 14 file(s), 0 handler(s)
+- 15 file(s), 0 handler(s)
 - Audit score: _(no GPU audit)_
 - no audit signals
 
 
-## Files (14)
+## Files (15)
 
 - `capabilities.test.ts`
 - `circuit-breakers.test.ts`
 - `database.test.ts`
 - `gpu.test.ts`
+- `inference.test.ts`
 - `neo4j.test.ts`
 - `ocr.test.ts`
 - `ollama.test.ts`
-- `qdrant.test.ts`
 
 ## Tools
 
@@ -38,7 +38,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/14 files have paired tests
+- **Paired tests**: 0/15 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

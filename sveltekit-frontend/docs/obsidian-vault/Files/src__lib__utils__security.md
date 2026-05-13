@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/utils/security.ts"
 aliases: ["security.ts","src/lib/utils/security.ts"]
-clusterId: 52
+clusterId: -1
 ext: ".ts"
 lineCount: 567
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: true
 hasZod: true
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/utils/security.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-52]]"]
+up: []
 imports: []
-tags: ["file","ext/ts","cluster/52","auth","zod","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","auth","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/utils/security.ts`
 ## For future Claude
 > Security utilities for the Legal AI Platform
-cluster:: [[Clusters/cluster-52]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 567

@@ -2,7 +2,7 @@
 type: "file"
 path: "src/routes/(app)/demos/yorha/components/JudicialAnalysisAgent.svelte"
 aliases: ["JudicialAnalysisAgent.svelte","src/routes/(app)/demos/yorha/components/JudicialAnalysisAgent.svelte"]
-clusterId: 97
+clusterId: -1
 ext: ".svelte"
 lineCount: 472
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: true
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/routes/(app)/demos/yorha/components/JudicialAnalysisAgent.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "medium"
-up: ["[[Clusters/cluster-97]]"]
+up: []
 imports: []
-tags: ["file","ext/svelte","cluster/97","svelte","auth","t/svelte","t/src","t/routes"]
+tags: ["file","ext/svelte","svelte","auth","t/svelte","t/src","t/routes"]
 ---
 
 # `src/routes/(app)/demos/yorha/components/JudicialAnalysisAgent.svelte`
 ## For future Claude
 > .svelte at src/routes/(app)/demos/yorha/components/JudicialAnalysisAgent.svelte (472 lines), Svelte component, auth-guarded.
-cluster:: [[Clusters/cluster-97]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 472

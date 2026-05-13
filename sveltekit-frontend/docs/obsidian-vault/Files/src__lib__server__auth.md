@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/server/auth.ts"
 aliases: ["auth.ts","src/lib/server/auth.ts"]
-clusterId: 90
+clusterId: -1
 ext: ".ts"
 lineCount: 561
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: true
 hasZod: false
 importCount: 10
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/auth.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
-up: ["[[Clusters/cluster-90]]"]
+up: []
 imports: ["[[Files/db__client]]","[[Files/db__schema-postgres]]","[[Files/env]]","[[Files/errors]]","[[Files/utils__endpoints]]"]
-tags: ["file","ext/ts","cluster/90","auth","t/ts","t/src","t/lib"]
+tags: ["file","ext/ts","auth","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/auth.ts`
 ## For future Claude
 > src/lib/server/auth.ts
-cluster:: [[Clusters/cluster-90]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 561

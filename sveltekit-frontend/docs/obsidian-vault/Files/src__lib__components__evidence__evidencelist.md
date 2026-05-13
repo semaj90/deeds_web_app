@@ -2,7 +2,7 @@
 type: "file"
 path: "src/lib/components/evidence/EvidenceList.svelte"
 aliases: ["EvidenceList.svelte","src/lib/components/evidence/EvidenceList.svelte"]
-clusterId: 59
+clusterId: -1
 ext: ".svelte"
 lineCount: 505
 pagerank: 0
@@ -14,18 +14,17 @@ hasAuth: false
 hasZod: false
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/evidence/EvidenceList.svelte"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "medium"
-up: ["[[Clusters/cluster-59]]"]
+up: []
 imports: ["[[Files/evidence-utils]]"]
-tags: ["file","ext/svelte","cluster/59","svelte","t/svelte","t/src","t/lib"]
+tags: ["file","ext/svelte","svelte","t/svelte","t/src","t/lib"]
 ---
 
 # `src/lib/components/evidence/EvidenceList.svelte`
 ## For future Claude
 > .svelte at src/lib/components/evidence/EvidenceList.svelte (505 lines), Svelte component.
-cluster:: [[Clusters/cluster-59]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 505

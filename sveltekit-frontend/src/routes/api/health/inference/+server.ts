@@ -9,7 +9,27 @@ import { isTopologySearchHealthy } from '$lib/server/retrieval/topology-search-c
  * Reports the status of the inference stack, including active runtime profiles,
  * GPU bridge availability (CUDA Graphs), and downstream service health.
  */
-export async function GET() {
+export async function GET({ locals }) {
+  if (!locals.user) {
+    return json({
+      status: 'error',
+      error: 'Unauthorized',
+      timestamp: new Date().toISOString(),
+      runtime: {
+        profile: '',
+        backend: '',
+        turboQuant: false,
+        runtimeAvailable: false,
+        notes: ''
+      },
+      gpu: {
+        cudaGraphSupported: false,
+        topologySearchHealthy: false
+      },
+      recommendation: ''
+    }, { status: 401 });
+  }
+
   const runtime = resolveRuntimeConfig();
   const cudaGraphAvailable = CudaGraphManager.isAvailable();
   const topologyHealthy = await isTopologySearchHealthy();

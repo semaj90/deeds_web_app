@@ -4,7 +4,7 @@ path: "src/mcp/server.ts"
 aliases: ["server.ts","src/mcp/server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 4493
+lineCount: 4731
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,13 +12,13 @@ isSvelteComp: false
 isTest: false
 hasAuth: true
 hasZod: true
-importCount: 7
+importCount: 11
 embedding_id: "qdrant://codebase_chunks_768/src/mcp/server.ts"
-last_updated_by_llm: "2026-05-11T03:30:09.005Z"
+last_updated_by_llm: "2026-05-13T00:29:45.067Z"
 ai-first: true
 confidence: "high"
 up: []
-imports: ["[[Files/mcp__index]]"]
+imports: ["[[Files/mcp__index]]","[[Files/tools__repair_tools]]"]
 tags: ["file","ext/ts","auth","zod","t/ts","t/src","t/mcp"]
 ---
 
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","auth","zod","t/ts","t/src","t/mcp"]
 > Setup tool handlers for MCP server
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 4493
+lines:: 4731
 ## Summary
 
 Setup tool handlers for MCP server
@@ -35,6 +35,7 @@ Setup tool handlers for MCP server
 ## Imports
 
 - imports:: [[Files/mcp__index]] `../mcp/index.js`
+- imports:: [[Files/tools__repair_tools]] `./tools/repair_tools.js`
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;
