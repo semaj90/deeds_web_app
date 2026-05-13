@@ -308,12 +308,11 @@ async function main() {
       for (let i = 0; i < dedupedEdges.length; i += BATCH) {
         const batch = dedupedEdges.slice(i, i + BATCH);
         const values = batch.map((e, idx) => {
-          const offset = idx * 6;
-          return `($${offset+1}, $${offset+2}, $${offset+3}, $${offset+4}, $${offset+5}::double precision, $${offset+6}::jsonb, now())`;
+          const offset = idx * 5;
+          return `($${offset+1}, $${offset+2}, $${offset+3}, $${offset+4}, $${offset+5}::jsonb, now())`;
         }).join(', ');
 
         const params = batch.flatMap(e => [
-          e.sourceFile,
           e.sourceFile,
           e.targetKey,
           e.relationType,
@@ -322,7 +321,7 @@ async function main() {
         ]);
 
         await pool.query(
-          `INSERT INTO code_relations (source_file, source_key, target_key, relation_type, confidence, evidence, created_at)
+          `INSERT INTO code_relations (source_file, target_key, relation_type, confidence, evidence, created_at)
            VALUES ${values}
            ON CONFLICT (source_file, target_key, relation_type)
            DO UPDATE SET confidence = EXCLUDED.confidence, evidence = EXCLUDED.evidence`,

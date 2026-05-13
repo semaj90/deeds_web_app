@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { clusterTensorKey } from '$lib/server/cache-keys.js';
 
 export const clusterSummaryLensesTool = {
   name: 'clusters.get_summary_lenses',
@@ -15,7 +16,7 @@ export const clusterSummaryLensesTool = {
     try {
       const results = await Promise.all(args.clusterIds.map(async (clusterId) => {
         // Try Redis first (graphify cluster summaries)
-        const redisKey = `cluster:summary:${clusterId}`;
+        const redisKey = clusterTensorKey.summary(clusterId);
         const cached = await redis.get(redisKey).catch(() => null) as string | null;
         if (cached) {
           try { return { clusterId, source: 'redis', ...JSON.parse(cached) }; } catch { /* fall through */ }

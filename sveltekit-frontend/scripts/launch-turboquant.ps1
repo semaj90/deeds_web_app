@@ -231,6 +231,19 @@ if ($kvProfile -eq 'atomicbot') {
       '--triattention-normalize'
     )
 }
+# ── Speculative Decoding: inject --model-draft for accelerated throughput ──
+if ($env:DRAFT_MODEL_PATH) {
+  if (Test-Path $env:DRAFT_MODEL_PATH) {
+    $draftN = if ($env:DRAFT_N) { $env:DRAFT_N } else { '5' }
+    Write-Host ("Speculative Decoding: --model-draft enabled ($($env:DRAFT_MODEL_PATH))") -ForegroundColor Cyan
+    Write-Host ("Speculative Decoding automatically disables vision/multimodal (--mmproj)") -ForegroundColor Yellow
+    $TextOnly = $true
+    $baseArgs = $baseArgs + @('--model-draft', $env:DRAFT_MODEL_PATH, '--draft', $draftN, '--n-gpu-layers-draft', '99')
+  } else {
+    Write-Host ("Speculative Decoding: DRAFT_MODEL_PATH set but file not found at $($env:DRAFT_MODEL_PATH) — skipping") -ForegroundColor Yellow
+  }
+}
+
 if (-not $TextOnly -and (Test-Path $mmproj)) {
   $baseArgs = @('-m', $model, '--mmproj', $mmproj) + $baseArgs[2..($baseArgs.Length - 1)]
 }
@@ -265,16 +278,7 @@ if ($kvProfile -eq 'atomicbot') {
   }
 }
 
-# ── Speculative Decoding: inject --model-draft for accelerated throughput ──
-if ($env:DRAFT_MODEL_PATH) {
-  if (Test-Path $env:DRAFT_MODEL_PATH) {
-    $draftN = if ($env:DRAFT_N) { $env:DRAFT_N } else { '5' }
-    Write-Host ("Speculative Decoding: --model-draft enabled ($($env:DRAFT_MODEL_PATH))") -ForegroundColor Cyan
-    $baseArgs = $baseArgs + @('--model-draft', $env:DRAFT_MODEL_PATH, '--draft', $draftN, '--n-gpu-layers-draft', '99')
-  } else {
-    Write-Host ("Speculative Decoding: DRAFT_MODEL_PATH set but file not found at $($env:DRAFT_MODEL_PATH) — skipping") -ForegroundColor Yellow
-  }
-}
+
 
 # ── Foreground branch ────────────────────────────────────────────────────
 if (-not $Detached) {
@@ -288,7 +292,7 @@ New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 $stamp    = (Get-Date).ToString('yyyy-MM-ddTHH-mm-ss')
 $errPath  = Join-Path $logDir ("launch-$stamp.err")
 $outPath  = Join-Path $logDir ("launch-$stamp.out")
-$detachedArgs = $baseArgs + @('--log-disable')
+$detachedArgs = $baseArgs
 
 $proc = Start-Process -FilePath $llama `
                       -ArgumentList $detachedArgs `
@@ -296,9 +300,9 @@ $proc = Start-Process -FilePath $llama `
                       -RedirectStandardError $errPath `
                       -RedirectStandardOutput $outPath
 
-# Poll /health for up to 60s (model load + GPU warm)
+# Poll /health for up to 120s (model load + GPU warm)
 $ready = $false
-for ($i = 0; $i -lt 120; $i++) {
+for ($i = 0; $i -lt 240; $i++) {
   if ($proc.HasExited) { break }
   try {
     Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 1 | Out-Null

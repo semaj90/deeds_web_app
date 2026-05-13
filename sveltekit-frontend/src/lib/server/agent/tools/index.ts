@@ -1,5 +1,5 @@
 // Barrel re-exports for agent tools
-export { webSearch, formatWebSearchResults, fetchPageContent } from './web-search-searxng.js';
+export { webSearch, formatWebSearchResults, fetchPageContent } from './web-search.js';
 export { ripgrepSearch, formatRipgrepResults } from './ripgrep-search.js';
 export { findFiles, formatFindFilesResults } from './find-files.js';
 export { analyzeFile, formatAnalyzeFileResults } from './analyze-file.js';

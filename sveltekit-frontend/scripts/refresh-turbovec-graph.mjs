@@ -5,12 +5,14 @@ async function refreshGraph() {
   console.log('🚀 Refreshing TurboVec Graph (Python Extraction)...');
 
   const pythonPath = 'C:/Users/james/AppData/Local/Programs/Python/Python311/python.exe';
-  const scriptPath = 'scripts/enhanced_graph_synthesis.py';
+  const scriptPath = 'scripts/extract-enhanced-graph.mjs';
+  const binPath = 'npx';
 
   return new Promise((resolve, reject) => {
-    const proc = spawn(pythonPath, [scriptPath], {
+    const proc = spawn(binPath, ['tsx', scriptPath], {
       stdio: 'inherit',
-      cwd: process.cwd()
+      cwd: process.cwd(),
+      shell: true
     });
 
     proc.on('close', (code) => {

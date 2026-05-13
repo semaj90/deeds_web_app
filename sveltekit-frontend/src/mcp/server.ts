@@ -10,7 +10,7 @@ import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, sear
 import { runRgSearchAtlas } from '$lib/server/rg-atlas/run.js';
 import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
 import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
-import { getWikiStatus, searchWiki, explainWikiPage } from '$lib/server/kb/wiki-logic.js';
+import { getWikiStatus, searchWiki, explainWikiPage, refreshDirectory } from '$lib/server/kb/wiki-logic.js';
 
 
 export const server = new Server(
@@ -1795,6 +1795,18 @@ export function setupToolHandlers() {
           required: ['id'],
         },
       },
+      {
+        name: 'wiki.refresh_directory',
+        description: 'Refreshes one directory card (AGENTS.md mirror). Default dryRun=true.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            path: { type: 'string', description: 'Directory path to refresh' },
+            dryRun: { type: 'boolean', description: 'Perform a dry run (default true)', default: true },
+          },
+          required: ['path'],
+        },
+      },
       ...REPAIR_TOOLS_SCHEMAS as any[],
 
     ],
@@ -1915,6 +1927,12 @@ export function setupToolHandlers() {
       case 'wiki.explain_page': {
         const { id } = args as { id: string };
         const result = await explainWikiPage(id);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+      
+      case 'wiki.refresh_directory': {
+        const { path: dirPath, dryRun } = args as { path: string; dryRun?: boolean };
+        const result = await refreshDirectory(dirPath, dryRun ?? true);
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 

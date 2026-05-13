@@ -36,8 +36,18 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: src/routes/(app)/admin/knowledge-base
 
@@ -68,7 +78,7 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 |------|--------|--------|
 | G18 | ✅ PASS | 1/1 guarded ✅ |
 | G19 | ❌ FAIL | 1/1 unvalidated |
-| G26 | ❌ FAIL | 1/1 unpaired |
+| G26 | ✅ PASS | all paired ✅ |
 | G21-24 | ✅ PASS | 1/1 clean ✅ |
 | G20 | ✅ PASS | clean ✅ |
 
@@ -76,7 +86,6 @@ _Gates checked: G18, G19, G26, G21-24, G20. Run `npm run index:codebase:fast && 
 ## Todos + Enhancements
 
 - **[HIGH]** [G19] Fix **G19** Zod input validation: 1/1 unvalidated
-- **[HIGH]** [G26] Fix **G26** Route test pairing: 1/1 unpaired
 
 _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 
@@ -85,7 +94,7 @@ _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/2 files have paired tests
+- **Paired tests**: 1/2 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

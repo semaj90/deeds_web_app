@@ -2,7 +2,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { ENV } from "$lib/server/env.server.js";
 
-const TRACE_MCP_URL = ENV.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
+const TRACE_MCP_URL = ENV.TRACE_MCP_URL;
 
 export class TraceMcpClient {
   private client: Client | null = null;

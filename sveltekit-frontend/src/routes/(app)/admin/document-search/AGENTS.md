@@ -54,8 +54,18 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: src/routes/(app)/admin/document-search
 
@@ -63,7 +73,7 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 - 2 file(s), 0 handler(s)
 - Audit score: _(no GPU audit)_
-- 🔴 SSR-unsafe: 1
+- no audit signals
 
 
 ## Files (2)
@@ -88,13 +98,12 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 | G19 | ✅ PASS | 1/1 validated ✅ |
 | G26 | ❌ FAIL | 1/1 unpaired |
 | G21-24 | ✅ PASS | 1/1 clean ✅ |
-| G20 | ❌ FAIL | 1 SSR-unsafe file(s) |
+| G20 | ✅ PASS | clean ✅ |
 
 _Gates checked: G18, G19, G26, G21-24, G20. Run `npm run index:codebase:fast && npm run agents:write` to refresh._
 ## Todos + Enhancements
 
 - **[HIGH]** [G26] Fix **G26** Route test pairing: 1/1 unpaired
-- **[HIGH]** [G20] Fix **G20** SSR safety: 1 SSR-unsafe file(s)
 
 _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 

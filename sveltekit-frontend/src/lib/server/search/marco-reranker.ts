@@ -25,7 +25,7 @@ export async function rerankWithMarco(query: string, candidates: string[]): Prom
 
 	try {
 		// Implementation assuming a local inference API (e.g. TEI or custom Go bridge)
-		const response = await fetch(`${ENV.RERANK_URL ?? 'http://localhost:8080'}/rerank`, {
+		const response = await fetch(`${ENV.RERANK_URL}/rerank`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -31,3 +31,24 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     return json({ success: false, error: err.message }, { status: 500 });
   }
 };
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    const validation = SearchSchema.safeParse(body);
+    if (!validation.success) {
+      return json({ success: false, error: 'Invalid body', details: validation.error.format() }, { status: 400 });
+    }
+
+    const { query, limit } = validation.data;
+    const results = await searchWiki(query, { limit });
+    return json({ success: true, results });
+  } catch (err: any) {
+    console.error('[Wiki API] Search POST error:', err);
+    return json({ success: false, error: err.message }, { status: 500 });
+  }
+};

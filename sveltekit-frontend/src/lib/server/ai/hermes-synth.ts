@@ -7,6 +7,7 @@
 
 import { createHash } from 'crypto';
 import type { ExecutionResult, ToolResult } from './hermes-executor.js';
+import { packContext, serializePacket } from '$lib/server/ace/token-aware-packer.js';
 
 // ── Context assembler ─────────────────────────────────────────────────────────
 
@@ -165,7 +166,7 @@ function formatToolResult(r: ToolResult): string {
       ? `ev=${s.evidence} clusters=${s.clusterSummaries} triples=${s.graphTriples} couch=${s.couchGroups} prior=${s.priorCases}`
       : '';
     return [
-      `[Token-aware ACE packer] tokens=${d.tokenUsed ?? '?'} ${summary}`,
+      `[Packed ACE context] tokens=${d.tokenUsed ?? '?'} ${summary}`,
       d.serialized ? d.serialized.slice(0, 1200) : '(empty packet)',
     ].join('\n');
   }
@@ -200,28 +201,59 @@ export function assembleContext(
     const graphResult = execution.results.find((r) => r.tool === 'neo4j_expand_neighborhood' || r.tool === 'graph:neo4j_cached');
     const couchResult = execution.results.find((r) => r.tool === 'couchdb_view_query' || r.tool === 'search:couchdb');
 
-    const qdrantHits = Array.isArray(qdrantResult?.data) ? (qdrantResult!.data as unknown[]) as never[] : [];
-    const clusterSummaries = (clusterResult?.data as { summaries?: never[] } | null)?.summaries ?? [];
+    // Normalize the raw tool payloads into the canonical packer's lane shapes.
+    const qdrantHits = Array.isArray(qdrantResult?.data) ? qdrantResult.data as Array<Record<string, unknown>> : [];
+    const clusterSummaries = (clusterResult?.data as { summaries?: Array<Record<string, unknown>> } | null)?.summaries ?? [];
     const graphTriples = (graphResult?.data as { triples?: Array<[string, string, string]> } | null)?.triples ?? [];
-    const couchRows = couchResult?.data ? [couchResult.data as { view: string; rows: never[] }] : [];
+    const couchRows = (couchResult?.data as { view?: string; rows?: Array<{ key: unknown; value: unknown }> } | null)?.rows
+      ? [{ view: String((couchResult?.data as { view?: string } | null)?.view ?? 'couchdb_view_query'), rows: (couchResult!.data as { rows: Array<{ key: unknown; value: unknown }> }).rows }]
+      : [];
 
-    // Lazy import to avoid circular dep at module load
-    import('$lib/server/ace/token-aware-packer.js').then(({ packContext, serializePacket }) => {
-      /* intentional no-op — used below via sync placeholder */
-      void packContext; void serializePacket;
-    }).catch(() => {/* ignore */});
+    if (qdrantHits.length || clusterSummaries.length || graphTriples.length || couchRows.length) {
+      // Hand off to the canonical packer, then serialize the compact prompt.
+      const packet = packContext({
+        query: userQuery,
+        budget: {
+          maxInputTokens: opts.maxInputTokens,
+          reservedOutputTokens: opts.reservedOutputTokens ?? 1200,
+        },
+        qdrantHits: qdrantHits.map((hit) => ({
+          filePath: typeof hit.filePath === 'string' ? hit.filePath : typeof hit.file_path === 'string' ? hit.file_path : undefined,
+          content: typeof hit.content === 'string' ? hit.content : typeof hit.text === 'string' ? hit.text : '',
+          score: typeof hit.score === 'number' ? hit.score : 0,
+          somCluster: typeof hit.somCluster === 'number' ? hit.somCluster : typeof hit.clusterId === 'number' ? hit.clusterId : undefined,
+          clusterId: typeof hit.clusterId === 'number' ? hit.clusterId : typeof hit.somCluster === 'number' ? hit.somCluster : undefined,
+          encoded64Score: typeof hit.encoded64Score === 'number' ? hit.encoded64Score : undefined,
+          pagerankScore: typeof hit.pagerankScore === 'number' ? hit.pagerankScore : undefined,
+          graphProximity: typeof hit.graphProximity === 'number' ? hit.graphProximity : undefined,
+          qdrantScore: typeof hit.qdrantScore === 'number' ? hit.qdrantScore : undefined,
+        })),
+        clusterSummaries: clusterSummaries.map((summary) => ({
+          clusterId: typeof summary.clusterId === 'number' ? summary.clusterId : 0,
+          label: typeof summary.label === 'string' ? summary.label : `Cluster ${String(summary.clusterId ?? 0)}`,
+          summary: typeof summary.summary === 'string' ? summary.summary : '',
+          authorityScore: typeof summary.authorityScore === 'number' ? summary.authorityScore : undefined,
+          clusterPagerank: typeof summary.clusterPagerank === 'number' ? summary.clusterPagerank : undefined,
+          karpathyBlend: typeof summary.karpathyBlend === 'number' ? summary.karpathyBlend : undefined,
+          topFiles: Array.isArray(summary.topFiles) ? summary.topFiles.filter((value): value is string => typeof value === 'string') : undefined,
+        })),
+        graphTriples,
+        couchRows,
+        // Preserve prior-case evidence from wiki lookups as low-cost memory lanes.
+        priorCaseTexts: execution.results
+          .filter((result) => result.tool === 'karpathy_wiki_lookup')
+          .flatMap((result) => {
+            const notes = (result.data as { notes?: Array<Record<string, unknown>> } | null)?.notes ?? [];
+            return notes.map((note, index) => ({
+              id: String(note.id ?? note.path ?? `${result.tool}:${index}`),
+              text: String(note.summary ?? note.resolution ?? note.query ?? JSON.stringify(note)).slice(0, 800),
+              score: typeof note.confidence === 'number' ? note.confidence : 0,
+            }));
+          }),
+      });
 
-    // Sync fallback — inline packing is async-unfriendly here; build a minimal summary instead
-    const tokenNote = `Budget: ${opts.maxInputTokens}t input / ${opts.reservedOutputTokens ?? 1200}t reserved`;
-    const sections = execution.results.map(formatToolResult);
-    return [
-      `# Retrieval context for: ${userQuery}`,
-      tokenNote,
-      `Tools: ${execution.toolsExecuted} ok / ${execution.toolsFailed} failed / ${execution.totalDurationMs.toFixed(0)}ms`,
-      `Context lanes: qdrant=${qdrantHits.length} clusters=${clusterSummaries.length} triples=${graphTriples.length} couch=${couchRows.length}`,
-      '',
-      ...sections,
-    ].join('\n');
+      return serializePacket(packet);
+    }
   }
 
   const sections = execution.results.map(formatToolResult);

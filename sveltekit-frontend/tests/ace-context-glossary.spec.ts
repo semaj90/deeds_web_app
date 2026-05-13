@@ -17,6 +17,7 @@ vi.mock('$lib/server/db/client', () => ({
   pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
   db: {
     execute: mockDbExecute,
+    insert: vi.fn(() => ({ values: vi.fn(async () => ({ rows: [] })) })),
   },
   pool: {
     query: mockPoolQuery,

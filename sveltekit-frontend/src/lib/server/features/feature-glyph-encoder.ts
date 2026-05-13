@@ -1,9 +1,5 @@
 import { FeatureGlyphBits, type FeatureGlyph } from './feature-map.types.js';
 
-/**
- * NES-style glyph encoder for feature state visualization.
- * Converts feature completeness into an 8-bit state mask and a 64-bit boolean array.
- */
 export function encodeFeatureGlyph(input: {
   featureId: string;
   hasTypes?: boolean;
@@ -16,6 +12,7 @@ export function encodeFeatureGlyph(input: {
   hasCachePacket?: boolean;
 }): FeatureGlyph {
   let mask = 0;
+
   if (input.hasTypes) mask |= FeatureGlyphBits.HAS_TYPES;
   if (input.hasService) mask |= FeatureGlyphBits.HAS_SERVICE;
   if (input.hasRoute) mask |= FeatureGlyphBits.HAS_ROUTE;
@@ -25,7 +22,8 @@ export function encodeFeatureGlyph(input: {
   if (input.hasGraphEdge) mask |= FeatureGlyphBits.HAS_GRAPH_EDGE;
   if (input.hasCachePacket) mask |= FeatureGlyphBits.HAS_CACHE_PACKET;
 
-  // Expand the 8-bit mask into a 64-bit array (8x8 grid)
+  // Generate 8x8 bitmask (64 bits)
+  // Each bit in the 8-bit mask is mapped to a pattern in the 8x8 grid
   const bits = Array.from({ length: 64 }, (_, i) => (mask >> (i % 8)) & 1);
 
   return {

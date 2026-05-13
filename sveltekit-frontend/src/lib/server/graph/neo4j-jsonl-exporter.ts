@@ -7,7 +7,6 @@
 
 import { db } from '$lib/server/db/client';
 import { aceChunks, audioTranscripts, whisperSegments, qdrantCentroidClusters } from '$lib/server/db/schema';
-import { sql } from 'drizzle-orm';
 import fs from 'fs/promises';
 import { resolve } from 'path';
 
@@ -42,15 +41,19 @@ export async function exportGraphToJsonl(outputPath: string): Promise<ExportResu
   const chunks = await db.select().from(aceChunks).limit(2000); // Limit for safety
   for (const c of chunks) {
     const nodeId = `chunk_${c.id}`;
+    const chunkMeta = (c.metadata ?? {}) as { source?: string; stored_at?: string; url?: string; title?: string };
     nodes.push({
       type: 'node',
       id: nodeId,
       labels: ['Chunk', 'CodebaseChunk'],
       properties: {
         chunkId: c.id,
-        filePath: c.filePath,
+        filePath: chunkMeta.url ?? c.sourceDocumentId ?? c.caseId ?? null,
         content: c.content?.slice(0, 1000), // Avoid massive strings
-        tokenCount: c.tokenCount
+        tokenCount: c.content.length,
+        chunkIndex: c.chunkIndex,
+        contentHash: c.contentHash,
+        title: chunkMeta.title ?? null
       }
     });
 

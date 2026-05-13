@@ -6,7 +6,7 @@
  */
 
 import { qdrant } from './qdrant-manager.js';
-import { kmeansWithCentroids } from '$lib/server/gpu/tensorrt-bridge.js';
+import { kmeansWithCentroids } from '$lib/server/gpu/pytorch-graph.js';
 
 export interface ClusteringResult {
   collection: string;
@@ -52,7 +52,7 @@ export class ClusteringService {
           }
         }
       }
-      nextOffset = response.next_page_offset;
+      nextOffset = response.next_page_offset as string | number | null | undefined;
     } while (nextOffset);
 
     if (embeddings.length === 0) {
@@ -61,17 +61,19 @@ export class ClusteringService {
 
     console.log(`📊 Collected ${embeddings.length} embeddings. Running k-means on GPU...`);
 
-    // 2. Run k-means (k-means via tensorrt_bridge / LibTorch)
-    const clusterAssignments = await kmeansWithCentroids(embeddings, k);
+    // 2. Run k-means via the existing LibTorch graph wrapper
+    const dim = embeddings[0]?.length ?? 0;
+    const flatEmbeddings = new Float32Array(embeddings.flat());
+    const { assignments } = kmeansWithCentroids(flatEmbeddings, embeddings.length, dim, k);
 
     // 3. Batch update payloads
     const batchSize = 200;
     for (let i = 0; i < ids.length; i += batchSize) {
       const chunkIds = ids.slice(i, i + batchSize);
-      const chunkAssignments = clusterAssignments.slice(i, i + batchSize);
+      const chunkAssignments = Array.from(assignments.slice(i, i + batchSize));
 
       await qdrant.client.setPayload(collection, {
-        payload: { gpuCluster: 0 }, // Placeholder, we use points filter below
+        payload: { som_cluster: 0 }, // Placeholder, we use points filter below
         points: chunkIds,
         wait: false
       });
@@ -80,7 +82,7 @@ export class ClusteringService {
       // Better to use batch update if possible
       await Promise.all(chunkIds.map((id, idx) => 
         qdrant.client.setPayload(collection, {
-          payload: { gpuCluster: chunkAssignments[idx] },
+          payload: { som_cluster: chunkAssignments[idx] },
           points: [id],
           wait: false
         })

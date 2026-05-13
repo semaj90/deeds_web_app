@@ -1,13 +1,13 @@
 # AGENTS.md — `tests/routes`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/routes
 
 ## Snapshot
 
-- module directory with 31 files, 2 API handlers, 6 Drizzle refs
+- module directory with 31 files, 2 API handlers, 7 Drizzle refs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `tests` `routes` `ace-wiki-graph-index.test.ts` `test` `ai-models.test.ts` `all-routes-page-server.test.ts`

@@ -1,7 +1,7 @@
 # AGENTS.md — `sveltekit-frontend/` (LLM directory wiki)
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > Per-directory AGENTS.md files are scattered throughout `src/` — agents walk UP from any file to the nearest one. **This file is the directory index** so agents (and humans) can quickly jump to a dir's KAG slug or fire the right tool call.
@@ -34,11 +34,11 @@ These tools are wired in-process in [`src/lib/server/ai/gemma4-agent.ts`](./src/
 
 | Gate | Status |
 |------|--------|
-| G4  Auth on API routes | 767✅ / 11❌ |
-| G5  Zod on body-parsing routes | 533✅ / 0❌ |
-| G15 SSR-unsafe globals | 2❌ |
-| G16 Routes without tests | 1❌ |
-| G20 Cyclic import pairs | 1 |
+| G4  Auth on API routes | 771✅ / 0❌ |
+| G5  Zod on body-parsing routes | 534✅ / 0❌ |
+| G15 SSR-unsafe globals | 0❌ |
+| G16 Routes without tests | 2❌ |
+| G20 Cyclic import pairs | 0 |
 
 Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
@@ -281,7 +281,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/indexer` | 22 | — | — | `src_lib_server_indexer` | `agents_md({ path: "src/lib/server/indexer" })` |
 | `src/lib/server/indexer/pipeline` | 3 | — | — | `src_lib_server_indexer_pipeline` | `agents_md({ path: "src/lib/server/indexer/pipeline" })` |
 | `src/lib/server/inference` | 4 | — | — | `src_lib_server_inference` | `agents_md({ path: "src/lib/server/inference" })` |
-| `src/lib/server/kb` | 8 | — | — | `src_lib_server_kb` | `agents_md({ path: "src/lib/server/kb" })` |
+| `src/lib/server/kb` | 9 | — | — | `src_lib_server_kb` | `agents_md({ path: "src/lib/server/kb" })` |
 | `src/lib/server/langextract` | 3 | — | — | `src_lib_server_langextract` | `agents_md({ path: "src/lib/server/langextract" })` |
 | `src/lib/server/legal` | 9 | — | — | `src_lib_server_legal` | `agents_md({ path: "src/lib/server/legal" })` |
 | `src/lib/server/llm` | 6 | — | — | `src_lib_server_llm` | `agents_md({ path: "src/lib/server/llm" })` |
@@ -313,8 +313,8 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/types` | 11 | — | — | `src_lib_server_types` | `agents_md({ path: "src/lib/server/types" })` |
 | `src/lib/server/utils` | 13 | — | — | `src_lib_server_utils` | `agents_md({ path: "src/lib/server/utils" })` |
 | `src/lib/server/validation` | 2 | — | — | `src_lib_server_validation` | `agents_md({ path: "src/lib/server/validation" })` |
-| `src/lib/server/vector` | 13 | — | — | `src_lib_server_vector` | `agents_md({ path: "src/lib/server/vector" })` |
-| `src/lib/server/wiki` | 8 | — | — | `src_lib_server_wiki` | `agents_md({ path: "src/lib/server/wiki" })` |
+| `src/lib/server/vector` | 14 | — | — | `src_lib_server_vector` | `agents_md({ path: "src/lib/server/vector" })` |
+| `src/lib/server/wiki` | 9 | — | — | `src_lib_server_wiki` | `agents_md({ path: "src/lib/server/wiki" })` |
 | `src/lib/server/workers` | 5 | — | — | `src_lib_server_workers` | `agents_md({ path: "src/lib/server/workers" })` |
 
 ### `src/lib/services/` (1 dir)
@@ -333,7 +333,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/shims` | 11 | 🔴 1 ssr | — | `src_lib_shims` | `agents_md({ path: "src/lib/shims" })` |
+| `src/lib/shims` | 11 | — | — | `src_lib_shims` | `agents_md({ path: "src/lib/shims" })` |
 
 ### `src/lib/stores/` (3 dirs)
 
@@ -435,7 +435,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/admin/component-analysis` | 2 | — | — | `src_routes__app__admin_component_analysis` | `agents_md({ path: "src/routes/(app)/admin/component-analysis" })` |
 | `src/routes/(app)/admin/dev-tools` | 4 | — | — | `src_routes__app__admin_dev_tools` | `agents_md({ path: "src/routes/(app)/admin/dev-tools" })` |
 | `src/routes/(app)/admin/dev-tools/component-showcase` | 13 | — | — | `src_routes__app__admin_dev_tools_component_showcase` | `agents_md({ path: "src/routes/(app)/admin/dev-tools/component-showcase" })` |
-| `src/routes/(app)/admin/document-search` | 2 | 🔴 1 ssr | — | `src_routes__app__admin_document_search` | `agents_md({ path: "src/routes/(app)/admin/document-search" })` |
+| `src/routes/(app)/admin/document-search` | 2 | — | — | `src_routes__app__admin_document_search` | `agents_md({ path: "src/routes/(app)/admin/document-search" })` |
 | `src/routes/(app)/admin/error-analysis` | 2 | — | — | `src_routes__app__admin_error_analysis` | `agents_md({ path: "src/routes/(app)/admin/error-analysis" })` |
 | `src/routes/(app)/admin/error-brain` | 3 | — | — | `src_routes__app__admin_error_brain` | `agents_md({ path: "src/routes/(app)/admin/error-brain" })` |
 | `src/routes/(app)/admin/gpu-evidence-graph` | 3 | — | — | `src_routes__app__admin_gpu_evidence_graph` | `agents_md({ path: "src/routes/(app)/admin/gpu-evidence-graph" })` |
@@ -536,7 +536,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 
-### `src/routes/api/` (667 dirs)
+### `src/routes/api/` (669 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|

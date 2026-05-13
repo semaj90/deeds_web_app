@@ -421,9 +421,7 @@ export async function executeContextualTool(
         return { ok: true, tool: name, result, durationMs: Date.now() - start, metadata };
       }
       case 'web_search': {
-        const { webSearch, formatWebSearchResults } = await import(
-          '$lib/server/agent/tools/web-search-searxng.js'
-        );
+        const { webSearch, formatWebSearchResults } = await import('$lib/server/agent/tools/web-search.js');
         const searchResult = await Promise.race([
           webSearch({
             query: String(args.query || ''),

@@ -54,16 +54,26 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/config
 
 ## Snapshot
 
 - shared library directory with 8 files, 0 API handlers
-- Audit score: **85/100**
-- 🟠 hardcoded localhost: 1
+- Audit score: **90/100**
+- no audit signals
 - Tags: `src` `lib` `config` `auth` `zod` `json`
 
 ## Files (8)
@@ -74,12 +84,6 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 - `src/lib/config/mcp-context7-registration.json`
 - `src/lib/config/pgvector-gpu-config.js`
 
-## Constraints
-
-> Forbidden / risky patterns. Derived from audit warnings + gate FAILs.
-
-- ⚠️ Hardcoded localhost refs
-
 ## Tools
 
 > MCP tools the Gemma4 agent should reach for inside this directory.
@@ -89,19 +93,6 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 - clusters.get_members
 - context.build_kv_packet
 - taxonomy.children
-## Audit Gates
-
-| Gate | Status | Detail |
-|------|--------|--------|
-| G17 | ❌ FAIL | 1/8 files — use env.server.ts getters |
-
-_Gates checked: G17. Run `npm run index:codebase:fast && npm run agents:write` to refresh._
-## Todos + Enhancements
-
-- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 1/8 files — use env.server.ts getters
-- **[MED]** Hardcoded localhost refs
-
-_Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 
 ## Retrieval / Rerank Hints
 

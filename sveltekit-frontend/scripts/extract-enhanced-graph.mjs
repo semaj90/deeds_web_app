@@ -242,7 +242,43 @@ async function runEnhancedExtractor() {
     } catch (err) {}
   }
 
-  // --- 4. Persist to DB ---
+  // --- 5. AGENTS.md Context Extractor (Recommendations & Protocols) ---
+  console.log('🔍 Running AGENTS.md Extractor (Context & Recommendations)...');
+  const agentsFiles = await glob('**/AGENTS.md', { ignore: ['node_modules/**'] });
+
+  for (const file of agentsFiles) {
+    try {
+      const content = await fs.readFile(file, 'utf-8');
+      const dir = path.dirname(file);
+      const id = `dir:${dir === '.' ? 'root' : dir}`;
+      
+      // Basic extraction of features and protocols from AGENTS.md
+      const features = content.match(/## (Features|Repo at a glance)([\s\S]*?)##/i)?.[2] || '';
+      const protocols = content.match(/## (Protocols|Critical conventions)([\s\S]*?)##/i)?.[2] || '';
+      
+      const mapping = mappings.get(id) || {
+        id,
+        kind: 'directory',
+        label: path.basename(dir) || 'root',
+        path: dir,
+        flags: 0,
+        edges: [],
+        metadata: {}
+      };
+
+      mapping.summary = content.split('\n').slice(0, 5).join('\n'); // Top 5 lines as summary
+      mapping.metadata = {
+        ...mapping.metadata,
+        agentsContext: true,
+        extractedFeatures: features.trim(),
+        criticalConventions: protocols.trim()
+      };
+
+      mappings.set(id, mapping);
+    } catch (err) {}
+  }
+
+  // --- 6. Persist to DB ---
   console.log(`💾 Persisting ${mappings.size} enhanced mappings to DB (batching)...`);
   
   const allMappings = Array.from(mappings.values());

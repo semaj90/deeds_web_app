@@ -54,15 +54,25 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes
 
 ## Snapshot
 
-- module directory with 6 files, 676 API handlers, 258 Drizzle refs, 2 TODOs, 1 SSR-unsafe
-- Audit score: **91/100**
+- module directory with 6 files, 678 API handlers, 258 Drizzle refs, 2 TODOs
+- Audit score: **100/100**
 - no audit signals
 - Tags: `src` `routes` `(admin)` `component` `auth` `(analysis)`
 
@@ -78,7 +88,6 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 > Forbidden / risky patterns. Derived from audit warnings + gate FAILs.
 
-- ⚠️ 1 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
 - ⚠️ 70 routes lack test pairing
 
@@ -105,7 +114,6 @@ _Gates checked: G18, G19, G26, G21-24, G20. Run `npm run index:codebase:fast && 
 ## Todos + Enhancements
 
 - **[HIGH]** [G19] Fix **G19** Zod input validation: 1/1 unvalidated
-- **[MED]** 1 SSR-unsafe globals
 - **[MED]** Hardcoded localhost refs
 - **[MED]** 70 routes lack test pairing
 

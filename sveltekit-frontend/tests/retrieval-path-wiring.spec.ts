@@ -38,7 +38,24 @@ vi.mock('$lib/server/redis.js', () => ({
 		get: vi.fn(async () => null),
 		set: vi.fn(async () => 'OK'),
 		ping: vi.fn(async () => 'PONG'),
+		mget: vi.fn(async () => []),
+		smembers: vi.fn(async () => []),
+		exists: vi.fn(async () => 0),
+		zrevrangebyscore: vi.fn(async () => []),
+		scan: vi.fn(async () => ['0', []]),
+		pipeline: vi.fn(() => ({ setex: vi.fn().mockReturnThis(), sadd: vi.fn().mockReturnThis(), exec: vi.fn(async () => []) })),
 	},
+	getRedis: vi.fn(() => ({
+		get: vi.fn(async () => null),
+		set: vi.fn(async () => 'OK'),
+		ping: vi.fn(async () => 'PONG'),
+		mget: vi.fn(async () => []),
+		smembers: vi.fn(async () => []),
+		exists: vi.fn(async () => 0),
+		zrevrangebyscore: vi.fn(async () => []),
+		scan: vi.fn(async () => ['0', []]),
+		pipeline: vi.fn(() => ({ setex: vi.fn().mockReturnThis(), sadd: vi.fn().mockReturnThis(), exec: vi.fn(async () => []) })),
+	})),
 }));
 
 // ── Mock DB ─────────────────────────────────────────────────────────────
@@ -531,6 +548,19 @@ describe('Graph-informed retrieval path wiring', () => {
 			const { TTL } = await import('$lib/server/cache-keys.js');
 			expect(TTL).toHaveProperty('AUTHORITY_CHAIN');
 			expect(TTL.AUTHORITY_CHAIN).toBe(15 * 60); // 15 min in seconds
+		});
+
+		it('tensor cache key helpers expose compact Redis artifacts', async () => {
+			const { aceContextKey, clusterTensorKey, graphPacketKey, tensorCacheKey } = await import('$lib/server/cache-keys.js');
+
+			expect(tensorCacheKey.encoded64('abc')).toBe('gpu:encoded64:abc');
+			expect(tensorCacheKey.topkClusters('abc')).toBe('gpu:topk_clusters:abc');
+			expect(tensorCacheKey.rerankScores('abc')).toBe('gpu:rerank_scores:abc');
+			expect(clusterTensorKey.summary(42)).toBe('cluster:summary:42');
+			expect(clusterTensorKey.members(42)).toBe('cluster:members:42');
+			expect(graphPacketKey.expand('deadbeef')).toBe('neo4j:expand:deadbeef');
+			expect(graphPacketKey.triples('deadbeef')).toBe('graph:triples:deadbeef');
+			expect(aceContextKey.packet('cafebabe')).toBe('ace:context:cafebabe');
 		});
 
 		it('_extractNewAuthorities is exported for testing', async () => {

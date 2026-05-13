@@ -54,14 +54,24 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)
 
 ## Snapshot
 
-- route handler directory with 2 files, 4 API handlers, 32 Drizzle refs, 1 TODOs, 1 SSR-unsafe
+- route handler directory with 2 files, 4 API handlers, 32 Drizzle refs, 1 TODOs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `routes` `(app)` `auth` `route` `component`
@@ -75,9 +85,8 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 > Forbidden / risky patterns. Derived from audit warnings + gate FAILs.
 
-- ⚠️ 1 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
-- ⚠️ 62 routes lack test pairing
+- ⚠️ 61 routes lack test pairing
 
 ## Tools
 
@@ -98,9 +107,8 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 _Gates checked: G21-24, G20. Run `npm run index:codebase:fast && npm run agents:write` to refresh._
 ## Todos + Enhancements
 
-- **[MED]** 1 SSR-unsafe globals
 - **[MED]** Hardcoded localhost refs
-- **[MED]** 62 routes lack test pairing
+- **[MED]** 61 routes lack test pairing
 
 _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 

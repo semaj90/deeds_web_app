@@ -3,6 +3,7 @@
 	import FeedbackButtons from '$lib/components/ui/FeedbackButtons.svelte';
 	import ResearchSummariesBrowser from '$lib/components/analytics/ResearchSummariesBrowser.svelte';
 	import LiveResearchPanel from '$lib/components/analytics/LiveResearchPanel.svelte';
+	import GlyphAtlasViewer from '$lib/components/graph/GlyphAtlasViewer.svelte';
 	import { contextualChat } from '$lib/stores/contextual-chat.svelte.js';
 
 	// ── Types ─────────────────────────────────────────────────────────────────
@@ -664,6 +665,42 @@
 	let tlNextCursor  = $state<string | null>(null);
 	let tlEventType   = $state('');
 	let tlPipeline    = $state('');
+	
+	let atlasManifest = $state<any>(null);
+	let atlasBase64   = $state<string | null>(null);
+	let atlasLoading  = $state(false);
+
+	let triples       = $state<any[]>([]);
+	let triplesLoading = $state(false);
+	let tripleFilter  = $state('');
+	
+	let filteredTriples = $derived(
+		tripleFilter ? triples.filter(t => t.relation.toLowerCase().includes(tripleFilter.toLowerCase()) || t.source.label.toLowerCase().includes(tripleFilter.toLowerCase())) : triples
+	);
+
+	async function loadAtlas() {
+		atlasLoading = true;
+		try {
+			const res = await fetch('/api/graph/glyph-atlas', { signal: AbortSignal.timeout(30_000) });
+			if (res.ok) {
+				const d = await res.json();
+				atlasManifest = d;
+			}
+		} catch { /* ignore */ }
+		finally { atlasLoading = false; }
+	}
+
+	async function loadTriples() {
+		triplesLoading = true;
+		try {
+			const res = await fetch('/api/analytics/knowledge-triples?limit=100', { signal: AbortSignal.timeout(30_000) });
+			if (res.ok) {
+				const d = await res.json();
+				triples = d.triples ?? [];
+			}
+		} catch { /* ignore */ }
+		finally { triplesLoading = false; }
+	}
 
 	async function fetch_timeline(cursor?: string) {
 		tlLoading = true;
@@ -691,7 +728,11 @@
 
 	$effect(() => {
 		void tlEventType; void tlPipeline;
-		if (activeSection === 'graph') void fetch_timeline();
+		if (activeSection === 'graph') {
+			void fetch_timeline();
+			if (!atlasManifest) void loadAtlas();
+			if (triples.length === 0) void loadTriples();
+		}
 	});
 
 	async function fetch_graph() {
@@ -3228,6 +3269,88 @@
 			</div>
 		{/if}
 	</section>
+	
+	<!-- ── Glyph Atlas & Density ────────────────────────────────────────── -->
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="cpu" class="w-4 h-4" /> NES Glyph Density & Topology</span>
+			<span class="panel-sub">Visual clustering of 10M-density codebase chunks via On-Disk HNSW.</span>
+		</div>
+		<div class="atlas-container" style="min-height: 400px; max-height: 800px; overflow-y: auto;">
+			<GlyphAtlasViewer manifest={atlasManifest} atlasBase64={atlasBase64} />
+		</div>
+	</section>
+
+	<!-- ── Neo4j Triple Viewer ─────────────────────────────────────────── -->
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="network" class="w-4 h-4" /> Neo4j Knowledge Triples</span>
+			<span class="panel-sub">Raw relational triples extracted from the latest synthesis run.</span>
+			<div class="hdr-actions" style="margin-left: auto; display: flex; gap: 0.5rem;">
+				<input 
+					type="text" 
+					class="ctrl-select" 
+					placeholder="Filter triples..." 
+					bind:value={tripleFilter}
+					style="width: 150px;"
+				/>
+				<button 
+					class="btn-sm btn-ghost" 
+					style="color: #f87171;"
+					onclick={async () => {
+						if (confirm('Prune all triples with confidence < 50%?')) {
+							const res = await fetch('/api/analytics/knowledge-triples/prune', {
+								method: 'POST',
+								body: JSON.stringify({ threshold: 0.5 })
+							});
+							if (res.ok) void loadTriples();
+						}
+					}}
+				>
+					<Icon name="trash-2" class="w-3.5 h-3.5" /> Prune < 50%
+				</button>
+			</div>
+		</div>
+		<div class="triples-browser" style="max-height: 500px; overflow-y: auto;">
+			{#if triplesLoading && triples.length === 0}
+				<p class="loading-note"><Icon name="loader" class="w-4 h-4 spin" /> Loading triples…</p>
+			{:else if filteredTriples.length === 0}
+				<p class="empty-note">No matching triples found.</p>
+			{:else}
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th>Source</th>
+							<th>Relation</th>
+							<th>Target</th>
+							<th>Conf</th>
+							<th>Origin</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each filteredTriples as t}
+							<tr>
+								<td>
+									<div class="triple-entity">
+										<span class="entity-kind">{t.source.kind}</span>
+										<span class="entity-label" title={t.source.id}>{t.source.label}</span>
+									</div>
+								</td>
+								<td class="triple-relation">{t.relation}</td>
+								<td>
+									<div class="triple-entity">
+										<span class="entity-label" title={t.target.id}>{t.target.id.split('/').pop()}</span>
+									</div>
+								</td>
+								<td class="r-cell">{(t.confidence * 100).toFixed(0)}%</td>
+								<td class="muted">{t.metadata.source}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			{/if}
+		</div>
+	</section>
 
 </div>
 {/if}
@@ -4338,4 +4461,11 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 .idx-stage-chip.cached { color: #a78bfa; background: #a78bfa0d; border: 1px solid #a78bfa44; }
 .idx-final-counts { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; font-size: 0.72rem; color: #9ca3af; }
 .idx-final-counts b { color: #d4c7a3; }
+
+/* ── Knowledge Triples ────────────────────────────────────────────────── */
+.triples-browser { border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; background: rgba(0,0,0,0.2); }
+.triple-entity { display: flex; flex-direction: column; gap: 0.1rem; }
+.entity-kind { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; color: #7c6ff7; font-weight: 700; }
+.entity-label { font-size: 0.75rem; color: #e5e7eb; font-weight: 500; }
+.triple-relation { font-family: monospace; font-size: 0.7rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
 </style>

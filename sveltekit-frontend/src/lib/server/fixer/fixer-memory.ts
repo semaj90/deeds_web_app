@@ -18,6 +18,7 @@ import { createHash }        from 'node:crypto';
 import type { Pool }         from 'pg';
 import type { Redis }        from 'ioredis';
 import { QdrantClient }      from '@qdrant/js-client-rest';
+import { ENV }               from '$lib/server/env.server.js';
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ function makePointId(errorHash: string): string {
 
 function qdrantClient(): QdrantClient {
   return new QdrantClient({
-    url: process.env.QDRANT_URL ?? 'http://127.0.0.1:6333',
+    url: ENV.QDRANT_URL,
   });
 }
 

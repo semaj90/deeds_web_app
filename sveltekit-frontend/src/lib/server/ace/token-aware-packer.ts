@@ -78,17 +78,33 @@ function estimateTokens(text: string): number {
 // ── Slot builders ─────────────────────────────────────────────────────────────
 
 function buildEvidenceSlots(
-  qdrantHits: Array<{ filePath?: string; content?: string; score?: number; somCluster?: number }>,
+  qdrantHits: Array<{
+    filePath?: string;
+    content?: string;
+    text?: string;
+    score?: number;
+    qdrantScore?: number;
+    encoded64Score?: number;
+    pagerankScore?: number;
+    graphProximity?: number;
+    clusterId?: number;
+    somCluster?: number;
+  }>,
   clusterScoreMap: Map<number, number>,
   maxSlots: number
 ): EvidenceSlot[] {
+  // Blend retrieval, embedding, pagerank, and cluster affinity into one score.
   return qdrantHits
     .slice(0, maxSlots * 2)
     .map((h) => {
-      const qdrantScore   = h.score ?? 0;
-      const clusterMatch  = clusterScoreMap.get(h.somCluster ?? -1) ?? 0;
-      const contextScore  = qdrantScore * 0.30 + clusterMatch * 0.15;
-      const text          = String(h.content ?? '').slice(0, 800);
+      const qdrantScore   = h.qdrantScore ?? h.score ?? 0;
+      const encoded64Score = h.encoded64Score ?? 0;
+      const pagerankScore = h.pagerankScore ?? 0;
+      const graphProximity = h.graphProximity ?? 0;
+      const clusterMatch  = clusterScoreMap.get(h.clusterId ?? h.somCluster ?? -1) ?? 0;
+      const contextScore  = qdrantScore * 0.30 + encoded64Score * 0.15 + pagerankScore * 0.10 + graphProximity * 0.20 + clusterMatch * 0.15;
+      const text          = String(h.content ?? h.text ?? '').trim().slice(0, 800);
+      // Emit a compact evidence slot that preserves the highest-signal fields.
       return {
         id:        h.filePath ?? 'unknown',
         text,
@@ -102,15 +118,26 @@ function buildEvidenceSlots(
 }
 
 function buildClusterSummarySlots(
-  summaries: Array<{ clusterId: number; label: string; summary: string }>,
+  summaries: Array<{
+    clusterId: number;
+    label: string;
+    summary: string;
+    authorityScore?: number;
+    clusterPagerank?: number;
+    karpathyBlend?: number;
+    topFiles?: string[];
+  }>,
   qdrantTagScore: Map<number, number>,
   maxSlots: number
 ): ClusterSummarySlot[] {
+  // Boost summaries that line up with cluster authority signals.
   return summaries
     .slice(0, maxSlots * 2)
     .map((s) => {
-      const score   = 0.15 + (qdrantTagScore.get(s.clusterId) ?? 0) * 0.15;
+      const authorityBoost = Math.max(s.authorityScore ?? 0, s.clusterPagerank ?? 0, s.karpathyBlend ?? 0);
+      const score   = 0.15 + authorityBoost * 0.20 + (qdrantTagScore.get(s.clusterId) ?? 0) * 0.15;
       const text    = `Cluster ${s.clusterId} — ${s.label}: ${s.summary}`;
+      // Emit one summary slot per cluster with the authority-derived score.
       return {
         clusterId: s.clusterId,
         label:     s.label,
@@ -127,7 +154,9 @@ function buildGraphTripleSlots(
   triples: Array<[string, string, string]>,
   maxTriples: number
 ): GraphTripleSlot[] {
+  // Keep graph triples cheap and slightly prefer earlier triples.
   return triples.slice(0, maxTriples).map((triple, i) => ({
+    // Preserve the edge itself and attach a gentle position bias.
     triple,
     score:     0.20 - i * 0.005,
     tokenCost: estimateTokens(`[${triple[0]}] —${triple[1]}→ [${triple[2]}]`),
@@ -139,7 +168,7 @@ function buildCouchViewGroups(
   view: string,
   maxGroups: number
 ): CouchViewGroup[] {
-  // Group by first key element; count members per group
+  // Group by first key element; count members per group.
   const groups = new Map<string, number>();
   for (const row of rows) {
     const groupKey = JSON.stringify(Array.isArray(row.key) ? row.key[0] : row.key).slice(0, 40);
@@ -147,6 +176,7 @@ function buildCouchViewGroups(
   }
   const sorted = Array.from(groups.entries()).sort((a, b) => b[1] - a[1]).slice(0, maxGroups);
   const maxCount = sorted[0]?.[1] ?? 1;
+  // Collapse repeated keys into one group slot with relative frequency.
   return sorted.map(([key, count]) => ({
     view,
     key,
@@ -163,6 +193,7 @@ function greedyPack<T extends { score: number; tokenCost: number; id?: string }>
   remaining: { tokens: number },
   excluded:  Array<{ id: string; reason: string }>
 ): T[] {
+  // Highest-value slots win until the remaining token budget is exhausted.
   const selected: T[] = [];
   for (const item of items.sort((a, b) => b.score - a.score)) {
     if (remaining.tokens - item.tokenCost < 0) {
@@ -182,12 +213,35 @@ export interface PackerInput {
   budget:        TokenBudget;
   activeClusterIds?: number[];
 
-  // Raw tool results — all optional (packer is tolerant of missing lanes)
+  // Raw tool results — all optional (packer is tolerant of missing lanes).
   qdrantHits?:       Array<{ filePath?: string; content?: string; score?: number; somCluster?: number }>;
-  clusterSummaries?: Array<{ clusterId: number; label: string; summary: string }>;
+  chunks?:           Array<{
+    id: string;
+    text: string;
+    filePath?: string;
+    clusterId?: number;
+    qdrantScore?: number;
+    pagerankScore?: number;
+    encoded64Score?: number;
+    graphProximity?: number;
+    somCluster?: number;
+    [key: string]: unknown;
+  }>;
+  clusterSummaries?: Array<{
+    clusterId: number;
+    label?: string;
+    summary: string;
+    authorityScore?: number;
+    clusterPagerank?: number;
+    karpathyBlend?: number;
+    topFiles?: string[];
+  }>;
   graphTriples?:     Array<[string, string, string]>;
   couchRows?:        Array<{ view: string; rows: Array<{ key: unknown; value: unknown }> }>;
   priorCaseTexts?:   Array<{ id: string; text: string; score: number }>;
+  wikiRows?:         Array<{ id: string; text: string; score?: number; clusterId?: number }>;
+  rawCode?:          Array<{ id: string; text: string; score?: number }>;
+  grpoCheckpoints?:  Array<{ hyperedgeHash: string; gradeScore: number; loraHint?: string }>;
 }
 
 /**
@@ -199,6 +253,15 @@ export function packContext(input: PackerInput): RetrievalPacket {
   const remaining = { tokens: Math.max(available, 0) };
   const excludedSourceIds: Array<{ id: string; reason: string }> = [];
 
+  // Carry forward any cluster signal already attached to the request.
+  const activeClusterIds = Array.from(new Set([
+    ...(input.activeClusterIds ?? []),
+    ...(input.clusterSummaries ?? []).map((s) => s.clusterId),
+    ...(input.qdrantHits ?? []).flatMap((hit) => [hit.clusterId, hit.somCluster]).filter((n): n is number => typeof n === 'number'),
+    ...(input.chunks ?? []).flatMap((chunk) => [chunk.clusterId, chunk.somCluster]).filter((n): n is number => typeof n === 'number'),
+    ...(input.wikiRows ?? []).map((row) => row.clusterId).filter((n): n is number => typeof n === 'number'),
+  ]));
+
   // Per-slot cluster score map for cross-signal boosting
   const clusterScoreMap = new Map<number, number>(
     (input.clusterSummaries ?? []).map((s, i) => [s.clusterId, 1 - i * 0.05])
@@ -206,19 +269,104 @@ export function packContext(input: PackerInput): RetrievalPacket {
   const qdrantTagScore = clusterScoreMap;
 
   // Build candidate pools (unbudgeted)
-  const evidenceCandidates    = buildEvidenceSlots(input.qdrantHits ?? [], clusterScoreMap, 12);
-  const summarySlots          = buildClusterSummarySlots(input.clusterSummaries ?? [], qdrantTagScore, 8);
-  const tripleSlots           = buildGraphTripleSlots(input.graphTriples ?? [], 20);
+  const qdrantHits: Array<{
+    filePath?: string;
+    content?: string;
+    score?: number;
+    qdrantScore?: number;
+    encoded64Score?: number;
+    pagerankScore?: number;
+    graphProximity?: number;
+    clusterId?: number;
+    somCluster?: number;
+  }> = [...(input.qdrantHits ?? [])];
+
+  // Normalize chunk lanes into the evidence pool.
+  for (const chunk of input.chunks ?? []) {
+    const text = String(chunk.text ?? '').trim();
+    if (!text) {
+      excludedSourceIds.push({ id: chunk.id, reason: 'missing_text' });
+      continue;
+    }
+    qdrantHits.push({
+      filePath: chunk.filePath ?? chunk.id,
+      content: text,
+      score: chunk.qdrantScore ?? chunk.pagerankScore ?? 0,
+      qdrantScore: chunk.qdrantScore,
+      encoded64Score: chunk.encoded64Score,
+      pagerankScore: chunk.pagerankScore,
+      graphProximity: chunk.graphProximity,
+      somCluster: chunk.somCluster ?? chunk.clusterId,
+      clusterId: chunk.clusterId ?? chunk.somCluster,
+    });
+  }
+
+  // Normalize raw code into the same evidence pool as chunks.
+  for (const code of input.rawCode ?? []) {
+    const text = String(code.text ?? '').trim();
+    if (!text) {
+      excludedSourceIds.push({ id: code.id, reason: 'missing_text' });
+      continue;
+    }
+    qdrantHits.push({
+      filePath: code.id,
+      content: text,
+      score: code.score ?? 0,
+      qdrantScore: code.score ?? 0,
+    });
+  }
+
+  // Deduplicate graph triples before slot scoring.
+  const normalizedGraphTriples: Array<[string, string, string]> = [];
+  const seenGraphTriples = new Set<string>();
+  for (const triple of input.graphTriples ?? []) {
+    const key = triple.join('|');
+    if (seenGraphTriples.has(key)) {
+      excludedSourceIds.push({ id: `triple:${key}`, reason: 'duplicate' });
+      continue;
+    }
+    seenGraphTriples.add(key);
+    normalizedGraphTriples.push(triple);
+  }
+
+  // Convert normalized lanes into ranked slots.
+  const evidenceCandidates    = buildEvidenceSlots(qdrantHits, clusterScoreMap, 12);
+  const summarySlots          = buildClusterSummarySlots(
+    (input.clusterSummaries ?? []).map((summary) => ({
+      ...summary,
+      label: summary.label ?? `Cluster ${summary.clusterId}`,
+    })),
+    qdrantTagScore,
+    8
+  );
+  const tripleSlots           = buildGraphTripleSlots(normalizedGraphTriples, 20);
   const couchGroups: CouchViewGroup[] = (input.couchRows ?? []).flatMap(({ view, rows }) =>
     buildCouchViewGroups(rows, view, 6)
   );
-  const priorCases: EvidenceSlot[]    = (input.priorCaseTexts ?? []).map((p) => ({
-    ...p,
-    tokenCost: estimateTokens(p.text),
-    source: 'prior_case' as const,
-  }));
+  // Fold wiki notes and GRPO checkpoints into the lower-cost memory lane.
+  const priorCases: EvidenceSlot[]    = [
+    ...(input.priorCaseTexts ?? []).map((p) => ({
+      ...p,
+      tokenCost: estimateTokens(p.text),
+      source: 'prior_case' as const,
+    })),
+    ...(input.wikiRows ?? []).map((p) => ({
+      id: p.id,
+      text: p.text,
+      score: p.score ?? 0,
+      tokenCost: estimateTokens(p.text),
+      source: 'prior_case' as const,
+    })),
+    ...(input.grpoCheckpoints ?? []).map((p) => ({
+      id: p.hyperedgeHash,
+      text: `GRPO checkpoint ${p.hyperedgeHash} (grade ${p.gradeScore.toFixed(3)}${p.loraHint ? `, ${p.loraHint}` : ''})`,
+      score: p.gradeScore,
+      tokenCost: estimateTokens(p.hyperedgeHash) + estimateTokens(p.loraHint ?? '') + 12,
+      source: 'prior_case' as const,
+    })),
+  ].filter((p) => Boolean(p.text.trim()));
 
-  // Greedy fill: summaries → triples → couchdb groups → evidence chunks → prior cases
+  // Greedy fill from coarsest to finest granularity.
   const clusterSummaries = greedyPack(summarySlots, remaining, excludedSourceIds);
   const graphTriples     = greedyPack(tripleSlots, remaining, excludedSourceIds);
   const couchViewGroups  = greedyPack(couchGroups, remaining, excludedSourceIds);
@@ -227,11 +375,12 @@ export function packContext(input: PackerInput): RetrievalPacket {
 
   const tokenUsed = available - remaining.tokens;
 
+  // Return the final packed packet with selected slots and excluded overflow.
   return {
     query:     input.query,
     budget:    input.budget,
     tokenUsed,
-    activeClusterIds: input.activeClusterIds ?? [],
+    activeClusterIds,
     telemetry: {
       selectedSourceIds: directEvidence.map(e => e.id),
       excludedSourceIds,
@@ -250,6 +399,7 @@ export function packContext(input: PackerInput): RetrievalPacket {
  * Serialize a RetrievalPacket into the compact prompt string injected before Gemma4.
  */
 export function serializePacket(packet: RetrievalPacket): string {
+  // Emit a compact, human-readable prompt block for Gemma4.
   const lines: string[] = [
     `# Retrieval context for: ${packet.query}`,
     `Budget: ${packet.tokenUsed}/${packet.budget.maxInputTokens - packet.budget.reservedOutputTokens} tokens used`,

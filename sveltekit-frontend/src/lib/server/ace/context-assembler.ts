@@ -2217,7 +2217,7 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     confidenceFactors.userAnalytics = 0.5;
   }
 
-  // 13b. Token-aware compressed ACE packet (when assembly enabled it)
+  // 13b. Token-aware compressed ACE packet (inject packed context when enabled)
   if (context.aceContextPacket?.contextMarkdown) {
     lines.push(`\n## Token-Aware ACE Context\n${context.aceContextPacket.contextMarkdown}`);
     confidenceFactors.tokenAwareContext = Math.max(

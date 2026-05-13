@@ -648,9 +648,13 @@ export class QdrantManager {
     }
   }
 
+  async getCollections() {
+    return await this.client.getCollections();
+  }
+
   async healthCheck() {
     try {
-      const collections = await this.client.getCollections();
+      const collections = await this.getCollections();
       return {
         status: 'healthy',
         collections: collections.collections.map((c) => ({ name: c.name })),

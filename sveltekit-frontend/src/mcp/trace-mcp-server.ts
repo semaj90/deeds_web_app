@@ -90,6 +90,7 @@ import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
+import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
 const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
@@ -546,6 +547,58 @@ const _origTool = server.tool.bind(server);
 };
 
 // ── graph.expand_neighborhood ─────────────────────────────────────────────────
+
+server.registerTool(
+  'wiki.status',
+  {
+    description: 'Returns Karpathy/AGENTS wiki status across Postgres, Redis, CouchDB, Qdrant, Neo4j, and graphify metadata.',
+    inputSchema: z.object({}),
+  },
+  async () => ({
+    content: [{ type: 'text' as const, text: JSON.stringify(await getWikiStatus()) }],
+  })
+);
+
+server.registerTool(
+  'wiki.search',
+  {
+    description: 'Hybrid wiki search over rg/codebase-graph metadata, Redis Karpathy scores, Qdrant payloads, CouchDB wiki docs, and Postgres JSONB mappings.',
+    inputSchema: z.object({
+      query: z.string().min(1).describe('Search query'),
+      limit: z.number().int().min(1).max(50).default(10).describe('Maximum results'),
+    }),
+  },
+  async ({ query, limit }) => ({
+    content: [{ type: 'text' as const, text: JSON.stringify(await searchWiki(query, { limit })) }],
+  })
+);
+
+server.registerTool(
+  'wiki.refresh_directory',
+  {
+    description: 'Refreshes one AGENTS/Karpathy directory card. Defaults to dryRun=true and does not start a full re-index.',
+    inputSchema: z.object({
+      path: z.string().min(1).describe('Directory path to refresh'),
+      dryRun: z.boolean().default(true).describe('When true, reports proposed changes without writes'),
+    }),
+  },
+  async ({ path, dryRun }) => ({
+    content: [{ type: 'text' as const, text: JSON.stringify(await refreshDirectory(path, dryRun ?? true)) }],
+  })
+);
+
+server.registerTool(
+  'wiki.explain_page',
+  {
+    description: 'Explains one wiki page with source files, imports, path aliases, feature keys, Qdrant tags, graph links, activity score, recommendations, and related FeatureMaps.',
+    inputSchema: z.object({
+      id: z.string().min(1).describe('Wiki page id, feature id, or enhanced graph mapping id'),
+    }),
+  },
+  async ({ id }) => ({
+    content: [{ type: 'text' as const, text: JSON.stringify(await explainWikiPage(id)) }],
+  })
+);
 
 server.registerTool(
   'graph.expand_neighborhood',

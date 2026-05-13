@@ -54,14 +54,24 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib
 
 ## Snapshot
 
-- module directory with 11 files, 3 API handlers, 205 Drizzle refs, 9 TODOs, 1 SSR-unsafe
+- module directory with 11 files, 3 API handlers, 206 Drizzle refs, 9 TODOs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `lib` `ai` `zod` `has-todo` `ambient-events.d.ts`
@@ -78,7 +88,6 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 > Forbidden / risky patterns. Derived from audit warnings + gate FAILs.
 
-- ⚠️ 1 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
 
 ## Tools
@@ -92,7 +101,6 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 - taxonomy.children
 ## Todos + Enhancements
 
-- **[MED]** 1 SSR-unsafe globals
 - **[MED]** Hardcoded localhost refs
 
 _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._

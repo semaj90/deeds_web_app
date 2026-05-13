@@ -231,7 +231,7 @@ for (const f of dedupedFiles) {
 
   const clusterId   = resolveClusterId(f.rel);
   const clusterIdx  = clusterCounts.get(clusterId) ?? 0;
-  const clusterMeta = clusters.clusters.find((c) => c.id === clusterId);
+  const clusterMeta = clusterList.find((c) => c.id === clusterId);
   const clusterSize = clusterMeta?.memberFiles?.length ?? 1;
 
   clusterCounts.set(clusterId, clusterIdx + 1);
@@ -538,7 +538,7 @@ const multihopNodes = fileNodes.map((fn) => {
   const clusterId    = fn.clusterKey?.startsWith('cluster:gpu:')
     ? parseInt(fn.clusterKey.split(':').pop(), 10)
     : -1;
-  const clusterMeta  = clusterId >= 0 ? clusters.clusters.find((c) => c.id === clusterId) : null;
+  const clusterMeta  = clusterId >= 0 ? clusterList.find((c) => c.id === clusterId) : null;
   return {
     stableKey:         fn.stableKey,
     kind:              fn.kind,

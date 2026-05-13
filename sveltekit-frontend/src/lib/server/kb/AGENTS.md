@@ -54,19 +54,29 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/kb
 
 ## Snapshot
 
-- server module directory with 8 files, 0 API handlers, 1 Drizzle refs
+- server module directory with 9 files, 0 API handlers, 2 Drizzle refs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `lib` `server` `zod` `db-schema`
 
-## Files (8)
+## Files (9)
 
 - `src/lib/server/kb/embed-text.ts`
 - `src/lib/server/kb/knowledge-card-schema.ts`
@@ -89,7 +99,7 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/8 files have paired tests
+- **Paired tests**: 0/9 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

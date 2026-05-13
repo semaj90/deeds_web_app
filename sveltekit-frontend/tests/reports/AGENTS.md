@@ -1,7 +1,7 @@
 # AGENTS.md — `tests/reports`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T00:19:23.638Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-13T05:38:18.598Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/reports
 
@@ -10,7 +10,7 @@
 - module directory with 2 files, 0 API handlers
 - Audit score: **90/100**
 - no audit signals
-- Tags: `json` `tests` `reports` `e2e-test-status-jan29-2026.json` `test` `svelte-check-baseline-jan29-2026.json`
+- Tags: `json`
 
 ## Files (2)
 
@@ -32,7 +32,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 2/2 files have paired tests
+- **Paired tests**: 0/2 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 
