@@ -3,6 +3,7 @@ import { embeddedSummaries } from '../src/lib/server/db/schema/embedded-summarie
 import { tensorAnalysisCache } from '../src/lib/server/db/schema/topology';
 import { eq, isNull, and } from 'drizzle-orm';
 import { encode768to64 } from '../src/lib/server/gpu/encode-768-to-64';
+import { deterministicPointId } from '../src/lib/server/vector/qdrant-manager.js';
 import { getRedis } from '../src/lib/server/redis.js';
 
 /**
@@ -25,14 +26,18 @@ async function main() {
   
   for (const row of missing) {
     try {
-      // 1. Try to find the topological grounding in tensor_analysis_cache
+      // 1. Map file:path to qdrant:id via deterministicPointId
+      // qdrant-manager.ts uses MD5 hash -> first 4 bytes -> int % 2^31
+      const qdrantId = deterministicPointId(row.chunkId);
+      const stableKey = `qdrant:${qdrantId}`;
+
       const [topology] = await db.select()
         .from(tensorAnalysisCache)
-        .where(eq(tensorAnalysisCache.stableKey, row.chunkId)) // ID is already file:path or chunk:id
+        .where(eq(tensorAnalysisCache.stableKey, stableKey))
         .limit(1);
         
       if (topology) {
-        console.log(`✅ Found topology for ${row.chunkId}`);
+        console.log(`✅ Found topology for ${row.chunkId} (Key: ${stableKey})`);
         await db.update(embeddedSummaries)
           .set({
             gpuCluster: topology.somCluster,
@@ -40,12 +45,9 @@ async function main() {
           })
           .where(eq(embeddedSummaries.id, row.id));
         updated++;
-        continue;
+      } else {
+        console.warn(`⚠️  No spine entry for ${row.chunkId} (Key: ${stableKey})`);
       }
-      
-      // 2. If no topology found, we could re-encode if we had the embedding
-      // For now, we skip or log as missing spine entry
-      console.warn(`⚠️  No spine entry for ${row.chunkId}`);
       
     } catch (err) {
       console.error(`❌ Failed to backfill ${row.chunkId}:`, err.message);

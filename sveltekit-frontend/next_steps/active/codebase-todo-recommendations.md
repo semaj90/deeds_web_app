@@ -10,6 +10,7 @@
 
 * **`lib/server/db/client.ts`**: Review and refactor the database client initialization to ensure all connection pooling logic is resilient to environment changes. (High authority suggests this is a core dependency needing immediate stability checks.)
 * **`lib/server/env.server.ts`**: Standardize environment variable loading across the entire application to eliminate hardcoded `localhost` fallbacks and improve container portability. (High recent focus on environment hardening suggests this is a critical, high-impact cleanup task.)
+* **`lib/server/atlas/context-for-file.ts`**: Extend the path-mapping layer to read from the daily activity atlas so date-scoped workflow context can be reused before agent synthesis. (This makes the new atlas doc operational rather than just descriptive.)
 * **`routes/api/analytics/research-graph/+server.ts`**: Audit the graph endpoint logic to confirm it correctly handles path-alias expansion for Qdrant/Neo4j consistency. (The recent activity shows graph/indexing issues are a primary source of bugs.)
 * **`lib/server/redis.ts`**: Implement robust connection health checks and automatic reconnection logic for Redis to prevent cascading failures during transient network issues. (Redis is a key piece of infrastructure highlighted in recent fixes, demanding reliability improvements.)
 * **`lib/server/ollama.ts`**: Review the Ollama interaction layer to ensure proper error handling for model unavailability or unexpected API responses. (Agent/Tooling reliability is a major theme, and this file manages a key external dependency.)
@@ -20,9 +21,10 @@
 |---|------|-------|----|-----------|-----------|-------|---------|
 | 1 | `src/lib/server/db/client.ts` | 0.622 | 7.06 | 0.55 | 0.79 | · | authority=0.55, PR=7.1 |
 | 2 | `src/lib/server/env.server.ts` | 0.392 | 5.28 | 0.37 | 0.27 | · | PR=5.3 |
-| 3 | `src/routes/api/analytics/research-graph/+server.ts` | 0.360 | 0.15 | 0.35 | 0.90 | · | unclassified:community-2590 |
-| 4 | `src/lib/server/redis.ts` | 0.334 | 0.15 | 0.35 | 0.28 | · | unclassified:community-2516 |
-| 5 | `src/lib/server/db/relations.ts` | 0.333 | 1.83 | 0.25 | 0.91 | · | — |
+| 3 | `src/lib/server/atlas/context-for-file.ts` | 0.371 | 0.15 | 0.36 | 0.82 | · | atlas + daily activity context reuse |
+| 4 | `src/routes/api/analytics/research-graph/+server.ts` | 0.360 | 0.15 | 0.35 | 0.90 | · | unclassified:community-2590 |
+| 5 | `src/lib/server/redis.ts` | 0.334 | 0.15 | 0.35 | 0.28 | · | unclassified:community-2516 |
+| 6 | `src/lib/server/db/relations.ts` | 0.333 | 1.83 | 0.25 | 0.91 | · | — |
 | 6 | `src/lib/server/ollama.ts` | 0.332 | 3.41 | 0.32 | 0.42 | · | PR=3.4 |
 | 7 | `src/lib/server/db/schema/legal-nodes.ts` | 0.328 | 1.68 | 0.26 | 0.91 | · | — |
 | 8 | `src/lib/server/db/schema/legal-citations.ts` | 0.313 | 1.78 | 0.26 | 0.80 | · | — |
