@@ -1,34 +1,34 @@
 {
-  "generatedAt": "2026-05-13T21:46:53.291Z",
+  "generatedAt": "2026-05-14T00:39:13.750Z",
   "sourceGraph": "docs/graph/codebase-graph.json",
   "stats": {
-    "generatedAt": "2026-05-13T21:46:53.291Z",
-    "nodeCount": 4970,
-    "edgeCount": 15950,
-    "resolvedEdges": 8290,
-    "unresolvedEdges": 1041,
-    "externalEdges": 6386,
+    "generatedAt": "2026-05-14T00:39:13.750Z",
+    "nodeCount": 4980,
+    "edgeCount": 16007,
+    "resolvedEdges": 8320,
+    "unresolvedEdges": 1042,
+    "externalEdges": 6412,
     "edgeTypeBreakdown": {
-      "imports_static": 8094,
+      "imports_static": 8134,
       "imports_dynamic": 636,
-      "env_dependency": 739,
+      "env_dependency": 742,
       "exports_from": 290,
-      "db_dependency": 1061,
-      "redis_dependency": 598,
-      "qdrant_dependency": 273,
+      "db_dependency": 1070,
+      "redis_dependency": 600,
+      "qdrant_dependency": 274,
       "test_covers_file": 2841,
-      "neo4j_dependency": 136,
+      "neo4j_dependency": 137,
       "mcp_tool_calls": 183,
-      "server_route_depends_on": 1098,
+      "server_route_depends_on": 1099,
       "svelte_route_uses_loader": 1
     },
     "zoneBreakdown": {
-      "types": 129,
+      "types": 130,
       "client": 933,
-      "server": 822,
+      "server": 828,
       "test": 1010,
-      "route": 1171,
-      "script": 905
+      "route": 1172,
+      "script": 907
     },
     "hotspotCount": 50,
     "routeCount": 50,
@@ -1044,7 +1044,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 1060,
+      "lineCount": 1068,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 2,
@@ -1096,7 +1096,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 989,
+      "lineCount": 996,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 1,
@@ -1174,7 +1174,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 959,
+      "lineCount": 967,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 2,
@@ -2357,7 +2357,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 704,
+      "lineCount": 712,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -2929,7 +2929,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 140,
+      "lineCount": 151,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -3137,7 +3137,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 472,
+      "lineCount": 478,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -3163,7 +3163,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 649,
+      "lineCount": 657,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 2,
@@ -3280,7 +3280,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 573,
+      "lineCount": 581,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -3449,7 +3449,7 @@
       "isRoute": false,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 939,
+      "lineCount": 947,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 1,
@@ -9393,7 +9393,7 @@
       "lineCount": 57,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 3,
+      "directFanIn": 0,
       "directFanOut": 0,
       "hash": "78f20553"
     },
@@ -9975,7 +9975,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 341,
+      "lineCount": 345,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -9988,7 +9988,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 385,
+      "lineCount": 392,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
@@ -10456,7 +10456,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 4603,
+      "lineCount": 4615,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 33,
@@ -10599,7 +10599,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 352,
+      "lineCount": 366,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 3,
@@ -10677,7 +10677,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 24,
+      "lineCount": 25,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
@@ -10781,7 +10781,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 452,
+      "lineCount": 458,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
@@ -11002,7 +11002,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1519,
+      "lineCount": 1536,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 1,
@@ -11509,9 +11509,9 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 66,
+      "lineCount": 88,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "directFanIn": 0,
       "directFanOut": 2,
       "hash": "532cef05"
@@ -12643,7 +12643,7 @@
       "lineCount": 158,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 2,
+      "directFanIn": 3,
       "directFanOut": 1,
       "hash": "0de5ca85"
     },
@@ -12656,7 +12656,7 @@
       "lineCount": 48,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 3,
       "directFanOut": 3,
       "hash": "43249a25"
     },
@@ -13787,7 +13787,7 @@
       "lineCount": 141,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 557,
+      "directFanIn": 560,
       "directFanOut": 7,
       "hash": "0d33d955"
     },
@@ -14330,10 +14330,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 49,
+      "lineCount": 50,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 2,
       "directFanOut": 0,
       "hash": "e44e026c"
     },
@@ -14398,7 +14398,7 @@
       "lineCount": 43,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 0,
       "directFanOut": 0,
       "hash": "ea85860a"
     },
@@ -14427,6 +14427,19 @@
       "directFanIn": 0,
       "directFanOut": 0,
       "hash": "b2305cac"
+    },
+    {
+      "rel": "src/lib/server/db/schema/evidence-multi-modal.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 92,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 2,
+      "directFanOut": 1,
+      "hash": "84f0cd4a"
     },
     {
       "rel": "src/lib/server/db/schema/evidence.ts",
@@ -14486,10 +14499,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 65,
+      "lineCount": 66,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 6,
+      "directFanIn": 8,
       "directFanOut": 10,
       "hash": "36268142"
     },
@@ -14515,7 +14528,7 @@
       "lineCount": 27,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 2,
       "directFanOut": 0,
       "hash": "1901493a"
     },
@@ -14541,7 +14554,7 @@
       "lineCount": 109,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 7,
+      "directFanIn": 8,
       "directFanOut": 0,
       "hash": "d7e5dc37"
     },
@@ -14775,7 +14788,7 @@
       "lineCount": 72,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 4,
       "directFanOut": 0,
       "hash": "64504762"
     },
@@ -15123,7 +15136,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 148,
+      "lineCount": 149,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 104,
@@ -15230,7 +15243,7 @@
       "lineCount": 476,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 6,
+      "directFanIn": 7,
       "directFanOut": 3,
       "hash": "f0a7f0be"
     },
@@ -15568,7 +15581,7 @@
       "lineCount": 346,
       "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 485,
+      "directFanIn": 491,
       "directFanOut": 0,
       "hash": "2cfc0822"
     },
@@ -15841,7 +15854,7 @@
       "lineCount": 29,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 2,
       "directFanOut": 0,
       "hash": "ef5ce122"
     },
@@ -15898,6 +15911,71 @@
       "hash": "492cba71"
     },
     {
+      "rel": "src/lib/server/evidence/video/transcript-service.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 115,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 3,
+      "hash": "a94fbe3c"
+    },
+    {
+      "rel": "src/lib/server/evidence/video/video-ingest-service.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 340,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 10,
+      "hash": "08fe1bab"
+    },
+    {
+      "rel": "src/lib/server/evidence/video/video-ingest-types.ts",
+      "zone": "types",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 75,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 3,
+      "directFanOut": 0,
+      "hash": "632eae43"
+    },
+    {
+      "rel": "src/lib/server/evidence/video/video-summary-service.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 22,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 2,
+      "hash": "e0865413"
+    },
+    {
+      "rel": "src/lib/server/evidence/video/vision-service.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 211,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 7,
+      "hash": "8a2ca4b5"
+    },
+    {
       "rel": "src/lib/server/evidence/worker-embed.ts",
       "zone": "server",
       "isRoute": false,
@@ -15932,7 +16010,7 @@
       "lineCount": 107,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 4,
       "directFanOut": 0,
       "hash": "12014cd8"
     },
@@ -16322,7 +16400,7 @@
       "lineCount": 74,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 8,
+      "directFanIn": 9,
       "directFanOut": 2,
       "hash": "85e9fc91"
     },
@@ -16358,7 +16436,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1486,
+      "lineCount": 1506,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 51,
@@ -17242,7 +17320,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 97,
+      "lineCount": 100,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -18025,7 +18103,7 @@
       "lineCount": 303,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 16,
+      "directFanIn": 17,
       "directFanOut": 1,
       "hash": "2bebf213"
     },
@@ -18038,7 +18116,7 @@
       "lineCount": 177,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 4,
       "directFanOut": 1,
       "hash": "2f3d54bb"
     },
@@ -18155,7 +18233,7 @@
       "lineCount": 26,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 38,
+      "directFanIn": 39,
       "directFanOut": 1,
       "hash": "fec84b93"
     },
@@ -18337,7 +18415,7 @@
       "lineCount": 1377,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 188,
+      "directFanIn": 189,
       "directFanOut": 12,
       "hash": "b3738cdc"
     },
@@ -18935,7 +19013,7 @@
       "lineCount": 324,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 300,
+      "directFanIn": 302,
       "directFanOut": 1,
       "hash": "46ee6e0b"
     },
@@ -21155,7 +21233,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 179,
+      "lineCount": 186,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -21262,7 +21340,7 @@
       "lineCount": 1073,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 94,
+      "directFanIn": 95,
       "directFanOut": 10,
       "hash": "d5ba4aa4"
     },
@@ -21278,6 +21356,19 @@
       "directFanIn": 0,
       "directFanOut": 0,
       "hash": "d3003001"
+    },
+    {
+      "rel": "src/lib/server/vector/turbovec-client.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 66,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "8595330b"
     },
     {
       "rel": "src/lib/server/vector-cache.ts",
@@ -21376,7 +21467,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 187,
+      "lineCount": 196,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
@@ -22052,7 +22143,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 200,
+      "lineCount": 205,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
@@ -25367,7 +25458,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 429,
+      "lineCount": 538,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
@@ -25861,7 +25952,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 1353,
+      "lineCount": 1357,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
@@ -26056,7 +26147,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 599,
+      "lineCount": 603,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
@@ -29462,7 +29553,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 166,
+      "lineCount": 170,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
@@ -29540,7 +29631,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 443,
+      "lineCount": 448,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
@@ -31022,7 +31113,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 307,
+      "lineCount": 429,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 3,
@@ -31776,7 +31867,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 63,
+      "lineCount": 65,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
@@ -33024,7 +33115,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 513,
+      "lineCount": 511,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 2,
@@ -35117,7 +35208,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 2353,
+      "lineCount": 2376,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 1,
@@ -35136,6 +35227,19 @@
       "directFanIn": 1,
       "directFanOut": 0,
       "hash": "874f0d97"
+    },
+    {
+      "rel": "src/routes/api/evidence/video/ingest/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 59,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "e73db51f"
     },
     {
       "rel": "src/routes/api/evidence/[docId]/status/+server.ts",
@@ -41495,6 +41599,19 @@
       "hash": "2fca92b0"
     },
     {
+      "rel": "scripts/fill-synthesis-blanks.mjs",
+      "zone": "script",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 65,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 6,
+      "hash": "4b7cd21e"
+    },
+    {
       "rel": "scripts/fix-cases-sub.mjs",
       "zone": "script",
       "isRoute": false,
@@ -42085,7 +42202,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 268,
+      "lineCount": 281,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 0,
@@ -49943,6 +50060,19 @@
       "directFanIn": 0,
       "directFanOut": 0,
       "hash": "091e4009"
+    },
+    {
+      "rel": "scripts/smoke-video-ingest.mjs",
+      "zone": "script",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 44,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "d25d6e56"
     },
     {
       "rel": "scripts/start-dev-stack.mjs",
@@ -64419,7 +64549,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": true,
-      "lineCount": 114,
+      "lineCount": 115,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
@@ -64445,7 +64575,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": true,
-      "lineCount": 99,
+      "lineCount": 313,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
@@ -64651,7 +64781,7 @@
   "neighborhoods": {
     "src/lib/server/db/client.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 19,
+      "downstreamNodeCount": 20,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
@@ -64681,7 +64811,7 @@
     },
     "src/lib/server/ollama.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 34,
+      "downstreamNodeCount": 35,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
@@ -64699,13 +64829,13 @@
     },
     "src/lib/server/db/schema.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 12,
+      "downstreamNodeCount": 13,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
     "src/lib/server/grpc/embedding-client.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 36,
+      "downstreamNodeCount": 37,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
@@ -64728,7 +64858,7 @@
       "downstreamTruncated": false
     },
     "src/lib/server/gpu/libtorch-bridge.ts": {
-      "upstreamNodeCount": 479,
+      "upstreamNodeCount": 480,
       "downstreamNodeCount": 3,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -64741,7 +64871,13 @@
     },
     "src/lib/server/analytics/search-analytics.ts": {
       "upstreamNodeCount": 122,
-      "downstreamNodeCount": 26,
+      "downstreamNodeCount": 27,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
+    "src/lib/server/neo4j-driver.ts": {
+      "upstreamNodeCount": 426,
+      "downstreamNodeCount": 2,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64751,15 +64887,9 @@
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
-    "src/lib/server/neo4j-driver.ts": {
-      "upstreamNodeCount": 425,
-      "downstreamNodeCount": 2,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
     "src/lib/server/ace/context-assembler.ts": {
       "upstreamNodeCount": 46,
-      "downstreamNodeCount": 118,
+      "downstreamNodeCount": 119,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64771,19 +64901,19 @@
     },
     "src/lib/server/ai/code-intel-service.ts": {
       "upstreamNodeCount": 31,
-      "downstreamNodeCount": 59,
+      "downstreamNodeCount": 60,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/queue/rabbitmq-manager-fixed.ts": {
       "upstreamNodeCount": 278,
-      "downstreamNodeCount": 55,
+      "downstreamNodeCount": 56,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/services/couchdb-client.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 34,
+      "downstreamNodeCount": 35,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
@@ -64807,7 +64937,7 @@
     },
     "src/routes/api/sse/chat/+server.ts": {
       "upstreamNodeCount": 4,
-      "downstreamNodeCount": 144,
+      "downstreamNodeCount": 145,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64819,7 +64949,7 @@
     },
     "src/lib/server/queue/dispatch-inline.ts": {
       "upstreamNodeCount": 69,
-      "downstreamNodeCount": 63,
+      "downstreamNodeCount": 64,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64849,37 +64979,37 @@
     },
     "src/lib/server/agents/agents-card-store.ts": {
       "upstreamNodeCount": 104,
-      "downstreamNodeCount": 35,
+      "downstreamNodeCount": 36,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
+    "src/lib/server/minio-client.ts": {
+      "upstreamNodeCount": 39,
+      "downstreamNodeCount": 2,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/cache/code-llm-index.ts": {
       "upstreamNodeCount": 107,
-      "downstreamNodeCount": 23,
+      "downstreamNodeCount": 24,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/db/index.ts": {
       "upstreamNodeCount": 18,
-      "downstreamNodeCount": 14,
+      "downstreamNodeCount": 15,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/indexer/karpathy-wiki.ts": {
       "upstreamNodeCount": 59,
-      "downstreamNodeCount": 37,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/minio-client.ts": {
-      "upstreamNodeCount": 37,
-      "downstreamNodeCount": 2,
+      "downstreamNodeCount": 38,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/retrieval/graph-context.ts": {
       "upstreamNodeCount": 59,
-      "downstreamNodeCount": 25,
+      "downstreamNodeCount": 26,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64897,7 +65027,7 @@
     },
     "src/lib/server/agents/regen/loaders/types.ts": {
       "upstreamNodeCount": 21,
-      "downstreamNodeCount": 36,
+      "downstreamNodeCount": 37,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64945,7 +65075,7 @@
     },
     "src/lib/server/research/web-research-ingester.ts": {
       "upstreamNodeCount": 88,
-      "downstreamNodeCount": 43,
+      "downstreamNodeCount": 44,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64957,7 +65087,7 @@
     },
     "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 20,
+      "downstreamNodeCount": 21,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64969,7 +65099,7 @@
     },
     "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 20,
+      "downstreamNodeCount": 21,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64981,7 +65111,7 @@
     },
     "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 20,
+      "downstreamNodeCount": 21,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -64999,7 +65129,7 @@
     },
     "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 20,
+      "downstreamNodeCount": 21,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -65011,7 +65141,7 @@
     },
     "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 20,
+      "downstreamNodeCount": 21,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -65023,7 +65153,7 @@
     },
     "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 20,
+      "downstreamNodeCount": 21,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -65047,7 +65177,7 @@
     },
     "src/routes/(app)/active-cases/+page.server.ts": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 20,
+      "downstreamNodeCount": 21,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -65107,13 +65237,13 @@
     },
     "src/routes/(app)/admin/api-testing/agentic-events/+server.ts": {
       "upstreamNodeCount": 2,
-      "downstreamNodeCount": 38,
+      "downstreamNodeCount": 39,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/routes/(app)/admin/api-testing/agentic-loop/+server.ts": {
       "upstreamNodeCount": 2,
-      "downstreamNodeCount": 38,
+      "downstreamNodeCount": 39,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -65233,13 +65363,13 @@
     },
     "src/routes/(app)/admin/document-search/+page.server.ts": {
       "upstreamNodeCount": 2,
-      "downstreamNodeCount": 38,
+      "downstreamNodeCount": 39,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/routes/(app)/admin/document-search/+page.svelte": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 39,
+      "downstreamNodeCount": 40,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },

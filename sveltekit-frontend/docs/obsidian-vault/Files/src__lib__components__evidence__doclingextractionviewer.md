@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 3
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/evidence/DoclingExtractionViewer.svelte"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "medium"
 up: []

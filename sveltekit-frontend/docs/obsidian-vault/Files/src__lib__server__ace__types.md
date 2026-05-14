@@ -4,7 +4,7 @@ path: "src/lib/server/ace/types.ts"
 aliases: ["types.ts","src/lib/server/ace/types.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 655
+lineCount: 514
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 1
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ace/types.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","t/ts","t/src","t/lib"]
 > ACE (Agentic Contextual Engineering) — Core Types
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 655
+lines:: 514
 ## Summary
 
 ACE (Agentic Contextual Engineering) — Core Types

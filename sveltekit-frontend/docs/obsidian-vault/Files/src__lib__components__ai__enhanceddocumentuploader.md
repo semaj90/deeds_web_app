@@ -4,7 +4,7 @@ path: "src/lib/components/ai/EnhancedDocumentUploader.svelte"
 aliases: ["EnhancedDocumentUploader.svelte","src/lib/components/ai/EnhancedDocumentUploader.svelte"]
 clusterId: -1
 ext: ".svelte"
-lineCount: 989
+lineCount: 996
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/ai/EnhancedDocumentUploader.svelte"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "medium"
 up: []
@@ -24,10 +24,10 @@ tags: ["file","ext/svelte","svelte","zod","t/svelte","t/src","t/lib"]
 
 # `src/lib/components/ai/EnhancedDocumentUploader.svelte`
 ## For future Claude
-> .svelte at src/lib/components/ai/EnhancedDocumentUploader.svelte (989 lines), Svelte component.
+> .svelte at src/lib/components/ai/EnhancedDocumentUploader.svelte (996 lines), Svelte component.
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 989
+lines:: 996
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;

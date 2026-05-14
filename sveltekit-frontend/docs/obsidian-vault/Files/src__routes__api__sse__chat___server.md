@@ -4,7 +4,7 @@ path: "src/routes/api/sse/chat/+server.ts"
 aliases: ["+server.ts","src/routes/api/sse/chat/+server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 2604
+lineCount: 2611
 pagerank: 0
 blend: 0
 isRoute: true
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 30
 embedding_id: "qdrant://codebase_chunks_768/src/routes/api/sse/chat/+server.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","route","auth","zod","t/ts","t/src","t/routes"]
 > Returns true when a Postgres error is 42P01 (undefined_table).
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 2604
+lines:: 2611
 ## Summary
 
 Returns true when a Postgres error is 42P01 (undefined_table).

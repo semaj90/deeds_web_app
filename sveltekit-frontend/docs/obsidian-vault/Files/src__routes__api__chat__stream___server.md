@@ -4,7 +4,7 @@ path: "src/routes/api/chat/stream/+server.ts"
 aliases: ["+server.ts","src/routes/api/chat/stream/+server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 513
+lineCount: 511
 pagerank: 0
 blend: 0
 isRoute: true
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 7
 embedding_id: "qdrant://codebase_chunks_768/src/routes/api/chat/stream/+server.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","route","auth","zod","t/ts","t/src","t/routes"]
 > Server-Sent Events endpoint for contextual chat streaming
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 513
+lines:: 511
 ## Summary
 
 Server-Sent Events endpoint for contextual chat streaming

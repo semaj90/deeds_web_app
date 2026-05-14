@@ -12,9 +12,9 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: false
-importCount: 3
+importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/ai/client-cache.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []

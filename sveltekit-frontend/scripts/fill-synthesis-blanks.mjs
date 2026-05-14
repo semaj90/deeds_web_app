@@ -1,7 +1,7 @@
 import { db } from '../src/lib/server/db/client';
 import { embeddedSummaries } from '../src/lib/server/db/schema/embedded-summaries';
 import { tensorAnalysisCache } from '../src/lib/server/db/schema/topology';
-import { eq, isNull, and } from 'drizzle-orm';
+import { eq, isNull, and, sql } from 'drizzle-orm';
 import { encode768to64 } from '../src/lib/server/gpu/encode-768-to-64';
 import { deterministicPointId } from '../src/lib/server/vector/qdrant-manager.js';
 import { getRedis } from '../src/lib/server/redis.js';
@@ -27,17 +27,21 @@ async function main() {
   for (const row of missing) {
     try {
       // 1. Map file:path to qdrant:id via deterministicPointId
-      // qdrant-manager.ts uses MD5 hash -> first 4 bytes -> int % 2^31
+      // Modern system uses chunkId (long hash) directly as stableKey.
+      // Legacy system used qdrant:deterministicPointId(chunkId).
       const qdrantId = deterministicPointId(row.chunkId);
-      const stableKey = `qdrant:${qdrantId}`;
+      const legacyKey = `qdrant:${qdrantId}`;
+      const modernKey = row.chunkId;
 
       const [topology] = await db.select()
         .from(tensorAnalysisCache)
-        .where(eq(tensorAnalysisCache.stableKey, stableKey))
+        .where(
+          sql`${tensorAnalysisCache.stableKey} = ${modernKey} OR ${tensorAnalysisCache.stableKey} = ${legacyKey}`
+        )
         .limit(1);
         
       if (topology) {
-        console.log(`✅ Found topology for ${row.chunkId} (Key: ${stableKey})`);
+        console.log(`✅ Found topology for ${row.chunkId} (Modern/Legacy: ${topology.stableKey})`);
         await db.update(embeddedSummaries)
           .set({
             gpuCluster: topology.somCluster,
@@ -46,7 +50,7 @@ async function main() {
           .where(eq(embeddedSummaries.id, row.id));
         updated++;
       } else {
-        console.warn(`⚠️  No spine entry for ${row.chunkId} (Key: ${stableKey})`);
+        console.warn(`⚠️  No spine entry for ${row.chunkId} (Keys: ${modernKey} / ${legacyKey})`);
       }
       
     } catch (err) {

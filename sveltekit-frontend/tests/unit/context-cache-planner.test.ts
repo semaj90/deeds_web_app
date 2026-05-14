@@ -2,16 +2,17 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockGetContextCacheWithSource, mockBumpContextCacheHit } = vi.hoisted(() => ({
+const { mockGetContextCacheWithSource, mockBumpContextCacheHit, mockSetContextCache } = vi.hoisted(() => ({
   mockGetContextCacheWithSource: vi.fn(),
   mockBumpContextCacheHit: vi.fn(),
+  mockSetContextCache: vi.fn(),
 }));
 
 vi.mock('$lib/server/ace/llm-context-cache.js', () => ({
   buildContextCacheKey: (identity: { queryHash: string; repoGitSha: string; systemPromptHash: string }) =>
     `llmctx:${identity.queryHash}:${identity.repoGitSha}:${identity.systemPromptHash}`,
   getContextCacheWithSource: (...args: unknown[]) => mockGetContextCacheWithSource(...args),
-  setContextCache: vi.fn(async () => {}),
+  setContextCache: (...args: unknown[]) => mockSetContextCache(...args),
   bumpContextCacheHit: (...args: unknown[]) => mockBumpContextCacheHit(...args),
   normalizeCachedContextPacket: <T>(pack: T) => pack,
 }));
@@ -21,6 +22,7 @@ describe('context-cache-planner', () => {
     vi.clearAllMocks();
     vi.resetModules();
     mockBumpContextCacheHit.mockResolvedValue(undefined);
+    mockSetContextCache.mockResolvedValue(undefined);
   });
 
   it('reports local cache hits and computes delta fields from cached planner state', async () => {
@@ -96,6 +98,28 @@ describe('context-cache-planner', () => {
     expect(hit?.meta.deltaFields).toEqual(['repoGitSha']);
     expect(hit?.packet.toolPolicy).toEqual({ allowWriteTools: false });
     expect(mockBumpContextCacheHit).toHaveBeenCalledWith(state.cacheKey);
+  });
+
+  it('stores context hit in Redis and local JSON', async () => {
+    const { buildAceContextPlannerState, storeAceContextPlannerHit } = await import(
+      '$lib/server/ace/context-cache-planner.js'
+    );
+    const state = buildAceContextPlannerState({ query: 'test' });
+    const packet = { 
+      featureId: 'test-feature',
+      glyphMask: 0,
+      summary: 'test summary',
+      topFiles: [],
+      topTriples: [],
+      selectedSourceIds: [],
+      cacheKeys: [],
+      warnings: []
+    };
+    const meta = { source: 'qdrant', retrievedAt: new Date().toISOString(), estimatedPrefixTokens: 10 };
+
+    await storeAceContextPlannerHit(state, packet as any, meta as any);
+
+    expect(mockSetContextCache).toHaveBeenCalled();
   });
 
   it('returns null when every cache layer misses', async () => {

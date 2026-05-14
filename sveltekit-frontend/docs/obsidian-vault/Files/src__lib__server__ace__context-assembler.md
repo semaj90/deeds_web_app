@@ -4,7 +4,7 @@ path: "src/lib/server/ace/context-assembler.ts"
 aliases: ["context-assembler.ts","src/lib/server/ace/context-assembler.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 4135
+lineCount: 4615
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 30
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ace/context-assembler.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 > ACE Context Assembler — Central Orchestration Module
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 4135
+lines:: 4615
 ## Summary
 
 ACE Context Assembler — Central Orchestration Module

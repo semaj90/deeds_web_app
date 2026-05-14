@@ -4,7 +4,7 @@ path: "src/lib/server/ai/hermes/tools/registry.ts"
 aliases: ["registry.ts","src/lib/server/ai/hermes/tools/registry.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 827
+lineCount: 828
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 5
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ai/hermes/tools/registry.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 > Hermes Stable Tool Registry
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 827
+lines:: 828
 ## Summary
 
 Hermes Stable Tool Registry

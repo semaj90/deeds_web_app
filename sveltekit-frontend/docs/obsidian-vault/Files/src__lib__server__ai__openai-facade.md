@@ -4,7 +4,7 @@ path: "src/lib/server/ai/openai-facade.ts"
 aliases: ["openai-facade.ts","src/lib/server/ai/openai-facade.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 471
+lineCount: 481
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: false
 importCount: 10
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ai/openai-facade.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","auth","t/ts","t/src","t/lib"]
 > OpenAI-compatible facade for the YorHA agent stack.
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 471
+lines:: 481
 ## Summary
 
 OpenAI-compatible facade for the YorHA agent stack.

@@ -60,23 +60,45 @@ export async function persistKarpathyHook(output: KarpathyHookOutput) {
 						slice.map(row => ({
 							snapshotId: snap.id,
 							stableKey: row.stableKey,
-							x: 0, y: 0, z: 0, t: 0,
+							x: row.manifold4?.[0] ?? 0,
+							y: row.manifold4?.[1] ?? 0,
+							z: row.manifold4?.[2] ?? 0,
+							t: row.manifold4?.[3] ?? 0,
+							topoByte: row.topoByte ?? 0,
 							metadata: { filePath: row.filePath, tags: row.tags },
 						}))
 					).onConflictDoUpdate({
 						target: [topologyPositions.snapshotId, topologyPositions.stableKey],
-						set: { metadata: sql`excluded.metadata` },
+						set: { 
+							x: sql`excluded.x`,
+							y: sql`excluded.y`,
+							z: sql`excluded.z`,
+							t: sql`excluded.t`,
+							topoByte: sql`excluded.topo_byte`,
+							metadata: sql`excluded.metadata` 
+						},
 					}).catch(() => {
 						// Fallback: individual upserts if batch conflicts
 						return Promise.all(slice.map(row =>
 							db.insert(topologyPositions).values({
 								snapshotId: snap.id,
 								stableKey: row.stableKey,
-								x: 0, y: 0, z: 0, t: 0,
+								x: row.manifold4?.[0] ?? 0,
+								y: row.manifold4?.[1] ?? 0,
+								z: row.manifold4?.[2] ?? 0,
+								t: row.manifold4?.[3] ?? 0,
+								topoByte: row.topoByte ?? 0,
 								metadata: { filePath: row.filePath, tags: row.tags },
 							}).onConflictDoUpdate({
 								target: [topologyPositions.snapshotId, topologyPositions.stableKey],
-								set: { metadata: { filePath: row.filePath, tags: row.tags } },
+								set: { 
+									x: row.manifold4?.[0] ?? 0,
+									y: row.manifold4?.[1] ?? 0,
+									z: row.manifold4?.[2] ?? 0,
+									t: row.manifold4?.[3] ?? 0,
+									topoByte: row.topoByte ?? 0,
+									metadata: { filePath: row.filePath, tags: row.tags } 
+								},
 							}).catch(() => {})
 						));
 					});

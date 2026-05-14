@@ -14,20 +14,24 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/db/meta/0000_snapshot.json"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
-confidence: "medium"
+confidence: "high"
 up: []
 imports: []
-tags: ["file","ext/json","t/json","t/src","t/lib"]
+tags: ["file","ext/json","t/json"]
 ---
 
 # `src/lib/server/db/meta/0000_snapshot.json`
 ## For future Claude
-> .json at src/lib/server/db/meta/0000_snapshot.json (2985 lines).
+> JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 2985
+## Summary
+
+JSON data file
+
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;

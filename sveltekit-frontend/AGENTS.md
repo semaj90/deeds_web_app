@@ -1,7 +1,7 @@
 # AGENTS.md — `sveltekit-frontend/` (LLM directory wiki)
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T22:18:48.377Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-14T00:50:41.701Z · agents.md spec · regen: npm run agents:write -->
 
 > SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > Per-directory AGENTS.md files are scattered throughout `src/` — agents walk UP from any file to the nearest one. **This file is the directory index** so agents (and humans) can quickly jump to a dir's KAG slug or fire the right tool call.
@@ -34,8 +34,8 @@ These tools are wired in-process in [`src/lib/server/ai/gemma4-agent.ts`](./src/
 
 | Gate | Status |
 |------|--------|
-| G4  Auth on API routes | 774✅ / 0❌ |
-| G5  Zod on body-parsing routes | 537✅ / 0❌ |
+| G4  Auth on API routes | 775✅ / 0❌ |
+| G5  Zod on body-parsing routes | 538✅ / 0❌ |
 | G15 SSR-unsafe globals | 0❌ |
 | G16 Routes without tests | 3❌ |
 | G20 Cyclic import pairs | 0 |
@@ -105,7 +105,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/components/legal-corpus` | 8 | — | — | `src_lib_components_legal_corpus` | `agents_md({ path: "src/lib/components/legal-corpus" })` |
 | `src/lib/components/modals` | 2 | — | — | `src_lib_components_modals` | `agents_md({ path: "src/lib/components/modals" })` |
 | `src/lib/components/monitoring` | 3 | — | — | `src_lib_components_monitoring` | `agents_md({ path: "src/lib/components/monitoring" })` |
-| `src/lib/components/phase78` | 3 | — | — | `src_lib_components_phase78` | `agents_md({ path: "src/lib/components/phase78" })` |
+| `src/lib/components/phase78` | 4 | — | — | `src_lib_components_phase78` | `agents_md({ path: "src/lib/components/phase78" })` |
 | `src/lib/components/poi` | 10 | — | — | `src_lib_components_poi` | `agents_md({ path: "src/lib/components/poi" })` |
 | `src/lib/components/rag` | 4 | — | — | `src_lib_components_rag` | `agents_md({ path: "src/lib/components/rag" })` |
 | `src/lib/components/recommendations` | 2 | — | — | `src_lib_components_recommendations` | `agents_md({ path: "src/lib/components/recommendations" })` |
@@ -116,11 +116,10 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/components/ui/avatar` | 5 | — | — | `src_lib_components_ui_avatar` | `agents_md({ path: "src/lib/components/ui/avatar" })` |
 | `src/lib/components/ui/badge` | 3 | — | — | `src_lib_components_ui_badge` | `agents_md({ path: "src/lib/components/ui/badge" })` |
 | `src/lib/components/ui/bits` | 5 | — | — | `src_lib_components_ui_bits` | `agents_md({ path: "src/lib/components/ui/bits" })` |
-| `src/lib/components/ui/button` | 2 | — | — | `src_lib_components_ui_button` | `agents_md({ path: "src/lib/components/ui/button" })` |
+| `src/lib/components/ui/button` | 3 | — | — | `src_lib_components_ui_button` | `agents_md({ path: "src/lib/components/ui/button" })` |
 | `src/lib/components/ui/card` | 8 | — | — | `src_lib_components_ui_card` | `agents_md({ path: "src/lib/components/ui/card" })` |
 | `src/lib/components/ui/core` | 2 | — | — | `src_lib_components_ui_core` | `agents_md({ path: "src/lib/components/ui/core" })` |
 | `src/lib/components/ui/dialog` | 13 | — | — | `src_lib_components_ui_dialog` | `agents_md({ path: "src/lib/components/ui/dialog" })` |
-| `src/lib/components/ui/enhanced-bits` | 2 | — | — | `src_lib_components_ui_enhanced_bits` | `agents_md({ path: "src/lib/components/ui/enhanced-bits" })` |
 | `src/lib/components/ui/gaming/8bit` | 2 | — | — | `src_lib_components_ui_gaming_8bit` | `agents_md({ path: "src/lib/components/ui/gaming/8bit" })` |
 | `src/lib/components/ui/gaming/constants` | 2 | — | — | `src_lib_components_ui_gaming_constants` | `agents_md({ path: "src/lib/components/ui/gaming/constants" })` |
 | `src/lib/components/ui/gaming/core` | 3 | — | — | `src_lib_components_ui_gaming_core` | `agents_md({ path: "src/lib/components/ui/gaming/core" })` |
@@ -138,11 +137,11 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/components/ui/tabs` | 9 | — | — | `src_lib_components_ui_tabs` | `agents_md({ path: "src/lib/components/ui/tabs" })` |
 | `src/lib/components/ui/textarea` | 2 | — | — | `src_lib_components_ui_textarea` | `agents_md({ path: "src/lib/components/ui/textarea" })` |
 | `src/lib/components/webgpu` | 2 | — | — | `src_lib_components_webgpu` | `agents_md({ path: "src/lib/components/webgpu" })` |
-| `src/lib/components/yorha` | 21 | — | — | `src_lib_components_yorha` | `agents_md({ path: "src/lib/components/yorha" })` |
-| `src/lib/components/yorha/_simulations` | 6 | — | — | `src_lib_components_yorha__simulations` | `agents_md({ path: "src/lib/components/yorha/_simulations" })` |
+| `src/lib/components/yorha` | 38 | — | — | `src_lib_components_yorha` | `agents_md({ path: "src/lib/components/yorha" })` |
+| `src/lib/components/yorha/_simulations` | 12 | — | — | `src_lib_components_yorha__simulations` | `agents_md({ path: "src/lib/components/yorha/_simulations" })` |
 | `src/lib/components/yorha/cases` | 3 | — | — | `src_lib_components_yorha_cases` | `agents_md({ path: "src/lib/components/yorha/cases" })` |
-| `src/lib/components/yorha/dashboard` | 5 | — | — | `src_lib_components_yorha_dashboard` | `agents_md({ path: "src/lib/components/yorha/dashboard" })` |
-| `src/lib/components/yorha/evidence` | 4 | — | — | `src_lib_components_yorha_evidence` | `agents_md({ path: "src/lib/components/yorha/evidence" })` |
+| `src/lib/components/yorha/dashboard` | 14 | — | — | `src_lib_components_yorha_dashboard` | `agents_md({ path: "src/lib/components/yorha/dashboard" })` |
+| `src/lib/components/yorha/evidence` | 5 | — | — | `src_lib_components_yorha_evidence` | `agents_md({ path: "src/lib/components/yorha/evidence" })` |
 
 ### `src/lib/config/` (1 dir)
 
@@ -263,12 +262,13 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/data` | 2 | — | — | `src_lib_server_data` | `agents_md({ path: "src/lib/server/data" })` |
 | `src/lib/server/db` | 72 | — | — | `src_lib_server_db` | `agents_md({ path: "src/lib/server/db" })` |
 | `src/lib/server/db/meta` | 2 | — | — | `src_lib_server_db_meta` | `agents_md({ path: "src/lib/server/db/meta" })` |
-| `src/lib/server/db/schema` | 47 | — | — | `src_lib_server_db_schema` | `agents_md({ path: "src/lib/server/db/schema" })` |
-| `src/lib/server/embedding` | 8 | — | — | `src_lib_server_embedding` | `agents_md({ path: "src/lib/server/embedding" })` |
+| `src/lib/server/db/schema` | 48 | — | — | `src_lib_server_db_schema` | `agents_md({ path: "src/lib/server/db/schema" })` |
+| `src/lib/server/embedding` | 9 | — | — | `src_lib_server_embedding` | `agents_md({ path: "src/lib/server/embedding" })` |
 | `src/lib/server/error-brain` | 5 | — | — | `src_lib_server_error_brain` | `agents_md({ path: "src/lib/server/error-brain" })` |
 | `src/lib/server/error-brain/transport` | 6 | — | — | `src_lib_server_error_brain_transport` | `agents_md({ path: "src/lib/server/error-brain/transport" })` |
 | `src/lib/server/evidence` | 10 | — | — | `src_lib_server_evidence` | `agents_md({ path: "src/lib/server/evidence" })` |
 | `src/lib/server/evidence/services` | 5 | — | — | `src_lib_server_evidence_services` | `agents_md({ path: "src/lib/server/evidence/services" })` |
+| `src/lib/server/evidence/video` | 5 | — | — | `src_lib_server_evidence_video` | `agents_md({ path: "src/lib/server/evidence/video" })` |
 | `src/lib/server/features` | 8 | — | — | `src_lib_server_features` | `agents_md({ path: "src/lib/server/features" })` |
 | `src/lib/server/ff1` | 2 | — | — | `src_lib_server_ff1` | `agents_md({ path: "src/lib/server/ff1" })` |
 | `src/lib/server/ff1/agent` | 2 | — | — | `src_lib_server_ff1_agent` | `agents_md({ path: "src/lib/server/ff1/agent" })` |
@@ -314,7 +314,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/types` | 11 | — | — | `src_lib_server_types` | `agents_md({ path: "src/lib/server/types" })` |
 | `src/lib/server/utils` | 13 | — | — | `src_lib_server_utils` | `agents_md({ path: "src/lib/server/utils" })` |
 | `src/lib/server/validation` | 2 | — | — | `src_lib_server_validation` | `agents_md({ path: "src/lib/server/validation" })` |
-| `src/lib/server/vector` | 14 | — | — | `src_lib_server_vector` | `agents_md({ path: "src/lib/server/vector" })` |
+| `src/lib/server/vector` | 15 | — | — | `src_lib_server_vector` | `agents_md({ path: "src/lib/server/vector" })` |
 | `src/lib/server/wiki` | 9 | — | — | `src_lib_server_wiki` | `agents_md({ path: "src/lib/server/wiki" })` |
 | `src/lib/server/workers` | 5 | — | — | `src_lib_server_workers` | `agents_md({ path: "src/lib/server/workers" })` |
 
@@ -401,54 +401,49 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/routes/(admin)/error-brain/components` | 3 | — | — | `src_routes__admin__error_brain_components` | `agents_md({ path: "src/routes/(admin)/error-brain/components" })` |
+| `src/routes/(admin)/error-brain/components` | 2 | — | — | `src_routes__admin__error_brain_components` | `agents_md({ path: "src/routes/(admin)/error-brain/components" })` |
 
 ### `src/routes/(analysis)/` (4 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/routes/(analysis)` | 2 | — | — | `src_routes__analysis_` | `agents_md({ path: "src/routes/(analysis)" })` |
-| `src/routes/(analysis)/audio-analysis/[evidenceId]` | 2 | — | — | `src_routes__analysis__audio_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)/audio-analysis/[evidenceId]" })` |
-| `src/routes/(analysis)/document-analysis/[evidenceId]` | 2 | — | — | `src_routes__analysis__document_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)/document-analysis/[evidenceId]" })` |
-| `src/routes/(analysis)/video-analysis/[evidenceId]` | 2 | — | — | `src_routes__analysis__video_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)/video-analysis/[evidenceId]" })` |
+| `src/routes/(analysis)` | 4 | — | — | `src_routes__analysis_` | `agents_md({ path: "src/routes/(analysis)" })` |
+| `src/routes/(analysis)/audio-analysis/[evidenceId]` | 3 | — | — | `src_routes__analysis__audio_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)/audio-analysis/[evidenceId]" })` |
+| `src/routes/(analysis)/document-analysis/[evidenceId]` | 3 | — | — | `src_routes__analysis__document_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)/document-analysis/[evidenceId]" })` |
+| `src/routes/(analysis)/video-analysis/[evidenceId]` | 3 | — | — | `src_routes__analysis__video_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)/video-analysis/[evidenceId]" })` |
 
-### `src/routes/(analysis)@/` (4 dirs)
+### `src/routes/(analysis)@/` (3 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/routes/(analysis)@` | 2 | — | — | `src_routes__analysis__` | `agents_md({ path: "src/routes/(analysis)@" })` |
-| `src/routes/(analysis)@/audio-analysis/[evidenceId]` | 2 | — | — | `src_routes__analysis___audio_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)@/audio-analysis/[evidenceId]" })` |
-| `src/routes/(analysis)@/document-analysis/[evidenceId]` | 2 | — | — | `src_routes__analysis___document_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)@/document-analysis/[evidenceId]" })` |
-| `src/routes/(analysis)@/video-analysis/[evidenceId]` | 2 | — | — | `src_routes__analysis___video_analysis__evidenceId_` | `agents_md({ path: "src/routes/(analysis)@/video-analysis/[evidenceId]" })` |
 
-### `src/routes/(app)/` (214 dirs)
+### `src/routes/(app)/` (213 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 | `src/routes/(app)` | 2 | — | — | `src_routes__app_` | `agents_md({ path: "src/routes/(app)" })` |
 | `src/routes/(app)/active-cases` | 2 | — | — | `src_routes__app__active_cases` | `agents_md({ path: "src/routes/(app)/active-cases" })` |
 | `src/routes/(app)/admin` | 2 | — | — | `src_routes__app__admin` | `agents_md({ path: "src/routes/(app)/admin" })` |
-| `src/routes/(app)/admin/ai-dashboard` | 3 | — | — | `src_routes__app__admin_ai_dashboard` | `agents_md({ path: "src/routes/(app)/admin/ai-dashboard" })` |
-| `src/routes/(app)/admin/ai-dashboard/lab` | 2 | — | — | `src_routes__app__admin_ai_dashboard_lab` | `agents_md({ path: "src/routes/(app)/admin/ai-dashboard/lab" })` |
-| `src/routes/(app)/admin/ai-dashboard/operator` | 2 | — | — | `src_routes__app__admin_ai_dashboard_operator` | `agents_md({ path: "src/routes/(app)/admin/ai-dashboard/operator" })` |
+| `src/routes/(app)/admin/ai-dashboard` | 5 | — | — | `src_routes__app__admin_ai_dashboard` | `agents_md({ path: "src/routes/(app)/admin/ai-dashboard" })` |
+| `src/routes/(app)/admin/ai-dashboard/lab` | 3 | — | — | `src_routes__app__admin_ai_dashboard_lab` | `agents_md({ path: "src/routes/(app)/admin/ai-dashboard/lab" })` |
 | `src/routes/(app)/admin/all-routes` | 4 | — | — | `src_routes__app__admin_all_routes` | `agents_md({ path: "src/routes/(app)/admin/all-routes" })` |
 | `src/routes/(app)/admin/ast-topology` | 3 | — | — | `src_routes__app__admin_ast_topology` | `agents_md({ path: "src/routes/(app)/admin/ast-topology" })` |
-| `src/routes/(app)/admin/cache` | 3 | — | — | `src_routes__app__admin_cache` | `agents_md({ path: "src/routes/(app)/admin/cache" })` |
+| `src/routes/(app)/admin/cache` | 2 | — | — | `src_routes__app__admin_cache` | `agents_md({ path: "src/routes/(app)/admin/cache" })` |
 | `src/routes/(app)/admin/chat-memory` | 2 | — | — | `src_routes__app__admin_chat_memory` | `agents_md({ path: "src/routes/(app)/admin/chat-memory" })` |
 | `src/routes/(app)/admin/codebase-index` | 3 | — | — | `src_routes__app__admin_codebase_index` | `agents_md({ path: "src/routes/(app)/admin/codebase-index" })` |
 | `src/routes/(app)/admin/codebase-index/[fileId]` | 2 | — | — | `src_routes__app__admin_codebase_index__fileId_` | `agents_md({ path: "src/routes/(app)/admin/codebase-index/[fileId]" })` |
-| `src/routes/(app)/admin/codebase-viewer` | 3 | — | — | `src_routes__app__admin_codebase_viewer` | `agents_md({ path: "src/routes/(app)/admin/codebase-viewer" })` |
+| `src/routes/(app)/admin/codebase-viewer` | 4 | — | — | `src_routes__app__admin_codebase_viewer` | `agents_md({ path: "src/routes/(app)/admin/codebase-viewer" })` |
 | `src/routes/(app)/admin/component-analysis` | 2 | — | — | `src_routes__app__admin_component_analysis` | `agents_md({ path: "src/routes/(app)/admin/component-analysis" })` |
-| `src/routes/(app)/admin/dev-tools` | 3 | — | — | `src_routes__app__admin_dev_tools` | `agents_md({ path: "src/routes/(app)/admin/dev-tools" })` |
-| `src/routes/(app)/admin/dev-tools/component-showcase` | 2 | — | — | `src_routes__app__admin_dev_tools_component_showcase` | `agents_md({ path: "src/routes/(app)/admin/dev-tools/component-showcase" })` |
+| `src/routes/(app)/admin/dev-tools` | 4 | — | — | `src_routes__app__admin_dev_tools` | `agents_md({ path: "src/routes/(app)/admin/dev-tools" })` |
+| `src/routes/(app)/admin/dev-tools/component-showcase` | 13 | — | — | `src_routes__app__admin_dev_tools_component_showcase` | `agents_md({ path: "src/routes/(app)/admin/dev-tools/component-showcase" })` |
 | `src/routes/(app)/admin/document-search` | 2 | — | — | `src_routes__app__admin_document_search` | `agents_md({ path: "src/routes/(app)/admin/document-search" })` |
 | `src/routes/(app)/admin/error-analysis` | 2 | — | — | `src_routes__app__admin_error_analysis` | `agents_md({ path: "src/routes/(app)/admin/error-analysis" })` |
-| `src/routes/(app)/admin/error-brain` | 4 | — | — | `src_routes__app__admin_error_brain` | `agents_md({ path: "src/routes/(app)/admin/error-brain" })` |
+| `src/routes/(app)/admin/error-brain` | 3 | — | — | `src_routes__app__admin_error_brain` | `agents_md({ path: "src/routes/(app)/admin/error-brain" })` |
 | `src/routes/(app)/admin/gpu-evidence-graph` | 3 | — | — | `src_routes__app__admin_gpu_evidence_graph` | `agents_md({ path: "src/routes/(app)/admin/gpu-evidence-graph" })` |
 | `src/routes/(app)/admin/kag-notebook` | 2 | — | — | `src_routes__app__admin_kag_notebook` | `agents_md({ path: "src/routes/(app)/admin/kag-notebook" })` |
 | `src/routes/(app)/admin/knowledge-base` | 2 | — | — | `src_routes__app__admin_knowledge_base` | `agents_md({ path: "src/routes/(app)/admin/knowledge-base" })` |
 | `src/routes/(app)/admin/knowledge-search` | 2 | — | — | `src_routes__app__admin_knowledge_search` | `agents_md({ path: "src/routes/(app)/admin/knowledge-search" })` |
-| `src/routes/(app)/admin/library` | 2 | — | — | `src_routes__app__admin_library` | `agents_md({ path: "src/routes/(app)/admin/library" })` |
+| `src/routes/(app)/admin/library` | 47 | — | — | `src_routes__app__admin_library` | `agents_md({ path: "src/routes/(app)/admin/library" })` |
 | `src/routes/(app)/admin/memory-inspector` | 2 | — | — | `src_routes__app__admin_memory_inspector` | `agents_md({ path: "src/routes/(app)/admin/memory-inspector" })` |
 | `src/routes/(app)/admin/phase78/monitor` | 2 | — | — | `src_routes__app__admin_phase78_monitor` | `agents_md({ path: "src/routes/(app)/admin/phase78/monitor" })` |
 | `src/routes/(app)/admin/phase78/routes/[routePath]` | 2 | — | — | `src_routes__app__admin_phase78_routes__routePath_` | `agents_md({ path: "src/routes/(app)/admin/phase78/routes/[routePath]" })` |
@@ -456,24 +451,22 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/admin/qlora-training` | 2 | — | — | `src_routes__app__admin_qlora_training` | `agents_md({ path: "src/routes/(app)/admin/qlora-training" })` |
 | `src/routes/(app)/admin/search-intelligence` | 3 | — | — | `src_routes__app__admin_search_intelligence` | `agents_md({ path: "src/routes/(app)/admin/search-intelligence" })` |
 | `src/routes/(app)/admin/unified-indexing-studio` | 2 | — | — | `src_routes__app__admin_unified_indexing_studio` | `agents_md({ path: "src/routes/(app)/admin/unified-indexing-studio" })` |
-| `src/routes/(app)/analysis-center` | 5 | — | — | `src_routes__app__analysis_center` | `agents_md({ path: "src/routes/(app)/analysis-center" })` |
+| `src/routes/(app)/analysis-center` | 4 | — | — | `src_routes__app__analysis_center` | `agents_md({ path: "src/routes/(app)/analysis-center" })` |
 | `src/routes/(app)/analytics` | 2 | — | — | `src_routes__app__analytics` | `agents_md({ path: "src/routes/(app)/analytics" })` |
 | `src/routes/(app)/cases` | 4 | — | — | `src_routes__app__cases` | `agents_md({ path: "src/routes/(app)/cases" })` |
 | `src/routes/(app)/cases/[id]` | 6 | — | — | `src_routes__app__cases__id_` | `agents_md({ path: "src/routes/(app)/cases/[id]" })` |
-| `src/routes/(app)/cases/[id]/ai` | 2 | — | — | `src_routes__app__cases__id__ai` | `agents_md({ path: "src/routes/(app)/cases/[id]/ai" })` |
+| `src/routes/(app)/cases/[id]/ai` | 7 | — | — | `src_routes__app__cases__id__ai` | `agents_md({ path: "src/routes/(app)/cases/[id]/ai" })` |
 | `src/routes/(app)/cases/[id]/board` | 3 | — | — | `src_routes__app__cases__id__board` | `agents_md({ path: "src/routes/(app)/cases/[id]/board" })` |
-| `src/routes/(app)/cases/[id]/canvas` | 3 | — | — | `src_routes__app__cases__id__canvas` | `agents_md({ path: "src/routes/(app)/cases/[id]/canvas" })` |
-| `src/routes/(app)/cases/[id]/chat` | 2 | — | — | `src_routes__app__cases__id__chat` | `agents_md({ path: "src/routes/(app)/cases/[id]/chat" })` |
+| `src/routes/(app)/cases/[id]/canvas` | 2 | — | — | `src_routes__app__cases__id__canvas` | `agents_md({ path: "src/routes/(app)/cases/[id]/canvas" })` |
 | `src/routes/(app)/cases/[id]/evidence` | 2 | — | — | `src_routes__app__cases__id__evidence` | `agents_md({ path: "src/routes/(app)/cases/[id]/evidence" })` |
 | `src/routes/(app)/cases/[id]/evidence/upload` | 2 | — | — | `src_routes__app__cases__id__evidence_upload` | `agents_md({ path: "src/routes/(app)/cases/[id]/evidence/upload" })` |
 | `src/routes/(app)/cases/[id]/notes` | 2 | — | — | `src_routes__app__cases__id__notes` | `agents_md({ path: "src/routes/(app)/cases/[id]/notes" })` |
 | `src/routes/(app)/cases/[id]/overview` | 3 | — | — | `src_routes__app__cases__id__overview` | `agents_md({ path: "src/routes/(app)/cases/[id]/overview" })` |
-| `src/routes/(app)/cases/[id]/persons` | 2 | — | — | `src_routes__app__cases__id__persons` | `agents_md({ path: "src/routes/(app)/cases/[id]/persons" })` |
 | `src/routes/(app)/cases/[id]/reports` | 3 | — | — | `src_routes__app__cases__id__reports` | `agents_md({ path: "src/routes/(app)/cases/[id]/reports" })` |
 | `src/routes/(app)/cases/new` | 3 | — | — | `src_routes__app__cases_new` | `agents_md({ path: "src/routes/(app)/cases/new" })` |
 | `src/routes/(app)/chat` | 2 | — | — | `src_routes__app__chat` | `agents_md({ path: "src/routes/(app)/chat" })` |
 | `src/routes/(app)/chat/[id]` | 2 | — | — | `src_routes__app__chat__id_` | `agents_md({ path: "src/routes/(app)/chat/[id]" })` |
-| `src/routes/(app)/citations` | 3 | — | — | `src_routes__app__citations` | `agents_md({ path: "src/routes/(app)/citations" })` |
+| `src/routes/(app)/citations` | 4 | — | — | `src_routes__app__citations` | `agents_md({ path: "src/routes/(app)/citations" })` |
 | `src/routes/(app)/citations/[...label]` | 2 | — | — | `src_routes__app__citations_____label_` | `agents_md({ path: "src/routes/(app)/citations/[...label]" })` |
 | `src/routes/(app)/citations/law` | 2 | — | — | `src_routes__app__citations_law` | `agents_md({ path: "src/routes/(app)/citations/law" })` |
 | `src/routes/(app)/citations/law/[citation]` | 2 | — | — | `src_routes__app__citations_law__citation_` | `agents_md({ path: "src/routes/(app)/citations/law/[citation]" })` |
@@ -492,85 +485,27 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/command-center/codebase/errors` | 2 | — | — | `src_routes__app__command_center_codebase_errors` | `agents_md({ path: "src/routes/(app)/command-center/codebase/errors" })` |
 | `src/routes/(app)/couchdb-analytics` | 5 | — | — | `src_routes__app__couchdb_analytics` | `agents_md({ path: "src/routes/(app)/couchdb-analytics" })` |
 | `src/routes/(app)/dashboard` | 2 | — | — | `src_routes__app__dashboard` | `agents_md({ path: "src/routes/(app)/dashboard" })` |
-| `src/routes/(app)/demos` | 2 | — | — | `src_routes__app__demos` | `agents_md({ path: "src/routes/(app)/demos" })` |
-| `src/routes/(app)/demos/ace-pipeline` | 2 | — | — | `src_routes__app__demos_ace_pipeline` | `agents_md({ path: "src/routes/(app)/demos/ace-pipeline" })` |
-| `src/routes/(app)/demos/agent-chat` | 2 | — | — | `src_routes__app__demos_agent_chat` | `agents_md({ path: "src/routes/(app)/demos/agent-chat" })` |
 | `src/routes/(app)/demos/agentic-errors` | 3 | — | — | `src_routes__app__demos_agentic_errors` | `agents_md({ path: "src/routes/(app)/demos/agentic-errors" })` |
 | `src/routes/(app)/demos/agentic-errors/analysis` | 2 | — | — | `src_routes__app__demos_agentic_errors_analysis` | `agents_md({ path: "src/routes/(app)/demos/agentic-errors/analysis" })` |
-| `src/routes/(app)/demos/ai-assistant` | 2 | — | — | `src_routes__app__demos_ai_assistant` | `agents_md({ path: "src/routes/(app)/demos/ai-assistant" })` |
-| `src/routes/(app)/demos/ai-chat-test` | 2 | — | — | `src_routes__app__demos_ai_chat_test` | `agents_md({ path: "src/routes/(app)/demos/ai-chat-test" })` |
-| `src/routes/(app)/demos/ai-file-upload` | 2 | — | — | `src_routes__app__demos_ai_file_upload` | `agents_md({ path: "src/routes/(app)/demos/ai-file-upload" })` |
-| `src/routes/(app)/demos/ask-ai` | 2 | — | — | `src_routes__app__demos_ask_ai` | `agents_md({ path: "src/routes/(app)/demos/ask-ai" })` |
-| `src/routes/(app)/demos/bits-ui` | 2 | — | — | `src_routes__app__demos_bits_ui` | `agents_md({ path: "src/routes/(app)/demos/bits-ui" })` |
-| `src/routes/(app)/demos/cache` | 2 | — | — | `src_routes__app__demos_cache` | `agents_md({ path: "src/routes/(app)/demos/cache" })` |
-| `src/routes/(app)/demos/case-form` | 2 | — | — | `src_routes__app__demos_case_form` | `agents_md({ path: "src/routes/(app)/demos/case-form" })` |
-| `src/routes/(app)/demos/celestial-icons` | 2 | — | — | `src_routes__app__demos_celestial_icons` | `agents_md({ path: "src/routes/(app)/demos/celestial-icons" })` |
-| `src/routes/(app)/demos/chat-messages` | 2 | — | — | `src_routes__app__demos_chat_messages` | `agents_md({ path: "src/routes/(app)/demos/chat-messages" })` |
-| `src/routes/(app)/demos/citation-tools` | 2 | — | — | `src_routes__app__demos_citation_tools` | `agents_md({ path: "src/routes/(app)/demos/citation-tools" })` |
-| `src/routes/(app)/demos/client-ai-chat` | 2 | — | — | `src_routes__app__demos_client_ai_chat` | `agents_md({ path: "src/routes/(app)/demos/client-ai-chat" })` |
-| `src/routes/(app)/demos/client-inference` | 2 | — | — | `src_routes__app__demos_client_inference` | `agents_md({ path: "src/routes/(app)/demos/client-inference" })` |
-| `src/routes/(app)/demos/collab-canvas` | 2 | — | — | `src_routes__app__demos_collab_canvas` | `agents_md({ path: "src/routes/(app)/demos/collab-canvas" })` |
-| `src/routes/(app)/demos/context-menu` | 2 | — | — | `src_routes__app__demos_context_menu` | `agents_md({ path: "src/routes/(app)/demos/context-menu" })` |
-| `src/routes/(app)/demos/contextual-chat` | 2 | — | — | `src_routes__app__demos_contextual_chat` | `agents_md({ path: "src/routes/(app)/demos/contextual-chat" })` |
-| `src/routes/(app)/demos/courtroom-sim` | 3 | — | — | `src_routes__app__demos_courtroom_sim` | `agents_md({ path: "src/routes/(app)/demos/courtroom-sim" })` |
+| `src/routes/(app)/demos/courtroom-sim` | 2 | — | — | `src_routes__app__demos_courtroom_sim` | `agents_md({ path: "src/routes/(app)/demos/courtroom-sim" })` |
 | `src/routes/(app)/demos/crime-reconstruction` | 2 | — | — | `src_routes__app__demos_crime_reconstruction` | `agents_md({ path: "src/routes/(app)/demos/crime-reconstruction" })` |
-| `src/routes/(app)/demos/detective-command` | 2 | — | — | `src_routes__app__demos_detective_command` | `agents_md({ path: "src/routes/(app)/demos/detective-command" })` |
-| `src/routes/(app)/demos/dialog-wrapper` | 2 | — | — | `src_routes__app__demos_dialog_wrapper` | `agents_md({ path: "src/routes/(app)/demos/dialog-wrapper" })` |
-| `src/routes/(app)/demos/embedding-stream` | 2 | — | — | `src_routes__app__demos_embedding_stream` | `agents_md({ path: "src/routes/(app)/demos/embedding-stream" })` |
-| `src/routes/(app)/demos/enhanced-upload` | 2 | — | — | `src_routes__app__demos_enhanced_upload` | `agents_md({ path: "src/routes/(app)/demos/enhanced-upload" })` |
-| `src/routes/(app)/demos/evidence-canvas` | 2 | — | — | `src_routes__app__demos_evidence_canvas` | `agents_md({ path: "src/routes/(app)/demos/evidence-canvas" })` |
-| `src/routes/(app)/demos/evidence-dashboard` | 2 | — | — | `src_routes__app__demos_evidence_dashboard` | `agents_md({ path: "src/routes/(app)/demos/evidence-dashboard" })` |
-| `src/routes/(app)/demos/evidence-form` | 2 | — | — | `src_routes__app__demos_evidence_form` | `agents_md({ path: "src/routes/(app)/demos/evidence-form" })` |
-| `src/routes/(app)/demos/gpu-cache` | 2 | — | — | `src_routes__app__demos_gpu_cache` | `agents_md({ path: "src/routes/(app)/demos/gpu-cache" })` |
-| `src/routes/(app)/demos/hover-card` | 2 | — | — | `src_routes__app__demos_hover_card` | `agents_md({ path: "src/routes/(app)/demos/hover-card" })` |
-| `src/routes/(app)/demos/keyboard-shortcuts` | 2 | — | — | `src_routes__app__demos_keyboard_shortcuts` | `agents_md({ path: "src/routes/(app)/demos/keyboard-shortcuts" })` |
-| `src/routes/(app)/demos/legal-layout` | 2 | — | — | `src_routes__app__demos_legal_layout` | `agents_md({ path: "src/routes/(app)/demos/legal-layout" })` |
-| `src/routes/(app)/demos/legal-spellbook` | 2 | — | — | `src_routes__app__demos_legal_spellbook` | `agents_md({ path: "src/routes/(app)/demos/legal-spellbook" })` |
 | `src/routes/(app)/demos/memory-palace` | 2 | — | — | `src_routes__app__demos_memory_palace` | `agents_md({ path: "src/routes/(app)/demos/memory-palace" })` |
-| `src/routes/(app)/demos/modals` | 2 | — | — | `src_routes__app__demos_modals` | `agents_md({ path: "src/routes/(app)/demos/modals" })` |
-| `src/routes/(app)/demos/modular-upload` | 2 | — | — | `src_routes__app__demos_modular_upload` | `agents_md({ path: "src/routes/(app)/demos/modular-upload" })` |
 | `src/routes/(app)/demos/nes-graph` | 2 | — | — | `src_routes__app__demos_nes_graph` | `agents_md({ path: "src/routes/(app)/demos/nes-graph" })` |
 | `src/routes/(app)/demos/nes-routes` | 2 | — | — | `src_routes__app__demos_nes_routes` | `agents_md({ path: "src/routes/(app)/demos/nes-routes" })` |
-| `src/routes/(app)/demos/nes-toast` | 2 | — | — | `src_routes__app__demos_nes_toast` | `agents_md({ path: "src/routes/(app)/demos/nes-toast" })` |
-| `src/routes/(app)/demos/nier-showcase` | 2 | — | — | `src_routes__app__demos_nier_showcase` | `agents_md({ path: "src/routes/(app)/demos/nier-showcase" })` |
-| `src/routes/(app)/demos/notifications` | 2 | — | — | `src_routes__app__demos_notifications` | `agents_md({ path: "src/routes/(app)/demos/notifications" })` |
-| `src/routes/(app)/demos/phantom-code-lab` | 2 | — | — | `src_routes__app__demos_phantom_code_lab` | `agents_md({ path: "src/routes/(app)/demos/phantom-code-lab" })` |
-| `src/routes/(app)/demos/prosecutor-dashboard` | 2 | — | — | `src_routes__app__demos_prosecutor_dashboard` | `agents_md({ path: "src/routes/(app)/demos/prosecutor-dashboard" })` |
-| `src/routes/(app)/demos/rich-text-editor` | 2 | — | — | `src_routes__app__demos_rich_text_editor` | `agents_md({ path: "src/routes/(app)/demos/rich-text-editor" })` |
 | `src/routes/(app)/demos/scene-intent-2d` | 2 | — | — | `src_routes__app__demos_scene_intent_2d` | `agents_md({ path: "src/routes/(app)/demos/scene-intent-2d" })` |
-| `src/routes/(app)/demos/search-tools` | 2 | — | — | `src_routes__app__demos_search_tools` | `agents_md({ path: "src/routes/(app)/demos/search-tools" })` |
-| `src/routes/(app)/demos/source-drawer` | 2 | — | — | `src_routes__app__demos_source_drawer` | `agents_md({ path: "src/routes/(app)/demos/source-drawer" })` |
-| `src/routes/(app)/demos/stats-panel` | 2 | — | — | `src_routes__app__demos_stats_panel` | `agents_md({ path: "src/routes/(app)/demos/stats-panel" })` |
-| `src/routes/(app)/demos/streaming` | 2 | — | — | `src_routes__app__demos_streaming` | `agents_md({ path: "src/routes/(app)/demos/streaming" })` |
 | `src/routes/(app)/demos/svelte5-components` | 2 | — | — | `src_routes__app__demos_svelte5_components` | `agents_md({ path: "src/routes/(app)/demos/svelte5-components" })` |
-| `src/routes/(app)/demos/svelte5-primitives` | 2 | — | — | `src_routes__app__demos_svelte5_primitives` | `agents_md({ path: "src/routes/(app)/demos/svelte5-primitives" })` |
-| `src/routes/(app)/demos/synthesis-chat` | 2 | — | — | `src_routes__app__demos_synthesis_chat` | `agents_md({ path: "src/routes/(app)/demos/synthesis-chat" })` |
-| `src/routes/(app)/demos/theory-board` | 2 | — | — | `src_routes__app__demos_theory_board` | `agents_md({ path: "src/routes/(app)/demos/theory-board" })` |
-| `src/routes/(app)/demos/toc-reader` | 2 | — | — | `src_routes__app__demos_toc_reader` | `agents_md({ path: "src/routes/(app)/demos/toc-reader" })` |
-| `src/routes/(app)/demos/ui-components` | 2 | — | — | `src_routes__app__demos_ui_components` | `agents_md({ path: "src/routes/(app)/demos/ui-components" })` |
-| `src/routes/(app)/demos/webgpu-memory-palace` | 2 | — | — | `src_routes__app__demos_webgpu_memory_palace` | `agents_md({ path: "src/routes/(app)/demos/webgpu-memory-palace" })` |
-| `src/routes/(app)/demos/webgpu-showcase` | 2 | — | — | `src_routes__app__demos_webgpu_showcase` | `agents_md({ path: "src/routes/(app)/demos/webgpu-showcase" })` |
-| `src/routes/(app)/demos/yorha` | 2 | — | — | `src_routes__app__demos_yorha` | `agents_md({ path: "src/routes/(app)/demos/yorha" })` |
-| `src/routes/(app)/demos/yorha-assistant` | 2 | — | — | `src_routes__app__demos_yorha_assistant` | `agents_md({ path: "src/routes/(app)/demos/yorha-assistant" })` |
-| `src/routes/(app)/demos/yorha-icons` | 2 | — | — | `src_routes__app__demos_yorha_icons` | `agents_md({ path: "src/routes/(app)/demos/yorha-icons" })` |
-| `src/routes/(app)/demos/yorha-terminal` | 2 | — | — | `src_routes__app__demos_yorha_terminal` | `agents_md({ path: "src/routes/(app)/demos/yorha-terminal" })` |
-| `src/routes/(app)/demos/yorha/components` | 21 | — | — | `src_routes__app__demos_yorha_components` | `agents_md({ path: "src/routes/(app)/demos/yorha/components" })` |
-| `src/routes/(app)/demos/yorha/components/_simulations` | 6 | — | — | `src_routes__app__demos_yorha_components__simulations` | `agents_md({ path: "src/routes/(app)/demos/yorha/components/_simulations" })` |
+| `src/routes/(app)/demos/yorha/components` | 4 | — | — | `src_routes__app__demos_yorha_components` | `agents_md({ path: "src/routes/(app)/demos/yorha/components" })` |
 | `src/routes/(app)/demos/yorha/components/cases` | 3 | — | — | `src_routes__app__demos_yorha_components_cases` | `agents_md({ path: "src/routes/(app)/demos/yorha/components/cases" })` |
-| `src/routes/(app)/demos/yorha/components/dashboard` | 5 | — | — | `src_routes__app__demos_yorha_components_dashboard` | `agents_md({ path: "src/routes/(app)/demos/yorha/components/dashboard" })` |
-| `src/routes/(app)/demos/yorha/components/evidence` | 4 | — | — | `src_routes__app__demos_yorha_components_evidence` | `agents_md({ path: "src/routes/(app)/demos/yorha/components/evidence" })` |
+| `src/routes/(app)/demos/yorha/components/evidence` | 3 | — | — | `src_routes__app__demos_yorha_components_evidence` | `agents_md({ path: "src/routes/(app)/demos/yorha/components/evidence" })` |
 | `src/routes/(app)/evidence` | 6 | 1/1 auth | — | `src_routes__app__evidence` | `agents_md({ path: "src/routes/(app)/evidence" })` |
 | `src/routes/(app)/evidence-library` | 2 | — | — | `src_routes__app__evidence_library` | `agents_md({ path: "src/routes/(app)/evidence-library" })` |
 | `src/routes/(app)/evidence/[id]/view` | 2 | — | — | `src_routes__app__evidence__id__view` | `agents_md({ path: "src/routes/(app)/evidence/[id]/view" })` |
-| `src/routes/(app)/evidence/analyze` | 2 | — | — | `src_routes__app__evidence_analyze` | `agents_md({ path: "src/routes/(app)/evidence/analyze" })` |
-| `src/routes/(app)/evidence/hash` | 2 | — | — | `src_routes__app__evidence_hash` | `agents_md({ path: "src/routes/(app)/evidence/hash" })` |
 | `src/routes/(app)/evidence/manage` | 2 | — | — | `src_routes__app__evidence_manage` | `agents_md({ path: "src/routes/(app)/evidence/manage" })` |
 | `src/routes/(app)/evidence/realtime` | 3 | — | — | `src_routes__app__evidence_realtime` | `agents_md({ path: "src/routes/(app)/evidence/realtime" })` |
 | `src/routes/(app)/evidence/upload` | 2 | — | — | `src_routes__app__evidence_upload` | `agents_md({ path: "src/routes/(app)/evidence/upload" })` |
 | `src/routes/(app)/fictional-cases` | 2 | — | — | `src_routes__app__fictional_cases` | `agents_md({ path: "src/routes/(app)/fictional-cases" })` |
 | `src/routes/(app)/fictional-cases/[id]` | 2 | — | — | `src_routes__app__fictional_cases__id_` | `agents_md({ path: "src/routes/(app)/fictional-cases/[id]" })` |
-| `src/routes/(app)/global-search` | 2 | — | — | `src_routes__app__global_search` | `agents_md({ path: "src/routes/(app)/global-search" })` |
-| `src/routes/(app)/legal-corpus` | 4 | — | — | `src_routes__app__legal_corpus` | `agents_md({ path: "src/routes/(app)/legal-corpus" })` |
+| `src/routes/(app)/legal-corpus` | 3 | — | — | `src_routes__app__legal_corpus` | `agents_md({ path: "src/routes/(app)/legal-corpus" })` |
 | `src/routes/(app)/legal-corpus/[id]` | 3 | — | — | `src_routes__app__legal_corpus__id_` | `agents_md({ path: "src/routes/(app)/legal-corpus/[id]" })` |
 | `src/routes/(app)/library` | 3 | — | — | `src_routes__app__library` | `agents_md({ path: "src/routes/(app)/library" })` |
 | `src/routes/(app)/library/[documentId]` | 2 | — | — | `src_routes__app__library__documentId_` | `agents_md({ path: "src/routes/(app)/library/[documentId]" })` |
@@ -579,14 +514,14 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/library/corpus` | 2 | — | — | `src_routes__app__library_corpus` | `agents_md({ path: "src/routes/(app)/library/corpus" })` |
 | `src/routes/(app)/library/glossary` | 2 | — | — | `src_routes__app__library_glossary` | `agents_md({ path: "src/routes/(app)/library/glossary" })` |
 | `src/routes/(app)/persons-of-interest` | 3 | — | — | `src_routes__app__persons_of_interest` | `agents_md({ path: "src/routes/(app)/persons-of-interest" })` |
-| `src/routes/(app)/persons-of-interest/[id]` | 3 | — | — | `src_routes__app__persons_of_interest__id_` | `agents_md({ path: "src/routes/(app)/persons-of-interest/[id]" })` |
+| `src/routes/(app)/persons-of-interest/[id]` | 2 | — | — | `src_routes__app__persons_of_interest__id_` | `agents_md({ path: "src/routes/(app)/persons-of-interest/[id]" })` |
 | `src/routes/(app)/persons-of-interest/create` | 2 | — | — | `src_routes__app__persons_of_interest_create` | `agents_md({ path: "src/routes/(app)/persons-of-interest/create" })` |
 | `src/routes/(app)/rag-search` | 2 | — | — | `src_routes__app__rag_search` | `agents_md({ path: "src/routes/(app)/rag-search" })` |
 | `src/routes/(app)/recommendations` | 2 | — | — | `src_routes__app__recommendations` | `agents_md({ path: "src/routes/(app)/recommendations" })` |
 | `src/routes/(app)/reports/[id]` | 3 | — | — | `src_routes__app__reports__id_` | `agents_md({ path: "src/routes/(app)/reports/[id]" })` |
 | `src/routes/(app)/reports/[id]/edit` | 2 | — | — | `src_routes__app__reports__id__edit` | `agents_md({ path: "src/routes/(app)/reports/[id]/edit" })` |
 | `src/routes/(app)/simulation` | 2 | — | — | `src_routes__app__simulation` | `agents_md({ path: "src/routes/(app)/simulation" })` |
-| `src/routes/(app)/terminal` | 3 | — | — | `src_routes__app__terminal` | `agents_md({ path: "src/routes/(app)/terminal" })` |
+| `src/routes/(app)/terminal` | 2 | — | — | `src_routes__app__terminal` | `agents_md({ path: "src/routes/(app)/terminal" })` |
 
 ### `src/routes/(dev)/` (8 dirs)
 
@@ -602,7 +537,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 
-### `src/routes/api/` (672 dirs)
+### `src/routes/api/` (673 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
@@ -626,11 +561,6 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 | `src/routes/register` | 3 | — | — | `src_routes_register` | `agents_md({ path: "src/routes/register" })` |
-
-### `src/shims/` (1 dir)
-
-| Dir | Files | Score | Cluster | KAG slug | Quick tool call |
-|-----|-------|-------|---------|----------|-----------------|
 
 ### `src/src/` (1 dir)
 

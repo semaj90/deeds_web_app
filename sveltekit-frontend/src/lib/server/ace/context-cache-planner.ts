@@ -92,6 +92,7 @@ function estimateTokens(text: string): number {
 function normalizePacket(packet: FeatureWikiPacket): FeatureWikiPacket {
   return {
     ...packet,
+    topFiles: packet.topFiles ?? [],
     topTriples: packet.topTriples ?? packet.topGraphTriples ?? [],
     topGraphTriples: packet.topGraphTriples ?? packet.topTriples ?? [],
     selectedSourceIds: packet.selectedSourceIds ?? [],
