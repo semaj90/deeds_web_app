@@ -1,18 +1,57 @@
 # Subgraph Instruction Programming + KAG/ACE Topology
 
 ## Overview
-This architecture defines an end-to-end legal AI platform in which SvelteKit 2 is the SSR and API gateway, Svelte 5 runes power the UI layer, Bits UI and Superforms/Zod handle interaction and validation, Drizzle/Postgres stores durable truth, and Redis, Qdrant, Neo4j, CouchDB, and gRPC sidecars provide retrieval, graph, cache, and worker capabilities.
+This architecture defines an SSR-first hybrid MPA where SvelteKit 2 is the page and API gateway, Svelte 5 runes power local component reactivity, TypeScript is the implementation language, Bits UI and Superforms v2/Zod handle interaction and validation, Drizzle ORM/Postgres stores durable truth, WebGPU accelerates local visualization and compute paths, and Redis, Qdrant, Neo4j, CouchDB, and gRPC sidecars provide retrieval, graph, cache, and worker capabilities.
 
 ## System Boundary
 - SvelteKit owns browser-facing rendering, route boundaries, server actions, and API orchestration.
 - All durable state changes flow through Postgres via Drizzle.
 - All heavy compute and specialized processing live behind internal sidecars.
 - Retrieval and graph stores are supporting systems, not the source of truth.
+- The UI is hybrid MPA, not a pure SPA: pages are server-rendered first, with client navigation used only where it adds value.
+
+## Rendering and State Model
+This application is an SSR-first hybrid MPA, not a pure SPA.
+
+SvelteKit owns:
+- browser-facing route boundaries
+- server-rendered pages
+- `+page.server.ts` data loading
+- form actions
+- API routes
+- streaming/SSE endpoints
+- invalidation and refresh boundaries
+
+Svelte 5 runes are used for local component reactivity only:
+- `$state` for local mutable UI state
+- `$derived` for local computed values
+- `$effect` for browser-side effects
+- `$props` for component props
+
+Do not describe this as a global rune syncing architecture. State synchronization should flow through SvelteKit server loads, actions, fetches, SSE, and explicit invalidation, not through a client-only sync layer.
+
+Use SPA-like behavior only where the interaction is inherently live or incremental:
+- chat streaming
+- timeline scrubbers
+- video/frame viewers
+- workflow progress panels
+- dashboard live-refresh widgets
+- graph visualizations
+
+Do not turn the full app into a single client shell.
 
 ## Presentation Layer
-- Use Svelte 5 runes for component state, derived state, and side effects.
+- Use Svelte 5 runes for local component state, derived state, and side effects.
+- Do not build a global client sync layer; sync state through SvelteKit loads, actions, and fetches.
 - Use Bits UI for accessible primitives such as dialogs, tabs, selects, tooltips, command inputs, progress, and scroll areas.
 - Keep browser logic minimal and push business rules into server modules.
+
+## Language and UI Stack
+- Use TypeScript across routes, server modules, and shared utilities.
+- Use Superforms v2 with Zod for all form validation and submit workflows.
+- Use Drizzle ORM as the typed database layer over Postgres.
+- Use WebGPU only where GPU-accelerated browser-side rendering or compute is warranted.
+- Keep these tools aligned with SvelteKit's server/client boundary rather than treating them as a standalone app framework.
 
 ## Form and Validation Layer
 - Use Superforms v2 for form state, submit behavior, file uploads, and progressive enhancement.
@@ -29,6 +68,40 @@ This architecture defines an end-to-end legal AI platform in which SvelteKit 2 i
 - Qdrant stores embeddings and vector search candidates.
 - Neo4j handles relationship traversal, topology expansion, and multi-hop graph reasoning.
 - CouchDB stores document-shaped ACE artifacts and flexible envelopes where versioned structure is useful.
+
+## Feature Map Context
+These are the contextual chunks to keep aligned with codebase indexing and GraphRAG-style verification:
+- `src/routes/(app)/codebase-graph/+page.svelte` and `src/routes/(app)/code-intel/+page.svelte` for the user-facing code intelligence surfaces.
+- `src/lib/server/ace/context-assembler.ts` and `src/lib/server/ace/retrieval-lanes.ts` for the ACE orchestration spine.
+- `src/lib/server/ace/graph-expander.ts` for import-graph expansion and compact neighborhood context.
+- `src/lib/server/retrieval/graph-context.ts`, `src/lib/server/retrieval/manifold4-search.ts`, and `src/lib/server/graph/community-graph.ts` for graph-backed retrieval.
+- `src/routes/api/codebase-index/deep-research/+server.ts`, `src/routes/api/vector-search/+server.ts`, `src/routes/api/search/+server.ts`, and `src/routes/api/topology/+server.ts` for exposed retrieval and topology entry points.
+- `src/lib/server/db/schema/features.ts` and `src/lib/server/db/schema/metadata-spine.ts` for persisted feature and retrieval metadata.
+
+## Subgraph Rules
+The subgraph instruction model should carry explicit rendering metadata so verification can distinguish local UI reactivity from synchronization boundaries.
+
+```ts
+renderingModel: 'ssr_hybrid_mpa';
+reactivityModel: 'svelte5_runes_local';
+syncBoundary: 'sveltekit_load_actions_fetch_sse';
+```
+
+Example:
+
+```json
+{
+  "key": "ui.evidence_upload",
+  "renderingModel": "ssr_hybrid_mpa",
+  "reactivityModel": "svelte5_runes_local",
+  "syncBoundary": "sveltekit_load_actions_fetch_sse",
+  "blockedPatterns": [
+    "global rune syncing",
+    "client-only evidence mutation",
+    "browser-direct database writes"
+  ]
+}
+```
 
 ## Sidecar Layer
 - gRPC is the internal contract for workers and compute services.
@@ -62,6 +135,28 @@ This architecture defines an end-to-end legal AI platform in which SvelteKit 2 i
 - Keep API routes thin and explicit.
 - Treat retrieval artifacts as derived outputs that can be rebuilt.
 - Add smoke coverage for UI, API, retrieval, and sidecar paths before expanding surface area.
+- During verification, cross-check the feature map above against the latest codebase indexing output so the spec stays synchronized with reality.
+
+## Verification Criteria
+The architecture is correct when:
+- `+page.server.ts` loads durable page data.
+- `+page.svelte` uses runes for local UI state.
+- Form actions or `+server.ts` perform mutations.
+- Superforms and Zod validate form data.
+- Postgres stores truth.
+- Redis caches hot packets.
+- Qdrant and Neo4j retrieve context.
+- Gemma4 receives compact ACE/KAG packets.
+- UI updates through `invalidate()`, polling, or SSE.
+
+The architecture is wrong when:
+- browser state becomes the source of truth.
+- runes are used as global app sync.
+- Gemma4 directly mutates DB or search stores.
+- components bypass server actions for durable writes.
+- agent patches are applied without operator approval.
+
+Final wording: `SvelteKit SSR-first hybrid MPA with Svelte 5 runes for local component reactivity.`
 
 ## Companion Artifact
 - Implementation TODO: `docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md`
