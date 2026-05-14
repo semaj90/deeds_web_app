@@ -18,7 +18,7 @@ export interface MultiLaneQuery {
 }
 
 export interface LaneResult {
-	lane: 'hash' | 'sparse' | 'graph' | 'ace_cache' | 'symbol' | 'dense' | 'topology' | 'wiki' | 'error' | 'task' | 'research' | 'web_search' | 'cartridge';
+	lane: 'hash' | 'sparse' | 'graph' | 'ace_cache' | 'symbol' | 'dense' | 'topology' | 'wiki' | 'error' | 'task' | 'research' | 'web_search' | 'cartridge' | 'summary';
 	hits: MultiLaneHit[];
 	latencyMs: number;
 	cacheHit: boolean;
@@ -735,20 +735,22 @@ export async function multiLaneSearch(
 	const t0 = Date.now();
 	const queryHash = qHash(query.text);
 
-	const [hashResult, sparseResult, graphResult, aceCacheResult, symbolResult, denseResult, topologyResult, wikiResult, errorResult, taskResult, researchResult, webSearchResult] = await Promise.allSettled([
-		runHashLane(redis, pool, query),
-		runSparseLane(pool, query),
-		runGraphLane(redis, query),
-		runAceCacheLane(redis, queryHash),
-		runSymbolLane(redis, query),
-		runDenseLane(query),
-		Promise.resolve(runTopologyLane(query)),
-		runWikiLane(redis, query),
-		runErrorLane(pool, query),
-		runTaskLane(pool, query),
-		runResearchLane(pool, query),
-		runWebSearchLane(query),
-	]);
+	const [hashResult, sparseResult, graphResult, aceCacheResult, symbolResult, denseResult, topologyResult, wikiResult, errorResult, taskResult, researchResult, webSearchResult, summaryResult] =
+		await Promise.allSettled([
+			runHashLane(redis, pool, query),
+			runSparseLane(pool, query),
+			runGraphLane(redis, query),
+			runAceCacheLane(redis, queryHash),
+			runSymbolLane(pool, query),
+			runDenseLane(query),
+			runTopologyLane(redis, query),
+			runWikiLane(pool, query),
+			runErrorLane(pool, query),
+			runTaskLane(pool, query),
+			runResearchLane(pool, query),
+			runWebSearchLane(query),
+			runSummaryLane(query),
+		]);
 
 	const lanes: LaneResult[] = [];
 
@@ -801,7 +803,12 @@ export async function multiLaneSearch(
 			? webSearchResult.value
 			: { lane: 'web_search' as const, hits: [], latencyMs: 0, cacheHit: false };
 
-	lanes.push(resolvedHash, resolvedSparse, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedDense, resolvedTopology, resolvedWiki, resolvedError, resolvedTask, resolvedResearch, resolvedWebSearch);
+	const resolvedSummary =
+		summaryResult.status === 'fulfilled'
+			? summaryResult.value
+			: { lane: 'summary' as const, hits: [], latencyMs: 0, cacheHit: false };
+
+	lanes.push(resolvedHash, resolvedSparse, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedDense, resolvedTopology, resolvedWiki, resolvedError, resolvedTask, resolvedResearch, resolvedWebSearch, resolvedSummary);
 
 	const rrfMerged = mergeAndRank(lanes);
 	// Optional cross-encoder rerank pass (gated behind MULTILANE_CROSS_ENCODER_ENABLED).

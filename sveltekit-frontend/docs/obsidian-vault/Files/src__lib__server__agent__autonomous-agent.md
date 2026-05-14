@@ -4,7 +4,7 @@ path: "src/lib/server/agent/autonomous-agent.ts"
 aliases: ["autonomous-agent.ts","src/lib/server/agent/autonomous-agent.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 1494
+lineCount: 1536
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,9 +12,9 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: true
-importCount: 13
+importCount: 14
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/agent/autonomous-agent.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 > LangChain Autonomous Agent with FastMCP Tool Integration
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 1494
+lines:: 1536
 ## Summary
 
 LangChain Autonomous Agent with FastMCP Tool Integration

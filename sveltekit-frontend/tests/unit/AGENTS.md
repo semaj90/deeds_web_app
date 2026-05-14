@@ -1,14 +1,14 @@
 # AGENTS.md — `tests/unit`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-13T22:18:48.377Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-14T00:50:41.701Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/unit
 
 ## Snapshot
 
-- module directory with 8 files, 0 API handlers
-- Audit score: **90/100**
+- module directory with 8 files, 0 API handlers, 1 Drizzle refs
+- Audit score: **100/100**
 - no audit signals
 - Tags: `tests` `unit` `agents-md-quick-hit.test.ts` `zod` `test` `board-persistence-server.test.ts`
 

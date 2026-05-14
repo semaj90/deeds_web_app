@@ -4,7 +4,7 @@ path: "tests/retrieval-path-wiring.spec.ts"
 aliases: ["retrieval-path-wiring.spec.ts","tests/retrieval-path-wiring.spec.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 608
+lineCount: 638
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 1
 embedding_id: "qdrant://codebase_chunks_768/tests/retrieval-path-wiring.spec.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","test","t/ts","t/tests","t/retrieval-path-wiring_spec_ts"
 > Retrieval Path Wiring Tests
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 608
+lines:: 638
 ## Summary
 
 Retrieval Path Wiring Tests

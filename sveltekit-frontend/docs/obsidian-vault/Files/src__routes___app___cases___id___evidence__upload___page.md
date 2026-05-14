@@ -4,7 +4,7 @@ path: "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte"
 aliases: ["+page.svelte","src/routes/(app)/cases/[id]/evidence/upload/+page.svelte"]
 clusterId: -1
 ext: ".svelte"
-lineCount: 599
+lineCount: 603
 pagerank: 0
 blend: 0
 isRoute: true
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 4
 embedding_id: "qdrant://codebase_chunks_768/src/routes/(app)/cases/[id]/evidence/upload/+page.svelte"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/svelte","route","svelte","auth","zod","t/svelte","t/src","t/r
 > Scan a text-based file for PII before upload
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 599
+lines:: 603
 ## Summary
 
 Scan a text-based file for PII before upload

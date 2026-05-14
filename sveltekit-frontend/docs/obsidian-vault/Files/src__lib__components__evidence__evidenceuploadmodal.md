@@ -4,7 +4,7 @@ path: "src/lib/components/evidence/EvidenceUploadModal.svelte"
 aliases: ["EvidenceUploadModal.svelte","src/lib/components/evidence/EvidenceUploadModal.svelte"]
 clusterId: -1
 ext: ".svelte"
-lineCount: 649
+lineCount: 657
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/components/evidence/EvidenceUploadModal.svelte"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "medium"
 up: []
@@ -24,10 +24,10 @@ tags: ["file","ext/svelte","svelte","t/svelte","t/src","t/lib"]
 
 # `src/lib/components/evidence/EvidenceUploadModal.svelte`
 ## For future Claude
-> .svelte at src/lib/components/evidence/EvidenceUploadModal.svelte (649 lines), Svelte component.
+> .svelte at src/lib/components/evidence/EvidenceUploadModal.svelte (657 lines), Svelte component.
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 649
+lines:: 657
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;

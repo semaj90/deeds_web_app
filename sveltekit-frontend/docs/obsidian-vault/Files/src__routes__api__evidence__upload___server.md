@@ -4,7 +4,7 @@ path: "src/routes/api/evidence/upload/+server.ts"
 aliases: ["+server.ts","src/routes/api/evidence/upload/+server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 2353
+lineCount: 2376
 pagerank: 0
 blend: 0
 isRoute: true
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 30
 embedding_id: "qdrant://codebase_chunks_768/src/routes/api/evidence/upload/+server.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","route","auth","zod","t/ts","t/src","t/routes"]
 > Min text length before we try OCR fallback for scanned PDFs
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 2353
+lines:: 2376
 ## Summary
 
 Min text length before we try OCR fallback for scanned PDFs

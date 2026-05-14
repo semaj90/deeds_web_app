@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "generated_at": "2026-05-13T18:30:11.087Z",
+  "generated_at": "2026-05-14T00:55:53.533Z",
   "hours_window": 168,
   "schema": [
     "f",
@@ -62998,7 +62998,7 @@
       0,
       0,
       0,
-      "src/lib/components/ui",
+      "src/lib/components/ui/enhanced-bits",
       0,
       6,
       0
@@ -63012,7 +63012,7 @@
       0,
       0,
       0,
-      "src/lib/components/ui",
+      "src/lib/components/ui/enhanced-bits",
       0,
       6,
       0
@@ -88408,7 +88408,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]",
       0,
       6,
       0
@@ -88436,7 +88436,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]",
       0,
       6,
       0
@@ -88478,7 +88478,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/(analysis)@/document-analysis/[evidenceId]",
       0,
       6,
       0
@@ -88506,7 +88506,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/(analysis)@/document-analysis/[evidenceId]",
       0,
       6,
       0
@@ -88534,7 +88534,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/(analysis)@",
       0,
       6,
       0
@@ -88562,7 +88562,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/(analysis)@",
       0,
       6,
       0
@@ -88604,7 +88604,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/(analysis)@/video-analysis/[evidenceId]",
       0,
       6,
       0
@@ -88632,7 +88632,7 @@
       0,
       0,
       0,
-      "src/routes",
+      "src/routes/(analysis)@/video-analysis/[evidenceId]",
       0,
       6,
       0
@@ -101092,7 +101092,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/admin/ai-dashboard",
+      "src/routes/(app)/admin/ai-dashboard/operator",
       0,
       6,
       0
@@ -101106,7 +101106,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/admin/ai-dashboard",
+      "src/routes/(app)/admin/ai-dashboard/operator",
       0,
       6,
       0
@@ -103010,7 +103010,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/cases/[id]",
+      "src/routes/(app)/cases/[id]/chat",
       0,
       6,
       0
@@ -103024,7 +103024,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/cases/[id]",
+      "src/routes/(app)/cases/[id]/chat",
       0,
       6,
       0
@@ -103332,7 +103332,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/cases/[id]",
+      "src/routes/(app)/cases/[id]/persons",
       0,
       6,
       0
@@ -103346,7 +103346,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/cases/[id]",
+      "src/routes/(app)/cases/[id]/persons",
       0,
       6,
       0
@@ -104508,7 +104508,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ace-pipeline",
       0,
       6,
       0
@@ -104522,7 +104522,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ace-pipeline",
       0,
       6,
       0
@@ -104536,7 +104536,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/agent-chat",
       0,
       6,
       0
@@ -104550,7 +104550,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/agent-chat",
       0,
       6,
       0
@@ -104690,7 +104690,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ai-assistant",
       0,
       6,
       0
@@ -104704,7 +104704,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ai-assistant",
       0,
       6,
       0
@@ -104718,7 +104718,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ai-chat-test",
       0,
       6,
       0
@@ -104732,7 +104732,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ai-chat-test",
       0,
       6,
       0
@@ -104746,7 +104746,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ai-file-upload",
       0,
       6,
       0
@@ -104760,7 +104760,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ai-file-upload",
       0,
       6,
       0
@@ -104774,7 +104774,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ask-ai",
       0,
       6,
       0
@@ -104788,7 +104788,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ask-ai",
       0,
       6,
       0
@@ -104802,7 +104802,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -104816,7 +104816,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/bits-ui",
       0,
       6,
       0
@@ -104830,7 +104830,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/bits-ui",
       0,
       6,
       0
@@ -104844,7 +104844,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/cache",
       0,
       6,
       0
@@ -104858,7 +104858,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/cache",
       0,
       6,
       0
@@ -104872,7 +104872,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/case-form",
       0,
       6,
       0
@@ -104886,7 +104886,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/case-form",
       0,
       6,
       0
@@ -104900,7 +104900,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -104914,7 +104914,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -104928,7 +104928,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/celestial-icons",
       0,
       6,
       0
@@ -104942,7 +104942,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/celestial-icons",
       0,
       6,
       0
@@ -104956,7 +104956,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/chat-messages",
       0,
       6,
       0
@@ -104970,7 +104970,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/chat-messages",
       0,
       6,
       0
@@ -104984,7 +104984,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -104998,7 +104998,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/citation-tools",
       0,
       6,
       0
@@ -105012,7 +105012,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/citation-tools",
       0,
       6,
       0
@@ -105026,7 +105026,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/client-ai-chat",
       0,
       6,
       0
@@ -105040,7 +105040,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/client-ai-chat",
       0,
       6,
       0
@@ -105054,7 +105054,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/client-inference",
       0,
       6,
       0
@@ -105068,7 +105068,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/client-inference",
       0,
       6,
       0
@@ -105082,7 +105082,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -105096,7 +105096,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/collab-canvas",
       0,
       6,
       0
@@ -105110,7 +105110,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/collab-canvas",
       0,
       6,
       0
@@ -105124,7 +105124,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/context-menu",
       0,
       6,
       0
@@ -105138,7 +105138,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/context-menu",
       0,
       6,
       0
@@ -105152,7 +105152,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/contextual-chat",
       0,
       6,
       0
@@ -105166,7 +105166,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/contextual-chat",
       0,
       6,
       0
@@ -105292,7 +105292,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/detective-command",
       0,
       6,
       0
@@ -105306,7 +105306,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/detective-command",
       0,
       6,
       0
@@ -105320,7 +105320,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/dialog-wrapper",
       0,
       6,
       0
@@ -105334,7 +105334,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/dialog-wrapper",
       0,
       6,
       0
@@ -105348,7 +105348,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -105362,7 +105362,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/embedding-stream",
       0,
       6,
       0
@@ -105376,7 +105376,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/embedding-stream",
       0,
       6,
       0
@@ -105390,7 +105390,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/enhanced-upload",
       0,
       6,
       0
@@ -105404,7 +105404,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/enhanced-upload",
       0,
       6,
       0
@@ -105418,7 +105418,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/evidence-canvas",
       0,
       6,
       0
@@ -105432,7 +105432,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/evidence-canvas",
       0,
       6,
       0
@@ -105446,7 +105446,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/evidence-dashboard",
       0,
       6,
       0
@@ -105460,7 +105460,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/evidence-dashboard",
       0,
       6,
       0
@@ -105474,7 +105474,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/evidence-form",
       0,
       6,
       0
@@ -105488,7 +105488,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/evidence-form",
       0,
       6,
       0
@@ -105502,7 +105502,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/gpu-cache",
       0,
       6,
       0
@@ -105516,7 +105516,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/gpu-cache",
       0,
       6,
       0
@@ -105530,7 +105530,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/hover-card",
       0,
       6,
       0
@@ -105544,7 +105544,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/hover-card",
       0,
       6,
       0
@@ -105558,7 +105558,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -105572,7 +105572,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -105586,7 +105586,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/keyboard-shortcuts",
       0,
       6,
       0
@@ -105600,7 +105600,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/keyboard-shortcuts",
       0,
       6,
       0
@@ -105614,7 +105614,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -105628,7 +105628,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/legal-layout",
       0,
       6,
       0
@@ -105642,7 +105642,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/legal-layout",
       0,
       6,
       0
@@ -105656,7 +105656,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/legal-spellbook",
       0,
       6,
       0
@@ -105670,7 +105670,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/legal-spellbook",
       0,
       6,
       0
@@ -105726,7 +105726,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/modals",
       0,
       6,
       0
@@ -105740,7 +105740,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/modals",
       0,
       6,
       0
@@ -105754,7 +105754,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/modular-upload",
       0,
       6,
       0
@@ -105768,7 +105768,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/modular-upload",
       0,
       6,
       0
@@ -105782,7 +105782,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -105796,7 +105796,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -105894,7 +105894,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/nes-toast",
       0,
       6,
       0
@@ -105908,7 +105908,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/nes-toast",
       0,
       6,
       0
@@ -105922,7 +105922,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/nier-showcase",
       0,
       6,
       0
@@ -105936,7 +105936,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/nier-showcase",
       0,
       6,
       0
@@ -105950,7 +105950,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/notifications",
       0,
       6,
       0
@@ -105964,7 +105964,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/notifications",
       0,
       6,
       0
@@ -105978,7 +105978,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -105992,7 +105992,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106006,7 +106006,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106020,7 +106020,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106034,7 +106034,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/phantom-code-lab",
       0,
       6,
       0
@@ -106048,7 +106048,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/phantom-code-lab",
       0,
       6,
       0
@@ -106062,7 +106062,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/prosecutor-dashboard",
       0,
       6,
       0
@@ -106076,7 +106076,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/prosecutor-dashboard",
       0,
       6,
       0
@@ -106090,7 +106090,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106104,7 +106104,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106118,7 +106118,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/rich-text-editor",
       0,
       6,
       0
@@ -106132,7 +106132,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/rich-text-editor",
       0,
       6,
       0
@@ -106146,7 +106146,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/search-tools",
       0,
       6,
       0
@@ -106160,7 +106160,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/search-tools",
       0,
       6,
       0
@@ -106174,7 +106174,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106188,7 +106188,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/source-drawer",
       0,
       6,
       0
@@ -106202,7 +106202,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/source-drawer",
       0,
       6,
       0
@@ -106216,7 +106216,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106230,7 +106230,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/stats-panel",
       0,
       6,
       0
@@ -106244,7 +106244,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/stats-panel",
       0,
       6,
       0
@@ -106258,7 +106258,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/streaming",
       0,
       6,
       0
@@ -106272,7 +106272,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/streaming",
       0,
       6,
       0
@@ -106328,7 +106328,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/svelte5-primitives",
       0,
       6,
       0
@@ -106342,7 +106342,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/svelte5-primitives",
       0,
       6,
       0
@@ -106356,7 +106356,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/synthesis-chat",
       0,
       6,
       0
@@ -106370,7 +106370,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/synthesis-chat",
       0,
       6,
       0
@@ -106384,7 +106384,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/theory-board",
       0,
       6,
       0
@@ -106398,7 +106398,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/theory-board",
       0,
       6,
       0
@@ -106412,7 +106412,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/toc-reader",
       0,
       6,
       0
@@ -106426,7 +106426,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/toc-reader",
       0,
       6,
       0
@@ -106440,7 +106440,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ui-components",
       0,
       6,
       0
@@ -106454,7 +106454,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/ui-components",
       0,
       6,
       0
@@ -106468,7 +106468,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106482,7 +106482,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos",
       0,
       6,
       0
@@ -106496,7 +106496,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/webgpu-memory-palace",
       0,
       6,
       0
@@ -106510,7 +106510,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/webgpu-memory-palace",
       0,
       6,
       0
@@ -106524,7 +106524,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/webgpu-showcase",
       0,
       6,
       0
@@ -106538,7 +106538,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/webgpu-showcase",
       0,
       6,
       0
@@ -106552,7 +106552,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/yorha-assistant",
       0,
       6,
       0
@@ -106566,7 +106566,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/yorha-assistant",
       0,
       6,
       0
@@ -106692,7 +106692,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/dashboard",
       0,
       6,
       0
@@ -106706,7 +106706,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/dashboard",
       0,
       6,
       0
@@ -106720,7 +106720,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/dashboard",
       0,
       6,
       0
@@ -106734,7 +106734,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/dashboard",
       0,
       6,
       0
@@ -106916,7 +106916,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/_simulations",
       0,
       6,
       0
@@ -106930,7 +106930,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/_simulations",
       0,
       6,
       0
@@ -106944,7 +106944,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/_simulations",
       0,
       6,
       0
@@ -106958,7 +106958,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/_simulations",
       0,
       6,
       0
@@ -106972,7 +106972,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/_simulations",
       0,
       6,
       0
@@ -106986,7 +106986,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/demos/yorha/components",
+      "src/routes/(app)/demos/yorha/components/_simulations",
       0,
       6,
       0
@@ -107154,7 +107154,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/yorha-icons",
       0,
       6,
       0
@@ -107168,7 +107168,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/yorha-icons",
       0,
       6,
       0
@@ -107182,7 +107182,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/yorha",
       0,
       6,
       0
@@ -107196,7 +107196,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/yorha",
       0,
       6,
       0
@@ -107210,7 +107210,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/yorha-terminal",
       0,
       6,
       0
@@ -107224,7 +107224,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/demos/yorha-terminal",
       0,
       6,
       0
@@ -107266,7 +107266,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/evidence",
+      "src/routes/(app)/evidence/analyze",
       0,
       6,
       0
@@ -107280,7 +107280,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/evidence",
+      "src/routes/(app)/evidence/analyze",
       0,
       6,
       0
@@ -107294,7 +107294,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/evidence",
+      "src/routes/(app)/evidence/hash",
       0,
       6,
       0
@@ -107308,7 +107308,7 @@
       0,
       0,
       0,
-      "src/routes/(app)/evidence",
+      "src/routes/(app)/evidence/hash",
       0,
       6,
       0
@@ -107728,7 +107728,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/global-search",
       0,
       6,
       0
@@ -107742,7 +107742,7 @@
       0,
       0,
       0,
-      "src/routes/(app)",
+      "src/routes/(app)/global-search",
       0,
       6,
       0
@@ -125446,8 +125446,6 @@
         4495,
         4496,
         4497,
-        4498,
-        4499,
         4500,
         4501,
         4502,
@@ -125592,6 +125590,10 @@
         4487,
         4489,
         4490
+      ],
+      "src/lib/components/ui/enhanced-bits": [
+        4498,
+        4499
       ],
       "src/lib/components/ui/gaming/8bit": [
         4508,
@@ -127551,14 +127553,6 @@
       ],
       "src/routes": [
         6309,
-        6313,
-        6315,
-        6318,
-        6320,
-        6322,
-        6324,
-        6327,
-        6329,
         6330,
         6331,
         6332,
@@ -128463,15 +128457,31 @@
         6312,
         6314
       ],
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]": [
+        6313,
+        6315
+      ],
       "src/routes/(analysis)/document-analysis/[evidenceId]": [
         6316,
         6317,
         6319
       ],
+      "src/routes/(analysis)@/document-analysis/[evidenceId]": [
+        6318,
+        6320
+      ],
+      "src/routes/(analysis)@": [
+        6322,
+        6324
+      ],
       "src/routes/(analysis)/video-analysis/[evidenceId]": [
         6325,
         6326,
         6328
+      ],
+      "src/routes/(analysis)@/video-analysis/[evidenceId]": [
+        6327,
+        6329
       ],
       "src/routes/api/codebase-index/deep-research": [
         6601,
@@ -128494,134 +128504,7 @@
         7330,
         7341,
         7422,
-        7463,
-        7464,
-        7465,
-        7466,
-        7476,
-        7477,
-        7478,
-        7479,
-        7480,
-        7481,
-        7482,
-        7483,
-        7484,
-        7485,
-        7486,
-        7487,
-        7488,
-        7489,
-        7490,
-        7491,
-        7492,
-        7493,
-        7494,
-        7495,
-        7496,
-        7497,
-        7498,
-        7499,
-        7500,
-        7501,
-        7502,
-        7503,
-        7504,
-        7505,
-        7506,
-        7507,
-        7508,
-        7509,
-        7510,
-        7519,
-        7520,
-        7521,
-        7522,
-        7523,
-        7524,
-        7525,
-        7526,
-        7527,
-        7528,
-        7529,
-        7530,
-        7531,
-        7532,
-        7533,
-        7534,
-        7535,
-        7536,
-        7537,
-        7538,
-        7539,
-        7540,
-        7541,
-        7542,
-        7543,
-        7544,
-        7545,
-        7546,
-        7550,
-        7551,
-        7552,
-        7553,
-        7554,
-        7555,
-        7562,
-        7563,
-        7564,
-        7565,
-        7566,
-        7567,
-        7568,
-        7569,
-        7570,
-        7571,
-        7572,
-        7573,
-        7574,
-        7575,
-        7576,
-        7577,
-        7578,
-        7579,
-        7580,
-        7581,
-        7582,
-        7583,
-        7584,
-        7585,
-        7586,
-        7587,
-        7588,
-        7589,
-        7593,
-        7594,
-        7595,
-        7596,
-        7597,
-        7598,
-        7599,
-        7600,
-        7601,
-        7602,
-        7603,
-        7604,
-        7605,
-        7606,
-        7607,
-        7608,
-        7609,
-        7610,
-        7652,
-        7653,
-        7654,
-        7655,
-        7656,
-        7657,
         7658,
-        7693,
-        7694,
         7695,
         7696,
         7697,
@@ -128640,8 +128523,6 @@
       ],
       "src/routes/(app)/admin/ai-dashboard": [
         7215,
-        7219,
-        7220,
         7221,
         7222,
         7223
@@ -128650,6 +128531,10 @@
         7216,
         7217,
         7218
+      ],
+      "src/routes/(app)/admin/ai-dashboard/operator": [
+        7219,
+        7220
       ],
       "src/routes/(app)/admin/all-routes": [
         7224,
@@ -128825,16 +128710,12 @@
       ],
       "src/routes/(app)/cases/[id]": [
         7343,
-        7356,
-        7357,
         7365,
         7366,
         7367,
         7376,
         7377,
-        7378,
-        7379,
-        7380
+        7378
       ],
       "src/routes/(app)/cases/[id]/ai": [
         7344,
@@ -128853,6 +128734,10 @@
         7353,
         7354,
         7355
+      ],
+      "src/routes/(app)/cases/[id]/chat": [
+        7356,
+        7357
       ],
       "src/routes/(app)/cases/[id]/evidence": [
         7358,
@@ -128876,6 +128761,10 @@
         7373,
         7374,
         7375
+      ],
+      "src/routes/(app)/cases/[id]/persons": [
+        7379,
+        7380
       ],
       "src/routes/(app)/cases/[id]/reports": [
         7381,
@@ -128999,6 +128888,14 @@
       "src/routes/(app)/dashboard": [
         7462
       ],
+      "src/routes/(app)/demos/ace-pipeline": [
+        7463,
+        7464
+      ],
+      "src/routes/(app)/demos/agent-chat": [
+        7465,
+        7466
+      ],
       "src/routes/(app)/demos/agentic-errors": [
         7467,
         7471,
@@ -129012,6 +128909,89 @@
         7469,
         7470
       ],
+      "src/routes/(app)/demos/ai-assistant": [
+        7476,
+        7477
+      ],
+      "src/routes/(app)/demos/ai-chat-test": [
+        7478,
+        7479
+      ],
+      "src/routes/(app)/demos/ai-file-upload": [
+        7480,
+        7481
+      ],
+      "src/routes/(app)/demos/ask-ai": [
+        7482,
+        7483
+      ],
+      "src/routes/(app)/demos": [
+        7484,
+        7491,
+        7492,
+        7497,
+        7504,
+        7523,
+        7538,
+        7539,
+        7542,
+        7554,
+        7555,
+        7568,
+        7569,
+        7570,
+        7571,
+        7576,
+        7577,
+        7582,
+        7585,
+        7603,
+        7604
+      ],
+      "src/routes/(app)/demos/bits-ui": [
+        7485,
+        7486
+      ],
+      "src/routes/(app)/demos/cache": [
+        7487,
+        7488
+      ],
+      "src/routes/(app)/demos/case-form": [
+        7489,
+        7490
+      ],
+      "src/routes/(app)/demos/celestial-icons": [
+        7493,
+        7494
+      ],
+      "src/routes/(app)/demos/chat-messages": [
+        7495,
+        7496
+      ],
+      "src/routes/(app)/demos/citation-tools": [
+        7498,
+        7499
+      ],
+      "src/routes/(app)/demos/client-ai-chat": [
+        7500,
+        7501
+      ],
+      "src/routes/(app)/demos/client-inference": [
+        7502,
+        7503
+      ],
+      "src/routes/(app)/demos/collab-canvas": [
+        7505,
+        7506
+      ],
+      "src/routes/(app)/demos/context-menu": [
+        7507,
+        7508
+      ],
+      "src/routes/(app)/demos/contextual-chat": [
+        7509,
+        7510
+      ],
       "src/routes/(app)/demos/courtroom-sim": [
         7511,
         7512,
@@ -129024,10 +129004,66 @@
         7517,
         7518
       ],
+      "src/routes/(app)/demos/detective-command": [
+        7519,
+        7520
+      ],
+      "src/routes/(app)/demos/dialog-wrapper": [
+        7521,
+        7522
+      ],
+      "src/routes/(app)/demos/embedding-stream": [
+        7524,
+        7525
+      ],
+      "src/routes/(app)/demos/enhanced-upload": [
+        7526,
+        7527
+      ],
+      "src/routes/(app)/demos/evidence-canvas": [
+        7528,
+        7529
+      ],
+      "src/routes/(app)/demos/evidence-dashboard": [
+        7530,
+        7531
+      ],
+      "src/routes/(app)/demos/evidence-form": [
+        7532,
+        7533
+      ],
+      "src/routes/(app)/demos/gpu-cache": [
+        7534,
+        7535
+      ],
+      "src/routes/(app)/demos/hover-card": [
+        7536,
+        7537
+      ],
+      "src/routes/(app)/demos/keyboard-shortcuts": [
+        7540,
+        7541
+      ],
+      "src/routes/(app)/demos/legal-layout": [
+        7543,
+        7544
+      ],
+      "src/routes/(app)/demos/legal-spellbook": [
+        7545,
+        7546
+      ],
       "src/routes/(app)/demos/memory-palace": [
         7547,
         7548,
         7549
+      ],
+      "src/routes/(app)/demos/modals": [
+        7550,
+        7551
+      ],
+      "src/routes/(app)/demos/modular-upload": [
+        7552,
+        7553
       ],
       "src/routes/(app)/demos/nes-graph": [
         7556,
@@ -129039,20 +129075,88 @@
         7560,
         7561
       ],
+      "src/routes/(app)/demos/nes-toast": [
+        7562,
+        7563
+      ],
+      "src/routes/(app)/demos/nier-showcase": [
+        7564,
+        7565
+      ],
+      "src/routes/(app)/demos/notifications": [
+        7566,
+        7567
+      ],
+      "src/routes/(app)/demos/phantom-code-lab": [
+        7572,
+        7573
+      ],
+      "src/routes/(app)/demos/prosecutor-dashboard": [
+        7574,
+        7575
+      ],
+      "src/routes/(app)/demos/rich-text-editor": [
+        7578,
+        7579
+      ],
+      "src/routes/(app)/demos/search-tools": [
+        7580,
+        7581
+      ],
+      "src/routes/(app)/demos/source-drawer": [
+        7583,
+        7584
+      ],
+      "src/routes/(app)/demos/stats-panel": [
+        7586,
+        7587
+      ],
+      "src/routes/(app)/demos/streaming": [
+        7588,
+        7589
+      ],
       "src/routes/(app)/demos/svelte5-components": [
         7590,
         7591,
         7592
+      ],
+      "src/routes/(app)/demos/svelte5-primitives": [
+        7593,
+        7594
+      ],
+      "src/routes/(app)/demos/synthesis-chat": [
+        7595,
+        7596
+      ],
+      "src/routes/(app)/demos/theory-board": [
+        7597,
+        7598
+      ],
+      "src/routes/(app)/demos/toc-reader": [
+        7599,
+        7600
+      ],
+      "src/routes/(app)/demos/ui-components": [
+        7601,
+        7602
+      ],
+      "src/routes/(app)/demos/webgpu-memory-palace": [
+        7605,
+        7606
+      ],
+      "src/routes/(app)/demos/webgpu-showcase": [
+        7607,
+        7608
+      ],
+      "src/routes/(app)/demos/yorha-assistant": [
+        7609,
+        7610
       ],
       "src/routes/(app)/demos/yorha/components": [
         7611,
         7616,
         7617,
         7618,
-        7619,
-        7620,
-        7621,
-        7622,
         7623,
         7624,
         7626,
@@ -129060,12 +129164,6 @@
         7632,
         7633,
         7634,
-        7635,
-        7636,
-        7637,
-        7638,
-        7639,
-        7640,
         7641,
         7642,
         7643,
@@ -129084,6 +129182,12 @@
         7614,
         7615
       ],
+      "src/routes/(app)/demos/yorha/components/dashboard": [
+        7619,
+        7620,
+        7621,
+        7622
+      ],
       "src/routes/(app)/demos/yorha/components/evidence": [
         7625,
         7627,
@@ -129091,12 +129195,28 @@
         7629,
         7630
       ],
+      "src/routes/(app)/demos/yorha/components/_simulations": [
+        7635,
+        7636,
+        7637,
+        7638,
+        7639,
+        7640
+      ],
+      "src/routes/(app)/demos/yorha-icons": [
+        7652,
+        7653
+      ],
+      "src/routes/(app)/demos/yorha": [
+        7654,
+        7655
+      ],
+      "src/routes/(app)/demos/yorha-terminal": [
+        7656,
+        7657
+      ],
       "src/routes/(app)/evidence": [
         7659,
-        7660,
-        7661,
-        7662,
-        7663,
         7664,
         7672,
         7673,
@@ -129105,6 +129225,14 @@
         7680,
         7681,
         7682
+      ],
+      "src/routes/(app)/evidence/analyze": [
+        7660,
+        7661
+      ],
+      "src/routes/(app)/evidence/hash": [
+        7662,
+        7663
       ],
       "src/routes/(app)/evidence-library": [
         7665,
@@ -129138,6 +129266,10 @@
         7688,
         7689,
         7690
+      ],
+      "src/routes/(app)/global-search": [
+        7693,
+        7694
       ],
       "src/routes/(app)/legal-corpus": [
         7700,
@@ -129308,9 +129440,9 @@
     "files": 7843,
     "clusters": 154,
     "topo_classes": 8,
-    "agents_dirs": 279,
+    "agents_dirs": 345,
     "with_authority": 0,
     "with_hits": 0,
-    "build_ms": 14834
+    "build_ms": 5223
   }
 }

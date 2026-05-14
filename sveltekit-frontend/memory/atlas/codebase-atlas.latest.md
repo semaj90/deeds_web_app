@@ -1,6 +1,6 @@
 # Directory Atlas Recommendations
 
-> Generated: 2026-05-13T18:30:11.087Z · 1135 directories · 7843 files
+> Generated: 2026-05-14T00:55:53.533Z · 1135 directories · 7843 files
 
 ## `src/lib/server/db`
 
@@ -16,7 +16,7 @@
 
 - Rank: **0.336** · files=91 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0 avg=0, PageRank max=0, Karpathy blend=2.376
+- Authority max=0 avg=0, PageRank max=0, Karpathy blend=2.377
 - Topo classes: `unclassified`
 - Clusters: `gpu:39`, `general`, `gpu:32`, `gpu:64`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
@@ -26,7 +26,7 @@
 
 - Rank: **0.273** · files=14 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/config/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0 avg=0, PageRank max=0, Karpathy blend=1.274
+- Authority max=0 avg=0, PageRank max=0, Karpathy blend=1.275
 - Topo classes: `unclassified`, `graph-gpu-topology`
 - Clusters: `general`, `gpu:75`, `gpu:72`, `gpu:87`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
@@ -36,7 +36,7 @@
 
 - Rank: **0.249** · files=54 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/ai/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0 avg=0, PageRank max=0, Karpathy blend=0.862
+- Authority max=0 avg=0, PageRank max=0, Karpathy blend=0.863
 - Topo classes: `unclassified`
 - Clusters: `general`, `gpu:94`, `gpu:9`, `gpu:72`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`

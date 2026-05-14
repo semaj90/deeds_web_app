@@ -4,7 +4,7 @@ path: "src/lib/server/gpu/libtorch-bridge.ts"
 aliases: ["libtorch-bridge.ts","src/lib/server/gpu/libtorch-bridge.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 1486
+lineCount: 1506
 pagerank: 0.20716
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 7
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/gpu/libtorch-bridge.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","zod","t/ts","t/src","t/lib"]
 > LibTorch N-API Bridge — server-only.
 pagerank:: 0.207160
 blend:: 0.000000
-lines:: 1486
+lines:: 1506
 ## Summary
 
 LibTorch N-API Bridge — server-only.

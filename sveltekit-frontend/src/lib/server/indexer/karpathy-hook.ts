@@ -2,6 +2,7 @@ import { generateChunkId, generateFileId, generateDirectoryId, generateSummaryId
 import type { WikiNote, DirectoryNote } from './karpathy-wiki.js';
 import { generateSummaryLenses } from './summary-lens-generator.js';
 import { triageAuditHotspots, generateAuditVerdict } from './audit-triage.js';
+import { getTensorAnalysis } from '../tensor/tensor-analysis-cache.js';
 
 export type KarpathyHookInput = {
 	repoRoot: string;
@@ -152,11 +153,14 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 		output.stats.qdrantPayloads++;
 
 		// 5. LibTorch Export Row
+		const tensor = await getTensorAnalysis(chunkId, file.contentHash).catch(() => null);
 		output.libtorchRows.push({
 			stableKey: chunk.id,
 			filePath: file.filePath,
 			directoryPath: dirPath,
-			tags: chunk.tags
+			tags: chunk.tags,
+			manifold4: tensor?.manifold4,
+			topoByte: tensor?.topoByte
 		});
 		output.stats.libtorchRows++;
 
@@ -174,7 +178,9 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 				chunkId: fileId,
 				targetType: 'file',
 				content: file.content,
-				lenses
+				lenses,
+				gpuCluster: tensor?.somCluster ?? undefined,
+				manifold4: tensor?.manifold4,
 			});
 			
 			for (const s of summaries) {

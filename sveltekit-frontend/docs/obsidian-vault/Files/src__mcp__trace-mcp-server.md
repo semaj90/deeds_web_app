@@ -4,7 +4,7 @@ path: "src/mcp/trace-mcp-server.ts"
 aliases: ["trace-mcp-server.ts","src/mcp/trace-mcp-server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 5073
+lineCount: 5126
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,13 +12,13 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: true
-importCount: 24
+importCount: 25
 embedding_id: "qdrant://codebase_chunks_768/src/mcp/trace-mcp-server.ts"
-last_updated_by_llm: "2026-05-13T00:29:45.067Z"
+last_updated_by_llm: "2026-05-14T01:10:45.024Z"
 ai-first: true
 confidence: "high"
 up: []
-imports: ["[[Files/lib__server__env]]","[[Files/new_tools]]","[[Files/admin_tools]]","[[Files/skill_tools]]","[[Files/tools__legal-skills]]","[[Files/codebase_tools]]","[[Files/research_tools]]","[[Files/lib__server__kb__search-logic]]","[[Files/bifrost_tools]]","[[Files/topology_mgmt_tools]]","[[Files/db-inspection-tools]]","[[Files/rg_atlas_tools]]","[[Files/lib__server__agent__tools__ripgrep-search]]"]
+imports: ["[[Files/lib__server__env]]","[[Files/new_tools]]","[[Files/admin_tools]]","[[Files/skill_tools]]","[[Files/tools__legal-skills]]","[[Files/codebase_tools]]","[[Files/research_tools]]","[[Files/lib__server__kb__search-logic]]","[[Files/bifrost_tools]]","[[Files/topology_mgmt_tools]]","[[Files/db-inspection-tools]]","[[Files/rg_atlas_tools]]","[[Files/lib__server__agent__tools__ripgrep-search]]","[[Files/lib__server__kb__wiki-logic]]"]
 tags: ["file","ext/ts","zod","t/ts","t/src","t/mcp"]
 ---
 
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","zod","t/ts","t/src","t/mcp"]
 > trace-mcp-server.ts
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 5073
+lines:: 5126
 ## Summary
 
 trace-mcp-server.ts
@@ -47,6 +47,7 @@ trace-mcp-server.ts
 - imports:: [[Files/db-inspection-tools]] `./db-inspection-tools.js`
 - imports:: [[Files/rg_atlas_tools]] `./rg_atlas_tools.js`
 - imports:: [[Files/lib__server__agent__tools__ripgrep-search]] `../lib/server/agent/tools/ripgrep-search.js`
+- imports:: [[Files/lib__server__kb__wiki-logic]] `../lib/server/kb/wiki-logic.js`
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;
