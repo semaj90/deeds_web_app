@@ -47,5 +47,32 @@
     },
     "forbiddenFields": 0,
     "status": "success"
+  },
+  {
+    "runId": "atlas-scale-2000-001",
+    "mode": "safe_atlas_write",
+    "workspace": "sveltekit-frontend",
+    "timestamp": "2026-05-15T22:51:47Z",
+    "limits": {
+      "redis": 2000,
+      "couchdb": 2000,
+      "neo4j": 2000,
+      "qdrant": 2000,
+      "engram": 250
+    },
+    "skip": {
+      "llm": true,
+      "embeddings": true,
+      "gpu": true
+    },
+    "results": {
+      "redis": { "written": 2027, "errors": 0 },
+      "couchdb": { "written": 320, "errors": 0 },
+      "neo4j": { "nodes": 2000, "edges": 1904, "errors": 0 },
+      "qdrant": { "patched": 1534, "errors": 0 },
+      "engram": { "written": 2, "rejected": 0 }
+    },
+    "forbiddenFields": 0,
+    "status": "success"
   }
 ]
