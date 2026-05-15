@@ -1,7 +1,7 @@
 {
   "repo": "deeds-web-app",
-  "runId": "run_1778884918530",
-  "generatedAt": "2026-05-15T22:41:58.530Z",
+  "runId": "atlas-scale-2000-001",
+  "generatedAt": "2026-05-15T22:47:13.455Z",
   "targets": {
     "qdrant": {
       "collection": "codebase_chunks_768",
