@@ -8,6 +8,10 @@ STAGED=$(git diff --cached --name-only --diff-filter=AM)
 
 for f in $STAGED; do
   [ -f "$f" ] || continue
+  FILTER=$(git check-attr filter -- "$f" 2>/dev/null | awk -F': ' '{print $3}')
+  if [ "$FILTER" = "lfs" ]; then
+    continue
+  fi
   case "$f" in
     *.exe|*.dll|*.so|*.dylib|*.lib|*.a|*.o|*.obj|*.pdb|*.ptx|*.cubin|*.bin|*.gguf|*.ggml|*.safetensors|*.pt|*.pth)
       echo "❌ Blocked binary artifact: $f" >&2

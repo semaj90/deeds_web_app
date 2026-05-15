@@ -3,3 +3,6 @@ scripts/tag-legacy-go-files.mjs eol=lf
 # Avoid tracking binaries via LFS by default; build artifacts should not be committed
 # If you truly need LFS for specific assets, scope them narrowly by path, not extension.
 # Previously: '*.exe' and '*.zip' were forced into LFS, inflating repo size.
+sveltekit-frontend/docs/graph/codebase-graph.json filter=lfs diff=lfs merge=lfs -text
+sveltekit-frontend/docs/graph/sveltekit-route-gap-atlas.json filter=lfs diff=lfs merge=lfs -text
+sveltekit-frontend/docs/graph/sveltekit-route-map.json filter=lfs diff=lfs merge=lfs -text
