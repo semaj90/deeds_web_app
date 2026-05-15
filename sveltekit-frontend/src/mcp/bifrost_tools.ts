@@ -15,10 +15,10 @@ export function registerBifrostTools(server: McpServer) {
     'trace.bifrost_dispatch',
     {
       description: 'Unified inference routing (Bifrost Gateway).',
-      inputSchema: {
+      inputSchema: z.object({
         tier: z.enum(['EMBED', 'RERANK', 'GENERATE_FAST', 'GENERATE_LONG']).describe('Inference tier'),
         payload: z.record(z.string(), z.any()).describe('OpenAI-compatible payload or tool-specific JSON')
-      }
+      })
     },
     async ({ tier, payload }) => {
       let targetUrl = '';

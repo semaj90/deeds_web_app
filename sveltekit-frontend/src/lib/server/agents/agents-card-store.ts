@@ -4,7 +4,7 @@
  * NOT canonical feature specs (per next_steps/active/2026-05-11 plan).
  *
  * Storage tiers (all already in the codebase):
- *   - Redis  agents:dir:{hash}        — hot cache, 24h TTL
+ *   - Redis  llms:dir:{hash}        — hot cache, 24h TTL
  *   - CouchDB karpathy_wiki dir docs  — durable, MapReduce views
  *   - Qdrant codebase_chunks_768      — payload tags (agents_card_id, etc.)
  *
@@ -62,14 +62,14 @@ export type AgentsDirectoryCard = z.infer<typeof agentsDirectoryCardSchema>;
  * Derive the canonical id from a directory path.
  * Same dirPath → same id, always. Used as Redis key suffix + Qdrant payload tag.
  *
- * Example: `src/lib/server/vector` → `agents:dir:src-lib-server-vector`
+ * Example: `src/lib/server/vector` → `llms:dir:src-lib-server-vector`
  */
 export function cardIdForDir(dirPath: string): string {
 	const slug = dirPath
 		.replace(/[\\/]+/g, '-')
 		.replace(/^-+|-+$/g, '')
 		.toLowerCase();
-	return `agents:dir:${slug}`;
+	return `llms:dir:${slug}`;
 }
 
 /**
@@ -180,7 +180,7 @@ const COUCHDB_DB = 'karpathy_wiki';
 type CouchDocBase = { _id: string; _rev?: string };
 
 /**
- * Write a card to CouchDB karpathy_wiki under doc id `agents:dir:<slug>`.
+ * Write a card to CouchDB karpathy_wiki under doc id `llms:dir:<slug>`.
  * Idempotent: skips the write if the existing doc has the same contentHash.
  *
  * Returns true if a write actually happened, false if skipped or failed.

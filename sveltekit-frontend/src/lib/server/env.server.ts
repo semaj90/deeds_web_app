@@ -162,9 +162,9 @@ export const ENV = {
   CUDA_DEVICE_ID: privateEnv.CUDA_DEVICE_ID !== undefined ? Number(privateEnv.CUDA_DEVICE_ID) : undefined,
   // Inference cascade: Bifrost L2 cache (:3040) → Reranker (:8090) → TurboQuant (:8080) → VLM (:8085) → LiteRT (:8070)
   BIFROST_URL: privateEnv.BIFROST_URL ?? `http://${LOOPBACK_IP}:3040`,
-  TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8080`,
+  TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
   // Alias — admin/inference-lane route references ENV.TURBOQUANT_URL; mirror BASE_URL.
-  TURBOQUANT_URL: privateEnv.TURBOQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8080`,
+  TURBOQUANT_URL: privateEnv.TURBOQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
   TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR ?? `http://${LOOPBACK_IP}:8099`,
   RERANK_BASE_URL: privateEnv.RERANK_BASE_URL ?? privateEnv.RERANK_URL ?? `http://${LOOPBACK_IP}:8090`,
   RERANK_URL: privateEnv.RERANK_URL ?? privateEnv.RERANK_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
@@ -173,7 +173,7 @@ export const ENV = {
   // Neo4j graph database
   NEO4J_URI: privateEnv.NEO4J_URI ?? privateEnv.NEO4J_URL ?? `bolt://${LOOPBACK_IP}:7687`,
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',
-  NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD ?? privateEnv.NEO4J_PASS ?? 'password',
+  NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD ?? privateEnv.NEO4J_PASS ?? 'neo4j123',
   // Neo4j browser HTTP API (used by memory-mirror, couchdb sync — separate from bolt)
   NEO4J_HTTP_URL: privateEnv.NEO4J_HTTP_URL ?? `http://${LOOPBACK_IP}:7474`,
   // CouchDB document store — default password matches docker-compose.yml
@@ -292,6 +292,13 @@ export const ENV = {
   ACE_ENCODED_RERANK_ENABLED: (privateEnv.ACE_ENCODED_RERANK_ENABLED ?? 'false') === 'true',
   /** Weight for encoded-cluster similarity in decision-tree reranker (default: 0.05) */
   ACE_ENCODED_RERANK_WEIGHT: parseFloat(privateEnv.ACE_ENCODED_RERANK_WEIGHT ?? '0.05'),
+  // SeaweedFS S3
+  SEAWEED_S3_ENDPOINT: privateEnv.SEAWEED_S3_ENDPOINT ?? `http://127.0.0.1:8333`,
+  SEAWEED_S3_REGION: privateEnv.SEAWEED_S3_REGION ?? 'us-east-1',
+  SEAWEED_S3_BUCKET: privateEnv.SEAWEED_S3_BUCKET ?? 'deeds-dev',
+  SEAWEED_ACCESS_KEY: privateEnv.SEAWEED_ACCESS_KEY ?? 'admin',
+  SEAWEED_SECRET_KEY: privateEnv.SEAWEED_SECRET_KEY ?? 'admin',
+  PUBLIC_APP_URL: privateEnv.PUBLIC_APP_URL ?? `http://127.0.0.1:5173`,
 };
 
 

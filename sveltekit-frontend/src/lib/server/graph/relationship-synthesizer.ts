@@ -1,10 +1,9 @@
 import pg from 'pg';
 import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
 
 const NEO4J_URL = process.env.NEO4J_URI || 'bolt://localhost:7687';
-const NEO4J_USER = process.env.NEO4J_USERNAME || 'neo4j';
-const NEO4J_PASS = process.env.NEO4J_PASSWORD || 'neo4j_password';
 
 export async function synthesizeCommunityRelationships() {
   console.log('[relationship-synthesizer] Starting inter-community synthesis...');
@@ -21,7 +20,7 @@ export async function synthesizeCommunityRelationships() {
   // 2. Load cross-community edges from Neo4j
   let neo4j;
   try { neo4j = await import('neo4j-driver'); } catch { return; }
-  const driver = neo4j.default.driver(NEO4J_URL, neo4j.default.auth.basic(NEO4J_USER, NEO4J_PASS));
+  const driver = neo4j.default.driver(NEO4J_URL, neo4j.default.auth.basic(ENV.NEO4J_USER, ENV.NEO4J_PASSWORD));
   const session = driver.session();
 
   const edges = [];

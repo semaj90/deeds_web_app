@@ -16,11 +16,11 @@ export function registerCodebaseTools(server: McpServer) {
     'codebase.rg_search',
     {
       description: 'The search pattern (ripgrep style).',
-      inputSchema: {
+      inputSchema: z.object({
         query: z.string().describe('The search pattern (ripgrep style)'),
         include: z.string().optional().describe('Glob for files to include'),
         contextLines: z.number().default(2).describe('Lines of context to show')
-      }
+      })
     },
     async ({ query, include, contextLines }) => {
       try {
@@ -50,11 +50,11 @@ export function registerCodebaseTools(server: McpServer) {
     'codebase.awk_analyze',
     {
       description: 'Advanced codebase analysis tools leveraging awk.',
-      inputSchema: {
+      inputSchema: z.object({
         filePath: z.string().describe('File path to analyze'),
         pattern: z.string().describe('Pattern to match (regex)'),
         logic: z.string().describe('AWK logic to apply (e.g. "{print $1}")')
-      }
+      })
     },
     async ({ filePath, pattern, logic }) => {
       try {

@@ -107,7 +107,7 @@ export interface RerankBreakdown {
   bow: number;
   /** Boost from paired test file presence */
   pairedTest: number;
-  /** Boost from chunk being under the resolved AGENTS.md directory (≤0.05 cap) */
+  /** Boost from chunk being under the resolved LLMS.md directory (≤0.05 cap) */
   sameAgentsDir?: number;
   /** Boost from manifold4 quaternion similarity to top candidate (≤0.06 cap) */
   quaternion?: number;
@@ -217,9 +217,9 @@ export interface ACEContext {
     karpathyBlend?: number | null;
     /** Louvain communityId written by graphify:gds, mirrored via Qdrant payload patch */
     communityId?: string | null;
-    /** Directory summary mirrored from AGENTS.md directory cards (L4 lane) */
+    /** Directory summary mirrored from LLMS.md directory cards (L4 lane) */
     dirSummary?: string | null;
-    /** Resolved AGENTS.md card ID (agents:dir:*) */
+    /** Resolved LLMS.md card ID (llms:dir:*) */
     agentsCardId?: string | null;
     rerankBreakdown?: RerankBreakdown | null;
     /** Stable content-addressed key for this chunk (used by code-intel/search) */
@@ -253,7 +253,7 @@ export interface ACEContext {
   /** Deterministic policy decision used to size context and route tools */
   policyDecision: ACEPolicyDecision | null;
   /**
-   * nes-arch path-first directory context (agents.md spec).
+   * nes-arch path-first directory context (LLMS.md spec).
    */
   agentsMd?: {
     resolvedKey: string;

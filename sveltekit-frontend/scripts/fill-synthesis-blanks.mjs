@@ -1,7 +1,7 @@
-import { db } from '../src/lib/server/db/client';
-import { embeddedSummaries } from '../src/lib/server/db/schema/embedded-summaries';
-import { tensorAnalysisCache } from '../src/lib/server/db/schema/topology';
-import { eq, isNull, and, sql } from 'drizzle-orm';
+import { db } from '../src/lib/server/db/client.js';
+import { embeddedSummaries } from '../src/lib/server/db/schema/embedded-summaries.js';
+import { tensorAnalysisCache } from '../src/lib/server/db/schema/topology.js';
+import { eq, isNull, and, or, sql } from 'drizzle-orm';
 import { encode768to64 } from '../src/lib/server/gpu/encode-768-to-64';
 import { deterministicPointId } from '../src/lib/server/vector/qdrant-manager.js';
 import { getRedis } from '../src/lib/server/redis.js';
@@ -17,7 +17,13 @@ async function main() {
   
   const missing = await db.select()
     .from(embeddedSummaries)
-    .where(isNull(embeddedSummaries.gpuCluster));
+    .where(
+      or(
+        isNull(embeddedSummaries.gpuCluster),
+        eq(embeddedSummaries.topoByte, 0),
+        eq(embeddedSummaries.topoClass, 'unclassified')
+      )
+    );
     
   console.log(`📊 Found ${missing.length} records to backfill.`);
   
@@ -33,18 +39,36 @@ async function main() {
       const legacyKey = `qdrant:${qdrantId}`;
       const modernKey = row.chunkId;
 
-      const [topology] = await db.select()
+      let [topology] = await db.select()
         .from(tensorAnalysisCache)
         .where(
-          sql`${tensorAnalysisCache.stableKey} = ${modernKey} OR ${tensorAnalysisCache.stableKey} = ${legacyKey}`
+          or(
+            eq(tensorAnalysisCache.stableKey, modernKey),
+            eq(tensorAnalysisCache.stableKey, legacyKey)
+          )
         )
         .limit(1);
+        
+      // 2. Fallback: If no direct ID match, try matching by file path in output_meta
+      if (!topology && row.chunkId.startsWith('file:')) {
+        const filePath = row.chunkId.replace('file:', '');
+        [topology] = await db.select()
+          .from(tensorAnalysisCache)
+          .where(sql`${tensorAnalysisCache.outputMeta}->>'filePath' = ${filePath}`)
+          .limit(1);
+          
+        if (topology) {
+          console.log(`📡 [Fallback] Found topology via filePath for ${row.chunkId} (Key: ${topology.stableKey})`);
+        }
+      }
         
       if (topology) {
         console.log(`✅ Found topology for ${row.chunkId} (Modern/Legacy: ${topology.stableKey})`);
         await db.update(embeddedSummaries)
           .set({
             gpuCluster: topology.somCluster,
+            topoByte: topology.topoByte,
+            topoClass: topology.topoClass,
             manifold4: [topology.manifold4X, topology.manifold4Y, topology.manifold4Z, topology.manifold4W]
           })
           .where(eq(embeddedSummaries.id, row.id));

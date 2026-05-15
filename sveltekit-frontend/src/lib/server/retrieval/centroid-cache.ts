@@ -72,11 +72,22 @@ function cosine(a: Float32Array, b: Float32Array): number {
 export async function nearestCluster(
   queryVec: Float32Array | number[],
   maxClusters = 50
-): Promise<{ clusterId: number; similarity: number; source: 'cuda-batch-cosine' | 'cpu-cosine'; durationMs: number } | null> {
+): Promise<{ 
+  clusterId: number; 
+  similarity: number; 
+  source: 'cuda-batch-cosine' | 'cpu-cosine'; 
+  durationMs: number;
+  topoClass?: string;
+  topoByte?: number;
+} | null> {
   const t0 = Date.now();
   try {
     const redis = getRedis();
-    const keys  = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
+    let keys = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
+    if (!keys.length) {
+      await loadCentroidsFromDB();
+      keys = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
+    }
     if (!keys.length) return null;
 
     const values = await redis.mget(...keys);
@@ -94,13 +105,25 @@ export async function nearestCluster(
     // Build parallel arrays of (id, vec) for valid entries
     const ids:  number[]   = [];
     const vecs: number[][] = [];
+    const meta: Array<{ topoClass?: string; topoByte?: number }> = [];
+
     for (let i = 0; i < keys.length; i++) {
       const raw = values[i];
       if (!raw) continue;
       const id = parseInt(keys[i].split(':')[3], 10);
       if (isNaN(id)) continue;
+      
+      const parsed = parseFn(raw);
       ids.push(id);
-      vecs.push(parseFn(raw));
+      
+      if (Array.isArray(parsed)) {
+        vecs.push(parsed);
+        meta.push({});
+      } else {
+        const data = parsed as any;
+        vecs.push(data.vector || []);
+        meta.push({ topoClass: data.topoClass, topoByte: data.topoByte });
+      }
     }
     if (!ids.length) return null;
 
@@ -121,6 +144,8 @@ export async function nearestCluster(
             similarity: result.scores[bestIdx],
             source: 'cuda-batch-cosine',
             durationMs: Date.now() - t0,
+            topoClass: meta[bestIdx].topoClass,
+            topoByte: meta[bestIdx].topoByte,
           };
         }
       } catch { /* GPU unavailable or OOM — fall through to CPU */ }
@@ -135,7 +160,14 @@ export async function nearestCluster(
     }
 
     return bestId >= 0
-      ? { clusterId: bestId, similarity: bestSim, source: 'cpu-cosine', durationMs: Date.now() - t0 }
+      ? { 
+          clusterId: bestId, 
+          similarity: bestSim, 
+          source: 'cpu-cosine', 
+          durationMs: Date.now() - t0,
+          topoClass: meta[ids.indexOf(bestId)].topoClass,
+          topoByte: meta[ids.indexOf(bestId)].topoByte,
+        }
       : null;
   } catch {
     return null;
@@ -201,7 +233,23 @@ data = JSON.parse(raw);
       if (!count) continue;
       for (let d = 0; d < dim; d++) sum[d] /= count;
 
-      pipe.setex(centroidKey.cluster(clusterId), ttlSeconds, JSON.stringify(Array.from(sum)));
+      // Get dominant topoClass for this cluster
+      const { rows: topoRows } = await db.execute(sql`
+        SELECT topo_class, topo_byte, count(*) as cnt 
+        FROM embedded_summaries 
+        WHERE gpu_cluster = ${clusterId} 
+        GROUP BY topo_class, topo_byte 
+        ORDER BY cnt DESC LIMIT 1
+      `);
+      const topoInfo = topoRows[0] || { topo_class: 'unclassified', topo_byte: 0 };
+
+      const centroidData = {
+        vector: Array.from(sum),
+        topoClass: String(topoInfo.topo_class),
+        topoByte: Number(topoInfo.topo_byte)
+      };
+
+      pipe.setex(centroidKey.cluster(clusterId), ttlSeconds, JSON.stringify(centroidData));
       written++;
     } catch { /* non-fatal per cluster */ }
   }
@@ -250,7 +298,9 @@ export async function persistCentroidsToDB(
         .values({
           clusterId:   clusterIds[i],
           clusterType,
-          centroidVec: vec,
+          centroidVec: data.vector || [],
+          topoClass:   data.topoClass || 'unclassified',
+          topoByte:    data.topoByte || 0,
           chunkCount:  0,
           updatedAt:   new Date(),
         })
@@ -259,6 +309,8 @@ export async function persistCentroidsToDB(
           set: {
             centroidVec: sql`EXCLUDED.centroid_vec`,
             clusterType: sql`EXCLUDED.cluster_type`,
+            topoClass:   sql`EXCLUDED.topo_class`,
+            topoByte:    sql`EXCLUDED.topo_byte`,
             updatedAt:   sql`now()`,
           },
         });
@@ -498,6 +550,8 @@ export async function loadCentroidsFromDB(
       .select({
         clusterId:   gpuClusterCentroids.clusterId,
         centroidVec: gpuClusterCentroids.centroidVec,
+        topoClass:   gpuClusterCentroids.topoClass,
+        topoByte:    gpuClusterCentroids.topoByte,
       })
       .from(gpuClusterCentroids)
       .where(eq(gpuClusterCentroids.clusterType, clusterType));
@@ -509,10 +563,15 @@ export async function loadCentroidsFromDB(
 
     for (const row of rows) {
       if (!row.centroidVec?.length) continue;
+      const centroidData = {
+        vector: row.centroidVec,
+        topoClass: row.topoClass,
+        topoByte: row.topoByte
+      };
       pipe.setex(
         centroidKey.cluster(row.clusterId),
         ttlSeconds,
-        JSON.stringify(row.centroidVec),
+        JSON.stringify(centroidData),
       );
     }
 

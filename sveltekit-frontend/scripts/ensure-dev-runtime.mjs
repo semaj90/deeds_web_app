@@ -19,6 +19,37 @@ for (const pkg of requiredPackages) {
 }
 
 if (missing.length === 0) {
+  const assetChecks = [
+    ['Gemma 3 270M ONNX', path.join(projectRoot, 'static', 'gemma3_270m_onnx', 'gemma3_270m_w8a16.onnx')],
+    ['Gemma 3 client ONNX', path.join(projectRoot, 'static', 'gemma3_270m_onnx', 'gemma3_client_quantized.onnx')],
+    ['EmbeddingGemma ONNX', path.join(projectRoot, 'static', 'embeddinggemma_300m_onnx', 'model.onnx')],
+    ['ORT WASM SIMD', path.join(projectRoot, 'static', 'ort', 'ort-wasm-simd-threaded.wasm')],
+    ['Vector ops WASM', path.join(projectRoot, 'static', 'wasm', 'vector-ops.wasm')],
+  ];
+
+  for (const [label, filePath] of assetChecks) {
+    if (!existsSync(filePath)) {
+      if (label === 'Vector ops WASM') {
+        const build = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'build:wasm'], {
+          stdio: 'inherit',
+          cwd: projectRoot,
+          env: { ...process.env },
+        });
+        const exitCode = await new Promise((resolve) => build.on('close', resolve));
+        if (exitCode !== 0) {
+          process.exit(typeof exitCode === 'number' ? exitCode : 1);
+        }
+        continue;
+      }
+
+      console.warn(`[ensure-dev-runtime] Missing ${label} at ${filePath}`);
+    } else {
+      console.log(`[ensure-dev-runtime] ${label} already built`);
+    }
+  }
+
+  console.log('[ensure-dev-runtime] Gemma 4 ONNX path is remote E2B (onnx-community/gemma-4-E2B-it-ONNX); no local static build check required');
+
   // ── Detached background services (same pattern as llama-server.exe) ──
   const bgScripts = [
     path.join(scriptDir, 'ensure-search-engine.mjs'),

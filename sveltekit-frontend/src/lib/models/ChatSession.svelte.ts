@@ -595,6 +595,7 @@ export class ChatSession {
     const decision = shouldEscalateToServer(routedMessage, this.messages, {
       forceServer: effectiveOptions.forceServer,
       forceLocal: effectiveOptions.forceLocal,
+      allowClientGemma: false,
       hasCaseContext: this._hasCaseContext,
       capabilities,
       e2bReady,

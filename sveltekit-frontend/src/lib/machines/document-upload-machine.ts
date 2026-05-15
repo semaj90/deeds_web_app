@@ -142,8 +142,19 @@ const uploadFiles = fromPromise(async ({ input }: { input: DocumentUploadContext
       const errorData = await response.json().catch(() => ({}));
       throw new Error((errorData as { error?: string }).error || `HTTP ${response.status}`);
     }
-    const result = (await response.json()) as { id: string; jobId: string; fileName: string };
-    uploadedFiles.push({ id: result.id, name: result.fileName, jobId: result.jobId });
+    const result = (await response.json()) as {
+      id?: string;
+      fileId?: string;
+      jobId?: string;
+      fileName?: string;
+      data?: { id?: string; fileId?: string; jobId?: string; fileName?: string };
+    };
+    const payload = result.data ?? result;
+    uploadedFiles.push({
+      id: String(payload.fileId ?? payload.id ?? file.name),
+      name: String(payload.fileName ?? file.name),
+      jobId: String(payload.jobId ?? ''),
+    });
   }
 
   return { files: uploadedFiles };

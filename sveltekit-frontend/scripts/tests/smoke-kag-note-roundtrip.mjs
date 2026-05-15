@@ -112,10 +112,11 @@ if (USE_GEMMA4) {
       { role: 'system', content: 'You are a codebase analyst. Return STRICT JSON ONLY (no prose, no markdown fence) with keys: summary (string, ≤300 chars), dominantTags (array of 5 lowercase strings), auditScore (0-100). Nothing else.' },
       { role: 'user',   content: `Directory: ${TARGET_DIR}\nFiles: redis-exact-match.ts, dag-cache.ts, llm-cache.ts, cache-keys.ts\nAnalyze for production readiness.` },
     ],
-    max_tokens: 300,
-    temperature: 0.15,
+    max_tokens: 1000,
+    temperature: 0.1,
     cache_prompt: true,
   };
+  let raw = '';
   try {
     const r = await fetch('http://127.0.0.1:8090/v1/chat/completions', {
       method:  'POST',
@@ -125,10 +126,31 @@ if (USE_GEMMA4) {
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const j = await r.json();
-    const raw = j.choices?.[0]?.message?.content ?? '';
-    // Strip code fences if Gemma4 wrapped JSON
-    const json = raw.replace(/^```(?:json)?\s*|\s*```$/g, '').trim();
-    const parsed = JSON.parse(json);
+    
+    // Some reasoning models put the final answer in content, some mix it.
+    // If content is empty, check reasoning_content.
+    const content = j.choices?.[0]?.message?.content ?? '';
+    const reasoning = j.choices?.[0]?.message?.reasoning_content ?? '';
+    raw = content || reasoning;
+    
+    // Strip <|think|> blocks if present
+    const cleanRaw = raw.replace(/<\|think\|>[\s\S]*?<\|turn\|>|[\s\S]*?<\|think\|>[\s\S]*?<\/|think\|>/g, '').trim();
+    
+    // Strip code fences
+    const json = cleanRaw.replace(/^```(?:json)?\s*|\s*```$/g, '').trim();
+    
+    if (!json) {
+      // If we still have nothing, maybe the JSON is buried in the reasoning
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (match) {
+        raw = match[0];
+      }
+    }
+    
+    const finalJson = raw.replace(/^```(?:json)?\s*|\s*```$/g, '').trim();
+    if (!finalJson) throw new Error('Empty response after cleaning');
+
+    const parsed = JSON.parse(finalJson);
     note = {
       ...SYNTHETIC_NOTE,
       summary:      parsed.summary ?? SYNTHETIC_NOTE.summary,
@@ -138,6 +160,8 @@ if (USE_GEMMA4) {
     pass('Gemma4 returned strict JSON', `summary=${note.summary.slice(0, 60)}...`);
   } catch (e) {
     fail('Gemma4 returned strict JSON', `${e.message} — falling back to synthetic note`);
+    // Diagnostic log
+    // console.log(c.dim(`    DEBUG: raw response was: ${raw.slice(0, 500)}...`));
     note = SYNTHETIC_NOTE;
   }
 }

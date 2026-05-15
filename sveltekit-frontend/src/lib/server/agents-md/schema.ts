@@ -1,6 +1,6 @@
 /**
- * AGENTS.md envelope schema — the structured form of an AGENTS.md file
- * after parse-agents-md.ts extracts rules, tools, tags, and summary from
+ * LLMS.md envelope schema — the structured form of an LLMS.md file
+ * after parse-LLMS.md.ts extracts rules, tools, tags, and summary from
  * the markdown body.
  *
  * Mirrors the agent_context_files Postgres columns + the JSONB rules/tools
@@ -28,8 +28,8 @@ export const agentConstraintSchema = z.object({
 });
 
 export const agentsMdEnvelopeSchema = z.object({
-  kind:           z.literal('agents_md'),
-  /** Stable cross-run key, e.g. `agents:src/lib/server/ai/AGENTS.md` */
+  kind:           z.literal('LLMS.md'),
+  /** Stable cross-run key, e.g. `agents:src/lib/server/ai/LLMS.md` */
   stable_key:     z.string().min(1).max(500),
   file_path:      z.string().min(1).max(500),
   directory_path: z.string().min(1).max(500),
@@ -55,4 +55,4 @@ export type AgentToolPolicy   = z.infer<typeof agentToolPolicySchema>;
 export type AgentConstraint   = z.infer<typeof agentConstraintSchema>;
 export type AgentsMdEnvelope  = z.infer<typeof agentsMdEnvelopeSchema>;
 
-export const AGENTS_MD_SCHEMA_VERSION = 1;
+export const LLMS.md_SCHEMA_VERSION = 1;

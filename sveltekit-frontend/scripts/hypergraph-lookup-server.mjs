@@ -58,17 +58,66 @@ async function handler(req, res) {
       const vec = body && body.embedding;
       const k = body && (body.k || 8);
       if (!vec || !Array.isArray(vec)) { res.writeHead(400); res.end('missing embedding'); return; }
-      const all = await client.hgetall(PREFIX + ':centroids');
-      const items = [];
-      for (const [field, value] of Object.entries(all)) {
-        if (field === 'meta') continue;
-        try { const o = JSON.parse(value); items.push({ id: Number(field), vector: o.vector }); } catch (e) { continue; }
+
+      // Greedy Topology Search if neighbors are available, else brute force
+      const neighborsKey = PREFIX + ':neighbors';
+      const centroidsKey = PREFIX + ':centroids';
+      
+      const metaRaw = await client.hget(centroidsKey, 'meta');
+      const meta = metaRaw ? JSON.parse(metaRaw) : { K: 0 };
+      
+      let bestId = 0;
+      let bestDist = Infinity;
+
+      if (meta.K > 0) {
+        // Start from a few random entry points or just centroid 0
+        const entryPoints = [0, Math.floor(meta.K / 2), meta.K - 1];
+        for (const startId of entryPoints) {
+          let currId = startId;
+          let currRaw = await client.hget(centroidsKey, String(currId));
+          if (!currRaw) continue;
+          let currDist = l2sq(vec, JSON.parse(currRaw).vector);
+          
+          if (currDist < bestDist) { bestDist = currDist; bestId = currId; }
+
+          // Greedy walk
+          let improved = true;
+          while (improved) {
+            improved = false;
+            const neighborsRaw = await client.hget(neighborsKey, String(currId));
+            if (!neighborsRaw) break;
+            const neighbors = JSON.parse(neighborsRaw);
+            
+            for (const nb of neighbors) {
+              const nbRaw = await client.hget(centroidsKey, String(nb.id));
+              if (!nbRaw) continue;
+              const d = l2sq(vec, JSON.parse(nbRaw).vector);
+              if (d < currDist) {
+                currDist = d;
+                currId = nb.id;
+                improved = true;
+                if (d < bestDist) { bestDist = d; bestId = currId; }
+              }
+            }
+          }
+        }
       }
-      const scored = items.map(it => ({ id: it.id, dist: l2sq(vec, it.vector) }));
-      scored.sort((a,b)=>a.dist-b.dist);
-      const top = scored.slice(0, Math.min(k, scored.length));
+
+      // After finding the best entry via greedy walk, we could also return its neighbors
+      const finalNeighborsRaw = await client.hget(neighborsKey, String(bestId));
+      const finalNeighbors = finalNeighborsRaw ? JSON.parse(finalNeighborsRaw) : [];
+      
+      const results = [{ id: bestId, dist: bestDist }];
+      // Add a few neighbors of the best centroid to the results for exploration
+      for (const nb of finalNeighbors.slice(0, k - 1)) {
+        const nbRaw = await client.hget(centroidsKey, String(nb.id));
+        if (!nbRaw) continue;
+        results.push({ id: nb.id, dist: l2sq(vec, JSON.parse(nbRaw).vector) });
+      }
+      results.sort((a,b) => a.dist - b.dist);
+
       res.writeHead(200, {'Content-Type':'application/json'});
-      res.end(JSON.stringify({ k: top.length, results: top }));
+      res.end(JSON.stringify({ k: results.length, results, method: 'greedy-topology' }));
       await client.disconnect();
       return;
     }

@@ -10,7 +10,7 @@ export type DagNodeName =
   | 'search_centroid_clusters'
   | 'search_qdrant_chunks'
   | 'expand_graph_neighbors'
-  | 'resolve_agents_md_context'
+  | 'resolve_LLMS.md_context'
   | 'fetch_llm_summaries'
   | 'ace_rerank'
   | 'gemma4_synthesis'
@@ -69,7 +69,7 @@ export class KagDagRunner {
       'search_centroid_clusters',
       'search_qdrant_chunks',
       'expand_graph_neighbors',
-      'resolve_agents_md_context',
+      'resolve_LLMS.md_context',
       'fetch_llm_summaries',
       'ace_rerank',
       'gemma4_synthesis',

@@ -24,7 +24,7 @@ export interface CodebaseChunkPayload {
   centroid_id?: number | null;
   quality_score?: number | null;
   authority_score?: number | null;
-  agents_scope?: string | null;  // nearest AGENTS.md path
+  agents_scope?: string | null;  // nearest LLMS.md path
   relation_types?: string[];     // from code_relations (READS_REDIS_KEY, QUERIES_TABLE, …)
   semantic_tags?: string[];      // NES glyph-derived tags
   symbol_names?: string[];       // exported symbols from AST chunker

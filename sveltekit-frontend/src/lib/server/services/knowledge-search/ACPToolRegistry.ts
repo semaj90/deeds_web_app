@@ -659,6 +659,43 @@ const handlers: Record<string, HandlerFn> = {
     } catch (error: any) {
       return fail(error.message, startTime);
     }
+  },
+
+  async searchHyperRag(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const { query, mode = 'codebase', synthesize = false, topK = 15 } = args;
+
+    if (!query || typeof query !== 'string' || !query.trim()) {
+      return fail('query must be a non-empty string', startTime);
+    }
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'embed', target: 'query', detail: 'Generate 768-dim embedding' },
+        { action: 'search', target: `HyperRag/${mode}`, detail: `Multi-lane search, topK=${topK}` },
+        { action: 'synthesize', target: 'Gemma4', detail: synthesize ? 'Generate LLM synthesis' : 'Skip synthesis' }
+      ], startTime);
+    }
+
+    try {
+      const { HyperRagFusionService } = await import('$lib/server/retrieval/hyperrag-fusion-service.js');
+      const service = HyperRagFusionService.getInstance();
+      const result = await service.search({
+        query: query.trim(),
+        mode: mode as any,
+        topK,
+        synthesize
+      });
+
+      return {
+        success: true,
+        kind: 'result',
+        data: result,
+        duration: Date.now() - startTime
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
   }
 };
 
@@ -670,7 +707,7 @@ const handlers: Record<string, HandlerFn> = {
 const DRY_RUN_TOOLS = new Set([
   'knowledge:search', 'db:query', 'cache:get', 'cache:set', 'llm:generate',
   'error:analyze', 'fix:synthesize', 'fix:apply', 'metrics:snapshot', 'metrics:health',
-  'langextract:extract', 'langextract:batch'
+  'langextract:extract', 'langextract:batch', 'search:hyperrag'
 ]);
 
 export const TOOLS: Record<string, ACPTool> = {
@@ -971,6 +1008,26 @@ export const TOOLS: Record<string, ACPTool> = {
       }
     ],
     handler: handlers.langextractBatch
+  },
+  'search:hyperrag': {
+    name: 'search:hyperrag',
+    description: 'Production-grade HyperRAG multi-lane search with topological synthesis',
+    category: 'search',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string' },
+        mode: { type: 'string', enum: ['codebase', 'evidence', 'legal', 'docs'], default: 'codebase' },
+        synthesize: { type: 'boolean', default: false },
+        topK: { type: 'number', default: 15 }
+      },
+      required: ['query']
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      { input: { query: 'context assembler', mode: 'codebase' }, output: {}, description: 'Search codebase for context assembler' }
+    ],
+    handler: handlers.searchHyperRag
   }
 };
 

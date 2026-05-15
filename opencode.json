@@ -16,7 +16,6 @@
   },
   "instructions": [
     "AGENTS.md",
-    "sveltekit-frontend/AGENTS.md",
     ".claude/skills/trace-mcp-tooling/SKILL.md",
     "sveltekit-frontend/docs/architecture/gemma4-to-claude-code-handoff.md"
   ]

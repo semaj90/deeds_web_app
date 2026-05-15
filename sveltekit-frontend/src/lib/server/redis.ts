@@ -13,6 +13,7 @@ const REDIS_URL = ENV.REDIS_URL;
  * Creates and manages a pool of Redis connections to prevent exhaustion
  */
 class RedisConnectionPool {
+	private static globalErrorLogged = false;
 	private pool: Redis[] = [];
 	private maxConnections = 10;
 	private currentIndex = 0;
@@ -49,16 +50,13 @@ class RedisConnectionPool {
 			// (which fires synchronously after construction when Redis is offline)
 			// has a listener and doesn't surface as "Unhandled error event".
 			//
-			// Throttle logs: print first error per pool slot, then go silent —
-			// the retryStrategy already caps reconnect attempts. Without this
-			// throttle the console fills with hundreds of identical lines on
-			// every Redis-down test run.
-			let _logged = false;
+			// Global throttle: only log the first connection error across all slots
+			// to keep the console clean during tests or outages.
 			client.on('error', (err) => {
-				if (_logged) return;
-				_logged = true;
+				if (RedisConnectionPool.globalErrorLogged) return;
+				RedisConnectionPool.globalErrorLogged = true;
 				const msg = err?.message ?? String(err);
-				console.error(`[Redis Pool] Connection error (further errors suppressed): ${msg}`);
+				console.error(`[Redis Pool] Connection error (systemic): ${msg} — further pool errors suppressed.`);
 			});
 
 			this.pool.push(client);
@@ -177,7 +175,7 @@ export async function ensureRedis() {
  *   ace:authority:top — 6h TTL, top entries from graphify:gds
  *   ace:atlas:*       — 24h TTL, atlas directory cards
  *   gpu:karpathy:scores — 24h TTL, GPU rank blend
- *   agents:dir:*      — 24h TTL, AGENTS.md envelope mirror
+ *   llms:dir:*      — 24h TTL, LLMS.md envelope mirror
  *   taxonomy:clusters — 12h TTL, SOM/K-means cluster centroids
  */
 

@@ -14,9 +14,9 @@ export function registerSkillTools(server: McpServer) {
     'skills.list',
     {
       description: 'Filter skills by name or description.',
-      inputSchema: {
+      inputSchema: z.object({
         query: z.string().optional().describe('Filter skills by name or description')
-      }
+      })
     },
     async ({ query }) => {
       const skills = await SkillsService.listSkills(query);
@@ -31,11 +31,11 @@ export function registerSkillTools(server: McpServer) {
     'skills.run_mission',
     {
       description: 'Execute a specialized autonomous skill mission.',
-      inputSchema: {
+      inputSchema: z.object({
         skillName: z.string().describe('The name of the skill to execute'),
         mission: z.string().describe('The specific mission description'),
         input: z.record(z.string(), z.any()).optional().describe('Input parameters for the skill')
-      }
+      })
     },
     async ({ skillName, mission, input }) => {
       // Note: In a real MCP server, we might want to run this async or stream it.

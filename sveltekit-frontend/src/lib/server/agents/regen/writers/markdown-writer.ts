@@ -1,7 +1,7 @@
 /**
- * Phase A5 — AGENTS.md writer (filesystem layer).
+ * Phase A5 — LLMS.md writer (filesystem layer).
  *
- * One write per directory. Reads any existing AGENTS.md, merges fresh
+ * One write per directory. Reads any existing LLMS.md, merges fresh
  * auto-blocks via `mergeCardIntoMarkdown`, writes back ONLY if the body
  * differs (idempotent — no mtime churn on unchanged dirs).
  *
@@ -18,7 +18,7 @@ import { mergeCardIntoMarkdown } from '../markdown/auto-blocks.js';
 import type { AutoBlockId } from '../markdown/auto-blocks.js';
 import type { AgentsDirectoryCard } from '../../agents-card-store.js';
 
-const AGENTS_MD_FILENAME = 'AGENTS.md';
+const LLMS.md_FILENAME = 'LLMS.md';
 
 export interface MarkdownWriteOptions {
 	enabled?:  boolean;
@@ -50,7 +50,7 @@ export async function writeCardMarkdown(
 	opts: MarkdownWriteOptions = {},
 ): Promise<MarkdownWriteResult> {
 	const repoRoot = opts.repoRoot ?? process.cwd();
-	const absPath  = path.join(repoRoot, card.dirPath, AGENTS_MD_FILENAME);
+	const absPath  = path.join(repoRoot, card.dirPath, LLMS.md_FILENAME);
 	const empty: MarkdownWriteResult = {
 		wrote: false, skipped: 'disabled', absPath, bytesWritten: 0,
 		replacedBlocks: [], appendedBlocks: [],

@@ -3,7 +3,7 @@
  *
  * Mirrors the existing `scripts/agents/build-agents-index.mjs` writer:
  *   - Database: `karpathy_wiki` (overridable via env)
- *   - Doc id:   `agents:dir:<slug>` (same as cardIdForDir output)
+ *   - Doc id:   `llms:dir:<slug>` (same as cardIdForDir output)
  *   - Update protocol: GET → check _rev + hash → PUT with _rev (or POST when new)
  *   - Idempotent: skips PUT when stored contentHash matches the candidate
  *

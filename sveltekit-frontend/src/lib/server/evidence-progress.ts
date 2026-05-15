@@ -77,6 +77,10 @@ export function getJob(jobId: string): JobProgress | undefined {
 	return jobs.get(jobId);
 }
 
+export function listJobs(): JobProgress[] {
+	return [...jobs.values()].sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
 export function subscribe(jobId: string, callback: ProgressCallback): () => void {
 	if (!subscribers.has(jobId)) {
 		subscribers.set(jobId, new Set());

@@ -42,7 +42,7 @@ const OLLAMA_URL       = ENV.OLLAMA_BASE_URL;
 const CHAT_MODEL       = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
 const NEO4J_URL        = ENV.NEO4J_URI;
 const NEO4J_USER       = ENV.NEO4J_USER ?? 'neo4j';
-const NEO4J_PASS       = ENV.NEO4J_PASSWORD ?? 'legal_ai_pass';
+const NEO4J_PASS       = ENV.NEO4J_PASSWORD;
 const COMMUNITY_TTL    = 3600;       // 1h Redis cache
 const LOG_MAX_ENTRIES  = 200;        // rolling encoding log window
 const MIN_CLUSTERS_PER_COMMUNITY = 2;
@@ -736,22 +736,22 @@ notes.push({ ...parsed, _key: indexKeys[i] });
 }
 
 /**
- * Quick-hit AGENTS.md fetcher for agent tool-calls.
+ * Quick-hit LLMS.md fetcher for agent tool-calls.
  *
- * Returns the pre-rendered markdown for a directory's AGENTS.md file (mirrored
- * into Redis by `npm run agents:write`). Use this in ACE tool-call paths when
+ * Returns the pre-rendered markdown for a directory's LLMS.md file (mirrored
+ * into Redis by `npm run llms:write`). Use this in ACE tool-call paths when
  * an agent needs directory-scoped context in <5ms — much cheaper than the
  * full `getDirectoryKAGContext()` which does GPU cosine + multi-key reads.
  *
- * Walks UP the directory tree (per agents.md spec) until a key is found:
- *   src/lib/server/ace/foo  → tries agents:dir:src/lib/server/ace/foo
- *                           → falls back to agents:dir:src/lib/server/ace
- *                           → ... → agents:root (always-present root)
+ * Walks UP the directory tree (per LLMS.md spec) until a key is found:
+ *   src/lib/server/ace/foo  → tries llms:dir:src/lib/server/ace/foo
+ *                           → falls back to llms:dir:src/lib/server/ace
+ *                           → ... → llms:root (always-present root)
  *
- * Keys: agents:dir:<rel>           rendered AGENTS.md per directory (24h TTL)
- *       agents:root                rendered repo-root AGENTS.md (24h TTL)
+ * Keys: llms:dir:<rel>           rendered LLMS.md per directory (24h TTL)
+ *       llms:root                rendered repo-root LLMS.md (24h TTL)
  *
- * Refresh: `npm run agents:write` (after `npm run index:codebase:fast`).
+ * Refresh: `npm run llms:write` (after `npm run index:codebase:fast`).
  */
 export interface AgentsMdQuickHitResult {
   markdown: string;
@@ -819,7 +819,7 @@ function buildLookupDirs(dir: string): string[] {
 }
 
 function toFrontendAgentsRepoPath(dir: string): string {
-  return dir ? `sveltekit-frontend/${dir}/AGENTS.md` : 'sveltekit-frontend/AGENTS.md';
+  return dir ? `sveltekit-frontend/${dir}/LLMS.md` : 'sveltekit-frontend/LLMS.md';
 }
 
 async function readAgentsMarkdown(filePath: string): Promise<string | null> {
@@ -840,7 +840,7 @@ export async function resolveAgentsMdQuickHit(
   try {
     const redis = getRedis();
     for (const dir of lookupDirs) {
-      const key = `agents:dir:${dir}`;
+      const key = `llms:dir:${dir}`;
       const markdown = await redis.get(key).catch(() => null);
       if (markdown) {
         return {
@@ -852,13 +852,13 @@ export async function resolveAgentsMdQuickHit(
       }
     }
 
-    const rootMarkdown = await redis.get('agents:root').catch(() => null);
+    const rootMarkdown = await redis.get('llms:root').catch(() => null);
     if (rootMarkdown) {
       return {
         markdown: rootMarkdown,
         source: 'redis',
-        resolvedPath: 'AGENTS.md',
-        resolvedKey: 'agents:root',
+        resolvedPath: 'LLMS.md',
+        resolvedKey: 'llms:root',
       };
     }
   } catch {
@@ -867,8 +867,8 @@ export async function resolveAgentsMdQuickHit(
 
   for (const dir of [...lookupDirs, '']) {
     const filePath = dir
-      ? path.join(frontendRoot, ...dir.split('/'), 'AGENTS.md')
-      : path.join(frontendRoot, 'AGENTS.md');
+      ? path.join(frontendRoot, ...dir.split('/'), 'LLMS.md')
+      : path.join(frontendRoot, 'LLMS.md');
     const markdown = await readAgentsMarkdown(filePath);
     if (markdown) {
       return {
@@ -879,14 +879,14 @@ export async function resolveAgentsMdQuickHit(
     }
   }
 
-  const repoRootAgents = path.join(repoRoot, 'AGENTS.md');
+  const repoRootAgents = path.join(repoRoot, 'LLMS.md');
   const repoMarkdown = await readAgentsMarkdown(repoRootAgents);
   if (!repoMarkdown) return null;
 
   return {
     markdown: repoMarkdown,
     source: 'disk',
-    resolvedPath: 'AGENTS.md',
+    resolvedPath: 'LLMS.md',
   };
 }
 

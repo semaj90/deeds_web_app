@@ -29,6 +29,13 @@
 			<p>Validation, image analysis, GPU-heavy investigation tools, training telemetry, and architecture demos.</p>
 			<span class="card-link">Open lab route</span>
 		</a>
+
+		<a class="hub-card assistant" href="/admin/search-intelligence">
+			<div class="card-topline">Contextual Chat</div>
+			<h2>Assistant Console</h2>
+			<p>DenseRAG + GraphRAG query fusion for admin search, topology, and evidence-aware support.</p>
+			<span class="card-link">Open contextual assistant</span>
+		</a>
 	</section>
 </div>
 
@@ -121,6 +128,11 @@
 	.hub-card.lab:hover {
 		border-color: rgba(245, 158, 11, 0.28);
 		background: rgba(25, 21, 17, 0.92);
+	}
+
+	.hub-card.assistant:hover {
+		border-color: rgba(96, 165, 250, 0.28);
+		background: rgba(17, 22, 28, 0.92);
 	}
 
 	.card-topline {

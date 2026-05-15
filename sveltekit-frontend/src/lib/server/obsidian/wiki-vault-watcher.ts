@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Bidirectional Obsidian vault watcher.
  *
  * Watches `karpathy-wiki/` inside the configured Obsidian vault for file changes
@@ -8,7 +8,7 @@
  *  3. Refreshes Redis `wiki:note:*` TTL
  *  4. Skips files written by the server itself (2-second write-guard via timestamp)
  *
- * Singleton — only one watcher runs per process. Use start/stop/status API.
+ * Singleton � only one watcher runs per process. Use start/stop/status API.
  */
 
 import { readFile } from 'node:fs/promises';
@@ -18,13 +18,13 @@ import { couchPut, type WikiNote } from '$lib/server/indexer/karpathy-wiki.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 
-// chokidar has no @types — use a dynamic import typed manually
+// chokidar has no @types � use a dynamic import typed manually
 type ChokidarWatcher = {
 	close(): Promise<void>;
 	on(event: string, fn: (...args: unknown[]) => void): ChokidarWatcher;
 };
 
-// ── State ────────────────────────────────────────────────────────────────────
+// -- State --------------------------------------------------------------------
 
 const DEBOUNCE_MS   = 800;   // coalesce rapid saves (Obsidian can emit 2-3 events per save)
 const WRITE_GUARD_MS = 2000; // ignore files written by server within this window
@@ -34,7 +34,7 @@ let vaultRoot = '';
 const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 // Tracks paths the server just wrote, so we don't echo them back to CouchDB
-const recentServerWrites = new Map<string, number>(); // path → ms timestamp
+const recentServerWrites = new Map<string, number>(); // path ? ms timestamp
 
 export function markServerWrite(obsidianPath: string): void {
 	recentServerWrites.set(obsidianPath, Date.now());
@@ -42,7 +42,7 @@ export function markServerWrite(obsidianPath: string): void {
 	setTimeout(() => recentServerWrites.delete(obsidianPath), WRITE_GUARD_MS + 500);
 }
 
-// ── Public API ───────────────────────────────────────────────────────────────
+// -- Public API ---------------------------------------------------------------
 
 export interface WatcherStatus {
 	running: boolean;
@@ -72,7 +72,7 @@ export async function startWatcher(): Promise<{ ok: boolean; error?: string }> {
 
 		watcher.on('add', (p: unknown) => scheduleIngest(String(p)));
 		watcher.on('change', (p: unknown) => scheduleIngest(String(p)));
-		// Deletions: ignore — CouchDB retains the record; Obsidian deletion is rarely intentional
+		// Deletions: ignore � CouchDB retains the record; Obsidian deletion is rarely intentional
 
 		return { ok: true };
 	} catch (err) {
@@ -99,7 +99,7 @@ export function getWatcherStatus(): WatcherStatus {
 	};
 }
 
-// ── Ingest pipeline ──────────────────────────────────────────────────────────
+// -- Ingest pipeline ----------------------------------------------------------
 
 function scheduleIngest(absPath: string): void {
 	const existing = debounceTimers.get(absPath);
@@ -133,21 +133,21 @@ async function ingestFile(absPath: string): Promise<void> {
 
 	const { note } = parsed;
 
-	// ── CouchDB upsert ─────────────────────────────────────────────────────
+	// -- CouchDB upsert -----------------------------------------------------
 	// couchPut handles _rev conflict resolution internally
 	await couchPut(note);
 
-	// ── Redis refresh ───────────────────────────────────────────────────────
+	// -- Redis refresh -------------------------------------------------------
 	try {
 		const redis = getRedis();
 		const redisKey = redisKeyForNote(note);
 		if (redisKey) {
 			await redis.setex(redisKey, 86_400, JSON.stringify(note));
 		}
-	} catch { /* Redis unavailable — non-fatal */ }
+	} catch { /* Redis unavailable � non-fatal */ }
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// -- Helpers ------------------------------------------------------------------
 
 function redisKeyForNote(note: WikiNote): string | null {
 	switch (note.type) {

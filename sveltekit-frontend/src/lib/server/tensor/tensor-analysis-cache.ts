@@ -12,9 +12,10 @@
 
 import db from '$lib/server/db/client.js';
 import { tensorAnalysisCache } from '$lib/server/db/schema/topology.js';
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, or, and } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';
 import { topoByteFromPath, unpackTopoByte, classifyPath, TOPO_CLASS_LABEL } from './topology-byte-mapper.js';
+import { deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import type { NewTensorAnalysisCache, TensorAnalysisCache } from '$lib/server/db/schema/topology.js';
 
 export interface TensorAnalysisRecord {
@@ -55,10 +56,18 @@ export async function getTensorAnalysis(
 
   // L2: Postgres
   try {
+    const qdrantId = deterministicPointId(stableKey);
+    const legacyKey = `qdrant:${qdrantId}`;
+
     const [row] = await db
       .select()
       .from(tensorAnalysisCache)
-      .where(eq(tensorAnalysisCache.stableKey, stableKey))
+      .where(
+        or(
+          eq(tensorAnalysisCache.stableKey, stableKey),
+          eq(tensorAnalysisCache.stableKey, legacyKey)
+        )
+      )
       .limit(1);
 
     if (!row || row.contentHash !== contentHash) return null;

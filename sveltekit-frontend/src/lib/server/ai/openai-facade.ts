@@ -368,14 +368,14 @@ export async function runChatCompletion(
       chunks:     (aceCtx.ragChunks?.length ?? 0) + (aceCtx.kbChunks?.length ?? 0) + (aceCtx.caseChunks?.length ?? 0),
       agentsMd:   !!aceCtx.agentsMd?.markdown,
       codeLlmHit: !!aceCtx.codeLlmHit?.llmOutput,
-      cacheHit:   aceCtx.codeLlmHit ? 'prior-answer' : (aceCtx.agentsMd ? 'agents-md' : 'none'),
+      cacheHit:   aceCtx.codeLlmHit ? 'prior-answer' : (aceCtx.agentsMd ? 'LLMS.md' : 'none'),
     },
     hmm: hmmResult ? {
       hmmAnalyzerUsed: true,
       intent:          hmmResult.section,
       confidence:      hmmResult.confidence,
       state:           'context_sufficient',
-      signals:         ['ace_retrieval', 'qdrant', ...(aceCtx.agentsMd ? ['agents_md'] : [])],
+      signals:         ['ace_retrieval', 'qdrant', ...(aceCtx.agentsMd ? ['LLMS.md'] : [])],
     } : undefined,
     toolLoop: {
       toolsUsed:       [],

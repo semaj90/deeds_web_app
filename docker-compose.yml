@@ -274,7 +274,7 @@ services:
         max-size: "10m"
         max-file: "3"
     ports:
-      - "8380:8080"
+      - "8080:8080"
     volumes:
       - seaweed_volume_data:/data
     networks:
@@ -302,7 +302,7 @@ services:
         max-size: "10m"
         max-file: "3"
     ports:
-      - "8382:8888"
+      - "8888:8888"
     networks:
       - legal-ai-network
 
@@ -563,6 +563,7 @@ services:
   # Docling VLM — Document understanding + YOLO object detection + Whisper transcription
   # FastAPI service consolidating: docling-parse, ultralytics, whisper
   docling-vlm:
+    image: deeds-web-app-docling-vlm:latest
     build:
       context: ./docker/docling-vlm
       dockerfile: Dockerfile
@@ -615,6 +616,7 @@ services:
   # Pipeline: FLUX.1-schnell (keyframe) → Wan2.1-1.3B (video) → DepthAnything v2 (depth)
   # Multi-image: POST /reconstruct/gaussian-splat (needs ENABLE_GAUSSIAN_SPLATTING=true)
   image-synthesis:
+    image: deeds-web-app-image-synthesis:latest
     build:
       context: ./docker/image-synthesis
     container_name: legal-ai-image-synthesis

@@ -10,10 +10,12 @@ This architecture defines an SSR-first hybrid MPA where SvelteKit 2 is the page 
 - Retrieval and graph stores are supporting systems, not the source of truth.
 - The UI is hybrid MPA, not a pure SPA: pages are server-rendered first, with client navigation used only where it adds value.
 
-## Rendering and State Model
-This application is an SSR-first hybrid MPA, not a pure SPA.
+## Rendering, Language, and State Model
+
+This application is a **SvelteKit SSR-first hybrid MPA with Svelte 5 runes for local component reactivity**.
 
 SvelteKit owns:
+
 - browser-facing route boundaries
 - server-rendered pages
 - `+page.server.ts` data loading
@@ -23,14 +25,31 @@ SvelteKit owns:
 - invalidation and refresh boundaries
 
 Svelte 5 runes are used for local component reactivity only:
+
 - `$state` for local mutable UI state
 - `$derived` for local computed values
 - `$effect` for browser-side effects
 - `$props` for component props
 
-Do not describe this as a global rune syncing architecture. State synchronization should flow through SvelteKit server loads, actions, fetches, SSE, and explicit invalidation, not through a client-only sync layer.
+Do not describe this as a global rune-syncing architecture. State synchronization should flow through SvelteKit server loads, actions, fetches, SSE, and explicit invalidation, not through a client-only sync layer.
+
+TypeScript is the implementation language across routes, server modules, workers, shared utilities, and tests.
+
+Use:
+
+- **Bits UI v2** for accessible headless UI primitives
+- **Superforms v2 + Zod** for form state, validation, file uploads, and progressive enhancement
+- **Drizzle ORM + Postgres** for durable truth
+- **Redis** for hot ACE/BitFrost context packets
+- **Qdrant** for dense/hybrid semantic retrieval
+- **Neo4j** for KAG/DAG graph paths and topology traversal
+- **CouchDB** for stitched wiki and MapReduce rollups
+- **WebGPU** only for browser-side visualization or local compute paths where it is clearly warranted
+- **gRPC/Protobuf** only for internal sidecars, not browser-facing UI
+- **MCP** as the model-facing safe tool boundary
 
 Use SPA-like behavior only where the interaction is inherently live or incremental:
+
 - chat streaming
 - timeline scrubbers
 - video/frame viewers
@@ -78,8 +97,9 @@ These are the contextual chunks to keep aligned with codebase indexing and Graph
 - `src/routes/api/codebase-index/deep-research/+server.ts`, `src/routes/api/vector-search/+server.ts`, `src/routes/api/search/+server.ts`, and `src/routes/api/topology/+server.ts` for exposed retrieval and topology entry points.
 - `src/lib/server/db/schema/features.ts` and `src/lib/server/db/schema/metadata-spine.ts` for persisted feature and retrieval metadata.
 
-## Subgraph Rules
-The subgraph instruction model should carry explicit rendering metadata so verification can distinguish local UI reactivity from synchronization boundaries.
+## Subgraph Rendering Rules
+
+Each subgraph instruction should carry explicit rendering metadata so agents can distinguish local UI reactivity from synchronization boundaries.
 
 ```ts
 renderingModel: 'ssr_hybrid_mpa';
@@ -98,7 +118,10 @@ Example:
   "blockedPatterns": [
     "global rune syncing",
     "client-only evidence mutation",
-    "browser-direct database writes"
+    "browser-direct database writes",
+    "browser state as source of truth",
+    "Gemma4 direct DB mutation",
+    "ungated patch application"
   ]
 }
 ```
@@ -138,21 +161,27 @@ Example:
 - During verification, cross-check the feature map above against the latest codebase indexing output so the spec stays synchronized with reality.
 
 ## Verification Criteria
+
 The architecture is correct when:
+
 - `+page.server.ts` loads durable page data.
 - `+page.svelte` uses runes for local UI state.
 - Form actions or `+server.ts` perform mutations.
-- Superforms and Zod validate form data.
-- Postgres stores truth.
-- Redis caches hot packets.
-- Qdrant and Neo4j retrieve context.
+- Superforms v2 and Zod validate form data.
+- Drizzle ORM writes durable state to Postgres.
+- Redis caches hot ACE/BitFrost packets.
+- Qdrant and Neo4j retrieve semantic and graph context.
+- CouchDB stores stitched wiki/context pages.
+- WebGPU is limited to visualization or bounded browser compute.
+- gRPC sidecars are called from the server, never directly from the browser.
 - Gemma4 receives compact ACE/KAG packets.
-- UI updates through `invalidate()`, polling, or SSE.
+- UI updates through `invalidate()`, polling, SSE, or explicit fetches.
 
 The architecture is wrong when:
+
 - browser state becomes the source of truth.
 - runes are used as global app sync.
-- Gemma4 directly mutates DB or search stores.
+- Gemma4 directly mutates DB/search stores.
 - components bypass server actions for durable writes.
 - agent patches are applied without operator approval.
 

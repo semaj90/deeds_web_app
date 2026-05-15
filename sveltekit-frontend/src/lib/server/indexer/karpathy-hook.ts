@@ -169,7 +169,7 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 			(file.graph?.pageRank && file.graph.pageRank > 0.5) || 
 			(file.audit?.score && file.audit.score < 0.4) || // Audit failure
 			file.route || // Active route
-			file.filePath.includes('AGENTS.md'); // Policy file
+			file.filePath.includes('LLMS.md'); // Policy file
 
 		if (isHighValue) {
 			// Trigger Tier 2: Gemma4 summary lenses

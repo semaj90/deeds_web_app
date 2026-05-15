@@ -2,7 +2,7 @@
  * HyperGraphRAG types.
  *
  * A hyperedge connects N heterogeneous members (query, files, clusters,
- * AGENTS.md context, prior answers, tests) in a single relation.
+ * LLMS.md context, prior answers, tests) in a single relation.
  * Unlike binary graph edges (IMPORTS, SIMILAR_TO) a hyperedge is n-ary.
  *
  * Search modes (GraphSearch-inspired):
@@ -12,11 +12,11 @@
  */
 
 export const EDGE_TYPES = [
-  'retrieval',       // ACE/RAG retrieval run — query → chunks + clusters + agents_md
+  'retrieval',       // ACE/RAG retrieval run — query → chunks + clusters + LLMS.md
   'fix_attempt',     // ops.record_fix_attempt — file + test + operator token hash + prior answer
   'test_coverage',   // test file covers source files
   'cluster_context', // cluster annotation — files belonging to a GPU/SOM cluster
-  'agents_context',  // AGENTS.md walk-up binding — file + relevant agents_md nodes
+  'agents_context',  // LLMS.md walk-up binding — file + relevant LLMS.md nodes
   'shared_resource', // shared resource edge — cross-cluster file dependency
   'vault_link',      // vault markdown link edge
   'topo_context',    // topology context edge — SOM neighborhood
@@ -27,7 +27,7 @@ export type EdgeType = typeof EDGE_TYPES[number];
 export const MEMBER_KINDS = [
   'query',         // hashed query string
   'file',          // source file stable_key
-  'agents_md',     // AGENTS.md Redis key (agents:dir:<path> or agents:root)
+  'LLMS.md',     // LLMS.md Redis key (llms:dir:<path> or llms:root)
   'cluster',       // GPU/SOM cluster id
   'prior_answer',  // code_llm_index / ace_hits stable_key
   'test',          // test file stable_key

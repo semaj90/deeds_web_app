@@ -220,13 +220,13 @@ const AGENT_TOOLS = [
   {
     type: 'function',
     function: {
-      name: 'agents_md',
+      name: 'LLMS.md',
       description:
-        'Quick-hit fetch of the per-directory AGENTS.md (agents.md spec) for a path. ' +
+        'Quick-hit fetch of the per-directory LLMS.md (LLMS.md spec) for a path. ' +
         'Returns pre-rendered Markdown with: directory purpose, audit score, ' +
         'top warnings (auth/Zod/SSR/Svelte4/network), dominant tags, ' +
         'topological neighbors, and representative files. Walks UP the tree to ' +
-        'the nearest AGENTS.md (Cursor/Codex/Aider use the same convention). ' +
+        'the nearest LLMS.md (Cursor/Codex/Aider use the same convention). ' +
         'Use this BEFORE editing files in an unfamiliar directory — it gives you ' +
         'the same snapshot a human reviewer would expect from the dir README. ' +
         'Sub-5ms latency vs ~50-100ms for the full KAG pipeline.',
@@ -694,7 +694,7 @@ function buildGoClusterPackets(
 const ALLOWED_TOOLS = {
   read: new Set([
     'rag_search', 'case_search', 'memory_recall', 'hyperedge_stats',
-    'topology_search', 'trace_search', 'agents_md', 'read_file',
+    'topology_search', 'trace_search', 'LLMS.md', 'read_file',
     'graph_search', 'wiki_note_lookup', 'audit_hotspots', 'web_search',
     // TRACE MCP graph tools (proxy to :8788)
     'graph_expand', 'graph_path', 'graph_community', 'graph_pagerank',
@@ -1140,7 +1140,7 @@ async function dispatchTool(
       }
     }
 
-    if (name === 'agents_md') {
+    if (name === 'LLMS.md') {
       const p = String(args.path ?? '');
       if (!p) return { tool: name, result: null, errorMsg: 'path is required' };
       try {
@@ -1150,7 +1150,7 @@ async function dispatchTool(
           return {
             tool: name,
             result: null,
-            errorMsg: 'No AGENTS.md found for this path (run `npm run agents:write`)',
+            errorMsg: 'No LLMS.md found for this path (run `npm run llms:write`)',
           };
         }
         return {

@@ -64,7 +64,7 @@ export class KAGTraverser {
 		this.config = {
 			neo4jUrl: config?.neo4jUrl ?? ENV.NEO4J_URI,
 			neo4jUser: config?.neo4jUser ?? process.env?.NEO4J_USER ?? 'neo4j',
-			neo4jPassword: config?.neo4jPassword ?? process.env?.NEO4J_PASSWORD ?? 'password',
+			neo4jPassword: config?.neo4jPassword ?? ENV.NEO4J_PASSWORD,
 			maxDepth: config?.maxDepth ?? 5,
 			confidenceBoost: config?.confidenceBoost ?? 0.1,
 			minSuccessRate: config?.minSuccessRate ?? 0.7,

@@ -15,10 +15,10 @@ export function registerAdminTools(server: McpServer) {
     'ui.analyze_view',
     {
       description: 'Analyzes the current UI state based on a provided snapshot.',
-      inputSchema: {
+      inputSchema: z.object({
         snapshot: z.record(z.string(), z.any()).describe('A structured snapshot of the current UI elements'),
         focus: z.string().optional().describe('Specific element ID to focus on')
-      }
+      })
     },
     async ({ snapshot, focus }) => {
       // In a real implementation, this might use a vision model or a complex heuristic.
@@ -44,11 +44,11 @@ export function registerAdminTools(server: McpServer) {
       'admin.log_event',
       {
         description: 'Logs a manual administrative event with context.',
-        inputSchema: {
+        inputSchema: z.object({
           event: z.string().describe('The event description'),
           severity: z.enum(['info', 'warning', 'error']).default('info'),
           context: z.record(z.string(), z.any()).optional()
-        }
+        })
       },
       async ({ event, severity, context }) => {
         console.log(`[ADMIN LOG] [${severity.toUpperCase()}] ${event}`, context);
@@ -68,14 +68,14 @@ export function registerAdminTools(server: McpServer) {
     'ops.execute_graphify',
     {
       description: 'Executes an authorized graphify pipeline command.',
-      inputSchema: {
+      inputSchema: z.object({
         command: z.enum([
           'npm run graphify:topology:gpu',
           'npm run qdrant:patch-topology',
           'npm run graphify:seed-llm-index'
         ]).describe('The canonical graphify command to execute'),
         confirm: z.boolean().describe('Must be true to execute')
-      }
+      })
     },
     async ({ command, confirm }) => {
       if (!confirm) {

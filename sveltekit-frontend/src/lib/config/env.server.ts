@@ -123,7 +123,7 @@ export function getNeo4jConfig() {
  return {
   uri: env?.NEO4J_URI|| `bolt://${isDocker ? 'neo4j' : LOCALHOST}:7687`,
   user: env?.NEO4J_USER ?? 'neo4j',
-  password: env?.NEO4J_PASSWORD ?? 'legal123456',
+   password: env?.NEO4J_PASSWORD ?? 'neo4j123',
   };
 }
 
@@ -185,7 +185,7 @@ const ConfigSchema = z.object({
   QDRANT_URL: z.string().url().default(getQdrantUrl()),
   NEO4J_URL: z.string().url().default(getNeo4jConfig().uri),
   NEO4J_USER: z.string().default('neo4j'),
-  NEO4J_PASSWORD: z.string().default('legal123456'),
+  NEO4J_PASSWORD: z.string().default('neo4j123'),
   MINIO_URL: z.string().url().default(normalizeMinioUrl()),
   MINIO_ACCESS_KEY: z.string().default('minioadmin'),
   MINIO_SECRET_KEY: z.string().default('minioadmin'),
@@ -275,4 +275,3 @@ export const LEGACY = {
 	MINIO_URL: CONFIG.MINIO_URL,
 	MINIO_REGION: CONFIG.MINIO_REGION ?? env.MINIO_REGION ?? undefined,
 };
-

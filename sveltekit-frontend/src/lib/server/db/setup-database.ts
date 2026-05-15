@@ -3,7 +3,7 @@
  * Ensures all required tables, indexes, and extensions are properly configured
  */
 import { sql } from 'drizzle-orm';
-import { db } from './unified-client.js';
+import { db } from './client.js';
 
 export interface DatabaseSetupResult {
     success: boolean;

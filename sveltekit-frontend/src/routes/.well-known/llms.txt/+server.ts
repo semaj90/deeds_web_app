@@ -21,7 +21,7 @@
  * Data sources (best-effort, all non-fatal):
  *   1. docs/graph/codebase-graph.json — fast AST file list + tags
  *   2. Redis cluster summaries (summary:cluster:*)
- *   3. Redis AGENTS.md root (agents:root) — directory index preamble
+ *   3. Redis LLMS.md root (llms:root) — directory index preamble
  *   4. Static stack section from package.json dependencies
  *
  * Cache: public, max-age=900 (15 min) — fresh enough for agent discovery,
@@ -35,7 +35,7 @@ import type { RequestHandler } from './$types';
 
 const GRAPH_JSON  = path.resolve('docs/graph/codebase-graph.json');
 const PKG_JSON    = path.resolve('package.json');
-const AGENTS_FILE = path.resolve('AGENTS.md');
+const AGENTS_FILE = path.resolve('LLMS.md');
 
 interface GraphFile {
   rel: string;
@@ -113,7 +113,7 @@ async function readAgentsMdPreamble(): Promise<string | null> {
   try {
     const { getRedis } = await import('$lib/server/redis.js');
     const redis = getRedis();
-    const root = await redis.get('agents:root');
+    const root = await redis.get('llms:root');
     if (root) {
       // Return first 60 lines (directory index + tool surface)
       return root.split('\n').slice(0, 60).join('\n');
@@ -186,7 +186,7 @@ export const GET: RequestHandler = async () => {
   lines.push('');
   lines.push('| Tier | Tech | Key pattern | TTL | Notes |');
   lines.push('|------|------|-------------|-----|-------|');
-  lines.push('| Tiny RAM | Redis | `agents:dir:*` | 24h | Per-directory AGENTS.md rendered markdown |');
+  lines.push('| Tiny RAM | Redis | `llms:dir:*` | 24h | Per-directory LLMS.md rendered markdown |');
   lines.push('| Tiny RAM | Redis | `code:index:*` | 6h | Fast-AST file metadata |');
   lines.push('| Tiny RAM | Redis | `wiki:note:dir:*` | 24h | Karpathy wiki notes per directory |');
   lines.push('| Tiny RAM | Redis | `summary:cluster:*` | 6h | Gemma4 GPU cluster narratives |');
@@ -197,9 +197,9 @@ export const GET: RequestHandler = async () => {
   lines.push('| PPU | LibTorch N-API | — | — | GPU cosine similarity / k-means / SOM |');
   lines.push('');
 
-  // ── AGENTS.md preamble ────────────────────────────────────────────────────
+  // ── LLMS.md preamble ────────────────────────────────────────────────────
   if (agentsMd) {
-    lines.push('## AGENTS.md Directory Index (excerpt)');
+    lines.push('## LLMS.md Directory Index (excerpt)');
     lines.push('');
     lines.push(agentsMd);
     lines.push('');
@@ -246,7 +246,7 @@ export const GET: RequestHandler = async () => {
   lines.push('');
   lines.push('## Optional');
   lines.push('');
-  lines.push('- Full AGENTS.md index: `/llms-full.txt`');
+  lines.push('- Full LLMS.md index: `/llms-full.txt`');
   lines.push('- Codebase graph JSON: `GET /api/codebase-index/stats`');
 
   const body = lines.join('\n');

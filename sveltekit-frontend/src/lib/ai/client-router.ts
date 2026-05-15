@@ -1,16 +1,15 @@
 /**
- * Client Inference Router — 5-tier routing with Gemma 4 on-device inference.
+ * Client Inference Router — server-first reasoning with helper-only client tiers.
  *
  * Five routing tiers (local → server):
- *   LOCAL-E2B    (score < 0.3, E2B ready):     Gemma 4 E2B 2.3B via Transformers.js + WebGPU
- *   LOCAL-LITERT (score < 0.3, LiteRT ready):   Gemma 4 E2B via LiteRT-LM (CPU XNNPACK + MTP heads)
- *   LOCAL-ONNX   (score < 0.3, both unready):   Gemma 3 270M ONNX (legacy fallback)
- *   RETRIEVAL    (0.3–0.6):                     Hybrid client+server — factual queries needing search
- *   SERVER       (score > 0.6):                 gemma4-legal full pipeline — legal reasoning, drafting
+ *   LOCAL-HELPER  helper-only browser/local models (default)
+ *   LOCAL-ONNX    Gemma 3 270M ONNX or other tiny helper models
+ *   RETRIEVAL     Hybrid client+server — factual queries needing search
+ *   SERVER        Gemma4 reasoning/synthesis with agentic tools
+ *   VISION        multimodal server reasoning where needed
  *
- * LiteRT-LM advantage over ONNX 270M: Gemma 4 E2B (2.3B) with MTP heads gives
- * ~1.8x decode speedup and far better quality than 270M. Runs on CPU (AVX2/NEON)
- * without WebGPU. Falls back to 270M ONNX only when LiteRT isn't installed.
+ * Client Gemma4 lanes remain opt-in helpers only. The default local lane is
+ * tiny ONNX/helper models; server-side Gemma4 handles reasoning and synthesis.
  *
  * Health-aware: polls /api/health/capabilities (30s cache) to know which
  * server services are actually available before escalating.
@@ -313,21 +312,20 @@ export interface RouterDecision {
 
 /**
  * Pick the best available local inference source.
- * Priority: E2B (WebGPU 2.3B) → LiteRT-LM (CPU 2.3B + MTP) → ONNX (270M legacy)
+ * Default: ONNX helper lane. Opt-in Gemma4 client helpers remain available when enabled.
  */
-function pickLocalSource(e2bReady?: boolean, litertReady?: boolean): InferenceSource {
-	if (e2bReady) return 'local-e2b';
-	if (litertReady) return 'local-litert';
+function pickLocalSource(e2bReady?: boolean, litertReady?: boolean, allowClientGemma = false): InferenceSource {
+	if (allowClientGemma && e2bReady) return 'local-e2b';
+	if (allowClientGemma && litertReady) return 'local-litert';
 	return 'local-onnx';
 }
 
 /**
  * Determine whether a user message should be handled:
- *   - locally via E2B (Gemma 4 E2B 2.3B, WebGPU)
- *   - locally via LiteRT-LM (Gemma 4 E2B 2.3B, CPU XNNPACK + MTP heads)
- *   - locally via ONNX (Gemma 3 270M, legacy fallback)
+ *   - locally via ONNX/helper lanes by default
+ *   - optionally via client Gemma4 helpers when explicitly enabled
  *   - via retrieval-hybrid (client embed + server search + local answer)
- *   - via server (Ollama gemma4-legal full RAG pipeline)
+ *   - via server Gemma4 reasoning/synthesis
  */
 export function shouldEscalateToServer(
 	message: string,
@@ -345,17 +343,20 @@ export function shouldEscalateToServer(
 		e2bReady?: boolean;
 		/** Whether LiteRT-LM sidecar is running (avoids async check) */
 		litertReady?: boolean;
+		/** Allow client-side Gemma4 helper lanes when explicitly opted in */
+		allowClientGemma?: boolean;
 	}
 ): RouterDecision {
 	// Classify intent via KAG system
 	const { intent } = classifyIntent(message);
 
 	const litertOk = options?.litertReady ?? getCachedLitertReady();
+	const allowClientGemma = options?.allowClientGemma ?? false;
 
 	// Explicit overrides
 	if (options?.forceLocal) {
 		return {
-			source: pickLocalSource(options?.e2bReady, litertOk),
+			source: pickLocalSource(options?.e2bReady, litertOk, allowClientGemma),
 			reason: 'user-forced-local',
 			confidence: 0.5,
 			intent,
@@ -368,7 +369,7 @@ export function shouldEscalateToServer(
 	if (options?.forceServer) {
 		if (caps && !caps.serverReady) {
 			return {
-				source: pickLocalSource(options?.e2bReady, litertOk),
+				source: pickLocalSource(options?.e2bReady, litertOk, allowClientGemma),
 				reason: 'forced-server-but-unavailable',
 				confidence: 0.3,
 				intent,
@@ -384,7 +385,7 @@ export function shouldEscalateToServer(
 	const localHit = LOCAL_PATTERNS.some(p => lower.includes(p));
 	if (localHit && message.length < 200) {
 		return {
-			source: pickLocalSource(options?.e2bReady, litertOk),
+			source: pickLocalSource(options?.e2bReady, litertOk, allowClientGemma),
 			reason: 'local-pattern',
 			confidence: 0.9,
 			intent: 'greeting',
@@ -440,7 +441,7 @@ export function shouldEscalateToServer(
 		// Health check: if server is down, fall to retrieval or local
 		if (caps && !caps.ollama) {
 			return {
-				source: pickLocalSource(options?.e2bReady, litertOk),
+				source: pickLocalSource(options?.e2bReady, litertOk, allowClientGemma),
 				reason: reasonStr + '+server-unavailable',
 				confidence: 0.3,
 				intent,
@@ -470,7 +471,7 @@ export function shouldEscalateToServer(
 		// Health check: if RAG/server not available, fall to local
 		if (caps && (!caps.ollama || !caps.rag)) {
 			return {
-				source: pickLocalSource(options?.e2bReady, litertOk),
+				source: pickLocalSource(options?.e2bReady, litertOk, allowClientGemma),
 				reason: reasonStr + '+rag-unavailable',
 				confidence: 0.4,
 				intent,
@@ -485,7 +486,7 @@ export function shouldEscalateToServer(
 	}
 
 	return {
-		source: pickLocalSource(options?.e2bReady, litertOk),
+		source: pickLocalSource(options?.e2bReady, litertOk, allowClientGemma),
 		reason: reasonStr,
 		confidence: 1.0 - serverScore,
 		intent,

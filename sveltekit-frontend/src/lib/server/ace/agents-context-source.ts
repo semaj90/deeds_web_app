@@ -7,7 +7,7 @@
  *
  * Cards are LEXICON HINTS, NOT canonical spec. The assembler should treat
  * card.purpose as soft context, never as a hard fact about feature shape —
- * canonical truth lives in code + tests + master_agents.md.
+ * canonical truth lives in code + tests + master_LLMS.md.
  */
 
 import { z } from 'zod';
@@ -42,7 +42,7 @@ const REDIS_CARDS_SCAN_LIMIT = 60; // bounded scan; ACE caller is hot-path
  * Returns up to `limit` cards ranked by query relevance. Sources fall
  * through in this order, stopping when `limit` is reached:
  *   1. Redis exact: derive cardId from `filePath` walk-up
- *   2. Redis broad: scan `agents:dir:*`, filter by query keyword in tags
+ *   2. Redis broad: scan `llms:dir:*`, filter by query keyword in tags
  *   3. Qdrant: search `codebase_chunks_768` and pull out unique `agents_card_id` payload values
  *   4. CouchDB: not yet wired (returns empty); leaves a hook
  */
@@ -145,7 +145,7 @@ function extractKeywords(text: string): string[] {
 }
 
 /**
- * SCAN agents:dir:* in Redis, fetch the card payloads, return ones whose
+ * SCAN llms:dir:* in Redis, fetch the card payloads, return ones whose
  * tags / featureKeys / purpose intersect the query keywords.
  */
 async function scanRedisCardsByKeywords(
@@ -164,7 +164,7 @@ async function scanRedisCardsByKeywords(
 	const HARD_CAP = 8; // ≤8 SCAN calls — bounded latency
 
 	while (calls++ < HARD_CAP) {
-		const [next, keys] = await redis.scan(cursor, 'MATCH', 'agents:dir:*', 'COUNT', '200');
+		const [next, keys] = await redis.scan(cursor, 'MATCH', 'llms:dir:*', 'COUNT', '200');
 		collected.push(...keys);
 		cursor = next;
 		if (cursor === '0' || collected.length >= maxScan) break;

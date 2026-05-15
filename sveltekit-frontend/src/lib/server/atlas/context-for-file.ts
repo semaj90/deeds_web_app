@@ -170,8 +170,8 @@ function safeParse<T = Record<string, unknown>>(raw: unknown): T | null {
 // dir × 918 dirs = ~3-4MB). We expand them to readable names in the response.
 interface RawDirCard {
   d?:        string;            // directory path
-  a?:        string;            // AGENTS.md path
-  p?:        string;            // parent AGENTS.md path
+  a?:        string;            // LLMS.md path
+  p?:        string;            // parent LLMS.md path
   n?:        number;            // file count
   clusters?: string[];
   topo?:     string[];
@@ -275,7 +275,7 @@ function buildRecommendedActions(
       out.push(`Frequently retrieved (${file.h} ACE hits) — agents already lean on this file; preserve external behaviour.`);
     }
     if (file.rules > 0 || file.tools > 0) {
-      out.push(`${file.rules} rule(s) / ${file.tools} tool entry(s) in nearest AGENTS.md — read those before editing.`);
+      out.push(`${file.rules} rule(s) / ${file.tools} tool entry(s) in nearest LLMS.md — read those before editing.`);
     }
     if (karpathyBlend != null && karpathyBlend >= 2.5) {
       out.push(`Karpathy GPU blend ${karpathyBlend.toFixed(2)} — top-tier composite priority; treat as a stabilization target.`);

@@ -41,6 +41,28 @@
       }
     },
     {
+      "label": "Dev Server (GPU, detached)",
+      "type": "shell",
+      "command": "node scripts/startup/run-detached.mjs dev:gpu",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "AUTO-STARTS on folder open — spawns npm run dev:gpu detached so VS Code returns immediately. Uses scripts/startup/run-detached.mjs and writes logs to logs/task-output/pipeline-test/dev-gpu.{out,err}.log."
+    },
+    {
       "label": "Dev Server (gRPC Retrieval)",
       "type": "shell",
       "command": "npm run dev:grpc",

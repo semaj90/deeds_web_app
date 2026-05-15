@@ -304,6 +304,31 @@ test.describe('Natural Routing (no query params)', () => {
     });
   });
 
+	test('Index-based GraphRAG prompt routes to server naturally', async ({ page }) => {
+		await page.goto(`${BASE}/chat?debug=1`, { waitUntil: 'networkidle' });
+
+		const input = page.locator('[data-testid="chat-input"]');
+		const sendBtn = page.locator('[data-testid="chat-send"]');
+
+		await input.fill(
+			'Calling to 1 million PDFs and transforming isolated vector clusters into navigable topological nodes requires a highly structured, agentic architecture. By combining Turbovec\'s compression, Qdrant\'s payload mapping, Neo4j\'s graph structure, and Gemma 4\'s native reasoning, you can build an "Index-based GraphRAG" pipeline.'
+		);
+		await sendBtn.click();
+
+		const assistantMsg = page.locator('[data-role="assistant"]').first();
+		await expect(assistantMsg).toBeVisible({ timeout: 15_000 });
+
+		const overlay = page.locator('[data-testid="debug-overlay"]');
+		await expect(overlay).toContainText('server-ollama');
+		await expect(overlay).toContainText('Status: idle');
+
+		const sourceBadge = page.locator('[data-testid="answer-source"]').first();
+		await expect(sourceBadge).toBeVisible();
+		await expect(sourceBadge).toHaveAttribute('data-source', 'server-ollama');
+
+		await page.screenshot({ path: `${SCREENSHOT_DIR}/08b-index-based-graphrag-server-route.png`, fullPage: true });
+	});
+
   test('simple query routes to local (then escalates)', async ({ page }) => {
     // "thanks" matches a local pattern; depending on ONNX availability it may stay local or escalate
     await page.goto(`${BASE}/chat?debug=1`, { waitUntil: 'networkidle' });

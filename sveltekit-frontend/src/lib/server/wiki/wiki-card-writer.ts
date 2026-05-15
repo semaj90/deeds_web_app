@@ -71,7 +71,7 @@ const CODEBASE_RELATIONSHIP_SPINE_CARD: Omit<WikiCard, 'gaps' | 'updatedAt'> = {
 		'The relationship spine extracts 7 semantic edge types (EXPORTS_SYMBOL, READS/WRITES_REDIS_KEY, ' +
 		'QUERIES_TABLE, QUERIES_QDRANT_COLLECTION, QUERIES_NEO4J_LABEL, HAS_AGENTS_SCOPE) from every TS/Svelte ' +
 		'source file and persists them in Postgres code_relations + Neo4j. ' +
-		'These edges feed the ACE multi-lane retrieval spine (symbol lookup, graph expansion, AGENTS.md walk-up) ' +
+		'These edges feed the ACE multi-lane retrieval spine (symbol lookup, graph expansion, LLMS.md walk-up) ' +
 		'and are the primary input for the gap analyzer and wiki card pipeline. ' +
 		'The pipeline: workspace-metadata-extractor → codebase-scanner-v2 → relationship-extractor → ' +
 		'pg-neo4j-sync → codebase-neo4j-sync → graph-centrality/community-graph → ' +

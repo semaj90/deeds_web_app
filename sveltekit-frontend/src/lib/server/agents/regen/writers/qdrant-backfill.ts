@@ -3,7 +3,7 @@
  *
  * For every Qdrant chunk whose `file_path` (or `path`) payload field starts
  * with the card's dirPath, set/merge:
- *   - agents_card_id = card.id  (the agents:dir:<slug> handle)
+ *   - agents_card_id = card.id  (the llms:dir:<slug> handle)
  *   - feature_keys   = card.featureKeys
  *
  * Uses Qdrant HTTP `set_payload` with a filter — single round-trip per card,

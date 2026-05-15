@@ -1,77 +1,43 @@
 # AGENTS.md — Deeds Web App
 
-<!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-14T00:50:41.701Z · agents.md spec · regen: npm run agents:write -->
+> Legal-AI platform: SvelteKit 2 + Svelte 5 (runes) + Bits UI v2 + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 
-> Legal-AI platform: SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
-> See [`CLAUDE.md`](./CLAUDE.md) for the canonical 600-line dev guide. This file is the agents.md-spec entry point — agents.md / Claude Code / Cursor / Codex all read it.
+## Critical constraints
 
-## Repo at a glance
+- Svelte 5 runes only: no `export let`, `$:`, `on:click`, or `<slot>`; use `$state`, `$derived`, `$props`, `onclick`, and snippets.
+- Bits UI uses namespace imports from `bits-ui`; prefer the `child` snippet pattern.
+- Drizzle server code should come from `$lib/server/db/client`, keep `.js` import extensions, and use migrate flows rather than `drizzle-kit push` on live data.
+- GET API routes should keep a stable JSON shape even on failure.
+- Zod-validate every `request.json()` payload.
+- Use `env.server.ts` for service URLs; do not hardcode `localhost` in app code.
 
-- **Frontend**: `sveltekit-frontend/` — SvelteKit + Svelte 5 runes only. 682 server routes across 1553 dirs, 4980 indexed files.
-- **GPU bridge**: `simd-bridge/cpp/` — N-API addon for LibTorch CUDA + simdjson AVX2.
-- **Go services**: `go-microservice/`, `services/go-retrieval-service/` — gRPC :50051-50057 (see `CLAUDE.md#grpc-port-map`).
-- **Docs**: `docs/graph/codebase-graph.json` (auto), `docs/graph/codebase-map.md`, `docs/ace-kag-howto.md`, `docs/agents-md-howto.md`.
+## Commands
 
-## Audit gate snapshot
+- `cd sveltekit-frontend && npm ci`
+- `cd sveltekit-frontend && npm run dev`
+- `cd sveltekit-frontend && npm run check`
+- `cd sveltekit-frontend && npm run test:run`
+- `cd sveltekit-frontend && npm run agents:write`
 
-| Gate | Status |
-|------|--------|
-| G4  Auth on API routes | 775✅ / 0❌ |
-| G5  Zod on body-parsing routes | 538✅ / 0❌ |
-| G15 SSR-unsafe globals (real) | 0❌ |
-| G20 Cyclic import pairs | 0 |
+## Repo map
 
-Refresh: `npm run index:codebase:fast` then `npm run agents:write`.
+- `sveltekit-frontend/` is the main app root.
+- `simd-bridge/` holds the native bridge code.
+- `services/` holds standalone services.
+- `docker/` holds compose/runtime stacks.
+- `drizzle/` holds migrations and schema assets.
+- `scripts/` and `docs/` contain repo-level tooling and documentation.
 
-## Build / test commands (Frontend)
+## Agent context
 
-```bash
-cd sveltekit-frontend
-npm run dev                     # SvelteKit dev server (sets DEV_BYPASS_AUTH)
-npx svelte-check --threshold error
-npx vitest run                  # all unit tests
-npm run test:stubs:progress     # 533 G16 route stubs (serial, ~22 min)
-npm run smoke:graphify          # 5-pillar codebase intelligence health check
-```
+- The repo-local wiki lives in `llm/`.
+- `llm/llm_timeline.md` is append-only and must never lose prior entries.
+- When updating `llm/`, add a new timestamped note instead of rewriting history; keep the index and timeline in sync.
+- Prefer `llm/llm.md` plus the nearest `AGENTS.md` for agentic context; treat `llm/` as the repo's `llms.txt`-style ingest hub for ACE packet injection, 4D topology lookup, and Gemma4 tool-calling.
+- Do not create new directory `AGENTS.md` files just to mirror docs; use `llm/` pages for durable repo-wide context and add directory files only when a subtree already depends on them.
 
-## Critical conventions
+## Gotchas
 
-- **Svelte 5 runes only**. No `export let`, no `$:`, no `on:click`, no `<slot>`. See `CLAUDE.md#svelte-5-runes`.
-- **bits-ui v2.16.2** — namespace imports, `child` snippet (not `asChild`), `forceMount` for transitions.
-- **Drizzle imports** — `from '$lib/server/db/client'` (Pool), NOT `db/index` (postgres.js). Use `.js` extensions.
-- **Degraded GET response contract** — error path returns same JSON shape with empty defaults, not `{error}` only.
-- **Auth on API routes** — `if (!locals.user) return json({...empty defaults..., error: 'Unauthorized'}, {status:401})`.
-- **Zod on body-parsing routes** — every `request.json()` / `request.formData()` validated before use.
-- **Env URLs** — `ENV.X ?? 'http://localhost:N'` pattern via `env.server.ts`. Never bare hardcoded URLs.
-
-## How agents.md works here
-
-- **Discovery**: nearest `AGENTS.md` walking up from the file you're editing wins; subdirectory files ADD context, don't replace.
-- **Per-directory files** are auto-generated from Redis KAG notes (`wiki:note:dir:*`) + per-file gate flags.
-- **Stale detection**: regenerate after every `graphify:daily` or `graphify:full` run.
-- **Compat**: `CLAUDE.md` and `AGENTS.md` coexist. CLAUDE.md is the canonical long-form guide; AGENTS.md is the agents.md-spec entry point.
-
-## Pointer index — start here for navigation
-
-- **Frontend directory wiki** (LLM jump table): [`sveltekit-frontend/AGENTS.md`](./sveltekit-frontend/AGENTS.md) — every dir + cluster + KAG slug + tool call
-- **Per-directory context** (~250 files): `AGENTS.md` files throughout `sveltekit-frontend/src/` — agents auto-discover via tree walk
-- **AGENTS.md system how-to**: [`sveltekit-frontend/docs/agents-md-howto.md`](./sveltekit-frontend/docs/agents-md-howto.md) — generation, idempotency, cache integration, reranking pattern
-- **Root long-form docs**: [`CLAUDE.md`](./CLAUDE.md), [`docs/ace-kag-howto.md`](./docs/ace-kag-howto.md)
-- **Audit dashboard**: [`sveltekit-frontend/docs/graph/codebase-map.md`](./sveltekit-frontend/docs/graph/codebase-map.md)
-- **Cluster digest**: [`sveltekit-frontend/docs/graph/hypergraph-clusters.md`](./sveltekit-frontend/docs/graph/hypergraph-clusters.md)
-
-## Top-level repo structure
-
-| Path | Purpose | Has AGENTS.md? |
-|------|---------|----------------|
-| `sveltekit-frontend/` | SvelteKit + Svelte 5 frontend (main app) | ✅ (this dir + ~250 children) |
-| `simd-bridge/cpp/` | LibTorch CUDA + simdjson N-API addon | — |
-| `go-microservice/` | Go gRPC services (:50051+) | — |
-| `services/go-retrieval-service/` | Go retrieval gRPC | — |
-| `docker/` | Compose stacks (Redis, Postgres, Qdrant, RabbitMQ, Caddy) | — |
-| `docs/` | Repo docs (CODEBASE_DIRECTORY_MAP.md etc.) | — |
-| `scripts/` | Repo-level scripts (truth-check, audit) | — |
-| `drizzle/` | DB migrations | — |
-
-Generated by `scripts/generate-agents-md.mjs` from KAG cache + graph JSON + hypergraph clusters. Regenerate: `npm run agents:write`.
+- User IDs are mixed across tables; check schema before querying.
+- SeaweedFS is the primary S3 gateway; ignore MinIO stubs.
+- UnoCSS is the styling baseline; do not assume default Tailwind classes exist.

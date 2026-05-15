@@ -271,7 +271,7 @@ async function runSymbolLane(redis: Redis, query: MultiLaneQuery): Promise<LaneR
 	return { lane: 'symbol', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
 }
 
-async function runDenseLane(query: MultiLaneQuery): Promise<LaneResult> {
+async function runDenseLane(query: MultiLaneQuery, embedding: number[] | null): Promise<LaneResult> {
 	const t0 = Date.now();
 
 	// skipVectorLane=true means the caller (context-assembler) already ran Qdrant.
@@ -289,8 +289,6 @@ async function runDenseLane(query: MultiLaneQuery): Promise<LaneResult> {
 
 	try {
 		const { qdrant } = await import('../vector/qdrant-manager.js');
-		const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
-		const embedding = await generateSingleEmbedding(query.text).catch(() => null);
 		if (!embedding) return { lane: 'dense', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
 		const searchResult = await qdrant._denseSearch({
 			query: query.text,
@@ -357,6 +355,7 @@ const LANE_WEIGHT: Record<string, number> = {
 	error:      0.95,
 	ace_cache:  0.90,
 	symbol:     0.80,
+	summary:    0.85,
 	dense:      0.75,
 	topology:   0.70,
 	wiki:       0.65,
@@ -378,7 +377,7 @@ const LANE_WEIGHT: Record<string, number> = {
  * produce non-comparable scores (cosine ∈ [0,1] vs ts_rank ∈ ℝ⁺ vs Redis
  * substring score ∈ {0.5, 1.0}).
  *
- * Drop-in per master_agents.md §6.3. k=60 is the standard from the original
+ * Drop-in per master_LLMS.md §6.3. k=60 is the standard from the original
  * paper and matches Elasticsearch / Solr / Qdrant hybrid search defaults.
  */
 const RRF_K = 60;
@@ -727,6 +726,38 @@ async function enrichWithCartridgeData(redis: Redis, hits: MultiLaneHit[], query
 	});
 }
 
+/**
+ * Summary lane — targets summary_lenses_768 for synthesized topological context.
+ */
+async function runSummaryLane(query: MultiLaneQuery, embedding: number[] | null): Promise<LaneResult> {
+	const t0 = Date.now();
+	if (!embedding) return { lane: 'summary', hits: [], latencyMs: 0, cacheHit: false };
+	try {
+		const { qdrant } = await import('../vector/qdrant-manager.js');
+		const searchResult = await qdrant.hybridSearch({
+			collection: 'summary_lenses_768',
+			query: query.text,
+			queryEmbedding: embedding,
+			limit: query.topK ?? 10,
+		}).catch(() => null);
+
+		const rawChunks = searchResult?.results ?? [];
+		const hits: MultiLaneHit[] = rawChunks.map((c) => ({
+			id: String(c.id ?? ''),
+			text: String(c.payload?.summary ?? c.payload?.content ?? '').slice(0, 400),
+			filePath: c.payload?.file_path as string | undefined,
+			symbols: c.payload?.tags as string[] | undefined,
+			tags: c.payload?.tags as string[] | undefined,
+			score: c.score ?? 0.5,
+			lane: 'summary',
+		})).filter((h) => h.id);
+
+		return { lane: 'summary', hits, latencyMs: Date.now() - t0, cacheHit: false };
+	} catch {
+		return { lane: 'summary', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+}
+
 export async function multiLaneSearch(
 	redis: Redis,
 	pool: Pool,
@@ -735,6 +766,9 @@ export async function multiLaneSearch(
 	const t0 = Date.now();
 	const queryHash = qHash(query.text);
 
+	const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
+	const embedding = await generateSingleEmbedding(query.text).catch(() => null);
+
 	const [hashResult, sparseResult, graphResult, aceCacheResult, symbolResult, denseResult, topologyResult, wikiResult, errorResult, taskResult, researchResult, webSearchResult, summaryResult] =
 		await Promise.allSettled([
 			runHashLane(redis, pool, query),
@@ -742,14 +776,14 @@ export async function multiLaneSearch(
 			runGraphLane(redis, query),
 			runAceCacheLane(redis, queryHash),
 			runSymbolLane(pool, query),
-			runDenseLane(query),
+			runDenseLane(query, embedding),
 			runTopologyLane(redis, query),
 			runWikiLane(pool, query),
 			runErrorLane(pool, query),
 			runTaskLane(pool, query),
 			runResearchLane(pool, query),
 			runWebSearchLane(query),
-			runSummaryLane(query),
+			runSummaryLane(query, embedding),
 		]);
 
 	const lanes: LaneResult[] = [];

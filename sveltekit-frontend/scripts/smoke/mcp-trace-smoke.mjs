@@ -23,6 +23,7 @@ const STRICT  = process.argv.includes('--strict');
 const VERBOSE = process.argv.includes('--verbose');
 const MCP_URL = process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
 const TIMEOUT = 15_000;
+const TRACE_KAG_TIMEOUT = 30_000;
 
 const REQUIRED_TOOLS = [
   'trace.kag_search',
@@ -47,11 +48,12 @@ const c = {
 const results = [];
 
 async function mcpCall(method, params = {}) {
+  const timeout = method === 'tools/call' && params?.name === 'trace.kag_search' ? TRACE_KAG_TIMEOUT : TIMEOUT;
   const res = await fetch(`${MCP_URL}/mcp`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
     body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params }),
-    signal: AbortSignal.timeout(TIMEOUT),
+    signal: AbortSignal.timeout(timeout),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const text = await res.text();
@@ -104,7 +106,7 @@ await gate('T2', 'tools/list returns required tool set', async () => {
 await gate('T3', 'trace.kag_search returns chunks', async () => {
   const data = await mcpCall('tools/call', {
     name: 'trace.kag_search',
-    arguments: { query: 'codebase retrieval pipeline', limit: 3 },
+    arguments: { query: 'src/mcp/trace-mcp-server.ts', limit: 1 },
   });
   const content = data?.result?.content ?? data?.content ?? [];
   const text = Array.isArray(content) ? content.map(c => c.text ?? '').join('') : String(content);

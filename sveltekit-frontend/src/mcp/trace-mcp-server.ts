@@ -19,13 +19,13 @@
  *   topology.search_near       — 4D manifold neighborhood search
  *   topology.same_som_cluster  — all nodes sharing a SOM cluster
  *   clusters.get_members       — files in a GPU cluster
- *   clusters.get_summary_lenses — AGENTS.md / wiki notes for cluster
+ *   clusters.get_summary_lenses — LLMS.md / wiki notes for cluster
  *   trace.kag_search           — full KAG-DAG retrieval (via /api/graph/traverse + ACE)
  *   trace.explain_retrieval    — retrieval trace for a prior query
  *   kag.record_agent_run         — write run artifacts + queue JSONL for ingest
  *   kag.ingest_memory_directory  — flush pending JSONL queue → Redis ACE cache
  *   graph.expand_neighborhood    — ego-graph expansion (direct + N-hop neighbours)
- *   clusters.get_summary_lenses  — AGENTS.md/wiki notes for a GPU cluster
+ *   clusters.get_summary_lenses  — LLMS.md/wiki notes for a GPU cluster
  *   trace.validate_ace_hit       — validate cache key contract + graph node presence
  *   ops.propose_patch            — [OPERATOR-GATED] propose a code fix (read-only preview, no write)
  *   ops.run_targeted_test        — [OPERATOR-GATED] run a specific vitest file, return output
@@ -35,7 +35,7 @@
  *   hypergraph.get_edge          — fetch single hyperedge by edge_hash
  *   hypergraph.explain_activation — why a hyperedge was activated for query terms
  *   hypergraph.expand_members    — edges sharing members with a given edge
- *   knowledge.get_minified_map   — compact map: top edges + AGENTS.md for a directory
+ *   knowledge.get_minified_map   — compact map: top edges + LLMS.md for a directory
  *   legal.get_transcript         — fetch Whisper transcript for an evidence item
  *   legal.find_precedents        — semantic + FTS search across legal precedents
  *   legal.search_recordings      — timestamp-aware audio segment search
@@ -266,7 +266,7 @@ function hashQuery(query: string, limit: number): string {
 
 // ── Input hardening helpers ───────────────────────────────────────────────────
 
-function clampNumber(value: unknown, min: number, max: number, fallback = 0): number {
+function clampFinite(value: unknown, min: number, max: number, fallback = 0): number {
   const n = Number(value);
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, n));
@@ -524,7 +524,13 @@ const _origRegister = server.registerTool.bind(server);
     }
   };
   if (typeof handler === 'function') toolRegistry.set(name, wrappedHandler as ToolHandler);
-  return _origRegister(name, options, wrappedHandler);
+  try {
+    return _origRegister(name, options, wrappedHandler);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes('already registered')) return undefined;
+    throw err;
+  }
 };
 
 const _origTool = server.tool.bind(server);
@@ -1607,12 +1613,12 @@ server.registerTool(
   },
   async ({ som_x, som_y, semantic_z, grpo_w, radius, limit, filters }) => {
     const t0 = Date.now();
-    const cSomX      = clampNumber(som_x,           0,    255);
-    const cSomY      = clampNumber(som_y,           0,    255);
-    const cSemanticZ = clampNumber(semantic_z ?? 0.5, -1,    1, 0.5);
-    const cGrpoW     = clampNumber(grpo_w     ?? 0.5, -1,    1, 0.5);
-    const cRadius    = clampNumber(radius,         0.01,  5.0, 0.5);
-    const cLimit     = clampNumber(limit,             1,   50, 10);
+    const cSomX      = clampFinite(som_x,           0,    255);
+    const cSomY      = clampFinite(som_y,           0,    255);
+    const cSemanticZ = clampFinite(semantic_z ?? 0.5, -1,    1, 0.5);
+    const cGrpoW     = clampFinite(grpo_w     ?? 0.5, -1,    1, 0.5);
+    const cRadius    = clampFinite(radius,         0.01,  5.0, 0.5);
+    const cLimit     = clampFinite(limit,             1,   50, 10);
     const safeFilters = normalizeJsonFilter(filters);
     try {
       const body: Record<string, unknown> = {
@@ -1822,7 +1828,68 @@ server.registerTool(
   }
 );
 
+// ── trace.kag_search ──────────────────────────────────────────────────────────
+// High-performance KAG-DAG retrieval: Go retrieval service → SvelteKit proxy → Postgres fallback.
+// This is the primary lane for the TRACE performance path.
+
+if (!toolRegistry.has('trace.kag_search')) server.registerTool(
+  'trace.kag_search',
+  {
+    description: 'High-performance KAG-DAG retrieval: Go retrieval service → SvelteKit proxy → Postgres fallback.',
+    inputSchema: z.object({
+      query: z.string().describe('Search query'),
+      limit: z.number().int().min(1).max(50).default(20),
+      topo_class: z.string().optional(),
+    }),
+  },
+  async ({ query, limit, topo_class }) => {
+    const t0 = Date.now();
+    // 1. Try Go retrieval service FIRST
+    try {
+      const res = await fetch(`${GO_RETRIEVAL_URL}/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, limit, topo_class }),
+        signal: AbortSignal.timeout(5_000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      }
+    } catch { /* fall through to SvelteKit */ }
+
+    // 2. SvelteKit proxy
+    try {
+      const res = await fetch(`${SVELTEKIT}/api/code-intel/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, limit, topoClass: topo_class }),
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      }
+    } catch { /* fall through to Postgres */ }
+
+    // 3. Postgres fallback
+    const { rows } = await pool.query('SELECT * FROM search_code_lexical($1, $2, $3)', [query, limit, topo_class ?? null]);
+    return {
+      content: [{
+        type: 'text' as const,
+        text: JSON.stringify({
+          results: rows,
+          count: rows.length,
+          mode: 'lexical-fallback',
+          elapsedMs: Date.now() - t0
+        }, null, 2)
+      }]
+    };
+  }
+);
+
 // ── trace.graphrag_search ────────────────────────────────────────────────────
+
 // GraphRAG retrieval: dense (Qdrant) + sparse (Postgres FTS) prefetch → RRF
 // merge → Neo4j graph expansion of top-K → Karpathy blend (Redis gpu:karpathy:scores)
 // → composite scoring with per-source breakdown.
@@ -2055,7 +2122,7 @@ server.registerTool(
     const t0 = Date.now();
     try {
       const safeQuery   = String(query ?? '').slice(0, 4000);
-      const safeLimit   = clampNumber(limit, 1, 50, 10);
+      const safeLimit   = clampFinite(limit, 1, 50, 10);
       const safeFilters = normalizeJsonFilter(filters);
       const body: Record<string, unknown> = { query: safeQuery, limit: safeLimit, type };
       if (safeFilters) body.filters = safeFilters;
@@ -2291,7 +2358,7 @@ server.registerTool(
     description: 'Returns codebase chunks for coding and debugging prompts.',
     inputSchema: z.object({
       query:      z.string().max(2000).describe('Natural language coding/debugging query'),
-      filePath:   z.string().optional().describe('Current file path for AGENTS.md-scoped boost'),
+      filePath:   z.string().optional().describe('Current file path for LLMS.md-scoped boost'),
       limit:      z.number().int().min(1).max(20).default(8).describe('Max chunks returned (default 8)'),
       topo_class: z.string().optional().describe('Optional topology-class prefilter'),
     })
@@ -3130,16 +3197,16 @@ server.registerTool(
   },
 );
 
-// ── agents_md.peers_via_relations ────────────────────────────────────────────
+// ── LLMS.md.peers_via_relations ────────────────────────────────────────────
 // DB-backed sibling lookup via agent_context_relations.SHARES_TAGS edges.
-// Complements the canonical `agents_md.peers_for_dir` (Redis atlas card) by
-// answering "AGENTS.md dirs that share TAGS with this dir" — falls back to
+// Complements the canonical `LLMS.md.peers_for_dir` (Redis atlas card) by
+// answering "LLMS.md dirs that share TAGS with this dir" — falls back to
 // sibling directories when SHARES_TAGS edges are sparse (pre-P0.2 envelope
 // JSON state). Both tools coexist under distinct names per MCP 2026 FQN
 // best-practice (last-registered-wins is silent → rename, don't override).
 
 server.registerTool(
-  'agents_md.peers_via_relations',
+  'LLMS.md.peers_via_relations',
   {
     description: 'Finds neighboring directories using the SHARES_TAGS hypergraph relation.',
     inputSchema: z.object({
@@ -3149,7 +3216,7 @@ server.registerTool(
   },
   async ({ dirPath, limit = 8 }) => {
     try {
-      const stable = `agents:${dirPath.replace(/^src\//, 'src/')}/AGENTS.md`;
+      const stable = `agents:${dirPath.replace(/^src\//, 'src/')}/LLMS.md`;
       const { rows } = await pool.query<{ target_key: string; relation: string; weight: number }>(
         `SELECT target_key, relation, weight
          FROM agent_context_relations
@@ -3183,16 +3250,16 @@ server.registerTool(
   },
 );
 
-// ── agents_md.coverage_chain ─────────────────────────────────────────────────
+// ── LLMS.md.coverage_chain ─────────────────────────────────────────────────
 // Walk-up inheritance chain from directory_context_bindings — every binding
 // row from leaf → root, ordered by (priority DESC, depth ASC). Complements
-// the canonical `agents_md.coverage` (envelope completeness probe) by
-// answering "WHICH AGENTS.md rules apply to this file, in what priority?".
+// the canonical `LLMS.md.coverage` (envelope completeness probe) by
+// answering "WHICH LLMS.md rules apply to this file, in what priority?".
 
 server.registerTool(
-  'agents_md.coverage_chain',
+  'LLMS.md.coverage_chain',
   {
-    description: 'Returns the full AGENTS.md inheritance chain for a file.',
+    description: 'Returns the full LLMS.md inheritance chain for a file.',
     inputSchema: z.object({
       filePath: z.string().min(1).max(500).describe('Repo-relative file path'),
     })
@@ -3219,7 +3286,7 @@ server.registerTool(
   },
 );
 
-// NOTE: The older `codebase.context_for_file` / `agents_md.context_for_file`
+// NOTE: The older `codebase.context_for_file` / `LLMS.md.context_for_file`
 // implementations (deleted) had genuine bugs: `scopeToCluster` was passed to
 // contextForFile() which doesn't accept it (silently ignored), and
 // `parentAgents` doesn't exist on the CodebaseContextForFile.directory
@@ -3228,12 +3295,12 @@ server.registerTool(
 // since they'd just produce inferior copies of the same output.
 
 // ── clusters.get_summary_lenses ───────────────────────────────────────────────
-// Returns AGENTS.md notes and wiki KAG notes for a given GPU cluster.
+// Returns LLMS.md notes and wiki KAG notes for a given GPU cluster.
 
 server.registerTool(
   'clusters.get_summary_lenses',
   {
-    description: 'Returns wiki and AGENTS.md context lenses for a GPU cluster.',
+    description: 'Returns wiki and LLMS.md context lenses for a GPU cluster.',
     inputSchema: z.object({
       clusterId: z.number().int().min(0).describe('GPU k-means cluster ID'),
       maxNotes:  z.number().int().min(1).max(20).default(5).describe('Max wiki/KAG notes to include'),
@@ -3388,7 +3455,7 @@ server.registerTool(
 
     const safeFile = String(file_path ?? '').replace(/\.\./g, '').slice(0, 500);
     const safeIssue = String(issue ?? '').slice(0, 1000);
-    const maxLines  = clampNumber(context_lines, 5, 200, 40);
+    const maxLines  = clampFinite(context_lines, 5, 200, 40);
 
     try {
       const absPath = _resolvePath(process.cwd(), safeFile);
@@ -3435,7 +3502,7 @@ server.registerTool(
       return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'test_file must end with .spec.ts / .test.ts (no path traversal)' }) }] };
     }
 
-    const timeoutMs = clampNumber(timeout_ms, 5000, 120000, 30000);
+    const timeoutMs = clampFinite(timeout_ms, 5000, 120000, 30000);
     const t0 = Date.now();
 
     try {
@@ -3502,8 +3569,8 @@ server.registerTool(
     const safeType = String(fix_type ?? '').slice(0, 100);
     const safeDesc = String(fix_description ?? '').slice(0, 2000);
     const safeDiff = fix_diff != null ? String(fix_diff).slice(0, 8000) : null;
-    const nFiles   = clampNumber(files_affected, 0, 9999, 1);
-    const nErrors  = clampNumber(errors_resolved, 0, 9999, 1);
+    const nFiles   = clampFinite(files_affected, 0, 9999, 1);
+    const nErrors  = clampFinite(errors_resolved, 0, 9999, 1);
     const safeOk   = typeof success === 'boolean' ? success : null;
     const safeMeta = normalizeJsonFilter(metadata) ?? {};
 
@@ -3544,7 +3611,7 @@ server.registerTool(
     if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
 
     const safeGate = String(gate ?? 'tsc') === 'vitest-all' ? 'vitest-all' : 'tsc';
-    const timeoutMs = clampNumber(timeout_ms, 5000, 300000, 60000);
+    const timeoutMs = clampFinite(timeout_ms, 5000, 300000, 60000);
     const t0 = Date.now();
 
     const [cmd, args] = safeGate === 'vitest-all'
@@ -3591,7 +3658,7 @@ server.registerTool(
     description: 'Semantic search across the hypergraph edges.',
     inputSchema: z.object({
       query:          z.string().max(500).describe('Natural language query (1-500 chars)'),
-      edge_types:     z.array(z.string()).optional().describe('Filter by edge_type (agents_md, cluster_summary, codebase_chunk, generic)'),
+      edge_types:     z.array(z.string()).optional().describe('Filter by edge_type (LLMS.md, cluster_summary, codebase_chunk, generic)'),
       limit:          z.number().int().min(1).max(50).optional().describe('Max results 1-50 (default 10)'),
       min_confidence: z.number().min(0).max(1).optional().describe('Minimum confidence threshold 0-1'),
     })
@@ -3701,13 +3768,13 @@ server.registerTool(
     inputSchema: z.object({
       directory:  z.string().max(200).optional().describe('Relative directory path (e.g. "src/lib/server/ai")'),
       max_edges:  z.number().int().min(1).max(20).optional().describe('Max hyperedges to include (default 5)'),
-      max_agents: z.number().int().min(1).max(10).optional().describe('Max AGENTS.md directives to include (default 3)'),
+      max_agents: z.number().int().min(1).max(10).optional().describe('Max LLMS.md directives to include (default 3)'),
     })
   },
   async ({ directory, max_edges, max_agents }) => {
     const dir       = String(directory ?? '').slice(0, 200).trim();
-    const edgeLimit = clampNumber(max_edges, 1, 20, 5);
-    const agentLimit = clampNumber(max_agents, 1, 10, 3);
+    const edgeLimit = clampFinite(max_edges, 1, 20, 5);
+    const agentLimit = clampFinite(max_agents, 1, 10, 3);
 
     try {
       // 1. Top hyperedges (grade B+ or by confidence)
@@ -3718,7 +3785,7 @@ server.registerTool(
       });
       const edgeData = edgeRes.ok ? await edgeRes.json() : { results: [] };
 
-      // 2. AGENTS.md context for the directory (Redis key agents:dir:<dir>)
+      // 2. LLMS.md context for the directory (Redis key llms:dir:<dir>)
       let agentsMd: string[] = [];
       try {
         const agentRes = await pool.query<{ title: string; summary: string; rules: unknown[] }>(
@@ -3894,13 +3961,13 @@ server.registerTool(
 );
 
 
-// ── agents_md.context_for_file ───────────────────────────────────────────────
+// ── LLMS.md.context_for_file ───────────────────────────────────────────────
 // Slim wrapper — returns only the AGENTS-related slice of the full packet.
 // Useful when a caller wants directory rules / tools / constraints without
 // the prompt-card payload (saves ~3-5KB per response).
 
 server.registerTool(
-  'agents_md.context_for_file',
+  'LLMS.md.context_for_file',
   {
     description: 'Returns only the AGENTS-related slice of the atlas context packet for a file.',
     inputSchema: z.object({
@@ -3936,13 +4003,13 @@ server.registerTool(
   },
 );
 
-// ── agents_md.peers_for_dir ───────────────────────────────────────────────────
+// ── LLMS.md.peers_for_dir ───────────────────────────────────────────────────
 // Returns the directory card directly — peers, tools, tags, top files in
 // the directory, without going through context-for-file's per-file lookup.
 // O(1) Redis GET on ace:atlas:dir:<slug>.
 
 server.registerTool(
-  'agents_md.peers_for_dir',
+  'LLMS.md.peers_for_dir',
   {
     description: 'Returns the directory card directly from the atlas cache.',
     inputSchema: z.object({
@@ -3984,15 +4051,15 @@ server.registerTool(
   },
 );
 
-// ── agents_md.coverage ────────────────────────────────────────────────────────
-// Quality probe: how complete is the AGENTS.md envelope for the directory
+// ── LLMS.md.coverage ────────────────────────────────────────────────────────
+// Quality probe: how complete is the LLMS.md envelope for the directory
 // containing this file? Reads the Postgres mirror to report which envelope
 // fields are populated. Lets agents detect "thin context" before relying on it.
 
 server.registerTool(
-  'agents_md.coverage',
+  'LLMS.md.coverage',
   {
-    description: 'Reports the population status of the AGENTS.md envelope for a file.',
+    description: 'Reports the population status of the LLMS.md envelope for a file.',
     inputSchema: z.object({
       filePath: z.string().min(1).max(512).describe('Repo-relative file path'),
     })
@@ -4020,7 +4087,7 @@ server.registerTool(
          WHERE file_path LIKE $1 OR file_path LIKE $2
          ORDER BY indexed_at DESC
          LIMIT 5`,
-        [`%${dir}%AGENTS.md`, `%/${dir}/AGENTS.md`],
+        [`%${dir}%LLMS.md`, `%/${dir}/LLMS.md`],
       );
       const result = {
         filePath,
@@ -4042,24 +4109,24 @@ server.registerTool(
   },
 );
 
-// ── agents_md.shares_tags ────────────────────────────────────────────────────
+// ── LLMS.md.shares_tags ────────────────────────────────────────────────────
 // SHARES_TAGS lens — pure DB query against agent_context_relations.
-// Distinct from agents_md.peers_for_dir which reads the Redis atlas card.
+// Distinct from LLMS.md.peers_for_dir which reads the Redis atlas card.
 // This one returns only directories whose qdrant_tags Jaccard-overlap (≥0.3)
-// with the source AGENTS.md, with a sibling-dir fallback when the SHARES_TAGS
+// with the source LLMS.md, with a sibling-dir fallback when the SHARES_TAGS
 // edge set is sparse for the requested source.
 
 server.registerTool(
-  'agents_md.shares_tags',
+  'LLMS.md.shares_tags',
   {
-    description: 'Returns neighboring directories based on shared tags in their AGENTS.md files.',
+    description: 'Returns neighboring directories based on shared tags in their LLMS.md files.',
     inputSchema: z.object({
       dirPath: z.string().min(1).max(500).describe('Directory path (e.g. "src/lib/server/ace")'),
       limit:   z.number().int().min(1).max(50).default(10).optional(),
     })
   },
   async ({ dirPath, limit = 10 }) => {
-    const stable = `agents:${dirPath.replace(/^src\//, 'src/')}/AGENTS.md`;
+    const stable = `agents:${dirPath.replace(/^src\//, '')}/LLMS.md`;
     try {
       const { rows } = await pool.query<{ target_key: string; weight: number; evidence: Record<string, unknown> }>(
         `SELECT target_key, weight, evidence
@@ -4110,17 +4177,17 @@ server.registerTool(
   },
 );
 
-// ── agents_md.binding_chain ──────────────────────────────────────────────────
+// ── LLMS.md.binding_chain ──────────────────────────────────────────────────
 // directory_context_bindings priority-ordered walk-up chain.
-// Distinct from agents_md.coverage which returns nearestEnvelopes (one row per
+// Distinct from LLMS.md.coverage which returns nearestEnvelopes (one row per
 // matching dir LIKE). This walks the formal binding hierarchy with
 // (binding_type, depth, priority, confidence) per row — answers
-// "in what order do AGENTS.md envelopes apply to this file?".
+// "in what order do LLMS.md envelopes apply to this file?".
 
 server.registerTool(
-  'agents_md.binding_chain',
+  'LLMS.md.binding_chain',
   {
-    description: 'Walks the AGENTS.md binding hierarchy for a file to determine the order of applying envelopes.',
+    description: 'Walks the LLMS.md binding hierarchy for a file to determine the order of applying envelopes.',
     inputSchema: z.object({
       filePath: z.string().min(1).max(500).describe('Repo-relative file path'),
     })
@@ -4153,15 +4220,15 @@ server.registerTool(
   },
 );
 
-// ── ops.update_agents_md ─────────────────────────────────────────────────────
+// ── ops.update_LLMS.md ─────────────────────────────────────────────────────
 // Lets the LLM write structured knowledge back into the directory memory layer.
-// Immediately updates the Redis agents:dir:<dir> key (24h TTL) so the next
+// Immediately updates the Redis llms:dir:<dir> key (24h TTL) so the next
 // ACE call picks it up via Lane L4.  Optionally appends to the on-disk
-// AGENTS.md file under the target section so the fact survives redis flush.
+// LLMS.md file under the target section so the fact survives redis flush.
 server.registerTool(
-  'ops.update_agents_md',
+  'ops.update_LLMS.md',
   {
-    description: 'Append a new fact, rule, or tool note to a directory AGENTS.md file and flush to Redis. ' +
+    description: 'Append a new fact, rule, or tool note to a directory LLMS.md file and flush to Redis. ' +
                  'Use this after discovering something useful that should survive future conversations. ' +
                  'The fact appears in every future ACE context for that directory automatically (Lane L4).',
     inputSchema: z.object({
@@ -4189,7 +4256,7 @@ server.registerTool(
       const { join, resolve } = await import('node:path');
       const { existsSync, readFileSync, writeFileSync, mkdirSync } = await import('node:fs');
 
-      const redisKey = `agents:dir:${safeDir}`;
+      const redisKey = `llms:dir:${safeDir}`;
       const existing = await redisClient.get(redisKey) ?? '';
 
       // Build new entry line with timestamp
@@ -4213,9 +4280,9 @@ server.registerTool(
 
       let diskPath = '';
       if (!redis_only) {
-        const root    = resolve(process.cwd(), '..', 'sveltekit-frontend', 'src');
+        const root    = process.env.FRONTEND_ROOT || process.cwd();
         const dirFull = resolve(root, safeDir);
-        const mdPath  = join(dirFull, 'AGENTS.md');
+        const mdPath  = join(dirFull, "LLMS.md");
 
         if (existsSync(dirFull)) {
           const onDisk   = existsSync(mdPath) ? readFileSync(mdPath, 'utf8') : `# ${safeDir}\n`;
@@ -4347,7 +4414,7 @@ server.registerTool(
   {
     description:
       'One-shot context prefetch for agentic coding. Combines KAG graph search, KB research summaries, ' +
-      'Karpathy blend scores, and AGENTS.md rules into a single compact pack. ' +
+      'Karpathy blend scores, and LLMS.md rules into a single compact pack. ' +
       'Call this before making any code edits or retrievals — it saves 3-5 downstream tool calls.',
     inputSchema: {
       query:       z.string().describe('What you are about to work on (code path, feature, question)'),
@@ -4470,8 +4537,8 @@ server.registerTool(
           (pack as Record<string, unknown>).thisFileKarpathy = JSON.parse(fileScore);
         }
 
-        // AGENTS.md from Redis agents:dir:*
-        const dirKey = `agents:dir:${opts.file_path.replace(/\/[^/]+$/, '').replace(/^src\//, '')}`;
+        // LLMS.md from Redis llms:dir:*
+        const dirKey = `llms:dir:${opts.file_path.replace(/\/[^/]+$/, '').replace(/^src\//, '')}`;
         const agentsMd = await r.get(dirKey).catch(() => null);
         if (agentsMd) {
           // Extract just the Rules section for compactness
@@ -5109,7 +5176,7 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       context.explain_compression, context.refresh_task_toc,');
   console.log('       kag.ingest_error, kag.multi_lane_search, trace.validate_ace_hit,');
   console.log('       ops.propose_patch, ops.run_targeted_test, ops.record_fix_attempt, ops.run_quality_gate,');
-  console.log('       ops.update_agents_md [OPERATOR-GATED]');
+  console.log('       ops.update_LLMS.md [OPERATOR-GATED]');
   console.log('       ops.recall_fixer_pattern, ops.store_fixer_pattern [OPERATOR-GATED]');
   console.log('       context.prefetch_feature_context (TRACE+KB+Karpathy bridge)');
   console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');

@@ -536,9 +536,9 @@ export function setupToolHandlers() {
         },
       },
       {
-        name: 'agents_md',
+        name: 'LLMS.md',
         description:
-          'Resolve the nearest applicable AGENTS.md instructions for a file or directory. Prefers Redis-rendered mirrors and falls back to on-disk AGENTS.md walk-up.',
+          'Resolve the nearest applicable LLMS.md instructions for a file or directory. Prefers Redis-rendered mirrors and falls back to on-disk LLMS.md walk-up.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -1790,14 +1790,14 @@ export function setupToolHandlers() {
         inputSchema: {
           type: 'object',
           properties: {
-            id: { type: 'string', description: 'Wiki page ID (e.g. agents:dir:src-lib-server)' },
+            id: { type: 'string', description: 'Wiki page ID (e.g. llms:dir:src-lib-server)' },
           },
           required: ['id'],
         },
       },
       {
         name: 'wiki.refresh_directory',
-        description: 'Refreshes one directory card (AGENTS.md mirror). Default dryRun=true.',
+        description: 'Refreshes one directory card (LLMS.md mirror). Default dryRun=true.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -1822,7 +1822,7 @@ export function setupToolHandlers() {
   // TTL: 3600s (1 hr) — overridable per tool via MCP_CACHE_TTL_SECONDS env.
 
   const MCP_READONLY_TOOLS = new Set([
-    'agents_md',
+    'LLMS.md',
     'codebase:search',
     'codebase:ace_context',
     'codebase:graph_neighbors',
@@ -2758,7 +2758,7 @@ export function setupToolHandlers() {
         }
       }
 
-      case 'agents_md': {
+      case 'LLMS.md': {
         const targetPath = String(args.path ?? '').trim();
         if (!targetPath) throw new Error('path is required');
 
@@ -2773,7 +2773,7 @@ export function setupToolHandlers() {
                 text: JSON.stringify({
                   path: targetPath,
                   markdown: null,
-                  error: 'No AGENTS.md found for this path (run npm run agents:write)',
+                  error: 'No LLMS.md found for this path (run npm run llms:write)',
                 }),
               },
             ],

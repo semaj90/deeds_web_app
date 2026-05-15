@@ -8,7 +8,7 @@
  *   - code_retrieval_chunks          (topo_class, topo_byte)
  *   - qdrant_cluster_members         (cluster_key)
  *   - chunk_hit_log                  (demand signal)
- *   - agent_context_files            (AGENTS.md envelope per dir)
+ *   - agent_context_files            (LLMS.md envelope per dir)
  *
  * Mirrored to Redis ace:atlas:latest (24h TTL).
  *
@@ -35,7 +35,7 @@ import { z } from 'zod';
 //   5      ga           graphAuthorityScore      ([0,1])
 //   6      h            chunk_hit_log hits       (count over hours_window)
 //   7      rs           avg rerank_score         ([0,1] from chunk_hit_log)
-//   8      a            nearest AGENTS.md dir
+//   8      a            nearest LLMS.md dir
 //   9      rules        envelope.rules count
 //   10     tools        envelope.tools count
 //   11     tags         envelope.qdrant_tags count
@@ -136,7 +136,7 @@ export function filesInTopoClass(atlas: AtlasIndex, topoClass: string): AtlasFil
   return idxs.map(i => rowToFile(atlas.files[i], atlas.schema));
 }
 
-/** O(1) AGENTS.md directory → file rows lookup. */
+/** O(1) LLMS.md directory → file rows lookup. */
 export function filesUnderAgents(atlas: AtlasIndex, dir: string): AtlasFile[] {
   const idxs = atlas.indices.by_agents_dir[dir] ?? [];
   return idxs.map(i => rowToFile(atlas.files[i], atlas.schema));

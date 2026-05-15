@@ -139,7 +139,7 @@ export function buildRetrievalEdge(
     members: [
       { member_kind: 'query', member_key: queryHash, role: 'source' },
       ...chunkIds.map(k => ({ member_kind: 'chunk' as const, member_key: k, role: 'result' as const })),
-      ...agentsMdKeys.map(k => ({ member_kind: 'agents_md' as const, member_key: k, role: 'context' as const })),
+      ...agentsMdKeys.map(k => ({ member_kind: 'LLMS.md' as const, member_key: k, role: 'context' as const })),
       ...clusterIds.map(k => ({ member_kind: 'cluster' as const, member_key: k, role: 'context' as const })),
     ],
   };
@@ -158,7 +158,7 @@ export function buildAgentsContextEdge(
     metadata: { fileKey, agentsMdKey },
     members: [
       { member_kind: 'file', member_key: fileKey, role: 'source' },
-      { member_kind: 'agents_md', member_key: agentsMdKey, role: 'context' },
+      { member_kind: 'LLMS.md', member_key: agentsMdKey, role: 'context' },
     ],
   };
 }

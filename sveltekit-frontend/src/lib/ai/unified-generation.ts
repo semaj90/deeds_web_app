@@ -1,12 +1,11 @@
 /**
- * Unified Client-Side Generation — E2B → LiteRT → ONNX → Server Fallback
+ * Unified Client-Side Generation — helper ONNX → optional client Gemma4 → server fallback
  *
  * 5-tier cascade with Bifrost L2 cache integration:
  *   1. Check Bifrost L2 cache (2-5s semantic match) — if available
- *   2. Local E2B (Gemma 4 E2B 2.3B via Transformers.js + WebGPU)
- *   3. Local LiteRT-LM (Gemma 4 E2B 2.3B via CPU XNNPACK + MTP heads)
- *   4. Local ONNX (Gemma 3 270M via ONNX Runtime, legacy fallback)
- *   5. Server (via client-router decision: retrieval-hybrid or server-ollama)
+ *   2. Local ONNX / helper models by default
+ *   3. Optional client Gemma4 helper lanes when explicitly enabled
+ *   4. Server (via client-router decision: retrieval-hybrid or server-ollama)
  *
  * Bifrost integration: Checks semantic cache BEFORE running local inference.
  * Cache hit (score > threshold) → instant return. Cache miss → run local, store result.
@@ -32,6 +31,8 @@ export interface GenerationRequest {
 	forceServer?: boolean;
 	/** Check Bifrost L2 cache before local inference */
 	useBifrostCache?: boolean;
+	/** Allow client-side Gemma4 helper lanes when explicitly opted in */
+	allowClientGemma?: boolean;
 	/** Bifrost similarity threshold (default: 0.8) */
 	bifrostThreshold?: number;
 }
@@ -280,11 +281,12 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 	const start = performance.now();
 	const conversationHistory = request.conversationHistory ?? [];
 	const maxTokens = request.maxTokens ?? 200;
+	const allowClientGemma = request.allowClientGemma ?? false;
 
 	// Step 0: Check client router decision
 	const capabilities = await fetchCapabilities();
-	const e2bReady = await isE2bReady();
-	const litertReady = await isLitertReady();
+	const e2bReady = allowClientGemma ? await isE2bReady() : undefined;
+	const litertReady = allowClientGemma ? await isLitertReady() : undefined;
 
 	const routerDecision = shouldEscalateToServer(
 		request.prompt,
@@ -292,6 +294,7 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 		{
 			forceServer: request.forceServer,
 			forceLocal: request.forceLocal,
+			allowClientGemma,
 			capabilities,
 			e2bReady,
 			litertReady,
@@ -317,7 +320,7 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 		}
 	}
 
-	// Step 2: Local E2B (if router says local-e2b)
+	// Step 2: Optional client Gemma4 helper lane (if explicitly enabled)
 	if (routerDecision.source === 'local-e2b') {
 		const e2bResult = await tryE2bInference(request.prompt, maxTokens);
 		if (e2bResult) {
@@ -335,10 +338,10 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 				cacheLayer: 'none',
 			};
 		}
-		// E2B failed → fall through to LiteRT
+		// Helper lane failed → fall through to the remaining helper lanes
 	}
 
-	// Step 3: Local LiteRT-LM (if router says local-litert OR E2B failed)
+	// Step 3: Optional LiteRT helper lane
 	if (routerDecision.source === 'local-litert' || routerDecision.source === 'local-e2b') {
 		const litertResult = await tryLitertInference(request.prompt, maxTokens);
 		if (litertResult) {
@@ -355,10 +358,10 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 				cacheLayer: 'none',
 			};
 		}
-		// LiteRT failed → fall through to ONNX
+		// LiteRT failed → fall through to ONNX helper lane
 	}
 
-	// Step 4: Local ONNX (if router says local-onnx OR E2B+LiteRT failed)
+	// Step 4: Default ONNX/helper lane
 	if (
 		routerDecision.source === 'local-onnx' ||
 		routerDecision.source === 'local-e2b' ||

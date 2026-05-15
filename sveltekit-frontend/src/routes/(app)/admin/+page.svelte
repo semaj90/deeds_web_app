@@ -254,6 +254,7 @@
 		{ href: '/admin/library', label: 'Legal Library', icon: 'book-open', desc: 'Document ingestion' },
 		{ href: '/admin/phase89', label: 'Phase 89', icon: 'flask-conical', desc: 'Cluster analysis' },
 		{ href: '/admin/kag-notebook', label: 'KAG Notebook', icon: 'notebook-pen', desc: 'Knowledge notebook' },
+		{ href: '/admin/search-intelligence', label: 'Contextual Assistant', icon: 'bot', desc: 'GraphRAG + DenseRAG chat' },
 		{ href: '/admin/all-routes', label: 'All Routes', icon: 'route', desc: 'Route health ops' },
 		{ href: '/admin/face-gallery', label: 'Face Gallery', icon: 'scan-face', desc: 'POI face matching + GRPO reranker + QLoRA synths' },
 		{ href: '/admin/observability', label: 'Observability', icon: 'activity', desc: 'Graph/search/ACE spine health' },

@@ -23,7 +23,7 @@ export class WikiMcpService {
     const [featureCount] = await db.select({ count: count() }).from(featureMaps);
 
     // 2. Redis Metrics (scan for agents: and wiki: keys)
-    const agentKeys = await redis.keys('agents:dir:*');
+    const agentKeys = await redis.keys('llms:dir:*');
     const wikiKeys = await redis.keys('wiki:page:*');
 
     // 3. Qdrant Metrics
@@ -178,7 +178,7 @@ export class WikiMcpService {
         path,
         status: 'dry_run',
         proposedChanges: [
-          `Update AGENTS.md metadata for ${path}`,
+          `Update LLMS.md metadata for ${path}`,
           `Recalculate pagerank for child files`,
           `Sync ${path} to Neo4j`,
         ],

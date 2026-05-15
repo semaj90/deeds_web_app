@@ -492,7 +492,7 @@ export const hypergraphSearchByLaneTool = {
     'Search the 4-lane hyperedge graph by edge_type. ' +
     'Lane A (cluster_context) = GPU k-means cohesion. ' +
     'Lane B (shared_resource) = files coupled by same DB table / Qdrant collection / Redis key / Neo4j label. ' +
-    'Lane C (agents_context) = AGENTS.md scopes sharing tag vocabulary (jaccard ≥ 0.4). ' +
+    'Lane C (agents_context) = LLMS.md scopes sharing tag vocabulary (jaccard ≥ 0.4). ' +
     'Lane D (vault_link)     = vault MD files all linking to the same target (shared-reference). ' +
     'Read-only Postgres query against hypergraph_edges. Returns ranked edges with members + metadata.',
   parameters: z.object({
@@ -625,7 +625,7 @@ export const agentProposeFixTool = {
       laneB.length ? laneB.map(fmtHit).join('\n') : '_no matching shared_resource edges_',
       ``,
       `## Lane C — agent conventions (${laneC.length} hyperedges)`,
-      `_AGENTS.md scopes that describe related conventions for this area._`,
+      `_LLMS.md scopes that describe related conventions for this area._`,
       ``,
       laneC.length ? laneC.map(fmtHit).join('\n') : '_no matching agents_context edges_',
       ``,
@@ -639,7 +639,7 @@ export const agentProposeFixTool = {
       `2. \`retrieval.qdrantLookup("${note.fm.embedding_id ?? `qdrant://codebase_chunks_768/${args.file_path}`}")\` — semantic chunks`,
       `3. \`vault.followLinks("${vaultPath}", "imports", 2)\` — import graph 2 hops`,
       `4. \`hypergraph.searchByLane({query: "${probes[0] ?? fileStem}", lane: "shared_resource"})\` — full Lane B coupling`,
-      `5. Review siblings + neighbors + AGENTS.md guidance before drafting the change`,
+      `5. Review siblings + neighbors + LLMS.md guidance before drafting the change`,
       `6. Apply the change manually and re-run \`graphify:obsidian:incremental\` to refresh`,
     ].join('\n');
 

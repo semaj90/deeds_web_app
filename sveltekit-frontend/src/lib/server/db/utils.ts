@@ -1,11 +1,10 @@
 // Centralized Drizzle ORM helpers and DB exports for the project
-import { db } from './unified-client.js';
+import { db, adminDb } from './client.js';
 import { sql } from 'drizzle-orm';
 import * as pgCore from 'drizzle-orm/pg-core';
 import { eq, and, or, gt, lt, like, not, asc, desc } from 'drizzle-orm';
 
 // Re-exports
-export const adminDb = db;
 export * from 'drizzle-orm/pg-core';
 export { eq, and, or, gt, lt, like, not, asc, desc, sql };
 

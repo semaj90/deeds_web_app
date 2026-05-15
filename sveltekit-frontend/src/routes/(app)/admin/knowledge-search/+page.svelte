@@ -5,7 +5,10 @@
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: {
-	data: PageData & { collections?: string[] }, form: ActionData & { results?: Array<{ score: number; collection?: string; payload?: Record<string, any> }> } } = $props();
+	data: PageData & { collections?: string[] }, form: ActionData & { 
+		results?: Array<{ score: number; collection?: string; payload?: Record<string, any> }>,
+		hyperRagResult?: any
+	} } = $props();
 
 	// Search State
 	let searchQuery = $state('');
@@ -34,7 +37,7 @@
 	let selectedCluster = $state<number | null>(null);
 
 	// Active Tab
-	let activeTab = $state<'search' | 'tags' | 'graph' | 'files' | 'clusters'>('search');
+	let activeTab = $state<'search' | 'tags' | 'graph' | 'files' | 'clusters' | 'hyperrag'>('hyperrag');
 
 	// Actions
 	function handleEnhance() {
@@ -76,6 +79,7 @@
 	<!-- Tabs -->
 	<div class="tabs">
 		<button class:active={activeTab === 'search'} onclick={() => (activeTab = 'search')}>🔍 Search</button>
+		<button class:active={activeTab === 'hyperrag'} onclick={() => (activeTab = 'hyperrag')}>⚡ HyperRAG</button>
 		<button class:active={activeTab === 'tags'} onclick={() => (activeTab = 'tags')}>🏷️ Enhanced Tags</button>
 		<button class:active={activeTab === 'graph'} onclick={() => (activeTab = 'graph')}>🌐 Neo4j Graph</button>
 		<button class:active={activeTab === 'files'} onclick={() => (activeTab = 'files')}>📄 File Analysis</button>
@@ -145,6 +149,88 @@
 					<p class="text-gray-500">No results found.</p>
 				{/if}
 			</div>
+		</div>
+	{/if}
+
+	<!-- HyperRAG Tab -->
+	{#if activeTab === 'hyperrag'}
+		<div class="hyperrag-panel">
+			<form method="POST" action="?/hyperRagSearch" use:enhance={handleEnhance} class="search-controls">
+				<input
+					type="text"
+					name="query"
+					bind:value={searchQuery}
+					placeholder="HyperRAG: Multi-lane topological retrieval..."
+					class="search-input"
+				/>
+
+				<select name="mode" class="collection-select">
+					<option value="codebase">Codebase</option>
+					<option value="legal">Legal</option>
+					<option value="evidence">Evidence</option>
+				</select>
+
+				<label class="flex items-center gap-2 text-sm">
+					<input type="checkbox" name="synthesize" checked />
+					<span>Synthesize</span>
+				</label>
+
+				<button type="submit" disabled={isSearching} class="btn-primary">
+					{isSearching ? '⚡ Synthesizing...' : '⚡ HyperRAG Search'}
+				</button>
+			</form>
+
+			{#if form?.hyperRagResult}
+				<div class="hyperrag-results">
+					{#if form.hyperRagResult.synthesis}
+						<div class="synthesis-box">
+							<h3>🤖 AI Synthesis</h3>
+							<div class="synthesis-content">
+								{form.hyperRagResult.synthesis}
+							</div>
+						</div>
+					{/if}
+
+					<div class="results-grid">
+						{#each form.hyperRagResult.hits as hit}
+							<div class="result-card" class:boosted={hit.score > 1.0}>
+								<div class="result-header">
+									<span class="score">{(hit.score).toFixed(2)}</span>
+									<span class="topo-badge">{hit.signals.topoClass || 'no-cluster'}</span>
+								</div>
+								<div class="result-content">
+									<h4 class="font-bold mb-1">{hit.title}</h4>
+									<p class="text-xs text-gray-600 mb-2">{hit.sourcePath}</p>
+									<p class="text-sm line-clamp-3">{hit.text}</p>
+									
+									<div class="reasons mt-2">
+										{#each hit.reasons as reason}
+											<span class="reason-tag">{reason}</span>
+										{/each}
+									</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+
+					{#if form.hyperRagResult.summaryLenses?.length > 0}
+						<div class="lenses-section mt-8">
+							<h3>🔭 Topological Summary Lenses</h3>
+							<div class="lenses-grid">
+								{#each form.hyperRagResult.summaryLenses as lens}
+									<div class="lens-card">
+										<div class="lens-header">
+											<span class="lens-title">{lens.title}</span>
+											<span class="lens-topo">{lens.topoClass}</span>
+										</div>
+										<p class="text-sm">{lens.summary}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	{/if}
 
@@ -330,6 +416,82 @@
 		padding: 0.25rem 0.75rem;
 		border-radius: 9999px;
 		font-size: 0.75rem;
+	}
+
+	/* HyperRAG Styles */
+	.synthesis-box {
+		background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+		border: 1px solid #3b82f6;
+		border-radius: 0.75rem;
+		padding: 1.5rem;
+		margin-bottom: 2rem;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	}
+
+	.synthesis-box h3 {
+		color: #1d4ed8;
+		font-weight: bold;
+		margin-bottom: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.synthesis-content {
+		line-height: 1.6;
+		color: #1f2937;
+		white-space: pre-wrap;
+	}
+
+	.topo-badge {
+		background: #fef3c7;
+		color: #92400e;
+		padding: 0.25rem 0.6rem;
+		border-radius: 0.375rem;
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	.boosted {
+		border-left: 4px solid #3b82f6 !important;
+	}
+
+	.reason-tag {
+		display: inline-block;
+		background: #f3f4f6;
+		color: #4b5563;
+		font-size: 0.65rem;
+		padding: 0.1rem 0.4rem;
+		border-radius: 0.25rem;
+		margin-right: 0.4rem;
+		margin-bottom: 0.2rem;
+	}
+
+	.lenses-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+
+	.lens-card {
+		background: #f8fafc;
+		border: 1px dashed #cbd5e1;
+		padding: 1rem;
+		border-radius: 0.5rem;
+	}
+
+	.lens-header {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 0.5rem;
+		font-weight: bold;
+		font-size: 0.85rem;
+	}
+
+	.lens-topo {
+		color: #64748b;
 	}
 </style>
 

@@ -1,7 +1,7 @@
-ï»¿/**
- * GET  /api/wiki/watch  â€” watcher status
- * POST /api/wiki/watch  â€” start watcher
- * DELETE /api/wiki/watch â€” stop watcher
+/**
+ * GET  /api/wiki/watch  — watcher status
+ * POST /api/wiki/watch  — start watcher
+ * DELETE /api/wiki/watch — stop watcher
  *
  * Requires: OBSIDIAN_VAULT_PATH env var pointing to the vault root on disk.
  * The watcher watches karpathy-wiki/ (glob **\/*.md) and ingests any file edited

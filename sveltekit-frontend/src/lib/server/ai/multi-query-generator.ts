@@ -15,7 +15,6 @@ QUERY: "${query}"
 
 Return ONLY a JSON array of strings: ["...", "...", "..."]
 `.trim();
-
 		try {
 			const response = await bifrostChat(
 				[{ role: 'user', content: prompt }],
@@ -25,7 +24,10 @@ Return ONLY a JSON array of strings: ["...", "...", "..."]
 
 			const match = response.match(/\[.*\]/s);
 			if (match) {
-				return JSON.parse(match[0]);
+				const generated = JSON.parse(match[0]);
+				// Ensure original query is always the first variant for maximum precision
+				const combined = [query, ...generated];
+				return Array.from(new Set(combined.map(s => s.trim()))).slice(0, count + 1);
 			}
 		} catch (err) {
 			console.error('[MultiQueryGenerator] Failed to generate queries:', err);

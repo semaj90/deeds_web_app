@@ -75,7 +75,7 @@ export const RPC_DEADLINES_MS = {
   'grpc.GetTopologyContext':    1500,
   'grpc.GetResearchContext':    3000,
   // MCP read-only tools
-  'mcp.agents_md':               500,
+  'mcp.LLMS.md':               500,
   'mcp.codebase:search':        2000,
   'mcp.codebase:ace_context':   2000,
   'mcp.codebase:graph_neighbors': 1500,
