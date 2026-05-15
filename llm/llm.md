@@ -19,6 +19,7 @@ Treat this as the repo's `llms.txt`-style context entrypoint for ingestion, ACE 
 - `llm_todos.md` — open follow-ups and next actions
 - `karpathy_llmwiki.md` — master traversal page for ACE/Karpathy indexing, relevant scripts, and debug flow
 - `repo_root_map.md` — workspace-root path map for Docker, services, bridges, workflows, and configs
+- `docs/codebase_atlas/` — docs-facing atlas view of the same maps
 
 ## Rules
 

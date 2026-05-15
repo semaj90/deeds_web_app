@@ -50,6 +50,9 @@
 - `drizzle/` — SQL migrations and schema assets
 - `services/` — standalone service packages
 - `docs/` and `memory/` — narrative docs and agent memory
+- `docs/codebase_atlas/` — docs-facing atlas landing page and future exported maps
+- `docs/codebase_atlas/` now includes docs-facing atlas pages mirroring the `llm/` hub
+- `docs/codebase_atlas/feature_map.md`, `package_map.md`, `language_counts.md`, `top_scripts.md`
 - `docker/`, `.github/`, `simd-bridge/`, `scripts/`, and repo-root config files — deployment, native bridges, and workspace wiring
 
 ## What to count here

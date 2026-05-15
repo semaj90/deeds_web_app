@@ -29,6 +29,8 @@
     "hypergraph:seed:dry",
     "archive:llm",
     "archive:llm:dry",
+    "wiki:loop",
+    "wiki:loop:smoke",
     "smoke:atlas",
     "smoke:hypergraph",
     "atlas:prompt:smoke",
@@ -87,6 +89,7 @@
       "requireBoth": false
     },
     "tasks": [
+      "wiki:loop",
       "graphify:authority",
       "graphify:gds",
       "graphify:som",
