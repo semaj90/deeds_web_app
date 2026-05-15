@@ -1,0 +1,27 @@
+{
+  "repo": "deeds-web-app",
+  "runId": "run_1778884847387",
+  "generatedAt": "2026-05-15T22:40:47.387Z",
+  "targets": {
+    "qdrant": {
+      "collection": "codebase_chunks_768",
+      "count": 32135
+    },
+    "neo4j": {
+      "nodeCount": 33044,
+      "edgeCount": 64270
+    },
+    "couchdb": {
+      "docCount": 33194
+    },
+    "redis": {
+      "keyCount": 32140
+    }
+  },
+  "safety": {
+    "noHiddenThoughts": true,
+    "noRawTensors": true,
+    "noKvCache": true,
+    "stagedWriteOnly": true
+  }
+}

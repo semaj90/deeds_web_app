@@ -6,7 +6,9 @@ const graph = loadCodebaseGraph(config);
 const routeMap = loadRouteMap(config);
 const routeStats = routeSummary(routeMap);
 
-const runId = `run_${Date.now()}`;
+const args = new Set(process.argv.slice(2));
+const customRunId = [...args].find(a => a.startsWith('--runId='))?.split('=')[1];
+const runId = customRunId || `run_${Date.now()}`;
 
 const manifest = {
   repo: config.repoName,
