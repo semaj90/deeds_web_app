@@ -75,7 +75,7 @@ async function mirrorToPostgres(dbName: MemoryDatabase, doc: MemoryDoc): Promise
 async function mirrorToNeo4j(dbName: MemoryDatabase, doc: MemoryDoc): Promise<void> {
   const neo4jUrl  = ENV.NEO4J_HTTP_URL;
   const neo4jAuth = 'Basic ' + Buffer.from(
-    (process.env.NEO4J_USER ?? 'neo4j') + ':' + (process.env.NEO4J_PASSWORD ?? 'password')
+    ENV.NEO4J_USER + ':' + ENV.NEO4J_PASSWORD
   ).toString('base64');
 
   const label = doc.type === 'wiki_note' || doc.type === 'directory_summary' || doc.type === 'cluster_summary'

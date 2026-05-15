@@ -1,0 +1,70 @@
+{
+  "20": {
+    "alias": "webgpu_similarity",
+    "topic": "WebGPU similarity and GPU graph operations"
+  },
+  "23": {
+    "alias": "gpu_topology",
+    "topic": "WebGPU manifold and GPU graph topology"
+  },
+  "25": {
+    "alias": "redis_cache",
+    "topic": "cache services, Redis, ACE packets"
+  },
+  "32": {
+    "alias": "langextract_services",
+    "topic": "LangExtract extraction services and tooling"
+  },
+  "47": {
+    "alias": "legal_corpus_routes",
+    "topic": "legal corpus, statutes, citations"
+  },
+  "48": {
+    "alias": "db_schema",
+    "topic": "Drizzle schema, database tables, migrations"
+  },
+  "55": {
+    "alias": "db_schema",
+    "topic": "Drizzle schema, database tables, migrations"
+  },
+  "57": {
+    "alias": "gpu_topology",
+    "topic": "WebGPU manifold and GPU graph topology"
+  },
+  "72": {
+    "alias": "ace_context",
+    "topic": "ACE context assembly and retrieval policy"
+  },
+  "73": {
+    "alias": "retrieval_graph",
+    "topic": "retrieval ranking, graph context, legal PageRank"
+  },
+  "80": {
+    "alias": "gpu_topology",
+    "topic": "WebGPU manifold and GPU graph topology"
+  },
+  "82": {
+    "alias": "grpc_mcp_tools",
+    "topic": "gRPC, MCP tool clients, internal tool routing"
+  },
+  "88": {
+    "alias": "db_schema",
+    "topic": "Drizzle schema, database tables, migrations"
+  },
+  "91": {
+    "alias": "db_schema",
+    "topic": "Drizzle schema, database tables, migrations"
+  },
+  "92": {
+    "alias": "evidence_upload_ui",
+    "topic": "evidence upload UI and upload components"
+  },
+  "94": {
+    "alias": "redis_cache",
+    "topic": "cache services, Redis, ACE packets"
+  },
+  "95": {
+    "alias": "db_schema",
+    "topic": "Drizzle schema, database tables, migrations"
+  }
+}

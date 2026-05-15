@@ -1,9 +1,9 @@
 /**
- * Phase A5 — `@auto:*` block contract for AGENTS.md hand-edit preservation.
+ * Phase A5 — `@auto:*` block contract for LLMS.md hand-edit preservation.
  *
  * Spec: docs/design/2026-05-11_agents-directory-card-regen.md §4 "Hand-edit policy".
  *
- * AGENTS.md files mix regen-owned content (auto-blocks) with operator notes
+ * LLMS.md files mix regen-owned content (auto-blocks) with operator notes
  * (anything outside the markers). Regen REPLACES auto-blocks verbatim; it
  * NEVER touches text outside them. Operator-authored sections like
  * "## Operator notes (preserved across regen)" survive forever.
@@ -12,9 +12,9 @@
  *   This directory implements ACE context assembly.
  *   <!-- @auto:summary end -->
  *
- * First-run policy: if an existing AGENTS.md has zero auto-blocks, regen
+ * First-run policy: if an existing LLMS.md has zero auto-blocks, regen
  * appends a fresh block set at the end and preserves the original content
- * above. If no AGENTS.md exists at all, regen writes a brand-new file
+ * above. If no LLMS.md exists at all, regen writes a brand-new file
  * composed entirely of auto-blocks.
  *
  * Pure module — no I/O, no DB. The fs writer lives in
@@ -96,7 +96,7 @@ function renderImports(card: AgentsDirectoryCard): string {
 function renderFeatures(card: AgentsDirectoryCard): string {
 	const lines: string[] = ['## Features + routes + schema', ''];
 	if (card.featureKeys.length > 0) {
-		lines.push('**Feature keys (master_agents.md):** ' + card.featureKeys.map((k) => `\`${k}\``).join(' · '));
+		lines.push('**Feature keys (master_LLMS.md):** ' + card.featureKeys.map((k) => `\`${k}\``).join(' · '));
 	} else {
 		lines.push('_(no feature_implementations rows map to this directory)_');
 	}
@@ -169,7 +169,7 @@ const HEADER = (card: AgentsDirectoryCard) => [
 ].join('\n');
 
 /**
- * Render a complete AGENTS.md body composed entirely of auto-blocks. Used
+ * Render a complete LLMS.md body composed entirely of auto-blocks. Used
  * when no file exists yet OR as the auto-region in `mergeCardIntoMarkdown`.
  */
 export function renderAllAutoBlocks(card: AgentsDirectoryCard): string {
@@ -239,7 +239,7 @@ export interface MergeResult {
  *
  * If `existing` is empty or has zero auto-blocks, we treat it as a fresh
  * file: prepend the header + render all auto-blocks, append the existing
- * content (so legacy AGENTS.md content isn't lost — operators can prune
+ * content (so legacy LLMS.md content isn't lost — operators can prune
  * it later).
  */
 export function mergeCardIntoMarkdown(card: AgentsDirectoryCard, existing: string | null): MergeResult {

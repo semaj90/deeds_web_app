@@ -42,7 +42,7 @@ async function setPayloadBatch(qdrantUrl, collection, points, dryRun) {
     return;
   }
   // Qdrant SetPayload endpoint: PUT /collections/{name}/points/payload
-  // Body: { "payload": { "som_cluster": <N> }, "points": [<id>, ...] }
+  // Body: { "payload": { "som_cluster": <N>, "gpu_cluster": <N> }, "points": [<id>, ...] }
   // We must group by centroid value to batch efficiently.
   const byCentroid = new Map();
   for (const { id, centroid } of points) {
@@ -51,7 +51,7 @@ async function setPayloadBatch(qdrantUrl, collection, points, dryRun) {
   }
   for (const [centroid, ids] of byCentroid) {
     const url = `${qdrantUrl}/collections/${encodeURIComponent(collection)}/points/payload`;
-    const body = JSON.stringify({ payload: { som_cluster: centroid }, points: ids });
+    const body = JSON.stringify({ payload: { som_cluster: centroid, gpu_cluster: centroid }, points: ids });
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

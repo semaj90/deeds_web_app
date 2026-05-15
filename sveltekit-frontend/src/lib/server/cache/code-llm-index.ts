@@ -908,7 +908,7 @@ export async function lookupPriorAnswerMemory(
 /**
  * Render a prior-answer hit as a compact ACE prompt section. Stays under
  * ~600 chars so it fits inside the prompt budget without crowding out
- * semantic chunks. Caller drops this between AGENTS.md context and the
+ * semantic chunks. Caller drops this between LLMS.md context and the
  * Qdrant chunk list.
  */
 export function renderPriorAnswerSection(hit: PriorAnswerHit): string {

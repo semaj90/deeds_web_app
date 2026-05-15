@@ -56,13 +56,13 @@ const limitIdx = args.indexOf('--limit');
 const LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 50;
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL;
 const COLLECTION = 'codebase_chunks_768';
-const NEO4J_URL = process.env.NEO4J_URL ?? 'http://localhost:7474';
+const NEO4J_URL = process.env.NEO4J_URL ?? process.env.NEO4J_URI;
 const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
-const REDIS_URL    = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
-const DATABASE_URL = process.env.DATABASE_URL ?? '';
+const REDIS_URL    = process.env.REDIS_URL;
+const DATABASE_URL = process.env.DATABASE_URL;
 
 const LOG_DIR = resolve(ROOT, 'logs/task-output/pipeline-test');
 const REPORT = resolve(REPO, 'sveltekit-frontend/next_steps/active/karpathy-gpu-recommendations.md');
@@ -132,7 +132,7 @@ async function neo4jQuery(cypher, params = {}) {
 async function fetchTopByHitLog(limit, hours) {
   const { Pool } = await import('pg');
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
+    connectionString: DATABASE_URL,
     max: 2,
   });
   try {
@@ -393,8 +393,8 @@ const RISK_QUERY =
 //   2. Direct Ollama         — fallback when dev server is down
 //   3. TurboQuant llama-server is chat-only on :8090 (started without --embeddings) so skipped.
 async function fetchProbeEmbedding(query) {
-  const sveltekitUrl = process.env.PUBLIC_API_URL ?? 'http://localhost:5173';
-  const ollamaUrl = process.env.OLLAMA_URL ?? process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+  const sveltekitUrl = process.env.PUBLIC_API_URL;
+  const ollamaUrl = process.env.OLLAMA_BASE_URL;
 
   // Try SvelteKit cached path first
   try {

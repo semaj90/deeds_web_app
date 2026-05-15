@@ -11,6 +11,7 @@ export type RetrievalLaneName =
   | 'ast_symbol'
   | 'neo4j_graph'
   | 'som_topology'
+  | 'summary_lenses'
   | 'web_research';
 
 export interface ContextHit {
@@ -46,10 +47,11 @@ const LANE_WEIGHTS: Record<RetrievalLaneName, number> = {
   redis_ace: 1.0,
   qdrant_vector: 1.0,
   ast_symbol: 0.9,
-  som_topology: 0.85,
-  neo4j_graph: 0.85,
+  som_topology: 0.8,
+  summary_lenses: 1.5,
   postgres_trigram: 0.75,
-  web_research: 0.7,
+  neo4j_graph: 0.85,
+  web_research: 0.5,
 };
 
 function sha256(s: string): string {
@@ -301,6 +303,70 @@ async function runSomTopologyLane(
   }
 }
 
+async function runQdrantVectorLane(
+  query: string,
+  embedding: number[] | null,
+  topK: number
+): Promise<RetrievalLaneResult> {
+  const t0 = Date.now();
+  if (!embedding) return { lane: 'qdrant_vector', degraded: false, latencyMs: 0, hits: [] };
+  try {
+    const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+    const res = await qdrant.hybridSearch({
+      collection: qdrant.collections.codebase_chunks,
+      query,
+      queryEmbedding: embedding,
+      limit: topK,
+    });
+
+    const hits: ContextHit[] = res.results.map((r) => ({
+      id: String(r.id),
+      chunkId: String(r.payload?.stable_key ?? r.id),
+      filePath: String(r.payload?.path ?? ''),
+      source: 'qdrant_vector',
+      text: String(r.payload?.content ?? ''),
+      score: r.score,
+      metadata: r.payload as Record<string, unknown>,
+    }));
+
+    return { lane: 'qdrant_vector', degraded: false, latencyMs: Date.now() - t0, hits };
+  } catch (err) {
+    return degraded('qdrant_vector', String(err), Date.now() - t0);
+  }
+}
+
+async function runSummaryLensesLane(
+  query: string,
+  embedding: number[] | null,
+  topK: number
+): Promise<RetrievalLaneResult> {
+  const t0 = Date.now();
+  if (!embedding) return { lane: 'summary_lenses', degraded: false, latencyMs: 0, hits: [] };
+  try {
+    const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+    const res = await qdrant.hybridSearch({
+      collection: qdrant.collections.summary_lenses,
+      query,
+      queryEmbedding: embedding,
+      limit: topK,
+    });
+
+    const hits: ContextHit[] = res.results.map((r) => ({
+      id: String(r.id),
+      chunkId: String(r.payload?.stable_key ?? r.id),
+      filePath: String(r.payload?.file_path ?? ''),
+      source: 'summary_lenses',
+      text: String(r.payload?.summary ?? r.payload?.content ?? ''),
+      score: r.score,
+      metadata: r.payload as Record<string, unknown>,
+    }));
+
+    return { lane: 'summary_lenses', degraded: false, latencyMs: Date.now() - t0, hits };
+  } catch (err) {
+    return degraded('summary_lenses', String(err), Date.now() - t0);
+  }
+}
+
 export function mergeContextHits(lanes: RetrievalLaneResult[]): ContextHit[] {
   const byFile = new Map<string, ContextHit>();
   const noFile: ContextHit[] = [];
@@ -364,11 +430,17 @@ export async function runRetrievalLanes(opts: {
   const t0 = Date.now();
   const { query, pool, redis, topK = 10 } = opts;
 
+  // Generate embedding once for all vector lanes
+  const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
+  const embedding = await generateSingleEmbedding(query).catch(() => null);
+
   const settled = await Promise.allSettled([
     runRedisAceLane(redis, query, topK),
     runPostgresTrigramLane(pool, query, topK),
     runAstSymbolLane(redis, query),
     runSomTopologyLane(redis, query),
+    runQdrantVectorLane(query, embedding, topK),
+    runSummaryLensesLane(query, embedding, topK),
   ]);
 
   const lanes: RetrievalLaneResult[] = settled.map((result, i) => {
@@ -377,6 +449,8 @@ export async function runRetrievalLanes(opts: {
       'postgres_trigram',
       'ast_symbol',
       'som_topology',
+      'qdrant_vector',
+      'summary_lenses',
     ];
     if (result.status === 'fulfilled') return result.value;
     return degraded(names[i], String(result.reason));

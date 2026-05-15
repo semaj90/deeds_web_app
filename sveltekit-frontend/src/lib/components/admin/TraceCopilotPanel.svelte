@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
-  import { createMachine, interpret } from 'xstate';
+  import RoutingExplanationPanel from './RoutingExplanationPanel.svelte';
 
   // Props (Runes)
   let { contextTag = 'global', isOpen = $bindable(true) } = $props();
@@ -151,6 +151,7 @@
         <span>CHUNKS: {systemStatus.metrics?.db?.chunks || 0}</span>
         <span>SUMMARIES: {systemStatus.metrics?.db?.summaries || 0}</span>
         <span>LATENCY: {systemStatus.system?.latencyMs}ms</span>
+        <!-- TODO: Integrate routingExplanation visualization (Lexical/Topology/Task signal breakdown) -->
       </div>
     {/if}
 
@@ -169,6 +170,11 @@
           >
             {msg.content}
           </div>
+          {#if msg.metadata?.routingExplanation}
+            <div class="mt-2 w-full max-w-[90%]">
+              <RoutingExplanationPanel explanation={msg.metadata.routingExplanation} />
+            </div>
+          {/if}
           {#if msg.metadata?.model}
             <span class="text-[9px] text-zinc-600 font-mono uppercase px-1">{msg.metadata.model}</span>
           {/if}

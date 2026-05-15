@@ -1,7 +1,7 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
-import { db } from './index.js';
+import { db } from './client.js';
 import * as schema from './schema.js';
 import { eq, sql } from 'drizzle-orm';
 

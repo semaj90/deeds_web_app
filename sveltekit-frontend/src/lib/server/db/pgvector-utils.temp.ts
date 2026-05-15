@@ -3,7 +3,7 @@
  * Provides vector similarity search and embedding operations
  */
 
-import { db } from './index.js';
+import { db, pgRows } from './client.js';
 
 // Type definitions
 type Row = Record<string, unknown>;
@@ -145,7 +145,8 @@ export async function searchSimilarMessages(
 			LIMIT ${limit}
 		`;
 
-		const results = (await db.execute(sql)) as Array<Row>;
+		const result = await db.execute(sql);
+		const results = pgRows<Row>(result);
 
 		return (results || []).map((row) => ({
 			id: asString(row.id),
@@ -193,7 +194,8 @@ export async function searchSimilarEvidence(
 			LIMIT ${limit}
 		`;
 
-		const results = (await db.execute(sql)) as Array<Row>;
+		const result = await db.execute(sql);
+		const results = pgRows<Row>(result);
 
 		return (results || []).map((row) => ({
 			id: asString(row.id),
@@ -356,12 +358,13 @@ export function calculateCosineSimilarity(a: number[], b: number[]): number {
  */
 export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
 	try {
-		const extensionCheck = (await db.execute(`
+		const result = await db.execute(`
 			SELECT EXISTS (
 				SELECT 1 FROM pg_extension WHERE extname = 'vector'
 			) as has_vector,
 			(SELECT extversion FROM pg_extension WHERE extname = 'vector') as version
-		`)) as Array<{ has_vector?: boolean; version?: string }>;
+		`);
+		const extensionCheck = pgRows<{ has_vector?: boolean; version?: string }>(result);
 
 		const first = extensionCheck?.[0];
 		if (!first?.has_vector) {
@@ -372,12 +375,13 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
 			};
 		}
 
-		const functionsCheck = (await db.execute(`
+		const result2 = await db.execute(`
 			SELECT routine_name
 			FROM information_schema.routines
 			WHERE routine_schema = 'public'
 			AND routine_name IN ('cosine_similarity', 'search_similar_messages', 'search_similar_evidence')
-		`)) as Array<{ routine_name?: string }>;
+		`);
+		const functionsCheck = pgRows<{ routine_name?: string }>(result2);
 
 		const availableFunctions = (functionsCheck || [])
 			.map((row) => row?.routine_name ?? '')

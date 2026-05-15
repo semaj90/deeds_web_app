@@ -4,7 +4,7 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { db } from './index.js';
+import { db } from './client.js';
 import { wardenCases } from './warden-schema.js';
 
 /**

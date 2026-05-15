@@ -103,7 +103,7 @@ if ($env:ROTORQUANT_MODEL_PATH) {
   Write-Host 'Model: RotorQuant GGUF (weight-quantised, stock binary OK)' -ForegroundColor Cyan
 }
 $mmproj  = if ($env:TURBO_MMPROJ_PATH) { $env:TURBO_MMPROJ_PATH } else { Join-Path $env:USERPROFILE 'Downloads\gemma4-mmproj\mmproj-BF16.gguf' }
-$port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8080' }
+$port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
 $ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '4096' }
 $ngl     = if ($env:TURBO_NGL)         { $env:TURBO_NGL }         else { '99' }
 

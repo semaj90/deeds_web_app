@@ -11,38 +11,28 @@ Files
 
 Quick Usage
 -----------
-From the repository root run:
+To run the full pipeline (Export -> Build -> Topology -> Tag):
 
 ```bash
-node sveltekit-frontend/scripts/hypergraph-build.mjs \
-  --input path/to/embeddings.ndjson \
-  --clusters 100 \
-  --batch-size 200 \
-  --out next_steps/active/hyper_centroids.json \
-  --assignments next_steps/active/hyper_assignments.ndjson
+node sveltekit-frontend/scripts/hypergraph-pipeline.mjs codebase_chunks_768 100
 ```
 
-With Redis checkpointing (recommended for long runs):
+Individual steps:
+- `hypergraph-build.mjs` — Streaming online k-means builder with optional Redis checkpointing. Reads NDJSON of embeddings and writes centroids + assignments.
+- `export-embeddings-qdrant.mjs` — Pulls vectors from Qdrant into NDJSON.
+- `hypergraph-topology-writer.mjs` — Computes k-NN among centroids for fast greedy lookup.
+- `hypergraph-tag-qdrant.mjs` — Writes `som_cluster` payload back to Qdrant.
 
-```bash
-npm run --workspace sveltekit-frontend hypergraph:build:redis -- \
-  --input path/to/embeddings.ndjson \
-  --clusters 100 \
-  --out next_steps/active/hyper_centroids.json
-```
-
-Input format
-------------
-NDJSON where each line is a JSON object with at least an `id` and `embedding` array, for example:
-
-```json
-{"id":"vec-1","embedding":[0.12,0.33,...]}
-```
+Lookup Server
+-------------
+The lookup server (`hypergraph-lookup-server.mjs`) supports:
+1. **Brute force lookup**: Good for small $K$.
+2. **Greedy Topology Search**: Uses the neighbor graph to find the nearest centroid in $O(\log K)$ steps. Triggered automatically if neighbors are indexed.
 
 Next steps
 ----------
-- Export embeddings from Qdrant or Postgres into NDJSON (driver script planned).
-- Add SOM/topology indexing to shard centroids into Redis for fast nearest-centroid lookups.
+- Integrate Postgres research_summaries into the pipeline.
+- Add cluster-narrative generation via Ollama (Gemma4).
 - Tune `--checkpoint-every` and `--batch-size` for your environment.
 
 Notes

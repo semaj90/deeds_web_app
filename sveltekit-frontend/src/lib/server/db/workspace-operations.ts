@@ -3,7 +3,7 @@
  * Handles multi-panel contextual chat with RAG (Retrieval-Augmented Generation)
  */
 
-import { db } from './unified-client.js';
+import { db } from './client.js';
 import {
     workspaces,
     workspaceSessions,

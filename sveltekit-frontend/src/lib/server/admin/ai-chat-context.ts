@@ -3,7 +3,8 @@ import { ENV } from '$lib/server/env.server.js';
 import { createRedisConnection } from '$lib/server/redis';
 import { sanitizeBrowserContext, emptyContext } from './browser-context-sanitizer.js';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
-import { AgenticSearchService } from '$lib/server/vector/agentic-search.js';
+import { HyperRagFusionService } from '$lib/server/retrieval/hyperrag-fusion-service.js';
+
 
 
 const BROWSER_REDIS_KEY = (userId: string) => `browser-context:snapshot:${userId}`;
@@ -86,11 +87,8 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
       : Promise.resolve(null),
 
     // 6. Agentic Multi-Query Retrieval
-    intent === 'agentic_multiquery'
-      ? AgenticSearchService.search(query, { 
-          collection: 'codebase_chunks', 
-          tags: query.match(/#\w+/g)?.map(t => t.slice(1)) ?? [] 
-        }).catch(() => null)
+    intent === 'agentic_multiquery' || intent === 'general'
+      ? HyperRagFusionService.getInstance().search({ query, mode: 'codebase', topK: 10 }).catch(() => null)
       : Promise.resolve(null)
   ]);
 

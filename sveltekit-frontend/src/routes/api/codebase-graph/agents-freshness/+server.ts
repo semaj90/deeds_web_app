@@ -1,17 +1,17 @@
 /**
  * GET /api/codebase-graph/agents-freshness?path=<filePath>
  *
- * Returns AGENTS.md freshness for a given file path:
- *   - resolvedKey      Redis key the walk-up resolved to (or 'agents:root' fallback)
+ * Returns LLMS.md freshness for a given file path:
+ *   - resolvedKey      Redis key the walk-up resolved to (or 'llms:root' fallback)
  *   - resolvedDir      directory the resolver landed on (after walking up)
  *   - ttlSeconds       seconds remaining on the resolved key (-1 = no TTL, -2 = missing)
  *   - lengthChars      size of the cached markdown
- *   - fallbackToRoot   true when the resolution fell through to repo-root AGENTS.md
+ *   - fallbackToRoot   true when the resolution fell through to repo-root LLMS.md
  *
- * Used by the fast-ast detail panel to surface "AGENTS.md cache fresh / stale"
+ * Used by the fast-ast detail panel to surface "LLMS.md cache fresh / stale"
  * info next to selected files in GraphifyViewer (architecture review item 5).
  *
- * GET (no path) → returns global stats: total agents:dir:* keys + agents:root presence
+ * GET (no path) → returns global stats: total llms:dir:* keys + llms:root presence
  *                 so the panel can render a top-level "NES-arch ready" badge.
  */
 
@@ -44,9 +44,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   // Global stats mode — no path param
   if (!path) {
     try {
-      const dirKeys      = await redis.keys('agents:dir:*');
-      const rootRaw      = await redis.get('agents:root');
-      const rootTtl      = rootRaw ? await redis.ttl('agents:root') : null;
+      const dirKeys      = await redis.keys('llms:dir:*');
+      const rootRaw      = await redis.get('llms:root');
+      const rootTtl      = rootRaw ? await redis.ttl('llms:root') : null;
       const stats: GlobalStats = {
         totalDirKeys:    dirKeys.length,
         rootPresent:     rootRaw !== null,
@@ -70,12 +70,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     if (/\.[a-z]{1,5}$/i.test(dir)) dir = dir.split('/').slice(0, -1).join('/');
 
     const walk: FreshnessResult['walk'] = [];
-    let resolvedKey  = 'agents:root';
+    let resolvedKey  = 'llms:root';
     let resolvedDir  = '';
     let resolved     = false;
 
     while (dir && dir !== '.' && dir !== '/') {
-      const key    = `agents:dir:${dir}`;
+      const key    = `llms:dir:${dir}`;
       const exists = (await redis.exists(key)) === 1;
       walk.push({ key, exists });
       if (exists && !resolved) {
@@ -104,7 +104,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     return json(result);
   } catch (e) {
     return json({
-      resolvedKey:    'agents:root',
+      resolvedKey:    'llms:root',
       resolvedDir:    '',
       requestedPath:  path,
       ttlSeconds:     null,

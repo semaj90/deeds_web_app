@@ -1,5 +1,5 @@
-﻿/**
- * redis-streams.ts — typed Redis Streams helpers for token-chunk streaming.
+/**
+ * redis-streams.ts � typed Redis Streams helpers for token-chunk streaming.
  *
  * Key layout: stream:tokens:{requestId}
  * Fields per entry: { seq, chunk, meta (JSON) }
@@ -14,9 +14,8 @@
 
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
-import { attachDispose } from '$lib/server/redis-disposable.js';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// -- Types ---------------------------------------------------------------------
 
 export type TokenMeta = Record<string, unknown>;
 
@@ -46,7 +45,7 @@ interface StreamRedis {
   duplicate(): StreamRedis;
 }
 
-// ── Key ───────────────────────────────────────────────────────────────────────
+// -- Key -----------------------------------------------------------------------
 
 function streamKey(requestId: string): string {
   return `stream:tokens:${requestId}`;
@@ -56,7 +55,7 @@ function sr(redis: Redis): StreamRedis {
   return redis as unknown as StreamRedis;
 }
 
-// ── Producer API ──────────────────────────────────────────────────────────────
+// -- Producer API --------------------------------------------------------------
 
 /**
  * Append a token chunk to the stream.
@@ -100,7 +99,7 @@ export async function publishStreamDone(
   await redis.expire(key, 2 * 60 * 60);
 }
 
-// ── Consumer API ──────────────────────────────────────────────────────────────
+// -- Consumer API --------------------------------------------------------------
 
 /**
  * Read entries from a Redis stream using XRANGE.
@@ -136,26 +135,33 @@ export async function consumeTokenStream(
   const start    = Date.now();
 
   // Duplicate connection for blocking XREAD so we don't stall the main pool.
-  // `await using` auto-calls .quit() on scope exit — even on throw.
   const dupRaw = baseRedis.duplicate();
-  await using _dup = attachDispose(dupRaw);
   const reader = sr(dupRaw);
 
-  while (Date.now() - start < stopAfterMs) {
-    const response = await reader.xread('BLOCK', 5000, 'STREAMS', key, lastId);
-    if (!response) continue; // 5s timeout — check total elapsed and loop
+  try {
+    while (Date.now() - start < stopAfterMs) {
+      const response = await reader.xread('BLOCK', 5000, 'STREAMS', key, lastId);
+      if (!response) continue; // 5s timeout � check total elapsed and loop
 
-    const [, entries] = response[0];
-    for (const [id, fields] of entries) {
-      const entry = parseStreamEntry(id, fields);
-      await callback(entry);
-      lastId = id;
-      if (entry.done) return; // sentinel received — clean exit
+      const [, entries] = response[0];
+      for (const [id, fields] of entries) {
+        const entry = parseStreamEntry(id, fields);
+        await callback(entry);
+        lastId = id;
+        if (entry.done) return; // sentinel received � clean exit
+      }
+    }
+  } finally {
+    try {
+      if (typeof dupRaw.quit === 'function') await dupRaw.quit();
+      else if (typeof dupRaw.disconnect === 'function') dupRaw.disconnect();
+    } catch {
+      // already disconnected � fine
     }
   }
 }
 
-// ── Maintenance ───────────────────────────────────────────────────────────────
+// -- Maintenance ---------------------------------------------------------------
 
 /** Trim a stream to approximately maxLen entries (XLTRIM MAXLEN ~). */
 export async function trimTokenStream(
@@ -178,7 +184,7 @@ export async function setStreamTTL(
   await sr(getRedis()).expire(streamKey(requestId), seconds);
 }
 
-// ── Internal ──────────────────────────────────────────────────────────────────
+// -- Internal ------------------------------------------------------------------
 
 function parseStreamEntry(id: string, fields: string[]): TokenEntry {
   const obj: Record<string, string> = {};

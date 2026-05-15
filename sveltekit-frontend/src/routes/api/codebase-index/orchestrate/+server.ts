@@ -1174,8 +1174,8 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
               })
               .catch(() => {});
 
-            // Fire-and-forget: refresh agents:dir:* Redis keys now that wiki:note:dir:* are fresh.
-            // ACE NES-arch preflight reads agents:dir:* for sub-5ms directory context.
+            // Fire-and-forget: refresh llms:dir:* Redis keys now that wiki:note:dir:* are fresh.
+            // ACE NES-arch preflight reads llms:dir:* for sub-5ms directory context.
             forwardFetch('/api/codebase-index/agents-write', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

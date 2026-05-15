@@ -34,7 +34,7 @@ export const openAIChatCompletionRequestSchema = z.object({
   tool_choice:  z.union([z.string(), z.record(z.string(), z.unknown())]).optional(),
   user:         z.string().optional(),
   // ── Custom extensions (ignored by stock OpenAI clients, used by our agents) ──
-  /** Repo-relative file path for nes-arch AGENTS.md preflight + same-dir boost */
+  /** Repo-relative file path for nes-arch LLMS.md preflight + same-dir boost */
   file_path:    z.string().optional(),
   /** Case UUID for case-scoped retrieval */
   case_id:      z.string().uuid().optional(),
@@ -91,7 +91,7 @@ export interface OpenAIChatCompletionResponse {
     contextChunks:  number;
     agentsMd:       boolean;
     codeLlmHit:     boolean;
-    cacheHit:       'none' | 'agents-md' | 'prior-answer' | 'bifrost';
+    cacheHit:       'none' | 'LLMS.md' | 'prior-answer' | 'bifrost';
     durationMs:     number;
     // Tool loop metadata (Step 5 — Gemma4 MCP tool controller)
     toolsUsed?:        string[];

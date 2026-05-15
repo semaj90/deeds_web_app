@@ -8,9 +8,9 @@ export type { QuantRuntimeConfig, RuntimeBackend } from './quant-config.js';
  * Centralized Model IDs — Single source of truth for all inference paths.
  *
  * Client inference tiers (priority order):
- *   1. Gemma 4 E2B 2.3B (Q4F16, Transformers.js + WebGPU)        — GPU required
- *   2. LiteRT-LM Gemma 4 E2B (~1.5 GB, XNNPACK CPU + MTP heads)  — CPU/iGPU ok
- *   3. Gemma 3 270M ONNX (W8A16, onnxruntime-web fallback)        — any device
+ *   1. Tiny ONNX / helper models (browser-local utility lane)
+ *   2. Optional Gemma 4 client helpers (WebGPU or LiteRT)
+ *   3. Gemma 3 270M ONNX (legacy helper fallback)
  *
  * Server inference tiers (priority order):
  *   1. TensorRT-LLM (INT4 AWQ, :8099)
@@ -24,9 +24,9 @@ export type { QuantRuntimeConfig, RuntimeBackend } from './quant-config.js';
  *   - embeddinggemma:latest for embeddings (768-dim)
  */
 
-// ── Client Tier 1: Gemma 4 E2B (Transformers.js + WebGPU, primary) ───────
+// ── Client Tier 1: Optional Gemma 4 helper (Transformers.js + WebGPU) ─────
 
-/** Gemma 4 E2B 2.3B — Q4F16 via @huggingface/transformers v4 */
+/** Gemma 4 E2B 2.3B — opt-in helper via @huggingface/transformers v4 */
 export const CLIENT_E2B_MODEL_ID = 'onnx-community/gemma-4-E2B-it-ONNX';
 export const CLIENT_E2B_DTYPE = 'q4f16' as const;
 export const CLIENT_E2B_DEVICE = 'webgpu' as const;
@@ -110,7 +110,8 @@ export type ModelRole =
 	| 'tool_router'
 	| 'embedding'
 	| 'vlm'
-	| 'reward_scorer';
+	| 'reward_scorer'
+	| 'client-helper';
 
 export type ModelRuntime =
 	| 'llama-server'
@@ -137,9 +138,10 @@ export type ModelCapabilities = {
 	notes?: string;
 };
 
-// Capability registry for routing and validation. Retrieval embeddings stay on
-// EmbeddingGemma/nomic-style embedding models; planner/synthesis models are not
-// valid substitutes for Qdrant or semantic-cache vectors.
+// Capability registry for routing and validation.
+// Retrieval embeddings stay on EmbeddingGemma/nomic-style embedding models.
+// Client-side Gemma4 variants are helper-only by default, not the main
+// reasoning lane.
 export const MODEL_CAPABILITIES: Record<string, ModelCapabilities> = {
 	[SERVER_EMBEDDING_MODEL]: {
 		id: SERVER_EMBEDDING_MODEL,
@@ -206,43 +208,43 @@ export const MODEL_CAPABILITIES: Record<string, ModelCapabilities> = {
 	},
 	[CLIENT_E2B_MODEL_ID]: {
 		id: CLIENT_E2B_MODEL_ID,
-		roles: ['planner', 'synthesizer'],
+		roles: ['client-helper'],
 		supportsFunctionCalling: false,
 		supportsPLE: false,
 		supportsVision: false,
 		supportsAudio: false,
 		recommendedRuntime: 'transformers',
-		notes: 'Primary client-side Gemma 4 E2B model. No retrieval-vector role.',
+		notes: 'Opt-in client helper only. No retrieval-vector or primary reasoning role.',
 	},
 	[LITERT_E2B_MODEL_ID]: {
 		id: LITERT_E2B_MODEL_ID,
-		roles: ['planner', 'synthesizer'],
+		roles: ['client-helper'],
 		supportsFunctionCalling: false,
 		supportsPLE: false,
 		supportsVision: false,
 		supportsAudio: false,
 		recommendedRuntime: 'litert',
-		notes: 'On-device LiteRT Gemma lane for smaller local inference.',
+		notes: 'Opt-in LiteRT client helper for smaller local tasks.',
 	},
 	[LITERT_E4B_MODEL_ID]: {
 		id: LITERT_E4B_MODEL_ID,
-		roles: ['planner', 'synthesizer'],
+		roles: ['client-helper'],
 		supportsFunctionCalling: false,
 		supportsPLE: false,
 		supportsVision: false,
 		supportsAudio: false,
 		recommendedRuntime: 'litert',
-		notes: 'Larger LiteRT local reasoning lane.',
+		notes: 'Opt-in larger LiteRT client helper. Not the default reasoning lane.',
 	},
 	[CLIENT_LLM_MODEL]: {
 		id: CLIENT_LLM_MODEL,
-		roles: ['planner'],
+		roles: ['client-helper'],
 		supportsFunctionCalling: false,
 		supportsPLE: false,
 		supportsVision: false,
 		supportsAudio: false,
 		recommendedRuntime: 'onnx',
-		notes: 'Legacy Gemma 3 270M ONNX fallback for simple local generation/routing.',
+		notes: 'Legacy ONNX helper fallback for simple browser/local UI tasks.',
 	},
 	[CLIENT_EMBEDDING_MODEL]: {
 		id: CLIENT_EMBEDDING_MODEL,
@@ -361,15 +363,15 @@ export const INFERENCE_RUNTIME_TRUTH = VERIFIED_QUANT_CONFIGS;
 // ── Inference source tags (for SSE chunk attribution) ────────────────────
 
 export type InferenceSource =
-	| 'local-e2b'        // Gemma 4 E2B 2.3B via Transformers.js + WebGPU
-	| 'local-litert'     // Gemma 4 E2B/E4B via LiteRT-LM (CPU XNNPACK + MTP heads)
-	| 'local-onnx'       // Gemma 3 270M via ONNX Runtime (legacy fallback)
+	| 'local-e2b'        // Opt-in Gemma 4 client helper via Transformers.js + WebGPU
+	| 'local-litert'     // Opt-in Gemma 4 client helper via LiteRT-LM
+	| 'local-onnx'       // Default helper lane: tiny ONNX/local utility model
 	| 'local-wasm'       // Archived — was llama.cpp WASM
 	| 'server-vlm'       // VLM server (HF Transformers + NF4, vision + text, :8085)
 	| 'server-turboquant' // TurboQuant llama-server (turbo3 KV cache, :8090)
-	| 'server-ollama'    // Ollama gemma4-legal (default server)
+	| 'server-ollama'    // Ollama Gemma4 reasoning/synthesis (default server)
 	| 'server-agentic'   // Gemma4 multi-round tool-calling agent (/api/ai/agent)
 	| 'server-gemini'    // Gemini API (external)
-	| 'retrieval-hybrid'; // Client embed + server RAG search
+	| 'retrieval-hybrid'; // EmbeddingGemma + server RAG search + synthesis
 
 // WASM llama.cpp worker ARCHIVED → deeds_labs/wasm-archive/ (ONNX Runtime WebGPU is superior path)

@@ -33,6 +33,94 @@
 			"detail": "Run the focused diagnostics Playwright browser slice"
 		},
 		{
+			"label": "Atlas: route grep",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"New-Item -ItemType Directory -Force -Path tmp | Out-Null; rg -n --glob '!node_modules' '\\+page|\\+layout|\\+server|export const load|export const actions|RequestHandler|PageServerLoad|LayoutServerLoad|superValidate|superForm|zod|\\$state|\\$derived|\\$effect' src/routes src/lib > tmp/sveltekit-route-grep.txt; Write-Host 'Wrote tmp/sveltekit-route-grep.txt'"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"detail": "Build the fast route/layout/API grep surface"
+		},
+		{
+			"label": "Atlas: route map",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"node scripts/atlas/build-sveltekit-route-map.mjs"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"detail": "Generate docs/graph/sveltekit-route-map.json and .md"
+		},
+		{
+			"label": "Atlas: route gaps",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"node scripts/atlas/infer-sveltekit-route-gaps.mjs"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"detail": "Infer route/layout/API gaps and write the audit markdown"
+		},
+		{
+			"label": "Smoke: HyperRAG API",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"npx vitest run src/routes/api/search/hyperrag/server.route.test.ts src/lib/server/retrieval/hyperrag-fusion-service.test.ts"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"detail": "Smoke-test the HyperRAG API route contract"
+		},
+		{
+			"label": "Full: Atlas route audit",
+			"dependsOrder": "sequence",
+			"dependsOn": [
+				"Atlas: route grep",
+				"Atlas: route map",
+				"Atlas: route gaps",
+				"Smoke: HyperRAG API"
+			],
+			"problemMatcher": [],
+			"group": "build",
+			"detail": "Run the full SvelteKit route/path audit pipeline"
+		},
+		{
+			"label": "Atlas: Lexical Cluster Search",
+			"type": "shell",
+			"command": "node scripts/atlas/search-clusters-lexical.mjs --query '${input:clusterQuery}'",
+			"group": "test",
+			"detail": "Lexical discovery on hypergraph-clusters.md using optimized ripgrep"
+		},
+		{
 			"label": "Run ACE Demo",
 			"type": "shell",
 			"command": "powershell -ExecutionPolicy Bypass -File scripts/run-ace-demo.ps1"

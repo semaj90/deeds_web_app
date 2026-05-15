@@ -222,7 +222,7 @@
 						</div>
 						<div class="snap-item">
 							<span class="snap-val">{snap.agentsMdCount}</span>
-							<span class="snap-lbl">AGENTS.md</span>
+							<span class="snap-lbl">LLMS.md</span>
 						</div>
 						<div class="snap-item">
 							<span class="snap-val">{snap.gemma4Coverage}%</span>

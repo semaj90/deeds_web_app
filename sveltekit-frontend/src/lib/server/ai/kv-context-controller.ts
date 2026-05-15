@@ -52,7 +52,7 @@ const STABLE_TOOL_CONTRACT =
   '  trace.explain_retrieval              — cached retrieval trace\n' +
   '  graph.expand_neighborhood            — Neo4j ego-graph expansion\n' +
   '  graph.shortest_path                  — topology path finding\n' +
-  '  clusters.get_summary_lenses          — AGENTS.md + wiki notes for cluster\n' +
+  '  clusters.get_summary_lenses          — LLMS.md + wiki notes for cluster\n' +
   '  context.get_compressed_card          — expand stableKey → full card\n' +
   '  context.build_kv_packet              — rebuild task table-of-contents\n' +
   '  context.explain_compression          — inspect current packet\n' +

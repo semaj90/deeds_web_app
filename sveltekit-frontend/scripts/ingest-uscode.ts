@@ -5,8 +5,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { db } from '../src/lib/server/db/index';
-import { statutes, statuteChunks } from '../src/lib/server/db/schema-postgres';
+import { db } from '../src/lib/server/db/client.js';
+import { statutes, statuteChunks } from '../src/lib/server/db/schema-postgres.js';
 import { generateEmbedding } from '../src/lib/server/services/embedding-service';
 
 const PARSED_STATUTES_PATH = '/tmp/uscode-extracted/parsed-statutes.json';

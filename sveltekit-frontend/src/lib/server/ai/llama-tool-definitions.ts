@@ -214,7 +214,7 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
     type: 'function',
     function: {
       name:        'clusters__get_summary_lenses',
-      description: 'Get the AGENTS.md wiki summary and KAG notes for a cluster. Fastest way to understand what a cluster does.',
+      description: 'Get the LLMS.md wiki summary and KAG notes for a cluster. Fastest way to understand what a cluster does.',
       parameters: {
         type: 'object',
         properties: {
@@ -230,7 +230,7 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
     type: 'function',
     function: {
       name:        'trace__kag_search',
-      description: 'Full KAG-DAG retrieval: semantic vector search + knowledge graph expansion + AGENTS.md context. Heavier than search__dev_context; use when you need deep context.',
+      description: 'Full KAG-DAG retrieval: semantic vector search + knowledge graph expansion + LLMS.md context. Heavier than search__dev_context; use when you need deep context.',
       parameters: {
         type: 'object',
         properties: {

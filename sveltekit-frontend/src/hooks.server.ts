@@ -266,10 +266,12 @@ function runSingletonBootTasks(): void {
         { createDefaultRegistry },
         { startDocumentEmbedConsumer },
         { startAudioQueueConsumer },
+        { startDummyPdfOcrWorker },
       ] = await Promise.all([
         import('$lib/server/queue/queue-worker.js'),
         import('$lib/server/workers/document-embed-consumer.js'),
         import('$lib/server/workers/audio-queue-consumer.js'),
+        import('$lib/server/workers/dummy-pdf-ocr-worker.js'),
       ]);
 
       const queueWorkerRegistry = createDefaultRegistry();
@@ -297,6 +299,11 @@ function runSingletonBootTasks(): void {
         .then(() => console.log('[Boot] Audio queue consumer active'))
         .catch((err) =>
           console.warn('[Boot] Audio queue consumer failed (non-fatal):', (err as Error).message)
+        );
+      startDummyPdfOcrWorker()
+        .then(() => console.log('[Boot] Dummy PDF OCR worker active'))
+        .catch((err) =>
+          console.warn('[Boot] Dummy PDF OCR worker failed (non-fatal):', (err as Error).message)
         );
     })
     .catch((err) => {

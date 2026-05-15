@@ -1,7 +1,7 @@
 /**
  * GET /.well-known/llms-full.txt
  *
- * Extended llms.txt — full AGENTS.md root index + all cluster summaries.
+ * Extended llms.txt — full LLMS.md root index + all cluster summaries.
  * Larger payload; intended for agents that want complete directory context.
  *
  * Cache: public, max-age=900
@@ -12,23 +12,23 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import type { RequestHandler } from './$types';
 
-const AGENTS_FILE = path.resolve('AGENTS.md');
+const AGENTS_FILE = path.resolve('LLMS.md');
 
 export const GET: RequestHandler = async () => {
   const lines: string[] = [];
 
   lines.push('# Deeds Legal AI — Full Architecture Index');
   lines.push('');
-  lines.push('> Complete AGENTS.md root + GPU cluster summaries + SOM neighbourhood map.');
+  lines.push('> Complete LLMS.md root + GPU cluster summaries + SOM neighbourhood map.');
   lines.push('> For the condensed version see `/.well-known/llms.txt`.');
   lines.push('');
 
-  // ── Full AGENTS.md ─────────────────────────────────────────────────────────
+  // ── Full LLMS.md ─────────────────────────────────────────────────────────
   let agentsMd: string | null = null;
   try {
     const { getRedis } = await import('$lib/server/redis.js');
     const redis = getRedis();
-    agentsMd = await redis.get('agents:root');
+    agentsMd = await redis.get('llms:root');
   } catch { /* Redis unavailable */ }
 
   if (!agentsMd && existsSync(AGENTS_FILE)) {
@@ -36,7 +36,7 @@ export const GET: RequestHandler = async () => {
   }
 
   if (agentsMd) {
-    lines.push('## AGENTS.md Root Index');
+    lines.push('## LLMS.md Root Index');
     lines.push('');
     lines.push(agentsMd);
     lines.push('');

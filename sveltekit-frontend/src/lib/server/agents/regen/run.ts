@@ -110,7 +110,7 @@ export interface RunRegenDeps {
 	couchWriteFn?: (card: AgentsDirectoryCard, enabled: boolean) => Promise<CouchWriteResult>;
 	/** Override the Qdrant backfill (used by tests). Gated by !dryRun && !redisOnly. */
 	qdrantBackfillFn?: (card: AgentsDirectoryCard, enabled: boolean) => Promise<QdrantBackfillResult>;
-	/** Override the AGENTS.md writer (used by tests). Gated by !dryRun && !redisOnly. */
+	/** Override the LLMS.md writer (used by tests). Gated by !dryRun && !redisOnly. */
 	markdownWriteFn?: (card: AgentsDirectoryCard, enabled: boolean) => Promise<MarkdownWriteResult>;
 }
 

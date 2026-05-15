@@ -16,7 +16,7 @@ import { getRedis } from '$lib/server/redis.js';
 
 const NEO4J_URL  = ENV.NEO4J_URI;
 const NEO4J_USER = ENV.NEO4J_USER ?? 'neo4j';
-const NEO4J_PASS = ENV.NEO4J_PASSWORD ?? 'legal_ai_pass';
+const NEO4J_PASS = ENV.NEO4J_PASSWORD;
 
 // Directories scoring below this threshold get web-search enrichment
 const LOW_SCORE_THRESHOLD = 50;

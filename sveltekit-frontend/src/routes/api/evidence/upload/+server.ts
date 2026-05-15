@@ -30,6 +30,9 @@ import {
 import { batchStoreEntities } from '$lib/server/evidence/batch-entity-storer.js';
 import { batchEmbedAndStoreEntities } from '$lib/server/evidence/batch-entity-embedder.js';
 import { summarizeDoclingStructure } from '$lib/server/evidence/docling-structure.js';
+import {
+  registerPdfOcrWorkflowRun,
+} from '$lib/server/workflows/pdf-ocr-workflow.js';
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -37,6 +40,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { classifyDocument } from '$lib/server/nlp/analyzer.js';
 import { createYOLOService } from '$lib/server/yolo.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { createUploadedFile } from '$lib/server/files/upload-file-service.js';
 
 const evidenceUploadSchema = z.object({
   title: z.string().max(256).optional(),
@@ -349,10 +353,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const objectKey = `evidence/${caseId ?? 'default'}/${timestamp}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
 
-    await uploadFile(BUCKET, objectKey, buffer, {
-      'Content-Type': file.type || 'application/octet-stream',
-      'X-Evidence-Hash': fileHash,
-    });
     uploadedObjectKey = objectKey;
 
     const minioUrl = `minio://${BUCKET}/${objectKey}`;
@@ -429,6 +429,37 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       message: 'Database record created',
     });
 
+    const uploadedFile = await createUploadedFile({
+      file,
+      bytes: buffer,
+      objectKey,
+      bucket: BUCKET,
+      storageBackend: 'minio',
+      upload: async ({ objectKey, bytes, contentType }) => {
+        await uploadFile(BUCKET, objectKey, Buffer.from(bytes), {
+          'Content-Type': contentType,
+          'X-Evidence-Hash': fileHash,
+        });
+      },
+      metadata: {
+        evidenceId,
+        caseId,
+        jobId,
+        source: 'evidence-upload',
+      },
+      allowInsertFailure: true,
+    });
+    const uploadedFileId = uploadedFile.file?.id ?? null;
+
+    if (enableOcr && evidenceType === 'PDF') {
+      await registerPdfOcrWorkflowRun({
+        workflowRunId: jobId,
+        evidenceId,
+        fileName: file.name,
+        mimeType: file.type || 'application/pdf',
+      });
+    }
+
     // 4b. Audit log — chain of custody
     import('$lib/server/audit/evidence-audit.js')
       .then(({ logEvidenceAction }) => {
@@ -490,6 +521,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const responseData = {
       id: evidenceId,
       evidenceId,
+      fileId: uploadedFileId,
       caseId,
       jobId,
       status: 'uploaded',
@@ -501,6 +533,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json(
       {
         success: true,
+        ...responseData,
         data: responseData,
       },
       { status: 201 }

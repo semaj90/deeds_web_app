@@ -7,8 +7,8 @@
 
 import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
-import { db } from '../src/lib/server/db';
-import { documentChunks, evidence, legalDocuments, phase72ErrorVector } from '../src/lib/server/db/schema-postgres';
+import { db } from '../src/lib/server/db/client.js';
+import { documentChunks, evidence, legalDocuments, phase72ErrorVector } from '../src/lib/server/db/schema-postgres.js';
 
 // Calculate SHA256 hash of content
 function calculateContentHash(content: string | object): string {

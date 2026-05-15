@@ -34,9 +34,14 @@ import { createHash } from 'crypto';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT      = path.resolve(__dirname, '..');
-const SRC_DIR   = path.resolve(ROOT, 'src');
-const GRAPH_DIR = path.resolve(ROOT, 'docs', 'graph');
+const SVELTEKIT_ROOT = path.resolve(__dirname, '..');
+const PARENT_ROOT    = path.resolve(SVELTEKIT_ROOT, '..');
+
+// Default to SvelteKit root, but if we see deeds-web-app style dirs in parent, use that.
+const IS_DEEDS_APP = fs.existsSync(path.resolve(PARENT_ROOT, 'simd-bridge')) || fs.existsSync(path.resolve(PARENT_ROOT, 'services'));
+const ROOT         = IS_DEEDS_APP ? PARENT_ROOT : SVELTEKIT_ROOT;
+const SRC_DIR      = path.resolve(SVELTEKIT_ROOT, 'src');
+const GRAPH_DIR    = path.resolve(SVELTEKIT_ROOT, 'docs', 'graph');
 
 const WRITE_PLAN   = process.argv.includes('--write-plan');
 const SKIP_REDIS   = process.argv.includes('--skip-redis');
@@ -47,7 +52,7 @@ const SRC_OVERRIDE = (() => {
   return idx !== -1 ? path.resolve(process.argv[idx + 1]) : null;
 })();
 
-const scanRoot = SRC_OVERRIDE ?? SRC_DIR;
+const scanRoot = SRC_OVERRIDE ?? ROOT;
 
 // ── Gradient checkpoint constants ──────────────────────────────────────────────
 const CHECKPOINT_KEY   = 'code:index:checkpoint:hashes';  // Redis set of done contentHashes
@@ -207,9 +212,9 @@ const RE_REEXPORT    = /export\s+(?:\*|\{[^}]*\})\s+from\s+['"]([^'"]+)['"]/g;
 // blocks the handler from running in production. `if (!dev) return 403` is a
 // valid gate (route is dev-only, returns 403 in prod) so we accept it.
 const RE_AUTH        = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH|\(locals\s+as\s+\{|if\s*\(\s*!\s*dev\s*\)|process\.env\.\w*AUTH_TOKEN|MCP_AUTH_TOKEN/;
-function isLayoutGuarded(rel) {
+function isLayoutGuarded(relInSvelteKit) {
   // Routes under (app)/ are protected by +layout.server.ts auth redirect
-  return rel.includes('/routes/(app)/') || rel.includes('/routes/(admin)/');
+  return relInSvelteKit.includes('/routes/(app)/') || relInSvelteKit.includes('/routes/(admin)/');
 }
 // G5 — Zod validation (direct z.*, zod import, named schema from $lib/schemas, or .safeParse/.parse call)
 const RE_ZOD         = /\bz\.\w+|from\s+['"]zod['"]|zodSchema|zod\(|from\s+['"][^'"]*\/schemas\/|\.safeParse\(|\.parse\(|Schema\s*=\s*z\./;
@@ -262,16 +267,18 @@ const RE_SVELTE_SCRIPT = /<script[^>]*>/;
 function extractMeta(filePath, src) {
   const rel    = path.relative(ROOT, filePath).replace(/\\/g, '/');
   const ext    = path.extname(filePath);
-  // Accept either '/tests/' (nested) OR 'tests/' / 'test/' / 'e2e/' / 'integration/' / 'playwright/'
-  // at the START of rel (top-level test dirs from EXTRA_INDEX_DIRS), plus the .test. / .spec. filename markers.
+  
+  // Adjusted for consolidated repo: rel might start with sveltekit-frontend/
+  const relInSvelteKit = rel.startsWith('sveltekit-frontend/') ? rel.slice('sveltekit-frontend/'.length) : rel;
+
   const isTest = /(?:^|\/)(?:tests?|e2e|integration|playwright)\//.test(rel)
               || rel.includes('.test.')
               || rel.includes('.spec.');
-  const isRoute = rel.startsWith('src/routes/') && (
-    rel.endsWith('+server.ts') || rel.endsWith('+page.server.ts') ||
-    rel.endsWith('+page.svelte') || rel.endsWith('+layout.svelte')
+  const isRoute = relInSvelteKit.startsWith('src/routes/') && (
+    relInSvelteKit.endsWith('+server.ts') || relInSvelteKit.endsWith('+page.server.ts') ||
+    relInSvelteKit.endsWith('+page.svelte') || relInSvelteKit.endsWith('+layout.svelte')
   );
-  const isServerRoute = isRoute && (rel.endsWith('+server.ts') || rel.endsWith('+page.server.ts'));
+  const isServerRoute = isRoute && (relInSvelteKit.endsWith('+server.ts') || relInSvelteKit.endsWith('+page.server.ts'));
   const isSvelteComp  = ext === '.svelte' && RE_SVELTE_SCRIPT.test(src);
 
   // Simplified extraction for JSON files — skip expensive code-stripping regex
@@ -329,9 +336,9 @@ function extractMeta(filePath, src) {
   //   - lines containing `DEV.` or `DEV =` (env-default const blocks)
   // Client-side localhost is reported separately (cosmetic) so server-side
   // hits stand out as real production-breaking bugs.
-  const isEnvServer  = rel.endsWith('src/lib/server/env.server.ts') || rel.endsWith('/env.server.ts');
-  const isTestFile   = /\.(test|spec)\.[mc]?[jt]s$/.test(rel);
-  const isServerSide = rel.startsWith('src/lib/server/') || rel.includes('/+server.') || rel.includes('/+page.server.') || rel.includes('/+layout.server.') || rel.includes('/hooks.server.');
+  const isEnvServer  = relInSvelteKit.endsWith('src/lib/server/env.server.ts') || relInSvelteKit.endsWith('/env.server.ts');
+  const isTestFile   = /\.(test|spec)\.[mc]?[jt]s$/.test(relInSvelteKit);
+  const isServerSide = relInSvelteKit.startsWith('src/lib/server/') || relInSvelteKit.includes('/+server.') || relInSvelteKit.includes('/+page.server.') || relInSvelteKit.includes('/+layout.server.') || relInSvelteKit.includes('/hooks.server.');
   const localhostRefs = (isEnvServer || isTestFile)
     ? []
     : [...src.matchAll(RE_LOCALHOST)]
@@ -539,7 +546,10 @@ for (const filePath of walk(scanRoot)) {
 // pairing detection — useful for G16 metrics, but the files don't show up in
 // the graph anywhere else.
 
-const EXTRA_INDEX_DIRS = ['scripts', 'tests', 'test', 'e2e', 'integration', 'playwright'];
+const EXTRA_INDEX_DIRS = [
+  'scripts', 'tests', 'test', 'e2e', 'integration', 'playwright',
+  'simd-bridge', 'services', 'go-microservice', 'docker', 'drizzle', 'proto', 'python', 'tools', 'turbovec', 'next_steps'
+];
 let extraIndexed = 0;
 for (const dirName of EXTRA_INDEX_DIRS) {
   const dir = path.resolve(ROOT, dirName);

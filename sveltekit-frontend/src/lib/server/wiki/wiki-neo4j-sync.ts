@@ -25,8 +25,8 @@ import { ENV } from '$lib/server/env.server.js';
 async function getDriver() {
 	const neo4j = await import('neo4j-driver');
 	const url = ENV.NEO4J_URI;
-	const user = process.env.NEO4J_USER ?? 'neo4j';
-	const pass = process.env.NEO4J_PASSWORD ?? 'neo4j_password';
+	const user = ENV.NEO4J_USER;
+	const pass = ENV.NEO4J_PASSWORD;
 	return neo4j.default.driver(url, neo4j.default.auth.basic(user, pass));
 }
 

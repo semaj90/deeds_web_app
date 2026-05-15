@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     libgomp1 \
     ffmpeg \
+    git \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

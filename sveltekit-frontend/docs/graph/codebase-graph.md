@@ -1,49 +1,49 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-14T00:50:34.872Z
+> Generated: 2026-05-15T03:35:55.073Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 4980 |
-| Routes | 1013 |
-| Components | 884 |
-| API handlers | 705 |
-| TODOs | 49 |
-| Dirs | 451 |
+| Files | 32044 |
+| Routes | 1027 |
+| Components | 5329 |
+| API handlers | 5484 |
+| TODOs | 7697 |
+| Dirs | 1401 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
 | G4 No auth | 0 |
-| G5 No Zod  | 0 |
-| G11 Localhost | 127 |
-| G14 Svelte4 | 0 |
+| G5 No Zod  | 1 |
+| G11 Localhost | 1415 |
+| G14 Svelte4 | 142 |
 | G15 SSR unsafe | 0 |
-| G16 No test | 3 |
-| G20 Cyclic | 0 |
+| G16 No test | 5 |
+| G20 Cyclic | 1 |
 
 ## Files with TODO/FIXME
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/proto/legal_api_pb.js` — 2370 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/proto/legal_api_pb.js` — 2370 marker(s)
+- `deeds_labs/services/python-middleware/python_codebase/utilities/scripts/backups/phase34b/lib/optimization/index.ts` — 79 marker(s)
+- `deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-14/src/lib/components/ui/context-menu/index.ts` — 79 marker(s)
+- `deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-14/src/lib/components/ui/context-menu/index.ts` — 79 marker(s)
+- `deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-30/src/lib/machines/index.ts` — 79 marker(s)
+- `deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-30/src/lib/optimization/index.ts` — 79 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/core/useGamingEvolution.js` — 31 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/core/useGamingEvolution.js` — 31 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/utils/parallaxDynamic.js` — 22 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/utils/parallaxDynamic.js` — 22 marker(s)
+- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
 - `scripts/phase104-backups/src/lib/services/vector-service.ts` — 13 marker(s)
-- `scripts/phase104-backups/src/lib/server/ai/feedback-loop.ts` — 6 marker(s)
-- `scripts/phase104-backups/src/lib/server/services/recovery.service.ts` — 3 marker(s)
-- `scripts/phase104-backups/src/lib/services/cuda-vector-integration.ts` — 3 marker(s)
-- `scripts/phase104-backups/src/routes_parked/api/ai/summarize/cache/[key]/+server.ts` — 3 marker(s)
-- `src/lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte` — 2 marker(s)
-- `src/lib/workers/embedding-worker-enhanced.js` — 2 marker(s)
-- `scripts/phase104-backups/src/lib/services/ace-web/ace-context-service.ts` — 2 marker(s)
-- `src/lib/ai/onnx/inference.ts` — 1 marker(s)
-- `src/lib/components/RouteDecisionModal.svelte` — 1 marker(s)
-- `src/lib/components/RouteInspectorWorking.svelte` — 1 marker(s)
-- `src/lib/components/ui/Form.svelte` — 1 marker(s)
-- `src/lib/components/yorha/dashboard/GPUMetrics.svelte` — 1 marker(s)
-- `src/routes/(app)/demos/yorha/components/dashboard/GPUMetrics.svelte` — 1 marker(s)
-- `src/routes/api/synthesis/generate/+server.ts` — 1 marker(s)
-- `scripts/enrich-agents-md.mjs` — 1 marker(s)
-- `scripts/phase104-backups/src/crewAIOrchestrationMachine.ts` — 1 marker(s)
-- `scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts` — 1 marker(s)
-- `scripts/phase104-backups/src/lib/server/services/vector-service-simple.ts` — 1 marker(s)
-- `scripts/phase104-backups/src/lib/stores/_archive/old-stores/enhanced-auth.svelte.ts` — 1 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/workers/aiProcessingWorker.js` — 12 marker(s)
+- `deeds_labs/routes-parked-full/admin/users/[userId]/+page.svelte` — 12 marker(s)
+- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/workers/aiProcessingWorker.js` — 12 marker(s)
 
 ## ACE usage
 Redis `code:index:manifest`, `code:index:tag:{word}`, `code:index:gate-stats`, `wiki:note:dir:*`

@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "generated_at": "2026-05-14T00:55:53.533Z",
+  "generated_at": "2026-05-14T15:35:20.635Z",
   "hours_window": 168,
   "schema": [
     "f",
@@ -129443,6 +129443,6 @@
     "agents_dirs": 345,
     "with_authority": 0,
     "with_hits": 0,
-    "build_ms": 5223
+    "build_ms": 5442
   }
 }

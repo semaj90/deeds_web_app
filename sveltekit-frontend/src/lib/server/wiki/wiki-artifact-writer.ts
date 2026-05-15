@@ -19,7 +19,7 @@ import { formatCardMarkdown } from './wiki-card-writer.js';
 //     ingest.jsonl          — ACE-ready ingestion feed (one JSON per line)
 //     cluster_map.json      — placeholder (filled by GPU analysis)
 //     orphan_symbols.json   — placeholder (filled by GPU analysis)
-//     missing_agents_md.json — placeholder (filled by GPU analysis)
+//     missing_LLMS.md.json — placeholder (filled by GPU analysis)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface ArtifactWriteResult {
@@ -52,7 +52,7 @@ export function writeWikiArtifacts(
 	write('ingest.jsonl', buildIngestJsonl(report, cards));
 	write('cluster_map.json', JSON.stringify({ status: 'pending_gpu_analysis', runId: report.runId }, null, 2));
 	write('orphan_symbols.json', JSON.stringify({ status: 'pending_gpu_analysis', symbols: [] }, null, 2));
-	write('missing_agents_md.json', JSON.stringify({ status: 'pending_gpu_analysis', dirs: [] }, null, 2));
+	write('missing_LLMS.md.json', JSON.stringify({ status: 'pending_gpu_analysis', dirs: [] }, null, 2));
 
 	return { runDir, filesWritten };
 }

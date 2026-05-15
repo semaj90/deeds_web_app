@@ -16,6 +16,17 @@ tags:
 
 # HyperRAG Feature Atlas + Runtime Safety
 
+## Canonical Retrieval Boundary
+
+All UI-facing and agent-facing retrieval should use:
+
+- `src/lib/server/retrieval/hyperrag-fusion-service.ts`
+- `POST /api/search/hyperrag`
+
+Do not create parallel retrieval routes that call Qdrant, Neo4j, Redis, TurboVec, or ACE independently. New retrieval behavior should be added as an internal lane of `HyperRagFusionService`.
+
+The browser must never call Qdrant, Neo4j, Redis, TurboVec, or Gemma4 directly.
+
 **Status**: Blueprint (2026-05-09). ~90% substrate exists. Net-new: trust-tier metadata, `feature_implementations` / `feature_file_edges` tables, panel-activity log, Lane C/D hyperedge wiring.
 
 Reference runtime rules: [`trace-runtime-split.md`](./trace-runtime-split.md) and [`trace-kag-web-development-guide.md`](./trace-kag-web-development-guide.md).

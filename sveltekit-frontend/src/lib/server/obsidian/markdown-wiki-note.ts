@@ -1,4 +1,4 @@
-ï»¿import { createHash } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import type {
 	ClusterNote, DirectoryNote, PlaybookNote, ResearchNote, RetrievalNote, WikiNote,
 } from '$lib/server/indexer/karpathy-wiki.js';
@@ -84,7 +84,7 @@ function parseResearch(fm: Fm, body: string): ResearchNote {
 	// Parse outside sources from a "## Outside Sources" section
 	const sourcesRaw = extractBulletList(body, 'Outside Sources');
 	const outsideSources = sourcesRaw.map((line) => {
-		const m = line.match(/\[([^\]]+)\]\(([^)]+)\)\s*[â€”-]\s*(.*)/);
+		const m = line.match(/\[([^\]]+)\]\(([^)]+)\)\s*[—-]\s*(.*)/);
 		return m
 			? { title: m[1], url: m[2], snippet: m[3] }
 			: { title: line.slice(0, 60), url: '', snippet: line };
@@ -202,7 +202,7 @@ function extractFixAttempts(body: string): Array<{ attempt: string; outcome: 'su
 	const section = extractSection(body, 'Fix Attempts') ?? '';
 	const results: Array<{ attempt: string; outcome: 'success' | 'failure'; detail: string }> = [];
 	for (const line of section.split('\n')) {
-		const m = line.match(/[-*]\s+(.+?)\s*[-â€”â€“]\s*(success|failure)[:\s]*(.*)$/i);
+		const m = line.match(/[-*]\s+(.+?)\s*[-—–]\s*(success|failure)[:\s]*(.*)$/i);
 		if (m) results.push({ attempt: m[1].trim(), outcome: m[2].toLowerCase() as 'success' | 'failure', detail: m[3].trim() });
 	}
 	return results;

@@ -98,7 +98,7 @@ export function buildCodeChunkTrustMeta(sourceUri: string, text: string): TrustM
 }
 
 /**
- * Shorthand for T1 (AGENTS.md / system) chunks.
+ * Shorthand for T1 (LLMS.md / system) chunks.
  */
 export function buildSystemTrustMeta(sourceUri: string, text: string): TrustMeta {
   const contentHash = createHash('sha256').update(text).digest('hex').slice(0, 32);

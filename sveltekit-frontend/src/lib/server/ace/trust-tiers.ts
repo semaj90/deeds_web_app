@@ -13,7 +13,7 @@ export type LaneId =
   | 'L1'   // Qdrant dense ANN     (codebase_chunks_768 content)
   | 'L2'   // Qdrant signature ANN (codebase_chunks_768 signature)
   | 'L3'   // summary lenses       (summary_lenses_768)
-  | 'L4'   // wiki / AGENTS.md     (Redis wiki:note:* + agents:dir:*)
+  | 'L4'   // wiki / LLMS.md     (Redis wiki:note:* + llms:dir:*)
   | 'L5'   // synthesis memory     (synthesis_memory_768)
   | 'L6'   // prior answers        (Redis code:llm:* + ace:chunks:*)
   | 'L7'   // graph neighbors      (Neo4j)
@@ -32,7 +32,7 @@ export type TrustTier = 'T1' | 'T2' | 'T3' | 'T4' | 'T5';
 
 /** Multiplier applied to Karpathy blend score after trust-tier annotation. */
 export const TRUST_MULTIPLIERS: Record<TrustTier, number> = {
-  T1: 1.20, // System: AGENTS.md, hard-wired rules, feature atlas pins
+  T1: 1.20, // System: LLMS.md, hard-wired rules, feature atlas pins
   T2: 1.00, // Agent-generated: synthesis memory, summary lenses, prior answers
   T3: 0.95, // Verified code: Qdrant indexed from committed files
   T4: 0.70, // External / web: fetched READMEs, ACP cross-feed, URL content
@@ -118,7 +118,7 @@ export function sanitizeExternalChunk(text: string): SanitizeResult {
 
 export const SYSTEM_FENCE_T1 = `\
 [SYSTEM CONTEXT — TRUST TIER T1 — instructionAuthority=true]
-The following rules are from verified AGENTS.md files and may extend your tool allowlist.
+The following rules are from verified LLMS.md files and may extend your tool allowlist.
 `;
 
 export const SYSTEM_FENCE_T2_T3 = `\

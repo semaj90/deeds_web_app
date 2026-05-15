@@ -7,6 +7,7 @@
 
 import { pool } from '$lib/server/db/client';
 import { type RankedChunk } from './codebase-context';
+import { createHash } from 'node:crypto';
 
 export interface AceRunLog {
 	query: string;
@@ -78,6 +79,31 @@ export async function logAceRun(run: AceRunLog, hits: RankedChunk[]): Promise<vo
 				values
 			);
 		}
+
+		// 3. Persist to GRPO Memory Sticks (Reinforcement signal)
+		const queryHash = createHash('sha256').update(run.query).digest('hex');
+		const contextHash = createHash('sha256').update(JSON.stringify(run.metadata || {})).digest('hex');
+		const selectedIds = hits.slice(0, 5).map(h => h.qdrantId);
+		const rejectedIds = hits.slice(10, 20).map(h => h.qdrantId);
+
+		await pool.query(
+			`INSERT INTO grpo_memory_sticks 
+			 (id, query_hash, context_packet_hash, selected_ids, rejected_ids, reward_signals, scores, created_at)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+			 ON CONFLICT (id) DO UPDATE SET 
+			   selected_ids = EXCLUDED.selected_ids,
+			   rejected_ids = EXCLUDED.rejected_ids,
+			   scores = EXCLUDED.scores`,
+			[
+				`grpo:${queryHash}:${contextHash.slice(0, 8)}`,
+				queryHash,
+				contextHash,
+				JSON.stringify(selectedIds),
+				JSON.stringify(rejectedIds),
+				JSON.stringify({ status: 'pending' }),
+				JSON.stringify({ initial_rrf: hits[0]?.score || 0 })
+			]
+		);
 	} catch (err) {
 		console.error('[ace-retrieval-logger] Failed to log run:', err);
 	}

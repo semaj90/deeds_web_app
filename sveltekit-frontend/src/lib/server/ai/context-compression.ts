@@ -4,7 +4,7 @@
  * Level-2 compression pipeline: raw chunks/files/traces → compact cards.
  *
  * Design rules:
- *  - No Gemma4 calls for every chunk — prefer cached AGENTS.md wiki notes and
+ *  - No Gemma4 calls for every chunk — prefer cached LLMS.md wiki notes and
  *    Qdrant directory summaries.
  *  - All functions are pure-ish (I/O only to Redis; no DB writes here).
  *  - Redis TTLs: file cards 24h, trace cards 24h, research cards 7d, TOC 1h.

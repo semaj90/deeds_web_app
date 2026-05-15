@@ -69,6 +69,7 @@ import crypto from 'node:crypto';
 import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
+import * as Hypergraph from '$lib/server/ai/hypergraph-store.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 

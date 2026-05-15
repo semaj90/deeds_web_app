@@ -127,6 +127,13 @@
       "when": 1776811439440,
       "tag": "0017_cooing_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1778796883461,
+      "tag": "0018_open_luminals",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, unique, jsonb, doublePrecision, uuid, integer, real } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, unique, jsonb, doublePrecision, uuid, integer, real, smallint } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 /**
@@ -36,6 +36,8 @@ export const embeddedSummaries = pgTable(
 		
 		// Topological grounding (4D manifold)
 		gpuCluster: integer('gpu_cluster'),
+		topoByte: smallint('topo_byte').default(0).notNull(),
+		topoClass: text('topo_class').default('unclassified').notNull(),
 		somBmuRow: integer('som_bmu_row'),
 		somBmuCol: integer('som_bmu_col'),
 		manifold4: real('manifold4').array(),

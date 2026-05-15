@@ -1,16 +1,16 @@
 /**
  * POST /api/codebase-index/agents-write
  *
- * Server-side AGENTS.md Redis writer — no CLI required.
+ * Server-side LLMS.md Redis writer — no CLI required.
  *
  * Reads wiki:note:dir:* keys (written by ingestDirectorySummaries or the fast-AST
  * indexer) and docs/graph/codebase-graph.json, then builds and writes per-directory
- * AGENTS.md markdown into Redis as agents:dir:<relPath> (24h TTL).
+ * LLMS.md markdown into Redis as llms:dir:<relPath> (24h TTL).
  *
- * This closes the gap where `npm run agents:write` (CLI-only) was the sole path to
- * populate the agents:dir:* keys consumed by the ACE NES-arch preflight step.
+ * This closes the gap where `npm run llms:write` (CLI-only) was the sole path to
+ * populate the llms:dir:* keys consumed by the ACE NES-arch preflight step.
  * The orchestrator can now trigger this after the summarize-dirs stage so every
- * full indexing run automatically refreshes the agents:dir:* cache.
+ * full indexing run automatically refreshes the llms:dir:* cache.
  *
  * Body (all optional):
  *   { filter?: string, minFiles?: number, rootOnly?: boolean, dryRun?: boolean }
@@ -27,7 +27,7 @@ import type { RequestHandler } from './$types';
 
 const GRAPH_JSON = path.resolve('docs/graph/codebase-graph.json');
 const AGENTS_TTL = 24 * 3600; // 24h
-const HEADER_MARKER = '<!-- AGENTS-GEN v1 · do not edit below this line -->';
+const HEADER_MARKER = '<!-- LLMS-GEN v1 · do not edit below this line -->';
 
 interface GraphFile {
   rel: string;
@@ -83,7 +83,7 @@ function buildDirMarkdown(
   lines.push(`# ${dirRel || 'root'}`);
   lines.push('');
   lines.push(HEADER_MARKER);
-  lines.push(`<!-- generated: ${generatedAt} · agents.md spec · regen: POST /api/codebase-index/agents-write -->`);
+  lines.push(`<!-- generated: ${generatedAt} · LLMS.md spec · regen: POST /api/codebase-index/agents-write -->`);
   lines.push('');
 
   if (kag?.purpose || kag?.summary) {
@@ -183,7 +183,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         '# Deeds Legal AI — Repository Root',
         '',
         HEADER_MARKER,
-        `<!-- generated: ${generatedAt} · agents.md spec · regen: POST /api/codebase-index/agents-write -->`,
+        `<!-- generated: ${generatedAt} · LLMS.md spec · regen: POST /api/codebase-index/agents-write -->`,
         '',
         `Files indexed: ${files.length}  ·  Directories: ${dirMap.size}`,
         '',
@@ -195,7 +195,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           .map(([d, fs]) => `- \`${d}\` (${fs.length} files)`),
         '',
       ];
-      await redis.setex('agents:root', AGENTS_TTL, rootLines.join('\n'));
+      await redis.setex('llms:root', AGENTS_TTL, rootLines.join('\n'));
       written++;
     } catch { /* non-fatal */ }
   }
@@ -236,7 +236,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       if (!dryRun) {
         try {
-          await redis.setex(`agents:dir:${dirRel}`, AGENTS_TTL, markdown);
+          await redis.setex(`llms:dir:${dirRel}`, AGENTS_TTL, markdown);
           written++;
         } catch { skipped++; }
       } else {
@@ -263,8 +263,8 @@ export const GET: RequestHandler = async ({ locals }) => {
   try {
     const { getRedis } = await import('$lib/server/redis.js');
     const redis = getRedis();
-    const keys = await redis.keys('agents:dir:*');
-    const rootExists = !!(await redis.exists('agents:root'));
+    const keys = await redis.keys('llms:dir:*');
+    const rootExists = !!(await redis.exists('llms:root'));
     const sample = keys.slice(0, 10);
     const ttls = await Promise.all(sample.map((k) => redis.ttl(k)));
     return json({

@@ -15,6 +15,7 @@ import {
 	jsonb,
 	pgTable,
 	real,
+	smallint,
 	text,
 	timestamp,
 	uuid,
@@ -81,6 +82,8 @@ export const gpuClusterCentroids = pgTable('gpu_cluster_centroids', {
 	clusterType:    text('cluster_type').notNull().default('gpu'),  // 'gpu' | 'som'
 	centroidVec:    real('centroid_vec').array().notNull(),          // 768-dim
 	chunkCount:     integer('chunk_count').notNull().default(0),
+	topoClass:      text('topo_class').notNull().default('unclassified'),
+	topoByte:       smallint('topo_byte').notNull().default(0),
 	dominantTags:   text('dominant_tags').array().notNull().default(sql`'{}'::text[]`),
 	purpose:        text('purpose'),
 	metadata:       jsonb('metadata').notNull().default(sql`'{}'::jsonb`),

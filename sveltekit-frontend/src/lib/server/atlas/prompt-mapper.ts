@@ -58,7 +58,7 @@ export interface PromptCard {
   topoClass:   string;
   /** GPU/dir cluster key — drives community grouping. */
   clusterKey:  string;
-  /** Nearest AGENTS.md directory — for walk-up rule resolution. */
+  /** Nearest LLMS.md directory — for walk-up rule resolution. */
   agentsDir:   string;
   /** Composed rank score (0..1). */
   rank:        number;

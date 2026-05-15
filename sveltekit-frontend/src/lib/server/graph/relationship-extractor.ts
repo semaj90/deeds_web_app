@@ -8,7 +8,7 @@
  *   QUERIES_TABLE       File → PostgresTable (known table name in SQL/query literal)
  *   QUERIES_QDRANT_COLLECTION  File → QdrantCollection (collection name literal)
  *   QUERIES_NEO4J_LABEL File → Neo4jLabel (Cypher node label pattern)
- *   HAS_AGENTS_SCOPE    File → AgentsMd (nearest AGENTS.md in walk-up)
+ *   HAS_AGENTS_SCOPE    File → AgentsMd (nearest LLMS.md in walk-up)
  *
  * Results are written to code_relations (Postgres) and optionally Neo4j.
  */
@@ -97,12 +97,12 @@ function camelToSnake(s: string): string {
   return s.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
 
-// Walk up directory tree looking for AGENTS.md
+// Walk up directory tree looking for LLMS.md
 function findNearestAgentsMd(filePath: string, srcRoot: string): string | null {
   let dir = dirname(filePath);
   const root = resolve(srcRoot);
   while (dir.startsWith(root)) {
-    const candidate = resolve(dir, 'AGENTS.md');
+    const candidate = resolve(dir, 'LLMS.md');
     if (existsSync(candidate)) return candidate;
     const parent = dirname(dir);
     if (parent === dir) break;

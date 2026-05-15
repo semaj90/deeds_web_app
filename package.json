@@ -4,6 +4,7 @@
   "description": "YoRHa-styled legal AI frontend with Gemma3 integration - Phase 70 Clean",
   "type": "module",
   "scripts": {
+    "agents:write:workspace": "node sveltekit-frontend/scripts/generate-agents-md.mjs",
     "dev": "vite dev --host 0.0.0.0",
     "dev:agent": "powershell scripts/dev-agentic.ps1",
     "build": "npm run build:wasm && vite build",

@@ -2,7 +2,7 @@
  * CouchDB Mango index bootstrap + schema types for the memory fabric.
  *
  * Ensures required indexes exist on:
- *   karpathy_wiki   — cluster wiki notes, directory summaries, AGENTS.md docs
+ *   karpathy_wiki   — cluster wiki notes, directory summaries, LLMS.md docs
  *   research_memory — official/GitHub/Reddit research notes
  *   synthesis_memory — ACE synthesis outputs, LLM answer cache
  *   trace_events    — TRACE retrieval run audit trail
@@ -23,7 +23,7 @@ export type MemoryDocType =
   | 'synthesis_memory'
   | 'directory_summary'
   | 'cluster_summary'
-  | 'agents_md'
+  | 'LLMS.md'
   | 'trace_event';
 
 export interface MemoryDoc {

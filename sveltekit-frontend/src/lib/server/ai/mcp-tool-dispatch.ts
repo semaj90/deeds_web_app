@@ -165,8 +165,8 @@ export async function tool_graph_shortest_path(args: {
     const driver = neo4j.driver(
       ENV.NEO4J_URI,
       neo4j.auth.basic(
-        process.env.NEO4J_USER     ?? 'neo4j',
-        process.env.NEO4J_PASSWORD ?? 'password',
+        ENV.NEO4J_USER,
+        ENV.NEO4J_PASSWORD,
       ),
     );
     const session = driver.session({ defaultAccessMode: neo4j.session.READ });

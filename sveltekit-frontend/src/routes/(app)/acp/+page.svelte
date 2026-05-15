@@ -91,7 +91,8 @@
 	'vector:similarity': { text: 'Svelte reactivity', topK: 5 },
 	'ast:analyze': { filePath: 'src/lib/components/Example.svelte' },
 	'code:search': { pattern: 'export let', path: 'src' },
-	'db:query': { query: 'SELECT table_name FROM information_schema.tables LIMIT 5' }
+	'db:query': { query: 'SELECT table_name FROM information_schema.tables LIMIT 5' },
+	'search:hyperrag': { query: 'context assembler', mode: 'codebase', synthesize: false }
 		};
 
 		if (defaults[toolName]) {

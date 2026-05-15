@@ -139,24 +139,9 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
     handleTraceSearch
   );
 
-  // `trace.kag_search` is the CANONICAL named tool per §10 of the dev guide.
-  // The richer KAG-DAG impl lives in `tools/trace-kag.tool.ts` but is mounted
-  // only by `server-fastmcp.ts` (a separate server). On the live :8788 server
-  // this thin alias is what makes the canonical name appear in `tools/list` —
-  // so it must register unconditionally. When the two servers eventually
-  // merge, the trace-kag.tool.ts impl wins (registered later) and this entry
-  // is shadowed; the name still resolves either way.
-  server.registerTool(
-    'trace.kag_search',
-    {
-      description: 'Canonical KAG search alias. The thin impl reuses kb.trace_search; the full KAG-DAG impl in tools/trace-kag.tool.ts is mounted by server-fastmcp.ts.',
-      inputSchema: z.object({
-        query: z.string().describe('Technical query or coding problem'),
-        limit: z.number().int().min(1).max(20).default(5),
-      })
-    },
-    handleTraceSearch
-  );
+  // `trace.kag_search` is registered in the standalone TRACE server with the
+  // richer KAG-DAG implementation. Keep this bundle focused on the kb.* tools
+  // and the legacy aliases only.
 
   if (enableLegacy) {
     server.registerTool(
