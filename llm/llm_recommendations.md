@@ -9,6 +9,7 @@
 - Keep directory wiki pages close to the original `AGENTS.md` indexing shape so ACE / KAG / Gemma4 retrieval stays predictable.
 - Prefer a single master Karpathy page for script routing over scattering many tiny notes.
 - Keep a workspace-root map alongside the app map so infra, bridges, and workflows are not hidden behind `sveltekit-frontend/`.
+- Mirror the atlas in docs pages when humans need a browseable view; keep `llm/` canonical for agents.
 
 ## Safeguards
 

@@ -110,6 +110,10 @@ starter instead:
 
 Or double-click **"Start Hermes Stack.lnk"** on the desktop.
 
+The installer also drops a `hermes` CLI shim into `%LOCALAPPDATA%\hermes\bin`,
+so `hermes workspace` maps to the same launcher flow and the rest of the Hermes
+CLI still passes through to the real executable.
+
 The starter:
 - Sets the RTX 3060 Ti GPU-tuned env vars (idempotent — only writes if changed)
 - Starts Ollama if `:11434` is down

@@ -1216,6 +1216,101 @@ function Start-HermesAgentServices {
     }
 }
 
+function Ensure-HermesCliShim {
+    Write-Step "Installing Hermes CLI workspace shim"
+
+    $shimDir = Join-Path $env:LOCALAPPDATA "hermes\bin"
+    New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
+
+    $realHermes = (Get-Command "hermes.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source)
+    if (-not $realHermes) {
+        Write-Host "Hermes executable not found; skipping CLI shim install." -ForegroundColor Yellow
+        return
+    }
+
+    $workspaceLauncher = Join-Path (Split-Path -Parent $PSCommandPath) "start-hermes-stack.ps1"
+    if (-not (Test-Path $workspaceLauncher)) {
+        throw "Could not find Hermes workspace launcher at $workspaceLauncher"
+    }
+
+    $wrapperPs1Path = Join-Path $shimDir "hermes-wrapper.ps1"
+    $wrapperCmdPath = Join-Path $shimDir "hermes.cmd"
+    $workspaceCmdPath = Join-Path $shimDir "hermes-workspace.cmd"
+    $dashboardCmdPath = Join-Path $shimDir "hermes-dashboard.cmd"
+    $gatewayCmdPath = Join-Path $shimDir "hermes-gateway.cmd"
+
+    $wrapperTemplate = @'
+param(
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$HermesArgs
+)
+
+$realHermes = '__REAL_HERMES__'
+if ($HermesArgs.Count -gt 0 -and $HermesArgs[0] -eq 'workspace') {
+    $workspaceDir = Join-Path $env:USERPROFILE 'Downloads\Hermes-Ollama\hermes-workspace'
+    $vitePath = Join-Path $workspaceDir 'node_modules\vite\bin\vite.js'
+
+    if (-not (Test-Path $workspaceDir)) {
+        Write-Host "Hermes workspace directory not found: $workspaceDir" -ForegroundColor Yellow
+        exit 1
+    }
+
+    if (-not (Test-Path $vitePath)) {
+        Write-Host "Vite entrypoint not found: $vitePath" -ForegroundColor Yellow
+        exit 1
+    }
+
+    $cmd = "Set-Location '$workspaceDir'; `$env:NODE_OPTIONS='--max-old-space-size=2048'; `$env:PORT='3000'; node '$vitePath' dev --host 0.0.0.0 --port 3000"
+    Start-Process -FilePath 'pwsh.exe' -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', $cmd) -WindowStyle Minimized | Out-Null
+    exit 0
+}
+
+& $realHermes @HermesArgs
+exit $LASTEXITCODE
+'@
+
+    $wrapperContent = $wrapperTemplate.
+        Replace('__REAL_HERMES__', $realHermes.Replace("'", "''")).
+        Replace('__WORKSPACE_LAUNCHER__', $workspaceLauncher.Replace("'", "''"))
+
+    Set-Content -Path $wrapperPs1Path -Value $wrapperContent -Encoding UTF8
+
+    Set-Content -Path $wrapperCmdPath -Encoding ASCII -Value @"
+@echo off
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -File $wrapperPs1Path %*
+"@
+
+    Set-Content -Path $workspaceCmdPath -Encoding ASCII -Value @"
+@echo off
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -File $workspaceLauncher %*
+"@
+
+    Set-Content -Path $dashboardCmdPath -Encoding ASCII -Value @"
+@echo off
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -File $wrapperPs1Path dashboard %*
+"@
+
+    Set-Content -Path $gatewayCmdPath -Encoding ASCII -Value @"
+@echo off
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -File $wrapperPs1Path gateway %*
+"@
+
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($userPath -notlike "*$shimDir*") {
+        [Environment]::SetEnvironmentVariable("Path", "$shimDir;$userPath", "User")
+        Write-Host "  added $shimDir to User PATH"
+    }
+
+    if ($env:Path -notlike "*$shimDir*") {
+        $env:Path = "$shimDir;$env:Path"
+    }
+
+    Write-Host "  installed: $wrapperCmdPath"
+    Write-Host "  installed: $workspaceCmdPath"
+    Write-Host "  installed: $dashboardCmdPath"
+    Write-Host "  installed: $gatewayCmdPath"
+}
+
 function New-Shortcut {
     param(
         [Parameter(Mandatory = $true)][string]$ShortcutPath,
@@ -1262,6 +1357,18 @@ function Ensure-DesktopShortcuts {
         -WorkingDirectory $repoDir `
         -Description "Launch Hermes Desktop, Hermes Workspace, Local Deep Research, Redis, and Ollama" `
         -IconLocation "$env:SystemRoot\System32\shell32.dll,220"
+
+    $workspaceLauncher = Join-Path $PSScriptRoot "start-hermes-stack.ps1"
+    if (Test-Path $workspaceLauncher) {
+        $pwshExe = (Get-Command "pwsh.exe").Source
+        New-Shortcut `
+            -ShortcutPath (Join-Path $desktop "Hermes Workspace.lnk") `
+            -TargetPath $pwshExe `
+            -Arguments "-ExecutionPolicy Bypass -NoProfile -File `"$workspaceLauncher`" -NoBrowser" `
+            -WorkingDirectory $repoDir `
+            -Description "Launch Hermes Workspace" `
+            -IconLocation "$env:SystemRoot\System32\shell32.dll,220"
+    }
 
     $hermesDesktop = Find-HermesDesktopApp
     if ($hermesDesktop) {
@@ -1460,6 +1567,7 @@ Resolve-EmbeddingModel
 # Phase A handoff lane — writes ~/.hermes/mcp.json so Hermes' MCP client
 # connects to the local TRACE server with a read-only allowlist.
 Write-HermesMcpConfig
+Ensure-HermesCliShim
 
 if ($IncludeLocalDeepResearch) {
     Start-LocalDeepResearch

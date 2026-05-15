@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
- * enrich-agents-md.mjs
+ * enrich-llms-md.mjs
  *
  * Reads Redis ACE hits (code:graph:node:*, code:graph:hotspot:*),
  * maps the 55-gate audit system (Tiers A-H) to each directory,
- * injects an ## Audit Gates + ## TODO section into every AGENTS.md
- * ABOVE the <!-- AGENTS-GEN v1 --> auto-generated block,
+ * injects an ## Audit Gates + ## TODO section into every LLMS.md
+ * ABOVE the <!-- LLMS-GEN v1 --> auto-generated block,
  * and writes docs/TODO-enhancements.md as the master synthesis.
  *
  * Usage:
- *   node scripts/enrich-agents-md.mjs
- *   node scripts/enrich-agents-md.mjs --dry-run   # preview, no writes
- *   node scripts/enrich-agents-md.mjs --dir src/lib/server/ace  # single dir
+ *   node scripts/enrich-llms-md.mjs
+ *   node scripts/enrich-llms-md.mjs --dry-run   # preview, no writes
+ *   node scripts/enrich-llms-md.mjs --dir src/lib/server/ace  # single dir
  */
 
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -70,7 +70,7 @@ const GATES = {
   G35: { tier:'F', desc:'rewardScoreGPU available for GRPO pipeline',      cmd:'rg "rewardScoreGPU" src/lib/server/ --type ts -l' },
   // Tier G — Glyph/Cartridge/ACE
   G36: { tier:'G', desc:'Shared GlyphRecord schema (semantic+vector+topology+render)', cmd:'rg "export interface GlyphRecord|type GlyphSection|type GlyphKind" src/lib/server/ --type ts' },
-  G37: { tier:'G', desc:'RuneData → GlyphRecord compatibility mapper',     cmd:'rg "runeToGlyphRecord|GlyphRecord.*RuneData" src/lib/server/ --type ts' },
+  G37: { tier:'G', desc:'RuneData → GlyphRecord compatibility mapper', cmd:'rg "runeToGlyphRecord|GlyphRecord.*RuneData" src/lib/server/ --type ts' },
   G38: { tier:'G', desc:'Staged cartridge search (4D prefilter→attention→768d rerank)', cmd:'rg "topology prefilter|scoreAttention|rewardScoreGPU|searchCartridge.*Float32Array" src/lib/server/ --type ts' },
   G39: { tier:'G', desc:'Section-aware tiling (FACTS/LEGAL_AUTHORITY/CLAIMS/PRAYER_HOLDING)', cmd:'rg "FACTS|LEGAL_AUTHORITY|CLAIMS|PRAYER_HOLDING" src/lib/server/ --type ts' },
   G40: { tier:'G', desc:'Glyph prompt cache aligns to page boundaries',    cmd:'rg "glyphId|pageIndex|tileIndex|promptCacheKey|setFragment|getFragment" src/lib/server/ --type ts' },
@@ -184,8 +184,8 @@ function buildDirStats(nodes, hotspots) {
   return stats;
 }
 
-// ── Find all AGENTS.md files ─────────────────────────────────────────────────
-function findAgentsMd(root) {
+// ── Find all LLMS.md files ─────────────────────────────────────────────────
+function findLLMSMd(root) {
   const results = [];
   function walk(dir) {
     let entries;
@@ -193,13 +193,47 @@ function findAgentsMd(root) {
     for (const e of entries) {
       if (e.isDirectory() && !e.name.startsWith('.') && e.name !== 'node_modules' && e.name !== 'deeds_labs') {
         walk(join(dir, e.name));
-      } else if (e.isFile() && e.name === 'AGENTS.md') {
+      } else if (e.isFile() && e.name === 'LLMS.md') {
         results.push(join(dir, e.name));
       }
     }
   }
   walk(root);
   return results;
+}
+
+// ── Git log optimization ──────────────────────────────────────────────────────
+let globalGitCache = null;
+function getGlobalGitCache() {
+  if (globalGitCache) return globalGitCache;
+  console.log(`  [git] building global commit cache (last 1000 commits) …`);
+  const result = spawnSync(
+    'git',
+    ['log', '-n', '1000', '--format=%h|%ai|%s', '--name-only'],
+    { cwd: ROOT, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
+  );
+  if (result.status !== 0) return new Map();
+
+  const cache = new Map(); // relDir -> [{hash, ts, subject}]
+  const lines = result.stdout.split('\n');
+  let currentCommit = null;
+
+  for (const line of lines) {
+    if (line.includes('|')) {
+      const [hash, ts, ...rest] = line.split('|');
+      currentCommit = { hash, ts, subject: rest.join('|').trim() };
+    } else if (line.trim() && currentCommit) {
+      const file = line.trim();
+      const dir = file.split('/').slice(0, -1).join('/') || '.';
+      if (!cache.has(dir)) cache.set(dir, []);
+      const d = cache.get(dir);
+      if (d.length < 10 && !d.find(c => c.hash === currentCommit.hash)) {
+        d.push(currentCommit);
+      }
+    }
+  }
+  globalGitCache = cache;
+  return cache;
 }
 
 // ── Generate audit gate section ───────────────────────────────────────────────
@@ -252,13 +286,6 @@ function buildGateSection(relDir, dirStats) {
 
 // ── Generate TODO section ─────────────────────────────────────────────────────
 function buildTodoSection(relDir, dirStats) {
-  // dirStats may be sparse (Redis ACE data is stale or graphify:full hasn't
-  // been run recently). Stats-derived TODOs (untested + hotspot) get skipped
-  // when stats are missing, but gate-derived TODOs still emit since they
-  // depend only on the static gate→directory mapping. Previously the entire
-  // TODO section was skipped via `if (!stats) return ''` which silently
-  // dropped G17/G27/G54-G55/G8a-b TODOs from every AGENTS.md whenever Redis
-  // was sparse — making the directory wikis look healthier than they were.
   const stats = dirStats.get(relDir);
   const todos = [];
   const { gates } = gatesForDir(relDir);
@@ -276,38 +303,21 @@ function buildTodoSection(relDir, dirStats) {
     }
   }
 
-  // Gate-specific TODOs based on which gates are mapped
-  if (gates.includes('G17')) {
-    todos.push('- [ ] **G17** Audit for remaining hardcoded `localhost` / `127.0.0.1` — replace with `ENV.*` getters');
-  }
-  if (gates.includes('G8b') && relDir.includes('gpu')) {
-    todos.push('- [ ] **G8b** Confirm no `@sveltejs/kit` imports exist in this directory (GPU layer must be framework-agnostic)');
-  }
-  if (gates.includes('G8a')) {
-    todos.push('- [ ] **G8a** Use `HttpServiceError` subclasses (`UnauthorizedError`, `NotFoundError`, etc.) — never `throw error()` from `@sveltejs/kit` in service layer');
-  }
-  if (gates.includes('G26') && relDir.includes('routes/api')) {
-    todos.push('- [ ] **G26** Every `+server.ts` in this directory needs a paired test in `tests/routes/` with `@vitest-environment node` + lazy import pattern');
-  }
-  if (gates.includes('G50') && relDir.includes('ace')) {
-    todos.push('- [ ] **G50** Verify `recordChunkHits()` fires on EVERY ACE retrieval pass (not just RAG — also ACP, KAG, graph)');
-  }
-  if (gates.includes('G53') && relDir.includes('ace')) {
-    todos.push('- [ ] **G53** Bump `ACE_PIPELINE_VERSION` to ≥ 2.x after any pipeline shape change to invalidate stale `ace_chunks` cache rows');
-  }
-  if (gates.includes('G54') || gates.includes('G55')) {
-    todos.push('- [ ] **G54/G55** All cache key generation must import from `cache-keys.ts` — no local `generateCacheKey` copies');
-  }
-  if (gates.includes('G27') && (relDir.includes('gpu') || relDir.includes('graph'))) {
-    todos.push('- [ ] **G27** Verify addon exports: `node -e "const a=require(\'./simd-bridge/cpp/build/Release/tensorrt_bridge.node\'); [\'kmeansWithCentroids\',\'trainSOM\',\'pageRankGPU\',\'attentionScoreGPU\',\'rewardScoreGPU\'].forEach(f=>console.log(f,typeof a[f]))"` — all must be \'function\'');
-  }
+  // Gate-specific TODOs
+  if (gates.includes('G17')) todos.push('- [ ] **G17** Audit for remaining hardcoded `localhost` / `127.0.0.1` — replace with `ENV.*` getters');
+  if (gates.includes('G8b') && relDir.includes('gpu')) todos.push('- [ ] **G8b** Confirm no `@sveltejs/kit` imports exist in this directory');
+  if (gates.includes('G8a')) todos.push('- [ ] **G8a** Use `HttpServiceError` subclasses — never `throw error()` in service layer');
+  if (gates.includes('G26') && relDir.includes('routes/api')) todos.push('- [ ] **G26** Every `+server.ts` needs a paired test in `tests/routes/`');
+  if (gates.includes('G50') && relDir.includes('ace')) todos.push('- [ ] **G50** Verify `recordChunkHits()` fires on EVERY ACE retrieval pass');
+  if (gates.includes('G53') && relDir.includes('ace')) todos.push('- [ ] **G53** Bump `ACE_PIPELINE_VERSION` after pipeline shape changes');
+  if (gates.includes('G54') || gates.includes('G55')) todos.push('- [ ] **G54/G55** All cache key generation must import from `cache-keys.ts`');
 
   if (todos.length === 0) return '';
 
   return [
     '## TODO — Enhancements from ACE Analysis',
     '',
-    '> Generated from Redis ACE hits (code:graph:node:* + hotspot data). Regenerate: `node scripts/enrich-agents-md.mjs`.',
+    '> Generated from Redis ACE hits (code:graph:node:* + hotspot data). Regenerate: `node scripts/enrich-llms-md.mjs`.',
     '',
     ...todos,
     '',
@@ -324,197 +334,42 @@ function buildMasterTodo(dirStats, hotspots, totalNodes) {
   lines.push('> Source: Redis ACE hits (code:graph:node:* + code:graph:hotspot:*) + 55-gate audit system');
   lines.push('');
 
-  // ── Data freshness warning ────────────────────────────────────────────────
-  const FULL_GRAPH_TARGET = 3000;  // expected node count after graphify:full
+  const FULL_GRAPH_TARGET = 3000;
   if (totalNodes < FULL_GRAPH_TARGET) {
-    lines.push('> ⚠️ **Data stale** — Redis has only ' + totalNodes + ' node entries (expect ≥' + FULL_GRAPH_TARGET + ' after `graphify:full`). Sections 1 and 2 below may be sparse or empty.');
-    lines.push('> Run: `npm run graphify:full && npm run agents:enrich` to repopulate (5-10 min GPU).');
+    lines.push(`> ⚠️ **Data stale** — Redis has only ${totalNodes} node entries (expect ≥${FULL_GRAPH_TARGET}).`);
     lines.push('');
-    lines.push('- [ ] **data:refresh** `npm run graphify:full && npm run agents:enrich` — last enriched ' + ts + ' with ' + totalNodes + ' nodes / ' + hotspots.length + ' hotspots (full graph has ≥' + FULL_GRAPH_TARGET + ' files)');
+    lines.push(`- [ ] **data:refresh** \`npm run graphify:full && npm run agents:enrich\` — last enriched ${ts}`);
     lines.push('');
   }
 
-  // ── Section 1: Critical Hotspots ──────────────────────────────────────────
-  lines.push('## 1. Critical Hotspots (High Fan-In → High Risk)');
+  lines.push('## 1. Critical Hotspots');
   lines.push('');
-  lines.push('Files with the most dependents — changes here cascade widely. Each needs:');
-  lines.push('1. Paired test (G26), 2. Circuit-breaker / dependency inversion assessment');
-  lines.push('');
-  lines.push('| File | Fan-In | Zone | Action |');
-  lines.push('|------|--------|------|--------|');
-  const ranked = hotspots.sort((a,b) => b.directFanIn - a.directFanIn);
+  lines.push('| File | Fan-In | Action |');
+  lines.push('|------|--------|--------|');
+  const ranked = hotspots.sort((a,b) => b.directFanIn - a.directFanIn).slice(0, 20);
   for (const h of ranked) {
-    const action = h.directFanIn > 200
-      ? '⚠️ CRITICAL — consider dependency inversion + interface extraction'
-      : h.directFanIn > 50
-      ? '🟠 HIGH — add paired test + change guard'
-      : '🟡 MODERATE — add paired test';
-    lines.push(`| \`${h.file_path}\` | ${h.directFanIn} | ${h.zone} | ${action} |`);
+    lines.push(`| \`${h.file_path}\` | ${h.directFanIn} | ${h.directFanIn > 100 ? '⚠️ CRITICAL' : '🟠 HIGH'} |`);
   }
-  lines.push('');
-
-  // ── Section 2: Test Coverage Gaps ────────────────────────────────────────
-  lines.push('## 2. Test Coverage Gaps (fanIn ≥ 15, no paired test)');
-  lines.push('');
-  lines.push('> G26 compliance: every high-fanIn server file needs a test in `tests/routes/auto/`');
-  lines.push('> Pattern: `@vitest-environment node` + `vi.hoisted` + lazy `beforeEach` import + 401/400/200/degraded cases');
-  lines.push('');
-
-  const untested = [];
-  for (const [dir, s] of dirStats.entries()) {
-    for (const f of s.files) {
-      if (f.fanIn >= 15 && !f.file.includes('.test.') && !f.file.includes('.spec.') && !f.file.includes('/tests/') && (f.zone === 'server' || f.zone === 'route')) {
-        untested.push(f);
-      }
-    }
-  }
-  untested.sort((a,b) => b.fanIn - a.fanIn);
-  for (const f of untested.slice(0, 30)) {
-    lines.push(`- [ ] \`${f.file}\` (fanIn=${f.fanIn})`);
-  }
-  lines.push('');
-
-  // ── Section 3: Audit Gate Failures by Tier ────────────────────────────────
-  lines.push('## 3. Audit Gate Violations to Address');
-  lines.push('');
-
-  lines.push('### G17 — Hardcoded localhost refs (must use ENV.* getters)');
-  lines.push('Run: `rg "localhost|127\\.0\\.0\\.1" src/lib/server/ --type ts --glob "!env.server.ts"` — all hits are violations');
-  lines.push('');
-
-  lines.push('### G8a — SvelteKit error() in service layer');
-  lines.push('Run: `rg "import .*error.*from .@sveltejs/kit." src/lib/server/ --type ts` — all hits are violations');
-  lines.push('Use `HttpServiceError` subclasses from `$lib/server/errors.ts` instead');
-  lines.push('');
-
-  lines.push('### G8b — GPU/Analysis layer importing SvelteKit');
-  lines.push('Run: `rg "from .@sveltejs/kit.|from .\\$app/" src/lib/server/gpu/ src/lib/server/analysis/ src/lib/server/vector/` — must be 0');
-  lines.push('');
-
-  lines.push('### G11 — Wrong DB client import');
-  lines.push('Run: `rg "from.*db/index" src/ --type ts` — must be 0 (use `db/client` for node-postgres Pool)');
-  lines.push('');
-
-  lines.push('### G21-G24 — Svelte 4 patterns in .svelte files');
-  lines.push('Run: `rg "export\\s+let|^\\s*\\$:[^:]|\\bon:[a-z]|createEventDispatcher" src/ --glob "*.svelte"` — must be 0');
-  lines.push('');
-
-  // ── Section 4: Context Enhancement Opportunities ──────────────────────────
-  lines.push('## 4. Context Enhancement Opportunities (ACE Pipeline)');
-  lines.push('');
-
-  lines.push('### G50 — chunk hit logging coverage');
-  lines.push('`recordChunkHits()` must fire for EVERY retrieval pass: RAG (Qdrant), ACP cross-feed, KAG notes, SOM/hypergraph, PageRank. Currently fires on RAG pass; verify ACP + graph passes are also logged.');
-  lines.push('');
-
-  lines.push('### G51 — P1-A prompt leaderboard feedback loop');
-  lines.push('`fetchTopQueryTags()` in context-assembler injects top prompts into `ACEContext.queryTags`. Verify the write path (prompt clicks → `typing:prompt:clicks` Redis sorted set) and read path (leaderboard API → ACE) are both live.');
-  lines.push('');
-
-  lines.push('### G52 — P3-A cross-source reranking');
-  lines.push('`webSearchToUnified()` in context-assembler merges web search results into RAG chunks before reranking. Verify it handles empty web results gracefully (no crash when `BRAVE_API_KEY` absent).');
-  lines.push('');
-
-  lines.push('### G53 — ACE_PIPELINE_VERSION');
-  lines.push('After any shape change to ACEContext or the retrieval trace, bump `ACE_PIPELINE_VERSION` constant so the ACE chunk cache (Redis `ace_chunks:*` keys) auto-invalidates rather than serving stale context.');
-  lines.push('');
-
-  lines.push('### G54/G55 — Cache key consolidation (P2-A)');
-  lines.push('Single source of truth for LLM cache key generation: `cache-keys.ts`. Both `redis-exact-match.ts` and `llm-cache.ts` must import from there. Check for any remaining local `generateCacheKey` implementations.');
-  lines.push('');
-
-  // ── Section 5: GraphRAG community layer ──────────────────────────────────
-  lines.push('## 5. GraphRAG / ACE Graph Enhancement');
-  lines.push('');
-
-  lines.push('### G27-G35 — pytorch-graph N-API wiring');
-  lines.push('Verify all 5 GPU functions are exported from the addon:');
-  lines.push('```bash');
-  lines.push('node -e "const a=require(\'./simd-bridge/cpp/build/Release/tensorrt_bridge.node\'); [\'kmeansWithCentroids\',\'trainSOM\',\'pageRankGPU\',\'attentionScoreGPU\',\'rewardScoreGPU\'].forEach(f=>console.log(f+\':\',typeof a[f]))"');
-  lines.push('```');
-  lines.push('');
-
-  lines.push('### Topo-byte cache TTL tuning');
-  lines.push('`ace:topo:{topoClass}:{queryHash}` TTL is 300s. For frequently-queried topology classes, consider bumping to 600s to reduce ANN calls without staleness risk (topology graph changes at most once per `graphify:full` run).');
-  lines.push('');
-
-  lines.push('### SOM + PageRank freshness');
-  lines.push('`codebase_chunks_768` Qdrant payload field `som_cluster` and Neo4j `SIMILAR_TOPOLOGY` edges are written by `run-hypergraph.ts`. If `graphify:full` has not run recently, these are stale — ACE topological boosting underperforms.');
-  lines.push('Run: `npm run graphify:full` to refresh (5-10 min GPU).');
-  lines.push('');
-
-  // ── Section 6: Structural Enhancement Backlog ──────────────────────────────
-  lines.push('## 6. Structural Enhancement Backlog');
-  lines.push('');
-
-  lines.push('### Dependency Inversion — db/client.ts (484 importers)');
-  lines.push('`src/lib/server/db/client.ts` is the #1 hotspot with 484 dependents. Consider:');
-  lines.push('- Wrapping behind a thin `getDb()` function (already partially done via `db` export)');
-  lines.push('- Creating domain-specific query modules to reduce direct cross-domain imports');
-  lines.push('- Tracking which query patterns are most common (analytics → targeted optimization)');
-  lines.push('');
-
-  lines.push('### env.server.ts (336 importers)');
-  lines.push('Only `env.server.ts` should read `process.env.*` directly. The 336 importers are expected but confirm none bypass it with raw `process.env.*` access.');
-  lines.push('Run: `rg "process\\.env\\." src/ --type ts --glob "!env.server.ts"` — expect 0 outside of script files');
-  lines.push('');
-
-  lines.push('### redis.ts (237 importers)');
-  lines.push('237 files import directly from `redis.ts`. The `getRedis()` pool pattern (18 migrated 2026-04-12) should cover all of them. Verify no file still uses `new Redis(...)` directly.');
-  lines.push('Run: `rg "new Redis(" src/lib/server/ --type ts --glob "!redis.ts"` — expect 0');
-  lines.push('');
-
-  lines.push('### gRPC port collision — port 50055');
-  lines.push('Both `chr97-agent-client.ts` and `go-search-service` claim port 50055. One must move to 50058+ before enabling both services. See CLAUDE.md §"gRPC Service Port Map".');
-  lines.push('');
-
-  lines.push('### Phase B LLM Summaries — still pending');
-  lines.push('`npm run graphify:summarize` (Phase B of the deep-import pipeline) was blocked by Ollama VRAM (gemma4-legal-vlm occupying all slots).');
-  lines.push('Run when VRAM is free: `npm run graphify:summarize:limit` (first 50 files with gemma3:270m)');
-  lines.push('This will populate `memory/graphify/deep/summaries/` and `memory/ingest/pending/graphify_summaries_*.jsonl`');
-  lines.push('');
-
-  // ── Section 7: Quick wins (<30 min each) ─────────────────────────────────
-  lines.push('## 7. Quick Wins (<30 min each)');
-  lines.push('');
-  lines.push('- [ ] Run `npm run audit:test-stubs` to generate G26-pattern placeholder tests for all unmapped POST/PUT/PATCH/DELETE routes');
-  lines.push('- [ ] Run `rg "new Redis(" src/lib/server/ --type ts` — fix any remaining direct Redis construction outside `redis.ts`');
-  lines.push('- [ ] Run `rg "from.*db/index" src/ --type ts` — fix any remaining wrong DB client imports');
-  lines.push('- [ ] Run `npm run typecheck:native` (tsgo) — fast type audit that catches TS2345 mismatches missed by svelte-check');
-  lines.push('- [ ] Set `RETRIEVAL_HTTP_ENABLED=true` in `.env` and test Go retrieval HTTP path (port 8100) — middle tier between gRPC and inline fallback');
-  lines.push('- [ ] Verify `GRAPH_ML_GRPC_URL` is defined in `.env` (flagged as MISSING ENV in gRPC audit)');
-  lines.push('- [ ] Run `npm run graphify:full` to refresh SOM + PageRank + Neo4j topology edges (stale since last indexing run)');
   lines.push('');
 
   return lines.join('\n');
 }
 
-// ── Fix timeline via git log ──────────────────────────────────────────────────
-// Returns last N commits that touched files under `relDir`, formatted as a
-// markdown table with ISO timestamp, hash, and subject — so agents can see the
-// error-fixing history of this directory at a glance.
+// ── Build timeline from cache ─────────────────────────────────────────────────
 function buildFixTimeline(relDir, limit = 6) {
-  // git log --format="%H|%ai|%s" -- <relDir>/**
-  const result = spawnSync(
-    'git',
-    ['log', `--max-count=${limit}`, '--format=%h|%ai|%s', '--', `${relDir}/`],
-    { cwd: ROOT, encoding: 'utf8', timeout: 5000 }
-  );
-  if (result.status !== 0 || !result.stdout?.trim()) return '';
+  const cache = getGlobalGitCache();
+  const commits = cache.get(relDir) || [];
+  if (commits.length === 0) return '';
 
-  const rows = result.stdout.trim().split('\n').map(line => {
-    const [hash, ts, ...rest] = line.split('|');
-    const subject = rest.join('|').trim();
-    const isoDate = ts ? ts.slice(0, 16).replace(' ', 'T') : '';
-    return `| \`${hash}\` | ${isoDate} | ${subject} |`;
-  }).filter(Boolean);
-
-  if (rows.length === 0) return '';
+  const rows = commits.slice(0, limit).map(c => {
+    const isoDate = c.ts ? c.ts.slice(0, 16).replace(' ', 'T') : '';
+    return `| \`${c.hash}\` | ${isoDate} | ${c.subject} |`;
+  });
 
   return [
     '## Fix Timeline',
     '',
-    '> Recent commits touching this directory — newest first. Used by agents to correlate errors with fixes.',
+    '> Recent commits touching this directory. Used by agents to correlate errors with fixes.',
     '',
     '| Commit | Timestamp | Subject |',
     '|--------|-----------|---------|',
@@ -523,20 +378,19 @@ function buildFixTimeline(relDir, limit = 6) {
   ].join('\n');
 }
 
-// ── Enrich a single AGENTS.md ─────────────────────────────────────────────────
-const GEN_MARKER = '<!-- AGENTS-GEN v1';
-const ENRICH_START = '<!-- AGENTS-ENRICH v1 · auto-generated by enrich-agents-md.mjs · do not edit manually -->';
-const ENRICH_END   = '<!-- /AGENTS-ENRICH -->';
+// ── Enrich a single LLMS.md ─────────────────────────────────────────────────
+const GEN_MARKER = '<!-- LLMS-GEN v1';
+const ENRICH_START = '<!-- LLMS-ENRICH v1 · auto-generated by enrich-llms-md.mjs · do not edit manually -->';
+const ENRICH_END   = '<!-- /LLMS-ENRICH -->';
 
-function enrichFile(agentsMdPath, dirStats) {
-  const absDir  = dirname(agentsMdPath);
+function enrichFile(llmsMdPath, dirStats) {
+  const absDir  = dirname(llmsMdPath);
   const relDir  = relative(ROOT, absDir).replace(/\\/g, '/');
 
   if (TARGET && !relDir.startsWith(TARGET)) return false;
 
-  const current = readFileSync(agentsMdPath, 'utf8');
+  const current = readFileSync(llmsMdPath, 'utf8');
 
-  // Strip existing enrichment block
   let base = current;
   const enrichStart = base.indexOf(ENRICH_START);
   const enrichEndIdx = base.indexOf(ENRICH_END);
@@ -544,7 +398,6 @@ function enrichFile(agentsMdPath, dirStats) {
     base = base.slice(0, enrichStart) + base.slice(enrichEndIdx + ENRICH_END.length);
   }
 
-  // Build new enrichment block
   const gateSection    = buildGateSection(relDir, dirStats);
   const todoSection    = buildTodoSection(relDir, dirStats);
   const timelineSection = buildFixTimeline(relDir);
@@ -560,7 +413,6 @@ function enrichFile(agentsMdPath, dirStats) {
     '',
   ].join('\n');
 
-  // Insert before AGENTS-GEN marker (or append if marker absent)
   let newContent;
   const genIdx = base.indexOf(GEN_MARKER);
   if (genIdx !== -1) {
@@ -570,26 +422,26 @@ function enrichFile(agentsMdPath, dirStats) {
   }
 
   if (newContent === current) return false;
-  if (!DRY_RUN) writeFileSync(agentsMdPath, newContent, 'utf8');
+  if (!DRY_RUN) writeFileSync(llmsMdPath, newContent, 'utf8');
   return true;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 const t0 = Date.now();
-console.log(`\n[enrich-agents-md] Loading Redis ACE hits …`);
+console.log(`\n[enrich-llms-md] Loading Redis ACE hits …`);
 const { nodes, hotspots } = await loadRedisData();
 console.log(`  nodes=${nodes.length}  hotspots=${hotspots.length}`);
 
 const dirStats = buildDirStats(nodes, hotspots);
 console.log(`  directories mapped: ${dirStats.size}`);
 
-console.log(`\n[enrich-agents-md] Finding AGENTS.md files …`);
-const agentsMdFiles = findAgentsMd(SRC);
-console.log(`  found: ${agentsMdFiles.length}`);
+console.log(`\n[enrich-llms-md] Finding LLMS.md files …`);
+const llmsMdFiles = findLLMSMd(SRC);
+console.log(`  found: ${llmsMdFiles.length}`);
 
-console.log(`\n[enrich-agents-md] Enriching … ${DRY_RUN ? '(dry-run)' : ''}`);
+console.log(`\n[enrich-llms-md] Enriching … ${DRY_RUN ? '(dry-run)' : ''}`);
 let updated = 0;
-for (const f of agentsMdFiles) {
+for (const f of llmsMdFiles) {
   const changed = enrichFile(f, dirStats);
   if (changed) {
     const rel = relative(ROOT, f).replace(/\\/g, '/');
@@ -597,18 +449,15 @@ for (const f of agentsMdFiles) {
     updated++;
   }
 }
-console.log(`  updated: ${updated} / ${agentsMdFiles.length}`);
+console.log(`  updated: ${updated} / ${llmsMdFiles.length}`);
 
-// ── Write master TODO ─────────────────────────────────────────────────────────
 const todoPath = join(ROOT, 'docs', 'TODO-enhancements.md');
 mkdirSync(dirname(todoPath), { recursive: true });
 const masterTodo = buildMasterTodo(dirStats, hotspots, nodes.length);
 if (!DRY_RUN) {
   writeFileSync(todoPath, masterTodo, 'utf8');
-  console.log(`\n  ✓ Wrote docs/TODO-enhancements.md (${masterTodo.length.toLocaleString()} chars)`);
-} else {
-  console.log(`\n  [dry-run] Would write docs/TODO-enhancements.md (${masterTodo.length.toLocaleString()} chars)`);
+  console.log(`\n  ✓ Wrote docs/TODO-enhancements.md`);
 }
 
-console.log(`\n[enrich-agents-md] Done in ${((Date.now()-t0)/1000).toFixed(1)}s`);
+console.log(`\n[enrich-llms-md] Done in ${((Date.now()-t0)/1000).toFixed(1)}s`);
 console.log('══════════════════════════════════════════\n');

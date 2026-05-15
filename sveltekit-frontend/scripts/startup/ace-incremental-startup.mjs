@@ -213,7 +213,7 @@ async function runIncrementalLane(redis) {
     log.changedFiles = changed;
 
     const relevant = changed.filter(f =>
-      /^(sveltekit-frontend\/)?(src|scripts|docs|memory|next_steps|drizzle|package\.json|CLAUDE\.md|AGENTS\.md)/.test(f)
+      /^(sveltekit-frontend\/)?(src|scripts|docs|memory|next_steps|drizzle|package\.json|CLAUDE\.md|AGENTS\.md|LLMS\.md)/.test(f)
     );
     log.relevantCount = relevant.length;
     log.changeClass = classifyChanges(relevant);
@@ -241,10 +241,10 @@ async function runIncrementalLane(redis) {
         required: false, timeout: 60_000,
       });
 
-      runStep('agents pipeline dry-run', 'agents:pipeline:dry', { timeout: 180_000 });
+      runStep('llms pipeline dry-run', 'llms:pipeline:dry', { timeout: 180_000 });
 
       if (!DRY) {
-        runStep('agents pipeline safe', 'agents:pipeline:safe', { timeout: 240_000 });
+        runStep('llms pipeline safe', 'llms:pipeline:safe', { timeout: 600_000 });
       }
 
       runStep('topology validate', 'topology:validate', { required: false, timeout: 120_000 });
