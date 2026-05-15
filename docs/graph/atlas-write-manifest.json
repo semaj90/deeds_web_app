@@ -1,7 +1,7 @@
 {
   "repo": "deeds-web-app",
-  "runId": "run_1778884847387",
-  "generatedAt": "2026-05-15T22:40:47.387Z",
+  "runId": "run_1778884918530",
+  "generatedAt": "2026-05-15T22:41:58.530Z",
   "targets": {
     "qdrant": {
       "collection": "codebase_chunks_768",
