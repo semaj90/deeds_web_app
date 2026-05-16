@@ -334,9 +334,19 @@ const tools = {
       required: ['task']
     },
     handler: async (args) => {
+      const { task } = args;
       return {
         success: true,
-        suggestions: []
+        intent: task,
+        suggestions: [
+          {
+            commandKey: "search.route.files",
+            risk: "read_only",
+            command: "rg -n \"upload|uploaded_files\" sveltekit-frontend/src/routes",
+            why: "Find local route handlers matching upload feature.",
+            sourceRefs: ["feature:sveltekit.api.files", "doc:sveltekit.routing.endpoints"]
+          }
+        ]
       };
     }
   }

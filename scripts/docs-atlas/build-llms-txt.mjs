@@ -18,19 +18,27 @@ async function build() {
     const files = await readdir(srcDir);
     
     let fullContent = `# ${sourceId} Documentation\n\n`;
-    let summaryContent = `# ${sourceId} Documentation Summary\n\n`;
+    let summaryContent = `# ${sourceId} Documentation Map\n\n> Normalized for local Gemma4/HyperRAG use.\n\n`;
 
     for (const file of files) {
       if (file.endsWith('.md')) {
         const content = await readFile(join(srcDir, file), 'utf8');
-        fullContent += `## ${file}\n\n${content}\n\n`;
-        summaryContent += `- [${file}](./${file})\n`;
+        const topic = file.replace('.md', '');
+        
+        fullContent += `# ${sourceId} — ${topic}\n\n`;
+        fullContent += `Source: https://.../${sourceId}/${topic}\n`;
+        fullContent += `Version: latest\n`;
+        fullContent += `Topic: ${topic}\n\n`;
+        fullContent += `${content}\n\n`;
+        
+        summaryContent += `## ${topic}\n`;
+        summaryContent += `- [${topic}](./${file})\n`;
       }
     }
 
     await writeFile(join(OUTPUT_DIR, `${sourceId}.llms.txt`), summaryContent);
     await writeFile(join(OUTPUT_DIR, `${sourceId}.llms-full.txt`), fullContent);
-    console.log(`[llms.txt] Generated for ${sourceId}`);
+    console.log(`[llms.txt] Generated ${sourceId}.llms.txt and ${sourceId}.llms-full.txt`);
   }
 }
 
