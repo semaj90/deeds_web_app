@@ -18,7 +18,7 @@ import { mergeCardIntoMarkdown } from '../markdown/auto-blocks.js';
 import type { AutoBlockId } from '../markdown/auto-blocks.js';
 import type { AgentsDirectoryCard } from '../../agents-card-store.js';
 
-const LLMS.md_FILENAME = 'LLMS.md';
+const LLMS_MD_FILENAME = 'LLMS.md';
 
 export interface MarkdownWriteOptions {
 	enabled?:  boolean;
@@ -50,7 +50,7 @@ export async function writeCardMarkdown(
 	opts: MarkdownWriteOptions = {},
 ): Promise<MarkdownWriteResult> {
 	const repoRoot = opts.repoRoot ?? process.cwd();
-	const absPath  = path.join(repoRoot, card.dirPath, LLMS.md_FILENAME);
+	const absPath  = path.join(repoRoot, card.dirPath, LLMS_MD_FILENAME);
 	const empty: MarkdownWriteResult = {
 		wrote: false, skipped: 'disabled', absPath, bytesWritten: 0,
 		replacedBlocks: [], appendedBlocks: [],

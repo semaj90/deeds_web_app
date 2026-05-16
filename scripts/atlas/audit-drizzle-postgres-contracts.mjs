@@ -204,13 +204,7 @@ function checkUnsafeWrites() {
 
 // ── Phase E: known FK type mismatches (static + live) ────────────────────────
 const KNOWN_FK_MISMATCHES = [
-  { table: 'cases',                col: 'user_id',     drizzleType: 'uuid',    pgType: 'integer', refs: 'users.id' },
-  { table: 'chat_messages',        col: 'user_id',     drizzleType: 'uuid',    pgType: 'integer', refs: 'users.id' },
-  { table: 'audit_log',            col: 'user_id',     drizzleType: 'uuid',    pgType: 'integer', refs: 'users.id' },
-  { table: 'analytics_events',     col: 'user_id',     drizzleType: 'uuid',    pgType: 'integer', refs: 'users.id' },
-  { table: 'chunk_hit_log',        col: 'user_id',     drizzleType: 'uuid',    pgType: 'integer', refs: 'users.id' },
-  { table: 'synthesis_runs',       col: 'user_id',     drizzleType: 'uuid',    pgType: 'integer', refs: 'users.id' },
-  { table: 'yorha_chat_sessions',  col: 'user_id',     drizzleType: 'uuid',    pgType: 'integer', refs: 'users.id' },
+  // All legacy integer-based user_id FKs have been migrated to uuid in Phase 9C.
 ];
 
 function checkKnownFkMismatches(drizzleMap) {

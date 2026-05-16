@@ -19,7 +19,7 @@
 
 import { createHash } from 'node:crypto';
 import {
-  LLMS.md_SCHEMA_VERSION,
+  LLMS_MD_SCHEMA_VERSION,
   agentsMdEnvelopeSchema,
   type AgentRule,
   type AgentToolPolicy,
@@ -243,7 +243,7 @@ export function parseAgentsMd(body: string, filePath: string): AgentsMdEnvelope 
     // qdrant_tags inherits from semantic_tags by default — indexer can override
     qdrant_tags:    tags,
     confidence:     Math.max(0.5, structureScore || 0.5),
-    schema_version: LLMS.md_SCHEMA_VERSION,
+    schema_version: LLMS_MD_SCHEMA_VERSION,
   };
 
   return agentsMdEnvelopeSchema.parse(envelope);
