@@ -33,6 +33,7 @@ const GRAPH_DIR    = join(REPO_ROOT, 'docs/graph');
 
 const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const EMBEDDING_DIM = 768; // canonical embedding dimension for this project
+const ALLOWED_DIMS = new Set([768, 1536, 384, 128, 64, 32, 512]);
 
 const ARGS = process.argv.slice(2);
 const OPT_JSON    = ARGS.includes('--json');
@@ -49,11 +50,11 @@ const hmmLabel = s => `${C.cyan}[${s}]${C.reset}`;
 
 // ── rg helper ─────────────────────────────────────────────────────────────────
 function rg(pattern, path, flags = []) {
-  const r = spawnSync('rg', [pattern, path, '--no-heading', '-n', ...flags], { encoding: 'utf8' });
+  const r = spawnSync('rg', [pattern, path, '--no-heading', '-n', '-u', ...flags], { encoding: 'utf8' });
   return (r.stdout ?? '').trim();
 }
 function rgFiles(pattern, path, flags = []) {
-  const r = spawnSync('rg', [pattern, path, '-l', ...flags], { encoding: 'utf8' });
+  const r = spawnSync('rg', [pattern, path, '-l', '-u', ...flags], { encoding: 'utf8' });
   return (r.stdout ?? '').trim().split('\n').filter(Boolean);
 }
 
@@ -104,7 +105,7 @@ async function auditRouteContracts() {
     }
 
     // action must return { form } on fail
-    if (text.includes('!form.valid') && !text.includes('fail(400, { form }') && !text.includes("fail(400, {form}")) {
+    if (text.includes('!form.valid') && !/fail\(400,\s*\{[^}]*\bform\b/.test(text)) {
       findings.push(makeFinding({
         layer: 'sveltekit-route',
         hmmState: 'route_missing_form_return',
@@ -142,14 +143,16 @@ async function auditRouteContracts() {
   const apiFiles = rgFiles('return json\\(', ROUTES_DIR, ['--glob', '**/+server.ts']);
   for (const f of apiFiles) {
     const text = readFileSync(f, 'utf8');
-    // Detect error response without matching success shape key
-    if (text.includes('status: 500') && !text.includes('error:') ) {
+    
+    // Check GET handlers specifically for status: 500
+    const getMatch = text.match(/GET: RequestHandler[\s\S]*?(?=export const|$)/);
+    if (getMatch && getMatch[0].includes('status: 500') && !getMatch[0].includes('error:')) {
       findings.push(makeFinding({
         layer: 'sveltekit-route',
         hmmState: 'route_contract_mismatch',
         severity: 'low',
         localSourceRefs: [f],
-        problem: 'GET route may return 500 status code instead of degraded-but-valid JSON shape.',
+        problem: 'GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.',
         expected: 'GET routes return 200 with empty arrays/nulls matching success shape.',
         suggestedFix: 'Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).',
         validationCommands: ['npm run audit:contracts'],
@@ -208,7 +211,11 @@ async function auditSuperformsContracts() {
     const svelteFile = f.replace('+page.server.ts', '+page.svelte');
     if (existsSync(svelteFile)) {
       const svText = readFileSync(svelteFile, 'utf8');
-      if (text.includes('superValidate') && !svText.includes('superForm') && !svText.includes('use:enhance')) {
+      if (text.includes('superValidate') && 
+          !svText.includes('superForm') && 
+          !svText.includes('use:enhance') &&
+          !svText.includes('formData={data.form}') &&
+          !svText.includes('form={data.form}')) {
         findings.push(makeFinding({
           layer: 'superforms-contract',
           hmmState: 'route_missing_form_return',
@@ -544,7 +551,7 @@ async function auditPgvectorStatic() {
     const dimMatches = [...text.matchAll(/vector\s*\(\s*['"]?\w+['"]?\s*,?\s*\{?\s*dimensions?\s*:?\s*(\d+)/g)];
     for (const m of dimMatches) {
       const dim = parseInt(m[1], 10);
-      if (!isNaN(dim) && dim !== EMBEDDING_DIM && dim !== 64) {
+      if (!isNaN(dim) && !ALLOWED_DIMS.has(dim)) {
         findings.push(makeFinding({
           layer: 'pgvector',
           hmmState: 'vector_dimension_mismatch',

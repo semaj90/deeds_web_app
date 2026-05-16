@@ -73,11 +73,21 @@ function rg(pattern, path, flags = []) {
   return (r.stdout ?? '').trim();
 }
 
-function allSchemaFiles() {
-  if (!existsSync(SCHEMA_DIR)) return [];
-  return readdirSync(SCHEMA_DIR)
-    .filter(f => f.match(/^schema.*\.ts$/) && !f.endsWith('.d.ts'))
-    .map(f => join(SCHEMA_DIR, f));
+function allSchemaFiles(dir = SCHEMA_DIR) {
+  if (!existsSync(dir)) return [];
+  const files = readdirSync(dir);
+  const out = [];
+  for (const f of files) {
+    const p = join(dir, f);
+    const stat = statSync(p);
+    if (stat.isDirectory()) {
+      if (f === 'archived-schemas' || f === 'meta' || f === 'archived') continue;
+      out.push(...allSchemaFiles(p));
+    } else if (f.endsWith('.ts') && !f.endsWith('.d.ts')) {
+      out.push(p);
+    }
+  }
+  return out;
 }
 
 function allSqlFiles() {
@@ -310,7 +320,7 @@ async function checkLivePostgresDrift(drizzleMap) {
     }
 
   } catch (err) {
-    if (!JSON_OUT) console.warn(`  ${C.yellow}⚠ Postgres unreachable (${err.message.slice(0, 60)}) — live drift check skipped${C.reset}`);
+    if (!JSON_OUT) console.warn(`  ${C.yellow}⚠ SKIP: Postgres unreachable (${err.message.slice(0, 60)}) — live drift check skipped${C.reset}`);
   } finally {
     await pool?.end().catch(() => {});
   }

@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-05-16T18:18:43.937Z",
+  "inputFindings": 6,
+  "activeStates": 1,
+  "topoOrder": [
+    "env_url_mismatch",
+    "ssr_safety_violation",
+    "meta_hygiene",
+    "stale_migration",
+    "schema_mismatch",
+    "vector_infra_missing",
+    "route_contract_mismatch",
+    "api_validation_gap"
+  ],
+  "dagNodes": [
+    {
+      "errorId": "contract:schema_mismatch",
+      "hmmState": "schema_mismatch",
+      "hmmLabel": "Schema Mismatch",
+      "hmmDescription": "Drizzle schema column type does not match the live Postgres column type.",
+      "rootCauseScore": 0.65,
+      "findingCount": 6,
+      "severity": "high",
+      "downstreamErrors": [],
+      "kagRecall": [],
+      "recommendedOrder": 5,
+      "validationCommands": [
+        "npm run db:check",
+        "npm run audit:contracts",
+        "npm run test:network-contracts"
+      ],
+      "agentCommandKeys": [
+        "db.check",
+        "contract.audit",
+        "drizzle.inspect"
+      ],
+      "findings": [
+        "contract:drizzle-meta-stale_migration-001-d6a201cf",
+        "contract:drizzle-meta-stale_migration-002-033419d2",
+        "contract:drizzle-meta-stale_migration-003-3f91ba5e",
+        "contract:drizzle-meta-stale_migration-004-1486163b",
+        "contract:drizzle-meta-stale_migration-005-187064cc",
+        "contract:drizzle-postgres-drizzle_fk_type_mismatch-006-99f0d2c8"
+      ],
+      "trustTier": "canonical_local_code_plus_official_docs"
+    }
+  ],
+  "dagEdges": [],
+  "redisKagAvailable": false,
+  "summary": {
+    "high": 1,
+    "medium": 0,
+    "low": 0,
+    "totalFindings": 6
+  },
+  "status": "action-required"
+}

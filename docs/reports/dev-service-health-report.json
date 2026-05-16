@@ -1,0 +1,113 @@
+{
+  "generatedAt": "2026-05-16T18:01:38.763Z",
+  "strict": false,
+  "services": [
+    {
+      "name": "Postgres",
+      "host": "127.0.0.1",
+      "port": 5434,
+      "required": true,
+      "status": "up",
+      "latencyMs": 2,
+      "error": null,
+      "envVar": "DATABASE_URL"
+    },
+    {
+      "name": "Redis",
+      "host": "127.0.0.1",
+      "port": 6379,
+      "required": true,
+      "status": "up",
+      "latencyMs": 1,
+      "error": null,
+      "envVar": "REDIS_URL"
+    },
+    {
+      "name": "Qdrant",
+      "host": "127.0.0.1",
+      "port": 6333,
+      "required": false,
+      "status": "up",
+      "latencyMs": 0,
+      "error": null,
+      "envVar": null
+    },
+    {
+      "name": "Neo4j bolt",
+      "host": "127.0.0.1",
+      "port": 7687,
+      "required": false,
+      "status": "up",
+      "latencyMs": 0,
+      "error": null,
+      "envVar": null
+    },
+    {
+      "name": "Neo4j browser",
+      "host": "127.0.0.1",
+      "port": 7474,
+      "required": false,
+      "status": "up",
+      "latencyMs": 1,
+      "error": null,
+      "envVar": null
+    },
+    {
+      "name": "TurboQuant",
+      "host": "127.0.0.1",
+      "port": 8090,
+      "required": false,
+      "status": "up",
+      "latencyMs": 0,
+      "error": null,
+      "envVar": "LLAMA_SERVER_URL"
+    },
+    {
+      "name": "Ollama",
+      "host": "127.0.0.1",
+      "port": 11434,
+      "required": false,
+      "status": "up",
+      "latencyMs": 0,
+      "error": null,
+      "envVar": "OLLAMA_HOST"
+    },
+    {
+      "name": "RabbitMQ",
+      "host": "127.0.0.1",
+      "port": 5672,
+      "required": false,
+      "status": "up",
+      "latencyMs": 1,
+      "error": null,
+      "envVar": null
+    },
+    {
+      "name": "SeaweedFS S3",
+      "host": "127.0.0.1",
+      "port": 8333,
+      "required": false,
+      "status": "up",
+      "latencyMs": 1,
+      "error": null,
+      "envVar": "SEAWEED_S3_PORT"
+    },
+    {
+      "name": "SvelteKit dev",
+      "host": "127.0.0.1",
+      "port": 5173,
+      "required": false,
+      "status": "down_optional",
+      "latencyMs": 1,
+      "error": "ECONNREFUSED",
+      "envVar": null
+    }
+  ],
+  "summary": {
+    "up": 9,
+    "downRequired": 0,
+    "downOptional": 1,
+    "skipped": 0
+  },
+  "status": "healthy"
+}

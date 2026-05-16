@@ -1,4 +1,4 @@
-# drizzle Documentation Map
+# Drizzle ORM Map
 
 > Normalized for local Gemma4/HyperRAG use.
 
