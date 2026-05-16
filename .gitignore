@@ -520,8 +520,8 @@ test.db
 ########################################
 # LLM models & weight directories
 ########################################
-# Root-scoped: only ignore /models/ at repo root (NOT src/routes/api/ai/models/ or src/lib/models/)
-/models/
+# /models/ is NOT ignored here — binary extensions are ignored inside models/.gitignore
+# so rg can still descend and search metadata/config files in that directory.
 # Explicit sub-paths that must stay ignored
 sveltekit-frontend/models/
 local-llms/
