@@ -12,9 +12,9 @@
  * using weights loaded from Redis.
  *
  * Usage:
- *   npm run autoencoder:centroids             (defaults to --dry-run)
- *   npm run autoencoder:centroids -- --dry-run
- *   npm run autoencoder:centroids -- --min-cluster 3
+ *   npm run ae:centroids                                 (live — writes centroids to Redis)
+ *   npm run ae:centroids:dry                             (dry-run — no Redis writes)
+ *   npm run ae:centroids -- --min-cluster=3 --limit=500  (override defaults)
  */
 
 import { Redis } from 'ioredis';
@@ -82,8 +82,12 @@ async function loadWeights(redis) {
     };
 }
 
-// ── CPU encode: tanh(data @ W^T + b) ─────────────────────────────────────────
-function encodeLayer(data, n, inputDim, W, b, outputDim) {
+// ── CPU encode: matches architecture from ae-encode-to-redis.mjs + train-autoencoder.py ──
+// Layer 1: Linear(768→256) + ReLU
+// Layer 2: Linear(256→64)  + no activation (linear)
+// Output:  L2-normalize → cosine distance works in 64-dim
+// W stored in PyTorch (outputDim × inputDim) row-major convention.
+function linearLayer(data, n, inputDim, W, b, outputDim, relu) {
     const out = new Float32Array(n * outputDim);
     for (let i = 0; i < n; i++) {
         const xOff = i * inputDim;
@@ -91,19 +95,28 @@ function encodeLayer(data, n, inputDim, W, b, outputDim) {
         for (let h = 0; h < outputDim; h++) {
             let act = b[h];
             const wOff = h * inputDim;
-            for (let d = 0; d < inputDim; d++) {
-                act += data[xOff + d] * W[wOff + d];
-            }
-            out[yOff + h] = Math.tanh(act);
+            for (let d = 0; d < inputDim; d++) act += data[xOff + d] * W[wOff + d];
+            out[yOff + h] = relu ? Math.max(0, act) : act;
         }
     }
     return out;
 }
 
+function l2NormalizeRows(data, n, dim) {
+    for (let i = 0; i < n; i++) {
+        const off = i * dim;
+        let norm = 0;
+        for (let d = 0; d < dim; d++) norm += data[off + d] * data[off + d];
+        norm = Math.sqrt(norm) || 1e-12;
+        for (let d = 0; d < dim; d++) data[off + d] /= norm;
+    }
+    return data;
+}
+
 function encode768to64(vec768, weights) {
-    const h = encodeLayer(vec768, 1, CONTENT_DIM, weights.W1, weights.b1, HIDDEN_DIM);
-    const z = encodeLayer(h, 1, HIDDEN_DIM, weights.W2, weights.b2, ENCODED_DIM);
-    return z;
+    const h = linearLayer(vec768, 1, CONTENT_DIM, weights.W1, weights.b1, HIDDEN_DIM, true);
+    const z = linearLayer(h,      1, HIDDEN_DIM,  weights.W2, weights.b2, ENCODED_DIM, false);
+    return l2NormalizeRows(z, 1, ENCODED_DIM);
 }
 
 // ── Qdrant helpers ────────────────────────────────────────────────────────────
