@@ -137,6 +137,7 @@ import {
   readLatestRelationSynthesis,
   type ClusterTagsEntry,
 } from './cluster-tags-cache.js';
+import { clusterPivot } from './rg-cluster-pivot.js';
 
 // ── QueryRouter4x4 singleton — persisted to Redis ace:router4x4:matrix (24h) ─
 // Reads saved matrix on first call; adapts after each retrieval cycle.
@@ -1403,6 +1404,23 @@ export async function assembleACEContext(opts: {
                   baseContext.ragChunks = assignRanks(
                     sortByBestScore([...(baseContext.ragChunks ?? []), ...dedupedFast])
                   );
+                }
+
+                // Cluster pivot: expand rg-matched paths into adjacent SOM clusters
+                const fastPaths = fastChunks.map((c) => c.filePath).filter(Boolean) as string[];
+                const existingPaths = new Set(baseContext.ragChunks?.map((r) => r.filePath).filter(Boolean) as string[]);
+                const pivot = await clusterPivot(fastPaths, existingPaths).catch(() => null);
+                if (pivot?.hits.length) {
+                  baseContext.ragChunks = assignRanks(
+                    sortByBestScore([...(baseContext.ragChunks ?? []), ...pivot.hits])
+                  );
+                  if (baseContext.retrievalTrace) {
+                    (baseContext.retrievalTrace as Record<string, unknown>).clusterPivot = {
+                      pivotClusters: pivot.pivotClusters,
+                      anchoredFiles: pivot.anchoredFiles,
+                      hits: pivot.hits.length,
+                    };
+                  }
                 }
               }
             }
