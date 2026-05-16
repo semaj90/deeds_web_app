@@ -1,6 +1,6 @@
 # Directory Atlas Recommendations
 
-> Generated: 2026-05-16T18:37:21.321Z · 1167 directories · 8284 files
+> Generated: 2026-05-16T19:33:27.660Z · 1167 directories · 8284 files
 
 ## `src/lib/server/db`
 

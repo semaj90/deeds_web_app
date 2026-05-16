@@ -1,22 +1,22 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-16T18:39:54.004Z
+Generated: 2026-05-16T19:39:11.650Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 32317 |
-| Total edges | 75714 |
-| Resolved edges | 7318 |
+| Nodes | 32336 |
+| Total edges | 75744 |
+| Resolved edges | 7324 |
 | Unresolved (local) | 8447 |
-| External refs | 58247 |
+| External refs | 58271 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 817 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 26093 |
-| script | 3807 |
+| shared | 26104 |
+| script | 3815 |
 | test | 1261 |
 | types | 1016 |
 | config | 140 |
@@ -24,15 +24,15 @@ Generated: 2026-05-16T18:39:54.004Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 60854 |
+| imports_static | 60880 |
 | test_covers_file | 4089 |
-| redis_dependency | 2872 |
+| redis_dependency | 2874 |
 | imports_dynamic | 2221 |
 | exports_from | 1756 |
 | env_dependency | 1722 |
-| qdrant_dependency | 1103 |
+| qdrant_dependency | 1104 |
 | neo4j_dependency | 406 |
-| mcp_tool_calls | 401 |
+| mcp_tool_calls | 402 |
 | db_dependency | 287 |
 | svelte_route_uses_loader | 3 |
 
@@ -43,8 +43,8 @@ Generated: 2026-05-16T18:39:54.004Z
 | 2 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |
 | 3 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |
 | 4 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 58 | 5 |
-| 5 | `scripts/atlas/_atlas-utils.mjs` | script | 44 | 0 |
-| 6 | `scripts/atlas/_atlas-utils.mjs` | script | 44 | 0 |
+| 5 | `scripts/atlas/_atlas-utils.mjs` | script | 48 | 0 |
+| 6 | `scripts/atlas/_atlas-utils.mjs` | script | 48 | 0 |
 | 7 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/base-service.ts` | shared | 42 | 0 |
 | 8 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/base-service.ts` | shared | 42 | 0 |
 | 9 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/base-service.ts` | shared | 42 | 0 |

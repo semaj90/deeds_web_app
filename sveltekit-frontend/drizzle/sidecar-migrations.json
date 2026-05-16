@@ -63,6 +63,15 @@
       "appliedAt": "2026-05-16",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexdef LIKE '%hnsw%';\""
+    },
+    {
+      "file": "20260516_production_reconciliation.sql",
+      "status": "manual_sidecar",
+      "reason": "Standardizes identity system on UUIDs and resolves high-severity type drifts (varchar/text, integer/bigint) to achieve full Drizzle parity.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT data_type FROM information_schema.columns WHERE table_name='users' AND column_name='id';\""
     }
   ]
 }
