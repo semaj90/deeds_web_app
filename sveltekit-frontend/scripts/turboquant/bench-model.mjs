@@ -65,7 +65,7 @@ async function infer(prompt) {
     body: JSON.stringify({
       model: 'local',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 128,
+      max_tokens: 512,
       stream: true,
       temperature: 0.1,
     }),
@@ -90,8 +90,10 @@ async function infer(prompt) {
       if (data === '[DONE]') break;
       try {
         const obj = JSON.parse(data);
-        const delta = obj?.choices?.[0]?.delta?.content ?? '';
-        if (delta) {
+        const delta = obj?.choices?.[0]?.delta;
+        // Gemma 4 thinking model: reasoning_content = thinking tokens, content = answer tokens
+        const text = delta?.content ?? delta?.reasoning_content ?? '';
+        if (text) {
           if (firstToken === null) firstToken = performance.now() - t0;
           outputTokens++;
         }
