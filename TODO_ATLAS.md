@@ -21,8 +21,10 @@
 - [x] **VRAM Safety**: LLM/Embedding stack disabled.
 - [x] **Node Tuning**: `$env:NODE_OPTIONS="--max-old-space-size=8192"`
 
-### 2. Karpathy Synthesis Mode (GPU Enabled, Scoped Limits) - **NEXT**
-- [ ] **Constraints**: Limit to 25-100 files per run on RTX 3060 Ti.
+### 2. Karpathy Synthesis Mode (GPU Enabled, Scoped Limits) - **IN PROGRESS**
+- [x] **Canary (25)**: Karpathy synthesis canary over parent atlas passed.
+- [x] **Bugfix**: Resolved Qdrant path alias mismatch in neo4j-graph-enrich.
+- [ ] **Stage 2A (100)**: Gradual scaling (Next step).
 - [ ] **Gemma4 Profile**: 4B–9B quants, 4k–8k context.
 
 ### 3. Docker Infrastructure (Recommended Limits for 20GB RAM)

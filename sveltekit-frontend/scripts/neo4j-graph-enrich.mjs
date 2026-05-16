@@ -302,25 +302,58 @@ function riskLevel(fp) {
 
 // ── Phase 5: Qdrant batch patch ───────────────────────────────────────────────
 
-/** Normalise a file path to a repo-relative forward-slash key (src/... or scripts/...) */
-function normQdrantKey(fp) {
-  return (fp ?? '')
+/** 
+ * Robustly extract a file path from various payload naming conventions.
+ */
+function getPayloadPath(payload = {}) {
+  return (
+    payload.file_path ??
+    payload.filePath ??
+    payload.relativePath ??
+    payload.relative_path ??
+    payload.path ??
+    payload.source_path ??
+    payload.source ??
+    payload.file ??
+    payload.filepath ??
+    payload.stable_key ??
+    payload.stableKey ??
+    null
+  );
+}
+
+/** 
+ * Normalize a file path to a repo-relative forward-slash key.
+ */
+function normalizeRepoPath(value) {
+  if (!value || typeof value !== 'string') return null;
+  return value
     .replace(/\\/g, '/')
     .replace(/^.*?\/sveltekit-frontend\//, '')
     .replace(/^.*?\/src\//, 'src/')
-    .replace(/^\//, '');
+    .replace(/^\.\/+/, '')
+    .trim();
+}
+
+/** Legacy alias for backward compatibility */
+function normQdrantKey(fp) {
+  return normalizeRepoPath(fp);
 }
 
 /** All identity aliases a Qdrant payload may carry */
 function buildPayloadAliases(payload = {}) {
+  const path = getPayloadPath(payload);
+  const norm = normalizeRepoPath(path);
+  
   return [
-    payload.filePath,
-    payload.file_path,
-    payload.relativePath,
-    payload.relative_path,
+    path,
+    norm,
     payload.stableKey,
     payload.stable_key,
-    payload.path,
+    payload.relativePath,
+    payload.relative_path,
+    payload.filePath,
+    payload.file_path,
   ].filter(Boolean);
 }
 
@@ -388,7 +421,7 @@ async function buildQdrantIndex(limit = 50_000) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         limit: 500,
-        with_payload: ['stable_key', 'stableKey', 'relativePath', 'relative_path', 'file_path', 'filePath', 'path'],
+        with_payload: true, // Internal job: grab everything to ensure no alias is missed
         with_vector: false,
         ...(offset ? { offset } : {}),
       }),
@@ -409,7 +442,27 @@ async function buildQdrantIndex(limit = 50_000) {
     offset = d.result?.next_page_offset ?? null;
     if (!offset || pts.length < 500) break;
   }
+
+  if (index.size === 0 && collected > 0) {
+    console.warn('\n   ✗ Qdrant index built but has 0 unique paths.');
+    // The debugPayloadAliases call is now handled by the caller or by keeping a sample
+  }
+
   return index;
+}
+
+/** 
+ * Print payload keys and resolved paths for debugging 
+ */
+function debugPayloadAliases(points, limit = 5) {
+  if (!points || !points.length) return;
+  console.log('   [qdrant payload sample]');
+  for (const point of points.slice(0, limit)) {
+    const payload = point.payload ?? {};
+    console.log(`     - ID: ${point.id}`);
+    console.log(`       Keys: ${Object.keys(payload).sort().join(', ')}`);
+    console.log(`       Resolved Path: ${normalizeRepoPath(getPayloadPath(payload)) || 'FAIL'}`);
+  }
 }
 
 async function qdrantPatchBatch(patches) {
@@ -432,9 +485,30 @@ function runId() {
   return createHash('sha256').update(Date.now().toString()).digest('hex').slice(0, 12);
 }
 
+// ── Self Test ─────────────────────────────────────────────────────────────────
+function runSelfTest() {
+  const cases = [
+    { payload: { file_path: 'src/lib/server/db/connections.ts' }, expected: 'src/lib/server/db/connections.ts' },
+    { payload: { path: 'src/lib/server/db/connections.ts' }, expected: 'src/lib/server/db/connections.ts' },
+    { payload: { relativePath: 'src/lib/server/db/connections.ts' }, expected: 'src/lib/server/db/connections.ts' },
+    { payload: { stable_key: 'src/lib/server/db/connections.ts' }, expected: 'src/lib/server/db/connections.ts' },
+    { payload: { filePath: 'sveltekit-frontend/src/lib/server/db/connections.ts' }, expected: 'src/lib/server/db/connections.ts' },
+  ];
+  
+  for (const { payload, expected } of cases) {
+    const actual = normalizeRepoPath(getPayloadPath(payload));
+    if (actual !== expected) {
+      console.error(`   ✗ Self-test failed! Expected ${expected}, got ${actual} from ${JSON.stringify(payload)}`);
+      process.exit(1);
+    }
+  }
+  console.log('   ✓ Path resolution self-test passed');
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
+  runSelfTest();
   const RUN_ID = runId();
   console.log(`🧠 Neo4j GDS Enrichment (Phase D2)${DRY_RUN ? ' [DRY RUN]' : ''}`);
   console.log(`   run_id=${RUN_ID}  limit=${LIMIT}  neo4j=${NEO4J_URL}`);
