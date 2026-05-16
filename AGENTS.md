@@ -54,3 +54,43 @@
 - User IDs are mixed across tables; check schema before querying.
 - SeaweedFS is the primary S3 gateway; ignore MinIO stubs.
 - UnoCSS is the styling baseline; do not assume default Tailwind classes exist.
+
+## Drizzle / SvelteKit Contract Audit Lane (Phase 6E — 2026-05-16)
+
+Run the full cross-layer audit before pushing schema changes, adding new API routes, or wiring new Superforms pages:
+
+```bash
+# Full 8-layer orchestrator + KAG/DAG/HMM error-fix DAG
+npm run audit:contracts
+
+# Sub-audits (can run independently)
+npm run audit:drizzle-meta          # drizzle/meta/ hygiene (non-JSON files)
+npm run audit:drizzle-meta:fix      # auto-move violations to drizzle/meta/archived/
+npm run audit:pgvector              # pgvector extension, HNSW indexes, dimensions
+npm run audit:drizzle               # Drizzle ↔ Postgres schema drift + FK type mismatches
+npm run audit:forms                 # SvelteKit + Superforms v2 form contracts
+npm run audit:error-dag             # KAG/DAG/HMM error-fix graph (reads prior report)
+npm run services:health             # TCP health gate for all 10 dev services
+npm run services:health:strict      # Exits 1 if Postgres or Redis are down
+```
+
+### Output files
+| Report | Purpose |
+|--------|---------|
+| `docs/reports/contract-error-map-report.{json,md}` | All 8-layer findings |
+| `docs/reports/drizzle-postgres-contract-report.{json,md}` | Drizzle ↔ live PG drift |
+| `docs/reports/pgvector-audit-report.json` | pgvector extension + HNSW check |
+| `docs/reports/sveltekit-form-contracts-report.json` | Superforms / Zod gaps |
+| `docs/reports/error-fix-dag-report.{json,md}` | KAG/DAG/HMM topological fix order |
+| `docs/graph/contract-error-map.json` | Graph nodes+edges for Neo4j/visualization |
+| `docs/reports/dev-service-health-report.json` | Docker/WSL2 service TCP probe results |
+
+### HMM error states (fix in this order)
+1. `meta_hygiene` — drizzle/meta has non-JSON files (breaks `drizzle-kit generate`)
+2. `stale_migration` — SQL on disk not in `_journal.json` or vice versa
+3. `schema_mismatch` — Drizzle column type ≠ live Postgres column type (esp. `user_id uuid` vs `users.id integer`)
+4. `vector_infra_missing` — pgvector extension or HNSW indexes absent
+5. `env_url_mismatch` — port 5432 instead of 5434, missing SEAWEED_* vars
+6. `route_contract_mismatch` — missing `fail(400, { form })`, superValidate without load()
+7. `api_validation_gap` — POST/PATCH without Zod validation, legacy `zod` adapter
+8. `ssr_safety_violation` — `$lib/server/` imports in `.svelte` client files

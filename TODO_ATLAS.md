@@ -130,3 +130,15 @@
 - [x] **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
 - [x] **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
 - [ ] **Tier 1 Expansion**: Ingest TypeScript 5.4, Node.js 22, and PostgreSQL 16 docs.
+## Phase 6E: Cross-Layer Contract Audit (2026-05-16)
+- [x] **Orchestrator**: `scripts/atlas/audit-contract-map.mjs` — 8-layer cross-layer contract auditor.
+- [x] **Service Health Gate**: `scripts/atlas/validate-dev-services.mjs` — TCP probe for all 10 dev services.
+- [x] **Drizzle/Postgres Contract**: `scripts/atlas/audit-drizzle-postgres-contracts.mjs` — schema drift, FK mismatch, unsafe writes.
+- [x] **pgvector Audit**: `scripts/atlas/audit-pgvector-schema.mjs` — extension, HNSW indexes, dim validation.
+- [x] **Drizzle Meta Hygiene**: `scripts/atlas/audit-drizzle-meta-hygiene.mjs` — non-JSON file detector + `--fix` mover.
+- [x] **Form Contracts**: `scripts/atlas/audit-sveltekit-form-contracts.mjs` — Superforms v2, Zod, SSR safety.
+- [x] **Error-Fix DAG**: `scripts/atlas/build-error-fix-dag.mjs` — KAG recall + HMM state topological fix order.
+- [x] **Playwright E2E**: `sveltekit-frontend/tests/e2e/contract-network.spec.ts` — API shape, CORS, SSE, 500-error gate.
+- [ ] **build-atlas-index.mjs**: Harden against Postgres being offline (DONE — fail-open `.catch()` added at line 67).
+- [ ] **Redis KAG recall**: Populate `ace:fixer:patterns:<hmmState>` keys with past fix summaries for each error state.
+- [ ] **CI gate**: Wire `npm run audit:contracts --strict` as a pre-merge check blocking on high-severity findings.
