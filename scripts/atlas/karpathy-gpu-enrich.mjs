@@ -19,7 +19,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '..');
+const ROOT = resolve(__dirname, '../../sveltekit-frontend');
 const REPO = resolve(ROOT, '..');
 const esmRequire = createRequire(import.meta.url);
 

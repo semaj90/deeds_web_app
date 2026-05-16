@@ -2,7 +2,7 @@
   "runId": "karpathy-stage-2c-500",
   "limit": 500,
   "candidates": 193,
-  "qdrantHits": 178,
+  "qdrantHits": 192,
   "summariesWritten": 93,
   "directoriesConsidered": 100,
   "directoryOutcomes": {

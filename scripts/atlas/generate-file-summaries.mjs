@@ -41,7 +41,8 @@ import { Progress } from './lib/progress.mjs';
 dotenv.config();
 
 const __dir    = dirname(fileURLToPath(import.meta.url));
-const SRC_ROOT = resolve(__dir, '../src');
+const SRC_ROOT = resolve(__dir, '../../sveltekit-frontend/src');
+const FRONTEND_ROOT = resolve(__dir, '../../sveltekit-frontend');
 
 // ── Args ─────────────────────────────────────────────────────────────────────
 
@@ -136,7 +137,7 @@ function extractTags(filePath, src) {
 // ── T0: Deterministic summary ─────────────────────────────────────────────────
 
 async function buildT0Summary(filePath) {
-  const relPath = relative(resolve(__dir, '..'), filePath).replace(/\\/g, '/');
+  const relPath = relative(FRONTEND_ROOT, filePath).replace(/\\/g, '/');
   let src = '';
   try { src = await readFile(filePath, 'utf8'); } catch { return null; }
 
@@ -395,7 +396,7 @@ if (DO_T2) {
   } else {
     // Map relative paths to absolute
     topFiles = topFiles.map(rel => {
-      const abs = resolve(__dir, '..', rel);
+      const abs = resolve(FRONTEND_ROOT, rel);
       return existsSync(abs) ? abs : null;
     }).filter(Boolean);
   }
@@ -407,7 +408,7 @@ if (DO_T2) {
     const t0 = await buildT0Summary(f);
     if (!t0) { p.tick(); continue; }
 
-    const t2 = await buildT2Summary(f, t0);
+    const t2 = DRY_RUN ? { ...t0, summary_md: '[dry-run summary]', trust_tier: 2 } : await buildT2Summary(f, t0);
 
     if (!DRY_RUN) {
       await upsertPg(pg, t2);
@@ -434,7 +435,7 @@ if (DO_T3) {
 
   const p = new Progress('T3 AGENTS.md cards', agentFiles.length);
   for (const f of agentFiles) {
-    const relPath = relative(resolve(__dir, '..'), f).replace(/\\/g, '/');
+    const relPath = relative(FRONTEND_ROOT, f).replace(/\\/g, '/');
     let src = '';
     try { src = await readFile(f, 'utf8'); } catch { p.tick(); continue; }
 

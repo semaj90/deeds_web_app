@@ -34,7 +34,7 @@ const limit    = limitArg ? parseInt(limitArg.slice(8), 10) : 5000;
 // Load .env for credentials
 try {
   const { config } = await import('dotenv');
-  config({ path: resolve(__dirname, '../.env') });
+  config({ path: resolve(__dirname, '../../.env') });
 } catch { /* dotenv optional */ }
 
 const QDRANT_URL    = process.env.QDRANT_URL       ?? 'http://127.0.0.1:6333';
@@ -170,7 +170,7 @@ console.log(`[authority] ✓ Mirrored ${mirrored} authority scores in ${dur}ms`)
 
 // ── 4. Write authority_scores.json into latest run dir that has graph_nodes.json ─
 
-const MEMORY_RUNS = resolve(__dirname, '..', 'memory', 'runs');
+const MEMORY_RUNS = resolve(__dirname, '../../sveltekit-frontend/memory/runs');
 const nowStr = new Date().toISOString();
 
 // Prefer a run dir that already contains graph_nodes.json (synthesis-ready)
@@ -219,10 +219,10 @@ try {
 
   // P2: authority_pipeline_trace.json — cross-stage audit trail
   try {
-    const gdsLatestPath = resolve(__dirname, '..', 'memory', 'graphify', 'gds', 'latest.json');
+    const gdsLatestPath = resolve(__dirname, '../../sveltekit-frontend/memory/graphify/gds', 'latest.json');
     const gdsLatest = existsSync(gdsLatestPath) ? JSON.parse(readFileSync(gdsLatestPath, 'utf8')) : null;
 
-    const tsgoPath = resolve(__dirname, '..', 'scratch', 'audits', 'tsgo-diagnostics.json');
+    const tsgoPath = resolve(__dirname, '../../sveltekit-frontend/scratch', 'audits', 'tsgo-diagnostics.json');
     let tsgoErrorCount = 0;
     if (existsSync(tsgoPath)) {
       try {
