@@ -55,7 +55,27 @@
 - SeaweedFS is the primary S3 gateway; ignore MinIO stubs.
 - UnoCSS is the styling baseline; do not assume default Tailwind classes exist.
 
-## Drizzle / SvelteKit Contract Audit Lane (Phase 6E — 2026-05-16)
+## Drizzle / SvelteKit / Contract Audit Lane (Phase 6E — 2026-05-16)
+
+Relevant files:
+- sveltekit-frontend/drizzle.config.ts
+- sveltekit-frontend/drizzle/**
+- sveltekit-frontend/src/lib/server/db/**
+- sveltekit-frontend/src/routes/**
+- sveltekit-frontend/src/lib/schema/**
+- sveltekit-frontend/tests/playwright/**
+- docs/reports/*contract*
+- docs/graph/contract-error-map.json
+
+Rules:
+- Do not run `drizzle-kit push` against production.
+- Do not mutate live DB in audit scripts.
+- Do not place AGENTS.md, LLMS.md, or Markdown files inside `drizzle/meta`.
+- Drizzle meta must contain only supported JSON snapshot/journal files.
+- Use `db:check`, `db:generate`, and audits before migrations.
+- Use Playwright for browser/network contract verification.
+- Use web search only as `external_unverified` when local docs atlas misses.
+- Every finding must include localSourceRefs, externalDocRefs when available, suggestedFix, validationCommand, and trustTier.
 
 Run the full cross-layer audit before pushing schema changes, adding new API routes, or wiring new Superforms pages:
 
@@ -94,6 +114,11 @@ npm run services:health:strict      # Exits 1 if Postgres or Redis are down
 6. `route_contract_mismatch` — missing `fail(400, { form })`, superValidate without load()
 7. `api_validation_gap` — POST/PATCH without Zod validation, legacy `zod` adapter
 8. `ssr_safety_violation` — `$lib/server/` imports in `.svelte` client files
+
+### Vector Dimension Policy (Phase 6E)
+- **768**: Canonical codebase and programming-doc semantic embeddings (embeddinggemma:latest).
+- **384**: Compact warden/GPU-cache and Nomic-Embed-Text embeddings.
+- **Other**: Dimensions like 1536 (OpenAI) or 128 (compressed) require explicit documentation in the audit whitelist.
 
 ## Drizzle Sidecar Migration Policy (Phase 6E)
 
