@@ -118,7 +118,7 @@ export const ragIndexMetadata = pgTable('rag_index_metadata', {
 export const auditLog = pgTable('audit_log',
  {
  			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-			userId: uuid('user_id'),
+			userId: integer('user_id'),
 			resourceType: auditTableEnum('resource_type').notNull(),
 			resourceId: uuid('resource_id').notNull(),
 			operation: auditOperationEnum('operation').notNull(),

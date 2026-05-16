@@ -9,7 +9,7 @@ import { sql } from 'drizzle-orm';
 export const conversations = pgTable('conversations', {
     id: uuid('id').defaultRandom().primaryKey(),
     title: text('title').notNull().default('New Conversation'),
-    userId: uuid('user_id').notNull(), // Assuming a user system exists, but not strictly forcing FK if users table is external/managed elsewhere
+    userId: integer('user_id').notNull(), // Assuming a user system exists, but not strictly forcing FK if users table is external/managed elsewhere
     model: varchar('model', { length: 64 }).notNull().default('gpt-4o'),
     systemPrompt: text('system_prompt'),
 
