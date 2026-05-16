@@ -152,3 +152,12 @@
 - [ ] Add `20260516_hnsw_indexes.sql` to `sidecar-migrations.json` once applied.
 - [ ] Run `npm run audit:pgvector` and confirm `hnsw_indexes` check passes.
 - [ ] Run `npm run audit:contracts` before every schema migration going forward.
+
+## Phase 6E Operator Gates (2026-05-16)
+- [ ] **Postgres reachability**: `docker ps --filter "name=legal-ai-postgres"` + `Test-NetConnection 127.0.0.1 -Port 5434` before applying HNSW migrations.
+- [ ] **HNSW index migration**: After Postgres confirmed healthy, apply `docs/reports/pgvector-index-plan.md` SQL in a dedicated commit (`feat(db): add reviewed hnsw indexes for vector tables`).
+- [ ] **Update sidecar manifest**: Add `20260516_hnsw_indexes.sql` to `sveltekit-frontend/drizzle/sidecar-migrations.json` once applied.
+- [ ] **Vector dimension policy**: `rg 'dimensions.*384' sveltekit-frontend/src/lib/server/db/` — confirm whether 384-dim columns exist and document them in ALLOWED_DIMS (384 = warden/GPU-cache lane, 768 = canonical codebase lane).
+- [ ] **Update pgvector auditor**: If 384-dim is confirmed intentional, add to `ALLOWED_DIMS` in `scripts/atlas/audit-pgvector-schema.mjs`.
+- [ ] **Graceful offline degradation**: Ensure live Postgres checks in all auditors degrade to SKIP/WARN (not crash) when Docker is offline — verify with `npm run audit:pgvector`, `npm run audit:contracts`, `npm run audit:drizzle-meta`.
+- [ ] **Full validation sequence** (when Docker is up): `npm run services:health && npm run audit:contracts && npm run audit:pgvector && npm run audit:drizzle-meta && npm run atlas:validate && npm run atlas:root:full`
