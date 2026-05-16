@@ -56,7 +56,14 @@ const HOURS     = parseInt(args.find(a => a.startsWith('--hours='))?.split('=')[
 
 const DB_URL    = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
-const pool      = new pg.Pool({ connectionString: DB_URL, max: 4 });
+const pool      = new pg.Pool({
+  connectionString: DB_URL,
+  max: 4,
+  connectionTimeoutMillis: 5000,
+  statement_timeout: 30000,
+  idleTimeoutMillis: 10000,
+});
+pool.on('error', () => {}); // suppress pool errors — main query will catch
 
 console.log(`\n[atlas-index] ${DRY_RUN ? 'DRY-RUN' : 'BUILD'}  hits-window=${HOURS}h`);
 
@@ -98,7 +105,10 @@ const { rows: files } = await pool.query(`
   FROM per_chunk p
   LEFT JOIN per_topo t ON t.file_path = p.relative_path
                        OR t.file_path LIKE '%' || p.relative_path
-`);
+`).catch(err => {
+  console.warn(`  [atlas-index] DB unreachable: ${err.message} — continuing with 0 files`);
+  return { rows: [] };
+});
 console.log(`  files indexed:           ${files.length}`);
 
 // ── 2. Pull cluster_key (qdrant_cluster_members) per file ───────────────────
