@@ -71,6 +71,7 @@ export const VECTOR_CONFIG = {
     /** KAG/ACE summary lenses and synthesis memory */
     summary_lenses: 'summary_lenses_768',
     synthesis_memory: 'synthesis_memory_768',
+    programming_docs: 'external_programming_docs_768',
   },
 
   /** Per-collection vector schema (vector name → used by health checks + init) */
@@ -100,6 +101,7 @@ export const VECTOR_CONFIG = {
     /** KAG/ACE summary lenses and synthesis memory */
     summary_lenses_768: { vectors: ['summary'], on_disk_payload: true },
     synthesis_memory_768: { vectors: ['synthesis'], on_disk_payload: true },
+    external_programming_docs_768: { vectors: ['default'], on_disk_payload: true },
   },
 
   /** Qdrant HNSW config applied to all collections */
