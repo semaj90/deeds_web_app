@@ -39,14 +39,14 @@ const C = {
 
 function rg(pattern, path, extraArgs = []) {
   const result = spawnSync('rg', [
-    '--no-heading', '-n', '--color=never', pattern, path, ...extraArgs,
+    '-u', '--no-heading', '-n', '--color=never', pattern, path, ...extraArgs,
   ], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
   return (result.stdout || '').trim();
 }
 
 function rgFiles(pattern, path, extraArgs = []) {
   const result = spawnSync('rg', [
-    '-l', '--color=never', pattern, path, ...extraArgs,
+    '-u', '-l', '--color=never', pattern, path, ...extraArgs,
   ], { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 });
   return (result.stdout || '').trim().split('\n').filter(Boolean);
 }

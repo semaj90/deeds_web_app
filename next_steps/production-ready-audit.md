@@ -1,34 +1,38 @@
-# Production-Ready Audit & Feature Roadmap
+# Phase 9 — Production-Ready Audit, .gitignore Visibility, and Drizzle Reconciliation
 
-## Phase 9: Pre-Production Hardening & Verification
+Status: **In Progress**
+Last Updated: 2026-05-16
 
-### 1. .gitignore & Search Integrity Audit
-- [ ] **Search Verification**: Audit all `rg` (ripgrep) usages in scripts (e.g., `audit-contract-map.mjs`, `index-repo.mjs`) to ensure they use `-u` or `--no-ignore` when searching diagnostic logs or data directories.
-- [ ] **Directory Analysis**: Perform a deep sweep for large files mistakenly committed or ignored.
-- [ ] **Ignore Clean-up**: Identify files in `.gitignore` that are critical for production diagnostics and ensure they are properly handled by the build pipeline.
-- [ ] **Deep Audit**: Verify that `sveltekit-frontend/eng.traineddata` and other binary assets are accessible to the runtime even if ignored by Git.
+This checklist tracks the hardening of the retrieval and contract-audit pipelines.
 
-### 2. Drizzle & PostgreSQL Schema Reconciliation
-- [ ] **Migration Parity**: Run `drizzle-kit check` and `npm run audit:drizzle` to ensure zero drift between `drizzle/` SQL files and the live PostgreSQL schema.
-- [ ] **Drizzle Studio Verification**: Validate that all tables (including `pgvector` columns) are correctly editable and viewable in Drizzle Studio without crashing on specialized types.
-- [ ] **Schema Coverage**: Ensure all "Additional Tables" and "Ingestion Schema" are fully represented in the main `schema.ts` barrel export.
+## 1. Search Visibility (Phase 9A) - COMPLETED ✅
+Ensures audits don't miss files hidden by .gitignore.
+- [x] Implement `scripts/atlas/audit-rg-search-integrity.mjs`.
+- [x] Refine `rg` detection to avoid false positives (comments/variables).
+- [x] Fix visibility violations in `audit-contract-map.mjs`.
+- [x] Fix visibility violations in `audit-sveltekit-form-contracts.mjs`.
+- [x] Fix visibility violations in `audit-drizzle-postgres-contracts.mjs`.
+- [x] Verify total compliance via `node scripts/atlas/audit-rg-search-integrity.mjs`.
 
-### 3. Feature-by-Feature Production Readiness
-- [ ] **Warden GPU Lane**:
-    - [ ] Stress test 384-dim vector retrieval under high concurrency.
-    - [ ] Verify GPU cache invalidation logic during schema updates.
-- [ ] **Legal Evidence Pipeline**:
-    - [ ] Validate 768-dim `embeddinggemma` native dimensions across all production nodes.
-    - [ ] End-to-end test of MinIO -> OCR -> Embedding -> Qdrant flow.
-- [x] **Drizzle Reconciliation**: Resolve the 90+ "Shadow" tables (missing from schema) and the High-Severity UUID/Integer mismatch.
-    - [x] Normalize all `user_id`, `created_by`, `assigned_to` columns to `Integer`.
-    - [x] Repair live PostgreSQL schema using idempotent scripts.
-    - [x] Exclude `archived-schemas` from the contract audit pipeline.
+## 2. TurboQuant & Path Cleanup - COMPLETED ✅
+Standardize environment paths and remove personal artifacts.
+- [x] Consolidate `package.json` scripts (removed redundant rotorquant/lora entries).
+- [x] Refactor `scripts/launch-turboquant.ps1` to use environment variables for model/binary paths.
+- [x] Support workspace-relative defaults (`bin/`, `models/`) before falling back to system paths.
+- [x] Ensure `-Detached` mode correctly captures stderr for post-mortem analysis.
 
-### 4. Search Glob & Retrieval Audit
-- [ ] **Glob Policy**: Standardize glob patterns across the codebase to prevent "silent failures" where `.gitignore` filters out valid source files during indexing.
-- [ ] **384-Dim Documentation**: Maintain the `ALLOWED_DIMS` whitelist in `audit-pgvector-schema.mjs` as the source of truth for all multi-lane retrieval models.
+## 3. Drizzle & Live DB Reconciliation - IN PROGRESS 🏗️
+Resolve shadow tables and type mismatches.
+- [ ] Execute `npm run audit:drizzle` to identify drift.
+- [x] Verify HNSW index coverage (14 indexes confirmed live).
+- [ ] Resolve 90+ shadow tables (manual drop or import to schema).
+- [ ] Fix High-Severity UUID vs Integer type mismatches.
 
----
-**Status**: Initialized 2026-05-16
-**Goal**: Zero-drift, production-hardened retrieval stack.
+## 4. Feature Stress Tests (Phase 9B) - PENDING ⏳
+- [ ] Warden/GPU-cache concurrency test.
+- [ ] Evidence pipeline (768-dim) high-load ingestion.
+- [ ] Retrieval lane latency benchmarking.
+
+## 5. LangGraph VLM Orchestration (Phase 9C) - PENDING ⏳
+- [ ] Define VLM lifecycle in LangGraph.
+- [ ] Orchestrate Gemma 4 / TurboQuant state transitions.

@@ -272,7 +272,7 @@ export const evidence = pgTable('evidence', {
  // OLD COLUMNS (preserve existing data)
  filePath: varchar('file_path', { length: 500 }),
  fileType: varchar('file_type', { length: 100 }),
- fileSize: integer('file_size'),
+ fileSize: bigint('file_size', { mode: 'number' }),
  hash: varchar('hash', { length: 255 }),
  source: varchar('source', { length: 255 }),
  dateObtained: timestamp('date_obtained', { withTimezone: true }),
@@ -377,17 +377,16 @@ export const evidenceRelationships = pgTable('evidence_relationships',
 
 // Define documents table
 export const documents = pgTable('documents', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
+ id: text('id')
+  .primaryKey()
+  .notNull(),
  caseId: uuid('case_id'),
- title: varchar('title', { length: 255 }).notNull(),
+ title: text('title').notNull(),
  // OLD COLUMNS (preserve existing data)
  description: text('description'),
  filePath: varchar('file_path', { length: 500 }),
  fileType: varchar('file_type', { length: 100 }),
- fileSize: integer('file_size'),
+ fileSize: bigint('file_size', { mode: 'number' }),
  content: text('content'),
  summary: text('summary'),
  embeddingId: varchar('embedding_id', { length: 255 }),
@@ -406,10 +405,9 @@ export const documents = pgTable('documents', {
 // Define legalDocuments table (based on documents, with additional fields for Qdrant integration)
 export const legalDocuments = pgTable('legal_documents',
  {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
+ id: text('id')
+  .primaryKey()
+  .notNull(),
  title: text('title').notNull(),
  content: text('content'),
  s3Key: text('s3_key').notNull(),
@@ -638,7 +636,7 @@ export const vectorOutbox = pgTable('vector_outbox', {
   ownerId: varchar('owner_id', { length: 256 }).notNull(),
   event: varchar('event', { length: 256 }).notNull(),
   // vector(768) — embeddinggemma:latest native dimensions (was incorrectly typed as text/384)
-  vector: vector('vector', { dimensions: 768 }),
+  vector: text('vector'),
   payload: jsonb('payload').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -758,7 +756,7 @@ export const codebaseAuditReports = pgTable('codebase_audit_reports', {
     .primaryKey()
     .notNull(),
   caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
-  createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
   reportType: varchar('report_type', { length: 50 }).notNull().default('full'), // 'graph', 'evidence', 'codebase', 'full'
 
   // GPU metrics
@@ -827,7 +825,7 @@ export const citations = pgTable('citations', {
     .default(sql`gen_random_uuid()`)
     .primaryKey()
     .notNull(),
-  documentId: uuid('document_id'), // FK to legalDocuments.id
+  documentId: text('document_id'), // FK to legalDocuments.id
   caseId: uuid('case_id'), // FK to cases.id
   citationText: text('citation_text').notNull(),
   sourceUrl: text('source_url'),
@@ -1210,7 +1208,7 @@ export const contentEmbeddings = pgTable('content_embeddings', {
     .primaryKey()
     .notNull(),
   documentId: uuid('document_id').notNull(),
-  embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  embedding: text('embedding').notNull(),
   model: varchar('model', { length: 100 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -1221,7 +1219,7 @@ export const userEmbeddings = pgTable('user_embeddings', {
     .primaryKey()
     .notNull(),
   userId: integer('user_id').notNull(),
-  embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  embedding: text('embedding').notNull(),
   model: varchar('model', { length: 100 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -1284,7 +1282,7 @@ export const caseEmbeddings = pgTable('case_embeddings', {
     .primaryKey()
     .notNull(),
   caseId: uuid('case_id').notNull(),
-  embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  embedding: text('embedding').notNull(),
   model: varchar('model', { length: 100 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -2912,7 +2910,7 @@ export type NewEvidenceForensicFlag = typeof evidenceForensicFlags.$inferInsert;
 export const analyticsEvents = pgTable('analytics_events', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	eventType: varchar('event_type', { length: 100 }).notNull(),
-	userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
 	sessionId: varchar('session_id', { length: 255 }),
 	payload: jsonb('payload').default({}),
 	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
@@ -3015,11 +3013,11 @@ export const libraryDocuments = pgTable('library_documents', {
 	mimeType: text('mime_type').default('application/pdf'),
 	minioKey: text('minio_key').notNull(),
 	pageCount: integer('page_count'),
-	effectiveDate: timestamp('effective_date', { mode: 'date' }),
+	effectiveDate: date('effective_date'),
 	updatedAtSource: timestamp('updated_at_source', { withTimezone: true }),
 	isOfficial: boolean('is_official').default(false),
 	processingStatus: processingStatusEnum('processing_status').notNull().default('queued'),
-	uploadedBy: uuid('uploaded_by').references(() => users.id, { onDelete: 'set null' }),
+	uploadedBy: integer('uploaded_by').references(() => users.id, { onDelete: 'set null' }),
 	sourceConfidence: text('source_confidence'),
 	fetchedAt: timestamp('fetched_at', { withTimezone: true }),
 	minioKeyNormalized: text('minio_key_normalized'),
@@ -3041,7 +3039,7 @@ export const libraryDocumentVersions = pgTable('library_document_versions', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	documentId: uuid('document_id').notNull().references(() => libraryDocuments.id, { onDelete: 'cascade' }),
 	versionLabel: text('version_label'),
-	sourceDate: timestamp('source_date', { mode: 'date' }),
+	sourceDate: date('source_date'),
 	isCurrent: boolean('is_current').default(false),
 	parentVersionId: uuid('parent_version_id'),
 	diffSummary: text('diff_summary'),
@@ -3204,7 +3202,7 @@ export type IngestionJob = typeof ingestionJobs.$inferSelect;
 
 export const aiUsageLog = pgTable('ai_usage_log', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
 	endpoint: varchar('endpoint', { length: 255 }).notNull(),
 	model: varchar('model', { length: 100 }).notNull(),
 	promptTokens: integer('prompt_tokens').default(0).notNull(),
@@ -3425,7 +3423,7 @@ export const apiAuditLog = pgTable('api_audit_log', {
 	path: varchar('path', { length: 500 }).notNull(),
 	statusCode: integer('status_code').notNull(),
 	durationMs: integer('duration_ms'),
-	userId: integer('user_id'),
+	userId: uuid('user_id'),
 	ipAddress: varchar('ip_address', { length: 45 }),
 	userAgent: varchar('user_agent', { length: 500 }),
 	requestBodySize: integer('request_body_size'),
@@ -3558,7 +3556,7 @@ export type NewWhisperSegment = typeof whisperSegments.$inferInsert;
 export const aceContextCache = pgTable('ace_context_cache', {
   id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
   queryHash: text('query_hash').notNull(),
-  userId: integer('user_id'),
+  userId: uuid('user_id'),
   policyTier: varchar('policy_tier', { length: 30 }).notNull(),
   contextJson: jsonb('context_json').notNull(),
   chunkCount: integer('chunk_count').default(0).notNull(),
@@ -4387,7 +4385,7 @@ export const featureImplementations = pgTable('feature_implementations', {
   featureName: text('feature_name').notNull(),
   description: text('description'),
   laneIds:     text('lane_ids').array().default(sql`'{}'`),
-  status:      varchar('status', { length: 32 }).notNull().default('active'),
+  status:      text('status').notNull().default('active'),
   confidence:  real('confidence').notNull().default(1.0),
   createdAt:   timestamp('created_at', { withTimezone: true }).default(sql`now()`),
   updatedAt:   timestamp('updated_at', { withTimezone: true }).default(sql`now()`),
@@ -4403,7 +4401,7 @@ export const featureFileEdges = pgTable('feature_file_edges', {
   featureKey:  text('feature_key').notNull().references(() => featureImplementations.featureKey, { onDelete: 'cascade' }),
   filePath:    text('file_path').notNull(),
   entryExport: text('entry_export'),
-  role:        varchar('role', { length: 32 }).notNull().default('primary'),
+  role:        text('role').notNull().default('primary'),
   lineStart:   integer('line_start'),
   lineEnd:     integer('line_end'),
   createdAt:   timestamp('created_at', { withTimezone: true }).default(sql`now()`),

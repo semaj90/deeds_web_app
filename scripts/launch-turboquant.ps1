@@ -92,18 +92,38 @@ if (Test-Path $envPath) {
 }
 
 # ── Resolve paths and ports ──────────────────────────────────────────────
-$llama   = if ($env:LLAMA_SERVER_PATH) { $env:LLAMA_SERVER_PATH } else { 'C:\Users\james\Desktop\llama-server-cuda\llama-server.exe' }
+$llama = if ($env:LLAMA_SERVER_PATH) { 
+    $env:LLAMA_SERVER_PATH 
+} else { 
+    # Fallback order: 1. bin/ in workspace, 2. vendor/ in workspace, 3. system path
+    $localBin = Join-Path $PSScriptRoot "..\bin\llama-server.exe"
+    $localVendor = Join-Path $PSScriptRoot "..\vendor\llama-server\llama-server.exe"
+    if (Test-Path $localBin) { $localBin }
+    elseif (Test-Path $localVendor) { $localVendor }
+    else { "llama-server.exe" } # Assume it's in PATH
+}
+
 # ROTORQUANT_MODEL_PATH overrides TURBO_MODEL_PATH when set.
-# Download majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS from HuggingFace, then:
-#   $env:ROTORQUANT_MODEL_PATH = 'C:\path\to\gemma-4-E4B-RotorQuant-GGUF-IQ4_XS.gguf'
-# Works on the stock llama-server.exe — no TurboQuant binary required.
-$model   = if ($env:ROTORQUANT_MODEL_PATH) { $env:ROTORQUANT_MODEL_PATH } `
-           elseif ($env:TURBO_MODEL_PATH)  { $env:TURBO_MODEL_PATH } `
-           else { Join-Path $env:USERPROFILE '.ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43' }
+$model = if ($env:ROTORQUANT_MODEL_PATH) { 
+    $env:ROTORQUANT_MODEL_PATH 
+} elseif ($env:TURBO_MODEL_PATH) { 
+    $env:TURBO_MODEL_PATH 
+} else {
+    # Try to find a gemma model in models/ or .ollama
+    $localModel = Join-Path $PSScriptRoot "..\models\gemma-4-legal.gguf"
+    if (Test-Path $localModel) { $localModel }
+    else { Join-Path $env:USERPROFILE ".ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43" }
+}
 if ($env:ROTORQUANT_MODEL_PATH) {
   Write-Host 'Model: RotorQuant GGUF (weight-quantised, stock binary OK)' -ForegroundColor Cyan
 }
-$mmproj  = if ($env:TURBO_MMPROJ_PATH) { $env:TURBO_MMPROJ_PATH } else { Join-Path $env:USERPROFILE 'Downloads\gemma4-mmproj\mmproj-BF16.gguf' }
+$mmproj = if ($env:TURBO_MMPROJ_PATH) { 
+    $env:TURBO_MMPROJ_PATH 
+} else { 
+    $localMmproj = Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf"
+    if (Test-Path $localMmproj) { $localMmproj }
+    else { Join-Path $env:USERPROFILE 'Downloads\gemma4-mmproj\mmproj-BF16.gguf' }
+}
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
 $ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '4096' }
 

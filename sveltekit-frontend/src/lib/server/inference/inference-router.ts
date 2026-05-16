@@ -55,11 +55,19 @@ const TRT_MIN_VRAM_MB = 4000;
 // ── TurboQuant VRAM Swap ──────────────────────────────────────────────────
 // llama-server (~3.4 GB) and Ollama VLM (~5 GB) can't coexist on 8 GB VRAM.
 // When VLM is needed, we stop llama-server, run VLM, then restart it.
-const TURBOQUANT_EXE = process.env.TURBOQUANT_EXE_PATH ?? 'C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe';
-const TURBOQUANT_GGUF = process.env.TURBOQUANT_MODEL_PATH ?? '';
+const TURBOQUANT_EXE =
+  process.env.TURBOQUANT_EXE_PATH ??
+  process.env.LLAMA_SERVER_PATH ??
+  'llama-server.exe';
+const TURBOQUANT_GGUF =
+  process.env.TURBOQUANT_MODEL_PATH ??
+  process.env.ROTORQUANT_MODEL_PATH ??
+  process.env.TURBO_MODEL_PATH ??
+  '';
 const TURBOQUANT_MMPROJ =
   process.env.TURBOQUANT_MMPROJ_PATH ??
-  'C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf';
+  process.env.MMPROJ_PATH ??
+  '';
 const TURBOQUANT_RESTART_DELAY_MS = 3_000;
 
 /** Find the PID of llama-server listening on :8090 and the GGUF model + mmproj paths */
