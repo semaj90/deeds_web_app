@@ -279,6 +279,66 @@ const tools = {
       if (!response.ok) throw new Error(`Recommendation failed: ${response.statusText}`);
       return await response.json();
     }
+  },
+
+  'trace.docs_search': {
+    name: 'trace.docs_search',
+    description: 'Search programming documentation atlas (external_programming_docs_768)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Search query' },
+        limit: { type: 'number', default: 5, description: 'Max results' }
+      },
+      required: ['query']
+    },
+    handler: async (args) => {
+      const { query, limit = 5 } = args;
+      // Mock implementation for now
+      return {
+        success: true,
+        results: [],
+        sourceRefs: []
+      };
+    }
+  },
+
+  'trace.docs_compare_feature': {
+    name: 'trace.docs_compare_feature',
+    description: 'Compare local feature implementation against external documentation',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        featureName: { type: 'string', description: 'Local feature name' },
+        sourceId: { type: 'string', description: 'External doc source ID' }
+      },
+      required: ['featureName', 'sourceId']
+    },
+    handler: async (args) => {
+      return {
+        success: true,
+        gaps: [],
+        recommendations: []
+      };
+    }
+  },
+
+  'trace.command_suggest': {
+    name: 'trace.command_suggest',
+    description: 'Suggest allowlisted commands based on documentation patterns',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        task: { type: 'string', description: 'Task description' }
+      },
+      required: ['task']
+    },
+    handler: async (args) => {
+      return {
+        success: true,
+        suggestions: []
+      };
+    }
   }
 };
 

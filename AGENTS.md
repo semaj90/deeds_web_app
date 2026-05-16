@@ -13,6 +13,13 @@
 - **Engram Memory (Lane -1)**: Low-trust pre-routing hints. MUST NOT store hidden thoughts, raw tensors, or model cache.
 - **Port 8888**: Reserved for SeaweedFS Filer. Do NOT bind SearXNG to 8888; use port 8889 (SEARXNG_PORT=8889).
 
+## Docs Ingestion Governance
+- **Official Docs First**: Prioritize official documentation over third-party tutorials or blog posts.
+- **SourceRefs Required**: Every synthesized fact or code suggestion must include valid `sourceRefs` to the local Docs Atlas.
+- **External Unverified**: All external web results are marked `external_unverified` until promoted by an operator or validated against the codebase.
+- **No Direct Promotion**: Do not promote web search results directly to the canonical knowledge base without verification.
+- **No Hidden Reasoning**: Do not store `hiddenThoughts`, `chainOfThought`, or `kv_cache` in the Docs Atlas or browser outputs.
+
 
 ## Commands
 
