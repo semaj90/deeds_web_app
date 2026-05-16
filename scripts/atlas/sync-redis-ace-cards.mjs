@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import { loadConfig, loadCodebaseGraph, loadRouteMap, loadClusterAliases, resolveRepoPath, writeJson, writeMarkdown, parentAtlasMarkdown, topEntries, workspaceForPath, routeSummary, scanKeys } from './_atlas-utils.mjs';
+import { loadConfig, loadCodebaseGraph, loadRouteMap, loadClusterAliases, resolveRepoPath, writeJson, writeMarkdown, parentAtlasMarkdown, topEntries, workspaceForPath, routeSummary, scanKeys, createProgressLogger } from './_atlas-utils.mjs';
 
 const args = new Set(process.argv.slice(2));
 const WRITE = args.has('--write');
@@ -15,6 +15,7 @@ function sanitizePayload(payload) {
 const LIMIT = parseInt([...args].find((arg) => String(arg).startsWith('--limit='))?.split('=')[1] ?? '0', 10);
 const WORKSPACE = [...args].find(a => a.startsWith('--workspace='))?.split('=')[1];
 const RUN_ID = [...args].find(a => a.startsWith('--runId='))?.split('=')[1];
+const PROGRESS_EVERY = parseInt([...args].find((arg) => String(arg).startsWith('--progress-every='))?.split('=')[1] ?? '500', 10);
 
 if (WRITE && !RUN_ID) {
   console.error('Refusing write: --runId is required for write mode.');
@@ -65,22 +66,33 @@ if (WRITE) {
   console.log('Connecting to Redis for write...');
   
   try {
+    const startAt = Date.now();
     const pipeline = redis.pipeline();
-    for (const [dir, count] of dirNotes) {
-      pipeline.hset(`wiki:note:dir:${dir}`, sanitizePayload({ count, runId: EFFECTIVE_RUN_ID, updatedAt: new Date().toISOString() }));
+    const total = dirNotes.size + clusterCards.size + llmOutputs.size + summaryCards.size;
+    const progress = createProgressLogger({ label: 'redis-sync', total, every: PROGRESS_EVERY });
+    let count = 0;
+
+    for (const [dir, c] of dirNotes) {
+      pipeline.hset(`wiki:note:dir:${dir}`, sanitizePayload({ count: c, runId: EFFECTIVE_RUN_ID, updatedAt: new Date().toISOString() }));
+      progress(++count);
     }
-    for (const [cluster, count] of clusterCards) {
-      pipeline.hset(`ace:cluster:${cluster}`, sanitizePayload({ count, runId: EFFECTIVE_RUN_ID, updatedAt: new Date().toISOString() }));
+    for (const [cluster, c] of clusterCards) {
+      pipeline.hset(`ace:cluster:${cluster}`, sanitizePayload({ count: c, runId: EFFECTIVE_RUN_ID, updatedAt: new Date().toISOString() }));
+      progress(++count);
     }
-    for (const [path, count] of llmOutputs) {
-      pipeline.hset(`code:llm_output:path:${path}`, sanitizePayload({ count, runId: EFFECTIVE_RUN_ID, updatedAt: new Date().toISOString() }));
+    for (const [path, c] of llmOutputs) {
+      pipeline.hset(`code:llm_output:path:${path}`, sanitizePayload({ count: c, runId: EFFECTIVE_RUN_ID, updatedAt: new Date().toISOString() }));
+      progress(++count);
     }
-    for (const [key, count] of summaryCards) {
-      pipeline.hset(key, sanitizePayload({ count, runId: EFFECTIVE_RUN_ID, updatedAt: new Date().toISOString() }));
+    for (const [key, c] of summaryCards) {
+      pipeline.hset(key, sanitizePayload({ count: c, runId: EFFECTIVE_RUN_ID, updatedAt: new Date().toISOString() }));
+      progress(++count);
     }
     
+    console.log(`Executing Redis pipeline for ${total} cards...`);
     await pipeline.exec();
-    console.log(`Successfully wrote ${dirNotes.size + clusterCards.size + llmOutputs.size + summaryCards.size} cards to Redis.`);
+    const elapsed = ((Date.now() - startAt) / 1000).toFixed(1);
+    console.log(`Successfully wrote ${total} cards to Redis in ${elapsed}s.`);
     
     // Validation using scanKeys
     const sampleKeys = await scanKeys(redis, 'ace:cluster:*', 5);
@@ -129,7 +141,10 @@ writeMarkdown(resolveRepoPath(config.outputs.redisReportMd), parentAtlasMarkdown
   runId: EFFECTIVE_RUN_ID
 }, report.topClusters.map(({ key, value }) => `${key}: ${value}`)));
 
+
 console.log(`Redis ACE report written to ${config.outputs.redisReportJson} [runId: ${EFFECTIVE_RUN_ID}]`);
 if (!WRITE) console.log('Dry-run complete. Add --write once Redis writes are enabled.');
+
+process.exit(0);
 
 

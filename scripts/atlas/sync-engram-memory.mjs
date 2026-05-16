@@ -1,5 +1,4 @@
-#!/usr/bin/env node
-import { loadConfig, loadCodebaseGraph, loadRouteMap, loadClusterAliases, resolveRepoPath, writeJson, writeMarkdown, parentAtlasMarkdown, topEntries, workspaceForPath, fileLanguage, routeSummary } from './_atlas-utils.mjs';
+import { loadConfig, loadCodebaseGraph, loadRouteMap, loadClusterAliases, resolveRepoPath, writeJson, writeMarkdown, parentAtlasMarkdown, topEntries, workspaceForPath, fileLanguage, routeSummary, createProgressLogger } from './_atlas-utils.mjs';
 import { createNoopEngramPluginAdapter, createRedisEngramAdapter } from './engram-plugin-adapter.mjs';
 
 const args = new Set(process.argv.slice(2));
@@ -7,6 +6,7 @@ const WRITE = args.has('--write');
 const LIMIT = parseInt([...args].find((arg) => String(arg).startsWith('--limit='))?.split('=')[1] ?? '0', 10);
 const WORKSPACE = [...args].find(a => a.startsWith('--workspace='))?.split('=')[1];
 const RUN_ID = [...args].find(a => a.startsWith('--runId='))?.split('=')[1];
+const PROGRESS_EVERY = parseInt([...args].find((arg) => String(arg).startsWith('--progress-every='))?.split('=')[1] ?? '25', 10);
 
 if (WRITE && !RUN_ID) {
   console.error('Refusing write: --runId is required for write mode.');
@@ -130,10 +130,19 @@ for (const { key: featureKey } of topFeatures.slice(0, 3)) {
 }
 
 const health = await adapter.health();
+const startAt = Date.now();
 const writes = [];
-for (const memory of candidates) {
-  if (WRITE) writes.push(await adapter.writeMemory(memory));
+const progress = createProgressLogger({ label: 'engram-sync', total: candidates.length, every: PROGRESS_EVERY });
+
+for (let i = 0; i < candidates.length; i++) {
+  const memory = candidates[i];
+  if (WRITE) {
+    writes.push(await adapter.writeMemory(memory));
+  }
+  progress(i + 1);
 }
+const elapsed = ((Date.now() - startAt) / 1000).toFixed(1);
+if (WRITE) console.log(`Successfully synced ${writes.length} engram memories to Redis in ${elapsed}s.`);
 
 const report = {
   repo: config.repoName,
@@ -154,7 +163,6 @@ writeJson(resolveRepoPath('docs/graph/repo-engram-memory-report.json'), report);
 writeMarkdown(resolveRepoPath('docs/graph/repo-engram-memory-report.md'), parentAtlasMarkdown('Engram Memory Sync', { memories: candidates.length, routes: report.routeCount, health: health.ok ? 'ok' : 'degraded' }, topFeatures.map(({ key, value }) => `${key}: ${value}`)));
 
 console.log(`Engram memory report written to docs/graph/repo-engram-memory-report.json [runId: ${EFFECTIVE_RUN_ID}]`);
-if (WRITE) console.log(`Successfully synced ${writes.length} engram memories to Redis.`);
-else console.log('Dry-run complete. Add --write to sync engram memories.');
+if (!WRITE) console.log('Dry-run complete. Add --write to sync engram memories.');
 
 await adapter.close();
