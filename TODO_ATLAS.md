@@ -98,9 +98,11 @@
 - [ ] **Embedding Parity**: Ensure Qdrant `codebase_chunks_768` payloads contain accurate `sourceRefs`.
 
 ## Phase 4: Admin Copilot UI Integration
-- [ ] **Provenance Display**: Show Qdrant `sourceRefs` and Neo4j graph paths in search results.
+- [x] **Provenance Display**: Show Qdrant `sourceRefs` and Neo4j graph paths in search results.
 - [ ] **Cluster Visualization**: Integrate 4D manifold cluster aliases into the UI.
 - [ ] **Direct Edit**: Enable operators to promote/demote synthesis trust tiers.
+- [x] **Multi-Lane Retrieval**: Surface Local + External docs with trust markers.
+- [x] **Action Suggestions**: Integrated `trace.command_suggest` into the chat panel.
 
 ## Phase 5: Neo4j Enhanced Synthesis + Feature Command Atlas
 - [ ] **Feature Registry**: Reconcile core architectural features with code-based evidence.
@@ -112,10 +114,10 @@
 - [x] **Ingestion Plane**: Crawl/Normalize/Chunk/Index scripts created.
 - [x] **Data Lake**: Initialize `external_programming_docs_768` in Qdrant.
 - [x] **Crawl (Canary)**: Execute dry-run for SvelteKit 2.
-- [ ] **Concept Graph**: Project nodes/edges into Neo4j.
+- [x] **Concept Graph**: Project nodes/edges into Neo4j.
 - [x] **Gap Report**: Generate first `programming-doc-feature-gap-report.json`.
 - [x] **MCP Surface**: `trace.docs_search` and `trace.docs_compare_feature` added.
-- [ ] **Product Integration**: Surface external sourceRefs in Admin Copilot.
+- [x] **Product Integration**: Surface external sourceRefs in Admin Copilot.
 - [x] **Governance**: Versioned sources and `external_unverified` tagging enforced.
 
 ## Phase 7: Knowledge-Base Retrieval Flow
@@ -127,3 +129,4 @@
 - [x] **Validate Infrastructure**: `node scripts/atlas/validate-model-endpoints.mjs`.
 - [x] **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
 - [x] **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
+- [ ] **Tier 1 Expansion**: Ingest TypeScript 5.4, Node.js 22, and PostgreSQL 16 docs.

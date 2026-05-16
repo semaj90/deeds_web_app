@@ -19,6 +19,9 @@
 - **External Unverified**: All external web results are marked `external_unverified` until promoted by an operator or validated against the codebase.
 - **No Direct Promotion**: Do not promote web search results directly to the canonical knowledge base without verification.
 - **No Hidden Reasoning**: Do not store `hiddenThoughts`, `chainOfThought`, or `kv_cache` in the Docs Atlas or browser outputs.
+- **Multi-Lane Retrieval**: Retrieval should always combine `local_code` (Parent Atlas) and `official_docs` (Programming Docs Atlas).
+- **External Collection**: Use `external_programming_docs_768` in Qdrant for technical documentation.
+- **Trust Hierarchy**: `local_code` (Authoritative) > `official_docs` (High Trust) > `external_unverified` (Web/Low Trust).
 
 
 ## Commands
