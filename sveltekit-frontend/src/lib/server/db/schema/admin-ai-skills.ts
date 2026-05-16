@@ -13,7 +13,7 @@ export const adminAiSkills = pgTable('admin_ai_skills', {
   inputSchema: jsonb('input_schema'), // Zod-like schema for input parameters
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-  createdBy: uuid('created_by'),
+  createdBy: integer('created_by'),
   isSystem: boolean('is_system').default(false) // Built-in skills
 });
 

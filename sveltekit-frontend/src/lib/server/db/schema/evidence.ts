@@ -1,4 +1,4 @@
-import { jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { integer, jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 import { cases } from './legal-cases.js';
 
 export const evidence = pgTable('evidence', {
@@ -24,7 +24,7 @@ export const evidence = pgTable('evidence', {
   .$type<string[]>()
   .default([] as any),
  aiSummary: text('ai_summary'),
- uploadedByUserId: uuid('uploaded_by_user_id'),
+ uploadedByUserId: integer('uploaded_by_user_id'),
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 

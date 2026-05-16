@@ -138,8 +138,9 @@ export const ingestedDocumentChunks = pgTable('document_chunks', {
     tokens: integer('tokens').notNull(),
 
     // Vector embedding - THIS IS THE KEY FIELD FOR pgvector
-    // Using sql template for vector type (384 dimensions for embeddinggemma)
-    embedding: text('embedding').notNull().$type<number[]>(), // Will be cast to vector(384) in migration
+    // Using sql template for vector type (768 dimensions for embeddinggemma:latest)
+    // Note: Legacy schemas used 384; 768 is the canonical native dimension.
+    embedding: text('embedding').notNull().$type<number[]>(), // Will be cast to vector(768) in migration
     embeddingModel: varchar('embedding_model', { length: 100 }).notNull().default('embeddinggemma:latest'),
 
     // Position in document

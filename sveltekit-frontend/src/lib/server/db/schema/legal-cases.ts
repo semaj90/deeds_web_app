@@ -27,7 +27,7 @@ export const cases = pgTable('cases', {
     court: varchar('court'),
     clientName: varchar('client_name'),
     opposingParty: varchar('opposing_party'),
-    assignedAttorney: uuid('assigned_attorney'),
+    assignedAttorney: integer('assigned_attorney'),
     filingDate: timestamp('filing_date', { withTimezone: true }),
     dueDate: timestamp('due_date', { withTimezone: true }),
     closedDate: timestamp('closed_date', { withTimezone: true }),
@@ -38,7 +38,7 @@ export const cases = pgTable('cases', {
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
     caseEmbedding384: vector('case_embedding_384', { dimensions: 384 }),
-    userId: uuid('user_id'),
+    userId: integer('user_id'),
 });
 
 /**

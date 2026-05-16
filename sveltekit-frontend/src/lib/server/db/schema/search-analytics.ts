@@ -47,7 +47,7 @@ export const chunkHitLog = pgTable('chunk_hit_log', {
 	queryHash:   varchar('query_hash', { length: 16 }).notNull(),
 	score:       real('score'),
 	rerankScore: real('rerank_score'),
-	userId:      uuid('user_id'),
+	userId:      integer('user_id'),
 	caseId:      uuid('case_id'),
 	hitAt:       timestamp('hit_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => ({
@@ -87,7 +87,7 @@ export type NewQueryVariancePair = typeof queryVariancePairs.$inferInsert;
 
 export const ragQueryLog = pgTable('rag_query_log', {
 	id:                 uuid('id').defaultRandom().primaryKey(),
-	userId:             uuid('user_id'),
+	userId:             integer('user_id'),
 	caseId:             uuid('case_id'),
 	query:              text('query').notNull(),
 	queryHash:          varchar('query_hash', { length: 16 }).notNull(),
@@ -154,7 +154,7 @@ export type NewQloraExample = typeof qloraExamples.$inferInsert;
 export const responseFeedback = pgTable('response_feedback', {
 	id:        uuid('id').defaultRandom().primaryKey(),
 	queryHash: text('query_hash').notNull(),
-	userId:    uuid('user_id'),
+	userId:    integer('user_id'),
 	rating:    varchar('rating', { length: 4 }).notNull(),   // 'up' | 'down'
 	pipeline:  text('pipeline'),
 	chunkIds:  text('chunk_ids').array(),

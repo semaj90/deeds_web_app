@@ -7,7 +7,7 @@ import { boolean, integer, jsonb, pgTable, text, timestamp, uuid, varchar } from
 
 export const webCrawlJobs = pgTable('web_crawl_jobs', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	userId: uuid('user_id'),
+	userId: integer('user_id'),
 	urls: jsonb('urls').notNull(), // Array of URLs to crawl
 	status: varchar('status', { length: 20 }).notNull().default('pending'), // pending, processing, completed, failed
 	ragMode: varchar('rag_mode', { length: 20 }).default('hybrid'), // rag, kag, dag, hybrid
@@ -22,7 +22,7 @@ export const webCrawlJobs = pgTable('web_crawl_jobs', {
 
 export const userAnalytics = pgTable('user_analytics', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	userId: uuid('user_id').notNull(),
+	userId: integer('user_id').notNull(),
 	eventType: varchar('event_type', { length: 100 }).notNull(), // web_crawl_initiated, ai_chat_started, etc.
 	metadata: jsonb('metadata'), // Event-specific data
 	timestamp: timestamp('timestamp').defaultNow().notNull()
@@ -30,7 +30,7 @@ export const userAnalytics = pgTable('user_analytics', {
 
 export const aiChatSessions = pgTable('ai_chat_sessions', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	userId: uuid('user_id'),
+	userId: integer('user_id'),
 	jobId: uuid('job_id'), // Link to web_crawl_jobs or other job types
 	model: varchar('model', { length: 100 }).notNull().default('gemma4-legal:latest'),
 	systemPrompt: text('system_prompt'),
