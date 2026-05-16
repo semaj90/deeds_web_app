@@ -1,5 +1,4 @@
-#!/usr/bin/env node
-import { loadConfig, loadCodebaseGraph, loadRouteMap, loadClusterAliases, resolveRepoPath, writeJson, writeMarkdown, parentAtlasMarkdown, topEntries, workspaceForPath, routeSummary } from './_atlas-utils.mjs';
+import { loadConfig, loadCodebaseGraph, loadRouteMap, loadClusterAliases, resolveRepoPath, writeJson, writeMarkdown, parentAtlasMarkdown, topEntries, workspaceForPath, routeSummary, createProgressLogger } from './_atlas-utils.mjs';
 
 const args = new Set(process.argv.slice(2));
 const WRITE = args.has('--write');
@@ -15,6 +14,7 @@ function sanitizePayload(payload) {
 const LIMIT = parseInt([...args].find((arg) => String(arg).startsWith('--limit='))?.split('=')[1] ?? '0', 10);
 const WORKSPACE = [...args].find(a => a.startsWith('--workspace='))?.split('=')[1];
 const RUN_ID = [...args].find(a => a.startsWith('--runId='))?.split('=')[1];
+const PROGRESS_EVERY = parseInt([...args].find((arg) => String(arg).startsWith('--progress-every='))?.split('=')[1] ?? '100', 10);
 
 if (WRITE && !RUN_ID) {
   console.error('Refusing write: --runId is required for write mode.');
@@ -171,20 +171,28 @@ if (WRITE) {
     return cloned;
   });
 
-  console.log(`Writing ${allDocs.length} documents to CouchDB (db: wiki_cards)...`);
-  const res = await fetch(`${BASE}/wiki_cards/_bulk_docs`, {
-    method: 'POST',
-    headers: { Authorization: AUTH, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ docs: allDocs })
-  });
-  
-  if (res.ok) {
-    console.log(`Successfully wrote ${allDocs.length} documents to CouchDB.`);
-  } else {
-    const errJson = await res.json();
-    console.error('CouchDB bulk write failed:', errJson);
-    process.exit(1);
-  }
+    const startAt = Date.now();
+    console.log(`Writing ${allDocs.length} documents to CouchDB (db: wiki_cards) in batches of ${PROGRESS_EVERY}...`);
+    const progress = createProgressLogger({ label: 'couchdb-ingest', total: allDocs.length, every: PROGRESS_EVERY });
+    
+    for (let i = 0; i < allDocs.length; i += PROGRESS_EVERY) {
+      const batch = allDocs.slice(i, i + PROGRESS_EVERY);
+      const res = await fetch(`${BASE}/wiki_cards/_bulk_docs`, {
+        method: 'POST',
+        headers: { Authorization: AUTH, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ docs: batch })
+      });
+      
+      if (!res.ok) {
+        const errJson = await res.json();
+        console.error(`CouchDB bulk write batch ${i} failed:`, errJson);
+        process.exit(1);
+      }
+      progress(Math.min(i + PROGRESS_EVERY, allDocs.length));
+    }
+    
+    const elapsed = ((Date.now() - startAt) / 1000).toFixed(1);
+    console.log(`Successfully wrote ${allDocs.length} documents to CouchDB in ${elapsed}s.`);
 }
 
 const report = {
@@ -219,4 +227,6 @@ writeMarkdown(resolveRepoPath(config.outputs.couchdbReportMd), parentAtlasMarkdo
 
 console.log(`CouchDB MapReduce report written to ${config.outputs.couchdbReportJson} [runId: ${EFFECTIVE_RUN_ID}]`);
 if (!WRITE) console.log('Dry-run complete. Add --write once CouchDB client is configured.');
+
+process.exit(0);
 

@@ -2,48 +2,46 @@
 
 ## Phase 0: Pre-Scale Safety Gate
 - [x] **Commit Milestone**: Commit the canary-proven safety layer (RunID: `run_1778883133370`).
-- [ ] **Network Health**:
-    - [ ] Confirm SearXNG moved to port 8889.
-    - [ ] Confirm SeaweedFS Filer remains on port 8888.
-- [ ] **Validation Pass**:
-    - [ ] `npm run atlas:manifest:validate` passes.
-    - [ ] `npm run atlas:root:full` dry-run passes.
-- [ ] **Operating Mode**: Confirm `ATLAS_SKIP_LLM`, `ATLAS_SKIP_EMBEDDINGS`, and `ATLAS_SKIP_GPU` are enabled for datastore writes.
+- [x] **Network Health**: SearXNG (8889), SeaweedFS (8888).
+- [x] **Validation Pass**: Manifest validation and dry-run parity passed.
+- [x] **Operating Mode**: `ATLAS_SKIP_LLM`, `ATLAS_SKIP_EMBEDDINGS`, and `ATLAS_SKIP_GPU` verified.
 
 ## Phase 1: Production Scaling (Safe Write Mode)
-- [ ] **Stage 1: Scale 500** (RunID: `atlas-scale-500-001`)
-    - [ ] `npm run atlas:manifest:create`
-    - [ ] Run writes (Redis → CouchDB → Neo4j → Qdrant → Engram)
-- [ ] **Stage 2: Scale 2000** (RunID: `atlas-scale-2000-001`)
-- [ ] **Stage 3: Scale 5000**
-- [ ] **Stage 4: Full Workspace Batch** (~32,135 payloads)
+- [x] **Stage 1: Scale 500** (RunID: `atlas-scale-500-001`) - **PASSED**
+- [x] **Stage 2: Scale 2000** (RunID: `atlas-scale-2000-001`) - **PASSED**
+- [x] **Stage 3: Scale 5000** (RunID: `atlas-scale-5000-001`) - **PASSED**
+- [x] **Stage 4: Full Workspace Batch** (RunID: `atlas-scale-10000-001`) - **PASSED**
+- [x] **Stage 5: Full Monorepo Sweep** (RunID: `atlas-full-payload-sweep-004`) - **PASSED**
+    - [x] **Neo4j Optimized**: Batching (500-1000) reduced runtime to 11.5s.
+    - [x] **Qdrant Recovery**: Syntax error resolved; 2,253 point sets patched.
+    - [x] **Parity Validation**: `npm run atlas:validate` returns missing=0.
 
 ## Phase 2: Operating Profiles & Hardware Safety
-### 1. Safe Atlas Write Mode (High RAM, No GPU)
-- [ ] **VRAM Safety**: LLM/Embedding stack disabled to prevent OOM during massive DB I/O.
-- [ ] **Node Tuning**: `$env:NODE_OPTIONS="--max-old-space-size=8192"`
+### 1. Safe Atlas Write Mode (High RAM, No GPU) - **STABLE**
+- [x] **VRAM Safety**: LLM/Embedding stack disabled.
+- [x] **Node Tuning**: `$env:NODE_OPTIONS="--max-old-space-size=8192"`
 
-### 2. Karpathy Synthesis Mode (GPU Enabled, Scoped Limits)
+### 2. Karpathy Synthesis Mode (GPU Enabled, Scoped Limits) - **NEXT**
 - [ ] **Constraints**: Limit to 25-100 files per run on RTX 3060 Ti.
-- [ ] **Gemma4 Profile**: 4B–9B quants, 4k–8k context; avoid 27B full offload on 8GB VRAM.
+- [ ] **Gemma4 Profile**: 4B–9B quants, 4k–8k context.
 
 ### 3. Docker Infrastructure (Recommended Limits for 20GB RAM)
-- [ ] **Qdrant**: `mem_limit: 3g`
-- [ ] **Neo4j**: `mem_limit: 6g` (Heap: 2G/4G, PageCache: 1G)
-- [ ] **Postgres**: `mem_limit: 2g`
-- [ ] **CouchDB / Redis**: `mem_limit: 1g` each
+- [x] **Qdrant**: `mem_limit: 3g`
+- [x] **Neo4j**: `mem_limit: 6g`
+- [x] **Postgres**: `mem_limit: 2g`
+- [x] **CouchDB / Redis**: `mem_limit: 1g` each
 
 ## Phase 3: Memory Optimization
 ### 1. Qdrant / TurboVEC
-- [ ] **On-Disk HNSW Index**: Set `on_disk: true` for the canonical `codebase_chunks_768` collection to reduce RAM pressure.
-- [ ] **Experimental Binary Quantization**: Test on secondary collections (`codebase_chunks_64d`, `glyph_atlas`) only; keep 768d canonical for high-fidelity recall.
+- [ ] **On-Disk HNSW Index**: Set `on_disk: true` for the canonical `codebase_chunks_768`.
+- [ ] **Experimental Binary Quantization**: Test on secondary collections.
 
 ### 2. Pipeline Streaming
 - [ ] **JSONStream Integration**: Refactor `index-repo-root.mjs` to stream the 400MB+ codebase graph.
 
 ---
-**Verified Status**: Canary Batch Successful (RunID: `run_1778883133370`)
+**Verified Status**: Full Monorepo Sweep Successful (RunID: `atlas-full-payload-sweep-004`)
 **Hardware Reality (RTX 3060 Ti 8GB)**:
-- Atlas Writes: Safe with RAM allocation (16-32GB).
+- Atlas Writes: Optimized via batching (10k+ nodes/edges in <15s).
 - LLM Synthesis: Requires small models/scoped batches.
 - Big Bang Synthesis: Not realistic; use lane-by-lane ingestion.

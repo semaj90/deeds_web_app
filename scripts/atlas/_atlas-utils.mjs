@@ -138,6 +138,38 @@ export function loadRouteMap(config = loadConfig()) {
 export function loadRouteGapAtlas(config = loadConfig()) {
   return readJson(resolveRepoPath(config.sources.routeGapAtlas), null);
 }
+/**
+ * Helper to log progress for long-running loops
+ */
+export function createProgressLogger({
+  label,
+  total,
+  every = 100,
+}) {
+  const startedAt = Date.now();
+  let last = 0;
+
+  return function progress(current, extra = {}) {
+    if (current !== total && (current - last < every)) return;
+    last = current;
+
+    const elapsedSec = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+    const rate = current / elapsedSec;
+    const pct = total > 0 ? ((current / total) * 100).toFixed(1) : '0.0';
+    const remaining = (total > current && rate > 0)
+      ? Math.round((total - current) / rate)
+      : 0;
+
+    const extraText = Object.entries(extra)
+      .map(([k, v]) => `${k}=${v}`)
+      .join(' ');
+
+    console.log(
+      `[${label}] ${current}/${total} ${pct}% ` +
+      `rate=${rate.toFixed(1)}/s eta=${remaining}s ${extraText}`.trim()
+    );
+  };
+}
 
 export function loadClusterAliases(config = loadConfig()) {
   return readJson(resolveRepoPath(config.sources.clusterAliases), {});
