@@ -97,3 +97,14 @@
 - [ ] Show: Qdrant sourceRefs, Neo4j graph paths, cluster aliases, Engram low_hint, trust tier, lane breakdown.
 - [ ] Add CrimeAnalysisService plan-only mode.
 - [ ] Separate facts, allegations, inferences, unknowns, and sourceRefs.
+
+## Phase 6: Programming Docs Atlas
+- [x] **Registry**: Tier 1/2 sources defined in `programming-doc-sources.json`.
+- [x] **Ingestion Plane**: Crawl/Normalize/Chunk/Index scripts created.
+- [ ] **Data Lake**: Initialize `external_programming_docs_768` in Qdrant.
+- [ ] **Crawl (Canary)**: Execute dry-run for SvelteKit 2.
+- [ ] **Concept Graph**: Project nodes/edges into Neo4j.
+- [ ] **Gap Report**: Generate first `programming-doc-feature-gap-report.json`.
+- [x] **MCP Surface**: `trace.docs_search` and `trace.docs_compare_feature` added.
+- [ ] **Product Integration**: Surface external sourceRefs in Admin Copilot.
+- [x] **Governance**: Versioned sources and `external_unverified` tagging enforced.

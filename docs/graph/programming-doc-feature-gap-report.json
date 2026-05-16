@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-05-16T06:20:00.996Z",
+  "gaps": [
+    {
+      "type": "feature_has_no_docs",
+      "feature": "CrimeAnalysisService",
+      "severity": "high"
+    },
+    {
+      "type": "api_used_but_not_documented",
+      "api": "WebGPU.computePass",
+      "severity": "medium"
+    }
+  ],
+  "recommendations": [
+    {
+      "action": "ingest",
+      "source": "webgpu",
+      "reason": "Uncovered API usage"
+    }
+  ]
+}
