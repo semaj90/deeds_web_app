@@ -1,5 +1,5 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-16T18:35:33.408Z
+> Generated: 2026-05-16T18:39:52.198Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
