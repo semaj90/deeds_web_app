@@ -47,7 +47,7 @@ export const chunkHitLog = pgTable('chunk_hit_log', {
 	queryHash:   varchar('query_hash', { length: 16 }).notNull(),
 	score:       real('score'),
 	rerankScore: real('rerank_score'),
-	userId:      integer('user_id'),
+	userId:      uuid('user_id'),
 	caseId:      uuid('case_id'),
 	hitAt:       timestamp('hit_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => ({
@@ -87,7 +87,7 @@ export type NewQueryVariancePair = typeof queryVariancePairs.$inferInsert;
 
 export const ragQueryLog = pgTable('rag_query_log', {
 	id:                 uuid('id').defaultRandom().primaryKey(),
-	userId:             integer('user_id'),
+	userId:             uuid('user_id'),
 	caseId:             uuid('case_id'),
 	query:              text('query').notNull(),
 	queryHash:          varchar('query_hash', { length: 16 }).notNull(),
@@ -128,15 +128,15 @@ export const qloraExamples = pgTable('qlora_examples', {
 	contextChunks:  jsonb('context_chunks').notNull().default(sql`'[]'::jsonb`),
 	graphSummary:   text('graph_summary'),
 	response:       text('response').notNull(),
-	qualityTier:    varchar('quality_tier', { length: 20 }),    // 'platinum'|'gold'|'silver'|'bronze'
+	qualityTier:    text('quality_tier'),    // 'platinum'|'gold'|'silver'|'bronze'
 	responseScore:  real('response_score'),
 	avgRerankScore: real('avg_rerank_score'),
 	gpuClusters:    jsonb('gpu_clusters').notNull().default(sql`'[]'::jsonb`),
 	somClusters:    jsonb('som_clusters').notNull().default(sql`'[]'::jsonb`),
 	pipelineHits:   jsonb('pipeline_hits').notNull().default(sql`'{}'::jsonb`),
 	entityTags:     jsonb('entity_tags').notNull().default(sql`'[]'::jsonb`),  // extracted statute + case entity tags
-	modelVersion:   varchar('model_version', { length: 50 }),  // e.g. 'gemma4-legal'
-	datasetSplit:   varchar('dataset_split', { length: 10 }),   // 'train'|'eval'|'test' — frozen after first assignment
+	modelVersion:   text('model_version'),  // e.g. 'gemma4-legal'
+	datasetSplit:   text('dataset_split'),   // 'train'|'eval'|'test' — frozen after first assignment
 	createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => ({
 	queryHashIdx: index('qlora_examples_query_hash_idx').on(t.queryHash),
@@ -154,7 +154,7 @@ export type NewQloraExample = typeof qloraExamples.$inferInsert;
 export const responseFeedback = pgTable('response_feedback', {
 	id:        uuid('id').defaultRandom().primaryKey(),
 	queryHash: text('query_hash').notNull(),
-	userId:    integer('user_id'),
+	userId:    uuid('user_id'),
 	rating:    varchar('rating', { length: 4 }).notNull(),   // 'up' | 'down'
 	pipeline:  text('pipeline'),
 	chunkIds:  text('chunk_ids').array(),
@@ -223,10 +223,7 @@ export const codebaseChunkIndex = pgTable(
     tags: jsonb('tags')
       .notNull()
       .default(sql`'[]'::jsonb`), // legacy jsonb tags
-    semanticTags: text('semantic_tags')
-      .array()
-      .notNull()
-      .default(sql`'{}'`), // typed Karpathy atoms
+    semanticTags: text('semantic_tags').array(), // typed Karpathy atoms
     clusterSummary: jsonb('cluster_summary')
       .notNull()
       .default(sql`'{}'::jsonb`),
@@ -332,7 +329,7 @@ export const llmOutputChunks = pgTable('llm_output_chunks', {
 	chunkId:  uuid('chunk_id').notNull().references(() => codebaseChunkIndex.id, { onDelete: 'cascade' }),
 	rank:     integer('rank').notNull(),
 	score:    real('score'),
-	role:     varchar('role', { length: 30 }),
+	role:     text('role'),
 	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
 }, (t) => ({
 	pk:       primaryKey({ columns: [t.outputId, t.chunkId] }),

@@ -1,0 +1,946 @@
+{
+  "generatedAt": "2026-05-16T18:53:38.995Z",
+  "totalEntries": 57,
+  "unknownCount": 0,
+  "status": "pass",
+  "byRole": {
+    "source": [
+      {
+        "path": "sveltekit-frontend/src",
+        "role": "source",
+        "rg_mode": "source_only",
+        "owner": "SvelteKit App",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "sveltekit-frontend/src/routes",
+        "role": "source",
+        "rg_mode": "complete_visibility_required",
+        "owner": "SvelteKit routes",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/server/db",
+        "role": "source",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Drizzle schema files",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/db",
+        "role": "source",
+        "rg_mode": "source_only",
+        "owner": "DB client entry",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "proto",
+        "role": "source",
+        "rg_mode": "complete_visibility_required",
+        "owner": "gRPC protobuf definitions",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "services",
+        "role": "source",
+        "rg_mode": "source_only",
+        "owner": "Go / auxiliary microservices",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "simd-bridge",
+        "role": "source",
+        "rg_mode": "source_only",
+        "owner": "C++ N-API SIMD/LibTorch bridge",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "vscode-extension",
+        "role": "source",
+        "rg_mode": "source_only",
+        "owner": "VS Code extension source",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      }
+    ],
+    "migrations": [
+      {
+        "path": "sveltekit-frontend/drizzle",
+        "role": "migrations",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Drizzle ORM",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "sveltekit-frontend/drizzle/manual",
+        "role": "migrations",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Manual SQL sidecars",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "sveltekit-frontend/drizzle/meta",
+        "role": "migrations",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Drizzle journal",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "drizzle",
+        "role": "migrations",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Root-level legacy drizzle (pre-monorepo)",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "sql",
+        "role": "migrations",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Root-level raw SQL files",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      }
+    ],
+    "tests": [
+      {
+        "path": "sveltekit-frontend/tests",
+        "role": "tests",
+        "rg_mode": "source_only",
+        "owner": "Vitest + Playwright",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "tests",
+        "role": "tests",
+        "rg_mode": "source_only",
+        "owner": "Root-level tests",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "playwright_todos",
+        "role": "tests",
+        "rg_mode": "source_only",
+        "owner": "Playwright TODO tracking",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      }
+    ],
+    "generated_reports": [
+      {
+        "path": "docs/reports",
+        "role": "generated_reports",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Atlas audit output",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "docs/graph",
+        "role": "generated_reports",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Graph / atlas JSON blobs",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "audit",
+        "role": "generated_reports",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Root-level audit output",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      }
+    ],
+    "external_docs_normalized": [
+      {
+        "path": "docs/llms",
+        "role": "external_docs_normalized",
+        "rg_mode": "generated_artifacts_allowed",
+        "owner": "LLMS.txt for AI context",
+        "exists": true,
+        "rgModeLabel": "rg -u preferred"
+      },
+      {
+        "path": "sveltekit-frontend/docs/atlas-index",
+        "role": "external_docs_normalized",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Atlas index snapshots",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "sveltekit-frontend/memory",
+        "role": "external_docs_normalized",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Karpathy memory store",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "memory",
+        "role": "external_docs_normalized",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Root-level Claude memory files",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      }
+    ],
+    "scripts": [
+      {
+        "path": "scripts",
+        "role": "scripts",
+        "rg_mode": "source_only",
+        "owner": "Atlas / audit scripts",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "scripts/atlas",
+        "role": "scripts",
+        "rg_mode": "source_only",
+        "owner": "Atlas audit scripts",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "sveltekit-frontend/scripts",
+        "role": "scripts",
+        "rg_mode": "source_only",
+        "owner": "Frontend tooling",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "next_steps",
+        "role": "scripts",
+        "rg_mode": "source_only",
+        "owner": "Operator roadmap documents",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "python",
+        "role": "scripts",
+        "rg_mode": "source_only",
+        "owner": "Python utility scripts",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "tools",
+        "role": "scripts",
+        "rg_mode": "source_only",
+        "owner": "Developer tooling",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      }
+    ],
+    "archive": [
+      {
+        "path": "sveltekit-frontend/src/lib/server/db/archived-schemas",
+        "role": "archive",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Legacy schema files",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "deeds_labs",
+        "role": "archive",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Gitignored lab/experimental code",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      }
+    ],
+    "binary_artifact": [
+      {
+        "path": "granite-docling-258M",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Docling model weights",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "turbovec",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Turbovec binary",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "sveltekit-frontend/static",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Static assets (WASM, fonts, images)",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "lawpdfs",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Legal PDF source documents",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "minio-data",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "MinIO object storage data",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "models",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "ML model weights",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "onnx",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "ONNX model files",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "pgvector-precompiled",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Precompiled pgvector binaries",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "qdrant-windows",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Qdrant Windows binary",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "storage",
+        "role": "binary_artifact",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Local object storage data",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      }
+    ],
+    "build_cache": [
+      {
+        "path": "sveltekit-frontend/.svelte-kit",
+        "role": "build_cache",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "SvelteKit build cache",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "sveltekit-frontend/node_modules",
+        "role": "build_cache",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Frontend npm deps",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "node_modules",
+        "role": "build_cache",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Root npm deps",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      }
+    ],
+    "diagnostic_log": [
+      {
+        "path": "artifacts",
+        "role": "diagnostic_log",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Build/test artifacts",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "logs",
+        "role": "diagnostic_log",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Runtime and task output logs",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "scratch",
+        "role": "diagnostic_log",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Scratch / temp files",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      },
+      {
+        "path": "test-results",
+        "role": "diagnostic_log",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "Playwright / Vitest test result outputs",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      }
+    ],
+    "external_docs_raw": [
+      {
+        "path": "data",
+        "role": "external_docs_raw",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Raw data files",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "karpathy-wiki",
+        "role": "external_docs_raw",
+        "rg_mode": "complete_visibility_required",
+        "owner": "Karpathy wiki raw notes",
+        "exists": true,
+        "rgModeLabel": "rg -u required"
+      },
+      {
+        "path": "llm",
+        "role": "external_docs_raw",
+        "rg_mode": "source_only",
+        "owner": "LLM notes / timelines",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      }
+    ],
+    "config": [
+      {
+        "path": "docker",
+        "role": "config",
+        "rg_mode": "source_only",
+        "owner": "Docker Compose / Caddy / service configs",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "minio",
+        "role": "config",
+        "rg_mode": "source_only",
+        "owner": "MinIO configuration",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "nginx",
+        "role": "config",
+        "rg_mode": "source_only",
+        "owner": "Nginx proxy config",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "qdrant",
+        "role": "config",
+        "rg_mode": "source_only",
+        "owner": "Qdrant config / data",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "redis",
+        "role": "config",
+        "rg_mode": "source_only",
+        "owner": "Redis config",
+        "exists": true,
+        "rgModeLabel": "default rg OK"
+      },
+      {
+        "path": "ssl",
+        "role": "config",
+        "rg_mode": "safe_to_respect_gitignore",
+        "owner": "TLS certificates (gitignored)",
+        "exists": true,
+        "rgModeLabel": "skip / ignore OK"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "path": "sveltekit-frontend/src",
+      "role": "source",
+      "rg_mode": "source_only",
+      "owner": "SvelteKit App",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes",
+      "role": "source",
+      "rg_mode": "complete_visibility_required",
+      "owner": "SvelteKit routes",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/db",
+      "role": "source",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Drizzle schema files",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/db",
+      "role": "source",
+      "rg_mode": "source_only",
+      "owner": "DB client entry",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "sveltekit-frontend/drizzle",
+      "role": "migrations",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Drizzle ORM",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "sveltekit-frontend/drizzle/manual",
+      "role": "migrations",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Manual SQL sidecars",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "sveltekit-frontend/drizzle/meta",
+      "role": "migrations",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Drizzle journal",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "sveltekit-frontend/tests",
+      "role": "tests",
+      "rg_mode": "source_only",
+      "owner": "Vitest + Playwright",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "tests",
+      "role": "tests",
+      "rg_mode": "source_only",
+      "owner": "Root-level tests",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "docs/reports",
+      "role": "generated_reports",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Atlas audit output",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "docs/graph",
+      "role": "generated_reports",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Graph / atlas JSON blobs",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "docs/llms",
+      "role": "external_docs_normalized",
+      "rg_mode": "generated_artifacts_allowed",
+      "owner": "LLMS.txt for AI context",
+      "exists": true,
+      "rgModeLabel": "rg -u preferred"
+    },
+    {
+      "path": "sveltekit-frontend/docs/atlas-index",
+      "role": "external_docs_normalized",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Atlas index snapshots",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "sveltekit-frontend/memory",
+      "role": "external_docs_normalized",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Karpathy memory store",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "scripts",
+      "role": "scripts",
+      "rg_mode": "source_only",
+      "owner": "Atlas / audit scripts",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "scripts/atlas",
+      "role": "scripts",
+      "rg_mode": "source_only",
+      "owner": "Atlas audit scripts",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "sveltekit-frontend/scripts",
+      "role": "scripts",
+      "rg_mode": "source_only",
+      "owner": "Frontend tooling",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "next_steps",
+      "role": "scripts",
+      "rg_mode": "source_only",
+      "owner": "Operator roadmap documents",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/db/archived-schemas",
+      "role": "archive",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Legacy schema files",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "granite-docling-258M",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Docling model weights",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "turbovec",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Turbovec binary",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "sveltekit-frontend/static",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Static assets (WASM, fonts, images)",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "sveltekit-frontend/.svelte-kit",
+      "role": "build_cache",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "SvelteKit build cache",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "sveltekit-frontend/node_modules",
+      "role": "build_cache",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Frontend npm deps",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "node_modules",
+      "role": "build_cache",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Root npm deps",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "artifacts",
+      "role": "diagnostic_log",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Build/test artifacts",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "audit",
+      "role": "generated_reports",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Root-level audit output",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "data",
+      "role": "external_docs_raw",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Raw data files",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "deeds_labs",
+      "role": "archive",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Gitignored lab/experimental code",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "docker",
+      "role": "config",
+      "rg_mode": "source_only",
+      "owner": "Docker Compose / Caddy / service configs",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "drizzle",
+      "role": "migrations",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Root-level legacy drizzle (pre-monorepo)",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "karpathy-wiki",
+      "role": "external_docs_raw",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Karpathy wiki raw notes",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "lawpdfs",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Legal PDF source documents",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "llm",
+      "role": "external_docs_raw",
+      "rg_mode": "source_only",
+      "owner": "LLM notes / timelines",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "logs",
+      "role": "diagnostic_log",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Runtime and task output logs",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "memory",
+      "role": "external_docs_normalized",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Root-level Claude memory files",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "minio-data",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "MinIO object storage data",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "minio",
+      "role": "config",
+      "rg_mode": "source_only",
+      "owner": "MinIO configuration",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "models",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "ML model weights",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "nginx",
+      "role": "config",
+      "rg_mode": "source_only",
+      "owner": "Nginx proxy config",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "onnx",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "ONNX model files",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "pgvector-precompiled",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Precompiled pgvector binaries",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "playwright_todos",
+      "role": "tests",
+      "rg_mode": "source_only",
+      "owner": "Playwright TODO tracking",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "proto",
+      "role": "source",
+      "rg_mode": "complete_visibility_required",
+      "owner": "gRPC protobuf definitions",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "python",
+      "role": "scripts",
+      "rg_mode": "source_only",
+      "owner": "Python utility scripts",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "qdrant-windows",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Qdrant Windows binary",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "qdrant",
+      "role": "config",
+      "rg_mode": "source_only",
+      "owner": "Qdrant config / data",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "redis",
+      "role": "config",
+      "rg_mode": "source_only",
+      "owner": "Redis config",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "scratch",
+      "role": "diagnostic_log",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Scratch / temp files",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "services",
+      "role": "source",
+      "rg_mode": "source_only",
+      "owner": "Go / auxiliary microservices",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "simd-bridge",
+      "role": "source",
+      "rg_mode": "source_only",
+      "owner": "C++ N-API SIMD/LibTorch bridge",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "sql",
+      "role": "migrations",
+      "rg_mode": "complete_visibility_required",
+      "owner": "Root-level raw SQL files",
+      "exists": true,
+      "rgModeLabel": "rg -u required"
+    },
+    {
+      "path": "ssl",
+      "role": "config",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "TLS certificates (gitignored)",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "storage",
+      "role": "binary_artifact",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Local object storage data",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "test-results",
+      "role": "diagnostic_log",
+      "rg_mode": "safe_to_respect_gitignore",
+      "owner": "Playwright / Vitest test result outputs",
+      "exists": true,
+      "rgModeLabel": "skip / ignore OK"
+    },
+    {
+      "path": "tools",
+      "role": "scripts",
+      "rg_mode": "source_only",
+      "owner": "Developer tooling",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    },
+    {
+      "path": "vscode-extension",
+      "role": "source",
+      "rg_mode": "source_only",
+      "owner": "VS Code extension source",
+      "exists": true,
+      "rgModeLabel": "default rg OK"
+    }
+  ]
+}

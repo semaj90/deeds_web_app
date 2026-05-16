@@ -1,0 +1,298 @@
+{
+  "generatedAt": "2026-05-16T18:51:28.999Z",
+  "violationsCount": 0,
+  "scriptsAnalyzed": 2540,
+  "findings": [
+    {
+      "file": "scripts\\atlas\\analyze-directory-roles.mjs",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "'rg -u required'",
+          "args": "-u required",
+          "isUnrestricted": true,
+          "line": 83,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "'rg -u preferred'",
+          "args": "-u preferred",
+          "isUnrestricted": true,
+          "line": 85,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "'rg -u required'",
+          "args": "-u required",
+          "isUnrestricted": true,
+          "line": 110,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "scripts\\atlas\\audit-contract-map.mjs",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "spawnSync('rg', [pattern, path, '--no-heading', '-n', '-u', ...flags]",
+          "args": "pattern, path, '--no-heading', '-n', '-u', ...flags",
+          "isUnrestricted": true,
+          "line": 53,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "spawnSync('rg', [pattern, path, '-l', '-u', ...flags]",
+          "args": "pattern, path, '-l', '-u', ...flags",
+          "isUnrestricted": true,
+          "line": 57,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "scripts\\atlas\\audit-drizzle-postgres-contracts.mjs",
+      "category": "contract_audit",
+      "usages": [
+        {
+          "fullMatch": "spawnSync('rg', [pattern, path, '-u', '--no-heading', '-n', ...flags]",
+          "args": "pattern, path, '-u', '--no-heading', '-n', ...flags",
+          "isUnrestricted": true,
+          "line": 75,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "scripts\\atlas\\audit-rg-search-integrity.mjs",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "`rg -u ...`",
+          "args": "-u ...",
+          "isUnrestricted": true,
+          "line": 93,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "\"rg -u\"",
+          "args": "-u",
+          "isUnrestricted": true,
+          "line": 95,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "spawnSync('rg', [...]",
+          "args": "...",
+          "isUnrestricted": false,
+          "line": 94,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "spawnSync('rg', [...]",
+          "args": "...",
+          "isUnrestricted": false,
+          "line": 110,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "scripts\\atlas\\audit-sveltekit-form-contracts.mjs",
+      "category": "contract_audit",
+      "usages": [
+        {
+          "fullMatch": "spawnSync('rg', [\n    '-u', '--no-heading', '-n', '--color=never', pattern, path, ...extraArgs,\n  ]",
+          "args": "\n    '-u', '--no-heading', '-n', '--color=never', pattern, path, ...extraArgs,\n  ",
+          "isUnrestricted": true,
+          "line": 41,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "spawnSync('rg', [\n    '-u', '-l', '--color=never', pattern, path, ...extraArgs,\n  ]",
+          "args": "\n    '-u', '-l', '--color=never', pattern, path, ...extraArgs,\n  ",
+          "isUnrestricted": true,
+          "line": 48,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "scripts\\atlas\\lib\\reference-verifier.mjs",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "spawnSync(\n      'rg', ['--files', '--type-add', 'srcweb:*.{ts,tsx,svelte,svelte.ts,js,mjs,cjs}', '-tsrcweb', 'src']",
+          "args": "'--files', '--type-add', 'srcweb:*.{ts,tsx,svelte,svelte.ts,js,mjs,cjs}', '-tsrcweb', 'src'",
+          "isUnrestricted": false,
+          "line": 49,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "scripts\\phase3-file-inventory.mjs",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "'rg \\'",
+          "args": "\\",
+          "isUnrestricted": false,
+          "line": 34,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "'rg \\'",
+          "args": "\\",
+          "isUnrestricted": false,
+          "line": 42,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "scripts\\phase76-mcp-server.mjs",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "\"rg -n \\\"",
+          "args": "-n \\",
+          "isUnrestricted": false,
+          "line": 345,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\agent\\tools\\ripgrep-search.ts",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "spawn('rg', ['--version']",
+          "args": "'--version'",
+          "isUnrestricted": false,
+          "line": 243,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\agent\\tools\\web-search.ts",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "'rg command'",
+          "args": "command",
+          "isUnrestricted": false,
+          "line": 243,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\ai\\hermes\\skills\\codebase.ts",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "`rg --files src/${input.directory || '",
+          "args": "--files src/${input.directory || ",
+          "isUnrestricted": false,
+          "line": 39,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "'rg --files src/routes'",
+          "args": "--files src/routes",
+          "isUnrestricted": false,
+          "line": 48,
+          "status": "PASS",
+          "reason": "Safe."
+        },
+        {
+          "fullMatch": "'rg -i \"",
+          "args": "-i ",
+          "isUnrestricted": false,
+          "line": 88,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\analytics\\codebase-research.ts",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "`rg ${caseFlag} --json --max-count ${maxResults} --glob \"",
+          "args": "${caseFlag} --json --max-count ${maxResults} --glob ",
+          "isUnrestricted": false,
+          "line": 84,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\features\\feature-map-compiler.ts",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "`rg -l \"",
+          "args": "-l ",
+          "isUnrestricted": false,
+          "line": 263,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\indexer\\rg-search-utility.ts",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "`rg -n --column --no-heading --color never \"",
+          "args": "-n --column --no-heading --color never ",
+          "isUnrestricted": false,
+          "line": 31,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\tools\\handlers\\scanRepo.ts",
+      "category": "other",
+      "usages": [
+        {
+          "fullMatch": "`rg ${args.join('",
+          "args": "${args.join(",
+          "isUnrestricted": false,
+          "line": 67,
+          "status": "PASS",
+          "reason": "Safe."
+        }
+      ]
+    }
+  ],
+  "status": "PASS"
+}

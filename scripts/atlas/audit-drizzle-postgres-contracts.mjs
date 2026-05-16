@@ -65,11 +65,14 @@ const DRIZZLE_TO_PG = {
   halfvec:   ['USER-DEFINED'],
   date:      ['date'],
   smallint:  ['smallint', 'int2'],
+  'text[]':    ['ARRAY', '_text'],
+  'integer[]': ['ARRAY', '_int4'],
+  'real[]':    ['ARRAY', '_float4'],
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function rg(pattern, path, flags = []) {
-  const r = spawnSync('rg', [pattern, path, '--no-heading', '-n', ...flags], { encoding: 'utf8' });
+  const r = spawnSync('rg', [pattern, path, '-u', '--no-heading', '-n', ...flags], { encoding: 'utf8' });
   return (r.stdout ?? '').trim();
 }
 
@@ -130,9 +133,11 @@ function parseDrizzleSchema() {
         }
         const cm = line.match(/\b(uuid|integer|serial|bigserial|varchar|text|boolean|timestamp|jsonb|json|real|bigint|numeric|vector|halfvec|sparsevec|date|smallint)\s*\(\s*['"]([^'"]+)['"]/);
         if (cm) {
-          tables.get(currentTable)?.cols.set(cm[2], cm[1]);
+          let type = cm[1];
+          if (line.includes('.array(')) type += '[]';
+          tables.get(currentTable)?.cols.set(cm[2], type);
         }
-        if (braceDepth < 0) currentTable = null;
+        if (braceDepth <= 0) currentTable = null;
       }
     }
   }
