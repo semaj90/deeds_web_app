@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-16T19:39:08.252Z
+> Generated: 2026-05-16T20:03:25.485Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -1099,12 +1099,12 @@
 | ✅ | `sveltekit-frontend/scripts/phase104-backups/src` | 100 | 383 | 43530 | 12 | 10/88 | 36 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/screenshots` | 100 | 3 | 695 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/validate` | 100 | 2 | 1518 | 0 | 1/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src` | 100 | 16 | 657453 | 689 | 1125/897 | 9 | 🟠lh ⬜notest |
-| ✅ | `sveltekit-frontend/src/lib` | 100 | 6 | 416427 | 3 | 12/304 | 8 | 🟠lh |
+| ✅ | `sveltekit-frontend/src` | 100 | 16 | 657456 | 689 | 1125/897 | 9 | 🟠lh ⬜notest |
+| ✅ | `sveltekit-frontend/src/lib` | 100 | 6 | 416430 | 3 | 12/304 | 8 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/lib/data` | 100 | 5 | 1687 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/db` | 100 | 12 | 2897 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/intent` | 100 | 1 | 137 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 835 | 204382 | 3 | 9/222 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 835 | 204385 | 3 | 9/222 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/types` | 100 | 21 | 2998 | 0 | 0/5 | 0 | — |
 | ✅ | `sveltekit-frontend/src/mcp` | 100 | 14 | 14161 | 0 | 1/19 | 0 | — |
 | ✅ | `sveltekit-frontend/src/routes` | 100 | 6 | 221760 | 686 | 1111/571 | 1 | 🟠lh ⬜notest |
