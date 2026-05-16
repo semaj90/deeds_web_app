@@ -5,7 +5,7 @@
  */
 import { sql } from 'drizzle-orm';
 import { index, integer, jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
-import { vector } from 'pgvector/drizzle-orm';
+import { vector } from 'drizzle-orm/pg-core';
 
 // Users table
 export const users = pgTable('users', {

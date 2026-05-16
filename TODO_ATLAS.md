@@ -142,3 +142,13 @@
 - [ ] **build-atlas-index.mjs**: Harden against Postgres being offline (DONE — fail-open `.catch()` added at line 67).
 - [ ] **Redis KAG recall**: Populate `ace:fixer:patterns:<hmmState>` keys with past fix summaries for each error state.
 - [ ] **CI gate**: Wire `npm run audit:contracts --strict` as a pre-merge check blocking on high-severity findings.
+
+## Phase 6E Follow-up Findings (2026-05-16)
+- [x] Document manual sidecar SQL migrations in `sveltekit-frontend/drizzle/sidecar-migrations.json`.
+- [x] Update audit logic: `documented_sidecar` (low/info) vs `unknown_unjournaled_sql` (medium/fail).
+- [x] Replace legacy `pgvector/drizzle-orm` imports with `drizzle-orm/pg-core` in 4 schema files.
+- [x] Generate `docs/reports/pgvector-index-plan.md` with reviewed HNSW index SQL (operator must apply).
+- [ ] Apply `docs/reports/pgvector-index-plan.md` migration after Docker Postgres is confirmed up (operator gate).
+- [ ] Add `20260516_hnsw_indexes.sql` to `sidecar-migrations.json` once applied.
+- [ ] Run `npm run audit:pgvector` and confirm `hnsw_indexes` check passes.
+- [ ] Run `npm run audit:contracts` before every schema migration going forward.

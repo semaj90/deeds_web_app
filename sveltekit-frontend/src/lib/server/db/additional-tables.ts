@@ -11,7 +11,7 @@ import {
     uuid,
     varchar
 } from 'drizzle-orm/pg-core';
-import { vector } from 'pgvector/drizzle-orm';
+import { vector } from 'drizzle-orm/pg-core';
 import { cases, evidence, legalDocuments, users } from './schema-postgres.js';
 
 // Evidence Chain of Custody

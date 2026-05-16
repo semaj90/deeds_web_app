@@ -10,7 +10,7 @@ import {
     timestamp,
     uuid,
 } from 'drizzle-orm/pg-core';
-import { vector } from 'pgvector/drizzle-orm';
+import { vector } from 'drizzle-orm/pg-core';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ===============

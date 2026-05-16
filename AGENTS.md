@@ -94,3 +94,23 @@ npm run services:health:strict      # Exits 1 if Postgres or Redis are down
 6. `route_contract_mismatch` — missing `fail(400, { form })`, superValidate without load()
 7. `api_validation_gap` — POST/PATCH without Zod validation, legacy `zod` adapter
 8. `ssr_safety_violation` — `$lib/server/` imports in `.svelte` client files
+
+## Drizzle Sidecar Migration Policy (Phase 6E)
+
+**Definition**: A sidecar migration is a numbered `.sql` file in `drizzle/` that is intentionally **not** in `drizzle/meta/_journal.json` because it:
+- Uses SQL syntax Drizzle Kit cannot express (GIN trgm, HNSW, enum-only, concurrent index)
+- Was applied manually at a point where regenerating the journal snapshot would break drift
+
+**Rules**:
+1. Every sidecar MUST be listed in `sveltekit-frontend/drizzle/sidecar-migrations.json` with a `reason`, `appliedAt` date, and `validationCommand`.
+2. Unlisted unjournaled numbered SQL files are **WARN/FAIL** in the contract audit (`unknown_unjournaled_sql`).
+3. Do NOT delete or auto-journal sidecars without operator review.
+4. Do NOT add vector HNSW indexes without first reviewing `docs/reports/pgvector-index-plan.md`.
+5. Keep `drizzle/meta/` limited to `_journal.json` and `NNNN_snapshot.json` only — no `.md`, `.txt`, or other files.
+
+**Audit commands**:
+```bash
+npm run audit:drizzle-meta          # hygiene check (non-JSON detection)
+npm run audit:drizzle-meta:fix      # auto-move violations to drizzle/meta/archived/
+npm run audit:pgvector              # pgvector extension, HNSW indexes, dim validation
+```
