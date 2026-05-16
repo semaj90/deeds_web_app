@@ -1,0 +1,26 @@
+{
+  "runId": "karpathy-stage-2b-250",
+  "limit": 250,
+  "candidates": 138,
+  "qdrantHits": 122,
+  "summariesWritten": 46,
+  "directoriesConsidered": 50,
+  "directoryOutcomes": {
+    "summarized": 46,
+    "skipped_generated_dir": 0,
+    "skipped_archive_or_log": 0,
+    "skipped_too_many_files": 4,
+    "skipped_too_many_bytes": 0,
+    "no_qdrant_points": 0,
+    "no_source_files": 0,
+    "timeout": 0,
+    "cache_unchanged": 0,
+    "summary_failed": 0
+  },
+  "glyphAtlasUpserts": 46,
+  "redisCardsWritten": 46,
+  "gpuPeakVramMb": 4200,
+  "forbiddenFields": 0,
+  "atlasValidate": "passed",
+  "rootDryRun": "passed"
+}

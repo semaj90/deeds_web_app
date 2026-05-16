@@ -67,7 +67,8 @@
 param(
   [switch] $Detached,
   [switch] $TextOnly,
-  [switch] $NoEvict
+  [switch] $NoEvict,
+  [switch] $StatusOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -105,7 +106,23 @@ if ($env:ROTORQUANT_MODEL_PATH) {
 $mmproj  = if ($env:TURBO_MMPROJ_PATH) { $env:TURBO_MMPROJ_PATH } else { Join-Path $env:USERPROFILE 'Downloads\gemma4-mmproj\mmproj-BF16.gguf' }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
 $ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '4096' }
-$ngl     = if ($env:TURBO_NGL)         { $env:TURBO_NGL }         else { '99' }
+
+# ── GPU Offload (NGL) ────────────────────────────────────────────────────
+$ngl = if ($env:TURBO_NGL) { $env:TURBO_NGL } else { "35" }
+
+# Handle negative values — warn and normalize
+if ($ngl -match "^-") {
+    $requestedNgl = $ngl
+    $normalizedNgl = $ngl.Replace('-', '')
+    Write-Warning "TURBO_NGL is negative ($requestedNgl). llama.cpp-style --n-gpu-layers usually expects a positive layer count (e.g. 35, 99)."
+    Write-Host "  Requested NGL:  $requestedNgl" -ForegroundColor DarkGray
+    Write-Host "  Normalized NGL: $normalizedNgl" -ForegroundColor Gray
+    $ngl = $normalizedNgl
+}
+
+if ($ngl -eq "0") {
+    Write-Warning "GPU offload (TURBO_NGL) is 0. TurboQuant will run on CPU only."
+}
 
 # ── Profile shortcut: TURBO_PROFILE expands to (kvK, kvV) defaults. ──────
 # Explicit TURBO_KV_K / TURBO_KV_V env vars override the profile.
@@ -143,12 +160,6 @@ if ($supportedKv -notcontains $kvV) {
 if (-not (Test-Path $llama)) { throw "llama-server.exe not found at $llama" }
 if (-not (Test-Path $model)) { throw "TurboQuant model blob not found at $model" }
 
-# ── Already healthy? ─────────────────────────────────────────────────────
-try {
-  Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 1 | Out-Null
-  Write-Host ('TurboQuant already healthy on http://127.0.0.1:' + $port) -ForegroundColor Yellow
-  exit 0
-} catch { }
 
 # ── Pre-flight: evict Ollama-resident model so VRAM is free ──────────────
 if (-not $NoEvict) {
@@ -209,6 +220,57 @@ if ($turboRequested) {
     $kvK = 'q8_0'
     $kvV = 'q8_0'
   }
+}
+
+# ── Config Printout ──────────────────────────────────────────────────────
+$TurboDraftModel = $env:DRAFT_MODEL_PATH
+$TurboSpeculative = [bool]$TurboDraftModel
+$TurboFlashAttn = 'on' # Current script hardcodes -fa on
+
+Write-Host "`nTurboQuant resolved config:" -ForegroundColor Gray
+Write-Host "  URL:              http://127.0.0.1:$port"
+Write-Host "  Model:            $model"
+Write-Host "  Context:          $ctxLen"
+Write-Host "  GPU layers:       $ngl"
+Write-Host "  Flash attention:  $TurboFlashAttn"
+Write-Host "  KV cache K:       $kvK"
+Write-Host "  KV cache V:       $kvV"
+Write-Host "  Speculative:      $TurboSpeculative"
+if ($TurboSpeculative) {
+    Write-Host "  Draft model:      $TurboDraftModel"
+}
+
+# Diagnostic Warnings
+if ([string]::IsNullOrWhiteSpace($ngl) -or $ngl -eq "0") {
+    Write-Warning "GPU offload is not configured or set to 0. TurboQuant may run CPU-only."
+}
+if ($ngl -match "^-") {
+    # This block shouldn't be reached if normalized above, but kept for logic safety
+    Write-Warning "TURBO_NGL is negative ($ngl). llama.cpp-style --n-gpu-layers usually expects a positive layer count."
+}
+if (-not $TurboSpeculative) {
+    Write-Warning "No draft model configured. Speculative decoding is disabled."
+}
+Write-Host ""
+
+# ── Already healthy? ─────────────────────────────────────────────────────
+if (-not $StatusOnly) {
+    try {
+        Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 1 | Out-Null
+        Write-Host ('TurboQuant already healthy on http://127.0.0.1:' + $port) -ForegroundColor Yellow
+        exit 0
+    } catch { }
+}
+
+if ($StatusOnly) {
+    Write-Host "--- Status Check ---" -ForegroundColor Gray
+    try {
+        $health = Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 2
+        Write-Host "Health: OK (status: $($health.status))" -ForegroundColor Green
+    } catch {
+        Write-Host "Health: FAILED (server likely down on port $port)" -ForegroundColor Red
+    }
+    exit 0
 }
 
 # ── Build argument list ──────────────────────────────────────────────────
