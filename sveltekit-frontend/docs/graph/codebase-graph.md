@@ -1,26 +1,26 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-15T03:35:55.073Z
+> Generated: 2026-05-16T09:16:50.925Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 32044 |
+| Files | 32295 |
 | Routes | 1027 |
-| Components | 5329 |
-| API handlers | 5484 |
+| Components | 5331 |
+| API handlers | 5488 |
 | TODOs | 7697 |
-| Dirs | 1401 |
+| Dirs | 1063 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
 | G4 No auth | 0 |
-| G5 No Zod  | 1 |
-| G11 Localhost | 1415 |
+| G5 No Zod  | 0 |
+| G11 Localhost | 1400 |
 | G14 Svelte4 | 142 |
 | G15 SSR unsafe | 0 |
-| G16 No test | 5 |
+| G16 No test | 56 |
 | G20 Cyclic | 1 |
 
 ## Files with TODO/FIXME
@@ -40,7 +40,7 @@
 - `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
-- `scripts/phase104-backups/src/lib/services/vector-service.ts` — 13 marker(s)
+- `sveltekit-frontend/scripts/phase104-backups/src/lib/services/vector-service.ts` — 13 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/workers/aiProcessingWorker.js` — 12 marker(s)
 - `deeds_labs/routes-parked-full/admin/users/[userId]/+page.svelte` — 12 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/workers/aiProcessingWorker.js` — 12 marker(s)

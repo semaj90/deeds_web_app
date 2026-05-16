@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-05-16T09:06:17.439Z",
+  "checks": [
+    {
+      "check": "schema_top_level",
+      "pass": false,
+      "findingCount": 1
+    },
+    {
+      "check": "superValidate_pairing",
+      "pass": true,
+      "findingCount": 0
+    },
+    {
+      "check": "action_fail_contract",
+      "pass": true,
+      "findingCount": 0
+    },
+    {
+      "check": "client_superForm_pairing",
+      "pass": false,
+      "findingCount": 1
+    },
+    {
+      "check": "api_routes_zod_validation",
+      "pass": false,
+      "findingCount": 1
+    },
+    {
+      "check": "zod4_adapter",
+      "pass": true,
+      "findingCount": 0
+    },
+    {
+      "check": "server_import_leak",
+      "pass": true,
+      "findingCount": 0
+    },
+    {
+      "check": "orphaned_schemas",
+      "pass": true,
+      "findingCount": 0
+    }
+  ],
+  "findings": [
+    {
+      "findingId": "forms:schema-not-top-level:sveltekit-frontend\\src\\routes\\(app)\\evidence\\+page.server.ts:86",
+      "severity": "medium",
+      "layer": "superforms",
+      "code": "superforms_schema_not_top_level",
+      "file": "sveltekit-frontend\\src\\routes\\(app)\\evidence\\+page.server.ts",
+      "line": 86,
+      "problem": "Schema \"formData\" passed to superValidate() appears to be defined inside a function scope — Superforms v2 requires schemas at module top level to avoid re-creation on every request.",
+      "suggestedFix": "Move the formData schema definition to module top level (outside of any function/action/load)."
+    },
+    {
+      "findingId": "forms:client-superForm-server-load-missing-form:sveltekit-frontend\\src\\routes\\(app)\\admin\\knowledge-search\\+page.svelte",
+      "severity": "medium",
+      "layer": "superforms",
+      "code": "client_superForm_without_server_load",
+      "file": "sveltekit-frontend\\src\\routes\\(app)\\admin\\knowledge-search\\+page.svelte",
+      "problem": "Client calls superForm(data.form) but the server load() does not return a form object — data.form will be undefined.",
+      "suggestedFix": "In +page.server.ts load(), return { form: await superValidate(zod(schema)) }."
+    },
+    {
+      "findingId": "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\files\\+server.ts",
+      "severity": "high",
+      "layer": "api-contract",
+      "code": "api_route_parses_json_without_zod",
+      "file": "sveltekit-frontend\\src\\routes\\api\\files\\+server.ts",
+      "problem": "API route (UNKNOWN) reads request body via request.json()/formData() but does not validate it with Zod — untrusted input passes through unvalidated.",
+      "suggestedFix": "Import Zod schema and call schema.safeParse(body) before using the data. Return 400 on parse failure."
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "high": 1,
+    "medium": 2,
+    "low": 0
+  },
+  "status": "fail"
+}
