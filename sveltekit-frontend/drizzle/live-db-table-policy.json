@@ -1,0 +1,122 @@
+{
+  "_comment": "Live-DB table policy for Phase 9B Drizzle reconciliation. Every table present in the live Postgres but absent from canonical Drizzle schema must have a classification here. Status values: adopt_into_drizzle | manual_sidecar | legacy_shadow | external_service_owned | drop_candidate_requires_review | unknown.",
+  "_lastUpdated": "2026-05-16",
+  "_liveDbTableCount": "247 (approx)",
+  "_drizzleSchemaCount": "~148 canonical + ~30 sidecar",
+  "tables": [
+    {
+      "table": "code_retrieval_chunks",
+      "status": "manual_sidecar",
+      "owner": "Parent Atlas / Retrieval",
+      "reason": "Used by Atlas indexing and retrieval audits; created by manual SQL, not Drizzle.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "validationCommand": "npm run audit:contracts"
+    },
+    {
+      "table": "ace_chunks",
+      "status": "manual_sidecar",
+      "owner": "ACE / Retrieval pipeline",
+      "reason": "Protected by tablesFilter in drizzle.config.ts. Created by manual ACE indexer.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "validationCommand": "npm run audit:pgvector"
+    },
+    {
+      "table": "embedded_summaries",
+      "status": "manual_sidecar",
+      "owner": "Summarization pipeline",
+      "reason": "Protected by tablesFilter. Contains AI-generated summaries from async worker.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "validationCommand": "npm run audit:contracts"
+    },
+    {
+      "table": "trace_runs",
+      "status": "manual_sidecar",
+      "owner": "TRACE observability",
+      "reason": "Protected by tablesFilter. Written by TRACE MCP server.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "validationCommand": "npm run audit:contracts"
+    },
+    {
+      "table": "warden_chunks",
+      "status": "manual_sidecar",
+      "owner": "Warden / GPU-cache 384-dim lane",
+      "reason": "Protected by tablesFilter. Uses 384-dim embeddings (nomic-embed-text era). Do not mix with 768-dim tables.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "embeddingDim": 384,
+      "validationCommand": "npm run audit:pgvector"
+    },
+    {
+      "table": "kg_nodes",
+      "status": "legacy_shadow",
+      "owner": "Phase 89 Knowledge Graph",
+      "reason": "Protected by !kg_* tablesFilter. Created in old KG pipeline. Contains 2764+ rows — do NOT drop without operator review.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*) FROM kg_nodes;\""
+    },
+    {
+      "table": "kg_edges",
+      "status": "legacy_shadow",
+      "owner": "Phase 89 Knowledge Graph",
+      "reason": "Protected by !kg_* tablesFilter. Paired with kg_nodes.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*) FROM kg_edges;\""
+    },
+    {
+      "table": "phase89_error_patterns",
+      "status": "legacy_shadow",
+      "owner": "Phase 89 Error Analysis",
+      "reason": "Protected by !phase89_* tablesFilter. Legacy diagnostic table.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": true,
+      "dropRequiresReview": true,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*) FROM phase89_error_patterns;\""
+    },
+    {
+      "table": "vlm_image_tags",
+      "status": "adopt_into_drizzle",
+      "owner": "VLM vision pipeline",
+      "reason": "Created 2026-05-10 migration. Schema already in schema-postgres.ts. Verify Drizzle journal includes this.",
+      "adoptIntoDrizzle": true,
+      "dropCandidate": false,
+      "validationCommand": "npm --prefix sveltekit-frontend run db:check"
+    },
+    {
+      "table": "password_reset_tokens",
+      "status": "adopt_into_drizzle",
+      "owner": "Auth / Lucia",
+      "reason": "user_id converted from uuid to integer 2026-05-10. Schema in schema-postgres.ts.",
+      "adoptIntoDrizzle": true,
+      "dropCandidate": false,
+      "validationCommand": "npm --prefix sveltekit-frontend run db:check"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "status": "manual_sidecar",
+      "owner": "Codebase indexer / ACE",
+      "reason": "pgvector table for codebase chunks. HNSW index pending operator approval (see pgvector-index-plan.md).",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "embeddingDim": 768,
+      "validationCommand": "npm run audit:pgvector"
+    },
+    {
+      "table": "document_embeddings",
+      "status": "manual_sidecar",
+      "owner": "Document indexing pipeline",
+      "reason": "pgvector table. HNSW index pending.",
+      "adoptIntoDrizzle": false,
+      "dropCandidate": false,
+      "embeddingDim": 768,
+      "validationCommand": "npm run audit:pgvector"
+    }
+  ],
+  "unclassifiedPolicy": "Any live-only table NOT present in this file is treated as UNKNOWN and causes audit:contracts Layer 5 to FAIL. Add entries here after operator review.",
+  "drizzleFilterRef": "sveltekit-frontend/drizzle.config.ts tablesFilter protects !ace_chunks !embedded_summaries !trace_runs !warden_* !phase89_* !kg_*"
+}
