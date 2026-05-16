@@ -151,5 +151,19 @@
     "forbiddenFields": 0,
     "status": "success",
     "notes": "Neo4j optimized with Phase-based batching and path constraints. Qdrant syntax error resolved and fully recovered."
+  },
+  {
+    "phase": "karpathy_synthesis",
+    "run": "canary-25",
+    "timestamp": "2026-05-16T01:00:00Z",
+    "candidates": 25,
+    "gdsNodes": 14412,
+    "qdrantMatches": "250/250",
+    "collection": "codebase_chunks_768",
+    "atlasValidate": "passed",
+    "rootDryRun": "10/10 green",
+    "missingPayloads": 0,
+    "status": "success",
+    "notes": "Resolved Qdrant path alias mismatch. Neo4j GDS PageRank/Louvain verified. Canary successfully enriched 25 files with GPU attention and Gemma4 summaries."
   }
 ]

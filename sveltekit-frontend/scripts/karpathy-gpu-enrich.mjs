@@ -58,7 +58,7 @@ const LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 50;
 // ── Config ────────────────────────────────────────────────────────────────────
 const QDRANT_URL = process.env.QDRANT_URL;
 const COLLECTION = 'codebase_chunks_768';
-const NEO4J_URL = process.env.NEO4J_URL ?? process.env.NEO4J_URI;
+const NEO4J_URL = process.env.NEO4J_HTTP_URL ?? (process.env.NEO4J_URL ?? process.env.NEO4J_URI ?? 'http://localhost:7474').replace(/^bolt:\/\/|^neo4j:\/\//, 'http://').replace(':7687', ':7474');
 const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
 const REDIS_URL    = process.env.REDIS_URL;
