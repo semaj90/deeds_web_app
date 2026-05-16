@@ -114,7 +114,7 @@ export const users = pgTable('users', {
 export const sessions = pgTable('sessions',
  {
  id: text('id').primaryKey().notNull(),
- userId: uuid('user_id').notNull(),
+ userId: integer('user_id').notNull(),
  expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
  },
 	(table) => ({
@@ -129,7 +129,7 @@ export const sessions = pgTable('sessions',
 export const emailVerificationCodes = pgTable('email_verification_codes',
  {
  id: serial('id').primaryKey().notNull(), // Assuming serial ID
- userId: uuid('user_id').notNull(),
+ userId: integer('user_id').notNull(),
  email: varchar('email', { length: 255 }).notNull(),
  code: varchar('code', { length: 8 }).notNull(),
  expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }).notNull(),
@@ -266,7 +266,7 @@ export const evidence = pgTable('evidence', {
  .primaryKey()
  .notNull(),
  caseId: uuid('case_id'), // Foreign key to cases.id
- userId: uuid('user_id'), // Foreign key to users.id - owner of the evidence
+ userId: integer('user_id'), // Foreign key to users.id - owner of the evidence
  title: varchar('title', { length: 255 }).notNull(),
  description: text('description'),
  // OLD COLUMNS (preserve existing data)
@@ -400,7 +400,7 @@ export const documents = pgTable('documents', {
  s3Bucket: text('s3_bucket').default('legal-documents'),
  originalName: text('original_name'),
  mimeType: text('mime_type'),
- userId: uuid('user_id'),
+ userId: integer('user_id'),
 });
 
 // Define legalDocuments table (based on documents, with additional fields for Qdrant integration)
@@ -418,7 +418,7 @@ export const legalDocuments = pgTable('legal_documents',
  mimeType: text('mime_type').notNull(),
  fileSize: bigint('file_size', { mode: 'number' }).notNull().default(0),
  caseId: uuid('case_id'), // Foreign key to cases table
- userId: uuid('user_id'), // Foreign key to users table
+ userId: integer('user_id'), // Foreign key to users table
  evidenceId: uuid('evidence_id'), // Added: Foreign key to evidence table
  createdBy: uuid('created_by'), // Added: Foreign key to users table
  status: documentStatusEnum('status').notNull().default('queued'),
@@ -482,7 +482,7 @@ export const storageFiles = pgTable('storage_files',
  key: text('key').notNull(),
  original_name: text('original_name'),
  bucket: text('bucket').notNull(),
- userId: uuid('user_id'), // Foreign key to users table
+ userId: integer('user_id'), // Foreign key to users table
  size: bigint('size', { mode: 'bigint' }).notNull(),
  mime: text('mime'),
  uploadedAt: timestamp('uploaded_at').defaultNow().notNull(), // Changed to uploadedAt for consistency
@@ -879,7 +879,7 @@ export const citationCollections = pgTable(
       .default(sql`gen_random_uuid()`)
       .primaryKey()
       .notNull(),
-    userId: uuid('user_id')
+    userId: integer('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     name: varchar('name', { length: 255 }).notNull(),
@@ -956,7 +956,7 @@ export const reportAuditLog = pgTable(
     reportId: uuid('report_id')
       .notNull()
       .references(() => reports.id, { onDelete: 'cascade' }),
-    userId: uuid('user_id')
+    userId: integer('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'set null' }),
     action: varchar('action', { length: 50 }).notNull(), // 'created', 'updated', 'deleted', 'published', 'exported'
@@ -1008,7 +1008,7 @@ export const savedReports = pgTable('saved_reports', {
     .default(sql`gen_random_uuid()`)
     .primaryKey()
     .notNull(),
-  userId: uuid('user_id').notNull(), // FK to users.id
+  userId: integer('user_id').notNull(), // FK to users.id
   reportId: uuid('report_id').notNull(), // FK to reports.id
   caseId: uuid('case_id'), // FK to cases.id
   savedAt: timestamp('saved_at').defaultNow().notNull(),
@@ -1022,7 +1022,7 @@ export const themes = pgTable('themes', {
     .default(sql`gen_random_uuid()`)
     .primaryKey()
     .notNull(),
-  userId: uuid('user_id').notNull(), // FK to users.id
+  userId: integer('user_id').notNull(), // FK to users.id
   name: varchar('name', { length: 100 }).notNull(),
   config: jsonb('config').notNull(),
   isDefault: boolean('is_default').default(false).notNull(),
@@ -1220,7 +1220,7 @@ export const userEmbeddings = pgTable('user_embeddings', {
     .default(sql`gen_random_uuid()`)
     .primaryKey()
     .notNull(),
-  userId: uuid('user_id').notNull(),
+  userId: integer('user_id').notNull(),
   embedding: vector('embedding', { dimensions: 768 }).notNull(),
   model: varchar('model', { length: 100 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -1294,7 +1294,7 @@ export const ragSessions = pgTable('rag_sessions', {
     .default(sql`gen_random_uuid()`)
     .primaryKey()
     .notNull(),
-  userId: uuid('user_id').notNull(),
+  userId: integer('user_id').notNull(),
   caseId: uuid('case_id'),
   title: varchar('title', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -1405,7 +1405,7 @@ export const legalAnalysisSessions = pgTable('legal_analysis_sessions', {
     .default(sql`gen_random_uuid()`)
     .primaryKey()
     .notNull(),
-  userId: uuid('user_id').notNull(),
+  userId: integer('user_id').notNull(),
   caseId: uuid('case_id'),
   analysisType: varchar('analysis_type', { length: 100 }).notNull(),
   inputData: jsonb('input_data'),
@@ -2601,7 +2601,7 @@ export const errorSuggestionStates = pgTable('error_suggestion_states',
  .notNull()
  .references(() => errorSuggestions.id, { onDelete: 'cascade' }),
  routePath: varchar('route_path', { length: 255 }).notNull(),
- userId: uuid('user_id'),
+ userId: integer('user_id'),
  state: suggestionStateEnum('state').notNull().default('pending'),
  createdAt: timestamp('created_at').notNull().defaultNow(),
  updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -2673,7 +2673,7 @@ export const diagnosisEvents = pgTable('diagnosis_events',
 		cached: boolean('cached').notNull().default(false),
 		totalMs: integer('total_ms'),
 		stages: jsonb('stages').default({}).notNull(),
-		userId: uuid('user_id'),
+		userId: integer('user_id'),
 		feedbackAccurate: boolean('feedback_accurate'),
 		feedbackHelpful: boolean('feedback_helpful'),
 		queryEmbedding: vector('query_embedding', { dimensions: 768 }),
@@ -2735,7 +2735,7 @@ export const caseReports = pgTable('case_reports', {
 // === AUDIT LOG ===
 export const auditLog = pgTable('audit_log', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	userId: uuid('user_id').notNull(),
+	userId: integer('user_id').notNull(),
 	action: varchar('action', { length: 100 }).notNull(),
 	resourceType: varchar('resource_type', { length: 100 }).notNull(),
 	resourceId: varchar('resource_id', { length: 255 }).notNull(),
@@ -2779,7 +2779,7 @@ export const userInteractionHistory = pgTable(
 	'user_interaction_history',
 	{
 		id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-		userId: uuid('user_id').notNull(),
+		userId: integer('user_id').notNull(),
 		recommendationId: uuid('recommendation_id'), // Reference to earlier /api/recommendations response
 		documentId: uuid('document_id'),
 		caseId: uuid('case_id'),
@@ -2817,7 +2817,7 @@ export const evidenceAuditLog = pgTable('evidence_audit_log', {
 	evidenceId: uuid('evidence_id')
 		.notNull()
 		.references(() => evidence.id, { onDelete: 'cascade' }),
-	userId: uuid('user_id')
+	userId: integer('user_id')
 		.references(() => users.id, { onDelete: 'set null' }),
 	action: varchar('action', { length: 50 }).notNull(), // 'uploaded', 'viewed', 'updated', 'deleted', 'exported', 'tagged', 'analyzed'
 	changes: jsonb('changes'), // { field: { old, new } } diff
@@ -2912,7 +2912,7 @@ export type NewEvidenceForensicFlag = typeof evidenceForensicFlags.$inferInsert;
 export const analyticsEvents = pgTable('analytics_events', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	eventType: varchar('event_type', { length: 100 }).notNull(),
-	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+	userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
 	sessionId: varchar('session_id', { length: 255 }),
 	payload: jsonb('payload').default({}),
 	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
@@ -3204,7 +3204,7 @@ export type IngestionJob = typeof ingestionJobs.$inferSelect;
 
 export const aiUsageLog = pgTable('ai_usage_log', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+	userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
 	endpoint: varchar('endpoint', { length: 255 }).notNull(),
 	model: varchar('model', { length: 100 }).notNull(),
 	promptTokens: integer('prompt_tokens').default(0).notNull(),
@@ -3425,7 +3425,7 @@ export const apiAuditLog = pgTable('api_audit_log', {
 	path: varchar('path', { length: 500 }).notNull(),
 	statusCode: integer('status_code').notNull(),
 	durationMs: integer('duration_ms'),
-	userId: uuid('user_id'),
+	userId: integer('user_id'),
 	ipAddress: varchar('ip_address', { length: 45 }),
 	userAgent: varchar('user_agent', { length: 500 }),
 	requestBodySize: integer('request_body_size'),
