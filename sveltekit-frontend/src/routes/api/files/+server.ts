@@ -7,6 +7,28 @@ import { putFileToSeaweed, seaweedBucket } from "$lib/server/storage/seaweed.js"
 import crypto from "node:crypto";
 import { createUploadedFile } from "$lib/server/files/upload-file-service.js";
 import { ENV } from "$lib/server/env.server.js";
+import { z } from "zod";
+
+const ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+  'text/plain',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+
+const MAX_UPLOAD_BYTES = 50 * 1024 * 1024; // 50 MB
+
+const FileUploadSchema = z.object({
+  name: z.string().min(1, 'File name is required').max(255, 'File name too long'),
+  type: z.string().refine(
+    (t) => ALLOWED_MIME_TYPES.includes(t),
+    { message: 'File type not allowed' },
+  ),
+  size: z.number()
+    .min(1, 'Empty files not allowed')
+    .max(MAX_UPLOAD_BYTES, `File exceeds ${MAX_UPLOAD_BYTES / 1024 / 1024}MB limit`),
+});
 
 /**
  * GET /api/files
@@ -45,7 +67,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const file = form.get("file");
 
     if (!(file instanceof File)) {
-      throw error(400, "Missing file field");
+      return json({ error: "Missing file field" }, { status: 400 });
+    }
+
+    const parsed = FileUploadSchema.safeParse({ name: file.name, type: file.type, size: file.size });
+    if (!parsed.success) {
+      return json({ error: "Invalid file", issues: parsed.error.flatten() }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
