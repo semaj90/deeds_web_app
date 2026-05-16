@@ -1,0 +1,30 @@
+{
+  "sources": [
+    {
+      "sourceId": "sveltekit",
+      "runId": "docs-atlas-sveltekit-001",
+      "status": "canary_passed",
+      "topics": ["routing", "loading-data", "form-actions"],
+      "chunksCreated": 3,
+      "qdrantUpserts": 3,
+      "neo4jProjection": "complete",
+      "trustTier": "official_docs",
+      "promotionStatus": "external_unverified",
+      "llmsTxt": "docs/llms/generated/sveltekit.llms.txt",
+      "llmsFullTxt": "docs/llms/generated/sveltekit.llms-full.txt"
+    },
+    {
+      "sourceId": "drizzle",
+      "runId": "docs-atlas-drizzle-001",
+      "status": "canary_passed",
+      "topics": ["overview", "queries", "migrations"],
+      "chunksCreated": 8,
+      "qdrantUpserts": 8,
+      "neo4jProjection": "complete",
+      "trustTier": "official_docs",
+      "promotionStatus": "external_unverified",
+      "llmsTxt": "docs/llms/generated/drizzle.llms.txt",
+      "llmsFullTxt": "docs/llms/generated/drizzle.llms-full.txt"
+    }
+  ]
+}
