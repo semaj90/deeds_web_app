@@ -92,19 +92,38 @@
 - [ ] Add Redis SCAN-based cleanup script for a runId.
 - [ ] Add `atlas:rollback:dry-run`.
 
-## Phase 4: Legal-AI Product Integration
-- [ ] Surface Parent Atlas provenance in Admin Copilot.
-- [ ] Show: Qdrant sourceRefs, Neo4j graph paths, cluster aliases, Engram low_hint, trust tier, lane breakdown.
-- [ ] Add CrimeAnalysisService plan-only mode.
-- [ ] Separate facts, allegations, inferences, unknowns, and sourceRefs.
+## Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)
+- [ ] **Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance.
+- [ ] **Summary Verification**: Inspect `docs/graph/repo-neo4j-graphrag-report.json` for synthesis drift.
+- [ ] **Embedding Parity**: Ensure Qdrant `codebase_chunks_768` payloads contain accurate `sourceRefs`.
+
+## Phase 4: Admin Copilot UI Integration
+- [ ] **Provenance Display**: Show Qdrant `sourceRefs` and Neo4j graph paths in search results.
+- [ ] **Cluster Visualization**: Integrate 4D manifold cluster aliases into the UI.
+- [ ] **Direct Edit**: Enable operators to promote/demote synthesis trust tiers.
+
+## Phase 5: Neo4j Enhanced Synthesis + Feature Command Atlas
+- [ ] **Feature Registry**: Reconcile core architectural features with code-based evidence.
+- [ ] **Command Mapping**: Bridge features to safe, allowlisted MCP commands.
+- [ ] **Synthetic Evidence**: Generate concept cards for undocumented local patterns.
 
 ## Phase 6: Programming Docs Atlas
 - [x] **Registry**: Tier 1/2 sources defined in `programming-doc-sources.json`.
 - [x] **Ingestion Plane**: Crawl/Normalize/Chunk/Index scripts created.
-- [ ] **Data Lake**: Initialize `external_programming_docs_768` in Qdrant.
-- [ ] **Crawl (Canary)**: Execute dry-run for SvelteKit 2.
+- [x] **Data Lake**: Initialize `external_programming_docs_768` in Qdrant.
+- [x] **Crawl (Canary)**: Execute dry-run for SvelteKit 2.
 - [ ] **Concept Graph**: Project nodes/edges into Neo4j.
-- [ ] **Gap Report**: Generate first `programming-doc-feature-gap-report.json`.
+- [x] **Gap Report**: Generate first `programming-doc-feature-gap-report.json`.
 - [x] **MCP Surface**: `trace.docs_search` and `trace.docs_compare_feature` added.
 - [ ] **Product Integration**: Surface external sourceRefs in Admin Copilot.
 - [x] **Governance**: Versioned sources and `external_unverified` tagging enforced.
+
+## Phase 7: Knowledge-Base Retrieval Flow
+- [ ] **Multi-Lane Retrieval**: Combine Parent Atlas (Local) + Docs Atlas (External) + Web (Unverified).
+- [ ] **Reranking**: Use PageRank and Feature Authority to boost canonical sources.
+- [ ] **Synthesis**: Gemma4 generates answers only after `sourceRefs` are collected.
+
+## Phase 8: Immediate Next Steps
+- [x] **Validate Infrastructure**: `node scripts/atlas/validate-model-endpoints.mjs`.
+- [ ] **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
+- [ ] **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
