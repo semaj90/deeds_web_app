@@ -4098,15 +4098,26 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	// 4D manifold coords: [som_x, som_y, semantic_z, grpo_w] — matches research_summaries.manifold4
 	manifold4: real('manifold4').array(),
 
+	// ── Layer 2: Routing tier (compressed 64d centroid assignment) ──────────
+	// Set by the autoencoder pipeline after 768d embedding is complete.
+	// centroid_id → FK to centroid_registry; used to filter Qdrant ANN.
+	centroidId:           uuid('centroid_id'),
+	compressedEmbedding:  vector('compressed_embedding', { dimensions: 64 }),
+	reconstructionError:  real('reconstruction_error'), // MSE of 768d→64d→768d round-trip
+	routingTier:          varchar('routing_tier', { length: 10 }).default('cold'),
+	// routingTier: 'cold' (no centroid), 'warm' (centroid assigned), 'hot' (in Redis cluster card)
+
 	indexedAt: timestamp('indexed_at', { withTimezone: true }).notNull().default(sql`now()`),
 	enrichedAt: timestamp('enriched_at', { withTimezone: true }),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (table) => ({
-	qdrantIdUq: unique('codebase_chunk_index_qdrant_id_key').on(table.qdrantId),
-	repoIdIdx: index('codebase_chunk_index_repo_id_idx').on(table.repoId),
+	qdrantIdUq:   unique('codebase_chunk_index_qdrant_id_key').on(table.qdrantId),
+	repoIdIdx:    index('codebase_chunk_index_repo_id_idx').on(table.repoId),
 	gpuClusterIdx: index('codebase_chunk_index_gpu_cluster_idx').on(table.gpuCluster),
-	domainIdx: index('codebase_chunk_index_domain_idx').on(table.domain),
+	domainIdx:    index('codebase_chunk_index_domain_idx').on(table.domain),
 	extensionIdx: index('codebase_chunk_index_extension_idx').on(table.extension),
+	centroidIdx:  index('codebase_chunk_index_centroid_idx').on(table.centroidId),
+	routingTierIdx: index('codebase_chunk_index_routing_tier_idx').on(table.routingTier),
 }));
 
 /** Cluster-level LLM summaries — one row per (repo_id, gpu_cluster) pair */
@@ -4136,6 +4147,63 @@ export const clusterSummaries = pgTable('cluster_summaries', {
 	repoClusterUq: unique('cluster_summaries_repo_cluster_uq').on(table.repoId, table.gpuCluster),
 	repoClusterIdx: index('cluster_summaries_repo_cluster_idx').on(table.repoId, table.gpuCluster),
 }));
+
+// ── Vector Routing Tier (Layer 2) ─────────────────────────────────────────────
+// Compressed 64d centroids + cluster cards enable fast candidate routing
+// before the full 768d Qdrant ANN pass.  Pipeline:
+//   embed(768d) → autoencode(64d) → nearest centroid → cluster card
+//   → filter Qdrant by centroid_id → rerank 768d → ACE packet → Gemma4
+
+/**
+ * Centroid Registry — one row per k-means centroid per collection.
+ * centroid_key is stable across re-runs: "{collection}:k{k}:c{idx}"
+ * Migration: drizzle/manual/20260516_storage_tier_routing.sql
+ */
+export const centroidRegistry = pgTable('centroid_registry', {
+    id:             uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    centroidKey:    varchar('centroid_key', { length: 128 }).unique().notNull(),
+    collection:     varchar('collection', { length: 100 }).notNull(),
+    dimIn:          integer('dim_in').notNull().default(768),
+    dimOut:         integer('dim_out').notNull().default(64),
+    clusterK:       integer('cluster_k').notNull(),
+    clusterIdx:     integer('cluster_idx').notNull(),
+    centroidVector: vector('centroid_vector', { dimensions: 64 }),
+    memberCount:    integer('member_count').notNull().default(0),
+    semanticLabel:  text('semantic_label'),
+    topTags:        text('top_tags').array().notNull().default(sql`'{}'::text[]`),
+    authorityScore: real('authority_score').notNull().default(0),
+    builtAt:        timestamp('built_at', { withTimezone: true }).notNull().default(sql`now()`),
+    updatedAt:      timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (table) => ({
+    collectionKIdx:  index('centroid_registry_collection_k_idx').on(table.collection, table.clusterK, table.clusterIdx),
+    authorityIdx:    index('centroid_registry_authority_idx').on(table.collection, table.authorityScore),
+}));
+
+export type CentroidRegistry    = typeof centroidRegistry.$inferSelect;
+export type NewCentroidRegistry = typeof centroidRegistry.$inferInsert;
+
+/**
+ * Cluster Cards — denormalized fast-access card per centroid.
+ * Synced to Redis at `cluster:card:{centroid_id}` (TTL 3600s).
+ * Postgres is durable ground truth; Redis is the hot-path cache.
+ */
+export const clusterCards = pgTable('cluster_cards', {
+    centroidId:              uuid('centroid_id').primaryKey().notNull(),
+    collection:              varchar('collection', { length: 100 }).notNull(),
+    topChunkIds:             uuid('top_chunk_ids').array().notNull().default(sql`'{}'::uuid[]`),
+    topFilePaths:            text('top_file_paths').array().notNull().default(sql`'{}'::text[]`),
+    topTags:                 text('top_tags').array().notNull().default(sql`'{}'::text[]`),
+    clusterSummary:          text('cluster_summary'),
+    representativeEmbedding: vector('representative_embedding', { dimensions: 768 }),
+    authorityScore:          real('authority_score').notNull().default(0),
+    memberCount:             integer('member_count').notNull().default(0),
+    lastRebuiltAt:           timestamp('last_rebuilt_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (table) => ({
+    collectionAuthorityIdx: index('cluster_cards_collection_authority_idx').on(table.collection, table.authorityScore),
+}));
+
+export type ClusterCard    = typeof clusterCards.$inferSelect;
+export type NewClusterCard = typeof clusterCards.$inferInsert;
 
 /** GraphRAG community reports — one row per Leiden community (GraphRAG Stage 9b) */
 export const communityReports = pgTable('community_reports', {
