@@ -97,7 +97,11 @@ Do NOT attempt to mutate data or generate code for production use.
     // 5. Log Assistant Reply
     await AdminAiChatService.logMessage(session.id, 'assistant', assistantReply, {
       model: ENV.GEMMA4_MODEL,
-      context_used: true
+      context_used: true,
+      hits: systemContext.agentic?.hits || [],
+      graphPaths: systemContext.agentic?.graphPaths || [],
+      suggestedCommands: systemContext.suggestedCommands || [],
+      routingExplanation: systemContext.agentic?.routingExplanation
     });
 
     return json({

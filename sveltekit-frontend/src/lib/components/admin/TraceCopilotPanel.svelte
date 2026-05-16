@@ -3,6 +3,8 @@
   import { fade, slide } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import RoutingExplanationPanel from './RoutingExplanationPanel.svelte';
+  import SourceProvenancePanel from './SourceProvenancePanel.svelte';
+  import CommandSuggestPanel from './CommandSuggestPanel.svelte';
 
   // Props (Runes)
   let { contextTag = 'global', isOpen = $bindable(true) } = $props();
@@ -173,6 +175,16 @@
           {#if msg.metadata?.routingExplanation}
             <div class="mt-2 w-full max-w-[90%]">
               <RoutingExplanationPanel explanation={msg.metadata.routingExplanation} />
+            </div>
+          {/if}
+          {#if msg.metadata?.hits}
+            <div class="mt-2 w-full max-w-[95%]">
+              <SourceProvenancePanel hits={msg.metadata.hits} graphPaths={msg.metadata.graphPaths} />
+            </div>
+          {/if}
+          {#if msg.metadata?.suggestedCommands}
+            <div class="mt-2 w-full max-w-[95%]">
+              <CommandSuggestPanel commands={msg.metadata.suggestedCommands} />
             </div>
           {/if}
           {#if msg.metadata?.model}

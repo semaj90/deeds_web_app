@@ -50,7 +50,8 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
     retrievalHealth,
     evidenceContext,
     caseContext,
-    agenticResults
+    agenticResults,
+    commandSuggestions
   ] = await Promise.all([
     // 1. DB Row Counts (Quick probe)
     pool.query(`
@@ -89,7 +90,14 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
     // 6. Agentic Multi-Query Retrieval
     intent === 'agentic_multiquery' || intent === 'general'
       ? HyperRagFusionService.getInstance().search({ query, mode: 'codebase', topK: 10 }).catch(() => null)
-      : Promise.resolve(null)
+      : Promise.resolve(null),
+
+    // 7. Command Suggestions (Phase 76 MCP)
+    fetch(`${ENV.TRACE_MCP_URL}/function-call`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'trace.command_suggest', arguments: { task: query } })
+    }).then(r => r.json()).then(j => j.suggestions).catch(() => [])
   ]);
 
   await redis.quit();
@@ -107,6 +115,7 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
     },
     indexing: indexingStatus,
     agentic: agenticResults,
+    suggestedCommands: commandSuggestions,
     request: {
       query,
       currentPath,

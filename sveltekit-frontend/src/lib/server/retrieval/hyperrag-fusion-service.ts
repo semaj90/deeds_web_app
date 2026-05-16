@@ -33,7 +33,7 @@ export type LexicalClusterHit = {
   text: string;
 };
 
-export type HyperRagMode = 'codebase' | 'evidence' | 'legal' | 'docs';
+export type HyperRagMode = 'codebase' | 'evidence' | 'legal' | 'docs' | 'programming_docs';
 
 export type HyperRagQuery = {
   query: string;
@@ -261,13 +261,16 @@ export class HyperRagFusionService {
       if (step.name !== 'unfiltered' && !step.filter) continue;
       
       console.log(`[HyperRagFusionService] Attempting Qdrant search: ${step.name}`);
-      const [semantic, kag] = await Promise.all([
+      const [semantic, kag, externalDocs] = await Promise.all([
         this.searchQdrantMulti(qdrantUrl, targetCollection, variants, topK, 'semantic', { [query]: embedding }, step.filter).catch(() => []),
         this.searchQdrant(qdrantUrl, VECTOR_CONFIG.COLLECTIONS.summary_lenses, embedding, Math.ceil(topK / 2), 'kag').catch(() => []),
+        mode === 'codebase' 
+          ? this.searchQdrant(qdrantUrl, VECTOR_CONFIG.COLLECTIONS.programming_docs, embedding, 5, 'external_docs').catch(() => [])
+          : Promise.resolve([])
       ]);
       
       if (semantic.length >= minHits || step.name === 'unfiltered') {
-        qdrantSemantic = semantic;
+        qdrantSemantic = [...semantic, ...externalDocs];
         qdrantKag = kag;
         if (step.name !== 'strict_cluster') explanation.addFallback(`Fell back to ${step.name} due to low hit count`);
         break;
@@ -345,7 +348,9 @@ export class HyperRagFusionService {
         activity_w: (payload.activity_w ?? payload.pagerank ?? 0) as number,
         cluster_alias: clusterAlias ?? undefined,
         recencyOrHitRate: Math.max(hitRate, recencyBoost),
-        engramBoost: 0, // Placeholder
+        engramBoost: 0,
+        trustTier: (payload.trustTier ?? (pt.lane === 'external_docs' ? 'official_docs' : 'canonical')) as string,
+        isExternal: pt.lane === 'external_docs'
       };
 
       // Engram Boost (v1.1)
@@ -390,6 +395,7 @@ export class HyperRagFusionService {
       if (includeReasons) {
         if (pt.lane === 'semantic') reasons.push('Semantic match in codebase');
         if (pt.lane === 'kag') reasons.push('Topological match in directory atlas');
+        if (pt.lane === 'external_docs') reasons.push(`Official documentation match (${payload.sourceId || 'external'})`);
         if (hasClusterMatch) reasons.push(`Inferred same manifold cluster (${clusterMatch!.clusterId})`);
         if (signals.topologyRouted > 0) reasons.push(`Routed via topological centroid lookup (${clusterField})`);
         if (signals.turbovec > 0) reasons.push('TurboVec ANN prefilter hit');
@@ -680,6 +686,7 @@ INSTRUCTIONS:
       case 'evidence': return VECTOR_CONFIG.COLLECTIONS.evidence;
       case 'legal': return VECTOR_CONFIG.COLLECTIONS.legal_canon_chunks;
       case 'docs': return VECTOR_CONFIG.COLLECTIONS.knowledge;
+      case 'programming_docs': return VECTOR_CONFIG.COLLECTIONS.programming_docs;
       case 'codebase':
       default:
         return VECTOR_CONFIG.COLLECTIONS.codebase_chunks;
