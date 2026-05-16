@@ -1,0 +1,50 @@
+{
+  "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
+  "sidecars": [
+    {
+      "file": "0013_codeintel_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Code-intelligence GIN/trgm and B-tree indexes. Drizzle ORM cannot express GIN trgm ops (USING gin(col gin_trgm_ops)) natively — must live outside the journal.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname LIKE '%trgm%' LIMIT 5;\""
+    },
+    {
+      "file": "0016_codeintel_schema.sql",
+      "status": "manual_sidecar",
+      "reason": "Code-intelligence supplemental tables (codebase_chunk_index, ast_node_cache). Applied manually to avoid collision with drizzle-kit journal snapshot state at index 16.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('codebase_chunk_index','ast_node_cache');\""
+    },
+    {
+      "file": "0016_courtroom_3d_animation.sql",
+      "status": "manual_sidecar",
+      "reason": "Courtroom 3D animation tables (courtroom_models, courtroom_animations, courtroom_anim_type enum). Applied manually because drizzle-kit journal index 16 was already taken; enum creation requires sidecar pattern.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('courtroom_models','courtroom_animations');\""
+    },
+    {
+      "file": "0018_output_meta_manifold4.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds manifold4 real[] column to research_summaries for SOM 4D coordinate storage. Applied manually alongside journal entry 18 to avoid snapshot regeneration.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='research_summaries' AND column_name='manifold4';\""
+    },
+    {
+      "file": "0019_llm_context_cache.sql",
+      "status": "manual_sidecar",
+      "reason": "LLM context cache table (llm_context_cache) with JSONB payload. Applied manually because drizzle-kit snapshot was not regenerated after this addition.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='llm_context_cache';\""
+    }
+  ]
+}

@@ -345,27 +345,51 @@ async function auditMigrationsAndMeta() {
     }
   }
 
-  // 4b. migrations missing their Drizzle schema table (orphan migrations)
+  // 4b. migrations missing from journal — load sidecar manifest first
   if (existsSync(DRIZZLE_DIR)) {
-    const sqlFiles = readdirSync(DRIZZLE_DIR).filter(f => f.endsWith('.sql'));
+    const sidecarManifest = join(DRIZZLE_DIR, 'sidecar-migrations.json');
+    const sidecarFiles = new Set(
+      existsSync(sidecarManifest)
+        ? (readJson(sidecarManifest, { sidecars: [] }).sidecars ?? []).map(s => s.file)
+        : [],
+    );
+
+    const sqlFiles = readdirSync(DRIZZLE_DIR).filter(f => /^\d{4}_/.test(f) && f.endsWith('.sql'));
     const journalPath = join(DRIZZLE_META, '_journal.json');
     const journal = readJson(journalPath, { entries: [] });
     const journaledSnaps = new Set((journal.entries ?? []).map(e => e.tag));
 
     for (const sql of sqlFiles) {
       const tag = sql.replace('.sql', '');
-      if (!journaledSnaps.has(tag)) {
+      if (journaledSnaps.has(tag)) continue;
+
+      if (sidecarFiles.has(sql)) {
+        // Documented sidecar — low-severity informational only
+        findings.push(makeFinding({
+          layer: 'drizzle-meta',
+          hmmState: 'stale_migration',
+          severity: 'low',
+          localSourceRefs: [join(DRIZZLE_DIR, sql)],
+          externalSourceRefs: ['drizzle-kit:journal'],
+          problem: `Documented sidecar "${sql}" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).`,
+          expected: 'Sidecar migrations are applied manually and excluded from the journal by design.',
+          suggestedFix: 'No action required — verify it was applied: see validationCommand in sidecar-migrations.json.',
+          validationCommands: ['npm run audit:drizzle-meta'],
+          agentCommandKeys: ['drizzle.meta.check'],
+        }));
+      } else {
+        // Unknown unjournaled SQL — this is a real problem
         findings.push(makeFinding({
           layer: 'drizzle-meta',
           hmmState: 'stale_migration',
           severity: 'medium',
           localSourceRefs: [join(DRIZZLE_DIR, sql)],
           externalSourceRefs: ['drizzle-kit:journal'],
-          problem: `Migration file "${sql}" is not recorded in drizzle/meta/_journal.json — drizzle-kit migrate will skip it.`,
-          expected: 'All .sql files in drizzle/ should appear in the journal unless they are manually applied sidecars.',
-          suggestedFix: 'Apply manually: `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/' + sql + '` or add to journal.',
-          validationCommands: ['npm run db:check'],
-          agentCommandKeys: ['db.check'],
+          problem: `"${sql}" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.`,
+          expected: 'Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.',
+          suggestedFix: `Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/${sql}) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.`,
+          validationCommands: ['npm run audit:drizzle-meta', 'npm run db:check'],
+          agentCommandKeys: ['drizzle.meta.check', 'db.check'],
         }));
       }
     }
