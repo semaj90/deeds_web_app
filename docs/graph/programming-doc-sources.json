@@ -1,27 +1,66 @@
 {
   "tier1": [
-    { "id": "sveltekit", "name": "SvelteKit 2", "url": "https://kit.svelte.dev/docs", "version": "2.0" },
-    { "id": "svelte", "name": "Svelte 5", "url": "https://svelte.dev/docs", "version": "5.0" },
-    { "id": "drizzle", "name": "Drizzle ORM", "url": "https://orm.drizzle.team/docs/overview", "version": "0.44" },
-    { "id": "typescript", "name": "TypeScript", "url": "https://www.typescriptlang.org/docs/", "version": "5.7" },
-    { "id": "javascript", "name": "ECMAScript / JavaScript", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript", "version": "ES2024" },
-    { "id": "nodejs", "name": "Node.js", "url": "https://nodejs.org/docs/latest/api/", "version": "22.x" },
-    { "id": "postgresql", "name": "PostgreSQL", "url": "https://www.postgresql.org/docs/current/", "version": "16" },
-    { "id": "qdrant", "name": "Qdrant", "url": "https://qdrant.tech/documentation/", "version": "1.10" },
-    { "id": "neo4j-gds", "name": "Neo4j GDS", "url": "https://neo4j.com/docs/graph-data-science/current/", "version": "2.6" },
-    { "id": "redis", "name": "Redis", "url": "https://redis.io/docs/", "version": "7.2" },
-    { "id": "couchdb", "name": "CouchDB", "url": "https://docs.couchdb.org/en/stable/", "version": "3.3" },
-    { "id": "mcp", "name": "Model Context Protocol (MCP)", "url": "https://modelcontextprotocol.io/", "version": "1.0" }
+    {
+      "sourceId": "sveltekit",
+      "title": "SvelteKit Documentation",
+      "version": "2",
+      "baseUrl": "https://kit.svelte.dev/docs",
+      "kind": "framework_docs",
+      "licensePolicy": "respect_site_terms",
+      "crawlDepth": 3,
+      "include": ["/docs"],
+      "exclude": ["/blog", "/showcase"],
+      "topics": ["routing", "load", "actions", "hooks", "adapters"],
+      "trustTier": "official_docs"
+    },
+    {
+      "sourceId": "svelte",
+      "title": "Svelte 5 Documentation",
+      "version": "5",
+      "baseUrl": "https://svelte.dev/docs",
+      "kind": "framework_docs",
+      "licensePolicy": "respect_site_terms",
+      "crawlDepth": 3,
+      "include": ["/docs"],
+      "exclude": ["/blog"],
+      "topics": ["runes", "props", "events", "snippets"],
+      "trustTier": "official_docs"
+    },
+    {
+      "sourceId": "drizzle",
+      "title": "Drizzle ORM",
+      "version": "0.44",
+      "baseUrl": "https://orm.drizzle.team/docs/overview",
+      "kind": "orm_docs",
+      "licensePolicy": "respect_site_terms",
+      "crawlDepth": 3,
+      "include": ["/docs"],
+      "topics": ["schema", "queries", "migrations", "relations"],
+      "trustTier": "official_docs"
+    }
   ],
   "tier2": [
-    { "id": "webgpu", "name": "WebGPU / WGSL", "url": "https://www.w3.org/TR/webgpu/", "version": "1.0" },
-    { "id": "cuda", "name": "CUDA C++", "url": "https://docs.nvidia.com/cuda/", "version": "12.4" },
-    { "id": "cpp", "name": "C++", "url": "https://en.cppreference.com/w/cpp", "version": "C++23" },
-    { "id": "c", "name": "C", "url": "https://en.cppreference.com/w/c", "version": "C17" },
-    { "id": "napi", "name": "N-API", "url": "https://nodejs.org/api/n-api.html", "version": "latest" },
-    { "id": "grpc", "name": "gRPC", "url": "https://grpc.io/docs/", "version": "1.63" },
-    { "id": "protobuf", "name": "Protocol Buffers", "url": "https://protobuf.dev/", "version": "3.25" },
-    { "id": "http2", "name": "HTTP/2", "url": "https://httpwg.org/specs/rfc7540.html", "version": "RFC 7540" },
-    { "id": "quic", "name": "HTTP/3 / QUIC", "url": "https://quicwg.org/", "version": "RFC 9000" }
+    {
+      "sourceId": "webgpu",
+      "title": "WebGPU / WGSL",
+      "version": "1.0",
+      "baseUrl": "https://www.w3.org/TR/webgpu/",
+      "kind": "spec_docs",
+      "licensePolicy": "open_standard",
+      "crawlDepth": 2,
+      "topics": ["render-pipeline", "compute-shader", "bind-groups"],
+      "trustTier": "standard_body"
+    },
+    {
+      "sourceId": "cuda",
+      "title": "CUDA C++",
+      "version": "12.4",
+      "baseUrl": "https://docs.nvidia.com/cuda/",
+      "kind": "vendor_docs",
+      "licensePolicy": "nvidia_terms",
+      "crawlDepth": 3,
+      "topics": ["memory-management", "kernels", "streams"],
+      "trustTier": "official_docs"
+    }
   ]
 }
