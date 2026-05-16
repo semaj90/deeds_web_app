@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * Legal AI Chat Functionality Tests
@@ -8,7 +9,7 @@ import { test, expect } from '@playwright/test';
  * so tests gracefully handle missing services.
  */
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 test.describe('Legal AI Chat Functionality', () => {
   test.beforeEach(async ({ page }) => {

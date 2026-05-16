@@ -29,7 +29,7 @@ const { values: args } = parseArgs({
   },
 });
 
-const SVELTEKIT = args.sk_url || process.env.SVELTEKIT_URL || 'http://localhost:5173';
+const SVELTEKIT = args.sk_url || process.env.PUBLIC_APP_URL || process.env.SVELTEKIT_URL || 'http://localhost:5173';
 const PG_URL    = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
 const QDRANT    = process.env.QDRANT_URL ?? 'http://localhost:6333';

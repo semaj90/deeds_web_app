@@ -10,6 +10,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { PORTS } from './helpers/env-ports.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +21,7 @@ const screenshotDir = path.join(__dirname, '../reports/phase99-screenshots');
 test.describe('Phase 99: /cases Route Testing', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to cases page
-    await page.goto('http://localhost:5173/cases');
+	    await page.goto(`${PORTS.APP_BASE}/cases`);
     await page.waitForLoadState('networkidle');
   });
 
@@ -60,7 +61,7 @@ test.describe('Phase 99: /cases Route Testing', () => {
       });
     } else {
       // Try navigating directly
-      await page.goto('http://localhost:5173/cases/new');
+	      await page.goto(`${PORTS.APP_BASE}/cases/new`);
       await page.waitForLoadState('networkidle');
 
       await page.screenshot({
@@ -71,7 +72,7 @@ test.describe('Phase 99: /cases Route Testing', () => {
   });
 
   test('should check for form fields on /cases/new', async ({ page }) => {
-    await page.goto('http://localhost:5173/cases/new');
+	    await page.goto(`${PORTS.APP_BASE}/cases/new`);
     await page.waitForLoadState('networkidle');
 
     // Expected fields from database schema
@@ -127,7 +128,7 @@ test.describe('Phase 99: /cases Route Testing', () => {
   });
 
   test('should test form validation behavior', async ({ page }) => {
-    await page.goto('http://localhost:5173/cases/new');
+	    await page.goto(`${PORTS.APP_BASE}/cases/new`);
     await page.waitForLoadState('networkidle');
 
     // Try submitting empty form
@@ -155,7 +156,7 @@ test.describe('Phase 99: /cases Route Testing', () => {
 
 test.describe('Phase 99: /evidence Route Testing', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5173/evidence');
+	    await page.goto(`${PORTS.APP_BASE}/evidence`);
     await page.waitForLoadState('networkidle');
   });
 
@@ -185,7 +186,7 @@ test.describe('Phase 99: /evidence Route Testing', () => {
       await uploadButton.click();
       await page.waitForLoadState('networkidle');
     } else {
-      await page.goto('http://localhost:5173/evidence/upload');
+	      await page.goto(`${PORTS.APP_BASE}/evidence/upload`);
       await page.waitForLoadState('networkidle');
     }
 
@@ -220,7 +221,7 @@ test.describe('Phase 99: /evidence Route Testing', () => {
   });
 
   test('should check evidence form validation', async ({ page }) => {
-    await page.goto('http://localhost:5173/evidence/upload');
+	    await page.goto(`${PORTS.APP_BASE}/evidence/upload`);
     await page.waitForLoadState('networkidle');
 
     const submitButton = page.locator('button[type="submit"]').first();
@@ -273,7 +274,7 @@ test.describe('Phase 99: Database Schema vs Form Fields Analysis', () => {
     };
 
     // Navigate to cases form
-    await page.goto('http://localhost:5173/cases/new');
+	    await page.goto(`${PORTS.APP_BASE}/cases/new`);
     await page.waitForLoadState('networkidle');
 
     // Detect form fields
@@ -289,7 +290,7 @@ test.describe('Phase 99: Database Schema vs Form Fields Analysis', () => {
     );
 
     // Navigate to evidence form
-    await page.goto('http://localhost:5173/evidence/upload');
+	    await page.goto(`${PORTS.APP_BASE}/evidence/upload`);
     await page.waitForLoadState('networkidle');
 
     const evidenceInputs = await page.locator('input, textarea, select').all();

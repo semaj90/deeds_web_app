@@ -18,8 +18,9 @@
 import { test, expect } from '@playwright/test';
 import { captureNumberedStep } from './utils/screenshot-utils';
 import { timeouts } from './utils/test-fixtures';
+import { PORTS } from '../helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 
 // Seeded credentials (from db:seed / manual SQL insert)
 const SEED_USERS = {

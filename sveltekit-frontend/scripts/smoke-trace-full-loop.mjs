@@ -42,7 +42,7 @@ const ROOT      = join(__dirname, '..');
 
 const STRICT   = process.argv.includes('--strict') || process.env.TRACE_STRICT === '1';
 const QUIET    = process.argv.includes('--quiet');
-const BASE_URL = process.env.ACE_FULL_LOOP_URL ?? process.env.VITE_BASE_URL ?? 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? process.env.ACE_FULL_LOOP_URL ?? process.env.VITE_BASE_URL ?? 'http://localhost:5173';
 const ENDPOINT = `${BASE_URL}/api/v1/chat/completions`;
 
 const color = {

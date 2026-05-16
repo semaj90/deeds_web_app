@@ -12,8 +12,9 @@
 
 import type { Page, ConsoleMessage, APIRequestContext } from '@playwright/test';
 import pg from 'pg';
+import { PORTS } from '../../helpers/env-ports.js';
 
-export const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+export const BASE = PORTS.APP_BASE;
 
 // Port 5434 = deeds-postgres-prod-proxy → legal-ai-postgres container.
 // Port 5432 on the host is squatted by a native Windows Postgres.

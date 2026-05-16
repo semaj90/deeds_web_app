@@ -3,7 +3,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 
-const NEO4J_URL = process.env.NEO4J_URI || 'bolt://localhost:7687';
+const NEO4J_URL = ENV.NEO4J_URI;
 
 export async function synthesizeCommunityRelationships() {
   console.log('[relationship-synthesizer] Starting inter-community synthesis...');

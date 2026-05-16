@@ -12,7 +12,7 @@
  *   5. Service block has expected service keys
  */
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? process.env.BASE_URL ?? 'http://localhost:5173';
 const COOKIE = process.env.SESSION_COOKIE ?? '';
 
 const REQUIRED_KEYS = [

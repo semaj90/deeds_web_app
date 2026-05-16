@@ -5,8 +5,13 @@ let bridge: {
   attentionScoreGPU?: (query: Float32Array, dim: number, candidates: Float32Array, n: number) => Float32Array;
 } | null = null;
 
+// IMPORTANT: this file lives at src/lib/server/ai/.
+// The native bridge lives outside sveltekit-frontend at ../simd-bridge/.
+// Prefer process.cwd() when this service is launched from sveltekit-frontend.
+// Avoid fragile ../../../../ paths; four levels only reaches sveltekit-frontend.
+// Native bridge failure must fall back to CPU scoring unless this is an explicit verification command.
 try {
-  bridge = require('../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node');
+  bridge = require('../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node');
 } catch (err) {
   if (!process.env.VITEST) {
     console.warn('[LibTorchReranker] Native bridge unavailable, using CPU fallback:', err instanceof Error ? err.message : err);

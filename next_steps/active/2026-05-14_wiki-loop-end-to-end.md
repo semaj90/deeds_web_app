@@ -31,7 +31,7 @@ Finish the canonical Karpathy / LLMS / atlas loop so graph ingestion, graph algo
 - CI should prefer the smaller smoke slices until the full loop is stable under the available services.
 
 ## Next work
-1. Add the remaining graph ingestion / Qdrant tag refresh steps to the heavy lane wrapper.
+1. ~~Add the remaining graph ingestion / Qdrant tag refresh steps to the heavy lane wrapper.~~ Done in `wiki:loop`.
 2. Verify pgvector and Qdrant produce matching cosine-ranked candidates.
 3. Extend multi-hop traversal synthesis for node neighborhood expansion.
 4. Fold the enhanced graph mapping outputs back into the LLMS atlas refresh.

@@ -27,8 +27,9 @@ import { test as base, type Page } from '@playwright/test';
 import { test as forensicTest } from './forensic-page';
 import { existsSync, mkdirSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { PORTS } from '../../../helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 const STORAGE_STATE = resolve(process.cwd(), 'playwright', '.auth', 'user.json');
 const STORAGE_TTL_MS = 30 * 60 * 1000; // 30 min — re-login if file older
 

@@ -31,19 +31,19 @@ const FRONTEND_ROOT = path.resolve(__dirname, '..');
 
 const RUNS = [
 	{
-		label:     'agents:index:smoke',
-		summaryRe: /\[agents:index\] summary=(\{.*\})/,
-		argv:      ['node', 'scripts/agents/build-agents-index.mjs', '--dry-run', '--limit', '10', '--quiet'],
+		label:     'llms:index:smoke',
+		summaryRe: /\[llms:index\] summary=(\{.*\})/,
+		argv:      ['node', 'scripts/llms/build-llms-index.mjs', '--dry-run', '--limit', '10', '--quiet'],
 	},
 	{
-		label:     'agents:cache:smoke',
+		label:     'llms:cache:smoke',
 		summaryRe: /\[mini-active-cache\] summary=(\{.*\})/,
-		argv:      ['node', 'scripts/agents/build-mini-active-cache.mjs', '--dry-run', '--quiet', '--skip-neo4j'],
+		argv:      ['node', 'scripts/llms/build-mini-active-cache.mjs', '--dry-run', '--quiet', '--skip-neo4j'],
 	},
 	{
-		label:     'agents:regen:smoke',
-		summaryRe: /\[agents:regen\] summary=(\{.*\})/,
-		argv:      ['npx', 'tsx', 'scripts/agents-md-regen.ts', '--all', '--limit', '10', '--dry-run', '--quiet', '--skip-activity', '--skip-clusters'],
+		label:     'llms:enrich:smoke',
+		summaryRe: /\[enrich-llms-md\] summary=(\{.*\})/,
+		argv:      ['node', 'scripts/enrich-llms-md.mjs', '--dry-run', '--quiet'],
 	},
 ];
 
@@ -94,7 +94,7 @@ const startMs = Date.now();
 const results = [];
 let exitCode = 0;
 
-console.log(`[agents:smoke:all] running ${RUNS.length} smokes (cwd=${FRONTEND_ROOT})`);
+console.log(`[llms:smoke:all] running ${RUNS.length} smokes (cwd=${FRONTEND_ROOT})`);
 
 for (const run of RUNS) {
 	const t0 = Date.now();
@@ -131,6 +131,6 @@ const summary = {
 	violations:   results.filter((r) => r.violations && r.violations.length > 0).length,
 	durationMs:   totalMs,
 };
-console.log(`[agents:smoke:all] summary=${JSON.stringify(summary)}`);
+console.log(`[llms:smoke:all] summary=${JSON.stringify(summary)}`);
 
 process.exit(exitCode);

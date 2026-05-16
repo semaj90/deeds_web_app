@@ -65,6 +65,55 @@ function Write-EnvValue {
     Set-Content -Path $Path -Value $lines -Encoding UTF8
 }
 
+function Write-HermesMcpConfig {
+    $hermesDir = Join-Path $env:USERPROFILE '.hermes'
+    New-Item -ItemType Directory -Force -Path $hermesDir | Out-Null
+
+    $cfgPath = Join-Path $hermesDir 'mcp.json'
+    $cfg = [ordered]@{
+        '$schema' = 'https://schemas.hermes.dev/mcp-config/v1.json'
+        generatedBy = 'start-hermes-stack.ps1'
+        generatedAt = (Get-Date).ToString('o')
+        mcpServers = [ordered]@{
+            'trace-readonly' = [ordered]@{
+                url = 'http://127.0.0.1:8788/mcp'
+                transport = 'http'
+                description = 'TRACE read-only MCP for Hermes Workspace'
+                allow = @(
+                    'trace.kag_search',
+                    'trace.explain_retrieval',
+                    'kb.hybrid_search',
+                    'kb.trace_search',
+                    'kb.search_pathways',
+                    'kb.wiki_note_lookup',
+                    'kb.search_summary_tree',
+                    'db.schema_overview',
+                    'db.table_inspect',
+                    'topology.search_4d',
+                    'topology.search_som_neighborhood',
+                    'graph.expand_neighborhood',
+                    'graph.pagerank_top',
+                    'graph.shortest_path',
+                    'context.build_kv_packet',
+                    'context.get_compressed_card',
+                    'context.prefetch_feature_context'
+                )
+                block = @(
+                    'shell.*', 'bash.*', 'exec.*',
+                    'db.execute_write', 'db.run_migration', 'db.*write*',
+                    'cache.delete_*', 'redis.flush*',
+                    'rabbitmq.publish_*', 'queue.publish_*',
+                    'graph.materialize_pathway', 'topology.recompute*',
+                    'kag.ingest_*'
+                )
+            }
+        }
+    }
+
+    $cfg | ConvertTo-Json -Depth 10 | Set-Content -Path $cfgPath -Encoding UTF8
+    Write-Host ("  wrote {0}" -f $cfgPath)
+}
+
 Write-Step 'Ollama'
 if (Test-Port 11434) {
     Write-Host '  already running'
@@ -104,6 +153,7 @@ if ($hermesExe) {
     $hermesHome = Join-Path $env:USERPROFILE '.hermes'
     $hermesEnv = Join-Path $hermesHome '.env'
     Write-EnvValue -Path $hermesEnv -Key 'API_SERVER_ENABLED' -Value 'true'
+    Write-HermesMcpConfig
 
     if (-not (Test-Port 8642)) {
         Start-Process -FilePath $hermesExe -ArgumentList 'gateway run' -WindowStyle Minimized

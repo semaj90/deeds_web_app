@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const API_URL = process.env.API_URL || 'http://localhost:5173/api/codebase-index/karpathy-hook';
+const APP_BASE = process.env.PUBLIC_APP_URL ?? process.env.APP_URL ?? 'http://localhost:5173';
+const API_URL = process.env.API_URL || `${APP_BASE}/api/codebase-index/karpathy-hook`;
 
 async function runKarpathyHook(dir) {
 	console.log(`[karpathy-hook] Scanning directory: ${dir}`);

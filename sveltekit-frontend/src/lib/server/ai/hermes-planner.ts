@@ -151,7 +151,7 @@ Return ONLY valid JSON matching this schema exactly:
 // Hermes gateway client
 // ---------------------------------------------------------------------------
 
-const HERMES_GATEWAY_URL = process.env.HERMES_API_URL ?? 'http://127.0.0.1:8642';
+const HERMES_GATEWAY_URL = ENV.HERMES_API_URL;
 
 export interface AvailableSignals {
   hasEncoded64: boolean;

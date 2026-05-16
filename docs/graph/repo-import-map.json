@@ -1,0 +1,409 @@
+{
+  "repo": "deeds-web-app",
+  "generatedAt": "2026-05-16T01:33:55.854Z",
+  "totalFiles": 32135,
+  "topTargets": [
+    {
+      "key": "@sveltejs/kit",
+      "value": 5760
+    },
+    {
+      "key": "$lib/types",
+      "value": 4202
+    },
+    {
+      "key": "./$types.js",
+      "value": 2484
+    },
+    {
+      "key": "$lib/types/enhanced-svelte5-types",
+      "value": 1924
+    },
+    {
+      "key": "./$types",
+      "value": 1845
+    },
+    {
+      "key": "svelte",
+      "value": 1750
+    },
+    {
+      "key": "path",
+      "value": 1645
+    },
+    {
+      "key": "drizzle-orm",
+      "value": 1642
+    },
+    {
+      "key": "fs",
+      "value": 1396
+    },
+    {
+      "key": "vitest",
+      "value": 1128
+    },
+    {
+      "key": "svelte/store",
+      "value": 1023
+    },
+    {
+      "key": "zod",
+      "value": 1011
+    },
+    {
+      "key": "$app/environment",
+      "value": 945
+    },
+    {
+      "key": "crypto",
+      "value": 776
+    },
+    {
+      "key": "url",
+      "value": 700
+    },
+    {
+      "key": "$lib/server/db",
+      "value": 622
+    },
+    {
+      "key": "$lib/server/db/client",
+      "value": 622
+    },
+    {
+      "key": "child_process",
+      "value": 559
+    },
+    {
+      "key": "xstate",
+      "value": 543
+    },
+    {
+      "key": "lucide-svelte",
+      "value": 534
+    },
+    {
+      "key": "$lib/server/env.server.js",
+      "value": 501
+    },
+    {
+      "key": "pg",
+      "value": 473
+    },
+    {
+      "key": "fs/promises",
+      "value": 467
+    },
+    {
+      "key": "$lib/components/ui/Button.svelte",
+      "value": 442
+    },
+    {
+      "key": "ioredis",
+      "value": 434
+    },
+    {
+      "key": "$lib/server/db/schema-postgres",
+      "value": 419
+    },
+    {
+      "key": "node:path",
+      "value": 416
+    },
+    {
+      "key": "svelte/transition",
+      "value": 366
+    },
+    {
+      "key": "drizzle-orm/pg-core",
+      "value": 342
+    },
+    {
+      "key": "node:fs",
+      "value": 322
+    },
+    {
+      "key": "./types.js",
+      "value": 295
+    },
+    {
+      "key": "@qdrant/js-client-rest",
+      "value": 293
+    },
+    {
+      "key": "fast-check",
+      "value": 292
+    },
+    {
+      "key": "$lib/server/redis.js",
+      "value": 288
+    },
+    {
+      "key": "$lib/components/ui/Icon.svelte",
+      "value": 282
+    },
+    {
+      "key": "$lib/server/db/schema",
+      "value": 275
+    },
+    {
+      "key": "$lib/middleware/redis-orchestrator-middleware",
+      "value": 267
+    },
+    {
+      "key": "$app/navigation",
+      "value": 263
+    },
+    {
+      "key": "bits-ui",
+      "value": 244
+    },
+    {
+      "key": "@unocss/core",
+      "value": 240
+    },
+    {
+      "key": "redis",
+      "value": 238
+    },
+    {
+      "key": "postgres",
+      "value": 218
+    },
+    {
+      "key": "./types",
+      "value": 203
+    },
+    {
+      "key": "$lib/server/redis",
+      "value": 202
+    },
+    {
+      "key": "node:crypto",
+      "value": 195
+    },
+    {
+      "key": "os",
+      "value": 195
+    },
+    {
+      "key": "node:url",
+      "value": 195
+    },
+    {
+      "key": "@playwright/test",
+      "value": 193
+    },
+    {
+      "key": "dotenv",
+      "value": 191
+    },
+    {
+      "key": "$lib/server/ollama.js",
+      "value": 183
+    }
+  ],
+  "topSources": [
+    {
+      "key": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "value": 40
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts",
+      "value": 40
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+      "value": 40
+    },
+    {
+      "key": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "value": 35
+    },
+    {
+      "key": "deeds_labs/dead-scripts/phase-scripts/phase74-complete-import-fix.mjs",
+      "value": 30
+    },
+    {
+      "key": "deeds_labs/dead-scripts/syntax-repair/patterns/import-type-fix.test.ts",
+      "value": 30
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ai/AgentOrchestrator.svelte",
+      "value": 30
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/keyboard/KeyboardShortcuts.svelte",
+      "value": 30
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/notes/LegalNotesManager.svelte",
+      "value": 30
+    },
+    {
+      "key": "deeds_labs/snapshots/2026-03-10/bucket-c-stale/.svelte5-fix-backups/20251214_113406/src/lib/components/notes/LegalNotesManager.svelte",
+      "value": 30
+    },
+    {
+      "key": "deeds_labs/snapshots/2026-03-15-root/node-scripts/fetch-docs-output.js",
+      "value": 30
+    },
+    {
+      "key": "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+      "value": 30
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/(app)/cases/[id]/+page.svelte",
+      "value": 30
+    },
+    {
+      "key": "deeds_labs/dead-scripts/phase-scripts/generate-enhanced-training-data.mjs",
+      "value": 29
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/api/rag/search/+server.ts",
+      "value": 29
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
+      "value": 29
+    },
+    {
+      "key": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
+      "value": 27
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/(app)/+layout.svelte",
+      "value": 27
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/(app)/citations/+page.svelte",
+      "value": 26
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/js_tests/fix-all-ui-ux-enhanced.mjs",
+      "value": 25
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/api/codebase-index/orchestrate/+server.ts",
+      "value": 25
+    },
+    {
+      "key": "deeds_labs/dead-scripts/phase-scripts/complete-prosecutor-mvp.mjs",
+      "value": 24
+    },
+    {
+      "key": "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-presets/preset-mini/src/_rules/default.ts",
+      "value": 24
+    },
+    {
+      "key": "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-presets/preset-mini/src/_rules/default.ts",
+      "value": 24
+    },
+    {
+      "key": "sveltekit-frontend/src/hooks.server.ts",
+      "value": 24
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/(app)/evidence/+page.svelte",
+      "value": 24
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/api/search/+server.ts",
+      "value": 24
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ai/EnhancedAIChatTest.svelte",
+      "value": 23
+    },
+    {
+      "key": ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/legal/precedent/matching/+page.svelte",
+      "value": 22
+    },
+    {
+      "key": "deeds_labs/dead-scripts/phase-scripts/fix-colon-separated-imports.mjs",
+      "value": 22
+    },
+    {
+      "key": "deeds_labs/frontend/svelte4-archive/components/layout/ProductionLayout.svelte",
+      "value": 22
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/layout/ProductionLayout.svelte",
+      "value": 22
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/enhanced-ai-synthesis-orchestrator.ts",
+      "value": 22
+    },
+    {
+      "key": "deeds_labs/projects/agentic-error-resolution/fixed/phase2/routes/legal/precedent/matching/+page.svelte",
+      "value": 22
+    },
+    {
+      "key": "deeds_labs/dead-scripts/phase-scripts/fix-enhanced-bits-imports.mjs",
+      "value": 21
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/citations/CitationsManager.svelte",
+      "value": 21
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/editor/LegalDocumentEditor.svelte",
+      "value": 21
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/backups/phase34-backups/src/routes/investigation/+page.svelte",
+      "value": 21
+    },
+    {
+      "key": "sveltekit-frontend/src/lib/server/agent/autonomous-agent.ts",
+      "value": 21
+    },
+    {
+      "key": "sveltekit-frontend/src/mcp/server.ts",
+      "value": 21
+    },
+    {
+      "key": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EvidenceCanvasEditor.svelte",
+      "value": 20
+    },
+    {
+      "key": "deeds_labs/dead-scripts/phase-scripts/phase15d_rune_injector.mjs",
+      "value": 20
+    },
+    {
+      "key": "deeds_labs/frontend/svelte4-archive/components/upload/FileUploadForm.svelte",
+      "value": 20
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/upload/FileUploadForm.svelte",
+      "value": 20
+    },
+    {
+      "key": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/backups/phase34-backups/src/routes/legal/research/+page.svelte",
+      "value": 20
+    },
+    {
+      "key": "deeds_labs/projects/agentic-error-resolution/fixed/phase2/lib/components/canvas/EvidenceCanvasEditor.svelte",
+      "value": 20
+    },
+    {
+      "key": "deeds_labs/routes-parked-full/help/+page.svelte",
+      "value": 20
+    },
+    {
+      "key": "deeds_labs/snapshots/2026-03-15-root/ts/fetch-latest-docs.ts",
+      "value": 20
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/(app)/global-search/+page.svelte",
+      "value": 20
+    },
+    {
+      "key": "sveltekit-frontend/src/routes/+layout.svelte",
+      "value": 20
+    }
+  ]
+}

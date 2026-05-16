@@ -12,7 +12,7 @@
 import { Pool } from 'pg';
 
 const DATABASE_URL = 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const DEV_SERVER_URL = 'http://localhost:5173';
+const DEV_SERVER_URL = process.env.PUBLIC_APP_URL ?? 'http://localhost:5173';
 
 async function checkDevServer() {
 	try {

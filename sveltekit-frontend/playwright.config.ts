@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { PORTS } from './tests/helpers/env-ports.js';
 
 /**
  * Playwright Configuration for E2E Testing
@@ -97,7 +98,7 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL for the SvelteKit dev server
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173',
+    baseURL: PORTS.APP_BASE,
 
     // Collect trace on first retry for debugging
     trace: 'on-first-retry',
@@ -152,7 +153,7 @@ export default defineConfig({
   // Web server: auto-start in CI, reuse existing locally
   webServer: {
     command: 'npm run dev',
-    url: 'http://127.0.0.1:5173',
+    url: PORTS.APP_BASE,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

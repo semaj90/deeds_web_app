@@ -16,7 +16,7 @@
 import pg from 'pg';
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
-const DEV_SERVER = process.env.DEV_SERVER || 'http://localhost:5173';
+const DEV_SERVER = process.env.PUBLIC_APP_URL ?? (process.env.DEV_SERVER || 'http://localhost:5173');
 const CASE_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 const runUpload = process.argv.includes('--upload');
 

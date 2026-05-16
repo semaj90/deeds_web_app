@@ -3,9 +3,10 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
+import { PORTS } from './helpers/env-ports.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 /**
  * Create a valid test PNG using Node.js sharp (already a project dependency).

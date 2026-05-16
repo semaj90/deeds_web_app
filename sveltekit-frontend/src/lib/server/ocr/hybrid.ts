@@ -6,10 +6,11 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { createWorker } from 'tesseract.js';
 import os from 'os';
+import { ENV } from '$lib/server/env.server.js';
 
 /** VLM OCR endpoints — tries llama-server VLM first, then Ollama as fallback */
-const VLM_BASE_URL = process.env.VLM_BASE_URL ?? 'http://localhost:8085';
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const VLM_BASE_URL = ENV.VLM_BASE_URL;
+const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
 const VLM_MODEL_NAME = process.env.VLM_MODEL ?? 'gemma4-legal-vlm';
 /** Confidence threshold below which Tesseract result triggers VLM supplement */
 const VLM_OCR_THRESHOLD = 0.6;

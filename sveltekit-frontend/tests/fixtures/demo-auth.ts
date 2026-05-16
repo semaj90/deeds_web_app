@@ -11,6 +11,7 @@
 
 import { test as base, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { PORTS } from '../helpers/env-ports.js';
 
 /**
  * Extended test fixture that automatically logs in as demo user
@@ -18,7 +19,7 @@ import type { Page } from '@playwright/test';
 export const test = base.extend<{ authenticatedPage: Page }>({
 	authenticatedPage: async ({ page }, use) => {
 		// Navigate to dev login endpoint and create session
-		const response = await page.request.post('http://localhost:5173/api/dev/login-demo');
+		const response = await page.request.post(`${PORTS.APP_BASE}/api/dev/login-demo`);
 
 		if (!response.ok()) {
 			throw new Error(
@@ -31,7 +32,7 @@ export const test = base.extend<{ authenticatedPage: Page }>({
 		console.log(`[fixture] Logged in as ${data.user.email} (${data.user.role})`);
 
 		// Navigate to dashboard to verify session
-		await page.goto('http://localhost:5173/dashboard');
+		await page.goto(`${PORTS.APP_BASE}/dashboard`);
 
 		// Verify we're logged in (no redirect to /auth/login)
 		await expect(page).not.toHaveURL(/\/auth\/login/);

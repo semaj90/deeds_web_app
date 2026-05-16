@@ -11,7 +11,7 @@ class AgentOrchestrator {
         this.ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
         this.tritonUrl = process.env.TRITON_URL || 'http://localhost:8000';
         this.mcpUrl = process.env.MCP_URL || 'http://localhost:3003';
-        this.apiToolUrl = process.env.TOOL_API_URL || process.env.APP_URL || 'http://localhost:5173';
+        this.apiToolUrl = process.env.PUBLIC_APP_URL || process.env.TOOL_API_URL || process.env.APP_URL || 'http://localhost:5173';
         this.conversationState = [];
         this.toolCallLog = [];
 

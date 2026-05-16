@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 test.describe('Store Consolidation Smoke Tests', () => {
   test('auth store loads without errors', async ({ page }) => {
@@ -11,7 +12,7 @@ test.describe('Store Consolidation Smoke Tests', () => {
     });
 
     // Navigate to a page that uses auth store
-    await page.goto('http://localhost:5173/');
+		await page.goto(PORTS.APP_BASE);
     await page.waitForLoadState('networkidle');
 
     // Check for import errors related to auth stores
@@ -22,7 +23,7 @@ test.describe('Store Consolidation Smoke Tests', () => {
     expect(importErrors).toHaveLength(0);
   });
 
-  test('AI assistant store loads without errors', async ({ page }) => {
+	  test('AI assistant store loads without errors', async ({ page }) => {
     const errors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -31,7 +32,7 @@ test.describe('Store Consolidation Smoke Tests', () => {
     });
 
     // Navigate to AI chat page
-    await page.goto('http://localhost:5173/ai-chat');
+		await page.goto(`${PORTS.APP_BASE}/ai-chat`);
     await page.waitForLoadState('networkidle');
 
     // Check for import errors related to AI stores
@@ -51,7 +52,7 @@ test.describe('Store Consolidation Smoke Tests', () => {
     });
 
     // Navigate to chat page
-    await page.goto('http://localhost:5173/chat');
+		await page.goto(`${PORTS.APP_BASE}/chat`);
     await page.waitForLoadState('networkidle');
 
     // Check for import errors related to chat stores
@@ -83,7 +84,7 @@ test.describe('Store Consolidation Smoke Tests', () => {
     `;
 
     // For this test, we'll just verify no console errors on main pages
-    await page.goto('http://localhost:5173/');
+		await page.goto(PORTS.APP_BASE);
 
     // If we get here without errors, stores are loading
     expect(true).toBe(true);

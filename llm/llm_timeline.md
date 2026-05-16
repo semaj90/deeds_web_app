@@ -15,3 +15,4 @@ Append-only event log for this repo-local wiki.
 - 2026-05-14T00:00:00Z — added docs codebase atlas landing page — created docs-facing home under `docs/codebase_atlas/` — `docs/codebase_atlas/README.md`
 - 2026-05-14T00:00:00Z — added docs atlas pages — created docs-facing index, root map, and Karpathy traversal pages — `docs/codebase_atlas/index.md`, `docs/codebase_atlas/repo_root_map.md`, `docs/codebase_atlas/karpathy_llmwiki.md`
 - 2026-05-14T00:00:00Z — expanded docs atlas — added feature, package, language, and top-script maps — `docs/codebase_atlas/feature_map.md`, `docs/codebase_atlas/package_map.md`, `docs/codebase_atlas/language_counts.md`, `docs/codebase_atlas/top_scripts.md`
+- 2026-05-15T10:00:00Z — hardened ACE topological infrastructure — resolved LibTorch bridge pathing, integrated topology search (8101) into dev-everything, and established gRPC/simdjson boundaries — `libtorch-reranker.ts`, `dev-everything.mjs`, `ace-incremental-startup.mjs`

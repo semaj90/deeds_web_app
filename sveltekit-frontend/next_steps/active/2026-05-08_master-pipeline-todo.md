@@ -31,7 +31,7 @@ Run any of these to refresh signals: `npm run karpathy:gpu`, `npm run hypergraph
 | Karpathy attention z-score sigmoid | spread 0.05–0.96 (was saturated at 1.0) |
 | PageRank cache full-200 | 200/200 non-zero entries |
 | `agents_md.shares_tags` + `agents_md.binding_chain` MCP tools | renamed, no name collisions |
-| `smoke:atlas` 16-probe regression | every Pipeline lane gated |
+| `smoke:atlas` 16-probe regression | every Pipeline lane gated; dev-server-down runs may skip HTTP probe |
 | `seed-hit-demand.mjs` startup wire-up | folderOpen, 5min cooldown |
 | `DATABASE_URL_FALLBACK` removed | tsgo green; :5434 canonical |
 | Drizzle schema-postgres.ts +15 columns | mirrors live `hypergraph_edges` shape |
@@ -135,7 +135,7 @@ Bullets above are Gemma4-generated; weight them as priors, not commands. Verify 
 
 ```bash
 # Auto-fires on folderOpen via .vscode/tasks.json — these are manual triggers if needed
-npm run smoke:atlas                # verify atlas + MCP + HTTP all green (16 probes)
+npm run smoke:atlas                # verify atlas + MCP + HTTP; dev-server-down runs may skip the HTTP probe
 npm run skill:codebase-todo:stdout # regenerate Gemma4 recommendations
 npm run ace:hit-demand             # refresh chunk_hit_log → Redis
 npm run karpathy:gpu               # refresh GPU authority blend (24h TTL)

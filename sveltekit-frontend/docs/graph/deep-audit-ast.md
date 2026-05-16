@@ -1,13 +1,13 @@
 # Deep AST Audit
 
-Generated: 2026-05-14T01:10:51.901Z
-Graph files: 4980
+Generated: 2026-05-15T22:18:13.123Z
+Graph files: 32135
 
 ## Summary
 
 | Gate | Description | Count |
 | :--- | :--- | ---: |
-| D9 | Likely orphans (0 fanIn, no dynImport ref) | 872 |
+| D9 | Likely orphans (0 fanIn, no dynImport ref) | 11958 |
 
 ---
 
@@ -19,38 +19,38 @@ Graph files: 4980
 >
 > Files listed here are likely unused, but still require `/audit-components` disposition before deletion or archive. Do not bulk-prune — let the skill classify the first 20-30, then archive in batches.
 
-**872** findings (showing first 30)
+**11958** findings (showing first 30)
 
-- `src/lib/ai/base64-fp32-quantizer.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/client/db/loki-client.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/client/timeline-client.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/client-logging.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/admin/SummarizeButton.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/audio/AudioAnalysisView.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/chat/AudioUploadWidget.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/chat/ChatPromptBar.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/codebase/TagDeleteDialog.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/document/DocumentAnalysisView.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/evidence/EvidenceImageSearch.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/evidence/VlmTagModal.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/glyph/GlyphAtlasPanel.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/monitoring/CacheWarmUpControl.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/ui/ContextMenuSeparator.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/ui/gaming/constants/gaming-constants-minimal.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/ui/gaming/types/gaming-types-minimal.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/ui/IconContainer.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/ui/tooltip.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/ui/wrappers/bits/bits-overrides.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/components/video/VideoAnalysisView.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/config/pgvector-gpu-config.js:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/config/redis-config.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/data/route-groups-config.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/db/queries/route-health-archive.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/db/schema/gpuInferenceDemo.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/db/vite-error-schema.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/machines/AIAssistantMachineComponent.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/machines/audio-upload-machine.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
-- `src/lib/machines/evidence-analysis-machine.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.claude/hooks/posttooluse-audit.mjs:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.claude/hooks/pretooluse-deny.mjs:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AdvancedRichTextEditor.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AgentOrchestrator.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatInput.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatInterface.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatMessage.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIProcessingDashboard.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIServiceStatus.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/ChatInterface.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/cognitive/NeuralPerformanceDashboard.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/CudaSearch.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/Enhanced3DLegalAIInterface.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedAIAssistant.simple.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedAIAssistant.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedContextualChat.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedMCPIntegration.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedVectorSearch.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EvidenceTimelineCard.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/FindModal.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/GamingAIInterface.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/GPUStreamingChat.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/IntegratedAIChat.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/IntelligentWebAnalysisDemo.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/LegalAIPipelineDemo.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/LLMProviderSelector.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/MultiAgentAnalysisCard.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/MultiLLMOrchestrator.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/NESTextureStreamer.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/NeuralTopology3DDemo.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
 
 ---
 
@@ -58,7 +58,7 @@ Graph files: 4980
 
 Each skill is a multi-gate agentic pipeline that drills deeper than this AST audit. Run from Claude Code via `/<skill-name>`:
 
-- /audit-components — verify 872 D9 orphan candidates with 8-gate test (G0 transitive-dep, G0.5 dynamic-import, G1-G8 disposition)
+- /audit-components — verify 11958 D9 orphan candidates with 8-gate test (G0 transitive-dep, G0.5 dynamic-import, G1-G8 disposition)
 - /prune-codebase — full archive flow with G6 route reachability + reverse-dependency chain
 - /deep-audit — full 47-gate sweep covering G1-G47 (compounds D1-D10 with infra, security, RL pipeline)
 - /graphify — refresh codebase-graph.json + glyph_atlas + cluster_summaries; D9 false-positive count drops once new fanIn data lands

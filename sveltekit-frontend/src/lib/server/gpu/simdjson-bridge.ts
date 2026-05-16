@@ -13,6 +13,10 @@
  *   - SIMD-friendly FNV-1a: samples 64-byte prefix + stride tail — stays in L1 cache
  *   - Payloads < 1 KB bypass native (V8 JIT faster for small strings)
  *   - TTL eviction: stale entries cleared on each insert
+ *
+ * SIMDJSON USAGE RULES:
+ * - simdjson is ONLY for JSON text payloads such as Ollama / TurboQuant responses.
+ * - Do NOT use fastJsonParse on gRPC streams, Protobuf buffers, or tensor TypedArrays.
  */
 
 import { resolve } from 'path';

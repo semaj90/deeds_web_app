@@ -16,8 +16,9 @@
 
 // @vitest-environment node
 import { describe, expect, it, beforeAll } from 'vitest';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE = 'http://localhost:5173';
+const BASE = PORTS.APP_BASE;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

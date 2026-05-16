@@ -14,7 +14,7 @@
  * 9. Response includes confidence factors + context metadata
  */
 
-const BASE = 'http://127.0.0.1:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
 const CASE_ID = 'c9b79f5d-5d81-40ee-9c60-4945a6b38287';
 const COUCHDB = 'http://127.0.0.1:5984';
 const COUCHDB_HEADERS = { 'Authorization': 'Basic ' + Buffer.from('admin:legal_ai_pass').toString('base64') };

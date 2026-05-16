@@ -7,7 +7,7 @@
  * potentially uses tools like web_search.
  */
 
-const BASE = process.env.BASE_URL || 'http://127.0.0.1:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://127.0.0.1:5173');
 const ENDPOINT = `${BASE}/api/codeintel/fix`;
 
 const cyan = (s) => `\x1b[36m${s}\x1b[0m`;

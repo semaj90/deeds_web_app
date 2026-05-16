@@ -63,7 +63,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT      = path.resolve(__dirname, '../..');   // sveltekit-frontend/
 const PLANS_DIR = path.join(ROOT, 'next_steps', 'active');
 
-const DEV_SERVER   = process.env.DEV_SERVER_URL  ?? 'http://localhost:5173';
+const DEV_SERVER   = process.env.PUBLIC_APP_URL ?? process.env.DEV_SERVER_URL  ?? 'http://localhost:5173';
 const TURBO_URL    = process.env.TURBO_URL        ?? 'http://localhost:8090';
 const OLLAMA_URL   = process.env.OLLAMA_BASE_URL  ?? 'http://localhost:11434';
 const BYPASS_HEADER = { 'x-dev-bypass-auth': 'true' };

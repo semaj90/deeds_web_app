@@ -15,10 +15,15 @@
  */
 
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join, dirname, relative } from 'node:path';
+import { join, dirname, relative, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
+import pg from 'pg';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = join(__dirname, '..');
@@ -142,23 +147,65 @@ async function loadRedisData() {
     await r.connect();
     const nodeKeys = await r.keys('code:graph:node:*');
     const hotKeys  = await r.keys('code:graph:hotspot:*');
+    const prKeys   = await r.keys('graph:pagerank:file:*');
 
-    const readAll = async (keys) => {
+    const readAll = async (keys, isLegacy = true) => {
       const out = [];
       for (let i = 0; i < keys.length; i += 500) {
         const pipe = r.pipeline();
         for (const k of keys.slice(i, i+500)) pipe.get(k);
         const res = await pipe.exec();
-        out.push(...res.map(([,v]) => { try { return JSON.parse(v); } catch { return null; } }).filter(Boolean));
+        out.push(...res.map(([,v], idx) => {
+          if (!v) return null;
+          if (isLegacy) {
+            try { return JSON.parse(v); } catch { return null; }
+          } else {
+            // pagerank keys are just numbers
+            const fp = keys[i+idx].replace('graph:pagerank:file:', '');
+            return { file_path: fp, pagerank: parseFloat(v) };
+          }
+        }).filter(Boolean));
       }
       return out;
     };
 
-    const nodes    = await readAll(nodeKeys);
-    const hotspots = await readAll(hotKeys);
+    const nodes    = await readAll(nodeKeys, true);
+    const hotspots = await readAll(hotKeys, true);
+    const prNodes  = await readAll(prKeys, false);
+
+    // Merge prNodes into nodes if they don't exist
+    for (const prn of prNodes) {
+      if (!nodes.find(n => n.file_path === prn.file_path)) {
+        nodes.push(prn);
+      }
+    }
+
     await r.quit().catch(() => {});
     return { nodes, hotspots };
   } catch { await r.quit().catch(() => {}); return { nodes: [], hotspots: [] }; }
+}
+
+// ── PG read ────────────────────────────────────────────────────────────────────
+async function loadEnhancedMappings() {
+  const pool = new pg.Pool({ connectionString: DB_URL });
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, kind, label, path, summary, edges, scores, flags, metadata
+       FROM enhanced_graph_mappings
+       WHERE kind IN ('file', 'directory', 'route', 'feature')`
+    );
+    await pool.end();
+    
+    const mapping = new Map(); // path -> row
+    for (const r of rows) {
+      if (r.path) mapping.set(r.path, r);
+    }
+    return mapping;
+  } catch (err) {
+    console.warn(`⚠️  Postgres unavailable (${err.message}) — Enhanced mappings won't enrich the output`);
+    await pool.end();
+    return new Map();
+  }
 }
 
 // ── Build directory stats ─────────────────────────────────────────────────────
@@ -378,12 +425,93 @@ function buildFixTimeline(relDir, limit = 6) {
   ].join('\n');
 }
 
+// ── Generate Enhanced Graph section ───────────────────────────────────────────
+function buildGraphSection(relDir, nodes, enhancedMappings) {
+  // Check for directory mapping
+  const dirMapping = enhancedMappings.get(relDir) || enhancedMappings.get(relDir === '' ? 'root' : relDir);
+  
+  const lines = [];
+  lines.push(`## Enhanced Graph Context`);
+  lines.push('');
+  
+  if (dirMapping) {
+    if (dirMapping.summary) {
+      lines.push(`> ${dirMapping.summary.split('\n')[0]}`);
+      lines.push('');
+    }
+    
+    const scores = dirMapping.scores || {};
+    if (scores.authority || scores.pagerank) {
+      lines.push(`- **Authority Score**: ${(scores.authority ?? scores.pagerank ?? 0).toFixed(4)}`);
+    }
+    
+    const edges = dirMapping.edges || [];
+    const relations = [...new Set(edges.map(e => e.relation))];
+    if (relations.length > 0) {
+      lines.push(`- **Key Relations**: ${relations.join(', ')}`);
+    }
+  }
+
+  // 1. Start with files from PG enhanced mappings
+  const filesMap = new Map(); // name -> { path, auth, flags }
+  
+  for (const m of enhancedMappings.values()) {
+    if (m.kind !== 'file' || !m.path) continue;
+    const mDir = dirname(m.path).replace(/\\/g, '/');
+    if (mDir === relDir || (relDir === '.' && mDir === '')) {
+      const name = basename(m.path);
+      filesMap.set(name, {
+        name,
+        path: m.path,
+        auth: m.scores?.authority ?? m.scores?.pagerank ?? 0,
+        flags: m.flags ? `0x${m.flags.toString(16)}` : '-'
+      });
+    }
+  }
+
+  // 2. Add/Update with Redis PageRank data
+  for (const node of nodes) {
+    if (!node.file_path) continue;
+    const nDir = dirname(node.file_path).replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
+    if (nDir === relDir || (relDir === '.' && nDir === '')) {
+      const name = basename(node.file_path);
+      const existing = filesMap.get(name);
+      const pr = node.pagerank || node.directFanIn || 0;
+      if (existing) {
+        if (pr > existing.auth) existing.auth = pr;
+      } else {
+        filesMap.set(name, {
+          name,
+          path: node.file_path,
+          auth: pr,
+          flags: '-'
+        });
+      }
+    }
+  }
+
+  const combined = Array.from(filesMap.values())
+    .sort((a,b) => b.auth - a.auth)
+    .slice(0, 10);
+
+  if (combined.length > 0) {
+    lines.push('');
+    lines.push('| File | Authority | Flags |');
+    lines.push('|------|-----------|-------|');
+    for (const f of combined) {
+      lines.push(`| \`${f.name}\` | ${f.auth.toFixed(3)} | ${f.flags} |`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
 // ── Enrich a single LLMS.md ─────────────────────────────────────────────────
 const GEN_MARKER = '<!-- LLMS-GEN v1';
-const ENRICH_START = '<!-- LLMS-ENRICH v1 · auto-generated by enrich-llms-md.mjs · do not edit manually -->';
+const ENRICH_START = '<!-- LLMS-ENRICH v1'; // Match prefix to be robust
 const ENRICH_END   = '<!-- /LLMS-ENRICH -->';
 
-function enrichFile(llmsMdPath, dirStats) {
+function enrichFile(llmsMdPath, dirStats, nodes, hotspots, enhancedMappings) {
   const absDir  = dirname(llmsMdPath);
   const relDir  = relative(ROOT, absDir).replace(/\\/g, '/');
 
@@ -392,26 +520,31 @@ function enrichFile(llmsMdPath, dirStats) {
   const current = readFileSync(llmsMdPath, 'utf8');
 
   let base = current;
-  const enrichStart = base.indexOf(ENRICH_START);
-  const enrichEndIdx = base.indexOf(ENRICH_END);
-  if (enrichStart !== -1 && enrichEndIdx !== -1) {
-    base = base.slice(0, enrichStart) + base.slice(enrichEndIdx + ENRICH_END.length);
+  while (true) {
+    const startIdx = base.indexOf(ENRICH_START);
+    if (startIdx === -1) break;
+    const endIdx = base.indexOf(ENRICH_END, startIdx);
+    if (endIdx === -1) break;
+    base = base.slice(0, startIdx) + base.slice(endIdx + ENRICH_END.length);
   }
+  base = base.trim();
 
   const gateSection    = buildGateSection(relDir, dirStats);
   const todoSection    = buildTodoSection(relDir, dirStats);
   const timelineSection = buildFixTimeline(relDir);
+  const graphSection    = buildGraphSection(relDir, nodes, enhancedMappings);
 
+  const fullEnrichStart = '<!-- LLMS-ENRICH v1 · auto-generated by enrich-llms-md.mjs · do not edit manually -->';
   const enrichBlock = [
-    ENRICH_START,
+    fullEnrichStart,
     '',
+    graphSection,
     gateSection,
-    '',
     todoSection,
+    '',
     timelineSection,
     ENRICH_END,
-    '',
-  ].join('\n');
+  ].filter(s => s !== undefined && s !== null).join('\n');
 
   let newContent;
   const genIdx = base.indexOf(GEN_MARKER);
@@ -435,6 +568,10 @@ console.log(`  nodes=${nodes.length}  hotspots=${hotspots.length}`);
 const dirStats = buildDirStats(nodes, hotspots);
 console.log(`  directories mapped: ${dirStats.size}`);
 
+console.log(`\n[enrich-llms-md] Loading Enhanced Graph Mappings …`);
+const enhancedMappings = await loadEnhancedMappings();
+console.log(`  mappings loaded: ${enhancedMappings.size}`);
+
 console.log(`\n[enrich-llms-md] Finding LLMS.md files …`);
 const llmsMdFiles = findLLMSMd(SRC);
 console.log(`  found: ${llmsMdFiles.length}`);
@@ -442,7 +579,7 @@ console.log(`  found: ${llmsMdFiles.length}`);
 console.log(`\n[enrich-llms-md] Enriching … ${DRY_RUN ? '(dry-run)' : ''}`);
 let updated = 0;
 for (const f of llmsMdFiles) {
-  const changed = enrichFile(f, dirStats);
+  const changed = enrichFile(f, dirStats, nodes, hotspots, enhancedMappings);
   if (changed) {
     const rel = relative(ROOT, f).replace(/\\/g, '/');
     console.log(`  ✓ ${rel}`);
@@ -460,4 +597,10 @@ if (!DRY_RUN) {
 }
 
 console.log(`\n[enrich-llms-md] Done in ${((Date.now()-t0)/1000).toFixed(1)}s`);
+console.log(`[enrich-llms-md] summary=${JSON.stringify({
+  processed: llmsMdFiles.length,
+  updated,
+  markdownWrites: DRY_RUN ? 0 : updated + 1,
+  durationMs: Date.now() - t0
+})}`);
 console.log('══════════════════════════════════════════\n');

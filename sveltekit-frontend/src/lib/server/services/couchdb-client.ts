@@ -5,17 +5,28 @@ import { ollamaFetch } from '$lib/server/ollama.js';
  * CouchDB Client - Lightweight wrapper for ACE knowledge base
  */
 
-const COUCHDB_URL = ENV.COUCHDB_URL.replace(/\/$/, '');
+function stripCredentials(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.username = '';
+    parsed.password = '';
+    return parsed.toString().replace(/\/$/, '');
+  } catch {
+    return url.replace(/\/$/, '');
+  }
+}
+
+const COUCHDB_URL = stripCredentials(ENV.COUCHDB_URL);
 
 function authHeader(): string {
-  // Extract from URL if present, otherwise fallback to basic defaults
+  // Extract from original URL if present, otherwise fallback to basic defaults
   try {
-    const url = new URL(COUCHDB_URL);
+    const url = new URL(ENV.COUCHDB_URL);
     if (url.username && url.password) {
       return 'Basic ' + Buffer.from(url.username + ':' + url.password).toString('base64');
     }
   } catch { /* ignore */ }
-  return ''; // Authorization header might be redundant if credentials are in the URL
+  return '';
 }
 
 async function couchFetch(path: string, init?: RequestInit): Promise<Response> {

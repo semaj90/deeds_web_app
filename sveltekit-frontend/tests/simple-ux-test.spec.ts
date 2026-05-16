@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * Simple UX Tests for Enhanced-Bits Components
@@ -7,7 +8,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Enhanced-Bits UX Tests (Dev Server)', () => {
   // Use existing dev server on port 5174
-  const baseURL = 'http://localhost:5174';
+  const baseURL = PORTS.APP_BASE;
 
   test('Case Scoring Dashboard - Layout and Mock Data', async ({ page }) => {
     await page.goto(`${baseURL}/demo/case-scoring`);

@@ -5,8 +5,9 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 // All 90 AI API endpoints
 const API_ROUTES = [

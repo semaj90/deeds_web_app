@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 const mockContent =
   'This is a mock AI response for testing purposes. The key elements of a valid contract include offer, acceptance, consideration, and mutual assent.';
@@ -11,7 +12,7 @@ function buildSSEResponse(content: string = mockContent) {
 
 let testCounter = 0;
 function getChatUrl() {
-  return `http://127.0.0.1:5173/chat/ai-test-${Date.now()}-${testCounter++}`;
+	return `${PORTS.APP_BASE}/chat/ai-test-${Date.now()}-${testCounter++}`;
 }
 
 test.describe('Legal AI Chat Testing', () => {

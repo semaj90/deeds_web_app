@@ -8,6 +8,7 @@
 
 import type { Page } from '@playwright/test';
 import type { CapturedLog } from '../fixtures/forensic-page';
+import { PORTS } from '../../../helpers/env-ports.js';
 
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -86,7 +87,7 @@ export async function navAndCapture(
 	relativePath: string,
 	opts: { waitMs?: number; waitUntil?: 'load' | 'domcontentloaded' | 'networkidle' } = {}
 ): Promise<CapturedLog> {
-	const base = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+	const base = PORTS.APP_BASE;
 	await stubCompletedOnboarding(page);
 	await page
 		.goto(`${base}${relativePath}`, {

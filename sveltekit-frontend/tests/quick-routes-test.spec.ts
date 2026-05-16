@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * Quick Routes Screenshot & Verification Test
  * Tests core routes to identify runtime errors
  */
 
-const BASE_URL = 'http://localhost:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 const coreRoutes = [
   '/',

@@ -24,11 +24,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = resolve(__dirname, '..');
 
 const MCP_URL    = process.env.MCP_URL    ?? 'http://127.0.0.1:8788/mcp';
-const SVELTEKIT_BASES = [...new Set([
-  process.env.SVELTEKIT_URL,
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-].filter(Boolean))];
+const APP_BASE    = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
 const JSON_OUT   = process.argv.includes('--json');
 const STRICT     = process.argv.includes('--strict');
 
@@ -182,17 +178,15 @@ await check('hitDemand path present (null OK if cold)', () => {
 });
 
 // ── P1.8 — hypergraph.search regression ──────────────────────────────────────
-// hypergraph.search proxies through SvelteKit (:5173). When the dev server is
+// hypergraph.search proxies through the app base. When the dev server is
 // cold the MCP returns a connection-refused error — that is an infrastructure
-// state, not a test regression. Pre-probe :5173 and SKIP (not FAIL) if down.
+// state, not a test regression. Pre-probe the app base and SKIP (not FAIL) if down.
 
 let devServerUp = false;
-for (const base of SVELTEKIT_BASES) {
-  try {
-    const r = await fetch(`${base}/api/health`, { signal: AbortSignal.timeout(5000) });
-    if (r.ok) { devServerUp = true; break; }
-  } catch { /* unreachable */ }
-}
+try {
+  const r = await fetch(`${APP_BASE}/api/health`, { signal: AbortSignal.timeout(5000) });
+  devServerUp = r.ok;
+} catch { /* unreachable */ }
 
 if (!JSON_OUT) console.log('\n=== P1.8 — hypergraph.search regression ===');
 if (!JSON_OUT && !devServerUp) {
@@ -264,31 +258,44 @@ if (!JSON_OUT) console.log('\n=== /api/ace/recommendations HTTP ===');
 let httpRes = null;
 let httpBase = '';
 let httpErr = '';
+let httpServerUp = false;
 for (const base of SVELTEKIT_BASES) {
-  const res = await fetch(`${base}/api/ace/recommendations?filePath=${encodeURIComponent(PROBE_FILE)}&maxCards=2`, {
-    signal: AbortSignal.timeout(10_000),
-  }).catch((err) => ({ ok: false, _err: err.message }));
-  if (!res._err && res.ok) {
-    httpRes = res;
-    httpBase = base;
+  const health = await fetch(`${base}/api/health`, { signal: AbortSignal.timeout(5000) }).catch(() => null);
+  if (health?.ok) {
+    httpServerUp = true;
     break;
   }
-  if (!res._err && res.status !== 404) {
-    httpRes = res;
-    httpBase = base;
-    break;
-  }
-  httpErr = res._err ?? `HTTP ${res.status}`;
-  httpRes = res;
 }
 
-await check('GET /api/ace/recommendations responds', async () => {
-  if (httpRes._err) throw new Error('WARN: dev server unreachable: ' + httpErr);
-  if (!httpRes.ok) throw new Error(`WARN: ${httpBase} HTTP ${httpRes.status}`);
-  const body = await httpRes.json();
-  if (body.filePath !== PROBE_FILE) throw new Error(`echo mismatch: ${body.filePath}`);
-  return `rank=${body.file?.rank ?? '?'}`;
-});
+if (httpServerUp) {
+  for (const base of SVELTEKIT_BASES) {
+    const res = await fetch(`${base}/api/ace/recommendations?filePath=${encodeURIComponent(PROBE_FILE)}&maxCards=2`, {
+      signal: AbortSignal.timeout(10_000),
+    }).catch((err) => ({ ok: false, _err: err.message }));
+    if (!res._err && res.ok) {
+      httpRes = res;
+      httpBase = base;
+      break;
+    }
+    if (!res._err && res.status !== 404) {
+      httpRes = res;
+      httpBase = base;
+      break;
+    }
+    httpErr = res._err ?? `HTTP ${res.status}`;
+    httpRes = res;
+  }
+
+  await check('GET /api/ace/recommendations responds', async () => {
+    if (httpRes._err) throw new Error('WARN: dev server unreachable: ' + httpErr);
+    if (!httpRes.ok) throw new Error(`WARN: ${httpBase} HTTP ${httpRes.status}`);
+    const body = await httpRes.json();
+    if (body.filePath !== PROBE_FILE) throw new Error(`echo mismatch: ${body.filePath}`);
+    return `rank=${body.file?.rank ?? '?'}`;
+  });
+} else {
+  skip('GET /api/ace/recommendations responds', 'dev server down');
+}
 
 // ── Output ───────────────────────────────────────────────────────────────────
 

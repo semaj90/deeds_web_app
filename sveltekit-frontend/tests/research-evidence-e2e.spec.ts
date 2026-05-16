@@ -29,8 +29,9 @@
 
 import { test, expect, type Page } from '@playwright/test';
 import { mkdir } from 'fs/promises';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE = 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 const SCREENSHOT_DIR = 'tests/screenshots/latest';
 
 // Ensure screenshot dir exists before any test runs

@@ -26,7 +26,7 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://localhost:5173');
 const SCREENSHOTS_DIR = path.join(__dirname, 'screenshots', 'evidence-upload-flow');
 const PICTURES_DIR = process.env.PICTURES_DIR || path.join(process.env.USERPROFILE || process.env.HOME, 'Pictures');
 

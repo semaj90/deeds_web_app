@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { execSync } from 'child_process';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -27,6 +28,26 @@ function readEnvFile(): Record<string, string> {
 
 const envFile = readEnvFile();
 
+function isPortListening(port: string): boolean {
+	try {
+		const stdout = execSync(`netstat -ano | findstr :${port}`, { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] });
+		return stdout.includes('LISTENING');
+	} catch {
+		return false;
+	}
+}
+
+function detectAppBaseURL(): string {
+	const HTTP_PORTS = [5173, 5174, 5175, 5176, 5177];
+	for (const port of HTTP_PORTS) {
+		if (isPortListening(String(port))) return `http://127.0.0.1:${port}`;
+	}
+
+	if (isPortListening('5178')) return 'http://127.0.0.1:5178';
+
+	return 'http://127.0.0.1:5173';
+}
+
 /**
  * Get env var from process.env > .env.local > .env > fallback
  */
@@ -40,7 +61,7 @@ export function env(key: string, fallback: string): string {
  */
 export const PORTS = {
 	/** SvelteKit dev/preview server */
-	APP_BASE: env('PLAYWRIGHT_BASE_URL', 'http://127.0.0.1:5173'),
+	APP_BASE: env('PLAYWRIGHT_BASE_URL', detectAppBaseURL()),
 
 	/** TurboQuant llama-server with --mmproj */
 	TURBO_URL: env('TURBO_QUANT_URL', 'http://localhost:8090'),

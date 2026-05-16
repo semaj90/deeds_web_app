@@ -1,0 +1,498 @@
+{
+  "repo": "deeds-web-app",
+  "runId": "run_1778895242579",
+  "generatedAt": "2026-05-16T01:34:03.106Z",
+  "dryRun": true,
+  "workspace": "all",
+  "limit": 0,
+  "docs": 6947,
+  "docCounts": {
+    "directory_wiki": 6946,
+    "cluster_summary": 0,
+    "feature_card": 1,
+    "engram_memory": 0
+  },
+  "views": [
+    "by_type",
+    "by_workspace",
+    "by_cluster",
+    "by_feature",
+    "by_route",
+    "by_tag",
+    "by_updated_at",
+    "by_engram_memory_type",
+    "by_engram_feature",
+    "by_engram_reward",
+    "stale_docs"
+  ],
+  "routeCount": 909,
+  "sample": [
+    {
+      "_id": "wiki:dir:.cache",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".cache",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".cache/sveltecheck.candidate.json",
+        ".cache/sveltecheck.candidate_clean.json",
+        ".cache/sveltecheck.chunk.0.json",
+        ".cache/sveltecheck.clean.json",
+        ".cache/sveltecheck.clean.trimmed.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.000Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/hooks",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".claude/hooks",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/hooks/posttooluse-audit.mjs",
+        ".claude/hooks/pretooluse-deny.mjs"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.claude",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".claude",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/mcp.json",
+        ".claude/settings.json",
+        ".claude/settings.local.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".mcp.json",
+        "atlas.config.json",
+        "ecosystem.config.cjs",
+        "ecosystem.dev.config.cjs",
+        "ecosystem.prod.config.cjs"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.python311/lib/python3.11/site-packages/pip-24.0.dist-info",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".python311/lib/python3.11/site-packages/pip-24.0.dist-info",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".python311/lib/python3.11/site-packages/pip-24.0.dist-info/direct_url.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info/direct_url.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.roo",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".roo",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".roo/mcp.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AdvancedRichTextEditor.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai-synthesis-client.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AIAssistant.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AIAssistantButton.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AIFabButton.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/agentic",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/agentic",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/agentic/AgenticController.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AgentOrchestrator.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIAssistantButton.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIAssistantPanel.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIButton.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatInput.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/cognitive",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/cognitive",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/cognitive/NeuralPerformanceDashboard.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/rag",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/rag",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/rag/DocumentUpload.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/rag/EnhancedRAGInterface.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/webgpu",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/webgpu",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/webgpu/CacheOptimizerDemo.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/webgpu/WebGPUProcessor.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/webgpu/WebGPUWebAssemblyBridge.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/analytics",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/analytics",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/analytics/PerformanceDashboard.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/EnhancedAuthForm.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/LoginButton.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/RegisterForm.simple.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/RegisterForm.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/RegisterModal.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/cache",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/cache",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/cache/CacheDemo.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EnhancedLegalCanvas.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EvidenceCanvas.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EvidenceCanvasEditor.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EvidenceNode.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/cases",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/cases",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/cases/CaseFilters.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/cases/CaseStats.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chat",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chat",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chat/ChatMessage.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chat/LegalAIChat.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chat/nes-typewriter-stream.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chat/SSRQLorAChatInterface.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chr-rom",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chr-rom",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chr-rom/DocumentListCHRROM.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/citations",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/citations",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/citations/CitationsManager.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/citations/CitationsSaveButton.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/dashboard",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/dashboard",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/dashboard/EvidenceAnalysisDashboard.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/detective",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/detective",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/detective/ContextMenu.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/detective/ContextualDetectiveBoard.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/detective/EvidenceCard.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/detective/UploadZone.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor/LegalDocumentEditor.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor/ReportEditor.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor/ReportToolbar.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor/RichTextEditor.svelte",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor/TiptapWithAIAssistant.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    },
+    {
+      "_id": "wiki:dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editors",
+      "type": "directory_wiki",
+      "workspace": "repo-root",
+      "path": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editors",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editors/NierRichTextEditor.svelte"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1778895242579",
+      "updatedAt": "2026-05-16T01:34:03.001Z"
+    }
+  ]
+}

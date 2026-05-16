@@ -6,7 +6,7 @@ const dim = (s) => `\x1b[2m${s}\x1b[0m`;
 const bold = (s) => `\x1b[1m${s}\x1b[0m`;
 const chalk = { cyan, green, red, yellow, dim, bold };
 
-const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://127.0.0.1:5173');
 const AUTH_HEADER = { 'Authorization': 'Bearer dev-only-service-token' };
 
 async function testAgenticVerification() {

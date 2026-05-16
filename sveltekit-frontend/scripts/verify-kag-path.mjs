@@ -8,7 +8,7 @@
  * 3. buildGraphShouldFilter() produces a valid Qdrant filter
  */
 
-const BASE = 'http://localhost:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
 const CASE_ID = 'c9b79f5d-5d81-40ee-9c60-4945a6b38287';
 
 async function testSSEChatWithCase() {

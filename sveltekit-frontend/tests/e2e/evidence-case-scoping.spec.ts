@@ -14,8 +14,9 @@
 
 import { test, expect } from '@playwright/test';
 import { registerTestUser } from '../utils/seed-cases';
+import { PORTS } from '../helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 
 const CASE_A_ID = '00000000-0000-0000-0000-000000000aaa';
 const CASE_B_ID = '00000000-0000-0000-0000-000000000bbb';

@@ -45,6 +45,9 @@ npm run agents:write       # Regenerates per-dir docs (use --root-only for speed
 - **User IDs**: Mixed types (INT, UUID, TEXT) across tables. Check schema before querying.
 - **Storage**: SeaweedFS (:8333) is the primary S3 gateway; ignore MinIO stubs.
 - **UnoCSS**: Do NOT use standard Tailwind classes unless defined in `uno.config.js`.
+- **Engram Memory (Lane -1)**: Low-trust pre-routing hints. MUST NOT store hidden thoughts, raw tensors, or model cache. Boosting (0.05) is restricted to debug/workflow profiles and requires `accepted: true`.
+- **Port Reservation**: Port 8888 is reserved for SeaweedFS Filer. SearXNG is relocated to port 8889.
+
 
 ---
 *This file is protected from auto-generation overwrites.*

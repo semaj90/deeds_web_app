@@ -10,7 +10,7 @@
  * Usage: node scripts/tests/test-ai.mjs
  */
 
-const BASE = process.env.DEV_SERVER ?? 'http://localhost:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? (process.env.DEV_SERVER ?? 'http://localhost:5173');
 const BIFROST = process.env.BIFROST_URL ?? 'http://localhost:3040';
 
 let passed = 0;

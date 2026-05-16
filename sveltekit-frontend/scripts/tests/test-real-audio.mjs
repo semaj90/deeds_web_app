@@ -5,7 +5,7 @@
 import { readFile } from 'fs/promises';
 import { basename } from 'path';
 
-const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? (process.env.TEST_BASE_URL || 'http://localhost:5173');
 const AUDIO_PATH = 'C:/Users/james/Downloads/(One, two, three, four).mp3';
 
 // ANSI colors

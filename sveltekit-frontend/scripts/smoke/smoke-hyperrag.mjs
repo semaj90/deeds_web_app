@@ -36,7 +36,7 @@ const SKIP_API  = args.includes('--skip-api');
 const STRICT    = args.includes('--strict');
 
 const DB_URL  = process.env.DATABASE_URL;
-const SK_URL  = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+const SK_URL  = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
 const MCP_URL = process.env.MCP_URL       ?? 'http://127.0.0.1:8788';
 
 if (!DB_URL) {

@@ -58,6 +58,7 @@ Client Router (src/lib/ai/client-router.ts)
       ├─ **Generation/Chat**: llama-server (Gemma4/Qwen)
       │   └─ Optimization: TurboQuant KV Cache + Bitfrost semantic cache
       └─ Reference: [`docs/KARPATHY_PIPELINE_ARCHITECTURE.md`](./docs/KARPATHY_PIPELINE_ARCHITECTURE.md)
+      └─ Reference: [`docs/ACE_STARTUP_CUDA_BRIDGE.md`](./docs/ACE_STARTUP_CUDA_BRIDGE.md)
 ```
 
 ### Cache Hierarchy (Client → Server)

@@ -6,20 +6,6 @@
  * call Gemma4 to generate a semantic summary, embed it via embeddinggemma,
  * then upsert a glyph-like Qdrant point into codebase_chunks_768 so ACE
  * can search directory-level context semantically.
- *
- * Also writes the Gemma4 summary back to the Redis wiki note so ACE KAG
- * notes include an LLM-generated description alongside the raw audit data.
- *
- * Usage:
- *   node scripts/graphify-cluster-summaries.mjs               # all dirs with files
- *   node scripts/graphify-cluster-summaries.mjs --limit 20    # first 20 (test run)
- *   node scripts/graphify-cluster-summaries.mjs --dir src/lib/server/ace  # single dir
- *   node scripts/graphify-cluster-summaries.mjs --skip-llm    # embed existing summaries only
- *   node scripts/graphify-cluster-summaries.mjs --force       # ignore cached summaries
- *
- * Outputs:
- *   Redis wiki:note:dir:* — adds gemma4Summary + embeddingId fields
- *   Qdrant codebase_chunks_768 — upserts directory glyph points
  */
 
 import { createHash } from 'crypto';
@@ -41,6 +27,10 @@ const SKIP_LLM   = has('--skip-llm');                     // embed only, no Gemm
 const FORCE      = has('--force');                         // ignore cached summaries
 const QUIET      = has('--quiet');
 
+const MAX_FILES_PER_DIR = parseInt(flag('--max-files-per-dir', '40'), 10);
+const MAX_BYTES_PER_DIR = parseInt(flag('--max-bytes-per-dir', '250000'), 10);
+const SUMMARY_TIMEOUT   = parseInt(flag('--summary-timeout-ms', '60000'), 10);
+
 const OLLAMA     = process.env.OLLAMA_BASE_URL   ?? 'http://127.0.0.1:11434';
 const QDRANT_URL = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
 const REDIS_URL  = process.env.REDIS_URL         ?? 'redis://127.0.0.1:6379';
@@ -49,9 +39,29 @@ const LLM_MODEL  = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
 const EMBED_MODEL= 'embeddinggemma:latest';
 
 const WIKI_NOTE_TTL = 24 * 3600;
-const SUMMARY_TTL   = 6  * 3600;  // Qdrant glyph TTL (not supported in Qdrant, but tracked)
-
 const log = QUIET ? () => {} : (...a) => console.log(...a);
+
+const SKIP_DIR_PATTERNS = [
+  /(^|\/)node_modules(\/|$)/,
+  /(^|\/)\.git(\/|$)/,
+  /(^|\/)\.svelte-kit(\/|$)/,
+  /(^|\/)dist(\/|$)/,
+  /(^|\/)build(\/|$)/,
+  /(^|\/)coverage(\/|$)/,
+  /(^|\/)\.cache(\/|$)/,
+  /(^|\/)logs?(\/|$)/,
+  /(^|\/)archives?(\/|$)/,
+  /(^|\/)backups?(\/|$)/,
+  /(^|\/)docs\/graph(\/|$)/,
+  /(^|\/)docs\/reports(\/|$)/,
+  /(^|\/)tmp(\/|$)/,
+];
+
+function shouldSkipDirectory(dir) {
+  if (!dir) return false;
+  const normalized = dir.replaceAll('\\', '/');
+  return SKIP_DIR_PATTERNS.some((pattern) => pattern.test(normalized));
+}
 
 // ── Redis ─────────────────────────────────────────────────────────────────────
 
@@ -76,27 +86,16 @@ async function rset(key, val, ttl = WIKI_NOTE_TTL) {
 
 log('🔍 Scanning Redis for wiki notes with representative files…');
 const allKeys = await redis.keys('wiki:note:dir:*');
-const candidates = [];
+const rawCandidates = [];
 
 for (const key of allKeys) {
   const note = await rget(key);
   if (!note || !note.representativeFiles?.length) continue;
   if (DIR_FILTER && note.directoryPath !== DIR_FILTER) continue;
-  if (!FORCE && note.gemma4Summary) {
-    // Already summarised — skip unless --force
-    continue;
-  }
-  candidates.push({ key, note });
+  rawCandidates.push({ key, note });
 }
 
-const targets = LIMIT > 0 ? candidates.slice(0, LIMIT) : candidates;
-log(`📂 ${targets.length} directories to summarise (${allKeys.length} total notes, ${candidates.length} with files and no cached summary)`);
-
-if (targets.length === 0) {
-  log('✅ Nothing to do. Use --force to re-summarise or --limit N to test.');
-  await redis.quit();
-  process.exit(0);
-}
+log(`📂 ${rawCandidates.length} directories considered (${allKeys.length} total notes)`);
 
 // ── Helpers: Ollama LLM + embed ──────────────────────────────────────────────
 
@@ -110,7 +109,7 @@ async function callGemma4(prompt) {
       stream: false,
       options: { temperature: 0.2, num_predict: 200 },
     }),
-    signal: AbortSignal.timeout(60_000),
+    signal: AbortSignal.timeout(SUMMARY_TIMEOUT),
   });
   if (!res.ok) throw new Error(`Ollama ${res.status}: ${await res.text()}`);
   const d = await res.json();
@@ -147,110 +146,106 @@ async function upsertGlyph(id, vector, payload) {
   }
 }
 
-// ── Deterministic Qdrant point ID from directory path ─────────────────────────
-// Qdrant needs either a UUID or unsigned int. We hash the dir path to a uint64
-// but JS doesn't support true uint64 — use a 31-bit int (safe for Qdrant).
 function dirToPointId(dir) {
   const h = createHash('sha1').update(`dir-glyph:${dir}`).digest('hex');
-  // Use first 7 hex chars as a positive 28-bit int (fits Qdrant unsigned int)
   return parseInt(h.slice(0, 7), 16);
 }
 
-// ── Build prompt from wiki note ───────────────────────────────────────────────
-
 function buildPrompt(note) {
   const files = (note.representativeFiles ?? []).join('\n  - ');
-  const warnings = (note.warnings ?? []).join('; ') || 'none';
-  const tags = (note.dominantTags ?? []).join(', ') || 'none';
-  const metrics = note.auditMetrics ?? {};
-  return `You are analysing a software directory for a legal AI platform (SvelteKit + TypeScript).
-
+  return `You are analysing a software directory for a legal AI platform.
 Directory: ${note.directoryPath}
-Type: ${note.purpose}
-Files (${metrics.fileCount ?? 0} total, top by import count):
+Files:
   - ${files}
 
-Metrics:
-  - API handlers: ${metrics.apiCount ?? 0}, Auth coverage: ${metrics.authCount ?? 0}
-  - Zod validation: ${metrics.zodCount ?? 0}, SSR-unsafe: ${metrics.ssrUnsafeCount ?? 0}
-  - Routes without tests: ${metrics.noTestCount ?? 0}, TypeScript errors: ${metrics.tsErrors ?? 0}
-  - Svelte 4 legacy patterns: ${metrics.sv4LegacyCount ?? 0}
-Tags: ${tags}
-Warnings: ${warnings}
-Audit score: ${note.auditScore ?? '?'}/100
-
-Write a 2-3 sentence technical summary of what this directory does and what its key responsibilities are in the codebase. Focus on purpose and data flow, not on the audit warnings.`;
+Write a 2-3 sentence technical summary of what this directory does. Focus on purpose and data flow.`;
 }
 
 // ── Main loop ─────────────────────────────────────────────────────────────────
 
-let ok = 0, failed = 0, skippedEmbed = 0;
+const outcomes = {
+  summarized: 0,
+  skipped_generated_dir: 0,
+  skipped_too_many_files: 0,
+  skipped_too_many_bytes: 0,
+  no_source_files: 0,
+  timeout: 0,
+  cache_unchanged: 0,
+  summary_failed: 0,
+};
+
+const startTime = Date.now();
+const targets = LIMIT > 0 ? rawCandidates.slice(0, LIMIT) : rawCandidates;
 
 for (let i = 0; i < targets.length; i++) {
   const { key, note } = targets[i];
-  const dir = note.directoryPath ?? key.replace('wiki:note:dir:dir:', '').replace(/_/g, '/');
+  const dir = note.directoryPath ?? key.replace('wiki:note:dir:', '').replace(/_/g, '/');
   const shortDir = dir.replace('src/', '');
+
+  // 1. Classification & Filtering
+  if (shouldSkipDirectory(dir)) {
+    outcomes.skipped_generated_dir++;
+    continue;
+  }
+
+  if (!FORCE && note.gemma4Summary) {
+    outcomes.cache_unchanged++;
+    continue;
+  }
+
+  const metrics = note.auditMetrics ?? {};
+  if ((metrics.fileCount ?? 0) > MAX_FILES_PER_DIR) {
+    outcomes.skipped_too_many_files++;
+    continue;
+  }
 
   log(`[${i + 1}/${targets.length}] ${shortDir}`);
 
   try {
-    // Step 1: Generate Gemma4 summary
     let summary = note.gemma4Summary;
     if (!summary || FORCE) {
       if (SKIP_LLM) {
-        // Fallback: use the existing audit summary
         summary = note.summary ?? `Directory: ${dir}`;
-        skippedEmbed++;
       } else {
         const prompt = buildPrompt(note);
         summary = await callGemma4(prompt);
         log(`   💬 ${summary.slice(0, 80)}…`);
       }
-    } else {
-      log(`   ⏭️  Using cached summary`);
     }
 
-    // Step 2: Embed the summary
     const vector = await embed(`${dir}: ${summary}`);
-
-    // Step 3: Upsert to Qdrant as a directory glyph
     const pointId = dirToPointId(dir);
     await upsertGlyph(pointId, vector, {
-      kind:               'directory-cluster',
+      kind: 'directory-cluster',
       dir,
       summary,
-      representativeFiles: note.representativeFiles ?? [],
-      dominantTags:        note.dominantTags ?? [],
-      auditScore:          note.auditScore ?? 0,
-      clusterId:           note.clusterId ?? -1,
-      clusterType:        'directory-glyph',
-      warnings:            note.warnings ?? [],
-      auditMetrics:        note.auditMetrics ?? {},
-      generatedAt:         new Date().toISOString(),
+      generatedAt: new Date().toISOString(),
     });
 
-    // Step 4: Write summary back to Redis wiki note
-    const updatedNote = {
-      ...note,
-      gemma4Summary: summary,
-      embeddingId:   pointId,
-      summaryUpdatedAt: new Date().toISOString(),
-    };
-    await rset(key, updatedNote);
-
-    ok++;
+    await rset(key, { ...note, gemma4Summary: summary, embeddingId: pointId });
+    outcomes.summarized++;
+    
+    // Progress diagnostics
+    if ((i + 1) % 5 === 0) {
+      const elapsed = Date.now() - startTime;
+      const rate = (i + 1) / (elapsed / 1000);
+      const remaining = targets.length - (i + 1);
+      const eta = Math.round(remaining / rate);
+      log(`   📈 Rate: ${rate.toFixed(2)} dir/s | ETA: ${eta}s`);
+    }
   } catch (err) {
-    console.warn(`   ❌ ${shortDir}: ${err.message}`);
-    failed++;
+    if (err.name === 'TimeoutError' || err.message.includes('timeout')) {
+      console.warn(`   ❌ ${shortDir}: Timeout (${SUMMARY_TIMEOUT}ms). recommendation: skip or cap.`);
+      outcomes.timeout++;
+    } else {
+      console.warn(`   ❌ ${shortDir}: ${err.message}`);
+      outcomes.summary_failed++;
+    }
   }
 }
 
-// ── Summary ───────────────────────────────────────────────────────────────────
-
-log('');
-log(`✅ Done: ${ok} glyph(s) upserted to Qdrant ${COLLECTION}`);
-if (skippedEmbed > 0) log(`   ⏭️  ${skippedEmbed} used fallback summary (--skip-llm)`);
-if (failed > 0)        log(`   ❌ ${failed} failed`);
-log(`   Qdrant: ${QDRANT_URL}/collections/${COLLECTION}`);
+log('\n── Outcome Report ──');
+console.table(outcomes);
+log(`\nTotal time: ${Math.round((Date.now() - startTime) / 1000)}s`);
 
 await redis.quit();

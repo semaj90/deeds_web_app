@@ -47,7 +47,7 @@ does not exist" while psql resolved fine.
      -X POST -H 'Content-Type: application/json' \
      -d '{"query":"redis","limit":3}' | jq '.totalMatched'
    ```
-4. Expected: all green, `totalMatched: 3`, no route reads `:5432` schema.
+4. Expected: green when the dev server is up, `totalMatched: 3`, no route reads `:5432` schema.
 
 **Why deliberate:** affects correctness app-wide. Worth doing as an explicit
 operator action with a clean commit message.

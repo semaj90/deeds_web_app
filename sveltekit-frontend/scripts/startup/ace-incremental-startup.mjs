@@ -88,6 +88,9 @@ function runStep(name, npmScript, opts = {}) {
     stdoutTail: (res.stdout ?? '').slice(-2000),
     stderrTail: (res.stderr ?? '').slice(-2000),
   };
+  if (res.status === 0 && opts.skipIfStdoutIncludes && step.stdoutTail.includes(opts.skipIfStdoutIncludes)) {
+    step.status = 'SKIP';
+  }
   log.steps.push(step);
   if (res.status !== 0 && opts.required !== false) {
     throw new Error(`${name} failed (exit ${res.status})`);
@@ -117,20 +120,30 @@ async function probeServices() {
       return res.ok ? 'up' : `http-${res.status}`;
     } catch { return 'down'; }
   }
-  const [caddy, bifrost, goRetrieval, traceMcp, turboQuant] = await Promise.all([
+
+  // Startup order matters:
+  // 1. Load env with dotenv (in src/lib/server/env.server.ts).
+  // 2. Start topology search on :8101.
+  // 3. Detect native LibTorch/simdjson bridge mode.
+  // 4. Confirm CouchDB inference logs.
+  // 5. Confirm Postgres proxy on :5434.
+  // 6. Treat TurboQuant :8090 as optional unless the command explicitly requires local GPU inference.
+  const [caddy, bifrost, goRetrieval, traceMcp, turboQuant, topology] = await Promise.all([
     hit('http://127.0.0.1:5178/health'),          // Caddy QUIC proxy
     hit('http://127.0.0.1:3040/health'),           // Bifrost semantic cache
     hit('http://127.0.0.1:8100/health'),           // Go retrieval gRPC/HTTP
     hit('http://127.0.0.1:8788/health'),           // TRACE MCP
     hit('http://127.0.0.1:8090/health'),           // TurboQuant llama-server
+    hit('http://127.0.0.1:8101/health'),           // Topology Search Engine
   ]);
-  return { caddy, bifrost, goRetrieval, traceMcp, turboQuant };
+  return { caddy, bifrost, goRetrieval, traceMcp, turboQuant, topology };
 }
 
 async function ensureDevServer() {
   // Probe /api/health for a real "backend services ready" signal, not just
   // "vite compiled" — hypergraph.search needs the full SvelteKit request stack.
-  const HEALTH_URL = 'http://127.0.0.1:5173/api/health';
+  const APP_BASE = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+  const HEALTH_URL = `${APP_BASE}/api/health`;
   const READY_TIMEOUT_MS = 90_000;  // dev:everything boots Docker + TurboQuant first
   const POLL_MS = 2_000;
 
@@ -167,7 +180,7 @@ async function ensureDevServer() {
     await new Promise(r => setTimeout(r, POLL_MS));
     if (await probe()) {
       log.devServer.status = 'healthy';
-      console.log('[startup] /api/health OK — stack ready at :5173');
+      console.log(`[startup] /api/health OK — stack ready at ${APP_BASE}`);
       return;
     }
   }
@@ -230,22 +243,18 @@ async function runIncrementalLane(redis) {
     if (hasChanges) {
       // index:codebase:fast:resume — incremental AST scan with gradient
       // checkpoint that skips unchanged files. Writes to code_relations +
-      // qdrant_cluster_members, which are the exact upstream tables the
+      // qdrant_cluster_members, which are the upstream tables the
       // hypergraph seeder + atlas builder consume. Without this step, the
       // downstream seeders work against stale data after every refactor.
       //
       // Cost: ~1-3s when nothing changed (gradient checkpoint short-circuit),
-      // up to ~30s when many files changed. The agents:pipeline below depends
+      // up to ~30s when many files changed. The llms:pipeline below depends
       // on fresh code_relations data, so this MUST run first.
       runStep('codebase index resume', 'index:codebase:fast:resume', {
-        required: false, timeout: 60_000,
+        required: false, timeout: 180_000,
       });
 
-      runStep('llms pipeline dry-run', 'llms:pipeline:dry', { timeout: 180_000 });
-
-      if (!DRY) {
-        runStep('llms pipeline safe', 'llms:pipeline:safe', { timeout: 600_000 });
-      }
+      console.log('[startup] llms pipeline split out of startup lane — run npm run llms:pipeline:dry or npm run llms:pipeline:safe separately');
 
       runStep('topology validate', 'topology:validate', { required: false, timeout: 120_000 });
       runStep('graph synthesize', 'graph:synthesize', { required: false, timeout: 240_000 });
@@ -253,7 +262,7 @@ async function runIncrementalLane(redis) {
       // atlas:index — rebuild atlas dir cards (ace:atlas:dir:*) and
       // ace:atlas:dirs index from the fresh code_relations + agent_context_files
       // data the steps above just refreshed. Adaptive (skips dirs without
-      // changed files), so re-runs are cheap. Must come AFTER agents:pipeline
+      // changed files), so re-runs are cheap. Must come AFTER llms:pipeline
       // and graph:synthesize so the dir cards reflect the latest envelope +
       // synthesis state.
       runStep('atlas index rebuild', 'atlas:index', { required: false, timeout: 60_000 });
@@ -342,7 +351,11 @@ async function runIncrementalLane(redis) {
     // Required: false so a smoke failure doesn't tank the lane — the
     // operator gets the failure recorded and can investigate via
     // logs/task-output/pipeline-test/smoke-atlas-latest.json.
-    runStep('atlas smoke gate', 'smoke:atlas', { required: false, timeout: 60_000 });
+    runStep('atlas smoke gate', 'smoke:atlas', {
+      required: false,
+      timeout: 60_000,
+      skipIfStdoutIncludes: 'SKIP GET /api/ace/recommendations responds — dev server down',
+    });
 
     // Update Redis state and sha baseline.
     if (head !== 'unknown') await redis.set(POLICY.redisStateKeys.lastSha, head);
@@ -439,9 +452,14 @@ main()
   .finally(() => {
     log.finishedAt = new Date().toISOString();
     log.totalMs = new Date(log.finishedAt).getTime() - new Date(log.startedAt).getTime();
+    const stepCounts = log.steps.reduce((acc, step) => {
+      acc[step.status] = (acc[step.status] ?? 0) + 1;
+      return acc;
+    }, {});
     const out = JSON.stringify(log, null, 2);
     writeFileSync(resolve(LOG_DIR, `startup-${stamp}.json`), out);
     writeFileSync(resolve(LOG_DIR, 'startup-latest.json'), out);
     const heavy = log.heavyLane.ran ? '+heavy' : (log.heavyLane.attempted ? '(heavy-skipped)' : '');
-    console.log(`[startup] ${log.status} ${heavy} → logs/task-output/pipeline-test/startup-latest.json (${log.totalMs ?? 0}ms)`);
+    const skipped = stepCounts.SKIP ? ` · ${stepCounts.SKIP} skipped` : '';
+    console.log(`[startup] ${log.status} ${heavy}${skipped} → logs/task-output/pipeline-test/startup-latest.json (${log.totalMs ?? 0}ms)`);
   });

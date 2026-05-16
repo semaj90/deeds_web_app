@@ -7,6 +7,8 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { Pool } = require('pg');
 
+const BASE_URL = process.env.PUBLIC_APP_URL ?? 'http://localhost:5173';
+
 const pool = new Pool({
 	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'
 });
@@ -62,7 +64,7 @@ async function testAPIEndpoint(evidenceId) {
 	log('\n🧪 Testing API Endpoint...', blue);
 
 	try {
-		const response = await fetch(`http://localhost:5173/api/audio/analysis/${evidenceId}`);
+		const response = await fetch(`${BASE_URL}/api/audio/analysis/${evidenceId}`);
 
 		if (!response.ok) {
 			log(`❌ API returned ${response.status}`, red);
@@ -108,7 +110,7 @@ async function testPageRoute(evidenceId) {
 	log('\n🌐 Testing Page Route...', blue);
 
 	try {
-		const response = await fetch(`http://localhost:5173/audio-analysis/${evidenceId}`, {
+		const response = await fetch(`${BASE_URL}/audio-analysis/${evidenceId}`, {
 			headers: {
 				Cookie: 'session=test-session-id' // Mock session for testing
 			}
@@ -121,10 +123,7 @@ async function testPageRoute(evidenceId) {
 					`  ℹ️  Redirected (likely to login) - this is expected without auth`,
 					yellow
 				);
-				log(
-					`  ℹ️  Test the page manually at: http://localhost:5173/audio-analysis/${evidenceId}`,
-					yellow
-				);
+				log(`  ℹ️  Test the page manually at: ${BASE_URL}/audio-analysis/${evidenceId}`, yellow);
 				return true; // Not a failure - just needs auth
 			}
 			return false;
@@ -184,7 +183,7 @@ async function main() {
 		log(`  4. Server Load: +page.server.ts`, reset);
 
 		log(`\n🌐 Test the UI manually:`, blue);
-		log(`  http://localhost:5173/audio-analysis/${evidenceId}`, yellow);
+		log(`  ${BASE_URL}/audio-analysis/${evidenceId}`, yellow);
 
 		log('\n📊 Features Available:', blue);
 		log('  ✓ Full transcription text display', reset);

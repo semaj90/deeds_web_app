@@ -18,8 +18,9 @@
  */
 import { test, expect, type APIRequestContext } from '@playwright/test';
 import { registerTestUser } from './utils/seed-cases';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 test.describe('AI Analysis Pipeline', () => {
 	test.describe.configure({ mode: 'serial' });
@@ -33,7 +34,7 @@ test.describe('AI Analysis Pipeline', () => {
 
 		// Pre-check Ollama availability
 		try {
-			const res = await apiContext.fetch('http://127.0.0.1:11434/api/tags', {
+			const res = await apiContext.fetch(`${PORTS.OLLAMA_URL}/api/tags`, {
 				timeout: 5000,
 			});
 			ollamaAvailable = res.ok();

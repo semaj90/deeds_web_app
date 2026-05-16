@@ -3,7 +3,7 @@
  * Tests document upload → embedding → chat context pipeline
  */
 
-const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? (process.env.TEST_BASE_URL || 'http://localhost:5173');
 
 // ANSI colors
 const green = '\x1b[32m';

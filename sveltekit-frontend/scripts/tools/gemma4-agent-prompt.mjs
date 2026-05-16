@@ -23,7 +23,7 @@ const pipeline = process.env.GEMMA_PIPELINE ?? 'ace';
 console.log(`\n🤖 Gemma4 Agentic Tool Loop (pipeline=${pipeline})\n   Query: ${q}\n`);
 
 try {
-  const res = await fetch('http://localhost:5173/api/ai/agent', {
+  const res = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/ai/agent`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

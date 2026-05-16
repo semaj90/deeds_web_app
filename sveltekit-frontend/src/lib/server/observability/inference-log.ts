@@ -24,6 +24,33 @@ const FLUSH_THRESHOLD = 50;
 const RETENTION_DAYS = 7;
 const CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000; // every 6 hours
 
+function stripCredentials(url: string): string {
+	try {
+		const parsed = new URL(url);
+		parsed.username = '';
+		parsed.password = '';
+		return parsed.toString().replace(/\/$/, ''); // remove trailing slash if any
+	} catch {
+		return url.replace(/\/$/, '');
+	}
+}
+
+/**
+ * Extracts basic auth from ENV.COUCHDB_URL or falls back to standard defaults
+ */
+function getAuthHeader(): string {
+	try {
+		const url = new URL(ENV.COUCHDB_URL);
+		if (url.username && url.password) {
+			return 'Basic ' + Buffer.from(`${url.username}:${url.password}`).toString('base64');
+		}
+	} catch { /* ignore */ }
+	
+	const user = process.env.COUCHDB_USER ?? 'admin';
+	const pass = process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
+	return 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
+}
+
 export interface InferenceLogEntry {
   type: 'llm' | 'embedding' | 'vector_search' | 'graph_query' | 'dag_ordering' | 'policy';
   model?: string;
@@ -116,14 +143,12 @@ async function flushBuffer(): Promise<void> {
 			}));
 
 			const res = await fetch(
-				`${ENV.COUCHDB_URL}/${INFERENCE_LOG_DB}/_bulk_docs`,
+				`${stripCredentials(ENV.COUCHDB_URL)}/${INFERENCE_LOG_DB}/_bulk_docs`,
 				{
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: 'Basic ' + Buffer.from(
-							`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
-						).toString('base64'),
+						Authorization: getAuthHeader(),
 					},
 					body: JSON.stringify({ docs }),
 				}
@@ -206,15 +231,12 @@ export function logVectorSearch(params: {
 export async function cleanupOldInferenceLogs(): Promise<{ deleted: number; error?: string }> {
 	try {
 		const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString().replace(/[:.]/g, '-');
-		const baseUrl = ENV.COUCHDB_URL;
-		const auth = 'Basic ' + Buffer.from(
-			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
-		).toString('base64');
+		const baseUrl = stripCredentials(ENV.COUCHDB_URL);
 
 		// Fetch all doc IDs up to the cutoff (IDs are timestamp-prefixed, so lexicographic order works)
 		const res = await fetch(
 			`${baseUrl}/${INFERENCE_LOG_DB}/_all_docs?endkey=${JSON.stringify(cutoff)}&limit=1000`,
-			{ headers: { Authorization: auth }, signal: AbortSignal.timeout(10_000) }
+			{ headers: { Authorization: getAuthHeader() }, signal: AbortSignal.timeout(10_000) }
 		);
 		if (!res.ok) return { deleted: 0, error: `_all_docs failed: ${res.status}` };
 
@@ -228,7 +250,7 @@ export async function cleanupOldInferenceLogs(): Promise<{ deleted: number; erro
 			`${baseUrl}/${INFERENCE_LOG_DB}/_bulk_docs`,
 			{
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', Authorization: auth },
+				headers: { 'Content-Type': 'application/json', Authorization: getAuthHeader() },
 				body: JSON.stringify({ docs: deleteDocs }),
 				signal: AbortSignal.timeout(15_000),
 			}

@@ -1,0 +1,11 @@
+{
+  "repo": "deeds-web-app",
+  "generatedAt": "2026-05-15T19:24:39.540Z",
+  "totalFiles": 32064,
+  "languages": {
+    "typescript": 18565,
+    "svelte": 5367,
+    "json": 5117,
+    "javascript": 3015
+  }
+}

@@ -7,8 +7,9 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 const API_BASE = `${BASE_URL}/api/internal/error-brain`;
 const KNOWLEDGE_API_BASE = `${BASE_URL}/api/knowledge`;
 

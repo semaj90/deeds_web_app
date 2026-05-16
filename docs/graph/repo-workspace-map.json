@@ -1,0 +1,186 @@
+{
+  "repo": "deeds-web-app",
+  "generatedAt": "2026-05-15T19:24:38.472Z",
+  "totalRoutes": 1027,
+  "workspaces": [
+    {
+      "workspace": "repo-root",
+      "files": 2799,
+      "routes": 0,
+      "languages": {
+        "json": 2099,
+        "svelte": 630,
+        "javascript": 68,
+        "typescript": 2
+      }
+    },
+    {
+      "workspace": "audit",
+      "files": 1,
+      "routes": 0,
+      "languages": {
+        "json": 1
+      }
+    },
+    {
+      "workspace": "deeds_labs",
+      "files": 18405,
+      "routes": 0,
+      "languages": {
+        "typescript": 12312,
+        "svelte": 3896,
+        "javascript": 1953,
+        "json": 244
+      }
+    },
+    {
+      "workspace": "docker",
+      "files": 66,
+      "routes": 0,
+      "languages": {
+        "json": 46,
+        "javascript": 20
+      }
+    },
+    {
+      "workspace": "drizzle",
+      "files": 6,
+      "routes": 0,
+      "languages": {
+        "json": 4,
+        "typescript": 2
+      }
+    },
+    {
+      "workspace": "granite-docling-258M",
+      "files": 9,
+      "routes": 0,
+      "languages": {
+        "json": 9
+      }
+    },
+    {
+      "workspace": "logs",
+      "files": 2,
+      "routes": 0,
+      "languages": {
+        "json": 2
+      }
+    },
+    {
+      "workspace": "minio-data",
+      "files": 1,
+      "routes": 0,
+      "languages": {
+        "json": 1
+      }
+    },
+    {
+      "workspace": "models",
+      "files": 47,
+      "routes": 0,
+      "languages": {
+        "json": 47
+      }
+    },
+    {
+      "workspace": "next_steps",
+      "files": 2,
+      "routes": 0,
+      "languages": {
+        "json": 2
+      }
+    },
+    {
+      "workspace": "qdrant-windows",
+      "files": 65,
+      "routes": 0,
+      "languages": {
+        "json": 65
+      }
+    },
+    {
+      "workspace": "scratch",
+      "files": 14,
+      "routes": 0,
+      "languages": {
+        "javascript": 7,
+        "json": 6,
+        "typescript": 1
+      }
+    },
+    {
+      "workspace": "scripts",
+      "files": 3673,
+      "routes": 0,
+      "languages": {
+        "typescript": 2738,
+        "json": 570,
+        "javascript": 365
+      }
+    },
+    {
+      "workspace": "simd-bridge",
+      "files": 328,
+      "routes": 0,
+      "languages": {
+        "json": 318,
+        "javascript": 8,
+        "typescript": 2
+      }
+    },
+    {
+      "workspace": "storage",
+      "files": 11,
+      "routes": 0,
+      "languages": {
+        "json": 11
+      }
+    },
+    {
+      "workspace": "sveltekit-frontend",
+      "files": 6249,
+      "routes": 1027,
+      "languages": {
+        "typescript": 3492,
+        "json": 1332,
+        "svelte": 841,
+        "javascript": 584
+      }
+    },
+    {
+      "workspace": "test-results",
+      "files": 1,
+      "routes": 0,
+      "languages": {
+        "json": 1
+      }
+    },
+    {
+      "workspace": "tests",
+      "files": 8,
+      "routes": 0,
+      "languages": {
+        "typescript": 8
+      }
+    },
+    {
+      "workspace": "turbovec",
+      "files": 356,
+      "routes": 0,
+      "languages": {
+        "json": 356
+      }
+    },
+    {
+      "workspace": "vscode-extension",
+      "files": 21,
+      "routes": 0,
+      "languages": {
+        "javascript": 10,
+        "typescript": 8,
+        "json": 3
+      }
+    }
+  ]
+}

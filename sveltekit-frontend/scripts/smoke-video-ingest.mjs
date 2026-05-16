@@ -7,7 +7,8 @@ function argValue(name) {
   return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
-const endpoint = argValue('endpoint') ?? 'http://127.0.0.1:5173/api/evidence/video/ingest';
+const appBase = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+const endpoint = argValue('endpoint') ?? new URL('/api/evidence/video/ingest', appBase).href;
 const caseId = argValue('case-id');
 const filePath = argValue('file');
 const sourceUrl = argValue('source-url');

@@ -1,65 +1,61 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-15T03:36:03.840Z
+Generated: 2026-05-15T21:45:13.289Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 32044 |
-| Total edges | 75332 |
-| Resolved edges | 25347 |
-| Unresolved (local) | 8538 |
-| External refs | 39745 |
+| Nodes | 32135 |
+| Total edges | 75459 |
+| Resolved edges | 7292 |
+| Unresolved (local) | 8445 |
+| External refs | 58020 |
 | Neighborhoods computed | 100 |
-| Test-covered files | 884 |
+| Test-covered files | 817 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 21160 |
-| script | 4631 |
-| client | 1725 |
-| test | 1288 |
-| route | 1157 |
-| server | 976 |
-| types | 967 |
+| shared | 26041 |
+| script | 3678 |
+| test | 1260 |
+| types | 1016 |
 | config | 140 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 56203 |
-| test_covers_file | 4036 |
-| db_dependency | 3430 |
-| redis_dependency | 2844 |
-| env_dependency | 2304 |
-| imports_dynamic | 1827 |
+| imports_static | 60642 |
+| test_covers_file | 4086 |
+| redis_dependency | 2860 |
+| imports_dynamic | 2219 |
 | exports_from | 1756 |
-| server_route_depends_on | 1108 |
-| qdrant_dependency | 1053 |
-| mcp_tool_calls | 389 |
-| neo4j_dependency | 379 |
+| env_dependency | 1722 |
+| qdrant_dependency | 1095 |
+| mcp_tool_calls | 401 |
+| neo4j_dependency | 391 |
+| db_dependency | 284 |
 | svelte_route_uses_loader | 3 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
 | Rank | File | Zone | FanIn | FanOut |
 |------|------|------|-------|--------|
-| 1 | `src/lib/types.ts` | types | 4202 | 0 |
-| 2 | `src/lib/types/enhanced-svelte5-types.ts` | types | 1924 | 1 |
-| 3 | `src/lib/server/db/index.ts` | server | 808 | 3 |
-| 4 | `src/lib/server/db/client.ts` | server | 698 | 7 |
-| 5 | `src/lib/server/db/schema-postgres.ts` | server | 636 | 1 |
-| 6 | `src/lib/server/env.server.ts` | server | 522 | 0 |
-| 7 | `src/lib/server/redis.ts` | server | 513 | 1 |
-| 8 | `src/lib/components/ui/Button.svelte` | client | 443 | 0 |
-| 9 | `src/lib/server/db/schema.ts` | server | 336 | 10 |
-| 10 | `src/lib/components/ui/Icon.svelte` | client | 282 | 14 |
-| 11 | `src/lib/components/ui/enhanced-bits.svelte` | client | 239 | 1 |
-| 12 | `src/lib/server/ollama.ts` | server | 235 | 13 |
-| 13 | `src/lib/server/db/drizzle.ts` | server | 130 | 5 |
-| 14 | `src/lib/test-utils/setup.ts` | client | 119 | 0 |
-| 15 | `src/lib/server/middleware/cache-headers.ts` | server | 110 | 0 |
-| 16 | `src/lib/server/z-schemas.ts` | server | 109 | 0 |
-| 17 | `src/lib/server/z-schemas.ts` | server | 109 | 0 |
-| 18 | `src/lib/server/z-schemas.ts` | server | 109 | 0 |
-| 19 | `src/lib/server/grpc/embedding-client.ts` | server | 107 | 7 |
-| 20 | `src/lib/server/vector/qdrant-manager.ts` | server | 107 | 10 |
+| 1 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 77 | 0 |
+| 2 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |
+| 3 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |
+| 4 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 58 | 5 |
+| 5 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/base-service.ts` | shared | 42 | 0 |
+| 6 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/base-service.ts` | shared | 42 | 0 |
+| 7 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/base-service.ts` | shared | 42 | 0 |
+| 8 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/base-service.ts` | shared | 42 | 0 |
+| 9 | `deeds_labs/dead_code/contradictionEngine/types.ts` | types | 41 | 0 |
+| 10 | `deeds_labs/dead_code/contradictionEngine/types.ts` | types | 41 | 0 |
+| 11 | `deeds_labs/dead_code/contradictionEngine/types.ts` | types | 41 | 0 |
+| 12 | `deeds_labs/dead-scripts/syntax-repair/pattern-matcher.ts` | shared | 38 | 0 |
+| 13 | `sveltekit-frontend/src/lib/server/redis.ts` | shared | 28 | 0 |
+| 14 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
+| 15 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
+| 16 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
+| 17 | `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts` | shared | 27 | 1 |
+| 18 | `scripts/atlas/_atlas-utils.mjs` | script | 26 | 0 |
+| 19 | `scripts/atlas/_atlas-utils.mjs` | script | 26 | 0 |
+| 20 | `deeds_labs/dead-scripts/phase-scripts/phase90-enhanced-ast-fixer.mjs` | shared | 24 | 0 |

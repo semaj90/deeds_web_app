@@ -7,7 +7,7 @@
 console.log('\n🧪 Testing Cache Invalidation (RabbitMQ DOWN)...\n');
 
 try {
-	const response = await fetch('http://localhost:5173/api/cache/invalidate', {
+	const response = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/cache/invalidate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ pattern: 'template:test:*' })

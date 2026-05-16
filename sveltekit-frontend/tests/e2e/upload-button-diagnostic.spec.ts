@@ -15,8 +15,9 @@
  */
 
 import { test, expect, type Page, type ConsoleMessage } from '@playwright/test';
+import { PORTS } from '../helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 
 interface CapturedLog {
 	consoleMessages: Array<{ type: string; text: string; location: string }>;

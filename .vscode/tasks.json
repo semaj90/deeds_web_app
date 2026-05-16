@@ -1366,7 +1366,7 @@
     {
       "label": "🩺 Startup: Atlas Smoke Gate (16 probes, detached)",
       "type": "shell",
-      "command": "$stamp = 'logs/task-output/.atlas-smoke-last-run'; $cooldownSec = 1800; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🩺 atlas smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run smoke:atlas 2>&1 | Tee-Object -FilePath logs/task-output/smoke-atlas-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🩺 atlas smoke green' } else { Write-Host '🩺 atlas smoke FAILED — atlas/MCP/HTTP regression detected' } }",
+      "command": "$stamp = 'logs/task-output/.atlas-smoke-last-run'; $cooldownSec = 1800; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🩺 atlas smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; $output = (npm run smoke:atlas 2>&1 | Tee-Object -FilePath logs/task-output/smoke-atlas-startup.log | Out-String); if ($LASTEXITCODE -eq 0) { if ($output -match 'SKIP GET /api/ace/recommendations responds — dev server down') { Write-Host '🩺 atlas smoke skipped — dev server down' } else { Set-Content $stamp (Get-Date -Format o); Write-Host '🩺 atlas smoke green' } } else { Write-Host '🩺 atlas smoke FAILED — atlas/MCP/HTTP regression detected' } }",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -1385,7 +1385,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "16-probe regression gate over the atlas → context_for_file → hypergraph search → /api/ace/recommendations chain. Runs after ACE incremental refresh has primed the caches. 30-min cooldown via logs/task-output/.atlas-smoke-last-run stamp. Catches schema drift, dual-DB confusion, empty hypergraph_edges, and stale Redis caches in one shot — green = the agent's grounding signals all read from canonical Postgres (:5434) and are queryable end-to-end."
+      "detail": "16-probe regression gate over the atlas → context_for_file → hypergraph search → /api/ace/recommendations chain. Runs after ACE incremental refresh has primed the caches. 30-min cooldown via logs/task-output/.atlas-smoke-last-run stamp. Catches schema drift, dual-DB confusion, empty hypergraph_edges, and stale Redis caches in one shot — green when the full chain runs; skipped when the dev server is down."
     },
     {
       "label": "🔥 Startup: Seed Hit-Demand (chunk_hit_log → Redis, detached)",
@@ -2542,7 +2542,7 @@
     {
       "label": "🤖 Ollama: Start with GPU Layers",
       "type": "shell",
-      "command": "set OLLAMA_GPU_LAYERS=30 && set CUDA_VISIBLE_DEVICES=0 && ollama serve",
+      "command": "pwsh -NoProfile -Command \"$env:OLLAMA_GPU_LAYERS='30'; $env:CUDA_VISIBLE_DEVICES='0'; ollama serve\"",
       "isBackground": true,
       "group": "build",
       "presentation": {

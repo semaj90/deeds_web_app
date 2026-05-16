@@ -121,7 +121,7 @@ Verification sweep + new wiring summary. State at 2026-05-08T10:47Z.
 | `npm run reconstruction:compile-demo` | ✅ still byte-identical (`2240019055…`, plan_hash `4a5d9c80…`) |
 | `npm run reconstruction:emit-presets` | ✅ still byte-identical (sha256 `60f537ec…`) |
 
-**~19:43Z — Atlas smoke transient error.** First run printed `SyntaxError: Unexpected token 'C', "Connection"... is not valid JSON` from `smoke-atlas-context.mjs:56` — MCP transport was returning `"Connection is closed."` as the SSE body literal during a momentary MCP restart. Re-run was clean: P1.7 atlas+MCP probes 11/11 pass. P1.8 hypergraph.search HTTP probes 5/5 fail and `/api/ace/recommendations` warns — single root cause: **dev server not running on :5173**. Not a regression; the smoke gate correctly distinguishes MCP-path success from HTTP-path failure.
+**~19:43Z — Atlas smoke transient error.** First run printed `SyntaxError: Unexpected token 'C', "Connection"... is not valid JSON` from `smoke-atlas-context.mjs:56` — MCP transport was returning `"Connection is closed."` as the SSE body literal during a momentary MCP restart. Re-run was clean: P1.7 atlas+MCP probes 11/11 pass. P1.8 hypergraph.search HTTP probes are skipped when the dev server is not running on :5173, so `/api/ace/recommendations` now skips instead of warning in that state. Not a regression; the smoke gate correctly distinguishes MCP-path success from HTTP-path availability.
 
 **~19:46Z — Final-state service map:**
 

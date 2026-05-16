@@ -13,8 +13,9 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { PORTS } from '../helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 
 test.describe('POST /api/ai/intent-dispatch — Phase B contract', () => {
 	test('400 on missing text field', async ({ request }) => {

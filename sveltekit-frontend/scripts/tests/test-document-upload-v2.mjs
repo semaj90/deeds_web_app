@@ -3,7 +3,7 @@
  * Tests document upload → embedding → Qdrant indexing with valid session
  */
 
-const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? (process.env.TEST_BASE_URL || 'http://localhost:5173');
 const SESSION_ID = '00000000-0000-0000-0000-000000000001';
 
 // ANSI colors

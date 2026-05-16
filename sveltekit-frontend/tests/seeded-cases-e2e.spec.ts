@@ -16,8 +16,9 @@ import {
 	getSeededCases,
 	type SeedCaseResult
 } from './utils/seed-cases';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 const TEST_CASES = [
   {

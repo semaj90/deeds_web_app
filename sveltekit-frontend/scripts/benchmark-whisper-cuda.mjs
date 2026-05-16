@@ -39,7 +39,7 @@ const CUSTOM_FILE = getArg('file');
 const MODEL = getArg('model') ?? process.env.WHISPER_MODEL ?? 'base';
 const WHISPER_BIN = process.env.WHISPER_PATH ?? 'whisper-cli';
 const WHISPER_SERVER = process.env.WHISPER_SERVER_URL ?? 'http://127.0.0.1:8178';
-const API_URL = process.env.API_URL ?? 'http://localhost:5173';
+const API_URL = process.env.PUBLIC_APP_URL ?? process.env.API_URL ?? 'http://localhost:5173';
 
 // ── WAV generator ────────────────────────────────────────────────────────
 

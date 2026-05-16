@@ -13,19 +13,27 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Add hoisted mocks here when handler logic is filled in:
-// const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
-// vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
+const mockFetch = vi.hoisted(() => vi.fn());
+vi.stubGlobal('fetch', mockFetch);
+
+vi.mock('$lib/server/env.server.js', () => ({
+	ENV: { COUCHDB_URL: 'http://admin:legal_ai_pass@127.0.0.1:5984' },
+}));
+
+function okJson(body: unknown) {
+	return Promise.resolve({ ok: true, json: () => Promise.resolve(body), text: () => Promise.resolve(JSON.stringify(body)) });
+}
 
 describe('src/routes/api/couchdb/view/+server.ts', () => {
   describe('GET /api/couchdb/view', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
-    beforeEach(async () => {
-      vi.resetAllMocks();
-      const mod = await import('../../../../../src/routes/api/couchdb/view/+server.js') as Record<string, unknown>;
-      handler = mod.GET as typeof handler;
-    });
+	beforeEach(async () => {
+	  vi.resetAllMocks();
+	  mockFetch.mockResolvedValue(okJson({ rows: [] }));
+	  const mod = await import('../../../../../src/routes/api/couchdb/view/+server.js') as Record<string, unknown>;
+	  handler = mod.GET as typeof handler;
+	});
 
     function makeReq(body?: unknown) {
       return new Request('http://localhost/api/couchdb/view', { method: 'GET' });
@@ -48,9 +56,26 @@ describe('src/routes/api/couchdb/view/+server.ts', () => {
       expect([200, 400, 401, 403, 404, 405, 429, 500, 503]).toContain(status);
     });
 
-    it.todo('400 — bad input shape returns degraded JSON envelope');
-    it.todo('200 — happy path returns expected schema');
-    it.todo('degraded — upstream failure returns same top-level shape with empty defaults');
+    it('rejects missing view param', async () => {
+		const resp = await handler({ request: makeReq(), locals: { user: { id: 'u1' } }, url: makeUrl(), params: {} });
+		expect(resp.status).toBe(400);
+	});
+
+	it('rejects disallowed database names', async () => {
+		const url = new URL('http://localhost/api/couchdb/view?db=bad&view=by_cluster');
+		const resp = await handler({ request: makeReq(), locals: { user: { id: 'u1' } }, url, params: {} });
+		expect(resp.status).toBe(403);
+	});
+
+	it('proxies allowed view requests with clamped limit', async () => {
+		const url = new URL('http://localhost/api/couchdb/view?db=karpathy_wiki&design=wiki&view=by_cluster&limit=999');
+		const resp = await handler({ request: makeReq(), locals: { user: { id: 'u1' } }, url, params: {} });
+		expect(resp.status).toBe(200);
+		expect(mockFetch).toHaveBeenCalled();
+		const calledUrl = String(mockFetch.mock.calls[0]?.[0]);
+		expect(calledUrl).toContain('/karpathy_wiki/_design/wiki/_view/by_cluster');
+		expect(calledUrl).toContain('limit=200');
+	});
   });
 
 });

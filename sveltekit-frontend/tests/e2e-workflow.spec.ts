@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * End-to-End Workflow Tests
@@ -8,7 +9,7 @@ import { expect, test } from '@playwright/test';
  * so tests verify routes load without crashing.
  */
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 test.describe('End-to-End Workflow Tests', () => {
   test('POI management page loads', async ({ page }) => {

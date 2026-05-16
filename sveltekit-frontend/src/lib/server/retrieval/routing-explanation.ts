@@ -18,6 +18,13 @@ export type RoutingExplanation = {
   fallbacks: string[];
   redisCards: string[];
   taskDistillate?: string;
+  engram?: {
+    enabled: boolean;
+    didYouMean?: string;
+    bmuHints: string[];
+    clusterHints: string[];
+    trust: string;
+  };
 };
 
 export class RoutingExplanationBuilder {
@@ -82,6 +89,11 @@ export class RoutingExplanationBuilder {
 
   public addFallback(message: string) {
     this.explanation.fallbacks.push(message);
+    return this;
+  }
+
+  public setEngram(engram: RoutingExplanation['engram']) {
+    this.explanation.engram = engram;
     return this;
   }
 

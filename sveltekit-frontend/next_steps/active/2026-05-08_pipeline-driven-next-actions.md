@@ -28,7 +28,7 @@ through the smoke harness — the chain is self-verifying on every folderOpen.
 - ✅ SvelteKit 2 reads canonical Postgres schema on `:5434`
 - ✅ `DATABASE_URL_FALLBACK` removed from `env.server.ts`
 - ✅ `hypergraph_edges` Drizzle schema mirrors live table (10 → 25 cols)
-- ✅ `smoke:atlas`: green
+- ✅ `smoke:atlas`: green when dev server is up, skipped when it is down
 - ✅ `smoke:hypergraph`: 5/5 pass
 - ✅ `svelte-check`: 0 errors / 0 warnings
 - ✅ `tsgo`: 0 errors

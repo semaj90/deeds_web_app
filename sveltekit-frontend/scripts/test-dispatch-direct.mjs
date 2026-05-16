@@ -31,7 +31,7 @@ console.log('   Expected: DOWN (stopped via docker stop phase66-rabbitmq)');
 
 // Test via API endpoint
 try {
-	const response = await fetch('http://localhost:5173/api/cache/invalidate', {
+	const response = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/cache/invalidate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ pattern: 'template:dispatch-test:*' })
@@ -71,7 +71,7 @@ console.log('2. Trigger cache invalidation:');
 console.log('   node scripts/test-cache-invalidate.mjs\n');
 
 console.log('3. Check dispatch stats (when endpoint exists):');
-console.log('   curl http://localhost:5173/api/queue/dispatch-stats\n');
+console.log(`   curl ${(process.env.PUBLIC_APP_URL ?? 'http://localhost:5173')}/api/queue/dispatch-stats\n`);
 
 console.log('4. Restart RabbitMQ and verify queued mode:');
 console.log('   docker start phase66-rabbitmq');

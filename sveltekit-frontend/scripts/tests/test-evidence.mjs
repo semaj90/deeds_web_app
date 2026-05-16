@@ -11,7 +11,7 @@
  * Usage: node scripts/tests/test-evidence.mjs
  */
 
-const BASE = process.env.DEV_SERVER ?? 'http://localhost:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? (process.env.DEV_SERVER ?? 'http://localhost:5173');
 const NONEXISTENT = '00000000-0000-0000-0000-000000000000';
 
 let passed = 0;

@@ -11,7 +11,7 @@
 
 import { chromium } from 'playwright';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://localhost:5173');
 const VERBOSE = process.argv.includes('--verbose');
 const TEST_USER_ID = '00000000-0000-0000-0000-000000000001';
 const TEST_CASE_ID = '5814dc72-fe7e-49ab-b5d2-ff22f2e40ff1';

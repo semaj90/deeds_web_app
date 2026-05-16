@@ -6,8 +6,9 @@
 import { expect, test } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE = 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 const SCREENSHOT_DIR = path.join(process.cwd(), 'test-results', 'screenshots');
 
 if (!fs.existsSync(SCREENSHOT_DIR)) {

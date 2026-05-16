@@ -12,8 +12,9 @@
 
 import { test, expect } from '@playwright/test';
 import pg from 'pg';
+import { PORTS } from '../helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 // Dev server reads DATABASE_URL from env.server.ts default of port 5434
 // (deeds-postgres-prod-proxy). Don't fall back to 5432 — that's a separate DB
 // with stale rows that won't match what the dev server sees.
