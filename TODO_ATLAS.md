@@ -125,5 +125,5 @@
 
 ## Phase 8: Immediate Next Steps
 - [x] **Validate Infrastructure**: `node scripts/atlas/validate-model-endpoints.mjs`.
-- [ ] **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
-- [ ] **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
+- [x] **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
+- [x] **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
