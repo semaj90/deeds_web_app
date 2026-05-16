@@ -29,9 +29,16 @@ const DRIZZLE_DIR = join(FRONTEND, 'drizzle');
 const REPORTS_DIR = join(REPO_ROOT, 'docs/reports');
 
 const DB_URL       = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const EMBEDDING_DIM = 768;
-// 64-dim is allowed for compressed/autoencoder paths
-const ALLOWED_DIMS = new Set([768, 64, 1536]);
+const EMBEDDING_DIM = 768; // embeddinggemma:latest
+const ALLOWED_DIMS = new Set([
+  768,  // Canonical Codebase/Evidence Lane (embeddinggemma:latest)
+  1536, // External OpenAI (text-embedding-3-small)
+  384,  // Warden / GPU-Cache / Nomic-Embed-Text / Legacy Ingestion
+  512,  // Clip / Vision / Medium models
+  128,  // Compressed / Autoencoder
+  64,   // Latent space / Compressed
+  32,   // Fingerprinting
+]);
 
 const ARGS    = process.argv.slice(2);
 const DRY_RUN = ARGS.includes('--dry-run');
@@ -44,8 +51,8 @@ const C = {
 
 // Known vector tables that should have HNSW indexes
 const VECTOR_TABLES = [
-  'evidence_vectors', 'codebase_chunks_768', 'legal_documents',
-  'chat_messages', 'legal_cases', 'embedding_cache',
+  'evidence_vectors', 'codebase_chunk_index', 'legal_documents',
+  'embedding_cache', 'document_embeddings', 'warden_chunks',
 ];
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -90,8 +97,9 @@ function checkHnswIndexes() {
   const sqlFiles = allSqlFiles();
   const allSql = sqlFiles.map(f => readFileSync(f, 'utf8')).join('\n');
   const results = VECTOR_TABLES.map(table => {
-    const hasHnsw = allSql.match(new RegExp(`CREATE INDEX.*${table}.*USING hnsw`, 'i'))
-      || allSql.match(new RegExp(`USING hnsw.*${table}`, 'i'));
+    // Match across newlines using [\s\S]*?
+    const hasHnsw = allSql.match(new RegExp(`CREATE INDEX[\\s\\S]*?${table}[\\s\\S]*?USING hnsw`, 'i'))
+      || allSql.match(new RegExp(`USING hnsw[\\s\\S]*?${table}`, 'i'));
     return { table, hasHnsw: !!hasHnsw };
   });
   const missing = results.filter(r => !r.hasHnsw).map(r => r.table);
