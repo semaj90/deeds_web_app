@@ -11,8 +11,6 @@ import crypto from 'crypto';
 import { eq, type InferInsertModel } from 'drizzle-orm';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
-import { zod4 as zod } from 'sveltekit-superforms/adapters';
-import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types.js';
 
 const metaEnv = import.meta.env;
@@ -108,14 +106,11 @@ type IntermediateEvidenceMetadata = {
 } & Partial<FinalEvidenceMetadata>;
 
 export const load: PageServerLoad = async ({ locals }) => {
-  // Initialize the form with default values
-  const form = await superValidate(zod(evidenceUploadSchema));
-
   const user = locals.user;
 
   // If no user, return empty cases (client will handle fallback)
   if (!user) {
-    return { form, cases: [], user: null };
+    return { cases: [], user: null };
   }
 
   // Get available cases for the current user
@@ -131,10 +126,10 @@ export const load: PageServerLoad = async ({ locals }) => {
       .where(eq(cases.status, 'open'))
       .orderBy(cases.createdAt);
 
-    return { form, cases: userCases, user };
+    return { cases: userCases, user };
   } catch (error) {
     console.error('Error fetching cases:', error);
-    return { form, cases: [], user };
+    return { cases: [], user };
   }
 };
 
