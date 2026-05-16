@@ -1016,7 +1016,9 @@
     "audit:error-dag": "node ../scripts/atlas/build-error-fix-dag.mjs",
     "audit:rg": "node ../scripts/atlas/audit-rg-search-integrity.mjs",
     "audit:directories": "node ../scripts/atlas/analyze-directory-roles.mjs",
-    "audit:production-ready": "npm run audit:contracts && npm run audit:pgvector && npm run audit:drizzle-meta && npm run audit:rg && npm run audit:directories"
+    "audit:models": "node ../scripts/atlas/audit-model-artifacts.mjs",
+    "audit:models:json": "node ../scripts/atlas/audit-model-artifacts.mjs --json",
+    "audit:production-ready": "npm run audit:contracts && npm run audit:pgvector && npm run audit:drizzle-meta && npm run audit:rg && npm run audit:directories && npm run audit:models"
   },
   "devDependencies": {
     "@babel/core": "7.28.5",

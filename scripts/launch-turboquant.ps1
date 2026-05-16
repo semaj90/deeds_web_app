@@ -29,13 +29,13 @@
   VRAM yourself or Ollama isn't running.
 
 .ENV
-  LLAMA_SERVER_PATH    default: C:\Users\james\Desktop\llama-server-cuda\llama-server.exe
+  LLAMA_SERVER_PATH    default: bin\llama-server.exe, then vendor\llama-server\llama-server.exe, then system PATH
   TURBO_MODEL_PATH     default: %USERPROFILE%\.ollama\blobs\sha256-a79de882...
   ROTORQUANT_MODEL_PATH  optional: path to a RotorQuant GGUF (e.g. gemma-4-E4B-RotorQuant-GGUF-IQ4_XS.gguf
                            from majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS on HuggingFace).
                            When set, overrides TURBO_MODEL_PATH. Weight-quantised; runs on the
                            stock llama-server.exe without any TurboQuant binary.
-  TURBO_MMPROJ_PATH    default: %USERPROFILE%\Downloads\gemma4-mmproj\mmproj-BF16.gguf
+  TURBO_MMPROJ_PATH    default: models\mmproj-BF16.gguf (repo-local; see models/model-manifest.json)
   TURBO_PORT           default: 8090
   TURBO_PROFILE        default: stock
                          stock           K=q8_0  V=q8_0   (works on stock llama.cpp)
@@ -98,9 +98,7 @@ $llama = if ($env:LLAMA_SERVER_PATH) {
     # Fallback order: 1. bin/ in workspace, 2. vendor/ in workspace, 3. system path
     $localBin = Join-Path $PSScriptRoot "..\bin\llama-server.exe"
     $localVendor = Join-Path $PSScriptRoot "..\vendor\llama-server\llama-server.exe"
-    if (Test-Path $localBin) { $localBin }
-    elseif (Test-Path $localVendor) { $localVendor }
-    else { "llama-server.exe" } # Assume it's in PATH
+    if (Test-Path $localBin) { $localBin } elseif (Test-Path $localVendor) { $localVendor } else { "llama-server.exe" }
 }
 
 # ROTORQUANT_MODEL_PATH overrides TURBO_MODEL_PATH when set.
@@ -109,20 +107,13 @@ $model = if ($env:ROTORQUANT_MODEL_PATH) {
 } elseif ($env:TURBO_MODEL_PATH) { 
     $env:TURBO_MODEL_PATH 
 } else {
-    # Try to find a gemma model in models/ or .ollama
-    $localModel = Join-Path $PSScriptRoot "..\models\gemma-4-legal.gguf"
-    if (Test-Path $localModel) { $localModel }
-    else { Join-Path $env:USERPROFILE ".ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43" }
-}
-if ($env:ROTORQUANT_MODEL_PATH) {
-  Write-Host 'Model: RotorQuant GGUF (weight-quantised, stock binary OK)' -ForegroundColor Cyan
 }
 $mmproj = if ($env:TURBO_MMPROJ_PATH) { 
     $env:TURBO_MMPROJ_PATH 
 } else { 
     $localMmproj = Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf"
     if (Test-Path $localMmproj) { $localMmproj }
-    else { Join-Path $env:USERPROFILE 'Downloads\gemma4-mmproj\mmproj-BF16.gguf' }
+    else { $null }  # no fallback — set TURBO_MMPROJ_PATH or place file at models/mmproj-BF16.gguf
 }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
 $ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '4096' }
