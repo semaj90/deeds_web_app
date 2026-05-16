@@ -4,12 +4,15 @@ import { resolve, join } from 'node:path';
 import { mkdir, writeFile, readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
+const args = process.argv.slice(2);
+const SOURCE_ID = args.find(a => a.startsWith('--source='))?.split('=')[1];
+
 const RAW_DIR = resolve(process.cwd(), 'data/external-docs/raw');
 const NORM_DIR = resolve(process.cwd(), 'data/external-docs/normalized');
 
 async function normalize() {
   if (!existsSync(RAW_DIR)) return;
-  const sourceDirs = await readdir(RAW_DIR);
+  const sourceDirs = SOURCE_ID ? [SOURCE_ID] : await readdir(RAW_DIR);
 
   for (const sourceId of sourceDirs) {
     const srcDir = join(RAW_DIR, sourceId);

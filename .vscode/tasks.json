@@ -2542,7 +2542,13 @@
     {
       "label": "🤖 Ollama: Start with GPU Layers",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$env:OLLAMA_GPU_LAYERS='30'; $env:CUDA_VISIBLE_DEVICES='0'; ollama serve\"",
+      "command": "ollama serve",
+      "options": {
+        "env": {
+          "OLLAMA_GPU_LAYERS": "30",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
       "isBackground": true,
       "group": "build",
       "presentation": {

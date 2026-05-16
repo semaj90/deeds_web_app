@@ -24,6 +24,12 @@ User Query → routeInference() (inference-router.ts)
 
 All tiers are OpenAI-compatible (`/v1/chat/completions`). The router health-checks each tier with a 1s timeout and falls through to the next on failure.
 
+> [!IMPORTANT]
+> **Healthy != GPU Active**: The `/health` endpoint only confirms the server process is alive and responding. It does **not** verify that GPU offload is configured correctly or that VRAM is being used. 
+> - **Verify GPU**: Always check `nvidia-smi` during generation. If GPU usage stays at 0% or VRAM doesn't increase, the server is running on CPU.
+> - **Speculative Decoding**: Requires a valid draft model. If none is configured, it will be disabled automatically.
+
+
 ---
 
 ## Current Status (2026-04-11)

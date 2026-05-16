@@ -4,6 +4,9 @@ import { resolve, join } from 'node:path';
 import { mkdir, writeFile, readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
+const args = process.argv.slice(2);
+const SOURCE_ID = args.find(a => a.startsWith('--source='))?.split('=')[1];
+
 const NORM_DIR = resolve(process.cwd(), 'data/external-docs/normalized');
 const OUTPUT_DIR = resolve(process.cwd(), 'docs/llms/generated');
 
@@ -11,7 +14,7 @@ async function build() {
   if (!existsSync(NORM_DIR)) return;
   if (!existsSync(OUTPUT_DIR)) await mkdir(OUTPUT_DIR, { recursive: true });
 
-  const sourceDirs = await readdir(NORM_DIR);
+  const sourceDirs = SOURCE_ID ? [SOURCE_ID] : await readdir(NORM_DIR);
 
   for (const sourceId of sourceDirs) {
     const srcDir = join(NORM_DIR, sourceId);

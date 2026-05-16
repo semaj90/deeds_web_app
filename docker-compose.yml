@@ -49,7 +49,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-123456}
       - POSTGRES_HOST_AUTH_METHOD=md5
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./sql/init:/docker-entrypoint-initdb.d

@@ -5,6 +5,9 @@ import { mkdir, writeFile, readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import crypto from 'node:crypto';
 
+const args = process.argv.slice(2);
+const SOURCE_ID = args.find(a => a.startsWith('--source='))?.split('=')[1];
+
 const NORM_DIR = resolve(process.cwd(), 'data/external-docs/normalized');
 const CHUNK_DIR = resolve(process.cwd(), 'data/external-docs/chunks');
 
@@ -15,7 +18,7 @@ async function chunk() {
   }
   if (!existsSync(CHUNK_DIR)) await mkdir(CHUNK_DIR, { recursive: true });
 
-  const sourceDirs = await readdir(NORM_DIR);
+  const sourceDirs = SOURCE_ID ? [SOURCE_ID] : await readdir(NORM_DIR);
 
   for (const sourceId of sourceDirs) {
     const srcDir = join(NORM_DIR, sourceId);
