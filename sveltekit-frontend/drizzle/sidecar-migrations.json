@@ -45,6 +45,24 @@
       "appliedAt": "2026-05-10",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='llm_context_cache';\""
+    },
+    {
+      "file": "20260516_pgvector_repair.sql",
+      "status": "manual_sidecar",
+      "reason": "Repairs legacy text/jsonb columns to pgvector types to align with Drizzle schema. Covers evidence_vectors, legal_documents, and document_embeddings.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name, data_type FROM information_schema.columns WHERE table_name='legal_documents' AND column_name='content_embedding';\""
+    },
+    {
+      "file": "20260516_hnsw_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Applies HNSW indexes to core vector tables for performance. CONCURRENTLY IF NOT EXISTS safe for live data.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexdef LIKE '%hnsw%';\""
     }
   ]
 }

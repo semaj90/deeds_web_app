@@ -130,15 +130,43 @@
 - [x] **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
 - [x] **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
 - [ ] **Tier 1 Expansion**: Ingest TypeScript 5.4, Node.js 22, and PostgreSQL 16 docs.
-## Phase 6E: Cross-Layer Contract Audit (2026-05-16)
-- [x] **Orchestrator**: `scripts/atlas/audit-contract-map.mjs` — 8-layer cross-layer contract auditor.
-- [x] **Service Health Gate**: `scripts/atlas/validate-dev-services.mjs` — TCP probe for all 10 dev services.
-- [x] **Drizzle/Postgres Contract**: `scripts/atlas/audit-drizzle-postgres-contracts.mjs` — schema drift, FK mismatch, unsafe writes.
-- [x] **pgvector Audit**: `scripts/atlas/audit-pgvector-schema.mjs` — extension, HNSW indexes, dim validation.
-- [x] **Drizzle Meta Hygiene**: `scripts/atlas/audit-drizzle-meta-hygiene.mjs` — non-JSON file detector + `--fix` mover.
-- [x] **Form Contracts**: `scripts/atlas/audit-sveltekit-form-contracts.mjs` — Superforms v2, Zod, SSR safety.
-- [x] **Error-Fix DAG**: `scripts/atlas/build-error-fix-dag.mjs` — KAG recall + HMM state topological fix order.
-- [x] **Playwright E2E**: `sveltekit-frontend/tests/e2e/contract-network.spec.ts` — API shape, CORS, SSE, 500-error gate.
+## Phase 6E: Cross-Layer Contract Error Map (2026-05-16)
+
+- [x] Create `scripts/atlas/audit-contract-map.mjs`.
+- [x] Create `scripts/atlas/audit-drizzle-meta-hygiene.mjs`.
+- [x] Create `scripts/atlas/audit-drizzle-postgres-contracts.mjs`.
+- [x] Create `scripts/atlas/audit-sveltekit-form-contracts.mjs`.
+- [x] Create `scripts/atlas/audit-pgvector-schema.mjs`.
+- [x] Create `scripts/atlas/build-error-fix-dag.mjs`.
+- [x] Create `scripts/atlas/validate-dev-services.mjs`.
+- [x] Create `sveltekit-frontend/tests/e2e/contract-network.spec.ts`.
+- [x] Compare:
+  - [x] SvelteKit routes/load/actions
+  - [x] Superforms v2 wiring
+  - [x] Zod schemas
+  - [x] Drizzle ORM 0.44 schemas
+  - [x] SQL migrations
+  - [x] live PostgreSQL tables
+  - [x] pgvector extension/indexes
+  - [x] Playwright browser/network behavior
+- [x] Detect:
+  - [x] drizzle_meta_non_json_file
+  - [x] drizzle_fk_type_mismatch
+  - [x] migration_schema_drift
+  - [x] live_db_schema_drift
+  - [x] missing_pgvector_extension
+  - [x] vector_dimension_mismatch
+  - [x] api_route_parses_json_without_zod
+  - [x] superforms_schema_not_top_level
+  - [x] action_missing_return_form
+  - [x] unsafe_drizzle_update_delete
+  - [x] env_url_mismatch
+  - [x] browser_network_contract_failure
+- [ ] Output:
+  - `docs/reports/contract-error-map-report.md`
+  - `docs/reports/contract-error-map-report.json`
+  - `docs/graph/contract-error-map.json`
+  - `docs/graph/error-fix-dag.json`
 - [ ] **build-atlas-index.mjs**: Harden against Postgres being offline (DONE — fail-open `.catch()` added at line 67).
 - [ ] **Redis KAG recall**: Populate `ace:fixer:patterns:<hmmState>` keys with past fix summaries for each error state.
 - [ ] **CI gate**: Wire `npm run audit:contracts --strict` as a pre-merge check blocking on high-severity findings.
@@ -154,10 +182,23 @@
 - [ ] Run `npm run audit:contracts` before every schema migration going forward.
 
 ## Phase 6E Operator Gates (2026-05-16)
-- [ ] **Postgres reachability**: `docker ps --filter "name=legal-ai-postgres"` + `Test-NetConnection 127.0.0.1 -Port 5434` before applying HNSW migrations.
-- [ ] **HNSW index migration**: After Postgres confirmed healthy, apply `docs/reports/pgvector-index-plan.md` SQL in a dedicated commit (`feat(db): add reviewed hnsw indexes for vector tables`).
-- [ ] **Update sidecar manifest**: Add `20260516_hnsw_indexes.sql` to `sveltekit-frontend/drizzle/sidecar-migrations.json` once applied.
-- [ ] **Vector dimension policy**: `rg 'dimensions.*384' sveltekit-frontend/src/lib/server/db/` — confirm whether 384-dim columns exist and document them in ALLOWED_DIMS (384 = warden/GPU-cache lane, 768 = canonical codebase lane).
-- [ ] **Update pgvector auditor**: If 384-dim is confirmed intentional, add to `ALLOWED_DIMS` in `scripts/atlas/audit-pgvector-schema.mjs`.
-- [ ] **Graceful offline degradation**: Ensure live Postgres checks in all auditors degrade to SKIP/WARN (not crash) when Docker is offline — verify with `npm run audit:pgvector`, `npm run audit:contracts`, `npm run audit:drizzle-meta`.
-- [ ] **Full validation sequence** (when Docker is up): `npm run services:health && npm run audit:contracts && npm run audit:pgvector && npm run audit:drizzle-meta && npm run atlas:validate && npm run atlas:root:full`
+- [x] **Postgres reachability**: `docker ps --filter "name=legal-ai-postgres"` + `Test-NetConnection 127.0.0.1 -Port 5434` before applying HNSW migrations.
+- [x] **HNSW index migration**: After Postgres confirmed healthy, apply `docs/reports/pgvector-index-plan.md` SQL in a dedicated commit (`feat(db): add reviewed hnsw indexes for vector tables`).
+- [x] **Update sidecar manifest**: Add `20260516_hnsw_indexes.sql` to `sveltekit-frontend/drizzle/sidecar-migrations.json` once applied.
+- [x] **Vector dimension policy**: `rg 'dimensions.*384' sveltekit-frontend/src/lib/server/db/` — confirm whether 384-dim columns exist and document them in ALLOWED_DIMS (384 = warden/GPU-cache lane, 768 = canonical codebase lane).
+- [x] **Update pgvector auditor**: If 384-dim is confirmed intentional, add to `ALLOWED_DIMS` in `scripts/atlas/audit-pgvector-schema.mjs`.
+- [x] **Graceful offline degradation**: Ensure live Postgres checks in all auditors degrade to SKIP/WARN (not crash) when Docker is offline — verify with `npm run audit:pgvector`, `npm run audit:contracts`, `npm run audit:drizzle-meta`.
+- [x] **Full validation sequence** (when Docker is up): `npm run services:health && npm run audit:contracts && npm run audit:pgvector && npm run audit:drizzle-meta && npm run atlas:validate && npm run atlas:root:full`
+## Phase 6F: Schema Mismatch Remediation (2026-05-16)
+- [ ] **Plan Review**: Review `docs/reports/schema-mismatch-remediation-plan.md`.
+- [ ] **Canary Migration**: Convert `users.id` to UUID in `schema-postgres.ts`.
+- [ ] **FK Alignment**: Reconcile 23 tables to use `uuid` foreign keys referencing `users.id`.
+- [ ] **Data Casting**: Handle existing integer IDs during the migration (if data exists).
+- [ ] **Lucia Alignment**: Ensure `lucia-schema.ts` and `schema-postgres.ts` use identical `users` definitions.
+
+## Phase 9: Pre-Production Hardening
+- [ ] **Full Production Audit**: See [production-ready-audit.md](./next_steps/production-ready-audit.md) for the detailed checklist.
+- [ ] **Drizzle Reconciliation**: Resolve High-Severity UUID/Integer mismatch across 23 tables.
+- [ ] **Shadow Table Audit**: Reconcile 90+ "Shadow" tables found in migrations but missing from Drizzle schema.
+- [ ] **Search Integrity**: Audit `rg` helpers in `scripts/atlas/` to use `-u` (unrestricted) for deep audits.
+- [ ] **Drizzle Studio**: Verify full CRUD parity for all schema parts in Studio.
