@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-05-16T18:15:17.241Z",
+  "embeddingDim": 768,
+  "allowedDims": [
+    768,
+    1536,
+    384,
+    512,
+    128,
+    64,
+    32
+  ],
+  "checks": [
+    {
+      "check": "extension_in_migrations",
+      "pass": true,
+      "message": "CREATE EXTENSION vector found in 9 migration file(s).",
+      "files": [
+        "sveltekit-frontend\\drizzle\\0013_codeintel_indexes.sql",
+        "sveltekit-frontend\\drizzle\\manual\\0016_cluster_centroids.sql",
+        "sveltekit-frontend\\drizzle\\manual\\0099_ff1_engine.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260310_bootstrap_all_tables.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260325_codeintel_indexes.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260506_code_retrieval_chunks.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260510_evidence_columns.sql",
+        "sveltekit-frontend\\drizzle\\manual\\rag_query_analytics.sql",
+        "sveltekit-frontend\\drizzle\\manual\\screenshot_artifacts.sql"
+      ],
+      "suggestedFix": null
+    },
+    {
+      "check": "hnsw_indexes",
+      "pass": true,
+      "message": "HNSW index hints found for all expected vector tables.",
+      "missing": [],
+      "suggestedFix": null,
+      "indexPlanPath": null
+    },
+    {
+      "check": "drizzle_vector_import",
+      "pass": true,
+      "message": "All vector imports use drizzle-orm/pg-core (native, correct).",
+      "files": [],
+      "suggestedFix": null
+    },
+    {
+      "check": "vector_dimensions",
+      "pass": true,
+      "message": "All vector columns use allowed dimensions (768/1536/384/512/128/64/32).",
+      "violations": [],
+      "suggestedFix": null
+    },
+    {
+      "check": "live_postgres",
+      "reachable": true,
+      "pass": true,
+      "vectorExtension": "v0.8.1",
+      "hnswIndexes": [
+        "cluster_summaries.cluster_summaries_embedding_hnsw",
+        "code_retrieval_chunks.crc_embedding_hnsw",
+        "codebase_chunk_index.codebase_chunk_index_content_hnsw",
+        "codebase_chunk_index.codebase_chunk_index_summary_hnsw",
+        "document_embeddings.document_embeddings_hnsw_idx",
+        "embedded_summaries.idx_embedded_summaries_vector_hnsw",
+        "embedding_cache.embedding_cache_hnsw_idx",
+        "evidence_vectors.evidence_vectors_hnsw_idx",
+        "fixer_patterns.fp_embedding_hnsw_idx",
+        "legal_documents.legal_documents_hnsw_idx",
+        "rag_query_log.rag_query_log_embedding_hnsw",
+        "research_summaries.rs_embedding_hnsw",
+        "screenshot_artifacts.screenshot_artifacts_caption_embedding_hnsw_idx",
+        "warden_chunks.warden_chunks_hnsw_idx"
+      ],
+      "missingHnswOnExistingTables": [],
+      "message": "pgvector 0.8.1 installed. 14 HNSW index(es) found.",
+      "suggestedFix": null
+    }
+  ],
+  "status": "pass"
+}

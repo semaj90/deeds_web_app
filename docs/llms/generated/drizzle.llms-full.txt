@@ -1,17 +1,17 @@
-# drizzle Documentation
+# Drizzle ORM
 
-# drizzle — migrations
+# Drizzle ORM — migrations
 
-Source: https://.../drizzle/migrations
-Version: latest
+Source: https://orm.drizzle.team/docs/overview/migrations
+Version: 0.44
 Topic: migrations
 
 
 
-# drizzle — overview
+# Drizzle ORM — overview
 
-Source: https://.../drizzle/overview
-Version: latest
+Source: https://orm.drizzle.team/docs/overview/overview
+Version: 0.44
 Topic: overview
 
 # Why Drizzle?
@@ -41,10 +41,10 @@ Drizzle ORM is dialect-specific, slim, performant and serverless-ready by design
 
 Drizzle operates natively through industry-standard database drivers. We support all major PostgreSQL, MySQL, SQLite or SingleStore drivers out there.
 
-# drizzle — queries
+# Drizzle ORM — queries
 
-Source: https://.../drizzle/queries
-Version: latest
+Source: https://orm.drizzle.team/docs/overview/queries
+Version: 0.44
 Topic: queries
 
 # Query Data

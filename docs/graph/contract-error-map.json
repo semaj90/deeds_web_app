@@ -1,92 +1,16 @@
 {
-  "generatedAt": "2026-05-16T08:03:58.638Z",
+  "generatedAt": "2026-05-16T18:18:43.936Z",
+  "totalFindings": 6,
   "nodes": [
     {
-      "id": "contract:drizzle-meta-stale_migration-001-0812ab40",
-      "label": "ErrorPattern",
-      "properties": {
-        "severity": "medium",
-        "layer": "drizzle-meta",
-        "hmmState": "stale_migration",
-        "problem": "Migration file \"0013_codeintel_indexes.sql\" is not recorded in drizzle/meta/_journal.json — drizzle-kit migrate will skip it.",
-        "suggestedFix": "Apply manually: `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0013_codeintel_indexes.sql` or add to journal.",
-        "trustTier": "canonical_local_code_plus_official_docs"
-      }
-    },
-    {
-      "id": "contract:drizzle-meta-stale_migration-002-f4118df0",
-      "label": "ErrorPattern",
-      "properties": {
-        "severity": "medium",
-        "layer": "drizzle-meta",
-        "hmmState": "stale_migration",
-        "problem": "Migration file \"0016_codeintel_schema.sql\" is not recorded in drizzle/meta/_journal.json — drizzle-kit migrate will skip it.",
-        "suggestedFix": "Apply manually: `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0016_codeintel_schema.sql` or add to journal.",
-        "trustTier": "canonical_local_code_plus_official_docs"
-      }
-    },
-    {
-      "id": "contract:drizzle-meta-stale_migration-003-bb28a111",
-      "label": "ErrorPattern",
-      "properties": {
-        "severity": "medium",
-        "layer": "drizzle-meta",
-        "hmmState": "stale_migration",
-        "problem": "Migration file \"0016_courtroom_3d_animation.sql\" is not recorded in drizzle/meta/_journal.json — drizzle-kit migrate will skip it.",
-        "suggestedFix": "Apply manually: `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0016_courtroom_3d_animation.sql` or add to journal.",
-        "trustTier": "canonical_local_code_plus_official_docs"
-      }
-    },
-    {
-      "id": "contract:drizzle-meta-stale_migration-004-6b74e3c0",
-      "label": "ErrorPattern",
-      "properties": {
-        "severity": "medium",
-        "layer": "drizzle-meta",
-        "hmmState": "stale_migration",
-        "problem": "Migration file \"0018_output_meta_manifold4.sql\" is not recorded in drizzle/meta/_journal.json — drizzle-kit migrate will skip it.",
-        "suggestedFix": "Apply manually: `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0018_output_meta_manifold4.sql` or add to journal.",
-        "trustTier": "canonical_local_code_plus_official_docs"
-      }
-    },
-    {
-      "id": "contract:drizzle-meta-stale_migration-005-40a25c16",
-      "label": "ErrorPattern",
-      "properties": {
-        "severity": "medium",
-        "layer": "drizzle-meta",
-        "hmmState": "stale_migration",
-        "problem": "Migration file \"0019_llm_context_cache.sql\" is not recorded in drizzle/meta/_journal.json — drizzle-kit migrate will skip it.",
-        "suggestedFix": "Apply manually: `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0019_llm_context_cache.sql` or add to journal.",
-        "trustTier": "canonical_local_code_plus_official_docs"
-      }
+      "id": "contract:schema_mismatch",
+      "label": "Schema Mismatch",
+      "state": "schema_mismatch",
+      "severity": "high",
+      "findingCount": 6,
+      "rootCauseScore": 0.65,
+      "fixOrder": 5
     }
   ],
-  "edges": [
-    {
-      "from": "contract:drizzle-meta-stale_migration-001-0812ab40",
-      "to": "file:sveltekit-frontend\\drizzle\\0013_codeintel_indexes.sql",
-      "type": "REFERENCES_FILE"
-    },
-    {
-      "from": "contract:drizzle-meta-stale_migration-002-f4118df0",
-      "to": "file:sveltekit-frontend\\drizzle\\0016_codeintel_schema.sql",
-      "type": "REFERENCES_FILE"
-    },
-    {
-      "from": "contract:drizzle-meta-stale_migration-003-bb28a111",
-      "to": "file:sveltekit-frontend\\drizzle\\0016_courtroom_3d_animation.sql",
-      "type": "REFERENCES_FILE"
-    },
-    {
-      "from": "contract:drizzle-meta-stale_migration-004-6b74e3c0",
-      "to": "file:sveltekit-frontend\\drizzle\\0018_output_meta_manifold4.sql",
-      "type": "REFERENCES_FILE"
-    },
-    {
-      "from": "contract:drizzle-meta-stale_migration-005-40a25c16",
-      "to": "file:sveltekit-frontend\\drizzle\\0019_llm_context_cache.sql",
-      "type": "REFERENCES_FILE"
-    }
-  ]
+  "edges": []
 }
