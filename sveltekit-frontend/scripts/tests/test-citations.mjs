@@ -9,7 +9,7 @@
  * Usage: node scripts/tests/test-citations.mjs
  */
 
-const BASE = process.env.DEV_SERVER ?? 'http://localhost:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? (process.env.DEV_SERVER ?? 'http://localhost:5173');
 
 let passed = 0;
 let failed = 0;

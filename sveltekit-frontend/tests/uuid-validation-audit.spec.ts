@@ -16,8 +16,9 @@
  */
 import { test, expect, type APIRequestContext } from '@playwright/test';
 import { registerTestUser } from './utils/seed-cases';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 const BAD_UUID = 'not-a-uuid';
 const VALID_FAKE_UUID = '00000000-0000-4000-a000-000000000000';
 

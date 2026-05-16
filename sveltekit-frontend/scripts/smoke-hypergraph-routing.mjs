@@ -18,8 +18,26 @@ const QUERIES = [
   "Drizzle schema database"
 ];
 
+const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+const SYNTHESIZE = process.env.SMOKE_SYNTHESIZE === '1';
+
+async function ollamaUp() {
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(5000) });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 async function run() {
   console.log('🧪 Atlas: Hypergraph Routing Smoke Test');
+
+  if (!(await ollamaUp())) {
+    console.log(`⚠️ Ollama unreachable at ${OLLAMA_URL} — skipping hypergraph routing smoke`);
+    process.exit(0);
+  }
+
   const service = HyperRagFusionService.getInstance();
 
   for (const queryText of QUERIES) {
@@ -30,7 +48,7 @@ async function run() {
         mode: 'codebase',
         useTopologyRouting: true,
         topK: 5,
-        synthesize: true
+        synthesize: SYNTHESIZE
       });
 
       console.log(`✅ Hits: ${result.hits.length}`);
@@ -46,6 +64,8 @@ async function run() {
 
       if (result.synthesis) {
         console.log('📝 Synthesis snippet:', result.synthesis.slice(0, 100) + '...');
+      } else if (!SYNTHESIZE) {
+        console.log('📝 Synthesis skipped (set SMOKE_SYNTHESIZE=1 to enable)');
       }
     } catch (err) {
       console.error(`❌ Query failed: ${err.message}`);
@@ -55,4 +75,9 @@ async function run() {
   console.log('\n✅ Smoke test cycle complete.');
 }
 
-run();
+run()
+  .then(() => process.exit(0))
+  .catch(err => {
+    console.error(`❌ Smoke test failed: ${err.message}`);
+    process.exit(1);
+  });

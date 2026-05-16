@@ -1,0 +1,27 @@
+{
+  "repo": "deeds-web-app",
+  "runId": "run_1778895601178",
+  "generatedAt": "2026-05-16T01:40:02.135Z",
+  "dryRun": true,
+  "workspace": "all",
+  "limit": 0,
+  "routeCount": 909,
+  "cards": {
+    "dirNotes": 6946,
+    "clusterCards": 0,
+    "llmOutputs": 20692,
+    "summaryCards": 1,
+    "engramMemories": 0
+  },
+  "keys": {
+    "wikiNotes": "wiki:note:dir:*",
+    "agents": "agents:dir:*",
+    "llmOutputs": "code:llm_output:path:*",
+    "summaries": "summary:cluster:*",
+    "atlas": "atlas:glyph:*",
+    "engram": "engram:memory:*",
+    "engramFeature": "engram:feature:*"
+  },
+  "aliases": 17,
+  "topClusters": []
+}

@@ -44,7 +44,7 @@ const ROOT       = path.resolve(__dirname, '../..');    // sveltekit-frontend/
 const SRC        = path.join(ROOT, 'src');
 const PLANS_DIR  = path.join(ROOT, 'next_steps', 'active');
 
-const DEV_SERVER = process.env.DEV_SERVER_URL  ?? 'http://localhost:5173';
+const DEV_SERVER = process.env.PUBLIC_APP_URL ?? process.env.DEV_SERVER_URL  ?? 'http://localhost:5173';
 const QDRANT_URL = process.env.QDRANT_URL      ?? 'http://localhost:6333';
 const REDIS_URL  = process.env.REDIS_URL       ?? 'redis://localhost:6379';
 const TURBO_URL  = process.env.TURBO_URL       ?? 'http://localhost:8090';

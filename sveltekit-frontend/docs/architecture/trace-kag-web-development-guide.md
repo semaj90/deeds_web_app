@@ -287,7 +287,7 @@ shared `McpServer` instance (which holds the tool registry) is reused.
 ### Open
 
 - **P1.8 hypergraph.search needs SvelteKit dev server** — not an MCP failure; the API route is dev-server-dependent. Run `npm run dev` before `smoke:atlas` to exercise both P1.7 and P1.8.
-- **`/api/ace/recommendations` warns when dev server down** — expected, not a regression.
+- **`/api/ace/recommendations` skips when dev server down** — expected, not a regression; green only means the probe ran.
 
 ## 17. SurrealDB
 

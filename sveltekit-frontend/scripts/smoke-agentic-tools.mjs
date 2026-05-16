@@ -20,7 +20,7 @@ import { parseArgs } from 'node:util';
 
 const { values: flags } = parseArgs({
   options: {
-    'dev-server': { type: 'string', default: 'http://localhost:5173' },
+    'dev-server': { type: 'string', default: process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://localhost:5173' },
     'skip-agent': { type: 'boolean', default: false },
   },
   strict: false,

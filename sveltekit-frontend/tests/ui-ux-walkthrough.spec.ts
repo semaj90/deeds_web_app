@@ -1,6 +1,7 @@
 
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
+import { PORTS } from './helpers/env-ports.js';
 
 test.describe('UI/UX Walkthrough', () => {
     test.use({ viewport: { width: 1280, height: 720 } });
@@ -27,18 +28,18 @@ test.describe('UI/UX Walkthrough', () => {
             }
         }
 
-        await capture('01-cases', 'http://127.0.0.1:5173/cases');
-        await capture('02-evidence', 'http://127.0.0.1:5173/evidence');
-        await capture('03-poi', 'http://127.0.0.1:5173/persons-of-interest');
-        await capture('04-analysis', 'http://127.0.0.1:5173/analysis-center');
-        await capture('05-global-search', 'http://127.0.0.1:5173/global-search');
-        await capture('06-system-config', 'http://127.0.0.1:5173/system-configuration');
-        await capture('07-terminal', 'http://127.0.0.1:5173/terminal');
+	    await capture('01-cases', `${PORTS.APP_BASE}/cases`);
+	    await capture('02-evidence', `${PORTS.APP_BASE}/evidence`);
+	    await capture('03-poi', `${PORTS.APP_BASE}/persons-of-interest`);
+	    await capture('04-analysis', `${PORTS.APP_BASE}/analysis-center`);
+	    await capture('05-global-search', `${PORTS.APP_BASE}/global-search`);
+	    await capture('06-system-config', `${PORTS.APP_BASE}/system-configuration`);
+	    await capture('07-terminal', `${PORTS.APP_BASE}/terminal`);
 
         // New Case Modal
         console.log('Testing New Case Modal...');
         try {
-            await page.goto('http://127.0.0.1:5173/cases');
+	            await page.goto(`${PORTS.APP_BASE}/cases`);
             await page.waitForLoadState('load');
             await page.waitForTimeout(2000);
 

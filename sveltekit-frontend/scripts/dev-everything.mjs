@@ -221,6 +221,12 @@ async function phase1() {
   if (existsSync(path.join(goServiceDir, 'main.go'))) {
     spawnDetached('Go Retrieval :8100', 'go', ['run', '.'], { cwd: goServiceDir });
   }
+
+  // Topology Search Engine — use ensure script for idempotency
+  const ensureTopology = path.join(projectRoot, 'scripts', 'ensure-search-engine.mjs');
+  if (existsSync(ensureTopology)) {
+    spawnDetached('Topology Search :8101', process.execPath, [ensureTopology, '--spawn']);
+  }
 }
 
 // ── Phase 2: Health gate ───────────────────────────────────────────────────
@@ -255,6 +261,8 @@ async function phase2() {
     waitFor('Bifrost         :3040',  () => httpOk('http://127.0.0.1:3040/health'),
             { timeoutMs: 20_000, critical: false }),
     waitFor('Go Retrieval    :8100',  () => httpOk('http://127.0.0.1:8100/health'),
+            { timeoutMs: 20_000, critical: false }),
+    waitFor('Topology Search  :8101',  () => httpOk('http://127.0.0.1:8101/health'),
             { timeoutMs: 20_000, critical: false }),
     waitFor('KB Retrieval    :8789',  () => httpOk('http://127.0.0.1:8789/health'),
             { timeoutMs: 20_000, critical: false }),

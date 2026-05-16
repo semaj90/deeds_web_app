@@ -283,7 +283,7 @@ async function callLLM(prompt) {
   try {
     const ctrl  = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 35_000);
-    const res   = await fetch('http://localhost:5173/api/ai/agent', {
+    const res   = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/ai/agent`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'x-dev-bypass': 'true' },
       body:    JSON.stringify({ query: prompt, pipeline: 'error_analysis' }),
@@ -673,6 +673,15 @@ async function main() {
       })
     )).filter(Boolean).join('\n');
 
+    const neighborhood = [];
+    for (const f of cluster.topFiles.slice(0, 3)) {
+      const rels = relMap[f] || [];
+      const neighbors = rels.slice(0, 5).map(r => `  - ${r.relation} -> ${r.target}`);
+      if (neighbors.length > 0) {
+        neighborhood.push(`Neighborhood for ${f}:\n${neighbors.join('\n')}`);
+      }
+    }
+
     const prompt = `You are a TypeScript/SvelteKit code-quality analyst reviewing cluster risk data.
 
 Cluster: ${cluster.cluster_key}
@@ -683,6 +692,8 @@ Graph authority: ${(cluster.graph_authority_score ?? 0).toFixed(3)}
 Protocols detected: ${cluster.protocols.join(', ') || 'none'}
 Top files (by pageRank):
 ${cluster.topFiles.map(f => '  ' + f).join('\n') || '  (none)'}
+
+${neighborhood.length > 0 ? `Topological Neighborhood:\n${neighborhood.join('\n\n')}\n` : ''}
 
 ${cluster.diagList.length ? `Top TypeScript diagnostics:\n${topErrors}` : ''}
 

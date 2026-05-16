@@ -13,19 +13,65 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Add hoisted mocks here when handler logic is filled in:
-// const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
-// vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
+const {
+	mockGetGdsStatus,
+	mockGetGdsExtendedStats,
+	mockEnsureGdsProjection,
+	mockRunPageRankMutate,
+	mockRunLouvainMutate,
+	mockRunKnnMutate,
+	mockWriteAuthorityScoresToQdrant,
+	mockSeedAndClassifyOntology,
+	mockGetUnclassifiedFileCount,
+} = vi.hoisted(() => ({
+	mockGetGdsStatus: vi.fn(),
+	mockGetGdsExtendedStats: vi.fn(),
+	mockEnsureGdsProjection: vi.fn(),
+	mockRunPageRankMutate: vi.fn(),
+	mockRunLouvainMutate: vi.fn(),
+	mockRunKnnMutate: vi.fn(),
+	mockWriteAuthorityScoresToQdrant: vi.fn(),
+	mockSeedAndClassifyOntology: vi.fn(),
+	mockGetUnclassifiedFileCount: vi.fn(),
+}));
+
+vi.mock('$lib/server/redis.js', () => ({
+	getRedis: vi.fn(() => ({
+		get: vi.fn(async () => null),
+		setex: vi.fn(async () => 'OK'),
+	})),
+}));
+
+vi.mock('$lib/server/graph/neo4j-gds.js', () => ({
+	getGdsStatus: mockGetGdsStatus,
+	getGdsExtendedStats: mockGetGdsExtendedStats,
+	ensureGdsProjection: mockEnsureGdsProjection,
+	runPageRankMutate: mockRunPageRankMutate,
+	runLouvainMutate: mockRunLouvainMutate,
+	runKnnMutate: mockRunKnnMutate,
+	writeAuthorityScoresToQdrant: mockWriteAuthorityScoresToQdrant,
+	seedAndClassifyOntology: mockSeedAndClassifyOntology,
+	getUnclassifiedFileCount: mockGetUnclassifiedFileCount,
+}));
 
 describe('src/routes/api/code-intel/graph/gds-status/+server.ts', () => {
   describe('GET /api/code-intel/graph/gds-status', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
-    beforeEach(async () => {
-      vi.resetAllMocks();
-      const mod = await import('../../../../../../src/routes/api/code-intel/graph/gds-status/+server.js') as Record<string, unknown>;
-      handler = mod.GET as typeof handler;
-    });
+	beforeEach(async () => {
+	  vi.resetAllMocks();
+	  mockGetGdsStatus.mockResolvedValue({ apocAvailable: true, gdsAvailable: true, projectionExists: true });
+	  mockGetGdsExtendedStats.mockResolvedValue({ apocAvailable: true, gdsAvailable: true, projectionExists: true, qdrantHealthy: true });
+	  mockEnsureGdsProjection.mockResolvedValue({ ok: true });
+	  mockRunPageRankMutate.mockResolvedValue({ ok: true });
+	  mockRunLouvainMutate.mockResolvedValue({ ok: true });
+	  mockRunKnnMutate.mockResolvedValue({ ok: true });
+	  mockWriteAuthorityScoresToQdrant.mockResolvedValue({ ok: true });
+	  mockSeedAndClassifyOntology.mockResolvedValue({ ok: true });
+	  mockGetUnclassifiedFileCount.mockResolvedValue(0);
+	  const mod = await import('../../../../../../src/routes/api/code-intel/graph/gds-status/+server.js') as Record<string, unknown>;
+	  handler = mod.GET as typeof handler;
+	});
 
     function makeReq(body?: unknown) {
       return new Request('http://localhost/api/code-intel/graph/gds-status', { method: 'GET' });
@@ -48,9 +94,20 @@ describe('src/routes/api/code-intel/graph/gds-status/+server.ts', () => {
       expect([200, 400, 401, 403, 404, 405, 429, 500, 503]).toContain(status);
     });
 
-    it.todo('400 — bad input shape returns degraded JSON envelope');
-    it.todo('200 — happy path returns expected schema');
-    it.todo('degraded — upstream failure returns same top-level shape with empty defaults');
+    it('returns Neo4j/GDS status shape', async () => {
+		const resp = await handler({ request: makeReq(), locals: { user: { id: 'u1' } }, url: makeUrl(), params: {} });
+		expect(resp.status).toBe(200);
+		const body = await resp.json();
+		expect(body).toMatchObject({ apocAvailable: true, gdsAvailable: true, projectionExists: true });
+	});
+
+	it('returns extended status when requested', async () => {
+		const resp = await handler({ request: makeReq(), locals: { user: { id: 'u1' } }, url: new URL('http://localhost/api/code-intel/graph/gds-status?extended=1'), params: {} });
+		expect(resp.status).toBe(200);
+		const body = await resp.json();
+		expect(body.cached).toBe(false);
+		expect(body.qdrantHealthy).toBe(true);
+	});
   });
 
 
@@ -80,9 +137,29 @@ describe('src/routes/api/code-intel/graph/gds-status/+server.ts', () => {
       expect([200, 400, 401, 403, 404, 405, 429, 500, 503]).toContain(resp.status);
     });
 
-    it.todo('400 — bad input shape returns degraded JSON envelope');
-    it.todo('200 — happy path returns expected schema');
-    it.todo('degraded — upstream failure returns same top-level shape with empty defaults');
+    it('rejects invalid action', async () => {
+		const req = new Request('http://localhost/api/code-intel/graph/gds-status', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ action: 'nope' }),
+		});
+		const resp = await handler({ request: req, locals: { user: { id: 'u1' } }, url: makeUrl(), params: {} });
+		expect(resp.status).toBe(400);
+	});
+
+	it('runs full graph pipeline', async () => {
+		const req = new Request('http://localhost/api/code-intel/graph/gds-status', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ action: 'full' }),
+		});
+		const resp = await handler({ request: req, locals: { user: { id: 'u1', email: 'user@example.com' } }, url: makeUrl(), params: {} });
+		expect(resp.status).toBe(200);
+		const body = await resp.json();
+		expect(body).toMatchObject({ action: 'full' });
+		expect(body.totalMs).toEqual(expect.any(Number));
+		expect(mockEnsureGdsProjection).toHaveBeenCalled();
+	});
   });
 
 });

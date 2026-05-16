@@ -4,7 +4,7 @@
  * Run: node scripts/verify-sse-chat-retrieval.mjs
  */
 
-const BASE_URL = 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
 
 async function main() {
   console.log('=== SSE Chat Retrieval Verification ===\n');

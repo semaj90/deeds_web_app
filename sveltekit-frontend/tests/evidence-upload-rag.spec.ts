@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import { PORTS } from './helpers/env-ports.js';
 
 test.describe('Evidence Upload with RAG Integration', () => {
   test('navigate from homepage to evidence upload and test RAG ingestion', async ({ page }) => {
     // Navigate to homepage
-    await page.goto('http://localhost:5173');
+	    await page.goto(PORTS.APP_BASE);
 
     // Wait for page to load
     await page.waitForLoadState('networkidle');
@@ -31,7 +32,7 @@ test.describe('Evidence Upload with RAG Integration', () => {
 
     if (!navigationSuccessful) {
       // Fallback: direct navigation
-      await page.goto('http://localhost:5173/evidence/upload');
+	      await page.goto(`${PORTS.APP_BASE}/evidence/upload`);
     }
 
     // Wait for upload page to load
@@ -42,7 +43,7 @@ test.describe('Evidence Upload with RAG Integration', () => {
     await expect(page.locator('text=Legal AI Evidence Upload')).toBeVisible({ timeout: 10000 });
 
     // Check if RAG upload endpoint exists
-    const ragEndpoint = 'http://localhost:5173/api/upload/rag-ingest';
+	    const ragEndpoint = `${PORTS.APP_BASE}/api/upload/rag-ingest`;
 
     // Fill in required form fields
     const caseSelect = page.locator('select[name="case_id"]');
@@ -192,10 +193,10 @@ test.describe('Evidence Upload with RAG Integration', () => {
   });
 
   test('test RAG endpoint with multiple file types', async ({ page }) => {
-    await page.goto('http://localhost:5173/evidence/upload');
+	    await page.goto(`${PORTS.APP_BASE}/evidence/upload`);
     await page.waitForLoadState('networkidle');
 
-    const ragEndpoint = 'http://localhost:5173/api/upload/rag-ingest';
+	    const ragEndpoint = `${PORTS.APP_BASE}/api/upload/rag-ingest`;
 
     // Test with different file types
     const fileTypes = [

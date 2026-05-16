@@ -454,7 +454,7 @@ Total: ~6 days.
 
 ## 13. Smoke Tests / Verification Gates
 
-Add to `npm run smoke:atlas` (or a new `npm run smoke:hyperrag`):
+Add to `npm run smoke:atlas` (or a new `npm run smoke:hyperrag`); note the atlas smoke may skip the HTTP probe when the dev server is down:
 
 ```
 G-HR1: feature_implementations table exists and has ≥1 row

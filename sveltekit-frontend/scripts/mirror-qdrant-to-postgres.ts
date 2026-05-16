@@ -86,7 +86,7 @@ async function qdrantScroll(
   offset?: string | number | null,
   limit = BATCH_SIZE
 ): Promise<ScrollResponse> {
-  const body: Record<string, unknown> = { limit, with_payload: true, with_vector: false };
+  const body: Record<string, unknown> = { limit, with_payload: true, with_vector: true };
   if (offset != null) body.offset = offset;
 
   const res = await fetch(
@@ -159,8 +159,9 @@ async function updateJob(
 // Upsert one chunk
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
+async function upsertChunk(pg: PgClient, point: any): Promise<boolean> {
   const payload      = point.payload ?? {};
+  const vector       = point.vector?.content || point.vector || null;
   const qdrantId     = String(point.id);
   const filePath     = textOrNull(payload.file_path)
                     ?? textOrNull(payload.relativePath)
@@ -205,6 +206,7 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
        embedding_model,
        summary_model,
        summary,
+       content_embedding,
        metadata,
        indexed_at,
        updated_at
@@ -212,7 +214,7 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
      VALUES (
        $1,  $2,  $3,  $4,  $5,  $6,  $7,  $8,  $9,
        $10, $11, $12, $13, $14, $15, $16, $17, $18,
-       $19, $20, $21, $22, $23, $24, $25, now(), now()
+       $19, $20, $21, $22, $23, $24, $25, $26, now(), now()
      )
      ON CONFLICT (qdrant_id) DO UPDATE SET
        repo_id           = EXCLUDED.repo_id,
@@ -238,6 +240,7 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
        embedding_model   = EXCLUDED.embedding_model,
        summary_model     = EXCLUDED.summary_model,
        summary           = EXCLUDED.summary,
+       content_embedding = COALESCE(EXCLUDED.content_embedding, codebase_chunk_index.content_embedding),
        metadata          = EXCLUDED.metadata,
        updated_at        = now()`,
     [
@@ -251,7 +254,7 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
       textOrNull(payload.extension),
       textOrNull(payload.content),
       textOrNull(payload.content_hash),
-      intOrNull(payload.gpu_cluster),
+      intOrNull(payload.gpuCluster ?? payload.gpu_cluster),
       intOrNull(payload.som_cluster),
       intOrNull(payload.som_bmu_row ?? payload.som_y),
       intOrNull(payload.som_bmu_col ?? payload.som_x),
@@ -265,6 +268,7 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
       textOrNull(payload.embedding_model),
       textOrNull(payload.summary_model),
       textOrNull(payload.summary),
+      vector != null ? JSON.stringify(vector) : null,
       JSON.stringify(metadata),
     ]
   );

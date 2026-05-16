@@ -1,0 +1,49 @@
+---
+type: "file"
+path: "sveltekit-frontend/src/lib/server/ace/context-assembler.ts"
+aliases: ["context-assembler.ts","sveltekit-frontend/src/lib/server/ace/context-assembler.ts"]
+clusterId: -1
+ext: ".ts"
+lineCount: 4615
+pagerank: 0
+blend: 0
+isRoute: false
+isSvelteComp: false
+isTest: false
+hasAuth: false
+hasZod: true
+importCount: 30
+embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/src/lib/server/ace/context-assembler.ts"
+last_updated_by_llm: "2026-05-15T22:12:05.184Z"
+ai-first: true
+confidence: "high"
+up: []
+imports: ["[[Files/types]]","[[Files/types]]","[[Files/practice-templates]]","[[Files/style-adapter]]","[[Files/user-analytics-context]]","[[Files/retrieval__cross-encoder-reranker]]","[[Files/retrieval__topological-search]]","[[Files/policy]]"]
+tags: ["file","ext/ts","zod","t/ts","t/sveltekit-frontend","t/src"]
+---
+
+# `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`
+## For future Claude
+> ACE Context Assembler — Central Orchestration Module
+pagerank:: 0.000000
+blend:: 0.000000
+lines:: 4615
+## Summary
+
+ACE Context Assembler — Central Orchestration Module
+
+## Imports
+
+- imports:: [[Files/types]] `./types.js`
+- imports:: [[Files/types]] `./types.js`
+- imports:: [[Files/practice-templates]] `./practice-templates.js`
+- imports:: [[Files/style-adapter]] `./style-adapter.js`
+- imports:: [[Files/user-analytics-context]] `./user-analytics-context.js`
+- imports:: [[Files/retrieval__cross-encoder-reranker]] `../retrieval/cross-encoder-reranker.js`
+- imports:: [[Files/retrieval__topological-search]] `../retrieval/topological-search.js`
+- imports:: [[Files/policy]] `./policy.js`
+## Backlinks (Dataview)
+```dataviewjs
+const cur = dv.current().file.path;
+dv.list(dv.pages().where(p => Array.isArray(p.imports) && p.imports.some(l => l && l.path === cur)).file.link);
+```

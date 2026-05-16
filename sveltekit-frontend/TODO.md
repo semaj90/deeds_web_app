@@ -5,7 +5,7 @@ This to-do list tracks the path to a high-concurrency, byte-stable production de
 ## 🚀 P0 — Production Infrastructure & Seeding
 - [ ] **Dependency Realization**: Run `npm install` to materialize `zod-to-json-schema` bridge and `ts-morph` dependencies.
 - [ ] **Hypergraph Seeding**: Run `npm run hypergraph:seed` to hydrate Neo4j and Qdrant with the codebase graph.
-- [ ] **Atlas Validation**: Run `npm run smoke:atlas` to verify 11/11 pass state for context lookup.
+- [ ] **Atlas Validation**: Run `npm run smoke:atlas` to verify context lookup; dev-server-down runs may skip the HTTP probe.
 
 ## 🧩 P1 — Feature Mapping Atlas
 - [ ] **Feature Annotation**: Execute `node scripts/features/record-feature-implementation.ts` for all current P0/P1 features.

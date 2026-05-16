@@ -9,8 +9,9 @@
  */
 
 import { expect, test } from '@playwright/test';
+import { PORTS } from '../helpers/env-ports.js';
 
-const BASE = 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 const SCREENSHOT_DIR = 'test-results/inference-routing';
 
 /** Build a proper SSE response body matching the SSEChunk interface */

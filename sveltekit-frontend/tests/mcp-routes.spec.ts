@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { PORTS } from './helpers/env-ports.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +26,7 @@ const routes = [...new Set(discoverRoutes(ROUTES_DIR))];
 test.describe("SvelteKit route MCP health", () => {
   for (const route of routes) {
     test(`Route health: ${route}`, async ({ page }) => {
-      const url = `http://localhost:5173${route}`;
+	      const url = `${PORTS.APP_BASE}${route}`;
       await page.goto(url);
       await expect(page).toHaveTitle(/.+/); // basic sanity
     });

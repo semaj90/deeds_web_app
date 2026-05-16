@@ -2,7 +2,7 @@
  * PRODUCTION HARDENED SMOKE TEST
  * Verifies Phase 1D/E and Phase 2/3 agentic lanes.
  */
-const BASE_URL = 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? 'http://localhost:5173';
 
 async function runTest(name, fn) {
 	process.stdout.write(`--- ${name} --- `);

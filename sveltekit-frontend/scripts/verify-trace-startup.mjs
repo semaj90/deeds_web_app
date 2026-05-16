@@ -18,6 +18,9 @@ const skipGpu   = args.includes('--skip-gpu');
 const skipGraph = args.includes('--skip-graph');
 
 const checks = [];
+const APP_BASE = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+const APP_HEALTH_URL = `${APP_BASE}/api/health`;
+const APP_ROOT_URL = `${APP_BASE}/`;
 
 async function check(name, fn) {
   const t0 = Date.now();
@@ -52,9 +55,9 @@ if (!jsonOut) console.log('\n🔍 TRACE Stack Verification\n');
 
 // ── Service health ────────────────────────────────────────────────────────────
 
-await check('SvelteKit :5173', () =>
-  getJson('http://127.0.0.1:5173/api/health', 'SvelteKit')
-    .catch(() => fetch('http://127.0.0.1:5173/', { signal: AbortSignal.timeout(4_000) })
+await check(`SvelteKit ${APP_BASE}`, () =>
+  getJson(APP_HEALTH_URL, 'SvelteKit')
+    .catch(() => fetch(APP_ROOT_URL, { signal: AbortSignal.timeout(4_000) })
       .then(r => { if (!r.ok && r.status !== 404) throw new Error(`HTTP ${r.status}`); return { status: 'reachable' }; }))
 );
 

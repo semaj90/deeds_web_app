@@ -5,7 +5,7 @@ const yellow = (s) => `\x1b[33m${s}\x1b[0m`;
 const dim = (s) => `\x1b[2m${s}\x1b[0m`;
 const chalk = { cyan, green, red, yellow, dim };
 
-const BASE = process.env.BASE_URL || 'http://127.0.0.1:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://127.0.0.1:5173');
 const RECALL_ENDPOINT = `${BASE}/api/codebase/recall`;
 
 async function testRerankPrecision() {

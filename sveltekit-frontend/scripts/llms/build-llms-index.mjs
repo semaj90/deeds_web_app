@@ -64,7 +64,7 @@ async function main() {
 	// Contract startup line — matches the regression test in tests/agents-index-cli.spec.ts
 	const writersState = FLAGS.dryRun ? 'disabled' : 'enabled';
 	const limitDisplay = FLAGS.limit === Infinity ? 'none' : FLAGS.limit;
-	console.log(`[agents:index] dryRun=${FLAGS.dryRun} limit=${limitDisplay} writers=${writersState}`);
+	console.log(`[llms:index] dryRun=${FLAGS.dryRun} limit=${limitDisplay} writers=${writersState}`);
 	if (FLAGS.dryRun) log('[dry-run] no writes will occur');
 	if (FLAGS.limit !== Infinity) log(`[limit] capped at ${FLAGS.limit} dirs`);
 
@@ -163,7 +163,7 @@ async function main() {
 		neo4jWrites:    FLAGS.dryRun ? 0 : counts.neo4jWrites,
 		analysisUpdates: FLAGS.dryRun ? 0 : counts.analysisUpdates,
 	};
-	console.log(`[agents:index] summary=${JSON.stringify(machineSummary)}`);
+	console.log(`[llms:index] summary=${JSON.stringify(machineSummary)}`);
 
 	if (FLAGS.dryRun) {
 		// Safety invariant: if dryRun is true, all write counters MUST be zero.

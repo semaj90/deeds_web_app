@@ -12,7 +12,7 @@ const pool = new Pool({
   connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
 });
 
-const EMBED_URL = 'http://localhost:5173/api/embed';
+const EMBED_URL = `${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/embed`;
 const BATCH_SIZE = 5;
 const DELAY_MS = 200;
 

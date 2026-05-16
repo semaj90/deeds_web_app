@@ -37,7 +37,7 @@ const BOW_DIM      = 64;
 const CLUSTER_TTL  = 60 * 60 * 6; // 6h cluster tiles TTL
 const REDIS_URL    = process.env.REDIS_URL ?? 'redis://localhost:6379';
 const QDRANT_URL   = process.env.QDRANT_URL ?? 'http://localhost:6333';
-const APP_URL      = process.env.APP_URL ?? 'http://localhost:5173';
+const APP_URL      = process.env.PUBLIC_APP_URL ?? process.env.APP_URL ?? 'http://localhost:5173';
 const REBUILD_ATLAS = argv.includes('--rebuild-atlas');
 
 // Grid dims: follow Kohonen rule ceil(sqrt(sqrt(n)*5)) for n clusters

@@ -4,10 +4,11 @@
  */
 
 import { test, expect } from '../fixtures/demo-auth';
+import { PORTS } from '../helpers/env-ports.js';
 
 test.describe('Demo Seed - Case Management', () => {
 	test('should load dashboard after login', async ({ authenticatedPage: page }) => {
-		await page.goto('http://localhost:5173/dashboard');
+		await page.goto(`${PORTS.APP_BASE}/dashboard`);
 
 		// Verify dashboard loads
 		await expect(page).toHaveTitle(/YoRHa Legal AI/i);
@@ -17,7 +18,7 @@ test.describe('Demo Seed - Case Management', () => {
 	});
 
 	test('should load cases page', async ({ authenticatedPage: page }) => {
-		await page.goto('http://localhost:5173/cases');
+		await page.goto(`${PORTS.APP_BASE}/cases`);
 
 		// Verify cases page loads
 		await expect(page).toHaveTitle(/YoRHa Legal AI/i);
@@ -27,7 +28,7 @@ test.describe('Demo Seed - Case Management', () => {
 	});
 
 	test('should see deterministic case numbers on cases page', async ({ authenticatedPage: page }) => {
-		await page.goto('http://localhost:5173/cases');
+		await page.goto(`${PORTS.APP_BASE}/cases`);
 
 		// Look for at least one deterministic case number
 		// If the seed worked, we should see CASE-DEMO-XXX patterns
@@ -41,7 +42,7 @@ test.describe('Demo Seed - Case Management', () => {
 
 test.describe('Demo Seed - Evidence Library', () => {
 	test('should load evidence library', async ({ authenticatedPage: page }) => {
-		await page.goto('http://localhost:5173/evidence-library');
+		await page.goto(`${PORTS.APP_BASE}/evidence-library`);
 
 		// Verify page loads
 		await expect(page).toHaveTitle(/YoRHa Legal AI/i);
@@ -53,7 +54,7 @@ test.describe('Demo Seed - Evidence Library', () => {
 
 test.describe('Demo Seed - POI Management', () => {
 	test('should load persons of interest page', async ({ authenticatedPage: page }) => {
-		await page.goto('http://localhost:5173/persons-of-interest');
+		await page.goto(`${PORTS.APP_BASE}/persons-of-interest`);
 
 		// Verify page loads
 		await expect(page).toHaveTitle(/YoRHa Legal AI/i);
@@ -66,7 +67,7 @@ test.describe('Demo Seed - POI Management', () => {
 test.describe('Demo Seed - Authentication', () => {
 	test('auth fixture provides logged-in session', async ({ authenticatedPage: page }) => {
 		// This test just verifies the auth fixture works
-		await page.goto('http://localhost:5173/dashboard');
+		await page.goto(`${PORTS.APP_BASE}/dashboard`);
 
 		// Should NOT be redirected to login
 		await expect(page).not.toHaveURL(/\/auth\/login/);

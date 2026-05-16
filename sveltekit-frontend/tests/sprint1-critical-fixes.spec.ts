@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 
 test.describe('Sprint 1 — Critical Fixes Verification', () => {
 	test.describe('1.1 Embedding Gateway Shim', () => {
@@ -32,7 +34,7 @@ test.describe('Sprint 1 — Critical Fixes Verification', () => {
 		test('OPTIONS /api/cases — should return CORS headers', async ({ request }) => {
 			const res = await request.fetch(`${BASE}/api/cases`, {
 				method: 'OPTIONS',
-				headers: { Origin: 'http://localhost:5173' },
+				headers: { Origin: PORTS.APP_BASE },
 			});
 			// Accept 204 (CORS handler) or other non-404 status
 			expect(res.status()).not.toBe(404);

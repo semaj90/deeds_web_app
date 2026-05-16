@@ -7,7 +7,7 @@
 
 console.log('\n🧪 Testing Dispatch-Inline (RabbitMQ DOWN)...\n');
 
-const response = await fetch('http://localhost:5173/api/analytics/events', {
+const response = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/analytics/events`, {
 	method: 'POST',
 	headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

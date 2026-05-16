@@ -7,7 +7,8 @@ const VALID_MODES = new Set(['diagnose', 'fast', 'plan', 'verify', 'full']);
 const mode = VALID_MODES.has(process.argv[2] ?? '') ? process.argv[2] : 'diagnose';
 const cwd = process.cwd();
 const repoRoot = path.resolve(cwd, '..');
-const agentUrl = process.env.AGENT_FIX_URL ?? 'http://127.0.0.1:5173/api/ai/agent';
+const appBase = process.env.PUBLIC_APP_URL ?? 'http://127.0.0.1:5173';
+const agentUrl = process.env.AGENT_FIX_URL ?? `${appBase}/api/ai/agent`;
 const preferredBackend = process.env.AGENT_FIX_PREFERRED_BACKEND === 'bifrost' ? 'bifrost' : 'turboquant';
 const MAX_AGENT_QUERY_LENGTH = 3900;
 

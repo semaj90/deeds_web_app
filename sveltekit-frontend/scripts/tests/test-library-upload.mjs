@@ -8,6 +8,7 @@ import pg from 'pg';
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db' });
+const BASE_URL = process.env.PUBLIC_APP_URL ?? 'http://localhost:5173';
 
 async function createTestPDF() {
   const doc = await PDFDocument.create();
@@ -59,7 +60,7 @@ async function main() {
   form.set('corpusType', 'statute');
   form.set('jurisdiction', 'federal');
 
-  const resp = await fetch('http://localhost:5173/api/library/upload', { method: 'POST', body: form });
+  const resp = await fetch(`${BASE_URL}/api/library/upload`, { method: 'POST', body: form });
   console.log('Upload status:', resp.status);
   const body = await resp.json();
   console.log('Response:', JSON.stringify(body, null, 2));

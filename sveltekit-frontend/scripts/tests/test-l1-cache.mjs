@@ -5,7 +5,7 @@
  * Expected: Run 1 ~2-3s, Run 2 ~5-50ms (Redis hit)
  */
 
-const BASE_URL = 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? 'http://localhost:5173';
 
 async function testCache(query, model = 'gemma3:270m') {
   const start = Date.now();

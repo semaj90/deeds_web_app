@@ -8,6 +8,7 @@ The active web app in this repository lives in `sveltekit-frontend`.
 - [REQUIREMENTS.md](REQUIREMENTS.md) lists the minimum and recommended machine requirements.
 - [CODEBASE_MAP.md](CODEBASE_MAP.md) summarizes the top-level directory layout for repo navigation.
 - [sveltekit-frontend/CODEBASE_MAP.md](sveltekit-frontend/CODEBASE_MAP.md) is the deeper application-specific map for the SvelteKit app.
+- [ACE Startup & CUDA Bridge Guide](sveltekit-frontend/docs/ACE_STARTUP_CUDA_BRIDGE.md) covers high-performance serialization, native bridge wiring, and service sequencing.
 
 ## Fresh Install
 

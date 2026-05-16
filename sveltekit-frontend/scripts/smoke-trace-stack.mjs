@@ -34,7 +34,7 @@ const services = [
   { name: 'llama-server',    url: 'http://127.0.0.1:8090/health', required: false },
   { name: 'topology-search', url: 'http://127.0.0.1:8101/health', required: false },
   { name: 'TRACE MCP',       url: 'http://127.0.0.1:8788/health', required: false },
-  { name: 'SvelteKit',       url: 'http://127.0.0.1:5173/',        required: false },
+  { name: 'SvelteKit',       url: `${process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173'}/`, required: false },
 ];
 
 console.log(`\n${color.bold(color.cyan('TRACE stack smoke test'))}\n`);

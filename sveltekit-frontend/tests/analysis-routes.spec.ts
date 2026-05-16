@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * Analysis Routes E2E Tests
@@ -13,7 +14,7 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Analysis Routes - Professional Editors', () => {
-	const BASE_URL = 'http://localhost:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 	// Test evidence IDs from the session notes
 	const AUDIO_ID = '1330f67c-bf15-4e3a-8da3-3565271b70ef';
@@ -255,7 +256,7 @@ test.describe('Analysis Routes - Professional Editors', () => {
 });
 
 test.describe('Neo4j Integration Tests', () => {
-	const BASE_URL = 'http://localhost:5173';
+  const BASE_URL = PORTS.APP_BASE;
 
 	test('Neo4j - Direct HTTP API Connection', async () => {
 		// Test Neo4j HTTP endpoint directly (bypass SvelteKit)

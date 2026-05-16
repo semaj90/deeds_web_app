@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 
 test.describe('Sprint 5-6 — Type Safety & Monitoring', () => {
 	test.describe('5.1 Auth Endpoints (type-safe locals)', () => {

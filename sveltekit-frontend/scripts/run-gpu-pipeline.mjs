@@ -1,5 +1,5 @@
 // Fire cluster-detect + recommendations jobs and poll for results
-const BASE = "http://localhost:5173";
+const BASE = process.env.PUBLIC_APP_URL ?? 'http://localhost:5173';
 
 async function post(path, body) {
   const r = await fetch(BASE + path, {

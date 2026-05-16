@@ -24,6 +24,7 @@ import { ContextPacketBudgeter } from '$lib/server/ace/context-packet-budgeter.j
 import { logAceRun } from '$lib/server/retrieval/ace-retrieval-logger.js';
 import { ColdStorageRetrievalService } from '$lib/server/retrieval/cold-storage-retrieval-service.js';
 import { execFileSync } from 'node:child_process';
+import { engramAdapter } from '$lib/server/memory/local-engram-memory-adapter.js';
 
 export type LexicalClusterHit = {
   clusterId: number;
@@ -44,6 +45,7 @@ export type HyperRagQuery = {
   topologyTopK?: number;
   clusterField?: 'gpu_cluster' | 'som_cluster';
   useTaskDistillates?: boolean;
+  userId?: string;
 };
 
 export type HyperRagHit = {
@@ -138,6 +140,7 @@ export class HyperRagFusionService {
       topologyTopK = 3,
       clusterField = 'gpu_cluster',
       useTaskDistillates = true,
+      userId,
     } = params;
 
     const redis = typeof getRedis === 'function' ? getRedis() : null;
@@ -162,6 +165,18 @@ export class HyperRagFusionService {
     // 1. Multi-query expansion & Profile Routing
     const profile = QueryProfileRouter.route(query);
     explanation.setProfile(profile);
+
+    // Lane -1: Engram Query Memory (Local Redis Bigram/SOM hints)
+    const engramHint = await engramAdapter.getRoutingHints(query).catch(() => null);
+    if (engramHint) {
+      explanation.setEngram({
+        enabled: true,
+        didYouMean: engramHint.didYouMean,
+        bmuHints: engramHint.bmuHints,
+        clusterHints: engramHint.clusterHints,
+        trust: 'low_hint'
+      });
+    }
     
     // Merge Profile Priors with Route Priors (if path is in query or passed in params)
     const profilePriors = QueryProfileRouter.getPriors(profile);
@@ -330,7 +345,25 @@ export class HyperRagFusionService {
         activity_w: (payload.activity_w ?? payload.pagerank ?? 0) as number,
         cluster_alias: clusterAlias ?? undefined,
         recencyOrHitRate: Math.max(hitRate, recencyBoost),
+        engramBoost: 0, // Placeholder
       };
+
+      // Engram Boost (v1.1)
+      // Restricted to validated workflow memory hits for specific profiles
+      const memoryProfiles = ['agent_workflow', 'code_debug', 'retrieval_debug'];
+      if (memoryProfiles.includes(options.profile ?? '') && engramHint?.workflowMemories) {
+        const hitCluster = String(payload[clusterField]);
+        const hitFeature = (payload.featureKey ?? payload.feature_key) as string;
+        
+        const hasMatch = engramHint.workflowMemories.some(m => 
+          m.accepted && m.testsPassed && 
+          (m.clusters.includes(hitCluster) || m.featureKeys.includes(hitFeature))
+        );
+        
+        if (hasMatch) {
+          signals.engramBoost = 0.05;
+        }
+      }
 
       let finalScore = 
           (signals.dense * 0.35) 
@@ -340,6 +373,9 @@ export class HyperRagFusionService {
         + (signals.taskBoost * 0.10)
         + (signals.aceBoost * 0.10)
         + (pt.lane === 'kag' ? 0.05 : 0);
+
+      // Engram Boost (v1.1)
+      finalScore += signals.engramBoost;
       
       // Topological Class Consistency Boost (0.08)
       if (clusterMatch?.topoClass && signals.topoClass === clusterMatch.topoClass) {
@@ -498,6 +534,32 @@ export class HyperRagFusionService {
 
     // 7. Context Budgeting & Persistence
     const budgeted = ContextPacketBudgeter.budget(result);
+    
+    // Lane -1: Record Engram Transition (Fire and forget)
+    if (ranked.length > 0) {
+      const topHit = ranked[0];
+      const redis = getRedis();
+      
+      // If we have a userId, we can recover the previous query from Redis
+      // using the existing 'ace:engram:last:{userId}' logic in engram-bigram.ts
+      (async () => {
+        let previousQuery: string | undefined;
+        if (userId) {
+          const lastKey = `ace:engram:last:${userId}`;
+          const lastQuery = await redis.get(lastKey);
+          previousQuery = lastQuery || undefined;
+          // Update last query for next time
+          await redis.set(lastKey, query.toLowerCase().trim(), 'EX', 3600);
+        }
+
+        await engramAdapter.recordTransition({
+          previousQuery,
+          currentQuery: query,
+          somRow: topHit.manifold4Meta?.som_x,
+          somCol: topHit.manifold4Meta?.som_y,
+        }).catch(() => {});
+      })().catch(() => {});
+    }
     
     // Log trace asynchronously
     logAceRun({

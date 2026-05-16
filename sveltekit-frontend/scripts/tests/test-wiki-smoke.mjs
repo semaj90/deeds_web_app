@@ -1,4 +1,4 @@
-const BASE = process.env.BASE_URL || 'http://localhost:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://localhost:5173');
 
 // Color helpers
 const green = (s) => `\x1b[32m${s}\x1b[0m`;

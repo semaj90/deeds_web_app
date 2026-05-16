@@ -10,6 +10,9 @@
 - GET API routes should keep a stable JSON shape even on failure.
 - Zod-validate every `request.json()` payload.
 - Use `env.server.ts` for service URLs; do not hardcode `localhost` in app code.
+- **Engram Memory (Lane -1)**: Low-trust pre-routing hints. MUST NOT store hidden thoughts, raw tensors, or model cache.
+- **Port 8888**: Reserved for SeaweedFS Filer. Do NOT bind SearXNG to 8888; use port 8889 (SEARXNG_PORT=8889).
+
 
 ## Commands
 

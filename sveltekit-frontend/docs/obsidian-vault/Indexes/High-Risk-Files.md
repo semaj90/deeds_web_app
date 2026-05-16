@@ -1,7 +1,7 @@
 ---
 type: "index"
 title: "High-Risk Files"
-generated: "2026-05-14T01:10:45.024Z"
+generated: "2026-05-15T22:12:05.184Z"
 ai-first: true
 tags: ["index","agent-readable"]
 ---

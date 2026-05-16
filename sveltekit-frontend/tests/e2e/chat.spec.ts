@@ -7,11 +7,12 @@ import { expect, test } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 import { cleanupSeededCases, registerTestUser, seedCasesForUser } from '../utils/seed-cases';
+import { PORTS } from '../helpers/env-ports.js';
 
 const SCREENSHOT_DIR = path.join(process.cwd(), 'test-results', 'screenshots');
 let testCounter = 0;
 function getChatUrl() {
-  return `http://127.0.0.1:5173/chat/test-session-${Date.now()}-${testCounter++}`;
+  return `${PORTS.APP_BASE}/chat/test-session-${Date.now()}-${testCounter++}`;
 }
 
 // Ensure screenshot directory exists
@@ -416,7 +417,7 @@ test.describe('Phase 76: Case-Aware Stream Diagnostics', () => {
       });
     });
 
-    await page.goto(`http://127.0.0.1:5173/cases/${caseId}/chat?debug=1`, {
+    await page.goto(`${PORTS.APP_BASE}/cases/${caseId}/chat?debug=1`, {
       waitUntil: 'networkidle',
     });
 

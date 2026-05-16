@@ -252,7 +252,7 @@ if (NO_NEO4J) {
     const tid = setTimeout(() => controller.abort(), 3000);
     let resp;
     try {
-      resp = await fetch('http://localhost:5173/api/code-intel/neo4j/health', {
+      resp = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/code-intel/neo4j/health`, {
         signal: controller.signal,
         headers: { cookie: '' },
       });
@@ -302,7 +302,7 @@ if (NO_NEO4J) {
     const tid27 = setTimeout(() => controller27.abort(), 5000);
     let d27resp;
     try {
-      d27resp = await fetch('http://localhost:5173/api/code-intel/graph/gds-status', {
+      d27resp = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/code-intel/graph/gds-status`, {
         method: 'POST',
         signal: controller27.signal,
         headers: { 'Content-Type': 'application/json', cookie: '' },

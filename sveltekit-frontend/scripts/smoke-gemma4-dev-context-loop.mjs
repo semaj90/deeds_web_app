@@ -15,7 +15,7 @@
  * Exits 0 on pass, 1 on failure.
  */
 
-const BASE     = 'http://localhost:5173';
+const BASE     = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
 const MCP_BASE = 'http://localhost:8788';
 const TIMEOUT  = 120_000;
 

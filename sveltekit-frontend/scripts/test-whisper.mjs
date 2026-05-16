@@ -43,7 +43,7 @@ const body = Buffer.concat([
 console.log(`Sending ${body.length} bytes to /api/whisper/transcribe...`);
 
 try {
-  const response = await fetch('http://127.0.0.1:5173/api/whisper/transcribe', {
+  const response = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://127.0.0.1:5173'}/api/whisper/transcribe`, {
     method: 'POST',
     headers: {
       'Content-Type': `multipart/form-data; boundary=${boundary}`,

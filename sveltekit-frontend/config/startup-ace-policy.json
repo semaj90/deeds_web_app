@@ -8,17 +8,17 @@
     "neo4j:clear",
     "redis:flush",
     "couchdb:delete",
-    "agents:write:force",
+    "llms:write:force",
     "drizzle:push",
     "drizzle:reset",
     "db:apply-migration"
   ],
   "allowedOnStartup": [
-    "agents:pipeline:dry",
-    "agents:pipeline:safe",
+    "llms:pipeline:dry",
+    "llms:pipeline:safe",
     "topology:validate",
     "graph:synthesize",
-    "smoke:agents",
+    "smoke:llms",
     "smoke:trace",
     "kag:ingest",
     "karpathy:gpu:dirty",
@@ -49,7 +49,17 @@
     "hyperrag:multiquery:dry",
     "hyperrag:multiquery",
     "smoke:hyperrag",
-    "smoke:hyperrag:skip-mcp"
+    "smoke:hyperrag:skip-mcp",
+    "qdrant:patch-topology",
+    "neo4j:manifold-sync",
+    "search:sync:pg",
+    "graphify:rerank-writeback",
+    "graphify:rerank-writeback:breakdown",
+    "qdrant:rerank-feedback",
+    "hypergraph:tag",
+    "wiki:loop:smoke",
+    "llms:enrich",
+    "codebase:index"
   ],
   "thresholds": {
     "smallChangeMaxFiles": 20,
@@ -103,7 +113,16 @@
       "graphify:obsidian:incremental",
       "graphify:semantic-cluster",
       "hyperrag:multiquery:dry",
-      "audit:full-pipeline"
+      "qdrant:patch-topology",
+      "neo4j:manifold-sync",
+      "search:sync:pg",
+      "graphify:rerank-writeback",
+      "graphify:rerank-writeback:breakdown",
+      "qdrant:rerank-feedback",
+      "hypergraph:tag",
+      "audit:full-pipeline",
+      "llms:enrich",
+      "codebase:index"
     ],
     "logKey": "ace:startup:heavy_log"
   }

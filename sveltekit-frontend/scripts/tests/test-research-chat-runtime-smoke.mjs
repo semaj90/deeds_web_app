@@ -21,7 +21,7 @@ import net from 'node:net';
 
 const args = process.argv.slice(2);
 const baseIndex = args.indexOf('--base');
-const BASE = baseIndex >= 0 ? args[baseIndex + 1] : process.env.BASE_URL || 'http://localhost:5173';
+const BASE = baseIndex >= 0 ? args[baseIndex + 1] : (process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://localhost:5173'));
 const VERBOSE = args.includes('--verbose');
 const RETRIEVAL_GRPC_PORT = Number(process.env.RETRIEVAL_GRPC_PORT || '50053');
 const READY_PATH = '/@vite/client';

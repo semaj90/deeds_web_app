@@ -11,7 +11,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
 const MODEL = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4:e4b-it-q4_K_M';
-const TURBOQUANT_BASE_URL = process.env.TURBOQUANT_BASE_URL ?? 'http://localhost:8080';
+const TURBOQUANT_BASE_URL = ENV.TURBOQUANT_BASE_URL;
 
 const synthesisSchema = z.object({
   globalSummary: z.string(),

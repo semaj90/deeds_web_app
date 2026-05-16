@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * UX Layout Tests for Enhanced-Bits Components
@@ -13,7 +14,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
 
   test.describe('Case Scoring Dashboard UX', () => {
     test('should render dashboard with proper layout', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
 
       // Wait for page load
       await expect(page.locator('h1')).toContainText('Case Scoring Dashboard Demo');
@@ -31,7 +32,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should load and display mock case data', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
 
       // Wait for the dashboard to load
       await page.waitForSelector('.case-scoring-dashboard', { timeout: 10000 });
@@ -55,7 +56,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should handle case filtering and sorting', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
       await page.waitForSelector('.case-scoring-dashboard');
       await page.waitForSelector('.loading-state', { state: 'hidden', timeout: 5000 });
 
@@ -77,7 +78,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should open modal dialog with case details', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
       await page.waitForSelector('.case-scoring-dashboard');
       await page.waitForSelector('.loading-state', { state: 'hidden', timeout: 5000 });
 
@@ -105,7 +106,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should simulate case rescoring', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
       await page.waitForSelector('.case-scoring-dashboard');
       await page.waitForSelector('.loading-state', { state: 'hidden', timeout: 5000 });
 
@@ -132,7 +133,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
 
     test('should be responsive on mobile viewport', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 }); // iPhone size
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
 
       // Check mobile responsiveness
       const dashboard = page.locator('.case-scoring-dashboard');
@@ -150,7 +151,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
 
   test.describe('LoadingButton UX', () => {
     test('should render all button variants correctly', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/loading-button');
+      await page.goto(`${PORTS.APP_BASE}/demo/loading-button`);
 
       // Check page loads
       await expect(page.locator('h1')).toContainText('LoadingButton Component Demo');
@@ -171,7 +172,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should handle loading states properly', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/loading-button');
+      await page.goto(`${PORTS.APP_BASE}/demo/loading-button`);
 
       // Click a loading button
       const saveBtn = page.locator('button:has-text("Save Document")');
@@ -194,7 +195,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should respect disabled state', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/loading-button');
+      await page.goto(`${PORTS.APP_BASE}/demo/loading-button`);
 
       const disabledBtn = page.locator('button:has-text("Disabled Button")');
 
@@ -208,7 +209,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should handle keyboard navigation', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/loading-button');
+      await page.goto(`${PORTS.APP_BASE}/demo/loading-button`);
 
       // Focus first button
       const firstBtn = page.locator('button').first();
@@ -226,7 +227,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should display custom content with snippets', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/loading-button');
+      await page.goto(`${PORTS.APP_BASE}/demo/loading-button`);
 
       // Find button with custom icon content
       const iconBtn = page.locator('button:has-text("Star this!")');
@@ -240,7 +241,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
   test.describe('Enhanced-Bits Integration', () => {
     test('should integrate SIMD parser with enhanced-bits components', async ({ page }) => {
       // Navigate to a page that uses SIMD parsing
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
 
       // Check if SIMD parser is available in global context
       const simdAvailable = await page.evaluate(() => {
@@ -268,7 +269,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should maintain accessibility standards', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
 
       // Run basic accessibility checks
       await page.locator('h1').first().waitFor();
@@ -310,7 +311,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
         }
       });
 
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
       await page.waitForLoadState('networkidle');
 
       // Should not have hydration mismatches or SSR errors
@@ -325,7 +326,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
 
   test.describe('Performance and Layout Stability', () => {
     test('should maintain layout stability during loading', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/case-scoring');
+      await page.goto(`${PORTS.APP_BASE}/demo/case-scoring`);
 
       // Measure layout shift during loading
       let cumulativeLayoutShift = 0;
@@ -349,7 +350,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should handle rapid user interactions', async ({ page }) => {
-      await page.goto('http://localhost:5174/demo/loading-button');
+      await page.goto(`${PORTS.APP_BASE}/demo/loading-button`);
 
       // Rapidly click multiple buttons
       const buttons = page.locator('button').filter({ hasNotText: 'Disabled' });

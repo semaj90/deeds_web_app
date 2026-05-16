@@ -32,7 +32,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const DATABASE_URL   = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const MCP_URL        = process.env.MCP_URL ?? 'http://127.0.0.1:8788/mcp';
-const SVELTEKIT_URL  = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
+const SVELTEKIT_URL  = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
 const JSON_OUT       = process.argv.includes('--json');
 const STRICT         = process.argv.includes('--strict');
 

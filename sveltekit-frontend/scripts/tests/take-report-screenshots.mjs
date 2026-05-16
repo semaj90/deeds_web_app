@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 import { mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://localhost:5173');
 const SCREENSHOT_DIR = './screenshots/reports';
 const TEST_CASE_ID = '5814dc72-fe7e-49ab-b5d2-ff22f2e40ff1';
 

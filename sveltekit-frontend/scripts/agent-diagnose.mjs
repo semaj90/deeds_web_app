@@ -128,7 +128,7 @@ function findRelatedTests(filePath) {
 async function getRedisHotErrors() {
   // Try via SvelteKit dev server stats endpoint
   try {
-    const resp = await fetch('http://localhost:5173/api/cache/exact-match/stats', {
+    const resp = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/cache/exact-match/stats`, {
       signal: AbortSignal.timeout(2000),
     });
     if (resp.ok) {
@@ -144,7 +144,7 @@ async function getRedisHotErrors() {
 async function getPostgresFailures() {
   // Query via the dev server API if available
   try {
-    const resp = await fetch('http://localhost:5173/api/code-intel/status', {
+    const resp = await fetch(`${process.env.PUBLIC_APP_URL ?? 'http://localhost:5173'}/api/code-intel/status`, {
       signal: AbortSignal.timeout(3000),
     });
     if (resp.ok) {

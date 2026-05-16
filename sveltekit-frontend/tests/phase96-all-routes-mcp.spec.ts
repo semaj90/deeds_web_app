@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * Phase 96: MCP-Enhanced All Routes Test
@@ -13,7 +14,7 @@ import { join } from 'path';
  * 5. Identifies broken routes and consolidation opportunities
  */
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 interface RouteTestResult {
   route: string;

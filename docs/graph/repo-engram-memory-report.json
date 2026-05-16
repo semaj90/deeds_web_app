@@ -1,0 +1,144 @@
+{
+  "repo": "deeds-web-app",
+  "runId": "run_1778895603155",
+  "generatedAt": "2026-05-16T01:40:03.964Z",
+  "dryRun": true,
+  "health": {
+    "ok": true,
+    "source": "atlas:engram:dry-run",
+    "warning": "Engram adapter is inactive"
+  },
+  "routeCount": 909,
+  "workspaceCount": 21,
+  "clusterCount": 0,
+  "featureCount": 2,
+  "memoryCount": 5,
+  "writes": 0,
+  "sample": [
+    {
+      "id": "engram:deeds_labs",
+      "repo": "deeds-web-app",
+      "workspace": "deeds_labs",
+      "memory_type": "workflow_lesson",
+      "summary": "Workspace deeds_labs hot context lesson",
+      "content": "Top files and routes for deeds_labs",
+      "accepted": true,
+      "tests_passed": true,
+      "reward": 1,
+      "trust": "low_hint",
+      "stores": [
+        "redis",
+        "couchdb",
+        "neo4j"
+      ],
+      "tags": [
+        "engram",
+        "workspace",
+        "deeds_labs"
+      ],
+      "runId": "run_1778895603155",
+      "createdAt": "2026-05-16T01:40:03.962Z",
+      "updatedAt": "2026-05-16T01:40:03.963Z"
+    },
+    {
+      "id": "engram:sveltekit-frontend",
+      "repo": "deeds-web-app",
+      "workspace": "sveltekit-frontend",
+      "memory_type": "workflow_lesson",
+      "summary": "Workspace sveltekit-frontend hot context lesson",
+      "content": "Top files and routes for sveltekit-frontend",
+      "accepted": true,
+      "tests_passed": true,
+      "reward": 1,
+      "trust": "low_hint",
+      "stores": [
+        "redis",
+        "couchdb",
+        "neo4j"
+      ],
+      "tags": [
+        "engram",
+        "workspace",
+        "sveltekit-frontend"
+      ],
+      "runId": "run_1778895603155",
+      "createdAt": "2026-05-16T01:40:03.963Z",
+      "updatedAt": "2026-05-16T01:40:03.963Z"
+    },
+    {
+      "id": "engram:scripts",
+      "repo": "deeds-web-app",
+      "workspace": "scripts",
+      "memory_type": "workflow_lesson",
+      "summary": "Workspace scripts hot context lesson",
+      "content": "Top files and routes for scripts",
+      "accepted": true,
+      "tests_passed": true,
+      "reward": 1,
+      "trust": "low_hint",
+      "stores": [
+        "redis",
+        "couchdb",
+        "neo4j"
+      ],
+      "tags": [
+        "engram",
+        "workspace",
+        "scripts"
+      ],
+      "runId": "run_1778895603155",
+      "createdAt": "2026-05-16T01:40:03.963Z",
+      "updatedAt": "2026-05-16T01:40:03.963Z"
+    },
+    {
+      "id": "engram:feature:code.surface",
+      "repo": "deeds-web-app",
+      "featureKey": "code.surface",
+      "memory_type": "debug_lesson",
+      "summary": "Feature code.surface hot context debug lesson",
+      "content": "Feature activity summary for code.surface",
+      "accepted": true,
+      "tests_passed": true,
+      "reward": 1,
+      "trust": "low_hint",
+      "stores": [
+        "redis",
+        "postgres",
+        "qdrant"
+      ],
+      "tags": [
+        "engram",
+        "feature",
+        "code.surface"
+      ],
+      "runId": "run_1778895603155",
+      "createdAt": "2026-05-16T01:40:03.963Z",
+      "updatedAt": "2026-05-16T01:40:03.963Z"
+    },
+    {
+      "id": "engram:feature:route.surface",
+      "repo": "deeds-web-app",
+      "featureKey": "route.surface",
+      "memory_type": "debug_lesson",
+      "summary": "Feature route.surface hot context debug lesson",
+      "content": "Feature activity summary for route.surface",
+      "accepted": true,
+      "tests_passed": true,
+      "reward": 1,
+      "trust": "low_hint",
+      "stores": [
+        "redis",
+        "postgres",
+        "qdrant"
+      ],
+      "tags": [
+        "engram",
+        "feature",
+        "route.surface"
+      ],
+      "runId": "run_1778895603155",
+      "createdAt": "2026-05-16T01:40:03.963Z",
+      "updatedAt": "2026-05-16T01:40:03.963Z"
+    }
+  ]
+}

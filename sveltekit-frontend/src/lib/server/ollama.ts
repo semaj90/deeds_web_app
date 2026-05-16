@@ -79,7 +79,7 @@ export function getOllamaEndpoint(): string {
 
 const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
 const CHAT_MODEL = ENV.OLLAMA_CHAT_MODEL;
-const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '300000');
+const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '600000');
 
 export function getOllamaRequestTimeoutMs(): number {
   return REQUEST_TIMEOUT_MS;
@@ -95,7 +95,7 @@ function isAbortTimeoutError(error: unknown): boolean {
   return error.name === 'AbortError' || /abort|timeout/i.test(error.message);
 }
 
-const BIFROST_GATEWAY_TIMEOUT_MS = parseTimeoutMs(process.env?.BIFROST_TIMEOUT_MS, 8000);
+const BIFROST_GATEWAY_TIMEOUT_MS = parseTimeoutMs(process.env?.BIFROST_TIMEOUT_MS, 30000);
 const BIFROST_L2_EMBED_TIMEOUT_MS = parseTimeoutMs(process.env?.BIFROST_L2_EMBED_TIMEOUT_MS, 2000);
 const BIFROST_L2_QDRANT_TIMEOUT_MS = parseTimeoutMs(
   process.env?.BIFROST_L2_QDRANT_TIMEOUT_MS,

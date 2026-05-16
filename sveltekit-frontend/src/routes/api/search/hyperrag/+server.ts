@@ -51,6 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       useGraph: input.useGraph !== false,
       useAceCache: input.useAceCache !== false,
       synthesize: input.synthesize,
+      userId: locals.user.id,
     });
 
     return json(result);

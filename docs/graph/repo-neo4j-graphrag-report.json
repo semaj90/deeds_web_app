@@ -1,0 +1,23 @@
+{
+  "repo": "deeds-web-app",
+  "runId": "run_1778895241347",
+  "generatedAt": "2026-05-16T01:34:01.840Z",
+  "dryRun": true,
+  "workspace": "all",
+  "limit": 0,
+  "nodes": {
+    "File": 26011,
+    "CodeArtifact": 32135,
+    "Component": 5097,
+    "Route": 1027
+  },
+  "edges": {
+    "IMPORTS": 69308
+  },
+  "topEdgeTypes": [
+    {
+      "key": "IMPORTS",
+      "value": 69308
+    }
+  ]
+}

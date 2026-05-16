@@ -11,7 +11,7 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const BASE_URL = 'http://localhost:5173';
+const BASE_URL = process.env.PUBLIC_APP_URL ?? 'http://localhost:5173';
 const TEST_CASE_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'; // From seed-evidence.ts
 
 // ANSI colors

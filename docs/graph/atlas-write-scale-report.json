@@ -165,5 +165,19 @@
     "missingPayloads": 0,
     "status": "success",
     "notes": "Resolved Qdrant path alias mismatch. Neo4j GDS PageRank/Louvain verified. Canary successfully enriched 25 files with GPU attention and Gemma4 summaries."
+  },
+  {
+    "phase": "karpathy_synthesis",
+    "run": "stage-2a-100",
+    "timestamp": "2026-05-16T01:30:00Z",
+    "candidates": 100,
+    "gdsNodes": 14412,
+    "qdrantMatches": "955/1000",
+    "collection": "codebase_chunks_768",
+    "atlasValidate": "passed",
+    "rootDryRun": "running",
+    "missingPayloads": 0,
+    "status": "success",
+    "notes": "Stage 2A successful. Karpathy GPU hit-rate 94/94 verified after path resolution fix. File summaries enriched 18 high-value targets. Cluster glyphs skipped due to timeout on large legacy dirs (as expected)."
   }
 ]

@@ -11,7 +11,7 @@
  * Requires: dev server running on localhost:5173
  */
 
-const BASE = process.env.BASE_URL || 'http://localhost:5173';
+const BASE = process.env.PUBLIC_APP_URL ?? (process.env.BASE_URL || 'http://localhost:5173');
 const ENDPOINT = `${BASE}/api/codebase-index/orchestrate`;
 
 const args = process.argv.slice(2);

@@ -14,69 +14,9 @@
 import { expect, test, type BrowserContext } from '@playwright/test';
 import fs from 'fs/promises';
 import path from 'path';
-
-/**
- * Dynamically find the active dev server port in range 5173-5180
- * Uses multiple detection methods for robustness
- */
-async function findActivePort(): Promise<number> {
-	const portRange = [5173, 5174, 5175, 5176, 5177, 5178, 5179, 5180];
-
-	// Method 1: Check Vite-specific endpoint
-	for (const port of portRange) {
-		try {
-			const response = await fetch(`http://127.0.0.1:${port}/@vite/client`, {
-				method: 'GET',
-				signal: AbortSignal.timeout(2000)
-			});
-			if (response.ok || response.status === 404) {
-				console.log(`✅ Found Vite dev server on port ${port} (via @vite/client)`);
-				return port;
-			}
-		} catch (error) {
-			// Try next port
-		}
-	}
-
-	// Method 2: Check SvelteKit root route
-	for (const port of portRange) {
-		try {
-			const response = await fetch(`http://127.0.0.1:${port}/`, {
-				method: 'HEAD',
-				signal: AbortSignal.timeout(2000)
-			});
-			if (response.ok || response.status === 404 || response.status === 500) {
-				console.log(`✅ Found dev server on port ${port} (via HEAD /)`);
-				return port;
-			}
-		} catch (error) {
-			// Try next port
-		}
-	}
-
-	// Method 3: Try login endpoint (auth-specific)
-	for (const port of portRange) {
-		try {
-			const response = await fetch(`http://127.0.0.1:${port}/login`, {
-				method: 'HEAD',
-				signal: AbortSignal.timeout(2000)
-			});
-			console.log(`✅ Found dev server on port ${port} (via /login endpoint)`);
-			return port;
-		} catch (error) {
-			// Try next port
-		}
-	}
-
-	throw new Error(
-		`❌ No active dev server found in port range 5173-5180.\n` +
-			`   Please start the dev server with: npm run dev\n` +
-			`   Checked ports: ${portRange.join(', ')}`
-	);
-}
-
-let BASE_PORT: number;
-let BASE_URL: string;
+import { PORTS } from './helpers/env-ports.js';
+const BASE_URL = PORTS.APP_BASE;
+const BASE_PORT = Number(new URL(BASE_URL).port);
 
 const CHROME_COOKIE_PATHS = [
 	// Windows Chrome profiles
@@ -180,9 +120,6 @@ test.describe('Phase 97: Authenticated Streaming API', () => {
 	let sessionId: string | null = null;
 
 	test.beforeAll(async ({ browser }) => {
-		// Initialize dynamic port detection
-		BASE_PORT = await findActivePort();
-		BASE_URL = `http://127.0.0.1:${BASE_PORT}`;
 		console.log(`📡 Using dev server on port ${BASE_PORT}`);
 
 		// Try to extract session from existing Chrome browser

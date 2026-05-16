@@ -10,6 +10,12 @@
 - 78 file(s), 0 handler(s)
 - Audit score: _(no GPU audit)_
 - 🟡 Svelte4: 3 · 🟠 hardcoded localhost: 10
+- 🚀 **Hardware**: LibTorch CUDA bridge (Verified) · Port 8101 Topology Server (Active)
+
+## Infrastructure Guides
+
+- [Startup & CUDA Bridge Wiring](docs/infrastructure/startup_infrastructure_guide.md) — troubleshooting path regressions and gRPC/JSON boundaries.
+
 
 
 ## Files (78)

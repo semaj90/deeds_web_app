@@ -7,6 +7,8 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { Pool } = require('pg');
 
+const BASE_URL = process.env.PUBLIC_APP_URL ?? 'http://localhost:5173';
+
 const pool = new Pool({
 	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'
 });
@@ -54,7 +56,7 @@ async function testAudioAnalysis() {
 		log(`✅ Found audio: ${audio.title}`, colors.green);
 
 		// Test API endpoint
-		const apiResponse = await fetch(`http://localhost:5173/api/audio/analysis/${audio.id}`);
+		const apiResponse = await fetch(`${BASE_URL}/api/audio/analysis/${audio.id}`);
 		if (!apiResponse.ok) {
 			log(`❌ API failed: ${apiResponse.status}`, colors.red);
 			return { success: false, reason: 'api error' };
@@ -67,7 +69,7 @@ async function testAudioAnalysis() {
 		log(`  - ACE Analysis: ${data.aceAnalysis ? 'YES' : 'NO'}`, colors.reset);
 
 		// Test page route
-		const pageUrl = `http://localhost:5173/audio-analysis/${audio.id}`;
+		const pageUrl = `${BASE_URL}/audio-analysis/${audio.id}`;
 		log(`\n🌐 Test URL: ${pageUrl}`, colors.cyan);
 
 		return { success: true, evidenceId: audio.id, url: pageUrl };
@@ -131,7 +133,7 @@ async function testVideoAnalysis() {
 			const video = { id: testId, title: 'Test Video Evidence' };
 
 			// Test API endpoint
-			const apiResponse = await fetch(`http://localhost:5173/api/video/analysis/${video.id}`);
+			const apiResponse = await fetch(`${BASE_URL}/api/video/analysis/${video.id}`);
 			if (!apiResponse.ok) {
 				log(`❌ API failed: ${apiResponse.status}`, colors.red);
 				return { success: false, reason: 'api error' };
@@ -143,7 +145,7 @@ async function testVideoAnalysis() {
 			log(`  - Frame Analysis: ${data.frameAnalysis?.length || 0} frames`, colors.reset);
 			log(`  - Video Metadata: ${data.videoMetadata ? 'YES' : 'NO'}`, colors.reset);
 
-			const pageUrl = `http://localhost:5173/video-analysis/${video.id}`;
+			const pageUrl = `${BASE_URL}/video-analysis/${video.id}`;
 			log(`\n🌐 Test URL: ${pageUrl}`, colors.cyan);
 
 			return { success: true, evidenceId: video.id, url: pageUrl };
@@ -153,7 +155,7 @@ async function testVideoAnalysis() {
 		log(`✅ Found video: ${video.title}`, colors.green);
 
 		// Test API endpoint
-		const apiResponse = await fetch(`http://localhost:5173/api/video/analysis/${video.id}`);
+		const apiResponse = await fetch(`${BASE_URL}/api/video/analysis/${video.id}`);
 		if (!apiResponse.ok) {
 			log(`❌ API failed: ${apiResponse.status}`, colors.red);
 			return { success: false, reason: 'api error' };
@@ -162,7 +164,7 @@ async function testVideoAnalysis() {
 		const data = await apiResponse.json();
 		log(`✅ API returned data`, colors.green);
 
-		const pageUrl = `http://localhost:5173/video-analysis/${video.id}`;
+		const pageUrl = `${BASE_URL}/video-analysis/${video.id}`;
 		log(`\n🌐 Test URL: ${pageUrl}`, colors.cyan);
 
 		return { success: true, evidenceId: video.id, url: pageUrl };
@@ -238,7 +240,7 @@ async function testDocumentAnalysis() {
 			const doc = { id: testId, title: 'Test Legal Document' };
 
 			// Test API endpoint
-			const apiResponse = await fetch(`http://localhost:5173/api/document/analysis/${doc.id}`);
+			const apiResponse = await fetch(`${BASE_URL}/api/document/analysis/${doc.id}`);
 			if (!apiResponse.ok) {
 				log(`❌ API failed: ${apiResponse.status}`, colors.red);
 				return { success: false, reason: 'api error' };
@@ -251,7 +253,7 @@ async function testDocumentAnalysis() {
 			log(`  - Entities: ${data.entities?.length || 0}`, colors.reset);
 			log(`  - ACE Analysis: ${data.aceAnalysis ? 'YES' : 'NO'}`, colors.reset);
 
-			const pageUrl = `http://localhost:5173/document-analysis/${doc.id}`;
+			const pageUrl = `${BASE_URL}/document-analysis/${doc.id}`;
 			log(`\n🌐 Test URL: ${pageUrl}`, colors.cyan);
 
 			return { success: true, evidenceId: doc.id, url: pageUrl };
@@ -261,7 +263,7 @@ async function testDocumentAnalysis() {
 		log(`✅ Found document: ${doc.title}`, colors.green);
 
 		// Test API endpoint
-		const apiResponse = await fetch(`http://localhost:5173/api/document/analysis/${doc.id}`);
+		const apiResponse = await fetch(`${BASE_URL}/api/document/analysis/${doc.id}`);
 		if (!apiResponse.ok) {
 			log(`❌ API failed: ${apiResponse.status}`, colors.red);
 			return { success: false, reason: 'api error' };
@@ -270,7 +272,7 @@ async function testDocumentAnalysis() {
 		const data = await apiResponse.json();
 		log(`✅ API returned data`, colors.green);
 
-		const pageUrl = `http://localhost:5173/document-analysis/${doc.id}`;
+		const pageUrl = `${BASE_URL}/document-analysis/${doc.id}`;
 		log(`\n🌐 Test URL: ${pageUrl}`, colors.cyan);
 
 		return { success: true, evidenceId: doc.id, url: pageUrl };

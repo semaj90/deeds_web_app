@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 test.describe('Evidence Upload RAG Integration', () => {
   test('evidence upload page loads', async ({ page }) => {
-    await page.goto('http://localhost:5173/evidence/upload');
+		await page.goto(`${PORTS.APP_BASE}/evidence/upload`);
 
     // Check page title
     await expect(page).toHaveTitle(/YoRHa Legal AI|Evidence/i);
@@ -12,13 +13,13 @@ test.describe('Evidence Upload RAG Integration', () => {
 
   test('navigate from homepage to evidence upload', async ({ page }) => {
     // Go to homepage
-    await page.goto('http://localhost:5173');
+		await page.goto(PORTS.APP_BASE);
 
     // Wait for page to load
     await page.waitForLoadState('networkidle');
 
     // Navigate directly to evidence upload
-    await page.goto('http://localhost:5173/evidence/upload');
+		await page.goto(`${PORTS.APP_BASE}/evidence/upload`);
 
     // Verify we're on the upload page
     await expect(page).toHaveTitle(/YoRHa Legal AI|Evidence/i);
@@ -27,7 +28,7 @@ test.describe('Evidence Upload RAG Integration', () => {
   });
 
   test('RAG ingest endpoint is accessible', async ({ page, request }) => {
-    const response = await request.post('http://localhost:5173/api/upload/rag-ingest', {
+		const response = await request.post(`${PORTS.APP_BASE}/api/upload/rag-ingest`, {
       multipart: {
         files: {
           name: 'test.txt',

@@ -22,7 +22,7 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { existsSync }                  from 'node:fs';
 import path                            from 'node:path';
 
-const DEV_SERVER = process.env.DEV_SERVER ?? 'http://127.0.0.1:5173';
+const DEV_SERVER = process.env.PUBLIC_APP_URL ?? process.env.DEV_SERVER ?? 'http://127.0.0.1:5173';
 const GRAPH_PATH = path.resolve('docs/graph/codebase-graph.json');
 
 // ── argv parsing ─────────────────────────────────────────────────────────────

@@ -15,8 +15,9 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { PORTS } from '../helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 
 test.describe('POST /api/rag/search — RAG_RRF_ENABLED canary contract', () => {
 	test('no sectionTypes → never returns canary field (legacy pipeline)', async ({ request }) => {

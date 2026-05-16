@@ -28,7 +28,7 @@ spawn(process.execPath, nodeArgs, { stdio: ['ignore', outFd, errFd], detached: t
 
 **Path**: source-level `z.record(z.any())` → `z.record(z.string(), z.any())` two-arg fix (commit `f41951c0ee`) + zod-v4-tools-list-patch.ts wired at `trace-mcp-server.ts:54` + bisect 8/8 PASS + G34 `mcp:zod-record-two-arg` permanent guard.
 
-**Verified live**: PID 39896 returned `tools/list` 200 OK with **41 tools** (parallel writer's later drift fix raises this to ~70+ after next restart). `smoke:atlas` runs end-to-end: 4 PASS / 2 WARN / 11 FAIL — every fail is a **data gap**, not infrastructure (hypergraph_edges empty, atlas Redis cache empty for probe file).
+**Verified live**: PID 39896 returned `tools/list` 200 OK with **41 tools** (parallel writer's later drift fix raises this to ~70+ after next restart). `smoke:atlas` runs end-to-end when the dev server is up; dev-server-down runs skip the HTTP probe. The remaining 4 PASS / 2 WARN / 11 FAIL items were data gaps, not infrastructure (hypergraph_edges empty, atlas Redis cache empty for probe file).
 
 ### 3. Phase C synth loop ran live with TRACE MCP ✅
 

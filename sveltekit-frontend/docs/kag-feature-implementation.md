@@ -234,7 +234,7 @@ GET /api/ace/recommendations?topoClass=database-schema
 
 ## 8. Smoke gates
 
-### `npm run smoke:atlas` (16 probes)
+### `npm run smoke:atlas` (16 probes, HTTP probe may skip if dev server is down)
 **File:** `scripts/smoke-atlas-context.mjs`
 **Checks:**
 - P1.7 — `context_for_file` shape: filePath echo, normalizedPath strip, directory completeness, `file.rank ∈ [0,1]`, promptCards present, provenance fields
@@ -271,7 +271,7 @@ npm run typecheck:native               # tsgo, 0 errors
 npm run check                          # svelte-check, 0/0
 
 # Live
-npm run smoke:atlas                    # 16 probes, sub-100ms each
+npm run smoke:atlas                    # 16 probes; HTTP probe skips if dev server is down
 node scripts/smoke-trace-mcp-tools.mjs # 44/44 MCP tools
 
 # Adaptive (run twice — 2nd run should short-circuit)
@@ -304,7 +304,7 @@ Expected: cold first run does the work; warm second run short-circuits with a fr
   ↓
 🚀 ACE Incremental Refresh        (lock-protected)
   ↓
-🩺 Atlas Smoke Gate (16 probes)   (30m cooldown)
+🩺 Atlas Smoke Gate (16 probes; HTTP may skip if dev server is down)   (30m cooldown)
   ↓
 🔥 Seed Hit-Demand                (5m cooldown + adaptive watermark)
 ```

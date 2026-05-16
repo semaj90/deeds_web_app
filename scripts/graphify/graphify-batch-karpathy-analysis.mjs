@@ -8,6 +8,7 @@ const REPO_ROOT = resolve(__dirname, '../..');
 
 const args = process.argv.slice(2);
 const WRITE = args.includes('--write');
+const FORCE = args.includes('--force');
 const LIMIT = parseInt(args.find(a => a.startsWith('--limit='))?.split('=')[1] || '50', 10);
 const PROGRESS_EVERY = parseInt(args.find(a => a.startsWith('--progress-every='))?.split('=')[1] || '5', 10);
 
@@ -16,7 +17,7 @@ const config = loadConfig();
 // Canonical codebase collection for synthesis
 const CODEBASE_COLLECTION = 'codebase_chunks_768';
 
-console.log(`Starting Phase 2: Karpathy Synthesis Mode [WRITE=${WRITE}] [LIMIT=${LIMIT}]`);
+console.log(`Starting Phase 2: Karpathy Synthesis Mode [WRITE=${WRITE}] [LIMIT=${LIMIT}] [FORCE=${FORCE}]`);
 
 function runScript(path, scriptArgs = [], envOverrides = {}) {
   const absPath = resolve(REPO_ROOT, path);
@@ -39,6 +40,7 @@ function runScript(path, scriptArgs = [], envOverrides = {}) {
 const commonArgs = [];
 if (WRITE) commonArgs.push('--write'); 
 if (!WRITE) commonArgs.push('--dry-run');
+if (FORCE) commonArgs.push('--force');
 
 // 0. Neo4j Graph Analysis (PageRank/Louvain)
 const gdsArgs = [...commonArgs, `--limit=${LIMIT * 10}`];
@@ -59,7 +61,8 @@ runScript('sveltekit-frontend/scripts/generate-file-summaries.mjs', summaryArgs,
 });
 
 // 3. Cluster/Directory Summaries (Gemma4)
-const clusterArgs = ['--limit', String(Math.ceil(LIMIT / 5))];
+const clusterArgs = [...commonArgs, '--limit', String(Math.ceil(LIMIT / 5))];
+// Cluster summaries don't use --dry-run conventionally, but they use --skip-llm to be safe if not writing
 if (!WRITE) clusterArgs.push('--skip-llm');
 runScript('sveltekit-frontend/scripts/graphify-cluster-summaries.mjs', clusterArgs, {
   QDRANT_COLLECTION: CODEBASE_COLLECTION
@@ -71,14 +74,16 @@ const report = {
   generatedAt: new Date().toISOString(),
   runId: `synthesis_${Date.now()}`,
   limit: LIMIT,
-  status: 'completed'
+  status: 'completed',
+  force: FORCE
 };
 
 writeJson(resolveRepoPath(config.outputs.batchReportJson), report);
 writeMarkdown(resolveRepoPath(config.outputs.batchReportMd), parentAtlasMarkdown('Karpathy Synthesis Lane - Production', {
   limit: LIMIT,
   runId: report.runId,
-  mode: WRITE ? 'WRITE' : 'DRY_RUN'
+  mode: WRITE ? 'WRITE' : 'DRY_RUN',
+  force: FORCE
 }, [
   'Neo4j GDS Analysis: OK',
   'Authority Blend (GPU): OK',

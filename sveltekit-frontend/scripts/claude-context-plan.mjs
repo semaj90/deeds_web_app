@@ -95,8 +95,10 @@ async function quickCheck(url) {
   } catch { return 'down'; }
 }
 
+const APP_BASE = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+
 const runtime = {
-  sveltekit:  await quickCheck('http://127.0.0.1:5173/api/health').catch(() => quickCheck('http://127.0.0.1:5173/')),
+  sveltekit:  await quickCheck(`${APP_BASE}/api/health`).catch(() => quickCheck(`${APP_BASE}/`)),
   mcp:        await quickCheck('http://127.0.0.1:8788/health'),
   topology:   await quickCheck('http://127.0.0.1:8101/health'),
   turboQuant: await quickCheck('http://127.0.0.1:8090/health'),
