@@ -44,19 +44,19 @@ if (FORCE) commonArgs.push('--force');
 
 // 0. Neo4j Graph Analysis (PageRank/Louvain)
 const gdsArgs = [...commonArgs, `--limit=${LIMIT * 10}`];
-runScript('sveltekit-frontend/scripts/neo4j-graph-enrich.mjs', gdsArgs, {
+runScript('scripts/atlas/neo4j-graph-enrich.mjs', gdsArgs, {
   QDRANT_COLLECTION: CODEBASE_COLLECTION
 });
 
 // 1. Karpathy Authority Blend (GPU Attention)
 const karpathyArgs = [...commonArgs, '--limit', String(LIMIT)];
-runScript('sveltekit-frontend/scripts/karpathy-gpu-enrich.mjs', karpathyArgs, {
+runScript('scripts/atlas/karpathy-gpu-enrich.mjs', karpathyArgs, {
   QDRANT_COLLECTION: CODEBASE_COLLECTION
 });
 
 // 2. File Summaries (T0 + T2 Gemma4)
 const summaryArgs = [...commonArgs, '--limit', String(LIMIT)];
-runScript('sveltekit-frontend/scripts/generate-file-summaries.mjs', summaryArgs, {
+runScript('scripts/atlas/generate-file-summaries.mjs', summaryArgs, {
   QDRANT_COLLECTION: CODEBASE_COLLECTION
 });
 
@@ -64,7 +64,7 @@ runScript('sveltekit-frontend/scripts/generate-file-summaries.mjs', summaryArgs,
 const clusterArgs = [...commonArgs, '--limit', String(Math.ceil(LIMIT / 5))];
 // Cluster summaries don't use --dry-run conventionally, but they use --skip-llm to be safe if not writing
 if (!WRITE) clusterArgs.push('--skip-llm');
-runScript('sveltekit-frontend/scripts/graphify-cluster-summaries.mjs', clusterArgs, {
+runScript('scripts/atlas/graphify-cluster-summaries.mjs', clusterArgs, {
   QDRANT_COLLECTION: CODEBASE_COLLECTION
 });
 

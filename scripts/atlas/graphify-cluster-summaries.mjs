@@ -166,8 +166,10 @@ Write a 2-3 sentence technical summary of what this directory does. Focus on pur
 const outcomes = {
   summarized: 0,
   skipped_generated_dir: 0,
+  skipped_archive_or_log: 0,
   skipped_too_many_files: 0,
   skipped_too_many_bytes: 0,
+  no_qdrant_points: 0,
   no_source_files: 0,
   timeout: 0,
   cache_unchanged: 0,
@@ -184,7 +186,11 @@ for (let i = 0; i < targets.length; i++) {
 
   // 1. Classification & Filtering
   if (shouldSkipDirectory(dir)) {
-    outcomes.skipped_generated_dir++;
+    if (dir.match(/logs?|archives?|backups?|temp|tmp/i)) {
+      outcomes.skipped_archive_or_log++;
+    } else {
+      outcomes.skipped_generated_dir++;
+    }
     continue;
   }
 
@@ -196,6 +202,14 @@ for (let i = 0; i < targets.length; i++) {
   const metrics = note.auditMetrics ?? {};
   if ((metrics.fileCount ?? 0) > MAX_FILES_PER_DIR) {
     outcomes.skipped_too_many_files++;
+    continue;
+  }
+  if ((metrics.totalBytes ?? 0) > MAX_BYTES_PER_DIR) {
+    outcomes.skipped_too_many_bytes++;
+    continue;
+  }
+  if (!note.representativeFiles?.length) {
+    outcomes.no_source_files++;
     continue;
   }
 
@@ -226,16 +240,18 @@ for (let i = 0; i < targets.length; i++) {
     outcomes.summarized++;
     
     // Progress diagnostics
-    if ((i + 1) % 5 === 0) {
+    if ((i + 1) % 5 === 0 || (i + 1) === targets.length) {
       const elapsed = Date.now() - startTime;
-      const rate = (i + 1) / (elapsed / 1000);
+      const rate = outcomes.summarized / (elapsed / 1000);
       const remaining = targets.length - (i + 1);
-      const eta = Math.round(remaining / rate);
-      log(`   📈 Rate: ${rate.toFixed(2)} dir/s | ETA: ${eta}s`);
+      const eta = rate > 0 ? Math.round(remaining / rate) : 0;
+      log(`   📈 Progress: ${i + 1}/${targets.length} | Rate: ${rate.toFixed(2)} dir/s | ETA: ${eta}s`);
     }
   } catch (err) {
     if (err.name === 'TimeoutError' || err.message.includes('timeout')) {
-      console.warn(`   ❌ ${shortDir}: Timeout (${SUMMARY_TIMEOUT}ms). recommendation: skip or cap.`);
+      const metrics = note.auditMetrics ?? {};
+      console.warn(`   ❌ ${shortDir}: Timeout (${SUMMARY_TIMEOUT}ms).`);
+      console.warn(`      Diagnostics: { fileCount: ${metrics.fileCount}, totalBytes: ${metrics.totalBytes}, recommendation: "skip or cap" }`);
       outcomes.timeout++;
     } else {
       console.warn(`   ❌ ${shortDir}: ${err.message}`);
