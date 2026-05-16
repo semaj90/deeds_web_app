@@ -211,7 +211,7 @@ async function fetchTopByPageRank(limit) {
 
 // ── Qdrant ────────────────────────────────────────────────────────────────────
 
-const QDRANT_BATCH_SIZE = 100;
+const QDRANT_BATCH_SIZE = 25;
 
 async function fetchEmbeddingsBatch(filePaths) {
   const result = new Map();
@@ -242,7 +242,7 @@ async function fetchEmbeddingsBatch(filePaths) {
           with_vector: true,
           with_payload: true,
         }),
-        signal: AbortSignal.timeout(60_000),
+        signal: AbortSignal.timeout(90_000),
       });
       if (!res.ok) continue;
       const data = await res.json();
