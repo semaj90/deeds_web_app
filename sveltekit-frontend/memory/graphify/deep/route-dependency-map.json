@@ -6043,9 +6043,9 @@
   },
   "sveltekit-frontend/src/routes/login/+page.svelte": {
     "zone": "shared",
-    "directDeps": 0,
+    "directDeps": 1,
     "serverDeps": 0,
-    "dbDeps": 0
+    "dbDeps": 1
   },
   "sveltekit-frontend/src/routes/minio/[...path]/+server.ts": {
     "zone": "shared",
