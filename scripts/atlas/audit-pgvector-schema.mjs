@@ -103,8 +103,10 @@ function checkHnswIndexes() {
       : `Missing HNSW index in migrations for: ${missing.join(', ')}`,
     missing,
     suggestedFix: missing.length > 0
-      ? missing.map(t => `CREATE INDEX CONCURRENTLY IF NOT EXISTS ${t}_hnsw_idx ON ${t} USING hnsw (embedding vector_cosine_ops) WITH (m=16, ef_construction=64);`).join('\n')
+      ? `See docs/reports/pgvector-index-plan.md for reviewed SQL. Run after operator review:\n` +
+        missing.map(t => `CREATE INDEX CONCURRENTLY IF NOT EXISTS ${t}_hnsw_idx ON ${t} USING hnsw (embedding vector_cosine_ops) WITH (m=16, ef_construction=64);`).join('\n')
       : null,
+    indexPlanPath: missing.length > 0 ? 'docs/reports/pgvector-index-plan.md' : null,
   };
 }
 

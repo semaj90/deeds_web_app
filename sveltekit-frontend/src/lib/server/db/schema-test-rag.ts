@@ -6,7 +6,7 @@
 
 import { text, jsonb } from 'drizzle-orm/pg-core';
 import { pgTable, uuid, timestamp, real, integer } from 'drizzle-orm/pg-core';
-import { vector } from 'pgvector/drizzle-orm';
+import { vector } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 /**
