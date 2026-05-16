@@ -45,6 +45,7 @@ import { execSync, spawn } from 'node:child_process';
 import { db } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { getRedis } from '$lib/server/redis.js';
+import { getVlmState, switchVlmMode, VlmMode } from './vlm-lifecycle.js';
 
 // Record turbo3/4 activation once per process lifetime (avoids DB spam)
 let _turboActivationRecorded = false;
@@ -52,109 +53,7 @@ let _turboActivationRecorded = false;
 /** Minimum free VRAM (MB) required before routing to TensorRT-LLM */
 const TRT_MIN_VRAM_MB = 4000;
 
-// ── TurboQuant VRAM Swap ──────────────────────────────────────────────────
-// llama-server (~3.4 GB) and Ollama VLM (~5 GB) can't coexist on 8 GB VRAM.
-// When VLM is needed, we stop llama-server, run VLM, then restart it.
-const TURBOQUANT_EXE =
-  process.env.TURBOQUANT_EXE_PATH ??
-  process.env.LLAMA_SERVER_PATH ??
-  'llama-server.exe';
-const TURBOQUANT_GGUF =
-  process.env.TURBOQUANT_MODEL_PATH ??
-  process.env.ROTORQUANT_MODEL_PATH ??
-  process.env.TURBO_MODEL_PATH ??
-  '';
-const TURBOQUANT_MMPROJ =
-  process.env.TURBOQUANT_MMPROJ_PATH ??
-  process.env.MMPROJ_PATH ??
-  '';
-const TURBOQUANT_RESTART_DELAY_MS = 3_000;
 
-/** Find the PID of llama-server listening on :8090 and the GGUF model + mmproj paths */
-function findTurboQuantProcess(): { pid: number; modelPath: string; mmprojPath: string } | null {
-	try {
-    // Find PID on port 8090 via netstat
-    const netstat = execSync('netstat -ano | findstr ":8090" | findstr "LISTENING"', {
-      encoding: 'utf8',
-      timeout: 3_000,
-    }).trim();
-    const pidMatch = netstat.match(/(\d+)\s*$/m);
-    if (!pidMatch) return null;
-    const pid = parseInt(pidMatch[1]);
-    if (!pid || pid <= 4) return null;
-
-    // Get the command line to extract the GGUF model and mmproj paths for restart
-    let modelPath = TURBOQUANT_GGUF;
-    let mmprojPath = TURBOQUANT_MMPROJ;
-    try {
-      const wmic = execSync(`wmic process where processid=${pid} get commandline /format:list`, {
-        encoding: 'utf8',
-        timeout: 3_000,
-      });
-      const mMatch =
-        wmic.match(/-m\s+"?([^"]+\.(?:gguf|safetensors|bin))"?/i) ?? wmic.match(/-m\s+(\S+)/);
-      if (mMatch?.[1]) modelPath = mMatch[1];
-      const mmMatch = wmic.match(/--mmproj\s+"?([^"]+\.gguf)"?/i);
-      if (mmMatch?.[1]) mmprojPath = mmMatch[1];
-    } catch {
-      // wmic may fail — use env fallback
-    }
-
-    return { pid, modelPath, mmprojPath };
-  } catch {
-    return null;
-  }
-}
-
-/** Stop TurboQuant llama-server by PID */
-function stopTurboQuant(pid: number): boolean {
-	try {
-		execSync(`taskkill /PID ${pid} /F`, { timeout: 5_000 });
-		console.info(`[vram-swap] Stopped llama-server PID ${pid} to free VRAM for VLM`);
-		return true;
-	} catch {
-		return false;
-	}
-}
-
-/** Restart TurboQuant llama-server in background (fire-and-forget) */
-function restartTurboQuant(modelPath: string, mmprojPath?: string): void {
-  if (!modelPath) {
-    console.warn('[vram-swap] No GGUF model path — cannot restart TurboQuant');
-    return;
-  }
-  try {
-    const args = [
-      '-m',
-      modelPath,
-      '--port',
-      '8090',
-      '-ngl',
-      '99',
-      '--flash-attn',
-      'on',
-      '-ctk',
-      'q4_0',
-      '-ctv',
-      'q4_0',
-      '-c',
-      '4096',
-    ];
-    // Include mmproj for unified text+vision on restart
-    if (mmprojPath) {
-      args.push('--mmproj', mmprojPath);
-    }
-    const child = spawn(TURBOQUANT_EXE, args, {
-      detached: true,
-      stdio: 'ignore',
-      windowsHide: true,
-    });
-    child.unref();
-    console.info(`[vram-swap] Restarted llama-server → PID ${child.pid}`);
-  } catch (err) {
-    console.error('[vram-swap] Failed to restart llama-server:', err);
-  }
-}
 
 export interface InferenceRequest {
   prompt: string;
@@ -186,6 +85,14 @@ export interface InferenceResponse {
  */
 export async function routeInference(request: InferenceRequest): Promise<InferenceResponse> {
   const start = performance.now();
+
+  // Lifecycle check: Ensure we are in the correct mode for the request
+  const currentMode = await getVlmState();
+  if (request.imageBase64 && currentMode !== VlmMode.VISION) {
+    console.info('[inference-router] Request requires VISION mode, current mode:', currentMode);
+    // Note: We don't auto-switch here to avoid request latency spikes; 
+    // the UI/orchestrator should call switchVlmMode explicitly via MCP.
+  }
 
   // VLM-first: when image is present, try TurboQuant (unified text+vision) first
   if (request.imageBase64) {
@@ -824,34 +731,20 @@ async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promi
 	const result = await _ollamaVlmCall(request, startTime);
 	if (result) return result;
 
-	// VRAM swap: stop TurboQuant, free ~3.4 GB, retry VLM, then restart
-	const tqProcess = findTurboQuantProcess();
-	if (!tqProcess) return null; // No TurboQuant to swap — genuinely unavailable
-
-	console.info(`[vram-swap] Ollama VLM failed — swapping out TurboQuant (PID ${tqProcess.pid}) for VRAM`);
-	const stopped = stopTurboQuant(tqProcess.pid);
-	if (!stopped) return null;
-
-	// Wait for VRAM to actually free up
-	await new Promise(r => setTimeout(r, TURBOQUANT_RESTART_DELAY_MS));
+	// VRAM swap: Use vlm-lifecycle to safely switch to VISION mode
+	console.info(`[vram-swap] Ollama VLM failed — triggering vlm-lifecycle switch to VISION`);
+	const switchRes = await switchVlmMode(VlmMode.VISION);
+	if (!switchRes.success) {
+    console.warn(`[vram-swap] VLM lifecycle switch failed: ${switchRes.error}`);
+    return null;
+  }
 
 	try {
-		const retryResult = await _ollamaVlmCall(request, startTime);
-		return retryResult;
+		return await _ollamaVlmCall(request, startTime);
 	} finally {
-		// Always restart TurboQuant after VLM (whether success or failure)
-		// Delay slightly so Ollama VLM model can unload first
-		setTimeout(() => {
-			// Unload VLM model from Ollama to free VRAM for llama-server
-			ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: 'gemma4:e4b-it-q4_K_M', prompt: '', keep_alive: 0 }),
-				signal: AbortSignal.timeout(5_000),
-			}).catch(() => {}).finally(() => {
-				setTimeout(() => restartTurboQuant(tqProcess.modelPath, tqProcess.mmprojPath), 2_000);
-			});
-		}, 1_000);
+		// We don't auto-switch back to TEXT here to allow subsequent vision requests
+    // to benefit from the loaded model. The system remains in VISION mode until
+    // another request or tool call switches it back.
 	}
 }
 

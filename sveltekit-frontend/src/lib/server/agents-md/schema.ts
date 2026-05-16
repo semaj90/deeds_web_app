@@ -55,4 +55,4 @@ export type AgentToolPolicy   = z.infer<typeof agentToolPolicySchema>;
 export type AgentConstraint   = z.infer<typeof agentConstraintSchema>;
 export type AgentsMdEnvelope  = z.infer<typeof agentsMdEnvelopeSchema>;
 
-export const LLMS.md_SCHEMA_VERSION = 1;
+export const LLMS_MD_SCHEMA_VERSION = 1;

@@ -97,7 +97,7 @@ export const caseRiskLevelEnum = pgEnum('case_risk_level', ['low', 'medium', 'hi
 // === TABLES FOR LEGAL AI APPLICATION ===
 
 export const users = pgTable('users', {
-  id: serial('id').primaryKey().notNull(),
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 255 }).unique().notNull(),
   passwordHash: varchar('hashed_password', { length: 255 }).notNull(),
   name: varchar('name', { length: 255 }), // Legacy field - use firstName/lastName instead
@@ -1067,7 +1067,7 @@ export const personsOfInterest = pgTable('persons_of_interest', {
   photoUrl: text('photo_url'),
   notes: text('notes'),
   metadata: jsonb('metadata').default({}),
-  createdBy: text('created_by'),
+  createdBy: uuid('created_by'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -3898,6 +3898,10 @@ export const contextTimeline = pgTable('context_timeline', {
   pipelineWeightAfter: real('pipeline_weight_after'),
   /** True when this event was the one that crossed the rebuild threshold */
   triggeredRebuild:    boolean('triggered_rebuild').notNull().default(false),
+  /** Autoencoder reconstruction error — helps decide if routing was 'noisy' */
+  reconstructionError: real('reconstruction_error'),
+  /** Compressed vector index (centroid/cluster ID) from the routing layer */
+  routingCluster:      integer('routing_cluster'),
   /** Catch-all for evolving fields (previousWeight, loraHint, etc.) */
   payload:             jsonb('payload').notNull().default(sql`'{}'::jsonb`),
   createdAt:           timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),

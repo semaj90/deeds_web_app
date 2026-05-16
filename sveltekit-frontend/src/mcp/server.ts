@@ -11,6 +11,7 @@ import { runRgSearchAtlas } from '$lib/server/rg-atlas/run.js';
 import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
 import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
 import { getWikiStatus, searchWiki, explainWikiPage, refreshDirectory } from '$lib/server/kb/wiki-logic.js';
+import { getVlmState, switchVlmMode, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 
 
 export const server = new Server(
@@ -1807,6 +1808,21 @@ export function setupToolHandlers() {
           required: ['path'],
         },
       },
+      {
+        name: 'vlm:switch_mode',
+        description: 'Switch the VLM inference mode between TEXT (TurboQuant) and VISION (Ollama VLM). Use this to prevent VRAM OOM on 8GB cards when switching between text-heavy and image-heavy tasks.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            mode: {
+              type: 'string',
+              enum: ['TEXT', 'VISION', 'OFF'],
+              description: 'Target mode (TEXT = TurboQuant, VISION = Ollama VLM, OFF = shut down both)'
+            }
+          },
+          required: ['mode']
+        }
+      },
       ...REPAIR_TOOLS_SCHEMAS as any[],
 
     ],
@@ -1913,6 +1929,12 @@ export function setupToolHandlers() {
     if (repairResult) return repairResult;
 
     switch (name) {
+      case 'vlm:switch_mode': {
+        const { mode } = args as { mode: VlmMode };
+        const result = await switchVlmMode(mode);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
       case 'wiki.status': {
         const result = await getWikiStatus();
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
