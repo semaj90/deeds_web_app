@@ -16,7 +16,7 @@
  *
  * Output:
  *   - Redis hash  ace:autoencoder:weights   (W1, b1, W2, b2, W3, b3, W4, b4 as CSV)
- *   - Redis key   ace:autoencoder:meta      (JSON: epoch, loss, dim, date)
+ *   - Redis hash  ace:autoencoder:meta      (hash: trainedAt, bestLoss, epochs, n, architecture, activation, latentNorm, …)
  *   - File        logs/task-output/pipeline-test/autoencoder-train-<ts>.json
  *
  * Usage:
@@ -81,6 +81,24 @@ function xavierUniform(rows, cols) {
 }
 
 function zeros(n) { return new Float32Array(n); }
+
+/** Convert JS (inDim × outDim) weight to PyTorch (outDim × inDim) for Redis storage. */
+function toTorchLayout(W_js, inDim, outDim) {
+  const W_pt = new Float32Array(inDim * outDim);
+  for (let r = 0; r < inDim; r++)
+    for (let c = 0; c < outDim; c++)
+      W_pt[c * inDim + r] = W_js[r * outDim + c];
+  return W_pt;
+}
+
+/** Convert PyTorch (outDim × inDim) weight loaded from Redis back to JS (inDim × outDim). */
+function fromTorchLayout(W_pt, inDim, outDim) {
+  const W_js = new Float32Array(inDim * outDim);
+  for (let r = 0; r < inDim; r++)
+    for (let c = 0; c < outDim; c++)
+      W_js[r * outDim + c] = W_pt[c * inDim + r];
+  return W_js;
+}
 
 /** Matrix multiply: C(m×n) = A(m×k) × B(k×n) — CPU fallback */
 function matmul(A, m, k, B, n, C) {
@@ -222,15 +240,17 @@ try {
     try {
       const saved = await redis.hgetall('ace:autoencoder:weights');
       if (saved?.W1) {
-        W1 = new Float32Array(saved.W1.split(',').map(Number));
-        b1 = new Float32Array(saved.b1.split(',').map(Number));
-        W2 = new Float32Array(saved.W2.split(',').map(Number));
-        b2 = new Float32Array(saved.b2.split(',').map(Number));
-        W3 = new Float32Array(saved.W3?.split(',').map(Number) ?? []);
-        b3 = new Float32Array(saved.b3?.split(',').map(Number) ?? []);
-        W4 = new Float32Array(saved.W4?.split(',').map(Number) ?? []);
-        b4 = new Float32Array(saved.b4?.split(',').map(Number) ?? []);
-        console.log('[ae-train] Resumed from saved weights');
+        // Weights on disk are in PyTorch (out × in) convention; convert to JS (in × out)
+        const parse = (s) => new Float32Array(s.split(',').map(Number));
+        W1 = fromTorchLayout(parse(saved.W1), DIM_IN,     DIM_HIDDEN);  // (256×768) → (768×256)
+        b1 = parse(saved.b1);
+        W2 = fromTorchLayout(parse(saved.W2), DIM_HIDDEN, DIM_LATENT);  // (64×256)  → (256×64)
+        b2 = parse(saved.b2);
+        if (saved.W3) W3 = fromTorchLayout(parse(saved.W3), DIM_LATENT, DIM_HIDDEN); // (256×64)  → (64×256)
+        if (saved.b3) b3 = parse(saved.b3);
+        if (saved.W4) W4 = fromTorchLayout(parse(saved.W4), DIM_HIDDEN, DIM_IN);     // (768×256) → (256×768)
+        if (saved.b4) b4 = parse(saved.b4);
+        console.log('[ae-train] Resumed from saved weights (PyTorch → JS layout)');
       }
     } catch { console.warn('[ae-train] No saved weights to resume from'); }
   }
@@ -293,12 +313,11 @@ try {
       epochLoss += totalLoss;
       batchCount++;
 
-      // ── Gradient step (SGD with momentum — simplified) ────────────────────
-      // Gradient of MSE w.r.t. decoder output: 2*(Xhat - X)/n
+      // ── Full backprop (SGD) ───────────────────────────────────────────────
       const dXhat = new Float32Array(BATCH * DIM_IN);
       for (let i = 0; i < BATCH * DIM_IN; i++) dXhat[i] = 2 * (Xhat[i] - X[i]) / (BATCH * DIM_IN);
 
-      // Gradient flows back through W4: dW4 = h3^T · dXhat (DIM_HIDDEN × DIM_IN)
+      // dW4 = h3^T · dXhat  (DIM_HIDDEN × DIM_IN)
       for (let j = 0; j < DIM_HIDDEN; j++)
         for (let k = 0; k < DIM_IN; k++) {
           let g = 0;
@@ -310,9 +329,80 @@ try {
         for (let i = 0; i < BATCH; i++) g += dXhat[i * DIM_IN + k];
         b4[k] -= LR * g;
       }
-      // (W1/W2/W3/b1/b2/b3 updates follow same pattern — encoder gradients propagate back)
-      // Full backprop through encoder omitted here for brevity; in practice PyTorch autograd
-      // handles this. This loop trains the decoder well enough for the 64-dim memory path.
+
+      // dh3 = (dXhat · W4^T) * ReLU_mask(h3)  — decoder layer 1 gradient
+      const dh3 = new Float32Array(BATCH * DIM_HIDDEN);
+      for (let i = 0; i < BATCH; i++)
+        for (let j = 0; j < DIM_HIDDEN; j++) {
+          let g = 0;
+          for (let k = 0; k < DIM_IN; k++) g += dXhat[i * DIM_IN + k] * W4[j * DIM_IN + k];
+          dh3[i * DIM_HIDDEN + j] = h3[i * DIM_HIDDEN + j] > 0 ? g : 0;
+        }
+      // dW3 = z^T · dh3  (DIM_LATENT × DIM_HIDDEN)
+      for (let j = 0; j < DIM_LATENT; j++)
+        for (let k = 0; k < DIM_HIDDEN; k++) {
+          let g = 0;
+          for (let i = 0; i < BATCH; i++) g += z[i * DIM_LATENT + j] * dh3[i * DIM_HIDDEN + k];
+          W3[j * DIM_HIDDEN + k] -= LR * g;
+        }
+      for (let k = 0; k < DIM_HIDDEN; k++) {
+        let g = 0;
+        for (let i = 0; i < BATCH; i++) g += dh3[i * DIM_HIDDEN + k];
+        b3[k] -= LR * g;
+      }
+
+      // dz_norm = dh3 · W3  — gradient at the L2-normalised latent
+      const dz_norm = new Float32Array(BATCH * DIM_LATENT);
+      for (let i = 0; i < BATCH; i++)
+        for (let j = 0; j < DIM_LATENT; j++) {
+          let g = 0;
+          for (let k = 0; k < DIM_HIDDEN; k++) g += dh3[i * DIM_HIDDEN + k] * W3[j * DIM_HIDDEN + k];
+          dz_norm[i * DIM_LATENT + j] = g;
+        }
+
+      // L2-norm Jacobian: dz_raw = dz_norm - z * (z · dz_norm)
+      // Since z is already unit-norm, ||z_raw|| ≈ 1 so we skip the /norm term.
+      const dz_raw = new Float32Array(BATCH * DIM_LATENT);
+      for (let i = 0; i < BATCH; i++) {
+        const off = i * DIM_LATENT;
+        let dot = 0;
+        for (let j = 0; j < DIM_LATENT; j++) dot += z[off + j] * dz_norm[off + j];
+        for (let j = 0; j < DIM_LATENT; j++) dz_raw[off + j] = dz_norm[off + j] - z[off + j] * dot;
+      }
+
+      // dW2 = h1^T · dz_raw  (DIM_HIDDEN × DIM_LATENT)
+      for (let j = 0; j < DIM_HIDDEN; j++)
+        for (let k = 0; k < DIM_LATENT; k++) {
+          let g = 0;
+          for (let i = 0; i < BATCH; i++) g += h1[i * DIM_HIDDEN + j] * dz_raw[i * DIM_LATENT + k];
+          W2[j * DIM_LATENT + k] -= LR * g;
+        }
+      for (let k = 0; k < DIM_LATENT; k++) {
+        let g = 0;
+        for (let i = 0; i < BATCH; i++) g += dz_raw[i * DIM_LATENT + k];
+        b2[k] -= LR * g;
+      }
+
+      // dh1 = (dz_raw · W2^T) * ReLU_mask(h1)  — encoder layer 1 gradient
+      const dh1 = new Float32Array(BATCH * DIM_HIDDEN);
+      for (let i = 0; i < BATCH; i++)
+        for (let j = 0; j < DIM_HIDDEN; j++) {
+          let g = 0;
+          for (let k = 0; k < DIM_LATENT; k++) g += dz_raw[i * DIM_LATENT + k] * W2[j * DIM_LATENT + k];
+          dh1[i * DIM_HIDDEN + j] = h1[i * DIM_HIDDEN + j] > 0 ? g : 0;
+        }
+      // dW1 = X^T · dh1  (DIM_IN × DIM_HIDDEN)
+      for (let j = 0; j < DIM_IN; j++)
+        for (let k = 0; k < DIM_HIDDEN; k++) {
+          let g = 0;
+          for (let i = 0; i < BATCH; i++) g += X[i * DIM_IN + j] * dh1[i * DIM_HIDDEN + k];
+          W1[j * DIM_HIDDEN + k] -= LR * g;
+        }
+      for (let k = 0; k < DIM_HIDDEN; k++) {
+        let g = 0;
+        for (let i = 0; i < BATCH; i++) g += dh1[i * DIM_HIDDEN + k];
+        b1[k] -= LR * g;
+      }
     }
 
     const avgLoss = epochLoss / Math.max(batchCount, 1);
@@ -323,16 +413,20 @@ try {
   }
   console.log('\n');
 
-  // ── Persist weights to Redis ──────────────────────────────────────────────
+  // ── Persist weights to Redis (PyTorch out×in convention) ─────────────────
+  // Internal training uses (in×out); transpose at the save boundary so
+  // ae-encode-to-redis.mjs and the Python script share the same format.
+  // W1_js (768×256) → W1_pt (256×768), W2_js (256×64) → W2_pt (64×256), etc.
+  const csv = (W) => Array.from(W).join(',');
   await redis.hset('ace:autoencoder:weights', {
-    W1: Array.from(W1).join(','),
-    b1: Array.from(b1).join(','),
-    W2: Array.from(W2).join(','),
-    b2: Array.from(b2).join(','),
-    W3: Array.from(W3).join(','),
-    b3: Array.from(b3).join(','),
-    W4: Array.from(W4).join(','),
-    b4: Array.from(b4).join(','),
+    W1: csv(toTorchLayout(W1, DIM_IN,     DIM_HIDDEN)),   // (256×768)
+    b1: csv(b1),
+    W2: csv(toTorchLayout(W2, DIM_HIDDEN, DIM_LATENT)),   // (64×256)
+    b2: csv(b2),
+    W3: csv(toTorchLayout(W3, DIM_LATENT, DIM_HIDDEN)),   // (256×64)
+    b3: csv(b3),
+    W4: csv(toTorchLayout(W4, DIM_HIDDEN, DIM_IN)),       // (768×256)
+    b4: csv(b4),
   });
   await redis.expire('ace:autoencoder:weights', 7 * 24 * 3600); // 7-day TTL
 
@@ -359,17 +453,24 @@ try {
     'EX', 7 * 24 * 3600
   );
 
-  await redis.set('ace:autoencoder:meta', JSON.stringify({
+  // Store meta as HASH (same convention as train-autoencoder.py) so that
+  // autoencoder-centroids.mjs and ae-encode-to-redis.mjs can read it with hgetall.
+  await redis.del('ace:autoencoder:meta'); // remove any stale plain-string key
+  await redis.hset('ace:autoencoder:meta', {
     trainedAt: new Date().toISOString(),
-    epochs: EPOCHS,
-    lr: LR,
-    batch: BATCH,
-    n: all.length,
-    bestLoss,
-    dimIn: DIM_IN,
-    dimHidden: DIM_HIDDEN,
-    dimLatent: DIM_LATENT,
-  }), 'EX', 7 * 24 * 3600);
+    epochs: String(EPOCHS),
+    lr: String(LR),
+    batch: String(BATCH),
+    n: String(all.length),
+    bestLoss: String(bestLoss),
+    dimIn: String(DIM_IN),
+    dimHidden: String(DIM_HIDDEN),
+    dimLatent: String(DIM_LATENT),
+    architecture: `${DIM_IN}-${DIM_HIDDEN}-${DIM_LATENT}-${DIM_HIDDEN}-${DIM_IN}`,
+    activation: 'relu',
+    latentNorm: 'l2',
+  });
+  await redis.expire('ace:autoencoder:meta', 7 * 24 * 3600);
 
   report.bestLoss = bestLoss;
   report.losses = losses;
