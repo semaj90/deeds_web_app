@@ -65,7 +65,7 @@ if (!process.env.DATABASE_URL) {
 const REDIS_URL   = process.env.REDIS_URL        ?? 'redis://127.0.0.1:6379';
 const REDIS_TTL   = 6 * 3600; // 6 h
 const GRAPH_NAME  = 'codeGraph';
-const OUTPUT_DIR  = resolve(__dirname, '../memory/graphify/gds');
+const OUTPUT_DIR  = resolve(__dirname, '../../sveltekit-frontend/memory/graphify/gds');
 
 // ── Neo4j HTTP helper ─────────────────────────────────────────────────────────
 

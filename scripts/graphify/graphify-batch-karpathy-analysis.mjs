@@ -11,13 +11,14 @@ const WRITE = args.includes('--write');
 const FORCE = args.includes('--force');
 const LIMIT = parseInt(args.find(a => a.startsWith('--limit='))?.split('=')[1] || '50', 10);
 const PROGRESS_EVERY = parseInt(args.find(a => a.startsWith('--progress-every='))?.split('=')[1] || '5', 10);
+const RUN_ID = args.find(a => a.startsWith('--runId='))?.split('=')[1] || (args.includes('--runId') ? args[args.indexOf('--runId') + 1] : null);
 
 const config = loadConfig();
 
 // Canonical codebase collection for synthesis
 const CODEBASE_COLLECTION = 'codebase_chunks_768';
 
-console.log(`Starting Phase 2: Karpathy Synthesis Mode [WRITE=${WRITE}] [LIMIT=${LIMIT}] [FORCE=${FORCE}]`);
+console.log(`Starting Phase 2: Karpathy Synthesis Mode [WRITE=${WRITE}] [LIMIT=${LIMIT}] [FORCE=${FORCE}] [RUN_ID=${RUN_ID}]`);
 
 function runScript(path, scriptArgs = [], envOverrides = {}) {
   const absPath = resolve(REPO_ROOT, path);
@@ -41,6 +42,7 @@ const commonArgs = [];
 if (WRITE) commonArgs.push('--write'); 
 if (!WRITE) commonArgs.push('--dry-run');
 if (FORCE) commonArgs.push('--force');
+if (RUN_ID) commonArgs.push(`--runId=${RUN_ID}`);
 
 // 0. Neo4j Graph Analysis (PageRank/Louvain)
 const gdsArgs = [...commonArgs, `--limit=${LIMIT * 10}`];

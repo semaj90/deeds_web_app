@@ -44,7 +44,7 @@ function topoLabel(rel) {
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '..');
+const ROOT = resolve(__dirname, '../../sveltekit-frontend');
 
 // ── CLI args ──────────────────────────────────────────────────────────────────
 
