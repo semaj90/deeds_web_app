@@ -3,14 +3,41 @@
 	import { goto } from '$app/navigation';
 	import { authMachine } from '$lib/machines/auth-machine.js';
 	import { createActor } from 'xstate';
+	import { superForm } from 'sveltekit-superforms';
+	import { zod } from 'sveltekit-superforms/adapters';
+	import { loginSchema } from './schema.js';
 
 	const demoCredentials = {
 		email: 'demo@legal-ai.local',
 		password: 'password123'
 	} as const;
 
+	let { data } = $props();
+	
+	const { form: superFormData, errors, enhance, message, delayed } = superForm(data.form, {
+		validators: zod(loginSchema),
+		onUpdated({ form }) {
+			if (form.valid) {
+				// Machine will handle redirection via $effect below
+				actor.send({ type: 'AUTH_SUCCESS', user: (form as any).data.user });
+			} else {
+				actor.send({ type: 'AUTH_FAILURE', error: form.message || 'Invalid credentials' });
+			}
+		},
+		onError({ result }) {
+			actor.send({ type: 'AUTH_FAILURE', error: (result as any).error?.message || 'Server error' });
+		}
+	});
+
 	let email = $state('');
 	let password = $state('');
+
+	// Sync local state to superForm for machine compatibility if needed, 
+	// though superForm can bind directly to inputs.
+	$effect(() => {
+		$superFormData.username = email;
+		$superFormData.password = password;
+	});
 
 	// XState v5 auth actor — manages login lifecycle, attempt tracking, lockout
 	const actor = createActor(authMachine);
@@ -99,19 +126,22 @@
 				</button>
 			</div>
 		{:else}
-			<form onsubmit={handleSubmit}>
+			<form method="POST" action="?/login" use:enhance>
 				<div class="form-group">
 					<label for="email">Email</label>
 					<input
-						id="email"
-						name="email"
+						id="username"
+						name="username"
 						type="text"
 						required
 						bind:value={email}
 						placeholder="Email or username"
 						disabled={isLoading}
-						autocomplete="email"
+						autocomplete="username"
 					/>
+					{#if $errors.username}
+						<span class="field-error">{$errors.username}</span>
+					{/if}
 				</div>
 				<div class="form-group">
 					<label for="password">Password</label>
@@ -125,6 +155,9 @@
 						disabled={isLoading}
 						autocomplete="current-password"
 					/>
+					{#if $errors.password}
+						<span class="field-error">{$errors.password}</span>
+					{/if}
 				</div>
 
 				<button type="submit" class="submit-btn" disabled={isLoading || !email.trim() || !password}>
@@ -203,6 +236,13 @@
 	.login-header p {
 		margin-top: 0.5rem;
 		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.field-error {
+		display: block;
+		margin-top: 0.375rem;
+		font-size: 0.75rem;
+		color: #fca5a5;
 	}
 
 	.error-banner {
