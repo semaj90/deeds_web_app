@@ -45,6 +45,9 @@ export type HyperRagQuery = {
   topologyTopK?: number;
   clusterField?: 'gpu_cluster' | 'som_cluster';
   useTaskDistillates?: boolean;
+  useTurboVec?: boolean;
+  useGraph?: boolean;
+  useAceCache?: boolean;
   userId?: string;
 };
 

@@ -1,0 +1,17 @@
+# Binary model weights — local only, never committed
+*.gguf
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.pb
+*.tq
+*.tvim
+
+# Compiled inference servers — platform-specific
+*.exe
+*.so
+*.dll
+*.dylib
