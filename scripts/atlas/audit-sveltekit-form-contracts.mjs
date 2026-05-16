@@ -121,13 +121,18 @@ function checkSchemaTopLevel() {
       }
 
       // Check superValidate( calls
+      // These are data-source variables (FormData, Request, etc.), not schema names.
+      // In Superforms v2: superValidate(formData, zod(schema)) — arg 1 is data, not schema.
+      const DATA_SOURCE_NAMES = new Set(['formData', 'request', 'data', 'form', 'body', 'payload', 'req']);
       const svMatch = line.match(/superValidate\s*\(\s*(\w+)/);
       if (svMatch && currentDepth > 0) {
         const schemaArg = svMatch[1];
-        // Check if schemaArg was defined inside a function (depth > 0)
+        // Check if schemaArg was defined inside a function (depth > 0) and is not a data source
         let isLocal = false;
-        for (const [d, names] of localVarsByDepth) {
-          if (d > 0 && names.has(schemaArg)) { isLocal = true; break; }
+        if (!DATA_SOURCE_NAMES.has(schemaArg)) {
+          for (const [d, names] of localVarsByDepth) {
+            if (d > 0 && names.has(schemaArg)) { isLocal = true; break; }
+          }
         }
         if (isLocal) {
           findings.push({
@@ -229,7 +234,9 @@ function checkClientSuperFormPairing() {
   for (const [dir, files] of pairs) {
     if (!files.pageSvelte) continue;
     const svelteText = readFile(files.pageSvelte);
-    if (!svelteText.includes('superForm(') && !svelteText.includes('use:enhance')) continue;
+    // Only flag pages that call superForm() — use:enhance is SvelteKit native and does not
+    // require superforms. A page using plain use:enhance (no superForm()) is correct.
+    if (!svelteText.includes('superForm(')) continue;
 
     // Check if the corresponding +page.server.ts exports a form in load()
     if (!files.pageServer) {
@@ -363,15 +370,25 @@ function checkServerImportLeak() {
     if (f.endsWith('.server.ts') || f.endsWith('.server.svelte')) continue;
     const text = readFile(f);
     for (const { pattern, label } of serverOnlyPatterns) {
-      if (text.includes(pattern)) {
+      // Only flag VALUE imports — `import type` lines are erased at compile time
+      // and are safe in .svelte files (TypeScript erases them before Svelte compiles).
+      const lines = text.split('\n');
+      const hasValueImport = lines.some(line => {
+        const trimmed = line.trim();
+        // Skip type-only imports: `import type { ... }` or `import type X`
+        if (/^import\s+type\b/.test(trimmed)) return false;
+        return trimmed.includes(pattern);
+      });
+
+      if (hasValueImport) {
         findings.push({
           findingId: `forms:server-import-in-svelte:${rel(f)}`,
           severity: 'high',
           layer: 'ssr-safety',
           code: 'server_import_leaked_to_client',
           file: rel(f),
-          problem: `Client-facing .svelte file contains a server-only import (${label}) — this will break SSR and may expose server credentials to the browser bundle.`,
-          suggestedFix: 'Move server-only logic to +page.server.ts load() / +server.ts and pass data as props.',
+          problem: `Client-facing .svelte file contains a server-only value import (${label}) — this will break SSR and may expose server credentials to the browser bundle.`,
+          suggestedFix: 'Move server-only logic to +page.server.ts load() / +server.ts and pass data as props. Type-only imports (import type) are safe and do not need moving.',
         });
         break; // one finding per file
       }
