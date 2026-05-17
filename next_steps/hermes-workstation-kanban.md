@@ -1,22 +1,30 @@
 # Hermes Workstation Kanban
 
 ## Backlog
-- Phase 12 VRAM hygiene / SIMD bridge memory pools
+- Phase 13 long-term soak optimizations
 - TurboVec benchmark sidecar
 - Service worker query trace IDs
 - Admin Copilot ACE packet display
 
 ## Ready
-- pre-warm compact 384d Nomics warden vector cache
+- Phase 13 soak test metric scaling
 
 ## In Progress
-- Phase 12 initialization: Limit LibTorch CUDA allocations inside native bridge
+- None
 
 ## Verify
-- Dry-run VRAM smoke execution
-- Bounded memory pool simulation
+- Production Soak Benchmark metrics over 100+ cycles
 
 ## Done
+- [x] Phase 12A: SIMD bridge memory audit.
+- [x] Phase 12B: VRAM hygiene policy.
+- [x] Phase 12C: GPU job mutex / semaphore queue.
+- [x] Phase 12D: Compact 384d Warden/Nomic cache prewarm.
+- [x] Phase 12E: Sequential VRAM recovery smoke.
+- [x] Verify `npm run audit:contracts`.
+- [x] Verify `npm run audit:pgvector`.
+- [x] Verify no progressive VRAM leak during staged smoke.
+- [x] Phase 13: Establish Workstation Parent Atlas Soak Benchmark Harness.
 - [x] Verify context-assembler clusterPivot wiring.
 - [x] Verify rg-cluster-pivot Vitest suite.
 - [x] Verify 2-layer autoencoder encoded64 Vitest suite.
