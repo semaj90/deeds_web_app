@@ -819,7 +819,7 @@ function buildLookupDirs(dir: string): string[] {
 }
 
 function toFrontendAgentsRepoPath(dir: string): string {
-  return dir ? `sveltekit-frontend/${dir}/LLMS.md` : 'sveltekit-frontend/LLMS.md';
+  return dir ? `sveltekit-frontend/${dir}/AGENTS.md` : 'sveltekit-frontend/AGENTS.md';
 }
 
 async function readAgentsMarkdown(filePath: string): Promise<string | null> {
@@ -852,13 +852,13 @@ export async function resolveAgentsMdQuickHit(
       }
     }
 
-    const rootMarkdown = await redis.get('llms:root').catch(() => null);
+    const rootMarkdown = await redis.get('agents:root').catch(() => null);
     if (rootMarkdown) {
       return {
         markdown: rootMarkdown,
         source: 'redis',
-        resolvedPath: 'LLMS.md',
-        resolvedKey: 'llms:root',
+        resolvedPath: 'sveltekit-frontend/AGENTS.md',
+        resolvedKey: 'agents:root',
       };
     }
   } catch {
@@ -867,8 +867,8 @@ export async function resolveAgentsMdQuickHit(
 
   for (const dir of [...lookupDirs, '']) {
     const filePath = dir
-      ? path.join(frontendRoot, ...dir.split('/'), 'LLMS.md')
-      : path.join(frontendRoot, 'LLMS.md');
+      ? path.join(frontendRoot, ...dir.split('/'), 'AGENTS.md')
+      : path.join(frontendRoot, 'AGENTS.md');
     const markdown = await readAgentsMarkdown(filePath);
     if (markdown) {
       return {
@@ -879,14 +879,14 @@ export async function resolveAgentsMdQuickHit(
     }
   }
 
-  const repoRootAgents = path.join(repoRoot, 'LLMS.md');
+  const repoRootAgents = path.join(repoRoot, 'AGENTS.md');
   const repoMarkdown = await readAgentsMarkdown(repoRootAgents);
   if (!repoMarkdown) return null;
 
   return {
     markdown: repoMarkdown,
     source: 'disk',
-    resolvedPath: 'LLMS.md',
+    resolvedPath: 'AGENTS.md',
   };
 }
 
