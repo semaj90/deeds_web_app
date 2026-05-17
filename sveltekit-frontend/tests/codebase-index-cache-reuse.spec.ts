@@ -10,6 +10,7 @@ const {
 	mockSetCachedSearchResults,
 	mockOllamaFetch,
 	mockPoolQuery,
+	mockGenerateEmbeddings,
 } = vi.hoisted(() => ({
 	mockFetch: vi.fn(),
 	mockGetCachedEmbedding: vi.fn(),
@@ -18,6 +19,7 @@ const {
 	mockSetCachedSearchResults: vi.fn(),
 	mockOllamaFetch: vi.fn(),
 	mockPoolQuery: vi.fn(),
+	mockGenerateEmbeddings: vi.fn(),
 }));
 
 vi.mock('$lib/server/knowledge-cache.js', () => ({
@@ -29,6 +31,13 @@ vi.mock('$lib/server/knowledge-cache.js', () => ({
 
 vi.mock('$lib/server/ollama.js', () => ({
 	ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+	VLM_MODELS: {
+		legal: 'gemma4-legal:latest',
+		vision: 'gemma4-legal-vlm:latest',
+		embedding: 'embeddinggemma:latest',
+		gemma4: 'gemma4-legal:latest',
+		tool: 'gemma4-legal:latest',
+	},
 }));
 
 vi.mock('$lib/server/gpu/libtorch-bridge.js', () => ({
@@ -41,6 +50,18 @@ vi.mock('$lib/server/db/client', () => ({
 	pool: {
 		query: (...args: unknown[]) => mockPoolQuery(...args),
 	},
+}));
+
+vi.mock('$lib/server/redis.js', () => ({
+	getRedis: () => ({
+		get: vi.fn(async () => null),
+		set: vi.fn(async () => 'OK'),
+	}),
+}));
+
+vi.mock('$lib/server/grpc/embedding-client.js', () => ({
+	generateEmbeddings: (...args: unknown[]) => mockGenerateEmbeddings(...args),
+	checkGrpcHealth: vi.fn(async () => ({ available: false, enabled: false })),
 }));
 
 function jsonResponse(body: unknown, status = 200) {
@@ -64,6 +85,15 @@ beforeEach(() => {
 	mockGetCachedSearchResults.mockResolvedValue(null);
 	mockOllamaFetch.mockResolvedValue(jsonResponse({ embedding: embedding(0.25) }));
 	mockPoolQuery.mockResolvedValue({ rows: [] });
+	mockGenerateEmbeddings.mockResolvedValue({
+		vectors: [embedding(0.4), embedding(0.4)],
+		model: 'embeddinggemma:latest',
+		dimension: 768,
+		source: 'http-ollama' as const,
+		cacheHit: true,
+		totalMs: 5,
+		attempts: [{ transport: 'http-ollama', status: 'cache-hit', detail: 'redis' }],
+	});
 	mockFetch.mockImplementation(async (input: string | URL | Request, init?: RequestInit) => {
 		const url = String(input);
 		if (url.includes('/collections/codebase_chunks_768/points')) {
@@ -80,12 +110,6 @@ describe('codebase index cache reuse', () => {
 	it('reuses cached embeddings during indexing reruns instead of calling Ollama again', async () => {
 		const content = 'export const cachedContent = true;';
 		const signature = 'function cachedContent(): boolean';
-		mockGetCachedEmbedding.mockImplementation(async (text: string) => {
-			if (text === content || text === signature) {
-				return embedding(0.4);
-			}
-			return null;
-		});
 
 		const { indexChunks } = await import('../src/lib/server/indexer/dual-embedder.js');
 		const result = await indexChunks([
@@ -105,7 +129,9 @@ describe('codebase index cache reuse', () => {
 			},
 		]);
 
-		expect(mockGetCachedEmbedding).toHaveBeenCalledTimes(2);
+		// generateEmbeddings was called once (content + signature batched together)
+		expect(mockGenerateEmbeddings).toHaveBeenCalledTimes(1);
+		// Cache hit means Ollama was never called
 		expect(mockOllamaFetch).not.toHaveBeenCalled();
 		expect(result.storedInQdrant).toBe(1);
 		expect(result.failed).toBe(0);
