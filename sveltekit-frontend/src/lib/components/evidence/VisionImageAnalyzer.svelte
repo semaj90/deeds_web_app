@@ -99,8 +99,10 @@
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({ error: 'Analysis failed' }));
-        throw new Error(data.error ?? `HTTP ${res.status}`);
+        const data = await res.json().catch(() => ({ error: 'Analysis failed' })) as { error?: string; hint?: string; currentMode?: string };
+        const msg = data.error ?? `HTTP ${res.status}`;
+        const detail = data.hint ? ` — ${data.hint}` : data.currentMode ? ` (current: ${data.currentMode})` : '';
+        throw new Error(msg + detail);
       }
 
       result = await res.json();

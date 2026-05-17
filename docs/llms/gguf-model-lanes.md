@@ -173,12 +173,48 @@ Only useful for rapid adapter comparison — day-to-day use should keep the merg
 ## Quick reference
 
 ```bash
-npm run models:probe          # inventory Ollama + GGUF files + binary flags + live test
-npm run turbo:start:detached  # start llama-server in background
-npm run turbo:status          # check if server is up
-npm run turbo:opencode        # open OpenCode using workspace opencode.json
-npm run turbo:trace-smoke     # smoke: TurboQuant + TRACE MCP agent loop
-npm run bench:turbo           # throughput benchmark (current model)
-npm run bench:turbo:8k        # 8k output benchmark
-npm run bench:hermes          # Hermes lane benchmark (hermes3:latest via Ollama)
+npm run models:probe              # inventory Ollama + GGUF files + binary flags + live test
+npm run turbo:start:detached      # start llama-server in background (text mode, no mmproj)
+npm run turbo:start:detached:vlm  # start llama-server with mmproj (vision mode)
+npm run turbo:status              # check if server is up
+npm run turbo:opencode            # open OpenCode using workspace opencode.json
+npm run turbo:trace-smoke         # smoke: TurboQuant + TRACE MCP agent loop
+npm run bench:turbo               # throughput benchmark (current model)
+npm run bench:turbo:8k            # 8k output benchmark
+npm run bench:hermes              # Hermes lane benchmark (hermes3:latest via Ollama)
 ```
+
+### VLM lifecycle REST API (requires dev server running)
+
+```bash
+# Check current mode + TurboQuant PID + health
+curl -s http://localhost:5173/api/vlm/status | jq .
+
+# Switch to text-only lane (~5GB VRAM, no vision)
+curl -s -X POST http://localhost:5173/api/vlm/switch-mode \
+  -H 'Content-Type: application/json' \
+  -d '{"mode":"TEXT"}' | jq .
+
+# Switch to vision lane (~6GB VRAM, mmproj loaded)
+curl -s -X POST http://localhost:5173/api/vlm/switch-mode \
+  -H 'Content-Type: application/json' \
+  -d '{"mode":"VISION"}' | jq .
+
+# Free all VRAM for GPU compute jobs
+curl -s -X POST http://localhost:5173/api/vlm/switch-mode \
+  -H 'Content-Type: application/json' \
+  -d '{"mode":"GPU_WORK"}' | jq .
+```
+
+### Env vars read by the lifecycle manager
+
+| Var | Default | Purpose |
+|-----|---------|---------|
+| `TURBO_MODEL_PATH` | — | Path to `.gguf` model file |
+| `TURBO_MMPROJ_PATH` | — | Path to mmproj file (vision tower) |
+| `LLAMA_SERVER_PATH` | `llama-server.exe` | Path to llama-server binary |
+| `TURBO_CTX` | `16384` | Context window size |
+| `TURBO_NGL` | `99` | GPU layers |
+| `TURBO_KV_K` | `q8_0` | K-cache quantization (matches PS1 launcher) |
+| `TURBO_KV_V` | `q8_0` | V-cache quantization (set `turbo3` for TurboQuant) |
+| `OLLAMA_CHAT_MODEL` | `gemma4:e4b-it-q4_K_M` | Ollama model to unload on mode switch |

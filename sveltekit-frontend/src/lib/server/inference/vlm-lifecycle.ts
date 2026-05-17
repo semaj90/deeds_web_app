@@ -9,7 +9,6 @@
 import { getRedis } from '$lib/server/redis.js';
 import { execSync, spawn } from 'node:child_process';
 import { ENV } from '$lib/server/env.server.js';
-import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
 
 export enum VlmMode {
   OFF = 'OFF',
@@ -38,6 +37,7 @@ const TURBOQUANT_GGUF =
 
 const TURBOQUANT_MMPROJ =
   process.env.TURBOQUANT_MMPROJ_PATH ??
+  process.env.TURBO_MMPROJ_PATH ??
   process.env.MMPROJ_PATH ??
   '';
 
@@ -188,15 +188,17 @@ function stopTurboQuant(pid: number): boolean {
  */
 function restartTurboQuant(modelPath: string, mmprojPath?: string): void {
   try {
-    const ctx = process.env.TURBO_CTX ?? '16384';
-    const ngl = process.env.TURBO_NGL ?? '99';
+    const ctx  = process.env.TURBO_CTX   ?? '16384';
+    const ngl  = process.env.TURBO_NGL   ?? '99';
+    const kvK  = process.env.TURBO_KV_K  ?? 'q8_0';
+    const kvV  = process.env.TURBO_KV_V  ?? 'q8_0';
     const args = [
       '-m', modelPath,
       '--port', '8090',
       '-ngl', ngl,
       '--flash-attn', 'on',
-      '-ctk', 'q8_0',
-      '-ctv', 'q8_0',
+      '-ctk', kvK,
+      '-ctv', kvV,
       '-c', ctx,
     ];
     if (mmprojPath) {

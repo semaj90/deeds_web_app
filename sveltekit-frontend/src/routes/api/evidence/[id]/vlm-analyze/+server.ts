@@ -12,6 +12,7 @@ import { getFile } from '$lib/server/minio-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
+import { getVlmState, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 
 const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 
@@ -38,6 +39,19 @@ function extractObjectKey(fileUrl: string): { bucket: string; key: string } | nu
 
 export const POST: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
+  // Vision analysis requires mmproj — reject early if lifecycle is not in VISION mode
+  const vlmState = await getVlmState();
+  if (vlmState !== VlmMode.VISION) {
+    return json(
+      {
+        error: 'VLM not in VISION mode',
+        currentMode: vlmState,
+        hint: 'POST /api/vlm/switch-mode {"mode":"VISION"} then retry',
+      },
+      { status: 503 },
+    );
+  }
 
   const evidenceId = params.id;
   if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID' }, { status: 400 });
