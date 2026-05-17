@@ -6,9 +6,6 @@ import path from 'path';
 export default defineConfig({
   plugins: [sveltekit(), svelteTesting()],
   resolve: {
-    alias: {
-      $lib: path.resolve(__dirname, './src/lib'),
-    },
     // Ensure Svelte components render in client mode for tests
     conditions: ['browser'],
   },
@@ -241,7 +238,6 @@ export default defineConfig({
     },
     // Mock module resolution
     alias: {
-      $lib: path.resolve(__dirname, './src/lib'),
       // @huggingface/transformers has broken package.json exports (main-only, no ESM)
       // Mock it so dynamic imports in ChatSession.svelte.ts resolve in test env
       '@huggingface/transformers': path.resolve(
