@@ -11,10 +11,9 @@
  * only the encoded_64 slot without touching existing vectors.
  *
  * Usage:
- *   npm run autoencoder:backfill           (defaults to --dry-run)
- *   npm run autoencoder:backfill -- --dry-run --limit 200
- *   npm run autoencoder:backfill -- --limit 5000
- *   npm run autoencoder:backfill -- --force   (re-encode even if encoded_at set)
+ *   npm run ae:backfill                    (live — upserts encoded_64 to Qdrant)
+ *   npm run ae:backfill:dry                (dry-run — no Qdrant writes)
+ *   npm run ae:backfill:force              (re-encode even if encoded_at set)
  */
 
 import { Redis } from 'ioredis';
@@ -98,10 +97,12 @@ async function loadWeights(redis) {
     return weights;
 }
 
-// ── CPU encode: tanh(data @ W^T + b) row by row ──────────────────────────────
-// Matches cpuAutoencoderEncode in topology-projection.ts:
-//   out[i*hidden + h] = tanh( sum_d(data[i*inputDim+d] * W[h*inputDim+d]) + b[h] )
-function encodeLayer(data, n, inputDim, W, b, outputDim) {
+// ── CPU encode: matches canonical 2-layer architecture from train-autoencoder.py ──
+// Layer 1: Linear(768→256) + ReLU
+// Layer 2: Linear(256→64)  + linear (no activation)
+// Output:  L2-normalize rows → cosine distance works in 64-dim
+// W stored in PyTorch (outputDim × inputDim) row-major convention.
+function linearLayer(data, n, inputDim, W, b, outputDim, relu) {
     const out = new Float32Array(n * outputDim);
     for (let i = 0; i < n; i++) {
         const xOff = i * inputDim;
@@ -109,18 +110,28 @@ function encodeLayer(data, n, inputDim, W, b, outputDim) {
         for (let h = 0; h < outputDim; h++) {
             let act = b[h];
             const wOff = h * inputDim;
-            for (let d = 0; d < inputDim; d++) {
-                act += data[xOff + d] * W[wOff + d];
-            }
-            out[yOff + h] = Math.tanh(act);
+            for (let d = 0; d < inputDim; d++) act += data[xOff + d] * W[wOff + d];
+            out[yOff + h] = relu ? Math.max(0, act) : act;
         }
     }
     return out;
 }
 
+function l2NormalizeRows(data, n, dim) {
+    for (let i = 0; i < n; i++) {
+        const off = i * dim;
+        let norm = 0;
+        for (let d = 0; d < dim; d++) norm += data[off + d] * data[off + d];
+        norm = Math.sqrt(norm) || 1e-12;
+        for (let d = 0; d < dim; d++) data[off + d] /= norm;
+    }
+    return data;
+}
+
 function encodeBatch(matrix, n, weights) {
-    const h = encodeLayer(matrix, n, CONTENT_DIM, weights.W1, weights.b1, HIDDEN_DIM);
-    return encodeLayer(h, n, HIDDEN_DIM, weights.W2, weights.b2, ENCODED_DIM);
+    const h = linearLayer(matrix, n, CONTENT_DIM, weights.W1, weights.b1, HIDDEN_DIM, true);
+    const z = linearLayer(h,      n, HIDDEN_DIM,  weights.W2, weights.b2, ENCODED_DIM, false);
+    return l2NormalizeRows(z, n, ENCODED_DIM);
 }
 
 // ── Qdrant helpers ────────────────────────────────────────────────────────────
