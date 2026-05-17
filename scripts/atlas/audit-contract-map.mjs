@@ -38,6 +38,7 @@ const ALLOWED_DIMS = new Set([768, 1536, 384, 128, 64, 32, 512]);
 const ARGS = process.argv.slice(2);
 const OPT_JSON    = ARGS.includes('--json');
 const OPT_DRY    = ARGS.includes('--dry-run');
+const OPT_STRICT = ARGS.includes('--strict');
 const OPT_LAYER  = ARGS.find(a => a.startsWith('--layer='))?.split('=')[1] ?? null;
 
 // ── color helpers ─────────────────────────────────────────────────────────────
@@ -803,7 +804,8 @@ async function main() {
     console.log(`${'─'.repeat(56)}\n`);
   }
 
-  process.exit(high > 0 ? 1 : 0);
+  const exitCode = (high > 0 || (OPT_STRICT && (high + med) > 0)) ? 1 : 0;
+  process.exit(exitCode);
 }
 
 main().catch(err => { console.error(err); process.exit(2); });

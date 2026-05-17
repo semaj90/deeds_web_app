@@ -162,14 +162,14 @@
   - [x] unsafe_drizzle_update_delete
   - [x] env_url_mismatch
   - [x] browser_network_contract_failure
-- [ ] Output:
-  - `docs/reports/contract-error-map-report.md`
-  - `docs/reports/contract-error-map-report.json`
-  - `docs/graph/contract-error-map.json`
-  - `docs/graph/error-fix-dag.json`
-- [ ] **build-atlas-index.mjs**: Harden against Postgres being offline (DONE — fail-open `.catch()` added at line 67).
-- [ ] **Redis KAG recall**: Populate `ace:fixer:patterns:<hmmState>` keys with past fix summaries for each error state.
-- [ ] **CI gate**: Wire `npm run audit:contracts --strict` as a pre-merge check blocking on high-severity findings.
+- [x] Output:
+  - [x] `docs/reports/contract-error-map-report.md`
+  - [x] `docs/reports/contract-error-map-report.json`
+  - [x] `docs/graph/contract-error-map.json`
+  - [x] `docs/graph/error-fix-dag.json`
+- [x] **build-atlas-index.mjs**: Harden against Postgres being offline (DONE — fail-open `.catch()` added at line 67).
+- [x] **Redis KAG recall**: Populate `ace:fixer:patterns:<hmmState>` keys with past fix summaries for each error state.
+- [x] **CI gate**: Wire `npm run audit:contracts --strict` as a pre-merge check blocking on high-severity findings.
 
 ## Phase 6E Follow-up Findings (2026-05-16)
 - [x] Document manual sidecar SQL migrations in `sveltekit-frontend/drizzle/sidecar-migrations.json`.
