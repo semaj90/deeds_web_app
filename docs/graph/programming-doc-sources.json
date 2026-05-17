@@ -86,9 +86,9 @@
     },
     {
       "sourceId": "postgres",
-      "title": "PostgreSQL 16",
-      "version": "16",
-      "baseUrl": "https://www.postgresql.org/docs/16/",
+      "title": "PostgreSQL 17",
+      "version": "17",
+      "baseUrl": "https://www.postgresql.org/docs/17/",
       "kind": "database_docs",
       "licensePolicy": "postgresql_license",
       "crawlDepth": 2,
