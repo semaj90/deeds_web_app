@@ -56,8 +56,11 @@ describe('EDGE_TYPES constant', () => {
     expect(EDGE_TYPES).toContain('agents_context');
   });
 
-  it('has exactly 5 edge types', () => {
-    expect(EDGE_TYPES).toHaveLength(5);
+  it('includes 4-lane hypergraph edge types (shared_resource, vault_link, topo_context)', () => {
+    expect(EDGE_TYPES).toContain('shared_resource');
+    expect(EDGE_TYPES).toContain('vault_link');
+    expect(EDGE_TYPES).toContain('topo_context');
+    expect(EDGE_TYPES.length).toBeGreaterThanOrEqual(8);
   });
 });
 
