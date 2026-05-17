@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ locals, params }) => {
 			.where(
 				and(
 					eq(reports.id, reportId),
-					eq(reports.createdBy, locals.user.id)
+					eq(reports.createdBy, Number(locals.user.id))
 				)
 			)
 			.returning();
@@ -82,7 +82,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 			.where(
 				and(
 					eq(reports.id, reportId),
-					eq(reports.createdBy, locals.user.id)
+					eq(reports.createdBy, Number(locals.user.id))
 				)
 			)
 			.returning();

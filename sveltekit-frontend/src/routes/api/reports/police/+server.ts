@@ -105,7 +105,7 @@ ${evidence.length > 0
 					title: `Police Report - ${new Date().toLocaleDateString()}`,
 					content: html,
 					status: 'draft',
-					createdBy: locals.user.id,
+					createdBy: Number(locals.user.id),
 					metadata: { type: 'police_report' },
 				}).returning();
 				savedReport = row;

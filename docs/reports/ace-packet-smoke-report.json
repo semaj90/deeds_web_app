@@ -1,7 +1,7 @@
 {
-  "runId": "ace-smoke-1778982692740",
-  "query": "how do we validate pgvector hnsw indexes",
-  "timestamp": "2026-05-17T01:51:32.740Z",
+  "runId": "ace-smoke-1778984886861",
+  "query": "drizzle schema user_id mismatch",
+  "timestamp": "2026-05-17T02:28:06.861Z",
   "lanes": {
     "lexical": {
       "status": "PASS",
@@ -160,22 +160,6 @@
       "text": "// Lexical anchor: sveltekit-frontend/src/workers\\embedding-worker.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
     },
     {
-      "id": "lex:sveltekit-frontend/src/mcp\\server.ts",
-      "filePath": "sveltekit-frontend/src/mcp\\server.ts",
-      "chunk_id": "lex-chunk:sveltekit-frontend/src/mcp\\server.ts",
-      "score": 0.15,
-      "why_retrieved": "Fast-AST lexical match",
-      "retrievalLane": "lexical",
-      "sourceRefs": [
-        {
-          "type": "local_code",
-          "path": "sveltekit-frontend/src/mcp\\server.ts",
-          "confidence": 0.85
-        }
-      ],
-      "text": "// Lexical anchor: sveltekit-frontend/src/mcp\\server.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
-    },
-    {
       "id": "lex:sveltekit-frontend/src/mcp\\trace-mcp-server.ts",
       "filePath": "sveltekit-frontend/src/mcp\\trace-mcp-server.ts",
       "chunk_id": "lex-chunk:sveltekit-frontend/src/mcp\\trace-mcp-server.ts",
@@ -190,6 +174,22 @@
         }
       ],
       "text": "// Lexical anchor: sveltekit-frontend/src/mcp\\trace-mcp-server.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
+    },
+    {
+      "id": "lex:sveltekit-frontend/src/types\\pgvector-drizzle.d.ts",
+      "filePath": "sveltekit-frontend/src/types\\pgvector-drizzle.d.ts",
+      "chunk_id": "lex-chunk:sveltekit-frontend/src/types\\pgvector-drizzle.d.ts",
+      "score": 0.15,
+      "why_retrieved": "Fast-AST lexical match",
+      "retrievalLane": "lexical",
+      "sourceRefs": [
+        {
+          "type": "local_code",
+          "path": "sveltekit-frontend/src/types\\pgvector-drizzle.d.ts",
+          "confidence": 0.85
+        }
+      ],
+      "text": "// Lexical anchor: sveltekit-frontend/src/types\\pgvector-drizzle.d.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
     }
   ]
 }

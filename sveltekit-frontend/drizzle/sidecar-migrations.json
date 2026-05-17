@@ -72,6 +72,15 @@
       "appliedAt": "2026-05-16",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT data_type FROM information_schema.columns WHERE table_name='users' AND column_name='id';\""
+    },
+    {
+      "file": "20260517_llm_synthesis_events.sql",
+      "status": "manual_sidecar",
+      "reason": "Durable LLM synthesis memory audit trail log table. Captures run_id, query, profile, ace_packet, tool_calls, source_refs, cache_keys, and model.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-17",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='llm_synthesis_events';\""
     }
   ]
 }

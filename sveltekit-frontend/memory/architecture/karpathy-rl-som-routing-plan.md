@@ -36,14 +36,28 @@ Format:    JSON { lane_id → { weight, trust_threshold, cluster_boost } }
 TTL:       24h
 ```
 
-**Export script**: `npm run kb:export-lane-router-training` generates `memory/kb/lane-router-training-set.jsonl`.
+**Export script**: `npm run kb:export-lane-router-training` → `memory/kb/lane-router-training-set.jsonl`
 
-**How applyKarpathyBoost() will read it**:
-```typescript
-const policy = JSON.parse(await redis.get('ace:lane:routing_policy') ?? '{}');
-const laneBoost = policy[hit.laneId]?.weight ?? 1.0;
-finalScore = blendScore * laneBoost * trustMultiplier;
+**Train script**: `npm run kb:train-lane-router` → `memory/kb/lane-router-policy.json` + Redis `ace:lane:routing_policy` (HASH, TTL 24h)
+
+**Full pipeline**: `npm run kb:lane-router:full` (export → train in sequence)
+
+**Redis hash format** (one field per feature key `{som_bucket}|{gpu_cluster}|{trust_tier}`):
 ```
+ace:lane:routing_policy  →  HASH
+  "r0-4|3|T3"   →  {"lane":"rag","conf":0.82,"support":47,"avg_score":0.71}
+  "r5-9|1|T2"   →  {"lane":"kag","conf":0.67,"support":23,"avg_score":0.68}
+```
+
+**How context-assembler.ts reads it** (Stage A0, before vector ANN):
+```typescript
+const key = `${somBucket}|${gpuCluster}|${trustTier}`;
+const raw = await redis.hget('ace:lane:routing_policy', key);
+const { lane, conf } = raw ? JSON.parse(raw) : { lane: 'default', conf: 0 };
+// conf >= 0.6 → prefer named lane; conf < 0.6 → fall through to vector ANN
+```
+
+**Feature key bucketing**: som_bmu_row → 5 buckets (r0-4, r5-9, r10-14, r15-19, r20+)
 
 **Safety**: Read-only from `chunk_hit_log`. No production weight mutation. No GPU required.
 
@@ -156,9 +170,10 @@ After each LiteRT/TurboQuant synthesis pass, run LangExtract on the output to ba
 ## Correct Build Order
 
 ```
-Phase 0: graphify:semantic          # populate Qdrant (unblocks everything)
-Phase 1: kb:export-lane-router-training   # Tier 1: export training set
-Phase 2: karpathy:gpu -- --limit 200      # Tier 2: activate PCA path
+Phase 0: graphify:semantic                # populate Qdrant (unblocks everything)
+Phase 1a: kb:export-lane-router-training # Tier 1: export training set from chunk_hit_log
+Phase 1b: kb:train-lane-router           # Tier 1: build decision table → Redis ace:lane:routing_policy
+Phase 2: karpathy:gpu -- --limit 200     # Tier 2: activate PCA path
 Phase 3: ae:train                         # train autoencoder (PyTorch, RTX 3060 Ti, ~30s)
 Phase 4: karpathy:gpu                     # rebuild blend with trained encoder
 Phase 5: smoke:hyperrag                   # verify G-HR3/G-HR4 now pass

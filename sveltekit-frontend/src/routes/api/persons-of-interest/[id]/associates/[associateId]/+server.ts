@@ -31,7 +31,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
     }
 
     await db.insert(auditLog).values({
-      userId: locals.user.id,
+      userId: Number(locals.user.id),
       action: 'poi_dissociate',
       resourceType: 'person_of_interest',
       resourceId: poiId,

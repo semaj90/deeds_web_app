@@ -1,0 +1,10 @@
+{
+  "model_name": "gemma3_270m_client",
+  "original_size_gb": 1.6245955033227801,
+  "quantized_size_mb": 417.2226085662842,
+  "vocab_size": 32000,
+  "max_position_embeddings": 8192,
+  "quantization": "QInt8_weight_only",
+  "opset_version": 17,
+  "compression_ratio": 3.9872858307443155
+}

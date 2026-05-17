@@ -3,8 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { authMachine } from '$lib/machines/auth-machine.js';
 	import { createActor } from 'xstate';
-	import { superForm } from 'sveltekit-superforms';
-	import { zod } from 'sveltekit-superforms/adapters';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { zod4Client as zod } from 'sveltekit-superforms/adapters';
 	import { loginSchema } from './schema.js';
 
 	const demoCredentials = {

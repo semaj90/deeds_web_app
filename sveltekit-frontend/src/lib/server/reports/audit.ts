@@ -29,7 +29,7 @@ export async function auditReportAction(options: AuditOptions): Promise<void> {
 	try {
 		await db.insert(reportAuditLog).values({
 			reportId,
-			userId,
+			userId: Number(userId),
 			action,
 			changes: changes ? JSON.parse(JSON.stringify(changes)) : null, // Ensure it's serializable
 			ipAddress: request?.headers.get('x-forwarded-for') || request?.headers.get('x-real-ip') || null,
@@ -91,7 +91,7 @@ export async function createReportVersion(
 			title: current.title ?? null,
 			content: current.content ?? null,
 			metadata: current.metadata ?? null,
-			changedBy: options?.changedBy ?? null,
+			changedBy: options?.changedBy ? Number(options.changedBy) : null,
 			changeReason: options?.changeReason ?? null,
 		});
 	} catch (err) {

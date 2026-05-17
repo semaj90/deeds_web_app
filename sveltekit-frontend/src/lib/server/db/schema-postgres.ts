@@ -97,7 +97,7 @@ export const caseRiskLevelEnum = pgEnum('case_risk_level', ['low', 'medium', 'hi
 // === TABLES FOR LEGAL AI APPLICATION ===
 
 export const users = pgTable('users', {
-  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  id: serial('id').primaryKey().notNull(),
   email: varchar('email', { length: 255 }).unique().notNull(),
   passwordHash: varchar('hashed_password', { length: 255 }).notNull(),
   name: varchar('name', { length: 255 }), // Legacy field - use firstName/lastName instead
@@ -756,7 +756,7 @@ export const codebaseAuditReports = pgTable('codebase_audit_reports', {
     .primaryKey()
     .notNull(),
   caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
-  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+   createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
   reportType: varchar('report_type', { length: 50 }).notNull().default('full'), // 'graph', 'evidence', 'codebase', 'full'
 
   // GPU metrics
@@ -2910,7 +2910,7 @@ export type NewEvidenceForensicFlag = typeof evidenceForensicFlags.$inferInsert;
 export const analyticsEvents = pgTable('analytics_events', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	eventType: varchar('event_type', { length: 100 }).notNull(),
-	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+	userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
 	sessionId: varchar('session_id', { length: 255 }),
 	payload: jsonb('payload').default({}),
 	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
@@ -3202,7 +3202,7 @@ export type IngestionJob = typeof ingestionJobs.$inferSelect;
 
 export const aiUsageLog = pgTable('ai_usage_log', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+	userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
 	endpoint: varchar('endpoint', { length: 255 }).notNull(),
 	model: varchar('model', { length: 100 }).notNull(),
 	promptTokens: integer('prompt_tokens').default(0).notNull(),
@@ -3423,7 +3423,7 @@ export const apiAuditLog = pgTable('api_audit_log', {
 	path: varchar('path', { length: 500 }).notNull(),
 	statusCode: integer('status_code').notNull(),
 	durationMs: integer('duration_ms'),
-	userId: uuid('user_id'),
+	userId: integer('user_id'),
 	ipAddress: varchar('ip_address', { length: 45 }),
 	userAgent: varchar('user_agent', { length: 500 }),
 	requestBodySize: integer('request_body_size'),
@@ -3556,7 +3556,7 @@ export type NewWhisperSegment = typeof whisperSegments.$inferInsert;
 export const aceContextCache = pgTable('ace_context_cache', {
   id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
   queryHash: text('query_hash').notNull(),
-  userId: uuid('user_id'),
+  userId: integer('user_id'),
   policyTier: varchar('policy_tier', { length: 30 }).notNull(),
   contextJson: jsonb('context_json').notNull(),
   chunkCount: integer('chunk_count').default(0).notNull(),
@@ -4557,4 +4557,24 @@ export type RgSearchRun    = typeof rgSearchRuns.$inferSelect;
 export type NewRgSearchRun = typeof rgSearchRuns.$inferInsert;
 export type RgSearchHit    = typeof rgSearchHits.$inferSelect;
 export type NewRgSearchHit = typeof rgSearchHits.$inferInsert;
+
+// === LLM SYNTHESIS EVENTS ===
+export const llmSynthesisEvents = pgTable('llm_synthesis_events', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  runId: text('run_id').notNull(),
+  sessionId: text('session_id'),
+  userId: integer('user_id'),
+  query: text('query').notNull(),
+  profile: text('profile').notNull(),
+  acePacket: jsonb('ace_packet').notNull(),
+  toolCalls: jsonb('tool_calls').notNull().default(sql`'[]'::jsonb`),
+  sourceRefs: jsonb('source_refs').notNull().default(sql`'[]'::jsonb`),
+  cacheKeys: jsonb('cache_keys').notNull().default(sql`'{}'::jsonb`),
+  model: text('model').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull().defaultNow(),
+});
+
+export type LlmSynthesisEvent = typeof llmSynthesisEvents.$inferSelect;
+export type NewLlmSynthesisEvent = typeof llmSynthesisEvents.$inferInsert;
+
 

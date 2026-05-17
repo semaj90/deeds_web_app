@@ -235,6 +235,122 @@ const tools = {
     }
   },
 
+  'llm_synthesis.log_event': {
+    name: 'llm_synthesis.log_event',
+    description: 'Log LLM Synthesis Memory Event durably in Postgres, Redis hot cache, and daily JSONL training log.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        runId: { type: 'string', description: 'Globally unique query/request trace id' },
+        sessionId: { type: 'string', description: 'Active user session id' },
+        userId: { type: 'number', description: 'Standard user integer id' },
+        query: { type: 'string', description: 'Raw user prompt / input' },
+        profile: { type: 'string', description: 'Active retrieval profile' },
+        acePacket: { type: 'object', description: 'Topological grounded ACE packet' },
+        toolCalls: { type: 'array', items: { type: 'object' }, default: [], description: 'List of executed tools in synthesis step' },
+        sourceRefs: { type: 'array', items: { type: 'object' }, default: [], description: 'Clickable file/doc links' },
+        cacheKeys: { type: 'object', default: {}, description: 'Keys of Redis semantic/exact cache entries' },
+        model: { type: 'string', description: 'Name/tag of model used' }
+      },
+      required: ['runId', 'query', 'profile', 'acePacket', 'model']
+    },
+    handler: async (args) => {
+      const {
+        runId,
+        sessionId = null,
+        userId = null,
+        query,
+        profile,
+        acePacket,
+        toolCalls = [],
+        sourceRefs = [],
+        cacheKeys = {},
+        model
+      } = args;
+
+      // Enforce zero-hidden-thoughts security policy
+      const payloads = [acePacket, toolCalls, sourceRefs];
+      for (const p of payloads) {
+        if (p) {
+          const str = JSON.stringify(p);
+          if (
+            str.includes('"hiddenThoughts"') ||
+            str.includes('"chainOfThought"') ||
+            str.includes('"kv_cache"') ||
+            str.includes('"tensor"') ||
+            str.includes('"cudaPointer"')
+          ) {
+            throw new Error('Security Constraint Violation: Persistent synthesis cache cannot store raw tensor, cudaPointer, hiddenThoughts or chainOfThought.');
+          }
+        }
+      }
+
+      // 1. Insert to Postgres
+      const pgResult = await pgPool.query(
+        `INSERT INTO llm_synthesis_events (
+          run_id, session_id, user_id, query, profile, ace_packet, tool_calls, source_refs, cache_keys, model
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+        [
+          runId,
+          sessionId,
+          userId,
+          query,
+          profile,
+          JSON.stringify(acePacket),
+          JSON.stringify(toolCalls),
+          JSON.stringify(sourceRefs),
+          JSON.stringify(cacheKeys),
+          model
+        ]
+      );
+
+      const recordId = pgResult.rows[0].id;
+
+      // 2. Cache in Redis
+      const redisKey = `ace:packet:${runId}`;
+      const redisPayload = {
+        id: recordId,
+        runId,
+        sessionId,
+        userId,
+        query,
+        profile,
+        acePacket,
+        toolCalls,
+        sourceRefs,
+        cacheKeys,
+        model,
+        createdAt: new Date().toISOString()
+      };
+      await redis.setex(redisKey, 3600, JSON.stringify(redisPayload));
+
+      // 3. Append to daily JSONL file
+      try {
+        const fs = await import('fs');
+        const path = await import('path');
+        const datasetDir = path.resolve('memory/datasets/llm_synthesis');
+        if (!fs.existsSync(datasetDir)) {
+          fs.mkdirSync(datasetDir, { recursive: true });
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const filePath = path.join(datasetDir, `${today}.jsonl`);
+        const line = JSON.stringify({
+          ...redisPayload,
+          datasetTimestamp: new Date().toISOString()
+        }) + '\n';
+        fs.appendFileSync(filePath, line, 'utf8');
+      } catch (err) {
+        console.warn('JSONL write failed in MCP tool:', err.message);
+      }
+
+      return {
+        success: true,
+        id: recordId,
+        message: 'LLM Synthesis Event logged successfully across all stores'
+      };
+    }
+  },
+
   'diagnose-error': {
     name: 'diagnose-error',
     description: 'Perform AST-powered deep diagnosis of a code error or failure',

@@ -167,7 +167,7 @@ Generate the complete report content in HTML format, maintaining the structure b
       .insert(reports)
       .values({
         caseId,
-        createdBy: locals.user.id,
+        createdBy: Number(locals.user.id),
         title,
         content,
         type: templateType,

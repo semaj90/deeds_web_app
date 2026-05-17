@@ -14,7 +14,7 @@ export const load: LayoutServerLoad = async ({ locals, params }) => {
 		db
 			.select()
 			.from(reports)
-			.where(and(eq(reports.id, params.id), eq(reports.createdBy, locals.user.id)))
+			.where(and(eq(reports.id, params.id), eq(reports.createdBy, Number(locals.user.id))))
 			.limit(1),
 		[]
 	);

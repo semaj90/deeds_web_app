@@ -51,7 +51,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   if (!parsed.success) return json({ error: 'Invalid params' }, { status: 400 });
 
   const { caseId, limit, days } = parsed.data;
-  const userId = locals.user.id;
+  const userId = Number(locals.user.id);
 
   // ── 1. Recent queries from rag_query_log ────────────────────────────────
   const entityCountMap = new Map<string, { type: 'statute' | 'case'; count: number; queries: string[] }>();

@@ -4,7 +4,7 @@ path: "sveltekit-frontend/memory/graphify/deep/unresolved-imports.json"
 aliases: ["unresolved-imports.json","sveltekit-frontend/memory/graphify/deep/unresolved-imports.json"]
 clusterId: -1
 ext: ".json"
-lineCount: 52715
+lineCount: 52842
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/memory/graphify/deep/unresolved-imports.json"
-last_updated_by_llm: "2026-05-15T22:12:05.184Z"
+last_updated_by_llm: "2026-05-17T00:47:15.229Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/json","t/json"]
 > JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 52715
+lines:: 52842
 ## Summary
 
 JSON data file

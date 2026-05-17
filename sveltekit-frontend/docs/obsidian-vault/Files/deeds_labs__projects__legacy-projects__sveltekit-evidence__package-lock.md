@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/deeds_labs/projects/legacy-projects/sveltekit-evidence/package-lock.json"
-last_updated_by_llm: "2026-05-15T22:12:05.184Z"
+last_updated_by_llm: "2026-05-17T00:47:15.229Z"
 ai-first: true
 confidence: "high"
 up: []

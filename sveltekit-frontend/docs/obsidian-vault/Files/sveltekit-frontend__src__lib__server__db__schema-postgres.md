@@ -4,7 +4,7 @@ path: "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
 aliases: ["schema-postgres.ts","sveltekit-frontend/src/lib/server/db/schema-postgres.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 4491
+lineCount: 4561
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 3
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
-last_updated_by_llm: "2026-05-15T22:12:05.184Z"
+last_updated_by_llm: "2026-05-17T00:47:15.229Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","t/ts","t/sveltekit-frontend","t/src"]
 > Stores comprehensive GPU-accelerated audit reports combining Neo4j graph analysis,
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 4491
+lines:: 4561
 ## Summary
 
 Stores comprehensive GPU-accelerated audit reports combining Neo4j graph analysis,

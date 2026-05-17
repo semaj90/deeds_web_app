@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-05-16T18:18:43.755Z",
-  "elapsedMs": 3472,
-  "totalFindings": 6,
+  "generatedAt": "2026-05-17T02:44:20.929Z",
+  "elapsedMs": 1200,
+  "totalFindings": 5,
   "bySeverity": {
-    "high": 1,
+    "high": 0,
     "medium": 0,
     "low": 5
   },
@@ -115,30 +115,6 @@
       ],
       "agentCommandKeys": [
         "drizzle.meta.check"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:drizzle-postgres-drizzle_fk_type_mismatch-006-99f0d2c8",
-      "severity": "high",
-      "layer": "drizzle-postgres",
-      "hmmState": "drizzle_fk_type_mismatch",
-      "localSourceRefs": [
-        "sveltekit-frontend\\src\\lib\\server\\db\\schema-postgres.ts"
-      ],
-      "externalSourceRefs": [
-        "postgres:foreign-key-types"
-      ],
-      "problem": "23 tables have user_id/uploaded_by typed as UUID in live DB but users.id is integer serial. Tables: ace_context_cache, ai_usage_log, analytics_events, api_audit_log, audit_log (…).",
-      "expected": "All user_id FK columns should match users.id type (integer serial).",
-      "suggestedFix": "Migrate UUID user_id columns to integer or convert users.id to uuid. See CLAUDE.md §Schema Mismatch.",
-      "validationCommands": [
-        "npm run db:check",
-        "npm run audit:contracts"
-      ],
-      "agentCommandKeys": [
-        "db.check",
-        "contract.audit"
       ],
       "trustTier": "canonical_local_code_plus_official_docs"
     }

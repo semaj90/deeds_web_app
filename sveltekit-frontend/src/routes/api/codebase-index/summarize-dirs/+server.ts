@@ -1,7 +1,9 @@
 import { json } from '@sveltejs/kit';
 import { readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
+import { getRedis } from '$lib/server/redis.js';
 import type { RequestHandler } from './$types';
 
 // Fetch SOM topology coords from Qdrant codebase_chunks_768 for each directory.
@@ -14,7 +16,7 @@ async function fetchSomCoordsFromQdrant(
 
   try {
     const { ENV } = await import('$lib/server/env.server.js');
-		const base = ENV.QDRANT_URL.replace(/\/$/, '');
+    const base = ENV.QDRANT_URL.replace(/\/$/, '');
 
     // Accumulate cluster/bmu votes per directory
     const votes = new Map<string, { cluster: number[]; row: number[]; col: number[] }>();
@@ -89,6 +91,27 @@ async function fetchSomCoordsFromQdrant(
 }
 
 const GRAPH_JSON = path.resolve('docs/graph/codebase-graph.json');
+const SOURCE_EXTENSIONS = new Set(['.ts', '.svelte', '.js', '.mjs', '.mts']);
+
+function isNoisyDirectory(dir: string): { noisy: boolean; category?: 'skipped_generated_dir' | 'skipped_archive_or_log' } {
+  const parts = dir.split('/');
+  
+  const generatedDirs = new Set([
+    'node_modules', '.git', '.svelte-kit', 'dist', 'build', '.cache', 'tmp',
+    'docs/graph', 'docs/reports', 'graph', 'reports'
+  ]);
+  const archiveDirs = new Set([
+    'coverage', 'logs', 'archive', 'backup', 'archived-schemas'
+  ]);
+
+  if (parts.some(p => generatedDirs.has(p))) {
+    return { noisy: true, category: 'skipped_generated_dir' };
+  }
+  if (parts.some(p => archiveDirs.has(p))) {
+    return { noisy: true, category: 'skipped_archive_or_log' };
+  }
+  return { noisy: false };
+}
 
 export const POST: RequestHandler = async ({ locals }) => {
   if (!locals.user) {
@@ -131,41 +154,166 @@ export const POST: RequestHandler = async ({ locals }) => {
   const dirList = [...dirMap.keys()];
   const somCoords = await fetchSomCoordsFromQdrant(dirList);
 
-  // Convert to DirAuditEntry shape expected by ingestDirectorySummaries
-  const dirOutputs = [...dirMap.entries()].map(([rel, d]) => {
+  const outcomes = {
+    summarized: 0,
+    skipped_generated_dir: 0,
+    skipped_archive_or_log: 0,
+    skipped_too_many_files: 0,
+    skipped_too_many_bytes: 0,
+    no_qdrant_points: 0,
+    no_source_files: 0,
+    timeout: 0,
+    cache_unchanged: 0,
+    summary_failed: 0,
+  };
+
+  const redis = getRedis();
+
+  const { ingestDirectorySummaries } = await import(
+    '$lib/server/indexer/directory-summarizer.js'
+  );
+
+  // Process directories sequentially to maintain stability and prevent resource thrashing
+  for (const [rel, d] of dirMap.entries()) {
+    // 1. Skip noisy directories
+    const noisyCheck = isNoisyDirectory(rel);
+    if (noisyCheck.noisy && noisyCheck.category) {
+      outcomes[noisyCheck.category]++;
+      continue;
+    }
+
+    // 2. Skip directories with no source files (e.g. static assets, raw markdown logs, config stubs)
+    const sourceFiles = d.files.filter(f => {
+      const ext = path.extname(f).toLowerCase();
+      return SOURCE_EXTENSIONS.has(ext);
+    });
+    if (sourceFiles.length === 0) {
+      outcomes.no_source_files++;
+      continue;
+    }
+
+    const fileCount = d.files.length;
+
+    // 3. Apply file count cap (max files per dir: 40)
+    if (fileCount > 40) {
+      outcomes.skipped_too_many_files++;
+      continue;
+    }
+
+    // Calculate total bytes
+    let totalBytes = 0;
+    for (const f of d.files) {
+      try {
+        const absPath = path.resolve(f);
+        if (existsSync(absPath)) {
+          const stats = statSync(absPath);
+          totalBytes += stats.size;
+        }
+      } catch {
+        // Safe fallback if path resolution drifts
+      }
+    }
+
+    // 4. Apply total bytes cap (max bytes per dir: 250,000)
+    if (totalBytes > 250000) {
+      outcomes.skipped_too_many_bytes++;
+      continue;
+    }
+
+    // 5. Cache Unchanged check: compare directory contents hash
+    let mtimes = '';
+    for (const f of d.files) {
+      try {
+        const absPath = path.resolve(f);
+        if (existsSync(absPath)) {
+          const stats = statSync(absPath);
+          mtimes += `${f}:${stats.mtimeMs};`;
+        }
+      } catch {}
+    }
+    const dirHash = crypto.createHash('sha256').update(mtimes).digest('hex');
+    const cacheKey = `dir:summary:hash:${rel}`;
+
+    try {
+      const cachedHash = await redis.get(cacheKey);
+      if (cachedHash === dirHash) {
+        outcomes.cache_unchanged++;
+        continue;
+      }
+    } catch {
+      // Non-fatal, proceed with summarization
+    }
+
+    // 6. Check if directory has matching Qdrant points
     const som = somCoords.get(rel);
-    return {
+    const hasQdrantPoints = som && (som.somCluster !== undefined || som.somBmuRow !== undefined || som.somBmuCol !== undefined);
+    if (!hasQdrantPoints) {
+      outcomes.no_qdrant_points++;
+      continue;
+    }
+
+    // 7. Enforce candidate dedupe caps (max files per dir: 15, max chunks per file: 4)
+    // We slice files to process to max 15 to prevent long-running loops
+    const filesToProcess = d.files.slice(0, 15);
+
+    const entry = {
       rel,
       score: Math.min(100, Math.round(
         (d.apis > 0 && d.tags.has('auth') ? 20 : 0) +
         (d.todos === 0 ? 20 : d.todos < 3 ? 10 : 0) +
         (d.tags.has('db') ? 15 : 0) +
         (d.tags.has('route') ? 15 : 0) +
-        (d.files.length > 2 ? 10 : 5) +
+        (filesToProcess.length > 2 ? 10 : 5) +
         (d.tags.has('has-todo') ? 0 : 20)
       )),
       metrics: {
-        fileCount: d.files.length,
+        fileCount: filesToProcess.length,
         tsErrors: d.todos,
         apiCount: d.apis,
       },
-      ragSummary: d.files.slice(0, 5).join(', '),
-      agentSummary: null,
-      hyperedge: null,
-      // 4D topology from Qdrant codebase_chunks_768 payloads (mode per dir)
-      somBmuRow:  som?.somBmuRow  ?? undefined,
-      somBmuCol:  som?.somBmuCol  ?? undefined,
-      somCluster: som?.somCluster ?? undefined,
+      ragSummary: filesToProcess.slice(0, 5).join(', '),
+      agentSummary: null as string | null,
+      hyperedge: null as any,
+      somBmuRow:  som?.somBmuRow,
+      somBmuCol:  som?.somBmuCol,
+      somCluster: som?.somCluster,
     };
+
+    // 8. Run ingestion with a strict 60,000ms timeout
+    try {
+      const ingestPromise = ingestDirectorySummaries([entry]);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), 60000)
+      );
+
+      const ingestRes = await Promise.race([ingestPromise, timeoutPromise]);
+      if (ingestRes.errors && ingestRes.errors.length > 0) {
+        outcomes.summary_failed++;
+      } else {
+        outcomes.summarized++;
+        await redis.set(cacheKey, dirHash).catch(() => null);
+      }
+    } catch (err: any) {
+      if (err.message === 'TIMEOUT') {
+        outcomes.timeout++;
+        console.warn('Timeout diagnostics:', {
+          directory: rel,
+          fileCount,
+          totalBytes,
+          timeoutMs: 60000,
+          recommendation: 'Break directory into smaller folders or increase the summary timeout limit.'
+        });
+      } else {
+        outcomes.summary_failed++;
+      }
+    }
+  }
+
+  return json({
+    success: true,
+    directoriesFound: dirMap.size,
+    outcomes,
   });
-
-  const { ingestDirectorySummaries } = await import(
-    '$lib/server/indexer/directory-summarizer.js'
-  );
-
-  const result = await ingestDirectorySummaries(dirOutputs);
-
-  return json({ directoriesFound: dirOutputs.length, ...result });
 };
 
 export const GET: RequestHandler = async ({ locals }) => {

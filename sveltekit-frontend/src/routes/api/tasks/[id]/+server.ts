@@ -23,7 +23,8 @@ const patchSchema = z.object({
 });
 
 export const PATCH: RequestHandler = async ({ params, request, locals, cookies }) => {
-	const userId = locals.user?.id ?? null;
+	const userIdStr = locals.user?.id ?? null;
+	const userId = userIdStr ? Number(userIdStr) : null;
 	const sessionId = getSession(cookies);
 	const taskId = params.id;
 
@@ -72,7 +73,8 @@ export const PATCH: RequestHandler = async ({ params, request, locals, cookies }
 };
 
 export const DELETE: RequestHandler = async ({ params, locals, cookies }) => {
-	const userId = locals.user?.id ?? null;
+	const userIdStr = locals.user?.id ?? null;
+	const userId = userIdStr ? Number(userIdStr) : null;
 	const sessionId = getSession(cookies);
 
 	const ownerFilter = userId

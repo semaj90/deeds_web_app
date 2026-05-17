@@ -1,0 +1,122 @@
+{
+  "generatedAt": "2026-05-17T00:22:32.253Z",
+  "autoencoder": {
+    "trainedAt": "2026-05-17T00:07:23.074521+00:00",
+    "bestLoss": 0.007172555950347801,
+    "epochs": 30,
+    "nTrainVectors": 41822,
+    "device": "cuda",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "dimIn": 768,
+    "dimHidden": 256,
+    "dimLatent": 64
+  },
+  "inventory": {
+    "qdrantTotal": 41822,
+    "redisEncodedCount": 3144,
+    "redisCentroidCount": 89,
+    "sampleSize": 200,
+    "flatVectorsSkipped": 0
+  },
+  "quality": {
+    "variance64d": 0.015265853138249996,
+    "nnOverlapAt5": 0.7300000000000001,
+    "nnOverlapPct": 73.00000000000001,
+    "alignedPairs": 50,
+    "centroidAvgCosineSim": 0.736425072158399,
+    "centroidsUsed": 20,
+    "centroidsTotal": 89,
+    "filePathCoveragePct": 100,
+    "coveredFilePaths": 32,
+    "qdrantSampleFilePaths": 32
+  },
+  "centroidTopAssignments": [
+    {
+      "centroidIdx": 68,
+      "count": 9
+    },
+    {
+      "centroidIdx": 27,
+      "count": 5
+    },
+    {
+      "centroidIdx": 88,
+      "count": 5
+    },
+    {
+      "centroidIdx": 3,
+      "count": 4
+    },
+    {
+      "centroidIdx": 11,
+      "count": 4
+    },
+    {
+      "centroidIdx": 16,
+      "count": 4
+    },
+    {
+      "centroidIdx": 26,
+      "count": 4
+    },
+    {
+      "centroidIdx": 30,
+      "count": 4
+    },
+    {
+      "centroidIdx": 79,
+      "count": 4
+    },
+    {
+      "centroidIdx": 10,
+      "count": 3
+    },
+    {
+      "centroidIdx": 15,
+      "count": 3
+    },
+    {
+      "centroidIdx": 83,
+      "count": 3
+    },
+    {
+      "centroidIdx": 12,
+      "count": 2
+    },
+    {
+      "centroidIdx": 22,
+      "count": 2
+    },
+    {
+      "centroidIdx": 28,
+      "count": 2
+    },
+    {
+      "centroidIdx": 56,
+      "count": 2
+    },
+    {
+      "centroidIdx": 57,
+      "count": 2
+    },
+    {
+      "centroidIdx": 62,
+      "count": 2
+    },
+    {
+      "centroidIdx": 63,
+      "count": 2
+    },
+    {
+      "centroidIdx": 65,
+      "count": 2
+    }
+  ],
+  "validation": {
+    "isFlat": false,
+    "hasGoodCoverage": true,
+    "hasGoodNNOverlap": true,
+    "isTrained": true
+  },
+  "status": "PASS"
+}

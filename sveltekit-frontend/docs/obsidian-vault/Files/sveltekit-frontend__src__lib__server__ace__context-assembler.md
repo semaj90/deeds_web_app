@@ -4,7 +4,7 @@ path: "sveltekit-frontend/src/lib/server/ace/context-assembler.ts"
 aliases: ["context-assembler.ts","sveltekit-frontend/src/lib/server/ace/context-assembler.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 4615
+lineCount: 4633
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 30
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/src/lib/server/ace/context-assembler.ts"
-last_updated_by_llm: "2026-05-15T22:12:05.184Z"
+last_updated_by_llm: "2026-05-17T00:47:15.229Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","zod","t/ts","t/sveltekit-frontend","t/src"]
 > ACE Context Assembler — Central Orchestration Module
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 4615
+lines:: 4633
 ## Summary
 
 ACE Context Assembler — Central Orchestration Module

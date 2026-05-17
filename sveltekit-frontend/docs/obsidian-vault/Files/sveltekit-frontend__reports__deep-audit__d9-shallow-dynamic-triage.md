@@ -4,7 +4,7 @@ path: "sveltekit-frontend/reports/deep-audit/d9-shallow-dynamic-triage.json"
 aliases: ["d9-shallow-dynamic-triage.json","sveltekit-frontend/reports/deep-audit/d9-shallow-dynamic-triage.json"]
 clusterId: -1
 ext: ".json"
-lineCount: 8497
+lineCount: 117502
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/reports/deep-audit/d9-shallow-dynamic-triage.json"
-last_updated_by_llm: "2026-05-15T22:12:05.184Z"
+last_updated_by_llm: "2026-05-17T00:47:15.229Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/json","t/json"]
 > JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 8497
+lines:: 117502
 ## Summary
 
 JSON data file

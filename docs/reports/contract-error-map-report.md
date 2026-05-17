@@ -1,6 +1,6 @@
 # Cross-Layer Contract Error Map
 
-Generated: 2026-05-16T18:18:43.755Z  |  Findings: 6  |  High: 1  Medium: 0  Low: 5
+Generated: 2026-05-17T02:44:20.929Z  |  Findings: 5  |  High: 0  Medium: 0  Low: 5
 
 ## Findings
 
@@ -68,16 +68,3 @@ Generated: 2026-05-16T18:18:43.755Z  |  Findings: 6  |  High: 1  Medium: 0  Low:
 **Files:** `sveltekit-frontend\drizzle\0019_llm_context_cache.sql`
 
 **Validation:** `npm run audit:drizzle-meta`
-
-### contract:drizzle-postgres-drizzle_fk_type_mismatch-006-99f0d2c8
-**Severity:** high  |  **Layer:** drizzle-postgres  |  **HMM State:** `drizzle_fk_type_mismatch`
-
-**Problem:** 23 tables have user_id/uploaded_by typed as UUID in live DB but users.id is integer serial. Tables: ace_context_cache, ai_usage_log, analytics_events, api_audit_log, audit_log (…).
-
-**Expected:** All user_id FK columns should match users.id type (integer serial).
-
-**Suggested Fix:** Migrate UUID user_id columns to integer or convert users.id to uuid. See CLAUDE.md §Schema Mismatch.
-
-**Files:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-
-**Validation:** `npm run db:check`, `npm run audit:contracts`

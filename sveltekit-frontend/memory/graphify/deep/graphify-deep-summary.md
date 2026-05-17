@@ -1,21 +1,21 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-16T20:03:26.998Z
+Generated: 2026-05-17T00:19:08.369Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 32336 |
-| Total edges | 75744 |
-| Resolved edges | 7324 |
-| Unresolved (local) | 8447 |
-| External refs | 58271 |
+| Nodes | 32350 |
+| Total edges | 75753 |
+| Resolved edges | 7323 |
+| Unresolved (local) | 8448 |
+| External refs | 58280 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 817 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 26104 |
+| shared | 26118 |
 | script | 3815 |
 | test | 1261 |
 | types | 1016 |
@@ -24,16 +24,16 @@ Generated: 2026-05-16T20:03:26.998Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 60880 |
+| imports_static | 60887 |
 | test_covers_file | 4089 |
-| redis_dependency | 2874 |
+| redis_dependency | 2877 |
 | imports_dynamic | 2221 |
 | exports_from | 1756 |
 | env_dependency | 1722 |
 | qdrant_dependency | 1104 |
 | neo4j_dependency | 406 |
 | mcp_tool_calls | 402 |
-| db_dependency | 287 |
+| db_dependency | 286 |
 | svelte_route_uses_loader | 3 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
