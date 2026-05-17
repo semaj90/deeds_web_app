@@ -24,7 +24,7 @@
 ### 2. Karpathy Synthesis Mode (GPU Enabled, Scoped Limits) - **IN PROGRESS**
 - [x] **Canary (25)**: Karpathy synthesis canary over parent atlas passed.
 - [x] **Stage 2A (100)**: Gradual scaling (RunID: `stage-2a-100`) - **PASSED**
-- [ ] **Stage 2B (250)**: Intermediate scaling (Next step).
+- [x] **Stage 2B (250)**: Intermediate scaling (RunID: `stage-2b-250`) - **PASSED**
 - [ ] **Stage 2C (500)**: Final scaling phase.
 - [ ] **Gemma4 Profile**: 4B–9B quants, 4k–8k context.
 
