@@ -301,4 +301,42 @@ Goal: prove the Workstation Parent Atlas / ACE Hypergraph Memory Router survives
   - `npm run audit:contracts`
   - `npm run audit:pgvector`
 
+## Phase 13B: Soak Ladder
+Status: In Progress
+Goal: Validate Parent Atlas / ACE Hypergraph Router stability over scaling soak runs.
+- [x] 2-cycle write soak baseline.
+- [x] 10-cycle dry-run soak.
+- [x] 25-cycle dry-run soak.
+- [x] 10-cycle write soak.
+- [ ] 30-minute bounded soak.
+- [ ] 60-minute bounded soak.
+- [x] Record:
+  - average latency
+  - p95 latency
+  - max latency
+  - VRAM min/max/delta
+  - Redis disconnects
+  - Qdrant disconnects
+  - Postgres insert failures
+  - missing sourceRefs
+  - forbidden field violations
+
+## Phase 14: Observability and Operator Dashboard
+Status: Ready
+Goal: Create a dashboard/reporting layer for active operator visualization of Parent Atlas and vector safety metrics.
+- [ ] Add aggregate benchmark history:
+  - `docs/reports/workstation-soak-history.jsonl`
+- [ ] Add trend summary:
+  - latency p50/p95
+  - VRAM baseline drift
+  - cache hit rate
+  - sourceRef coverage
+- [ ] Surface in Admin Copilot:
+  - latest soak status
+  - latest audit status
+  - latest pgvector status
+  - current model/VRAM state
+  - last synthesis event
+
+
 
