@@ -1,15 +1,15 @@
 # Workstation Parent Atlas Soak Benchmark Report
 
 ## Execution Summary
-- **Timestamp**: 2026-05-17T04:44:06.618Z
+- **Timestamp**: 2026-05-17T06:07:22.580Z
 - **Cycles Executed**: 25
 - **Dry-run Mode**: DISABLED (write to disk)
 - **Overall Status**: **PASS**
 
 ## Benchmark Summary Metrics
 - **Total Queries Executed**: 25
-- **Average Query Latency**: 748.88 ms
-- **Peak VRAM Delta**: 1 MB
+- **Average Query Latency**: 839.6 ms
+- **Peak VRAM Delta**: 9 MB
 - **SourceRef Compliance Gaps**: 0
 - **Zero-Hidden-Thought Policy Violations**: 0
 
@@ -19,31 +19,31 @@
 
 | Cycle | Query | Latency | VRAM (B/A) | SourceRefs | Compliance |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| #1 | "how do we validate pgvector hnsw indexes" | 758 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #2 | "drizzle schema user_id mismatch" | 1018 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #3 | "how does cluster pivot retrieval work" | 767 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #4 | "where is llm synthesis memory logged" | 789 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #5 | "how do we validate pgvector hnsw indexes" | 759 ms | 7696 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #6 | "drizzle schema user_id mismatch" | 682 ms | 7697 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #7 | "how does cluster pivot retrieval work" | 696 ms | 7697 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #8 | "where is llm synthesis memory logged" | 722 ms | 7697 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #9 | "how do we validate pgvector hnsw indexes" | 922 ms | 7697 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #10 | "drizzle schema user_id mismatch" | 834 ms | 7697 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #11 | "how does cluster pivot retrieval work" | 728 ms | 7697 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #12 | "where is llm synthesis memory logged" | 798 ms | 7697 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #13 | "how do we validate pgvector hnsw indexes" | 738 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #14 | "drizzle schema user_id mismatch" | 667 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #15 | "how does cluster pivot retrieval work" | 689 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #16 | "where is llm synthesis memory logged" | 759 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #17 | "how do we validate pgvector hnsw indexes" | 782 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #18 | "drizzle schema user_id mismatch" | 699 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #19 | "how does cluster pivot retrieval work" | 586 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #20 | "where is llm synthesis memory logged" | 700 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #21 | "how do we validate pgvector hnsw indexes" | 746 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #22 | "drizzle schema user_id mismatch" | 685 ms | 7696 MB / 7696 MB | ✅ Yes | ✅ Compliant |
-| #23 | "how does cluster pivot retrieval work" | 725 ms | 7696 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #24 | "where is llm synthesis memory logged" | 716 ms | 7697 MB / 7697 MB | ✅ Yes | ✅ Compliant |
-| #25 | "how do we validate pgvector hnsw indexes" | 757 ms | 7697 MB / 7697 MB | ✅ Yes | ✅ Compliant |
+| #1 | "how do we validate pgvector hnsw indexes" | 857 ms | 2376 MB / 2379 MB | ✅ Yes | ✅ Compliant |
+| #2 | "drizzle schema user_id mismatch" | 1069 ms | 2376 MB / 2376 MB | ✅ Yes | ✅ Compliant |
+| #3 | "how does cluster pivot retrieval work" | 951 ms | 2376 MB / 2381 MB | ✅ Yes | ✅ Compliant |
+| #4 | "where is llm synthesis memory logged" | 787 ms | 2381 MB / 2376 MB | ✅ Yes | ✅ Compliant |
+| #5 | "how do we validate pgvector hnsw indexes" | 832 ms | 2376 MB / 2368 MB | ✅ Yes | ✅ Compliant |
+| #6 | "drizzle schema user_id mismatch" | 1127 ms | 2368 MB / 2368 MB | ✅ Yes | ✅ Compliant |
+| #7 | "how does cluster pivot retrieval work" | 880 ms | 2370 MB / 2368 MB | ✅ Yes | ✅ Compliant |
+| #8 | "where is llm synthesis memory logged" | 946 ms | 2370 MB / 2368 MB | ✅ Yes | ✅ Compliant |
+| #9 | "how do we validate pgvector hnsw indexes" | 897 ms | 2368 MB / 2368 MB | ✅ Yes | ✅ Compliant |
+| #10 | "drizzle schema user_id mismatch" | 871 ms | 2368 MB / 2368 MB | ✅ Yes | ✅ Compliant |
+| #11 | "how does cluster pivot retrieval work" | 916 ms | 2368 MB / 2376 MB | ✅ Yes | ✅ Compliant |
+| #12 | "where is llm synthesis memory logged" | 826 ms | 2376 MB / 2374 MB | ✅ Yes | ✅ Compliant |
+| #13 | "how do we validate pgvector hnsw indexes" | 866 ms | 2374 MB / 2374 MB | ✅ Yes | ✅ Compliant |
+| #14 | "drizzle schema user_id mismatch" | 838 ms | 2374 MB / 2374 MB | ✅ Yes | ✅ Compliant |
+| #15 | "how does cluster pivot retrieval work" | 797 ms | 2374 MB / 2374 MB | ✅ Yes | ✅ Compliant |
+| #16 | "where is llm synthesis memory logged" | 775 ms | 2374 MB / 2376 MB | ✅ Yes | ✅ Compliant |
+| #17 | "how do we validate pgvector hnsw indexes" | 635 ms | 2374 MB / 2365 MB | ✅ Yes | ✅ Compliant |
+| #18 | "drizzle schema user_id mismatch" | 785 ms | 2365 MB / 2370 MB | ✅ Yes | ✅ Compliant |
+| #19 | "how does cluster pivot retrieval work" | 839 ms | 2370 MB / 2370 MB | ✅ Yes | ✅ Compliant |
+| #20 | "where is llm synthesis memory logged" | 762 ms | 2370 MB / 2372 MB | ✅ Yes | ✅ Compliant |
+| #21 | "how do we validate pgvector hnsw indexes" | 802 ms | 2372 MB / 2378 MB | ✅ Yes | ✅ Compliant |
+| #22 | "drizzle schema user_id mismatch" | 804 ms | 2378 MB / 2378 MB | ✅ Yes | ✅ Compliant |
+| #23 | "how does cluster pivot retrieval work" | 697 ms | 2378 MB / 2381 MB | ✅ Yes | ✅ Compliant |
+| #24 | "where is llm synthesis memory logged" | 743 ms | 2381 MB / 2378 MB | ✅ Yes | ✅ Compliant |
+| #25 | "how do we validate pgvector hnsw indexes" | 688 ms | 2378 MB / 2378 MB | ✅ Yes | ✅ Compliant |
 
 ---
 *Report programmatically generated by the Workstation Soak Benchmark Harness.*

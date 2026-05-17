@@ -984,6 +984,16 @@
     "sveltekit-frontend/tests/routes/auto/api/contextual/state.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/contextual/state.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/codebase-index/summarize-dirs/+server.ts": [
+    "sveltekit-frontend/tests/directory-summary-quality-gate.spec.ts",
+    "sveltekit-frontend/tests/directory-summary-quality-gate.spec.ts",
+    "sveltekit-frontend/tests/directory-summary-quality-gate.spec.ts",
+    "sveltekit-frontend/tests/routes/auto/api/codebase-index/summarize-dirs.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/codebase-index/summarize-dirs.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/documents/[id]/+server.ts": [
     "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
     "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
@@ -2186,13 +2196,6 @@
     "sveltekit-frontend/tests/routes/codebase-index-degraded-shape.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-degraded-shape.test.ts"
   ],
-  "sveltekit-frontend/src/routes/api/codebase-index/summarize-dirs/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/codebase-index/summarize-dirs.test.ts",
-    "sveltekit-frontend/tests/routes/auto/api/codebase-index/summarize-dirs.test.ts",
-    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
-    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
-    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts"
-  ],
   "sveltekit-frontend/src/routes/api/codebase-index/tags/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/tags.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/tags.test.ts",
@@ -3394,6 +3397,8 @@
     "sveltekit-frontend/tests/routes/sveltekit-load-patterns.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/topology/gpu-topology-projection.ts": [
+    "sveltekit-frontend/tests/topology-ae2l-smoke.spec.ts",
+    "sveltekit-frontend/tests/topology-ae2l-smoke.spec.ts",
     "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
     "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
     "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",

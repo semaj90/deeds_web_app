@@ -13,6 +13,7 @@
 import { sql } from 'drizzle-orm';
 import {
     index,
+    integer,
     jsonb,
     pgEnum,
     pgTable,

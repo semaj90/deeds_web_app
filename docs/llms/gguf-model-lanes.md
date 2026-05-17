@@ -80,3 +80,105 @@ graph TD
    * **Keep**: `gemma4-legal-iq4xs.gguf` (as our primary backup/upgrade file).
    * **Delete**: `gemma4-legal-iq4xs-direct.gguf`, `gemma4-legal-merged-q4km.gguf`, `gemma4-legal-f16.gguf`, `gemma4-legal-f16-test.gguf`.
    * *Space Recovered*: **~10.0 GB** of high-speed desktop storage.
+
+---
+
+## Three Development Model Lanes (OpenCode / local dev)
+
+When Copilot or Claude are unavailable, the workspace has three local LLM lanes configured in `opencode.json`:
+
+| Lane | Model | Server | Context | Purpose |
+|---|---|---|---|---|
+| **A — Hermes** | `gemma4-hermes-64k` (Ollama alias of `gemma4-legal-vlm:latest`) | Ollama `:11434` | 65 536 | Tool-calling sanity check, web search, agent behavior comparison |
+| **B — TurboQuant** | `gemma4-legal.gguf` via `llama-server.exe` | `:8090` | 16 384 (`TURBO_CTX`) | Long-context code audit, TRACE MCP loop — **default OpenCode lane** |
+| **C — RotorQuant / IQ4_XS** | `gemma4-legal-iq4xs.gguf` — swap `TURBO_MODEL_PATH` | same binary | same | Testing newer quantizations before promoting to `vendor/models/` |
+
+OpenCode defaults to Lane B. To switch lanes interactively:
+
+```bash
+# Lane A
+opencode run -m ollama/gemma4-hermes-64k --agent audit-hermes "..."
+
+# Lane B (default)
+opencode run -m turboquant/gemma4-tq --agent trace-audit "..."
+```
+
+---
+
+## IQ4_XS upgrade test procedure
+
+```powershell
+# 1. Point at the candidate IQ4_XS file (without touching vendor/)
+$env:TURBO_MODEL_PATH = "C:\Users\james\Desktop\gemma4-legal-iq4xs\gemma4-legal-iq4xs.gguf"
+
+# 2. Start server
+npm run turbo:start:detached
+
+# 3. Run benchmarks
+npm run bench:turbo           # baseline 2k tokens
+npm run bench:turbo:8k        # push to 8k output
+npm run models:probe          # MODEL_OK + tool_calls + throughput
+
+# 4. If throughput and tool_calls both pass, promote:
+copy "C:\Users\james\Desktop\gemma4-legal-iq4xs\gemma4-legal-iq4xs.gguf" `
+     "C:\Users\james\Videos\deeds-web-app\vendor\models\gemma4-legal.gguf"
+# .env TURBO_MODEL_PATH stays the same — it points to vendor/models/gemma4-legal.gguf
+```
+
+The `gemma4-legal-iq4xs-direct.gguf` (no imatrix) is a fallback if the calibrated variant shows
+quality regressions on legal text. Run both through `bench:turbo:8k` before deciding.
+
+---
+
+## Context window upgrade
+
+Default `TURBO_CTX=16384`. To extend for deep code audit:
+
+```
+# 32k — costs ~1 GB extra VRAM for q8_0 KV cache; fits RTX 3060 Ti with IQ4_XS model
+TURBO_CTX=32768
+
+# 64k — matches Hermes lane; needs ~2 GB extra; test for OOM before committing
+TURBO_CTX=65536
+```
+
+Edit `.env` and restart TurboQuant. The `opencode.json` `context: 65536` limit is the
+*request ceiling* — llama-server's `-c` flag is the actual window; they should match.
+
+---
+
+## LoRA adapter GGUF conversion (when needed)
+
+The `.safetensors` LoRAs in `vendor/models/lora/` are already merged into `gemma4-legal.gguf`.
+If you want a hot-swappable adapter on top of a **base** E4B model instead:
+
+```bash
+# Convert GRPO adapter to GGUF LoRA format
+python llama.cpp/convert_lora_to_gguf.py \
+  --base  <path-to-base-gemma4-e4b-F16.gguf> \
+  --lora  vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors \
+  --outfile vendor/models/lora/gemma4-legal-grpo.gguf \
+  --outtype f16
+
+# Then in .env:
+# LEGAL_LORA_PATH=C:\...\vendor\models\lora\gemma4-legal-grpo.gguf
+# And in launch-turboquant.ps1 probe: $baseArgs += "--lora", $env:LEGAL_LORA_PATH
+```
+
+This lets you run the base model + live LoRA injection without a full merge-remerge cycle.
+Only useful for rapid adapter comparison — day-to-day use should keep the merged GGUF.
+
+---
+
+## Quick reference
+
+```bash
+npm run models:probe          # inventory Ollama + GGUF files + binary flags + live test
+npm run turbo:start:detached  # start llama-server in background
+npm run turbo:status          # check if server is up
+npm run turbo:opencode        # open OpenCode using workspace opencode.json
+npm run turbo:trace-smoke     # smoke: TurboQuant + TRACE MCP agent loop
+npm run bench:turbo           # throughput benchmark (current model)
+npm run bench:turbo:8k        # 8k output benchmark
+npm run bench:hermes          # Hermes lane benchmark (hermes3:latest via Ollama)
+```

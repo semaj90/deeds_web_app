@@ -4564,13 +4564,16 @@ export const llmSynthesisEvents = pgTable('llm_synthesis_events', {
   runId: text('run_id').notNull(),
   sessionId: text('session_id'),
   userId: integer('user_id'),
+  authUserId: text('auth_user_id'),
   query: text('query').notNull(),
   profile: text('profile').notNull(),
   acePacket: jsonb('ace_packet').notNull(),
   toolCalls: jsonb('tool_calls').notNull().default(sql`'[]'::jsonb`),
   sourceRefs: jsonb('source_refs').notNull().default(sql`'[]'::jsonb`),
   cacheKeys: jsonb('cache_keys').notNull().default(sql`'{}'::jsonb`),
+  trustTier: text('trust_tier'),
   model: text('model').notNull(),
+  validation: jsonb('validation').notNull().default(sql`'{}'::jsonb`),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull().defaultNow(),
 });
 

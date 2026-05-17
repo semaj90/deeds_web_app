@@ -1,7 +1,7 @@
 {
   "repo": "deeds-web-app",
-  "generatedAt": "2026-05-16T06:39:40.134Z",
-  "totalFiles": 32135,
+  "generatedAt": "2026-05-17T05:36:01.356Z",
+  "totalFiles": 32426,
   "topTargets": [
     {
       "key": "@sveltejs/kit",
@@ -25,11 +25,11 @@
     },
     {
       "key": "svelte",
-      "value": 1750
+      "value": 1752
     },
     {
       "key": "path",
-      "value": 1645
+      "value": 1657
     },
     {
       "key": "drizzle-orm",
@@ -37,11 +37,11 @@
     },
     {
       "key": "fs",
-      "value": 1396
+      "value": 1405
     },
     {
       "key": "vitest",
-      "value": 1128
+      "value": 1131
     },
     {
       "key": "svelte/store",
@@ -49,7 +49,7 @@
     },
     {
       "key": "zod",
-      "value": 1011
+      "value": 1012
     },
     {
       "key": "$app/environment",
@@ -57,23 +57,23 @@
     },
     {
       "key": "crypto",
-      "value": 776
+      "value": 779
     },
     {
       "key": "url",
-      "value": 700
+      "value": 701
+    },
+    {
+      "key": "$lib/server/db/client",
+      "value": 623
     },
     {
       "key": "$lib/server/db",
       "value": 622
     },
     {
-      "key": "$lib/server/db/client",
-      "value": 622
-    },
-    {
       "key": "child_process",
-      "value": 559
+      "value": 561
     },
     {
       "key": "xstate",
@@ -85,43 +85,43 @@
     },
     {
       "key": "$lib/server/env.server.js",
-      "value": 501
+      "value": 502
+    },
+    {
+      "key": "node:path",
+      "value": 488
     },
     {
       "key": "pg",
-      "value": 473
+      "value": 487
     },
     {
       "key": "fs/promises",
       "value": 467
     },
     {
-      "key": "$lib/components/ui/Button.svelte",
-      "value": 442
+      "key": "ioredis",
+      "value": 457
     },
     {
-      "key": "ioredis",
-      "value": 434
+      "key": "$lib/components/ui/Button.svelte",
+      "value": 442
     },
     {
       "key": "$lib/server/db/schema-postgres",
       "value": 419
     },
     {
-      "key": "node:path",
-      "value": 416
+      "key": "node:fs",
+      "value": 391
     },
     {
       "key": "svelte/transition",
-      "value": 366
+      "value": 368
     },
     {
       "key": "drizzle-orm/pg-core",
-      "value": 342
-    },
-    {
-      "key": "node:fs",
-      "value": 322
+      "value": 350
     },
     {
       "key": "./types.js",
@@ -132,12 +132,12 @@
       "value": 293
     },
     {
-      "key": "fast-check",
+      "key": "$lib/server/redis.js",
       "value": 292
     },
     {
-      "key": "$lib/server/redis.js",
-      "value": 288
+      "key": "fast-check",
+      "value": 292
     },
     {
       "key": "$lib/components/ui/Icon.svelte",
@@ -160,16 +160,28 @@
       "value": 244
     },
     {
+      "key": "redis",
+      "value": 240
+    },
+    {
       "key": "@unocss/core",
       "value": 240
     },
     {
-      "key": "redis",
-      "value": 238
+      "key": "node:url",
+      "value": 231
     },
     {
       "key": "postgres",
-      "value": 218
+      "value": 229
+    },
+    {
+      "key": "node:crypto",
+      "value": 212
+    },
+    {
+      "key": "dotenv",
+      "value": 212
     },
     {
       "key": "./types",
@@ -180,27 +192,15 @@
       "value": 202
     },
     {
-      "key": "node:crypto",
-      "value": 195
-    },
-    {
       "key": "os",
       "value": 195
     },
     {
-      "key": "node:url",
-      "value": 195
-    },
-    {
       "key": "@playwright/test",
-      "value": 193
+      "value": 194
     },
     {
-      "key": "dotenv",
-      "value": 191
-    },
-    {
-      "key": "$lib/server/ollama.js",
+      "key": "drizzle-orm/postgres-js",
       "value": 183
     }
   ],
@@ -342,6 +342,10 @@
       "value": 22
     },
     {
+      "key": "sveltekit-frontend/src/mcp/server.ts",
+      "value": 22
+    },
+    {
       "key": "deeds_labs/dead-scripts/phase-scripts/fix-enhanced-bits-imports.mjs",
       "value": 21
     },
@@ -359,10 +363,6 @@
     },
     {
       "key": "sveltekit-frontend/src/lib/server/agent/autonomous-agent.ts",
-      "value": 21
-    },
-    {
-      "key": "sveltekit-frontend/src/mcp/server.ts",
       "value": 21
     },
     {

@@ -92,9 +92,9 @@ if (Test-Path $envPath) {
 }
 
 # ── Resolve paths and ports ──────────────────────────────────────────────
-$llama = if ($env:LLAMA_SERVER_PATH) { 
-    $env:LLAMA_SERVER_PATH 
-} else { 
+$llama = if ($env:LLAMA_SERVER_PATH) {
+    $env:LLAMA_SERVER_PATH
+} else {
     # Fallback order: 1. bin/ in workspace, 2. vendor/ in workspace, 3. system path
     $localBin = Join-Path $PSScriptRoot "..\bin\llama-server.exe"
     $localVendor = Join-Path $PSScriptRoot "..\vendor\llama-server\llama-server.exe"
@@ -102,15 +102,15 @@ $llama = if ($env:LLAMA_SERVER_PATH) {
 }
 
 # ROTORQUANT_MODEL_PATH overrides TURBO_MODEL_PATH when set.
-$model = if ($env:ROTORQUANT_MODEL_PATH) { 
-    $env:ROTORQUANT_MODEL_PATH 
-} elseif ($env:TURBO_MODEL_PATH) { 
-    $env:TURBO_MODEL_PATH 
+$model = if ($env:ROTORQUANT_MODEL_PATH) {
+    $env:ROTORQUANT_MODEL_PATH
+} elseif ($env:TURBO_MODEL_PATH) {
+    $env:TURBO_MODEL_PATH
 } else {
 }
-$mmproj = if ($env:TURBO_MMPROJ_PATH) { 
-    $env:TURBO_MMPROJ_PATH 
-} else { 
+$mmproj = if ($env:TURBO_MMPROJ_PATH) {
+    $env:TURBO_MMPROJ_PATH
+} else {
     $localMmproj = Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf"
     if (Test-Path $localMmproj) { $localMmproj }
     else { $null }  # no fallback — set TURBO_MMPROJ_PATH or place file at models/mmproj-BF16.gguf
@@ -328,9 +328,35 @@ if (-not $TextOnly -and (Test-Path $mmproj)) {
 # Path B (re-quantize merged model) produces better quality — see memory card.
 if ($env:LEGAL_LORA_PATH) {
   if (Test-Path $env:LEGAL_LORA_PATH) {
+    $loraExt = [System.IO.Path]::GetExtension($env:LEGAL_LORA_PATH)
+    if ($loraExt -ieq '.safetensors') {
+      Write-Host ("Legal LoRA: skipping $($env:LEGAL_LORA_PATH) (safetensors adapters are not supported by llama-server --lora; use a GGUF LoRA adapter or unset LEGAL_LORA_PATH)") -ForegroundColor Yellow
+    }
+    else {
     $loraScale = if ($env:LEGAL_LORA_SCALE) { $env:LEGAL_LORA_SCALE } else { '0.8' }
-    Write-Host ("Legal LoRA: --lora $($env:LEGAL_LORA_PATH) --lora-scale $loraScale") -ForegroundColor Cyan
-    $baseArgs = $baseArgs + @('--lora', $env:LEGAL_LORA_PATH, '--lora-scale', $loraScale)
+    $loraHelp = (& $llama -h 2>&1 | Out-String)
+    if ($loraHelp -match '--lora-scaled') {
+      $loraPathForScaled = $env:LEGAL_LORA_PATH
+      if ([System.IO.Path]::IsPathRooted($loraPathForScaled)) {
+        try {
+          $loraPathForScaled = [System.IO.Path]::GetRelativePath((Get-Location).Path, $loraPathForScaled)
+        }
+        catch {
+          # If relative conversion fails, keep original path and let llama-server validate it.
+        }
+      }
+      Write-Host ("Legal LoRA: --lora-scaled ${loraPathForScaled}:$loraScale") -ForegroundColor Cyan
+      $baseArgs = $baseArgs + @('--lora-scaled', "${loraPathForScaled}:$loraScale")
+    }
+    elseif ($loraHelp -match '--lora-scale') {
+      Write-Host ("Legal LoRA: --lora $($env:LEGAL_LORA_PATH) --lora-scale $loraScale") -ForegroundColor Cyan
+      $baseArgs = $baseArgs + @('--lora', $env:LEGAL_LORA_PATH, '--lora-scale', $loraScale)
+    }
+    else {
+      Write-Host ("Legal LoRA: --lora $($env:LEGAL_LORA_PATH) (scale unsupported by this llama-server build)") -ForegroundColor Yellow
+      $baseArgs = $baseArgs + @('--lora', $env:LEGAL_LORA_PATH)
+    }
+    }
   } else {
     Write-Host ("Legal LoRA: LEGAL_LORA_PATH set but file not found at $($env:LEGAL_LORA_PATH) — skipping") -ForegroundColor Yellow
   }
@@ -352,6 +378,36 @@ if ($kvProfile -eq 'atomicbot') {
 }
 
 
+# ── Probe helper: try --help then -h, return $true if flag is advertised ─
+function Test-LlamaFlag {
+    param([string]$Exe, [string]$Pattern)
+    $h1 = & $Exe --help 2>&1 | Out-String
+    if ($h1 -match $Pattern) { return $true }
+    $h2 = & $Exe -h 2>&1 | Out-String
+    return $h2 -match $Pattern
+}
+
+# ── Tool-calling: --jinja for OpenAI function-call format ────────────────
+if (Test-LlamaFlag $llama '--jinja') {
+    Write-Host "Tool calling: --jinja enabled (OpenCode/TRACE MCP loop)" -ForegroundColor Cyan
+    $baseArgs = $baseArgs + @('--jinja')
+} else {
+    Write-Host "Tool calling: --jinja not in this binary — Gemma4 uses generic tool-call path" -ForegroundColor DarkYellow
+}
+
+# ── KV prefix reuse: reduce prefill cost on repeated system prompts ───────
+if (Test-LlamaFlag $llama '--cache-prompt') {
+    $baseArgs = $baseArgs + @('--cache-prompt')
+    Write-Host "KV cache: --cache-prompt enabled" -ForegroundColor Cyan
+} else {
+    Write-Host "KV cache: --cache-prompt not supported by this binary — skipping" -ForegroundColor DarkYellow
+}
+if (Test-LlamaFlag $llama '--cache-reuse') {
+    $baseArgs = $baseArgs + @('--cache-reuse', '256')
+    Write-Host "KV cache: --cache-reuse 256 enabled" -ForegroundColor Cyan
+} else {
+    Write-Host "KV cache: --cache-reuse not supported by this binary — skipping" -ForegroundColor DarkYellow
+}
 
 # ── Foreground branch ────────────────────────────────────────────────────
 if (-not $Detached) {

@@ -1,14 +1,14 @@
 # Repo Env Map
 
-- envKeys: 578
-- envFiles: 781
+- envKeys: 583
+- envFiles: 802
 
 ## Top Entries
 
-- DATABASE_URL: 169
-- REDIS_URL: 120
-- QDRANT_URL: 117
-- OLLAMA_URL: 77
+- DATABASE_URL: 180
+- REDIS_URL: 130
+- QDRANT_URL: 122
+- OLLAMA_URL: 78
 - PUBLIC_APP_URL: 70
 - NODE_ENV: 54
 - OLLAMA_BASE_URL: 36

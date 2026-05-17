@@ -1823,6 +1823,34 @@ export function setupToolHandlers() {
           required: ['mode']
         }
       },
+      {
+        name: 'llm_synthesis.log_event',
+        description:
+          'Durably log an LLM synthesis event: writes to Postgres llm_synthesis_events, ' +
+          'caches a hot copy in Redis (ace:packet:{runId}, 1h TTL), and appends a row to ' +
+          'the daily JSONL training dataset. Audit-only — never triggers inference. ' +
+          'Forbidden fields (hiddenThoughts, chainOfThought, kv_cache, tensor, cudaPointer) ' +
+          'are rejected with an error.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            runId:      { type: 'string',  description: 'Unique ID for this synthesis run (required)' },
+            sessionId:  { type: 'string',  description: 'Session ID (optional)' },
+            userId:     { type: 'number',  description: 'Integer user ID from Lucia auth (optional)' },
+            authUserId: { type: 'string',  description: 'String Lucia user ID for cross-reference (optional)' },
+            query:      { type: 'string',  description: 'The user query that triggered synthesis (required)' },
+            profile:    { type: 'string',  description: 'ACE retrieval profile, e.g. code_debug, legal_qa (required)' },
+            acePacket:  { type: 'object',  description: 'ACE context packet — must include lanes and sourceRefs (required)' },
+            toolCalls:  { type: 'array',   items: { type: 'string' }, description: 'MCP/ACE tool names invoked during this run' },
+            sourceRefs: { type: 'array',   items: { type: 'string' }, description: 'File paths or doc IDs that grounded the answer' },
+            cacheKeys:  { type: 'object',  description: 'Redis/BitFrost cache key state (exactHit, semanticHit, etc.)' },
+            trustTier:  { type: 'string',  description: 'Trust classification, e.g. local_code_plus_official_docs' },
+            model:      { type: 'string',  description: 'Model ID used for synthesis (required)' },
+            validation: { type: 'object',  description: 'Validation state — testsPassed, commandRun, etc.' },
+          },
+          required: ['runId', 'query', 'profile', 'acePacket', 'model'],
+        },
+      },
       ...REPAIR_TOOLS_SCHEMAS as any[],
 
     ],
@@ -4692,6 +4720,46 @@ export function setupToolHandlers() {
               durationMs: result.durationMs,
               hits,
             }),
+          }],
+        };
+      }
+
+      case 'llm_synthesis.log_event': {
+        const { logLlmSynthesisEvent } = await import('$lib/server/llm-synthesis/log-event.js');
+        const runId      = String(args.runId ?? '').trim();
+        const query      = String(args.query ?? '').trim();
+        const profile    = String(args.profile ?? '').trim();
+        const model      = String(args.model ?? '').trim();
+
+        if (!runId || !query || !profile || !model) {
+          return { content: [{ type: 'text', text: 'Error: runId, query, profile, and model are required' }], isError: true };
+        }
+
+        const acePacket = (args.acePacket as Record<string, unknown>) ?? {};
+        if (!acePacket || typeof acePacket !== 'object') {
+          return { content: [{ type: 'text', text: 'Error: acePacket must be an object' }], isError: true };
+        }
+
+        const recordId = await logLlmSynthesisEvent({
+          runId,
+          sessionId:  args.sessionId  != null ? String(args.sessionId)  : undefined,
+          userId:     args.userId     != null ? Number(args.userId)      : undefined,
+          authUserId: args.authUserId != null ? String(args.authUserId)  : undefined,
+          query,
+          profile,
+          acePacket,
+          toolCalls:  Array.isArray(args.toolCalls)  ? args.toolCalls  : [],
+          sourceRefs: Array.isArray(args.sourceRefs) ? args.sourceRefs : [],
+          cacheKeys:  (args.cacheKeys as Record<string, string>) ?? {},
+          trustTier:  args.trustTier != null ? String(args.trustTier)   : undefined,
+          model,
+          validation: (args.validation as Record<string, unknown>) ?? {},
+        });
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({ ok: true, id: recordId, runId, redisKey: `ace:packet:${runId}` }),
           }],
         };
       }
