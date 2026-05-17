@@ -61,6 +61,39 @@
       "crawlDepth": 3,
       "topics": ["memory-management", "kernels", "streams"],
       "trustTier": "official_docs"
+    },
+    {
+      "sourceId": "typescript",
+      "title": "TypeScript 5.4",
+      "version": "5.4",
+      "baseUrl": "https://www.typescriptlang.org/docs/",
+      "kind": "language_docs",
+      "licensePolicy": "open_source",
+      "crawlDepth": 2,
+      "topics": ["interfaces", "types", "generics", "tsconfig"],
+      "trustTier": "official_docs"
+    },
+    {
+      "sourceId": "nodejs",
+      "title": "Node.js 22",
+      "version": "22",
+      "baseUrl": "https://nodejs.org/docs/latest-v22.x/api/",
+      "kind": "runtime_docs",
+      "licensePolicy": "open_source",
+      "crawlDepth": 2,
+      "topics": ["fs", "path", "process", "child_process"],
+      "trustTier": "official_docs"
+    },
+    {
+      "sourceId": "postgres",
+      "title": "PostgreSQL 16",
+      "version": "16",
+      "baseUrl": "https://www.postgresql.org/docs/16/",
+      "kind": "database_docs",
+      "licensePolicy": "postgresql_license",
+      "crawlDepth": 2,
+      "topics": ["ddl", "indexes", "foreign-keys", "jsonb"],
+      "trustTier": "official_docs"
     }
   ]
 }

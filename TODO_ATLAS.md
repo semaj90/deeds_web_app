@@ -129,7 +129,7 @@
 - [x] **Validate Infrastructure**: `node scripts/atlas/validate-model-endpoints.mjs`.
 - [x] **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
 - [x] **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
-- [ ] **Tier 1 Expansion**: Ingest TypeScript 5.4, Node.js 22, and PostgreSQL 16 docs.
+- [x] **Tier 1 Expansion**: Ingest TypeScript 5.4, Node.js 22, and PostgreSQL 16 docs.
 ## Phase 6E: Cross-Layer Contract Error Map (2026-05-16)
 
 - [x] Create `scripts/atlas/audit-contract-map.mjs`.
