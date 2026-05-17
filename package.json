@@ -91,6 +91,7 @@
     "syntax:repair:report": "npx tsc --noEmit 2>&1 | tail -20",
     "audit:contracts": "node scripts/atlas/audit-contract-map.mjs",
     "audit:contracts:json": "node scripts/atlas/audit-contract-map.mjs --json",
+    "audit:gaps": "node scripts/docs-atlas/compare-external-docs-to-features.mjs",
     "audit:drizzle-meta": "node scripts/atlas/audit-drizzle-meta-hygiene.mjs",
     "audit:drizzle-meta:fix": "node scripts/atlas/audit-drizzle-meta-hygiene.mjs --fix",
     "audit:pgvector": "node scripts/atlas/audit-pgvector-schema.mjs",
