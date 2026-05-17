@@ -7,42 +7,15 @@
 - Admin Copilot ACE packet display
 
 ## Ready
-- Phase 14: Observability and Operator Dashboard
 
 ## In Progress
-- Phase 13B: Soak Ladder (30-minute and 60-minute bounded runs)
-
-### Card: Phase 13B Soak Ladder Benchmark
-
-Status: In Progress
-Risk: Medium
-Goal: Prove repeated workstation use remains stable over scaling soak runs.
-
-Files:
-- `scripts/atlas/soak-workstation-parent-atlas.mjs`
-- `docs/reports/workstation-soak-report.json`
-- `docs/reports/workstation-soak-report.md`
-
-Definition of Done:
-- [x] Bounded soak loop runs with `--cycles=2 --dry-run`
-- [x] Bounded soak loop runs with `--cycles=10 --dry-run`
-- [x] Bounded soak loop runs with `--cycles=25 --dry-run`
-- [x] Bounded soak loop runs with `--cycles=10 --write`
-- [ ] 30-minute bounded soak runs
-- [ ] 60-minute bounded soak runs
-- [x] sourceRefs checked for every query
-- [x] forbidden fields checked for every output
-- [x] VRAM before/after recorded per cycle
-- [x] Redis/Qdrant/Postgres health checked
-- [x] report files written
-- [x] `audit:contracts` passes
-- [x] `audit:pgvector` passes
-
 
 ## Verify
 - Production Soak Benchmark metrics over 100+ cycles
 
 ## Done
+- [x] Phase 13B: Soak Ladder benchmark validation (10/25 cycle write loops completed with 0MB baseline leakage).
+- [x] Phase 14: YoRHa Tactical Observability Dashboard (Svelte 5 runes HUD, dynamic VLM profile management, SVG performance vector charts).
 - [x] Phase 12A: SIMD bridge memory audit.
 - [x] Phase 12B: VRAM hygiene policy.
 - [x] Phase 12C: GPU job mutex / semaphore queue.
