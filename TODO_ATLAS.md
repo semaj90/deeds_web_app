@@ -36,8 +36,8 @@
 
 ## Phase 3: Memory Optimization
 ### 1. Qdrant / TurboVEC
-- [ ] **On-Disk HNSW Index**: Set `on_disk: true` for the canonical `codebase_chunks_768`.
-- [ ] **Experimental Binary Quantization**: Test on secondary collections.
+- [x] **On-Disk HNSW Index**: Set `on_disk: true` for the canonical `codebase_chunks_768` - **PASSED (Applied and verified)**
+- [x] **Experimental Binary Quantization**: Test on secondary collections - **PASSED (Applied binary quantization to codebase_chunks_64d)**
 
 ### 2. Pipeline Streaming
 - [x] **JSONStream Integration**: Refactor `index-repo-root.mjs` to stream the 400MB+ codebase graph - **PASSED (32,486 files processed memory-efficiently)**
