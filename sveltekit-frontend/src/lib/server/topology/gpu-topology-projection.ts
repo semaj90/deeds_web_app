@@ -280,15 +280,7 @@ export async function runTopologyProjection(
   let result: ProjectionResult;
 
   if (mode === 'ae2l-pca') {
-    let weights = autoencoderWeights2Layer;
-    if (!weights) {
-      try {
-        const { getCachedAutoencoderWeights } = await import('$lib/server/gpu/autoencoder-weights.js');
-        weights = await getCachedAutoencoderWeights();
-      } catch (err) {
-        console.warn('⚠️ [gpu-topology-projection] Failed to load cached 2-layer autoencoder weights:', err);
-      }
-    }
+    const weights = autoencoderWeights2Layer;
 
     if (weights) {
       // 1. Run 2-layer autoencoder (768 -> 256 -> 64)

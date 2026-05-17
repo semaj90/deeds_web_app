@@ -83,10 +83,10 @@ export async function nearestCluster(
   const t0 = Date.now();
   try {
     const redis = getRedis();
-    let keys = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
+    let keys = (await redis.keys('centroid:cluster:*')).slice(0, maxClusters);
     if (!keys.length) {
       await loadCentroidsFromDB();
-      keys = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
+      keys = (await redis.keys('centroid:cluster:*')).slice(0, maxClusters);
     }
     if (!keys.length) return null;
 
@@ -110,7 +110,7 @@ export async function nearestCluster(
     for (let i = 0; i < keys.length; i++) {
       const raw = values[i];
       if (!raw) continue;
-      const id = parseInt(keys[i].split(':')[3], 10);
+      const id = parseInt(keys[i].split(':').at(-1)!, 10);
       if (isNaN(id)) continue;
       
       const parsed = parseFn(raw);
