@@ -613,6 +613,7 @@ src/lib/wasm/dist/
 # Large text & data files
 ########################################
 *.jsonl
+!docs/reports/workstation-soak-history.jsonl
 *.txt
 !README*.txt
 !LICENSE*.txt

@@ -1,0 +1,1 @@
+{"ts":"2026-05-17T02:27:38.348Z","runId":"soak_20260517_022738","cycles":10,"isDryRun":false,"overallStatus":"PASS","latencyP50Ms":2428,"latencyP95Ms":6297,"vramBaselineMb":7599,"vramPeakDeltaMb":85,"sourceRefCoveragePct":100,"forbiddenFields":0,"acePassRate":100,"synthesisPassRate":100}
