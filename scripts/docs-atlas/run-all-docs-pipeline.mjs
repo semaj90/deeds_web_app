@@ -23,6 +23,10 @@ async function runPipeline() {
       script: 'scripts/docs-atlas/build-llms-txt.mjs'
     },
     {
+      name: 'Autoencoding SOM Topological Manifold Clustering',
+      script: 'scripts/docs-atlas/autoencode-som-clustering.mjs'
+    },
+    {
       name: 'TurboVec Query Latency & VRAM Telemetry Benchmark',
       script: 'scripts/docs-atlas/turbovec-benchmark-sidecar.mjs'
     }
