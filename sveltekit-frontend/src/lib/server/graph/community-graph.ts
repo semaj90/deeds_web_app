@@ -744,11 +744,11 @@ notes.push({ ...parsed, _key: indexKeys[i] });
  * full `getDirectoryKAGContext()` which does GPU cosine + multi-key reads.
  *
  * Walks UP the directory tree (per LLMS.md spec) until a key is found:
- *   src/lib/server/ace/foo  → tries llms:dir:src/lib/server/ace/foo
- *                           → falls back to llms:dir:src/lib/server/ace
+ *   src/lib/server/ace/foo  → tries agents:dir:src/lib/server/ace/foo
+ *                           → falls back to agents:dir:src/lib/server/ace
  *                           → ... → llms:root (always-present root)
  *
- * Keys: llms:dir:<rel>           rendered LLMS.md per directory (24h TTL)
+ * Keys: agents:dir:<rel>           rendered LLMS.md per directory (24h TTL)
  *       llms:root                rendered repo-root LLMS.md (24h TTL)
  *
  * Refresh: `npm run llms:write` (after `npm run index:codebase:fast`).
@@ -840,7 +840,7 @@ export async function resolveAgentsMdQuickHit(
   try {
     const redis = getRedis();
     for (const dir of lookupDirs) {
-      const key = `llms:dir:${dir}`;
+      const key = `agents:dir:${dir}`;
       const markdown = await redis.get(key).catch(() => null);
       if (markdown) {
         return {

@@ -23,7 +23,7 @@ export class WikiMcpService {
     const [featureCount] = await db.select({ count: count() }).from(featureMaps);
 
     // 2. Redis Metrics (scan for agents: and wiki: keys)
-    const agentKeys = await redis.keys('llms:dir:*');
+    const agentKeys = await redis.keys('agents:dir:*');
     const wikiKeys = await redis.keys('wiki:page:*');
 
     // 3. Qdrant Metrics

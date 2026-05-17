@@ -1530,7 +1530,7 @@ export async function assembleACEContext(opts: {
               let resolvedDir = '';
               let ttl: number | null = null;
               while (dir && dir !== '.' && dir !== '/') {
-                const key = `llms:dir:${dir}`;
+                const key = `agents:dir:${dir}`;
                 if (await redis.exists(key)) {
                   resolvedKey = key;
                   resolvedDir = dir;
@@ -1554,7 +1554,7 @@ export async function assembleACEContext(opts: {
             } catch {
               // Couldn't introspect the key, but we still have the markdown
               agentsMd = {
-                resolvedKey: 'llms:dir:?',
+                resolvedKey: 'agents:dir:?',
                 requestedPath: opts.filePath,
                 resolvedDir: requestedDir,
                 markdown: md,
@@ -3741,7 +3741,7 @@ export async function fetchCodebaseContext(
         let dir = filePath.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
         if (/\.[a-z]{1,5}$/i.test(dir)) dir = dir.split('/').slice(0, -1).join('/');
         while (dir && dir !== '.' && dir !== '/') {
-          if (await redis.exists(`llms:dir:${dir}`)) {
+          if (await redis.exists(`agents:dir:${dir}`)) {
             agentsMdResolvedDir = dir;
             break;
           }

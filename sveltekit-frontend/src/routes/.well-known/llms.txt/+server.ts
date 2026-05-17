@@ -186,7 +186,7 @@ export const GET: RequestHandler = async () => {
   lines.push('');
   lines.push('| Tier | Tech | Key pattern | TTL | Notes |');
   lines.push('|------|------|-------------|-----|-------|');
-  lines.push('| Tiny RAM | Redis | `llms:dir:*` | 24h | Per-directory LLMS.md rendered markdown |');
+  lines.push('| Tiny RAM | Redis | `agents:dir:*` | 24h | Per-directory LLMS.md rendered markdown |');
   lines.push('| Tiny RAM | Redis | `code:index:*` | 6h | Fast-AST file metadata |');
   lines.push('| Tiny RAM | Redis | `wiki:note:dir:*` | 24h | Karpathy wiki notes per directory |');
   lines.push('| Tiny RAM | Redis | `summary:cluster:*` | 6h | Gemma4 GPU cluster narratives |');

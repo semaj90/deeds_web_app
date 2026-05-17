@@ -27,7 +27,7 @@ export type EdgeType = typeof EDGE_TYPES[number];
 export const MEMBER_KINDS = [
   'query',         // hashed query string
   'file',          // source file stable_key
-  'LLMS.md',     // LLMS.md Redis key (llms:dir:<path> or llms:root)
+  'LLMS.md',     // LLMS.md Redis key (agents:dir:<path> or llms:root)
   'cluster',       // GPU/SOM cluster id
   'prior_answer',  // code_llm_index / ace_hits stable_key
   'test',          // test file stable_key

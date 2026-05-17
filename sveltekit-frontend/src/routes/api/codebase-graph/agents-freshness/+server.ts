@@ -11,7 +11,7 @@
  * Used by the fast-ast detail panel to surface "LLMS.md cache fresh / stale"
  * info next to selected files in GraphifyViewer (architecture review item 5).
  *
- * GET (no path) → returns global stats: total llms:dir:* keys + llms:root presence
+ * GET (no path) → returns global stats: total agents:dir:* keys + llms:root presence
  *                 so the panel can render a top-level "NES-arch ready" badge.
  */
 
@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   // Global stats mode — no path param
   if (!path) {
     try {
-      const dirKeys      = await redis.keys('llms:dir:*');
+      const dirKeys      = await redis.keys('agents:dir:*');
       const rootRaw      = await redis.get('llms:root');
       const rootTtl      = rootRaw ? await redis.ttl('llms:root') : null;
       const stats: GlobalStats = {
@@ -75,7 +75,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     let resolved     = false;
 
     while (dir && dir !== '.' && dir !== '/') {
-      const key    = `llms:dir:${dir}`;
+      const key    = `agents:dir:${dir}`;
       const exists = (await redis.exists(key)) === 1;
       walk.push({ key, exists });
       if (exists && !resolved) {
