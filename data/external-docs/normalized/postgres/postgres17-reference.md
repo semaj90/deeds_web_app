@@ -1,12 +1,12 @@
-# PostgreSQL 16 Relational Database Reference Manual
+# PostgreSQL 17 Relational Database Reference Manual
 
-This manual details advanced SQL commands, JSONB storage operations, indexing schemes, and foreign-key constraint validations in PostgreSQL 16.
+This manual details advanced SQL commands, JSONB query improvements, indexing schemas, and foreign-key constraint validations specifically for PostgreSQL 17.
 
 ---
 
 ## 1. Table Definitions & Constraint Schemas
 
-PostgreSQL 16 enforces strict relational constraints and supports native auto-incrementing serial primary keys and standard foreign-key cascading rules.
+PostgreSQL 17 enforces strict relational integrity, utilizing serial primary keys and robust foreign keys with cascade constraints for modern web applications.
 
 ```sql
 -- Create users master table
@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 ---
 
-## 2. Advanced JSONB Document Storage & Querying
+## 2. PostgreSQL 17 JSONB Improvements & Querying
 
-JSONB columns enable highly efficient semi-structured document store query profiles alongside relational tables.
+PostgreSQL 17 includes advanced JSONB document performance improvements and standard relational query layouts.
 
 ```sql
 CREATE TABLE IF NOT EXISTS system_metadata (
@@ -47,9 +47,9 @@ WHERE payload @> '{"status": "active", "metrics": {"VRAM": 0}}';
 
 ---
 
-## 3. High-Performance HNSW Vector Indexing
+## 3. High-Performance pgvector HNSW Indexing
 
-Utilizing pgvector to support high-dimensional similarity searches with fast approximate nearest neighbors (ANN) index pipelines.
+Utilizing pgvector 0.7+ to create Hierarchical Navigable Small World (HNSW) vector indices with cosine distance operators.
 
 ```sql
 -- Enable the vector database extension
