@@ -8,7 +8,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { writeFileSync, existsSync, mkdirSync, readFileSync, appendFileSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -194,6 +194,36 @@ async function runSoak() {
     const mdPath = join(reportsDir, 'workstation-soak-report.md');
 
     writeFileSync(jsonPath, JSON.stringify(soakReport, null, 2), 'utf8');
+
+    // Append summary row to benchmark history JSONL
+    const historyPath = join(reportsDir, 'workstation-soak-history.jsonl');
+    try {
+      const cycles = soakReport.cycles;
+      const latencies = [...cycles.map(c => c.latencyMs)].sort((a, b) => a - b);
+      const pct = (p) => latencies[Math.max(0, Math.ceil(p * latencies.length) - 1)];
+      const histRow = JSON.stringify({
+        ts: soakReport.timestamp,
+        runId: 'soak_' + soakReport.timestamp.replace(/[-:T.Z]/g, '').slice(0, 15),
+        cycles: soakReport.cyclesConfigured,
+        isDryRun: soakReport.isDryRun,
+        overallStatus: soakReport.overallStatus,
+        latencyP50Ms: pct(0.50),
+        latencyP95Ms: pct(0.95),
+        vramBaselineMb: cycles[0]?.vramBeforeMb ?? 0,
+        vramPeakDeltaMb: soakReport.metrics.peakVramDeltaMb,
+        sourceRefCoveragePct: cycles.length
+          ? Math.round(cycles.filter(c => c.sourceRefsPresent).length / cycles.length * 100) : 0,
+        forbiddenFields: soakReport.metrics.forbiddenFieldsDetected,
+        acePassRate: cycles.length
+          ? Math.round(cycles.filter(c => c.aceSmokePassed).length / cycles.length * 100) : 0,
+        synthesisPassRate: cycles.length
+          ? Math.round(cycles.filter(c => c.synthesisSmokePassed).length / cycles.length * 100) : 0,
+      });
+      appendFileSync(historyPath, histRow + '\n', 'utf8');
+      console.log(`   - History: ${historyPath}`);
+    } catch (e) {
+      console.warn(`[soak] Failed to append history: ${e.message}`);
+    }
 
     // Format MD report
     const mdContent = `# Workstation Parent Atlas Soak Benchmark Report

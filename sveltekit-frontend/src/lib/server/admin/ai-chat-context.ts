@@ -4,10 +4,64 @@ import { createRedisConnection } from '$lib/server/redis';
 import { sanitizeBrowserContext, emptyContext } from './browser-context-sanitizer.js';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
 import { HyperRagFusionService } from '$lib/server/retrieval/hyperrag-fusion-service.js';
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 
 
 const BROWSER_REDIS_KEY = (userId: string) => `browser-context:snapshot:${userId}`;
+
+// Relative to the sveltekit-frontend package (dev) or repo root (production node)
+const SOAK_HISTORY_PATH = resolve(process.cwd(), '../docs/reports/workstation-soak-history.jsonl');
+const SOAK_REPORT_PATH  = resolve(process.cwd(), '../docs/reports/workstation-soak-report.json');
+
+interface SoakHistoryRow {
+  ts: string;
+  runId: string;
+  cycles: number;
+  isDryRun: boolean;
+  overallStatus: string;
+  latencyP50Ms: number;
+  latencyP95Ms: number;
+  vramBaselineMb: number;
+  vramPeakDeltaMb: number;
+  sourceRefCoveragePct: number;
+  forbiddenFields: number;
+  acePassRate: number;
+  synthesisPassRate: number;
+}
+
+function loadSoakStatus(): { latest: SoakHistoryRow | null; trend: { runsTotal: number; lastPassTs: string | null; avgP50: number; avgP95: number; vramDrift: number } } {
+  try {
+    if (!existsSync(SOAK_HISTORY_PATH)) {
+      return { latest: null, trend: { runsTotal: 0, lastPassTs: null, avgP50: 0, avgP95: 0, vramDrift: 0 } };
+    }
+    const lines = readFileSync(SOAK_HISTORY_PATH, 'utf8')
+      .split('\n').filter(l => l.trim())
+      .map(l => JSON.parse(l) as SoakHistoryRow);
+    if (!lines.length) return { latest: null, trend: { runsTotal: 0, lastPassTs: null, avgP50: 0, avgP95: 0, vramDrift: 0 } };
+
+    const latest = lines[lines.length - 1];
+    const passes = lines.filter(r => r.overallStatus === 'PASS');
+    const avgP50 = lines.reduce((s, r) => s + r.latencyP50Ms, 0) / lines.length;
+    const avgP95 = lines.reduce((s, r) => s + r.latencyP95Ms, 0) / lines.length;
+    const baselines = lines.map(r => r.vramBaselineMb).filter(Boolean);
+    const vramDrift = baselines.length > 1 ? baselines[baselines.length - 1] - baselines[0] : 0;
+
+    return {
+      latest,
+      trend: {
+        runsTotal: lines.length,
+        lastPassTs: passes.length ? passes[passes.length - 1].ts : null,
+        avgP50: Math.round(avgP50),
+        avgP95: Math.round(avgP95),
+        vramDrift,
+      },
+    };
+  } catch {
+    return { latest: null, trend: { runsTotal: 0, lastPassTs: null, avgP50: 0, avgP95: 0, vramDrift: 0 } };
+  }
+}
 
 /** Fetch the latest sanitized browser snapshot for a user (Redis-only here —
  *  the API route owns the in-process fallback for dev). Returns null if none.
@@ -102,6 +156,8 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
 
   await redis.quit();
 
+  const soakStatus = loadSoakStatus();
+
   return {
     system: {
       uptime: process.uptime(),
@@ -116,6 +172,7 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
     indexing: indexingStatus,
     agentic: agenticResults,
     suggestedCommands: commandSuggestions,
+    soak: soakStatus,
     request: {
       query,
       currentPath,
