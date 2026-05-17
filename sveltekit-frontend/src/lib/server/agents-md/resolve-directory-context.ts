@@ -1,32 +1,32 @@
 /**
  * Directory context resolver — given a file path and the set of indexed
- * LLMS.md files, return the nearest governing LLMS.md by walking UP
+ * AGENTS.md files, return the nearest governing AGENTS.md by walking UP
  * the directory tree.
  *
  * Pure function. No I/O. Used by:
  *   - the bindings indexer (to populate directory_context_bindings rows)
  *   - the ACE preflight (sub-5ms walk-up against agents:dir:* Redis keys)
- *   - the rerank scorer (to compute the same-LLMS.md-dir boost)
+ *   - the rerank scorer (to compute the same-AGENTS.md-dir boost)
  */
 
 const SEP_RE = /[\\/]/;
 
 /**
- * Generate candidate LLMS.md paths from `filePath` walking UP the tree.
- * Returns paths in nearest-first order (deepest dir's LLMS.md first).
+ * Generate candidate AGENTS.md paths from `filePath` walking UP the tree.
+ * Returns paths in nearest-first order (deepest dir's AGENTS.md first).
  *
  * Example: src/lib/server/ai/foo.ts →
- *   [ 'src/lib/server/ai/LLMS.md',
- *     'src/lib/server/LLMS.md',
- *     'src/lib/LLMS.md',
- *     'src/LLMS.md',
- *     'LLMS.md' ]
+ *   [ 'src/lib/server/ai/AGENTS.md',
+ *     'src/lib/server/AGENTS.md',
+ *     'src/lib/AGENTS.md',
+ *     'src/AGENTS.md',
+ *     'AGENTS.md' ]
  */
 export function candidateAgentsMdPaths(filePath: string): string[] {
   const norm  = filePath.replace(/\\/g, '/').replace(/\/+$/, '');
-  if (!norm || norm === 'LLMS.md') return ['LLMS.md'];
+  if (!norm || norm === 'AGENTS.md') return ['AGENTS.md'];
 
-  // If filePath is itself an LLMS.md, start from its containing dir
+  // If filePath is itself an AGENTS.md, start from its containing dir
   const trimmed = /\/AGENTS\.md$/i.test(norm)
     ? norm.replace(/\/AGENTS\.md$/i, '')
     : (/\.[a-z]{1,8}$/i.test(norm) ? norm.split('/').slice(0, -1).join('/') : norm);
@@ -34,17 +34,17 @@ export function candidateAgentsMdPaths(filePath: string): string[] {
   const parts = trimmed.split('/').filter(Boolean);
   const candidates: string[] = [];
   for (let i = parts.length; i > 0; i--) {
-    candidates.push(parts.slice(0, i).join('/') + '/LLMS.md');
+    candidates.push(parts.slice(0, i).join('/') + '/AGENTS.md');
   }
-  candidates.push('LLMS.md');
+  candidates.push('AGENTS.md');
   return candidates;
 }
 
 /**
- * Given a file path and a Set/Map of existing LLMS.md keys, return the
+ * Given a file path and a Set/Map of existing AGENTS.md keys, return the
  * nearest one that exists, or null if none. The set keys can be either
- * file paths (`src/lib/LLMS.md`) or Redis-style stable keys
- * (`agents:src/lib/LLMS.md`) — we check both forms.
+ * file paths (`src/lib/AGENTS.md`) or Redis-style stable keys
+ * (`agents:src/lib/AGENTS.md`) — we check both forms.
  */
 export function nearestAgentsMdForFile(
   filePath: string,
@@ -58,7 +58,7 @@ export function nearestAgentsMdForFile(
   for (const candidate of candidateAgentsMdPaths(filePath)) {
     if (has(candidate))                 return candidate;
     if (has(`agents:${candidate}`))     return candidate;
-    // Also try without trailing /LLMS.md (matches `agents:dir:src/lib/server/ai`)
+    // Also try without trailing /AGENTS.md (matches `agents:dir:src/lib/server/ai`)
     const dirOnly = candidate.replace(/\/?AGENTS\.md$/i, '') || '.';
     if (has(`agents:dir:${dirOnly}`))   return candidate;
   }
@@ -66,10 +66,10 @@ export function nearestAgentsMdForFile(
 }
 
 /**
- * Build the binding rows for a single LLMS.md against the directory tree
+ * Build the binding rows for a single AGENTS.md against the directory tree
  * it governs. The exact-binding row has depth=0; ancestors that the file's
- * dir walks up through don't get rows from this LLMS.md (only files in
- * subdirs of this LLMS.md's directory get inherited bindings).
+ * dir walks up through don't get rows from this AGENTS.md (only files in
+ * subdirs of this AGENTS.md's directory get inherited bindings).
  *
  * Used by the indexer to populate directory_context_bindings.
  */
@@ -93,7 +93,7 @@ export function bindingsForAgentsMd(args: {
 
   const out: ReturnType<typeof bindingsForAgentsMd> = [];
 
-  // exact row for the dir that contains the LLMS.md
+  // exact row for the dir that contains the AGENTS.md
   out.push({
     agent_context_key:   args.agentContextKey,
     directory_path:      ownerDir,

@@ -1,10 +1,10 @@
 /**
- * LLMS.md → envelope parser.
+ * AGENTS.md → envelope parser.
  *
  * Pure function — no I/O. Takes the raw markdown body + repo-relative file
  * path and returns an AgentsMdEnvelope ready for Postgres / Redis / Qdrant.
  *
- * The parser is intentionally lenient: LLMS.md files are author-written
+ * The parser is intentionally lenient: AGENTS.md files are author-written
  * markdown, not strictly machine-generated. We extract what we can:
  *
  *   - title       → first H1
@@ -196,7 +196,7 @@ function extractTitleAndSummary(preamble: string[]): { title?: string; summary: 
 }
 
 /**
- * Parse an LLMS.md body into a typed envelope. Pure function.
+ * Parse an AGENTS.md body into a typed envelope. Pure function.
  * Throws if the resulting envelope fails Zod validation (shouldn't happen
  * with valid inputs, but the validator is the contract).
  */
@@ -205,7 +205,7 @@ export function parseAgentsMd(body: string, filePath: string): AgentsMdEnvelope 
   const contentHash = createHash('sha256').update(norm).digest('hex');
 
   const fp        = filePath.replace(/\\/g, '/');
-  // Strip /LLMS.md OR bare LLMS.md (repo root). Empty result → '.'
+  // Strip /AGENTS.md OR bare AGENTS.md (repo root). Empty result → '.'
   const directory = fp.replace(/(?:^|\/)AGENTS\.md$/i, '').replace(/\/$/, '') || '.';
   const stableKey = `agents:${fp}`;
 
@@ -228,7 +228,7 @@ export function parseAgentsMd(body: string, filePath: string): AgentsMdEnvelope 
   );
 
   const envelope: AgentsMdEnvelope = {
-    kind:           'LLMS.md',
+    kind:           'agents_md',
     stable_key:     stableKey,
     file_path:      fp,
     directory_path: directory,
