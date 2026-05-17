@@ -15,7 +15,8 @@ export enum VlmMode {
   OFF = 'OFF',
   TEXT = 'TEXT',
   VISION = 'VISION',
-  SWITCHING = 'SWITCHING'
+  SWITCHING = 'SWITCHING',
+  GPU_WORK = 'GPU_WORK'
 }
 
 const REDIS_STATE_KEY = 'vlm:lifecycle:state';
@@ -92,33 +93,55 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
 
     console.info(`[vlm-lifecycle] Switching mode: ${currentMode} -> ${targetMode}`);
 
-    if (targetMode === VlmMode.VISION) {
-      // Transitioning to Vision (usually means stopping TurboQuant to free VRAM for Ollama VLM)
+    const ollamaModel =
+      process.env.OLLAMA_CHAT_MODEL ??
+      process.env.OLLAMA_MODEL ??
+      process.env.GEMMA4_MODEL ??
+      'gemma4:e4b-it-q4_K_M';
+
+    if (targetMode === VlmMode.OFF || targetMode === VlmMode.GPU_WORK) {
+      // Unload both services completely to free up 100% VRAM / GPU resources
       const tqProcess = findTurboQuantProcess();
       if (tqProcess) {
         stopTurboQuant(tqProcess.pid);
-        // Wait for VRAM to settle
+      }
+      await unloadOllamaModel(ollamaModel);
+      await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
+    } else if (targetMode === VlmMode.VISION) {
+      // Transitioning to Vision mode (runs TurboQuant with mmproj)
+      const tqProcess = findTurboQuantProcess();
+      if (tqProcess) {
+        stopTurboQuant(tqProcess.pid);
         await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
       }
-    } else if (targetMode === VlmMode.TEXT) {
-      // Transitioning back to Text (Restart TurboQuant)
-      // First try to unload Ollama VLM model if it was running
-      await unloadOllamaModel('gemma4:e4b-it-q4_K_M');
-      
+      await unloadOllamaModel(ollamaModel);
+
       const modelPath = TURBOQUANT_GGUF;
       const mmprojPath = TURBOQUANT_MMPROJ;
-      
-      if (modelPath) {
-        restartTurboQuant(modelPath, mmprojPath);
-        // Wait for server to start
+      if (modelPath && mmprojPath) {
+        restartTurboQuant(modelPath, mmprojPath); // start WITH mmproj
+        await waitForTurboQuant(8090, 20); // up to 20s
+      }
+    } else if (targetMode === VlmMode.TEXT) {
+      // Transitioning to Text mode (runs TurboQuant text-only, without mmproj)
+      const tqProcess = findTurboQuantProcess();
+      if (tqProcess) {
+        stopTurboQuant(tqProcess.pid);
         await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
+      }
+      await unloadOllamaModel(ollamaModel);
+
+      const modelPath = TURBOQUANT_GGUF;
+      if (modelPath) {
+        restartTurboQuant(modelPath); // start WITHOUT mmproj
+        await waitForTurboQuant(8090, 20); // up to 20s
       }
     }
 
     await redis.set(REDIS_STATE_KEY, targetMode);
     return { success: true };
   } catch (err) {
-    console.error('[vlm-lifecycle] Mode switch failed:', err);
+    console.error('[vlm-lifecycle] Mode switch failed, reverting state:', err);
     const redis = getRedis();
     await redis.set(REDIS_STATE_KEY, currentMode); // Revert on failure
     return { success: false, error: err instanceof Error ? err.message : String(err) };
@@ -206,4 +229,28 @@ async function unloadOllamaModel(model: string): Promise<void> {
   } catch {
     // Ignore errors during unload
   }
+}
+
+/**
+ * Polls the TurboQuant status/health endpoint until it responds with 200 OK or times out
+ */
+async function waitForTurboQuant(port: number, maxSeconds: number): Promise<boolean> {
+  const url = `http://127.0.0.1:${port}/health`;
+  const startTime = Date.now();
+  const timeoutMs = maxSeconds * 1000;
+  
+  while (Date.now() - startTime < timeoutMs) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(1000) });
+      if (res.ok) {
+        console.info(`[vlm-lifecycle] TurboQuant became healthy on port ${port} after ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
+        return true;
+      }
+    } catch {
+      // Server not listening yet or connection refused
+    }
+    await new Promise(r => setTimeout(r, 500));
+  }
+  
+  throw new Error(`[vlm-lifecycle] Timeout waiting for TurboQuant on port ${port} to start`);
 }
