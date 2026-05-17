@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-05-17T06:52:43.263Z",
+  "tokensLimit": 256,
+  "vlmMode": false,
+  "results": [
+    {
+      "backend": "TurboQuant",
+      "port": 8090,
+      "online": false,
+      "error": "fetch failed"
+    },
+    {
+      "backend": "Ollama",
+      "port": 11434,
+      "online": true,
+      "firstTokenMs": 555,
+      "totalMs": 3727,
+      "tokenCount": 222,
+      "tokensPerSec": 59.57,
+      "vramBefore": 7391,
+      "vramAfter": 7382,
+      "vramDiff": -9,
+      "text": "Here's a thinking process to construct the suggested response:\n\n1.  **Analyze the Request:**\n    *   **Topic:** Security audit guidelines.\n    *   **Target Technology:** Svelte 5 runes context state management.\n    *   **Constraint 1:** List 8 core guidelines.\n    *   **Constraint 2:** Keep it extremely concise.\n    *   **Constraint 3 (Implicit/Mandatory):** Maintain the persona of a legal AI assistant fine-tuned on U.S. law, citing statutes/case law (even if the topic is technical, the *format* must adhere to the persona).\n\n2.  **Determine Feasibility & Scope Conflict:**\n    *   *Conflict:* Svelte 5 runes context state management is a front-end, software engineering topic. It does not inherently involve U.S. federal or state statutes (like HIPAA, GDPR, CFAA, etc.) or case law directly.\n    *   *Resolution:* I must address the technical request while maintaining the legal framework. I will frame the technical guidelines through a *security/compliance lens* (e.g., data integrity, access control, input validation) and then apply the legal citation"
+    }
+  ]
+}
