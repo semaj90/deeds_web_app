@@ -34,6 +34,13 @@ vi.mock('$lib/server/db/client', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat: (...args: unknown[]) => mockBifrostChat(...args),
   ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+  VLM_MODELS: {
+    legal: 'gemma4-legal:latest',
+    vision: 'gemma4-legal-vlm:latest',
+    embedding: 'embeddinggemma:latest',
+    gemma4: 'gemma4-legal:latest',
+    tool: 'gemma4-legal:latest',
+  },
 }));
 
 vi.mock('$lib/server/redis.js', () => ({
@@ -57,7 +64,23 @@ beforeEach(() => {
   mockRedisGet.mockResolvedValue(null);
   mockRedisSet.mockResolvedValue('OK');
   mockFetch.mockImplementation(async () => jsonResponse({ result: { points: [] } }));
-  mockOllamaFetch.mockResolvedValue(jsonResponse({ embedding: [0.11, 0.22, 0.33, 0.44] }));
+  mockOllamaFetch.mockImplementation(async (url: string | URL | Request) => {
+    const urlStr = String(url);
+    if (urlStr.includes('/api/chat')) {
+      return jsonResponse({
+        message: {
+          content: JSON.stringify({
+            summary: 'Cluster summary for the Postgres mirror.',
+            purpose: 'Mirror bridge',
+            patterns: ['Postgres fallback', 'LLM summary'],
+            keyFiles: ['src/lib/server/indexer/cluster-summary.ts'],
+            warnings: [],
+          }),
+        },
+      });
+    }
+    return jsonResponse({ embedding: [0.11, 0.22, 0.33, 0.44] });
+  });
   mockPoolQuery.mockImplementation(async (sql: unknown, params?: unknown[]) => {
     const text = String(sql);
 
@@ -145,8 +168,10 @@ describe('generateClusterSummary', () => {
     const mod = await import('../src/lib/server/indexer/cluster-summary.js');
     mockFetch.mockClear();
 
-    const summary = await mod.generateClusterSummary(7, true);
+    const result = await mod.generateClusterSummary(7, true);
 
+    expect(result.ok).toBe(true);
+    const summary = (result as any).summary;
     expect(summary).not.toBeNull();
     expect(summary?.clusterId).toBe(7);
     expect(summary?.purpose).toBe('Mirror bridge');

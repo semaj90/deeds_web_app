@@ -20,6 +20,8 @@ vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
 vi.mock('$lib/server/env.server.js', () => ({
+  SEAWEED_MASTER_PORT: '9333',
+  SEAWEED_FILER_PORT: '8382',
   ENV: {
     OLLAMA_BASE_URL: 'http://ollama.test',
     QDRANT_URL: 'http://qdrant.test',
@@ -39,6 +41,8 @@ vi.mock('$lib/server/env.server.js', () => ({
     EMBEDDING_QUIC_ENABLED: 'false',
     EMBEDDING_GRPC_ENABLED: 'false',
     EMBEDDING_GRPC_URL: 'localhost:50051',
+    SEAWEED_MASTER_PORT: '9333',
+    SEAWEED_FILER_PORT: '8382',
   },
   ollamaFetch: mockOllamaFetch,
 }));
@@ -56,6 +60,7 @@ vi.mock('$lib/server/db/client', () => ({
 vi.mock('drizzle-orm', () => ({
   sql: Object.assign(vi.fn(), { raw: vi.fn((s: string) => s) }),
   eq: vi.fn(),
+  relations: vi.fn(),
 }));
 
 vi.mock('$lib/server/circuit-breaker.js', () => ({
