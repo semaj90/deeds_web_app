@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-05-17T02:14:29.701Z",
+  "cyclesConfigured": 2,
+  "isDryRun": false,
+  "overallStatus": "PASS",
+  "metrics": {
+    "totalQueriesExecuted": 2,
+    "averageLatencyMs": 1505,
+    "peakVramDeltaMb": 1,
+    "forbiddenFieldsDetected": 0,
+    "sourceRefsMissingCount": 0,
+    "redisOk": true,
+    "qdrantOk": true,
+    "postgresOk": true
+  },
+  "cycles": [
+    {
+      "cycleIndex": 1,
+      "query": "how do we validate pgvector hnsw indexes",
+      "vramBeforeMb": 7598,
+      "vramAfterMb": 7599,
+      "latencyMs": 1401,
+      "aceSmokePassed": true,
+      "synthesisSmokePassed": true,
+      "sourceRefsPresent": true,
+      "forbiddenFieldsDetected": false,
+      "errors": []
+    },
+    {
+      "cycleIndex": 2,
+      "query": "drizzle schema user_id mismatch",
+      "vramBeforeMb": 7599,
+      "vramAfterMb": 7599,
+      "latencyMs": 1609,
+      "aceSmokePassed": true,
+      "synthesisSmokePassed": true,
+      "sourceRefsPresent": true,
+      "forbiddenFieldsDetected": false,
+      "errors": []
+    }
+  ]
+}
