@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-05-17T06:59:07.979Z",
+  "documentsProcessed": 5,
+  "documentsSkipped": 0,
+  "clustersCreated": 10,
+  "qdrantUpsertedCount": 18,
+  "redisCachedCount": 10,
+  "details": [
+    {
+      "id": "doc_svelte_runes",
+      "title": "Svelte 5 Runes Compliance",
+      "sourceRef": "docs/programming/svelte5_runes.md",
+      "hash": "71897c5a1b6d509325e2a7f495e062f8"
+    },
+    {
+      "id": "doc_ca_contract_elements",
+      "title": "CA Contract Elements",
+      "sourceRef": "docs/legal/ca_contracts.md",
+      "hash": "e65617896ef008f25c440e0d21ec0eb8"
+    },
+    {
+      "id": "doc_gpu_vram_hygiene",
+      "title": "GPU VRAM Hygiene Rules",
+      "sourceRef": "docs/hardware/vram_hygiene.md",
+      "hash": "49b769716902c4f98772ff681b5ec758"
+    },
+    {
+      "id": "doc_redis_bifrost_l1",
+      "title": "Redis BitFrost L1 Cache",
+      "sourceRef": "docs/architecture/redis_bifrost.md",
+      "hash": "001377cf5e2d9bd57558e51ce7ef23c4"
+    },
+    {
+      "id": "doc_firecrawl_normalized",
+      "title": "Firecrawl Content Scraper",
+      "sourceRef": "docs/crawlers/firecrawl_normalization.md",
+      "hash": "44e479edde7ef07e9cdb3206af38d887"
+    }
+  ]
+}
