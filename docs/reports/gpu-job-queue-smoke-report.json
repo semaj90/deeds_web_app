@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-05-17T02:04:48.411Z",
+  "concurrencySerializedPassed": true,
+  "timeoutEnforcementPassed": true,
+  "cpuFallbackPassed": true,
+  "simulations": [
+    {
+      "testName": "concurrency_serialization",
+      "timeline": [
+        {
+          "name": "job_1",
+          "event": "start",
+          "time": 1778983488413
+        },
+        {
+          "name": "job_1",
+          "event": "end",
+          "time": 1778983488626
+        },
+        {
+          "name": "job_2",
+          "event": "start",
+          "time": 1778983488627
+        },
+        {
+          "name": "job_2",
+          "event": "end",
+          "time": 1778983488734
+        }
+      ],
+      "passed": true
+    },
+    {
+      "testName": "job_timeout",
+      "passed": true
+    },
+    {
+      "testName": "cpu_fallback",
+      "passed": true
+    }
+  ],
+  "finalQueueState": {
+    "activeJobsCount": 0,
+    "waitingJobsCount": 0,
+    "concurrencyLimit": 1,
+    "totalJobsProcessed": 2,
+    "totalTimeoutsEnforced": 1,
+    "totalFallbacksTriggered": 1
+  },
+  "overallStatus": "PASS"
+}
