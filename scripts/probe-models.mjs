@@ -65,8 +65,8 @@ async function probeOllama() {
       console.log(`  ${ok(m.name.padEnd(40))}  ${dim(gb + 'GB')}  ${dim(q)}  ${dim(fam)}`);
     }
     console.log();
-    console.log(dim(`  → update opencode.json ollama.models with the Hermes model ID above`));
-    console.log(dim(`    e.g. "hermes-agent": {} → rename key to match exact ollama list name`));
+    console.log(dim(`  → opencode.json ollama lane uses: gemma4-hermes-64k (65536-ctx alias of gemma4-legal-vlm)`));
+    console.log(dim(`    if missing: run VS Code task "Hermes: Create gemma4-hermes-64k model in Ollama"`));
   } catch (e) {
     console.log(bad(`Ollama unreachable at ${base}: ${e.message}`));
     console.log(dim('  Run: ollama serve'));

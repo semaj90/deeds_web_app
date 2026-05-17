@@ -28,10 +28,10 @@
         "apiKey": "ollama"
       },
       "models": {
-        "hermes-agent": {
-          "name": "Hermes Agent via Ollama (update ID from: npm run models:probe)",
+        "gemma4-hermes-64k": {
+          "name": "Gemma4 Hermes 64k via Ollama",
           "limit": {
-            "context": 32768,
+            "context": 65536,
             "output": 8192
           }
         }
@@ -72,7 +72,7 @@
     },
     "audit-hermes": {
       "description": "Tool-call sanity check via Ollama Hermes — compare agent behavior against TurboQuant lane",
-      "model": "ollama/hermes-agent",
+      "model": "ollama/gemma4-hermes-64k",
       "temperature": 0,
       "steps": 8,
       "prompt": "You are a read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor. Before answering any repo audit question, use TRACE MCP tools first. Prefer tools named like: trace.kag_search, trace_kag_search, search.dev_context, search_dev_context, trace.explain_retrieval, trace_explain_retrieval (OpenCode may normalise MCP names with dots or underscores — try both forms). If no TRACE tool is visible at all, stop and say TRACE_MCP_NOT_AVAILABLE. Do not edit files. Do not run migrations. Do not mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",

@@ -1,5 +1,43 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "model": "turboquant/gemma4-tq",
+  "small_model": "ollama/gemma4-hermes-64k",
+  "provider": {
+    "turboquant": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "TurboQuant llama-server local",
+      "options": {
+        "baseURL": "http://127.0.0.1:8090/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-tq": {
+          "name": "Gemma4 via TurboQuant",
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          }
+        }
+      }
+    },
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama local",
+      "options": {
+        "baseURL": "http://127.0.0.1:11434/v1",
+        "apiKey": "ollama"
+      },
+      "models": {
+        "gemma4-hermes-64k": {
+          "name": "Gemma4 Hermes 64k via Ollama",
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          }
+        }
+      }
+    }
+  },
   "mcp": {
     "trace": {
       "type": "remote",
@@ -14,9 +52,59 @@
       "timeout": 15000
     }
   },
+  "agent": {
+    "trace-audit": {
+      "description": "Read-only audit agent backed by TRACE MCP — uses trace tools before answering",
+      "model": "turboquant/gemma4-tq",
+      "temperature": 0,
+      "steps": 8,
+      "prompt": "You are a read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor. Before answering any repo audit question, use TRACE MCP tools first. Prefer tools named like: trace.kag_search, trace_kag_search, search.dev_context, search_dev_context, trace.explain_retrieval, trace_explain_retrieval (OpenCode may normalise MCP names with dots or underscores — try both forms). If no TRACE tool is visible at all, stop and say TRACE_MCP_NOT_AVAILABLE. Do not edit files. Do not run migrations. Do not mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "edit": "deny",
+        "bash": "deny",
+        "webfetch": "deny",
+        "websearch": "deny"
+      }
+    },
+    "audit-hermes": {
+      "description": "Tool-call sanity check via Ollama Hermes 64k — compare agent behavior against TurboQuant lane",
+      "model": "ollama/gemma4-hermes-64k",
+      "temperature": 0,
+      "steps": 8,
+      "prompt": "You are a read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor. Before answering any repo audit question, use TRACE MCP tools first. Prefer tools named like: trace.kag_search, trace_kag_search, search.dev_context, search_dev_context, trace.explain_retrieval, trace_explain_retrieval (OpenCode may normalise MCP names with dots or underscores — try both forms). If no TRACE tool is visible at all, stop and say TRACE_MCP_NOT_AVAILABLE. Do not edit files. Do not run migrations. Do not mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "edit": "deny",
+        "bash": "deny",
+        "webfetch": "deny",
+        "websearch": "deny"
+      }
+    }
+  },
+  "default_agent": "trace-audit",
   "instructions": [
     "AGENTS.md",
     ".claude/skills/trace-mcp-tooling/SKILL.md",
     "sveltekit-frontend/docs/architecture/gemma4-to-claude-code-handoff.md"
-  ]
+  ],
+  "share": "disabled"
 }

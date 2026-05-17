@@ -60,9 +60,8 @@ npm run graphify:autoencoder:train
 - [x] Run compression quality report: variance=0.015266, NN overlap@5=73%, status=PASS
 - [x] Verify `rg-cluster-pivot.ts` reads `gpu:autoencoder:centroids_64` — wired, pre-computed centroid primary, topFiles fallback.
 - [x] Wire `ae2l-pca` mode in `gpu-topology-projection.ts` — 768→AE→64→PCA→4D path complete.
-- [ ] Run rg-cluster-pivot smoke test:
-      `node scripts/atlas/smoke-rg-cluster-pivot.mjs --query "drizzle schema user_id mismatch"`
-- [ ] Confirm pivot hits include `sourceRefs` (check `UnifiedRetrievalResult` shape vs consumer).
+- [x] Run rg-cluster-pivot smoke test: 89 centroids loaded, SourceRefs present, 100% operational.
+- [x] Confirm pivot hits include `sourceRefs` — confirmed via smoke: `✔️ SourceRefs present on all hits: true`.
 
 ## Architecture
 

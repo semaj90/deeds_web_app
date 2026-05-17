@@ -24,7 +24,7 @@ vi.mock('$lib/server/vector/qdrant-manager.js', () => {
 });
 
 const mockReadLatestQdrantClusterTags = vi.fn();
-vi.mock('./cluster-tags-cache.js', () => ({
+vi.mock('$lib/server/ace/cluster-tags-cache.js', () => ({
   readLatestQdrantClusterTags: mockReadLatestQdrantClusterTags,
 }));
 
