@@ -1,22 +1,94 @@
 {
-  "generatedAt": "2026-05-16T06:39:25.433Z",
+  "generatedAt": "2026-05-17T07:06:23.461Z",
+  "codebasePath": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "metrics": {
+    "totalGaps": 5,
+    "highGaps": 3,
+    "mediumGaps": 2,
+    "lowGaps": 0
+  },
   "gaps": [
     {
-      "type": "feature_has_no_docs",
-      "feature": "CrimeAnalysisService",
-      "severity": "high"
+      "sourceId": "svelte",
+      "title": "Svelte 5 Documentation",
+      "usageCount": 23351,
+      "docsCount": 0,
+      "severity": "high",
+      "description": "Codebase has 23351 references to Svelte 5 Documentation features, but NO local documentation exists. Ingestion is highly recommended."
     },
     {
-      "type": "api_used_but_not_documented",
-      "api": "WebGPU.computePass",
-      "severity": "medium"
+      "sourceId": "webgpu",
+      "title": "WebGPU / WGSL",
+      "usageCount": 2329,
+      "docsCount": 0,
+      "severity": "high",
+      "description": "Codebase has 2329 references to WebGPU / WGSL features, but NO local documentation exists. Ingestion is highly recommended."
+    },
+    {
+      "sourceId": "cuda",
+      "title": "CUDA C++",
+      "usageCount": 139,
+      "docsCount": 0,
+      "severity": "high",
+      "description": "Codebase has 139 references to CUDA C++ features, but NO local documentation exists. Ingestion is highly recommended."
+    },
+    {
+      "sourceId": "sveltekit",
+      "title": "SvelteKit Documentation",
+      "usageCount": 4699,
+      "docsCount": 4,
+      "severity": "medium",
+      "description": "Codebase relies heavily on SvelteKit Documentation (4699 references), but documentation is sparse (4 pages). Crawling more pages is recommended."
+    },
+    {
+      "sourceId": "drizzle",
+      "title": "Drizzle ORM",
+      "usageCount": 6681,
+      "docsCount": 3,
+      "severity": "medium",
+      "description": "Codebase relies heavily on Drizzle ORM (6681 references), but documentation is sparse (3 pages). Crawling more pages is recommended."
     }
   ],
-  "recommendations": [
+  "coverage": [
     {
-      "action": "ingest",
-      "source": "webgpu",
-      "reason": "Uncovered API usage"
+      "sourceId": "sveltekit",
+      "title": "SvelteKit Documentation",
+      "trustTier": "official_docs",
+      "usageCount": 4699,
+      "docsCount": 4,
+      "coveragePercent": 40
+    },
+    {
+      "sourceId": "svelte",
+      "title": "Svelte 5 Documentation",
+      "trustTier": "official_docs",
+      "usageCount": 23351,
+      "docsCount": 0,
+      "coveragePercent": 0
+    },
+    {
+      "sourceId": "drizzle",
+      "title": "Drizzle ORM",
+      "trustTier": "official_docs",
+      "usageCount": 6681,
+      "docsCount": 3,
+      "coveragePercent": 30
+    },
+    {
+      "sourceId": "webgpu",
+      "title": "WebGPU / WGSL",
+      "trustTier": "standard_body",
+      "usageCount": 2329,
+      "docsCount": 0,
+      "coveragePercent": 0
+    },
+    {
+      "sourceId": "cuda",
+      "title": "CUDA C++",
+      "trustTier": "official_docs",
+      "usageCount": 139,
+      "docsCount": 0,
+      "coveragePercent": 0
     }
   ]
 }
