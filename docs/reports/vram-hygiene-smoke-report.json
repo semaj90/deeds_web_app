@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-05-17T02:01:19.425Z",
+  "nvidiaSmiAvailable": true,
+  "gpuDetected": true,
+  "vramTotalMb": 8192,
+  "vramUsedMb": 7621,
+  "vramFreeMb": 404,
+  "llamaServerRunning": true,
+  "environmentVariables": {},
+  "redisConnected": true,
+  "qdrantConnected": true,
+  "status": "PASS"
+}
