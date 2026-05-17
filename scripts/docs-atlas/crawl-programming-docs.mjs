@@ -40,7 +40,72 @@ async function crawl() {
     // Firecrawl adapter logic
     if (process.env.FIRECRAWL_API_KEY) {
       console.log(`[firecrawl] Using Firecrawl for ${source.sourceId}...`);
-      // Integration placeholder
+      const apiKey = process.env.FIRECRAWL_API_KEY;
+      const baseUrl = "https://api.firecrawl.dev/v1";
+
+      try {
+        const response = await fetch(`${baseUrl}/crawl`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            url: source.baseUrl,
+            crawlerOptions: {
+              limit: 50, // Workstation memory safety limit
+              includes: source.include || [],
+              excludes: source.exclude || [],
+              maxDepth: source.crawlDepth || 3,
+              generateImgAltText: false
+            },
+            pageOptions: {
+              onlyMainContent: true
+            }
+          })
+        });
+
+        const crawlData = await response.json();
+        if (!response.ok) {
+          throw new Error(`Firecrawl submit failed: ${crawlData.error || JSON.stringify(crawlData)}`);
+        }
+
+        const crawlId = crawlData.id;
+        console.log(`[firecrawl] Crawl job submitted successfully. ID: ${crawlId}`);
+
+        let completed = false;
+        let statusResult = null;
+
+        while (!completed) {
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          const statusRes = await fetch(`${baseUrl}/crawl/${crawlId}`, {
+            headers: { "Authorization": `Bearer ${apiKey}` }
+          });
+          
+          statusResult = await statusRes.json();
+          console.log(`[firecrawl] Status: ${statusResult.status} (${statusResult.completed || 0}/${statusResult.total || 0} pages)`);
+          
+          if (statusResult.status === "completed") {
+            completed = true;
+          } else if (statusResult.status === "failed") {
+            throw new Error(`Firecrawl job failed on the remote server: ${statusResult.error}`);
+          }
+        }
+
+        if (statusResult && statusResult.data) {
+          for (const page of statusResult.data) {
+            if (!page.markdown) continue;
+            
+            const urlPath = new URL(page.metadata?.sourceURL || page.url || source.baseUrl).pathname;
+            const safeName = urlPath.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".md";
+            
+            await writeFile(join(outDir, safeName), page.markdown);
+            console.log(`[firecrawl] Saved: ${safeName} (${page.markdown.length} chars)`);
+          }
+        }
+      } catch (err) {
+        console.error(`[firecrawl] Error during crawl: ${err.message}`);
+      }
     } else {
       console.warn(`[warn] No FIRECRAWL_API_KEY found. Falling back to simple fetch (limited).`);
       // Simple fetch logic for demonstration
