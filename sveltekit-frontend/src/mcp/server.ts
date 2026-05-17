@@ -12,6 +12,7 @@ import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
 import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
 import { getWikiStatus, searchWiki, explainWikiPage, refreshDirectory } from '$lib/server/kb/wiki-logic.js';
 import { getVlmState, switchVlmMode, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
+import { resolveAgentsMdQuickHit } from '$lib/server/graph/community-graph.js';
 
 
 export const server = new Server(
@@ -1851,6 +1852,17 @@ export function setupToolHandlers() {
           required: ['runId', 'query', 'profile', 'acePacket', 'model'],
         },
       },
+      {
+        name: 'agents_md',
+        description: 'Resolve the nearest AGENTS.md file for a given source path. Checks Redis first (agents:dir:<path>) then walks up the directory hierarchy on disk.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            path: { type: 'string', description: 'File path or directory relative to sveltekit-frontend root' },
+          },
+          required: ['path'],
+        },
+      },
       ...REPAIR_TOOLS_SCHEMAS as any[],
 
     ],
@@ -1984,6 +1996,26 @@ export function setupToolHandlers() {
         const { path: dirPath, dryRun } = args as { path: string; dryRun?: boolean };
         const result = await refreshDirectory(dirPath, dryRun ?? true);
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'agents_md': {
+        const { path: filePath } = args as { path: string };
+        const hit = await resolveAgentsMdQuickHit(filePath);
+        if (!hit) {
+          return { content: [{ type: 'text', text: JSON.stringify({ path: filePath, resolvedBy: null, markdown: null }) }] };
+        }
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              path: filePath,
+              resolvedBy: hit.source,
+              resolvedPath: hit.resolvedPath,
+              resolvedKey: hit.resolvedKey ?? null,
+              markdown: hit.markdown,
+            }),
+          }],
+        };
       }
 
       case 'cases:load': {

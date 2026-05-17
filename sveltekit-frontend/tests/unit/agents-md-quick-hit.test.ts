@@ -8,7 +8,16 @@ const { redisGetMock } = vi.hoisted(() => ({
 vi.mock('$lib/server/redis.js', () => ({
   getRedis: () => ({
     get: redisGetMock,
+    set: vi.fn(),
+    setex: vi.fn(),
   }),
+  redis: {
+    get: redisGetMock,
+    set: vi.fn(),
+    setex: vi.fn(),
+    hget: vi.fn(),
+    hgetall: vi.fn(),
+  },
 }));
 
 vi.mock('$lib/server/db/client', () => ({

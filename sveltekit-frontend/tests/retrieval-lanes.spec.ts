@@ -33,9 +33,9 @@ describe('retrieval-lanes: runRetrievalLanes', () => {
 
     const result = await runRetrievalLanes({ query: 'how does redis caching work', pool, redis });
 
-    expect(result.lanes).toHaveLength(4);
+    expect(result.lanes).toHaveLength(6);
     expect(result.lanes.map((l) => l.lane)).toEqual(
-      expect.arrayContaining(['redis_ace', 'postgres_trigram', 'ast_symbol', 'som_topology'])
+      expect.arrayContaining(['redis_ace', 'postgres_trigram', 'ast_symbol', 'som_topology', 'qdrant_vector', 'summary_lenses'])
     );
     expect(result.merged.length).toBeGreaterThan(0);
     expect(result.totalHits).toBeGreaterThan(0);
@@ -72,7 +72,7 @@ describe('retrieval-lanes: runRetrievalLanes', () => {
     expect(result.lanes.find((l) => l.lane === 'ast_symbol')?.degraded).toBe(true);
     expect(result.lanes.find((l) => l.lane === 'som_topology')?.degraded).toBe(true);
     expect(result.lanes.find((l) => l.lane === 'postgres_trigram')?.degraded).toBe(false);
-    expect(result.lanes).toHaveLength(4);
+    expect(result.lanes).toHaveLength(6);
   });
 
   it('handles redis cache miss gracefully with no error', async () => {
@@ -165,7 +165,7 @@ describe('retrieval-lanes: runRetrievalLanes', () => {
     expect(Array.isArray(result.merged)).toBe(true);
     expect(Array.isArray(result.topFiles)).toBe(true);
     expect(Array.isArray(result.topSymbols)).toBe(true);
-    expect(result.lanes).toHaveLength(4);
+    expect(result.lanes).toHaveLength(6);
     for (const lane of result.lanes) {
       expect(typeof lane.degraded).toBe('boolean');
       expect(Array.isArray(lane.hits)).toBe(true);
