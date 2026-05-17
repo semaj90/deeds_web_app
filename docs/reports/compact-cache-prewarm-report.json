@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-05-17T02:06:26.712Z",
+  "compactLane": "384d (Warden/Nomic routing only)",
+  "canonicalRecallAuthority": "Qdrant codebase_chunks_768",
+  "gpuUsageBypassed": true,
+  "totalKeysPrewarmed": 5,
+  "prewarmedKeys": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-job-queue.ts",
+      "keyName": "gpu:warden:cache:384d:sveltekit-frontend/src/lib/server/gpu/gpu-job-queue.ts",
+      "dimension": 384,
+      "normalized": true
+    },
+    {
+      "file": "simd-bridge/cpp/binding.cc",
+      "keyName": "gpu:warden:cache:384d:simd-bridge/cpp/binding.cc",
+      "dimension": 384,
+      "normalized": true
+    },
+    {
+      "file": "simd-bridge/cpp/som_cache.cu",
+      "keyName": "gpu:warden:cache:384d:simd-bridge/cpp/som_cache.cu",
+      "dimension": 384,
+      "normalized": true
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/+page.server.ts",
+      "keyName": "gpu:warden:cache:384d:sveltekit-frontend/src/routes/+page.server.ts",
+      "dimension": 384,
+      "normalized": true
+    },
+    {
+      "file": "scripts/atlas/smoke-vram-hygiene.mjs",
+      "keyName": "gpu:warden:cache:384d:scripts/atlas/smoke-vram-hygiene.mjs",
+      "dimension": 384,
+      "normalized": true
+    }
+  ],
+  "status": "PASS"
+}
