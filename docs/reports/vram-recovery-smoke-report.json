@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-05-17T02:06:46.213Z",
+  "baselineVramMb": 7548,
+  "stages": [
+    {
+      "stageName": "turboquant_check",
+      "vramMb": 7547,
+      "deltaFromBaseline": -1
+    },
+    {
+      "stageName": "somatic_cluster_pivot",
+      "vramMb": 7547,
+      "deltaFromBaseline": -1
+    },
+    {
+      "stageName": "ae2l_pca_projection",
+      "vramMb": 7547,
+      "deltaFromBaseline": -1
+    },
+    {
+      "stageName": "context_synthesis_logging",
+      "vramMb": 7546,
+      "deltaFromBaseline": -2
+    }
+  ],
+  "finalVramMb": 7546,
+  "vramRecoveredCleanly": true,
+  "status": "PASS"
+}
