@@ -28,7 +28,7 @@ export const agentConstraintSchema = z.object({
 });
 
 export const agentsMdEnvelopeSchema = z.object({
-  kind:           z.literal('LLMS.md'),
+  kind:           z.literal('agents_md'),
   /** Stable cross-run key, e.g. `agents:src/lib/server/ai/LLMS.md` */
   stable_key:     z.string().min(1).max(500),
   file_path:      z.string().min(1).max(500),
