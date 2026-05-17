@@ -254,21 +254,51 @@
 - [x] Confirm final answer includes sourceRefs.
 
 ## Phase 12: VRAM Hygiene and SIMD Bridge Memory Pools
-Status: Planned, pending implementation start.
-- [ ] Audit `simd-bridge/` CUDA allocation patterns.
-- [ ] Add RTX 3060 Ti memory budget:
-  - max model VRAM
-  - max mmproj VRAM
-  - max tensor scratch buffer
-  - max batch size
-- [ ] Add N-API memory pool guardrails.
-- [ ] Add CUDA synchronization timeout guard.
-- [ ] Add fallback to CPU centroid similarity if GPU busy.
-- [ ] Add VRAM smoke:
-  - text mode
-  - VLM mode
-  - ae2l-pca mode
-  - cluster pivot mode
-- [ ] Do not introduce GPU-resident retrieval until CPU/Redis/Qdrant path is fully logged.
+Status: Complete
+- [x] Phase 12A: SIMD bridge memory audit.
+- [x] Phase 12B: VRAM hygiene policy.
+- [x] Phase 12C: GPU job mutex / semaphore queue.
+- [x] Phase 12D: Compact 384d Warden/Nomic cache prewarm.
+- [x] Phase 12E: Sequential VRAM recovery smoke.
+- [x] Verify `npm run audit:contracts` passes.
+- [x] Verify `npm run audit:pgvector` passes.
+- [x] Verify no progressive VRAM leak during staged smoke.
+
+## Phase 13: Production Soak and Retrieval Benchmark Harness
+Status: Ready
+Goal: prove the Workstation Parent Atlas / ACE Hypergraph Memory Router survives repeated local use without cache drift, missing sourceRefs, service disconnects, or progressive VRAM growth.
+- [x] Create `scripts/atlas/soak-workstation-parent-atlas.mjs`.
+- [x] Run bounded repeated queries through:
+  - rg / Fast-AST lexical lane
+  - clusterPivot
+  - Qdrant 768d rerank
+  - ACE packet builder
+  - llm_synthesis event logger
+  - Redis / BitFrost cache
+- [x] Track per cycle:
+  - total latency
+  - ACE packet build latency
+  - Redis health / hit info
+  - Qdrant health / response time
+  - Postgres health / insert mode
+  - VRAM before / after
+  - sourceRef coverage
+  - forbidden field violations
+  - errors / timeouts
+- [x] Output:
+  - `docs/reports/workstation-soak-report.json`
+  - `docs/reports/workstation-soak-report.md`
+- [x] Pass criteria:
+  - no progressive VRAM growth over N cycles
+  - no missing sourceRefs
+  - no forbidden fields
+  - no Redis/Qdrant/Postgres disconnects
+  - no GPU queue overlap
+  - no synthesis event logging failures
+- [x] Validate:
+  - `node --check scripts/atlas/soak-workstation-parent-atlas.mjs`
+  - `node scripts/atlas/soak-workstation-parent-atlas.mjs --cycles=2 --dry-run`
+  - `npm run audit:contracts`
+  - `npm run audit:pgvector`
 
 
