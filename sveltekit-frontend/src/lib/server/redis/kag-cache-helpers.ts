@@ -21,5 +21,5 @@ export const kagCacheKeys = {
     summary: (stableKey: string, sourceHash: string) => `summary:${stableKey}:${sourceHash}`,
     
     /** 5. LLMS.md directory cache */
-    agentsDir: (directoryPath: string) => `llms:dir:${directoryPath}`
+    agentsDir: (directoryPath: string) => `agents:dir:${directoryPath}`
 };

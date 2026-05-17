@@ -13,7 +13,7 @@ export type LaneId =
   | 'L1'   // Qdrant dense ANN     (codebase_chunks_768 content)
   | 'L2'   // Qdrant signature ANN (codebase_chunks_768 signature)
   | 'L3'   // summary lenses       (summary_lenses_768)
-  | 'L4'   // wiki / LLMS.md     (Redis wiki:note:* + llms:dir:*)
+  | 'L4'   // wiki / LLMS.md     (Redis wiki:note:* + agents:dir:*)
   | 'L5'   // synthesis memory     (synthesis_memory_768)
   | 'L6'   // prior answers        (Redis code:llm:* + ace:chunks:*)
   | 'L7'   // graph neighbors      (Neo4j)

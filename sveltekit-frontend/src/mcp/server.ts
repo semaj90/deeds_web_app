@@ -1791,7 +1791,7 @@ export function setupToolHandlers() {
         inputSchema: {
           type: 'object',
           properties: {
-            id: { type: 'string', description: 'Wiki page ID (e.g. llms:dir:src-lib-server)' },
+            id: { type: 'string', description: 'Wiki page ID (e.g. agents:dir:src-lib-server)' },
           },
           required: ['id'],
         },

@@ -175,7 +175,7 @@ export async function ensureRedis() {
  *   ace:authority:top — 6h TTL, top entries from graphify:gds
  *   ace:atlas:*       — 24h TTL, atlas directory cards
  *   gpu:karpathy:scores — 24h TTL, GPU rank blend
- *   llms:dir:*      — 24h TTL, LLMS.md envelope mirror
+ *   agents:dir:*      — 24h TTL, LLMS.md envelope mirror
  *   taxonomy:clusters — 12h TTL, SOM/K-means cluster centroids
  */
 

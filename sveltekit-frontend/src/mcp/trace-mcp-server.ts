@@ -3785,7 +3785,7 @@ server.registerTool(
       });
       const edgeData = edgeRes.ok ? await edgeRes.json() : { results: [] };
 
-      // 2. LLMS.md context for the directory (Redis key llms:dir:<dir>)
+      // 2. LLMS.md context for the directory (Redis key agents:dir:<dir>)
       let agentsMd: string[] = [];
       try {
         const agentRes = await pool.query<{ title: string; summary: string; rules: unknown[] }>(
@@ -4222,7 +4222,7 @@ server.registerTool(
 
 // ── ops.update_LLMS.md ─────────────────────────────────────────────────────
 // Lets the LLM write structured knowledge back into the directory memory layer.
-// Immediately updates the Redis llms:dir:<dir> key (24h TTL) so the next
+// Immediately updates the Redis agents:dir:<dir> key (24h TTL) so the next
 // ACE call picks it up via Lane L4.  Optionally appends to the on-disk
 // LLMS.md file under the target section so the fact survives redis flush.
 server.registerTool(
@@ -4256,7 +4256,7 @@ server.registerTool(
       const { join, resolve } = await import('node:path');
       const { existsSync, readFileSync, writeFileSync, mkdirSync } = await import('node:fs');
 
-      const redisKey = `llms:dir:${safeDir}`;
+      const redisKey = `agents:dir:${safeDir}`;
       const existing = await redisClient.get(redisKey) ?? '';
 
       // Build new entry line with timestamp
@@ -4537,8 +4537,8 @@ server.registerTool(
           (pack as Record<string, unknown>).thisFileKarpathy = JSON.parse(fileScore);
         }
 
-        // LLMS.md from Redis llms:dir:*
-        const dirKey = `llms:dir:${opts.file_path.replace(/\/[^/]+$/, '').replace(/^src\//, '')}`;
+        // LLMS.md from Redis agents:dir:*
+        const dirKey = `agents:dir:${opts.file_path.replace(/\/[^/]+$/, '').replace(/^src\//, '')}`;
         const agentsMd = await r.get(dirKey).catch(() => null);
         if (agentsMd) {
           // Extract just the Rules section for compactness

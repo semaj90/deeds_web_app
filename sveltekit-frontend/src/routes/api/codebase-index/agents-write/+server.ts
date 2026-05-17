@@ -5,12 +5,12 @@
  *
  * Reads wiki:note:dir:* keys (written by ingestDirectorySummaries or the fast-AST
  * indexer) and docs/graph/codebase-graph.json, then builds and writes per-directory
- * LLMS.md markdown into Redis as llms:dir:<relPath> (24h TTL).
+ * LLMS.md markdown into Redis as agents:dir:<relPath> (24h TTL).
  *
  * This closes the gap where `npm run llms:write` (CLI-only) was the sole path to
- * populate the llms:dir:* keys consumed by the ACE NES-arch preflight step.
+ * populate the agents:dir:* keys consumed by the ACE NES-arch preflight step.
  * The orchestrator can now trigger this after the summarize-dirs stage so every
- * full indexing run automatically refreshes the llms:dir:* cache.
+ * full indexing run automatically refreshes the agents:dir:* cache.
  *
  * Body (all optional):
  *   { filter?: string, minFiles?: number, rootOnly?: boolean, dryRun?: boolean }
@@ -236,7 +236,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       if (!dryRun) {
         try {
-          await redis.setex(`llms:dir:${dirRel}`, AGENTS_TTL, markdown);
+          await redis.setex(`agents:dir:${dirRel}`, AGENTS_TTL, markdown);
           written++;
         } catch { skipped++; }
       } else {
@@ -263,7 +263,7 @@ export const GET: RequestHandler = async ({ locals }) => {
   try {
     const { getRedis } = await import('$lib/server/redis.js');
     const redis = getRedis();
-    const keys = await redis.keys('llms:dir:*');
+    const keys = await redis.keys('agents:dir:*');
     const rootExists = !!(await redis.exists('llms:root'));
     const sample = keys.slice(0, 10);
     const ttls = await Promise.all(sample.map((k) => redis.ttl(k)));

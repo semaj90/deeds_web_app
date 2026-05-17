@@ -151,7 +151,7 @@ export async function explainWikiPage(id: string) {
   if (!mapping && !wikiCard) return null;
 
   const mappedPath = String(mapping?.path ?? (wikiCard as any)?.dirPath ?? (wikiCard as any)?.path ?? '');
-  const featureId = id.startsWith('feature:') ? id : `feature:${id.replace(/^llms:dir:/, '').replace(/:/g, '-')}`;
+  const featureId = id.startsWith('feature:') ? id : `feature:${id.replace(/^agents:dir:/, '').replace(/:/g, '-')}`;
   const [feature] = await db.select().from(featureMaps).where(eq(featureMaps.id, featureId)).limit(1);
   const memorySticks = await db.select()
     .from(grpoMemorySticks)
@@ -235,11 +235,11 @@ async function getRedisStats() {
   return safe('redis:wiki-stats', async () => {
     const redis = getRedis();
     const [agentKeys, wikiKeys, karpathyScores] = await Promise.all([
-      scanRedisKeys(redis, 'llms:dir:*'),
+      scanRedisKeys(redis, 'agents:dir:*'),
       scanRedisKeys(redis, 'wiki:page:*'),
       redis.hgetall('gpu:karpathy:scores').catch(() => ({} as Record<string, string>)),
     ]);
-    const agentDirectories = new Set(agentKeys.map((key) => key.replace(/^llms:dir:/, '').replace(/-/g, '/')));
+    const agentDirectories = new Set(agentKeys.map((key) => key.replace(/^agents:dir:/, '').replace(/-/g, '/')));
     return {
       agentsKeyCount: agentKeys.length,
       wikiPageKeyCount: wikiKeys.length,
@@ -352,7 +352,7 @@ async function searchAgentsMarkdown(query: string, limit: number): Promise<WikiS
         const [file, lineNumber, ...rest] = line.split(':');
         const dir = file.replace(/\/?AGENTS\.md$/, '').replace(/\\/g, '/');
         return {
-          id: `llms:dir:${dir.replace(/[\/\\]/g, '-')}`,
+          id: `agents:dir:${dir.replace(/[\/\\]/g, '-')}`,
           kind: 'agents_card',
           label: dir,
           path: dir,

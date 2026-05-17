@@ -219,7 +219,7 @@ export interface ACEContext {
     communityId?: string | null;
     /** Directory summary mirrored from LLMS.md directory cards (L4 lane) */
     dirSummary?: string | null;
-    /** Resolved LLMS.md card ID (llms:dir:*) */
+    /** Resolved LLMS.md card ID (agents:dir:*) */
     agentsCardId?: string | null;
     rerankBreakdown?: RerankBreakdown | null;
     /** Stable content-addressed key for this chunk (used by code-intel/search) */

@@ -217,6 +217,7 @@ describe('getAgentsContextForQuery', () => {
 
 		const hits = await getAgentsContextForQuery('anything', {
 			filePath: 'src/lib/server/ace/context-assembler.ts',
+			allowFallback: false,
 		});
 		expect(hits).toHaveLength(1);
 		expect(hits[0].source).toBe('redis');

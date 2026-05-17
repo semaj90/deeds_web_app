@@ -5,7 +5,7 @@
  *
  * Pure function. No I/O. Used by:
  *   - the bindings indexer (to populate directory_context_bindings rows)
- *   - the ACE preflight (sub-5ms walk-up against llms:dir:* Redis keys)
+ *   - the ACE preflight (sub-5ms walk-up against agents:dir:* Redis keys)
  *   - the rerank scorer (to compute the same-LLMS.md-dir boost)
  */
 
@@ -58,9 +58,9 @@ export function nearestAgentsMdForFile(
   for (const candidate of candidateAgentsMdPaths(filePath)) {
     if (has(candidate))                 return candidate;
     if (has(`agents:${candidate}`))     return candidate;
-    // Also try without trailing /LLMS.md (matches `llms:dir:src/lib/server/ai`)
+    // Also try without trailing /LLMS.md (matches `agents:dir:src/lib/server/ai`)
     const dirOnly = candidate.replace(/\/?AGENTS\.md$/i, '') || '.';
-    if (has(`llms:dir:${dirOnly}`))   return candidate;
+    if (has(`agents:dir:${dirOnly}`))   return candidate;
   }
   return null;
 }
