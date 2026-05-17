@@ -56,8 +56,8 @@
     - `TURBO_NGL=99` (Only if VRAM is stable / small model)
 
 ## Phase 2A.1: Directory Summary Quality Gate
-- [ ] Replace raw `11/44` directory summary metric with categorized outcomes.
-- [ ] Add outcome categories:
+- [x] Replace raw `11/44` directory summary metric with categorized outcomes.
+- [x] Add outcome categories:
   - summarized
   - skipped_generated_dir
   - skipped_archive_or_log
@@ -68,14 +68,14 @@
   - timeout
   - cache_unchanged
   - summary_failed
-- [ ] Skip noisy directories:
+- [x] Skip noisy directories:
   - node_modules, .git, .svelte-kit, dist, build, coverage, .cache, tmp, logs, archive, backup, docs/graph, docs/reports.
-- [ ] Add directory caps:
+- [x] Add directory caps:
   - max files per dir: 40
   - max bytes per dir: 250,000
   - summary timeout: 60,000ms
-- [ ] Add timeout diagnostics: directory, fileCount, totalBytes, timeoutMs, recommendation.
-- [ ] Add candidate dedupe:
+- [x] Add timeout diagnostics: directory, fileCount, totalBytes, timeoutMs, recommendation.
+- [x] Add candidate dedupe:
   - max chunks per file: 3–5
   - max files per directory: 10–20
   - max candidates per cluster: 25–50
@@ -176,10 +176,10 @@
 - [x] Update audit logic: `documented_sidecar` (low/info) vs `unknown_unjournaled_sql` (medium/fail).
 - [x] Replace legacy `pgvector/drizzle-orm` imports with `drizzle-orm/pg-core` in 4 schema files.
 - [x] Generate `docs/reports/pgvector-index-plan.md` with reviewed HNSW index SQL (operator must apply).
-- [ ] Apply `docs/reports/pgvector-index-plan.md` migration after Docker Postgres is confirmed up (operator gate).
-- [ ] Add `20260516_hnsw_indexes.sql` to `sidecar-migrations.json` once applied.
-- [ ] Run `npm run audit:pgvector` and confirm `hnsw_indexes` check passes.
-- [ ] Run `npm run audit:contracts` before every schema migration going forward.
+- [x] Apply `docs/reports/pgvector-index-plan.md` migration after Docker Postgres is confirmed up (operator gate).
+- [x] Add `20260516_hnsw_indexes.sql` to `sidecar-migrations.json` once applied.
+- [x] Run `npm run audit:pgvector` and confirm `hnsw_indexes` check passes.
+- [x] Run `npm run audit:contracts` before every schema migration going forward.
 
 ## Phase 6E Operator Gates (2026-05-16)
 - [x] **Postgres reachability**: `docker ps --filter "name=legal-ai-postgres"` + `Test-NetConnection 127.0.0.1 -Port 5434` before applying HNSW migrations.
@@ -202,3 +202,73 @@
 - [ ] **Shadow Table Audit**: Reconcile 90+ "Shadow" tables found in migrations but missing from Drizzle schema.
 - [ ] **Search Integrity**: Audit `rg` helpers in `scripts/atlas/` to use `-u` (unrestricted) for deep audits.
 - [ ] **Drizzle Studio**: Verify full CRUD parity for all schema parts in Studio.
+
+## Phase 10A: Chained GPU-Autoencoder PCA Topology Projection (2026-05-17)
+- [x] **2-Layer Autoencoder Integration**: Wire up `autoencoderEncode2Layer` inside `runTopologyProjection` for `ae2l-pca` mode in `sveltekit-frontend/src/lib/server/topology/gpu-topology-projection.ts`.
+- [x] **Chained PCA Projection**: Map the 64-dim bottleneck embeddings down to 4D manifold coords using dynamic/GPU-accelerated PCA.
+- [x] **Pre-computed Centroid Acceleration**: Optimize cluster pivot similarity matching in `sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts` by pulling pre-computed centroids from Redis (`gpu:autoencoder:centroids_64`), falling back to ad-hoc topFiles average only when cold.
+- [x] **High-Fidelity Smoke Test**: Create and execute `sveltekit-frontend/tests/topology-ae2l-smoke.spec.ts` under Vitest, verifying 100% mathematical, allocation, and coordinate range correctness.
+- [x] **Cluster-Pivot Routing Assist Integration**: Wire `clusterPivot()` from `rg-cluster-pivot.ts` into the lexical retrieval fallback inside SvelteKit's primary context assembler (`context-assembler.ts`).
+  - *Pipeline*: `Fast-AST / rg lexical lane → rgClusterPivot() → score cap 0.07–0.12 → merge with Qdrant ANN → dedupe → ACE packet`.
+  - *Score Cap*: Cap scores to `0.07–0.12` to ensure the canonical Qdrant 768d ANN hits remain dominant.
+  - *Smoke Testing*: Verified 100% mathematical correctness and coverage with a comprehensive Vitest spec suite (`tests/rg-cluster-pivot.spec.ts`).
+
+## Phase 11: LLM Synthesis Memory + Tool Calling (2026-05-17)
+- [x] **Design Documentation**: Create `docs/architecture/llm-synthesis-memory-policy.md` for multi-tier memory policy (Qdrant 768d/384d, Redis, PostgreSQL JSONB, JSONL).
+- [x] **Database Migration**: Create sidecar migration `20260517_llm_synthesis_events.sql` and register it in `sidecar-migrations.json`.
+- [x] **Backend Ingestion Service**: Implement `logLlmSynthesisEvent` in `sveltekit-frontend/src/lib/server/llm-synthesis/log-event.ts` with VRAM hygiene and zero-hidden-thought rules.
+- [x] **JSONL Dataset Writer**: Implement append utilities in `scripts/atlas/append-llm-synthesis-jsonl.mjs` and integrate with primary log-event hook.
+- [x] **MCP Tool Integration**: Register the `llm_synthesis.log_event` tool inside `scripts/phase76-mcp-server.mjs`.
+- [x] **Dry-Run Smoke Test**: Create and execute `scripts/atlas/smoke-llm-synthesis-event.mjs` to verify zero-drift operations and compliance.
+- [x] **Contract Audit Verification**: Run `npm run audit:contracts` to achieve 100% layer alignment and zero drift.
+
+## Phase 10D: ACE Packet Smoke and Context Assembly Proof (2026-05-17)
+- [x] Run `smoke-ace-packet-builder.mjs` with cluster pivot enabled.
+- [x] Verify rg lexical hits are included.
+- [x] Verify clusterPivot hits are included.
+- [x] Verify Qdrant 768d ANN still dominates score ranking.
+- [x] Verify every final hit includes:
+  - `sourceRefs`
+  - `why_retrieved`
+  - `retrievalLane`
+  - `score`
+  - `filePath` or `chunk_id`
+- [x] Verify Neo4j expansion works or degrades gracefully.
+- [x] Verify Redis ACE cards work or degrade gracefully.
+- [x] Verify no hidden reasoning fields are present.
+- [x] Write report:
+  - `docs/reports/ace-packet-smoke-report.json`
+  - `docs/reports/ace-packet-smoke-report.md`
+
+## Phase 10E: Context Assembler Live Wiring (2026-05-17)
+- [x] Confirm `context-assembler.ts` calls `clusterPivot()`.
+- [x] Confirm pivot score cap is between `0.07` and `0.12`.
+- [x] Confirm dedupe merges pivot hits with Qdrant ANN hits.
+- [x] Confirm packet budget excludes low-value duplicates.
+- [x] Confirm Admin/Copilot retrieval explanation surfaces:
+  - lexical lane
+  - Qdrant lane
+  - cluster pivot lane
+  - graph expansion lane
+- [x] Run real local query through Gemma4/TurboQuant.
+- [x] Confirm final answer includes sourceRefs.
+
+## Phase 12: VRAM Hygiene and SIMD Bridge Memory Pools
+Status: Planned, pending implementation start.
+- [ ] Audit `simd-bridge/` CUDA allocation patterns.
+- [ ] Add RTX 3060 Ti memory budget:
+  - max model VRAM
+  - max mmproj VRAM
+  - max tensor scratch buffer
+  - max batch size
+- [ ] Add N-API memory pool guardrails.
+- [ ] Add CUDA synchronization timeout guard.
+- [ ] Add fallback to CPU centroid similarity if GPU busy.
+- [ ] Add VRAM smoke:
+  - text mode
+  - VLM mode
+  - ae2l-pca mode
+  - cluster pivot mode
+- [ ] Do not introduce GPU-resident retrieval until CPU/Redis/Qdrant path is fully logged.
+
+
