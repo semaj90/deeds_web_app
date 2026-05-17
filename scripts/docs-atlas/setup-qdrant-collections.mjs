@@ -18,7 +18,14 @@ async function setup() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vectors: { size: col.size, distance: 'Cosine' }
+          vectors: { 
+            size: col.size, 
+            distance: 'Cosine',
+            on_disk: true 
+          },
+          hnsw_config: {
+            on_disk: true
+          }
         })
       });
       if (res.ok) console.log(`✅ Collection ${col.name} created.`);
