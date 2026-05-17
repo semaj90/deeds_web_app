@@ -1,13 +1,13 @@
 # Repo Root Atlas
 
 - repo: deeds-web-app
-- generatedAt: 2026-05-17T05:35:04.212Z
+- generatedAt: 2026-05-17T07:23:25.924Z
 - sourceGraph: sveltekit-frontend/docs/graph/codebase-graph.json
-- fileCount: 32426
-- routeCount: 1027
-- componentCount: 5331
-- apiCount: 5488
-- dirCount: 1069
+- fileCount: 32486
+- routeCount: 0
+- componentCount: 0
+- apiCount: 1250
+- dirCount: 1079
 - workspaceCount: 21
 - languageCount: 4
 - envKeyCount: 583

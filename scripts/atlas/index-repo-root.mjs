@@ -1,11 +1,7 @@
 #!/usr/bin/env node
-import { loadConfig, loadCodebaseGraph, loadRouteMap, loadRouteGapAtlas, loadClusterAliases, loadHypergraphClusters, loadLlmNotes, readExistingGraphFiles, routeSummary, fileLanguage, workspaceForPath, fileSidecarKind, collectEnvFromRoots, parentAtlasMarkdown, resolveRepoPath, writeJson, writeMarkdown, topEntries } from './_atlas-utils.mjs';
+import { loadConfig, loadRouteMap, loadRouteGapAtlas, loadClusterAliases, loadHypergraphClusters, loadLlmNotes, streamCodebaseGraph, routeSummary, fileLanguage, workspaceForPath, fileSidecarKind, collectEnvFromRoots, parentAtlasMarkdown, resolveRepoPath, writeJson, writeMarkdown, topEntries } from './_atlas-utils.mjs';
 
 const config = loadConfig();
-const graph = loadCodebaseGraph(config);
-if (!graph) throw new Error(`Missing source graph: ${config.sources.codebaseGraph}`);
-
-const files = readExistingGraphFiles(config);
 const routes = loadRouteMap(config);
 const routeGaps = loadRouteGapAtlas(config);
 const aliases = loadClusterAliases(config);
@@ -18,16 +14,49 @@ const importCounts = new Map();
 const sidecarCounts = new Map();
 const workspaceRoutes = new Map();
 
-for (const file of files) {
-  const workspace = workspaceForPath(file.rel, config.workspaces);
-  workspaceCounts.set(workspace, (workspaceCounts.get(workspace) ?? 0) + 1);
-  const language = fileLanguage(file.rel);
-  languageCounts.set(language, (languageCounts.get(language) ?? 0) + 1);
-  for (const imp of [...(file.imports ?? []), ...(file.dynImports ?? [])]) importCounts.set(imp, (importCounts.get(imp) ?? 0) + 1);
-  const sidecar = fileSidecarKind(file.rel);
-  if (sidecar) sidecarCounts.set(sidecar, (sidecarCounts.get(sidecar) ?? 0) + 1);
-  if (file.isRoute) workspaceRoutes.set(workspace, (workspaceRoutes.get(workspace) ?? 0) + 1);
-}
+let graphMeta = {
+  fileCount: 0,
+  routeCount: 0,
+  componentCount: 0,
+  apiCount: 0,
+  dirCount: 0
+};
+
+let filesCounted = 0;
+
+const sourceGraphPath = resolveRepoPath(config.sources.codebaseGraph);
+
+console.log(`⏳ Streaming codebase graph memory-efficiently: ${config.sources.codebaseGraph}...`);
+
+await streamCodebaseGraph(
+  sourceGraphPath,
+  (file) => {
+    filesCounted++;
+    const workspace = workspaceForPath(file.rel, config.workspaces);
+    workspaceCounts.set(workspace, (workspaceCounts.get(workspace) ?? 0) + 1);
+    
+    const language = fileLanguage(file.rel);
+    languageCounts.set(language, (languageCounts.get(language) ?? 0) + 1);
+    
+    for (const imp of [...(file.imports ?? []), ...(file.dynImports ?? [])]) {
+      importCounts.set(imp, (importCounts.get(imp) ?? 0) + 1);
+    }
+    
+    const sidecar = fileSidecarKind(file.rel);
+    if (sidecar) {
+      sidecarCounts.set(sidecar, (sidecarCounts.get(sidecar) ?? 0) + 1);
+    }
+    
+    if (file.isRoute) {
+      workspaceRoutes.set(workspace, (workspaceRoutes.get(workspace) ?? 0) + 1);
+    }
+  },
+  (meta) => {
+    graphMeta = { ...graphMeta, ...meta };
+  }
+);
+
+console.log(`✅ Finished streaming. Processed ${filesCounted} files.`);
 
 const envUsage = collectEnvFromRoots(config.scanRoots, new Set(config.ignoreDirs));
 const routeStats = routeSummary(routes);
@@ -37,11 +66,11 @@ const summary = {
   repo: config.repoName,
   generatedAt: new Date().toISOString(),
   sourceGraph: config.sources.codebaseGraph,
-  fileCount: graph.fileCount ?? files.length,
-  routeCount: graph.routeCount ?? routeStats.total,
-  componentCount: graph.componentCount ?? 0,
-  apiCount: graph.apiCount ?? 0,
-  dirCount: graph.dirCount ?? 0,
+  fileCount: graphMeta.fileCount ?? filesCounted,
+  routeCount: graphMeta.routeCount ?? routeStats.total,
+  componentCount: graphMeta.componentCount ?? 0,
+  apiCount: graphMeta.apiCount ?? 0,
+  dirCount: graphMeta.dirCount ?? 0,
   workspaceCount: workspaceCounts.size,
   languageCount: languageCounts.size,
   envKeyCount: envUsage.envUsage.size,

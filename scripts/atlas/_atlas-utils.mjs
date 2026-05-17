@@ -1,5 +1,5 @@
-#!/usr/bin/env node
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, createReadStream } from 'node:fs';
+import { createInterface } from 'node:readline';
 import { dirname, extname, join, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -246,5 +246,77 @@ export async function scanKeys(redis, pattern, limit = 1000) {
     if (keys.length >= limit) break;
   } while (cursor !== '0');
   return keys;
+}
+
+export function streamCodebaseGraph(filePath, onFile, onMeta) {
+  return new Promise((resolve, reject) => {
+    if (!existsSync(filePath)) {
+      return reject(new Error(`Missing source file: ${filePath}`));
+    }
+
+    const fileStream = createReadStream(filePath);
+    const rl = createInterface({
+      input: fileStream,
+      crlfDelay: Infinity
+    });
+
+    let inFiles = false;
+    let accumulated = '';
+    let bracketCount = 0;
+    const metaLines = [];
+
+    rl.on('line', (line) => {
+      const trimmed = line.trim();
+      
+      if (!inFiles) {
+        if (trimmed.startsWith('"files": [')) {
+          inFiles = true;
+          try {
+            let metaJson = metaLines.join('\n');
+            if (!metaJson.trim().endsWith('}')) {
+              metaJson = metaJson.trim();
+              if (metaJson.endsWith(',')) metaJson = metaJson.slice(0, -1);
+              metaJson += '\n}';
+            }
+            const meta = JSON.parse(metaJson);
+            onMeta(meta);
+          } catch (err) {
+            // silent meta parse error
+          }
+        } else {
+          metaLines.push(line);
+        }
+      } else {
+        if (line.startsWith('    {') && bracketCount === 0) {
+          accumulated = '{';
+          bracketCount = 1;
+        } else if (bracketCount > 0) {
+          accumulated += '\n' + line;
+          if (line.startsWith('    }') || line.startsWith('    },')) {
+            bracketCount = 0;
+            let objStr = accumulated.trim();
+            if (objStr.endsWith(',')) objStr = objStr.slice(0, -1);
+            try {
+              const fileObj = JSON.parse(objStr);
+              if (fileObj && fileObj.rel) {
+                onFile(fileObj);
+              }
+            } catch (err) {
+              console.warn('[streamCodebaseGraph] Failed parsing file entry:', err.message);
+            }
+            accumulated = '';
+          }
+        }
+      }
+    });
+
+    rl.on('close', () => {
+      resolve();
+    });
+
+    rl.on('error', (err) => {
+      reject(err);
+    });
+  });
 }
 
