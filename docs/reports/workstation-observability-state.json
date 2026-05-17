@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-05-17T05:59:04.719Z",
+  "benchmarkHistoryCount": 3,
+  "latencyTrendMs": {
+    "p50": [
+      2428,
+      778,
+      738
+    ],
+    "p95": [
+      6297,
+      957,
+      922
+    ],
+    "average": []
+  },
+  "vramTrendMb": {
+    "baseline": [
+      7599,
+      7787,
+      7696
+    ],
+    "peakDelta": [
+      85,
+      42,
+      1
+    ]
+  },
+  "sourceRefCoveragePct": 100,
+  "compliancePassRate": 100,
+  "systemDriftDetected": false,
+  "audits": {
+    "contracts": {
+      "status": "PASS",
+      "findings": 5
+    },
+    "pgvector": {
+      "status": "PASS",
+      "indexes": 14
+    }
+  },
+  "latestRun": {
+    "timestamp": "2026-05-17T04:44:06.618Z",
+    "overallStatus": "PASS",
+    "averageLatencyMs": 748.88,
+    "peakVramDeltaMb": 1,
+    "queriesCount": 25
+  }
+}
