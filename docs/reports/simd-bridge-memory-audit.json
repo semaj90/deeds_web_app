@@ -1,0 +1,846 @@
+{
+  "auditRunId": "simd-audit-1778983167007",
+  "timestamp": "2026-05-17T01:59:27.007Z",
+  "filesScanned": [
+    "binding.cc",
+    "gpu_error_codes.h",
+    "libtorch_graph.cc",
+    "libtorch_stubs.cc",
+    "lstm_bridge.cc",
+    "lstm_gpu.cu",
+    "pytorch_graph.cc",
+    "simdjson_bridge.cc",
+    "som_cache.cu",
+    "tensor_bridge.cc"
+  ],
+  "findings": [
+    {
+      "file": "binding.cc",
+      "line": 15,
+      "codeSnippet": "*   bucket (if not full) or free()s it.  This eliminates the per-call",
+      "patternMatched": "free",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host free operation"
+    },
+    {
+      "file": "binding.cc",
+      "line": 59,
+      "codeSnippet": "napi_status napi_create_external_arraybuffer(napi_env, void*, size_t, napi_finalize, void*, napi_value*);",
+      "patternMatched": "napi_create_external_arraybuffer",
+      "classification": "napi_buffer",
+      "severity": "medium",
+      "description": "N-API external buffer transfer to V8"
+    },
+    {
+      "file": "binding.cc",
+      "line": 127,
+      "codeSnippet": "// Strategy: napi_create_external_arraybuffer transfers ownership of a raw",
+      "patternMatched": "napi_create_external_arraybuffer",
+      "classification": "napi_buffer",
+      "severity": "medium",
+      "description": "N-API external buffer transfer to V8"
+    },
+    {
+      "file": "binding.cc",
+      "line": 129,
+      "codeSnippet": "// and either recycles the region into g_ab_pool or free()s it.",
+      "patternMatched": "free",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host free operation"
+    },
+    {
+      "file": "binding.cc",
+      "line": 174,
+      "codeSnippet": "bucket.push_back(data);  // recycle — no free()",
+      "patternMatched": "free",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host free operation"
+    },
+    {
+      "file": "binding.cc",
+      "line": 176,
+      "codeSnippet": "free(data);              // bucket full — release to OS",
+      "patternMatched": "free",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host free operation"
+    },
+    {
+      "file": "binding.cc",
+      "line": 197,
+      "codeSnippet": "void* ptr = malloc(cap);",
+      "patternMatched": "malloc",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host malloc allocation (V8 backing store)"
+    },
+    {
+      "file": "binding.cc",
+      "line": 206,
+      "codeSnippet": "static napi_status create_pooled_ab(napi_env env, size_t bytes,",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 213,
+      "codeSnippet": "return napi_create_external_arraybuffer(",
+      "patternMatched": "napi_create_external_arraybuffer",
+      "classification": "napi_buffer",
+      "severity": "medium",
+      "description": "N-API external buffer transfer to V8"
+    },
+    {
+      "file": "binding.cc",
+      "line": 307,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)output_len * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 353,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &out_data, &arraybuffer) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 409,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)dim * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 446,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 479,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 515,
+      "codeSnippet": "if (create_pooled_ab(env, sizeof(float), &out_data, &arraybuffer) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 553,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 586,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 698,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 720,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 742,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 763,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 785,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)k * sizeof(int32_t), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 814,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &a_data, &a_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 817,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)k * dim * sizeof(float), &c_data, &c_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 868,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)neurons * dim * sizeof(float), &w_data, &w_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 871,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &b_data, &b_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 949,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * hidden * sizeof(float), &out_data, &out_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 983,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * output_dim * sizeof(float), &out_data, &out_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1017,
+      "codeSnippet": "if (create_pooled_ab(env, (size_t)n * k * sizeof(float), &out_data, &out_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: graphSimilarity",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"graphSimilarity\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: graphSimilarity",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"graphSimilarity\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: clusterEmbeddings",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"clusterEmbeddings\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: clusterEmbeddings",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"clusterEmbeddings\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: computeCaseEmbedding",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"computeCaseEmbedding\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: computeCaseEmbedding",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"computeCaseEmbedding\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: checkCudaAvailable",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"checkCudaAvailable\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: checkCudaAvailable",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"checkCudaAvailable\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_run_lstm",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridge_run_lstm\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_run_lstm",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"bridge_run_lstm\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_dot_product",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridge_dot_product\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_dot_product",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"bridge_dot_product\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_scale",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridge_scale\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_scale",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"bridge_scale\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_relu",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridge_relu\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_relu",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"bridge_relu\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: pageRankGPU",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"pageRankGPU\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: pageRankGPU",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"pageRankGPU\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: attentionScoreGPU",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"attentionScoreGPU\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: attentionScoreGPU",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"attentionScoreGPU\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: rewardScoreGPU",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"rewardScoreGPU\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: rewardScoreGPU",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"rewardScoreGPU\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: softmaxGPU",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"softmaxGPU\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: softmaxGPU",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"softmaxGPU\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: topKIndicesGPU",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"topKIndicesGPU\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: topKIndicesGPU",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"topKIndicesGPU\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: kmeansWithCentroids",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"kmeansWithCentroids\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: kmeansWithCentroids",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"kmeansWithCentroids\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: trainSOM",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"trainSOM\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "libtorch_stubs.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: trainSOM",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"trainSOM\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "lstm_bridge.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_run_lstm",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridge_run_lstm\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_bridge.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_dot_product",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridge_dot_product\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_bridge.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_scale",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridge_scale\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_bridge.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridge_relu",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridge_relu\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 25,
+      "codeSnippet": "// Avoids cudaMalloc/cudaFree per call. Thread-local to avoid contention.",
+      "patternMatched": "cudaMalloc",
+      "classification": "gpu_allocation",
+      "severity": "high",
+      "description": "Device/VRAM allocation"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 25,
+      "codeSnippet": "// Avoids cudaMalloc/cudaFree per call. Thread-local to avoid contention.",
+      "patternMatched": "cudaFree",
+      "classification": "gpu_allocation",
+      "severity": "medium",
+      "description": "Device/VRAM deallocation"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 35,
+      "codeSnippet": "if (ptr) cudaFree(ptr);",
+      "patternMatched": "cudaFree",
+      "classification": "gpu_allocation",
+      "severity": "medium",
+      "description": "Device/VRAM deallocation"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 37,
+      "codeSnippet": "if (cudaMalloc((void**)&ptr, capacity * sizeof(float)) != cudaSuccess) {",
+      "patternMatched": "cudaMalloc",
+      "classification": "gpu_allocation",
+      "severity": "high",
+      "description": "Device/VRAM allocation"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 44,
+      "codeSnippet": "~CudaBuffer() { if (ptr) cudaFree(ptr); }",
+      "patternMatched": "cudaFree",
+      "classification": "gpu_allocation",
+      "severity": "medium",
+      "description": "Device/VRAM deallocation"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 118,
+      "codeSnippet": "err = cudaDeviceSynchronize();",
+      "patternMatched": "cudaDeviceSynchronize",
+      "classification": "possible_concurrent_gpu_job",
+      "severity": "high",
+      "description": "Full CUDA device synchronization"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 143,
+      "codeSnippet": "cudaDeviceSynchronize();",
+      "patternMatched": "cudaDeviceSynchronize",
+      "classification": "possible_concurrent_gpu_job",
+      "severity": "high",
+      "description": "Full CUDA device synchronization"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 173,
+      "codeSnippet": "cudaDeviceSynchronize();",
+      "patternMatched": "cudaDeviceSynchronize",
+      "classification": "possible_concurrent_gpu_job",
+      "severity": "high",
+      "description": "Full CUDA device synchronization"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 194,
+      "codeSnippet": "cudaDeviceSynchronize();",
+      "patternMatched": "cudaDeviceSynchronize",
+      "classification": "possible_concurrent_gpu_job",
+      "severity": "high",
+      "description": "Full CUDA device synchronization"
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: run_lstm_add",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"run_lstm_add\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: run_dot_product",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"run_dot_product\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: run_scale",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"run_scale\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: run_relu",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"run_relu\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: run_lstm_add",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"run_lstm_add\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: run_dot_product",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"run_dot_product\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: run_scale",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"run_scale\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "lstm_gpu.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: run_relu",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"run_relu\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "som_cache.cu",
+      "line": 104,
+      "codeSnippet": "cudaDeviceSynchronize();",
+      "patternMatched": "cudaDeviceSynchronize",
+      "classification": "possible_concurrent_gpu_job",
+      "severity": "high",
+      "description": "Full CUDA device synchronization"
+    },
+    {
+      "file": "som_cache.cu",
+      "line": 108,
+      "codeSnippet": "cudaDeviceSynchronize();",
+      "patternMatched": "cudaDeviceSynchronize",
+      "classification": "possible_concurrent_gpu_job",
+      "severity": "high",
+      "description": "Full CUDA device synchronization"
+    },
+    {
+      "file": "som_cache.cu",
+      "line": 124,
+      "codeSnippet": "float* tmp = static_cast<float*>(std::malloc(bytes));",
+      "patternMatched": "malloc",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host malloc allocation (V8 backing store)"
+    },
+    {
+      "file": "som_cache.cu",
+      "line": 129,
+      "codeSnippet": "std::free(tmp);",
+      "patternMatched": "free",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host free operation"
+    },
+    {
+      "file": "som_cache.cu",
+      "line": 138,
+      "codeSnippet": "float* tmp = static_cast<float*>(std::malloc(bytes));",
+      "patternMatched": "malloc",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host malloc allocation (V8 backing store)"
+    },
+    {
+      "file": "som_cache.cu",
+      "line": 144,
+      "codeSnippet": "std::free(tmp);",
+      "patternMatched": "free",
+      "classification": "napi_buffer",
+      "severity": "low",
+      "description": "Host free operation"
+    },
+    {
+      "file": "tensor_bridge.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: runSOMCache",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"runSOMCache\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "tensor_bridge.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: runSOMCache",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"runSOMCache\" does not have an in-situ CPU execution fallback registered."
+    },
+    {
+      "file": "tensor_bridge.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridgeSIMDToTensorRT",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"bridgeSIMDToTensorRT\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
+      "file": "tensor_bridge.cc",
+      "line": 1,
+      "codeSnippet": "Function boundary: bridgeSIMDToTensorRT",
+      "patternMatched": "missing_cpu_fallback",
+      "classification": "missing_cpu_fallback",
+      "severity": "high",
+      "description": "Native entrypoint \"bridgeSIMDToTensorRT\" does not have an in-situ CPU execution fallback registered."
+    }
+  ],
+  "concurrencyAssessments": [],
+  "summary": {
+    "totalFindings": 90,
+    "byClassification": {
+      "gpu_allocation": 5,
+      "napi_buffer": 12,
+      "tensor_lifetime": 0,
+      "missing_timeout": 29,
+      "missing_cpu_fallback": 17,
+      "possible_concurrent_gpu_job": 6,
+      "safe": 21
+    },
+    "bySeverity": {
+      "high": 25,
+      "medium": 35,
+      "low": 30
+    }
+  }
+}
