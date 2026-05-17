@@ -82,7 +82,7 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
             userName: sql<string>`(SELECT name FROM users WHERE id = ${evidence.userId})`,
           })
           .from(evidence)
-          .where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)))
+          .where(and(eq(evidence.caseId, caseId), eq(evidence.userId, Number(locals.user.id))))
           .orderBy(desc(evidence.createdAt))
           .limit(limit)
           .then((rows) => {

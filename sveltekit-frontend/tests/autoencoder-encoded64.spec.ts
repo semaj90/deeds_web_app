@@ -4,14 +4,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // ── Hoisted mocks (must be referenced inside vi.mock factories) ───────────
 const mockHgetall = vi.hoisted(() => vi.fn());
 const mockHget    = vi.hoisted(() => vi.fn());
-const mockAutoencoderEncode = vi.hoisted(() => vi.fn());
+const mockAutoencoderEncode2Layer = vi.hoisted(() => vi.fn());
 
 vi.mock('$lib/server/redis.js', () => ({
 	getRedis: () => ({ hgetall: mockHgetall, hget: mockHget }),
 }));
 
 vi.mock('$lib/server/gpu/topology-projection.js', () => ({
-	autoencoderEncode: mockAutoencoderEncode,
+	autoencoderEncode2Layer: mockAutoencoderEncode2Layer,
 }));
 
 // ── Weight shape constants ─────────────────────────────────────────────────
@@ -163,63 +163,58 @@ describe('encode-768-to-64', () => {
 
 	it('encode768to64: returns Float32Array of length 64 for a single 768d input', async () => {
 		setupWeights();
-		mockAutoencoderEncode
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(256).fill(0.1), source: 'cpu' })
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(64).fill(0.05),  source: 'cpu' });
+		mockAutoencoderEncode2Layer
+			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(64).fill(0.05), source: 'cpu' });
 
 		const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
 		const result = await encode768to64(new Float32Array(768).fill(0.5));
 
 		expect(result).toBeInstanceOf(Float32Array);
 		expect(result.length).toBe(64);
-		expect(mockAutoencoderEncode).toHaveBeenCalledTimes(2);
+		expect(mockAutoencoderEncode2Layer).toHaveBeenCalledTimes(1);
 	});
 
-	it('encode768to64: Layer 1 receives dim=768, outDim=256; Layer 2 receives dim=256, outDim=64', async () => {
+	it('encode768to64: Layer 1 and Layer 2 are executed in a single 2-layer call', async () => {
 		setupWeights();
-		mockAutoencoderEncode
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(256).fill(0.1), source: 'cpu' })
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(64).fill(0.05),  source: 'cpu' });
+		mockAutoencoderEncode2Layer
+			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(64).fill(0.05), source: 'cpu' });
 
 		const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
 		await encode768to64(new Float32Array(768).fill(0.3));
 
-		const [call1, call2] = mockAutoencoderEncode.mock.calls;
-		expect(call1[3]).toMatchObject({ dim: 768, outDim: 256 });
-		expect(call2[3]).toMatchObject({ dim: 256, outDim: 64  });
+		const [call1] = mockAutoencoderEncode2Layer.mock.calls;
+		expect(call1[2]).toMatchObject({ n: 1, dim: 768 });
 	});
 
 	it('encode768to64: CPU fallback works (preferGpu: false)', async () => {
 		setupWeights();
-		mockAutoencoderEncode
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(256).fill(0.1), source: 'cpu' })
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(64).fill(0.05),  source: 'cpu' });
+		mockAutoencoderEncode2Layer
+			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(64).fill(0.05), source: 'cpu' });
 
 		const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
 		const result = await encode768to64(new Float32Array(768).fill(0.3), { preferGpu: false });
 
 		expect(result.length).toBe(64);
-		const [call1] = mockAutoencoderEncode.mock.calls;
-		expect(call1[3]).toMatchObject({ preferGpu: false });
+		const [call1] = mockAutoencoderEncode2Layer.mock.calls;
+		expect(call1[2]).toMatchObject({ preferGpu: false });
 	});
 
-	it('encode768to64: throws "Autoencoder Layer 1 failed" when Layer 1 returns ok:false', async () => {
+	it('encode768to64: throws "Autoencoder 2-layer encode failed" when Layer ok:false', async () => {
 		setupWeights();
-		mockAutoencoderEncode
+		mockAutoencoderEncode2Layer
 			.mockResolvedValueOnce({ ok: false, projected: new Float32Array(0), source: 'cpu' });
 
 		const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
 		await expect(encode768to64(new Float32Array(768).fill(0.5))).rejects.toThrow(
-			'Autoencoder Layer 1 failed'
+			'Autoencoder 2-layer encode failed'
 		);
 	});
 
 	it('encode768to64Batch: returns n×64 encoded matrix and correct metadata', async () => {
 		const n = 4;
 		setupWeights();
-		mockAutoencoderEncode
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(n * 256).fill(0.1), source: 'gpu' })
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(n * 64).fill(0.05),  source: 'gpu' });
+		mockAutoencoderEncode2Layer
+			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(n * 64).fill(0.05), source: 'gpu' });
 
 		const { encode768to64Batch } = await import('$lib/server/gpu/encode-768-to-64.js');
 		const result = await encode768to64Batch(new Float32Array(n * 768).fill(0.5), n);
@@ -239,9 +234,8 @@ describe('encode-768-to-64', () => {
 		}));
 
 		setupWeights();
-		mockAutoencoderEncode
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(256).fill(0.1), source: 'cpu' })
-			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(64).fill(0.05),  source: 'cpu' });
+		mockAutoencoderEncode2Layer
+			.mockResolvedValueOnce({ ok: true, projected: new Float32Array(64).fill(0.05), source: 'cpu' });
 
 		const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
 		await encode768to64(new Float32Array(768).fill(0.5));

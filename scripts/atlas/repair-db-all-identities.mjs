@@ -45,7 +45,21 @@ async function repairAll() {
     { table: 'cases', column: 'user_id' },
     { table: 'cases', column: 'created_by' },
     { table: 'documents', column: 'user_id' },
-    { table: 'evidence', column: 'user_id' }
+    { table: 'evidence', column: 'user_id' },
+    { table: 'ace_context_cache', column: 'user_id' },
+    { table: 'ai_usage_log', column: 'user_id' },
+    { table: 'analytics_events', column: 'user_id' },
+    { table: 'api_audit_log', column: 'user_id' },
+    { table: 'case_notes', column: 'created_by' },
+    { table: 'case_statute_links', column: 'created_by' },
+    { table: 'chunk_hit_log', column: 'user_id' },
+    { table: 'citation_collections', column: 'user_id' },
+    { table: 'codebase_audit_reports', column: 'created_by' },
+    { table: 'diagnosis_events', column: 'user_id' },
+    { table: 'email_verification_codes', column: 'user_id' },
+    { table: 'rag_query_log', column: 'user_id' },
+    { table: 'response_feedback', column: 'user_id' },
+    { table: 'user_analytics_events', column: 'user_id' }
   ];
 
   for (const target of targets) {

@@ -84,6 +84,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				const [doc] = await db
 					.insert(documents)
 					.values({
+						id: crypto.randomUUID(),
 						title: file.name,
 						content: textContent.slice(0, 100000),
 						fileType: file.type || 'application/octet-stream',

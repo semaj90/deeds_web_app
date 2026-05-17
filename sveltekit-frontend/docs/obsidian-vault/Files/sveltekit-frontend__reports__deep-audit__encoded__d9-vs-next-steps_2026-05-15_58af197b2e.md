@@ -1,0 +1,39 @@
+---
+type: "file"
+path: "sveltekit-frontend/reports/deep-audit/encoded/d9-vs-next-steps_2026-05-15_58af197b2e.json"
+aliases: ["d9-vs-next-steps_2026-05-15_58af197b2e.json","sveltekit-frontend/reports/deep-audit/encoded/d9-vs-next-steps_2026-05-15_58af197b2e.json"]
+clusterId: -1
+ext: ".json"
+lineCount: 7230
+pagerank: 0
+blend: 0
+isRoute: false
+isSvelteComp: false
+isTest: false
+hasAuth: false
+hasZod: false
+importCount: 0
+embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/reports/deep-audit/encoded/d9-vs-next-steps_2026-05-15_58af197b2e.json"
+last_updated_by_llm: "2026-05-17T00:47:15.229Z"
+ai-first: true
+confidence: "high"
+up: []
+imports: []
+tags: ["file","ext/json","t/json"]
+---
+
+# `sveltekit-frontend/reports/deep-audit/encoded/d9-vs-next-steps_2026-05-15_58af197b2e.json`
+## For future Claude
+> JSON data file
+pagerank:: 0.000000
+blend:: 0.000000
+lines:: 7230
+## Summary
+
+JSON data file
+
+## Backlinks (Dataview)
+```dataviewjs
+const cur = dv.current().file.path;
+dv.list(dv.pages().where(p => Array.isArray(p.imports) && p.imports.some(l => l && l.path === cur)).file.link);
+```

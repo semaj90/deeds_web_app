@@ -17,7 +17,7 @@ Usage:
 
 Output:
     Redis  ace:autoencoder:weights  (W1,b1,W2,b2,W3,b3,W4,b4 as CSV)
-    Redis  ace:autoencoder:meta     (JSON run stats)
+    Redis  ace:autoencoder:meta     (hash of run stats — trainedAt, bestLoss, epochs, n, …)
     File   logs/task-output/pipeline-test/autoencoder-train-<ts>.json
 """
 
@@ -174,18 +174,24 @@ for epoch in range(args.epochs):
         # Reconstruction loss
         rec_loss = F.mse_loss(X_hat, X)
 
-        # Contrastive loss: pull anchor↔positive together, push from negative
-        # Use actual batch size (last batch may be smaller than args.batch)
-        half = len(X) // 2
-        if half >= 1:
-            a         = z[:half]
-            pos       = z[half:2 * half]          # symmetric slice — always == half
-            neg_i     = torch.randperm(half, device=device)
-            neg       = a[neg_i]
-            sim_pos   = F.cosine_similarity(a, pos, dim=-1)
-            sim_neg   = F.cosine_similarity(a, neg, dim=-1)
+        # Contrastive loss with genuine positives: use 768d nearest neighbours
+        # within the batch as positives (truly similar pairs), random permutation
+        # of the batch as negatives.  The original scheme used random-batch
+        # halves as "positives" — statistically identical to negatives — causing
+        # mode collapse.  NN-positives give the encoder a real separation signal.
+        if len(X) >= 4:
+            with torch.no_grad():
+                X_n    = F.normalize(X, dim=-1)
+                sim768 = torch.mm(X_n, X_n.t())        # (B, B) cosine sims in 768d
+                sim768.fill_diagonal_(-2.0)             # exclude self
+                nn_idx = sim768.argmax(dim=1)           # closest neighbour per sample
+            pos       = z[nn_idx]                       # 64d latent of 768d NN
+            neg_i     = torch.randperm(len(X), device=device)
+            neg       = z[neg_i]
+            sim_pos   = F.cosine_similarity(z, pos, dim=-1)
+            sim_neg   = F.cosine_similarity(z, neg, dim=-1)
             cont_loss = F.relu(0.5 - sim_pos + sim_neg).mean()
-            loss = rec_loss + 0.1 * cont_loss
+            loss      = rec_loss + 0.1 * cont_loss
         else:
             loss = rec_loss
 
@@ -229,8 +235,13 @@ meta = {
     "n": len(data), "bestLoss": best_loss, "elapsedSec": round(elapsed, 1),
     "dimIn": DIM_IN, "dimHidden": DIM_HIDDEN, "dimLatent": DIM_LATENT,
     "device": str(device), "gpu": torch.cuda.get_device_name() if device.type == "cuda" else None,
+    "architecture": f"{DIM_IN}-{DIM_HIDDEN}-{DIM_LATENT}-{DIM_HIDDEN}-{DIM_IN}",
+    "activation": "relu",
+    "latentNorm": "l2",
 }
-r.set("ace:autoencoder:meta", json.dumps(meta), ex=7 * 24 * 3600)
+r.delete("ace:autoencoder:meta")  # clear old string key if present
+r.hset("ace:autoencoder:meta", mapping={k: str(v) for k, v in meta.items() if v is not None})
+r.expire("ace:autoencoder:meta", 7 * 24 * 3600)
 
 report = {"status": "PASS", **meta, "losses": losses}
 out    = json.dumps(report, indent=2)

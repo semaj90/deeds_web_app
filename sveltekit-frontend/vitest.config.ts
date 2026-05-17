@@ -217,6 +217,7 @@ export default defineConfig({
       // P1: autoencoder weights + 768→64 encode chain (2026-05-11)
       'tests/autoencoder-encoded64.spec.ts',
       'tests/feature-map.integrity.spec.ts',
+      'tests/rg-cluster-pivot.spec.ts',
     ],
     exclude: [
       'node_modules/**',

@@ -127,7 +127,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			await pgDb.insert(ragSessions).values({
 				id: response.context_id,
 				title: `RAG Context: ${query_id}`,
-				userId: user_id ?? 'system',
+				userId: Number(locals.user.id),
 				caseId: case_id,
 			}).onConflictDoNothing();
 		}).catch(() => {});

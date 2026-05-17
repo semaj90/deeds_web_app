@@ -5,10 +5,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockPcaProject = vi.hoisted(() => vi.fn());
 const mockAutoencoderEncode = vi.hoisted(() => vi.fn());
+const mockAutoencoderEncode2Layer = vi.hoisted(() => vi.fn());
 
 vi.mock('$lib/server/gpu/topology-projection', () => ({
   pcaProject: mockPcaProject,
   autoencoderEncode: mockAutoencoderEncode,
+  autoencoderEncode2Layer: mockAutoencoderEncode2Layer,
 }));
 
 // ── Lazy imports ──────────────────────────────────────────────────────────────
@@ -43,6 +45,20 @@ beforeEach(async () => {
       const { n, outDim } = opts;
       const projected = new Float32Array(n * outDim);
       for (let i = 0; i < n * outDim; i++) projected[i] = 0.5;
+      return {
+        ok: true, source: 'cpu-fallback', projected,
+        n, outDim, durationMs: 1,
+        outputMeta: { op: 'autoencoderEncodeGPU', gpuUsed: false, inputRows: n, inputDim: opts.dim, outputDim: outDim },
+      };
+    }
+  );
+
+  mockAutoencoderEncode2Layer.mockImplementation(
+    async (_data: Float32Array, weights: any, opts: { n: number; dim: number }) => {
+      const { n } = opts;
+      const { outDim } = weights;
+      const projected = new Float32Array(n * outDim);
+      for (let i = 0; i < n * outDim; i++) projected[i] = (i % 2 === 0 ? 0.3 : 0.7);
       return {
         ok: true, source: 'cpu-fallback', projected,
         n, outDim, durationMs: 1,
@@ -242,5 +258,31 @@ describe('runTopologyProjection', () => {
     const inputs = makeInputs(2);
     const result = await runTopologyProjection(inputs);
     expect(result.nodes[0].projectionSource).toBe('cpu-pca');
+  });
+
+  it('uses autoencoderEncode2Layer and pcaProject chained when mode=ae2l-pca and weights provided', async () => {
+    const inputs = makeInputs(4, 768);
+    const W1 = new Float32Array(256 * 768);
+    const b1 = new Float32Array(256);
+    const W2 = new Float32Array(64 * 256);
+    const b2 = new Float32Array(64);
+    
+    const result = await runTopologyProjection(inputs, {
+      mode: 'ae2l-pca',
+      autoencoderWeights2Layer: { W1, b1, W2, b2, hidden: 256, outDim: 64 },
+    });
+    
+    expect(mockAutoencoderEncode2Layer).toHaveBeenCalledOnce();
+    expect(mockPcaProject).toHaveBeenCalledOnce(); // Chained PCA projection 64 -> 4
+    expect(result.ok).toBe(true);
+    expect(result.nodes[0].projectionSource).toBe('cpu-ae2l-pca');
+  });
+
+  it('falls back to raw PCA when mode=ae2l-pca but no 2-layer weights', async () => {
+    const inputs = makeInputs(4, 768);
+    const result = await runTopologyProjection(inputs, { mode: 'ae2l-pca' });
+    expect(mockPcaProject).toHaveBeenCalledOnce();
+    expect(mockAutoencoderEncode2Layer).not.toHaveBeenCalled();
+    expect(result.ok).toBe(true);
   });
 });

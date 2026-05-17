@@ -75,15 +75,15 @@ async function main() {
       COALESCE(chl.rerank_score, chl.score)::real >= 0.5
                                                 AS accepted_context,
       -- look up trust_tier from feature_file_edges if available
-      COALESCE(fi.trust_tier, 'T3')             AS trust_tier,
+      -- (feature_file_edges.trust_tier not yet migrated — default T3 until column added)
+      'T3'::text                                AS trust_tier,
       -- PageRank from CouchDB cache (stored as JSON string in Redis; not directly queryable)
       -- som_bmu coords from Qdrant payload — not in chunk_hit_log; use som_cluster as proxy
       chl.som_cluster                           AS som_bmu_row,
       (chl.som_cluster % 5)::int                AS som_bmu_col,
-      chl.created_at
+      chl.hit_at
     FROM chunk_hit_log chl
-    LEFT JOIN feature_file_edges fi ON fi.file_path = chl.relative_path
-    ORDER BY chl.created_at DESC
+    ORDER BY chl.hit_at DESC
     LIMIT $1
   `, [LIMIT]);
 
@@ -128,7 +128,7 @@ async function main() {
     written++;
     if (written % 500 === 0) eta(written, rows.length, t0);
   }
-  stream.end();
+  await new Promise((resolve, reject) => { stream.end(resolve); stream.on('error', reject); });
   eta(rows.length, rows.length, t0);
   process.stdout.write('\n');
 

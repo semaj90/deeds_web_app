@@ -139,3 +139,18 @@ npm run audit:drizzle-meta          # hygiene check (non-JSON detection)
 npm run audit:drizzle-meta:fix      # auto-move violations to drizzle/meta/archived/
 npm run audit:pgvector              # pgvector extension, HNSW indexes, dim validation
 ```
+
+## LLM Synthesis Memory & Telemetry Policy (Phase 11 — 2026-05-17)
+
+### Core Rules
+- **No Hidden Thoughts / Chain of Thoughts**: Any persisted, cached, or JSONL training records MUST NOT retain `hiddenThoughts`, `chainOfThought`, `kv_cache`, `tensor`, or `cudaPointer` attributes.
+- **Durable Event Storage**: The Postgres table `llm_synthesis_events` serves as the canonical transaction log.
+- **Hot Caches (Redis BitFrost)**: Hot keys must be strictly rebuildable and enforce expirations:
+  - `ace:packet:{runId}` (1h TTL)
+  - `ace:cluster:{clusterId}` (24h TTL)
+- **JSONL Dataset Writes**: Every synthesis logging event must append to the daily training JSONL log (`memory/datasets/llm_synthesis/YYYY-MM-DD.jsonl`) to support offline fine-tuning.
+
+### MCP Interface
+- **Tool**: `llm_synthesis.log_event`
+- **Port**: 3002 (`scripts/phase76-mcp-server.mjs`)
+

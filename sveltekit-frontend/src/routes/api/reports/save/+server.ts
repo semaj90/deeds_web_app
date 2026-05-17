@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         content: contentHtml || '',
         updatedAt: new Date(),
       })
-      .where(and(eq(reports.id, reportId), eq(reports.createdBy, locals.user.id)))
+      .where(and(eq(reports.id, reportId), eq(reports.createdBy, Number(locals.user.id))))
       .returning();
 
 		if (!updated) {

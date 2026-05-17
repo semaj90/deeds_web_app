@@ -50,7 +50,7 @@ async function handleExport({ locals, params, format, request }: {
 		.where(
 			and(
 				eq(reports.id, reportId),
-				eq(reports.createdBy, locals.user.id)
+				eq(reports.createdBy, Number(locals.user.id))
 			)
 		)
 		.limit(1);

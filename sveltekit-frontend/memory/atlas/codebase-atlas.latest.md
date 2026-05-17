@@ -1,6 +1,6 @@
 # Directory Atlas Recommendations
 
-> Generated: 2026-05-16T20:00:57.479Z · 1167 directories · 8284 files
+> Generated: 2026-05-17T00:36:04.496Z · 1167 directories · 8284 files
 
 ## `src/lib/server/db`
 
@@ -202,6 +202,16 @@
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/server/grpc/embedding-client.ts`, `src/lib/server/grpc/embedding-client.ts`, `src/lib/server/grpc/client-options.ts`
 
+## `src/lib`
+
+- Rank: **0.273** · files=17 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/AGENTS.md` (parent: `agents:src/AGENTS.md`)
+- Authority max=0.136 avg=0.08, PageRank max=0, Karpathy blend=0.676
+- Topo classes: `unclassified`
+- Clusters: `general`, `gpu:57`, `gpu:20`, `gpu:9`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/polyfills.ts`, `src/lib/polyfills.ts`, `src/lib/types.ts`
+
 ## `src/lib/server/tools/handlers`
 
 - Rank: **0.273** · files=14 · hits=0 · dirty=0
@@ -221,16 +231,6 @@
 - Clusters: `gpu:57`, `general`, `gpu:77`, `gpu:9`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/types/index.ts`, `src/lib/types/qlora-protobuf.ts`, `src/lib/types/protocol.ts`
-
-## `src/lib`
-
-- Rank: **0.272** · files=17 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/AGENTS.md` (parent: `agents:src/AGENTS.md`)
-- Authority max=0.136 avg=0.08, PageRank max=0, Karpathy blend=0.655
-- Topo classes: `unclassified`
-- Clusters: `general`, `gpu:57`, `gpu:20`, `gpu:9`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/types.ts`, `src/lib/utils.ts`, `src/lib/index.ts`
 
 ## `src/lib/server/queue`
 

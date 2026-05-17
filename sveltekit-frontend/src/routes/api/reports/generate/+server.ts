@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const evidenceData = await db
       .select()
       .from(evidence)
-      .where(and(eq(evidence.caseId, id), eq(evidence.userId, locals.user.id)));
+      .where(and(eq(evidence.caseId, id), eq(evidence.userId, Number(locals.user.id))));
     let personsData: PersonRow[] = [];
     try {
       personsData = await db
@@ -100,7 +100,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         .insert(reports)
         .values({
           caseId: id,
-          createdBy: locals.user.id,
+          createdBy: Number(locals.user.id),
           title: `${type === 'charging_memo' ? 'Charging Memo' : 'Report'} - ${caseData.title}`,
           content: generatedContent.html,
           type,

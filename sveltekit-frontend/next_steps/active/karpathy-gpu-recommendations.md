@@ -1,6 +1,6 @@
 # Karpathy GPU Authority Blend
 
-Generated: 2026-05-16T05:49:05.074Z
+Generated: 2026-05-17T00:47:07.759Z
 
 | File | PR | Auth | Attn | Blend |
 |---|---|---|---|---|

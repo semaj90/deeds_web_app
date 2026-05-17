@@ -1,0 +1,12 @@
+{
+  "name": "gemma3-legal",
+  "format": "Q4_K_M",
+  "quantization": "int4",
+  "size": "7.3GB",
+  "architecture": "Gemma3ForCausalLM",
+  "vocab_size": 256000,
+  "hidden_size": 3072,
+  "num_layers": 28,
+  "num_attention_heads": 24,
+  "max_position_embeddings": 8192
+}

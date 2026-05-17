@@ -177,7 +177,7 @@ Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.
 | `+page.svelte` | 0.000 | 0x209 |
 ## Audit Gates — General
 
-> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-15
+> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-17
 > Run each check from the **sveltekit-frontend/** root.
 
 ### Tier A — Code Connectivity

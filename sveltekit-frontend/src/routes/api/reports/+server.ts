@@ -79,7 +79,7 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
       userReports = await db
         .select()
         .from(reports)
-        .where(and(inArray(reports.id, ids), eq(reports.createdBy, locals.user.id)))
+        .where(and(inArray(reports.id, ids), eq(reports.createdBy, Number(locals.user.id))))
         .orderBy(desc(reports.createdAt))
         .$withCache({ config: { ex: 60 } });
     }
@@ -88,7 +88,7 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
       userReports = await db
         .select()
         .from(reports)
-        .where(and(eq(reports.caseId, caseId), eq(reports.createdBy, locals.user.id)))
+        .where(and(eq(reports.caseId, caseId), eq(reports.createdBy, Number(locals.user.id))))
         .orderBy(desc(reports.createdAt))
         .limit(limit)
         .offset(offset)
@@ -99,7 +99,7 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
       userReports = await db
         .select()
         .from(reports)
-        .where(eq(reports.createdBy, locals.user.id))
+        .where(eq(reports.createdBy, Number(locals.user.id)))
         .orderBy(desc(reports.createdAt))
         .limit(limit)
         .offset(offset)
@@ -151,7 +151,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
         title: body.title ?? 'Untitled Report',
         type: reportType,
         status: body.status ?? 'draft',
-        createdBy: locals.user.id,
+        createdBy: Number(locals.user.id),
         metadata: body.metadata ?? null,
       })
       .returning();
@@ -228,7 +228,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 			.set(updates)
 			.where(
 				and(
-					eq(reports.createdBy, locals.user.id),
+					eq(reports.createdBy, Number(locals.user.id)),
 					inArray(reports.id, body.ids)
 				)
 			)
@@ -284,7 +284,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		const deleted = await db.delete(reports)
 			.where(
 				and(
-					eq(reports.createdBy, locals.user.id),
+					eq(reports.createdBy, Number(locals.user.id)),
 					inArray(reports.id, body.ids)
 				)
 			)

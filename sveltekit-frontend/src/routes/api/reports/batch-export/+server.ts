@@ -70,7 +70,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		.where(
 			and(
 				inArray(reports.id, validIds),
-				eq(reports.createdBy, locals.user.id)
+				eq(reports.createdBy, Number(locals.user.id))
 			)
 		);
 

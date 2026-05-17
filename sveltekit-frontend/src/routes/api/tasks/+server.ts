@@ -35,7 +35,8 @@ function getOrCreateSession(cookies: import('@sveltejs/kit').Cookies): string {
 // ── GET — list tasks ──────────────────────────────────────────────────────────
 
 export const GET: RequestHandler = async ({ locals, cookies }) => {
-	const userId = locals.user?.id ?? null;
+	const userIdStr = locals.user?.id ?? null;
+	const userId = userIdStr ? Number(userIdStr) : null;
 	const sessionId = getOrCreateSession(cookies);
 
 	try {
@@ -70,7 +71,8 @@ const createSchema = z.object({
 });
 
 export const POST: RequestHandler = async ({ request, locals, cookies }) => {
-	const userId = locals.user?.id ?? null;
+	const userIdStr = locals.user?.id ?? null;
+	const userId = userIdStr ? Number(userIdStr) : null;
 	const sessionId = getOrCreateSession(cookies);
 
 	const raw = await request.json().catch(() => ({})) as Record<string, unknown>;
