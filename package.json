@@ -34,6 +34,7 @@
     "turbo:status": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -StatusOnly",
     "turbo:start": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -TextOnly",
     "turbo:start:detached": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached -TextOnly",
+    "turbo:start:detached:vlm": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
     "turbo:opencode": "opencode",
     "turbo:trace-smoke": "mkdir -p .tmp/audits && opencode run -m turboquant/gemma4-tq --agent trace-audit --format json \"Use TRACE MCP first. Call trace_kag_search or search_dev_context for SvelteKit 2 Svelte 5 Drizzle Zod Bits UI audit. If no TRACE tool is available, say TRACE_MCP_NOT_AVAILABLE.\" | tee .tmp/audits/trace-smoke.ndjson",
     "atlas:health": "npm run services:health",

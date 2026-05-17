@@ -1,39 +1,34 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
-import { switchVlmMode, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
-import { z } from 'zod';
+import type { RequestHandler } from './$types';
+import { switchVlmMode, getVlmState, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 
-const SwitchModeSchema = z.object({
-  mode: z.nativeEnum(VlmMode)
-});
+const VALID_MODES = new Set<string>(Object.values(VlmMode).filter(m => m !== VlmMode.SWITCHING));
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
-  
+
+  let body: unknown;
   try {
-    const body = await request.json();
-    const validation = SwitchModeSchema.safeParse(body);
-    
-    if (!validation.success) {
-      return json(
-        { success: false, error: 'Invalid VLM mode', details: validation.error.format() },
-        { status: 400 }
-      );
-    }
-    
-    const { mode } = validation.data;
-    console.info(`🚀 [VLM Status API] Switch triggered: switching to mode ${mode}`);
-    
-    const result = await switchVlmMode(mode);
-    if (!result.success) {
-      return json({ success: false, error: result.error ?? 'Failed to switch mode' }, { status: 500 });
-    }
-    
-    return json({ success: true, mode });
-  } catch (err: any) {
-    console.error('[VLM Status API] POST switch error:', err);
-    return json({ success: false, error: err.message }, { status: 500 });
+    body = await request.json();
+  } catch {
+    return json({ error: 'Invalid JSON body' }, { status: 400 });
   }
+
+  const mode = (body as Record<string, unknown>)?.mode;
+  if (typeof mode !== 'string' || !VALID_MODES.has(mode)) {
+    return json(
+      { error: `Invalid mode. Must be one of: ${[...VALID_MODES].join(', ')}` },
+      { status: 400 }
+    );
+  }
+
+  const result = await switchVlmMode(mode as VlmMode);
+  if (!result.success) {
+    return json({ error: result.error ?? 'Mode switch failed' }, { status: 409 });
+  }
+
+  const newState = await getVlmState();
+  return json({ mode: newState });
 };

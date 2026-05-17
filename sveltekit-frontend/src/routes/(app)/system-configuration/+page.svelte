@@ -90,6 +90,46 @@
  });
 
  let webgpuCapabilities = $state({ hasWebGPU: false });
+
+  type VlmMode = 'OFF' | 'TEXT' | 'VISION' | 'SWITCHING' | 'GPU_WORK';
+  let vlmMode = $state<VlmMode | null>(null);
+  let vlmTurboQuantPid = $state<number | null>(null);
+  let vlmHealthy = $state(false);
+  let vlmSwitching = $state(false);
+  let vlmError = $state('');
+
+  async function fetchVlmStatus() {
+    try {
+      const res = await fetch('/api/vlm/status');
+      if (!res.ok) return;
+      const data = await res.json() as { mode: VlmMode; turboQuant: { pid: number | null; healthy: boolean } };
+      vlmMode = data.mode;
+      vlmTurboQuantPid = data.turboQuant.pid;
+      vlmHealthy = data.turboQuant.healthy;
+    } catch { /* ignore */ }
+  }
+
+  async function setVlmMode(mode: VlmMode) {
+    vlmSwitching = true;
+    vlmError = '';
+    try {
+      const res = await fetch('/api/vlm/switch-mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode }),
+      });
+      const data = await res.json() as { mode?: VlmMode; error?: string };
+      if (!res.ok) {
+        vlmError = data.error ?? 'Switch failed';
+      } else {
+        vlmMode = data.mode ?? mode;
+      }
+    } catch (e) {
+      vlmError = e instanceof Error ? e.message : 'Network error';
+    } finally {
+      vlmSwitching = false;
+    }
+  }
   let saveState = $state<'idle' | 'saved' | 'error'>('idle');
   let saveMessage = $state('');
   let lastSavedAt = $state('');
@@ -123,6 +163,13 @@
     const interval = window.setInterval(updateInfo, 5000);
     return () => window.clearInterval(interval);
 });
+
+
+  $effect(() => {
+    if (activeTab === 'gpu') {
+      fetchVlmStatus();
+    }
+  });
 
  function saveConfig() {
     if (!browser) return;
@@ -365,6 +412,40 @@
         Enable CUDA via Python Bridge
        </label>
       </div>
+     </div>
+
+     <div style="margin-top:1.5rem;">
+      <h3 style="color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.875rem;margin-bottom:0.75rem;">VLM_LIFECYCLE</h3>
+
+      {#if vlmMode === null}
+       <p style="color:#64748b;font-size:0.8rem;">Loading…</p>
+      {:else}
+       <div class="status-card {vlmMode === 'TEXT' || vlmMode === 'VISION' ? 'success' : vlmMode === 'SWITCHING' ? 'warning' : ''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+         <div>
+          <h3 style="margin:0 0 0.25rem;">llama-server mode: <strong>{vlmMode}</strong></h3>
+          {#if vlmTurboQuantPid}
+           <p style="margin:0;font-size:0.75rem;color:#94a3b8;">PID {vlmTurboQuantPid} · {vlmHealthy ? '✓ healthy' : '✗ not responding'}</p>
+          {:else}
+           <p style="margin:0;font-size:0.75rem;color:#64748b;">Not running on :8090</p>
+          {/if}
+         </div>
+         <button onclick={fetchVlmStatus} style="padding:0.25rem 0.5rem;font-size:0.75rem;background:transparent;border:1px solid #334155;color:#94a3b8;cursor:pointer;">↻</button>
+        </div>
+       </div>
+
+       {#if vlmError}
+        <p style="color:#f87171;font-size:0.8rem;margin:0.5rem 0;">{vlmError}</p>
+       {/if}
+
+       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem;">
+        <button onclick={() => setVlmMode('TEXT')} disabled={vlmSwitching || vlmMode === 'TEXT' || vlmMode === 'SWITCHING'} style="padding:0.4rem 0.85rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;border:1px solid #334155;background:{vlmMode==='TEXT'?'#1e3a5f':'transparent'};color:{vlmMode==='TEXT'?'#60a5fa':'#94a3b8'};cursor:pointer;">TEXT</button>
+        <button onclick={() => setVlmMode('VISION')} disabled={vlmSwitching || vlmMode === 'VISION' || vlmMode === 'SWITCHING'} style="padding:0.4rem 0.85rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;border:1px solid #334155;background:{vlmMode==='VISION'?'#1e3a5f':'transparent'};color:{vlmMode==='VISION'?'#60a5fa':'#94a3b8'};cursor:pointer;">VISION</button>
+        <button onclick={() => setVlmMode('GPU_WORK')} disabled={vlmSwitching || vlmMode === 'GPU_WORK' || vlmMode === 'SWITCHING'} style="padding:0.4rem 0.85rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;border:1px solid #334155;background:{vlmMode==='GPU_WORK'?'#3b1f0a':'transparent'};color:{vlmMode==='GPU_WORK'?'#fb923c':'#94a3b8'};cursor:pointer;">GPU_WORK</button>
+        <button onclick={() => setVlmMode('OFF')} disabled={vlmSwitching || vlmMode === 'OFF' || vlmMode === 'SWITCHING'} style="padding:0.4rem 0.85rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;border:1px solid #334155;background:transparent;color:{vlmMode==='OFF'?'#ef4444':'#94a3b8'};cursor:pointer;">OFF</button>
+       </div>
+       <p style="color:#475569;font-size:0.7rem;margin-top:0.5rem;">TEXT = no mmproj (~5GB VRAM) · VISION = with mmproj (~6GB) · GPU_WORK / OFF = fully unloaded</p>
+      {/if}
      </div>
     </section>
    {/if}

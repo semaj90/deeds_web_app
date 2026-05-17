@@ -1,37 +1,51 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
+import type { RequestHandler } from './$types';
 import { getVlmState } from '$lib/server/inference/vlm-lifecycle.js';
+import { execSync } from 'node:child_process';
+
+function getTurboQuantPid(): number | null {
+  try {
+    const out = execSync('netstat -ano | findstr ":8090" | findstr "LISTENING"', {
+      encoding: 'utf8',
+      timeout: 3000,
+    }).trim();
+    const m = out.match(/(\d+)\s*$/m);
+    if (!m) return null;
+    const pid = parseInt(m[1]);
+    return pid > 4 ? pid : null;
+  } catch {
+    return null;
+  }
+}
+
+async function isTurboQuantHealthy(): Promise<boolean> {
+  try {
+    const res = await fetch('http://127.0.0.1:8090/health', {
+      signal: AbortSignal.timeout(1500),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
-  
-  try {
-    const state = await getVlmState();
-    
-    // Check if TurboQuant llama-server is healthy on 8090
-    let turboQuantHealthy = false;
-    try {
-      const res = await fetch('http://127.0.0.1:8090/health', { signal: AbortSignal.timeout(1000) });
-      turboQuantHealthy = res.ok;
-    } catch {
-      // Port is not listening or timed out
-    }
-    
-    return json({
-      success: true,
-      state,
-      turboQuantHealthy,
-      config: {
-        model: process.env.TURBO_MODEL_PATH ? 'configured' : 'missing',
-        mmproj: process.env.TURBO_MMPROJ_PATH ? 'configured' : 'missing',
-        ctx: process.env.TURBO_CTX ?? '16384',
-        ngl: process.env.TURBO_NGL ?? '99'
-      }
-    });
-  } catch (err: any) {
-    console.error('[VLM Status API] GET error:', err);
-    return json({ success: false, error: err.message }, { status: 500 });
-  }
+
+  const [mode, pid, healthy] = await Promise.all([
+    getVlmState(),
+    Promise.resolve(getTurboQuantPid()),
+    isTurboQuantHealthy(),
+  ]);
+
+  return json({
+    mode,
+    turboQuant: {
+      pid,
+      healthy,
+      port: 8090,
+    },
+  });
 };

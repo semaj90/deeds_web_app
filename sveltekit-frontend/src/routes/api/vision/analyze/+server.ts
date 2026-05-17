@@ -15,6 +15,7 @@ import { uploadFile } from '$lib/server/minio-client.js';
 import { createYOLOService, type YOLOResult } from '$lib/server/yolo.js';
 import { GEMMA4_VLM_MAX_EDGE } from '$lib/server/image/resize-for-vlm.js';
 import { analyzeEvidenceImage } from '$lib/server/analysis/vlm-evidence-analyzer.js';
+import { getVlmState, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 
@@ -49,6 +50,19 @@ interface VisionResponse {
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
+  const vlmState = await getVlmState();
+  if (vlmState !== VlmMode.VISION) {
+    return json(
+      {
+        error: 'VLM not in VISION mode',
+        currentMode: vlmState,
+        hint: 'POST /api/vlm/switch-mode {"mode":"VISION"} then retry',
+      },
+      { status: 503 },
+    );
+  }
+
   const timings: Record<string, number> = {};
   const t0 = Date.now();
 
