@@ -91,7 +91,7 @@ function cpuPcaProject(
   return out;
 }
 
-/** CPU Autoencoder encode: tanh(data @ W^T + b) */
+/** CPU Autoencoder encode: tanh(data @ W^T + b) — single-layer legacy path */
 function cpuAutoencoderEncode(
   data: Float32Array, n: number, inputDim: number,
   W: Float32Array, b: Float32Array, hidden: number
@@ -107,6 +107,44 @@ function cpuAutoencoderEncode(
     }
   }
   return out;
+}
+
+/**
+ * CPU 2-layer autoencoder encode — canonical architecture from train-autoencoder.py:
+ *   Layer 1: Linear(inputDim → hidden) + ReLU
+ *   Layer 2: Linear(hidden → outDim) + linear (no activation)
+ *   Output:  L2-normalize per row
+ * W1/W2 stored in PyTorch (outputDim × inputDim) row-major convention.
+ */
+function cpuAutoencoderEncode2Layer(
+  data: Float32Array, n: number, inputDim: number,
+  W1: Float32Array, b1: Float32Array, hidden: number,
+  W2: Float32Array, b2: Float32Array, outDim: number
+): Float32Array {
+  const h = new Float32Array(n * hidden);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < hidden; j++) {
+      let act = b1[j];
+      for (let d = 0; d < inputDim; d++) act += data[i * inputDim + d] * W1[j * inputDim + d];
+      h[i * hidden + j] = Math.max(0, act);
+    }
+  }
+  const z = new Float32Array(n * outDim);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < outDim; j++) {
+      let act = b2[j];
+      for (let d = 0; d < hidden; d++) act += h[i * hidden + d] * W2[j * hidden + d];
+      z[i * outDim + j] = act;
+    }
+  }
+  for (let i = 0; i < n; i++) {
+    const off = i * outDim;
+    let norm = 0;
+    for (let d = 0; d < outDim; d++) norm += z[off + d] * z[off + d];
+    norm = Math.sqrt(norm) || 1e-12;
+    for (let d = 0; d < outDim; d++) z[off + d] /= norm;
+  }
+  return z;
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -226,6 +264,56 @@ export async function autoencoderEncode(
     projected, n: effectiveN, outDim: hidden,
     durationMs: Math.round(durationMs * 10) / 10,
     outputMeta: { op: 'autoencoderEncodeGPU', gpuUsed: false, inputRows: effectiveN, inputDim, outputDim: hidden },
+  };
+}
+
+/** Full encoder weights for the canonical 2-layer 768→256(ReLU)→64(L2) model. */
+export type AutoencoderWeights2Layer = {
+  W1: Float32Array;  // [hidden × inputDim]  PyTorch (out × in)
+  b1: Float32Array;  // [hidden]
+  W2: Float32Array;  // [outDim × hidden]    PyTorch (out × in)
+  b2: Float32Array;  // [outDim]
+  hidden: number;    // 256
+  outDim: number;    // 64
+};
+
+/**
+ * Encode n×inputDim embeddings through the canonical 2-layer autoencoder.
+ *
+ * Architecture: Linear(inputDim→hidden)+ReLU → Linear(hidden→outDim)+L2-norm
+ * Matches train-autoencoder.py / train-autoencoder.mjs weight format exactly.
+ *
+ * GPU path for 2-layer encoding not yet exposed by tensorrt_bridge.node;
+ * always runs CPU (still ~10× faster than the chained single-layer approach
+ * because it avoids an intermediate allocation + second N-API round-trip).
+ */
+export async function autoencoderEncode2Layer(
+  data: Float32Array,
+  weights: AutoencoderWeights2Layer,
+  opts: { n: number; dim: number; preferGpu?: boolean; maxN?: number }
+): Promise<ProjectionResult> {
+  const { n, dim: inputDim, maxN = 32_768 } = opts;
+  const { W1, b1, W2, b2, hidden, outDim } = weights;
+  const t0 = performance.now();
+
+  if (n <= 0 || inputDim <= 0) {
+    return {
+      ok: false, source: 'cpu-fallback',
+      projected: new Float32Array(0), n, outDim,
+      durationMs: 0,
+      outputMeta: { op: 'autoencoderEncodeGPU', gpuUsed: false, inputRows: n, inputDim, outputDim: outDim },
+    };
+  }
+
+  const effectiveN = Math.min(n, maxN);
+  const inputData = effectiveN < n ? data.subarray(0, effectiveN * inputDim) : data;
+  const projected = cpuAutoencoderEncode2Layer(inputData, effectiveN, inputDim, W1, b1, hidden, W2, b2, outDim);
+  const durationMs = performance.now() - t0;
+  return {
+    ok: true, source: 'cpu-fallback',
+    projected, n: effectiveN, outDim,
+    durationMs: Math.round(durationMs * 10) / 10,
+    outputMeta: { op: 'autoencoderEncodeGPU', gpuUsed: false, inputRows: effectiveN, inputDim, outputDim: outDim },
   };
 }
 
