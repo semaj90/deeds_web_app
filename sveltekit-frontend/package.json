@@ -654,6 +654,7 @@
 		"phase76:test:report": "playwright show-report",
 		"test": "vitest",
 		"test:unit": "vitest run",
+		"test:couchdb-writer": "vitest run src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
 		"test:unit:watch": "vitest",
 		"test:unit:coverage": "vitest run --coverage",
 		"test:diagnostics:unit": "vitest run tests/evidence-view-modal.spec.ts tests/evidence-detail-route.test.ts tests/rag-search-ace-route.spec.ts tests/routes/deep-research-task-provider.test.ts --config vitest.config.ts",
