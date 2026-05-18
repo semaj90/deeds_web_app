@@ -139,24 +139,28 @@ import {
 } from './cluster-tags-cache.js';
 import { clusterPivot } from './rg-cluster-pivot.js';
 
-// ── QueryRouter4x4 singleton — persisted to Redis ace:router4x4:matrix (24h) ─
-// Reads saved matrix on first call; adapts after each retrieval cycle.
-let _router4x4: QueryRouter4x4 | null = null;
-async function getRouter4x4(): Promise<QueryRouter4x4> {
-  if (_router4x4) return _router4x4;
+// ── QueryRouter4x4 cache — persisted to Redis (24h) ─
+const _userRouters = new Map<string, QueryRouter4x4>();
+async function getRouter4x4(userId?: string | number): Promise<QueryRouter4x4> {
+  const key = userId != null ? String(userId) : 'global';
+  let router = _userRouters.get(key);
+  if (router) return router;
   try {
     const r = getRedis();
-    const saved = await r.get('ace:router4x4:matrix');
-    _router4x4 = saved ? QueryRouter4x4.deserialize(saved) : new QueryRouter4x4();
+    const redisKey = userId != null ? `ace:router4x4:matrix:${userId}` : 'ace:router4x4:matrix';
+    const saved = await r.get(redisKey);
+    router = saved ? QueryRouter4x4.deserialize(saved) : new QueryRouter4x4();
   } catch {
-    _router4x4 = new QueryRouter4x4();
+    router = new QueryRouter4x4();
   }
-  return _router4x4;
+  _userRouters.set(key, router);
+  return router;
 }
-async function persistRouter4x4(router: QueryRouter4x4): Promise<void> {
+async function persistRouter4x4(router: QueryRouter4x4, userId?: string | number): Promise<void> {
   try {
     const r = getRedis();
-    await r.set('ace:router4x4:matrix', router.serialize(), 'EX', 86400);
+    const redisKey = userId != null ? `ace:router4x4:matrix:${userId}` : 'ace:router4x4:matrix';
+    await r.set(redisKey, router.serialize(), 'EX', 86400);
   } catch {
     /* non-fatal */
   }
@@ -406,10 +410,259 @@ async function fetchWebResearchRows(
 const ACP_MAX_RESULTS = 8;
 const ACP_MAX_SCORE = 0.08; // ACP boosts capped — must not dominate Qdrant/graph/SOM ranking
 
+interface CHR97SearchResult {
+  confidence: number;
+  topChunks: Array<{ stableKey: string; score: number; path: string }>;
+  results: any[];
+  topoPrefilter?: TopoPrefilterStats;
+}
+
+// ── 4D Topology Reranker (inline port of topology-rerank.mjs) ─────────────────
+// Maps a query string to a 4D coordinate based on semantic cues, then boosts
+// Qdrant hits whose payload.coords_4d is close in that space (+0.08 alpha cap).
+function project4DQuery(q: string): { x: number; y: number; z: number; w: number } {
+  const qt = q.toLowerCase();
+  let x = 0.0;
+  if (qt.includes('feature') || qt.includes('architecture')) x = 1.0;
+  else if (qt.includes('tool') || qt.includes('script')) x = 0.5;
+  else if (qt.includes('store') || qt.includes('redis') || qt.includes('postgres') || qt.includes('qdrant')) x = -0.5;
+  else if (qt.includes('error') || qt.includes('bug') || qt.includes('fail')) x = -1.0;
+  let y = 0.5;
+  if (qt.includes('why') || qt.includes('deep') || qt.includes('explain')) y = 0.8;
+  else if (qt.includes('what is') || qt.includes('simple')) y = 0.2;
+  let z = 0.5;
+  if (qt.includes('path') || qt.includes('import') || qt.includes('depend') || qt.includes('call')) z = 0.9;
+  else if (qt.includes('isolated') || qt.includes('single')) z = 0.1;
+  const w = qt.includes('rebuild') || qt.includes('deployment') || qt.includes('final') ? 0.9 : 0.0;
+  return { x, y, z, w };
+}
+
+function euclidean4D(
+  a: { x: number; y: number; z: number; w: number },
+  b: { x: number; y: number; z: number; w: number }
+): number {
+  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2 + (a.w - b.w) ** 2);
+}
+
+const TOPO_4D_ALPHA = 0.08; // max boost per chunk — matches ACP_MAX_SCORE ceiling
+
+export async function runCHR97Search(
+  query: string,
+  limit = ACP_MAX_RESULTS,
+  userId?: string | number
+): Promise<CHR97SearchResult> {
+  const startedAt = Date.now();
+  const queryClass = classifyQuery(query);
+  const qHash = topoQueryHash(query);
+
+  // ace:cartridge:{userId}:{qHash} or ace:cartridge:{qHash}
+  const cartridgeCacheKey =
+    userId != null ? `ace:cartridge:${userId}:${qHash}` : `ace:cartridge:${qHash}`;
+  try {
+    const _cr = getRedis();
+    const persisted = await _cr.get(cartridgeCacheKey);
+    if (persisted) return JSON.parse(persisted) as CHR97SearchResult;
+  } catch {}
+
+  let karpathyRev = 'v1';
+  try {
+    const r = getRedis();
+    const rev = await r.get('gpu:karpathy:rev');
+    if (rev) {
+      karpathyRev = rev;
+    } else {
+      const len = await r.hlen('gpu:karpathy:scores').catch(() => 0);
+      karpathyRev = `len_${len}`;
+    }
+  } catch {}
+
+  const cached = await getTopoCandidates(queryClass, query, karpathyRev);
+  if (cached && cached.length > 0) {
+    const topScore = cached[0]?.score ?? 0;
+    const topoPrefilter = buildTopoPrefilterStats({
+      used: true,
+      topoClass: queryClass,
+      cacheHit: true,
+      candidateCountAfter: cached.length,
+      qdrantCollectionEstimate: null,
+      queryHash: qHash,
+      cartridge: 'warm',
+    });
+    return {
+      confidence: topScore,
+      topChunks: cached,
+      results: cached.map((c) => ({
+        id: c.stableKey,
+        source: 'qdrant' as const,
+        title: c.path,
+        content: '',
+        score: c.score,
+        path: c.path,
+        metadata: undefined,
+      })),
+      topoPrefilter,
+    };
+  }
+
+  let cartridgeStatus: 'warm' | 'cold' | 'miss' = 'miss';
+  let cartridgeResults: any[] = [];
+  try {
+    const { codebaseChunkIndex } = await import('$lib/server/db/schema/search-analytics.js');
+    const rows = await db
+      .select({
+        relativePath: codebaseChunkIndex.relativePath,
+        summary: codebaseChunkIndex.summary,
+        summaryEmbedding: codebaseChunkIndex.summaryEmbedding,
+        gpuCluster: codebaseChunkIndex.gpuCluster,
+      })
+      .from(codebaseChunkIndex)
+      .where(eq(codebaseChunkIndex.kind, 'codebase_card'));
+
+    if (rows.length > 0) {
+      const r = getRedis();
+      const allScores = await r.hgetall('gpu:karpathy:scores').catch(() => ({}));
+
+      const sortedRows = rows
+        .map((row) => {
+          const fileScoreRaw = allScores[row.relativePath];
+          let blendScore = 0;
+          if (fileScoreRaw) {
+            try {
+              const parsed = JSON.parse(fileScoreRaw);
+              blendScore = parsed.blend ?? parsed.pr ?? (parseFloat(fileScoreRaw) || 0);
+            } catch {
+              blendScore = parseFloat(fileScoreRaw) || 0;
+            }
+          }
+          return { ...row, blendScore };
+        })
+        .sort((a, b) => b.blendScore - a.blendScore);
+
+      const parseVector = (v: any): number[] => {
+        if (Array.isArray(v)) return v;
+        if (typeof v === 'string') {
+          try {
+            const trimmed = v.trim().replace(/^\[|\]$/g, '');
+            if (!trimmed) return [];
+            return trimmed.split(',').map(Number);
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
+      const runes: any[] = sortedRows
+        .map((row, idx) => ({
+          id: idx,
+          clusterId: row.gpuCluster ?? 0,
+          embedding: parseVector(row.summaryEmbedding),
+          text: row.summary ?? '',
+          sourceName: row.relativePath,
+        }))
+        .filter((r) => r.embedding.length === 768);
+
+      if (runes.length > 0) {
+        const { buildCartridge, parseCartridge } = await import(
+          '$lib/server/cartridge/chr97-builder.js'
+        );
+        const cartridgeBuffer = buildCartridge(runes, {
+          caseId: 'codebase_kb',
+          createdAt: new Date().toISOString(),
+          runeCount: runes.length,
+          embeddingDim: 768,
+          collections: ['codebase_chunks_768'],
+          sources: runes.map((r) => r.sourceName).filter(Boolean) as string[],
+        });
+
+        const cartridge = parseCartridge(new Uint8Array(cartridgeBuffer));
+        const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
+        const emb = await generateSingleEmbedding(query);
+
+        if (Array.isArray(emb) && emb.length === 768) {
+          const queryVec = new Float32Array(emb);
+          const dim = 768;
+          const similarityResults: Array<{ stableKey: string; score: number; path: string }> = [];
+
+          for (let i = 0; i < cartridge.tensors.length; i++) {
+            const docTensor = cartridge.tensors[i];
+            if (docTensor.length !== dim) continue;
+
+            let dot = 0,
+              normQ = 0,
+              normD = 0;
+            for (let d = 0; d < dim; d++) {
+              const q = queryVec[d];
+              const v = docTensor[d];
+              dot += q * v;
+              normQ += q * q;
+              normD += v * v;
+            }
+            const denom = Math.sqrt(normQ) * Math.sqrt(normD);
+            const score = denom > 0 ? dot / denom : 0;
+
+            similarityResults.push({
+              stableKey: runes[i].sourceName ?? `codebase:${i}`,
+              score,
+              path: runes[i].sourceName ?? '',
+            });
+          }
+
+          similarityResults.sort((a, b) => b.score - a.score);
+          cartridgeResults = similarityResults.slice(0, limit);
+
+          if (cartridgeResults.length > 0) {
+            await setTopoCandidates(queryClass, query, cartridgeResults, karpathyRev);
+            cartridgeStatus = 'cold';
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Stage A0] Ephemeral cartridge build/search failed:', err);
+    cartridgeStatus = 'miss';
+  }
+
+  const topScore = cartridgeResults[0]?.score ?? 0;
+  const topoPrefilter = buildTopoPrefilterStats({
+    used: true,
+    topoClass: queryClass,
+    cacheHit: false,
+    candidateCountAfter: cartridgeResults.length,
+    qdrantCollectionEstimate: null,
+    queryHash: qHash,
+    cartridge: cartridgeStatus,
+  });
+
+  const result: CHR97SearchResult = {
+    confidence: topScore,
+    topChunks: cartridgeResults,
+    results: cartridgeResults.map((c) => ({
+      id: c.stableKey,
+      source: 'qdrant' as const,
+      title: c.path,
+      content: '',
+      score: c.score,
+      path: c.path,
+      metadata: undefined,
+    })),
+    topoPrefilter,
+  };
+
+  // Persist to ace:cartridge cache (300s) regardless of confidence — caller gates on threshold
+  try {
+    const _cr = getRedis();
+    await _cr.setex(cartridgeCacheKey, 300, JSON.stringify(result));
+  } catch {}
+
+  return result;
+}
+
 async function fetchACPKnowledgeResults(
   query: string,
   limit = ACP_MAX_RESULTS,
-  collection = 'codebase_chunks_768'
+  collection = 'codebase_chunks_768',
+  userId?: string | number
 ): Promise<ACPKnowledgeSearchResult | null> {
   try {
     const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
@@ -422,64 +675,117 @@ async function fetchACPKnowledgeResults(
     let filters: any = undefined;
     let topoPrefilter: TopoPrefilterStats | undefined;
 
-    // Stage A: Directory Summary Search + topo_class prefilter (codebase chunks only)
+    // Stage A: CHR97 cartridge fast-path, then HyperRAG Qdrant fallback
+    // CHR97 confidence >= 0.7 → return immediately (cached, <5ms warm)
+    // CHR97 confidence < 0.7  → seed Qdrant ANN with cartridge paths (+0.12 boost)
+    let cartridgeSeedPaths = new Set<string>();
     if (collection === 'codebase_chunks_768') {
-      // Stage A0: topo_class prefilter — Redis quick-hit cache, then Qdrant topo_class filter
-      const queryClass = classifyQuery(query);
-      const qHash = topoQueryHash(query);
-
-      if (queryClass !== TOPO_CLASS.UNCLASSIFIED) {
-        const cached = await getTopoCandidates(queryClass, query);
-        if (cached && cached.length > 0) {
-          // Cache hit — return early, skip Qdrant entirely
-          topoPrefilter = buildTopoPrefilterStats({
-            used: true,
-            topoClass: queryClass,
-            cacheHit: true,
-            candidateCountAfter: cached.length,
-            qdrantCollectionEstimate: null,
-            queryHash: qHash,
-          });
-          return {
-            ok: true,
-            query,
-            results: cached.map((c) => ({
-              id: c.stableKey,
-              source: 'qdrant' as const,
-              title: c.path,
-              content: '',
-              score: c.score,
-              path: c.path,
-              metadata: undefined,
-            })),
-            metadata: {
-              embeddingModel: 'embeddinggemma:latest',
-              collection,
-              latencyMs: Date.now() - startedAt,
-              topoPrefilter,
-            },
-          };
-        }
-        filters = { topo_class: queryClass };
-      }
-
-      try {
-        const dirHits = await qdrant.hybridSearch({
-          collection: 'codebase_chunks_768',
+      const searchRes = await runCHR97Search(query, limit, userId);
+      if (searchRes.confidence >= 0.7 && searchRes.topChunks.length > 0) {
+        return {
+          ok: true,
           query,
-          queryEmbedding: Array.from(emb),
-          limit: 5,
-          filters: { kind: 'directory-cluster' },
-        });
-        const dirs = dirHits.results
-          .map((h) => h.payload?.['directory_path'])
-          .filter(Boolean) as string[];
+          results: searchRes.results,
+          metadata: {
+            embeddingModel: 'embeddinggemma:latest',
+            collection,
+            latencyMs: Date.now() - startedAt,
+            topoPrefilter: searchRes.topoPrefilter,
+          },
+        };
+      }
+      // Low confidence — seed HyperRAG Qdrant with cartridge paths
+      cartridgeSeedPaths = new Set(searchRes.topChunks.map((c) => c.path).filter(Boolean));
+    }
 
-        if (dirs.length > 0) {
-          filters = { ...(filters ?? {}), directory_path: dirs };
+    // HyperRAG fallback: Qdrant ANN with optional CHR97 seed boost
+    try {
+      const dirHits = await qdrant.hybridSearch({
+        collection,
+        query,
+        queryEmbedding: Array.from(emb),
+        limit,
+      });
+
+      // 4D topology rerank: boost chunks whose payload.coords_4d is close to the query's 4D projection
+      const qCoords4d = project4DQuery(query);
+      const mapped = dirHits.map((h) => {
+        const seedBoost =
+          cartridgeSeedPaths.size > 0 && cartridgeSeedPaths.has(String(h.payload?.path || ''))
+            ? 0.12
+            : 0;
+        const c4d = (h.payload as any)?.coords_4d as
+          | { x: number; y: number; z: number; w: number }
+          | undefined;
+        const topoBoost = c4d ? TOPO_4D_ALPHA / (1 + euclidean4D(c4d, qCoords4d)) : 0;
+        return {
+          id: String(h.id),
+          source: 'qdrant' as const,
+          title: String(h.payload?.path || h.payload?.title || ''),
+          content: String(h.payload?.content || h.payload?.text || ''),
+          score: h.score + seedBoost + topoBoost,
+          path: String(h.payload?.path || ''),
+          metadata: h.payload,
+        };
+      });
+      mapped.sort((a, b) => b.score - a.score);
+
+      return {
+        ok: true,
+        query,
+        results: mapped,
+        metadata: {
+          embeddingModel: 'embeddinggemma:latest',
+          collection,
+          latencyMs: Date.now() - startedAt,
+        },
+      };
+    } catch (err) {
+      console.warn(`[ACP] hybridSearch failed for ${collection}:`, err);
+      return null;
+    }
+  } catch (err) {
+    console.warn('[ACP] fetchACPKnowledgeResults main error:', err);
+    return null;
+  }
+}
+
+// Dead code placeholder to bridge with downstream dispatch logic
+async function fetchACPKnowledgeResultsStub(
+  query: string,
+  limit = ACP_MAX_RESULTS,
+  collection = 'codebase_chunks_768'
+): Promise<ACPKnowledgeSearchResult | null> {
+  try {
+    const startedAt = Date.now();
+    const emb = [0];
+    let filters: any = undefined;
+
+    // Stage A1: Lane routing policy lookup (Tier-1 decision table from chunk_hit_log)
+    // Key: topo_label|trust_tier — derived at query time without SOM projection.
+    // Pipeline hint ('rag'|'kag'|'ace'|'codebase') with conf >= 0.6 overrides Stage B dispatch.
+    let a1PipelineHint: string | null = null;
+    let a1Conf = 0;
+    if (collection === 'codebase_chunks_768') {
+      try {
+        const r = getRedis();
+        const topoClass = classifyQuery(query);
+        const topoLabel =
+          topoClass !== TOPO_CLASS.UNCLASSIFIED
+            ? (TOPO_CLASS_LABEL[topoClass] ?? 'unclassified')
+            : 'unclassified';
+        const tempSig = extractSignal(query);
+        const trustTier =
+          tempSig.trustPressure >= 0.6 ? 'T1' : tempSig.trustPressure >= 0.3 ? 'T2' : 'T3';
+        const policyKey = `${topoLabel}|${trustTier}`;
+        const raw = await r.hget('ace:lane:routing_policy', policyKey).catch(() => null);
+        if (raw) {
+          const parsed = JSON.parse(raw) as { lane?: string; conf?: number };
+          a1PipelineHint = parsed.lane ?? null;
+          a1Conf = parsed.conf ?? 0;
         }
-      } catch (e) {
-        console.warn('Stage A directory search failed or skipped:', e);
+      } catch {
+        // non-fatal — fall through to Stage B
       }
     }
 
@@ -487,9 +793,14 @@ async function fetchACPKnowledgeResults(
     const router = await getRouter4x4();
     const signal = extractSignal(query, { hasFilePath: collection === 'codebase_chunks_768' });
     const routing = router.route(signal);
-    const useQdrant = routing.dispatch.includes('qdrant') || routing.dispatch.length === 0;
+    // If Tier-1 policy has a confident hint (conf >= 0.6), apply it to dispatch decisions:
+    // 'codebase' → prefer postgres (FTS), everything else → prefer qdrant (vector ANN)
+    const a1ForcesPostgres = a1Conf >= 0.6 && a1PipelineHint === 'codebase';
+    const useQdrant =
+      (routing.dispatch.includes('qdrant') || routing.dispatch.length === 0) && !a1ForcesPostgres;
     const usePostgres =
-      routing.dispatch.includes('postgres') && collection === 'codebase_chunks_768';
+      (routing.dispatch.includes('postgres') || a1ForcesPostgres) &&
+      collection === 'codebase_chunks_768';
 
     const batchLimit = Math.min(limit * 2, ACP_MAX_RESULTS);
     const qdrantScored: ScoredResult[] = [];
@@ -624,6 +935,7 @@ async function fetchACPKnowledgeResults(
         routing: {
           dispatch: routing.dispatch,
           weights: routing.weights,
+          explanation: routing.explanation,
           qdrantHits: qdrantScored.length,
           postgresHits: postgresScored.length,
         },
@@ -754,6 +1066,127 @@ export async function assembleACEContext(opts: {
       // Mutable ref: fetchCodebaseContext writes topoPrefilter/graphAuthority/manifold4 here
       const codebaseFetchStats: CodebaseFetchStats = {};
 
+      // 🚀 Stage A0: Cartridge Early Retrieval Gating
+      const qHash = topoQueryHash(query);
+      let cartridgeResults = {
+        confidence: 0,
+        topChunks: [] as any[],
+        results: [] as any[],
+        topoPrefilter: undefined as any,
+      };
+      if (opts.enableCodebaseContext) {
+        try {
+          const redis = getRedis();
+          const thresholdKey = userId
+            ? `ace:cartridge:${userId}:threshold`
+            : 'ace:cartridge:threshold';
+          let configuredThresholdRaw = await redis.get(thresholdKey).catch(() => null);
+          if (!configuredThresholdRaw && userId) {
+            configuredThresholdRaw = await redis.get('ace:cartridge:threshold').catch(() => null);
+          }
+          const configuredThreshold = configuredThresholdRaw
+            ? parseFloat(configuredThresholdRaw)
+            : 0.7;
+
+          cartridgeResults = await runCHR97Search(query, 8, userId ?? undefined);
+          if (cartridgeResults.confidence > configuredThreshold) {
+            // Retrieve codebase context from seeds and return immediately!
+            const codebaseContext = await fetchCodebaseContext(
+              query,
+              userId ?? undefined,
+              opts.filePath,
+              codebaseFetchStats,
+              cartridgeResults.topChunks
+            );
+
+            // Fetch active cluster summary if available for the top chunk
+            const topChunk = codebaseContext?.[0];
+            let activeClusterSummary = null;
+            if (topChunk?.gpuCluster != null) {
+              const { readLatestQdrantClusterTags } = await import('./cluster-tags-cache.js');
+              const entries = readLatestQdrantClusterTags();
+              const entry = entries.find((e) => e.clusterId === topChunk.gpuCluster);
+              if (entry) {
+                activeClusterSummary = {
+                  clusterId: entry.clusterId,
+                  summary: entry.synthesisSuggestion || '',
+                  purpose: entry.topoClasses.join(', '),
+                  patterns: entry.topTags.map((t) => (typeof t === 'string' ? t : t.tag || '')),
+                  keyFiles: entry.topFiles.filter(Boolean) as string[],
+                  warnings: [],
+                };
+              }
+            }
+
+            const fastContext: ACEContext = {
+              userProfile: userId
+                ? await fetchUserAnalyticsContext(userId, query, caseId).catch(() => null)
+                : null,
+              caseContext: caseId
+                ? await fetchDbSchemaContext(['users', 'cases', 'evidence', 'documents'])
+                    .catch(() => '')
+                    .then((r) => (Array.isArray(r) ? r.join('\n') : ''))
+                : null,
+              glossaryMatches: null,
+              ragChunks: [],
+              kbChunks: cartridgeResults.results,
+              caseChunks: [],
+              docChunks: [],
+              kagNeighbors: [],
+              chatHistory: [],
+              chatMemory: [],
+              entities,
+              practiceTemplate: null,
+              queryTags: [...legalTags.statutes.slice(0, 3), ...legalTags.cases.slice(0, 3)],
+              webSearchContext: `[FAST PATH — Stage A0 Cartridge similarity hit confidence: ${cartridgeResults.confidence.toFixed(4)}]\n\nDirectory summary and codebase cards matched successfully.`,
+              persona: opts.persona ?? 'neutral',
+              evidenceMetadata: null,
+              evidenceConnections: null,
+              userAnalyticsContext: null,
+              codebaseContext: codebaseContext ?? null,
+              activeClusterSummary,
+              dbSchemaContext: '',
+              policyDecision: null,
+              cachePlanner: {
+                hit: true,
+                source: 'redis',
+                cacheKey: userId ? `ace:cartridge:${userId}:${qHash}` : `ace:cartridge:${qHash}`,
+                contextHash: qHash,
+                deltaFields: [],
+                retrievalModeHash: 'fast-path',
+                sectionTypesHash: 'fast-path',
+                tokenAwarePacking: false,
+              },
+              retrievalTrace: {
+                topoPrefilter: cartridgeResults.topoPrefilter,
+              },
+            };
+
+            // Cache cartridge results at query layer (under Redis key ace:cartridge:{userId}:{query_hash} or global)
+            const redis = getRedis();
+            const cartridgeKey = userId
+              ? `ace:cartridge:${userId}:${qHash}`
+              : `ace:cartridge:${qHash}`;
+            await redis
+              .setex(
+                cartridgeKey,
+                300,
+                JSON.stringify({
+                  top_chunks: cartridgeResults.topChunks,
+                  confidence: cartridgeResults.confidence,
+                  results: cartridgeResults.results,
+                  karpathyRev: 'v1',
+                })
+              )
+              .catch(() => {});
+
+            return fastContext;
+          }
+        } catch (err) {
+          console.warn('[Stage A0 Fast-Path] failed, falling back to HyperRAG:', err);
+        }
+      }
+
       // Run all data fetches in parallel (includes optional web search)
       // Tiered retrieval: KB (corpus) + Case (evidence) run as one call, split internally
       const [
@@ -798,7 +1231,8 @@ export async function assembleACEContext(opts: {
               query,
               userId ?? undefined,
               opts.filePath,
-              codebaseFetchStats
+              codebaseFetchStats,
+              cartridgeResults.topChunks
             ).catch(() => null)
           : Promise.resolve(null),
         fetchTopQueryTags(5).catch(() => [] as string[]),
@@ -817,7 +1251,12 @@ export async function assembleACEContext(opts: {
         getDirectoryKAGContext(query, 3).catch(
           () => [] as Awaited<ReturnType<typeof getDirectoryKAGContext>>
         ),
-        fetchACPKnowledgeResults(query, ACP_MAX_RESULTS, 'codebase_chunks_768').catch(() => null),
+        fetchACPKnowledgeResults(
+          query,
+          ACP_MAX_RESULTS,
+          'codebase_chunks_768',
+          userId ?? undefined
+        ).catch(() => null),
         fetchDbSchemaContext(['users', 'cases', 'evidence', 'documents']).catch(() => []),
         // Fast-AST graph intel: top relevant files + audit hotspots from codebase-graph.json
         getGraphIntelContext(query).catch(() => null),
@@ -839,7 +1278,7 @@ export async function assembleACEContext(opts: {
               )
               .catch(() => null)
           : Promise.resolve(null),
-        fetchACPKnowledgeResults(query, 5, 'qdrant_docs').catch(() => null),
+        fetchACPKnowledgeResults(query, 5, 'qdrant_docs', userId ?? undefined).catch(() => null),
         fetchCommunityRelationships().catch(() => ''),
         acePlannerHit
           ? Promise.resolve(acePlannerHit.packet)
@@ -1408,7 +1847,9 @@ export async function assembleACEContext(opts: {
 
                 // Cluster pivot: expand rg-matched paths into adjacent SOM clusters
                 const fastPaths = fastChunks.map((c) => c.filePath).filter(Boolean) as string[];
-                const existingPaths = new Set(baseContext.ragChunks?.map((r) => r.filePath).filter(Boolean) as string[]);
+                const existingPaths = new Set(
+                  baseContext.ragChunks?.map((r) => r.filePath).filter(Boolean) as string[]
+                );
                 const pivot = await clusterPivot(fastPaths, existingPaths).catch(() => null);
                 if (pivot?.hits.length) {
                   baseContext.ragChunks = assignRanks(
@@ -1541,8 +1982,7 @@ export async function assembleACEContext(opts: {
                 if (parent === dir) break;
                 dir = parent;
               }
-              if (resolvedKey === 'llms:root')
-                ttl = await redis.ttl('llms:root').catch(() => null);
+              if (resolvedKey === 'llms:root') ttl = await redis.ttl('llms:root').catch(() => null);
               agentsMd = {
                 resolvedKey,
                 requestedPath: opts.filePath,
@@ -1631,13 +2071,28 @@ export async function assembleACEContext(opts: {
       // Fire-and-forget: record chunk hits for analytics (Step 17)
       const hitOpts = { userId: userId ?? undefined, caseId: caseId ?? undefined };
       const aceHits: ChunkHit[] = [
-        ...finalContext.kbChunks.map((c) => ({ id: c.id, score: c.score })),
-        ...finalContext.caseChunks.map((c) => ({ id: c.id, score: c.score })),
+        ...finalContext.kbChunks.map((c) => ({
+          id: c.id,
+          score: c.score,
+          rerankScore: c.rerankScore ?? c.finalScore ?? null,
+          somCluster: c.somCluster ?? null,
+        })),
+        ...finalContext.caseChunks.map((c) => ({
+          id: c.id,
+          score: c.score,
+          rerankScore: c.rerankScore ?? c.finalScore ?? null,
+          somCluster: c.somCluster ?? null,
+        })),
       ];
       if (aceHits.length) recordChunkHits(aceHits, query, 'ace', hitOpts);
       else if (finalContext.ragChunks.length) {
         recordChunkHits(
-          finalContext.ragChunks.map((c) => ({ id: c.id, score: c.score })),
+          finalContext.ragChunks.map((c) => ({
+            id: c.id,
+            score: c.score,
+            rerankScore: c.rerankScore ?? null,
+            somCluster: c.somCluster ?? null,
+          })),
           query,
           'rag',
           hitOpts
@@ -3726,7 +4181,8 @@ export async function fetchCodebaseContext(
   query: string,
   userId?: string,
   filePath?: string,
-  statsOut?: CodebaseFetchStats
+  statsOut?: CodebaseFetchStats,
+  seedChunks?: Array<{ stableKey: string; score: number; path: string }>
 ): Promise<ACEContext['codebaseContext']> {
   try {
     // Resolve nearest LLMS.md directory from filePath via a Redis walk-up.
@@ -3938,12 +4394,53 @@ export async function fetchCodebaseContext(
 
     // Fetch broader initial set so the reranker has candidates to work with
     const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
-    const results = await searchCodebase(query, {
+    let results = await searchCodebase(query, {
       limit: 20,
       contentWeight: 0.6,
       signatureWeight: 0.4,
       ...(combinedFilter ? { filter: combinedFilter } : {}),
     });
+
+    if (seedChunks && seedChunks.length > 0) {
+      const existingPaths = new Set(
+        results.map((r) => r.chunk.path ?? r.chunk.relativePath).filter(Boolean)
+      );
+      const missingSeeds = seedChunks.filter((c) => c.path && !existingPaths.has(c.path));
+      if (missingSeeds.length > 0) {
+        try {
+          const { codebaseChunkIndex } = await import('$lib/server/db/schema/search-analytics.js');
+          const seedPaths = missingSeeds.map((c) => c.path).filter(Boolean);
+          const rows = await db
+            .select()
+            .from(codebaseChunkIndex)
+            .where(
+              sql`${codebaseChunkIndex.relativePath} IN (${sql.join(
+                seedPaths.map((p) => sql`${p}`),
+                sql`, `
+              )})`
+            );
+
+          for (const row of rows) {
+            results.push({
+              chunk: {
+                path: row.relativePath,
+                relativePath: row.relativePath,
+                content: row.content || row.summary || '',
+                neo4j_gpuCluster: row.gpuCluster ?? row.neo4jGpuCluster,
+                neo4j_pageRankScore: row.pageRankScore,
+                som_cluster: row.somCluster,
+                tags: row.tags || [],
+                stableKey: row.relativePath,
+                ...row,
+              },
+              score: seedChunks.find((c) => c.path === row.relativePath)?.score ?? 0.8,
+            });
+          }
+        } catch (err) {
+          console.warn('[fetchCodebaseContext] failed to merge seedChunks:', err);
+        }
+      }
+    }
 
     // ── Tier-2 fallback: Postgres FTS when Qdrant returns nothing ───────────
     // searchCodeLexical hits code_retrieval_chunks (GIN tsvector) — no ANN needed.
@@ -4310,6 +4807,12 @@ async function applyKarpathyBoost(
 ): Promise<NonNullable<ACEContext['codebaseContext']>> {
   if (!candidates || candidates.length === 0) return candidates;
 
+  let redisScores: Record<string, string> = {};
+  try {
+    const r = getRedis();
+    redisScores = await r.hgetall('gpu:karpathy:scores').catch(() => ({}));
+  } catch {}
+
   // Normalise the LLMS.md resolved dir for fast prefix-match checks.
   // Empty string means "repo root fallback" — no useful prefix to match.
   const agentsDir = agentsMdResolvedDir
@@ -4392,12 +4895,25 @@ async function applyKarpathyBoost(
     const fileLookup = c.filePath
       ? c.filePath.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '')
       : '';
-    const pagerankBoost =
+    const fileScoreRaw = redisScores[c.relativePath ?? ''] || redisScores[c.filePath ?? ''];
+    let redisPageRankScore = 0;
+    if (fileScoreRaw) {
+      try {
+        const parsed = JSON.parse(fileScoreRaw);
+        redisPageRankScore = parsed.blend ?? parsed.pr ?? (parseFloat(fileScoreRaw) || 0);
+      } catch {
+        redisPageRankScore = parseFloat(fileScoreRaw) || 0;
+      }
+    }
+
+    const pagerankBoost = Math.max(
       payloadScore != null
         ? Math.min(payloadScore * 0.08, 0.08)
         : fileLookup
           ? Math.min((authorityMap.get(fileLookup) ?? 0) * 0.08, 0.08)
-          : 0;
+          : 0,
+      Math.min(redisPageRankScore * 0.08, 0.08)
+    );
     const pairedTestBoost = 0; // populated downstream by paired test check
 
     // Tag overlap boost: +0.08 per matching Karpathy tag (max +0.24)
