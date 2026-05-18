@@ -152,34 +152,70 @@
 		query: string;
 		latencyMs: number;
 		resultCount: number;
+		phaseLatency?: { embed: number; cluster: number; qdrant: number; couchdb: number };
 		phaseC?: { wikiDocsFetched: number; hitsEnriched: number };
 		phaseD?: { cudaBackend: string; centroidCount: number; synthesis: string | null; inferLatencyMs: number; inferError: string | null };
 		phaseE?: { sortedHitCount: number; clusterSidecarCount: number; auditLogWritten: boolean };
-		results: Array<{ rank: number; source_ref: string | null; rrfScore: number; karpathyBlend: number | null; text: string | null; wikiEnrichment?: unknown[] }>;
+		results: Array<{ id: string; rank: number; source_ref: string | null; rrfScore: number; karpathyBlend: number | null; text: string | null; wikiEnrichment?: unknown[] }>;
 	};
 	let hyperRunning = $state(false);
 	let hyperResult = $state<HyperRAGResult | null>(null);
 	let hyperError = $state('');
 	let hyperNoInfer = $state(false);
+	let hyperElapsedMs = $state(0);
+	let hyperAbortController: AbortController | null = null;
+	let hyperElapsedInterval: number | null = null;
+
+	function clearHyperTimer() {
+		if (hyperElapsedInterval !== null) {
+			clearInterval(hyperElapsedInterval);
+			hyperElapsedInterval = null;
+		}
+	}
+
+	function cancelHyperRAG() {
+		if (!hyperRunning || !hyperAbortController) return;
+		hyperAbortController.abort();
+		hyperAbortController = null;
+	}
 
 	async function runHyperRAG() {
-		if (!queryText.trim() || hyperRunning) return;
+		if (!queryText.trim()) {
+			hyperError = 'Query text is required for HyperRAG';
+			return;
+		}
+		if (hyperRunning) return;
 		hyperRunning = true;
 		hyperError = '';
 		hyperResult = null;
+		hyperElapsedMs = 0;
+		hyperAbortController = new AbortController();
+		const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
+		if (typeof window !== 'undefined') {
+			hyperElapsedInterval = window.setInterval(() => {
+				hyperElapsedMs = Math.round((typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime);
+			}, 100);
+		}
 		try {
 			const r = await fetch('/api/admin/atlas/hyperrag', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ query: queryText.trim(), topK: 10, topClusters: 5, noInference: hyperNoInfer }),
+				signal: hyperAbortController.signal,
 			});
 			const d = await r.json();
 			if (!r.ok) { hyperError = d.error ?? 'HyperRAG pipeline failed'; return; }
 			hyperResult = d;
 		} catch (e) {
-			hyperError = String(e);
+			if (e instanceof DOMException && e.name === 'AbortError') {
+				hyperError = 'HyperRAG request cancelled';
+			} else {
+				hyperError = String(e);
+			}
 		} finally {
 			hyperRunning = false;
+			clearHyperTimer();
+			hyperAbortController = null;
 		}
 	}
 
@@ -578,23 +614,27 @@
 					>
 						{hyperRunning ? 'HYPERRAG_EXEC…' : '⬡ RUN_HYPERRAG_PIPELINE'}
 					</button>
-					<label class="flex items-center gap-1 text-[0.65rem] text-[#a39f90] cursor-pointer select-none">
-						<input type="checkbox" bind:checked={hyperNoInfer} class="accent-[#8b9dbb]" />
-						<span>fast</span>
-					</label>
-				</div>
-
-				{#if queryError}
-					<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
-						<span class="font-bold">CRITICAL_ERROR:</span> {queryError}
-					</div>
-				{/if}
-				{#if hyperError}
-					<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
-						<span class="font-bold">HYPERRAG_ERROR:</span> {hyperError}
-					</div>
-				{/if}
+			<button
+				onclick={cancelHyperRAG}
+				disabled={!hyperRunning}
+				class="px-3 py-2 border border-[#c25953] bg-[#1c1b18] text-[#c25953] text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-30"
+			>
+				CANCEL
+			</button>
+			<label class="flex items-center gap-1 text-[0.65rem] text-[#a39f90] cursor-pointer select-none">
+				<input type="checkbox" bind:checked={hyperNoInfer} class="accent-[#8b9dbb]" />
+				<span>fast</span>
+			</label>
+		</div>
+		{#if hyperRunning}
+			<div class="text-[0.65rem] text-[#a39f90] uppercase tracking-wider">Elapsed: {hyperElapsedMs}ms</div>
+		{/if}
+		{#if hyperError}
+			<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
+				<span class="font-bold">HYPERRAG_ERROR:</span> {hyperError}
 			</div>
+		{/if}
+	</div>
 
 			<!-- Dynamic Parameter Indicators -->
 			<div class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/40 space-y-1">
@@ -1332,9 +1372,16 @@
 			{#if activeTab === 'hyperrag'}
 				<div class="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-[#d1cdb8]">
 					{#if hyperRunning}
-						<div class="text-center py-16 text-[#8b9dbb] animate-pulse">
-							<div class="text-2xl font-bold uppercase mb-1">⬡ HYPERRAG_EXEC…</div>
+						<div class="text-center py-12 text-[#8b9dbb]">
+							<div class="text-2xl font-bold uppercase mb-2 animate-pulse">⬡ HYPERRAG_EXEC…</div>
 							<p class="text-xs">Phases B→C→D→E running. Synthesis may take ~30s.</p>
+							<p class="text-xs mt-2 text-[#a39f90]">{(hyperElapsedMs / 1000).toFixed(1)}s elapsed</p>
+							{#if hyperElapsedMs >= 20000}
+								<button
+									onclick={cancelHyperRAG}
+									class="mt-4 px-4 py-1.5 border border-[#c25953]/60 bg-[#c25953]/10 hover:bg-[#c25953]/20 text-[#c25953] text-xs font-bold tracking-wider transition-all"
+								>[CANCEL]</button>
+							{/if}
 						</div>
 					{:else if hyperError}
 						<div class="p-4 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-xs">
@@ -1364,13 +1411,48 @@
 							{/if}
 						</div>
 
-						<!-- Synthesis panel -->
-						{#if hyperResult.phaseD?.synthesis}
-							<div class="border border-[#4a5568] bg-[#1c2030]/60 p-4 space-y-2">
+				{#if hyperResult.phaseLatency}
+					<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[0.68rem] border border-[#4a5568] bg-[#1c2030]/70 p-3 mt-2">
+						<div>
+							<div class="text-[#a39f90] uppercase tracking-wider text-[0.65rem] font-bold">Embed</div>
+							<div class="text-[#efede4] font-bold">{hyperResult.phaseLatency.embed}ms</div>
+						</div>
+						<div>
+							<div class="text-[#a39f90] uppercase tracking-wider text-[0.65rem] font-bold">Cluster</div>
+							<div class="text-[#efede4] font-bold">{hyperResult.phaseLatency.cluster}ms</div>
+						</div>
+						<div>
+							<div class="text-[#a39f90] uppercase tracking-wider text-[0.65rem] font-bold">Qdrant</div>
+							<div class="text-[#efede4] font-bold">{hyperResult.phaseLatency.qdrant}ms</div>
+						</div>
+						<div>
+							<div class="text-[#a39f90] uppercase tracking-wider text-[0.65rem] font-bold">CouchDB</div>
+							<div class="text-[#efede4] font-bold">{hyperResult.phaseLatency.couchdb}ms</div>
+						</div>
+					</div>
+				{/if}
+				{#if hyperResult.phaseD || hyperResult.results.length > 0}
+					<div class="grid grid-cols-3 gap-2 text-[0.68rem] border border-[#4a5568] bg-[#1c2030]/70 p-3">
+						<div>
+							<div class="text-[#a39f90] uppercase tracking-wider text-[0.65rem] font-bold">RotorQuant</div>
+							<div class="text-[#efede4] font-bold">{hyperResult.phaseD?.inferLatencyMs ?? 0}ms</div>
+						</div>
+						<div>
+							<div class="text-[#a39f90] uppercase tracking-wider text-[0.65rem] font-bold">Top Blend</div>
+							<div class="text-[#8c9f7a] font-bold">{hyperResult.results[0]?.karpathyBlend?.toFixed(3) ?? '—'}</div>
+						</div>
+						<div>
+							<div class="text-[#a39f90] uppercase tracking-wider text-[0.65rem] font-bold">Src Refs</div>
+							<div class="text-[#efede4] font-bold">{hyperResult.results.filter((h) => h.source_ref).length}</div>
+						</div>
+					</div>
+				{/if}
+				{#if hyperResult.phaseD?.synthesis}
+						<div class="border border-[#4a5568] bg-[#1c2030]/60 p-4 space-y-2">
 								<p class="text-[0.62rem] text-[#8b9dbb] font-bold uppercase tracking-wider">// RotorQuant Synthesis</p>
 								<div class="text-[0.75rem] text-[#efede4] leading-relaxed whitespace-pre-wrap">{hyperResult.phaseD.synthesis}</div>
 							</div>
-						{:else if hyperResult.phaseD?.inferError}
+				{:else if hyperResult.phaseD?.inferError}
 							<div class="border border-[#c25953]/40 bg-[#c25953]/5 p-3 text-[0.68rem] text-[#c25953]">
 								Inference error: {hyperResult.phaseD.inferError}
 							</div>
