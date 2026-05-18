@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	const rows = await db
     .select({ metadata: evidence.metadata, caseId: evidence.caseId })
     .from(evidence)
-    .where(and(eq(evidence.id, id), eq(evidence.userId, locals.user.id)))
+    .where(and(eq(evidence.id, id), eq(evidence.userId, Number(locals.user.id))))
     .limit(1);
 
 	if (!rows[0]) {
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 	const rows = await db
     .select({ caseId: evidence.caseId })
     .from(evidence)
-    .where(and(eq(evidence.id, id), eq(evidence.userId, locals.user.id)))
+    .where(and(eq(evidence.id, id), eq(evidence.userId, Number(locals.user.id))))
     .limit(1);
 
 	if (!rows[0]) {

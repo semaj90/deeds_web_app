@@ -25,6 +25,7 @@ import { ollamaFetch, getChatModelKeepAlive, VLM_MODELS } from '$lib/server/olla
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
+import { logToolTrace, type ToolTraceStatus } from '$lib/server/observability/tool-trace.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -33,12 +34,15 @@ import { logInference } from '$lib/server/observability/inference-log.js';
 /** JSON Schema parameter definition for an Ollama tool */
 export interface ToolParameterSchema {
   type: 'object';
-  properties: Record<string, {
-    type: string;
-    description?: string;
-    enum?: string[];
-    items?: Record<string, unknown>;
-  }>;
+  properties: Record<
+    string,
+    {
+      type: string;
+      description?: string;
+      enum?: string[];
+      items?: Record<string, unknown>;
+    }
+  >;
   required?: string[];
 }
 
@@ -111,6 +115,8 @@ export interface Gemma4ToolLoopOpts {
   timeoutMs?: number;
   /** Images to include with the user message (base64-encoded, for VLM) */
   images?: string[];
+  /** Optional message ID to associate tool executions with a database chat message */
+  messageId?: string;
 }
 
 /** Result returned from the tool-calling loop */
@@ -235,7 +241,7 @@ export async function callGemma4WithTools(
 
     console.log(
       `[gemma4-tool-loop] Iteration ${i + 1}/${maxIter} — ` +
-      `${messages.length} messages, ${tools.length} tools`
+        `${messages.length} messages, ${tools.length} tools`
     );
 
     // ── POST /api/chat ──────────────────────────────────────────────────
@@ -313,13 +319,17 @@ export async function callGemma4WithTools(
       const fnArgs = tc.function.arguments ?? {};
       const handler = handlers.get(fnName);
 
-      console.log(`[gemma4-tool-loop]   → calling tool: ${fnName}(${JSON.stringify(fnArgs).slice(0, 200)})`);
+      console.log(
+        `[gemma4-tool-loop]   → calling tool: ${fnName}(${JSON.stringify(fnArgs).slice(0, 200)})`
+      );
 
       const toolStart = performance.now();
       let result: unknown;
 
       if (!handler) {
-        result = { error: `Unknown tool: ${fnName}. Available: ${[...handlers.keys()].join(', ')}` };
+        result = {
+          error: `Unknown tool: ${fnName}. Available: ${[...handlers.keys()].join(', ')}`,
+        };
         console.warn(`[gemma4-tool-loop]   ⚠ no handler for tool "${fnName}"`);
       } else {
         try {
@@ -331,6 +341,28 @@ export async function callGemma4WithTools(
       }
 
       const toolDuration = Math.round(performance.now() - toolStart);
+      let toolStatus: ToolTraceStatus = 'ok';
+      let toolError: string | null = null;
+
+      if (!handler) {
+        toolStatus = 'error';
+        toolError = `Unknown tool: ${fnName}`;
+      } else if (typeof result === 'object' && result !== null && 'error' in result) {
+        const rawError = (result as { error?: unknown }).error;
+        toolStatus = 'error';
+        toolError =
+          rawError == null
+            ? null
+            : typeof rawError === 'string'
+              ? rawError
+              : JSON.stringify(rawError);
+      }
+
+      const resultSummary =
+        typeof result === 'string'
+          ? result.slice(0, 1000)
+          : (JSON.stringify(result ?? null) ?? '').slice(0, 1000);
+
       toolCallLog.push({
         iteration: i + 1,
         toolName: fnName,
@@ -338,6 +370,18 @@ export async function callGemma4WithTools(
         result,
         durationMs: toolDuration,
       });
+
+      if (opts.messageId) {
+        logToolTrace({
+          messageId: opts.messageId,
+          toolName: fnName,
+          args: fnArgs,
+          resultSummary,
+          durationMs: toolDuration,
+          status: toolStatus,
+          error: toolError,
+        });
+      }
 
       // ── Step 4: Append tool result to messages ──────────────────────
       messages.push({
@@ -348,7 +392,7 @@ export async function callGemma4WithTools(
 
       console.log(
         `[gemma4-tool-loop]   ✓ tool "${fnName}" returned in ${toolDuration}ms ` +
-        `(${JSON.stringify(result).length} chars)`
+          `(${JSON.stringify(result).length} chars)`
       );
     }
 

@@ -13,9 +13,14 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Add hoisted mocks here when handler logic is filled in:
-// const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
-// vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
+vi.mock('$lib/server/db/unified-client.js', () => ({
+  db: { select: vi.fn(), insert: vi.fn(), update: vi.fn(), delete: vi.fn() },
+  qdrant: { upsert: vi.fn(), search: vi.fn() },
+}));
+vi.mock('$lib/server/db/client', () => ({
+  pool: { query: vi.fn() },
+  db: { select: vi.fn(), insert: vi.fn() },
+}));
 
 describe('src/routes/api/ace/error-kag/+server.ts', () => {
   describe('POST /api/ace/error-kag', () => {

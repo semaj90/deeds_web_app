@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		const ev = await db
 			.select({ id: evidence.id })
 			.from(evidence)
-			.where(and(eq(evidence.id, id), eq(evidence.userId, locals.user.id)))
+			.where(and(eq(evidence.id, id), eq(evidence.userId, Number(locals.user.id))))
 			.limit(1);
 		if (!ev[0]) {
 			return json({ error: 'Evidence not found' }, { status: 404 });

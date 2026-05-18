@@ -13,7 +13,7 @@ import { sql, desc, eq } from 'drizzle-orm';
 import { getRedis }      from '$lib/server/redis.js';
 
 export interface TokenUsageParams {
-	userId?: string;
+	userId?: string | number;
 	endpoint: string;
 	model: string;
 	promptTokens?: number;
@@ -30,9 +30,11 @@ export function trackTokenUsage(params: TokenUsageParams): void {
 	const promptTokens = params.promptTokens ?? 0;
 	const completionTokens = params.completionTokens ?? 0;
 
+	const dbUserId = params.userId !== undefined && params.userId !== null ? Number(params.userId) : null;
+
 	db.insert(aiUsageLog)
 		.values({
-			userId: params.userId ?? null,
+			userId: dbUserId,
 			endpoint: params.endpoint,
 			model: params.model,
 			promptTokens,
@@ -147,7 +149,7 @@ export async function getKVBudgetSummary(sessionId: string): Promise<{
  * Get aggregated token usage stats for a user or globally.
  */
 export async function getTokenUsageStats(options?: {
-	userId?: string;
+	userId?: string | number;
 	sinceDaysAgo?: number;
 }): Promise<{
 	totalPromptTokens: number;
@@ -163,7 +165,7 @@ export async function getTokenUsageStats(options?: {
 	try {
 		const conditions = [sql`${aiUsageLog.createdAt} >= ${sinceDate.toISOString()}`];
 		if (options?.userId) {
-			conditions.push(eq(aiUsageLog.userId, options.userId));
+			conditions.push(eq(aiUsageLog.userId, Number(options.userId)));
 		}
 		const whereClause = conditions.length > 1
 			? sql`${conditions[0]} AND ${conditions[1]}`

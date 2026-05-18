@@ -73,4 +73,31 @@ export type ChatMetadata = typeof chatMetadata.$inferSelect;
 export type NewChatMetadata = typeof chatMetadata.$inferInsert;
 
 
+/**
+ * Tool Traces Table
+ * Tracks granular execution details for each step of the RAG pipeline,
+ * including success/failure status.
+ */
+export const toolTraces = pgTable('tool_traces', {
+	id: varchar('id', { length: 255 }).primaryKey(), // trace_1735123456789_abc123
+	messageId: varchar('message_id', { length: 255 }).references(() => chatMessages.id, { onDelete: 'cascade' }), // References chat_messages.id
+	toolName: varchar('tool_name', { length: 255 }).notNull(), // 'qdrant_search', 'neo4j_neighbors', 'corrective_rag', etc.
+	args: text('args'), // JSON string representing arguments
+	resultSummary: text('result_summary'), // Summary of results or raw text
+	durationMs: integer('duration_ms'), // Timing metric
+	status: varchar('status', { length: 32 }).notNull().default('ok'), // ok | error | skipped
+	error: text('error'), // Optional failure detail for observability
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+},
+	(table) => ({
+	messageIdIdx: index('idx_tool_traces_message_id').on(table.messageId),
+	toolNameIdx: index('idx_tool_traces_tool_name').on(table.toolName),
+	createdAtIdx: index('idx_tool_traces_created_at').on(table.createdAt)
+}));
+
+export type ToolTrace = typeof toolTraces.$inferSelect;
+export type NewToolTrace = typeof toolTraces.$inferInsert;
+
+
+
 

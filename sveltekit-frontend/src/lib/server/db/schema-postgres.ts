@@ -23,8 +23,8 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm/relations';
 
-// Re-export chatMessages from schema-chat for broader availability
-export { chatMessages, type ChatMessage, type NewChatMessage } from './schema-chat';
+// Re-export chatMessages and toolTraces from schema-chat for broader availability
+export { chatMessages, toolTraces, type ChatMessage, type NewChatMessage, type ToolTrace, type NewToolTrace } from './schema-chat';
 
 // === ENUMS FOR LEGAL AI APPLICATION ===
 export const userRoleEnum = pgEnum('user_role', ['prosecutor',

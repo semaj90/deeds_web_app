@@ -65,7 +65,7 @@ Use:
 
 ## 6. Object Storage
 
-Use local filesystem in dev and S3-compatible storage (R2, B2, S3, Wasabi) in prod. **Avoid hard-coding MinIO** — use a generic S3 adapter so you can swap providers without touching call sites.
+Use local filesystem in dev and the repo's SeaweedFS S3 gateway in prod. Keep the adapter generic so the same MinIO-compatible client shape can target SeaweedFS, R2, B2, S3, or Wasabi without touching call sites.
 
 ```
 src/lib/server/storage/
@@ -87,9 +87,9 @@ export interface ObjectStorage {
 }
 ```
 
-### License note
+### Compatibility note
 
-MinIO Object Store is **AGPLv3**. Fine for local dev and AGPL-compatible deployments; risky for closed-source SaaS or customer-hosted proprietary apps because AGPL requires distributing the source of network-combined works. For commercial production, prefer R2 / B2 / S3 / Wasabi behind the S3 adapter.
+SeaweedFS is Apache 2.0 and is the canonical object-store gateway in this repo. Keep MinIO-compatible client syntax only at the adapter boundary so legacy call sites do not change, and point that adapter at SeaweedFS or another S3 backend as needed.
 
 ## 7. Qdrant Collections
 

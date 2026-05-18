@@ -36,6 +36,13 @@
 			<p>DenseRAG + GraphRAG query fusion for admin search, topology, and evidence-aware support.</p>
 			<span class="card-link">Open contextual assistant</span>
 		</a>
+
+		<a class="hub-card lab" href="/admin/atlas">
+			<div class="card-topline">Retrieval Telemetry</div>
+			<h2>Atlas Studio</h2>
+			<p>CHR97 fast-path, Qdrant fallback, Redis cache, and sourceRefs in one operator surface.</p>
+			<span class="card-link">Open atlas studio</span>
+		</a>
 	</section>
 </div>
 

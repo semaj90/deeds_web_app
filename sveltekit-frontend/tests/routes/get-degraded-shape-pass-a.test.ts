@@ -492,7 +492,7 @@ describe('GET /api/infrastructure/status — degraded-shape contract', () => {
 		// Force isCudaAvailable (which runs outside individual catches) to throw
 		mockIsCudaAvailable.mockImplementation(() => { throw new Error('DLL not found'); });
 
-		const res = await GET({} as never);
+		const res = await GET({ locals: { user: { id: '1', role: 'admin' } } } as never);
 		expect(res.status).toBe(200);
 		const body = await res.json();
 

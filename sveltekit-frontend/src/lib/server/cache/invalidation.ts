@@ -228,10 +228,14 @@ export class CacheInvalidationService {
       // Synchronous pattern invalidation
       try {
         const redis = getRedis();
-        const keys = await redis.keys(pattern);
-        if (keys.length > 0) {
-          await redis.del(...keys);
-          result.redisKeysCleared = keys.length;
+        if (typeof redis.keys === 'function') {
+          const keys = await redis.keys(pattern);
+          if (keys.length > 0) {
+            await redis.del(...keys);
+            result.redisKeysCleared = keys.length;
+          }
+        } else {
+          console.warn('[CacheInvalidation] redis.keys is not a function (mock env?), skipping pattern del');
         }
       } catch (err) {
         console.warn('[CacheInvalidation] Redis pattern del failed:', err);

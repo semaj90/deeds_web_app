@@ -24,7 +24,7 @@ Reference `trace-runtime-split.md`.
 Use Postgres for canonical app state and JSONB metadata envelopes via Drizzle ORM.
 
 ## 6. Object Storage
-Use local filesystem in dev and S3-compatible storage (R2, B2, S3) in prod. Avoid hard-coding MinIO; use a generic S3 adapter.
+Use local filesystem in dev and the SeaweedFS S3 gateway in prod. Keep the adapter generic so the same MinIO-compatible client shape can target SeaweedFS, R2, B2, S3, or Wasabi without touching call sites.
 
 ## 7. Qdrant Collections
 - `codebase_chunks_768`

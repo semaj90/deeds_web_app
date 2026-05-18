@@ -109,6 +109,13 @@ export const synthesisKey = {
 
   /** Global (no case scope): query:{queryHash}:llm:{model} */
   global: (query: string, model: string) => `query:${hashStr(query)}:llm:${model}`,
+
+  /**
+   * bifrost:kb:llm_synthesis:v1:{kbSnapshotHash}:{karpathyRev}:{queryHash}
+   * Ensures cartridge reorder invalidates synthesis cache correctly.
+   */
+  bifrostKb: (kbSnapshotHash: string, karpathyRev: string, query: string) =>
+    `bifrost:kb:llm_synthesis:v1:${kbSnapshotHash}:${karpathyRev}:${hashStr(query)}`,
 };
 
 // ── Client/UI Cache Keys ──────────────────────────────────────────────────

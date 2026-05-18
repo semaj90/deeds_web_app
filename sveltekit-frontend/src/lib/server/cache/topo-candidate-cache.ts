@@ -44,8 +44,8 @@ export interface TopoCacheLookup {
 
 // ── Key builders ──────────────────────────────────────────────────────────────
 
-function candidateKey(topoClass: TopoClass, queryHash: string): string {
-  return `ace:topo:${topoClass}:${queryHash}`;
+function candidateKey(topoClass: TopoClass, queryHash: string, karpathyRev?: string): string {
+  return `ace:topo:${topoClass}:${queryHash}${karpathyRev ? `:${karpathyRev}` : ''}`;
 }
 
 export function queryHash(query: string): string {
@@ -61,11 +61,12 @@ export function queryHash(query: string): string {
 export async function getTopoCandidates(
   topoClass: TopoClass,
   query: string,
+  karpathyRev?: string,
 ): Promise<TopoCandidateEntry[] | null> {
   try {
     const redis = getRedis();
     const hash  = queryHash(query);
-    const raw   = await redis.get(candidateKey(topoClass, hash));
+    const raw   = await redis.get(candidateKey(topoClass, hash, karpathyRev));
     if (!raw) return null;
     return JSON.parse(raw) as TopoCandidateEntry[];
   } catch {
@@ -81,11 +82,12 @@ export async function setTopoCandidates(
   topoClass: TopoClass,
   query: string,
   candidates: TopoCandidateEntry[],
+  karpathyRev?: string,
 ): Promise<void> {
   try {
     const redis = getRedis();
     const hash  = queryHash(query);
-    const key   = candidateKey(topoClass, hash);
+    const key   = candidateKey(topoClass, hash, karpathyRev);
     const payload = JSON.stringify(candidates.slice(0, MAX_CANDIDATES));
     await redis.setex(key, CANDIDATE_TTL, payload);
   } catch {
@@ -127,6 +129,7 @@ export function buildTopoPrefilterStats(params: {
   candidateCountAfter:      number;
   qdrantCollectionEstimate: number | null;
   queryHash:                string;
+  cartridge?:               'warm' | 'cold' | 'miss';
 }): TopoPrefilterStats {
   return {
     used:               params.used,
@@ -138,6 +141,7 @@ export function buildTopoPrefilterStats(params: {
       ? `${params.qdrantCollectionEstimate.toLocaleString()} → ${params.candidateCountAfter}`
       : null,
     queryHash:          params.queryHash,
+    cartridge:          params.cartridge,
   };
 }
 
@@ -150,4 +154,5 @@ export interface TopoPrefilterStats {
   /** Human-readable reduction string, e.g. "32753 → 83" */
   candidateReduction: string | null;
   queryHash:          string;
+  cartridge?:         'warm' | 'cold' | 'miss';
 }

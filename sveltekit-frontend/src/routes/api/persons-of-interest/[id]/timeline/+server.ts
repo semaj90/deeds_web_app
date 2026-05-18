@@ -106,7 +106,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 				eventType: parsed.data.eventType,
 				location: parsed.data.location ?? null,
 				severity: parsed.data.severity,
-				createdBy: locals.user?.id ?? null,
+				createdBy: locals.user?.id ? Number(locals.user.id) : null,
 			})
 			.returning();
 

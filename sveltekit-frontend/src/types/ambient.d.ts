@@ -97,14 +97,6 @@ declare module 'redis' {
 	export = Redis;
 }
 
-/* Server/db module stubs used in the codebase */
-declare module '$lib/server/db/client.js' {
-	/** Minimal typed exports for common query usage in the codebase */
-	export function query<T = unknown>(sql: string, params?: unknown[]): Promise<DBQueryResult<T>>;
-	export function ensureEvidenceTable(): Promise<void> | void;
-	const client: DBClient;
-	export default client;
-}
 
 declare module '$lib/server/db/drizzle' {
 	const enhanced_db: unknown;

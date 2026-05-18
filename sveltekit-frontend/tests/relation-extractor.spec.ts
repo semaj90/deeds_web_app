@@ -205,21 +205,21 @@ describe('QUERIES_NEO4J_LABEL', () => {
 // ── HAS_AGENTS_SCOPE ──────────────────────────────────────────────────────────
 
 describe('HAS_AGENTS_SCOPE', () => {
-	it('finds nearest AGENTS.md via walk-up', () => {
+	it('finds nearest LLMS.md via walk-up', () => {
 		const root = makeTmpTree({
-			'src/AGENTS.md': '# Rules\n- test',
+			'src/LLMS.md': '# Rules\n- test',
 			'src/lib/server/deep/module.ts': 'export const x = 1;',
 		});
 		try {
 			const edges = extractSemanticRelations(join(root, 'src/lib/server/deep/module.ts'), root);
 			const hit = edges.find(e => e.relationType === 'HAS_AGENTS_SCOPE');
 			expect(hit).toBeDefined();
-			expect(hit!.targetKey).toContain('AGENTS.md');
+			expect(hit!.targetKey).toContain('LLMS.md');
 			expect(hit!.evidence.matchKind).toBe('walkup');
 		} finally { rmSync(root, { recursive: true, force: true }); }
 	});
 
-	it('returns no HAS_AGENTS_SCOPE when no AGENTS.md in tree', () => {
+	it('returns no HAS_AGENTS_SCOPE when no LLMS.md in tree', () => {
 		const root = makeTmpTree({ 'src/module.ts': 'export const y = 2;' });
 		try {
 			const edges = extractSemanticRelations(join(root, 'src/module.ts'), root);

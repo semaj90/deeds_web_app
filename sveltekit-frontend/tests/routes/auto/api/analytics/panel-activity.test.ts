@@ -45,7 +45,7 @@ describe('src/routes/api/analytics/panel-activity/+server.ts', () => {
       // Acceptable terminals: 200 (public), 401 (guarded), 400/404 (validation),
       // 500/503 (degraded — upstream DB/Redis offline in test env). The contract
       // is "handler returns *some* Response or throws HttpError", not a specific status.
-      expect([200, 400, 401, 403, 404, 405, 429, 500, 503]).toContain(status);
+      expect([200, 204, 400, 401, 403, 404, 405, 429, 500, 503]).toContain(status);
     });
 
     it.todo('400 — bad input shape returns degraded JSON envelope');

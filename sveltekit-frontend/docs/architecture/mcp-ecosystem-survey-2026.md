@@ -94,7 +94,7 @@ Claude Code `PreToolUse` hook that denies write verbs.
     "postgres-readonly": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres",
-               "postgresql://readonly_user@localhost:5432/legal_ai_db"]
+               "postgresql://readonly_user@localhost:5434/legal_ai_db"]
     },
     "obsidian-vault": {
       "command": "npx",
@@ -159,7 +159,7 @@ independent of any new MCP work:
   Python TUI with codebase introspection; not a planner, no GUI.
 - **No SurrealDB swap-in.** BSL 1.1 + immature unified ecosystem;
   keep the Postgres/Qdrant/Neo4j split.
-- **No MinIO hardwiring.** AGPLv3 commercial concerns; the
+- **No object-storage hardwiring.** AGPLv3 commercial concerns; the
   proposed object-storage adapter speaks S3 so SeaweedFS / R2 / B2
   / S3 are all swappable.
 - **No replacing custom TRACE tools with off-the-shelf MCP servers.**

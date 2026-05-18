@@ -70,8 +70,24 @@ const QUERY_VEC_KEY   = 'analytics:query_vecs';     // hash: queryHash → JSON 
 const VARIANCE_KEY    = 'analytics:variance_pairs'; // hash: pairKey → JSON
 const ROLLING_TTL     = 7 * 24 * 3600;              // 7-day rolling window
 
+type RedisCommandFn = (...args: unknown[]) => unknown;
+
+function tryRedisCommand(redis: unknown, methodNames: string[], args: unknown[]): Promise<unknown> {
+  const client = redis as Record<string, unknown>;
+  for (const methodName of methodNames) {
+    const fn = client?.[methodName] as RedisCommandFn | undefined;
+    if (typeof fn !== 'function') continue;
+    try {
+      return Promise.resolve(fn.apply(redis, args));
+    } catch {
+      return Promise.resolve(null);
+    }
+  }
+  return Promise.resolve(null);
+}
+
 export function queryHash(query: string): string {
-	return createHash('sha256').update(query.toLowerCase().trim()).digest('hex').slice(0, 16);
+  return createHash('sha256').update(query.toLowerCase().trim()).digest('hex').slice(0, 16);
 }
 
 // ── Core analytics functions ─────────────────────────────────────────────────
@@ -82,29 +98,37 @@ export function queryHash(query: string): string {
  * Fire-and-forget — never awaited by callers.
  */
 export function recordSearchQuery(opts: {
-	query:       string;
-	embedding?:  number[];
-	pipeline:    HitPipeline;
-	cacheHit:    boolean;
-	userId?:     string;
+  query: string;
+  embedding?: number[];
+  pipeline: HitPipeline;
+  cacheHit: boolean;
+  userId?: string;
 }): void {
-	const hash = queryHash(opts.query);
-	const redis = getRedis();
-	const sketch = opts.embedding ? opts.embedding.slice(0, 64) : null;
+  const hash = queryHash(opts.query);
+  const redis = getRedis();
+  const sketch = opts.embedding ? opts.embedding.slice(0, 64) : null;
 
-	Promise.all([
-		redis.zincrby(HOT_QUERY_KEY, 1, hash),
-		redis.expire(HOT_QUERY_KEY, ROLLING_TTL),
-		// Store meta only if not already present (hsetnx = set if not exists)
-		redis.hsetnx(QUERY_VEC_KEY, hash, JSON.stringify({
-			query:     opts.query.slice(0, 200),
-			sketch,    // 64-dim for fast dot-product variance check
-			pipeline:  opts.pipeline,
-			cacheHit:  opts.cacheHit,
-			firstSeen: new Date().toISOString(),
-		})),
-		redis.expire(QUERY_VEC_KEY, ROLLING_TTL),
-	]).catch(() => {});
+  Promise.all([
+    tryRedisCommand(redis, ['zincrby', 'zIncrBy'], [HOT_QUERY_KEY, 1, hash]),
+    tryRedisCommand(redis, ['expire'], [HOT_QUERY_KEY, ROLLING_TTL]),
+    // Store meta only if not already present (hsetnx = set if not exists)
+    tryRedisCommand(
+      redis,
+      ['hsetnx', 'hSetNX'],
+      [
+        QUERY_VEC_KEY,
+        hash,
+        JSON.stringify({
+          query: opts.query.slice(0, 200),
+          sketch, // 64-dim for fast dot-product variance check
+          pipeline: opts.pipeline,
+          cacheHit: opts.cacheHit,
+          firstSeen: new Date().toISOString(),
+        }),
+      ]
+    ),
+    tryRedisCommand(redis, ['expire'], [QUERY_VEC_KEY, ROLLING_TTL]),
+  ]).catch(() => {});
 }
 
 /**
@@ -113,15 +137,15 @@ export function recordSearchQuery(opts: {
  * Fire-and-forget.
  */
 export function recordChunkHits(
-	hits:     ChunkHit[],
-	query:    string,
-	pipeline: HitPipeline,
-	opts:     { userId?: string; caseId?: string } = {}
+  hits: ChunkHit[],
+  query: string,
+  pipeline: HitPipeline,
+  opts: { userId?: string; caseId?: string } = {}
 ): void {
-	if (!hits.length) return;
-	const qHash = queryHash(query);
+  if (!hits.length) return;
+  const qHash = queryHash(query);
 
-	pool
+  pool
     .query(
       `INSERT INTO chunk_hit_log
 		   (chunk_id, relative_path, gpu_cluster, som_cluster, pipeline, query_hash,
@@ -160,7 +184,7 @@ export function recordChunkHits(
  * Fire-and-forget. Embedding is stored async separately.
  */
 export function recordQueryLog(entry: QueryLogEntry): void {
-	pool
+  pool
     .query(
       `INSERT INTO rag_query_log
 		   (user_id, case_id, query, query_hash, total_found, search_time_ms, rerank_time_ms,
@@ -200,15 +224,15 @@ export function recordQueryLog(entry: QueryLogEntry): void {
  * Upserts on the canonical pair key (sorted hashes), incrementing hit_count.
  */
 export function recordVariancePair(opts: {
-	queryA:     string;
-	queryB:     string;
-	similarity: number;
-	pipeline?:  string;
+  queryA: string;
+  queryB: string;
+  similarity: number;
+  pipeline?: string;
 }): void {
-	const hashA = queryHash(opts.queryA);
-	const hashB = queryHash(opts.queryB);
+  const hashA = queryHash(opts.queryA);
+  const hashB = queryHash(opts.queryB);
 
-	pool
+  pool
     .query(
       `INSERT INTO query_variance_pairs
 		   (query_hash_a, query_hash_b, query_a, query_b, similarity, pipeline)
@@ -227,10 +251,10 @@ export function recordVariancePair(opts: {
     )
     .catch(() => {});
 
-	// Also in Redis for fast in-process reads (query expander)
-	const redis  = getRedis();
-	const pairKey = [hashA, hashB].sort().join(':');
-	redis.hincrby(VARIANCE_KEY, pairKey, 1).catch(() => {});
+  // Also in Redis for fast in-process reads (query expander)
+  const redis = getRedis();
+  const pairKey = [hashA, hashB].sort().join(':');
+  tryRedisCommand(redis, ['hincrby', 'hIncrBy'], [VARIANCE_KEY, pairKey, 1]).catch(() => {});
 }
 
 // ── Read-side helpers ─────────────────────────────────────────────────────────

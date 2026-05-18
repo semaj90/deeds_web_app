@@ -32,7 +32,7 @@ const COLLECTION = collIdx >= 0 ? argv[collIdx + 1] : 'llm_wiki_chunks';
 const QDRANT_URL  = process.env.QDRANT_URL      ?? 'http://localhost:6333';
 const OLLAMA_URL  = process.env.OLLAMA_URL       ?? 'http://localhost:11434';
 const REDIS_URL   = process.env.REDIS_URL        ?? 'redis://localhost:6379';
-const REDIS_PASS  = process.env.REDIS_PASSWORD   ?? 'redis';
+const REDIS_PASS  = process.env.REDIS_PASSWORD   ?? undefined; // no default — local dev has no auth
 const EMBED_MODEL = process.env.EMBED_MODEL      ?? 'embeddinggemma:latest';
 
 // ── Test suite ─────────────────────────────────────────────────────────────
@@ -142,7 +142,7 @@ async function main() {
   }
 
   const redis = new Redis(REDIS_URL, {
-    password:             REDIS_PASS,
+    ...(REDIS_PASS ? { password: REDIS_PASS } : {}),
     lazyConnect:          true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue:   false,

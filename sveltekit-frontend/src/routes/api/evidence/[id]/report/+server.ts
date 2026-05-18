@@ -20,7 +20,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const [item] = await db
       .select()
       .from(evidence)
-      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!item) {

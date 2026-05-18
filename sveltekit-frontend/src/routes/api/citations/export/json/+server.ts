@@ -43,18 +43,18 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			citationsData = await db
         .select()
         .from(citations)
-        .where(and(inArray(citations.id, citationIds), or(eq(citations.createdBy, locals.user.id), isNull(citations.createdBy))!));
+        .where(and(inArray(citations.id, citationIds), or(eq(citations.createdBy, Number(locals.user.id)), isNull(citations.createdBy))!));
 		} else if (caseId) {
 			citationsData = await db
         .select()
         .from(citations)
-        .where(and(eq(citations.caseId, caseId), or(eq(citations.createdBy, locals.user.id), isNull(citations.createdBy))!));
+        .where(and(eq(citations.caseId, caseId), or(eq(citations.createdBy, Number(locals.user.id)), isNull(citations.createdBy))!));
 		} else {
 			// Export all user's citations (limit to 1000 for safety)
 			citationsData = await db
         .select()
         .from(citations)
-        .where(or(eq(citations.createdBy, locals.user.id), isNull(citations.createdBy))!)
+        .where(or(eq(citations.createdBy, Number(locals.user.id)), isNull(citations.createdBy))!)
         .limit(1000);
 		}
 

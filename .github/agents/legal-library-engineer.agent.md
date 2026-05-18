@@ -1,6 +1,6 @@
 ---
 name: "Legal Library Engineer"
-description: "Use when implementing or debugging legal document ingestion, PDF extraction, structure-aware legal chunking, MinIO storage, legal_nodes/legal_chunks persistence, pgvector embedding, Qdrant indexing, ingestion job status polling, admin library UI, corpus type classification, jurisdiction wiring, and Go search service integration."
+description: "Use when implementing or debugging legal document ingestion, PDF extraction, structure-aware legal chunking, object storage, legal_nodes/legal_chunks persistence, pgvector embedding, Qdrant indexing, ingestion job status polling, admin library UI, corpus type classification, jurisdiction wiring, and Go search service integration."
 tools: [read, edit, search, execute, todo]
 argument-hint: "Describe the ingestion stage, pipeline failure, chunking issue, embedding gap, search result quality problem, admin UI behavior, or Go service integration to implement or fix."
 user-invocable: true
@@ -15,7 +15,7 @@ Your job is to make legal PDF documents move reliably from upload through extrac
 ### Ingestion Pipeline (8 stages)
 ```
 POST /api/library/upload
-  → uploadLibraryDocument()     MinIO: legal-library bucket
+  → uploadLibraryDocument()     SeaweedFS S3 gateway (legal-library bucket)
                                 library_documents (INSERT)
                                 ingestion_jobs (INSERT)
   → runIngestionPipeline()      [async, fire-and-forget]
@@ -54,14 +54,14 @@ GET /api/library/search?q=...
 | `src/lib/server/legal/ingestion-worker.ts` | 8-stage pipeline orchestrator |
 | `src/lib/server/indexer/legal-chunker.ts` | Structure-aware legal chunker |
 | `src/lib/server/grpc/embedding-client.ts` | gRPC embed → Ollama fallback |
-| `src/lib/server/minio-client.ts` | MinIO putObject / getFile / ensureBucket |
+| `src/lib/server/minio-client.ts` | SeaweedFS S3 adapter (legacy module name; keeps MinIO-compatible call sites intact) |
 | `services/go-search-service/main.go` | Go 4-way parallel search + RRF |
 
 ### Storage
 | Store | Table / Bucket | Content |
 |-------|---------------|---------|
-| MinIO | `legal-library` | Raw PDFs — key: `{docId}/{filename}` |
-| PostgreSQL | `library_documents` | Metadata, status, MinIO key |
+| SeaweedFS S3 | `legal-library` | Raw PDFs — key: `{docId}/{filename}` |
+| PostgreSQL | `library_documents` | Metadata, status, SeaweedFS S3 key |
 | PostgreSQL | `ingestion_jobs` | Stage tracking (queued → complete) |
 | PostgreSQL | `legal_nodes` | Section hierarchy tree |
 | PostgreSQL | `legal_chunks` | Text chunks + 768-dim pgvector embedding |
@@ -72,7 +72,7 @@ GET /api/library/search?q=...
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `GO_SEARCH_URL` | `''` | Go service URL — empty disables fast-path |
-| `MINIO_LIBRARY_BUCKET` | `legal-library` | MinIO bucket name |
+| `MINIO_LIBRARY_BUCKET` | `legal-library` | SeaweedFS bucket name (legacy env var retained for compatibility) |
 
 ## Constraints
 - Do not touch the evidence pipeline (`/api/evidence/`) — it is a separate 9-stage system

@@ -551,13 +551,19 @@ async function getCachedEmbedding(text: string): Promise<number[] | null> {
 }
 
 async function getCachedEmbeddingEntry(text: string): Promise<CachedEmbeddingEntry | null> {
+  console.log('--- getCachedEmbeddingEntry start:', text);
   try {
     const { getRedis } = await import('../redis.js');
+    console.log('--- getCachedEmbeddingEntry got getRedis');
     const redis = getRedis();
+    console.log('--- getCachedEmbeddingEntry got redis:', !!redis);
     if (!redis) return null;
     const { createHash } = await import('crypto');
+    console.log('--- getCachedEmbeddingEntry got createHash');
     const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
+    console.log('--- getCachedEmbeddingEntry key:', key);
     const cached = await redis.get(key);
+    console.log('--- getCachedEmbeddingEntry got cached:', !!cached);
     if (!cached) return null;
     const parsed = JSON.parse(cached) as number[] | CachedEmbeddingEntry;
     if (Array.isArray(parsed)) {
@@ -565,7 +571,8 @@ async function getCachedEmbeddingEntry(text: string): Promise<CachedEmbeddingEnt
     }
     if (!Array.isArray(parsed.vector)) return null;
     return parsed;
-  } catch {
+  } catch (err) {
+    console.log('--- getCachedEmbeddingEntry error for text:', text, err);
     return null;
   }
 }
@@ -698,6 +705,7 @@ export async function generateEmbeddings(
   texts: string[],
   options: EmbeddingOptions = {}
 ): Promise<EmbeddingResult> {
+  console.log('--- generateEmbeddings texts:', texts);
   const start = performance.now();
   const attempts: EmbeddingAttempt[] = [];
 

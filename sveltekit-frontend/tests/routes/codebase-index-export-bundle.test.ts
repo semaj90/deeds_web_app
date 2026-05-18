@@ -26,7 +26,14 @@ const { mockDbExecute, mockFetch, mockIORedisCtor, mockRedisInstance } = vi.hois
 	const mockRedisInstance = {
 		scan: vi.fn(),
 		mget: vi.fn(),
-		disconnect: vi.fn()
+		get: vi.fn(),
+		set: vi.fn(),
+		setex: vi.fn(),
+		hget: vi.fn(),
+		hgetall: vi.fn(),
+		disconnect: vi.fn(),
+		quit: vi.fn().mockResolvedValue('OK'),
+		on: vi.fn(),
 	};
 	const mockIORedisCtor = vi.fn(() => mockRedisInstance);
 	return {

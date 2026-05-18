@@ -15,7 +15,7 @@ Query
 [4D Topology → RTX CUDA Graph]                 ← tensorrt_bridge.node kmeansWithCentroids
   │  cluster centroids float32 stream
   ▼
-[Bitfrost Inference Stream]                    ← llama.cpp rotorquant (port 8090)
+[Bifrost Inference Stream]                    ← llama.cpp rotorquant (port 8090)
   │  final ranked context with trust tiers
   ▼
 [HyperRAG Multi-Query Merge]                   ← kag.multi_lane_search MCP tool
@@ -40,10 +40,10 @@ to prefilter Qdrant before full dense search
 ### Phase C: CouchDB GraphRAG Enrichment
 Enrich results with wiki notes from `karpathy_wiki` CouchDB views
 
-### Phase D: CUDA Graph Stream → Bitfrost
-Feed cluster centroids via `tensorrt_bridge.kmeansWithCentroids` → stream to
-rotorquant llama-server for speculative decoding
+### Phase D: CUDA Graph Stream → Bifrost Inference Stream
+Feed cluster centroids via `tensorrt_bridge.kmeansWithCentroids` → stream to the
+Bifrost Inference Stream (llama.cpp rotorquant, port 8090) for speculative decoding
 
-### Phase E: Minified Context + Log Triage
+### Phase E: Minified Graph Sort / Log Triage
 Sidecar-loader pattern: small JSON sidecar per cluster with compressed summary,
 sorted by graph PageRank, logged to `logs/hyperrag-stream/` for audit

@@ -49,6 +49,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 /** 
  * Idempotent normalization of repo paths.
+ * Strips absolute path prefixes and workspaces case-insensitively.
  */
 function normalizeRepoPath(value) {
   if (!value || typeof value !== 'string') return null;
@@ -57,7 +58,22 @@ function normalizeRepoPath(value) {
   path = path.replace(/^file:/, '');
   path = path.replace(/^stable:/, '');
   path = path.replace(/^\.\/+/, '');
-  // Remove repo/workspace prefix only if present.
+  
+  // Strip absolute path prefixes case-insensitively
+  const lower = path.toLowerCase();
+  const deedsPattern = 'deeds-web-app/';
+  const sveltePattern = 'sveltekit-frontend/';
+  
+  const deedsIdx = lower.lastIndexOf(deedsPattern);
+  if (deedsIdx !== -1) {
+    path = path.slice(deedsIdx + deedsPattern.length);
+  }
+  const svelteIdx = path.toLowerCase().lastIndexOf(sveltePattern);
+  if (svelteIdx !== -1) {
+    path = path.slice(svelteIdx + sveltePattern.length);
+  }
+
+  // Remove repo/workspace prefixes only if present at the start.
   path = path.replace(/^deeds-web-app\//, '');
   path = path.replace(/^sveltekit-frontend\//, '');
   // Remove duplicate slashes.
@@ -102,6 +118,8 @@ function qdrantPathVariants(path) {
   return [...new Set([
     normalized,
     `sveltekit-frontend/${normalized}`,
+    `deeds-web-app/${normalized}`,
+    `deeds-web-app/sveltekit-frontend/${normalized}`,
   ])];
 }
 
@@ -220,29 +238,23 @@ async function fetchEmbeddingsBatch(filePaths) {
   for (let i = 0; i < filePaths.length; i += QDRANT_BATCH_SIZE) {
     const chunk = filePaths.slice(i, i + QDRANT_BATCH_SIZE);
     try {
+      const allVariants = chunk.flatMap(fp => qdrantPathVariants(fp));
+      const filterKeys = ['file_path', 'filePath', 'relativePath', 'relative_path', 'path', 'stable_key', 'stableKey'];
+      const should = filterKeys.map(k => ({
+        key: k,
+        match: { any: allVariants }
+      }));
+
       const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filter: {
-            should: chunk.flatMap(fp => {
-              const variants = qdrantPathVariants(fp);
-              return variants.flatMap(v => [
-                { key: 'file_path', match: { value: v } },
-                { key: 'filePath', match: { value: v } },
-                { key: 'relativePath', match: { value: v } },
-                { key: 'relative_path', match: { value: v } },
-                { key: 'path', match: { value: v } },
-                { key: 'stable_key', match: { value: v } },
-                { key: 'stableKey', match: { value: v } },
-              ]);
-            }),
-          },
-          limit: chunk.length * 5, 
+          filter: { should },
+          limit: chunk.length * 10, 
           with_vector: true,
           with_payload: true,
         }),
-        signal: AbortSignal.timeout(90_000),
+        signal: AbortSignal.timeout(15_000),
       });
       if (!res.ok) continue;
       const data = await res.json();
@@ -272,20 +284,140 @@ async function fetchProbeEmbedding(query) {
       body: JSON.stringify({ text: query }),
       signal: AbortSignal.timeout(10_000),
     });
-    if (!res.ok) throw new Error(`probe fetch failed: ${res.status}`);
+    if (res.ok) {
+      const d = await res.json();
+      if (d.embedding) return new Float32Array(d.embedding);
+    }
+  } catch (err) {
+    console.warn(`[karpathy] SvelteKit probe failed, attempting direct Ollama fallback: ${err.message}`);
+  }
+
+  // Direct Ollama fallback
+  try {
+    const ollamaUrl = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+    const embedModel = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
+    console.log(`[karpathy] Querying Ollama fallback: ${ollamaUrl}/api/embeddings with model ${embedModel}`);
+    const res = await fetch(`${ollamaUrl}/api/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: embedModel, prompt: query }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) throw new Error(`Ollama response error: ${res.status}`);
     const d = await res.json();
     return d.embedding ? new Float32Array(d.embedding) : null;
   } catch (err) {
-    console.warn(`[karpathy] probe error: ${err.message}`);
+    console.warn(`[karpathy] Ollama fallback probe error: ${err.message}`);
     return null;
   }
 }
 
 // ── Math ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Computes PCA projection weights using Power Iteration with Deflation.
+ * Centered embeddings are projected to outDim principal components.
+ * O(N * inDim * outDim) time complexity, highly stable and fast.
+ */
 function pcaWeights(embeddings, n, inDim, outDim) {
-  // simplified 
-  return new Float32Array(inDim * outDim).fill(0.01);
+  if (n === 0 || !embeddings || embeddings.length === 0) {
+    return new Float32Array(inDim * outDim).fill(0.01);
+  }
+
+  const embs = Array.from(embeddings);
+  const N = embs.length;
+
+  // 1. Compute the mean vector
+  const mean = new Float32Array(inDim);
+  for (let i = 0; i < N; i++) {
+    const vec = embs[i];
+    for (let d = 0; d < inDim; d++) {
+      mean[d] += vec[d];
+    }
+  }
+  for (let d = 0; d < inDim; d++) {
+    mean[d] /= N;
+  }
+
+  // 2. Center the dataset
+  const centered = [];
+  for (let i = 0; i < N; i++) {
+    const vec = embs[i];
+    const cVec = new Float32Array(inDim);
+    for (let d = 0; d < inDim; d++) {
+      cVec[d] = vec[d] - mean[d];
+    }
+    centered.push(cVec);
+  }
+
+  // 3. Power Iteration with Deflation to find outDim principal components
+  const W = new Float32Array(inDim * outDim);
+
+  for (let j = 0; j < outDim; j++) {
+    // Initialize a random unit vector for the j-th principal component
+    let v = new Float32Array(inDim);
+    let norm = 0;
+    for (let d = 0; d < inDim; d++) {
+      v[d] = Math.random() * 2 - 1;
+      norm += v[d] * v[d];
+    }
+    norm = Math.sqrt(norm) || 1e-12;
+    for (let d = 0; d < inDim; d++) {
+      v[d] /= norm;
+    }
+
+    // Power iterations (15 steps is extremely accurate)
+    const maxIters = 15;
+    for (let iter = 0; iter < maxIters; iter++) {
+      // Compute u = C * v = (1 / N) * X^T * (X * v)
+      const y = new Float32Array(N);
+      for (let i = 0; i < N; i++) {
+        let dot = 0;
+        const cVec = centered[i];
+        for (let d = 0; d < inDim; d++) {
+          dot += cVec[d] * v[d];
+        }
+        y[i] = dot;
+      }
+
+      const u = new Float32Array(inDim);
+      for (let i = 0; i < N; i++) {
+        const cVec = centered[i];
+        const val = y[i];
+        for (let d = 0; d < inDim; d++) {
+          u[d] += cVec[d] * val;
+        }
+      }
+
+      let uNorm = 0;
+      for (let d = 0; d < inDim; d++) {
+        uNorm += u[d] * u[d];
+      }
+      uNorm = Math.sqrt(uNorm) || 1e-12;
+      for (let d = 0; d < inDim; d++) {
+        v[d] = u[d] / uNorm;
+      }
+    }
+
+    // Deflate the dataset
+    for (let i = 0; i < N; i++) {
+      let dot = 0;
+      const cVec = centered[i];
+      for (let d = 0; d < inDim; d++) {
+        dot += cVec[d] * v[d];
+      }
+      for (let d = 0; d < inDim; d++) {
+        cVec[d] -= dot * v[d];
+      }
+    }
+
+    // Store in flat row-major matrix: j-th principal component at row j
+    for (let d = 0; d < inDim; d++) {
+      W[j * inDim + d] = v[d];
+    }
+  }
+
+  return W;
 }
 
 function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
@@ -340,14 +472,16 @@ async function main() {
   for (const c of candidates) {
     const emb = embeddingMap.get(normalizeRepoPath(c.stableKey));
     let attention = 0;
-    if (emb && probe && gpu) {
-      // Dummy GPU call simulation if actual CUDA fails
-      attention = Math.random(); 
-    } else if (emb && probe) {
-      // CPU cosine
-      let dot = 0;
-      for (let i = 0; i < 768; i++) dot += emb[i] * probe[i];
-      attention = sigmoid(dot * 10);
+    if (emb && probe) {
+      // CPU cosine similarity (GPU path deferred until tensorrt_bridge is stable for attention)
+      let dot = 0, normE = 0, normP = 0;
+      for (let i = 0; i < 768; i++) {
+        dot   += emb[i] * probe[i];
+        normE += emb[i] * emb[i];
+        normP += probe[i] * probe[i];
+      }
+      const cosine = normE > 0 && normP > 0 ? dot / (Math.sqrt(normE) * Math.sqrt(normP)) : 0;
+      attention = Math.max(0, Math.min(1, (cosine + 1) / 2)); // map [-1,1] → [0,1]
     }
     
     const blend = (c.pr * 0.4) + (c.authority * 0.3) + (attention * 0.3);
@@ -359,9 +493,14 @@ async function main() {
 
   if (!DRY) {
     const redis = new Redis(REDIS_URL);
+    // Write scores as a pipeline for atomicity + set 24h TTL to match summary
+    const pipe = redis.pipeline();
+    pipe.del('gpu:karpathy:scores');
     for (const r of finalResults) {
-      await redis.hset('gpu:karpathy:scores', r.stableKey, JSON.stringify(r));
+      pipe.hset('gpu:karpathy:scores', r.stableKey, JSON.stringify(r));
     }
+    pipe.expire('gpu:karpathy:scores', 86400);
+    await pipe.exec();
     await redis.setex('gpu:karpathy:summary', 86400, JSON.stringify({
       ts: new Date().toISOString(),
       candidates: finalResults.length,

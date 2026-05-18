@@ -102,7 +102,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         and(
           eq(evidence.id, evidenceId),
           eq(evidence.caseId, params.id),
-          eq(evidence.userId, locals.user.id)
+          eq(evidence.userId, Number(locals.user.id))
         )
       )
       .limit(1);

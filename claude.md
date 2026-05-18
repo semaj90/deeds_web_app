@@ -99,7 +99,7 @@ Write back to L0-L3
 `unified_ast_query`, `cross_language_similarity`, `cuda_fix_priority`, `glyph_metadata`, `neo4j_dependency_graph`, `agentic_recommendation`, `batch_error_analysis`, `redis_cache_stats`, `system_health_check`
 
 ### Evidence Pipeline (8 stages)
-1. MinIO upload + SHA-256 hash + PostgreSQL record
+1. Object storage upload + SHA-256 hash + PostgreSQL record
 2. Text extraction: pdf-parse → OCR fallback (Tesseract CLI → tesseract.js)
 3. Structure-aware chunking via legal-chunker.ts (ARTICLE/SECTION/§)
 4. Embedding: gRPC → embeddinggemma → nomic-embed-text fallback

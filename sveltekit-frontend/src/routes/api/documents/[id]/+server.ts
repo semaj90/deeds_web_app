@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 		const [doc] = await db
       .select()
       .from(documents)
-      .where(and(eq(documents.id, id), eq(documents.userId, locals.user.id)))
+      .where(and(eq(documents.id, id), eq(documents.userId, Number(locals.user.id))))
       .limit(1);
 
 		if (!doc) {
@@ -95,7 +95,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 		const [ownedDoc] = await db
       .select({ id: documents.id })
       .from(documents)
-      .where(and(eq(documents.id, id), eq(documents.userId, locals.user.id)))
+      .where(and(eq(documents.id, id), eq(documents.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!ownedDoc) {
@@ -109,7 +109,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
         ...(status !== undefined ? { status } : {}),
         updatedAt: new Date(),
       })
-      .where(and(eq(documents.id, id), eq(documents.userId, locals.user.id)));
+      .where(and(eq(documents.id, id), eq(documents.userId, Number(locals.user.id))));
 
 		return json({ success: true, updatedAt: new Date().toISOString() });
 	} catch (err) {

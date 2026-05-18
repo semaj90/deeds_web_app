@@ -33,6 +33,9 @@ vi.mock('$lib/services/couchdb-client.js', () => ({
 vi.mock('$lib/services/error-analysis/KAGTraverser.js', () => ({
 	getKAGTraverser: mockGetKAGTraverser,
 }));
+vi.mock('$lib/server/services/error-analysis/KAGTraverser.js', () => ({
+	getKAGTraverser: mockGetKAGTraverser,
+}));
 
 /* ────────────────────────────────────────────────────────────────────────────
  * Global fetch mock — both ingest-errors and kag-notebook use module-level

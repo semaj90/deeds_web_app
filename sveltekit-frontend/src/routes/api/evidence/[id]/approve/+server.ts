@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     const [item] = await db
       .select({ id: evidence.id, metadata: evidence.metadata })
       .from(evidence)
-      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!item) {
@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     const [updated] = await db
       .update(evidence)
       .set({ metadata: reviewMeta, updatedAt: sql`now()` })
-      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))))
       .returning({ id: evidence.id, metadata: evidence.metadata });
 
     return json({

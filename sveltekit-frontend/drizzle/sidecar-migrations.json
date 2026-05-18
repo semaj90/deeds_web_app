@@ -81,6 +81,15 @@
       "appliedAt": "2026-05-17",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='llm_synthesis_events';\""
+    },
+    {
+      "file": "20260518_tool_traces.sql",
+      "status": "manual_sidecar",
+      "reason": "Tracks granular execution details for each step of the RAG pipeline. Captures args, result_summary, duration_ms, status, and error.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='tool_traces' AND column_name IN ('status','error');\""
     }
   ]
 }

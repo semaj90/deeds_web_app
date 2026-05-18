@@ -50,6 +50,7 @@ export interface RouterResult {
   dispatch: Array<'qdrant' | 'postgres' | 'neo4j' | 'mcp'>;
   signalVector: [number, number, number, number];
   rawScores: [number, number, number, number];
+  explanation?: string; // Natural language explanation of the decision
 }
 
 // ── Default 4×4 weight matrix M (row = backend, col = signal) ─────────────────
@@ -75,16 +76,17 @@ function matVecMul(M: [number, number, number, number][], v: [number, number, nu
 }
 
 function softmax(v: [number, number, number, number]): [number, number, number, number] {
-  const max = Math.max(...v);
-  const exps = v.map(x => Math.exp(x - max));
+  const scaled = v.map(x => x * 5.0) as [number, number, number, number];
+  const max = Math.max(...scaled);
+  const exps = scaled.map(x => Math.exp(x - max));
   const sum  = exps.reduce((a, b) => a + b, 0);
   return exps.map(e => e / sum) as [number, number, number, number];
 }
 
 // ── Signal extraction from query text + context ───────────────────────────────
 
-const GRAPH_KEYWORDS = /\b(depends|imports|exports|calls|uses|implements|extends|connected|path|between|from|to|neighbor|adjacent|cluster|related)\b/i;
-const LEXICAL_KEYWORDS = /[A-Z]{2,}|\b[a-z]+[A-Z]|\b\d{4}\b|"[^"]{3,}"|'[^']{3,}'|`[^`]{3,}`|\bU\.S\.C\b|\bCFR\b|§/;
+const GRAPH_KEYWORDS = /\b(depend[s]?|import[s]?|export[s]?|call[s]?|use[s]?|implement[s]?|extend[s]?|connected|path|between|from|to|neighbor|adjacent|cluster|related)\b/i;
+const LEXICAL_KEYWORDS = /[A-Z]{2,}|\b[a-z]+[A-Z]|\b\d{4}\b|"[^"]{3,}"|'[^']{3,}'|`[^`]{3,}`|\bU\.S\.C\b|\bCFR\b|§|\b\w+[\._-]\w+\b/g;
 const TRUST_KEYWORDS   = /\b(auth|secret|token|key|password|credential|admin|root|privilege|inject|execute|drop|delete|rm\s+-rf)\b/i;
 
 export function extractSignal(query: string, context?: { hasFilePath?: boolean; laneHints?: LaneId[] }): QuerySignal {
@@ -117,7 +119,7 @@ export class QueryRouter4x4 {
 
   constructor(opts?: { matrix?: [number, number, number, number][]; threshold?: number }) {
     this.matrix    = opts?.matrix ?? DEFAULT_MATRIX;
-    this.threshold = opts?.threshold ?? 0.15;
+    this.threshold = opts?.threshold ?? 0.25;
   }
 
   route(signal: QuerySignal): RouterResult {
@@ -138,7 +140,22 @@ export class QueryRouter4x4 {
       ['qdrant', 'postgres', 'neo4j', 'mcp'] as const
     ).filter((_, i) => weights[i] >= this.threshold);
 
-    return { weights: named, dispatch, signalVector: v, rawScores };
+    // Explainability Reasoning Engine
+    const signalNames = ['Semantic', 'Lexical', 'Graph', 'Trust Pressure'];
+    const maxSignalIdx = v.indexOf(Math.max(...v));
+    const dominantSignal = signalNames[maxSignalIdx];
+    const dominantSignalVal = v[maxSignalIdx];
+
+    const backendNames = { qdrant: 'Qdrant Vector', postgres: 'Postgres FTS', neo4j: 'Neo4j Graph', mcp: 'MCP Tool Agent' };
+    const prunedLanes = (['qdrant', 'postgres', 'neo4j', 'mcp'] as const).filter((_, i) => weights[i] < this.threshold);
+
+    let explanation = `Dominant query signal: ${dominantSignal} (${(dominantSignalVal * 100).toFixed(0)}%). `;
+    explanation += `Routed search dispatches to: ${dispatch.map(d => backendNames[d]).join(', ')}. `;
+    if (prunedLanes.length > 0) {
+      explanation += `Pruned redundant backends to save VRAM and thread-contention: ${prunedLanes.map(d => backendNames[d]).join(', ')}.`;
+    }
+
+    return { weights: named, dispatch, signalVector: v, rawScores, explanation };
   }
 
   /** Adapt matrix toward backends that produced high-reward chunks (gradient-free) */

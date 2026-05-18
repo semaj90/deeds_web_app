@@ -13,7 +13,7 @@
  *
  * Algorithm:
  *   1. Load JSONL training set (accepted rows only, rerank_score > 0.5)
- *   2. Group by composite key (som_bmu_row_bucket, gpu_cluster, trust_tier)
+ *   2. Group by composite key (topo_label, trust_tier)
  *   3. Within each group count lane_id occurrences + weighted by rerank_score
  *   4. For each key: pick the lane with highest weighted count → decision rule
  *   5. Serialize policy → Redis + disk
@@ -49,25 +49,37 @@ const REPORT_PATH     = path.join(ROOT, 'memory', 'kb', 'lane-router-policy-repo
 const REDIS_KEY       = 'ace:lane:routing_policy';
 const REDIS_TTL       = 86400; // 24h
 
-// ── SOM row bucketing ─────────────────────────────────────────────────────────
-// Collapse the raw som_bmu_row integer into one of 5 coarse buckets (0-4)
-// so the decision table generalises across SOM grid positions.
-function somBucket(row) {
-  if (row === null || row === undefined) return 'unknown';
-  const r = Number(row);
-  if (r < 5)  return 'r0-4';
-  if (r < 10) return 'r5-9';
-  if (r < 15) return 'r10-14';
-  if (r < 20) return 'r15-19';
-  return 'r20+';
+// ── Topo class label from file path ─────────────────────────────────────────
+// Mirrors topology-byte-mapper.ts classifyPath() in plain JS so we don't need
+// to import compiled TS. Must stay in sync with the canonical TS version.
+function topoLabelFromPath(p) {
+  if (!p) return 'unclassified';
+  const lp = p.toLowerCase();
+  if (/\/(tests?|spec|__tests?__|e2e|playwright|vitest|scripts\/)/.test(lp)) return 'test-audit-devtool';
+  if (/\/(scripts?|tools?|devtools?|audit)\//.test(lp))                       return 'test-audit-devtool';
+  if (/\/(db|schema|drizzle|migrations?)\//.test(lp))                         return 'database-schema';
+  if (/schema[-_]postgres|schema[-_]sqlite/.test(lp))                         return 'database-schema';
+  if (/\/(graph|hypergraph|tensor|topology|som|neo4j|gds)\//.test(lp))        return 'graph-gpu-topology';
+  if (/gpu|libtorch|tensorrt|cuda|simd/.test(lp))                             return 'graph-gpu-topology';
+  if (/\/(ace|rag|kag|retrieval|indexer|vector|qdrant|embeddings?)\//.test(lp)) return 'trace-retrieval';
+  if (/\/routes\/api\//.test(lp) || /\+server\.ts$/.test(lp))                return 'api-route';
+  if (/\/(evidence|legal|citations?|statutes?|documents?|cases?)\//.test(lp)) return 'legal-evidence';
+  if (/\/(components?|routes\/\(app\)|svelte)/.test(lp) && /\.svelte$/.test(lp)) return 'ui-component';
+  if (/\/routes\/\(app\)\//.test(lp))                                         return 'ui-component';
+  return 'unclassified';
 }
 
 // ── Feature key ───────────────────────────────────────────────────────────────
+// Key format: {topoLabel}|{trustTier}
+// Must match Stage A1 in context-assembler.ts which reads the policy at query
+// time using classifyQuery(queryText) → topoLabel and extractSignal() → trustTier.
+// Using path-derived topoLabel at training time correlates with query-derived
+// topoLabel at inference time (queries about ACE/retrieval retrieve trace-retrieval
+// chunks; queries about DB schema retrieve database-schema chunks, etc.).
 function featureKey(row) {
   return [
-    somBucket(row.som_bmu_row),
-    String(row.gpu_cluster ?? 'unk'),
-    String(row.trust_tier  ?? 'T3'),
+    topoLabelFromPath(row.relative_path),
+    String(row.trust_tier ?? 'T3'),
   ].join('|');
 }
 
@@ -120,7 +132,7 @@ function buildDecisionTable(rows) {
   const skipped = [];
 
   for (const [key, lanes] of Object.entries(groups)) {
-    const [somBkt, gpuCluster, trustTier] = key.split('|');
+    const [topoLabel, trustTier] = key.split('|');
     const total = Object.values(lanes).reduce((s, l) => s + l.count, 0);
 
     if (total < MIN_SUPPORT) {
@@ -148,8 +160,7 @@ function buildDecisionTable(rows) {
 
     rules.push({
       key,
-      som_bucket:   somBkt,
-      gpu_cluster:  gpuCluster,
+      topo_label:   topoLabel,
       trust_tier:   trustTier,
       preferred_lane: winner.lane,
       confidence:   Math.round(confidence * 1000) / 1000,
@@ -238,7 +249,7 @@ function buildReport({ rules, skipped, totalRows, filteredRows, builtAt }) {
     .join('\n');
 
   const ruleTable = topRules.map(r =>
-    `| \`${r.som_bucket}\` | \`${r.gpu_cluster}\` | \`${r.trust_tier}\` | \`${r.preferred_lane}\` | ${r.confidence} | ${r.support} | ${r.avg_score} |`
+    `| \`${r.topo_label}\` | \`${r.trust_tier}\` | \`${r.preferred_lane}\` | ${r.confidence} | ${r.support} | ${r.avg_score} |`
   ).join('\n');
 
   return `# Lane Router Policy Report
@@ -265,20 +276,24 @@ ${laneSummary}
 
 ## Top Rules (by support)
 
-| SOM bucket | GPU cluster | Trust tier | Preferred lane | Confidence | Support | Avg score |
-|---|---|---|---|---|---|---|
+| Topo label | Trust tier | Preferred lane | Confidence | Support | Avg score |
+|---|---|---|---|---|---|
 ${ruleTable}
 
 ## Feature Key Format
 
-\`{som_bucket}|{gpu_cluster}|{trust_tier}\`
+\`{topo_label}|{trust_tier}\`
 
-SOM buckets: \`r0-4\`, \`r5-9\`, \`r10-14\`, \`r15-19\`, \`r20+\`, \`unknown\`
+Topo labels: \`legal-evidence\`, \`api-route\`, \`ui-component\`, \`database-schema\`, \`trace-retrieval\`, \`graph-gpu-topology\`, \`test-audit-devtool\`, \`unclassified\`
+
+Derived from chunk \`relative_path\` at training time (mirrors \`classifyQuery()\` at inference time).
 
 ## Usage (ACE query path)
 
 \`\`\`typescript
-const key = \`\${somBucket}|\${gpuCluster}|\${trustTier}\`;
+const topoLabel = TOPO_CLASS_LABEL[classifyQuery(query)] ?? 'unclassified';
+const trustTier = signal.trustPressure >= 0.6 ? 'T1' : signal.trustPressure >= 0.3 ? 'T2' : 'T3';
+const key = \`\${topoLabel}|\${trustTier}\`;
 const raw = await redis.hget('ace:lane:routing_policy', key);
 const { lane, conf } = raw ? JSON.parse(raw) : { lane: 'default', conf: 0 };
 // conf < 0.6 → fall through to vector ANN; conf >= 0.6 → prefer named lane
@@ -362,7 +377,7 @@ async function main() {
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
   console.log(`[lane-train] Done in ${elapsed}s`);
-  console.log(`[lane-train] Next: use ace:lane:routing_policy in context-assembler.ts Stage A0`);
+  console.log(`[lane-train] Next: ace:lane:routing_policy is read in context-assembler.ts Stage A1`);
 }
 
 main().catch(err => {
