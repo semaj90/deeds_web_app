@@ -329,7 +329,7 @@ export async function writeCardsToCouchDB(
 	}
 
 	const durationMs = Date.now() - t0;
-	const safeDb     = `${redactUrl(opts.url ?? DEFAULT_COUCHDB_URL)}/${opts.database ?? DEFAULT_COUCHDB_DB}`;
+	const safeDb     = `${redactUrl((opts.url ?? DEFAULT_COUCHDB_URL).replace(/\/+$/, ''))}/${opts.database ?? DEFAULT_COUCHDB_DB}`;
 	console.log(`[couchdb-writer] batch: wrote=${wrote} skipped=${skipped} conflicted=${conflicted} failed=${failed} (${durationMs}ms) db=${safeDb}`);
 	return { wrote, skipped, conflicted, failed, results, durationMs };
 }

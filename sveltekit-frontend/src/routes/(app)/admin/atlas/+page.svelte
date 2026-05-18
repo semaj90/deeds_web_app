@@ -629,6 +629,11 @@
 		{#if hyperRunning}
 			<div class="text-[0.65rem] text-[#a39f90] uppercase tracking-wider">Elapsed: {hyperElapsedMs}ms</div>
 		{/if}
+		{#if queryError}
+			<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
+				<span class="font-bold">QUERY_ERROR:</span> {queryError}
+			</div>
+		{/if}
 		{#if hyperError}
 			<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
 				<span class="font-bold">HYPERRAG_ERROR:</span> {hyperError}
