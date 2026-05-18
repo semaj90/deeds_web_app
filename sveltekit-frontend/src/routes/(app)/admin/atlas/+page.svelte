@@ -147,6 +147,42 @@
 		}
 	}
 
+	// ── HyperRAG Pipeline ────────────────────────────────────────────────────
+	type HyperRAGResult = {
+		query: string;
+		latencyMs: number;
+		resultCount: number;
+		phaseC?: { wikiDocsFetched: number; hitsEnriched: number };
+		phaseD?: { cudaBackend: string; centroidCount: number; synthesis: string | null; inferLatencyMs: number; inferError: string | null };
+		phaseE?: { sortedHitCount: number; clusterSidecarCount: number; auditLogWritten: boolean };
+		results: Array<{ rank: number; source_ref: string | null; rrfScore: number; karpathyBlend: number | null; text: string | null; wikiEnrichment?: unknown[] }>;
+	};
+	let hyperRunning = $state(false);
+	let hyperResult = $state<HyperRAGResult | null>(null);
+	let hyperError = $state('');
+	let hyperNoInfer = $state(false);
+
+	async function runHyperRAG() {
+		if (!queryText.trim() || hyperRunning) return;
+		hyperRunning = true;
+		hyperError = '';
+		hyperResult = null;
+		try {
+			const r = await fetch('/api/admin/atlas/hyperrag', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query: queryText.trim(), topK: 10, topClusters: 5, noInference: hyperNoInfer }),
+			});
+			const d = await r.json();
+			if (!r.ok) { hyperError = d.error ?? 'HyperRAG pipeline failed'; return; }
+			hyperResult = d;
+		} catch (e) {
+			hyperError = String(e);
+		} finally {
+			hyperRunning = false;
+		}
+	}
+
 	// ── Graph Canvas ──────────────────────────────────────────────────────────
 	let selectedNode = $state<AtlasNode | null>(null);
 	let svgEl = $state<SVGSVGElement | null>(null);
@@ -215,8 +251,79 @@
 		await loadCache();
 	}
 
+	// ── TurboVec Panel ───────────────────────────────────────────────────────
+	type TurboVecHealth = { ok: boolean; indexed: number; dim: number; bits: number; backend: string } | null;
+	type TurboVecClusterResult = { clusterIds: number[]; centroidScores: Record<string, number>; backend: string; qdrantFilter: unknown };
+	let tvHealth = $state<TurboVecHealth>(null);
+	let tvLoading = $state(false);
+	let tvQuery = $state('');
+	let tvResult = $state<TurboVecClusterResult | null>(null);
+	let tvResultLoading = $state(false);
+
+	async function loadTurboVec() {
+		tvLoading = true;
+		try {
+			const r = await fetch('http://localhost:8099/health');
+			tvHealth = r.ok ? await r.json() : null;
+		} catch { tvHealth = null; } finally { tvLoading = false; }
+	}
+
+	async function runTvPrefilter() {
+		if (!tvQuery.trim()) return;
+		tvResultLoading = true;
+		tvResult = null;
+		try {
+			const r = await fetch('/api/admin/atlas/turbovec-prefilter', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query: tvQuery.trim(), topClusters: 5 }),
+			});
+			if (r.ok) tvResult = await r.json();
+		} finally { tvResultLoading = false; }
+	}
+
+	// ── CouchDB Panel ────────────────────────────────────────────────────────
+	type CouchDbStatus = {
+		ok: boolean;
+		dbName: string;
+		docCount: number;
+		indexes: string[];
+		lastRunId?: string;
+	} | null;
+	let couchDbStatus = $state<CouchDbStatus>(null);
+	let couchDbLoading = $state(false);
+	let rollbackRunId = $state('');
+	let rollbackLoading = $state(false);
+	let rollbackResult = $state<{ deleted: number; failed: number } | null>(null);
+
+	async function loadCouchDb() {
+		couchDbLoading = true;
+		try {
+			const r = await fetch('/api/admin/atlas/couchdb-status');
+			if (r.ok) couchDbStatus = await r.json();
+		} finally {
+			couchDbLoading = false;
+		}
+	}
+
+	async function doRollback() {
+		if (!rollbackRunId.trim()) return;
+		rollbackLoading = true;
+		rollbackResult = null;
+		try {
+			const r = await fetch('/api/admin/atlas/couchdb-rollback', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ runId: rollbackRunId.trim(), dryRun: false }),
+			});
+			if (r.ok) rollbackResult = await r.json();
+		} finally {
+			rollbackLoading = false;
+		}
+	}
+
 	// ── Active Tab ────────────────────────────────────────────────────────────
-	type Tab = 'graph' | 'chunks' | 'trace' | 'cache';
+	type Tab = 'graph' | 'chunks' | 'trace' | 'cache' | 'turbovec' | 'couchdb' | 'hyperrag';
 	let activeTab = $state<Tab>('graph');
 
 	// ── Helpers ───────────────────────────────────────────────────────────────
@@ -462,9 +569,29 @@
 					{querying ? 'EXEC_RETRIEVAL_SWEEP…' : 'RUN_QUERY_RETRIEVAL'}
 				</button>
 
+				<!-- HyperRAG Pipeline button -->
+				<div class="flex items-center gap-1.5">
+					<button
+						onclick={runHyperRAG}
+						disabled={hyperRunning || !queryText.trim()}
+						class="flex-1 py-2 border border-[#4a5568] bg-[#1c1b18] hover:bg-[#2a3444] text-[#8b9dbb] hover:text-[#b8c9e8] text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-30"
+					>
+						{hyperRunning ? 'HYPERRAG_EXEC…' : '⬡ RUN_HYPERRAG_PIPELINE'}
+					</button>
+					<label class="flex items-center gap-1 text-[0.65rem] text-[#a39f90] cursor-pointer select-none">
+						<input type="checkbox" bind:checked={hyperNoInfer} class="accent-[#8b9dbb]" />
+						<span>fast</span>
+					</label>
+				</div>
+
 				{#if queryError}
 					<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
 						<span class="font-bold">CRITICAL_ERROR:</span> {queryError}
+					</div>
+				{/if}
+				{#if hyperError}
+					<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
+						<span class="font-bold">HYPERRAG_ERROR:</span> {hyperError}
 					</div>
 				{/if}
 			</div>
@@ -678,12 +805,12 @@
 			<!-- Tabs Header -->
 			<div class="flex items-center justify-between px-4 py-2 border-b border-[#3f3e37] bg-[#23221c] z-10">
 				<div class="flex items-center gap-1.5">
-					{#each (['graph', 'chunks', 'trace', 'cache'] as Tab[]) as tab (tab)}
+					{#each (['graph', 'chunks', 'trace', 'cache', 'turbovec', 'couchdb', 'hyperrag'] as Tab[]) as tab (tab)}
 						<button
-							onclick={() => { activeTab = tab; if (tab === 'cache' && !cacheView) loadCache(); }}
-							class={`px-3 py-1 text-xs uppercase tracking-wider font-bold transition-all ${activeTab === tab ? 'bg-[#d1cdb8] text-[#1c1b18]' : 'text-[#a39f90] hover:text-[#efede4] hover:bg-[#313028]'}`}
+							onclick={() => { activeTab = tab; if (tab === 'cache' && !cacheView) loadCache(); if (tab === 'turbovec' && !tvHealth) loadTurboVec(); if (tab === 'couchdb' && !couchDbStatus) loadCouchDb(); if (tab === 'hyperrag' && !hyperResult) runHyperRAG(); }}
+							class={`px-3 py-1 text-xs uppercase tracking-wider font-bold transition-all ${activeTab === tab ? 'bg-[#8b9dbb] text-[#1c1b18]' : 'text-[#a39f90] hover:text-[#efede4] hover:bg-[#313028]'} ${tab === 'hyperrag' ? 'border border-[#4a5568]' : ''} ${tab === 'hyperrag' && hyperRunning ? 'animate-pulse' : ''}`}
 						>
-							[{tab}]
+							{tab === 'hyperrag' ? '⬡' : ''}[{tab}]
 						</button>
 					{/each}
 				</div>
@@ -1036,6 +1163,243 @@
 								>
 									flush {key.split(':')[1]}
 								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			<!-- ── TurboVec Tab ──────────────────────────────────────────────────── -->
+			{#if activeTab === 'turbovec'}
+				<div class="flex-1 overflow-y-auto p-4 space-y-4">
+					<div class="flex items-center justify-between border-b border-[#3f3e37] pb-2 gap-3">
+						<div class="text-xs font-bold text-[#d1cdb8] uppercase tracking-wider">// TurboVec ANN Sidecar :8099</div>
+						<button onclick={loadTurboVec} disabled={tvLoading} class="px-2.5 py-1 border border-[#5c594c] bg-[#1c1b18] hover:bg-[#d1cdb8] hover:text-[#1c1b18] text-xs font-bold transition-all disabled:opacity-40">
+							{tvLoading ? 'PROBING…' : 'REFRESH_HEALTH'}
+						</button>
+					</div>
+					{#if tvHealth}
+						<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[0.68rem]">
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+								<div class="text-[#a39f90] font-bold uppercase">STATUS</div>
+								<div class={`mt-1 font-bold ${tvHealth.ok ? 'text-[#8c9f7a]' : 'text-[#c25953]'}`}>{tvHealth.ok ? 'ONLINE' : 'DEGRADED'}</div>
+							</div>
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+								<div class="text-[#a39f90] font-bold uppercase">INDEXED</div>
+								<div class="mt-1 font-bold text-[#efede4]">{tvHealth.indexed.toLocaleString()}</div>
+							</div>
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+								<div class="text-[#a39f90] font-bold uppercase">DIM / BITS</div>
+								<div class="mt-1 font-bold text-[#efede4]">{tvHealth.dim}d / {tvHealth.bits}b</div>
+							</div>
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+								<div class="text-[#a39f90] font-bold uppercase">BACKEND</div>
+								<div class="mt-1 font-bold text-[#d1cdb8] uppercase">{tvHealth.backend}</div>
+							</div>
+						</div>
+					{:else if !tvLoading}
+						<div class="text-center py-6 text-[#c25953] border border-[#c25953]/25 bg-[#c25953]/5 p-4">
+							<div class="font-bold uppercase">SIDECAR_OFFLINE</div>
+							<p class="text-xs mt-1">TurboVec not reachable at localhost:8099</p>
+						</div>
+					{/if}
+					<div class="space-y-2 pt-2 border-t border-[#3f3e37]">
+						<p class="text-xs font-bold text-[#d1cdb8] uppercase tracking-wider">// Cluster Prefilter Probe</p>
+						<div class="flex gap-2">
+							<input
+								type="text"
+								bind:value={tvQuery}
+								placeholder="Enter query to prefilter clusters…"
+								onkeydown={(e) => { if (e.key === 'Enter') runTvPrefilter(); }}
+								class="flex-1 bg-[#1c1b18] border border-[#3f3e37] px-3 py-2 text-[#d1cdb8] placeholder-[#5c594c] text-xs font-mono focus:outline-none focus:border-[#d1cdb8] transition-all"
+							/>
+							<button onclick={runTvPrefilter} disabled={tvResultLoading || !tvQuery.trim()} class="px-3 py-2 bg-[#d1cdb8] hover:bg-[#efede4] text-[#1c1b18] text-xs font-bold transition-all disabled:opacity-40">
+								{tvResultLoading ? 'SCANNING…' : 'PREFILTER'}
+							</button>
+						</div>
+					</div>
+					{#if tvResult}
+						<div class="space-y-3 border border-[#3f3e37] bg-[#23221c]/60 p-4">
+							<div class="flex items-center justify-between text-[0.68rem]">
+								<span class="font-bold text-[#d1cdb8] uppercase">Cluster IDs</span>
+								<span class="text-[#a39f90] uppercase font-bold border border-[#3f3e37] px-2 py-0.5">backend: {tvResult.backend}</span>
+							</div>
+							<div class="flex flex-wrap gap-2">
+								{#each tvResult.clusterIds as cid (cid)}
+									<span class="px-3 py-1 border border-[#8c9f7a]/50 bg-[#8c9f7a]/10 text-[#8c9f7a] font-bold text-xs font-mono">GPU:{cid}</span>
+								{/each}
+							</div>
+							{#if Object.keys(tvResult.centroidScores).length > 0}
+								<div class="space-y-1">
+									<p class="text-[0.65rem] font-bold text-[#a39f90] uppercase tracking-wider">Centroid Scores</p>
+									<div class="space-y-1 max-h-40 overflow-y-auto pr-1">
+										{#each Object.entries(tvResult.centroidScores).sort(([, a], [, b]) => b - a) as [cid, score] (cid)}
+											<div class="flex items-center gap-3 text-[0.68rem]">
+												<span class="text-[#a39f90] font-bold w-12 shrink-0">GPU:{cid}</span>
+												<div class="flex-1 h-1.5 bg-[#3f3e37]">
+													<div class="h-full bg-[#8c9f7a]" style={`width:${Math.round(score * 100)}%`}></div>
+												</div>
+												<span class="text-[#efede4] font-bold w-14 text-right">{score.toFixed(4)}</span>
+											</div>
+										{/each}
+									</div>
+								</div>
+							{/if}
+							<div class="space-y-1">
+								<p class="text-[0.65rem] font-bold text-[#a39f90] uppercase tracking-wider">Qdrant Filter (injected into must[])</p>
+								<pre class="text-[0.65rem] bg-[#1c1b18] border border-[#3f3e37] p-3 overflow-x-auto text-[#d1cdb8] whitespace-pre-wrap">{JSON.stringify(tvResult.qdrantFilter, null, 2)}</pre>
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			<!-- ── CouchDB Writer Tab ──────────────────────────────────────────────── -->
+			{#if activeTab === 'couchdb'}
+				<div class="flex-1 overflow-y-auto p-4 space-y-4">
+					<div class="flex items-center justify-between border-b border-[#3f3e37] pb-2 gap-3">
+						<div class="text-xs font-bold text-[#d1cdb8] uppercase tracking-wider">// CouchDB Atlas Writer — karpathy_wiki</div>
+						<button onclick={loadCouchDb} disabled={couchDbLoading} class="px-2.5 py-1 border border-[#5c594c] bg-[#1c1b18] hover:bg-[#d1cdb8] hover:text-[#1c1b18] text-xs font-bold transition-all disabled:opacity-40">
+							{couchDbLoading ? 'PROBING…' : 'REFRESH_STATUS'}
+						</button>
+					</div>
+					{#if couchDbStatus}
+						<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[0.68rem]">
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+								<div class="text-[#a39f90] font-bold uppercase">STATUS</div>
+								<div class={`mt-1 font-bold ${couchDbStatus.ok ? 'text-[#8c9f7a]' : 'text-[#c25953]'}`}>{couchDbStatus.ok ? 'ONLINE' : 'DEGRADED'}</div>
+							</div>
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+								<div class="text-[#a39f90] font-bold uppercase">DOC_COUNT</div>
+								<div class="mt-1 font-bold text-[#efede4]">{couchDbStatus.docCount.toLocaleString()}</div>
+							</div>
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+								<div class="text-[#a39f90] font-bold uppercase">MANGO_INDEXES</div>
+								<div class="mt-1 font-bold text-[#efede4]">{couchDbStatus.indexes.length}</div>
+							</div>
+						</div>
+						{#if couchDbStatus.indexes.length > 0}
+							<div class="space-y-1">
+								<p class="text-[0.65rem] font-bold text-[#a39f90] uppercase tracking-wider border-b border-[#3f3e37] pb-1">Mango Indexes</p>
+								<div class="flex flex-wrap gap-1.5 pt-1">
+									{#each couchDbStatus.indexes as idx (idx)}
+										<span class="px-2 py-0.5 border border-[#3f3e37] bg-[#1c1b18] text-[#a39f90] text-[0.65rem] font-mono">{idx}</span>
+									{/each}
+								</div>
+							</div>
+						{/if}
+						{#if couchDbStatus.lastRunId}
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2 text-[0.68rem]">
+								<span class="text-[#a39f90] font-bold uppercase">LAST_RUN_ID:</span>
+								<span class="ml-2 text-[#efede4] font-mono">{couchDbStatus.lastRunId}</span>
+							</div>
+						{/if}
+					{:else if !couchDbLoading}
+						<div class="text-center py-6 text-[#c25953] border border-[#c25953]/25 bg-[#c25953]/5 p-4">
+							<div class="font-bold uppercase">COUCHDB_OFFLINE</div>
+							<p class="text-xs mt-1">karpathy_wiki not reachable</p>
+						</div>
+					{/if}
+					<!-- Rollback panel -->
+					<div class="space-y-2 pt-2 border-t border-[#3f3e37]">
+						<p class="text-xs font-bold text-[#c25953] uppercase tracking-wider">// Rollback by runId — DESTRUCTIVE</p>
+						<p class="text-[0.65rem] text-[#a39f90]">Deletes all karpathy_wiki docs stamped with the given runId. Requires explicit runId — no wildcard.</p>
+						<div class="flex gap-2">
+							<input
+								type="text"
+								bind:value={rollbackRunId}
+								placeholder="run-2026-05-18-abc123…"
+								class="flex-1 bg-[#1c1b18] border border-[#c25953]/40 px-3 py-2 text-[#d1cdb8] placeholder-[#5c594c] text-xs font-mono focus:outline-none focus:border-[#c25953] transition-all"
+							/>
+							<button
+								onclick={doRollback}
+								disabled={rollbackLoading || !rollbackRunId.trim()}
+								class="px-3 py-2 border border-[#c25953]/60 bg-[#c25953]/10 hover:bg-[#c25953]/25 text-[#c25953] text-xs font-bold transition-all disabled:opacity-40"
+							>
+								{rollbackLoading ? 'DELETING…' : 'ROLLBACK'}
+							</button>
+						</div>
+						{#if rollbackResult}
+							<div class={`border px-3 py-2 text-[0.68rem] font-bold ${rollbackResult.failed > 0 ? 'border-[#c8a635] text-[#c8a635]' : 'border-[#8c9f7a] text-[#8c9f7a]'}`}>
+								deleted: {rollbackResult.deleted} · failed: {rollbackResult.failed}
+							</div>
+						{/if}
+					</div>
+				</div>
+			{/if}
+
+			<!-- ── HyperRAG Pipeline Results ───────────────────────────────────────── -->
+			{#if activeTab === 'hyperrag'}
+				<div class="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-[#d1cdb8]">
+					{#if hyperRunning}
+						<div class="text-center py-16 text-[#8b9dbb] animate-pulse">
+							<div class="text-2xl font-bold uppercase mb-1">⬡ HYPERRAG_EXEC…</div>
+							<p class="text-xs">Phases B→C→D→E running. Synthesis may take ~30s.</p>
+						</div>
+					{:else if hyperError}
+						<div class="p-4 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-xs">
+							<span class="font-bold">PIPELINE_ERROR:</span> {hyperError}
+						</div>
+					{:else if !hyperResult}
+						<div class="text-center py-16 text-[#4a5568] border border-[#3f3e37]">
+							<div class="text-4xl mb-3">⬡</div>
+							<div class="text-sm font-bold uppercase tracking-widest">HYPERRAG_STANDBY</div>
+							<p class="text-xs text-[#a39f90] mt-2">Enter a query and click ⬡ RUN_HYPERRAG_PIPELINE or click this tab.</p>
+						</div>
+					{:else}
+						<!-- Pipeline summary bar -->
+						<div class="flex items-center gap-3 text-[0.68rem] border border-[#4a5568] bg-[#1c2030] px-3 py-2 flex-wrap">
+							<span class="text-[#8b9dbb] font-bold">⬡ HYPERRAG</span>
+							<span class="text-[#a39f90]">query: <span class="text-[#efede4]">"{hyperResult.query}"</span></span>
+							<span class="text-[#a39f90]">hits: <span class="text-[#efede4]">{hyperResult.resultCount}</span></span>
+							<span class="text-[#a39f90]">B: <span class="text-[#efede4]">{hyperResult.latencyMs}ms</span></span>
+							{#if hyperResult.phaseC}
+								<span class="text-[#a39f90]">C: <span class="text-[#8c9f7a]">{hyperResult.phaseC.hitsEnriched} wiki</span></span>
+							{/if}
+							{#if hyperResult.phaseD}
+								<span class="text-[#a39f90]">D: <span class="text-[#efede4]">{hyperResult.phaseD.cudaBackend} · {hyperResult.phaseD.centroidCount}k · {hyperResult.phaseD.inferLatencyMs}ms</span></span>
+							{/if}
+							{#if hyperResult.phaseE}
+								<span class="text-[#a39f90]">E: <span class="text-[#8c9f7a]">log ✓</span></span>
+							{/if}
+						</div>
+
+						<!-- Synthesis panel -->
+						{#if hyperResult.phaseD?.synthesis}
+							<div class="border border-[#4a5568] bg-[#1c2030]/60 p-4 space-y-2">
+								<p class="text-[0.62rem] text-[#8b9dbb] font-bold uppercase tracking-wider">// RotorQuant Synthesis</p>
+								<div class="text-[0.75rem] text-[#efede4] leading-relaxed whitespace-pre-wrap">{hyperResult.phaseD.synthesis}</div>
+							</div>
+						{:else if hyperResult.phaseD?.inferError}
+							<div class="border border-[#c25953]/40 bg-[#c25953]/5 p-3 text-[0.68rem] text-[#c25953]">
+								Inference error: {hyperResult.phaseD.inferError}
+							</div>
+						{:else if !hyperNoInfer}
+							<div class="border border-[#3f3e37] p-3 text-[0.68rem] text-[#a39f90] text-center">No synthesis — Phase D did not run.</div>
+						{/if}
+
+						<!-- Ranked hits -->
+						<div class="space-y-1">
+							<p class="text-[0.62rem] text-[#a39f90] font-bold uppercase tracking-wider border-b border-[#3f3e37] pb-1">
+								// Ranked Results ({hyperResult.results.length})
+							</p>
+							{#each hyperResult.results as hit (hit.rank)}
+								<div class="border border-[#3f3e37] bg-[#23221c]/60 px-3 py-2 text-[0.68rem] hover:border-[#4a5568] transition-all">
+									<div class="flex items-center gap-3">
+										<span class="text-[#4a5568] font-bold w-6 shrink-0">#{hit.rank}</span>
+										<span class="text-[#efede4] truncate flex-1 font-bold">{hit.source_ref ?? hit.id}</span>
+										<span class="text-[#8b9dbb] shrink-0">rrf {hit.rrfScore?.toFixed(4)}</span>
+										{#if hit.karpathyBlend != null}
+											<span class="text-[#8c9f7a] shrink-0">blend {hit.karpathyBlend.toFixed(3)}</span>
+										{/if}
+										{#if (hit.wikiEnrichment?.length ?? 0) > 0}
+											<span class="text-[#c8a635] shrink-0 text-[0.6rem] font-bold">WIKI</span>
+										{/if}
+									</div>
+									{#if hit.text}
+										<p class="text-[#a39f90] mt-1 ml-9 leading-relaxed line-clamp-2">{hit.text}</p>
+									{/if}
+								</div>
 							{/each}
 						</div>
 					{/if}
