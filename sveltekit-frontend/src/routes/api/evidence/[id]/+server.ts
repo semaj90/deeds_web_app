@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
     const [item] = await db
       .select()
       .from(evidence)
-      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!item) {
@@ -138,7 +138,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
     const [updated] = await db
       .update(evidence)
       .set(updates)
-      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, Number(locals.user.id))))
       .returning();
 
     if (!updated) {
@@ -175,7 +175,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
   try {
     const [deleted] = await db
       .delete(evidence)
-      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, Number(locals.user.id))))
       .returning({ id: evidence.id, title: evidence.title, caseId: evidence.caseId });
 
     if (!deleted) {

@@ -912,3 +912,14 @@ repo-root atlas
 ```
 
 Engram should be treated as a **low-trust episodic memory plugin** until the exact repo/API/license and deletion model are verified.
+
+---
+
+## 20. Tool Trace Observability
+
+```txt
+[ ] tool_traces stores status and error alongside args/result_summary/duration_ms.
+[ ] logToolTrace marks tool-loop failures with status=error and preserves error text.
+[ ] Observability views can filter traces by status without parsing result_summary.
+[ ] The trace logger stays fire-and-forget and fails open.
+```

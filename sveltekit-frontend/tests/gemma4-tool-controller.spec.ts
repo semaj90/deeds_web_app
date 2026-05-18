@@ -14,6 +14,7 @@ vi.mock('$lib/server/trace/trace-collector.js', () => ({
 vi.mock('$lib/server/ai/mcp-tool-dispatch.js', () => ({
   TOOL_DISPATCH: {
     'trace.kag_search': mocks.dispatchFn,
+    'codebase.rg_search': mocks.dispatchFn,
   },
 }));
 
@@ -27,6 +28,7 @@ describe('gemma4-tool-controller', () => {
   it('validates allowed tool names — returns valid:true for allowlisted tools', async () => {
     const { validateToolName } = await import('$lib/server/ai/gemma4-tool-controller.js');
     expect(validateToolName('trace.kag_search').valid).toBe(true);
+    expect(validateToolName('codebase.rg_search').valid).toBe(true);
     expect(validateToolName('graph.shortest_path').valid).toBe(true);
     expect(validateToolName('workspace.timeline').valid).toBe(true);
   });
@@ -129,5 +131,36 @@ describe('gemma4-tool-controller', () => {
     expect(result.answer).toBe('Final answer here.');
     expect(result.mcpPort).toBe(8788);
     expect(result.toolResultChars).toBeGreaterThan(0);
+  });
+
+  it('dispatches codebase.rg_search as a read-only fallback tool', async () => {
+    const { runGemma4ToolLoop } = await import('$lib/server/ai/gemma4-tool-controller.js');
+
+    const callModel = vi
+      .fn()
+      .mockResolvedValueOnce({
+        content: '',
+        tool_calls: [
+          { function: { name: 'codebase.rg_search', arguments: { query: 'validateToolName' } } },
+        ],
+      })
+      .mockResolvedValueOnce({ content: 'done', tool_calls: [] });
+
+    mocks.dispatchFn.mockResolvedValue({
+      tool: 'codebase.rg_search',
+      success: true,
+      data: {
+        matchCount: 1,
+        matches: [{ file: 'src/lib/server/ai/gemma4-tool-controller.ts', line: 1 }],
+      },
+    });
+
+    const result = await runGemma4ToolLoop({
+      messages: [{ role: 'user', content: 'search the bridge' }],
+      callModel,
+    });
+
+    expect(result.toolsUsed).toContain('codebase.rg_search');
+    expect(result.answer).toBe('done');
   });
 });

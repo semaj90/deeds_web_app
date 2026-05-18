@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const rows = await db
       .select({ aiAnalysis: evidence.aiAnalysis })
       .from(evidence)
-      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!rows[0]) return json({ error: 'Evidence not found' }, { status: 404 });
@@ -78,7 +78,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       caseId: evidence.caseId,
     })
     .from(evidence)
-    .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+    .where(and(eq(evidence.id, params.id), eq(evidence.userId, Number(locals.user.id))))
     .limit(1);
 
 	if (!rows[0]) return json({ error: 'Evidence not found' }, { status: 404 });
@@ -155,7 +155,7 @@ Respond with ONLY a JSON object:
         keyPointsGeneratedAt: generatedAt,
       })}::jsonb,
 			updated_at = NOW()
-			WHERE id = ${params.id} AND user_id = ${locals.user.id}
+			WHERE id = ${params.id} AND user_id = ${Number(locals.user.id)}
 		`);
 	} catch {
 		return json({ error: 'Failed to store key points' }, { status: 500 });

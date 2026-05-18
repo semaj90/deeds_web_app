@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
     const [ev] = await db
       .select({ id: evidence.id })
       .from(evidence)
-      .where(and(eq(evidence.id, id), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, id), eq(evidence.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!ev) {
@@ -82,7 +82,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
     const [ev] = await db
       .select({ id: evidence.id })
       .from(evidence)
-      .where(and(eq(evidence.id, id), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, id), eq(evidence.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!ev) {

@@ -39,6 +39,8 @@
     "turbo:trace-smoke": "mkdir -p .tmp/audits && opencode run -m turboquant/gemma4-tq --agent trace-audit --format json \"Use TRACE MCP first. Call trace_kag_search or search_dev_context for SvelteKit 2 Svelte 5 Drizzle Zod Bits UI audit. If no TRACE tool is available, say TRACE_MCP_NOT_AVAILABLE.\" | tee .tmp/audits/trace-smoke.ndjson",
     "atlas:health": "npm run services:health",
     "atlas:dry": "npm run atlas:dry-run",
+    "atlas:rollback": "node scripts/atlas/rollback-atlas-run.mjs",
+    "atlas:rollback:dry-run": "node scripts/atlas/rollback-atlas-run.mjs --dry-run",
     "trace:smoke": "curl http://127.0.0.1:8788/health",
     "soak:dry": "node scripts/atlas/soak-workstation-parent-atlas.mjs --cycles=10 --dry-run",
     "soak:dry:25": "node scripts/atlas/soak-workstation-parent-atlas.mjs --cycles=25 --dry-run",
@@ -106,7 +108,14 @@
     "audit:drizzle": "node scripts/atlas/audit-drizzle-postgres-contracts.mjs",
     "audit:drizzle:json": "node scripts/atlas/audit-drizzle-postgres-contracts.mjs --json",
     "services:health": "node scripts/atlas/validate-dev-services.mjs",
-    "services:health:strict": "node scripts/atlas/validate-dev-services.mjs --strict"
+    "services:health:strict": "node scripts/atlas/validate-dev-services.mjs --strict",
+    "backup:state": "node scripts/operator/backup-atlas-state.mjs",
+    "restore:state": "node scripts/operator/restore-atlas-state.mjs",
+    "atlas:hyperrag:expand": "node sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs",
+    "atlas:hyperrag:project": "node sveltekit-frontend/scripts/atlas/topology-project-4d.mjs",
+    "atlas:hyperrag:rerank": "node sveltekit-frontend/scripts/atlas/topology-rerank.mjs",
+    "atlas:hyperrag:trace": "node sveltekit-frontend/scripts/atlas/atlas-answer-trace.mjs",
+    "atlas:ingest:full": "node sveltekit-frontend/scripts/atlas/chunk-text-notes.mjs --input ../data/parents-atlas --out tmp/chunks/parents-corpus-all.ndjson && node sveltekit-frontend/scripts/atlas/build-rg-search-matrix.mjs --input tmp/chunks/parents-corpus-all.ndjson --out tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/embed-chunks.mjs --input tmp/chunks/parents-corpus-rg.ndjson --collection parents_atlas_chunks && node sveltekit-frontend/scripts/atlas/qdrant-tag-backfill.mjs --collection parents_atlas_chunks --from-ndjson tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs --input tmp/chunks/parents-corpus-rg.ndjson --out tmp/chunks/parents-corpus-expanded.ndjson && node sveltekit-frontend/scripts/atlas/topology-project-4d.mjs --input tmp/chunks/parents-corpus-expanded.ndjson --out tmp/chunks/parents-corpus-4d.ndjson"
   },
   "devDependencies": {
     "@sveltejs/kit": "^2.0.0",

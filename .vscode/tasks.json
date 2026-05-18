@@ -360,7 +360,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Run HyperRAG dense multi-query: embed → TurboVec ANN prefilter → 4D manifold cluster filter → Qdrant semantic+kag lanes → RRF merge + PageRank boost → CouchDB wiki enrichment. Output: logs/hyperrag-stream/latest.json (Bitfrost/rotorquant feed)."
+      "detail": "Run HyperRAG dense multi-query: embed → TurboVec ANN prefilter → 4D manifold cluster filter → Qdrant semantic+kag lanes → RRF merge + PageRank boost → CouchDB wiki enrichment. Output: logs/hyperrag-stream/latest.json (Bifrost inference stream / rotorquant feed)."
     },
     {
       "label": "RTX Pipeline: HyperRAG Custom Query",
@@ -379,7 +379,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Run HyperRAG dense multi-query with a custom query string. Prompts for query text. Result feeds Bitfrost via logs/hyperrag-stream/latest.json."
+      "detail": "Run HyperRAG dense multi-query with a custom query string. Prompts for query text. Result feeds the Bifrost inference stream via logs/hyperrag-stream/latest.json."
     },
     {
       "label": "RTX Pipeline: Full Startup (TurboVec + Cluster + Smoke)",
@@ -10296,7 +10296,7 @@
       "detail": "AUTO-STARTS on folder open — full Hermes stack in parallel: Ollama GPU + gateway :8642 + workspace :3001. TRACE MCP :8788 auto-loaded from AppData/Local/hermes/mcp.json. API_SERVER_ENABLED=true in AppData/Local/hermes/.env. gRPC :50051/:50053 is SvelteKit-internal only. Logs in logs/hermes/.",
       "problemMatcher": []
     },
-    
+
     {
       "label": "🦉 Hermes Stack: Gateway + Dashboard",
       "dependsOn": [
@@ -10800,7 +10800,7 @@
     {
       "id": "hyperragQuery",
       "type": "promptString",
-      "description": "HyperRAG dense search query — TurboVec ANN prefilter -> Qdrant multi-lane -> RRF -> CouchDB wiki enrichment",
+      "description": "HyperRAG dense search query — TurboVec ANN prefilter -> Qdrant multi-lane -> Bifrost inference stream -> RRF -> CouchDB wiki enrichment",
       "default": "context assembler retrieval kag pipeline"
     }
   ]

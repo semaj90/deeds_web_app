@@ -64,7 +64,8 @@ import {
   type ChunkHit,
 } from '$lib/server/analytics/search-analytics.js';
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
-import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { embedText, embedTexts } from '$lib/server/embedding/embed.js';
+import { runRgAsync } from '../../../../scripts/rg-atlas/run-rg.mjs';
 import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js';
 import { fetchCommunityRelationships } from './relationship-fetcher.js';
 import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js';
@@ -367,7 +368,7 @@ async function fetchWebResearchRows(
   limit = 4
 ): Promise<import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]> {
   try {
-    const vec = await generateSingleEmbedding(query);
+    const vec = await embedText(query);
     if (!vec || vec.length !== 768) return [];
     const rows = await db.execute(sql`
       SELECT url, title, snippet, relevance_score,
@@ -409,6 +410,30 @@ async function fetchWebResearchRows(
 
 const ACP_MAX_RESULTS = 8;
 const ACP_MAX_SCORE = 0.08; // ACP boosts capped — must not dominate Qdrant/graph/SOM ranking
+const CHR97_FAST_PATH_THRESHOLD = 0.45;
+const RG_FALLBACK_STOP_WORDS = new Set([
+  'the',
+  'and',
+  'for',
+  'with',
+  'from',
+  'that',
+  'this',
+  'what',
+  'when',
+  'where',
+  'which',
+  'why',
+  'how',
+  'does',
+  'did',
+  'into',
+  'onto',
+  'over',
+  'under',
+  'about',
+  'error',
+]);
 
 interface CHR97SearchResult {
   confidence: number;
@@ -437,6 +462,14 @@ function project4DQuery(q: string): { x: number; y: number; z: number; w: number
   return { x, y, z, w };
 }
 
+function buildRgFallbackQuery(query: string): string {
+  const tokens = (query.toLowerCase().match(/[a-z0-9_]{3,}/g) ?? []).filter(
+    (token) => !RG_FALLBACK_STOP_WORDS.has(token)
+  );
+  const uniqueTokens = [...new Set(tokens)];
+  return uniqueTokens.slice(0, 6).join('|') || query;
+}
+
 function euclidean4D(
   a: { x: number; y: number; z: number; w: number },
   b: { x: number; y: number; z: number; w: number }
@@ -449,7 +482,8 @@ const TOPO_4D_ALPHA = 0.08; // max boost per chunk — matches ACP_MAX_SCORE cei
 export async function runCHR97Search(
   query: string,
   limit = ACP_MAX_RESULTS,
-  userId?: string | number
+  userId?: string | number,
+  queryEmbedding?: number[]
 ): Promise<CHR97SearchResult> {
   const startedAt = Date.now();
   const queryClass = classifyQuery(query);
@@ -506,6 +540,7 @@ export async function runCHR97Search(
 
   let cartridgeStatus: 'warm' | 'cold' | 'miss' = 'miss';
   let cartridgeResults: any[] = [];
+  const rgFallbackPromise = runRgAsync(buildRgFallbackQuery(query), ['src', 'scripts']);
   try {
     const { codebaseChunkIndex } = await import('$lib/server/db/schema/search-analytics.js');
     const rows = await db
@@ -576,8 +611,7 @@ export async function runCHR97Search(
         });
 
         const cartridge = parseCartridge(new Uint8Array(cartridgeBuffer));
-        const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
-        const emb = await generateSingleEmbedding(query);
+        const emb = queryEmbedding ? queryEmbedding : await embedText(query);
 
         if (Array.isArray(emb) && emb.length === 768) {
           const queryVec = new Float32Array(emb);
@@ -623,6 +657,22 @@ export async function runCHR97Search(
     cartridgeStatus = 'miss';
   }
 
+  if (cartridgeResults.length === 0) {
+    try {
+      const rgHits = (await rgFallbackPromise).slice(0, limit);
+      if (rgHits.length > 0) {
+        cartridgeStatus = 'cold';
+        cartridgeResults = rgHits.map((hit, index) => ({
+          stableKey: `file:${hit.file}:${hit.line}`,
+          score: Math.max(0.45, 0.92 - index * 0.03),
+          path: hit.file,
+        }));
+      }
+    } catch (err) {
+      console.warn('[Stage A0] rg rescue failed:', err);
+    }
+  }
+
   const topScore = cartridgeResults[0]?.score ?? 0;
   const topoPrefilter = buildTopoPrefilterStats({
     used: true,
@@ -666,22 +716,25 @@ async function fetchACPKnowledgeResults(
 ): Promise<ACPKnowledgeSearchResult | null> {
   try {
     const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-    const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
     const startedAt = Date.now();
+    const emb = await embedText(query);
+    const rgFallbackPromise =
+      collection === 'codebase_chunks_768'
+        ? runRgAsync(query, ['src', 'scripts'])
+        : Promise.resolve([]);
 
-    const emb = await generateSingleEmbedding(query);
     if (!Array.isArray(emb) || emb.length !== 768) return null;
 
     let filters: any = undefined;
     let topoPrefilter: TopoPrefilterStats | undefined;
 
     // Stage A: CHR97 cartridge fast-path, then HyperRAG Qdrant fallback
-    // CHR97 confidence >= 0.7 → return immediately (cached, <5ms warm)
-    // CHR97 confidence < 0.7  → seed Qdrant ANN with cartridge paths (+0.12 boost)
+    // CHR97 confidence >= threshold → return immediately (cached, <5ms warm)
+    // CHR97 confidence < threshold  → seed Qdrant ANN with cartridge paths (+0.12 boost)
     let cartridgeSeedPaths = new Set<string>();
     if (collection === 'codebase_chunks_768') {
-      const searchRes = await runCHR97Search(query, limit, userId);
-      if (searchRes.confidence >= 0.7 && searchRes.topChunks.length > 0) {
+      const searchRes = await runCHR97Search(query, limit, userId, emb);
+      if (searchRes.confidence >= CHR97_FAST_PATH_THRESHOLD && searchRes.topChunks.length > 0) {
         return {
           ok: true,
           query,
@@ -707,9 +760,8 @@ async function fetchACPKnowledgeResults(
         limit,
       });
 
-      // 4D topology rerank: boost chunks whose payload.coords_4d is close to the query's 4D projection
       const qCoords4d = project4DQuery(query);
-      const mapped = dirHits.map((h) => {
+      let mapped = dirHits.map((h) => {
         const seedBoost =
           cartridgeSeedPaths.size > 0 && cartridgeSeedPaths.has(String(h.payload?.path || ''))
             ? 0.12
@@ -728,6 +780,30 @@ async function fetchACPKnowledgeResults(
           metadata: h.payload,
         };
       });
+
+      // Ripgrep rescue fallback when Qdrant = 0 hits
+      if (mapped.length === 0 && collection === 'codebase_chunks_768') {
+        try {
+          const rgHits = (await rgFallbackPromise).slice(0, limit);
+          mapped = rgHits.map((hit, index) => ({
+            id: `rg:${hit.file}:${hit.lineNumber}`,
+            source: 'qdrant' as const,
+            title: String(hit.file),
+            content: String(hit.snippet),
+            score: Math.max(0.45, 0.92 - index * 0.03),
+            path: String(hit.file),
+            metadata: {
+              file_path: hit.file,
+              source_path: hit.file,
+              text: hit.snippet,
+              tags: ['rg'],
+            },
+          }));
+        } catch (err) {
+          console.warn('[ACP] ripgrep rescue fallback failed:', err);
+        }
+      }
+
       mapped.sort((a, b) => b.score - a.score);
 
       return {
@@ -742,6 +818,38 @@ async function fetchACPKnowledgeResults(
       };
     } catch (err) {
       console.warn(`[ACP] hybridSearch failed for ${collection}:`, err);
+      if (collection === 'codebase_chunks_768') {
+        try {
+          const rgHits = (await rgFallbackPromise).slice(0, limit);
+          const mapped = rgHits.map((hit, index) => ({
+            id: `rg:${hit.file}:${hit.lineNumber}`,
+            source: 'qdrant' as const,
+            title: String(hit.file),
+            content: String(hit.snippet),
+            score: Math.max(0.45, 0.92 - index * 0.03),
+            path: String(hit.file),
+            metadata: {
+              file_path: hit.file,
+              source_path: hit.file,
+              text: hit.snippet,
+              tags: ['rg'],
+            },
+          }));
+          return {
+            ok: true,
+            query,
+            results: mapped,
+            metadata: {
+              embeddingModel: 'embeddinggemma:latest',
+              collection,
+              latencyMs: Date.now() - startedAt,
+              fallback: 'ripgrep',
+            },
+          };
+        } catch (rgErr) {
+          console.warn('[ACP] ripgrep fallback on Qdrant failure failed:', rgErr);
+        }
+      }
       return null;
     }
   } catch (err) {
@@ -1086,10 +1194,10 @@ export async function assembleACEContext(opts: {
           }
           const configuredThreshold = configuredThresholdRaw
             ? parseFloat(configuredThresholdRaw)
-            : 0.7;
+            : CHR97_FAST_PATH_THRESHOLD;
 
           cartridgeResults = await runCHR97Search(query, 8, userId ?? undefined);
-          if (cartridgeResults.confidence > configuredThreshold) {
+          if (cartridgeResults.confidence >= configuredThreshold) {
             // Retrieve codebase context from seeds and return immediately!
             const codebaseContext = await fetchCodebaseContext(
               query,
@@ -3714,8 +3822,8 @@ async function fetchRAGChunks(
   // Budget-capped to ≤15 chunks; Redis-cached at gpu:attn:{queryHash}:{setHash}.
   if (ragChunks.length > 1 && embedding) {
     try {
-      const chunkEmbeds = await Promise.all(
-        ragChunks.map((c) => generateSingleEmbedding(c.content).catch(() => [] as number[]))
+      const chunkEmbeds = await embedTexts(ragChunks.map((c) => c.content)).catch(
+        () => [] as number[][]
       );
       const hasEmbeds = chunkEmbeds.some((e) => e.length > 0);
       if (hasEmbeds) {
@@ -4340,7 +4448,7 @@ export async function fetchCodebaseContext(
     // Falls back gracefully when centroids aren't seeded.
     let clusterFilter: Record<string, unknown> | undefined;
     try {
-      const emb = await generateSingleEmbedding(query);
+      const emb = await embedText(query);
       if (emb && emb.length === 768) {
         const hit = await nearestCluster(new Float32Array(emb), 50);
         if (hit && hit.similarity > 0.35) {
@@ -4557,9 +4665,9 @@ export async function fetchCodebaseContext(
           // Phase 8: Apply 4D topological boost (PageRank + SOM + hyperedge grade + query BMU + manifold4)
           // queryBmuCached: Redis-cached CUDA SOM forward pass — maps query to grid position
           // so chunks near the query's own SOM neuron get an extra affinity signal.
-          const queryBmu = await queryBmuCached(
-            await generateSingleEmbedding(query).catch(() => [])
-          ).catch(() => undefined);
+          const queryBmu = await queryBmuCached(await embedText(query).catch(() => [])).catch(
+            () => undefined
+          );
 
           // Phase 8a: Compute manifold4 centroid of the reranked hit-set.
           // Used both for neighborhood expansion (below) and the per-chunk boost.
@@ -4652,9 +4760,7 @@ export async function fetchCodebaseContext(
             if (queryBmu) {
               import('$lib/server/retrieval/centroid-cache.js')
                 .then(async ({ didYouMeanClusters }) => {
-                  const qEmb = new Float32Array(
-                    await generateSingleEmbedding(query).catch(() => [])
-                  );
+                  const qEmb = new Float32Array(await embedText(query).catch(() => []));
                   if (!qEmb.length) return;
                   const dym = await didYouMeanClusters(qEmb, queryBmu.row, queryBmu.col, {
                     manifold4Coords: manifold4Center as
@@ -5099,7 +5205,7 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
   try {
     const { QdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
     const qdrant = new QdrantManager();
-    const embedding = await generateSingleEmbedding(query);
+    const embedding = await embedText(query);
 
     const results = await qdrant.client.search('feature_maps', {
       vector: embedding,

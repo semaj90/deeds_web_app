@@ -904,7 +904,7 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 					cached: false,
 					totalMs: result._perf.totalMs,
 					stages: result._perf.stages ?? {},
-					userId: locals.user?.id ?? null,
+					userId: locals.user?.id ? Number(locals.user.id) : null,
 					queryEmbedding: embeddingForPg,
 				}).returning({ id: diagnosisEvents.id });
 				if (inserted?.id) result.diagnosisId = inserted.id;

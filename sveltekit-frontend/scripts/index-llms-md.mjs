@@ -4,7 +4,7 @@
  *
  * Crawls every LLMS.md in the repo, parses a structured envelope, upserts
  * to agent_context_files + directory_context_bindings (Postgres), and writes
- * llms:dir:<relDir> / llms:root Redis keys.
+ * agents:dir:<relDir> / llms:root Redis keys.
  */
 
 import { createHash }                                from 'node:crypto';
@@ -82,7 +82,7 @@ function* walkForLLMSMd(dir, maxDepth = 12, depth = 0) {
 async function main() {
   console.log(`\n🤖 LLMS.md indexer${DRY_RUN ? ' [DRY RUN]' : ''}`);
   const found = [...walkForLLMSMd(REPO_ROOT)];
-  
+
   const repoRootLLMS = resolve(REPO_ROOT, '..', 'LLMS.md');
   if (existsSync(repoRootLLMS)) found.unshift(repoRootLLMS);
 
@@ -104,7 +104,7 @@ async function main() {
 
     for (const { body, env } of envelopes) {
       const relDir = env.directory_path === '.' ? '' : env.directory_path;
-      const key    = relDir ? `llms:dir:${relDir}` : 'llms:root';
+      const key = relDir ? `agents:dir:${relDir}` : 'llms:root';
       pipe.setex(key, REDIS_TTL, body);
     }
 

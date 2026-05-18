@@ -105,7 +105,7 @@ curl -N -X POST http://localhost:5173/api/codebase-index/orchestrate \
 cd sveltekit-frontend
 npx tsx scripts/summarize-clusters-pg.ts --force --cluster=0
 
-# Falls back to Ollama :11434 automatically if TurboQuant unhealthy
+# Falls back to Ollama :11434 (legacy fallback lane) automatically if TurboQuant unhealthy
 ```
 
 ---
@@ -118,7 +118,7 @@ reuses it across all 20 cluster summaries, saving ~18s per run on an 8GB GPU.
 | Port | Service | Model | VRAM |
 |---|---|---|---|
 | `8090` | llama-server.exe (TurboQuant) | `gemma4-legal-vlm.gguf` + `mmproj-BF16.gguf` | 5.8 GB |
-| `11434` | Ollama (fallback) | `gemma4-legal-vlm:latest` | swappable |
+| `11434` | Ollama (fallback) | `gemma4-legal-vlm:latest` | legacy swappable lane |
 
 Start TurboQuant via VS Code task: **⚡ TurboQuant: Start (vision + text, :8090)**
 

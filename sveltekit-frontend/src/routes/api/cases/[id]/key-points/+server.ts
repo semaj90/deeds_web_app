@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
       evidenceType: evidence.evidenceType,
     })
     .from(evidence)
-    .where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)));
+    .where(and(eq(evidence.caseId, caseId), eq(evidence.userId, Number(locals.user.id))));
 
 	if (rows.length === 0) {
 		return json({ generated: 0, skipped: 0, total: 0, message: 'No evidence found for this case' });

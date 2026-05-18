@@ -62,7 +62,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
         fileSize: evidence.fileSize,
       })
       .from(evidence)
-      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!item) {

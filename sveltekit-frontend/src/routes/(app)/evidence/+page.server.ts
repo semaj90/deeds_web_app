@@ -119,7 +119,8 @@ export const actions: Actions = {
       const newEvidence = await db
         .insert(evidence)
         .values({
-          userId: locals.user.id,
+          userId: Number(locals.user.id),
+          uploadedBy: Number(locals.user.id),
           caseId: caseId ?? null,
           title: title || file.name,
           description,
@@ -182,7 +183,7 @@ export const actions: Actions = {
       // Only delete if owned by user
       await db
         .delete(evidence)
-        .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)));
+        .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))));
 
       return { success: true };
     } catch (err) {
@@ -211,7 +212,7 @@ export const actions: Actions = {
           description,
           updatedAt: new Date(),
         })
-        .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+        .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))))
         .returning();
 
       return {

@@ -1,8 +1,8 @@
 # Codex / Claude Code Prompt: Parent Atlas + Karpathy Batch + Engram Plugin Research
 
-**Repo root:** `C:\Users\james\Videos\deeds-web-app`  
-**Primary workspace:** `C:\Users\james\Videos\deeds-web-app\sveltekit-frontend`  
-**Target repo:** `semaj90/deeds_web_app`  
+**Repo root:** `C:\Users\james\Videos\deeds-web-app`
+**Primary workspace:** `C:\Users\james\Videos\deeds-web-app\sveltekit-frontend`
+**Target repo:** `semaj90/deeds_web_app`
 **Purpose:** Finish the repo-root parent atlas pipeline, wrap the existing Karpathy batch synthesis lane, and define research/tasks for Engram-style agent memory plugin support.
 
 ---
@@ -912,3 +912,14 @@ repo-root atlas
 ```
 
 Engram should be treated as a **low-trust episodic memory plugin** until the exact repo/API/license and deletion model are verified.
+
+---
+
+## 20. Tool Trace Observability
+
+```txt
+[ ] tool_traces stores status and error alongside args/result_summary/duration_ms.
+[ ] logToolTrace marks tool-loop failures with status=error and preserves error text.
+[ ] Observability views can filter traces by status without parsing result_summary.
+[ ] The trace logger stays fire-and-forget and fails open.
+```

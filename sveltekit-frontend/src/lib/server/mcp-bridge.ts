@@ -22,6 +22,7 @@ import {
   jsonValueFromUnknown,
   type JsonRecord,
 } from '$lib/types/protocol';
+import { TOOL_DISPATCH } from './ai/mcp-tool-dispatch.js';
 import { mcpTools, type MCPToolResponse } from '../../mcp/index.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -76,6 +77,31 @@ async function routeTool(tool: string, args: Record<string, unknown>): Promise<M
     case 'users': {
       const handler = mcpTools.users[action as keyof typeof mcpTools.users];
       if (typeof handler === 'function') return (handler as Function)(args);
+      break;
+    }
+    case 'codebase': {
+      const handler = TOOL_DISPATCH[`codebase.${action}`];
+      if (typeof handler === 'function') {
+        const result = await handler(args);
+        const normalizedArgs = jsonValueFromUnknown(args);
+        return {
+          schemaVersion: PROTOCOL_SCHEMA_VERSION,
+          source: 'mcp',
+          lane: namespace || 'mcp',
+          createdAt: new Date().toISOString(),
+          validatorTag: 'protocol.v1',
+          protocol: 'http',
+          toolName: tool,
+          arguments:
+            normalizedArgs && typeof normalizedArgs === 'object' && !Array.isArray(normalizedArgs)
+              ? (normalizedArgs as JsonRecord)
+              : {},
+          ok: result.success,
+          ...(result.success
+            ? { result: jsonValueFromUnknown(result.data) }
+            : { error: result.error ?? `Unknown tool: ${tool}` }),
+        };
+      }
       break;
     }
     default: {
@@ -170,6 +196,7 @@ export const mcpBridge = {
         }
       }
     }
+    tools.push('codebase:rg_search');
     // Top-level tools
     for (const key of [
       'getAnalytics',

@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
       db
         .select()
         .from(evidence)
-        .where(and(eq(evidence.caseId, id), eq(evidence.userId, locals.user.id)))
+        .where(and(eq(evidence.caseId, id), eq(evidence.userId, Number(locals.user.id))))
         .limit(200),
       []
     ),

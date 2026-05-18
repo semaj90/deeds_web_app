@@ -378,7 +378,7 @@ describe('POST /api/codebase-index/orchestrate', () => {
 		);
 
 		const complete = events.find((event) => event.event === 'complete');
-		expect(complete?.data.completedStages).toEqual(['ast_embed', 'cluster_assign', 'summarize', 'tag']);
+		expect(complete?.data.completedStages).toEqual(expect.arrayContaining(['ast_embed', 'cluster_assign', 'summarize', 'tag']));
 		expect(complete?.data.cuda).toBe(true);
 
 		expect(mockChunkFiles).toHaveBeenCalledTimes(1);

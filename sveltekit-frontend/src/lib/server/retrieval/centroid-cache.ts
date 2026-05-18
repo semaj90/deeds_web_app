@@ -291,8 +291,8 @@ export async function persistCentroidsToDB(
     const raw = values[i];
     if (!raw) continue;
     try {
-      const vec = parseFn(raw);
-      if (!vec.length) continue;
+      const data = parseFn(raw) as any;
+      if (!data) continue;
       await db
         .insert(gpuClusterCentroids)
         .values({

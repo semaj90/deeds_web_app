@@ -40,20 +40,45 @@ export interface LlamaToolCall {
 // ── Tool definitions (mirrors trace-mcp-server.ts allowlist) ──────────────────
 
 export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
-
   // ── Dev context (Step 5B default first tool) ────────────────────────────────
   {
     type: 'function',
     function: {
-      name:        'search__dev_context',
-      description: 'Search the codebase for context relevant to a coding or debugging query. Returns ranked file chunks with stable keys. Call this first for any code question.',
+      name: 'search__dev_context',
+      description:
+        'Search the codebase for context relevant to a coding or debugging query. Returns ranked file chunks with stable keys. Call this first for any code question.',
       parameters: {
         type: 'object',
         properties: {
-          query:      { type: 'string',  description: 'Natural language coding/debugging question' },
-          filePath:   { type: 'string',  description: 'Current file path for scoped boost (optional)' },
-          limit:      { type: 'integer', description: 'Max results (1–20, default 8)' },
-          topo_class: { type: 'string',  description: 'Topology class filter (optional)' },
+          query: { type: 'string', description: 'Natural language coding/debugging question' },
+          filePath: {
+            type: 'string',
+            description: 'Current file path for scoped boost (optional)',
+          },
+          limit: { type: 'integer', description: 'Max results (1–20, default 8)' },
+          topo_class: { type: 'string', description: 'Topology class filter (optional)' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+
+  {
+    type: 'function',
+    function: {
+      name: 'codebase__rg_search',
+      description:
+        'Controlled ripgrep search over the codebase. Returns line hits from relative repo paths and is safe for exact symbol or text lookup.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: 'Ripgrep pattern or literal search string' },
+          paths: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Optional relative repo paths to search (default: ["src"])',
+          },
+          limit: { type: 'integer', description: 'Max results (default 40, max 200)' },
         },
         required: ['query'],
       },
@@ -64,14 +89,19 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'graph__expand_neighborhood',
-      description: 'Expand the ego-graph of a file or symbol in Neo4j. Returns neighbors with relationship types.',
+      name: 'graph__expand_neighborhood',
+      description:
+        'Expand the ego-graph of a file or symbol in Neo4j. Returns neighbors with relationship types.',
       parameters: {
         type: 'object',
         properties: {
-          stableKey: { type: 'string',  description: 'Stable key of the center node (e.g. "file:src/lib/server/ai/gemma4-tool-controller.ts")' },
-          depth:     { type: 'integer', description: 'Hop depth 1–3 (default 2)' },
-          limit:     { type: 'integer', description: 'Max neighbors (default 40)' },
+          stableKey: {
+            type: 'string',
+            description:
+              'Stable key of the center node (e.g. "file:src/lib/server/ai/gemma4-tool-controller.ts")',
+          },
+          depth: { type: 'integer', description: 'Hop depth 1–3 (default 2)' },
+          limit: { type: 'integer', description: 'Max neighbors (default 40)' },
         },
         required: ['stableKey'],
       },
@@ -80,13 +110,13 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'graph__shortest_path',
+      name: 'graph__shortest_path',
       description: 'Find the shortest dependency path between two files or symbols in Neo4j.',
       parameters: {
         type: 'object',
         properties: {
-          fromKey: { type: 'string',  description: 'Source node stableKey' },
-          toKey:   { type: 'string',  description: 'Target node stableKey' },
+          fromKey: { type: 'string', description: 'Source node stableKey' },
+          toKey: { type: 'string', description: 'Target node stableKey' },
           maxHops: { type: 'integer', description: 'Max path length (default 5)' },
         },
         required: ['fromKey', 'toKey'],
@@ -96,7 +126,7 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'graph__community_for_node',
+      name: 'graph__community_for_node',
       description: 'Get the GPU cluster, SOM cluster, and community membership for a node.',
       parameters: {
         type: 'object',
@@ -110,13 +140,13 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'graph__pagerank_top',
+      name: 'graph__pagerank_top',
       description: 'Return the top-N highest PageRank nodes (most architecturally central files).',
       parameters: {
         type: 'object',
         properties: {
-          limit:    { type: 'integer', description: 'Number of top nodes (default 20)' },
-          nodeType: { type: 'string',  description: 'Filter by Neo4j label e.g. "CodebaseFile"' },
+          limit: { type: 'integer', description: 'Number of top nodes (default 20)' },
+          nodeType: { type: 'string', description: 'Filter by Neo4j label e.g. "CodebaseFile"' },
         },
       },
     },
@@ -126,14 +156,15 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'topology__search_near',
-      description: 'Search the 4D SOM manifold for files near a natural-language query. Useful for finding semantically similar code across clusters.',
+      name: 'topology__search_near',
+      description:
+        'Search the 4D SOM manifold for files near a natural-language query. Useful for finding semantically similar code across clusters.',
       parameters: {
         type: 'object',
         properties: {
-          query:      { type: 'string',  description: 'Natural language query' },
-          radius:     { type: 'number',  description: '4D Euclidean radius (default 0.25)' },
-          limit:      { type: 'integer', description: 'Max results (default 20)' },
+          query: { type: 'string', description: 'Natural language query' },
+          radius: { type: 'number', description: '4D Euclidean radius (default 0.25)' },
+          limit: { type: 'integer', description: 'Max results (default 20)' },
           somCluster: { type: 'integer', description: 'Optional SOM cluster filter' },
         },
         required: ['query'],
@@ -143,13 +174,14 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'topology__same_som_cluster',
-      description: 'Find all files sharing the same SOM cluster as the given node. Good for finding related implementations.',
+      name: 'topology__same_som_cluster',
+      description:
+        'Find all files sharing the same SOM cluster as the given node. Good for finding related implementations.',
       parameters: {
         type: 'object',
         properties: {
-          stableKey: { type: 'string',  description: 'Reference node stableKey' },
-          limit:     { type: 'integer', description: 'Max results (default 30)' },
+          stableKey: { type: 'string', description: 'Reference node stableKey' },
+          limit: { type: 'integer', description: 'Max results (default 30)' },
         },
         required: ['stableKey'],
       },
@@ -159,18 +191,19 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'topology__search_4d',
-      description: 'Search using explicit 4D manifold coordinates (SOM grid + semantic + GRPO quality). Use when you know a cluster\'s SOM position and want structurally adjacent files with optional JSONB filters.',
+      name: 'topology__search_4d',
+      description:
+        "Search using explicit 4D manifold coordinates (SOM grid + semantic + GRPO quality). Use when you know a cluster's SOM position and want structurally adjacent files with optional JSONB filters.",
       parameters: {
         type: 'object',
         properties: {
-          som_x:      { type: 'number',  description: 'SOM X (BMU column)' },
-          som_y:      { type: 'number',  description: 'SOM Y (BMU row)' },
-          semantic_z: { type: 'number',  description: 'Semantic projection 0–1 (default 0.5)' },
-          grpo_w:     { type: 'number',  description: 'GRPO quality weight 0–1 (default 0.5)' },
-          radius:     { type: 'number',  description: '4D radius (default 0.5)' },
-          limit:      { type: 'integer', description: 'Max results (default 20)' },
-          filters:    { type: 'object',  description: 'JSONB payload filters' },
+          som_x: { type: 'number', description: 'SOM X (BMU column)' },
+          som_y: { type: 'number', description: 'SOM Y (BMU row)' },
+          semantic_z: { type: 'number', description: 'Semantic projection 0–1 (default 0.5)' },
+          grpo_w: { type: 'number', description: 'GRPO quality weight 0–1 (default 0.5)' },
+          radius: { type: 'number', description: '4D radius (default 0.5)' },
+          limit: { type: 'integer', description: 'Max results (default 20)' },
+          filters: { type: 'object', description: 'JSONB payload filters' },
         },
         required: ['som_x', 'som_y'],
       },
@@ -179,15 +212,19 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'search__go_hybrid',
-      description: 'Go search service RRF fusion: parallel FTS + pgvector + Qdrant with reciprocal rank fusion. Faster than in-process hybrid for large-scale recall.',
+      name: 'search__go_hybrid',
+      description:
+        'Go search service RRF fusion: parallel FTS + pgvector + Qdrant with reciprocal rank fusion. Faster than in-process hybrid for large-scale recall.',
       parameters: {
         type: 'object',
         properties: {
-          query:   { type: 'string',  description: 'Search query' },
-          type:    { type: 'string',  description: '"codebase", "legal", or "hybrid" (default: codebase)' },
-          limit:   { type: 'integer', description: 'Max results (default 20)' },
-          filters: { type: 'object',  description: 'JSONB metadata filters' },
+          query: { type: 'string', description: 'Search query' },
+          type: {
+            type: 'string',
+            description: '"codebase", "legal", or "hybrid" (default: codebase)',
+          },
+          limit: { type: 'integer', description: 'Max results (default 20)' },
+          filters: { type: 'object', description: 'JSONB metadata filters' },
         },
         required: ['query'],
       },
@@ -198,13 +235,16 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'clusters__get_members',
+      name: 'clusters__get_members',
       description: 'List files in a GPU or directory cluster, sorted by PageRank.',
       parameters: {
         type: 'object',
         properties: {
-          clusterKey: { type: 'string',  description: 'Cluster key e.g. "gpu:19" or "dir:src/lib/server/ace"' },
-          limit:      { type: 'integer', description: 'Max files (default 50)' },
+          clusterKey: {
+            type: 'string',
+            description: 'Cluster key e.g. "gpu:19" or "dir:src/lib/server/ace"',
+          },
+          limit: { type: 'integer', description: 'Max files (default 50)' },
         },
         required: ['clusterKey'],
       },
@@ -213,8 +253,9 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'clusters__get_summary_lenses',
-      description: 'Get the LLMS.md wiki summary and KAG notes for a cluster. Fastest way to understand what a cluster does.',
+      name: 'clusters__get_summary_lenses',
+      description:
+        'Get the LLMS.md wiki summary and KAG notes for a cluster. Fastest way to understand what a cluster does.',
       parameters: {
         type: 'object',
         properties: {
@@ -229,14 +270,15 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'trace__kag_search',
-      description: 'Full KAG-DAG retrieval: semantic vector search + knowledge graph expansion + LLMS.md context. Heavier than search__dev_context; use when you need deep context.',
+      name: 'trace__kag_search',
+      description:
+        'Full KAG-DAG retrieval: semantic vector search + knowledge graph expansion + LLMS.md context. Heavier than search__dev_context; use when you need deep context.',
       parameters: {
         type: 'object',
         properties: {
-          query:    { type: 'string',  description: 'Search query or question' },
-          filePath: { type: 'string',  description: 'Optional file path for scoped context' },
-          limit:    { type: 'integer', description: 'Max chunks (default 10)' },
+          query: { type: 'string', description: 'Search query or question' },
+          filePath: { type: 'string', description: 'Optional file path for scoped context' },
+          limit: { type: 'integer', description: 'Max chunks (default 10)' },
         },
         required: ['query'],
       },
@@ -245,8 +287,9 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'trace__explain_retrieval',
-      description: 'Inspect the cached retrieval trace for a previous query. Shows which sources contributed and why.',
+      name: 'trace__explain_retrieval',
+      description:
+        'Inspect the cached retrieval trace for a previous query. Shows which sources contributed and why.',
       parameters: {
         type: 'object',
         properties: {
@@ -261,12 +304,16 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'context__get_compressed_card',
-      description: 'Fetch a compressed HCA card for a file or trace. Returns a 128-token summary: one-line description, key symbols, risks. Faster than reading the full file.',
+      name: 'context__get_compressed_card',
+      description:
+        'Fetch a compressed HCA card for a file or trace. Returns a 128-token summary: one-line description, key symbols, risks. Faster than reading the full file.',
       parameters: {
         type: 'object',
         properties: {
-          stableKey: { type: 'string', description: 'Card key e.g. "file:src/lib/server/ai/gemma4-tool-controller.ts"' },
+          stableKey: {
+            type: 'string',
+            description: 'Card key e.g. "file:src/lib/server/ai/gemma4-tool-controller.ts"',
+          },
         },
         required: ['stableKey'],
       },
@@ -275,14 +322,15 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'context__build_kv_packet',
-      description: 'Build a compressed KV context packet for a set of hot files. Returns an attention TOC + file card summaries. Use when you have identified 1–8 relevant files.',
+      name: 'context__build_kv_packet',
+      description:
+        'Build a compressed KV context packet for a set of hot files. Returns an attention TOC + file card summaries. Use when you have identified 1–8 relevant files.',
       parameters: {
         type: 'object',
         properties: {
-          taskId:     { type: 'string', description: 'Stable task identifier' },
-          query:      { type: 'string', description: 'Task description' },
-          hotFiles:   { type: 'string', description: 'Comma-separated list of file paths' },
+          taskId: { type: 'string', description: 'Stable task identifier' },
+          query: { type: 'string', description: 'Task description' },
+          hotFiles: { type: 'string', description: 'Comma-separated list of file paths' },
           hotSymbols: { type: 'string', description: 'Comma-separated key symbol names' },
         },
         required: ['taskId', 'query'],
@@ -293,12 +341,13 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'kb__search_cards',
-      description: 'Search the knowledge base for codebase "cards" (identity-spine chunks). Returns ranked cards with stable IDs (card:path:hash), content snippets, and topological metadata.',
+      name: 'kb__search_cards',
+      description:
+        'Search the knowledge base for codebase "cards" (identity-spine chunks). Returns ranked cards with stable IDs (card:path:hash), content snippets, and topological metadata.',
       parameters: {
         type: 'object',
         properties: {
-          query: { type: 'string',  description: 'Natural language query or symbol name' },
+          query: { type: 'string', description: 'Natural language query or symbol name' },
           limit: { type: 'integer', description: 'Max results (default 10, max 25)' },
         },
         required: ['query'],
@@ -308,12 +357,16 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'kb__get_card',
-      description: 'Retrieve the full content and high-fidelity metadata for a specific knowledge card by ID. Use this when you have a card ID from search_cards.',
+      name: 'kb__get_card',
+      description:
+        'Retrieve the full content and high-fidelity metadata for a specific knowledge card by ID. Use this when you have a card ID from search_cards.',
       parameters: {
         type: 'object',
         properties: {
-          id: { type: 'string', description: 'Stable card ID (e.g. "card:src/lib/server/ai/gemma4-agent.ts:7a2b3")' },
+          id: {
+            type: 'string',
+            description: 'Stable card ID (e.g. "card:src/lib/server/ai/gemma4-agent.ts:7a2b3")',
+          },
         },
         required: ['id'],
       },
@@ -322,12 +375,13 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'kb__expand_neighbors',
-      description: 'Expand the topological neighborhood of a card or file using graph relationships. Returns structurally-related cards based on imports, dependencies, and cluster proximity.',
+      name: 'kb__expand_neighbors',
+      description:
+        'Expand the topological neighborhood of a card or file using graph relationships. Returns structurally-related cards based on imports, dependencies, and cluster proximity.',
       parameters: {
         type: 'object',
         properties: {
-          id:    { type: 'string',  description: 'Card or file ID to expand from' },
+          id: { type: 'string', description: 'Card or file ID to expand from' },
           limit: { type: 'integer', description: 'Max neighbors (default 20)' },
         },
         required: ['id'],
@@ -337,12 +391,13 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
-      name:        'kb__explain_retrieval',
-      description: 'Provide an audit trace for why a specific card or search result was retrieved. Includes cluster dominance, community purpose, and grounding signals.',
+      name: 'kb__explain_retrieval',
+      description:
+        'Provide an audit trace for why a specific card or search result was retrieved. Includes cluster dominance, community purpose, and grounding signals.',
       parameters: {
         type: 'object',
         properties: {
-          id:    { type: 'string', description: 'Card ID or query string to explain' },
+          id: { type: 'string', description: 'Card ID or query string to explain' },
           limit: { type: 'integer', description: 'Max grounding signals (default 5)' },
         },
         required: ['id'],
@@ -354,25 +409,26 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
 // Tool name mapping: llama-server uses __ as namespace separator (dots invalid in JSON schema names)
 // MCP uses dots.  Convert when dispatching.
 export const LLAMA_TO_MCP_NAME: Record<string, string> = {
-  'search__dev_context':           'search.dev_context',
-  'graph__expand_neighborhood':    'graph.expand_neighborhood',
-  'graph__shortest_path':          'graph.shortest_path',
-  'graph__community_for_node':     'graph.community_for_node',
-  'graph__pagerank_top':           'graph.pagerank_top',
-  'topology__search_near':         'topology.search_near',
-  'topology__same_som_cluster':    'topology.same_som_cluster',
-  'clusters__get_members':         'clusters.get_members',
-  'clusters__get_summary_lenses':  'clusters.get_summary_lenses',
-  'trace__kag_search':             'trace.kag_search',
-  'trace__explain_retrieval':      'trace.explain_retrieval',
-  'context__get_compressed_card':  'context.get_compressed_card',
-  'context__build_kv_packet':      'context.build_kv_packet',
-  'topology__search_4d':           'topology.search_4d',
-  'search__go_hybrid':             'search.go_hybrid',
-  'kb__search_cards':              'kb.search_cards',
-  'kb__get_card':                  'kb.get_card',
-  'kb__expand_neighbors':          'kb.expand_neighbors',
-  'kb__explain_retrieval':         'kb.explain_retrieval',
+  search__dev_context: 'search.dev_context',
+  codebase__rg_search: 'codebase.rg_search',
+  graph__expand_neighborhood: 'graph.expand_neighborhood',
+  graph__shortest_path: 'graph.shortest_path',
+  graph__community_for_node: 'graph.community_for_node',
+  graph__pagerank_top: 'graph.pagerank_top',
+  topology__search_near: 'topology.search_near',
+  topology__same_som_cluster: 'topology.same_som_cluster',
+  clusters__get_members: 'clusters.get_members',
+  clusters__get_summary_lenses: 'clusters.get_summary_lenses',
+  trace__kag_search: 'trace.kag_search',
+  trace__explain_retrieval: 'trace.explain_retrieval',
+  context__get_compressed_card: 'context.get_compressed_card',
+  context__build_kv_packet: 'context.build_kv_packet',
+  topology__search_4d: 'topology.search_4d',
+  search__go_hybrid: 'search.go_hybrid',
+  kb__search_cards: 'kb.search_cards',
+  kb__get_card: 'kb.get_card',
+  kb__expand_neighbors: 'kb.expand_neighbors',
+  kb__explain_retrieval: 'kb.explain_retrieval',
 };
 
 /**

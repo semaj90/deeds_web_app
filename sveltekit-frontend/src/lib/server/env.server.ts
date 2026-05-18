@@ -94,6 +94,8 @@ export const ENV = {
   RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
   /** Topology search engine — detached Node.js server (port 8101) */
   TOPOLOGY_SEARCH_URL: privateEnv.TOPOLOGY_SEARCH_URL ?? `http://${LOOPBACK_IP}:8101`,
+  /** Hypergraph lookup service URL */
+  HG_LOOKUP_URL: privateEnv.HG_LOOKUP_URL ?? undefined,
   /** Trace MCP server (trace-mcp-server.ts, Streamable HTTP, port 8788) */
   TRACE_MCP_URL: privateEnv.TRACE_MCP_URL ?? `http://${LOOPBACK_IP}:8788`,
   /** KB retrieval MCP server (kb-retrieval-server.ts, Streamable HTTP, port 8789) */

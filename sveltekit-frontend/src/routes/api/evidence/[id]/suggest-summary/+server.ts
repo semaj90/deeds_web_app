@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
         evidenceType: evidence.evidenceType,
       })
       .from(evidence)
-      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!item) {

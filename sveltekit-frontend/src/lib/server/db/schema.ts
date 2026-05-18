@@ -17,7 +17,7 @@ export {
 // Phase 80: Chat Messages Schema
 export {
     chatMessageRoleEnum, chatMessages,
-    chatMetadata, type ChatMessage, type ChatMetadata, type NewChatMessage, type NewChatMetadata
+    chatMetadata, toolTraces, type ChatMessage, type ChatMetadata, type ToolTrace, type NewChatMessage, type NewChatMetadata, type NewToolTrace
 } from './schema-chat';
 
 // ACE Web Ingestion Schema
@@ -142,7 +142,11 @@ export * from './schema/topology';
 export * from './schema/graph-pathway-cards';
 export * from './schema/admin-chat';
 export * from './schema/admin-ai-skills';
-export * from './schema/codebase-intelligence';
+export {
+	gpuClusterCentroids,
+	type GpuClusterCentroid,
+	type NewGpuClusterCentroid
+} from './schema/codebase-intelligence';
 // schema-search defines rgSearchRuns/rgSearchHits which also live in schema-postgres.
 // Export only the unique tables from schema-search to avoid barrel ambiguity.
 export { rgSearchResults, searchCentroids } from './schema-search';

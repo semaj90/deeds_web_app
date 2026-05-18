@@ -693,14 +693,14 @@ server.registerTool(
                 [r IN relationships(p) | type(r)] AS relations`,
         { from: startKey, to: endKey }
       );
-      
+
       if (!rows.length || !rows[0].row?.[0]) {
         return { content: [{ type: 'text', text: 'No structural path found' }] };
       }
-      
+
       const pathKeys = rows[0].row[0] as string[];
       const relations = rows[0].row[1] as string[];
-      
+
       // 2. Semantic Hydration (Postgres)
       const hydratedNodes = await pool.query(
         `SELECT chunk_id, summary_text, output_meta, som_bmu_row, som_bmu_col, pagerank_score, risk_score
@@ -708,9 +708,9 @@ server.registerTool(
          WHERE chunk_id = ANY($1)`,
         [pathKeys]
       );
-      
+
       const nodeMap = new Map(hydratedNodes.rows.map(n => [n.chunk_id, n]));
-      
+
       // 3. Synthesis
       const steps = pathKeys.map((key, i) => {
         const node = nodeMap.get(key);
@@ -724,18 +724,18 @@ server.registerTool(
           authority: node?.pagerank_score ?? 0,
         };
       });
-      
+
       // 4. Derive Outcomes
       const allTags = steps.flatMap(s => s.outputMeta?.tags || []);
       const sharedTags = Array.from(new Set(allTags.filter((t, i) => allTags.indexOf(t) !== i)));
-      
+
       const leaps = [];
       for (let i = 1; i < steps.length; i++) {
         if (steps[i-1].somAnchor && steps[i].somAnchor && steps[i-1].somAnchor !== steps[i].somAnchor) {
           leaps.push({ from: steps[i-1].stableKey, to: steps[i].stableKey, boundary: `${steps[i-1].somAnchor} -> ${steps[i].somAnchor}` });
         }
       }
-      
+
       const synthesis = {
         path: steps,
         sharedTags,
@@ -743,7 +743,7 @@ server.registerTool(
         totalAuthority: steps.reduce((acc, s) => acc + s.authority, 0),
         narrative: `Synthesized structural path of ${steps.length} steps. Identified ${sharedTags.length} shared tags and ${leaps.length} cluster leaps.`
       };
-      
+
       return { content: [{ type: 'text', text: JSON.stringify(synthesis, null, 2) }] };
     } catch (err) {
       return { content: [{ type: 'text', text: String(err) }], isError: true };
@@ -999,14 +999,14 @@ server.registerTool(
         som_bmu_col - radius,
         som_bmu_col + radius,
       ];
-      
+
       if (jsonFilter) {
         params.push(JSON.stringify(jsonFilter));
         sql += ` AND output_meta @> $${params.length}`;
       }
-      
+
       sql += ` ORDER BY som_distance ASC, updated_at DESC LIMIT 1000`;
-      
+
       const candidates = await pool.query(sql, params);
       if (candidates.rows.length === 0) return { content: [{ type: 'text', text: '[]' }] };
 
@@ -1134,24 +1134,29 @@ server.registerTool(
     try {
       const { embedding } = await getOrComputeEmbedding(summary);
       if (embedding.length === 0) return { content: [{ type: 'text', text: 'Embedding failed' }], isError: true };
-      
+
       const pathKey = createHash('sha256').update(`${startKey}:${endKey}:${summary.slice(0,100)}`).digest('hex').slice(0, 16);
-      
+
       // Attempt primary table
       try {
         const res = await pool.query(
           `INSERT INTO graph_pathway_cards (
             path_key, start_node, end_node, summary, path_sequence, citation_spans, pagerank_score, embedding
           ) VALUES ($1, $2, $3, $4, $5, $6, $7, ($8::real[]::vector))
-          ON CONFLICT (path_key) DO UPDATE SET 
+          ON CONFLICT (path_key) DO UPDATE SET
             summary = EXCLUDED.summary,
             path_sequence = EXCLUDED.path_sequence,
             updated_at = NOW()
           RETURNING id`,
           [
-            pathKey, startKey, endKey, summary, 
-            JSON.stringify(pathSteps), JSON.stringify(citationSpans || []), 
-            pagerankScore || 0.0, embedding
+            pathKey,
+            startKey,
+            endKey,
+            summary,
+            JSON.stringify(pathSteps),
+            JSON.stringify(citationSpans || []),
+            pagerankScore || 0.0,
+            embedding,
           ]
         );
         return { content: [{ type: 'text', text: `Pathway materialized with ID: ${res.rows[0].id}` }] };
@@ -1159,13 +1164,20 @@ server.registerTool(
         // Fallback to embedded_summaries
         const res = await pool.query(
           `INSERT INTO embedded_summaries (
-            chunk_id, summary_text, source_type, source_hash, summary_type, 
+            chunk_id, summary_text, source_type, source_hash, summary_type,
             model, embedding_model, qdrant_collection, manifold4
           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, ($9::real[]::vector))
           RETURNING id`,
           [
-            `${startKey}->${endKey}`, summary, 'pathway', pathKey, 'detailed',
-            'mcp-algorithmic', OLLAMA_EMBED_MODEL, 'pathway_cards', embedding
+            `${startKey}->${endKey}`,
+            summary,
+            'pathway',
+            pathKey,
+            'detailed',
+            'mcp-algorithmic',
+            OLLAMA_EMBED_MODEL,
+            'pathway_cards',
+            embedding,
           ]
         );
         return { content: [{ type: 'text', text: `Pathway materialized (fallback) with ID: ${res.rows[0].id}` }] };
@@ -1191,28 +1203,36 @@ server.registerTool(
     try {
       const { embedding } = await getOrComputeEmbedding(query);
       if (embedding.length === 0) return { content: [{ type: 'text', text: 'Embedding failed' }], isError: true };
-      
+
       // Search both potential tables
-      const pathways = await pool.query(
-        `SELECT id, path_key, summary, path_sequence FROM graph_pathway_cards 
+      const pathways = await pool
+        .query(
+          `SELECT id, path_key, summary, path_sequence FROM graph_pathway_cards
          ORDER BY (embedding::vector) <=> ($1::real[]::vector) LIMIT $2`,
-        [embedding, limit]
-      ).catch(() => ({ rows: [] }));
-      
+          [embedding, limit]
+        )
+        .catch(() => ({ rows: [] }));
+
       const fallback = await searchEmbeddedSummariesLexically({
         query,
         limit,
         sourceType: 'pathway',
       }).catch(() => ({ rows: [] }));
-      
-      return { 
-        content: [{ 
-          type: 'text', 
-          text: JSON.stringify({ 
-            primary: pathways.rows, 
-            fallback: fallback.rows 
-          }, null, 2) 
-        }] 
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                primary: pathways.rows,
+                fallback: fallback.rows,
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (err) {
       return { content: [{ type: 'text', text: String(err) }], isError: true };
@@ -1572,10 +1592,10 @@ server.registerTool(
          LIMIT 10`,
         [startKey, endKey]
       );
-      
+
       const direct = res.rows.filter(r => r.member_ids.includes(startKey) && r.member_ids.includes(endKey));
       const bridges = res.rows.filter(r => !direct.includes(r));
-      
+
       return {
         content: [{
           type: 'text',
@@ -5179,6 +5199,9 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       ops.update_LLMS.md [OPERATOR-GATED]');
   console.log('       ops.recall_fixer_pattern, ops.store_fixer_pattern [OPERATOR-GATED]');
   console.log('       context.prefetch_feature_context (TRACE+KB+Karpathy bridge)');
+  console.log(
+    '       atlas.query, atlas.get_chunk, atlas.explain_trace, atlas.suggest_files, atlas.source_refs, atlas.compact_context'
+  );
   console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');
   console.log('       evidence.image_feedback (thumbs up/down → Redis+Qdrant+GRPO),');
   console.log('       evidence.link_image_graph (repair/backfill IMAGE_FOR Neo4j edges),');

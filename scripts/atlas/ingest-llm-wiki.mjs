@@ -112,10 +112,33 @@ async function main() {
   }
   console.log(`\nTotal chunks produced: ${DRY ? '(dry-run)' : totalChunks}`);
 
-  // ── Stage 2: Embed all chunk files into Qdrant ────────────────────────────
-  const chunkFiles = DRY
+  // ── Stage 1.5: rg-search enrichment — add rg_paths to each chunk file ──────
+  // build-rg-search-matrix reads *.ndjson and writes *-rg.ndjson with codebase
+  // file paths that mention the same symbols. Embed stage picks up *-rg.ndjson.
+  for (const topicFile of topicFiles) {
+    const stem    = path.basename(topicFile, '.txt');
+    const inFile  = path.join(CHUNKS_DIR, `${stem}.ndjson`);
+    const rgFile  = path.join(CHUNKS_DIR, `${stem}-rg.ndjson`);
+    run(
+      `RG-MATRIX:${stem}`,
+      `node scripts/atlas/build-rg-search-matrix.mjs` +
+        ` --input "${inFile}"` +
+        ` --out "${rgFile}"` +
+        ` --root sveltekit-frontend/src` +
+        `${DRY ? ' --dry-run' : ''}`,
+      { optional: true },
+    );
+  }
+
+  // ── Stage 2: Embed all rg-enriched chunk files into Qdrant ───────────────
+  // Prefer *-rg.ndjson (rg-enriched); fall back to *.ndjson if rg stage failed.
+  const allNdjson = DRY
     ? ['(dry-run)']
     : fs.readdirSync(CHUNKS_DIR).filter(f => f.endsWith('.ndjson'));
+  const rgFiles   = allNdjson.filter(f => f.endsWith('-rg.ndjson'));
+  const chunkFiles = rgFiles.length > 0
+    ? rgFiles
+    : allNdjson.filter(f => !f.startsWith('_'));
 
   for (const chunkFile of chunkFiles) {
     const fullPath = DRY ? chunkFile : path.join(CHUNKS_DIR, chunkFile);

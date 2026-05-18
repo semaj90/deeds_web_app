@@ -19,8 +19,9 @@
  *     graph.pagerank_top, topology.search_near, topology.same_som_cluster,
  *     clusters.get_members, clusters.get_summary_lenses
  *   in-process fallback — search.hybrid, search.dev_context, search.postgres_fts,
- *     search.qdrant_topology, topology.route_query, context.build_kv_packet,
- *     context.get_compressed_card, context.explain_compression, workspace.timeline
+ *     codebase.rg_search, search.qdrant_topology, topology.route_query,
+ *     context.build_kv_packet, context.get_compressed_card,
+ *     context.explain_compression, workspace.timeline
  *
  * Blocked (never dispatched):
  *   qdrant.upsert, neo4j.write, redis.set, delete, migration,
@@ -47,10 +48,12 @@ export const ALLOWED_MCP_TOOLS = new Set([
   'topology.same_som_cluster',
   'clusters.get_members',
   'clusters.get_summary_lenses',
+  'codebase.rg_search',
   // in-process fallback via TOOL_DISPATCH (mcp-tool-dispatch.ts)
   'search.hybrid',
   'search.dev_context',
   'search.postgres_fts',
+  'codebase.rg_search',
   'search.qdrant_topology',
   'topology.route_query',
   'context.build_kv_packet',

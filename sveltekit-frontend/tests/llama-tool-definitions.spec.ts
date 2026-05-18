@@ -22,6 +22,11 @@ describe('LLAMA_TOOL_DEFINITIONS', () => {
     expect(LLAMA_TOOL_DEFINITIONS[0].function.name).toBe('search__dev_context');
   });
 
+  it('includes codebase__rg_search', () => {
+    const names = LLAMA_TOOL_DEFINITIONS.map((t) => t.function.name);
+    expect(names).toContain('codebase__rg_search');
+  });
+
   it('includes trace__kag_search', () => {
     const names = LLAMA_TOOL_DEFINITIONS.map(t => t.function.name);
     expect(names).toContain('trace__kag_search');
@@ -36,6 +41,10 @@ describe('LLAMA_TOOL_DEFINITIONS', () => {
 describe('LLAMA_TO_MCP_NAME', () => {
   it('maps search__dev_context → search.dev_context', () => {
     expect(LLAMA_TO_MCP_NAME['search__dev_context']).toBe('search.dev_context');
+  });
+
+  it('maps codebase__rg_search → codebase.rg_search', () => {
+    expect(LLAMA_TO_MCP_NAME['codebase__rg_search']).toBe('codebase.rg_search');
   });
 
   it('maps trace__kag_search → trace.kag_search', () => {
@@ -62,6 +71,17 @@ describe('parseLlamaToolCall', () => {
     expect(result).not.toBeNull();
     expect(result!.name).toBe('search.dev_context');
     expect(result!.args.query).toBe('fetchCodebaseContext');
+  });
+
+  it('maps codebase__rg_search to codebase.rg_search', () => {
+    const result = parseLlamaToolCall({
+      id: '1b',
+      type: 'function',
+      function: { name: 'codebase__rg_search', arguments: '{"query":"toolName"}' },
+    });
+    expect(result).not.toBeNull();
+    expect(result!.name).toBe('codebase.rg_search');
+    expect(result!.args.query).toBe('toolName');
   });
 
   it('maps trace__kag_search to trace.kag_search', () => {
