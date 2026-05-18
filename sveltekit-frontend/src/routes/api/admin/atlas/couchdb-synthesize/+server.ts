@@ -3,7 +3,7 @@
  *
  * 1. Bootstrap `_design/cluster_synthesis` in karpathy_wiki (idempotent).
  * 2. Query the `by_cluster` MapReduce view for wiki_note docs grouped by clusterId.
- * 3. For each cluster call Gemma3 to synthesize a 2-3 sentence summary.
+ * 3. For each cluster call Gemma4 (TurboQuant :8090) to synthesize a 2-3 sentence summary.
  * 4. Write results back as `type: cluster_synthesis` docs in karpathy_wiki.
  *
  * Body: { maxClusters?: number, dryRun?: boolean }
@@ -12,11 +12,11 @@ import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 
-const COUCHDB_URL  = (process.env.COUCHDB_URL  ?? 'http://localhost:5984').replace(/\/+$/, '');
-const COUCHDB_USER = process.env.COUCHDB_USER  ?? 'admin';
-const COUCHDB_PASS = process.env.COUCHDB_PASS  ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
-const DB_NAME      = process.env.COUCHDB_AGENTS_DB ?? 'karpathy_wiki';
-const OLLAMA_URL   = (process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434').replace(/\/+$/, '');
+const COUCHDB_URL      = (process.env.COUCHDB_URL  ?? 'http://localhost:5984').replace(/\/+$/, '');
+const COUCHDB_USER     = process.env.COUCHDB_USER  ?? 'admin';
+const COUCHDB_PASS     = process.env.COUCHDB_PASS  ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
+const DB_NAME          = process.env.COUCHDB_AGENTS_DB ?? 'karpathy_wiki';
+const ROTORQUANT_URL   = (process.env.ROTORQUANT_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
 
 const schema = z.object({
 	maxClusters: z.number().int().min(1).max(50).default(10),
@@ -84,14 +84,19 @@ async function synthesize(clusterId: string, docs: Array<{ title: string; body: 
 	const prompt = `Synthesize a concise 2-3 sentence technical summary for GPU cluster ${clusterId}. Focus on: what code lives here, its role, key dependencies.\n\n${context}\n\nSummary:`;
 
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const res = await fetch(`${ROTORQUANT_URL}/v1/chat/completions`, {
 			method: 'POST', headers: { 'Content-Type': 'application/json' },
-			body:   JSON.stringify({ model: 'gemma3-legal:latest', prompt, stream: false }),
+			body:   JSON.stringify({
+				model:      'gemma4-legal',
+				max_tokens: 800,
+				messages: [{ role: 'user', content: prompt }],
+			}),
 			signal: AbortSignal.timeout(30_000),
 		});
 		if (!res.ok) return `Cluster ${clusterId}: ${docs.length} wiki notes (LLM unavailable)`;
-		const data = await res.json() as { response?: string };
-		return (data.response ?? '').trim().slice(0, 500) || `Cluster ${clusterId}: ${docs.length} wiki notes`;
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+		const text = (data.choices?.[0]?.message?.content ?? '').trim();
+		return text.slice(0, 500) || `Cluster ${clusterId}: ${docs.length} wiki notes`;
 	} catch {
 		return `Cluster ${clusterId}: ${docs.length} wiki notes`;
 	}

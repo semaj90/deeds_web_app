@@ -162,14 +162,23 @@
 	let hyperResult = $state<HyperRAGResult | null>(null);
 	let hyperError = $state('');
 	let hyperNoInfer = $state(false);
+	let phase18Loading = $state(false);
+	let phase18Error = $state('');
+	let phase18Report = $state<Record<string, unknown> | null>(null);
 	let hyperElapsedMs = $state(0);
+	let hyperTimedOut = $state(false);
 	let hyperAbortController: AbortController | null = null;
 	let hyperElapsedInterval: number | null = null;
+	let hyperTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
 	function clearHyperTimer() {
 		if (hyperElapsedInterval !== null) {
 			clearInterval(hyperElapsedInterval);
 			hyperElapsedInterval = null;
+		}
+		if (hyperTimeoutHandle !== null) {
+			clearTimeout(hyperTimeoutHandle);
+			hyperTimeoutHandle = null;
 		}
 	}
 
@@ -189,12 +198,19 @@
 		hyperError = '';
 		hyperResult = null;
 		hyperElapsedMs = 0;
+		hyperTimedOut = false;
 		hyperAbortController = new AbortController();
 		const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
 		if (typeof window !== 'undefined') {
 			hyperElapsedInterval = window.setInterval(() => {
 				hyperElapsedMs = Math.round((typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime);
 			}, 100);
+			// 60s cancel guard — abort automatically if pipeline stalls
+			hyperTimeoutHandle = setTimeout(() => {
+				hyperTimedOut = true;
+				hyperAbortController?.abort();
+				hyperAbortController = null;
+			}, 60_000);
 		}
 		try {
 			const r = await fetch('/api/admin/atlas/hyperrag', {
@@ -208,7 +224,9 @@
 			hyperResult = d;
 		} catch (e) {
 			if (e instanceof DOMException && e.name === 'AbortError') {
-				hyperError = 'HyperRAG request cancelled';
+				hyperError = hyperTimedOut
+					? 'HyperRAG timed out after 60s — pipeline stalled. Try a shorter query or check server logs.'
+					: 'HyperRAG request cancelled';
 			} else {
 				hyperError = String(e);
 			}
@@ -216,6 +234,26 @@
 			hyperRunning = false;
 			clearHyperTimer();
 			hyperAbortController = null;
+		}
+	}
+
+	async function loadPhase18Report() {
+		if (phase18Loading) return;
+		phase18Loading = true;
+		phase18Error = '';
+		phase18Report = null;
+		try {
+			const r = await fetch('/api/admin/atlas/messy-routing');
+			if (!r.ok) {
+				const d = await r.json().catch(() => ({}));
+				phase18Error = d.error ?? 'Failed to load Phase 18 report';
+				return;
+			}
+			phase18Report = await r.json();
+		} catch (e) {
+			phase18Error = String(e);
+		} finally {
+			phase18Loading = false;
 		}
 	}
 
@@ -700,6 +738,23 @@
 		{#if hyperError}
 			<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
 				<span class="font-bold">HYPERRAG_ERROR:</span> {hyperError}
+			</div>
+		{/if}
+		<button
+			onclick={loadPhase18Report}
+			disabled={phase18Loading}
+			class="w-full py-2 border border-[#5c594c] bg-[#1c1b18] hover:bg-[#2a3444] text-[#a39f90] hover:text-[#efede4] text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-30"
+		>
+			{phase18Loading ? 'LOADING_PHASE_18…' : 'LOAD_PHASE_18_REPORT'}
+		</button>
+		{#if phase18Error}
+			<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
+				<span class="font-bold">PHASE_18_ERROR:</span> {phase18Error}
+			</div>
+		{/if}
+		{#if phase18Report}
+			<div class="p-3 border border-[#3f3e37] bg-[#1c1b18]/60 text-xs text-[#d1d0c0] font-mono whitespace-pre-wrap overflow-x-auto max-h-72">
+				<pre>{JSON.stringify(phase18Report, null, 2)}</pre>
 			</div>
 		{/if}
 	</div>
@@ -1559,13 +1614,14 @@
 						<div class="text-center py-12 text-[#8b9dbb]">
 							<div class="text-2xl font-bold uppercase mb-2 animate-pulse">⬡ HYPERRAG_EXEC…</div>
 							<p class="text-xs">Phases B→C→D→E running. Synthesis may take ~30s.</p>
-							<p class="text-xs mt-2 text-[#a39f90]">{(hyperElapsedMs / 1000).toFixed(1)}s elapsed</p>
-							{#if hyperElapsedMs >= 20000}
-								<button
-									onclick={cancelHyperRAG}
-									class="mt-4 px-4 py-1.5 border border-[#c25953]/60 bg-[#c25953]/10 hover:bg-[#c25953]/20 text-[#c25953] text-xs font-bold tracking-wider transition-all"
-								>[CANCEL]</button>
+							<p class="text-xs mt-2 text-[#a39f90]">{(hyperElapsedMs / 1000).toFixed(1)}s elapsed · auto-abort at 60s</p>
+							{#if hyperElapsedMs >= 30000}
+								<p class="text-xs mt-1 text-[#c8a635]">Taking longer than expected — server may be busy.</p>
 							{/if}
+							<button
+								onclick={cancelHyperRAG}
+								class="mt-4 px-4 py-1.5 border border-[#c25953]/60 bg-[#c25953]/10 hover:bg-[#c25953]/20 text-[#c25953] text-xs font-bold tracking-wider transition-all"
+							>[CANCEL]</button>
 						</div>
 					{:else if hyperError}
 						<div class="p-4 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-xs">
