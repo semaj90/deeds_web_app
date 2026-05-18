@@ -409,7 +409,15 @@ async function fetchWebResearchRows(
   }
 }
 
-const ACP_MAX_RESULTS = 8;
+// ctx-size aware retrieval limit: 3 at 16k, 5 at 32k, 8 at 64k
+// Effective context = model ctx - (MCP outputs + chat history + query) — stay conservative at 16k
+function getAdaptiveTopK(): number {
+  const ctx = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 16384);
+  if (ctx >= 49152) return 8;
+  if (ctx >= 24576) return 5;
+  return 3;
+}
+const ACP_MAX_RESULTS = getAdaptiveTopK();
 const ACP_MAX_SCORE = 0.08; // ACP boosts capped — must not dominate Qdrant/graph/SOM ranking
 const CHR97_FAST_PATH_THRESHOLD = 0.45;
 const RG_FALLBACK_STOP_WORDS = new Set([
@@ -525,7 +533,7 @@ export async function runCHR97Search(
     });
     return {
       confidence: topScore,
-      topChunks: cached,
+      topChunks: cached.map(c => ({ ...c, path: c.path ?? "" })),
       results: cached.map((c) => ({
         id: c.stableKey,
         source: 'qdrant' as const,
@@ -771,7 +779,7 @@ async function fetchACPKnowledgeResults(
       });
 
       const qCoords4d = project4DQuery(query);
-      let mapped = dirHits.map((h) => {
+      let mapped = dirHits.results.map((h) => {
         const seedBoost =
           cartridgeSeedPaths.size > 0 && cartridgeSeedPaths.has(String(h.payload?.path || ''))
             ? 0.12
@@ -853,7 +861,7 @@ async function fetchACPKnowledgeResults(
               embeddingModel: 'embeddinggemma:latest',
               collection,
               latencyMs: Date.now() - startedAt,
-              fallback: 'ripgrep',
+
             },
           };
         } catch (rgErr) {
@@ -924,7 +932,7 @@ async function fetchACPKnowledgeResultsStub(
     const qdrantScored: ScoredResult[] = [];
     const postgresScored: ScoredResult[] = [];
     const payloadMap = new Map<string, Record<string, unknown>>();
-
+    const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
     await Promise.all([
       // Qdrant ANN lane (always for non-codebase collections; routed for codebase)
       useQdrant
@@ -999,6 +1007,7 @@ async function fetchACPKnowledgeResultsStub(
     // Persist topo candidates + adapt router (fire-and-forget)
     const queryClass = classifyQuery(query);
     const qHash = topoQueryHash(query);
+    let topoPrefilter: TopoPrefilterStats | undefined;
     if (
       collection === 'codebase_chunks_768' &&
       queryClass !== TOPO_CLASS.UNCLASSIFIED &&
@@ -1053,7 +1062,7 @@ async function fetchACPKnowledgeResultsStub(
         routing: {
           dispatch: routing.dispatch,
           weights: routing.weights,
-          explanation: routing.explanation,
+
           qdrantHits: qdrantScored.length,
           postgresHits: postgresScored.length,
         },
@@ -1206,7 +1215,7 @@ export async function assembleACEContext(opts: {
             ? parseFloat(configuredThresholdRaw)
             : CHR97_FAST_PATH_THRESHOLD;
 
-          cartridgeResults = await runCHR97Search(query, 8, userId ?? undefined);
+          cartridgeResults = await runCHR97Search(query, 8, userId ?? undefined) as typeof cartridgeResults;
           if (cartridgeResults.confidence >= configuredThreshold) {
             // Retrieve codebase context from seeds and return immediately!
             const codebaseContext = await fetchCodebaseContext(
@@ -1223,11 +1232,11 @@ export async function assembleACEContext(opts: {
             if (topChunk?.gpuCluster != null) {
               const { readLatestQdrantClusterTags } = await import('./cluster-tags-cache.js');
               const entries = readLatestQdrantClusterTags();
-              const entry = entries.find((e) => e.clusterId === topChunk.gpuCluster);
+              const entry = entries.find((e) => String(e.clusterKey) === String(topChunk.gpuCluster));
               if (entry) {
                 activeClusterSummary = {
-                  clusterId: entry.clusterId,
-                  summary: entry.synthesisSuggestion || '',
+                  clusterId: entry.clusterKey,
+                  summary: entry.summary ?? '',
                   purpose: entry.topoClasses.join(', '),
                   patterns: entry.topTags.map((t) => (typeof t === 'string' ? t : t.tag || '')),
                   keyFiles: entry.topFiles.filter(Boolean) as string[],
@@ -5262,3 +5271,5 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
   }
   return null;
 }
+
+
