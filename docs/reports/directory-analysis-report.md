@@ -56,8 +56,8 @@ _Generated: 2026-05-16T18:53:38.996Z_
 | `llm` | `external_docs_raw` | default rg OK | LLM notes / timelines |
 | `logs` | `diagnostic_log` | skip / ignore OK | Runtime and task output logs |
 | `memory` | `external_docs_normalized` | rg -u required | Root-level Claude memory files |
-| `minio-data` | `binary_artifact` | skip / ignore OK | MinIO object storage data |
-| `minio` | `config` | default rg OK | MinIO configuration |
+| `minio-data` | `binary_artifact` | skip / ignore OK | object storage data |
+| `minio` | `config` | default rg OK | object storage configuration |
 | `models` | `binary_artifact` | skip / ignore OK | ML model weights |
 | `nginx` | `config` | default rg OK | Nginx proxy config |
 | `onnx` | `binary_artifact` | skip / ignore OK | ONNX model files |

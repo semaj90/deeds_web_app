@@ -51,7 +51,7 @@
 
 #### Issue 1: Upload Endpoint Error
 
-**Symptom**: Upload returns database error despite successful MinIO upload
+**Symptom**: Upload returns database error despite successful object storage upload
 
 **Evidence**:
 - Evidence records DO exist in database (17 total)

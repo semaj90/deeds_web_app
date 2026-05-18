@@ -30,9 +30,9 @@ User uploads file (image/PDF/video/audio/document)
   │
   ▼
 ┌─────────────────────────────────────────────────────┐
-│ Stage 1: MinIO Upload + SHA-256 Hash                │
+│ Stage 1: SeaweedFS S3 Upload + SHA-256 Hash         │
 │   ├── Buffer file, compute SHA-256 digest           │
-│   ├── Upload to MinIO bucket (presigned URL)        │
+│   ├── Upload to SeaweedFS S3 bucket (presigned URL) │
 │   ├── Insert evidence record into PostgreSQL        │
 │   └── Return evidenceId + fileUrl                   │
 ├─────────────────────────────────────────────────────┤
@@ -188,7 +188,7 @@ POST /api/vision/analyze { image: Buffer, filename: string }
   ├── Redis cache check (24h TTL)
   │     └── HIT → return cached VisionResult
   │
-  ├── MinIO upload (async, non-blocking)
+   ├── Object storage upload (async, non-blocking)
   │
   ├── YOLO Detection (Layer A: yolo.ts)
   │     ├── analyzeDocument(imageBuffer, filename)
@@ -438,7 +438,7 @@ L3:  Redis (server, configurable TTL)          ← Cross-request
      └── YOLO detection results
 L4:  Qdrant llm_response_cache (0.85 sim)      ← Semantic dedup
 L5:  PostgreSQL JSONB (permanent)               ← evidence.metadata, analysisJobs.result
-L6:  MinIO object storage (permanent)           ← Original files
+L6:  Object storage (permanent)                 ← Original files
 ```
 
 **Excessive caching philosophy:** Run inference ONCE, cache at EVERY tier. A second query for the same evidence hits L3 Redis in <1ms instead of re-running YOLO (200ms) + VLM (2000ms) + embedding (50ms).
@@ -458,7 +458,7 @@ evidence {
   userId         UUID → users.id
   title          VARCHAR(255) NOT NULL
   description    TEXT
-  filePath       VARCHAR(500)        -- MinIO path
+  filePath       VARCHAR(500)        -- SeaweedFS S3 path
   fileType       VARCHAR(100)        -- MIME type
   fileSize       INTEGER             -- bytes
   hash           VARCHAR(255)        -- SHA-256
@@ -468,7 +468,7 @@ evidence {
   metadata       JSONB               -- ← ALL analysis results stored here
   evidenceType   ENUM(16 types)      -- document|photo|video|audio|...
   fileName       VARCHAR(255)
-  fileUrl        TEXT                 -- MinIO presigned URL
+  fileUrl        TEXT                 -- SeaweedFS presigned S3 URL
   canvasPosition JSONB               -- detective board coordinates
   uploadedBy     UUID
   uploadedAt     TIMESTAMP
@@ -610,7 +610,7 @@ pgvector (evidence_vectors)     Qdrant (evidence_items)
    Sharp pipeline: auto-orient → resize (max 2048px) → sharpen → normalize contrast → denoise
    ```
 2. For Docling/OCR: binarize (Otsu threshold) + deskew before text extraction
-3. Cache both original and enhanced versions in MinIO (separate keys)
+3. Cache both original and enhanced versions in SeaweedFS (separate keys)
 4. Store enhancement metadata in `evidence.metadata.imageEnhancement`
 
 ### Priority 4: RabbitMQ Async YOLO Queue (MEDIUM IMPACT)
@@ -619,7 +619,7 @@ pgvector (evidence_vectors)     Qdrant (evidence_items)
 
 **Action:**
 1. Add `yolo.analyze` queue to RabbitMQ (8th queue)
-2. Evidence upload returns immediately after Stage 1 (MinIO + DB record)
+2. Evidence upload returns immediately after Stage 1 (SeaweedFS + DB record)
 3. Stages 2-8 run as RabbitMQ consumer job
 4. WebSocket push to client when analysis completes (DetectiveWebSocketManager)
 5. Frontend shows "analyzing..." spinner → auto-refreshes with results
@@ -680,7 +680,7 @@ pgvector (evidence_vectors)     Qdrant (evidence_items)
   ┌────────────────────┘  │  │  │  │  │  │  └────────────────┐
   │                       │  │  │  │  │  │                   │
   ▼                       ▼  │  ▼  │  ▼  │                   ▼
-MinIO                  Docling │ Legal │ gRPC              PostgreSQL
+SeaweedFS              Docling │ Legal │ gRPC              PostgreSQL
 (object store)         (OCR)   │Chunker│ Embedding         (evidence table)
                                │       │                   (metadata JSONB)
                                ▼       ▼

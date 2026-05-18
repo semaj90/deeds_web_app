@@ -75,7 +75,7 @@ Based on Session 93r28i benchmarks:
 **What this does:**
 - Builds optimized Docker image (Dockerfile.optimized)
 - Deploys single SvelteKit container on port 3000
-- Connects to existing infrastructure (postgres, redis, qdrant, minio, etc.)
+- Connects to existing infrastructure (postgres, redis, qdrant, SeaweedFS, etc.)
 - Health checks every 30s
 - Auto-restart on failure
 
@@ -119,7 +119,7 @@ This deploys:
 - SvelteKit Frontend (Nginx load-balanced)
 - Advanced AI API (3 replicas)
 - Ray Head + Workers (distributed processing)
-- Redis, PostgreSQL, MinIO
+- Redis, PostgreSQL, SeaweedFS
 - Prometheus + Grafana monitoring
 - Nginx reverse proxy
 
@@ -142,7 +142,7 @@ deeds-qdrant-prod    → 6333  (unhealthy - functional)
 ```
 phase66-postgres     → 5434  (running)
 phase66-couchdb      → 5984  (healthy) - ACE Context Engine
-phase66-minio        → 9000  (healthy) - Object storage
+phase66-minio        → 9000  (healthy) - SeaweedFS object storage
 phase66-rabbitmq     → 5672  (healthy) - Message queue
 phase66-qdrant       → 6333  (⚠️ port conflict with deeds-qdrant-prod)
 phase66-redis        → 6379  (⚠️ port conflict with deeds-redis-prod)

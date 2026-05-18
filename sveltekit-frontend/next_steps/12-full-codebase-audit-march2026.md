@@ -107,7 +107,7 @@ After reconciling the stale rewrite notes with live route wiring, the next step 
 Primary route: `src/routes/api/evidence/upload/+server.ts`
 
 **Confirmed active capabilities already in the route:**
-- MinIO upload + PostgreSQL persistence
+- Object storage upload + PostgreSQL persistence
 - OCR/Docling-aware text extraction fallback chain
 - chunking + embeddings + pgvector/Qdrant storage
 - entity extraction + forensic flags + summarization

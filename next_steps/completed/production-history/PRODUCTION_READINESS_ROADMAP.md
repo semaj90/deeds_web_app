@@ -70,9 +70,9 @@ REDIS_PASSWORD=STRONG_REDIS_PASSWORD
 # ⚠️ NOT localhost:6379 in production
 
 # ============================================
-# MinIO / S3 Object Storage
+# SeaweedFS / S3 Object Storage
 # ============================================
-MINIO_ENDPOINT=s3.amazonaws.com  # or your MinIO domain
+MINIO_ENDPOINT=s3.amazonaws.com  # or your SeaweedFS/S3 endpoint
 MINIO_ACCESS_KEY=YOUR_AWS_ACCESS_KEY_ID
 MINIO_SECRET_KEY=YOUR_AWS_SECRET_ACCESS_KEY
 MINIO_USE_SSL=true
@@ -518,7 +518,7 @@ Replace localhost services with managed cloud providers:
 2. Get connection URL + password
 3. Update `REDIS_URL` + `REDIS_PASSWORD` in `.env.production`
 
-#### MinIO / S3 (Choose One)
+#### SeaweedFS / S3 (Choose One)
 - **AWS S3** (industry standard, pay-per-use)
 - **DigitalOcean Spaces** (S3-compatible, $5/month)
 - **Backblaze B2** (cheapest, S3-compatible)
@@ -526,7 +526,7 @@ Replace localhost services with managed cloud providers:
 **Setup:**
 1. Create bucket: `legal-evidence-prod`
 2. Generate access key + secret
-3. Update MinIO env vars in `.env.production`
+3. Update object-storage env vars in `.env.production`
 
 #### Ollama (GPU Instance)
 - **RunPod** (cheapest GPU cloud, $0.30/hour)

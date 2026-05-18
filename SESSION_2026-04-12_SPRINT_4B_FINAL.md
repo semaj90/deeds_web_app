@@ -148,7 +148,7 @@ Total CPU:           ~12s
 
 #### API Routes (3 files, 325 lines)
 6. **`src/routes/api/audio/upload/+server.ts`** (110 lines)
-   - POST handler: file validation, MinIO upload, DB insert
+   - POST handler: file validation, object storage upload, DB insert
    - RabbitMQ publish to `audio.processing` exchange, `audio.process` routing key
    - Returns evidenceId for SSE tracking
 
@@ -813,7 +813,7 @@ nvidia-smi
 
 ### Recommendations for Future Work
 
-1. **MinIO Integration** — Replace local filesystem with object storage (S3-compatible)
+1. **Object Storage Integration** — Replace local filesystem with object storage (S3-compatible)
 2. **Document Versioning** — Track edits to uploaded files (currently immutable)
 3. **Attachment Removal** — Add UI/API to delete uploaded documents from chat
 4. **OCR Fallback** — Integrate tesseract.js for scanned PDFs (currently text-only)
@@ -840,7 +840,7 @@ nvidia-smi
 
 ### Medium-Term (P2 — Nice to Have)
 
-8. **MinIO Integration** — S3-compatible object storage for production file storage
+8. **Object Storage Integration** — S3-compatible object storage for production file storage
 9. **Piper TTS Evaluation** — Text-to-speech for case summaries (optional)
 10. **Gemma 4 Audio Defer** — Wait for stable Ollama support before enabling
 

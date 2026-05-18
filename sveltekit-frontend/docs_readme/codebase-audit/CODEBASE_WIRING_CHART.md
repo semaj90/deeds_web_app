@@ -172,7 +172,7 @@ User Message
 
 ```
 File → SHA-256 hash
-  → MinIO upload (evidence/{caseId}/{timestamp}.{ext})
+  → Object storage upload (evidence/{caseId}/{timestamp}.{ext})
   → PostgreSQL record (evidence table)
   → Text extraction (pdf-parse → Tesseract fallback)
   → Legal chunking (ARTICLE/SECTION/§, max 1024 tokens, 128 overlap)

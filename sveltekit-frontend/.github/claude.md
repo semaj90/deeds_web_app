@@ -112,7 +112,7 @@ rg "pattern" --type mjs  # Now works!
 │ ├─ Qdrant: 15 collections, 55,561 vectors (HNSW index)          │
 │ ├─ PostgreSQL pgvector: 100 errors, 100 embeddings (HNSW)       │
 │ ├─ CouchDB: Graph views (by_priority, by_status)                │
-│ ├─ MinIO: 4 buckets (raw docs, parsed chunks)                   │
+│ ├─ SeaweedFS S3: 4 buckets (raw docs, parsed chunks)            │
 │ └─ Redis: Cache (phase76:codebase:*, semantic:*)                │
 └────────────────────────┬─────────────────────────────────────────┘
                          ↓
@@ -122,7 +122,7 @@ rg "pattern" --type mjs  # Now works!
 │ 2. pgvector: Local HNSW similarity (sub-millisecond)            │
 │ 3. Qdrant: Semantic KB (15 collections)                         │
 │ 4. CouchDB: Graph expansion (related patterns/files)            │
-│ 5. MinIO: Payload retrieval (full context)                      │
+│ 5. SeaweedFS S3: Payload retrieval (full context; MinIO-compatible adapter) │
 │ → Merge: Deduplicate + rank by weighted score                   │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -156,7 +156,7 @@ WITH (m = 16, ef_construction = 64);
 
 **Distance**: Cosine (consistent with pgvector)
 
-#### MinIO (Port 9000)
+#### SeaweedFS S3 (Port 8333)
 **Buckets**:
 - `phase76-summaries` - Webcrawl summaries
 - `phase76-docs` - Raw HTML/PDF
@@ -184,7 +184,7 @@ WITH (m = 16, ef_construction = 64);
 
 | Script | Purpose | Key Arguments | Output |
 |--------|---------|---------------|--------|
-| `phase76-knowledge-builder.mjs` | Webcrawl + ingest docs | `--crawl <url> --depth 2` | Qdrant vectors, MinIO objects |
+| `phase76-knowledge-builder.mjs` | Webcrawl + ingest docs | `--crawl <url> --depth 2` | Qdrant vectors, SeaweedFS objects |
 | `phase76-kb-update.mjs` | Index markdown/JSON | `--paths <files> --tags <tags> --kind <type>` | Qdrant + Postgres kb_chunks |
 | `phase76-storage-layer.mjs` | Storage abstraction | N/A (library) | CRUD API |
 | `phase76-couchdb-graph-sync.mjs` | Sync knowledge_graph → CouchDB | Auto | Design docs |
@@ -209,7 +209,7 @@ WITH (m = 16, ef_construction = 64);
    - Args: `{ query: string, params?: any[] }`
    - Returns: `{ rows: any[] }`
 
-3. **minio_fetch** - S3 object retrieval
+3. **minio_fetch** - SeaweedFS S3 object retrieval (MinIO-compatible adapter)
    - Args: `{ bucket: string, key: string }`
    - Returns: `{ content: string, metadata: object }`
 

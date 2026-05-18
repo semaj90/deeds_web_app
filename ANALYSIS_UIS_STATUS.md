@@ -277,7 +277,7 @@ private async analyzeFrameWithGemma4(imagePath: string) {
 ### Test Data Sources
 
 **Database**: `legal_ai_db` on port **5434** (deeds-postgres-prod-proxy)
-**MinIO**: Buckets at `http://localhost:9000`
+**SeaweedFS S3**: Buckets at `http://localhost:8333`
   - `deeds-evidence/audio/` - Audio files
   - `deeds-evidence/video/` - Video files
   - `deeds-evidence/video-frames/[evidenceId]/` - Extracted frames

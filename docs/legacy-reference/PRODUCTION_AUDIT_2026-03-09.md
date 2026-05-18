@@ -121,7 +121,7 @@ After Ollama consolidation (4 files → 1 canonical), these duplicates remain:
 | P1-6 | RabbitMQ no DLQ | Failed messages silently dropped — add dead-letter exchange |
 | P1-7 | Qdrant no backup strategy | Vector data not backed up — add snapshot schedule |
 | P1-8 | No DB connection pooling limits | PG pool defaults may exhaust connections under load |
-| P1-9 | MinIO bucket policy too permissive | Review bucket policies for least-privilege |
+| P1-9 | Object storage bucket policy too permissive | Review bucket policies for least-privilege |
 | P1-10 | No request ID tracing | Add `X-Request-ID` header propagation for distributed tracing |
 
 ### 2.3 P2 — Nice to Have (Post-Launch)
@@ -163,7 +163,7 @@ BODY_SIZE_LIMIT=52428800              # 50MB for evidence uploads (default 512KB
 yourdomain.com {
     # Automatic HTTPS + HTTP/3 (QUIC) — enabled by default
 
-    reverse_proxy localhost:3000 {
+    reverse_proxy 127.0.0.1:3000 {
         # SSE support — critical for streaming responses
         flush_interval -1
 
@@ -243,7 +243,7 @@ services:
         limits:
           memory: 2G
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3

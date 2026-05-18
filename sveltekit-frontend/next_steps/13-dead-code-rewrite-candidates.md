@@ -69,7 +69,7 @@ Production-readiness direction is therefore unchanged: consolidate the active ev
 
 ### Evidence flow
 - `src/routes/api/evidence/upload/+server.ts` is the active production ingestion path.
-- It already combines MinIO upload, PostgreSQL persistence, OCR/Docling-aware extraction, LangExtract sectioning, embeddings, Qdrant indexing, summarization, entity extraction, forensics, and parallel YOLO/VLM analysis.
+- It already combines object storage upload, PostgreSQL persistence, OCR/Docling-aware extraction, LangExtract sectioning, embeddings, Qdrant indexing, summarization, entity extraction, forensics, and parallel YOLO/VLM analysis.
 - Recommendation: harden and validate this path rather than replacing it with legacy processors.
 
 ### RAG flow

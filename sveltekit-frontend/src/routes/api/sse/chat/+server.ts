@@ -33,6 +33,7 @@ import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
 import { getCachedDAG, setCachedDAG } from '$lib/server/cache/dag-cache.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
+import { logToolTrace } from '$lib/server/observability/tool-trace.js';
 import { queryHash as computeQueryHash, recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
 import { chatDocumentAttachments } from '$lib/server/db/schema-postgres.js';
@@ -1006,10 +1007,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   // Fire-and-forget: record into hot-query analytics ring buffer (feeds search-patterns API)
   recordSearchQuery({ query: message, pipeline: 'ace', cacheHit: false, userId: locals.user.id });
 
+  const userMessageId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   // Save user message to chatMessages table
   try {
     await db.insert(chatMessages).values({
-      id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      id: userMessageId,
       chatId: conversationId,
       role: 'user',
       content: message,
@@ -1214,6 +1216,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // ── Pre-retrieval KAG: fetch case graph neighbors BEFORE vector search ──
       // Graph neighbor IDs become a Qdrant `should` filter that boosts
       // graph-connected documents during retrieval (not just post-retrieval).
+      const preRetrievalStart = performance.now();
       let preRetrievalNeighbors: GraphNeighbor[] = [];
       let preRetrievalFilter: Record<string, unknown> | undefined;
       if (caseUuid) {
@@ -1225,18 +1228,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               `${preRetrievalFilter ? 'filter built' : 'no strong neighbors'}`
           );
         }
+        logToolTrace({
+          messageId: userMessageId,
+          toolName: 'pre_retrieval_kag',
+          args: { caseUuid },
+          resultSummary: `Found ${preRetrievalNeighbors.length} neighbors. Filter built: ${!!preRetrievalFilter}`,
+          durationMs: performance.now() - preRetrievalStart,
+        });
       }
 
       // ── Neo4j Multi-Hop KAG: 2-3 hop Cypher traversal ──
       // Complements PG 1-hop with cross-case entity traversal.
       // Non-fatal: skipped if Neo4j unavailable.
+      const neo4jStart = performance.now();
       let neo4jContext: string | null = null;
       if (caseUuid) {
         const neo4jNeighbors = await getNeo4jMultiHopNeighbors(caseUuid).catch(() => []);
+        let uniqueCount = 0;
         if (neo4jNeighbors.length > 0) {
           // Deduplicate against PG neighbors
           const pgIds = new Set(preRetrievalNeighbors.map((n) => n.nodeId));
           const uniqueNeo4j = neo4jNeighbors.filter((n) => !pgIds.has(n.nodeId));
+          uniqueCount = uniqueNeo4j.length;
           if (uniqueNeo4j.length > 0) {
             preRetrievalNeighbors = [...preRetrievalNeighbors, ...uniqueNeo4j];
             preRetrievalFilter = buildGraphShouldFilter(preRetrievalNeighbors) ?? undefined;
@@ -1247,6 +1260,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             );
           }
         }
+        logToolTrace({
+          messageId: userMessageId,
+          toolName: 'neo4j_kag',
+          args: { caseUuid },
+          resultSummary: `Found ${neo4jNeighbors.length} total neighbors, ${uniqueCount} unique. Context built: ${!!neo4jContext}`,
+          durationMs: performance.now() - neo4jStart,
+        });
       }
 
       // ── L0.5 Intercept: RAG Retrieval Cache (P2f) ──
@@ -1270,6 +1290,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
       }
 
+      const retrievalStart = performance.now();
       const [rawContextDocs, freshCodebaseResult, aceChunks] = await Promise.all([
         cachedRagDocs
           ? Promise.resolve(cachedRagDocs)
@@ -1293,6 +1314,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             )
           : Promise.resolve([] as Array<{ content: string; score: number; source: string }>),
       ]);
+      const retrievalDuration = performance.now() - retrievalStart;
+
+      logToolTrace({
+        messageId: userMessageId,
+        toolName: 'rag_retrieval',
+        args: {
+          wantsCode,
+          codeGlyphHit,
+          ragGlyphHit,
+          caseUuid,
+          limit: RAG_MAX_CHUNKS,
+        },
+        resultSummary: `Retrieved ${rawContextDocs.length} raw docs (Qdrant/Attachment), codeContext: ${!!freshCodebaseResult || !!codebaseResult}, aceChunks: ${aceChunks.length}`,
+        durationMs: retrievalDuration,
+      });
 
       // Cache fresh RAG results for 2 minutes
       if (!ragGlyphHit && rawContextDocs.length > 0 && !attachmentScopedDocs.length) {
@@ -1334,11 +1370,24 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
 
       // ── Corrective RAG: auto-reformulate query on low retrieval scores ──
+      const correctiveStart = performance.now();
       const {
         docs: correctedDocs,
         reformulated,
         newQuery,
       } = await correctiveRetrieval(message, rawContextDocs);
+      const correctiveDuration = performance.now() - correctiveStart;
+
+      logToolTrace({
+        messageId: userMessageId,
+        toolName: 'corrective_rag',
+        args: {
+          originalQuery: message,
+          initialDocCount: rawContextDocs.length,
+        },
+        resultSummary: `Reformulated: ${reformulated}. New query: "${newQuery ?? ''}". Final doc count: ${correctedDocs.length}`,
+        durationMs: correctiveDuration,
+      });
 
       // ── Auto-Backfill: if retrieval still returns no useful results, research in background ──
       if (
@@ -1362,11 +1411,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
 
       // ── DAG ordering: reorder context by citation dependency ──
+      const dagOrderStart = performance.now();
       let contextDocs = await dagOrderContext(correctedDocs, caseUuid);
+      const dagOrderDuration = performance.now() - dagOrderStart;
+
+      logToolTrace({
+        messageId: userMessageId,
+        toolName: 'dag_ordering',
+        args: { caseUuid, docCount: correctedDocs.length },
+        resultSummary: `DAG reordered ${contextDocs.length} docs`,
+        durationMs: dagOrderDuration,
+      });
 
       // ── Authority Chain Drill-Down (P4): multi-hop statute/case expansion ──
       // When top results cite specific statutes or cases, embed those citations
       // and search for their full text to give the LLM primary authority sources.
+      const authChainStart = performance.now();
+      let authResultExpanded = 0;
+      let authHops = 0;
+      let authStatutesCount = 0;
+      let authCasesCount = 0;
       {
         const authQueryVector = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(
           () => null
@@ -1406,6 +1470,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             authorities: { statutes: [] as string[], cases: [] as string[] },
           }));
 
+          authResultExpanded = authResult.expanded;
+          authHops = authResult.hops;
+          authStatutesCount = authResult.authorities?.statutes?.length ?? 0;
+          authCasesCount = authResult.authorities?.cases?.length ?? 0;
+
           if (authResult.expanded > 0) {
             contextDocs = authResult.docs.map((r) => ({
               content: r.content,
@@ -1417,15 +1486,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           }
         }
       }
+      if (authResultExpanded > 0) {
+        logToolTrace({
+          messageId: userMessageId,
+          toolName: 'authority_chain',
+          args: { hops: authHops },
+          resultSummary: `Expanded ${authResultExpanded} authorities (statutes: ${authStatutesCount}, cases: ${authCasesCount})`,
+          durationMs: performance.now() - authChainStart,
+        });
+      }
 
       const contextUsed = contextDocs.map((d) => d.documentId);
 
       // ── L0.5 Intercept 3: KAG Graph Context ─────────────────────
       // Cache graph traversal by evidence ID set (10min TTL)
+      const graphContextStart = performance.now();
       let graphContext: {
         context: string;
         neighbors: GraphNeighbor[];
       } | null = null;
+      let graphContextCacheHit = false;
       if (contextDocs.length > 0) {
         const evidenceIds = contextDocs
           .map((d) => d.sourceId ?? d.documentId.split(':').pop())
@@ -1435,6 +1515,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const cachedKag = getFragment(kagGlyphKey);
         if (cachedKag) {
           graphContext = { context: cachedKag, neighbors: [] };
+          graphContextCacheHit = true;
           console.log(`[Glyph L0.5] KAG graph context HIT (${cachedKag.length} chars)`);
         } else {
           graphContext = await getGraphContext(evidenceIds, caseUuid).catch(() => null);
@@ -1442,11 +1523,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             setFragment(kagGlyphKey, graphContext.context, FragmentType.KAG, 10 * 60_000);
           }
         }
+        logToolTrace({
+          messageId: userMessageId,
+          toolName: 'graph_context',
+          args: { caseUuid, evidenceCount: evidenceIds.length },
+          resultSummary: `Cache Hit: ${graphContextCacheHit}. Neighbors found: ${graphContext?.neighbors?.length ?? 0}. Context chars: ${graphContext?.context?.length ?? 0}`,
+          durationMs: performance.now() - graphContextStart,
+        });
       }
 
       // ── Graph-Informed Retrieval Expansion (P0 KAG Gap Fix) ──
       // Use graph neighbors to EXPAND the retrieval set, not just re-rank.
       // Fetches the query vector from embedding cache (stored by retrieveContext).
+      const graphExpandStart = performance.now();
+      let expandedCount = 0;
       if (graphContext?.neighbors?.length) {
         const queryVector = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(() => null);
         if (queryVector) {
@@ -1471,6 +1561,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             );
             return expandInput;
           });
+          expandedCount = Math.max(0, expandResult.length - expandInput.length);
           contextDocs = expandResult.map((r) => ({
             content: r.content,
             similarity: r.score,
@@ -1479,6 +1570,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             model: r.metadata?.['model'] as string | undefined,
           }));
         }
+        logToolTrace({
+          messageId: userMessageId,
+          toolName: 'graph_informed_retrieval',
+          args: { neighborsCount: graphContext.neighbors.length },
+          resultSummary: `Expanded retrieval by ${expandedCount} extra documents. Total count: ${contextDocs.length}`,
+          durationMs: performance.now() - graphExpandStart,
+        });
       }
 
       // ── Graph authority scoring: strength + confidence weighted re-ranking ──

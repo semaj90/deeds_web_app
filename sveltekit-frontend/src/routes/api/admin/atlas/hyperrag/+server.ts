@@ -174,15 +174,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const t0 = Date.now();
 
-	// Phase B
+	// Phase B — embed + cluster prefilter
+	const tEmbed0 = Date.now();
 	const embedding = await embedQuery(query);
+	const embedMs = Date.now() - tEmbed0;
+
+	const tCluster0 = Date.now();
 	const { clusterIds, centroidScores, backend: sidecarBackend } = await getClusterIds(embedding, topClusters);
+	const clusterMs = Date.now() - tCluster0;
+
 	const clusterFilter = clusterIds.length ? { must: [{ key: 'som_cluster', match: { any: clusterIds } }] } : null;
 
+	const tQdrant0 = Date.now();
 	const [filteredHits, unfilteredHits] = await Promise.all([
 		clusterFilter ? qdrantSearch(embedding, clusterFilter, topK * 2) : Promise.resolve([]),
 		qdrantSearch(embedding, null, topK * 2),
 	]);
+	const qdrantMs = Date.now() - tQdrant0;
 
 	const merged = rrfMerge(clusterFilter ? [filteredHits, unfilteredHits] : [unfilteredHits]).slice(0, topK);
 
@@ -204,11 +212,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		} catch { return merged; }
 	})();
 
-	// Phase C
+	// Phase C — CouchDB wiki enrichment
+	const tCouchdb0 = Date.now();
 	const withWiki = await enrichWithCouchDB(enriched as typeof merged);
+	const couchdbMs = Date.now() - tCouchdb0;
 	const wikiEnriched = withWiki.filter(h => h.wikiEnrichment.length > 0).length;
 
-	// Phase D
+	// Phase D — RotorQuant synthesis
 	let synthesis: string | null = null;
 	let inferLatencyMs = 0;
 	let inferError: string | null = null;
@@ -231,6 +241,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		centroidScores,
 		sidecarBackend,
 		latencyMs: Date.now() - t0,
+		phaseLatency: { embed: embedMs, cluster: clusterMs, qdrant: qdrantMs, couchdb: couchdbMs },
 		resultCount: sorted.length,
 		phaseC: { wikiDocsFetched: 0, hitsEnriched: wikiEnriched },
 		phaseD: { cudaBackend: 'server-side', centroidCount: 0, synthesis, inferLatencyMs, inferError },

@@ -7,6 +7,10 @@
  *   synthesis_memory — ACE synthesis outputs, LLM answer cache
  *   trace_events    — TRACE retrieval run audit trail
  *
+ * Atlas-specific indexes (workspace, runId, clusterId, featureKey, routeId,
+ * updatedAt) are applied to karpathy_wiki only since that is the primary
+ * writer target for the AgentsDirectoryCard pipeline.
+ *
  * Call ensureMangoIndexes() once at startup (idempotent).
  */
 import { ENV } from '$lib/server/env.server.js';
@@ -27,24 +31,38 @@ export type MemoryDocType =
   | 'trace_event';
 
 export interface MemoryDoc {
-  _id:         string;
-  _rev?:       string;
-  type:        MemoryDocType;
-  stableKey:   string;
-  clusterKey?: string;
+  _id:            string;
+  _rev?:          string;
+  type:           MemoryDocType;
+  stableKey:      string;
+  clusterKey?:    string;
   directoryPath?: string;
-  tags:        string[];
+  tags:           string[];
   /** LegalProduction | DevCodeIntel */
-  domain?:     'LegalProduction' | 'DevCodeIntel';
-  trustTier?:  'official' | 'community' | 'internal' | 'synthetic';
-  gainScore?:  number;
-  source?:     string;
-  manifold4?:  [number, number, number, number];
+  domain?:        'LegalProduction' | 'DevCodeIntel';
+  trustTier?:     'official' | 'community' | 'internal' | 'synthetic';
+  gainScore?:     number;
+  source?:        string;
+  manifold4?:     [number, number, number, number];
   qdrantPointId?: string;
   neo4jNodeId?:   string;
-  outputMeta?: Record<string, unknown>;
-  lastSyncedAt?: string;
-  createdAt:   string;
+  outputMeta?:    Record<string, unknown>;
+  lastSyncedAt?:  string;
+  createdAt:      string;
+
+  // ── Writer-stamped fields (A4+) ──────────────────────────────────────────
+  /** Run identifier for rollback via rollbackByRunId(). */
+  runId?:         string;
+  /** Logical workspace (e.g. 'deeds-web-app', 'legal-ai'). */
+  workspace?:     string;
+  /** ISO timestamp of last write — distinct from lastSyncedAt. */
+  updatedAt?:     string;
+  /** GPU k-means cluster integer ID (distinct from clusterKey slug). */
+  clusterId?:     string | number;
+  /** Feature-flag / feature-card key for atlas retrieval. */
+  featureKey?:    string;
+  /** SvelteKit route ID for route-card atlas lookup. */
+  routeId?:       string;
 }
 
 export interface WikiNote extends MemoryDoc {
@@ -80,26 +98,25 @@ export const MEMORY_DATABASES = [
 
 export type MemoryDatabase = (typeof MEMORY_DATABASES)[number];
 
-// ── Required indexes ──────────────────────────────────────────────────────────
+// ── Index definitions ─────────────────────────────────────────────────────────
 
-/** Mango index definitions applied to all memory databases. */
+/** Applied to all memory databases. */
 const COMMON_INDEXES = [
-  {
-    name:   'type-stablekey',
-    fields: ['type', 'stableKey'],
-  },
-  {
-    name:   'type-cluster-gain',
-    fields: ['type', 'clusterKey', 'gainScore', 'lastSyncedAt'],
-  },
-  {
-    name:   'type-dir-trust',
-    fields: ['type', 'directoryPath', 'trustTier'],
-  },
-  {
-    name:   'tags-source',
-    fields: ['tags', 'source'],
-  },
+  { name: 'type-stablekey',      fields: ['type', 'stableKey'] },
+  { name: 'type-cluster-gain',   fields: ['type', 'clusterKey', 'gainScore', 'lastSyncedAt'] },
+  { name: 'type-dir-trust',      fields: ['type', 'directoryPath', 'trustTier'] },
+  { name: 'tags-source',         fields: ['tags', 'source'] },
+  // A4+ additions: rollback and cross-database filtering
+  { name: 'run-id',              fields: ['runId'] },
+  { name: 'workspace-type',      fields: ['workspace', 'type'] },
+  { name: 'updated-at-type',     fields: ['updatedAt', 'type'] },
+];
+
+/** Applied only to karpathy_wiki (the primary atlas writer target). */
+const ATLAS_INDEXES = [
+  { name: 'cluster-id-type',     fields: ['clusterId', 'type'] },
+  { name: 'feature-key',         fields: ['featureKey'] },
+  { name: 'route-id',            fields: ['routeId'] },
 ];
 
 // ── HTTP helpers ──────────────────────────────────────────────────────────────
@@ -136,18 +153,11 @@ export async function ensureDatabase(dbName: MemoryDatabase): Promise<void> {
  */
 export async function ensureIndex(
   dbName: string,
-  name: string,
+  name:   string,
   fields: string[],
 ): Promise<void> {
-  const body = JSON.stringify({
-    index: { fields },
-    name,
-    type: 'json',
-  });
-  const res = await couchFetch(dbName + '/_index', {
-    method: 'POST',
-    body,
-  });
+  const body = JSON.stringify({ index: { fields }, name, type: 'json' });
+  const res  = await couchFetch(dbName + '/_index', { method: 'POST', body });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(`[mango-indexes] Failed to create index ${name} on ${dbName}: ${res.status} ${text}`);
@@ -160,17 +170,31 @@ export async function ensureIndex(
  */
 export async function ensureMangoIndexes(): Promise<{ ok: boolean; created: string[] }> {
   const created: string[] = [];
-  const errors: string[] = [];
+  const errors:  string[] = [];
 
   for (const db of MEMORY_DATABASES) {
     try {
       await ensureDatabase(db);
+
+      // Common indexes — applied to every database
       for (const idx of COMMON_INDEXES) {
         try {
           await ensureIndex(db, idx.name, idx.fields);
           created.push(`${db}/${idx.name}`);
         } catch (err) {
           errors.push(String(err));
+        }
+      }
+
+      // Atlas indexes — karpathy_wiki only (primary writer target)
+      if (db === 'karpathy_wiki') {
+        for (const idx of ATLAS_INDEXES) {
+          try {
+            await ensureIndex(db, idx.name, idx.fields);
+            created.push(`${db}/${idx.name}`);
+          } catch (err) {
+            errors.push(String(err));
+          }
         }
       }
     } catch (err) {
@@ -189,14 +213,14 @@ export async function ensureMangoIndexes(): Promise<{ ok: boolean; created: stri
  * Mango find query with full typing.
  */
 export async function findDocs<T extends MemoryDoc>(
-  dbName: string,
+  dbName:   string,
   selector: Record<string, unknown>,
-  opts?: { limit?: number; sort?: Record<string, 'asc' | 'desc'>[]; fields?: string[] },
+  opts?:    { limit?: number; sort?: Record<string, 'asc' | 'desc'>[]; fields?: string[] },
 ): Promise<T[]> {
   const body = JSON.stringify({
     selector,
-    limit: opts?.limit ?? 25,
-    sort: opts?.sort,
+    limit:  opts?.limit ?? 25,
+    sort:   opts?.sort,
     fields: opts?.fields,
   });
   const res = await couchFetch(dbName + '/_find', { method: 'POST', body });

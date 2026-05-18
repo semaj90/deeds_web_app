@@ -53,7 +53,7 @@ This report summarizes the testing and remediation work completed for the YoRHa 
 
 ### Health Check Utilities Created
 - ✅ `src/lib/server/db/ssr-health-check.ts` - Database health checks
-- ✅ `src/lib/server/minio/health-check.ts` - MinIO storage verification
+- ✅ `src/lib/server/minio/health-check.ts` - object storage verification
 - ✅ `src/lib/server/utils/graceful-error-handler.ts` - Error handling with retry
 
 ### Service Status (from last health check)

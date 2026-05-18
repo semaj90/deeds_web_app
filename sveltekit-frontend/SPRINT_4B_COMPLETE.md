@@ -484,7 +484,7 @@ curl http://localhost:8095/health
 
 ## 🚧 Future Enhancements
 
-1. **MinIO Integration** - Replace local filesystem with MinIO object storage
+1. **Object Storage Integration** - Replace local filesystem with object storage
 2. **Audio Streaming** - Real-time transcription during upload
 3. **Document OCR** - Add Tesseract for scanned PDFs
 4. **Multi-language Support** - Expand beyond Whisper base's 99 languages

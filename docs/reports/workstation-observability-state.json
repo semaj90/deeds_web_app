@@ -1,16 +1,24 @@
 {
-  "generatedAt": "2026-05-17T06:01:06.988Z",
-  "benchmarkHistoryCount": 3,
+  "generatedAt": "2026-05-17T16:18:22.359Z",
+  "benchmarkHistoryCount": 7,
   "latencyTrendMs": {
     "p50": [
       2428,
       778,
-      738
+      738,
+      774,
+      832,
+      736,
+      819
     ],
     "p95": [
       6297,
       957,
-      922
+      922,
+      835,
+      1069,
+      8487,
+      1048
     ],
     "average": []
   },
@@ -18,12 +26,20 @@
     "baseline": [
       7599,
       7787,
-      7696
+      7696,
+      2377,
+      2376,
+      2402,
+      7501
     ],
     "peakDelta": [
       85,
       42,
-      1
+      1,
+      4,
+      9,
+      11,
+      11
     ]
   },
   "sourceRefCoveragePct": 100,
@@ -40,10 +56,10 @@
     }
   },
   "latestRun": {
-    "timestamp": "2026-05-17T04:44:06.618Z",
+    "timestamp": "2026-05-17T16:16:58.812Z",
     "overallStatus": "PASS",
-    "averageLatencyMs": 748.88,
-    "peakVramDeltaMb": 1,
-    "queriesCount": 25
+    "averageLatencyMs": 840.8,
+    "peakVramDeltaMb": 11,
+    "queriesCount": 10
   }
 }

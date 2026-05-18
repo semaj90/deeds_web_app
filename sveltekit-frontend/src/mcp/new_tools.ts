@@ -29,6 +29,15 @@ export function registerNewTools(
   config: { rerankUrl: string },
   enableLegacy = false
 ) {
+  type AtlasChunkCard = {
+    chunkId: string;
+    rank: number;
+    sourceRef: string;
+    kind: 'source' | 'agents-md' | 'notecard';
+    summary: string;
+    score: number;
+  };
+
   function normalizeCompactScore(score: number | undefined): number {
     if (typeof score !== 'number' || Number.isNaN(score)) return 0;
     if (score <= 1) return Math.max(0, Math.min(1, score));
@@ -62,8 +71,15 @@ export function registerNewTools(
       })),
     ];
 
-    candidateChunks.sort((a, b) => b.score - a.score);
-    const topChunks = candidateChunks.slice(0, 8);
+    const chunkIndex: AtlasChunkCard[] = [...candidateChunks]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8)
+      .map((chunk, rank) => ({
+        chunkId: `${rank + 1}:${chunk.kind}:${chunk.sourceRef}`,
+        rank: rank + 1,
+        ...chunk,
+      }));
+    const topChunks = chunkIndex;
     const sourceRefs = packet.sourceRefs.slice(0, 5);
 
     const summaryParts = [
@@ -107,6 +123,7 @@ export function registerNewTools(
       query: packet.query,
       summary:
         summaryParts.length > 0 ? summaryParts.join(' | ') : `Compact context for ${packet.query}`,
+      chunk_index: chunkIndex,
       top_chunks: topChunks,
       sourceRefs,
       suggested_files: suggestedFiles,
@@ -605,21 +622,37 @@ export function registerNewTools(
     'atlas.get_chunk',
     {
       description:
-        'Return the best compact chunk card for a query, optionally prioritizing a specific sourceRef.',
+        'Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef.',
       inputSchema: atlasPrefetchInputSchema.extend({
+        chunkId: z
+          .string()
+          .optional()
+          .describe('Optional chunkId from atlas.compact_context.chunk_index'),
+        chunkIndex: z
+          .number()
+          .int()
+          .min(0)
+          .max(7)
+          .optional()
+          .describe('Optional zero-based chunk index within the compact Atlas packet'),
         sourceRef: z
           .string()
           .optional()
           .describe('Optional sourceRef to prioritize when selecting a chunk'),
       }),
     },
-    async ({ sourceRef, ...options }) => {
+    async ({ chunkId, chunkIndex, sourceRef, ...options }) => {
       try {
         const packet = await loadAtlasCompactContext(options);
         const compact = buildAtlasCompactContext(packet);
-        const prioritizedChunk = sourceRef
-          ? compact.top_chunks.find((chunk) => chunk.sourceRef === sourceRef)
-          : compact.top_chunks[0];
+        const index = compact.chunk_index;
+        const prioritizedChunk = chunkId
+          ? index.find((chunk) => chunk.chunkId === chunkId)
+          : typeof chunkIndex === 'number'
+            ? (index[chunkIndex] ?? null)
+            : sourceRef
+              ? index.find((chunk) => chunk.sourceRef === sourceRef)
+              : (index[0] ?? null);
 
         return {
           content: [
@@ -628,8 +661,11 @@ export function registerNewTools(
               text: JSON.stringify(
                 {
                   query: compact.query,
+                  chunkId: chunkId ?? null,
+                  chunkIndex: typeof chunkIndex === 'number' ? chunkIndex : null,
                   sourceRef: sourceRef ?? null,
                   chunk: prioritizedChunk ?? null,
+                  chunk_index: compact.chunk_index,
                   top_chunks: compact.top_chunks.slice(0, 5),
                   sourceRefs: compact.sourceRefs,
                   confidence: compact.confidence,

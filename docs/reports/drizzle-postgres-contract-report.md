@@ -1,6 +1,24 @@
 # Drizzle ↔ Postgres Contract Report
 
-Generated: 2026-05-16T19:08:55.896Z  |  Findings: 766
+Generated: 2026-05-18T02:31:47.116Z  |  Findings: 774
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
@@ -3866,12 +3884,6 @@ Generated: 2026-05-16T19:08:55.896Z  |  Findings: 766
 **File:** `sveltekit-frontend\src\lib\server\db\schema-ingestion.ts`
 **Validate:** `npm run db:check`
 
-### live_db_schema_drift  (high)
-**Problem:** users.id: Drizzle says uuid, live DB says integer.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
 ### missing_column  (medium)
 **Problem:** Column documents.case_id in Drizzle schema but absent from live DB.
 **Fix:** ALTER TABLE documents ADD COLUMN IF NOT EXISTS case_id ...
@@ -3994,6 +4006,42 @@ Generated: 2026-05-16T19:08:55.896Z  |  Findings: 766
 
 ### missing_table  (medium)
 **Problem:** Table "web_search_index" declared in Drizzle schema but absent from live DB — migration pending.
+**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`, `npm run db:generate`
+
+### missing_column  (medium)
+**Problem:** Column codebase_chunk_index.centroid_id in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE codebase_chunk_index ADD COLUMN IF NOT EXISTS centroid_id ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column codebase_chunk_index.compressed_embedding in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE codebase_chunk_index ADD COLUMN IF NOT EXISTS compressed_embedding ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column codebase_chunk_index.reconstruction_error in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE codebase_chunk_index ADD COLUMN IF NOT EXISTS reconstruction_error ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column codebase_chunk_index.routing_tier in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE codebase_chunk_index ADD COLUMN IF NOT EXISTS routing_tier ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`
+
+### missing_table  (medium)
+**Problem:** Table "centroid_registry" declared in Drizzle schema but absent from live DB — migration pending.
+**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`, `npm run db:generate`
+
+### missing_table  (medium)
+**Problem:** Table "cluster_cards" declared in Drizzle schema but absent from live DB — migration pending.
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
 **File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`

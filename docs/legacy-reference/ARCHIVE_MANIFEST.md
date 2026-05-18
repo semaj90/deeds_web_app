@@ -76,9 +76,9 @@
 
 | Directory | Files | What It Was | What Replaced It |
 |-----------|-------|-------------|-----------------|
-| `documents/` | 648 | Document storage (PDFs, text, metadata) | MinIO object storage + PostgreSQL evidence table |
-| `lawpdfs/` | 31+6 | Legal PDF corpus | MinIO storage + evidence pipeline |
-| `data/` | 1 | MinIO system files | MinIO runs in Docker |
+| `documents/` | 648 | Document storage (PDFs, text, metadata) | Object storage + PostgreSQL evidence table |
+| `lawpdfs/` | 31+6 | Legal PDF corpus | Object storage + evidence pipeline |
+| `data/` | 1 | Object storage system files | Object storage runs in Docker |
 | `datasets/` | 1 | `legal_corpus.json` sample data | Active corpus in Qdrant collections |
 | `sample-data/` | 1 | Test data files | Test fixtures in `scripts/tests/` |
 | `notebooks/` | 1 | Jupyter research notebooks | No active model training pipeline |
@@ -144,7 +144,7 @@ AFTER (2026):
   go-microservice/        — Consolidated Go (gRPC + QUIC + SIMD)
   simd-bridge/            — LibTorch/CUDA N-API addon
   Ollama (native)         — GPU inference (gemma3-legal + embeddinggemma)
-  Docker Compose          — PostgreSQL + Redis + Qdrant + MinIO + RabbitMQ + CouchDB
+  Docker Compose          — PostgreSQL + Redis + Qdrant + object storage + RabbitMQ + CouchDB
 ```
 
 ---

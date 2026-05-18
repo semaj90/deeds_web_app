@@ -5181,6 +5181,68 @@ server.registerTool(
   }
 );
 
+// ── atlas.prefilter ────────────────────────────────────────────────────────────
+// TurboVec cluster prefilter: embeds query → calls :8099/prefilter → returns
+// cluster IDs (for Qdrant filter injection) and centroid scores.
+
+server.registerTool(
+  'atlas.prefilter',
+  {
+    description:
+      'TurboVec ANN cluster prefilter. Embeds the query and queries the TurboVec sidecar ' +
+      '(:8099) to identify the top-N cluster IDs for injecting into a Qdrant should/must filter. ' +
+      'Returns clusterIds, centroidScores, backend (python|js|offline), and latency.',
+    inputSchema: z.object({
+      query:       z.string().min(1).max(2000).describe('Natural-language or code query to prefilter'),
+      topClusters: z.number().int().min(1).max(20).default(5).describe('Number of clusters to return'),
+    }),
+  },
+  async ({ query, topClusters }) => {
+    try {
+      // Embed the query via Ollama embeddinggemma
+      const embRes = await fetch('http://127.0.0.1:11434/api/embeddings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!embRes.ok) throw new Error(`embed failed: ${embRes.status}`);
+      const { embedding } = await embRes.json() as { embedding: number[] };
+      if (!embedding || embedding.length !== 768) throw new Error('embedding dim mismatch');
+
+      // Call TurboVec sidecar
+      const TURBOVEC_SIDECAR = process.env.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8099';
+      const tvRes = await fetch(`${TURBOVEC_SIDECAR}/prefilter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vector: embedding, topClusters }),
+        signal: AbortSignal.timeout(500),
+      });
+      if (!tvRes.ok) throw new Error(`turbovec failed: ${tvRes.status}`);
+      const tv = await tvRes.json();
+
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            clusterIds: tv.clusterIds ?? [],
+            centroidScores: tv.centroidScores ?? {},
+            backend: tv.backend ?? 'unknown',
+            qdrantFilter: (tv.clusterIds?.length ?? 0) > 0
+              ? { must: [{ key: 'neo4j_gpuCluster', match: { any: tv.clusterIds.map(String) } }] }
+              : null,
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
 nodeServer.listen(PORT, HOST, () => {
   console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
   console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');
@@ -5200,7 +5262,7 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       ops.recall_fixer_pattern, ops.store_fixer_pattern [OPERATOR-GATED]');
   console.log('       context.prefetch_feature_context (TRACE+KB+Karpathy bridge)');
   console.log(
-    '       atlas.query, atlas.get_chunk, atlas.explain_trace, atlas.suggest_files, atlas.source_refs, atlas.compact_context'
+    '       atlas.query, atlas.get_chunk, atlas.explain_trace, atlas.suggest_files, atlas.source_refs, atlas.compact_context, atlas.prefilter (TurboVec cluster prefilter)'
   );
   console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');
   console.log('       evidence.image_feedback (thumbs up/down → Redis+Qdrant+GRPO),');

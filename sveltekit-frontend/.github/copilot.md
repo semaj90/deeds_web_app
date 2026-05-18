@@ -239,7 +239,7 @@ MIRRORED SEARCH:
   ├─ pgvector: Local similarity (HNSW cosine)
   ├─ Qdrant: Semantic knowledge base (15 collections)
   ├─ CouchDB: Graph views (by_priority, by_status)
-  └─ MinIO: Payload retrieval (raw docs, parsed chunks)
+  └─ SeaweedFS S3: Payload retrieval (raw docs, parsed chunks; MinIO-compatible adapter)
 ```
 
 ### Storage Backends
@@ -247,7 +247,7 @@ MIRRORED SEARCH:
 |---------|------|---------|-------------|
 | **PostgreSQL 17 + pgvector** | 5434 | Error metadata, HNSW search | 100 errors, 100 embeddings (768D) |
 | **Qdrant** | 6333 | Semantic KB, vector search | 15 collections, 55,561 vectors |
-| **MinIO (S3)** | 9000 | Raw docs, parsed chunks | 4 buckets (phase76-summaries, docs, knowledge, legal-documents) |
+| **SeaweedFS S3** | 8333 | Raw docs, parsed chunks | 4 buckets (phase76-summaries, docs, knowledge, legal-documents) |
 | **CouchDB** | 5984 | Graph views, design docs | phase76 design docs (by_priority, by_status) |
 | **Redis** | 6379 | Cache, topology | phase76:codebase:*, phase76:semantic:* |
 | **Ollama** | 11434 | Embeddings, LLM | embeddinggemma:latest (768D), gemma3-legal:latest |
@@ -255,8 +255,8 @@ MIRRORED SEARCH:
 ### Key Scripts (Phase 76 Knowledge Base)
 | Script | Purpose | Input | Output |
 |--------|---------|-------|--------|
-| `phase76-knowledge-builder.mjs` | Webcrawl + ingest + embed | URLs, crawl depth | Qdrant vectors, MinIO objects |
-| `phase76-storage-layer.mjs` | Storage abstraction | Postgres, Redis, MinIO | Unified CRUD API |
+| `phase76-knowledge-builder.mjs` | Webcrawl + ingest + embed | URLs, crawl depth | Qdrant vectors, SeaweedFS objects |
+| `phase76-storage-layer.mjs` | Storage abstraction | Postgres, Redis, SeaweedFS | Unified CRUD API |
 | `phase76-couchdb-graph-sync.mjs` | Sync AST graph | knowledge_graph table | CouchDB design docs |
 | `init-qdrant.mjs` | Create collections | Collection names | 15 Qdrant collections |
 | `phase76-fastmcp-server.mjs` | FastMCP tool server | Port 3003 | 10 MCP tools |
@@ -279,7 +279,7 @@ node scripts/phase86-autonomous-loop.mjs
 ### FastMCP Server (10 Tools)
 1. **qdrant_search** - Semantic KB search (768D cosine)
 2. **postgres_query** - Raw SQL execution
-3. **minio_fetch** - S3-compatible object retrieval
+3. **minio_fetch** - SeaweedFS S3 object retrieval (MinIO-compatible adapter)
 4. **redis_cache** - Cache get/set/delete
 5. **read_file** - File I/O with line ranges
 6. **ripgrep** - Advanced code search (use glob patterns!)

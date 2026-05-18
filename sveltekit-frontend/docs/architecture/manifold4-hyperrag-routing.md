@@ -1,4 +1,4 @@
-# Manifold4 HyperRAG Routing
+# Manifold4 Atlas Routing
 
 ## Overview
 Manifold4 is a multi-signal retrieval routing architecture that moves beyond simple vector similarity. It combines topological positioning, semantic confidence, graph authority, and operational task distillates to provide high-precision context for agentic reasoning.
@@ -11,7 +11,7 @@ Every code chunk is projected into a 4D space:
 - **activity_w (Authority)**: PageRank or usage signal.
 
 ## Retrieval Lanes
-HyperRAG search now executes 4 parallel lanes:
+Atlas search now executes 4 parallel lanes:
 1. **Lane 0 (Lexical)**: Ripgrep discovery over cluster digests, paths, and symbols.
 2. **Lane 1 (Topology)**: Greedy centroid lookup for query embeddings.
 3. **Lane 2 (Profile)**: Heuristic routing based on query keywords (e.g., "Redis" -> cluster 94).
@@ -20,7 +20,7 @@ HyperRAG search now executes 4 parallel lanes:
 ## Scoring Formula (v1.0)
 The final ranking is determined by a weighted fusion:
 ```
-final_score = 
+final_score =
     0.35 * denseScore      (Qdrant Semantic)
   + 0.15 * topologyScore   (Cluster Match)
   + 0.15 * graphAuthority  (Neo4j PageRank)

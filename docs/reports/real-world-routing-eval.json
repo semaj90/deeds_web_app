@@ -1,0 +1,715 @@
+{
+  "evaluatedAt": "2026-05-17T21:23:13.059Z",
+  "status": "PASS",
+  "metrics": {
+    "goldenAccuracy": 1,
+    "realWorldAccuracy": 1,
+    "dispatchPruningRatePct": 62,
+    "p95LatencyMs": 5802,
+    "forbiddenFieldsTotal": 0,
+    "sourceRefsPresentRatePct": 100
+  },
+  "queries": [
+    {
+      "id": "real_001",
+      "query": "why is my drizzle migration failing with user_id mismatch and how does that relate to lucia sessions",
+      "signals": {
+        "semantic": 0.5666666666666667,
+        "lexical": 0.3333333333333333,
+        "graph": 0.8,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.2725187210914262,
+        "postgres": 0.07489151849016241,
+        "neo4j": 0.5091319990036561,
+        "mcp": 0.14345776141475522
+      },
+      "chosenLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "accuracy": 1,
+      "latencyMs": 15331,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_002",
+      "query": "where does context assembler inject cluster pivot hits into the ace packet",
+      "signals": {
+        "semantic": 0.8,
+        "lexical": 0,
+        "graph": 0.5,
+        "trustPressure": 0.5
+      },
+      "weights": {
+        "qdrant": 0.6460210737665999,
+        "postgres": 0.026333242783197305,
+        "neo4j": 0.10157852301794719,
+        "mcp": 0.22606716043225564
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 990,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_003",
+      "query": "show files that import community-graph and explain the dependency path",
+      "signals": {
+        "semantic": 0.3333333333333333,
+        "lexical": 0.3333333333333333,
+        "graph": 1,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.09442455487110366,
+        "postgres": 0.044603001478568015,
+        "neo4j": 0.7583420125866862,
+        "mcp": 0.1026304310636421
+      },
+      "chosenLanes": [
+        "neo4j"
+      ],
+      "expectedLanes": [
+        "neo4j"
+      ],
+      "accuracy": 1,
+      "latencyMs": 949,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_004",
+      "query": "why is qdrant matching file_path but neo4j enrichment says zero unique paths",
+      "signals": {
+        "semantic": 0.4,
+        "lexical": 0.3333333333333333,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.45708525067249856,
+        "postgres": 0.2963486356287709,
+        "neo4j": 0.08925849375946399,
+        "mcp": 0.15730761993926665
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 25,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_005",
+      "query": "how do we validate pgvector hnsw indexes and which migrations registered them",
+      "signals": {
+        "semantic": 0.8,
+        "lexical": 0,
+        "graph": 0.3,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.6532756925251534,
+        "postgres": 0.06230235549190684,
+        "neo4j": 0.1386564420887261,
+        "mcp": 0.14576550989421372
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 20,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_006",
+      "query": "what broke turboquant vlm mode switching and why does mmproj need to unload in text mode",
+      "signals": {
+        "semantic": 1,
+        "lexical": 0,
+        "graph": 0.5,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.6912325307415308,
+        "postgres": 0.03441444126612021,
+        "neo4j": 0.1542348252841622,
+        "mcp": 0.12011820270818684
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 22,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_007",
+      "query": "where is llm_synthesis_events logged and how does jsonl training memory get written",
+      "signals": {
+        "semantic": 0.4,
+        "lexical": 0.3333333333333333,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.45708525067249856,
+        "postgres": 0.2963486356287709,
+        "neo4j": 0.08925849375946399,
+        "mcp": 0.15730761993926665
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 23,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_008",
+      "query": "why did vitest fail on $lib/server/ace imports from the root package command",
+      "signals": {
+        "semantic": 0.8,
+        "lexical": 0,
+        "graph": 1,
+        "trustPressure": 0.5
+      },
+      "weights": {
+        "qdrant": 0.39784639938724325,
+        "postgres": 0.012629887129271015,
+        "neo4j": 0.35998630879645643,
+        "mcp": 0.22953740468702938
+      },
+      "chosenLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "accuracy": 1,
+      "latencyMs": 24,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_009",
+      "query": "what changed between llms:dir and agents:dir redis keys",
+      "signals": {
+        "semantic": 0.5333333333333333,
+        "lexical": 0,
+        "graph": 0.5,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.3713254103635333,
+        "postgres": 0.06671382003470526,
+        "neo4j": 0.3775660278909167,
+        "mcp": 0.18439474171084488
+      },
+      "chosenLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "accuracy": 1,
+      "latencyMs": 29,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_010",
+      "query": "which lane should answer a trust-sensitive query about deleting sessions and admin tokens",
+      "signals": {
+        "semantic": 0.43333333333333335,
+        "lexical": 0.3333333333333333,
+        "graph": 0,
+        "trustPressure": 0.5
+      },
+      "weights": {
+        "qdrant": 0.5701690894014745,
+        "postgres": 0.15932290070137212,
+        "neo4j": 0.03675470696889099,
+        "mcp": 0.23375330292826255
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 29,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_011",
+      "query": "drizzle.config.ts has postgres database port 5432 instead of 5434 in WSL2 environment",
+      "signals": {
+        "semantic": 0.4,
+        "lexical": 1,
+        "graph": 0.3,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.26763902442395227,
+        "postgres": 0.5665918191517062,
+        "neo4j": 0.07667986432444387,
+        "mcp": 0.08908929209989769
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 26,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_012",
+      "query": "lucia auth session table created_by integer vs users.id mismatch",
+      "signals": {
+        "semantic": 0.3,
+        "lexical": 0.6666666666666666,
+        "graph": 0,
+        "trustPressure": 0.5
+      },
+      "weights": {
+        "qdrant": 0.43010625771103717,
+        "postgres": 0.3377701459054608,
+        "neo4j": 0.030641816318809644,
+        "mcp": 0.2014817800646924
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 28,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_013",
+      "query": "how to run db:generate and migrate sidecar SQL",
+      "signals": {
+        "semantic": 0.26666666666666666,
+        "lexical": 0.3333333333333333,
+        "graph": 0.5,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.23653215875907393,
+        "postgres": 0.1723310799209305,
+        "neo4j": 0.40997007799185486,
+        "mcp": 0.1811666833281408
+      },
+      "chosenLanes": [
+        "neo4j"
+      ],
+      "expectedLanes": [
+        "neo4j"
+      ],
+      "accuracy": 1,
+      "latencyMs": 23,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_014",
+      "query": "I need a list of files importing pgvector and creating hnsw indexes",
+      "signals": {
+        "semantic": 0.8,
+        "lexical": 0,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.7405346939296241,
+        "postgres": 0.08205358296428654,
+        "neo4j": 0.0550021615100097,
+        "mcp": 0.12240956159607964
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 22,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_015",
+      "query": "drop all sessions and clean redis hot cache keys for user",
+      "signals": {
+        "semantic": 0.7333333333333333,
+        "lexical": 0,
+        "graph": 0,
+        "trustPressure": 0.5
+      },
+      "weights": {
+        "qdrant": 0.7443786334237597,
+        "postgres": 0.04679999773868022,
+        "neo4j": 0.025259857812259028,
+        "mcp": 0.1835615110253011
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 22,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_016",
+      "query": "how does Hebbian learning adapt the 4x4 softmax weights dynamic feedback loop",
+      "signals": {
+        "semantic": 0.8,
+        "lexical": 0,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.7405346939296241,
+        "postgres": 0.08205358296428654,
+        "neo4j": 0.0550021615100097,
+        "mcp": 0.12240956159607964
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 29,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_017",
+      "query": "explain dual-embedder HTTP error fallback strategy for ollama",
+      "signals": {
+        "semantic": 0.26666666666666666,
+        "lexical": 0.6666666666666666,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.29144538393426744,
+        "postgres": 0.5310481133536588,
+        "neo4j": 0.06289830983993709,
+        "mcp": 0.11460819287213672
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 16,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_018",
+      "query": "what are the allowed dimensions for warden 384 vs codebase 768 vector collections",
+      "signals": {
+        "semantic": 0.8666666666666667,
+        "lexical": 0,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.77260549728429,
+        "postgres": 0.07126713148757274,
+        "neo4j": 0.04620564139937828,
+        "mcp": 0.10992172982875897
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 22,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_019",
+      "query": "run preflight checks and verify services are up on port 6379 and 5434",
+      "signals": {
+        "semantic": 0.43333333333333335,
+        "lexical": 0.6666666666666666,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.3924617394482602,
+        "postgres": 0.4521914807141671,
+        "neo4j": 0.04927609393288952,
+        "mcp": 0.10607068590468315
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 17,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_020",
+      "query": "where does hermes-self-healing-warden.mjs pull KAG fixer patterns from",
+      "signals": {
+        "semantic": 0.26666666666666666,
+        "lexical": 1,
+        "graph": 0.5,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.1922093854116912,
+        "postgres": 0.5312602390172159,
+        "neo4j": 0.1710436282906755,
+        "mcp": 0.10548674728041757
+      },
+      "chosenLanes": [
+        "postgres"
+      ],
+      "expectedLanes": [
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 22,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_021",
+      "query": "lucia session table user_id uuid vs users.id serial integer",
+      "signals": {
+        "semantic": 0.3,
+        "lexical": 0.6666666666666666,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.3104624398511011,
+        "postgres": 0.5161494011709062,
+        "neo4j": 0.060123228280687856,
+        "mcp": 0.11326493069730464
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 28,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_022",
+      "query": "show dependency path between context-assembler.ts and query-router-4x4.ts",
+      "signals": {
+        "semantic": 0.23333333333333334,
+        "lexical": 1,
+        "graph": 1,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.09958788345540824,
+        "postgres": 0.2349502614808675,
+        "neo4j": 0.5683328052117422,
+        "mcp": 0.09712904985198202
+      },
+      "chosenLanes": [
+        "neo4j"
+      ],
+      "expectedLanes": [
+        "neo4j"
+      ],
+      "accuracy": 1,
+      "latencyMs": 22,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_023",
+      "query": "rebuild turboquant tensorrt native bridge simdjson n-api binary",
+      "signals": {
+        "semantic": 0.26666666666666666,
+        "lexical": 0.3333333333333333,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.37019758170420997,
+        "postgres": 0.3463224235261014,
+        "neo4j": 0.11150136887320254,
+        "mcp": 0.1719786258964862
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 17,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_024",
+      "query": "deleting session credentials and raw user auth tokens",
+      "signals": {
+        "semantic": 0.5333333333333333,
+        "lexical": 0,
+        "graph": 0,
+        "trustPressure": 0.5
+      },
+      "weights": {
+        "qdrant": 0.6407319637232747,
+        "postgres": 0.0698216790381997,
+        "neo4j": 0.041649021828174114,
+        "mcp": 0.24779733541035143
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 21,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "real_025",
+      "query": "check which migrations are registered in drizzle/meta/_journal.json",
+      "signals": {
+        "semantic": 0.23333333333333334,
+        "lexical": 0.3333333333333333,
+        "graph": 0.3,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.2842834670514845,
+        "postgres": 0.2508792791289449,
+        "neo4j": 0.27268170442621703,
+        "mcp": 0.19215554939335364
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres",
+        "neo4j"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres",
+        "neo4j"
+      ],
+      "accuracy": 1,
+      "latencyMs": 19,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    }
+  ]
+}

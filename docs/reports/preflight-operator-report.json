@@ -1,0 +1,92 @@
+{
+  "verifiedAt": "2026-05-17T21:27:44.404Z",
+  "status": "PASS",
+  "services": [
+    {
+      "name": "Postgres (Core DB)",
+      "port": 5434,
+      "required": true,
+      "type": "tcp",
+      "status": "ONLINE",
+      "latencyMs": 3,
+      "error": null,
+      "statusCode": null
+    },
+    {
+      "name": "Redis (Cache Layer)",
+      "port": 6379,
+      "required": true,
+      "type": "tcp",
+      "status": "ONLINE",
+      "latencyMs": 1,
+      "error": null,
+      "statusCode": null
+    },
+    {
+      "name": "Qdrant (Vector DB)",
+      "port": 6333,
+      "required": true,
+      "type": "http",
+      "status": "ONLINE",
+      "latencyMs": 24,
+      "error": null,
+      "statusCode": 200
+    },
+    {
+      "name": "Neo4j (Graph DB)",
+      "port": 7687,
+      "required": true,
+      "type": "tcp",
+      "status": "ONLINE",
+      "latencyMs": 0,
+      "error": null,
+      "statusCode": null
+    },
+    {
+      "name": "SearXNG (Web Search)",
+      "port": 8889,
+      "required": false,
+      "type": "http",
+      "status": "ONLINE",
+      "latencyMs": 114,
+      "error": null,
+      "statusCode": 200
+    },
+    {
+      "name": "SeaweedFS Filer",
+      "port": 8888,
+      "required": true,
+      "type": "http",
+      "status": "ONLINE",
+      "latencyMs": 134,
+      "error": null,
+      "statusCode": 200
+    },
+    {
+      "name": "SeaweedFS S3 Gateway",
+      "port": 8333,
+      "required": true,
+      "type": "http",
+      "status": "ONLINE",
+      "latencyMs": 9,
+      "error": null,
+      "statusCode": 403
+    },
+    {
+      "name": "TurboQuant (LLM Engine)",
+      "port": 8090,
+      "required": true,
+      "type": "http",
+      "status": "ONLINE",
+      "latencyMs": 17,
+      "error": null,
+      "statusCode": 200
+    }
+  ],
+  "metrics": {
+    "total": 8,
+    "online": 8,
+    "criticalDown": 0,
+    "optionalDown": 0
+  }
+}

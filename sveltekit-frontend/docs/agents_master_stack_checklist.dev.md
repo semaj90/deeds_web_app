@@ -15,7 +15,7 @@ Purpose: keep local development fast, explicit, and close to production behavior
 ## Checklist
 - [ ] Keep `npm run dev` and `npm run dev:full` working.
 - [ ] Keep `svelte-check`, `vitest`, `eslint`, and `prettier` runnable locally.
-- [ ] Document local service endpoints for Postgres, Redis, Qdrant, MinIO, and Ollama.
+- [ ] Document local service endpoints for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
 - [ ] Keep dev bypasses isolated from production code paths.
 - [ ] Include `dev-only` packages in local installs.
 

@@ -83,10 +83,10 @@ Start the Docker container with GPU support
 
 **Ports mapped**:
 - 8000 → FastAPI server
-- 5432 → PostgreSQL
+- 5434 → PostgreSQL
 - 6379 → Redis
 - 6333 → Qdrant
-- 9000 → MinIO
+- 8333 → SeaweedFS S3 gateway
 - 5672 → RabbitMQ
 - 7687 → Neo4j
 
@@ -394,10 +394,10 @@ Once container is running:
 | Service | URL | Port |
 |---------|-----|------|
 | FastAPI | http://localhost:8000 | 8000 |
-| PostgreSQL | localhost:5432 | 5432 |
+| PostgreSQL | localhost:5434 | 5434 |
 | Redis | localhost:6379 | 6379 |
 | Qdrant | http://localhost:6333 | 6333 |
-| MinIO | http://localhost:9000 | 9000 |
+| SeaweedFS S3 | http://localhost:8333 | 8333 |
 | RabbitMQ | localhost:5672 | 5672 |
 | Neo4j | bolt://localhost:7687 | 7687 |
 

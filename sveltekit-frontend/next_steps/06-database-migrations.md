@@ -446,7 +446,7 @@ grep -i "DROP" drizzle/0003_*.sql
 # Replace DROP+CREATE with ALTER TABLE RENAME
 
 # 6. Test on local dev database first
-POSTGRES_URL="postgresql://postgres:password@localhost:5432/deeds_dev" npx drizzle-kit migrate
+POSTGRES_URL="postgresql://postgres:password@localhost:5434/deeds_dev" npx drizzle-kit migrate
 
 # 7. Verify schema
 npx drizzle-kit introspect

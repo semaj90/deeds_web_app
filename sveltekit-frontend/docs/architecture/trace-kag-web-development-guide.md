@@ -24,10 +24,10 @@ Build a SvelteKit 2 app that supports legal/evidence workflows, AI retrieval, up
 
 Reference [`trace-runtime-split.md`](./trace-runtime-split.md). Short version: TypeScript orchestrates; GPU does dense math; Redis caches; Qdrant searches vectors; Postgres stores truth; Neo4j analyzes graphs; Gemma4 synthesizes only after retrieval has narrowed the candidate set.
 
-## 3. RAG / HyperRAG / KAG / DAG / TRACE
+## 3. RAG / Atlas / KAG / DAG / TRACE
 
 - **RAG** — Retrieve chunks from Qdrant, then answer with Gemma4.
-- **HyperRAG** — Retrieve across many memory types: chunks, summaries, wiki notes, research notes, prior answers, topology regions.
+- **Atlas** — Retrieve across many memory types with compact context packs: chunks, summaries, wiki notes, research notes, prior answers, topology regions.
 - **KAG (Knowledge-Augmented Generation)** — vectors + graph facts + ontology + audit gates + AGENTS.md + research provenance.
 - **DAG (Directed Acyclic Graph)** — safe ordered execution plan with no loops.
 - **TRACE** — Triage → Retrieve → Align → Compose → Encode. Production KAG-DAG.

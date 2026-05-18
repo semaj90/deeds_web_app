@@ -369,7 +369,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const evidenceId = uuidv4();
   const minioPath = `audio/${caseId}/${evidenceId}.${audioFile.name.split('.').pop()}`;
 
-  // TODO: Actual MinIO upload (omitted for brevity)
+  // TODO: Actual object storage upload (omitted for brevity)
 
   // 2. Create evidence record
   await db.insert(evidence).values({

@@ -131,6 +131,7 @@ import {
   boundedBowBoost,
 } from '$lib/server/search/bow-utils.js';
 import { encodedClusterPrefilter } from '$lib/server/retrieval/encoded-cluster-prefilter.js';
+import { turbovecPrefilter } from '$lib/server/retrieval/turbovec-prefilter.js';
 
 // ── Cluster tags artifact reader (shared with multi-lane-retrieval) ──────────
 import {
@@ -752,12 +753,21 @@ async function fetchACPKnowledgeResults(
     }
 
     // HyperRAG fallback: Qdrant ANN with optional CHR97 seed boost
+    // Stage A-TV: TurboVec cluster prefilter (200ms budget, non-blocking on failure)
+    let turbovecFilter: Record<string, any> | undefined;
+    if (collection === 'codebase_chunks_768') {
+      const tvResult = await turbovecPrefilter(emb, { topClusters: 5, timeoutMs: 200 });
+      if (tvResult.clusterIds.length > 0) {
+        turbovecFilter = { must: [{ key: 'neo4j_gpuCluster', match: { any: tvResult.clusterIds.map(String) } }] };
+      }
+    }
     try {
       const dirHits = await qdrant.hybridSearch({
         collection,
         query,
         queryEmbedding: Array.from(emb),
         limit,
+        filters: turbovecFilter,
       });
 
       const qCoords4d = project4DQuery(query);

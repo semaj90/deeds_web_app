@@ -121,7 +121,7 @@ npm run dev
 ### Step 3: Test with Ollama Fallback
 
 ```bash
-# Load test now routes: Bifrost (10s timeout) → Ollama (:11434)
+# Load test now routes: Bifrost (10s timeout) → Ollama fallback (:11434)
 node scripts/tests/redis-load-test.mjs --duration=60 --concurrency=5
 ```
 

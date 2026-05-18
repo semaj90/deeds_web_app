@@ -209,7 +209,7 @@ metadata: {
 
 ---
 
-## MinIO Integration
+## Object Storage Integration
 
 ### Bucket Structure
 ```
@@ -239,8 +239,8 @@ deeds-evidence/
 {/if}
 ```
 
-✅ **MinIO accessible** at `http://localhost:9000`
-✅ **Credentials**: From `.env` (`MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`)
+✅ **SeaweedFS S3 accessible** at `http://localhost:8333`
+✅ **Credentials**: From `.env` (`SEAWEED_ACCESS_KEY`, `SEAWEED_SECRET_KEY`)
 
 ---
 
@@ -372,7 +372,7 @@ Format: Description | Objects: obj1, obj2 | Tags: tag1, tag2
 - [x] VLM integration (video frames)
 - [x] Real database data tested
 - [x] Playwright tests passing
-- [x] MinIO file access (video frames)
+- [x] SeaweedFS S3 file access (video frames)
 
 ---
 
@@ -380,7 +380,7 @@ Format: Description | Objects: obj1, obj2 | Tags: tag1, tag2
 
 ### None Currently
 
-All features are working as expected with real data from `legal_ai_db` and MinIO buckets.
+All features are working as expected with real data from `legal_ai_db` and SeaweedFS S3 buckets.
 
 ---
 

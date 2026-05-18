@@ -121,7 +121,7 @@ User Query
 - [x] Qdrant vector DB operational (7 cached responses)
 - [x] Neo4j graph DB running (1,804 nodes)
 - [x] RabbitMQ message queue healthy
-- [x] MinIO object storage accessible
+- [x] Object storage accessible
 - [x] LangExtract entity extraction service running
 - [x] Ollama inference engine operational (gemma4-legal-fast)
 - [x] GPU acceleration enabled (RTX 3060 Ti, 2.8GB/8GB)

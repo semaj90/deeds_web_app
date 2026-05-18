@@ -271,7 +271,7 @@ npm run check
 │    ├─ Qdrant: 15 collections, 55,561 vectors (HNSW)        │
 │    ├─ PostgreSQL pgvector: 100 errors, 100 embeddings      │
 │    ├─ CouchDB: Graph views (by_priority, by_status)        │
-│    ├─ MinIO: Raw docs (4 buckets)                          │
+│    ├─ SeaweedFS S3: Raw docs (4 buckets; MinIO-compatible adapter) │
 │    └─ Redis: Cache (phase76:codebase:*, semantic:*)        │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -283,7 +283,7 @@ When Phase 86 autonomous loop encounters an error:
 2. **pgvector**: Local HNSW similarity (cosine, sub-millisecond)
 3. **Qdrant**: Semantic KB search (15 collections, 768D)
 4. **CouchDB**: Graph expansion (related errors, patterns, files)
-5. **MinIO**: Payload retrieval (full context, parsed docs)
+5. **SeaweedFS S3**: Payload retrieval (full context, parsed docs; MinIO-compatible adapter)
 
 **Merge Strategy**:
 ```javascript
@@ -296,7 +296,7 @@ finalScore = (pgvectorScore * 0.4) + (qdrantScore * 0.4) + (graphScore * 0.2)
 |---------|------|------|-------------|
 | PostgreSQL 17 + pgvector | 5434 | Error metadata, HNSW search | 100/33,599 errors (0.3%), 100 embeddings (768D) |
 | Qdrant | 6333 | Semantic knowledge base | 15 collections, 55,561 vectors (phase72_error_patterns: 53,227) |
-| MinIO (S3) | 9000 | Object storage | phase76-summaries, phase76-docs, phase76-knowledge, legal-documents |
+| SeaweedFS S3 | 8333 | Object storage | phase76-summaries, phase76-docs, phase76-knowledge, legal-documents |
 | CouchDB | 5984 | Graph views | phase76 design docs (by_priority, by_status, recommendations) |
 | Redis | 6379 | Cache layer | phase76:codebase:*, phase76:semantic:*, topology:cache:* |
 | Ollama | 11434 | Embeddings + LLM | embeddinggemma:latest (768D), gemma3-legal:latest (generation) |
@@ -320,7 +320,7 @@ finalScore = (pgvectorScore * 0.4) + (qdrantScore * 0.4) + (graphScore * 0.2)
 **Available Tools** (10 total):
 1. `qdrant_search` - Search Qdrant collections (768D cosine)
 2. `postgres_query` - Execute SQL (ts_errors, error_embeddings, knowledge_graph)
-3. `minio_fetch` - Retrieve objects from S3-compatible storage
+3. `minio_fetch` - Retrieve objects from SeaweedFS S3 (MinIO-compatible adapter)
 4. `redis_cache` - Cache operations (get/set/delete)
 5. `read_file` - Read files with line range support
 6. `ripgrep` - Symbol/pattern search (JSON output, use glob patterns!)

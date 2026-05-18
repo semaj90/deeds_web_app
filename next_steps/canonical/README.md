@@ -66,6 +66,14 @@ This directory contains all documentation for deploying the optimized SvelteKit 
 
 ---
 
+## 🔎 Related Inference Notes
+
+- [`../README.md`](../README.md) - index for the new inference planning notes.
+- [`../turbovecquant.md`](../turbovecquant.md) - merged legal Gemma4 runtime, KV split, TurboVec, and request flow.
+- [`../inference.md`](../inference.md) - directory map and KAG/contextual graph dependencies.
+
+---
+
 ## 🚀 Quick Start
 
 **To deploy the optimized production build:**
@@ -108,7 +116,7 @@ See [QUICK_START_PRODUCTION.md](QUICK_START_PRODUCTION.md) for detailed instruct
 | Dockerfile.optimized | ✅ Ready (160 lines) | `sveltekit-frontend/` |
 | docker-compose | ✅ Ready | `docker-compose.sveltekit-optimized.yml` |
 | Deployment script | ✅ Executable | `deploy-sveltekit.sh` |
-| Infrastructure | ✅ Healthy | postgres, redis, qdrant, minio |
+| Infrastructure | ✅ Healthy | postgres, redis, qdrant, seaweedfs |
 | Port 3000 | ✅ Available | Ready for Docker |
 
 ---
@@ -203,15 +211,15 @@ Based on Session 93r28i benchmarks:
 
 ### Required Services (Must Be Running)
 
-✅ **PostgreSQL** - Port 5432 (deeds-postgres-prod)
+✅ **PostgreSQL** - Port 5434 (canonical app DB; 5432 legacy)
 ✅ **Redis** - Port 6379 (deeds-redis-prod)
 ✅ **Qdrant** - Port 6333 (deeds-qdrant-prod)
 
 ### Optional Services (Recommended)
 
-✅ **MinIO** - Port 9000 (phase66-minio)
+✅ **SeaweedFS** - Port 8888/8333 (filer/s3)
 ✅ **RabbitMQ** - Port 5672 (phase66-rabbitmq)
-✅ **Ollama** - Port 11434 (native GPU)
+✅ **Ollama** - Port 11434 (native GPU fallback)
 ✅ **CouchDB** - Port 5984 (phase66-couchdb, for ACE)
 
 ### Deployment Target
