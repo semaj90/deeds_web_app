@@ -71,7 +71,7 @@ if (!updated) {
 **Evidence DB Flow**:
 ```
 POST /api/evidence/upload
-  ├─ MinIO upload (✅ file_path saved)
+  ├─ Object storage upload (✅ file_path saved)
   ├─ Sharp extract (✅ extracted_text saved)
   ├─ Chunking (✅ chunks JSONB saved)
   ├─ Embedding (✅ pgvector saved)
@@ -95,7 +95,7 @@ POST /api/evidence/upload
 **POI Photo DB Flow**:
 ```
 POST /api/persons-of-interest/<id>/photos
-  ├─ MinIO upload (✅ minio_key saved)
+  ├─ Object storage upload (✅ minio_key saved)
   ├─ Sharp thumbnail (✅ thumbnail_key saved)
   ├─ DB record insert (✅ poiPhotos record created)
   │
@@ -241,7 +241,7 @@ if (!updated) {
 - Extracted text preview (first 500 chars)
 - Chunks in grid layout (count + sample)
 - GPU analysis results (similarity, cluster)
-- MinIO preview link
+- Object storage preview link
 - Embedded_text_vector confirmation
 ```
 

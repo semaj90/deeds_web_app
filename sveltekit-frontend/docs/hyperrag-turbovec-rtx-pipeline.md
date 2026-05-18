@@ -1,4 +1,4 @@
-# HyperRAG × TurboVec × RTX CUDA Graph Stream Pipeline
+# Atlas × TurboVec × RTX CUDA Graph Stream Pipeline
 
 ## Architecture Overview
 
@@ -15,13 +15,13 @@ Query
 [4D Topology → RTX CUDA Graph]                 ← tensorrt_bridge.node kmeansWithCentroids
   │  cluster centroids float32 stream
   ▼
-[Bifrost Inference Stream]                    ← llama.cpp rotorquant (port 8090)
+[Atlas-fed RotorQuant Decode Stream]          ← llama.cpp rotorquant (port 8090, fed by Atlas compact chunks)
   │  final ranked context with trust tiers
   ▼
-[HyperRAG Multi-Query Merge]                   ← kag.multi_lane_search MCP tool
-  │  G4-sorted chunks + CouchDB wiki enrichment
+[Atlas Multi-Query Merge]                      ← kag.multi_lane_search MCP tool
+  │  Atlas-ranked chunks + CouchDB wiki enrichment
   ▼
-[Minified Graph Sort / Log Triage]             ← Redis BoW tile + GRPO writeback
+[Atlas Chunk Index / Log Triage]               ← Redis BoW tile + GRPO writeback
 ```
 
 ## TurboVec Verified ✅
@@ -34,16 +34,14 @@ Query
 `scripts/rotorquant-turbovec-sidecar.mjs` — spawn Python sidecar, expose ANN API
 
 ### Phase B: 4D Qdrant Multi-Query with Cluster Prefilter
-`scripts/hyperrag-dense-multiquery.mjs` — use saved manifold4 centroids from Redis
-to prefilter Qdrant before full dense search
+`scripts/hyperrag-dense-multiquery.mjs` — use saved manifold4 centroids from Redis to prefilter Qdrant before full dense search as part of the Atlas retrieval path
 
-### Phase C: CouchDB GraphRAG Enrichment
-Enrich results with wiki notes from `karpathy_wiki` CouchDB views
+### Phase C: CouchDB Atlas Enrichment
+Enrich results with wiki notes from `karpathy_wiki` CouchDB views, then fold them into the Atlas ranking pipeline
 
-### Phase D: CUDA Graph Stream → Bifrost Inference Stream
-Feed cluster centroids via `tensorrt_bridge.kmeansWithCentroids` → stream to the
-Bifrost Inference Stream (llama.cpp rotorquant, port 8090) for speculative decoding
+### Phase D: CUDA Graph Stream → Atlas-fed RotorQuant Decode Stream
+Feed cluster centroids and Atlas compact chunks via `tensorrt_bridge.kmeansWithCentroids` → stream to the
+Atlas-fed RotorQuant Decode Stream (llama.cpp rotorquant, port 8090) for speculative decoding
 
-### Phase E: Minified Graph Sort / Log Triage
-Sidecar-loader pattern: small JSON sidecar per cluster with compressed summary,
-sorted by graph PageRank, logged to `logs/hyperrag-stream/` for audit
+### Phase E: Atlas Chunk Index / Log Triage
+Sidecar-loader pattern: small JSON sidecar per cluster with compressed summary, chunk_index, sorted by graph PageRank, logged to `logs/hyperrag-stream/` for audit

@@ -54,7 +54,7 @@ Legend: `required` means the current app or service expects it now; `optional` m
 | `@langchain/textsplitters` | dev/prod | optional | AI / LLM | Text chunking. |
 | `pg` | dev/prod | required | Data | Postgres access. |
 | `drizzle-orm` | dev/prod | required | Data | Typed SQL schema and migration layer used throughout the app. |
-| `minio` | dev/prod | optional | Data | Object storage integration. |
+| `SeaweedFS S3` | dev/prod | optional | Data | Object storage integration via the MinIO-compatible adapter. |
 | `amqplib` | dev/prod | optional | Data | Queueing / broker integration. |
 | `express` | dev/prod | optional | Data | Service adapter and compatibility layer. |
 | `docling-parse` | prod-only | required | Document / vision / audio | Document parsing and layout extraction. |
@@ -94,7 +94,7 @@ Compression here means artifact and image compression, not source minification a
 ### Dev
 - [ ] `npm run dev` and `npm run dev:full` should start cleanly.
 - [ ] `svelte-check`, `vitest`, `eslint`, and `prettier` must remain runnable from the app workspace.
-- [ ] Local services should be documented for Postgres, Redis, Qdrant, MinIO, and Ollama.
+- [ ] Local services should be documented for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
 - [ ] Any dev bypasses must be explicit and isolated from production code paths.
 - [ ] Keep `dev-only` packages available in local installs even when prod images omit them.
 

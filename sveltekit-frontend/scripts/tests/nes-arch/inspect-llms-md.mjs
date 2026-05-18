@@ -6,7 +6,7 @@
  *
  * After `npm run llms:write`, the generator writes BOTH:
  *   - LLMS.md files on disk (per directory, per agents.md spec)
- *   - llms:dir:<rel> Redis keys (24h TTL) with the same rendered markdown
+ *   - agents:dir:<rel> Redis keys (24h TTL) with the same rendered markdown
  *
  * The Redis mirror is what the Gemma4 `agents_md` tool fetches at runtime
  * for sub-5ms agent-context lookups. This inspector confirms the mirror
@@ -55,7 +55,7 @@ if (PATH_ARG) {
   const tried = [];
   let resolved = null;
   while (dir && dir !== '.' && dir !== '/') {
-    const key = `llms:dir:${dir}`;
+    const key = `agents:dir:${dir}`;
     const exists = await r.exists(key);
     tried.push(`${exists ? '✓' : '·'} ${key}`);
     if (exists && !resolved) resolved = key;
@@ -77,11 +77,13 @@ if (PATH_ARG) {
   process.exit(0);
 }
 
-const allKeys = await r.keys('llms:dir:*');
+const allKeys = await r.keys('agents:dir:*');
 const keys = FILTER ? allKeys.filter(k => k.includes(FILTER)) : allKeys;
 const rootExists = await r.exists('llms:root');
 
-console.log(`📦 llms:dir:* keys: ${allKeys.length}${FILTER ? ` (${keys.length} matching "${FILTER}")` : ''}`);
+console.log(
+  `📦 agents:dir:* keys: ${allKeys.length}${FILTER ? ` (${keys.length} matching "${FILTER}")` : ''}`
+);
 console.log(`📦 llms:root:       ${rootExists ? 'present' : 'MISSING — run `npm run llms:write`'}\n`);
 
 const sample = keys.slice(0, 10);
@@ -100,7 +102,9 @@ if (STRICT) {
   const failures = [];
   if (!rootExists) failures.push('llms:root missing — run `npm run llms:write`');
   if (allKeys.length < MIN_KEYS) {
-    failures.push(`llms:dir:* count = ${allKeys.length} (expected ≥ ${MIN_KEYS}) — run \`npm run llms:write\``);
+    failures.push(
+      `agents:dir:* count = ${allKeys.length} (expected ≥ ${MIN_KEYS}) — run \`npm run llms:write\``
+    );
   }
   if (failures.length > 0) {
     console.error('\n✗ smoke:llms FAILED:');

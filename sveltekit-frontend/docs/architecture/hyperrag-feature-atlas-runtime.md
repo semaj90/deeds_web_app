@@ -1,9 +1,9 @@
 ---
-name: HyperRAG Feature Atlas + Runtime Safety
-description: 16-section blueprint for 11-lane HyperRAG, prompt-injection trust tiers, feature annotation schema, panel activity logging, and GPU authority blend integration
+name: Atlas Feature Atlas + Runtime Safety
+description: 16-section blueprint for 11-lane Atlas retrieval, prompt-injection trust tiers, feature annotation schema, panel activity logging, and GPU authority blend integration
 type: project
 tags:
-  - hyperrag
+  - atlas
   - kag
   - trust-tiers
   - feature-atlas
@@ -14,7 +14,7 @@ tags:
   - gemma4
 ---
 
-# HyperRAG Feature Atlas + Runtime Safety
+# Atlas Feature Atlas + Runtime Safety
 
 ## Canonical Retrieval Boundary
 
@@ -41,7 +41,7 @@ The current retrieval stack (`kag.multi_lane_search`, ACE `fetchACPKnowledgeResu
 
 2. **No durable feature annotation.** We can answer "which file implements X" via vector search, but the answer changes silently when code moves. A `feature_implementations` table ties natural-language feature names to specific files + entry-point exports, survives renames, and feeds the ACE context pack without a full Qdrant ANN.
 
-Everything else in this doc is an extension of what already exists. The 11-lane HyperRAG (§3) is a named-lane formalization of `kag.multi_lane_search`. The panel-activity log (§6) feeds the same `context_timeline` table that already captures tool calls and RL signals.
+Everything else in this doc is an extension of what already exists. The 11-lane Atlas (§3) is a named-lane formalization of `kag.multi_lane_search`. The panel-activity log (§6) feeds the same `context_timeline` table that already captures tool calls and RL signals.
 
 ---
 
@@ -64,7 +64,7 @@ Net-new work: §3 lane naming, §4 trust-tier schema, §5 feature annotation tab
 
 ---
 
-## 3. 11-Lane HyperRAG (L0–L11)
+## 3. 11-Lane Atlas (L0–L11)
 
 The 11 lanes formalize what `kag.multi_lane_search` already executes. Naming them makes routing decisions auditable and allows per-lane trust-tier assignment (§4).
 
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS feature_implementations (
   feature_key  TEXT NOT NULL UNIQUE,  -- e.g. 'hyperedge.search', 'ace.context_pack'
   feature_name TEXT NOT NULL,         -- human readable
   description  TEXT,
-  lane_ids     TEXT[] DEFAULT '{}',   -- which HyperRAG lanes this feature populates
+  lane_ids     TEXT[] DEFAULT '{}',   -- which Atlas lanes this feature populates
   status       TEXT NOT NULL DEFAULT 'active',  -- active | deprecated | wip
   confidence   REAL NOT NULL DEFAULT 1.0,
   created_at   TIMESTAMPTZ DEFAULT NOW(),
@@ -203,7 +203,7 @@ CREATE INDEX IF NOT EXISTS feat_key_idx ON feature_file_edges(feature_key);
 
 ### 5.2 Seeder
 
-`scripts/seed-feature-atlas.mjs` — reads `docs/graph/codebase-graph.json` (already built by `graphify:map`) and emits INSERT statements for known feature → file mappings. First seed covers the 11 HyperRAG lanes, ACE assembly, MCP tool surface, Karpathy pipeline, and reconstruction tracks.
+`scripts/seed-feature-atlas.mjs` — reads `docs/graph/codebase-graph.json` (already built by `graphify:map`) and emits INSERT statements for known feature → file mappings. First seed covers the 11 Atlas lanes, ACE assembly, MCP tool surface, Karpathy pipeline, and reconstruction tracks.
 
 Run once: `npm run seed:feature-atlas`. Subsequent runs are idempotent (ON CONFLICT DO NOTHING).
 
@@ -454,7 +454,7 @@ Total: ~6 days.
 
 ## 13. Smoke Tests / Verification Gates
 
-Add to `npm run smoke:atlas` (or a new `npm run smoke:hyperrag`); note the atlas smoke may skip the HTTP probe when the dev server is down:
+Add to `npm run smoke:atlas` (or keep the legacy `npm run smoke:hyperrag` alias); note the atlas smoke may skip the HTTP probe when the dev server is down:
 
 ```
 G-HR1: feature_implementations table exists and has ≥1 row

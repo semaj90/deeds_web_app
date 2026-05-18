@@ -1,7 +1,7 @@
 {
-  "runId": "ace-smoke-1778998065459",
-  "query": "how do we validate pgvector hnsw indexes",
-  "timestamp": "2026-05-17T06:07:45.459Z",
+  "runId": "ace-smoke-1779056619586",
+  "query": "does our Lucene-style lexical Postgres FTS run concurrently with Neo4j Louvain partition clusters for poInterest queries",
+  "timestamp": "2026-05-17T22:23:39.586Z",
   "lanes": {
     "lexical": {
       "status": "PASS",
@@ -112,22 +112,6 @@
       "text": "<script lang=\"ts\">\r\n // Migrated to $effect\r\n\r\n interface Props {\r\n caseId: string;\r\n onClose?: () => void;\r\n initialMessage?: string;\r\n }\r\n\r\n let { caseId, onClose, initialMessage }: Props = $props();\r\n\r\n $effect(() => {\r\n if (initialMessage) { inputValue = initialMessage; }\r\n });\r\n\r\n interface Message {\r\n role: 'user' | 'assistant';\r\n content: string;\r\n citations?: Array<{ type: string, id: string;\r\n\ttext: string;\r\n }>;\r\n }\r\n\r\n let messages = $state<Message[]>([]);\r\n let inputValue = $state('');\r\n let isLoading = $state(false);\r\n let error = $state<string | null>(null);\r\n let messagesContainer = $state<HTMLDivElement | null>(null);\r\n\r\n $effect(() => {\r\n\r\n // Scroll to bottom when messages change\r\n if (messagesContainer) {\r\n messagesContainer.scrollTop = messagesContainer.scrollHeight;\r\n }\r\n\r\n});\r\n\r\n $effect(() => {\r\n // Auto-scroll to bottom when new messages arrive\r\n if (messagesContainer) {\r\n setTimeout(() => {\r\n messagesContainer!.scrollTop = messagesContainer!.scrollHeight;\r\n },\r\n\t0);\r\n }\r\n });\r\n\r\n async function sendMessage() {\r\n if (!inputValue.trim()) return;\r\n\r\n const userMessage = inputValue.trim();\r\n inputValue = '';\r\n error = null;\r\n\r\n // Add user message to chat\r\n messages = [...messages, { role: 'user', content: userMessage }];\r\n\r\n isLoading = true;\r\n\r\n try {\r\n\t\tconst response = await fetch('/api/ai/contextual-chat', {\r\n\t\t\tmethod: 'POST',\r\n\t\t\theaders: { 'Content-Type': 'application/json' },\r\n\tbody: JSON.stringify({\r\nmessage: userMessage,\r\n\t\t\t\tcaseId,\r\n\t\t\t\tmessages: messages.map((m) => ({\r\n\t\t\t\t\trole: m.role,\r\n\t\t\t\t\tcontent: m.content\r\n\t\t\t\t}))\r\n\t\t\t})\r\n\t\t});\r\n\r\n if (!response.ok) {\r\n const data = await response.json();\r\n throw new Error(data.error || 'Failed to get response');\r\n }\r\n\r\n const data = await response.json();\r\n\r\n // Add assistant message\r\n\t\tmessages = [\r\n\t\t\t...messages,\r\n\t\t\t{\r\n\t\t\t\trole: 'assistant',\r\n\t\t\t\tcontent: data.answer || data.response || 'No response',\r\n\t\t\t\tcitations: data.citations || []\r\n\t\t\t}\r\n\t\t];\r\n } catch (err) {\r\n error = err instanceof Error ? err.message : 'Failed to send message';\r\n } finally {\r\n isLoading = false;\r\n }\r\n }\r\n\r\n function handleKeydown(e: KeyboardEvent) {\r\n if (e.key === 'Enter' && !e.shiftKey) {\r\n e.preventDefault();\r\n sendMessage();\r\n }\r\n }\r\n</script>\r\n\r\n<div class=\"contextual-chat-modal\">\r\n <!-- Messages Container -->\r\n <div class=\"messages-container\" bind:this={messagesContainer}>\r\n {#if messages.length === 0}\r\n <div class=\"empty-state\">\r\n <p>🧠 AI Contextual Chat</p>\r\n <p class=\"subtitle\">Ask questions about this case. The AI will reference your notes, evidence, and case context.</p>\r\n </div>\r\n {/if}\r\n\r\n\t{#each messages as message (message)}\r\n\t<div class=\"message\" class:user={message.role === 'user'} class:assistant={message.role === 'assistant'}>\r\n <div class=\"message-content\">\r\n {message.content}\r\n </div>\r\n {#if message.citations && message.citations.length > 0}\r\n <div class=\"citations\">\r\n <p class=\"citations-label\">Citations:</p>\r\n <ul>\r\n {#each message.citations as citation (citation.id)}\r\n <li class=\"citation\">\r\n <span class=\"citation-type\">[{citation.type}]</span>\r\n <span class=\"citation-text\">{citation.text}</span>\r\n </li>\r\n {/each}\r\n </ul>\r\n </div>\r\n {/if}\r\n </div>\r\n {/each}\r\n\r\n {#if isLoading}\r\n <div class=\"message assistant\">\r\n <div class=\"message-content loading\">\r\n <span class=\"dot\"></span>\r\n <span class=\"dot\"></span>\r\n <span class=\"dot\"></span>\r\n </div>\r\n </div>\r\n {/if}\r\n\r\n {#if error}\r\n <div class=\"message error\">\r\n <div class=\"message-content\">\r\n ❌ {error}\r\n </div>\r\n </div>\r\n {/if}\r\n </div>\r\n\r\n <!-- Input Area -->\r\n <div class=\"input-area\">\r\n\t<textarea\r\n bind:value={inputValue}\r\n\tonkeydown={handleKeydown}\r\n placeholder=\"Ask a question about this case... (Shift+Enter for new line)\"\r\n disabled={isLoading}\r\n class=\"input-field\"\r\n ></textarea>\r\n <button\r\n onclick={sendMessage}\r\n disabled={isLoading || !inputValue.trim()}\r\n class=\"send-button\"\r\n >\r\n {isLoading ? '⏳' : '📤'} Send\r\n </button>\r\n </div>\r\n</div>\r\n\r\n<style>\r\n .contextual-chat-modal {\r\n display: flex;"
     },
     {
-      "id": "lex:sveltekit-frontend/src/pgvector-search.ts",
-      "filePath": "sveltekit-frontend/src/pgvector-search.ts",
-      "chunk_id": "lex-chunk:sveltekit-frontend/src/pgvector-search.ts",
-      "score": 0.15,
-      "why_retrieved": "Fast-AST lexical match",
-      "retrievalLane": "lexical",
-      "sourceRefs": [
-        {
-          "type": "local_code",
-          "path": "sveltekit-frontend/src/pgvector-search.ts",
-          "confidence": 0.85
-        }
-      ],
-      "text": "// Lexical anchor: sveltekit-frontend/src/pgvector-search.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
-    },
-    {
       "id": "lex:sveltekit-frontend/src/LLMS.md",
       "filePath": "sveltekit-frontend/src/LLMS.md",
       "chunk_id": "lex-chunk:sveltekit-frontend/src/LLMS.md",
@@ -142,6 +126,22 @@
         }
       ],
       "text": "// Lexical anchor: sveltekit-frontend/src/LLMS.md\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
+    },
+    {
+      "id": "lex:sveltekit-frontend/src/pgvector-search.ts",
+      "filePath": "sveltekit-frontend/src/pgvector-search.ts",
+      "chunk_id": "lex-chunk:sveltekit-frontend/src/pgvector-search.ts",
+      "score": 0.15,
+      "why_retrieved": "Fast-AST lexical match",
+      "retrievalLane": "lexical",
+      "sourceRefs": [
+        {
+          "type": "local_code",
+          "path": "sveltekit-frontend/src/pgvector-search.ts",
+          "confidence": 0.85
+        }
+      ],
+      "text": "// Lexical anchor: sveltekit-frontend/src/pgvector-search.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
     },
     {
       "id": "lex:sveltekit-frontend/src/workers\\embedding-worker.ts",
@@ -160,36 +160,36 @@
       "text": "// Lexical anchor: sveltekit-frontend/src/workers\\embedding-worker.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
     },
     {
-      "id": "lex:sveltekit-frontend/src/mcp\\server.ts",
-      "filePath": "sveltekit-frontend/src/mcp\\server.ts",
-      "chunk_id": "lex-chunk:sveltekit-frontend/src/mcp\\server.ts",
+      "id": "lex:sveltekit-frontend/src/types\\LLMS.md",
+      "filePath": "sveltekit-frontend/src/types\\LLMS.md",
+      "chunk_id": "lex-chunk:sveltekit-frontend/src/types\\LLMS.md",
       "score": 0.15,
       "why_retrieved": "Fast-AST lexical match",
       "retrievalLane": "lexical",
       "sourceRefs": [
         {
           "type": "local_code",
-          "path": "sveltekit-frontend/src/mcp\\server.ts",
+          "path": "sveltekit-frontend/src/types\\LLMS.md",
           "confidence": 0.85
         }
       ],
-      "text": "// Lexical anchor: sveltekit-frontend/src/mcp\\server.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
+      "text": "// Lexical anchor: sveltekit-frontend/src/types\\LLMS.md\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
     },
     {
-      "id": "lex:sveltekit-frontend/src/mcp\\trace-mcp-server.ts",
-      "filePath": "sveltekit-frontend/src/mcp\\trace-mcp-server.ts",
-      "chunk_id": "lex-chunk:sveltekit-frontend/src/mcp\\trace-mcp-server.ts",
+      "id": "lex:sveltekit-frontend/src/types\\pgvector-drizzle.d.ts",
+      "filePath": "sveltekit-frontend/src/types\\pgvector-drizzle.d.ts",
+      "chunk_id": "lex-chunk:sveltekit-frontend/src/types\\pgvector-drizzle.d.ts",
       "score": 0.15,
       "why_retrieved": "Fast-AST lexical match",
       "retrievalLane": "lexical",
       "sourceRefs": [
         {
           "type": "local_code",
-          "path": "sveltekit-frontend/src/mcp\\trace-mcp-server.ts",
+          "path": "sveltekit-frontend/src/types\\pgvector-drizzle.d.ts",
           "confidence": 0.85
         }
       ],
-      "text": "// Lexical anchor: sveltekit-frontend/src/mcp\\trace-mcp-server.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
+      "text": "// Lexical anchor: sveltekit-frontend/src/types\\pgvector-drizzle.d.ts\nSource file matched keywords 'pgvector' or 'hnsw' during AST traversal."
     }
   ]
 }

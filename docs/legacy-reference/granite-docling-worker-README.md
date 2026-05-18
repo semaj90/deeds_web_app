@@ -8,7 +8,7 @@ A high-performance document processing worker optimized for Intel 11th-Gen i7/i9
 - **Hybrid GPU/CPU Pipeline**: Granite-Docling (GPU) + Tesseract (CPU fallback)
 - **Redis Caching**: 7-day TTL with auto-refresh for OCR results
 - **Page Classification**: Micro-ML classifier for optimal routing
-- **Parallel Streaming**: MinIO integration with 4-8 parallel streams
+- **Parallel Streaming**: object storage integration with 4-8 parallel streams
 - **LangExtract Chunking**: Semantic text chunking for RAG
 - **R2/R3 Ranking**: BM25 + semantic ranking hooks
 - **TensorRT-LLM Ready**: Migration path for future optimization
@@ -36,7 +36,7 @@ A high-performance document processing worker optimized for Intel 11th-Gen i7/i9
 
 ### Dependencies
 - Tesseract OCR
-- MinIO
+- object storage
 - Redis
 - Granite-Docling model
 
@@ -87,9 +87,11 @@ cmake --build .
 
 ## Quick Start
 
+Historical setup note: SeaweedFS S3 is the canonical object store in this repo now; keep `MINIO_*` names only as compatibility aliases.
+
 ### 1. Start Dependencies
 ```bash
-# MinIO
+# Object storage (historical MinIO container; SeaweedFS S3 is canonical now)
 docker run -p 9000:9000 -p 9001:9001 minio/minio server /data
 
 # Redis
@@ -128,7 +130,7 @@ Key settings:
 - `BATCH_SIZE`: Page batch size (default: 32)
 - `GPU_ENABLED`: Enable GPU processing (default: true)
 - `REDIS_CACHE_TTL`: Cache TTL in seconds (default: 604800 = 7 days)
-- `MINIO_PARALLEL_STREAMS`: Parallel upload streams (default: 4)
+- `MINIO_PARALLEL_STREAMS`: Parallel upload streams (legacy alias for SeaweedFS-backed uploads, default: 4)
 
 ## API Endpoints
 
@@ -164,7 +166,7 @@ GET /results/{document_id}
 ## Architecture
 
 ```
-Document Upload (MinIO)
+Document Upload (object storage)
     ↓
 Page Classification (Micro-ML)
     ↓
@@ -227,10 +229,10 @@ TESSERACT_PATH=C:\Program Files\Tesseract-OCR\tesseract.exe
 redis-cli ping
 ```
 
-### MinIO Connection Failed
+### Object storage Connection Failed
 ```bash
-# Check MinIO is running
-curl http://localhost:9000/minio/health/live
+# Check object storage is running
+curl http://localhost:9333/cluster/status
 ```
 
 ## Development
@@ -280,7 +282,7 @@ docker build -t granite-docling-worker:latest .
 ### Run Container
 ```bash
 docker run -p 8000:8000 \
-  -e MINIO_ENDPOINT=host.docker.internal:9000 \
+  -e MINIO_ENDPOINT=host.docker.internal:8333 \
   -e REDIS_HOST=host.docker.internal \
   granite-docling-worker:latest
 ```
@@ -291,7 +293,7 @@ The worker sends status events to the Legal Dashboard via SSE:
 
 ```python
 # Configure in .env
-DASHBOARD_SSE_ENDPOINT=http://localhost:3000/api/document-processing/stream
+DASHBOARD_SSE_ENDPOINT=http://127.0.0.1:3000/api/document-processing/stream
 DASHBOARD_AUTH_TOKEN=your-auth-token
 ```
 
@@ -331,7 +333,7 @@ For issues, questions, or contributions:
 - GPU/CPU hybrid pipeline
 - Redis caching
 - Page classification
-- MinIO integration
+- object storage integration
 - LangExtract chunking
 - R2/R3 ranking hooks
 - Windows native build support

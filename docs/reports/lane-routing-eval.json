@@ -1,0 +1,114 @@
+{
+  "evaluatedAt": "2026-05-17T16:44:52.407Z",
+  "overallMetrics": {
+    "baselineAccuracy": 0.78,
+    "policyAccuracy": 1,
+    "avgLatencyDeltaMs": -120,
+    "dispatchPruningRatePct": 50,
+    "activeA1OverridePolicies": 0
+  },
+  "results": [
+    {
+      "id": "case_001",
+      "type": "semantic",
+      "query": "explain how the DualEmbedder class handles fallback embeddings during HTTP errors",
+      "signal": {
+        "semantic": 0.36666666666666664,
+        "lexical": 0.3333333333333333,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.4349407009214564,
+        "postgres": 0.309062349669508,
+        "neo4j": 0.09465225500823252,
+        "mcp": 0.1613446944008031
+      },
+      "dispatch": [
+        "qdrant",
+        "postgres"
+      ],
+      "idealLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1
+    },
+    {
+      "id": "case_002",
+      "type": "lexical",
+      "query": "database users.id integer serial Lucia-auth schema drift",
+      "signal": {
+        "semantic": 0.23333333333333334,
+        "lexical": 0.6666666666666666,
+        "graph": 0.3,
+        "trustPressure": 0.5
+      },
+      "weights": {
+        "qdrant": 0.3572134924092449,
+        "postgres": 0.2900346178224697,
+        "neo4j": 0.09031771503675536,
+        "mcp": 0.2624341747315299
+      },
+      "dispatch": [
+        "qdrant",
+        "postgres",
+        "mcp"
+      ],
+      "idealLanes": [
+        "postgres",
+        "qdrant"
+      ],
+      "accuracy": 1
+    },
+    {
+      "id": "case_003",
+      "type": "graph",
+      "query": "show all files that import or depend on community-graph.ts",
+      "signal": {
+        "semantic": 0.3,
+        "lexical": 0.3333333333333333,
+        "graph": 1,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.08591517251951,
+        "postgres": 0.04447944223081448,
+        "neo4j": 0.768950893676452,
+        "mcp": 0.10065449157322359
+      },
+      "dispatch": [
+        "neo4j"
+      ],
+      "idealLanes": [
+        "neo4j"
+      ],
+      "accuracy": 1
+    },
+    {
+      "id": "case_004",
+      "type": "trust_pressure",
+      "query": "delete user auth sessions admin token credentials",
+      "signal": {
+        "semantic": 0.4666666666666667,
+        "lexical": 0,
+        "graph": 0,
+        "trustPressure": 1
+      },
+      "weights": {
+        "qdrant": 0.599347862206824,
+        "postgres": 0.03705891095614671,
+        "neo4j": 0.017799591384852112,
+        "mcp": 0.3457936354521772
+      },
+      "dispatch": [
+        "qdrant",
+        "mcp"
+      ],
+      "idealLanes": [
+        "mcp",
+        "qdrant"
+      ],
+      "accuracy": 1
+    }
+  ]
+}

@@ -21,12 +21,12 @@
 - [x] **VRAM Safety**: LLM/Embedding stack disabled.
 - [x] **Node Tuning**: `$env:NODE_OPTIONS="--max-old-space-size=8192"`
 
-### 2. Karpathy Synthesis Mode (GPU Enabled, Scoped Limits) - **IN PROGRESS**
+### 2. Karpathy Synthesis Mode (GPU Enabled, Scoped Limits) - **STABLE**
 - [x] **Canary (25)**: Karpathy synthesis canary over parent atlas passed.
 - [x] **Stage 2A (100)**: Gradual scaling (RunID: `stage-2a-100`) - **PASSED**
 - [x] **Stage 2B (250)**: Intermediate scaling (RunID: `stage-2b-250`) - **PASSED**
-- [ ] **Stage 2C (500)**: Final scaling phase.
-- [ ] **Gemma4 Profile**: 4B–9B quants, 4k–8k context.
+- [x] **Stage 2C (500)**: Final scaling phase.
+- [x] **Gemma4 Profile**: 4B–9B quants, 4k–8k context.
 
 ### 3. Docker Infrastructure (Recommended Limits for 20GB RAM)
 - [x] **Qdrant**: `mem_limit: 3g`
@@ -81,16 +81,16 @@
   - max candidates per cluster: 25–50
 
 ## Phase 2D: Karpathy Synthesis Reporting
-- [ ] Create `docs/graph/karpathy-synthesis-scale-report.json`.
-- [ ] Track each synthesis run: runId, limit, candidates, qdrantHits, summariesWritten, directoriesConsidered, directoryOutcomes, glyphAtlasUpserts, Redis cards, GPU peak VRAM, forbiddenFields, atlasValidate, rootDryRun.
-- [ ] Commit report after each successful stage: 100, 250, 500.
+- [x] Create `docs/graph/karpathy-synthesis-scale-report.json`.
+- [x] Track each synthesis run: runId, limit, candidates, qdrantHits, summariesWritten, directoriesConsidered, directoryOutcomes, glyphAtlasUpserts, Redis cards, GPU peak VRAM, forbiddenFields, atlasValidate, rootDryRun.
+- [x] Commit report after each successful stage: 100, 250, 500.
 
 ## Phase 3B: Rollback / Cleanup Safety
-- [ ] Add Qdrant payload patch rollback report.
-- [ ] Add Neo4j delete-by-runId or delete-by-snapshot command.
-- [ ] Add CouchDB stale document cleanup plan.
-- [ ] Add Redis SCAN-based cleanup script for a runId.
-- [ ] Add `atlas:rollback:dry-run`.
+- [x] Add Qdrant payload patch rollback report.
+- [x] Add Neo4j delete-by-runId or delete-by-snapshot command.
+- [x] Add CouchDB stale document cleanup plan.
+- [x] Add Redis SCAN-based cleanup script for a runId.
+- [x] Add `atlas:rollback:dry-run`.
 
 ## Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)
 - [ ] **Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance.
@@ -196,11 +196,11 @@
 - [x] **Verification**: Validated zero drift via 100% passing cross-layer contract audits.
 
 ## Phase 9: Pre-Production Hardening
-- [ ] **Full Production Audit**: See [production-ready-audit.md](./next_steps/production-ready-audit.md) for the detailed checklist.
-- [ ] **Drizzle Reconciliation**: Resolve High-Severity UUID/Integer mismatch across 23 tables.
-- [ ] **Shadow Table Audit**: Reconcile 90+ "Shadow" tables found in migrations but missing from Drizzle schema.
-- [ ] **Search Integrity**: Audit `rg` helpers in `scripts/atlas/` to use `-u` (unrestricted) for deep audits.
-- [ ] **Drizzle Studio**: Verify full CRUD parity for all schema parts in Studio.
+- [x] **Full Production Audit**: See [production-ready-audit.md](./next_steps/production-ready-audit.md) for the detailed checklist.
+- [x] **Drizzle Reconciliation**: Resolve High-Severity UUID/Integer mismatch across 23 tables.
+- [x] **Shadow Table Audit**: Reconcile 90+ "Shadow" tables found in migrations but missing from Drizzle schema.
+- [x] **Search Integrity**: Audit `rg` helpers in `scripts/atlas/` to use `-u` (unrestricted) for deep audits.
+- [x] **Drizzle Studio**: Verify full CRUD parity for all schema parts in Studio.
 
 ## Phase 10A: Chained GPU-Autoencoder PCA Topology Projection (2026-05-17)
 - [x] **2-Layer Autoencoder Integration**: Wire up `autoencoderEncode2Layer` inside `runTopologyProjection` for `ae2l-pca` mode in `sveltekit-frontend/src/lib/server/topology/gpu-topology-projection.ts`.
@@ -336,5 +336,56 @@ Goal: Create a dashboard/reporting layer for active operator visualization of Pa
   - current model/VRAM state
   - last synthesis event
 
+## Phase 15: Hermes Self-Healing Sentinel Loop
+Status: Complete
+Goal: Wire up an agentic self-healing diagnostics warden leveraging Redis Bifrost KAG fixer patterns.
+- [x] Create KAG recall fixer patterns in Redis Bifrost (`ace:fixer:patterns:<hmmState>`).
+- [x] Implement `scripts/atlas/hermes-self-healing-warden.mjs` supporting service TCP probes, contracts auditing, and fixer pattern command dispatch.
+- [x] Integrate VRAM baseline drift checking with automatic cache flush/eviction safety valves.
+- [x] Append healing transactions to a unified self-healing JSON/JSONL log ledger (`docs/reports/hermes-self-healing-report.json`).
+- [x] Run diagnostic audit and confirm `ALL_HEALED` status.
 
+## Phase 15B: Adaptive Retrieval Routing Policy Evaluator
+Status: Complete
+Goal: Implement a routing policy validator to measure dispatch accuracy, latency gains, and lane pruning rates under contrastive temperature scaled 4x4 matrix dispatches.
+- [x] Create the evaluator script (`scripts/atlas/eval-lane-routing.mjs`).
+- [x] Fix the global `/g` flag and code token parsing bugs in `LEXICAL_KEYWORDS`.
+- [x] Fix singular/plural verb boundary parsing bugs in `GRAPH_KEYWORDS`.
+- [x] Apply a contrastive temperature scaling factor of 5.0 to softmax outputs for sharp signal classification.
+- [x] Evaluate baseline accuracy vs matrix-gated accuracy, achieving 100% accuracy and 50% lane pruning latency savings.
+- [x] Persist evaluation results to [lane-routing-eval.json](file:///docs/reports/lane-routing-eval.json) and [lane-routing-eval.md](file:///docs/reports/lane-routing-eval.md).
+
+## Phase 15C: Real-World Routing Validation
+Status: Complete
+Goal: Prove the 4x4 adaptive router generalizes beyond the golden benchmark.
+- [x] Create `scripts/atlas/eval-real-world-routing.mjs`.
+- [x] Test 25–50 messy real queries.
+- [x] Log query, signals, weights, lanes, expected, latency, sourceRefs, usefulness.
+- [x] Output:
+  - `docs/reports/real-world-routing-eval.json`
+  - `docs/reports/real-world-routing-eval.md`
+- [x] Compare golden vs real-world accuracy, lane pruning rate, p95 latency.
+
+## Phase 17: Deployment Pack and Operator Bootstrap
+Status: Complete
+Goal: Package the workstation Parent Atlas service architecture with robust deployment, preflight, backup/restore, and operational guide assets.
+- [x] Create `.env.example.production`.
+- [x] Create `docker-compose.production.yml`.
+- [x] Add healthchecks for:
+  - Postgres 5434
+  - Redis 6379
+  - Qdrant 6333
+  - Neo4j
+  - SearXNG 8889
+  - SeaweedFS 8888
+  - TurboQuant 8090
+- [x] Add `scripts/operator/preflight.mjs`.
+- [x] Add `scripts/operator/backup-atlas-state.mjs`.
+- [x] Add `scripts/operator/restore-atlas-state.mjs`.
+- [x] Add `docs/operator/DEPLOYMENT.md`.
+- [x] Verify:
+  - `npm run audit:contracts`
+  - `npm run audit:pgvector`
+  - `node scripts/atlas/validate-parent-atlas.mjs`
+  - `node scripts/atlas/soak-workstation-parent-atlas.mjs --cycles=10 --dry-run`
 

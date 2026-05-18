@@ -10,7 +10,7 @@ This repository implements a complete document ingestion system optimized for le
 - **Multi-Format Support**: PDF, DOCX, images, plain text with OCR fallback
 - **AI-Powered Analysis**: Gemma-3 Vision, LangExtract structure analysis, MCP document validation
 - **Vector Search**: Qdrant integration with pgvector for hybrid search capabilities
-- **Scalable Architecture**: RabbitMQ message queuing, Redis caching, MinIO object storage
+- **Scalable Architecture**: RabbitMQ message queuing, Redis caching, object storage
 - **Legal Document Focus**: Specialized processing for contracts, NDAs, leases, and legal agreements
 
 ## 🏗️ Architecture
@@ -27,7 +27,7 @@ This repository implements a complete document ingestion system optimized for le
          │                       │                       │
          ▼                       ▼                       ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│     MinIO       │    │    RabbitMQ     │    │     Qdrant      │
+│  Object Store   │    │    RabbitMQ     │    │     Qdrant      │
 │  Object Store   │    │  Message Queue  │    │  Vector DB      │
 │                 │    │                 │    │                 │
 │ • Raw Files     │    │ • Job Queueing  │    │ • Embeddings    │
@@ -52,7 +52,7 @@ This repository implements a complete document ingestion system optimized for le
 - **PostgreSQL 17** with pgvector extension
 - **Redis** for caching and job status
 - **RabbitMQ** for distributed job processing
-- **MinIO** for S3-compatible object storage
+- **Object storage** for S3-compatible uploads
 - **Qdrant** for high-performance vector search
 - **GPU Workers** with CUDA acceleration
 
@@ -216,8 +216,8 @@ RABBITMQ_PORT=5672
 RABBITMQ_USER=guest
 RABBITMQ_PASSWORD=guest
 
-# MinIO
-MINIO_ENDPOINT=http://localhost:9000
+# Object storage (SeaweedFS S3 via MinIO-compatible env names)
+MINIO_ENDPOINT=http://localhost:8333
 MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=minioadmin
 

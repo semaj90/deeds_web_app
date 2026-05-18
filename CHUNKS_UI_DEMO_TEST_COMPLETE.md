@@ -250,7 +250,7 @@ interface Chunk {
 - ✅ Preview + full text
 - ✅ Page numbers + confidence scores
 - ✅ GPU analysis summary (if available)
-- ✅ MinIO preview link
+- ✅ Object storage preview link
 
 **Shows**: Immediate feedback on upload processing results
 
@@ -274,7 +274,7 @@ interface Chunk {
 - ❌ Real upload flow integration (requires file upload)
 - ❌ 8-stage evidence processing pipeline
 - ❌ Database persistence of chunks
-- ❌ MinIO storage integration
+- ❌ Object storage integration
 - ❌ GPU analysis integration
 - ❌ Mobile/responsive layout
 - ❌ Accessibility (keyboard navigation, screen readers)

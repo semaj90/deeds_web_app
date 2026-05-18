@@ -8,7 +8,7 @@ You have **3 parallel GPU acceleration pipelines** with **~75% feature implement
 |----------|--------|------------|-------------------|
 | **Inference** (Client ONNX) | ✅ OPERATIONAL | 90% | None |
 | **Analysis** (GPU Graph + LibTorch) | ✅ OPERATIONAL | 85% | Migration 013 DB sync |
-| **Evidence Processing** (Upload → VLM → Embed) | 🟡 PARTIAL | 70% | Minio wiring incomplete |
+| **Evidence Processing** (Upload → VLM → Embed) | 🟡 PARTIAL | 70% | SeaweedFS/object-storage wiring incomplete |
 
 ---
 
@@ -240,7 +240,7 @@ runAuditOrchestrator(req)
 
 | Stage | Status | Component | DB Saved? | GPU? | Notes |
 |-------|--------|-----------|-----------|------|-------|
-| **1. MinIO Upload** | ✅ | minio-client.ts | ✅ evidence.file_path | — | File hash + metadata |
+| **1. Object Storage Upload** | ✅ | SeaweedFS S3 adapter (`minio-client.ts`, legacy module name) | ✅ evidence.file_path | — | File hash + metadata |
 | **2. Sharp Extract** | ✅ | sharp + extract | ✅ evidence.extracted_text | — | PDF → text + images |
 | **3. LLM Structure** | ✅ | legal-chunker.ts | ✅ evidence_chunks | — | ARTICLE/SECTION boundaries |
 | **4. Entity Extract** | ✅ | entity-extraction.ts | ✅ evidence.metadata.entities | — | EMAIL, PHONE, DATE, CITATION |
@@ -256,7 +256,7 @@ runAuditOrchestrator(req)
 CREATE TABLE evidence (
   id UUID PRIMARY KEY,
   case_id UUID FK → cases.id,
-  file_path TEXT,                  -- MinIO path: s3://bucket/case/evidence/<uuid>
+  file_path TEXT,                  -- object storage path: s3://bucket/case/evidence/<uuid>
   file_size_bytes BIGINT,
   file_type VARCHAR,               -- pdf, jpg, mp4, txt
 
@@ -292,7 +292,7 @@ CREATE INDEX ON evidence(processing_status);
 CREATE INDEX ON evidence USING hnsw(embedded_text_vector);
 ```
 
-### Missing: Minio + Sharp Integration
+### Missing: Object Storage + Sharp Integration
 
 **Current Issue**: Evidence upload API exists but **UI doesn't show upload status or results**.
 
@@ -305,7 +305,7 @@ CREATE INDEX ON evidence USING hnsw(embedded_text_vector);
 // File: src/lib/components/evidence/FileUploadSection.svelte
 // Status: Component renders, but:
 //   ❌ No POI photo display
-//   ❌ No MinIO preview
+//   ❌ No object-storage preview
 //   ❌ No VLM analysis results visible
 //   ❌ No GPU similarity links
 ```
@@ -338,7 +338,7 @@ CREATE INDEX ON evidence USING hnsw(embedded_text_vector);
 <!-- ✅ Renders file input -->
 <!-- ✅ Shows progress bar -->
 <!-- 🟡 Shows plain JSON result (not formatted) -->
-<!-- ❌ No MinIO preview link -->
+<!-- ❌ No object-storage preview link -->
 <!-- ❌ No chunk visualization -->
 <!-- ❌ No GPU similarity table -->
 ```
@@ -378,7 +378,7 @@ CREATE INDEX ON evidence USING hnsw(embedded_text_vector);
 //    - Run VLM on each
 //    - Store descriptions to evidence.metadata.image_analysis
 
-// 3. Add MinIO preview in evidence library
+// 3. Add object-storage preview in evidence library
 //    - GET /api/evidence/<id>/preview (signed URL)
 //    - Display in modal
 
@@ -529,7 +529,7 @@ ALTER TYPE legal_node_type ADD VALUE 'amendment' AFTER 'article';
   - ✅ API endpoint works
   - ❌ Integrated to evidence UI
 
-- [ ] Minio preview links (90% done)
+- [ ] Object storage preview links (90% done)
   - ✅ Backend serves signed URLs
   - ❌ Frontend doesn't use them
 
@@ -548,7 +548,7 @@ ALTER TYPE legal_node_type ADD VALUE 'amendment' AFTER 'article';
 |------|-----------|------|--------|
 | Wire evidence upload results display | Low | 1 hour | High (user-facing) |
 | Add VLM POI photo display | Medium | 90 min | Medium (optional feature) |
-| Add Minio preview links | Low | 45 min | Medium (convenience) |
+| Add object storage preview links | Low | 45 min | Medium (convenience) |
 | Build audit web dashboard | High | 3-4 hrs | High (monitoring) |
 | Implement auto-fix orchestrator | Very High | 6-8 hrs | Very High (automation) |
 
@@ -581,7 +581,7 @@ Overall:            ~82% (good production baseline)
 |---------|--------|-----------|
 | Evidence UI display | Medium (users can't see results) | POST `/api/evidence/upload` + GET from `/api/audit/gpu` |
 | VLM POI integration | Low (nice-to-have) | Manual photo upload to `/api/persons-of-interest` |
-| Minio preview | Low (convenience) | Download from MinIO console |
+| Object storage preview | Low (convenience) | Download from object storage console |
 
 ---
 
@@ -604,7 +604,7 @@ Overall:            ~82% (good production baseline)
    - Run Gemma3 VLM on each
    - Store descriptions to `evidence.metadata.image_analysis`
 
-3. **Add Minio Preview Links**
+3. **Add Object Storage Preview Links**
    - Create `GET /api/evidence/<id>/preview` (signed URL)
    - Display in evidence library modal
    - Cache URLs in Redis (1 hour TTL)
@@ -639,7 +639,7 @@ With CouchDB Cache:     ~50ms   (2-hour TTL hit)
 ### Evidence Processing Timing
 
 ```
-PDF Upload:             ~200ms  (MinIO + hash)
+PDF Upload:             ~200ms  (object storage + hash)
 Sharp Extract:          ~500ms  (text + images)
 Chunking:               ~300ms  (legal-chunker)
 Embedding:              ~450ms  (gRPC to server)

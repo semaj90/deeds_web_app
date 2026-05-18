@@ -227,7 +227,7 @@ export * from './ShellC.svelte';
 # Essential (6GB RAM) — DB + Cache + Vector
 docker compose --profile essential up -d
 
-# Full (8GB RAM) — + RabbitMQ + CouchDB + MinIO
+# Full (8GB RAM) — + RabbitMQ + CouchDB + object storage
 docker compose --profile full up -d
 
 # GPU (16GB RAM) — + Ollama + Triton + Neo4j

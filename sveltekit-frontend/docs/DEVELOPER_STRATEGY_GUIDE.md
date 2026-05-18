@@ -1,7 +1,7 @@
 # Legal AI Platform — Developer Strategy Guide
 
-**Last updated: 2026-05-10**  
-Status: `svelte-check 0 errors` · `vite build PASS` · HyperRAG smoke 8/10 · 73 MCP tools
+**Last updated: 2026-05-10**
+Status: `svelte-check 0 errors` · `vite build PASS` · Atlas smoke 8/10 · 73 MCP tools
 
 This is the "how to play this game" guide. It assumes you can read the code. It tells you the non-obvious things: which path to take when there are three options, which tool to call first, which port to use, and where prior mistakes are buried.
 
@@ -17,7 +17,7 @@ Think of this codebase in five orthogonal layers. Each layer has an owner. Cross
 ├─────────────────────────────────────────────────────┤
 │  TRACE MCP :8788 (73 tools — the model surface)     │  ← TypeScript orchestration
 ├─────────────────────────────────────────────────────┤
-│  ACE / HyperRAG (11-lane retrieval + trust tiers)   │  ← SvelteKit server-side
+│  ACE / Atlas (11-lane retrieval + trust tiers)      │  ← SvelteKit server-side
 ├─────────────────────────────────────────────────────┤
 │  Data stores: Postgres · Redis · Qdrant · Neo4j     │  ← infra, never direct from model
 └─────────────────────────────────────────────────────┘
@@ -192,7 +192,7 @@ Shell: `npx mcporter call trace.kag_search query:"reranker topology"`
 ### Full stack startup order
 
 ```bash
-# 1. Docker infra (Postgres :5434, Redis :6379, Qdrant :6333, MinIO :9000)
+# 1. Docker infra (Postgres :5434, Redis :6379, Qdrant :6333, SeaweedFS S3 :8333)
 npm run orchestrator:docker:up
 
 # 2. llama-server / TurboQuant (chat inference :8090)

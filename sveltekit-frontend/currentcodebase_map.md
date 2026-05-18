@@ -297,7 +297,7 @@ L4: Service Logic (DB/Qdrant/Ollama)
 
 ### Evidence Pipeline (9 stages)
 
-1. MinIO upload + SHA-256 hash + PostgreSQL record
+1. Object storage upload + SHA-256 hash + PostgreSQL record
 2. Text extraction: pdf-parse → OCR fallback (Tesseract)
 3. Structure-aware chunking (legal-chunker.ts)
 4. Embedding: gRPC → embeddinggemma → nomic-embed-text fallback

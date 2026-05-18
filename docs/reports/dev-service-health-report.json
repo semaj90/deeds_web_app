@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T18:01:38.763Z",
+  "generatedAt": "2026-05-18T01:26:40.421Z",
   "strict": false,
   "services": [
     {
@@ -8,7 +8,7 @@
       "port": 5434,
       "required": true,
       "status": "up",
-      "latencyMs": 2,
+      "latencyMs": 4,
       "error": null,
       "envVar": "DATABASE_URL"
     },
@@ -48,7 +48,7 @@
       "port": 7474,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": null
     },
@@ -58,7 +58,7 @@
       "port": 8090,
       "required": false,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": "LLAMA_SERVER_URL"
     },
@@ -68,7 +68,7 @@
       "port": 11434,
       "required": false,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": "OLLAMA_HOST"
     },

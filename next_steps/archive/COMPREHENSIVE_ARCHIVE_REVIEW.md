@@ -28,7 +28,7 @@
 **File**: `src/routes/api/evidence/upload/+server.ts`
 **Type**: Direct, synchronous 8-stage process
 **Stages**:
-1. MinIO upload + SHA-256
+1. Object storage upload + SHA-256
 2. PostgreSQL record
 3. Text extraction (pdf-parse + OCR)
 4. Legal chunking

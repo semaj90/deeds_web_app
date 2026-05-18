@@ -79,16 +79,16 @@ const candidates = await db
 **Pipeline**:
 1. FormData file extraction
 2. SHA-256 hash for deduplication
-3. MinIO upload (bucket: `poi-photos`, key: `{poiId}/{hash}.{ext}`)
+3. Object storage upload (bucket: `poi-photos`, key: `{poiId}/{hash}.{ext}`)
 4. Thumbnail generation (sharp resize 200x200)
-5. MinIO upload thumbnail
+5. Object storage upload thumbnail
 6. Insert `poi_photos` record with urls
 
 ### Task 3: VLM Auto-Analysis on Photo Upload (30 min)
 
 **File**: Extend photo upload POST handler
 
-After MinIO upload, fire-and-forget VLM analysis:
+After object storage upload, fire-and-forget VLM analysis:
 1. Call `/api/vision/analyze` internally with photo URL
 2. Update `poi_photos` record with `ai_caption` and `ai_tags`
 3. Optionally generate face embedding via Ollama VLM -> store in `face_embedding` column

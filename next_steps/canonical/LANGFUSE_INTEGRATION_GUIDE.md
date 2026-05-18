@@ -47,7 +47,7 @@ Langfuse observability is fully integrated into the AutoGen multi-agent system a
 
 ### 1. Generate Langfuse API Keys
 
-1. Open Langfuse UI: **http://localhost:3000**
+1. Open Langfuse UI: **http://localhost:3030**
 2. Navigate to **Settings → API Keys**
 3. Click **+ Create new API Keys**
 4. Copy the **Public Key** and **Secret Key**
@@ -59,7 +59,7 @@ Add to your `.env` file or shell environment:
 ```bash
 # Langfuse Observability
 LANGFUSE_ENABLED=true
-LANGFUSE_URL=http://localhost:3000
+LANGFUSE_URL=http://localhost:3030
 LANGFUSE_PUBLIC_KEY=pk-lf-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 LANGFUSE_SECRET_KEY=sk-lf-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
@@ -83,14 +83,14 @@ node scripts/fastmcp-server.mjs
 
 **Verification**:
 ```
-✅ Langfuse observability enabled: http://localhost:3000
+✅ Langfuse observability enabled: http://localhost:3030
    Public Key: pk-lf-ab...
    📊 Langfuse observability attached to AutoGen config
 ```
 
 ### 4. View Traces
 
-Visit **http://localhost:3000/traces** to see real-time LLM traces!
+Visit **http://localhost:3030/traces** to see real-time LLM traces!
 
 ## FastMCP Langfuse Tools
 
@@ -131,7 +131,7 @@ POST http://localhost:3002/function-call
 {
   "ok": true,
   "trace_id": "tr-abc123...",
-  "url": "http://localhost:3000/traces/tr-abc123...",
+  "url": "http://localhost:3030/traces/tr-abc123...",
   "logged_at": "2025-01-27T10:30:00Z",
   "meta": {
     "tool": "langfuse_log_trace",
@@ -343,7 +343,7 @@ Savings: $1.91/day = $57/month = $684/year
 **Error**: `Langfuse API keys not configured`
 
 **Solution**:
-1. Visit http://localhost:3000
+1. Visit http://localhost:3030
 2. Settings → API Keys → Create new API Keys
 3. Copy keys to `.env` file
 4. Restart backend
@@ -357,7 +357,7 @@ docker ps --filter "name=langfuse"
 
 **Expected Output**:
 ```
-langfuse         Up (healthy)   0.0.0.0:3000->3000/tcp
+langfuse         Up (healthy)   0.0.0.0:3030->3000/tcp
 langfuse-clickhouse  Up (healthy)   0.0.0.0:5123->8123/tcp
 ```
 
@@ -372,7 +372,7 @@ docker-compose -f docker-compose.langfuse.yml up -d
 **Check Callback Handler**:
 Look for this in AutoGen startup logs:
 ```
-✅ Langfuse observability enabled: http://localhost:3000
+✅ Langfuse observability enabled: http://localhost:3030
    Public Key: pk-lf-abc...
    📊 Langfuse observability attached to AutoGen config
 ```
@@ -447,11 +447,11 @@ const queries = {
 
 ## Next Steps
 
-1. **Generate API Keys**: http://localhost:3000 → Settings → API Keys
+1. **Generate API Keys**: http://localhost:3030 → Settings → API Keys
 2. **Update `.env`**: Add `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY`
 3. **Restart Services**: `docker-compose restart backend`
 4. **Run AutoGen Agent**: Test with `POST /api/agents/autogen/fix-error`
-5. **View Traces**: http://localhost:3000/traces
+5. **View Traces**: http://localhost:3030/traces
 
 ## Related Documentation
 

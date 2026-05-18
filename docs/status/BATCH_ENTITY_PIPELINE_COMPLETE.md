@@ -135,7 +135,7 @@ CREATE INDEX evidence_entities_text_label_idx ON evidence_entities(entity_text, 
 ### Evidence Upload Pipeline (9 Stages)
 
 ```
-1. MinIO upload → SHA-256 hash → PostgreSQL record
+1. Object storage upload → SHA-256 hash → PostgreSQL record
 2. Text extraction (pdf-parse → OCR fallback)
 3. Structure-aware chunking (legal-chunker.ts)
 4. Chunk embedding (gRPC → Ollama fallback)

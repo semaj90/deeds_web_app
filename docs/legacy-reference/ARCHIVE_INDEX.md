@@ -54,9 +54,9 @@ All directories confirmed **disconnected** from the active SvelteKit 2 codebase 
 |-----------|-------------|--------------|
 | `data/` | Misc data files | No active references |
 | `datasets/` | Training/evaluation datasets | No active model training pipeline |
-| `documents/` | Document storage directory | Evidence stored in MinIO + PostgreSQL |
+| `documents/` | Document storage directory | Evidence stored in object storage + PostgreSQL |
 | `lawpdfs/` | Legal PDF collection | Reference PDFs, not programmatically accessed |
-| `legal_ai_output/` | AI analysis output files | Output now goes to DB/MinIO |
+| `legal_ai_output/` | AI analysis output files | Output now goes to DB/object storage |
 | `sample-data/` | Sample legal documents (1 PDF) | Zero references from active code |
 | `vector-backup-*` | Qdrant vector backup snapshot | One-time backup, not automated |
 | `notebooks/` | Jupyter notebooks | Research notebooks, not production code |
@@ -151,7 +151,7 @@ All directories confirmed **disconnected** from the active SvelteKit 2 codebase 
 | `nginx/` | Nginx reverse proxy config |
 | `qdrant/` | Qdrant vector DB config |
 | `redis/` | Redis config |
-| `minio/` | MinIO object storage config |
+| `minio/` | Legacy object storage config |
 | `next_steps/` | Project planning documents |
 | `python/` | Python utility scripts |
 | `python-workers/` | Python background workers |

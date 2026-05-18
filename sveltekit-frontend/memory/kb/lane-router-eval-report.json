@@ -1,0 +1,46 @@
+{
+  "totalRows": 32,
+  "rowsWithRerank": 0,
+  "rerankCoverage": "0.0",
+  "acceptedRows": 5,
+  "acceptedRate": "15.6",
+  "policyKeys": 0,
+  "policyApplied": 0,
+  "policyCoverage": "0.0",
+  "policyMatchRate": "N/A",
+  "policyPrecision": "N/A",
+  "lift": {
+    "avgRerankWithPolicy": "N/A",
+    "avgRerankWithoutPolicy": "N/A",
+    "avgRerankPolicyMatch": "N/A",
+    "avgRerankPolicyMiss": "N/A",
+    "p95RerankWithPolicy": "N/A",
+    "p95RerankWithoutPolicy": "N/A"
+  },
+  "byTopoLabel": {
+    "unclassified": {
+      "total": 32,
+      "accepted": 5,
+      "acceptedRate": "15.6",
+      "withRerank": 0,
+      "avgRerank": "N/A",
+      "policyApplied": 0,
+      "policyMatch": 0,
+      "policyMatchGood": 0,
+      "precision": "N/A",
+      "policyRecommends": null,
+      "dominantLane": "ace",
+      "laneDistrib": {
+        "ace": 32
+      },
+      "avgRerankOnMatch": "N/A"
+    }
+  },
+  "scoreThreshold": 0.5,
+  "confThreshold": 0.6,
+  "evaluatedAt": "2026-05-17T16:49:15.987Z",
+  "warning": [
+    "chunk_hit_log has 0 rows with rerank_score — lane router training data is not yet meaningful. Fix: ensure rerankScore is propagated in context-assembler.ts recordChunkHits() calls.",
+    "ace:lane:routing_policy is empty — run: npm run kb:lane-router:full"
+  ]
+}

@@ -37,7 +37,7 @@
 |------|-----------|-------|
 | `src/lib/server/authUtils.ts:13` | JWT_SECRET fallback | `'fallback-secret-key'` |
 | `src/lib/server/env.server.ts:9` | DATABASE_URL | `postgresql://legal_admin:123456@localhost:5432/legal_ai_db` |
-| `src/lib/server/adapters/service-integrations.ts` | MINIO_ACCESS_KEY | `minioadmin` |
+| `src/lib/server/adapters/service-integrations.ts` | SeaweedFS S3 access key (legacy `MINIO_ACCESS_KEY`) | `minioadmin` |
 | `src/lib/server/adapters/service-integrations.ts` | NEO4J_PASSWORD | `password` |
 | `src/lib/server/adapters/service-integrations.ts` | RABBITMQ_URL | `guest:guest` |
 | 12+ Go files | postgres/redis passwords | `123456`, `guest:guest` |

@@ -1,6 +1,6 @@
 # Search + Legal Library — Path Wiring Reference
 
-> Generated: 2026-04-14  
+> Generated: 2026-04-14
 > Scope: Global Search, Legal Library Ingestion, Go Search Service, Admin UI
 
 ---
@@ -119,7 +119,7 @@ Browser
          ├─ uploadLibraryDocument() → ingestion-worker.ts
          │   ├─ SHA-256 hash check → skip if duplicate
          │   ├─ ensureBucket('legal-library')
-         │   ├─ putObject(bucket, key, buffer)  → MinIO: legal-library bucket
+         │   ├─ putObject(bucket, key, buffer)  → SeaweedFS S3 gateway (legal-library bucket)
          │   ├─ INSERT INTO jurisdictions (upsert by code)
          │   ├─ INSERT INTO library_documents  → returns documentId
          │   └─ INSERT INTO ingestion_jobs     → returns jobId
@@ -188,8 +188,8 @@ ingestion-worker.ts: runIngestionPipeline()
 
 ## 4. Go Search Service — Internal Architecture
 
-**Binary:** `services/go-search-service/search-server.exe`  
-**Ports:** `:8096` (HTTP) · `:50055` (gRPC)  
+**Binary:** `services/go-search-service/search-server.exe`
+**Ports:** `:8096` (HTTP) · `:50055` (gRPC)
 **Config:** `GO_SEARCH_URL=http://localhost:8096` in `.env`
 
 ```
@@ -221,13 +221,13 @@ QDRANT_URL="http://localhost:6333" \
 
 | Store | Table / Collection | Content | Indexed By |
 |-------|--------------------|---------|------------|
-| PostgreSQL | `library_documents` | Document metadata, status, MinIO key | corpus_type, processing_status |
+| PostgreSQL | `library_documents` | Document metadata, status, SeaweedFS S3 key | corpus_type, processing_status |
 | PostgreSQL | `jurisdictions` | Jurisdiction lookup (code, name, level) | code (unique) |
 | PostgreSQL | `legal_nodes` | Section hierarchy tree | document_id, node_path |
 | PostgreSQL | `legal_chunks` | Text chunks + pgvector embedding (768-dim) | legal_node_id, qdrant_point_id |
 | PostgreSQL | `ingestion_jobs` | Pipeline stage tracking | document_id |
 | PostgreSQL | `legal_citations` | Extracted citation references | node_id |
-| MinIO | `legal-library` bucket | Raw PDF files | `{documentId}/{filename}` |
+| SeaweedFS S3 | `legal-library` bucket | Raw PDF files | `{documentId}/{filename}` |
 | Qdrant | `legal_documents` | 768-dim chunk embeddings (cosine, INT8) | point_id = legal_chunks.qdrant_point_id |
 
 ---
@@ -246,7 +246,7 @@ QDRANT_URL="http://localhost:6333" \
 | `src/lib/server/legal/ingestion-worker.ts` | 8-stage pipeline orchestrator |
 | `src/lib/server/indexer/legal-chunker.ts` | Structure-aware legal chunker |
 | `src/lib/server/grpc/embedding-client.ts` | gRPC embed → Ollama fallback |
-| `src/lib/server/minio-client.ts` | MinIO upload/download |
+| `src/lib/server/minio-client.ts` | SeaweedFS S3 upload/download (legacy module name) |
 | `src/lib/components/layout/YorhaSidebar.svelte` | Nav — LIBRARY INGEST link at `/admin/library` |
 | `src/lib/types/search.ts` | `PlatformSearchHit`, `PlatformSearchTiming` |
 | `services/go-search-service/main.go` | Go 4-way parallel search + RRF |
@@ -258,10 +258,10 @@ QDRANT_URL="http://localhost:6333" \
 | Variable | Default | Used By |
 |----------|---------|---------|
 | `GO_SEARCH_URL` | `''` (disabled) | `/api/library/search`, `/api/search` |
-| `MINIO_LIBRARY_BUCKET` | `legal-library` | `ingestion-worker.ts` |
-| `MINIO_ENDPOINT` | `localhost` | `minio-client.ts` |
-| `MINIO_ACCESS_KEY` | `minio` | `minio-client.ts` |
-| `MINIO_SECRET_KEY` | `minio123` | `minio-client.ts` |
+| `MINIO_LIBRARY_BUCKET` | `legal-library` | SeaweedFS bucket name (legacy env var) |
+| `MINIO_ENDPOINT` | `localhost` | SeaweedFS S3 endpoint host (legacy env var) |
+| `MINIO_ACCESS_KEY` | `minio` | SeaweedFS S3 access key (legacy env var) |
+| `MINIO_SECRET_KEY` | `minio123` | SeaweedFS S3 secret key (legacy env var) |
 | `DATABASE_URL` | — | All PostgreSQL queries |
 | `QDRANT_URL` | `http://localhost:6333` | Qdrant vector search |
 
@@ -273,7 +273,7 @@ QDRANT_URL="http://localhost:6333" \
 Admin uploads PDF
       │
       ▼
-MinIO: legal-library/{docId}/file.pdf
+SeaweedFS S3: legal-library/{docId}/file.pdf
       │
       ▼
 library_documents  (status: queued)

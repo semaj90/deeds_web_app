@@ -183,7 +183,7 @@ Status: ✅ Applied + tested
 - [ ] Display extracted text preview
 - [ ] Show chunks in grid layout
 - [ ] Display GPU analysis results (similarity, cluster)
-- [ ] Add MinIO preview links
+- [ ] Add object storage preview links
 
 ### Priority 2: VLM POI Integration (90 min)
 - [ ] Wire photo VLM analysis to UI

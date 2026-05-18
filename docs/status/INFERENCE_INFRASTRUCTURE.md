@@ -27,7 +27,7 @@ User Query (text)
    ├─ Vision: GET /props → modalities.vision
    └─ Fallback: llama-server not running
   ↓
-4. Bifrost (:11434 proxy)        — LiteLLM semantic cache (if enabled)
+4. Bifrost (:3040 proxy)         — LiteLLM semantic cache (if enabled)
    ├─ 28x speedup on repeated queries
    └─ Fallback: cache miss or disabled
   ↓
@@ -176,7 +176,7 @@ Router extracts `modalities.vision` and uses it to determine VLM routing priorit
 | HF VLM Server | 8085 | `GET /health` | Legal fine-tuned VLM |
 | LiteRT-LM | 8070 | `GET /health` | CPU sidecar |
 | Ollama | 11434 | `GET /api/tags` | Text + VLM fallback |
-| Bifrost (LiteLLM) | 11434 | N/A (proxy) | Semantic cache |
+| Bifrost (LiteLLM) | 3040 | N/A (proxy) | Semantic cache |
 
 ---
 

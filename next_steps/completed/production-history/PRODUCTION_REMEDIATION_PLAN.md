@@ -15,7 +15,7 @@
 | Session invalidation no-op | **PARTIAL** — `session.ts` is dead code. Real invalidation via `lucia.invalidateSession()`. |
 | Rate limiter empty stub | **FALSE** — `middleware/rate-limiter.ts` exports 3 real limiters + hooks inline write limiting. |
 | User registration not implemented | **FALSE** — Real registration in `/api/auth/register/+server.ts`. |
-| MinIO upload commented out | **FALSE** — Full 9-stage evidence pipeline ACTIVE. |
+| Object storage upload commented out | **FALSE** — Full 9-stage evidence pipeline ACTIVE. |
 | ingestion-queue.ts stub content | **FALSE** — File does not exist. |
 | web-search.ts placeholders | **FALSE** — File does not exist. |
 | enhanced-vector-operations.ts stub | **FALSE** — File does not exist. `pgvector-utils.ts` is real. |
@@ -222,7 +222,7 @@ SvelteKit → embedding-client.ts (4-tier fallback)
 | Field | Value |
 |-------|-------|
 | **File** | `src/routes/(app)/evidence/+server.ts:25` |
-| **v1 Claim** | MinIO upload commented out |
+| **v1 Claim** | Object storage upload commented out |
 | **v2 CORRECTION** | **FALSE POSITIVE.** Full 9-stage evidence pipeline is ACTIVE in `/api/evidence/upload/+server.ts`. MinIO `uploadFile()` is called, PostgreSQL record created, text extracted, chunks embedded, entities extracted, forensics run, GPU analysis triggered. |
 | **Status** | [x] FALSE POSITIVE — Already working |
 

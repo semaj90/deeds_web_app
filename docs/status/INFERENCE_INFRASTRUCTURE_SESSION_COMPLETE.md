@@ -130,7 +130,7 @@ llama-server -m gemma4-legal-vlm-q4_k_m.gguf \
 | **Neo4j** | 7687 | ✅ UP (healthy) | Graph database (469 cases, 14 evidence) |
 | **Qdrant** | 6333/6334 | ✅ UP | Vector search (INT8 quantized) |
 | **Redis** | 6379 | ✅ UP | Cache + sessions |
-| **MinIO** | 9000 | ✅ UP | Evidence storage |
+| **Object storage** | 9000 | ✅ UP | Evidence storage |
 | **RabbitMQ** | 5672 | ✅ UP | Message queue (87 queues) |
 | **CouchDB** | 5984 | ✅ UP | DAG cache + inference log |
 | **gRPC Embedding** | 50051 | ✅ LISTENING | 768-dim embeddings |

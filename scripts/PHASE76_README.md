@@ -2,9 +2,9 @@
 
 ## Overview
 
-Phase 76 Level 2 transforms your system from a "Smart Prototype" to a **Production-Grade Agentic System** with persistent, structured memory. It integrates your existing Docker containers (Postgres, MinIO, Redis) into a unified Node.js agent with:
+Phase 76 Level 2 transforms your system from a "Smart Prototype" to a **Production-Grade Agentic System** with persistent, structured memory. It integrates your existing Docker containers (Postgres, SeaweedFS S3, Redis) into a unified Node.js agent with:
 
-- **Deep Storage**: MinIO for full document text
+- **Deep Storage**: SeaweedFS S3 for full document text
 - **Structured Memory**: Postgres with pgvector for error patterns and document references
 - **Semantic Cache**: Redis for fast repeated queries
 - **Agentic Detection**: Automatic detection of legacy code patterns (Svelte 4 → Svelte 5)
@@ -29,7 +29,7 @@ Phase 76 Level 2 transforms your system from a "Smart Prototype" to a **Producti
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │           Unified Storage Layer                         │ │
 │  │  ┌──────────┐  ┌──────────┐  ┌──────────┐              │ │
-│  │  │  MinIO   │  │ Postgres │  │  Redis   │              │ │
+│  │  │ SeaweedFS │  │ Postgres │  │  Redis   │              │ │
 │  │  │  (Deep)  │  │ (Vector) │  │ (Cache)  │              │ │
 │  │  └──────────┘  └──────────┘  └──────────┘              │ │
 │  └────────────────────────────────────────────────────────┘ │
@@ -62,7 +62,7 @@ psql $DATABASE_URL -f scripts/setup-pgvector.sql
 
 This creates:
 - `error_patterns` table - Stores error signatures with embeddings
-- `doc_references` table - Links URLs to MinIO keys with embeddings
+- `doc_references` table - Links URLs to SeaweedFS S3 keys with embeddings
 - HNSW indexes for fast vector similarity search
 
 ### 2. Verify Docker Containers
@@ -88,7 +88,7 @@ Create or update `.env` with:
 # Postgres
 DATABASE_URL=postgresql://postgres:password@localhost:5432/phase76
 
-# MinIO
+# SeaweedFS S3 (MinIO-compatible env vars)
 MINIO_ENDPOINT=localhost
 MINIO_PORT=9000
 MINIO_USE_SSL=false
@@ -128,7 +128,7 @@ npm run phase76:kb:crawl \
 2. Extracts text and generates summary (gemma3-legal)
 3. Generates 768-dim embedding (embeddinggemma)
 4. Stores in Qdrant (search layer)
-5. Stores full text in MinIO (deep storage)
+5. Stores full text in SeaweedFS S3 (deep storage)
 6. Stores reference + vector in Postgres (structured memory)
 
 ### ACE Prompt Engineer: Agentic Task Execution
@@ -146,7 +146,7 @@ npm run phase76:ace --task="Convert my export let props to Svelte 5 $props"
 **What it does:**
 1. **Agentic Detection**: Detects legacy patterns (on:event, export let)
 2. **Semantic Search**: Finds relevant docs in Qdrant
-3. **Deep Context**: Fetches full text from MinIO
+3. **Deep Context**: Fetches full text from SeaweedFS S3
 4. **Context Injection**: Builds enhanced prompt with docs + instructions
 5. **LLM Synthesis**: Generates response with gemma3-legal
 6. **Caching**: Caches results in Redis (1hr TTL)
@@ -172,12 +172,12 @@ Output:
    🤖 Generating summary...
    🧠 Generating embedding...
    💾 Storing in Qdrant...
-   💾 Storing in MinIO + Postgres...
+  💾 Storing in SeaweedFS S3 + Postgres...
    ✅ Ingested: https://svelte.dev/docs/svelte/v5-migration-guide
 
 ✅ Knowledge building complete!
 📊 Indexed 3 documents
-💾 Stored in: Qdrant + MinIO + Postgres
+💾 Stored in: Qdrant + SeaweedFS S3 + Postgres
 ```
 
 ### 2. Execute Agentic Task
@@ -195,7 +195,7 @@ Output:
 🚨 [Agent] Detected Legacy Svelte 4 Syntax. Activating Migration Protocols...
 🧠 [Agent] Generating query embedding...
 🔍 [Agent] Searching knowledge base...
-📦 [Agent] Hydrating deep context from MinIO: svelte_dev_docs_svelte_v5_migration_guide.json
+📦 [Agent] Hydrating deep context from SeaweedFS S3: svelte_dev_docs_svelte_v5_migration_guide.json
 🤖 [Agent] Generating LLM response...
 
 ✅ LLM Response:
@@ -222,7 +222,7 @@ Additionally, if you're using export let for props, convert to $props():
 
 ## Storage Layer Details
 
-### MinIO (Deep Storage)
+### SeaweedFS S3 (Deep Storage)
 
 - **Bucket**: `phase76-summaries`
 - **Key Format**: `{url_sanitized}.json`
@@ -275,7 +275,7 @@ docker ps | grep postgres
 psql $DATABASE_URL -c "SELECT version();"
 ```
 
-### MinIO Connection Failed
+### SeaweedFS S3 Connection Failed
 
 ```bash
 # Check if container is running
@@ -326,7 +326,7 @@ npm run phase76:kb:crawl "https://example.com"
 Phase 76 Level 2 integrates seamlessly with the Knowledge Search Engine (Phase 3):
 
 - **KnowledgeSearcher** uses the same Qdrant collection
-- **MinioKnowledgeStore** uses the same MinIO bucket
+- **MinioKnowledgeStore** uses the same SeaweedFS-backed S3 bucket
 - **RedisCacheService** uses the same Redis instance
 - **PostgresKnowledgeStore** uses the same Postgres database
 

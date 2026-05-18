@@ -138,7 +138,7 @@ if ($ngl -eq "0") {
 # ── Profile shortcut: TURBO_PROFILE expands to (kvK, kvV) defaults. ──────
 # Explicit TURBO_KV_K / TURBO_KV_V env vars override the profile.
 $kvProfile = if ($env:TURBO_PROFILE) { $env:TURBO_PROFILE.ToLower() } else { 'stock' }
-$validProfiles = @('stock', 'turboquant', 'turboquant-safe', 'atomicbot')
+$validProfiles = @('stock', 'turboquant', 'turboquant-safe', 'atomicbot', 'turbo3', 'turbo4')
 if ($validProfiles -notcontains $kvProfile) {
   throw "Invalid TURBO_PROFILE '$kvProfile' — choose one of: $($validProfiles -join ', ')"
 }
@@ -146,7 +146,9 @@ switch ($kvProfile) {
   'stock'           { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
   'turboquant'      { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo3' }
   'turboquant-safe' { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
-  'atomicbot'       { $kvProfileK = 'q8_0'; $kvProfileV = 'q8_0' }
+  'atomicbot'       { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
+  'turbo3'          { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo3' }
+  'turbo4'          { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo4' }
 }
 
 $explicitK = [bool]$env:TURBO_KV_K
@@ -214,7 +216,7 @@ if (-not $NoEvict) {
 # resolved to turbo (impossible today, but kept symmetric for future
 # profiles), soft-fallback is acceptable.
 $turboRequested = ($turboKv -contains $kvK) -or ($turboKv -contains $kvV)
-$turboExplicit  = $turboRequested -and ($explicitK -or $explicitV -or $kvProfile -eq 'turboquant' -or $kvProfile -eq 'atomicbot')
+$turboExplicit  = $turboRequested -and ($explicitK -or $explicitV -or $kvProfile -eq 'turboquant' -or $kvProfile -eq 'atomicbot' -or $kvProfile -eq 'turbo3' -or $kvProfile -eq 'turbo4')
 if ($turboRequested) {
   $help = & $llama -h 2>&1 | Out-String
   $binaryAcceptsTurbo = $help -match 'turbo[234]|tbq[34]_0'

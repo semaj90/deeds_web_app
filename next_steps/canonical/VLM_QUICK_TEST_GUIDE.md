@@ -2,9 +2,9 @@
 
 ## Pre-Flight Checklist
 
-### 1. Verify Ollama Models
+### 1. Verify Ollama Fallback Models
 ```bash
-# Check Ollama is running
+# Check Ollama fallback is running
 curl http://localhost:11434/api/tags
 
 # Expected output should include:
@@ -185,9 +185,9 @@ psql -U legal_admin -d legal_ai_db -c "SELECT * FROM chat_turn_evidence LIMIT 5;
 
 ## Troubleshooting
 
-### Issue: "Ollama not responding"
+### Issue: "Ollama fallback not responding"
 ```bash
-# Check if Ollama is running
+# Check if Ollama fallback is running
 ps aux | grep ollama
 
 # Restart Ollama

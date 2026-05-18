@@ -273,7 +273,7 @@ Case Summary / Legal Brief (Text)
   ↓
 Piper TTS (Docker rhasspy/wyoming-piper) ← LOCAL, PRIVACY
   ↓
-Audio WAV File → MinIO storage
+Audio WAV File → object storage
   ↓
 Download link in case packet export
 ```

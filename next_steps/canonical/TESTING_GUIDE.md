@@ -47,7 +47,7 @@ SEARXNG_URL=http://localhost:8080  # or leave empty for DuckDuckGo fallback
 # Start SvelteKit dev server
 npm run dev
 
-# Verify Ollama is running
+# Verify Ollama fallback is running
 curl http://localhost:11434/api/tags
 
 # Verify agent endpoint

@@ -1,0 +1,344 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# deeds-web-app — Docker Compose Production Stack Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Composes all database, search, and memory services into a unified production network.
+# Includes robust container healthchecks, VRAM offload protection gates, and memory limits.
+#
+# Usage:
+#   docker compose -f docker-compose.production.yml up -d
+# ═══════════════════════════════════════════════════════════════════════════════
+
+networks:
+  legal-ai-network:
+    name: legal-ai-network
+    driver: bridge
+
+volumes:
+  production_postgres_data:
+  production_redis_data:
+  production_qdrant_data:
+  production_neo4j_data:
+  production_neo4j_logs:
+  production_seaweed_master_data:
+  production_seaweed_volume_data:
+
+services:
+  # ── PostgreSQL 17 + pgvector ───────────────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: legal-ai-postgres-prod
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    environment:
+      - POSTGRES_DB=legal_ai_db
+      - POSTGRES_USER=legal_admin
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-production_secured_db_password_9921}
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    ports:
+      - "5434:5432"
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-legal_admin} -d ${POSTGRES_DB:-legal_ai_db}"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ── Redis Stack Server ─────────────────────────────────────────────────────
+  redis:
+    image: redis/redis-stack-server:latest
+    container_name: legal-ai-redis-prod
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --port 6379
+      --protected-mode no
+      --bind 0.0.0.0
+      --loadmodule /opt/redis-stack/lib/redisearch.so
+      --loadmodule /opt/redis-stack/lib/rejson.so
+      --loadmodule /opt/redis-stack/lib/redisbloom.so
+      --maxmemory 1500mb
+      --maxmemory-policy allkeys-lru
+      --lazyfree-lazy-eviction yes
+      --lazyfree-lazy-expire yes
+    volumes:
+      - production_redis_data:/data
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Qdrant Vector DB ───────────────────────────────────────────────────────
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: legal-ai-qdrant-prod
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - production_qdrant_data:/qdrant/storage
+    networks:
+      - legal-ai-network
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/6333' 2>/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Neo4j Graph DB ─────────────────────────────────────────────────────────
+  neo4j:
+    image: neo4j:5-community
+    container_name: legal-ai-neo4j-prod
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:-production_secured_neo4j_password_8842}
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
+      - NEO4J_dbms_memory_heap_initial__size=1g
+      - NEO4J_dbms_memory_heap_max__size=2g
+      - NEO4J_dbms_memory_pagecache_size=1g
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - production_neo4j_data:/data
+      - production_neo4j_logs:/logs
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD:-production_secured_neo4j_password_8842}", "MATCH () RETURN count(*) limit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ── SearXNG Privacy Search ─────────────────────────────────────────────────
+  searxng:
+    image: searxng/searxng:latest
+    container_name: legal-ai-searxng-prod
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8889:8080"
+    volumes:
+      - ./docker/searxng/settings.yml:/etc/searxng/settings.yml:ro
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/healthz"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── SeaweedFS Master ───────────────────────────────────────────────────────
+  seaweedfs-master:
+    image: chrislusf/seaweedfs:latest
+    container_name: legal-ai-seaweed-master-prod
+    restart: unless-stopped
+    command: master -mdir=/data -ip=seaweedfs-master -port=9333
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "9333:9333"
+    volumes:
+      - production_seaweed_master_data:/data
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://seaweedfs-master:9333/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── SeaweedFS Volume ───────────────────────────────────────────────────────
+  seaweedfs-volume:
+    image: chrislusf/seaweedfs:latest
+    container_name: legal-ai-seaweed-volume-prod
+    restart: unless-stopped
+    command: volume -mserver=seaweedfs-master:9333 -ip=seaweedfs-volume -port=8080 -dir=/data -dataCenter=dc1
+    depends_on:
+      seaweedfs-master:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8080:8080"
+    volumes:
+      - production_seaweed_volume_data:/data
+    networks:
+      - legal-ai-network
+
+  # ── SeaweedFS Filer ────────────────────────────────────────────────────────
+  seaweedfs-filer:
+    image: chrislusf/seaweedfs:latest
+    container_name: legal-ai-seaweed-filer-prod
+    restart: unless-stopped
+    command: filer -master=seaweedfs-master:9333 -port=8888
+    depends_on:
+      seaweedfs-master:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8888:8888"
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8888/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── SeaweedFS S3-Compatible Gateway ────────────────────────────────────────
+  seaweedfs-s3:
+    image: chrislusf/seaweedfs:latest
+    container_name: legal-ai-seaweed-s3-prod
+    restart: unless-stopped
+    command: s3 -filer=seaweedfs-filer:8888 -port=8333 -config=/etc/seaweedfs/s3.json
+    depends_on:
+      seaweedfs-filer:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8333:8333"
+    volumes:
+      - ./docker/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -S -O /dev/null http://localhost:8333/ 2>&1 | grep -qE '(HTTP/1.1 200|HTTP/1.1 403)'"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── TurboQuant VRAM-Safe LLM Engine Health Probe ───────────────────────────
+  # Acts as an E2E health gate for SvelteKit and our deployment orchestrator.
+  # Bridges and checks the native GPU-accelerated llama-server running on port 8090.
+  turboquant:
+    image: alpine:latest
+    container_name: legal-ai-turboquant-prod-probe
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    command: sh -c "while true; do sleep 3600; done"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://host.docker.internal:8090/health | grep -q 'ok' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

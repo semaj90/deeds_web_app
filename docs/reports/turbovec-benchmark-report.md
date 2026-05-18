@@ -1,6 +1,6 @@
 # TurboVec: Compressed Vector Routing Telemetry Report
 
-*Generated on:* `5/17/2026, 12:17:12 AM`  
+*Generated on:* `5/17/2026, 2:57:32 PM`  
 *Workstation:* ` deeds-web-app RTX 3060 Ti `  
 *Scope:* Dimensional compression performance & Qdrant query profile comparison.
 
@@ -11,9 +11,9 @@
 | Metric Component | Canonical 768d Lane | Compressed 64d Lane | Performance Impact |
 | :--- | :---: | :---: | :---: |
 | **Vector Space Dimensions** | `768` | `64` | **91.6% space reduction** |
-| **P50 Query Latency** | `2.70ms` | `1.47ms` | `45.6%` speedup |
-| **P95 Query Latency** | `5.79ms` | `1.96ms` | Faster cluster pre-routing |
-| **P99 Query Latency** | `144.35ms` | `7.01ms` | Highly stable tail latency |
+| **P50 Query Latency** | `4.73ms` | `3.55ms` | `24.9%` speedup |
+| **P95 Query Latency** | `11.40ms` | `4.97ms` | Faster cluster pre-routing |
+| **P99 Query Latency** | `102.60ms` | `7.96ms` | Highly stable tail latency |
 | **Single Vector Memory Size** | `3072 Bytes` | `256 Bytes` | **91.7% VRAM savings** |
 | **Success Rate (50 runs)** | `50/50` | `50/50` | `100%` system health |
 
@@ -21,8 +21,8 @@
 
 ## ⚡ Inference & Compression Telemetry
 
-- **Ollama Embedding Latency:** `3812.52ms`
-- **Autoencoder Bottleneck Projection:** `0.0054ms`
+- **Ollama Embedding Latency:** `300.66ms`
+- **Autoencoder Bottleneck Projection:** `0.0076ms`
 - **Memory Optimization Policy:** `on_disk: true` (preserves active workstation RAM)
 
 ### 📈 Latency Profile Trends
@@ -32,10 +32,10 @@ gantt
     dateFormat  X
     axisFormat %s
     section Canonical 768d Lane
-    ANN Search Query : 0, 2.70
+    ANN Search Query : 0, 4.73
     section Compressed 64d Lane
     Autoencoder Projection : 0, 0.01
-    ANN Routing Query : 0.01, 1.48
+    ANN Routing Query : 0.01, 3.56
 ```
 
 ---

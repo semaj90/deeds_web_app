@@ -198,7 +198,7 @@ Free: 2.4 GB
 ```bash
 # .env
 BIFROST_ENABLED=true
-BIFROST_URL=http://localhost:11434
+BIFROST_URL=http://127.0.0.1:3040
 ```
 
 Restart SvelteKit dev server. Router auto-adds Bifrost to cascade.

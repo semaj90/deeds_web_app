@@ -1,9 +1,9 @@
 # ACE Packet Integration Smoke Report
 
 ## Execution Summary
-- **Run ID**: `ace-smoke-1778998065459`
-- **Query**: *"how do we validate pgvector hnsw indexes"*
-- **Timestamp**: 2026-05-17T06:07:45.459Z
+- **Run ID**: `ace-smoke-1779056619586`
+- **Query**: *"does our Lucene-style lexical Postgres FTS run concurrently with Neo4j Louvain partition clusters for poInterest queries"*
+- **Timestamp**: 2026-05-17T22:23:39.586Z
 - **Status**: 🟢 PASS
 
 ## Multi-Lane Retrieval Health
@@ -55,18 +55,18 @@
 - **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/lib/components/cases/ContextualChatModal.svelte","confidence":0.95}]`
 
 
-### Hit #6: sveltekit-frontend/src/pgvector-search.ts
-- **Retrieved via**: `lexical`
-- **Blended Score**: `0.1500`
-- **Providence Annotation**: *"Fast-AST lexical match"*
-- **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/pgvector-search.ts","confidence":0.85}]`
-
-
-### Hit #7: sveltekit-frontend/src/LLMS.md
+### Hit #6: sveltekit-frontend/src/LLMS.md
 - **Retrieved via**: `lexical`
 - **Blended Score**: `0.1500`
 - **Providence Annotation**: *"Fast-AST lexical match"*
 - **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/LLMS.md","confidence":0.85}]`
+
+
+### Hit #7: sveltekit-frontend/src/pgvector-search.ts
+- **Retrieved via**: `lexical`
+- **Blended Score**: `0.1500`
+- **Providence Annotation**: *"Fast-AST lexical match"*
+- **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/pgvector-search.ts","confidence":0.85}]`
 
 
 ### Hit #8: sveltekit-frontend/src/workers\embedding-worker.ts
@@ -76,18 +76,18 @@
 - **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/workers\\embedding-worker.ts","confidence":0.85}]`
 
 
-### Hit #9: sveltekit-frontend/src/mcp\server.ts
+### Hit #9: sveltekit-frontend/src/types\LLMS.md
 - **Retrieved via**: `lexical`
 - **Blended Score**: `0.1500`
 - **Providence Annotation**: *"Fast-AST lexical match"*
-- **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/mcp\\server.ts","confidence":0.85}]`
+- **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/types\\LLMS.md","confidence":0.85}]`
 
 
-### Hit #10: sveltekit-frontend/src/mcp\trace-mcp-server.ts
+### Hit #10: sveltekit-frontend/src/types\pgvector-drizzle.d.ts
 - **Retrieved via**: `lexical`
 - **Blended Score**: `0.1500`
 - **Providence Annotation**: *"Fast-AST lexical match"*
-- **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/mcp\\trace-mcp-server.ts","confidence":0.85}]`
+- **Source Citation**: `[{"type":"local_code","path":"sveltekit-frontend/src/types\\pgvector-drizzle.d.ts","confidence":0.85}]`
 
 
 ---

@@ -1,0 +1,335 @@
+{
+  "evaluatedAt": "2026-05-17T22:23:40.212Z",
+  "status": "PASS",
+  "metrics": {
+    "crossDomainAccuracy": 0.8,
+    "dispatchPruningRatePct": 57.5,
+    "p95LatencyMs": 9010,
+    "forbiddenFieldsTotal": 0,
+    "sourceRefsPresentRatePct": 100
+  },
+  "queries": [
+    {
+      "id": "cross_001",
+      "query": "how does KV cache affect performance in our turboquant llama-server setup",
+      "domains": [
+        "llm_wiki",
+        "codebase"
+      ],
+      "signals": {
+        "semantic": 0.36666666666666664,
+        "lexical": 0.6666666666666666,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.3503888565795183,
+        "postgres": 0.4849489155162074,
+        "neo4j": 0.05463694068067045,
+        "mcp": 0.11002528722360393
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 25062,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "cross_002",
+      "query": "how are the pgvector HNSW index configurations applied to the codebase_chunk_index table and does it support 768d Gemma embeddings",
+      "domains": [
+        "codebase",
+        "llm_wiki"
+      ],
+      "signals": {
+        "semantic": 0.6333333333333333,
+        "lexical": 0.6666666666666666,
+        "graph": 0.5,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.4589191622213518,
+        "postgres": 0.23758863267140687,
+        "neo4j": 0.17310079889350397,
+        "mcp": 0.13039140621373738
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 0.5,
+      "latencyMs": 953,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": false
+    },
+    {
+      "id": "cross_003",
+      "query": "does our Lucene-style lexical Postgres FTS run concurrently with Neo4j Louvain partition clusters for poInterest queries",
+      "domains": [
+        "codebase",
+        "graph"
+      ],
+      "signals": {
+        "semantic": 0.5333333333333333,
+        "lexical": 1,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.3387200383730431,
+        "postgres": 0.5773838253929986,
+        "neo4j": 0.02201756595669335,
+        "mcp": 0.06187857027726504
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "postgres",
+        "neo4j"
+      ],
+      "accuracy": 0.5,
+      "latencyMs": 896,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": false
+    },
+    {
+      "id": "cross_004",
+      "query": "explain how Svelte 5 runes coordinate with Superforms client validation in person POI views",
+      "domains": [
+        "codebase",
+        "external_docs"
+      ],
+      "signals": {
+        "semantic": 0.4666666666666667,
+        "lexical": 0.3333333333333333,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.5017073972163137,
+        "postgres": 0.27079184037157245,
+        "neo4j": 0.07888704945687876,
+        "mcp": 0.1486137129552351
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 30,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "cross_005",
+      "query": "where does our docker-compose wire Redis Bifrost and how does context-assembler query ace:feature Redis keys",
+      "domains": [
+        "codebase",
+        "infra"
+      ],
+      "signals": {
+        "semantic": 0.5,
+        "lexical": 0.6666666666666666,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.4361268388357235,
+        "postgres": 0.41832826577356214,
+        "neo4j": 0.044091474824842936,
+        "mcp": 0.10145342056587157
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "accuracy": 1,
+      "latencyMs": 34,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "cross_006",
+      "query": "why does LoRA fine-tuning require matrix dimension alignment with embeddinggemma:latest in Qdrant",
+      "domains": [
+        "llm_wiki",
+        "codebase"
+      ],
+      "signals": {
+        "semantic": 0.4,
+        "lexical": 0.6666666666666666,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.3711890866793035,
+        "postgres": 0.4687384484637102,
+        "neo4j": 0.051937700535639175,
+        "mcp": 0.10813476432134723
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 38,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "cross_007",
+      "query": "show the Louvain community partition cluster summaries that mention the pgvector HNSW sidecar migrations",
+      "domains": [
+        "graph",
+        "codebase"
+      ],
+      "signals": {
+        "semantic": 0.4666666666666667,
+        "lexical": 0.3333333333333333,
+        "graph": 0.5,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.3554209349686792,
+        "postgres": 0.1494013266765195,
+        "neo4j": 0.3215981611129864,
+        "mcp": 0.17357957724181491
+      },
+      "chosenLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "accuracy": 1,
+      "latencyMs": 28,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "cross_008",
+      "query": "what is the exact latency tradeoff when using local CHR97 similarity search over high-dim Qdrant ANN for Svelte 5 runes",
+      "domains": [
+        "llm_wiki",
+        "codebase"
+      ],
+      "signals": {
+        "semantic": 0.6666666666666666,
+        "lexical": 1,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.4239372722083014,
+        "postgres": 0.5008227109251349,
+        "neo4j": 0.01786634605769618,
+        "mcp": 0.0573736708088675
+      },
+      "chosenLanes": [
+        "qdrant",
+        "postgres"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 21,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "cross_009",
+      "query": "verify the security constraint of clearing raw session auth tokens from redis stack with admin credentials",
+      "domains": [
+        "codebase",
+        "security"
+      ],
+      "signals": {
+        "semantic": 1,
+        "lexical": 0,
+        "graph": 0.5,
+        "trustPressure": 1
+      },
+      "weights": {
+        "qdrant": 0.7531191312866888,
+        "postgres": 0.00836639782234788,
+        "neo4j": 0.02274222717014757,
+        "mcp": 0.21577224372081563
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant"
+      ],
+      "accuracy": 1,
+      "latencyMs": 30,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": true
+    },
+    {
+      "id": "cross_010",
+      "query": "how does GraphRAG community cohesion score determine early context exit bounds for our legal cases index",
+      "domains": [
+        "graph",
+        "llm_wiki"
+      ],
+      "signals": {
+        "semantic": 0.5333333333333333,
+        "lexical": 0.3333333333333333,
+        "graph": 0,
+        "trustPressure": 0
+      },
+      "weights": {
+        "qdrant": 0.5461820212969639,
+        "postgres": 0.2454154018488149,
+        "neo4j": 0.0691505233118941,
+        "mcp": 0.13925205354232706
+      },
+      "chosenLanes": [
+        "qdrant"
+      ],
+      "expectedLanes": [
+        "qdrant",
+        "neo4j"
+      ],
+      "accuracy": 0.5,
+      "latencyMs": 22,
+      "sourceRefsPresent": true,
+      "forbiddenFields": 0,
+      "useful": false
+    }
+  ]
+}

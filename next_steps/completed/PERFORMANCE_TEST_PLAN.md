@@ -135,7 +135,7 @@ time curl -X POST http://localhost:5173/api/evidence/upload \
 
 # Expected: ~13-20 seconds end-to-end
 # Breakdown:
-# - MinIO upload: ~500ms
+# - Object storage upload: ~500ms
 # - Text extraction: ~2-3s
 # - Chunking: ~500ms
 # - Batch embedding: ~10-13s (800 chunks ÷ 8/batch ÷ 3 concurrent)

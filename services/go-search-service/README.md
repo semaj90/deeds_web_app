@@ -19,7 +19,7 @@ Single-binary Go microservice providing parallel legal library search with RRF f
          │      │      │      │
     ┌────▼┐ ┌──▼──┐ ┌▼────┐ ┌▼─────┐
     │ PG  │ │Redis│ │Qdrant│ │Ollama│
-    │5432 │ │6379 │ │6333/ │ │11434 │
+    │5434 │ │6379 │ │6333/ │ │11434 │
     │     │ │     │ │6334  │ │      │
     └─────┘ └─────┘ └─────┘ └──────┘
 ```
@@ -47,7 +47,7 @@ Uses `k=60` constant: `score = weight / (k + rank)`. Results from all strategies
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `postgresql://legal_admin:123456@localhost:5432/legal_ai_db` | PostgreSQL connection string |
+| `DATABASE_URL` | `postgresql://legal_admin:123456@localhost:5434/legal_ai_db` | PostgreSQL connection string |
 | `QDRANT_URL` | `http://localhost:6333` | Qdrant REST endpoint |
 | `QDRANT_GRPC_HOST` | `localhost` | Qdrant gRPC host |
 | `QDRANT_GRPC_PORT` | `6334` | Qdrant gRPC port |
@@ -116,7 +116,7 @@ Task: `🚀 Local: Start Go Search gRPC`
 ```bash
 docker build -t go-search-service services/go-search-service/
 docker run -p 8096:8096 -p 50055:50055 \
-  -e DATABASE_URL="postgresql://legal_admin:123456@host.docker.internal:5432/legal_ai_db" \
+  -e DATABASE_URL="postgresql://legal_admin:123456@host.docker.internal:5434/legal_ai_db" \
   -e QDRANT_URL="http://host.docker.internal:6333" \
   -e QDRANT_GRPC_HOST="host.docker.internal" \
   go-search-service

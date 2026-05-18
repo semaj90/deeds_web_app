@@ -878,6 +878,13 @@
     "sveltekit-frontend/tests/routes/auto/api/cache.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/cache.test.ts"
   ],
+  "sveltekit-frontend/src/lib/server/cache/topo-candidate-cache.ts": [
+    "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
+    "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts": [
+    "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts"
+  ],
   "sveltekit-frontend/src/routes/api/auth/me/+server.ts": [
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/auth/me.test.ts"

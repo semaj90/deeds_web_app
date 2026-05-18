@@ -537,7 +537,7 @@ simd-bridge/cpp/
   Fetch:   stores/analysis-panel.svelte.ts → /api/gpu/compute
 ```
 ### Evidence Upload Pipeline (9 stages)
-1. MinIO upload + SHA-256 hash + PostgreSQL record
+1. Object storage upload + SHA-256 hash + PostgreSQL record
 2. Text extraction: pdf-parse → OCR fallback (Tesseract CLI → tesseract.js)
 3. Structure-aware chunking via legal-chunker.ts (ARTICLE/SECTION/§)
 4. Embedding: gRPC → embeddinggemma → nomic-embed-text fallback
@@ -553,14 +553,14 @@ simd-bridge/cpp/
 | quic-nats-bridge | :4434 | QUIC/NATS | Cross-protocol bridge + embedding proxy |
 | gpu_inference_server | :8095-8097 | gRPC/QUIC/HTTP3 | CUDA worker pools + tensor cache |
 | analytics-service | gRPC | gRPC | PostgreSQL analytics (trends, breakdowns) |
-| minio-simd-service | :8095 | HTTP | SIMD JSON parsing for MinIO metadata |
+| seaweedfs-simd-service (legacy minio-simd-service) | :8095 | HTTP | SIMD JSON parsing for SeaweedFS metadata |
 ### Docker Services
 | Service | Port | Status |
 |---------|------|--------|
 | deeds-postgres-prod | 5432 | UP |
 | deeds-redis-prod | 6379 | UP |
 | deeds-qdrant-prod | 6333 | UP |
-| phase66-minio | 9000 | UP |
+| phase66-seaweedfs (legacy phase66-minio) | 9000 | UP |
 | phase66-rabbitmq | 5672 | UP |
 | phase66-couchdb | 5984 | UP |
 | phase66-langextract | 8095 | UP |
@@ -580,7 +580,7 @@ SvelteKit ←─ gRPC ──→ Go embedding-server ←─ HTTP ──→ Ollama
     │            ←─ NATS ──→│ (quic-nats-bridge)
     │
     ├── HTTP ──→ Ollama (direct, Tier 3/4)
-    ├── HTTP ──→ Go SIMD sidecar (MinIO metadata)
+    ├── HTTP ──→ Go SIMD sidecar (SeaweedFS metadata)
     ├── N-API ──→ tensorrt_bridge.node (LibTorch CUDA)
     ├── bolt:// ──→ Neo4j (graph queries)
     ├── TCP ──→ Redis (cache + lease + sessions)

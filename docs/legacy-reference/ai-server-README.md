@@ -8,7 +8,7 @@ Production-ready AI server for legal evidence processing with token streaming, v
 - **Triton/TensorRT** primary AI inference with **Ollama fallback**
 - **PostgreSQL + PGVector** for vector storage
 - **Qdrant** for fast vector search
-- **MinIO** for object storage
+- **SeaweedFS S3 object storage** for file uploads
 - **Redis** for caching (24hr embeddings, 1hr analysis) and pub/sub
 - **Workflow orchestration** with progress tracking
 - **CORS** enabled for SvelteKit 2 frontend
@@ -29,13 +29,13 @@ pip install -r requirements.txt
 Copy `.env` file and update with your credentials:
 
 ```bash
-DATABASE_URL=postgresql://user:pass@localhost:5432/legal_ai_db
+DATABASE_URL=postgresql://user:pass@localhost:5434/legal_ai_db
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=your_password
-MINIO_ENDPOINT=localhost:9000
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin
+MINIO_ENDPOINT=localhost:8333  # SeaweedFS S3 gateway (legacy MinIO-compatible env var)
+MINIO_ACCESS_KEY=minioadmin    # legacy alias; SeaweedFS S3 credential
+MINIO_SECRET_KEY=minioadmin    # legacy alias; SeaweedFS S3 credential
 QDRANT_URL=http://localhost:6333
 OLLAMA_BASE_URL=http://localhost:11434
 AI_MODEL=gemma3-legal:latest
@@ -119,7 +119,7 @@ Server streams:
 
 ## 🔄 Workflow Pipeline
 
-1. **Upload** (10%) - File saved to MinIO
+1. **Upload** (10%) - File saved to object storage
 2. **OCR** (30%) - Text extraction
 3. **Embedding** (50%) - Vector generation with nomic-embed-text
 4. **Analysis** (70%) - AI streaming analysis with auto-tags
@@ -131,17 +131,17 @@ Server streams:
 ```
 FastAPI Server (Port 8000)
 ├── WebSocket (/ws) - Real-time streaming
-├── File Upload (/api/upload) - MinIO storage
+├── File Upload (/api/upload) - object storage
 ├── Search (/api/search) - PGVector + Qdrant
 ├── Workflow (/api/workflow) - Redis pub/sub
 └── Analysis (/api/analysis) - Cached results
 
 Services:
-- Ollama: http://localhost:11434 (primary AI)
+- Ollama: http://localhost:11434 (legacy AI fallback)
 - TensorRT: http://localhost:8001 (fallback)
-- PostgreSQL: localhost:5432 (PGVector)
+- PostgreSQL: localhost:5434 (PGVector)
 - Qdrant: http://localhost:6333 (vector search)
-- MinIO: localhost:9000 (file storage)
+- Object storage: localhost:8333 (SeaweedFS S3 gateway)
 - Redis: localhost:6379 (cache + pub/sub)
 ```
 

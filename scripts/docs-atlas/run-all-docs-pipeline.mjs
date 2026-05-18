@@ -29,6 +29,20 @@ async function runPipeline() {
     {
       name: 'TurboVec Query Latency & VRAM Telemetry Benchmark',
       script: 'scripts/docs-atlas/turbovec-benchmark-sidecar.mjs'
+    },
+    {
+      name: 'Qdrant Vector Indexing',
+      script: 'scripts/docs-atlas/index-programming-docs-qdrant.mjs',
+      args: ['--write']
+    },
+    {
+      name: 'Neo4j Graph Projection',
+      script: 'scripts/docs-atlas/project-programming-docs-neo4j.mjs',
+      args: ['--write']
+    },
+    {
+      name: 'Comparative Gap Analysis',
+      script: 'scripts/docs-atlas/compare-external-docs-to-features.mjs'
     }
   ];
 
@@ -40,7 +54,8 @@ async function runPipeline() {
     
     const t0 = performance.now();
     try {
-      execSync(`node ${resolve(rootDir, step.script)}`, {
+      const argsStr = step.args ? ' ' + step.args.join(' ') : '';
+      execSync(`node ${resolve(rootDir, step.script)}${argsStr}`, {
         stdio: 'inherit',
         env: { ...process.env, FORCE_COLOR: '1' }
       });

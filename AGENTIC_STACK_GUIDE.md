@@ -82,7 +82,7 @@ We have unified the disparate GPU and research scripts into a single entry point
 - **Command**: `npm run dev:agent`
 - **What it does**:
   1. **Hardware Alignment**: Enables FlashAttention 2, sets INT8 KV cache (`q8_0`), and configures `PYTORCH_CUDA_ALLOC_CONF` for your RTX 3060 Ti.
-  2. **Infrastructure**: Starts the full Docker profile (Postgres, Redis, Qdrant, MinIO, Bifrost, SearXNG).
+  2. **Infrastructure**: Starts the full Docker profile (Postgres, Redis, Qdrant, SeaweedFS S3, Bifrost, SearXNG).
   3. **Inference**: Launches Ollama via `start-ollama-flash-attention.bat`.
   4. **Context7 Bridge**: Starts the SvelteKit API in cluster mode (PM2) to handle high-concurrency tool calls.
   5. **Watchdog**: Runs a background VRAM monitor to prevent OOM errors.

@@ -63,7 +63,7 @@ Heap: Halved! Same data, half the space.
          ├─→ PostgreSQL 16 + pgvector (1GB)
          ├─→ Redis 7 (512MB, LRU eviction)
          ├─→ Qdrant (2GB, vector search)
-         ├─→ MinIO (512MB, object storage)
+          ├─→ SeaweedFS (512MB, object storage)
          ├─→ RabbitMQ (512MB, message queue)
          ├─→ Neo4j (1GB, graph DB) [optional]
          └─→ CouchDB (512MB, document store) [optional]
@@ -127,8 +127,9 @@ REDIS_URL=redis://redis:6379
 # Vector DB
 QDRANT_URL=http://qdrant:6333
 
-# Object Storage
-MINIO_ENDPOINT=minio
+# Object Storage (SeaweedFS; MinIO is legacy S3-compatible alias)
+SEAWEED_ENDPOINT=seaweedfs:8888
+MINIO_ENDPOINT=minio  # legacy S3-compatible alias
 MINIO_ACCESS_KEY=admin
 MINIO_SECRET_KEY=password
 
@@ -147,7 +148,7 @@ NEO4J_PASSWORD=password
 # CouchDB (ACE context engine)
 COUCHDB_URL=http://admin:password@couchdb:5984
 
-# Ollama (LLM inference — runs on host)
+# Ollama (LLM inference — host fallback)
 OLLAMA_URL=http://host.docker.internal:11434
 ```
 
@@ -164,7 +165,7 @@ docker-compose -f docker-compose.sveltekit-prod.yml ps
 # Individual service health
 curl http://localhost:3000/api/health  # SvelteKit
 curl http://localhost:6333/healthz     # Qdrant
-curl http://localhost:9000/minio/health/live  # MinIO
+curl http://localhost:9000/minio/health/live  # SeaweedFS / MinIO-compatible object storage health
 redis-cli -h localhost -p 6379 ping    # Redis
 ```
 
@@ -332,7 +333,7 @@ SAVINGS: $60.73/mo ($728.76/year)
 - [ ] Change default passwords in `.env`
 - [ ] Enable HTTPS (nginx + Let's Encrypt)
 - [ ] Configure firewall rules
-- [ ] Set up backup strategy (PostgreSQL, MinIO)
+- [ ] Set up backup strategy (PostgreSQL, object storage)
 - [ ] Enable Docker secrets for sensitive data
 - [ ] Run containers as non-root user (already configured)
 - [ ] Set up log rotation
@@ -346,8 +347,8 @@ SAVINGS: $60.73/mo ($728.76/year)
 # PostgreSQL backup
 docker exec deeds-postgres-prod pg_dump -U legal_admin legal_ai_db > backup.sql
 
-# MinIO backup
-mc mirror minio/legal-evidence ./backups/minio/
+# Object storage backup
+mc mirror minio/legal-evidence ./backups/object-storage/  # MinIO-compatible client alias
 
 # Automated daily backups
 crontab -e
