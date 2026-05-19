@@ -253,6 +253,7 @@
 		"graphify:export-clusters": "node scripts/export-cluster-summaries.mjs",
 		"graphify:export-clusters:top": "node scripts/export-cluster-summaries.mjs --top 20",
 		"graphify:sync-clusters-qdrant": "node scripts/sync-cluster-summaries-to-qdrant.mjs",
+		"graphify:sync-cluster-tags": "node ../scripts/atlas/sync-cluster-tags-redis.mjs",
 		"smoke:prior-answer-cache": "node scripts/tests/smoke-prior-answer-cache.mjs",
 		"smoke:graphify": "node scripts/tests/smoke-graphify.mjs",
 		"smoke:rust:graph": "node scripts/smoke-rust-graph.mjs",
