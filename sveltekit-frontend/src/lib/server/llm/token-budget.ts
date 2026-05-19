@@ -1,24 +1,30 @@
-// @ts-ignore — gpt-tokenizer not yet installed; install when needed
-import { encode } from 'gpt-tokenizer';
+import { encode, isWithinTokenLimit } from 'gpt-tokenizer';
 
 export function countTokens(text: string): number {
   return encode(text ?? '').length;
 }
 
 export function enforceTokenBudget(input: string, maxInputTokens = 12000) {
-  const tokens = countTokens(input);
+  const normalizedInput = input ?? '';
+  const withinBudget = isWithinTokenLimit(normalizedInput, maxInputTokens);
 
-  if (tokens <= maxInputTokens) {
-    return { text: input, tokens, truncated: false };
+  if (withinBudget !== false) {
+    return { text: normalizedInput, tokens: withinBudget, truncated: false };
   }
 
-  const clippedLength = Math.max(0, Math.floor((input.length * maxInputTokens) / tokens));
-  const clippedText = input.slice(0, clippedLength);
+  const tokens = countTokens(normalizedInput);
+
+  if (tokens <= maxInputTokens) {
+    return { text: normalizedInput, tokens, truncated: false };
+  }
+
+  const clippedLength = Math.max(0, Math.floor((normalizedInput.length * maxInputTokens) / tokens));
+  const clippedText = normalizedInput.slice(0, clippedLength);
 
   return {
     text: clippedText,
     tokens,
-    truncated: true
+    truncated: true,
   };
 }
 
@@ -35,7 +41,7 @@ export function buildBudgetedContext(parts: {
     ['system', parts.system, 2500],
     ['user', parts.user, 2000],
     ['acePacket', parts.acePacket ?? '', 4000],
-    ['toolResults', parts.toolResults ?? '', 2000]
+    ['toolResults', parts.toolResults ?? '', 2000],
   ] as const;
 
   let final = '';
@@ -57,6 +63,6 @@ export function buildBudgetedContext(parts: {
   return {
     text: final.trim(),
     tokens: total,
-    overBudget: total > max
+    overBudget: total > max,
   };
 }

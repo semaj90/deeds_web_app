@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import type { Pool } from 'pg';
 import type { Redis } from 'ioredis';
 import { aceTopkKey } from './cache-keys.js';
+import { readLatestQdrantClusterTags, scoreClusterRelevance } from './cluster-tags-cache.js';
 
 export type RetrievalLaneName =
   | 'redis_ace'
@@ -39,8 +40,22 @@ export interface MultiLaneOutput {
   merged: ContextHit[];
   topFiles: string[];
   topSymbols: string[];
+  hotClusters: HotClusterRecall[];
   totalHits: number;
   durationMs: number;
+}
+
+export interface HotClusterRecall {
+  clusterKey: string;
+  score: number;
+  filePath?: string;
+  summary: string;
+  purpose?: string;
+  topoClasses: string[];
+  topTags: string[];
+  fileCount: number;
+  riskLevel?: string;
+  protocols?: string[];
 }
 
 const LANE_WEIGHTS: Record<RetrievalLaneName, number> = {
@@ -64,6 +79,38 @@ function sha1(s: string): string {
 
 function degraded(lane: RetrievalLaneName, reason: string, latencyMs = 0): RetrievalLaneResult {
   return { lane, degraded: true, reason, latencyMs, hits: [] };
+}
+
+function buildHotClusterRecall(query: string, limit = 3): HotClusterRecall[] {
+  const entries = readLatestQdrantClusterTags();
+  if (!entries.length) return [];
+
+  const queryLower = query.toLowerCase();
+  const queryTerms = new Set(queryLower.split(/\W+/).filter((term) => term.length > 2));
+
+  return entries
+    .map((entry) => ({ entry, score: scoreClusterRelevance(entry, queryLower, queryTerms) }))
+    .filter(({ score }) => score >= 0.05)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(({ entry, score }) => {
+      const filePath = (entry.topFiles as (string | null)[]).find(
+        (path): path is string => path != null
+      );
+
+      return {
+        clusterKey: entry.clusterKey,
+        score,
+        filePath,
+        summary: entry.summary?.trim() || entry.purpose?.trim() || entry.clusterKey,
+        purpose: entry.purpose,
+        topoClasses: entry.topoClasses,
+        topTags: entry.topTags.slice(0, 6).map((tag) => tag.tag),
+        fileCount: entry.fileCount,
+        riskLevel: entry.risk_level,
+        protocols: entry.mitigation_protocols,
+      };
+    });
 }
 
 async function runRedisAceLane(
@@ -181,7 +228,11 @@ async function runPostgresTrigramLane(
 
     // Both queries rejected → lane is degraded (no usable data)
     if (docRes.status === 'rejected' && resRes.status === 'rejected') {
-      return degraded('postgres_trigram', String((docRes as PromiseRejectedResult).reason), Date.now() - t0);
+      return degraded(
+        'postgres_trigram',
+        String((docRes as PromiseRejectedResult).reason),
+        Date.now() - t0
+      );
     }
 
     hits.sort((a, b) => b.score - a.score);
@@ -272,29 +323,52 @@ async function runSomTopologyLane(
     const topoClass = inferTopoClass(query);
     const qHash = sha256(query).slice(0, 12);
     const raw = await redis.get(`ace:topo:${topoClass}:${qHash}`);
+    const hits: ContextHit[] = [];
 
-    if (!raw) {
-      return { lane: 'som_topology', degraded: false, latencyMs: Date.now() - t0, hits: [] };
+    if (raw) {
+      try {
+        const candidates = JSON.parse(raw) as Array<Record<string, unknown>>;
+        const arr = Array.isArray(candidates) ? candidates : [];
+        for (const item of arr) {
+          hits.push({
+            id: String(item.id ?? item.chunkId ?? qHash),
+            chunkId: item.chunkId != null ? String(item.chunkId) : undefined,
+            filePath: item.filePath != null ? String(item.filePath) : undefined,
+            source: 'som_topology',
+            text: item.text != null ? String(item.text) : undefined,
+            score: typeof item.score === 'number' ? item.score : 0.7,
+            tags: Array.isArray(item.tags) ? (item.tags as string[]) : undefined,
+            metadata: { topoClass, source: 'ace:topo' },
+          });
+        }
+      } catch {
+        // malformed cache
+      }
     }
 
-    const hits: ContextHit[] = [];
-    try {
-      const candidates = JSON.parse(raw) as Array<Record<string, unknown>>;
-      const arr = Array.isArray(candidates) ? candidates : [];
-      for (const item of arr) {
+    if (hits.length === 0) {
+      for (const cluster of buildHotClusterRecall(query)) {
         hits.push({
-          id: String(item.id ?? item.chunkId ?? qHash),
-          chunkId: item.chunkId != null ? String(item.chunkId) : undefined,
-          filePath: item.filePath != null ? String(item.filePath) : undefined,
+          id: cluster.clusterKey,
+          chunkId: cluster.clusterKey,
+          filePath: cluster.filePath,
           source: 'som_topology',
-          text: item.text != null ? String(item.text) : undefined,
-          score: typeof item.score === 'number' ? item.score : 0.7,
-          tags: Array.isArray(item.tags) ? (item.tags as string[]) : undefined,
-          metadata: { topoClass },
+          text: cluster.summary,
+          score: cluster.score,
+          tags: cluster.topTags,
+          metadata: {
+            topoClass,
+            source: 'cluster-tags-cache',
+            clusterKey: cluster.clusterKey,
+            fileCount: cluster.fileCount,
+            summary: cluster.summary,
+            purpose: cluster.purpose,
+            riskLevel: cluster.riskLevel,
+            protocols: cluster.protocols,
+            storedTopoClasses: cluster.topoClasses,
+          },
         });
       }
-    } catch {
-      // malformed cache
     }
 
     return { lane: 'som_topology', degraded: false, latencyMs: Date.now() - t0, hits };
@@ -459,6 +533,7 @@ export async function runRetrievalLanes(opts: {
   const merged = mergeContextHits(lanes);
   const topFiles = extractTopFiles(merged);
   const topSymbols = extractTopSymbols(merged);
+  const hotClusters = buildHotClusterRecall(query);
   const totalHits = lanes.reduce((n, l) => n + l.hits.length, 0);
 
   return {
@@ -466,6 +541,7 @@ export async function runRetrievalLanes(opts: {
     merged,
     topFiles,
     topSymbols,
+    hotClusters,
     totalHits,
     durationMs: Date.now() - t0,
   };
@@ -503,6 +579,15 @@ export async function writeRetrievalTrace(
   if (output.topFiles.length > 0) {
     lines.push(``, `## Top Files`, ``);
     for (const f of output.topFiles) lines.push(`- \`${f}\``);
+  }
+
+  if (output.hotClusters.length > 0) {
+    lines.push(``, `## Hot Cluster Recall`, ``);
+    for (const cluster of output.hotClusters.slice(0, 3)) {
+      const fileLabel = cluster.filePath ? ` — \`${cluster.filePath}\`` : '';
+      const tags = cluster.topTags.length > 0 ? ` | tags: ${cluster.topTags.join(', ')}` : '';
+      lines.push(`- [${cluster.clusterKey}] ${cluster.summary}${fileLabel}${tags}`);
+    }
   }
 
   if (output.merged.length > 0) {

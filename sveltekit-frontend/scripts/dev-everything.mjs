@@ -165,6 +165,82 @@ function spawnDetached(label, cmd, args, opts = {}) {
   }
 }
 
+function dockerDaemonHealthy() {
+  try {
+    const result = spawnSync('docker', ['info'], {
+      encoding: 'utf8',
+      stdio: 'pipe',
+      timeout: 5_000,
+    });
+    return result.status === 0;
+  } catch {
+    return false;
+  }
+}
+
+function launchDockerDesktop() {
+  if (process.platform !== 'win32') return false;
+
+  const candidates = [
+    process.env.DOCKER_DESKTOP_EXE,
+    process.env.ProgramFiles
+      ? path.join(process.env.ProgramFiles, 'Docker', 'Docker', 'Docker Desktop.exe')
+      : null,
+    process.env['ProgramFiles(x86)']
+      ? path.join(process.env['ProgramFiles(x86)'], 'Docker', 'Docker', 'Docker Desktop.exe')
+      : null,
+  ].filter((candidate) => typeof candidate === 'string' && candidate.length > 0);
+
+  for (const candidate of candidates) {
+    if (!existsSync(candidate)) continue;
+    info(`Launching Docker Desktop from ${candidate}`);
+    const child = spawn(candidate, [], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+      env: process.env,
+    });
+    child.unref();
+    return true;
+  }
+
+  warn('Docker Desktop.exe was not found in the standard Windows install locations.');
+  return false;
+}
+
+async function ensureDockerDesktopReady(timeoutMs = 60_000) {
+  if (dockerDaemonHealthy()) return true;
+  if (process.platform !== 'win32') return false;
+
+  const launched = launchDockerDesktop();
+  if (!launched) return false;
+
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (dockerDaemonHealthy()) return true;
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+  }
+
+  return false;
+}
+
+function runDockerCompose(profile) {
+  const result = spawnSync(
+    'docker-compose',
+    ['-f', path.join(rootDir, 'docker-compose.yml'), ...profile, 'up', '-d'],
+    {
+      stdio: 'inherit',
+      cwd: rootDir,
+      env: DEV_ENV,
+    }
+  );
+
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    throw new Error(`docker-compose up -d exited with code ${result.status ?? 'unknown'}`);
+  }
+}
+
 // ── Phase 1: Background services ───────────────────────────────────────────
 
 async function phase1() {
@@ -177,13 +253,22 @@ async function phase1() {
       ? ['--profile', 'full', '--profile', 'seaweedfs', '--profile', 'gpu']
       : ['--profile', 'full', '--profile', 'seaweedfs'];
     try {
-      spawnSync('docker-compose', ['-f', path.join(rootDir, 'docker-compose.yml'), ...profile, 'up', '-d'], {
-        stdio: 'inherit',
-        cwd:   rootDir,
-        env:   DEV_ENV,
-      });
+      runDockerCompose(profile);
     } catch (e) {
       warn(`docker-compose up failed: ${e.message}`);
+      if (process.platform === 'win32' && !dockerDaemonHealthy()) {
+        info('Docker Desktop is not ready; starting it and retrying docker-compose up -d once ...');
+        const ready = await ensureDockerDesktopReady();
+        if (!ready) {
+          throw new Error(
+            'Docker Desktop did not become ready in time. Start Docker Desktop and re-run dev:everything.'
+          );
+        }
+        info('Docker Desktop is healthy; retrying docker-compose up -d ...');
+        runDockerCompose(profile);
+      } else {
+        throw e;
+      }
     }
   } else {
     info('[dry] docker-compose up -d (full + seaweedfs profiles)');

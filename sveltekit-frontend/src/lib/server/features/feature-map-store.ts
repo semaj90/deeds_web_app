@@ -1,11 +1,15 @@
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { generateSingleEmbedding } from '../grpc/embedding-client.js';
 import { db } from '../db/client.js';
 import { featureMaps, grpoMemorySticks } from '../db/schema/features.js';
 import { getRedis } from '../redis.js';
 import { QdrantManager } from '../vector/qdrant-manager.js';
 import { aceContextKey } from '../cache-keys.js';
-import { buildAceContextRegistryPacket, writeAceContextRegistry } from '../ace/context-cache-registry.js';
+import {
+  buildAceContextRegistryPacket,
+  writeAceContextRegistry,
+} from '../ace/context-cache-registry.js';
 import type { FeatureCompileResult, FeatureMap, GrpoMemoryStick } from './feature-map.types.js';
 
 const FEATURE_TTL_SECONDS = 48 * 60 * 60;
@@ -43,6 +47,19 @@ export type FeatureMapStoreWrites = {
   neo4jJsonl: string[];
 };
 
+export async function buildFeatureSummaryEmbedding(featureMap: FeatureMap): Promise<number[]> {
+  const sourceText = [featureMap.title, featureMap.summaries.short]
+    .filter(Boolean)
+    .join('\n')
+    .trim();
+
+  try {
+    return await generateSingleEmbedding(sourceText.slice(0, 4000) || featureMap.title);
+  } catch {
+    return Array.from({ length: 768 }, () => 0);
+  }
+}
+
 export function prepareStoreWrites(result: FeatureCompileResult): FeatureMapStoreWrites {
   const { featureMap, grpoMemoryStick } = result;
   const encoded64 = featureMap.vectors?.encoded64 ?? Array.from({ length: 64 }, () => 0);
@@ -60,15 +77,27 @@ export function prepareStoreWrites(result: FeatureCompileResult): FeatureMapStor
       scores: featureMap.scores,
       cache: featureMap.cache,
       vectors: featureMap.vectors ?? {},
-      edges: featureMap.edges
+      edges: featureMap.edges,
     },
-    updatedAt: new Date()
+    updatedAt: new Date(),
   };
 
   const redisHotKeys = [
-    { key: `feature:summary:${featureMap.featureId}`, value: featureMap.summaries.short, ttlSeconds: FEATURE_TTL_SECONDS },
-    { key: `feature:glyph:${featureMap.featureId}`, value: JSON.stringify(featureMap.glyph), ttlSeconds: FEATURE_TTL_SECONDS },
-    { key: `feature:map:${featureMap.featureId}`, value: JSON.stringify(featureMap), ttlSeconds: FEATURE_TTL_SECONDS },
+    {
+      key: `feature:summary:${featureMap.featureId}`,
+      value: featureMap.summaries.short,
+      ttlSeconds: FEATURE_TTL_SECONDS,
+    },
+    {
+      key: `feature:glyph:${featureMap.featureId}`,
+      value: JSON.stringify(featureMap.glyph),
+      ttlSeconds: FEATURE_TTL_SECONDS,
+    },
+    {
+      key: `feature:map:${featureMap.featureId}`,
+      value: JSON.stringify(featureMap),
+      ttlSeconds: FEATURE_TTL_SECONDS,
+    },
   ];
 
   let grpoMemoryStickRow: typeof grpoMemorySticks.$inferInsert | undefined;
@@ -84,11 +113,19 @@ export function prepareStoreWrites(result: FeatureCompileResult): FeatureMapStor
       rewardSignals: grpoMemoryStick.rewardSignals,
       scores: grpoMemoryStick.scores,
       cacheKeys: grpoMemoryStick.cacheKeys,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
     redisHotKeys.push(
-      { key: `grpo:memory:${grpoMemoryStick.queryHash}`, value: JSON.stringify(grpoMemoryStick), ttlSeconds: GRPO_TTL_SECONDS },
-      { key: aceContextKey.packet(grpoMemoryStick.contextPacketHash), value: JSON.stringify(acePacket), ttlSeconds: FEATURE_TTL_SECONDS }
+      {
+        key: `grpo:memory:${grpoMemoryStick.queryHash}`,
+        value: JSON.stringify(grpoMemoryStick),
+        ttlSeconds: GRPO_TTL_SECONDS,
+      },
+      {
+        key: aceContextKey.packet(grpoMemoryStick.contextPacketHash),
+        value: JSON.stringify(acePacket),
+        ttlSeconds: FEATURE_TTL_SECONDS,
+      }
     );
     void writeAceContextRegistry(acePacket).catch(() => null);
   }
@@ -106,10 +143,10 @@ export function prepareStoreWrites(result: FeatureCompileResult): FeatureMapStor
         flags: featureMap.glyph.mask,
         vectors: featureMap.vectors ?? {},
         metadata: featureMap,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       featureMapRow,
-      grpoMemoryStickRow
+      grpoMemoryStickRow,
     },
     redisHotKeys,
     qdrantFeatureSummaryPoint: {
@@ -124,10 +161,10 @@ export function prepareStoreWrites(result: FeatureCompileResult): FeatureMapStor
         glyphMask: featureMap.glyph.mask,
         summary: featureMap.summaries.short,
         paths: featureMap.paths,
-        cacheKeys: featureMap.cache
-      }
+        cacheKeys: featureMap.cache,
+      },
     },
-    neo4jJsonl: buildNeo4jJsonl(featureMap)
+    neo4jJsonl: buildNeo4jJsonl(featureMap),
   };
 }
 
@@ -144,38 +181,52 @@ export async function storeFeatureMap(map: FeatureMap, prepared?: FeatureMapStor
   const writes = prepared ?? prepareStoreWrites({ featureMap: map, warnings: [] });
   const redis = getRedis();
 
-  await db.insert(featureMaps).values(writes.postgresJsonb.featureMapRow).onConflictDoUpdate({
-    target: [featureMaps.id],
-    set: {
-      name: writes.postgresJsonb.featureMapRow.name,
-      description: writes.postgresJsonb.featureMapRow.description,
-      status: writes.postgresJsonb.featureMapRow.status,
-      paths: writes.postgresJsonb.featureMapRow.paths,
-      graphTriples: writes.postgresJsonb.featureMapRow.graphTriples,
-      flags: writes.postgresJsonb.featureMapRow.flags,
-      glyph: writes.postgresJsonb.featureMapRow.glyph,
-      metadata: writes.postgresJsonb.featureMapRow.metadata,
-      updatedAt: new Date()
-    }
-  });
+  await db
+    .insert(featureMaps)
+    .values(writes.postgresJsonb.featureMapRow)
+    .onConflictDoUpdate({
+      target: [featureMaps.id],
+      set: {
+        name: writes.postgresJsonb.featureMapRow.name,
+        description: writes.postgresJsonb.featureMapRow.description,
+        status: writes.postgresJsonb.featureMapRow.status,
+        paths: writes.postgresJsonb.featureMapRow.paths,
+        graphTriples: writes.postgresJsonb.featureMapRow.graphTriples,
+        flags: writes.postgresJsonb.featureMapRow.flags,
+        glyph: writes.postgresJsonb.featureMapRow.glyph,
+        metadata: writes.postgresJsonb.featureMapRow.metadata,
+        updatedAt: new Date(),
+      },
+    });
 
   const pipe = redis.pipeline();
-  for (const entry of writes.redisHotKeys.filter((item) => item.key.startsWith('feature:') || item.key.startsWith('ace:'))) {
+  for (const entry of writes.redisHotKeys.filter(
+    (item) => item.key.startsWith('feature:') || item.key.startsWith('ace:')
+  )) {
     pipe.set(entry.key, entry.value, 'EX', entry.ttlSeconds);
   }
   await pipe.exec();
 
   try {
     const qdrant = new QdrantManager();
+    const summaryEmbedding = await buildFeatureSummaryEmbedding(map);
     await qdrant.client.upsert(writes.qdrantFeatureSummaryPoint.collection, {
-      points: [{
-        id: writes.qdrantFeatureSummaryPoint.id,
-        vector: writes.qdrantFeatureSummaryPoint.vector,
-        payload: writes.qdrantFeatureSummaryPoint.payload
-      }]
+      points: [
+        {
+          id: writes.qdrantFeatureSummaryPoint.id,
+          vector: { summary: summaryEmbedding },
+          payload: {
+            ...writes.qdrantFeatureSummaryPoint.payload,
+            encoded64: writes.qdrantFeatureSummaryPoint.vector,
+          },
+        },
+      ],
     });
   } catch (err) {
-    console.warn(`[feature-map-store] Qdrant upsert failed for ${map.featureId}:`, (err as Error).message);
+    console.warn(
+      `[feature-map-store] Qdrant upsert failed for ${map.featureId}:`,
+      (err as Error).message
+    );
   }
 
   appendNeo4jJsonl(writes.neo4jJsonl);

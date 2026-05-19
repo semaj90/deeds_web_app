@@ -4,8 +4,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const mocks = vi.hoisted(() => {
   const mockGet = vi.fn();
   const mockQuery = vi.fn();
-  return { mockGet, mockQuery };
+  const mockReadLatestQdrantClusterTags = vi.fn();
+  const mockScoreClusterRelevance = vi.fn();
+  return { mockGet, mockQuery, mockReadLatestQdrantClusterTags, mockScoreClusterRelevance };
 });
+
+vi.mock('$lib/server/ace/cluster-tags-cache.js', () => ({
+  readLatestQdrantClusterTags: mocks.mockReadLatestQdrantClusterTags,
+  scoreClusterRelevance: mocks.mockScoreClusterRelevance,
+}));
 
 describe('retrieval-lanes: runRetrievalLanes', () => {
   const redis = { get: mocks.mockGet } as any;
@@ -18,6 +25,8 @@ describe('retrieval-lanes: runRetrievalLanes', () => {
     vi.clearAllMocks();
     mocks.mockQuery.mockResolvedValue({ rows: [] });
     mocks.mockGet.mockResolvedValue(null);
+    mocks.mockReadLatestQdrantClusterTags.mockReturnValue([]);
+    mocks.mockScoreClusterRelevance.mockReturnValue(0);
     const mod = await import('$lib/server/ace/retrieval-lanes.js');
     runRetrievalLanes = mod.runRetrievalLanes;
     mergeContextHits = mod.mergeContextHits;
@@ -42,6 +51,7 @@ describe('retrieval-lanes: runRetrievalLanes', () => {
     expect(typeof result.durationMs).toBe('number');
     expect(Array.isArray(result.topFiles)).toBe(true);
     expect(Array.isArray(result.topSymbols)).toBe(true);
+    expect(Array.isArray(result.hotClusters)).toBe(true);
   });
 
   it('returns degraded postgres_trigram lane when pool throws', async () => {
@@ -130,6 +140,49 @@ describe('retrieval-lanes: runRetrievalLanes', () => {
     expect(result.merged.some((h) => h.source === 'postgres_trigram')).toBe(true);
   });
 
+  it('uses the cluster tag cache when the som_topology Redis key misses', async () => {
+    mocks.mockReadLatestQdrantClusterTags.mockReturnValue([
+      {
+        clusterKey: 'cluster:gpu:7',
+        fileCount: 12,
+        topoClasses: ['cache', 'vector'],
+        topTags: [
+          { tag: 'redis', count: 8 },
+          { tag: 'cache', count: 5 },
+        ],
+        topFiles: ['src/lib/server/redis.ts'],
+        summary: 'Hot cache cluster',
+        purpose: 'Accelerate repeated retrieval',
+        risk_level: 'medium',
+        mitigation_protocols: ['Invalidate on index refresh'],
+      },
+    ]);
+    mocks.mockScoreClusterRelevance.mockReturnValue(0.18);
+    mocks.mockGet.mockResolvedValue(null);
+    mocks.mockQuery.mockResolvedValue({ rows: [] });
+
+    const result = await runRetrievalLanes({ query: 'redis cache hot path', pool, redis });
+
+    const topoLane = result.lanes.find((l) => l.lane === 'som_topology');
+    expect(topoLane?.degraded).toBe(false);
+    expect(topoLane?.hits.length).toBe(1);
+    expect(topoLane?.hits[0].filePath).toBe('src/lib/server/redis.ts');
+    expect(topoLane?.hits[0].text).toContain('Hot cache cluster');
+    expect(topoLane?.hits[0].metadata).toMatchObject({
+      clusterKey: 'cluster:gpu:7',
+      source: 'cluster-tags-cache',
+      topoClass: 'cache',
+    });
+    expect(result.hotClusters).toHaveLength(1);
+    expect(result.hotClusters[0]).toMatchObject({
+      clusterKey: 'cluster:gpu:7',
+      filePath: 'src/lib/server/redis.ts',
+      summary: 'Hot cache cluster',
+      purpose: 'Accelerate repeated retrieval',
+      riskLevel: 'medium',
+    });
+  });
+
   it('ast_symbol lane returns scored hits when query contains a src/ file path', async () => {
     const SRC_PATH = 'src/lib/server/ace/retrieval-lanes.ts';
     mocks.mockGet.mockImplementation(async (key: string) => {
@@ -165,6 +218,7 @@ describe('retrieval-lanes: runRetrievalLanes', () => {
     expect(Array.isArray(result.merged)).toBe(true);
     expect(Array.isArray(result.topFiles)).toBe(true);
     expect(Array.isArray(result.topSymbols)).toBe(true);
+    expect(Array.isArray(result.hotClusters)).toBe(true);
     expect(result.lanes).toHaveLength(6);
     for (const lane of result.lanes) {
       expect(typeof lane.degraded).toBe('boolean');

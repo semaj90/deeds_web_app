@@ -38,6 +38,7 @@ async function run() {
     const result = await runTopologyProjection(mockEmbeddings, {
       mode: 'ae2l-pca',
       normalize: true,
+      loadAutoencoderWeights: true,
     });
     const duration = performance.now() - t0;
 
@@ -55,9 +56,7 @@ async function run() {
       console.log(`   └─ Sample Node Manifold4 Coords: ${JSON.stringify(sampleNode.manifold4)}`);
 
       // Verify coordinate range
-      const rangeOk = result.nodes.every(node => 
-        node.manifold4.every(c => c >= 0 && c <= 1)
-      );
+      const rangeOk = result.nodes.every((node) => node.manifold4.every((c) => c >= 0 && c <= 1));
       console.log(`✔️ Coordinates are correctly normalized to [0, 1] range: ${rangeOk}`);
 
       // Verify audit metadata
