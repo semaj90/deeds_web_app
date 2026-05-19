@@ -4611,6 +4611,7 @@ export async function fetchCodebaseContext(
     // (Qdrant semantics) — does not restrict the ANN sweep.
     // Threshold 0.05 filters noise (tile has no term overlap with query).
     let bowClusterShould: Array<{ key: string; match: { value: number } }> = [];
+    let _topBowClusterId: number | undefined;
     try {
       const bowQueryTerms = tokenizeBowQuery(query);
       if (bowQueryTerms.size > 0) {
@@ -4621,6 +4622,7 @@ export async function fetchCodebaseContext(
             bowClusterScores: ranked.slice(0, 5),
           };
         }
+        if (ranked.length > 0) _topBowClusterId = ranked[0].clusterId;
         bowClusterShould = ranked
           .slice(0, 2)
           .filter((c) => c.score >= 0.05)
@@ -4630,18 +4632,41 @@ export async function fetchCodebaseContext(
       /* non-fatal */
     }
 
-    // Merge: topo (must) + encoded-cluster (must) + centroid cluster (must) + BoW clusters (should).
+    // ── Stage 2C: Karpathy cluster member boost (Redis ace:cluster:members:*) ──
+    // Top cluster from BoW scoring → ZREVRANGE top-14 files by Karpathy blend →
+    // Qdrant `should` filter on relativePath. Non-breaking: only fires when Phase B
+    // Redis data is present (written by npm run karpathy:gpu after graphify:full).
+    let karpathyMemberShould: Array<{ key: string; match: { any: string[] } }> = [];
+    if (_topBowClusterId != null && process.env.ACE_CLUSTER_FILTER_ENABLED !== 'false') {
+      try {
+        const { getRedis } = await import('$lib/server/redis.js');
+        const members = await getRedis().zrevrange(
+          `ace:cluster:members:cluster:gpu:${_topBowClusterId}`,
+          0,
+          14
+        );
+        if (members && members.length > 0) {
+          karpathyMemberShould = [{ key: 'relativePath', match: { any: members } }];
+        }
+      } catch {
+        /* non-fatal */
+      }
+    }
+
+    // Merge: topo (must) + encoded-cluster (must) + centroid cluster (must) +
+    //        BoW clusters (should) + Karpathy member boost (should).
     // Qdrant: `should` boosts scores of matching docs without restricting the set.
     const mustClauses: unknown[] = [
       ...(topoFilter ? (topoFilter.must as unknown[]) : []),
       ...(encodedClusterFilter ? (encodedClusterFilter.must as unknown[]) : []),
       ...(clusterFilter ? (clusterFilter.must as unknown[]) : []),
     ];
+    const allShould = [...bowClusterShould, ...karpathyMemberShould];
     const combinedFilter: Record<string, unknown> | undefined =
-      mustClauses.length > 0 || bowClusterShould.length > 0
+      mustClauses.length > 0 || allShould.length > 0
         ? {
             ...(mustClauses.length > 0 ? { must: mustClauses } : {}),
-            ...(bowClusterShould.length > 0 ? { should: bowClusterShould } : {}),
+            ...(allShould.length > 0 ? { should: allShould } : {}),
           }
         : undefined;
 
