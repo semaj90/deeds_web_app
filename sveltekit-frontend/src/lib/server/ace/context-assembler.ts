@@ -117,6 +117,7 @@ import {
   toUnitQuaternion,
   manifold4ToQuaternion,
 } from '$lib/server/search/quaternion-manifold.js';
+import type { HotCluster } from './hot-cluster-reader.js';
 import {
   getTopoCandidates,
   setTopoCandidates,
@@ -4397,6 +4398,24 @@ export interface CodebaseFetchStats {
   karpathy?: {
     bowClusterBiasUsed: boolean;
     bowClusterScores: Array<{ clusterId: number; score: number }>;
+    hotClusterScores?: Array<{
+      clusterId: number;
+      hotness: number;
+      source: HotCluster['source'];
+      fileCount: number;
+      scalarSeed: number;
+      metadataSummary: string;
+    }>;
+    mergedClusterScores?: Array<{
+      clusterId: number;
+      score: number;
+      fromHot: boolean;
+      hotness?: number;
+      source?: HotCluster['source'];
+      fileCount?: number;
+      scalarSeed?: number;
+      metadataSummary?: string;
+    }>;
   };
 }
 
@@ -4604,28 +4623,57 @@ export async function fetchCodebaseContext(
       /* non-fatal — continue without cluster pre-filter */
     }
 
-    // ── Stage 2B: BoW cluster pre-scoring (term-space, no embedding needed) ────
+    // ── Stage 2B: BoW cluster pre-scoring + hot-cluster blend ────────────────
     // Scores all cluster BoW tiles against query terms in a single Promise.all.
-    // Top-2 clusters are added as Qdrant `should` conditions: when `must` clauses
-    // are also present (topo or centroid), `should` acts as a scoring boost only
-    // (Qdrant semantics) — does not restrict the ANN sweep.
-    // Threshold 0.05 filters noise (tile has no term overlap with query).
+    // Merges with XGBoost hotness scores from `ace:cluster:hot` (TTL 1h, written
+    // by xgboost-hotness-score.mjs).  Hot clusters with hotness ≥ 0.6 override
+    // their BoW score via a 50/50 blend.  Falls back to pure BoW when the key is
+    // absent (first run or Redis restart).
+    // Qdrant `should` semantics: boosts scores of matching docs without restricting.
     let bowClusterShould: Array<{ key: string; match: { value: number } }> = [];
     let _topBowClusterId: number | undefined;
     try {
       const bowQueryTerms = tokenizeBowQuery(query);
       if (bowQueryTerms.size > 0) {
-        const ranked = await scoreClustersForQuery(bowQueryTerms);
+        const { getRedis } = await import('$lib/server/redis.js');
+        const { readHotClusters } = await import('./hot-cluster-reader.js');
+        const { mergeClusterCandidates } = await import('./merge-cluster-candidates.js');
+        const [ranked, hotClusters] = await Promise.all([
+          scoreClustersForQuery(bowQueryTerms),
+          readHotClusters(getRedis(), 10, { preferHotSet: true }),
+        ]);
+        const merged = mergeClusterCandidates(ranked, hotClusters, {
+          hotThreshold: 0.6,
+          maxShould: 4,
+          hotWeight: 0.5,
+        });
         if (statsOut) {
           statsOut.karpathy = {
             bowClusterBiasUsed: ranked.length > 0,
             bowClusterScores: ranked.slice(0, 5),
+            hotClusterScores: hotClusters.slice(0, 5).map((cluster) => ({
+              clusterId: cluster.clusterId,
+              hotness: cluster.hotness,
+              source: cluster.source,
+              fileCount: cluster.fileCount,
+              scalarSeed: cluster.scalarSeed,
+              metadataSummary: cluster.metadataSummary,
+            })),
+            mergedClusterScores: merged.slice(0, 5).map((cluster) => ({
+              clusterId: cluster.clusterId,
+              score: cluster.score,
+              fromHot: cluster.fromHot,
+              hotness: cluster.hotness,
+              source: cluster.source,
+              fileCount: cluster.fileCount,
+              scalarSeed: cluster.scalarSeed,
+              metadataSummary: cluster.metadataSummary,
+            })),
           };
         }
-        if (ranked.length > 0) _topBowClusterId = ranked[0].clusterId;
-        bowClusterShould = ranked
-          .slice(0, 2)
-          .filter((c) => c.score >= 0.05)
+        if (merged.length > 0) _topBowClusterId = merged[0].clusterId;
+        bowClusterShould = merged
+          .filter((c) => c.score >= 0.03)
           .map((c) => ({ key: 'neo4j_gpuCluster', match: { value: c.clusterId } }));
       }
     } catch {

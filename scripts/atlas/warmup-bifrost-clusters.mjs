@@ -5,6 +5,7 @@
  * Phase D — Pre-seed Bifrost L2 semantic cache with top cluster summaries.
  *
  * Reads ace:cluster:tags:__meta → ace:cluster:tags:{ck} from Redis,
+ * or ace:cluster:hot → ace:cluster:tags:{ck} via the shared hot-cluster reader,
  * then POSTs each cluster summary to Bifrost (/v1/chat/completions) so that
  * future ACE queries referencing these clusters hit L2 instead of GPU inference.
  *
@@ -17,12 +18,17 @@
  *   --dry-run    Print what would be sent, skip actual POST
  *   --limit N    Only warm top N clusters (default: all)
  *   --ttl N      Bifrost cache TTL in seconds (default: 3600)
+ *   --from-hot-set  Prefer ace:cluster:hot over the static cluster manifest
  */
 
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
+import {
+  buildClusterWarmupPrompt,
+  readHotClusters,
+} from '../../sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FE_ROOT = resolve(__dirname, '../../sveltekit-frontend');
@@ -36,6 +42,7 @@ const BIFROST_MODEL  = process.env.BIFROST_MODEL   || 'gemma3-legal:latest';
 
 const args      = process.argv.slice(2);
 const DRY_RUN   = args.includes('--dry-run');
+const FROM_HOT_SET = args.includes('--from-hot-set');
 const LIMIT_IDX = args.indexOf('--limit');
 const LIMIT     = LIMIT_IDX !== -1 ? parseInt(args[LIMIT_IDX + 1], 10) : Infinity;
 const TTL_IDX   = args.indexOf('--ttl');
@@ -62,40 +69,30 @@ async function main() {
     process.exit(0);
   });
 
-  // ── read manifest ─────────────────────────────────────────────────────────
-  const metaRaw = await redis.get('ace:cluster:tags:__meta');
-  if (!metaRaw) {
-    console.warn('[warmup-bifrost] ace:cluster:tags:__meta not found — run graphify:sync-cluster-tags first');
+  const requestedTopK = Number.isFinite(LIMIT) ? LIMIT : 9999;
+  const clusters = await readHotClusters(redis, requestedTopK, { preferHotSet: FROM_HOT_SET });
+
+  if (clusters.length === 0) {
+    console.warn(
+      '[warmup-bifrost] no clusters available — run graphify:sync-cluster-tags or xgboost:hotness:score first'
+    );
     await redis.quit();
     return;
   }
 
-  let meta;
-  try { meta = JSON.parse(metaRaw); } catch {
-    console.error('[warmup-bifrost] malformed __meta JSON');
-    await redis.quit();
-    return;
-  }
-
-  const clusterKeys = (meta.clusterKeys ?? []).slice(0, isFinite(LIMIT) ? LIMIT : undefined);
-  console.log(`[warmup-bifrost] warming ${clusterKeys.length} of ${meta.count ?? '?'} clusters`);
+  const sourceLabel = FROM_HOT_SET ? 'ace:cluster:hot' : 'ace:cluster:tags:__meta';
+  console.log(`[warmup-bifrost] warming ${clusters.length} clusters from ${sourceLabel}`);
 
   // ── for each cluster, read summary and POST to Bifrost ───────────────────
   let warmed = 0;
   let skipped = 0;
   let errors = 0;
 
-  for (const ck of clusterKeys) {
-    const summary = await redis.hget(`ace:cluster:tags:${ck}`, 'summary');
-    if (!summary || !summary.trim()) {
-      skipped++;
-      continue;
-    }
-
-    const prompt = `Cluster ${ck} context: ${summary}`;
+  for (const cluster of clusters) {
+    const prompt = buildClusterWarmupPrompt(cluster);
 
     if (DRY_RUN) {
-      console.log(`  [dry] ${ck}: "${summary.slice(0, 80)}..."`);
+      console.log(`  [dry] ${cluster.clusterKey}: "${prompt.slice(0, 120)}..."`);
       warmed++;
       continue;
     }
@@ -112,7 +109,7 @@ async function main() {
           model: BIFROST_MODEL,
           messages: [
             { role: 'system', content: 'You are a legal AI codebase assistant. Answer concisely.' },
-            { role: 'user',   content: prompt },
+            { role: 'user', content: prompt },
           ],
           max_tokens: 32,
           temperature: 0,
@@ -124,17 +121,17 @@ async function main() {
         warmed++;
       } else {
         const body = await res.text().catch(() => '');
-        console.warn(`  [warn] ${ck}: HTTP ${res.status} — ${body.slice(0, 100)}`);
+        console.warn(`  [warn] ${cluster.clusterKey}: HTTP ${res.status} — ${body.slice(0, 100)}`);
         errors++;
       }
     } catch (err) {
       // Bifrost may be down — non-fatal, just skip
-      console.warn(`  [warn] ${ck}: ${err.message}`);
+      console.warn(`  [warn] ${cluster.clusterKey}: ${err.message}`);
       errors++;
     }
 
     // small jitter to avoid hammering Bifrost
-    await new Promise(r => setTimeout(r, 120));
+    await new Promise((r) => setTimeout(r, 120));
   }
 
   await redis.quit();
