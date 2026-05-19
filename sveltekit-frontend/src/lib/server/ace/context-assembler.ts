@@ -4653,15 +4653,40 @@ export async function fetchCodebaseContext(
       }
     }
 
+    // ── Stage 2D: GraphRAG neighbor expansion ──────────────────────────────
+    // Reads ace:cluster:graphrag:neighbors:* (written by graphify:graphrag-recommend)
+    // and adds the top-2 structural neighbors of the winning BoW cluster as extra
+    // `should` boost entries. Non-breaking: silently skips when key absent.
+    let graphragNeighborShould: Array<{ key: string; match: { value: number } }> = [];
+    if (_topBowClusterId != null && process.env.ACE_CLUSTER_FILTER_ENABLED !== 'false') {
+      try {
+        const { getRedis } = await import('$lib/server/redis.js');
+        const neighbors = await getRedis().zrevrange(
+          `ace:cluster:graphrag:neighbors:cluster:gpu:${_topBowClusterId}`,
+          0,
+          1 // top-2 neighbors only (Jaccard-ranked, avoids over-expansion)
+        );
+        for (const n of neighbors) {
+          const id = parseInt(n.replace('cluster:gpu:', ''), 10);
+          if (!isNaN(id) && id !== _topBowClusterId) {
+            graphragNeighborShould.push({ key: 'neo4j_gpuCluster', match: { value: id } });
+          }
+        }
+      } catch {
+        /* non-fatal */
+      }
+    }
+
     // Merge: topo (must) + encoded-cluster (must) + centroid cluster (must) +
-    //        BoW clusters (should) + Karpathy member boost (should).
+    //        BoW clusters (should) + Karpathy member boost (should) +
+    //        GraphRAG structural neighbors (should, damped top-2).
     // Qdrant: `should` boosts scores of matching docs without restricting the set.
     const mustClauses: unknown[] = [
       ...(topoFilter ? (topoFilter.must as unknown[]) : []),
       ...(encodedClusterFilter ? (encodedClusterFilter.must as unknown[]) : []),
       ...(clusterFilter ? (clusterFilter.must as unknown[]) : []),
     ];
-    const allShould = [...bowClusterShould, ...karpathyMemberShould];
+    const allShould = [...bowClusterShould, ...karpathyMemberShould, ...graphragNeighborShould];
     const combinedFilter: Record<string, unknown> | undefined =
       mustClauses.length > 0 || allShould.length > 0
         ? {
