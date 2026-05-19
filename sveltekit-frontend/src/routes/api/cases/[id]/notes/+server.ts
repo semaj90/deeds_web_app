@@ -106,7 +106,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 				title: body.title?.trim() || null,
 				content: body.content.trim(),
 				isAI: body.isAI,
-				createdBy: locals.user.id
+				createdBy: Number(locals.user.id)
 			})
 			.returning();
 

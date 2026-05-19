@@ -6,13 +6,15 @@ export const load: PageServerLoad = async (event) => {
     throw redirect(302, '/login');
   }
 
-  const [obsRes, vlmRes] = await Promise.all([
+  const [obsRes, vlmRes, aceMetricsRes] = await Promise.all([
     event.fetch('/api/admin/observability'),
-    event.fetch('/api/vlm/status')
+    event.fetch('/api/vlm/status'),
+    event.fetch('/api/admin/ace-metrics?since_days=1'),
   ]);
 
   let obsData = { success: false };
   let vlmData = { success: false };
+  let aceMetrics = { success: false };
 
   if (obsRes.ok) {
     obsData = await obsRes.json();
@@ -20,9 +22,13 @@ export const load: PageServerLoad = async (event) => {
   if (vlmRes.ok) {
     vlmData = await vlmRes.json();
   }
+  if (aceMetricsRes.ok) {
+    aceMetrics = await aceMetricsRes.json();
+  }
 
   return {
     obsData,
-    vlmData
+    vlmData,
+    aceMetrics,
   };
 };

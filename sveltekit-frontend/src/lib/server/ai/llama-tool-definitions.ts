@@ -21,7 +21,7 @@ export interface LlamaToolFunction {
   description: string;
   parameters:  {
     type:       'object';
-    properties: Record<string, { type: string; description: string; enum?: string[]; default?: unknown }>;
+    properties: Record<string, { type: string; description: string; enum?: string[]; default?: unknown; items?: unknown }>;
     required?:  string[];
   };
 }

@@ -161,7 +161,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				tags:           summary.entityTags,
 				sourceUrl:      summary.url ?? null,
 				caseId:         caseId ?? null,
-				createdBy:      locals.user.id,
+				createdBy:      Number(locals.user.id),
 			})
 			.returning();
 

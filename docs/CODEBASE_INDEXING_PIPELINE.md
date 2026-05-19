@@ -158,6 +158,19 @@ Deep research findings and error-prone domains are captured as durable notes:
 All notes live in CouchDB + Redis (`kb_bundle:*`), feeding back into ACE context
 assembly and GRPO reranking on the next query.
 
+## Query Routing Evaluation — Phase 18
+
+Phase 18 is the query-side hardening layer for the Atlas / HyperRAG stack. It validates messy developer query routing against the same Karpathy-indexed codebase state that this pipeline builds:
+
+- uses `codebase_chunks_768` as the indexed retrieval corpus
+- samples `gpu:karpathy:scores` as the authority blend signal
+- audits CHR97 fast-path gating and HyperRAG fallback decisions
+- writes evaluation reports to `docs/reports/messy-query-routing-eval.json` and `docs/reports/messy-query-routing-eval.md`
+
+Read the engineering completion doc at `docs/operator/PHASE_18_MESSY_QUERY_ROUTING.md`.
+
+This evaluation phase is intentionally non-production at first: it exists to verify that the indexed Karpathy retrieval surfaces and HyperRAG fallback are aligned before promoting the pattern to a live route.
+
 ---
 
 ## Export & Analysis Surface

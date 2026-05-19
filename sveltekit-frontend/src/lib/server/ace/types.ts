@@ -5,6 +5,7 @@
  * self-evaluation, and tag generation.
  */
 import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
+import type { AcePayload } from '$lib/server/ace/ace-payload-selector.js';
 
 export interface ACEUserProfile {
 	userId: string;
@@ -308,7 +309,30 @@ export interface ACEContext {
     durationMs: number;
   } | null;
   dbSchemaContext?: string;
+  compactSearch?: {
+    contextTreeId: string;
+    query: string;
+    hits: Array<{
+      rank: number;
+      chunkId: string;
+      path: string;
+      snippet: string;
+      score: number;
+      topoClass?: string | null;
+      sources: string[];
+      weights: { lex: number; semantic: number; authority: number };
+      fullText?: string;
+    }>;
+    totalCharsEstimate: number;
+    cacheHit: boolean;
+    elapsedMs: number;
+    nextAction: string;
+    embedCached: boolean;
+  } | null;
   aceContextPacket?: any;
+  /** Budget-filtered ACE payloads built from kbChunks+caseChunks+ragChunks.
+   *  Used by the prompt builder and by the reward-event recorder. */
+  acePayloads?: AcePayload[];
 }
 
 /**

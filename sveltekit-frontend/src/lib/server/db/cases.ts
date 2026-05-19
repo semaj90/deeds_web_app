@@ -68,7 +68,7 @@ export async function updateCaseTitle(
       .set({ title, updatedAt: new Date() })
       .where(eq(wardenCases.id, caseId));
 
-    return result.length > 0;
+    return (result.rowCount ?? 0) > 0;
 }
 
 

@@ -24,7 +24,7 @@ export async function logEvidenceAction(
 		await db.insert(evidenceAuditLog).values({
 			evidenceId,
 			action,
-			userId: options?.userId ?? null,
+			userId: options?.userId ? Number(options.userId) : null,
 			changes: options?.changes ?? null,
 			ipAddress: options?.ipAddress ?? null,
 			userAgent: options?.userAgent ?? null,

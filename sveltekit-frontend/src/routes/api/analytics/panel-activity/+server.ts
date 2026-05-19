@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   try {
     await db.insert(panelActivityLog).values({
-      userId:    user.id,
+      userId:    Number(user.id),
       sessionId: sessionId ?? 'unknown',
       route,
       panelKey,

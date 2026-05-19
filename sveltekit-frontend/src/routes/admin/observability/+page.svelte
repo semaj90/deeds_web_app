@@ -2,13 +2,18 @@
   import { onMount } from 'svelte';
 
   // Svelte 5 Props Rune
-  let { data } = $props<{ data: { obsData: any; vlmData: any } }>();
+  let { data } = $props<{ data: { obsData: any; vlmData: any; aceMetrics?: any } }>();
 
   // Svelte 5 State Runes
   let switchingMode = $state(false);
-  let currentVlmState = $state(data.vlmData?.state || 'OFF');
-  let turboQuantHealthy = $state(data.vlmData?.turboQuantHealthy || false);
+  let currentVlmState = $state('OFF');
+  let turboQuantHealthy = $state(false);
   let actionFeedback = $state('');
+
+  $effect(() => {
+    currentVlmState = data.vlmData?.state ?? 'OFF';
+    turboQuantHealthy = data.vlmData?.turboQuantHealthy ?? false;
+  });
   let feedbackType = $state<'info' | 'success' | 'error'>('info');
 
   // SVG Chart Derived coordinates for Latency Trends (dynamic mapping based on data)
@@ -72,7 +77,7 @@
         body: JSON.stringify({ mode: newMode })
       });
       const result = await res.json();
-      
+
       if (result.success) {
         currentVlmState = newMode;
         turboQuantHealthy = result.turboQuantHealthy;
@@ -149,7 +154,7 @@
       <span class="hud-subtitle">MONITOR SYSTEM // WORKSTATION TELEMETRY</span>
       <h1 class="hud-title">YoRHa Tactical Observability Dashboard</h1>
     </div>
-    
+
     <div class="hud-header-meta">
       <div class="meta-item">
         <span class="label">DRIFT STATUS</span>
@@ -211,6 +216,48 @@
     </div>
   </section>
 
+  <section class="metrics-row" style="margin-top: 1rem;">
+    <div class="hud-card metric-card">
+      <div class="card-bg-grid"></div>
+      <span class="card-tag">ACE_01</span>
+      <h3>Prompt Tokens (24h)</h3>
+      <div class="metric-display">
+        <span class="number text-glow-green">{data.aceMetrics?.tokenUsage?.totalPromptTokens ?? '—'}</span>
+        <span class="subtext">Total prompt tokens recorded for this user</span>
+      </div>
+    </div>
+
+    <div class="hud-card metric-card">
+      <div class="card-bg-grid"></div>
+      <span class="card-tag">ACE_02</span>
+      <h3>Completion Tokens (24h)</h3>
+      <div class="metric-display">
+        <span class="number text-glow-green">{data.aceMetrics?.tokenUsage?.totalCompletionTokens ?? '—'}</span>
+        <span class="subtext">Total model output tokens across completions</span>
+      </div>
+    </div>
+
+    <div class="hud-card metric-card">
+      <div class="card-bg-grid"></div>
+      <span class="card-tag">ACE_03</span>
+      <h3>ACE Packet Budget</h3>
+      <div class="metric-display">
+        <span class="number text-glow-green">{data.aceMetrics?.kvBudget?.totalSavedTokens ?? '—'}</span>
+        <span class="subtext">KV saved tokens for session</span>
+      </div>
+    </div>
+
+    <div class="hud-card metric-card">
+      <div class="card-bg-grid"></div>
+      <span class="card-tag">ACE_04</span>
+      <h3>ACE Requests</h3>
+      <div class="metric-display">
+        <span class="number text-glow-green">{data.aceMetrics?.tokenUsage?.requestCount ?? '—'}</span>
+        <span class="subtext">OpenAI requests logged for this user window</span>
+      </div>
+    </div>
+  </section>
+
   <!-- Split Panel: Latency & Memory Trends -->
   <div class="charts-split">
     <!-- Latency Chart Card -->
@@ -218,7 +265,7 @@
       <span class="card-tag">CH_LAT</span>
       <h3>ACE Packet Builder Latency (p50 / p95)</h3>
       <p class="chart-desc">Historical latency tracking over consecutive soak cycles (ms)</p>
-      
+
       <div class="chart-container">
         {#if data.obsData?.latencyTrendMs?.p50 && data.obsData.latencyTrendMs.p50.length > 0}
           <svg class="hud-svg-chart" viewBox="0 0 320 200">
@@ -243,7 +290,7 @@
               <circle cx={pt.x} cy={pt.y} r="5" fill="#00FF66" class="chart-dot" />
               <text x={pt.x - 10} y={pt.y - 10} class="chart-value-text">{data.obsData.latencyTrendMs.p50[i]}ms</text>
             {/each}
-            
+
             {#each p95Points as pt, i}
               <circle cx={pt.x} cy={pt.y} r="4" fill="#FF3366" class="chart-dot" />
             {/each}
@@ -252,7 +299,7 @@
           <div class="empty-chart">No latency benchmarks recorded yet.</div>
         {/if}
       </div>
-      
+
       <div class="chart-legend">
         <span class="legend-item"><span class="legend-line p50"></span> p50 Latency (Median)</span>
         <span class="legend-item"><span class="legend-line p95"></span> p95 Latency (Peak)</span>
@@ -264,7 +311,7 @@
       <span class="card-tag">CH_MEM</span>
       <h3>VRAM Baseline Trend</h3>
       <p class="chart-desc">Hardware memory leak protection / progressive soak baseline (MB)</p>
-      
+
       <div class="chart-container">
         {#if data.obsData?.vramTrendMb?.baseline && data.obsData.vramTrendMb.baseline.length > 0}
           <svg class="hud-svg-chart" viewBox="0 0 320 200">
@@ -351,44 +398,44 @@
       <div class="controls-action-box">
         <h4>Request Mode Transition</h4>
         <div class="buttons-grid">
-          <button 
-            type="button" 
-            class="hud-btn" 
-            class:active={currentVlmState === 'TEXT'} 
-            disabled={switchingMode} 
+          <button
+            type="button"
+            class="hud-btn"
+            class:active={currentVlmState === 'TEXT'}
+            disabled={switchingMode}
             onclick={() => handleModeChange('TEXT')}
           >
             TEXT ONLY
             <span class="btn-sub">Bypass VLM / Save 1GB VRAM</span>
           </button>
-          
-          <button 
-            type="button" 
-            class="hud-btn" 
-            class:active={currentVlmState === 'VISION'} 
-            disabled={switchingMode} 
+
+          <button
+            type="button"
+            class="hud-btn"
+            class:active={currentVlmState === 'VISION'}
+            disabled={switchingMode}
             onclick={() => handleModeChange('VISION')}
           >
             VLM VISION
             <span class="btn-sub">Load mmproj vision projector</span>
           </button>
 
-          <button 
-            type="button" 
-            class="hud-btn" 
-            class:active={currentVlmState === 'GPU_WORK'} 
-            disabled={switchingMode} 
+          <button
+            type="button"
+            class="hud-btn"
+            class:active={currentVlmState === 'GPU_WORK'}
+            disabled={switchingMode}
             onclick={() => handleModeChange('GPU_WORK')}
           >
             GPU WORK
             <span class="btn-sub">Unload TurboQuant for native tasks</span>
           </button>
 
-          <button 
-            type="button" 
-            class="hud-btn" 
-            class:active={currentVlmState === 'OFF'} 
-            disabled={switchingMode} 
+          <button
+            type="button"
+            class="hud-btn"
+            class:active={currentVlmState === 'OFF'}
+            disabled={switchingMode}
             onclick={() => handleModeChange('OFF')}
           >
             SYSTEM OFF
@@ -468,7 +515,7 @@
           <span class="label" style="opacity: 0.75; font-size: 0.85rem;">Average Latency Delta:</span>
           <span class="badge text-glow-green" style="color: #00FF66; font-weight: bold; font-size: 0.85rem;">{data.obsData?.routing?.overallMetrics?.avgLatencyDeltaMs ?? -120} ms (faster)</span>
         </div>
-        
+
         {#if data.obsData?.routing?.results?.length}
           <div style="font-size: 0.8rem; opacity: 0.8; color: #a3a3a3; margin-top: 0.25rem;">
             <strong>Golden Query Mappings:</strong>
@@ -498,17 +545,17 @@
 
       <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
         <form onsubmit={(e) => { e.preventDefault(); handleRoutingAnalysis(); }} style="display: flex; gap: 1rem;">
-          <input 
-            type="text" 
-            placeholder="Enter search query (e.g., 'why is my drizzle migration failing with user_id mismatch'...)" 
+          <input
+            type="text"
+            placeholder="Enter search query (e.g., 'why is my drizzle migration failing with user_id mismatch'...)"
             bind:value={routingQuery}
             style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 0.8rem 1rem; color: #cbd5e1; font-family: inherit; font-size: 0.9rem; outline: none; transition: border-color 0.25s;"
             onfocus={(e) => (e.currentTarget as HTMLInputElement).style.borderColor = 'rgba(0, 255, 102, 0.4)'}
             onblur={(e) => (e.currentTarget as HTMLInputElement).style.borderColor = 'rgba(255, 255, 255, 0.15)'}
           />
-          <button 
-            type="submit" 
-            class="hud-btn" 
+          <button
+            type="submit"
+            class="hud-btn"
             style="padding: 0 2rem; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;"
             disabled={analyzingRouting || !routingQuery.trim()}
           >
@@ -670,7 +717,7 @@
     content: "";
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-image: 
+    background-image:
       linear-gradient(rgba(57, 255, 20, 0.015) 1px, transparent 1px),
       linear-gradient(90deg, rgba(57, 255, 20, 0.015) 1px, transparent 1px);
     background-size: 40px 40px;
@@ -683,7 +730,7 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: linear-gradient(
-      rgba(18, 16, 16, 0) 50%, 
+      rgba(18, 16, 16, 0) 50%,
       rgba(0, 0, 0, 0.25) 50%
     );
     background-size: 100% 4px;

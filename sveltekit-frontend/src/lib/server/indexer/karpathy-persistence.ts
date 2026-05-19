@@ -2,7 +2,7 @@ import { QdrantManager } from '../vector/qdrant-manager.js';
 import { getNeo4jDriver } from '../neo4j-driver.js';
 import { couchPut } from './karpathy-wiki.js';
 import type { KarpathyHookOutput } from './karpathy-hook.js';
-import db from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client.js';
 import { topologySnapshots, topologyPositions } from '$lib/server/db/schema.js';
 import { sql } from 'drizzle-orm';
 import { getGdsStatus, seedAndClassifyOntology } from '../graph/neo4j-gds.js';

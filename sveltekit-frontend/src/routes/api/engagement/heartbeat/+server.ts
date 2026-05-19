@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const idleMs = await getIdleDuration(locals.user.id);
 
 	return json({
-		userId: locals.user.id,
+		userId: Number(locals.user.id),
 		idleMs,
 		idleMinutes: Math.round(idleMs / 60000),
 		isIdle: idleMs > 30 * 60 * 1000, // 30min threshold

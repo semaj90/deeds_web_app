@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Additional Legal AI Database Tables
 // These will be imported and added to the main unified-schema.ts
 import {

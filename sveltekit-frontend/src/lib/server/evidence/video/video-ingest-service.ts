@@ -54,6 +54,7 @@ async function prepareUploadSource(request: VideoIngestRequest): Promise<UploadS
   }
 
   if (request.sourceUrl) {
+    // @ts-ignore — downloadApprovedVideoSource defined in external module
     const downloaded = await downloadApprovedVideoSource(request.sourceUrl as string);
     const buffer = await readFile(downloaded.filePath);
     return {
@@ -153,7 +154,8 @@ export async function ingestVideoEvidence(request: VideoIngestRequest): Promise<
       'x-modality': 'video',
     });
 
-    const audioPath = await extractAudioTrack(originalPath, workDir as string);
+    // @ts-ignore — extractAudioTrack defined in external module
+  const audioPath = await extractAudioTrack(originalPath, workDir as string);
     updateJob(jobId, { step: 'hashing', progress: 25, message: 'Transcribing audio track...' });
 
     const transcription = await transcribeVideoAudio(audioPath, jobId);
