@@ -1364,6 +1364,44 @@
       "detail": "Only refresh GPU authority blend for files in Redis ace:rank:dirty_files (set by ace-incremental-startup). Skip silently if no dirty files."
     },
     {
+      "label": "🌲 XGBoost: Score Clusters (graph features)",
+      "type": "shell",
+      "command": "npm run xgboost:hotness:score",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Compute cluster hotness with graph features (clusterPageRank from couchdb:pagerank_scores + hyperedgeCount from hg:edge:idx). Writes ace:cluster:hot sorted set (1h TTL) and exports models/xgboost-hotness/features.json. Requires graphify:full run first to populate Redis graph keys."
+    },
+    {
+      "label": "🌲 XGBoost: Feature Matrix (dry run, no Redis write)",
+      "type": "shell",
+      "command": "npm run xgboost:features:graph",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Compute and export cluster feature matrix (models/xgboost-hotness/features.json) including PageRank + hyperedge graph features. Skips Redis ace:cluster:hot writes — safe to run for inspection."
+    },
+    {
       "label": "🔍🧠 RG-Atlas: Smoke Check (DB tables + API)",
       "type": "shell",
       "command": "npm run smoke:rg-atlas",
@@ -10216,10 +10254,11 @@
     {
       "label": "🦉 Hermes: Dashboard (web UI :9119)",
       "type": "shell",
-      "command": "bash",
+      "command": "pwsh",
       "args": [
-        "-c",
-        "mkdir -p '${workspaceFolder}/logs/hermes' && hermes dashboard 2>&1 | tee '${workspaceFolder}/logs/hermes/dashboard.log'"
+        "-NoProfile",
+        "-Command",
+        "$logDir = Join-Path '${workspaceFolder}' 'logs/hermes'; New-Item -ItemType Directory -Force -Path $logDir | Out-Null; hermes dashboard 2>&1 | Tee-Object -FilePath (Join-Path $logDir 'dashboard.log')"
       ],
       "isBackground": true,
       "group": "build",
@@ -10289,10 +10328,11 @@
     {
       "label": "🦉 Hermes: Gateway run (HTTP API :8642)",
       "type": "shell",
-      "command": "bash",
+      "command": "pwsh",
       "args": [
-        "-c",
-        "mkdir -p '${workspaceFolder}/logs/hermes' && hermes gateway run 2>&1 | tee '${workspaceFolder}/logs/hermes/gateway.log'"
+        "-NoProfile",
+        "-Command",
+        "$logDir = Join-Path '${workspaceFolder}' 'logs/hermes'; New-Item -ItemType Directory -Force -Path $logDir | Out-Null; hermes gateway run 2>&1 | Tee-Object -FilePath (Join-Path $logDir 'gateway.log')"
       ],
       "isBackground": true,
       "group": "build",
@@ -10306,10 +10346,11 @@
     {
       "label": "🦉 Hermes: Workspace dev (:3001)",
       "type": "shell",
-      "command": "bash",
+      "command": "pwsh",
       "args": [
-        "-c",
-        "cd '${userHome}/Downloads/Hermes-Ollama/hermes-workspace' && mkdir -p '${workspaceFolder}/logs/hermes' && pnpm install 2>&1 | tee -a '${workspaceFolder}/logs/hermes/workspace-install.log' && node_modules/.bin/vite dev --port 3001 2>&1 | tee '${workspaceFolder}/logs/hermes/workspace-dev.log'"
+        "-NoProfile",
+        "-Command",
+        "$workspaceDir = Join-Path '${userHome}' 'Downloads/Hermes-Ollama/hermes-workspace'; Set-Location $workspaceDir; $logDir = Join-Path '${workspaceFolder}' 'logs/hermes'; New-Item -ItemType Directory -Force -Path $logDir | Out-Null; pnpm install 2>&1 | Tee-Object -Append -FilePath (Join-Path $logDir 'workspace-install.log'); if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npx vite dev --port 3001 2>&1 | Tee-Object -FilePath (Join-Path $logDir 'workspace-dev.log')"
       ],
       "isBackground": true,
       "group": "build",

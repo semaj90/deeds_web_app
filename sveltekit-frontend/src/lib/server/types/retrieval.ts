@@ -114,6 +114,8 @@ export interface UnifiedRetrievalResult {
   graphDistance?: number | null;
   /** PageRank / citation authority score from Neo4j */
   authorityScore?: number | null;
+  /** GPU cluster assignment from the graph / clustering lane */
+  gpuCluster?: number | null;
   /** SOM cluster assignment from GPU K-Means */
   somCluster?: number | null;
 
@@ -169,30 +171,47 @@ export function fromQdrantPoint(
 ): UnifiedRetrievalResult {
   const p = pt.payload ?? {};
   return {
-    id:           String(pt.id),
-    kind:         opts.kind,
-    source:       'qdrant',
-    collection:   opts.collection,
-    content:      String(p['content'] ?? p['text'] ?? p['chunk_text'] ?? ''),
-    summary:      typeof p['summary'] === 'string' ? p['summary'] : undefined,
-    sourceId:     typeof (p['document_id'] ?? p['source_id'] ?? p['file_path']) === 'string'
-                    ? String(p['document_id'] ?? p['source_id'] ?? p['file_path'])
-                    : undefined,
-    filePath:     typeof p['file_path'] === 'string' ? p['file_path'] : undefined,
-    chunkIndex:   typeof p['chunk_index'] === 'number' ? p['chunk_index'] : undefined,
-    score:        pt.score ?? 0,
-    tags:         Array.isArray(p['tags']) ? (p['tags'] as string[]) : typeof p['tags'] === 'string' ? [p['tags'] as string] : [],
+    id: String(pt.id),
+    kind: opts.kind,
+    source: 'qdrant',
+    collection: opts.collection,
+    content: String(p['content'] ?? p['text'] ?? p['chunk_text'] ?? ''),
+    summary: typeof p['summary'] === 'string' ? p['summary'] : undefined,
+    sourceId:
+      typeof (p['document_id'] ?? p['source_id'] ?? p['file_path']) === 'string'
+        ? String(p['document_id'] ?? p['source_id'] ?? p['file_path'])
+        : undefined,
+    filePath: typeof p['file_path'] === 'string' ? p['file_path'] : undefined,
+    chunkIndex: typeof p['chunk_index'] === 'number' ? p['chunk_index'] : undefined,
+    score: pt.score ?? 0,
+    tags: Array.isArray(p['tags'])
+      ? (p['tags'] as string[])
+      : typeof p['tags'] === 'string'
+        ? [p['tags'] as string]
+        : [],
     jurisdiction: typeof p['jurisdiction'] === 'string' ? p['jurisdiction'] : undefined,
-    somCluster:   typeof p['som_cluster'] === 'number' ? p['som_cluster'] : typeof p['neo4j_gpuCluster'] === 'number' ? p['neo4j_gpuCluster'] : null,
+    gpuCluster:
+      typeof p['gpu_cluster'] === 'number'
+        ? p['gpu_cluster']
+        : typeof p['neo4j_gpuCluster'] === 'number'
+          ? p['neo4j_gpuCluster']
+          : null,
+    somCluster:
+      typeof p['som_cluster'] === 'number'
+        ? p['som_cluster']
+        : typeof p['neo4j_gpuCluster'] === 'number'
+          ? p['neo4j_gpuCluster']
+          : null,
     originalRank: opts.originalRank,
-    
-    // Agents enrichment
-    dirSummary:   typeof p['dir_summary'] === 'string' ? p['dir_summary'] : undefined,
-    featureKeys:  Array.isArray(p['feature_keys']) ? (p['feature_keys'] as string[]) : undefined,
-    auditStatus:  typeof p['audit_status'] === 'string' ? p['audit_status'] : undefined,
-    activityScore: typeof p['agents_activity_score'] === 'number' ? p['agents_activity_score'] : null,
 
-    metadata:     p,
+    // Agents enrichment
+    dirSummary: typeof p['dir_summary'] === 'string' ? p['dir_summary'] : undefined,
+    featureKeys: Array.isArray(p['feature_keys']) ? (p['feature_keys'] as string[]) : undefined,
+    auditStatus: typeof p['audit_status'] === 'string' ? p['audit_status'] : undefined,
+    activityScore:
+      typeof p['agents_activity_score'] === 'number' ? p['agents_activity_score'] : null,
+
+    metadata: p,
   };
 }
 
@@ -201,7 +220,13 @@ export function fromQdrantPoint(
  * These arrive via Neo4j expansion — set graphDistance accordingly.
  */
 export function fromContextDoc(
-  doc: { content: string; similarity: number; documentId: string; sourceId?: string; model?: string },
+  doc: {
+    content: string;
+    similarity: number;
+    documentId: string;
+    sourceId?: string;
+    model?: string;
+  },
   opts: {
     kind?: RetrievalKind;
     graphDistance?: number;
@@ -209,16 +234,16 @@ export function fromContextDoc(
   } = {}
 ): UnifiedRetrievalResult {
   return {
-    id:            doc.documentId,
-    kind:          opts.kind ?? 'graph_neighbor',
-    source:        'neo4j',
-    content:       doc.content,
-    sourceId:      doc.sourceId ?? doc.documentId,
-    score:         doc.similarity,
+    id: doc.documentId,
+    kind: opts.kind ?? 'graph_neighbor',
+    source: 'neo4j',
+    content: doc.content,
+    sourceId: doc.sourceId ?? doc.documentId,
+    score: doc.similarity,
     graphDistance: opts.graphDistance ?? null,
-    tags:          [],
-    originalRank:  opts.originalRank,
-    metadata:      { model: doc.model },
+    tags: [],
+    originalRank: opts.originalRank,
+    metadata: { model: doc.model },
   };
 }
 
@@ -248,27 +273,28 @@ export function fromRankedChunk(
   opts: { originalRank?: number } = {}
 ): UnifiedRetrievalResult {
   return {
-    id:             chunk.path,
-    kind:           'code_chunk',
-    source:         'qdrant',
-    content:        chunk.content,
-    sourceId:       chunk.relativePath,
-    filePath:       chunk.path,
-    score:          chunk.score,
-    tags:           chunk.tags,
-    originalRank:   opts.originalRank,
+    id: chunk.path,
+    kind: 'code_chunk',
+    source: 'qdrant',
+    content: chunk.content,
+    sourceId: chunk.relativePath,
+    filePath: chunk.path,
+    score: chunk.score,
+    tags: chunk.tags,
+    originalRank: opts.originalRank,
     // Surface GPU graph enrichment into canonical typed fields
-    somCluster:     chunk.gpuCluster ?? null,
+    gpuCluster: chunk.gpuCluster ?? null,
+    somCluster: chunk.gpuCluster ?? null,
     authorityScore: chunk.pageRankScore ?? null,
     metadata: {
-      symbol:       chunk.symbol,
-      chunkKind:    chunk.kind,
-      signature:    chunk.signature,
-      httpMethod:   chunk.httpMethod,
-      routeId:      chunk.routeId,
-      lineStart:    chunk.lineStart,
-      lineEnd:      chunk.lineEnd,
-      routeType:    chunk.routeType ?? null,
+      symbol: chunk.symbol,
+      chunkKind: chunk.kind,
+      signature: chunk.signature,
+      httpMethod: chunk.httpMethod,
+      routeId: chunk.routeId,
+      lineStart: chunk.lineStart,
+      lineEnd: chunk.lineEnd,
+      routeType: chunk.routeType ?? null,
       hasAuthGuard: chunk.hasAuthGuard ?? null,
     },
   };

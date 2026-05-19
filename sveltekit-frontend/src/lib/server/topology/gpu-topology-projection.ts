@@ -19,6 +19,7 @@
 
 import { pcaProject, autoencoderEncode, autoencoderEncode2Layer } from '$lib/server/gpu/topology-projection.js';
 import type { ProjectionResult, AutoencoderWeights2Layer } from '$lib/server/gpu/topology-projection.js';
+import { getCachedAutoencoderWeights } from '$lib/server/gpu/autoencoder-weights.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -34,7 +35,13 @@ const PCA_ITER = 20;
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export type Manifold4Coords = [number, number, number, number];
-export type ProjectionSource = 'gpu-pca' | 'cpu-pca' | 'gpu-autoencoder' | 'cpu-autoencoder' | 'gpu-ae2l-pca' | 'cpu-ae2l-pca';
+export type ProjectionSource =
+  | 'gpu-pca'
+  | 'cpu-pca'
+  | 'gpu-autoencoder'
+  | 'cpu-autoencoder'
+  | 'gpu-ae2l-pca'
+  | 'cpu-ae2l-pca';
 
 export interface EmbeddingInput {
   id: string;
@@ -56,8 +63,8 @@ export interface TopologyNode {
 }
 
 export interface AutoencoderWeights {
-  W: Float32Array;  // [hidden × inputDim] row-major
-  b: Float32Array;  // [hidden]
+  W: Float32Array; // [hidden × inputDim] row-major
+  b: Float32Array; // [hidden]
   hidden: number;
 }
 
@@ -76,8 +83,10 @@ export interface ProjectionPipelineOptions {
   maxN?: number;
   /** Required when mode='autoencoder'. */
   autoencoderWeights?: AutoencoderWeights;
-  /** Required when mode='ae2l-pca'. Canonical 768→256(ReLU)→64(L2) weights. */
+  /** Optional explicit 2-layer weights. If omitted, ae2l-pca can load cached Redis weights when enabled. */
   autoencoderWeights2Layer?: AutoencoderWeights2Layer;
+  /** When true, ae2l-pca will attempt to load cached Redis weights if none were supplied. */
+  loadAutoencoderWeights?: boolean;
 }
 
 export interface ProjectionAudit {
@@ -133,7 +142,7 @@ export function computePCAComponents(
   fitN: number,
   dim: number,
   k: number,
-  mean: Float32Array,
+  mean: Float32Array
 ): Float32Array {
   const components = new Float32Array(k * dim); // always return [k × dim] shape
   const effectiveK = Math.min(k, Math.max(1, fitN - 1));
@@ -194,7 +203,7 @@ export function computePCAComponents(
  */
 export function normalizeManifold4(
   projected: Float32Array,
-  n: number,
+  n: number
 ): { normalized: Float32Array; min: Manifold4Coords; max: Manifold4Coords } {
   const min: Manifold4Coords = [Infinity, Infinity, Infinity, Infinity];
   const max: Manifold4Coords = [-Infinity, -Infinity, -Infinity, -Infinity];
@@ -223,6 +232,22 @@ export function normalizeManifold4(
   return { normalized, min, max };
 }
 
+async function resolveAutoencoderWeights2Layer(): Promise<AutoencoderWeights2Layer | undefined> {
+  try {
+    const weights = await getCachedAutoencoderWeights();
+    return {
+      W1: weights.W1,
+      b1: weights.b1,
+      W2: weights.W2,
+      b2: weights.b2,
+      hidden: weights.b1.length,
+      outDim: weights.b2.length,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
 // ── Main pipeline ─────────────────────────────────────────────────────────────
 
 /**
@@ -237,7 +262,7 @@ export function normalizeManifold4(
  */
 export async function runTopologyProjection(
   inputs: EmbeddingInput[],
-  opts: ProjectionPipelineOptions = {},
+  opts: ProjectionPipelineOptions = {}
 ): Promise<ProjectionPipelineResult> {
   const {
     mode = 'pca',
@@ -245,13 +270,24 @@ export async function runTopologyProjection(
     maxN = DEFAULT_MAX_N,
     autoencoderWeights,
     autoencoderWeights2Layer,
+    loadAutoencoderWeights = false,
   } = opts;
   const t0 = performance.now();
 
   const emptyAudit = (): ProjectionAudit => ({
-    projection: { source: 'cpu-pca', backend: 'cpu-fallback', model: 'none', inputDim: 0, outputDim: 4, durationMs: 0, version: 1 },
-    normalized: false, fitSample: 0,
-    minCoords: [0, 0, 0, 0], maxCoords: [0, 0, 0, 0],
+    projection: {
+      source: 'cpu-pca',
+      backend: 'cpu-fallback',
+      model: 'none',
+      inputDim: 0,
+      outputDim: 4,
+      durationMs: 0,
+      version: 1,
+    },
+    normalized: false,
+    fitSample: 0,
+    minCoords: [0, 0, 0, 0],
+    maxCoords: [0, 0, 0, 0],
   });
 
   if (inputs.length === 0) {
@@ -280,7 +316,9 @@ export async function runTopologyProjection(
   let result: ProjectionResult;
 
   if (mode === 'ae2l-pca') {
-    const weights = autoencoderWeights2Layer;
+    const weights =
+      autoencoderWeights2Layer ??
+      (loadAutoencoderWeights ? await resolveAutoencoderWeights2Layer() : undefined);
 
     if (weights) {
       // 1. Run 2-layer autoencoder (768 -> 256 -> 64)
@@ -290,15 +328,22 @@ export async function runTopologyProjection(
         const aeN = aeResult.n;
         const aeDim = weights.outDim; // 64
         const aeFitN = Math.min(aeN, PCA_FIT_SAMPLE);
-        const aeFitFlat = aeFitN < aeN ? aeResult.projected.subarray(0, aeFitN * aeDim) : aeResult.projected;
+        const aeFitFlat =
+          aeFitN < aeN ? aeResult.projected.subarray(0, aeFitN * aeDim) : aeResult.projected;
         const aeMean = computeMean(aeFitFlat, aeFitN, aeDim);
         const aeComponents = computePCAComponents(aeFitFlat, aeFitN, aeDim, 4, aeMean);
 
         // 3. Project 64 -> 4 via PCA
-        result = await pcaProject(aeResult.projected, aeMean, aeComponents, { n: aeN, dim: aeDim, outDim: 4, maxN });
-        
+        result = await pcaProject(aeResult.projected, aeMean, aeComponents, {
+          n: aeN,
+          dim: aeDim,
+          outDim: 4,
+          maxN,
+        });
+
         // Override backend/source specifically for ae2l-pca
-        result.source = aeResult.source === 'gpu' || result.source === 'gpu' ? 'gpu' : 'cpu-fallback';
+        result.source =
+          aeResult.source === 'gpu' || result.source === 'gpu' ? 'gpu' : 'cpu-fallback';
       } else {
         // Fallback to raw PCA
         result = await pcaProject(flat, mean, components, { n, dim, outDim: 4, maxN });
@@ -328,8 +373,16 @@ export async function runTopologyProjection(
 
   const projSrc: ProjectionSource =
     result.source === 'gpu'
-      ? mode === 'ae2l-pca' ? 'gpu-ae2l-pca' : mode === 'autoencoder' ? 'gpu-autoencoder' : 'gpu-pca'
-      : mode === 'ae2l-pca' ? 'cpu-ae2l-pca' : mode === 'autoencoder' ? 'cpu-autoencoder' : 'cpu-pca';
+      ? mode === 'ae2l-pca'
+        ? 'gpu-ae2l-pca'
+        : mode === 'autoencoder'
+          ? 'gpu-autoencoder'
+          : 'gpu-pca'
+      : mode === 'ae2l-pca'
+        ? 'cpu-ae2l-pca'
+        : mode === 'autoencoder'
+          ? 'cpu-autoencoder'
+          : 'cpu-pca';
 
   const nodes: TopologyNode[] = inputs.slice(0, n).map((inp, i) => ({
     id: inp.id,
