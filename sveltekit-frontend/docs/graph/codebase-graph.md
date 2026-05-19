@@ -1,23 +1,23 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-19T02:06:33.255Z
+> Generated: 2026-05-19T18:51:31.451Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 32972 |
+| Files | 32995 |
 | Routes | 1053 |
 | Components | 5339 |
 | API handlers | 5509 |
 | TODOs | 7697 |
-| Dirs | 1124 |
+| Dirs | 1127 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
 | G4 No auth | 2 |
 | G5 No Zod  | 2 |
-| G11 Localhost | 1427 |
+| G11 Localhost | 1437 |
 | G14 Svelte4 | 142 |
 | G15 SSR unsafe | 0 |
 | G16 No test | 71 |
@@ -35,9 +35,9 @@
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/core/useGamingEvolution.js` — 31 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/utils/parallaxDynamic.js` — 22 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/utils/parallaxDynamic.js` — 22 marker(s)
-- `docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
-- `docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
-- `docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
 - `sveltekit-frontend/scripts/phase104-backups/src/lib/services/vector-service.ts` — 13 marker(s)

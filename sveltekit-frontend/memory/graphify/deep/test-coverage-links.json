@@ -492,8 +492,15 @@
     "sveltekit-frontend/scripts/backup-consolidation/tests/comparison-engine.test.mjs",
     "sveltekit-frontend/scripts/backup-consolidation/tests/pattern-matching.test.mjs"
   ],
+  "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.ts": [
+    "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.spec.ts",
+    "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts"
+  ],
   "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts": [
     "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.ts": [
+    "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.ts": [
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
@@ -522,6 +529,9 @@
   "sveltekit-frontend/src/lib/server/indexer/legal-chunker.ts": [
     "sveltekit-frontend/src/lib/server/indexer/legal-chunker.test.ts"
   ],
+  "sveltekit-frontend/src/lib/server/llm/token-budget.ts": [
+    "sveltekit-frontend/src/lib/server/llm/token-budget.spec.ts"
+  ],
   "sveltekit-frontend/src/lib/server/models/model-registry.ts": [
     "sveltekit-frontend/src/lib/server/models/model-registry.spec.ts"
   ],
@@ -543,6 +553,9 @@
   "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.ts": [
     "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.test.ts",
     "sveltekit-frontend/tests/unit/routing-explanation.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/types/retrieval.ts": [
+    "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.ts": [
     "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.test.ts"
@@ -590,11 +603,6 @@
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ace/ingest.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/synthesis/evaluation/[id]/+server.ts": [
-    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
-    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
-    "sveltekit-frontend/tests/routes/auto/api/synthesis/evaluation/__id.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ace/status/+server.ts": [
     "sveltekit-frontend/tests/ace-status-route.spec.ts",
@@ -1349,7 +1357,7 @@
     "sveltekit-frontend/tests/routes/all-routes-page-server.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ai/context/compact-search/+server.ts": [
-    "sveltekit-frontend/tests/routes/api/ai/context-compact-search.spec.ts"
+    "sveltekit-frontend/tests/routes/api/ai/context-compact-search.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ai/contextual-chat/+server.ts": [
     "sveltekit-frontend/tests/routes/api/ai/contextual-chat.spec.ts"
@@ -3151,6 +3159,9 @@
   ],
   "sveltekit-frontend/src/routes/api/sync/documents/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/sync/documents.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/synthesis/evaluation/[id]/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/synthesis/evaluation/__id.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/synthesis/generate.test.ts"

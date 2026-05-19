@@ -19,6 +19,8 @@
     "atlas:routes": "node scripts/atlas/ingest-sveltekit-route-map.mjs",
     "atlas:routes:import": "node scripts/atlas/ingest-sveltekit-route-map.mjs",
     "atlas:qdrant:tag": "node scripts/atlas/tag-qdrant-codebase-payloads.mjs",
+    "atlas:qdrant:cluster-audit": "node scripts/atlas/qdrant-cluster-tag-audit.mjs",
+    "atlas:qdrant:cluster-audit:dry": "node scripts/atlas/qdrant-cluster-tag-audit.mjs --dry-run",
     "atlas:neo4j:ingest": "node scripts/atlas/project-neo4j-graphrag.mjs",
     "atlas:couchdb:mapreduce": "node scripts/atlas/ingest-couchdb-mapreduce.mjs",
     "atlas:redis:sync": "node scripts/atlas/sync-redis-ace-cards.mjs",

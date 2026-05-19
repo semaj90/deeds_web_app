@@ -19,7 +19,7 @@
  */
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
 import pkg from 'pg';
@@ -39,9 +39,13 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const REDIS_URL = process.env.REDIS_URL;
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 const DATABASE_URL = process.env.DATABASE_URL;
+const NEO4J_URI = process.env.NEO4J_URI || process.env.NEO4J_URL || 'bolt://localhost:7687';
+const NEO4J_USER = process.env.NEO4J_USER || 'neo4j';
+const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || process.env.NEO4J_PASS || 'neo4j123';
 const COLLECTION = 'codebase_chunks_768';
 const HOT_SET_KEY = 'ace:cluster:hot';
 const HOT_SET_TTL = 3600; // 1h
+const DEEP_IMPORT_GRAPH_PATH = resolve(ROOT, 'docs/graph/deep-import-graph.json');
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
@@ -76,6 +80,14 @@ function normalizeLanguage(payload, fallbackPath = '') {
 
   const inferred = fileLanguage(fallbackPath);
   return inferred !== 'other' ? inferred : null;
+}
+
+function normalizeRepoPath(value) {
+  if (typeof value !== 'string') return '';
+  return value
+    .replace(/\\/g, '/')
+    .replace(/^\.\/+/, '')
+    .replace(/^sveltekit-frontend\//, '');
 }
 
 async function scrollClusterSignals(clusterId) {
@@ -207,6 +219,99 @@ async function getClusterHitFreq(pgPool, clusterId) {
   }
 }
 
+function loadDeepImportGraphMetrics() {
+  if (!existsSync(DEEP_IMPORT_GRAPH_PATH)) return new Map();
+
+  try {
+    const raw = JSON.parse(readFileSync(DEEP_IMPORT_GRAPH_PATH, 'utf8'));
+    const metrics = new Map();
+    for (const node of Array.isArray(raw?.nodes) ? raw.nodes : []) {
+      const rel = normalizeRepoPath(node?.rel);
+      if (!rel) continue;
+      metrics.set(rel, {
+        directFanIn: Number(node?.directFanIn ?? 0) || 0,
+        directFanOut: Number(node?.directFanOut ?? 0) || 0,
+      });
+    }
+    console.log(`[hotness] step 2.5: loaded ${metrics.size} deep-import fallback rows`);
+    return metrics;
+  } catch (error) {
+    console.warn('[hotness] step 2.5: failed to load deep-import graph fallback:', error.message);
+    return new Map();
+  }
+}
+
+async function loadNeo4jImportMetrics(clusterRows) {
+  const usableRows = clusterRows.filter((row) => Array.isArray(row.paths) && row.paths.length > 0);
+  if (usableRows.length === 0) return new Map();
+
+  let neo4j;
+  try {
+    neo4j = await import('neo4j-driver');
+  } catch {
+    return null;
+  }
+
+  const driver = neo4j.default.driver(
+    NEO4J_URI,
+    neo4j.default.auth.basic(NEO4J_USER, NEO4J_PASSWORD)
+  );
+
+  const session = driver.session();
+  try {
+    const result = await session.run(
+      `UNWIND $clusters AS cluster
+       UNWIND cluster.paths AS filePath
+       MATCH (f:CodebaseFile {filePath: filePath})
+       OPTIONAL MATCH (importer:CodebaseFile)-[:IMPORTS]->(f)
+       WITH cluster, f, count(DISTINCT importer) AS inDegree
+       OPTIONAL MATCH (f)-[:IMPORTS]->(imported:CodebaseFile)
+       WITH cluster, f, inDegree, count(DISTINCT imported) AS outDegree
+       RETURN cluster.clusterId AS clusterId,
+              sum(inDegree) AS inDegreeSum,
+              sum(outDegree) AS outDegreeSum,
+              avg(inDegree) AS inDegreeAvg,
+              avg(outDegree) AS outDegreeAvg,
+              max(inDegree) AS inDegreeMax,
+              max(outDegree) AS outDegreeMax,
+              count(f) AS matchedFiles
+       ORDER BY clusterId`,
+      {
+        clusters: usableRows.map((row) => ({
+          clusterId: row.clusterId,
+          paths: [...new Set(row.paths.map(normalizeRepoPath).filter(Boolean))],
+        })),
+      }
+    );
+
+    const metrics = new Map();
+    for (const record of result.records) {
+      const clusterId = Number(record.get('clusterId'));
+      metrics.set(clusterId, {
+        inDegreeSum: Number(record.get('inDegreeSum') ?? 0) || 0,
+        outDegreeSum: Number(record.get('outDegreeSum') ?? 0) || 0,
+        inDegreeAvg: Number(record.get('inDegreeAvg') ?? 0) || 0,
+        outDegreeAvg: Number(record.get('outDegreeAvg') ?? 0) || 0,
+        inDegreeMax: Number(record.get('inDegreeMax') ?? 0) || 0,
+        outDegreeMax: Number(record.get('outDegreeMax') ?? 0) || 0,
+        matchedFiles: Number(record.get('matchedFiles') ?? 0) || 0,
+      });
+    }
+
+    console.log(`[hotness] step 2.5: loaded Neo4j import metrics for ${metrics.size} clusters`);
+    return metrics;
+  } catch (error) {
+    console.warn(
+      '[hotness] step 2.5: Neo4j import metric query failed — using deep-import fallback:',
+      error.message
+    );
+    return null;
+  } finally {
+    await session.close().catch(() => {});
+    await driver.close().catch(() => {});
+  }
+}
+
 // ── Backfill chunk_hit_log.gpu_cluster ────────────────────────────────────
 
 async function backfillChunkHitLog(pgPool) {
@@ -267,13 +372,17 @@ function normalizeByMax(arr, key) {
 
 function computeHotness(f) {
   return (
-    0.30 * (f.meanBlendNorm ?? 0) +
-    0.20 * (f.pointCountNorm ?? 0) +
-    0.15 * (f.hitSignalNorm ?? 0) +
-    0.15 * (f.clusterPageRankNorm ?? 0) +
-    0.10 * (f.hyperedgeCountNorm ?? 0) +
-    0.05 * (f.meanAttn ?? 0) +
-    0.05 * (f.maxJaccard ?? 0)
+    0.24 * (f.meanBlendNorm ?? 0) +
+    0.18 * (f.pointCountNorm ?? 0) +
+    0.12 * (f.hitSignalNorm ?? 0) +
+    0.1 * (f.clusterPageRankNorm ?? 0) +
+    0.08 * (f.hyperedgeCountNorm ?? 0) +
+    0.05 * (f.hyperedgeCrossRateNorm ?? 0) +
+    0.08 * (f.inDegreeSumNorm ?? 0) +
+    0.05 * (f.outDegreeSumNorm ?? 0) +
+    0.04 * (f.betweennessProxyNorm ?? 0) +
+    0.03 * (f.meanAttn ?? 0) +
+    0.03 * (f.maxJaccard ?? 0)
   );
 }
 
@@ -309,7 +418,7 @@ async function main() {
 
   // --- Backfill chunk_hit_log.gpu_cluster ---
   if (pgPool && !SKIP_BACKFILL) {
-    await backfillChunkHitLog(pgPool).catch(err => {
+    await backfillChunkHitLog(pgPool).catch((err) => {
       console.warn('[hotness] backfill error (non-fatal):', err.message);
     });
   }
@@ -332,7 +441,9 @@ async function main() {
       prMap = JSON.parse(prRaw);
       console.log(`[hotness] step 2.5: loaded ${Object.keys(prMap).length} PageRank entries`);
     } else {
-      console.warn('[hotness] step 2.5: couchdb:pagerank_scores absent — clusterPageRank will be 0');
+      console.warn(
+        '[hotness] step 2.5: couchdb:pagerank_scores absent — clusterPageRank will be 0'
+      );
     }
   } catch (err) {
     console.warn('[hotness] step 2.5: failed to load PageRank scores (non-fatal):', err.message);
@@ -378,7 +489,14 @@ async function main() {
     const pointCount = hit.count;
 
     const { paths, tagCounts, languageCounts } = await scrollClusterSignals(clusterId);
-    const kFeatures = computeKarpathyFeatures(clusterId, pointCount, paths, tagCounts, languageCounts, karpathyMap);
+    const kFeatures = computeKarpathyFeatures(
+      clusterId,
+      pointCount,
+      paths,
+      tagCounts,
+      languageCounts,
+      karpathyMap
+    );
     const nFeatures = await getNeighborFeatures(redis, clusterId);
     const hFeatures = await getClusterHitFreq(pgPool, clusterId);
 
@@ -387,7 +505,10 @@ async function main() {
       ? paths.reduce((sum, p) => {
           const stripped = p.replace(/^sveltekit-frontend\//, '');
           const entry = prMap[p] ?? prMap[stripped];
-          return sum + (typeof entry?.score === 'number' ? entry.score : typeof entry === 'number' ? entry : 0);
+          return (
+            sum +
+            (typeof entry?.score === 'number' ? entry.score : typeof entry === 'number' ? entry : 0)
+          );
         }, 0) / paths.length
       : 0;
 
@@ -399,6 +520,7 @@ async function main() {
     const hyperedgeCrossRate = crossEdges / (hyperedgeCount || 1);
 
     const feature = {
+      paths,
       ...kFeatures,
       ...nFeatures,
       ...hFeatures,
@@ -406,6 +528,9 @@ async function main() {
       hyperedgeCount,
       crossEdges,
       hyperedgeCrossRate,
+      inDegreeSum: 0,
+      outDegreeSum: 0,
+      betweennessProxy: 0,
     };
 
     rawFeatures.push(feature);
@@ -416,8 +541,44 @@ async function main() {
         `neighbors=${feature.neighborCount} | ` +
         `tags=${feature.tagCount} | ` +
         `langs=${feature.languageCount} | ` +
-        `hits7d=${feature.hits7d}`
+        `hits7d=${feature.hits7d} | ` +
+        `pr=${feature.clusterPageRank.toFixed(3)} | ` +
+        `hedges=${feature.hyperedgeCount}`
     );
+  }
+
+  // --- Step 2.5b: Neo4j import-degree graph features ---
+  const deepImportMetrics = loadDeepImportGraphMetrics();
+  const importMetrics = await loadNeo4jImportMetrics(
+    rawFeatures.map((feature) => ({
+      clusterId: feature.clusterId,
+      paths: feature.paths,
+    }))
+  ).catch(() => null);
+
+  for (const feature of rawFeatures) {
+    const clusterImportMetrics = importMetrics?.get(feature.clusterId);
+    if (clusterImportMetrics) {
+      feature.inDegreeSum = clusterImportMetrics.inDegreeSum ?? 0;
+      feature.outDegreeSum = clusterImportMetrics.outDegreeSum ?? 0;
+    } else {
+      let inDegreeSum = 0;
+      let outDegreeSum = 0;
+      for (const pathName of feature.paths ?? []) {
+        const rel = normalizeRepoPath(pathName);
+        const fallback = deepImportMetrics.get(rel);
+        if (!fallback) continue;
+        inDegreeSum += fallback.directFanIn ?? 0;
+        outDegreeSum += fallback.directFanOut ?? 0;
+      }
+      feature.inDegreeSum = inDegreeSum;
+      feature.outDegreeSum = outDegreeSum;
+    }
+
+    feature.betweennessProxy =
+      feature.pointCount > 0
+        ? (feature.inDegreeSum * feature.outDegreeSum) / (feature.pointCount * feature.pointCount)
+        : 0;
   }
 
   // --- Normalize dimensions 0→1 ---
@@ -432,6 +593,10 @@ async function main() {
   // Step 2.5: normalize new graph dimensions
   features = normalizeByMax(features, 'clusterPageRank');
   features = normalizeByMax(features, 'hyperedgeCount');
+  features = normalizeByMax(features, 'hyperedgeCrossRate');
+  features = normalizeByMax(features, 'inDegreeSum');
+  features = normalizeByMax(features, 'outDegreeSum');
+  features = normalizeByMax(features, 'betweennessProxy');
 
   // --- Compute hotness ---
   features = features.map((f) => ({
@@ -452,11 +617,15 @@ async function main() {
   top5.forEach((f, i) => {
     console.log(
       `  ${i + 1}. cluster:gpu:${f.clusterId}  score=${f.hotness.toFixed(4)} ` +
-      `(blend=${f.meanBlend.toFixed(3)} tags=${f.tagCount} langs=${f.languageCount} hits24h=${f.hits24h})`
+        `(blend=${f.meanBlend.toFixed(3)} tags=${f.tagCount} langs=${f.languageCount} hits24h=${f.hits24h})`
     );
   });
 
   // --- Export features.json ---
+  for (const feature of features) {
+    delete feature.paths;
+  }
+
   const exportPath = resolve(REPO_ROOT, 'models/xgboost-hotness/features.json');
   mkdirSync(dirname(exportPath), { recursive: true });
   writeFileSync(
