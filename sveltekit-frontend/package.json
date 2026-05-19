@@ -254,6 +254,8 @@
 		"graphify:export-clusters:top": "node scripts/export-cluster-summaries.mjs --top 20",
 		"graphify:sync-clusters-qdrant": "node scripts/sync-cluster-summaries-to-qdrant.mjs",
 		"graphify:sync-cluster-tags": "node ../scripts/atlas/sync-cluster-tags-redis.mjs",
+		"graphify:graphrag-recommend": "node ../scripts/atlas/graphrag-cluster-recommendations.mjs",
+		"graphify:graphrag-recommend:dry": "node ../scripts/atlas/graphrag-cluster-recommendations.mjs --dry-run",
 		"warmup:bifrost:clusters": "node ../scripts/atlas/warmup-bifrost-clusters.mjs",
 		"warmup:bifrost:clusters:dry": "node ../scripts/atlas/warmup-bifrost-clusters.mjs --dry-run",
 		"smoke:prior-answer-cache": "node scripts/tests/smoke-prior-answer-cache.mjs",
