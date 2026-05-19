@@ -27,6 +27,22 @@ import Redis from 'ioredis';
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Retry pg.Client.connect() when Postgres is still initializing (error code
+// 57P03 "the database system is starting up" or ECONNREFUSED on Docker start).
+async function connectWithRetry(client, { maxAttempts = 8, delayMs = 3000 } = {}) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await client.connect();
+      return;
+    } catch (err) {
+      const isStarting = err.code === '57P03' || /starting up|ECONNREFUSED/.test(err.message);
+      if (!isStarting || attempt === maxAttempts) throw err;
+      console.log(`   pg not ready (attempt ${attempt}/${maxAttempts}) — retrying in ${delayMs}ms…`);
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+}
+
 const args  = process.argv.slice(2);
 const DRY   = args.includes('--dry-run');
 const HOURS = parseInt(
@@ -55,7 +71,7 @@ function normalizePath(p) {
 
 async function main() {
   const pgClient = new pg.Client({ connectionString: DB_URL });
-  await pgClient.connect();
+  await connectWithRetry(pgClient);
 
   // ── Adaptive guard: watermark on chunk_hit_log.id ─────────────────────────
   // The 24h rolling window means rows fall off the back as new ones land, so

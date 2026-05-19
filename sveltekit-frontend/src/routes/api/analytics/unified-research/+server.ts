@@ -52,7 +52,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
   try {
     const aggregations = await getUnifiedAggregations(days);
-    return json({ aggregations, meta: { days, userId: locals.user.id } });
+    return json({ aggregations, meta: { days, userId: Number(locals.user.id) } });
   } catch {
     return json({
       aggregations: { pipelineStats: [], scoreBuckets: [], bucketLabels: [] },
@@ -88,7 +88,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       unifiedTopics:    [],
       selfPromptChain:  [],
       langGraphState:   { messages: [], next: 'FINISH', step: 0, totalSteps: 5, supervisor: { decision: 'error', confidence: 0, nextAgent: 'FINISH' }, accumulated: { topics: [], selfPrompts: [], pipelineHints: [] } },
-      meta: { userId: locals.user.id, query: raw.query ?? '', pipeline: 'all', sources: [], computeMs: 0, cachedUntil: new Date().toISOString() },
+      meta: { userId: Number(locals.user.id), query: raw.query ?? '', pipeline: 'all', sources: [], computeMs: 0, cachedUntil: new Date().toISOString() },
     });
   }
 };

@@ -1,0 +1,207 @@
+#!/usr/bin/env node
+/**
+ * run-authority-scores.mjs
+ *
+ * Populates Redis `ace:authority:top` HASH from the latest GDS artifact
+ * (memory/graphify/gds/latest.json). This is the lightweight re-publish step
+ * that runs after graphify:daily so ACE context assembly can read authority
+ * scores in O(1) without re-running the full GDS pipeline.
+ *
+ * Falls back to Postgres `code_retrieval_chunks.graph_authority_score` if the
+ * GDS artifact is absent or stale (>25h).
+ *
+ * ace:authority:top layout:
+ *   HSET ace:authority:top  <file_path>  <JSON>
+ *   where file_path = 'lib/server/db/client.ts' (no src/ prefix, no abs path)
+ *   and JSON = { graphAuthorityScore, communityId, pagerank, topoClass }
+ *   TTL: 6h (21600s)
+ */
+
+import { existsSync, readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT      = join(__dirname, '..');
+const DRY       = process.argv.includes('--dry-run');
+const HASH_KEY  = 'ace:authority:top';
+const TTL       = 21600; // 6h
+const TOP_N     = 200;
+
+const REDIS_URL  = process.env.REDIS_URL       ?? 'redis://127.0.0.1:6379';
+const PG_URL     = process.env.DATABASE_URL    ?? null;
+
+// ── helpers ────────────────────────────────────────────────────────────────────
+
+function normalisePath(raw) {
+  if (!raw) return null;
+  // strip absolute prefix up to sveltekit-frontend/src/ or sveltekit-frontend/
+  let p = raw.replace(/\\/g, '/');
+  const marker = 'sveltekit-frontend/src/';
+  const idx = p.indexOf(marker);
+  if (idx !== -1) return p.slice(idx + marker.length);
+  const marker2 = 'sveltekit-frontend/';
+  const idx2 = p.indexOf(marker2);
+  if (idx2 !== -1) {
+    const rel = p.slice(idx2 + marker2.length);
+    return rel.startsWith('src/') ? rel.slice(4) : rel;
+  }
+  // already relative — strip leading src/
+  return p.startsWith('src/') ? p.slice(4) : p;
+}
+
+// ── 1. load GDS artifact ───────────────────────────────────────────────────────
+
+async function loadFromGdsArtifact() {
+  const latestPath = join(ROOT, 'memory', 'graphify', 'gds', 'latest.json');
+  if (!existsSync(latestPath)) return null;
+
+  let artifact;
+  try {
+    artifact = JSON.parse(readFileSync(latestPath, 'utf8'));
+  } catch {
+    return null;
+  }
+
+  // warn if older than 25h but still use — GDS isn't re-run on every graphify:daily
+  if (artifact.finishedAt) {
+    const ageH = (Date.now() - new Date(artifact.finishedAt).getTime()) / 3600000;
+    if (ageH > 25) console.log(`[authority] GDS artifact is ${ageH.toFixed(0)}h old — using anyway (re-run graphify:gds to refresh)`);
+  }
+
+  const topAuthorities = artifact.topAuthorities;
+  if (!Array.isArray(topAuthorities) || topAuthorities.length === 0) return null;
+
+  const entries = [];
+  for (const entry of topAuthorities) {
+    const fp = normalisePath(entry.filePath ?? entry.file_path ?? entry.stableKey ?? entry.stable_key);
+    if (!fp) continue;
+    entries.push({
+      filePath:            fp,
+      graphAuthorityScore: entry.graphAuthorityScore ?? entry.authority_score ?? null,
+      communityId:         entry.communityId ?? entry.community_id ?? null,
+      pagerank:            entry.pagerank ?? null,
+      topoClass:           entry.topoClass ?? entry.topo_class ?? null,
+    });
+  }
+  return entries.slice(0, TOP_N);
+}
+
+// ── 2. Postgres fallback ───────────────────────────────────────────────────────
+
+async function loadFromPostgres() {
+  if (!PG_URL) return null;
+  let pg;
+  try {
+    const { default: pgPkg } = await import('pg');
+    const Pool = pgPkg.Pool ?? pgPkg.default?.Pool;
+    if (!Pool) return null;
+    pg = new Pool({ connectionString: PG_URL, max: 1 });
+    const res = await pg.query(`
+      SELECT file_path,
+             max(graph_authority_score)   AS ga,
+             max(community_id)            AS community_id,
+             max(topo_class)              AS topo_class
+      FROM   code_retrieval_chunks
+      WHERE  graph_authority_score IS NOT NULL
+      GROUP  BY file_path
+      ORDER  BY max(graph_authority_score) DESC NULLS LAST
+      LIMIT  $1
+    `, [TOP_N]);
+    const entries = res.rows.map(r => ({
+      filePath:            normalisePath(r.file_path),
+      graphAuthorityScore: parseFloat(r.ga) || null,
+      communityId:         r.community_id ?? null,
+      pagerank:            null,
+      topoClass:           r.topo_class ?? null,
+    })).filter(e => e.filePath);
+    await pg.end();
+    return entries.length ? entries : null;
+  } catch (err) {
+    console.warn('[authority] Postgres fallback failed:', err.message);
+    if (pg) await pg.end().catch(() => {});
+    return null;
+  }
+}
+
+// ── 3. write to Redis ──────────────────────────────────────────────────────────
+
+async function writeToRedis(entries) {
+  const { Redis } = await import('ioredis');
+  const redis = new Redis(REDIS_URL, {
+    lazyConnect:          true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue:   false,
+    retryStrategy:        () => null,
+  });
+  redis.on('error', () => {});
+
+  try {
+    await redis.connect();
+    await redis.ping();
+  } catch (err) {
+    console.warn('[authority] Redis unavailable:', err.message);
+    redis.disconnect();
+    return 0;
+  }
+
+  const pipe = redis.pipeline();
+  for (const entry of entries) {
+    const value = JSON.stringify({
+      graphAuthorityScore: entry.graphAuthorityScore,
+      communityId:         entry.communityId,
+      pagerank:            entry.pagerank,
+      topoClass:           entry.topoClass,
+    });
+    pipe.hset(HASH_KEY, entry.filePath, value);
+  }
+  pipe.expire(HASH_KEY, TTL);
+  await pipe.exec();
+  await redis.quit();
+  return entries.length;
+}
+
+// ── main ───────────────────────────────────────────────────────────────────────
+
+async function main() {
+  console.log(`=== Authority Scores → Redis ${DRY ? '(dry-run)' : ''} ===`);
+
+  let entries = await loadFromGdsArtifact();
+  const source = entries ? 'gds-artifact' : 'postgres';
+
+  if (!entries) {
+    console.log('[authority] Falling back to Postgres...');
+    entries = await loadFromPostgres();
+  }
+
+  if (!entries || entries.length === 0) {
+    console.warn('[authority] No authority scores found (Neo4j GDS not yet run + Postgres empty). Skipping.');
+    console.log('[authority] Run `npm run graphify:gds` to populate authority scores.');
+    process.exit(0);
+  }
+
+  console.log(`[authority] Loaded ${entries.length} entries from ${source}`);
+
+  if (DRY) {
+    console.log('[authority] Dry-run — sample entries:');
+    for (const e of entries.slice(0, 5)) {
+      console.log(`  ${e.filePath}  score=${e.graphAuthorityScore}  community=${e.communityId}`);
+    }
+    console.log(`[authority] Would write ${entries.length} entries to Redis ${HASH_KEY} (TTL ${TTL}s)`);
+    return;
+  }
+
+  const written = await writeToRedis(entries);
+  if (written > 0) {
+    console.log(`[authority] Written ${written} entries to Redis ace:authority:top (TTL ${TTL}s)`);
+  } else {
+    console.warn('[authority] Redis write failed — ace:authority:top not updated');
+  }
+
+  console.log('=== Done ===');
+}
+
+main().catch(err => {
+  console.error('[authority] Fatal:', err.message);
+  process.exit(0); // non-fatal for pipeline — graphify:daily continues
+});

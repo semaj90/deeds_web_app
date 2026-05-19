@@ -181,7 +181,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       .then(({ dispatchOrExecuteInline }) =>
         dispatchOrExecuteInline('analytics.track', {
           eventType: 'report_create',
-          payload: { reportId: newReport[0].id, caseId: body.caseId, userId: locals.user.id },
+          payload: { reportId: newReport[0].id, caseId: body.caseId, userId: Number(locals.user.id) },
         })
       )
       .catch(() => {});

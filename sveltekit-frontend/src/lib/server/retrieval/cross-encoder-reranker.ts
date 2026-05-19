@@ -46,12 +46,15 @@ import { ENV } from '$lib/server/env.server.js';
 
 /**
  * Rerank backend selection.
- * Env: RERANK_BACKEND = 'tensorrt' | 'triton' | 'ollama' (default: 'ollama')
+ * Env: RERANK_BACKEND = 'tensorrt' | 'triton' | 'ollama' (default: 'triton')
  * At scoring time, the selected backend is probed once. On failure, falls back
  * through the chain: tensorrt → triton → ollama.
+ *
+ * Defaulting to Triton aligns the stack with a BGE-style cross-encoder reranker
+ * while still allowing an Ollama fallback if the Triton service is unavailable.
  */
 type RerankBackend = 'tensorrt' | 'triton' | 'ollama';
-const RERANK_BACKEND = (process.env.RERANK_BACKEND ?? 'ollama') as RerankBackend;
+const RERANK_BACKEND = (process.env.RERANK_BACKEND ?? 'triton') as RerankBackend;
 
 /** Below this score the reranker triggers web search ingestion */
 export const RERANK_FALLBACK_THRESHOLD = 0.45;
@@ -406,7 +409,7 @@ async function scoreWithBackendFallback(query: string, doc: RerankCandidate): Pr
  * Favors Triton batching if selected.
  */
 async function scoreBatchWithBackendFallback(
-  query: string, 
+  query: string,
   candidates: RerankCandidate[]
 ): Promise<Map<string, number>> {
   const scores = new Map<string, number>();
@@ -414,14 +417,14 @@ async function scoreBatchWithBackendFallback(
 
   // 1. Try Triton Batching first if it's the primary or secondary backend
   const tritonHealth = _backendHealth['triton'];
-  const useTritonBatch = (RERANK_BACKEND === 'triton' || RERANK_BACKEND === 'tensorrt') && 
+  const useTritonBatch = (RERANK_BACKEND === 'triton' || RERANK_BACKEND === 'tensorrt') &&
                          (tritonHealth.ok || Date.now() - tritonHealth.checkedAt > HEALTH_RECHECK_MS);
 
   if (useTritonBatch) {
     try {
         const docTexts = candidates.map(c => c.content.slice(0, SCORE_MAX_CHARS));
         const batchScores = await scoreBatchTriton(query, docTexts);
-        
+
         if (batchScores.length === candidates.length) {
             tritonHealth.ok = true;
             tritonHealth.checkedAt = Date.now();

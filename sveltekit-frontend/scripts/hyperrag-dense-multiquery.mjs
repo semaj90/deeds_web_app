@@ -26,7 +26,6 @@
  *   TURBOVEC_SIDECAR default http://127.0.0.1:8099
  */
 
-import { createRequire } from 'node:module';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';

@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 
-const OLLAMA_URL   = ENV.OLLAMA_URL   ?? 'http://localhost:11434';
+const OLLAMA_URL   = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 const EMBED_MODEL  = ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const QDRANT_URL   = ENV.QDRANT_URL   ?? 'http://localhost:6333';
 const COUCHDB_URL  = (ENV.COUCHDB_URL ?? 'http://admin:legal_ai_pass@127.0.0.1:5984').replace(/\/+$/, '');
@@ -15,7 +15,15 @@ const RRF_K        = 60;
 
 function sourceRef(p: Record<string, unknown> | null): string | null {
 	if (!p) return null;
-	return (p.path ?? p.source_ref ?? p.relativePath) as string | null;
+	return (p.path ??
+    p.source_ref ??
+    p.relativePath ??
+    p.relative_path ??
+    p.file_path ??
+    p.filePath ??
+    p.source_path ??
+    p.sourcePath ??
+    null) as string | null;
 }
 
 async function embedQuery(query: string): Promise<number[]> {

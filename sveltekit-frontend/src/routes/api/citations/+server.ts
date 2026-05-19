@@ -142,7 +142,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
         tags: body.tags ?? [],
         caseId: body.case_id || null,
         sourceUrl: body.source_type === 'manual' ? null : body.source_url || null,
-        createdBy: locals.user?.id ?? null,
+        createdBy: locals.user ? Number(locals.user.id) : null,
       })
       .returning();
 

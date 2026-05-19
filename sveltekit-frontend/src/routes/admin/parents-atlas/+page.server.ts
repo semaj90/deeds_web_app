@@ -46,7 +46,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		// 3. Fetch codebase chunks count
 		const countResult = await db.execute(sql`SELECT count(*) FROM codebase_chunk_index`);
 		const rows = pgRows(countResult);
-		totalChunks = rows[0] ? parseInt(rows[0].count, 10) : 0;
+		totalChunks = rows[0] ? parseInt(String((rows[0] as Record<string, unknown>).count ?? 0), 10) : 0;
 	} catch (err) {
 		console.warn('[parents-atlas-server] DB lookup failed, using fallback metrics', err);
 	}

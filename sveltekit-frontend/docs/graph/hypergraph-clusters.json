@@ -120,17 +120,17 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
+      "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.7326,
+      "avgBlend": 1.9208,
       "avgPr": 4.0503,
-      "totalBlend": 1.7326,
+      "totalBlend": 1.9208,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -138,18 +138,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 1.9208
   },
   {
     "id": 55,
@@ -312,17 +312,17 @@
         "lineEnd": 3150
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
+      "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.7326,
+      "avgBlend": 1.9208,
       "avgPr": 4.0503,
-      "totalBlend": 6.9306,
+      "totalBlend": 7.6834,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 4,
       "totalFiles": 8,
@@ -330,18 +330,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 1.9208
   },
   {
     "id": 65,
@@ -403,17 +403,17 @@
         "lineEnd": 1560
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
+      "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.7326,
+      "avgBlend": 1.9208,
       "avgPr": 4.0503,
-      "totalBlend": 1.7326,
+      "totalBlend": 1.9208,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 1,
@@ -421,18 +421,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 1.9208
   },
   {
     "id": 76,
@@ -494,17 +494,17 @@
         "lineEnd": 825
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
+      "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.7326,
+      "avgBlend": 1.9208,
       "avgPr": 4.0503,
-      "totalBlend": 1.7326,
+      "totalBlend": 1.9208,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 1,
@@ -512,18 +512,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 1.9208
   },
   {
     "id": 84,
@@ -686,17 +686,17 @@
         "lineEnd": 84
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
+      "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.7326,
+      "avgBlend": 1.9208,
       "avgPr": 4.0503,
-      "totalBlend": 1.7326,
+      "totalBlend": 1.9208,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -704,220 +704,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         }
       ]
     },
-    "clusterBlend": 1.7326
-  },
-  {
-    "id": 13,
-    "size": 41,
-    "sampledFor": 16,
-    "inferredTopic": "table-def chunks in `src/lib/server/db` (tag: database)",
-    "topKinds": [
-      {
-        "kind": "table-def",
-        "count": 8
-      },
-      {
-        "kind": "route-handler",
-        "count": 2
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "database",
-        "count": 8
-      },
-      {
-        "tag": "schema",
-        "count": 8
-      },
-      {
-        "tag": "drizzle",
-        "count": 8
-      },
-      {
-        "tag": "embedding",
-        "count": 5
-      },
-      {
-        "tag": "auth",
-        "count": 4
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "timeline_events",
-        "count": 2
-      },
-      {
-        "symbol": "POST",
-        "count": 2
-      },
-      {
-        "symbol": "user_timeline",
-        "count": 1
-      },
-      {
-        "symbol": "phase89_timeline",
-        "count": 1
-      },
-      {
-        "symbol": "case_timeline",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server/db",
-        "count": 7
-      },
-      {
-        "dir": "src/lib/db/schema",
-        "count": 1
-      },
-      {
-        "dir": "src/routes/api/persons-of-interest/[id]/timeline",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "count": 3
-      },
-      {
-        "path": "src/lib/server/db/schema-phase89-preserved.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/db/schema-timeline.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/db/schema-charges.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/db/schema/evidence.ts",
-        "count": 1
-      },
-      {
-        "path": "src/routes/api/persons-of-interest/[id]/timeline/+server.ts",
-        "count": 1
-      },
-      {
-        "path": "src/routes/api/analytics/context-timeline/+server.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/db/schema-timeline.ts",
-        "kind": "table-def",
-        "symbol": "user_timeline",
-        "lineStart": 4,
-        "lineEnd": 12
-      },
-      {
-        "path": "src/lib/server/db/schema-phase89-preserved.ts",
-        "kind": "table-def",
-        "symbol": "phase89_timeline",
-        "lineStart": 134,
-        "lineEnd": 139
-      },
-      {
-        "path": "src/lib/server/db/schema-charges.ts",
-        "kind": "table-def",
-        "symbol": "case_timeline",
-        "lineStart": 27,
-        "lineEnd": 36
-      },
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "kind": "table-def",
-        "symbol": "timeline_events",
-        "lineStart": 1149,
-        "lineEnd": 1180
-      },
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "kind": "table-def",
-        "symbol": "context_timeline",
-        "lineStart": 3842,
-        "lineEnd": 3872
-      },
-      {
-        "path": "src/lib/db/schema/evidence.ts",
-        "kind": "table-def",
-        "symbol": "timeline_events",
-        "lineStart": 66,
-        "lineEnd": 80
-      },
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "kind": "table-def",
-        "symbol": "error_timeline",
-        "lineStart": 2570,
-        "lineEnd": 2584
-      },
-      {
-        "path": "src/routes/api/persons-of-interest/[id]/timeline/+server.ts",
-        "kind": "route-handler",
-        "symbol": "POST",
-        "lineStart": 70,
-        "lineEnd": 126
-      }
-    ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.4738,
-      "avgPr": 3.4286,
-      "totalBlend": 5.8953,
-      "clusterAuthorityScore": 3.8638,
-      "scoredFiles": 4,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/server/db/schema-phase89-preserved.ts",
-          "pageRank": 1.5636766166671263,
-          "karpathyBlend": 0.6973806466668506
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/server/db/schema-phase89-preserved.ts",
-          "pageRank": 1.5636766166671263,
-          "karpathyBlend": 0.6973806466668506
-        }
-      ]
-    },
-    "clusterBlend": 1.655
+    "clusterBlend": 1.9208
   },
   {
     "id": 91,
@@ -1086,262 +884,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
+      "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.4351,
-      "avgPr": 3.3534,
-      "totalBlend": 5.7404,
-      "clusterAuthorityScore": 3.8412,
-      "scoredFiles": 4,
+      "avgBlend": 1.9208,
+      "avgPr": 4.0503,
+      "totalBlend": 5.7625,
+      "clusterAuthorityScore": 4.0503,
+      "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/db/schema/route-health-tables.ts",
-          "pageRank": 1.2626780740428891,
-          "karpathyBlend": 0.5425112296171557
+          "karpathyBlend": 1.9208428102629216
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/db/schema/route-health-tables.ts",
-          "pageRank": 1.2626780740428891,
-          "karpathyBlend": 0.5425112296171557
+          "karpathyBlend": 1.9208428102629216
         }
       ]
     },
-    "clusterBlend": 1.6434
-  },
-  {
-    "id": 88,
-    "size": 123,
-    "sampledFor": 16,
-    "inferredTopic": "const chunks in `src/lib/server/db` (tag: database)",
-    "topKinds": [
-      {
-        "kind": "const",
-        "count": 16
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "database",
-        "count": 16
-      },
-      {
-        "tag": "schema",
-        "count": 12
-      },
-      {
-        "tag": "drizzle",
-        "count": 12
-      },
-      {
-        "tag": "auth",
-        "count": 11
-      },
-      {
-        "tag": "embedding",
-        "count": 10
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "usersRelations",
-        "count": 1
-      },
-      {
-        "symbol": "yorhaChatSessionsRelations",
-        "count": 1
-      },
-      {
-        "symbol": "statuteChunksRelations",
-        "count": 1
-      },
-      {
-        "symbol": "legalChunksRelations",
-        "count": 1
-      },
-      {
-        "symbol": "routeMetadataRelations",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server/db",
-        "count": 11
-      },
-      {
-        "dir": "src/lib/server/db/schema",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/db/schema",
-        "count": 2
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "count": 7
-      },
-      {
-        "path": "src/lib/server/db/relations.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/db/schema/legal-relations.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/db/schema/route-health-tables.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/db/vector-schema.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/db/schema.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/db/warden-schema.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/db/schema/evidence.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/db/relations.ts",
-        "kind": "const",
-        "symbol": "usersRelations",
-        "lineStart": 16,
-        "lineEnd": 18
-      },
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "kind": "const",
-        "symbol": "yorhaChatSessionsRelations",
-        "lineStart": 2394,
-        "lineEnd": 2400
-      },
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "kind": "const",
-        "symbol": "statuteChunksRelations",
-        "lineStart": 2022,
-        "lineEnd": 2024
-      },
-      {
-        "path": "src/lib/server/db/schema/legal-relations.ts",
-        "kind": "const",
-        "symbol": "legalChunksRelations",
-        "lineStart": 63,
-        "lineEnd": 68
-      },
-      {
-        "path": "src/lib/db/schema/route-health-tables.ts",
-        "kind": "const",
-        "symbol": "routeMetadataRelations",
-        "lineStart": 272,
-        "lineEnd": 278
-      },
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "kind": "const",
-        "symbol": "attachmentVerificationsRelations",
-        "lineStart": 1614,
-        "lineEnd": 1620
-      },
-      {
-        "path": "src/lib/server/db/schema-postgres.ts",
-        "kind": "const",
-        "symbol": "workspaceSessionsRelations",
-        "lineStart": 2110,
-        "lineEnd": 2119
-      },
-      {
-        "path": "src/lib/server/db/schema/legal-relations.ts",
-        "kind": "const",
-        "symbol": "legalCitationsRelations",
-        "lineStart": 79,
-        "lineEnd": 90
-      }
-    ],
-    "somRow": 1,
-    "somCol": 0,
-    "somCluster": 8,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.2148,
-      "avgPr": 2.8055,
-      "totalBlend": 9.7181,
-      "clusterAuthorityScore": 3.6768,
-      "scoredFiles": 8,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/server/db/relations.ts",
-          "pageRank": 1.8346582262300364,
-          "karpathyBlend": 0.8097932904920147
-        },
-        {
-          "filePath": "src/lib/server/db/schema/legal-relations.ts",
-          "pageRank": 1.5728262441344403,
-          "karpathyBlend": 0.7176304976537762
-        },
-        {
-          "filePath": "src/lib/db/schema/route-health-tables.ts",
-          "pageRank": 1.2626780740428891,
-          "karpathyBlend": 0.5425112296171557
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/server/db/relations.ts",
-          "pageRank": 1.8346582262300364,
-          "karpathyBlend": 0.8097932904920147
-        },
-        {
-          "filePath": "src/lib/server/db/schema/legal-relations.ts",
-          "pageRank": 1.5728262441344403,
-          "karpathyBlend": 0.7176304976537762
-        },
-        {
-          "filePath": "src/lib/db/schema/route-health-tables.ts",
-          "pageRank": 1.2626780740428891,
-          "karpathyBlend": 0.5425112296171557
-        }
-      ]
-    },
-    "clusterBlend": 1.5773
+    "clusterBlend": 1.9208
   },
   {
     "id": 95,
@@ -1504,46 +1070,450 @@
         "lineEnd": 156
       }
     ],
-    "somRow": 1,
-    "somCol": 1,
-    "somCluster": 9,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
+      "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.1552,
-      "avgPr": 2.6607,
-      "totalBlend": 2.3105,
-      "clusterAuthorityScore": 3.6334,
-      "scoredFiles": 2,
+      "avgBlend": 1.9208,
+      "avgPr": 4.0503,
+      "totalBlend": 1.9208,
+      "clusterAuthorityScore": 4.0503,
+      "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/server/db/schema/state-constitution-sources.ts",
-          "pageRank": 1.2710805899578512,
-          "karpathyBlend": 0.5778222359831404
+          "karpathyBlend": 1.9208428102629216
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/server/db/schema/state-constitution-sources.ts",
-          "pageRank": 1.2710805899578512,
-          "karpathyBlend": 0.5778222359831404
+          "karpathyBlend": 1.9208428102629216
         }
       ]
     },
-    "clusterBlend": 1.5594
+    "clusterBlend": 1.9208
+  },
+  {
+    "id": 13,
+    "size": 41,
+    "sampledFor": 16,
+    "inferredTopic": "table-def chunks in `src/lib/server/db` (tag: database)",
+    "topKinds": [
+      {
+        "kind": "table-def",
+        "count": 8
+      },
+      {
+        "kind": "route-handler",
+        "count": 2
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "database",
+        "count": 8
+      },
+      {
+        "tag": "schema",
+        "count": 8
+      },
+      {
+        "tag": "drizzle",
+        "count": 8
+      },
+      {
+        "tag": "embedding",
+        "count": 5
+      },
+      {
+        "tag": "auth",
+        "count": 4
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "timeline_events",
+        "count": 2
+      },
+      {
+        "symbol": "POST",
+        "count": 2
+      },
+      {
+        "symbol": "user_timeline",
+        "count": 1
+      },
+      {
+        "symbol": "phase89_timeline",
+        "count": 1
+      },
+      {
+        "symbol": "case_timeline",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server/db",
+        "count": 7
+      },
+      {
+        "dir": "src/lib/db/schema",
+        "count": 1
+      },
+      {
+        "dir": "src/routes/api/persons-of-interest/[id]/timeline",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "count": 3
+      },
+      {
+        "path": "src/lib/server/db/schema-phase89-preserved.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/db/schema-timeline.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/db/schema-charges.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/db/schema/evidence.ts",
+        "count": 1
+      },
+      {
+        "path": "src/routes/api/persons-of-interest/[id]/timeline/+server.ts",
+        "count": 1
+      },
+      {
+        "path": "src/routes/api/analytics/context-timeline/+server.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/db/schema-timeline.ts",
+        "kind": "table-def",
+        "symbol": "user_timeline",
+        "lineStart": 4,
+        "lineEnd": 12
+      },
+      {
+        "path": "src/lib/server/db/schema-phase89-preserved.ts",
+        "kind": "table-def",
+        "symbol": "phase89_timeline",
+        "lineStart": 134,
+        "lineEnd": 139
+      },
+      {
+        "path": "src/lib/server/db/schema-charges.ts",
+        "kind": "table-def",
+        "symbol": "case_timeline",
+        "lineStart": 27,
+        "lineEnd": 36
+      },
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "kind": "table-def",
+        "symbol": "timeline_events",
+        "lineStart": 1149,
+        "lineEnd": 1180
+      },
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "kind": "table-def",
+        "symbol": "context_timeline",
+        "lineStart": 3842,
+        "lineEnd": 3872
+      },
+      {
+        "path": "src/lib/db/schema/evidence.ts",
+        "kind": "table-def",
+        "symbol": "timeline_events",
+        "lineStart": 66,
+        "lineEnd": 80
+      },
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "kind": "table-def",
+        "symbol": "error_timeline",
+        "lineStart": 2570,
+        "lineEnd": 2584
+      },
+      {
+        "path": "src/routes/api/persons-of-interest/[id]/timeline/+server.ts",
+        "kind": "route-handler",
+        "symbol": "POST",
+        "lineStart": 70,
+        "lineEnd": 126
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 1.9208,
+      "maxPr": 4.0503,
+      "avgBlend": 1.6611,
+      "avgPr": 3.4286,
+      "totalBlend": 6.6444,
+      "clusterAuthorityScore": 3.8638,
+      "scoredFiles": 4,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/server/db/schema-postgres.ts",
+          "pageRank": 4.050278318145834,
+          "karpathyBlend": 1.9208428102629216
+        },
+        {
+          "filePath": "src/lib/server/db/schema-phase89-preserved.ts",
+          "pageRank": 1.5636766166671263,
+          "karpathyBlend": 0.8819054049893633
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/server/db/schema-postgres.ts",
+          "pageRank": 4.050278318145834,
+          "karpathyBlend": 1.9208428102629216
+        },
+        {
+          "filePath": "src/lib/server/db/schema-phase89-preserved.ts",
+          "pageRank": 1.5636766166671263,
+          "karpathyBlend": 0.8819054049893633
+        }
+      ]
+    },
+    "clusterBlend": 1.8429
+  },
+  {
+    "id": 88,
+    "size": 123,
+    "sampledFor": 16,
+    "inferredTopic": "const chunks in `src/lib/server/db` (tag: database)",
+    "topKinds": [
+      {
+        "kind": "const",
+        "count": 16
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "database",
+        "count": 16
+      },
+      {
+        "tag": "schema",
+        "count": 12
+      },
+      {
+        "tag": "drizzle",
+        "count": 12
+      },
+      {
+        "tag": "auth",
+        "count": 11
+      },
+      {
+        "tag": "embedding",
+        "count": 10
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "usersRelations",
+        "count": 1
+      },
+      {
+        "symbol": "yorhaChatSessionsRelations",
+        "count": 1
+      },
+      {
+        "symbol": "statuteChunksRelations",
+        "count": 1
+      },
+      {
+        "symbol": "legalChunksRelations",
+        "count": 1
+      },
+      {
+        "symbol": "routeMetadataRelations",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server/db",
+        "count": 11
+      },
+      {
+        "dir": "src/lib/server/db/schema",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/db/schema",
+        "count": 2
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "count": 7
+      },
+      {
+        "path": "src/lib/server/db/relations.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/db/schema/legal-relations.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/db/schema/route-health-tables.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/db/vector-schema.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/db/schema.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/db/warden-schema.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/db/schema/evidence.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/db/relations.ts",
+        "kind": "const",
+        "symbol": "usersRelations",
+        "lineStart": 16,
+        "lineEnd": 18
+      },
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "kind": "const",
+        "symbol": "yorhaChatSessionsRelations",
+        "lineStart": 2394,
+        "lineEnd": 2400
+      },
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "kind": "const",
+        "symbol": "statuteChunksRelations",
+        "lineStart": 2022,
+        "lineEnd": 2024
+      },
+      {
+        "path": "src/lib/server/db/schema/legal-relations.ts",
+        "kind": "const",
+        "symbol": "legalChunksRelations",
+        "lineStart": 63,
+        "lineEnd": 68
+      },
+      {
+        "path": "src/lib/db/schema/route-health-tables.ts",
+        "kind": "const",
+        "symbol": "routeMetadataRelations",
+        "lineStart": 272,
+        "lineEnd": 278
+      },
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "kind": "const",
+        "symbol": "attachmentVerificationsRelations",
+        "lineStart": 1614,
+        "lineEnd": 1620
+      },
+      {
+        "path": "src/lib/server/db/schema-postgres.ts",
+        "kind": "const",
+        "symbol": "workspaceSessionsRelations",
+        "lineStart": 2110,
+        "lineEnd": 2119
+      },
+      {
+        "path": "src/lib/server/db/schema/legal-relations.ts",
+        "kind": "const",
+        "symbol": "legalCitationsRelations",
+        "lineStart": 79,
+        "lineEnd": 90
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 1.9208,
+      "maxPr": 4.0503,
+      "avgBlend": 1.4967,
+      "avgPr": 3.0259,
+      "totalBlend": 10.4769,
+      "clusterAuthorityScore": 3.743,
+      "scoredFiles": 7,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/server/db/schema-postgres.ts",
+          "pageRank": 4.050278318145834,
+          "karpathyBlend": 1.9208428102629216
+        },
+        {
+          "filePath": "src/lib/server/db/relations.ts",
+          "pageRank": 1.8346582262300366,
+          "karpathyBlend": 0.9981295339312428
+        },
+        {
+          "filePath": "src/lib/server/db/schema/legal-relations.ts",
+          "pageRank": 1.5728262441344403,
+          "karpathyBlend": 0.8976928229744212
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/server/db/schema-postgres.ts",
+          "pageRank": 4.050278318145834,
+          "karpathyBlend": 1.9208428102629216
+        },
+        {
+          "filePath": "src/lib/server/db/relations.ts",
+          "pageRank": 1.8346582262300366,
+          "karpathyBlend": 0.9981295339312428
+        },
+        {
+          "filePath": "src/lib/server/db/schema/legal-relations.ts",
+          "pageRank": 1.5728262441344403,
+          "karpathyBlend": 0.8976928229744212
+        }
+      ]
+    },
+    "clusterBlend": 1.7936
   },
   {
     "id": 53,
@@ -1711,65 +1681,55 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
+      "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.1302,
-      "avgPr": 2.617,
-      "totalBlend": 5.651,
-      "clusterAuthorityScore": 3.6203,
-      "scoredFiles": 5,
+      "avgBlend": 1.4443,
+      "avgPr": 2.9106,
+      "totalBlend": 5.7774,
+      "clusterAuthorityScore": 3.7084,
+      "scoredFiles": 4,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         },
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
           "pageRank": 1.7821034441546986,
-          "karpathyBlend": 0.7898213776618794
+          "karpathyBlend": 0.9696920496763416
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
-          "pageRank": 1.7597118175744615,
-          "karpathyBlend": 0.7805347270297847
-        },
-        {
-          "filePath": "src/lib/types/protocol.ts",
-          "pageRank": 1.4428226151366152,
-          "karpathyBlend": 0.6154090460546461
+          "pageRank": 1.7597118175744617,
+          "karpathyBlend": 0.9660065201549021
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "karpathyBlend": 1.9208428102629216
         },
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
           "pageRank": 1.7821034441546986,
-          "karpathyBlend": 0.7898213776618794
+          "karpathyBlend": 0.9696920496763416
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
-          "pageRank": 1.7597118175744615,
-          "karpathyBlend": 0.7805347270297847
-        },
-        {
-          "filePath": "src/lib/types/protocol.ts",
-          "pageRank": 1.4428226151366152,
-          "karpathyBlend": 0.6154090460546461
+          "pageRank": 1.7597118175744617,
+          "karpathyBlend": 0.9660065201549021
         }
       ]
     },
-    "clusterBlend": 1.5519
+    "clusterBlend": 1.7779
   },
   {
     "id": 75,
@@ -1940,56 +1900,46 @@
         "lineEnd": 38
       }
     ],
-    "somRow": 4,
-    "somCol": 2,
-    "somCluster": 34,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.1448,
+      "maxBlend": 1.3294,
       "maxPr": 2.7145,
-      "avgBlend": 0.916,
-      "avgPr": 2.155,
-      "totalBlend": 3.6639,
-      "clusterAuthorityScore": 2.5467,
-      "scoredFiles": 4,
+      "avgBlend": 1.1843,
+      "avgPr": 2.3562,
+      "totalBlend": 3.5529,
+      "clusterAuthorityScore": 2.607,
+      "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/config/env.server.ts",
           "pageRank": 2.7145393537960745,
-          "karpathyBlend": 1.1448257415184298
+          "karpathyBlend": 1.3294009141046603
         },
         {
           "filePath": "src/lib/server/minio.ts",
           "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.7138869260299371
-        },
-        {
-          "filePath": "src/lib/config/redis-config.ts",
-          "pageRank": 1.551257,
-          "karpathyBlend": 0.660403
+          "karpathyBlend": 0.8941135632154192
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/config/env.server.ts",
           "pageRank": 2.7145393537960745,
-          "karpathyBlend": 1.1448257415184298
+          "karpathyBlend": 1.3294009141046603
         },
         {
           "filePath": "src/lib/server/minio.ts",
           "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.7138869260299371
-        },
-        {
-          "filePath": "src/lib/config/redis-config.ts",
-          "pageRank": 1.551257,
-          "karpathyBlend": 0.660403
+          "karpathyBlend": 0.8941135632154192
         }
       ]
     },
-    "clusterBlend": 1.0762
+    "clusterBlend": 1.2859
   },
   {
     "id": 59,
@@ -2116,17 +2066,17 @@
         "lineEnd": null
       }
     ],
-    "somRow": 4,
-    "somCol": 7,
-    "somCluster": 39,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9154,
+      "maxBlend": 1.0894,
       "maxPr": 2.1297,
-      "avgBlend": 0.9154,
+      "avgBlend": 1.0894,
       "avgPr": 2.1297,
-      "totalBlend": 3.6615,
+      "totalBlend": 4.3577,
       "clusterAuthorityScore": 2.1297,
       "scoredFiles": 4,
       "totalFiles": 8,
@@ -2134,18 +2084,18 @@
         {
           "filePath": "src/lib/server/observability/inference-log.ts",
           "pageRank": 2.1297194485430113,
-          "karpathyBlend": 0.9153677794172046
+          "karpathyBlend": 1.0894140763721238
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/observability/inference-log.ts",
           "pageRank": 2.1297194485430113,
-          "karpathyBlend": 0.9153677794172046
+          "karpathyBlend": 1.0894140763721238
         }
       ]
     },
-    "clusterBlend": 0.9154
+    "clusterBlend": 1.0894
   },
   {
     "id": 94,
@@ -2316,46 +2266,46 @@
         "lineEnd": 284
       }
     ],
-    "somRow": 4,
-    "somCol": 2,
-    "somCluster": 34,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.827,
+      "maxBlend": 1.0016,
       "maxPr": 1.8989,
-      "avgBlend": 0.7768,
+      "avgBlend": 0.9538,
       "avgPr": 1.7833,
-      "totalBlend": 3.8838,
+      "totalBlend": 4.7689,
       "clusterAuthorityScore": 1.8642,
       "scoredFiles": 5,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
-          "pageRank": 1.8989401144504947,
-          "karpathyBlend": 0.8269560457801979
+          "pageRank": 1.8989401144504943,
+          "karpathyBlend": 1.0016486897507326
         },
         {
           "filePath": "src/lib/server/cache/pdf-export-cache.ts",
           "pageRank": 1.6097200311485362,
-          "karpathyBlend": 0.7014880124594145
+          "karpathyBlend": 0.8819559300652065
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
-          "pageRank": 1.8989401144504947,
-          "karpathyBlend": 0.8269560457801979
+          "pageRank": 1.8989401144504943,
+          "karpathyBlend": 1.0016486897507326
         },
         {
           "filePath": "src/lib/server/cache/pdf-export-cache.ts",
           "pageRank": 1.6097200311485362,
-          "karpathyBlend": 0.7014880124594145
+          "karpathyBlend": 0.8819559300652065
         }
       ]
     },
-    "clusterBlend": 0.8119
+    "clusterBlend": 0.9873
   },
   {
     "id": 90,
@@ -2519,16 +2469,16 @@
       }
     ],
     "somRow": 0,
-    "somCol": 1,
-    "somCluster": 1,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7787,
+      "maxBlend": 0.9552,
       "maxPr": 1.7783,
-      "avgBlend": 0.7787,
+      "avgBlend": 0.9552,
       "avgPr": 1.7783,
-      "totalBlend": 2.3362,
+      "totalBlend": 2.8657,
       "clusterAuthorityScore": 1.7783,
       "scoredFiles": 3,
       "totalFiles": 8,
@@ -2536,18 +2486,18 @@
         {
           "filePath": "src/lib/server/lucia.ts",
           "pageRank": 1.7783166924245377,
-          "karpathyBlend": 0.7787366769698151
+          "karpathyBlend": 0.9552279602550586
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/lucia.ts",
           "pageRank": 1.7783166924245377,
-          "karpathyBlend": 0.7787366769698151
+          "karpathyBlend": 0.9552279602550586
         }
       ]
     },
-    "clusterBlend": 0.7787
+    "clusterBlend": 0.9552
   },
   {
     "id": 20,
@@ -2722,17 +2672,17 @@
         "lineEnd": 331
       }
     ],
-    "somRow": 3,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 24,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.777,
+      "maxBlend": 0.947,
       "maxPr": 1.7873,
-      "avgBlend": 0.777,
+      "avgBlend": 0.947,
       "avgPr": 1.7873,
-      "totalBlend": 0.777,
+      "totalBlend": 0.947,
       "clusterAuthorityScore": 1.7873,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -2740,18 +2690,18 @@
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.7769820411681767
+          "karpathyBlend": 0.9469606041482612
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.7769820411681767
+          "karpathyBlend": 0.9469606041482612
         }
       ]
     },
-    "clusterBlend": 0.777
+    "clusterBlend": 0.947
   },
   {
     "id": 57,
@@ -2926,66 +2876,46 @@
         "lineEnd": 145
       }
     ],
-    "somRow": 2,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 16,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.777,
+      "maxBlend": 0.947,
       "maxPr": 1.7873,
-      "avgBlend": 0.6883,
-      "avgPr": 1.568,
-      "totalBlend": 2.7531,
-      "clusterAuthorityScore": 1.7215,
-      "scoredFiles": 4,
+      "avgBlend": 0.9406,
+      "avgPr": 1.7536,
+      "totalBlend": 1.8812,
+      "clusterAuthorityScore": 1.7772,
+      "scoredFiles": 2,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.7769820411681767
+          "karpathyBlend": 0.9469606041482612
         },
         {
           "filePath": "src/lib/server/retrieval/context-buffer.ts",
           "pageRank": 1.719915480779479,
-          "karpathyBlend": 0.7471861923117917
-        },
-        {
-          "filePath": "src/lib/server/vector/multi-store.ts",
-          "pageRank": 1.441000137093923,
-          "karpathyBlend": 0.6501400548375692
-        },
-        {
-          "filePath": "src/lib/stores/unified/index.svelte.ts",
-          "pageRank": 1.3236228583237653,
-          "karpathyBlend": 0.5787691433295061
+          "karpathyBlend": 0.9341958051762649
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.7769820411681767
+          "karpathyBlend": 0.9469606041482612
         },
         {
           "filePath": "src/lib/server/retrieval/context-buffer.ts",
           "pageRank": 1.719915480779479,
-          "karpathyBlend": 0.7471861923117917
-        },
-        {
-          "filePath": "src/lib/server/vector/multi-store.ts",
-          "pageRank": 1.441000137093923,
-          "karpathyBlend": 0.6501400548375692
-        },
-        {
-          "filePath": "src/lib/stores/unified/index.svelte.ts",
-          "pageRank": 1.3236228583237653,
-          "karpathyBlend": 0.5787691433295061
+          "karpathyBlend": 0.9341958051762649
         }
       ]
     },
-    "clusterBlend": 0.7504
+    "clusterBlend": 0.945
   },
   {
     "id": 25,
@@ -3152,36 +3082,36 @@
         "lineEnd": 48
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 56,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7423,
+      "maxBlend": 0.9282,
       "maxPr": 1.6816,
-      "avgBlend": 0.7423,
+      "avgBlend": 0.9282,
       "avgPr": 1.6816,
-      "totalBlend": 0.7423,
+      "totalBlend": 0.9282,
       "clusterAuthorityScore": 1.6816,
       "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/routes/api/cache/metrics/+server.ts",
-          "pageRank": 1.6815871693927569,
-          "karpathyBlend": 0.7422648677571028
+          "pageRank": 1.6815871693927562,
+          "karpathyBlend": 0.9282421567209731
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/routes/api/cache/metrics/+server.ts",
-          "pageRank": 1.6815871693927569,
-          "karpathyBlend": 0.7422648677571028
+          "pageRank": 1.6815871693927562,
+          "karpathyBlend": 0.9282421567209731
         }
       ]
     },
-    "clusterBlend": 0.7423
+    "clusterBlend": 0.9282
   },
   {
     "id": 56,
@@ -3329,16 +3259,16 @@
       }
     ],
     "somRow": 0,
-    "somCol": 6,
-    "somCluster": 6,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7305,
+      "maxBlend": 0.9105,
       "maxPr": 1.6752,
-      "avgBlend": 0.7305,
+      "avgBlend": 0.9105,
       "avgPr": 1.6752,
-      "totalBlend": 0.7305,
+      "totalBlend": 0.9105,
       "clusterAuthorityScore": 1.6752,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3346,18 +3276,18 @@
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
           "pageRank": 1.6751651851381948,
-          "karpathyBlend": 0.7304560740552779
+          "karpathyBlend": 0.9104999428035832
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
           "pageRank": 1.6751651851381948,
-          "karpathyBlend": 0.7304560740552779
+          "karpathyBlend": 0.9104999428035832
         }
       ]
     },
-    "clusterBlend": 0.7305
+    "clusterBlend": 0.9105
   },
   {
     "id": 86,
@@ -3524,17 +3454,17 @@
         "lineEnd": 256
       }
     ],
-    "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7305,
+      "maxBlend": 0.9105,
       "maxPr": 1.6752,
-      "avgBlend": 0.7305,
+      "avgBlend": 0.9105,
       "avgPr": 1.6752,
-      "totalBlend": 0.7305,
+      "totalBlend": 0.9105,
       "clusterAuthorityScore": 1.6752,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3542,18 +3472,18 @@
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
           "pageRank": 1.6751651851381948,
-          "karpathyBlend": 0.7304560740552779
+          "karpathyBlend": 0.9104999428035832
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
           "pageRank": 1.6751651851381948,
-          "karpathyBlend": 0.7304560740552779
+          "karpathyBlend": 0.9104999428035832
         }
       ]
     },
-    "clusterBlend": 0.7305
+    "clusterBlend": 0.9105
   },
   {
     "id": 36,
@@ -3643,17 +3573,17 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 24,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7116,
+      "maxBlend": 0.8906,
       "maxPr": 1.6746,
-      "avgBlend": 0.7116,
+      "avgBlend": 0.8906,
       "avgPr": 1.6746,
-      "totalBlend": 0.7116,
+      "totalBlend": 0.8906,
       "clusterAuthorityScore": 1.6746,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3661,18 +3591,18 @@
         {
           "filePath": "src/lib/webgpu/init.ts",
           "pageRank": 1.6746478680990662,
-          "karpathyBlend": 0.7115891472396265
+          "karpathyBlend": 0.8906088616221666
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
           "pageRank": 1.6746478680990662,
-          "karpathyBlend": 0.7115891472396265
+          "karpathyBlend": 0.8906088616221666
         }
       ]
     },
-    "clusterBlend": 0.7116
+    "clusterBlend": 0.8906
   },
   {
     "id": 23,
@@ -3851,66 +3781,46 @@
         "lineEnd": 75
       }
     ],
-    "somRow": 1,
-    "somCol": 7,
-    "somCluster": 15,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7116,
+      "maxBlend": 0.8906,
       "maxPr": 1.6746,
-      "avgBlend": 0.6636,
-      "avgPr": 1.5589,
-      "totalBlend": 2.6542,
-      "clusterAuthorityScore": 1.6399,
-      "scoredFiles": 4,
+      "avgBlend": 0.8769,
+      "avgPr": 1.6464,
+      "totalBlend": 1.7537,
+      "clusterAuthorityScore": 1.6662,
+      "scoredFiles": 2,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
           "pageRank": 1.6746478680990662,
-          "karpathyBlend": 0.7115891472396265
+          "karpathyBlend": 0.8906088616221666
         },
         {
           "filePath": "src/lib/webgpu/wire-telemetry.ts",
-          "pageRank": 1.6181393953058545,
-          "karpathyBlend": 0.6881457581223418
-        },
-        {
-          "filePath": "src/lib/polyfills.ts",
-          "pageRank": 1.5941067673292453,
-          "karpathyBlend": 0.6763427069316981
-        },
-        {
-          "filePath": "src/lib/gpu/gpu-compute-pipeline.ts",
-          "pageRank": 1.3485853870574804,
-          "karpathyBlend": 0.5781341548229921
+          "pageRank": 1.6181393953058547,
+          "karpathyBlend": 0.8631309901247453
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
           "pageRank": 1.6746478680990662,
-          "karpathyBlend": 0.7115891472396265
+          "karpathyBlend": 0.8906088616221666
         },
         {
           "filePath": "src/lib/webgpu/wire-telemetry.ts",
-          "pageRank": 1.6181393953058545,
-          "karpathyBlend": 0.6881457581223418
-        },
-        {
-          "filePath": "src/lib/polyfills.ts",
-          "pageRank": 1.5941067673292453,
-          "karpathyBlend": 0.6763427069316981
-        },
-        {
-          "filePath": "src/lib/gpu/gpu-compute-pipeline.ts",
-          "pageRank": 1.3485853870574804,
-          "karpathyBlend": 0.5781341548229921
+          "pageRank": 1.6181393953058547,
+          "karpathyBlend": 0.8631309901247453
         }
       ]
     },
-    "clusterBlend": 0.6972
+    "clusterBlend": 0.8865
   },
   {
     "id": 46,
@@ -3988,35 +3898,35 @@
       }
     ],
     "somRow": 0,
-    "somCol": 4,
-    "somCluster": 4,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6943,
+      "maxBlend": 0.8801,
       "maxPr": 1.5968,
-      "avgBlend": 0.6943,
+      "avgBlend": 0.8801,
       "avgPr": 1.5968,
-      "totalBlend": 0.6943,
+      "totalBlend": 0.8801,
       "clusterAuthorityScore": 1.5968,
       "scoredFiles": 1,
       "totalFiles": 2,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/ai/langgraph-client.ts",
-          "pageRank": 1.596808787919871,
-          "karpathyBlend": 0.6942835151679485
+          "pageRank": 1.5968087879198707,
+          "karpathyBlend": 0.8801285314801472
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/ai/langgraph-client.ts",
-          "pageRank": 1.596808787919871,
-          "karpathyBlend": 0.6942835151679485
+          "pageRank": 1.5968087879198707,
+          "karpathyBlend": 0.8801285314801472
         }
       ]
     },
-    "clusterBlend": 0.6943
+    "clusterBlend": 0.8801
   },
   {
     "id": 60,
@@ -4176,16 +4086,16 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6892,
+      "maxBlend": 0.8753,
       "maxPr": 1.6162,
-      "avgBlend": 0.6892,
+      "avgBlend": 0.8753,
       "avgPr": 1.6162,
-      "totalBlend": 0.6892,
+      "totalBlend": 0.8753,
       "clusterAuthorityScore": 1.6162,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -4193,18 +4103,18 @@
         {
           "filePath": "src/lib/db/schema/ace-web.ts",
           "pageRank": 1.6161655316884023,
-          "karpathyBlend": 0.689156212675361
+          "karpathyBlend": 0.8753176058816773
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/db/schema/ace-web.ts",
           "pageRank": 1.6161655316884023,
-          "karpathyBlend": 0.689156212675361
+          "karpathyBlend": 0.8753176058816773
         }
       ]
     },
-    "clusterBlend": 0.6892
+    "clusterBlend": 0.8753
   },
   {
     "id": 92,
@@ -4371,36 +4281,36 @@
         "lineEnd": 140
       }
     ],
-    "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6806,
+      "maxBlend": 0.8543,
       "maxPr": 1.6043,
-      "avgBlend": 0.6806,
+      "avgBlend": 0.8543,
       "avgPr": 1.6043,
-      "totalBlend": 0.6806,
+      "totalBlend": 0.8543,
       "clusterAuthorityScore": 1.6043,
       "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.604292372321895,
-          "karpathyBlend": 0.680566948928758
+          "pageRank": 1.6042923723218951,
+          "karpathyBlend": 0.8542998612215914
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.604292372321895,
-          "karpathyBlend": 0.680566948928758
+          "pageRank": 1.6042923723218951,
+          "karpathyBlend": 0.8542998612215914
         }
       ]
     },
-    "clusterBlend": 0.6806
+    "clusterBlend": 0.8543
   },
   {
     "id": 14,
@@ -4460,30 +4370,18 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6784,
-      "maxPr": 1.5858,
-      "avgBlend": 0.6784,
-      "avgPr": 1.5858,
-      "totalBlend": 0.6784,
-      "clusterAuthorityScore": 1.5858,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 1,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/ai/client-embed.ts",
-          "pageRank": 1.585769,
-          "karpathyBlend": 0.678378
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/ai/client-embed.ts",
-          "pageRank": 1.585769,
-          "karpathyBlend": 0.678378
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6784
+    "clusterBlend": 0
   },
   {
     "id": 22,
@@ -4638,36 +4536,24 @@
         "lineEnd": 249
       }
     ],
-    "somRow": 4,
-    "somCol": 1,
-    "somCluster": 33,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6732,
-      "maxPr": 1.5415,
-      "avgBlend": 0.6732,
-      "avgPr": 1.5415,
-      "totalBlend": 0.6732,
-      "clusterAuthorityScore": 1.5415,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/cache-keys.ts",
-          "pageRank": 1.541511,
-          "karpathyBlend": 0.673184
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/cache-keys.ts",
-          "pageRank": 1.541511,
-          "karpathyBlend": 0.673184
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6732
+    "clusterBlend": 0
   },
   {
     "id": 96,
@@ -4839,35 +4725,23 @@
       }
     ],
     "somRow": 0,
-    "somCol": 5,
-    "somCluster": 5,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6732,
-      "maxPr": 1.5415,
-      "avgBlend": 0.6732,
-      "avgPr": 1.5415,
-      "totalBlend": 0.6732,
-      "clusterAuthorityScore": 1.5415,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/cache-keys.ts",
-          "pageRank": 1.541511,
-          "karpathyBlend": 0.673184
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/cache-keys.ts",
-          "pageRank": 1.541511,
-          "karpathyBlend": 0.673184
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6732
+    "clusterBlend": 0
   },
   {
     "id": 71,
@@ -4917,36 +4791,24 @@
         "lineEnd": 43
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6501,
-      "maxPr": 1.441,
-      "avgBlend": 0.6501,
-      "avgPr": 1.441,
-      "totalBlend": 0.6501,
-      "clusterAuthorityScore": 1.441,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 1,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/vector/multi-store.ts",
-          "pageRank": 1.441000137093923,
-          "karpathyBlend": 0.6501400548375692
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/vector/multi-store.ts",
-          "pageRank": 1.441000137093923,
-          "karpathyBlend": 0.6501400548375692
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6501
+    "clusterBlend": 0
   },
   {
     "id": 77,
@@ -5110,45 +4972,23 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6345,
-      "maxPr": 1.4571,
-      "avgBlend": 0.6225,
-      "avgPr": 1.4401,
-      "totalBlend": 1.8674,
-      "clusterAuthorityScore": 1.452,
-      "scoredFiles": 3,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/types/qdrant.ts",
-          "pageRank": 1.4571280075570074,
-          "karpathyBlend": 0.6345112030228031
-        },
-        {
-          "filePath": "src/lib/types/pipeline-v2.ts",
-          "pageRank": 1.4061468281303122,
-          "karpathyBlend": 0.5983687312521249
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/types/qdrant.ts",
-          "pageRank": 1.4571280075570074,
-          "karpathyBlend": 0.6345112030228031
-        },
-        {
-          "filePath": "src/lib/types/pipeline-v2.ts",
-          "pageRank": 1.4061468281303122,
-          "karpathyBlend": 0.5983687312521249
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6309
+    "clusterBlend": 0
   },
   {
     "id": 47,
@@ -5323,46 +5163,24 @@
         "lineEnd": 372
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.636,
-      "maxPr": 1.4564,
-      "avgBlend": 0.5768,
-      "avgPr": 1.3409,
-      "totalBlend": 1.1536,
-      "clusterAuthorityScore": 1.4217,
-      "scoredFiles": 2,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/legal/law-citations.ts",
-          "pageRank": 1.4563551360726619,
-          "karpathyBlend": 0.6360320544290649
-        },
-        {
-          "filePath": "src/routes/(app)/legal-corpus/+page.server.ts",
-          "pageRank": 1.225401594221733,
-          "karpathyBlend": 0.5175206376886932
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/legal/law-citations.ts",
-          "pageRank": 1.4563551360726619,
-          "karpathyBlend": 0.6360320544290649
-        },
-        {
-          "filePath": "src/routes/(app)/legal-corpus/+page.server.ts",
-          "pageRank": 1.225401594221733,
-          "karpathyBlend": 0.5175206376886932
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6183
+    "clusterBlend": 0
   },
   {
     "id": 78,
@@ -5529,36 +5347,24 @@
         "lineEnd": 9
       }
     ],
-    "somRow": 1,
-    "somCol": 6,
-    "somCluster": 14,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6154,
-      "maxPr": 1.4428,
-      "avgBlend": 0.6154,
-      "avgPr": 1.4428,
-      "totalBlend": 2.4616,
-      "clusterAuthorityScore": 1.4428,
-      "scoredFiles": 4,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/types/protocol.ts",
-          "pageRank": 1.4428226151366152,
-          "karpathyBlend": 0.6154090460546461
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/types/protocol.ts",
-          "pageRank": 1.4428226151366152,
-          "karpathyBlend": 0.6154090460546461
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6154
+    "clusterBlend": 0
   },
   {
     "id": 69,
@@ -5705,56 +5511,24 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 56,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6155,
-      "maxPr": 1.3848,
-      "avgBlend": 0.5855,
-      "avgPr": 1.3124,
-      "totalBlend": 1.7564,
-      "clusterAuthorityScore": 1.3631,
-      "scoredFiles": 3,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/routes/api/codebase-index/recommendations/+server.ts",
-          "pageRank": 1.3847979725648445,
-          "karpathyBlend": 0.6154791890259378
-        },
-        {
-          "filePath": "src/lib/server/ml/topic-clustering-worker.ts",
-          "pageRank": 1.3317674522607204,
-          "karpathyBlend": 0.5934869809042882
-        },
-        {
-          "filePath": "src/routes/api/codebase-index/cluster-detect/+server.ts",
-          "pageRank": 1.2207050178362284,
-          "karpathyBlend": 0.5474120071344913
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/routes/api/codebase-index/recommendations/+server.ts",
-          "pageRank": 1.3847979725648445,
-          "karpathyBlend": 0.6154791890259378
-        },
-        {
-          "filePath": "src/lib/server/ml/topic-clustering-worker.ts",
-          "pageRank": 1.3317674522607204,
-          "karpathyBlend": 0.5934869809042882
-        },
-        {
-          "filePath": "src/routes/api/codebase-index/cluster-detect/+server.ts",
-          "pageRank": 1.2207050178362284,
-          "karpathyBlend": 0.5474120071344913
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6065
+    "clusterBlend": 0
   },
   {
     "id": 21,
@@ -5933,46 +5707,24 @@
         "lineEnd": 207
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6125,
-      "maxPr": 1.4764,
-      "avgBlend": 0.5907,
-      "avgPr": 1.4058,
-      "totalBlend": 1.1815,
-      "clusterAuthorityScore": 1.4553,
-      "scoredFiles": 2,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/routes/(app)/simulation/+page.svelte",
-          "pageRank": 1.4764258896393145,
-          "karpathyBlend": 0.6125303558557258
-        },
-        {
-          "filePath": "src/lib/components/evidence/BoardSearchOverlay.svelte",
-          "pageRank": 1.3352671554733229,
-          "karpathyBlend": 0.5689668621893291
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/routes/(app)/simulation/+page.svelte",
-          "pageRank": 1.4764258896393145,
-          "karpathyBlend": 0.6125303558557258
-        },
-        {
-          "filePath": "src/lib/components/evidence/BoardSearchOverlay.svelte",
-          "pageRank": 1.3352671554733229,
-          "karpathyBlend": 0.5689668621893291
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.606
+    "clusterBlend": 0
   },
   {
     "id": 32,
@@ -6139,46 +5891,24 @@
         "lineEnd": 112
       }
     ],
-    "somRow": 3,
-    "somCol": 3,
-    "somCluster": 27,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6062,
-      "maxPr": 1.3756,
-      "avgBlend": 0.5976,
-      "avgPr": 1.3504,
-      "totalBlend": 1.7927,
-      "clusterAuthorityScore": 1.368,
-      "scoredFiles": 3,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/langextract-client.ts",
-          "pageRank": 1.3755573625743533,
-          "karpathyBlend": 0.6061729450297413
-        },
-        {
-          "filePath": "src/lib/server/analysis/entity-extraction.ts",
-          "pageRank": 1.3000643321527225,
-          "karpathyBlend": 0.580325732861089
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/langextract-client.ts",
-          "pageRank": 1.3755573625743533,
-          "karpathyBlend": 0.6061729450297413
-        },
-        {
-          "filePath": "src/lib/server/analysis/entity-extraction.ts",
-          "pageRank": 1.3000643321527225,
-          "karpathyBlend": 0.580325732861089
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6036
+    "clusterBlend": 0
   },
   {
     "id": 66,
@@ -6333,46 +6063,24 @@
         "lineEnd": 42
       }
     ],
-    "somRow": 3,
-    "somCol": 3,
-    "somCluster": 27,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6062,
-      "maxPr": 1.3756,
-      "avgBlend": 0.5932,
-      "avgPr": 1.3378,
-      "totalBlend": 1.1865,
-      "clusterAuthorityScore": 1.3642,
-      "scoredFiles": 2,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/langextract-client.ts",
-          "pageRank": 1.3755573625743533,
-          "karpathyBlend": 0.6061729450297413
-        },
-        {
-          "filePath": "src/lib/server/analysis/entity-extraction.ts",
-          "pageRank": 1.3000643321527225,
-          "karpathyBlend": 0.580325732861089
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/langextract-client.ts",
-          "pageRank": 1.3755573625743533,
-          "karpathyBlend": 0.6061729450297413
-        },
-        {
-          "filePath": "src/lib/server/analysis/entity-extraction.ts",
-          "pageRank": 1.3000643321527225,
-          "karpathyBlend": 0.580325732861089
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6023
+    "clusterBlend": 0
   },
   {
     "id": 52,
@@ -6535,76 +6243,24 @@
         "lineEnd": 312
       }
     ],
-    "somRow": 7,
-    "somCol": 5,
-    "somCluster": 61,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.6145,
-      "maxPr": 1.4451,
-      "avgBlend": 0.5732,
-      "avgPr": 1.3251,
-      "totalBlend": 4.0124,
-      "clusterAuthorityScore": 1.4091,
-      "scoredFiles": 7,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/stores/unified/toast-store.svelte.ts",
-          "pageRank": 1.4451185769617179,
-          "karpathyBlend": 0.6145274307846871
-        },
-        {
-          "filePath": "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts",
-          "pageRank": 1.3287386377994366,
-          "karpathyBlend": 0.5662654551197747
-        },
-        {
-          "filePath": "src/lib/stores/unified/index.svelte.ts",
-          "pageRank": 1.3236228583237653,
-          "karpathyBlend": 0.5787691433295061
-        },
-        {
-          "filePath": "src/lib/server/db/enhanced-vector-operations.ts",
-          "pageRank": 1.322985961666778,
-          "karpathyBlend": 0.5938743846667112
-        },
-        {
-          "filePath": "src/lib/ai/base64-fp32-quantizer.ts",
-          "pageRank": 1.322985961666778,
-          "karpathyBlend": 0.5638743846667112
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/stores/unified/toast-store.svelte.ts",
-          "pageRank": 1.4451185769617179,
-          "karpathyBlend": 0.6145274307846871
-        },
-        {
-          "filePath": "src/lib/server/db/enhanced-vector-operations.ts",
-          "pageRank": 1.322985961666778,
-          "karpathyBlend": 0.5938743846667112
-        },
-        {
-          "filePath": "src/lib/stores/unified/index.svelte.ts",
-          "pageRank": 1.3236228583237653,
-          "karpathyBlend": 0.5787691433295061
-        },
-        {
-          "filePath": "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts",
-          "pageRank": 1.3287386377994366,
-          "karpathyBlend": 0.5662654551197747
-        },
-        {
-          "filePath": "src/lib/ai/base64-fp32-quantizer.ts",
-          "pageRank": 1.322985961666778,
-          "karpathyBlend": 0.5638743846667112
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.6021
+    "clusterBlend": 0
   },
   {
     "id": 5,
@@ -6767,36 +6423,24 @@
         "lineEnd": 46
       }
     ],
-    "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.597,
-      "maxPr": 1.4028,
-      "avgBlend": 0.597,
-      "avgPr": 1.4028,
-      "totalBlend": 0.597,
-      "clusterAuthorityScore": 1.4028,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/components/ai/SimpleWorkingChat.svelte",
-          "pageRank": 1.4027811480573464,
-          "karpathyBlend": 0.5969624592229387
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/components/ai/SimpleWorkingChat.svelte",
-          "pageRank": 1.4027811480573464,
-          "karpathyBlend": 0.5969624592229387
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.597
+    "clusterBlend": 0
   },
   {
     "id": 9,
@@ -6932,35 +6576,23 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5918,
-      "maxPr": 1.3859,
-      "avgBlend": 0.5918,
-      "avgPr": 1.3859,
-      "totalBlend": 0.5918,
-      "clusterAuthorityScore": 1.3859,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/types/api.ts",
-          "pageRank": 1.3858523265444422,
-          "karpathyBlend": 0.5917809306177769
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/types/api.ts",
-          "pageRank": 1.3858523265444422,
-          "karpathyBlend": 0.5917809306177769
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5918
+    "clusterBlend": 0
   },
   {
     "id": 74,
@@ -7124,35 +6756,23 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5918,
-      "maxPr": 1.3859,
-      "avgBlend": 0.5918,
-      "avgPr": 1.3859,
-      "totalBlend": 0.5918,
-      "clusterAuthorityScore": 1.3859,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/types/api.ts",
-          "pageRank": 1.3858523265444422,
-          "karpathyBlend": 0.5917809306177769
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/types/api.ts",
-          "pageRank": 1.3858523265444422,
-          "karpathyBlend": 0.5917809306177769
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5918
+    "clusterBlend": 0
   },
   {
     "id": 61,
@@ -7204,30 +6824,18 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5902,
-      "maxPr": 1.3504,
-      "avgBlend": 0.5902,
-      "avgPr": 1.3504,
-      "totalBlend": 0.5902,
-      "clusterAuthorityScore": 1.3504,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 1,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/concurrency/advisory-locks.ts",
-          "pageRank": 1.3504076454616971,
-          "karpathyBlend": 0.5902330581846789
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/concurrency/advisory-locks.ts",
-          "pageRank": 1.3504076454616971,
-          "karpathyBlend": 0.5902330581846789
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5902
+    "clusterBlend": 0
   },
   {
     "id": 50,
@@ -7382,46 +6990,24 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5961,
-      "maxPr": 1.4006,
-      "avgBlend": 0.5673,
-      "avgPr": 1.3292,
-      "totalBlend": 1.1347,
-      "clusterAuthorityScore": 1.3792,
-      "scoredFiles": 2,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/components/ui/alert-dialog/AlertDialogTrigger.svelte",
-          "pageRank": 1.4006064922551873,
-          "karpathyBlend": 0.5960625969020749
-        },
-        {
-          "filePath": "src/lib/components/ui/input/Svelte5Input.svelte",
-          "pageRank": 1.2577297358649155,
-          "karpathyBlend": 0.5386118943459662
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/components/ui/alert-dialog/AlertDialogTrigger.svelte",
-          "pageRank": 1.4006064922551873,
-          "karpathyBlend": 0.5960625969020749
-        },
-        {
-          "filePath": "src/lib/components/ui/input/Svelte5Input.svelte",
-          "pageRank": 1.2577297358649155,
-          "karpathyBlend": 0.5386118943459662
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5874
+    "clusterBlend": 0
   },
   {
     "id": 43,
@@ -7588,36 +7174,24 @@
         "lineEnd": 110
       }
     ],
-    "somRow": 3,
-    "somCol": 3,
-    "somCluster": 27,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5832,
-      "maxPr": 1.3291,
-      "avgBlend": 0.5832,
-      "avgPr": 1.3291,
-      "totalBlend": 0.5832,
-      "clusterAuthorityScore": 1.3291,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/utils/vector-schemas.ts",
-          "pageRank": 1.3290792066528676,
-          "karpathyBlend": 0.583231682661147
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/utils/vector-schemas.ts",
-          "pageRank": 1.3290792066528676,
-          "karpathyBlend": 0.583231682661147
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5832
+    "clusterBlend": 0
   },
   {
     "id": 17,
@@ -7780,36 +7354,24 @@
         "lineEnd": 669
       }
     ],
-    "somRow": 3,
-    "somCol": 3,
-    "somCluster": 27,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5781,
-      "maxPr": 1.3486,
-      "avgBlend": 0.5781,
-      "avgPr": 1.3486,
-      "totalBlend": 1.1563,
-      "clusterAuthorityScore": 1.3486,
-      "scoredFiles": 2,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/gpu/gpu-compute-pipeline.ts",
-          "pageRank": 1.3485853870574804,
-          "karpathyBlend": 0.5781341548229921
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/gpu/gpu-compute-pipeline.ts",
-          "pageRank": 1.3485853870574804,
-          "karpathyBlend": 0.5781341548229921
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5781
+    "clusterBlend": 0
   },
   {
     "id": 35,
@@ -7968,46 +7530,24 @@
         "lineEnd": 93
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5797,
-      "maxPr": 1.3611,
-      "avgBlend": 0.5742,
-      "avgPr": 1.3479,
-      "totalBlend": 1.1485,
-      "clusterAuthorityScore": 1.3572,
-      "scoredFiles": 2,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/components/legal-ai/StatuteSearchBar.svelte",
-          "pageRank": 1.3611027076272957,
-          "karpathyBlend": 0.5796910830509183
-        },
-        {
-          "filePath": "src/lib/components/legal/GlossaryTermCard.svelte",
-          "pageRank": 1.334774794959255,
-          "karpathyBlend": 0.568769917983702
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/components/legal-ai/StatuteSearchBar.svelte",
-          "pageRank": 1.3611027076272957,
-          "karpathyBlend": 0.5796910830509183
-        },
-        {
-          "filePath": "src/lib/components/legal/GlossaryTermCard.svelte",
-          "pageRank": 1.334774794959255,
-          "karpathyBlend": 0.568769917983702
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5781
+    "clusterBlend": 0
   },
   {
     "id": 4,
@@ -8170,36 +7710,24 @@
         "lineEnd": 26
       }
     ],
-    "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5767,
-      "maxPr": 1.301,
-      "avgBlend": 0.5767,
-      "avgPr": 1.301,
-      "totalBlend": 0.5767,
-      "clusterAuthorityScore": 1.301,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/icons/yorha/index.ts",
-          "pageRank": 1.3009969458156199,
-          "karpathyBlend": 0.5766787783262479
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/icons/yorha/index.ts",
-          "pageRank": 1.3009969458156199,
-          "karpathyBlend": 0.5766787783262479
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5767
+    "clusterBlend": 0
   },
   {
     "id": 67,
@@ -8262,36 +7790,24 @@
         "lineEnd": 21
       }
     ],
-    "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5757,
-      "maxPr": 1.3207,
-      "avgBlend": 0.5757,
-      "avgPr": 1.3207,
-      "totalBlend": 1.7271,
-      "clusterAuthorityScore": 1.3207,
-      "scoredFiles": 3,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 3,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/components/ui/tabs/index.ts",
-          "pageRank": 1.3206875133093108,
-          "karpathyBlend": 0.5757050053237243
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/components/ui/tabs/index.ts",
-          "pageRank": 1.3206875133093108,
-          "karpathyBlend": 0.5757050053237243
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5757
+    "clusterBlend": 0
   },
   {
     "id": 73,
@@ -8462,36 +7978,24 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 1,
-    "somCol": 7,
-    "somCluster": 15,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5735,
-      "maxPr": 1.3102,
-      "avgBlend": 0.5735,
-      "avgPr": 1.3102,
-      "totalBlend": 0.5735,
-      "clusterAuthorityScore": 1.3102,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/retrieval/document-dag.ts",
-          "pageRank": 1.3101609732563335,
-          "karpathyBlend": 0.5735343893025334
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/retrieval/document-dag.ts",
-          "pageRank": 1.3101609732563335,
-          "karpathyBlend": 0.5735343893025334
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5735
+    "clusterBlend": 0
   },
   {
     "id": 83,
@@ -8654,36 +8158,24 @@
         "lineEnd": 8
       }
     ],
-    "somRow": 4,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 32,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5716,
-      "maxPr": 1.4019,
-      "avgBlend": 0.5716,
-      "avgPr": 1.4019,
-      "totalBlend": 0.5716,
-      "clusterAuthorityScore": 1.4019,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/routes/(app)/admin/dev-tools/+page.svelte",
-          "pageRank": 1.4018654938706188,
-          "karpathyBlend": 0.5715761975482475
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/routes/(app)/admin/dev-tools/+page.svelte",
-          "pageRank": 1.4018654938706188,
-          "karpathyBlend": 0.5715761975482475
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5716
+    "clusterBlend": 0
   },
   {
     "id": 8,
@@ -8838,66 +8330,24 @@
         "lineEnd": 216
       }
     ],
-    "somRow": 6,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 48,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5583,
-      "maxPr": 1.2559,
-      "avgBlend": 0.5557,
-      "avgPr": 1.2483,
-      "totalBlend": 2.2226,
-      "clusterAuthorityScore": 1.2536,
-      "scoredFiles": 4,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/routes/api/library/document/[id]/node/[nodeId]/+server.ts",
-          "pageRank": 1.255854803865188,
-          "karpathyBlend": 0.5583219215460753
-        },
-        {
-          "filePath": "src/routes/api/library/documents/[documentId]/toc/+server.ts",
-          "pageRank": 1.2558229504031504,
-          "karpathyBlend": 0.5583091801612602
-        },
-        {
-          "filePath": "src/routes/api/library/document/[id]/+server.ts",
-          "pageRank": 1.2558229504031504,
-          "karpathyBlend": 0.5583091801612602
-        },
-        {
-          "filePath": "src/routes/api/knowledge/document/[id]/+server.ts",
-          "pageRank": 1.2258267871308266,
-          "karpathyBlend": 0.5476907148523307
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/routes/api/library/document/[id]/node/[nodeId]/+server.ts",
-          "pageRank": 1.255854803865188,
-          "karpathyBlend": 0.5583219215460753
-        },
-        {
-          "filePath": "src/routes/api/library/documents/[documentId]/toc/+server.ts",
-          "pageRank": 1.2558229504031504,
-          "karpathyBlend": 0.5583091801612602
-        },
-        {
-          "filePath": "src/routes/api/library/document/[id]/+server.ts",
-          "pageRank": 1.2558229504031504,
-          "karpathyBlend": 0.5583091801612602
-        },
-        {
-          "filePath": "src/routes/api/knowledge/document/[id]/+server.ts",
-          "pageRank": 1.2258267871308266,
-          "karpathyBlend": 0.5476907148523307
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5575
+    "clusterBlend": 0
   },
   {
     "id": 27,
@@ -9060,36 +8510,24 @@
         "lineEnd": 155
       }
     ],
-    "somRow": 7,
-    "somCol": 2,
-    "somCluster": 58,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5514,
-      "maxPr": 1.2259,
-      "avgBlend": 0.5514,
-      "avgPr": 1.2259,
-      "totalBlend": 0.5514,
-      "clusterAuthorityScore": 1.2259,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/routes/api/persons-of-interest/[id]/+server.ts",
-          "pageRank": 1.2258592848309848,
-          "karpathyBlend": 0.5513637139323939
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/routes/api/persons-of-interest/[id]/+server.ts",
-          "pageRank": 1.2258592848309848,
-          "karpathyBlend": 0.5513637139323939
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5514
+    "clusterBlend": 0
   },
   {
     "id": 70,
@@ -9261,35 +8699,23 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5294,
-      "maxPr": 1.1861,
-      "avgBlend": 0.5294,
-      "avgPr": 1.1861,
-      "totalBlend": 0.5294,
-      "clusterAuthorityScore": 1.1861,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/tools/handlers/kbSearch.ts",
-          "pageRank": 1.186103843072463,
-          "karpathyBlend": 0.5294015372289852
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/tools/handlers/kbSearch.ts",
-          "pageRank": 1.186103843072463,
-          "karpathyBlend": 0.5294015372289852
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5294
+    "clusterBlend": 0
   },
   {
     "id": 38,
@@ -9424,36 +8850,24 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 5,
-    "somCluster": 61,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.5163,
-      "maxPr": 1.2083,
-      "avgBlend": 0.5163,
-      "avgPr": 1.2083,
-      "totalBlend": 0.5163,
-      "clusterAuthorityScore": 1.2083,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/stores/evidenceCommandCenter.store.svelte.ts",
-          "pageRank": 1.2083202266083763,
-          "karpathyBlend": 0.5162980906433505
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/stores/evidenceCommandCenter.store.svelte.ts",
-          "pageRank": 1.2083202266083763,
-          "karpathyBlend": 0.5162980906433505
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.5163
+    "clusterBlend": 0
   },
   {
     "id": 0,
@@ -9507,9 +8921,9 @@
         "lineEnd": 181
       }
     ],
-    "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9675,9 +9089,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 4,
-    "somCluster": 52,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9782,9 +9196,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 6,
-    "somCluster": 54,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -9925,9 +9339,9 @@
         "lineEnd": 1
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 56,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10202,9 +9616,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 7,
-    "somCluster": 55,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10413,9 +9827,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 3,
-    "somCluster": 51,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10545,9 +9959,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10744,9 +10158,9 @@
         "lineEnd": 294
       }
     ],
-    "somRow": 3,
-    "somCol": 4,
-    "somCluster": 28,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -10925,8 +10339,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11105,8 +10519,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11252,9 +10666,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11376,9 +10790,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
-    "somCol": 1,
-    "somCluster": 41,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11516,9 +10930,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 48,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11708,9 +11122,9 @@
         "lineEnd": 228
       }
     ],
-    "somRow": 1,
-    "somCol": 5,
-    "somCluster": 13,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11777,9 +11191,9 @@
         "lineEnd": 72
       }
     ],
-    "somRow": 5,
-    "somCol": 6,
-    "somCluster": 46,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11901,9 +11315,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 4,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 32,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -11965,8 +11379,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12100,9 +11514,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
-    "somCol": 1,
-    "somCluster": 41,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12217,9 +11631,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 3,
-    "somCluster": 51,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12357,9 +11771,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 2,
-    "somCluster": 26,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12473,9 +11887,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 1,
-    "somCluster": 49,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12580,9 +11994,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 7,
-    "somCluster": 55,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12658,9 +12072,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 4,
-    "somCluster": 28,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12842,9 +12256,9 @@
         "lineEnd": 106
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 56,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -12923,9 +12337,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13099,9 +12513,9 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 1,
-    "somCol": 3,
-    "somCluster": 11,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13193,9 +12607,9 @@
         "lineEnd": 29
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13316,9 +12730,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 2,
-    "somCluster": 26,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13496,9 +12910,9 @@
         "lineEnd": 994
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13567,9 +12981,9 @@
         "lineEnd": 169
       }
     ],
-    "somRow": 2,
-    "somCol": 6,
-    "somCluster": 22,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13802,9 +13216,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 2,
-    "somCluster": 58,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -13880,9 +13294,9 @@
         "lineEnd": 127
       }
     ],
-    "somRow": 7,
-    "somCol": 5,
-    "somCluster": 61,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14068,9 +13482,9 @@
         "lineEnd": 621
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14127,8 +13541,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14270,9 +13684,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14394,9 +13808,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 4,
-    "somCluster": 28,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14583,8 +13997,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14762,9 +14176,9 @@
         "lineEnd": 100
       }
     ],
-    "somRow": 6,
+    "somRow": 0,
     "somCol": 0,
-    "somCluster": 48,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -14886,9 +14300,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 4,
-    "somCol": 2,
-    "somCluster": 34,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -15005,9 +14419,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 7,
-    "somCluster": 63,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -15069,8 +14483,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 7,
-    "somCluster": 7,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -15188,9 +14602,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
@@ -15427,9 +14841,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 1,
-    "somCluster": 25,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8,
     "authority": {

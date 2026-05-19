@@ -230,6 +230,34 @@
 		background?: boolean;
 	} | null>(null);
 
+	// ── GRPO reward flush ────────────────────────────────────────────────────
+	let grpoQueueDepth  = $state<number | null>(null);
+	let grpoFlushing    = $state(false);
+	let grpoFlushResult = $state<{ rowCount: number; drainedEvents: number; filePath: string | null; durationMs: number } | null>(null);
+	let grpoFlushError  = $state<string | null>(null);
+
+	async function loadGrpoDepth() {
+		try {
+			const r = await fetch('/api/admin/grpo/flush');
+			if (r.ok) { const d = await r.json(); grpoQueueDepth = d.queueDepth ?? 0; }
+		} catch { /* non-fatal */ }
+	}
+
+	async function flushGrpo() {
+		grpoFlushing = true; grpoFlushResult = null; grpoFlushError = null;
+		try {
+			const r = await fetch('/api/admin/grpo/flush', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ batchSize: 500 }),
+			});
+			if (!r.ok) throw new Error(await r.text());
+			grpoFlushResult = await r.json();
+			grpoQueueDepth = 0;
+		} catch (e) { grpoFlushError = (e as Error).message; }
+		grpoFlushing = false;
+	}
+
 	// ── Predictive Todos (generate-todos post-graph pipeline) ────────────────
 	type PredictiveTodo = {
 		id: string;
@@ -1088,6 +1116,13 @@
 	$effect(() => {
 		if (activeSection === 'graph' && !graphStats && !graphLoading) {
 			fetch_graph();
+		}
+	});
+
+	// Load GRPO queue depth when Graph tab is opened
+	$effect(() => {
+		if (activeSection === 'graph' && grpoQueueDepth === null) {
+			void loadGrpoDepth();
 		}
 	});
 
@@ -3268,6 +3303,60 @@
 				<p class="agent-answer">{agentResult.answer}</p>
 			</div>
 		{/if}
+	</section>
+
+	<!-- ── GRPO Reward Queue ─────────────────────────────────────────────── -->
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="database" class="w-4 h-4" style="color:#f472b6" /> GRPO Reward Queue</span>
+			<span class="panel-sub">Reward events queued for JSONL export → fine-tune pipeline</span>
+		</div>
+
+		<div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap; margin-bottom:0.75rem">
+			<button class="btn-distill run" style="background:#7c3aed"
+				onclick={() => { void loadGrpoDepth(); }}
+				disabled={grpoFlushing}>
+				<Icon name="refresh-cw" class="w-3.5 h-3.5" /> Refresh
+			</button>
+			<button class="btn-distill run" onclick={flushGrpo} disabled={grpoFlushing}>
+				<Icon name="download" class="w-3.5 h-3.5" />
+				{grpoFlushing ? 'Flushing…' : 'Flush → JSONL'}
+			</button>
+			{#if grpoQueueDepth !== null}
+				<span style="font-size:0.8rem; color:#a1a1aa">
+					Queue depth: <strong style="color:#f472b6">{grpoQueueDepth.toLocaleString()}</strong> events
+				</span>
+			{/if}
+		</div>
+
+		{#if grpoFlushResult}
+			<div class="distill-result">
+				<span class="dr-item ok"><Icon name="check" class="w-3 h-3" /> {grpoFlushResult.rowCount} rows written</span>
+				<span class="dr-item"><Icon name="list" class="w-3 h-3" /> {grpoFlushResult.drainedEvents} events drained</span>
+				<span class="dr-item muted"><Icon name="clock" class="w-3 h-3" /> {grpoFlushResult.durationMs}ms</span>
+				{#if grpoFlushResult.filePath}
+					<span class="dr-item ok" style="font-size:0.62rem; word-break:break-all">{grpoFlushResult.filePath}</span>
+				{/if}
+			</div>
+		{/if}
+		{#if grpoFlushError}
+			<div class="distill-err">{grpoFlushError}</div>
+		{/if}
+
+		<table class="data-table" style="margin-top:0.5rem">
+			<thead><tr>
+				<th>Signal</th><th>Reward</th><th>Description</th>
+			</tr></thead>
+			<tbody>
+				<tr><td>thumbs_up</td><td style="color:#4ade80">+1.0</td><td>Explicit positive — strongest training signal</td></tr>
+				<tr><td>copy</td><td style="color:#4ade80">+0.7</td><td>User copied the response</td></tr>
+				<tr><td>dwell_long</td><td style="color:#86efac">+0.4</td><td>Dwell &gt;8 s on retrieved result</td></tr>
+				<tr><td>answer_served</td><td style="color:#a3e635">+0.1</td><td>Implicit — server completed response (overridden by explicit signal)</td></tr>
+				<tr><td>dwell_short</td><td style="color:#fbbf24">−0.3</td><td>Dwell &lt;2 s — likely irrelevant</td></tr>
+				<tr><td>reformulate</td><td style="color:#f87171">−0.5</td><td>User immediately rephrased</td></tr>
+				<tr><td>thumbs_down</td><td style="color:#ef4444">−1.0</td><td>Explicit negative — strongest negative signal</td></tr>
+			</tbody>
+		</table>
 	</section>
 
 	<!-- ── Glyph Atlas & Density ────────────────────────────────────────── -->

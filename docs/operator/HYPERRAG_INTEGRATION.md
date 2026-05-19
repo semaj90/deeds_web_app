@@ -79,6 +79,9 @@ npm run atlas:hyperrag:rerank -- --query "how does the kmeans-worker handle erro
 
 # 10. Execute E2E Multi-Lane retrieval synthesis trace (Semantic + Graph + Cache + 4D)
 npm run atlas:hyperrag:trace -- --query "explain the kmeans-worker implementation"
+
+# 11. Phase 18 Messy Query Routing Evaluation
+npm run atlas:messy-routing
 ```
 
 > [!IMPORTANT]

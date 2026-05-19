@@ -81,7 +81,7 @@ async function checkOllama(): Promise<{ ok: boolean; latencyMs: number; detail?:
   try {
     const { ENV } = await import('$lib/server/env.server.js');
     const t = Date.now();
-    const r = await fetch(`${ENV.OLLAMA_URL ?? 'http://localhost:11434'}/api/tags`, {
+    const r = await fetch(`${ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434'}/api/tags`, {
       signal: AbortSignal.timeout(3000),
     });
     const data = await r.json() as any;

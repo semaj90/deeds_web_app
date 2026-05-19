@@ -43,6 +43,7 @@ import {
 import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
 import { SYSTEM_YORHA_LEGAL } from '$lib/ai/prompts.js';
 import { sortByBestScore, assignRanks } from '$lib/server/types/retrieval.js';
+import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js';
 import {
   traceGraph,
   traceCache,
@@ -50,6 +51,14 @@ import {
   traceVectorSearch,
   traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
+
+const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 32768);
+const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
+const ACE_PACKET_TOKEN_CAP = Number(process.env.ACE_PACKET_TOKEN_CAP ?? '3500');
+const MCP_RESULT_TOKEN_CAP = Number(process.env.MCP_RESULT_TOKEN_CAP ?? '800');
+const OPENCODE_MAX_OUTPUT_TOKENS = Number(
+  process.env.OPENAI_MAX_OUTPUT_TOKENS ?? process.env.OPENCODE_MAX_OUTPUT_TOKENS ?? '2048'
+);
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithGemma4 } from '../retrieval/cross-encoder-reranker.js';
 import { applyTopologicalBoostAsync } from '../retrieval/topological-search.js';
@@ -63,6 +72,7 @@ import {
   queryHash,
   type ChunkHit,
 } from '$lib/server/analytics/search-analytics.js';
+import { selectAcePayloads } from '$lib/server/ace/ace-payload-selector.js';
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { embedText, embedTexts } from '$lib/server/embedding/embed.js';
 import { runRgAsync } from '../../../../scripts/rg-atlas/run-rg.mjs';
@@ -412,9 +422,9 @@ async function fetchWebResearchRows(
 // ctx-size aware retrieval limit: 3 at 16k, 5 at 32k, 8 at 64k
 // Effective context = model ctx - (MCP outputs + chat history + query) — stay conservative at 16k
 function getAdaptiveTopK(): number {
-  const ctx = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 16384);
+  const ctx = TURBO_CTX_SIZE;
   if (ctx >= 49152) return 8;
-  if (ctx >= 24576) return 5;
+  if (ctx >= 32768) return 5;
   return 3;
 }
 const ACP_MAX_RESULTS = getAdaptiveTopK();
@@ -1148,6 +1158,12 @@ export async function assembleACEContext(opts: {
   tokenAwarePacking?: boolean;
   statsOut?: Record<string, any>;
 }): Promise<ACEContext> {
+  if (opts.statsOut) {
+    opts.statsOut.topo_hit = false;
+    opts.statsOut.packet_hit = false;
+    opts.statsOut.top_k = getAdaptiveTopK();
+  }
+
   return traceGraph(
     'ace-assembly',
     { query: opts.query.slice(0, 100), caseId: opts.caseId, userId: opts.userId },
@@ -2185,6 +2201,18 @@ export async function assembleACEContext(opts: {
         codeLlmHit,
       };
 
+      // Build budget-filtered ACE payloads from all ranked hit sources.
+      // These are consumed by buildACEPrompt (payload discipline) and by the
+      // reward-event recorder in openai-facade (training data collection).
+      finalContext.acePayloads = selectAcePayloads(
+        [
+          ...(finalContext.kbChunks ?? []),
+          ...(finalContext.caseChunks ?? []),
+          ...(finalContext.ragChunks ?? []),
+        ],
+        { snippetCap: 300, totalBudget: 8000 }
+      );
+
       // Fire-and-forget: persist top chunks to ace_chunks for future cache hits
       if (caseId) {
         persistACEChunks(
@@ -2809,12 +2837,52 @@ async function setCachedACEBundle(
   } catch {}
 }
 
+function buildACEContextWeightsBlock(
+  attentionWeights: Array<{
+    chunk_id: string;
+    rank: number;
+    summary?: string;
+    tags?: string[];
+    cacheLayer?: string | null;
+    weights: {
+      attention_weight: number;
+      llm_synthesis_weight: number;
+    };
+  }>
+): string {
+  const lines = attentionWeights
+    .slice(0, 5)
+    .map((entry) => {
+      const chunkId = truncate(entry.chunk_id, 120);
+      const attentionWeight = entry.weights.attention_weight.toFixed(3);
+      const synthesisWeight = entry.weights.llm_synthesis_weight.toFixed(3);
+      const useLabel = entry.rank <= 3 ? 'primary evidence' : 'supporting evidence';
+      const metadata: string[] = [];
+      if (entry.tags?.length) {
+        metadata.push(`tags: ${entry.tags.slice(0, 4).join(', ')}`);
+      }
+      if (entry.cacheLayer) {
+        metadata.push(`cache: ${entry.cacheLayer}`);
+      }
+      const metaString = metadata.length ? ` ${metadata.join(' | ')}` : '';
+      const summaryLine = entry.summary ? `\n  summary: ${truncate(entry.summary, 110)}` : '';
+      return `- chunk_id: ${chunkId} llm_synthesis_weight: ${synthesisWeight} attention_weight: ${attentionWeight} use: ${useLabel}${metaString}${summaryLine}`;
+    })
+    .join('\n');
+
+  return `\n## ACE Context Weights\n${lines}\nUse higher-weight chunks first. Only the top 3–5 chunks should strongly influence the reasoning path; use lower-weight chunks only to resolve contradictions or fill factual gaps.`;
+}
+
 /**
  * Build ACE prompt with Redis caching (Stage 4 — ace_context_bundle).
  * Returns cached prompt if context fingerprint hasn't changed (2min TTL).
  * Falls through to sync buildACEPrompt() on cache miss.
  */
-export async function buildACEPromptCached(context: ACEContext, query: string): Promise<ACEPrompt> {
+export async function buildACEPromptCached(
+  context: ACEContext,
+  query: string,
+  statsOut?: Record<string, any>
+): Promise<ACEPrompt> {
   // P1-C: Fast pre-check using ace:query:{hash} written by multiLaneSearch.
   // Prepends file/symbol hints derived from prior queries with the same hash
   // so the model receives context faster — does NOT short-circuit full assembly.
@@ -2849,10 +2917,48 @@ export async function buildACEPromptCached(context: ACEContext, query: string): 
   const cached = await getCachedACEBundle(cacheKey);
   if (cached) {
     console.log(`[ACE Prompt] bundle cache HIT (key: ${fingerprint})`);
+    if (statsOut) {
+      statsOut.packet_hit = true;
+    }
     return cached;
   }
 
+  if (statsOut?.attention_weights?.length) {
+    (context as unknown as Record<string, unknown>).__attentionWeights = statsOut.attention_weights;
+  }
+
   const prompt = buildACEPrompt(context, query);
+  let acePacketTokens = countTokens(prompt.systemPrompt);
+  const chunkCount =
+    (context.ragChunks?.length ?? 0) +
+    (context.kbChunks?.length ?? 0) +
+    (context.caseChunks?.length ?? 0);
+  console.log({
+    stage: 'ace_packet',
+    tokens: acePacketTokens,
+    chunk_count: chunkCount,
+    top_k: statsOut?.top_k ?? getAdaptiveTopK(),
+    ace_packet_cap: ACE_PACKET_TOKEN_CAP,
+  });
+
+  if (acePacketTokens > ACE_PACKET_TOKEN_CAP) {
+    const clipped = enforceTokenBudget(prompt.systemPrompt, ACE_PACKET_TOKEN_CAP);
+    prompt.systemPrompt = clipped.text;
+    acePacketTokens = countTokens(prompt.systemPrompt);
+    console.warn({
+      stage: 'ace_packet_shrink',
+      original_tokens: acePacketTokens,
+      clipped_tokens: acePacketTokens,
+      chunk_count: chunkCount,
+      top_k: statsOut?.top_k ?? getAdaptiveTopK(),
+      ace_packet_cap: ACE_PACKET_TOKEN_CAP,
+    });
+    if (statsOut) {
+      statsOut.ace_packet_truncated = true;
+      statsOut.ace_packet_original_tokens = acePacketTokens;
+      statsOut.ace_packet_truncated_tokens = acePacketTokens;
+    }
+  }
 
   // Cache assembled prompt (2 min — invalidated when any input tier changes)
   setCachedACEBundle(cacheKey, prompt, 120).catch(() => {});
@@ -2872,6 +2978,23 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
 
   // 1. System instructions
   lines.push(SYSTEM_YORHA_LEGAL);
+
+  const attentionWeights = (
+    context as unknown as {
+      __attentionWeights?: Array<{
+        chunk_id: string;
+        rank: number;
+        weights: {
+          attention_weight: number;
+          llm_synthesis_weight: number;
+        };
+      }>;
+    }
+  ).__attentionWeights;
+  if (attentionWeights?.length) {
+    lines.push(buildACEContextWeightsBlock(attentionWeights));
+    confidenceFactors.attentionWeights = 0.7;
+  }
 
   // 1b. nes-arch path-first LLMS.md (renders FIRST so the model sees
   // directory conventions, audit warnings, and dominant tags before chunks).
@@ -4397,6 +4520,9 @@ export async function fetchCodebaseContext(
             qdrantCollectionEstimate: null,
             queryHash: qHash,
           });
+          if (statsOut) {
+            (statsOut as Record<string, unknown>).topo_hit = true;
+          }
           // Filter Qdrant to the class label stored in payload (e.g. "graph-gpu-topology")
           topoFilter = {
             must: [{ key: 'topo_class', match: { value: TOPO_CLASS_LABEL[queryClass] } }],
@@ -5020,7 +5146,7 @@ async function applyKarpathyBoost(
     const fileLookup = c.filePath
       ? c.filePath.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '')
       : '';
-    const fileScoreRaw = redisScores[c.relativePath ?? ''] || redisScores[c.filePath ?? ''];
+    const fileScoreRaw = redisScores[c.filePath ?? ''];
     let redisPageRankScore = 0;
     if (fileScoreRaw) {
       try {
@@ -5271,5 +5397,3 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
   }
   return null;
 }
-
-

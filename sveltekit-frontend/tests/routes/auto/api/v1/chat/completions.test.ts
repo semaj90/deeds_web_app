@@ -13,9 +13,13 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Add hoisted mocks here when handler logic is filled in:
-// const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
-// vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
+const mocks = vi.hoisted(() => ({
+  runChatCompletion: vi.fn(),
+}));
+
+vi.mock('$lib/server/ai/openai-facade.js', () => ({
+  runChatCompletion: mocks.runChatCompletion,
+}));
 
 describe('src/routes/api/v1/chat/completions/+server.ts', () => {
   describe('POST /api/v1/chat/completions', () => {
@@ -28,7 +32,20 @@ describe('src/routes/api/v1/chat/completions/+server.ts', () => {
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/api/v1/chat/completions', body !== undefined ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      return new Request(
+        'http://localhost/api/v1/chat/completions',
+        body !== undefined
+          ? {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            }
+          : {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({}),
+            }
+      );
     }
     function makeUrl() { return new URL('http://localhost/api/v1/chat/completions'); }
 
@@ -51,6 +68,44 @@ describe('src/routes/api/v1/chat/completions/+server.ts', () => {
     it.todo('400 — bad input shape returns degraded JSON envelope');
     it.todo('200 — happy path returns expected schema');
     it.todo('degraded — upstream failure returns same top-level shape with empty defaults');
+
+    it('200 — stream:true returns SSE response from cached or provider path', async () => {
+      mocks.runChatCompletion.mockResolvedValue({
+        id: 'chatcmpl-test',
+        object: 'chat.completion',
+        created: 1,
+        model: 'gemma4-legal-vlm:latest',
+        choices: [
+          {
+            index: 0,
+            message: { role: 'assistant', content: 'hello world' },
+            finish_reason: 'stop',
+          },
+        ],
+        usage: { prompt_tokens: 0, completion_tokens: 3, total_tokens: 3 },
+      });
+
+      const { POST } = (await import(
+        '../../../../../../src/routes/api/v1/chat/completions/+server.js'
+      )) as Record<string, unknown>;
+      const response = await (POST as typeof handler)({
+        request: makeReq({
+          model: 'yorha-legal',
+          messages: [{ role: 'user', content: 'hello' }],
+          stream: true,
+        }),
+        locals: { user: { id: 'u1' } },
+        url: makeUrl(),
+        params: {},
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get('content-type')).toContain('text/event-stream');
+      const bodyText = await response.text();
+      expect(bodyText).toContain('data: ');
+      expect(bodyText).toContain('[DONE]');
+      expect(mocks.runChatCompletion).toHaveBeenCalled();
+    });
   });
 
 });

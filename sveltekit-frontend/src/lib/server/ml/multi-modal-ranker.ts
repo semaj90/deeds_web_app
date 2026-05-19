@@ -115,7 +115,7 @@ export async function inferUserTopicPreferences(
 				createdAt: userInteractionHistory.createdAt
 			})
 			.from(userInteractionHistory)
-			.where(eq(userInteractionHistory.userId, userId))
+			.where(eq(userInteractionHistory.userId, Number(userId)))
 			.limit(100);
 
 		const now = Date.now();

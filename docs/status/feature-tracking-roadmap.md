@@ -37,6 +37,15 @@ The system has transitioned from a structural graph traversal model to an author
    - Integrate SOM/BMU clustering results into the retrieval ranker.
    - Launch `DeepResearchLane` for external grounding.
 
+### Phase F / Phase 18: Messy Query Routing Evaluation
+- Validate `router-first/tools-second` route selection for messy developer queries.
+- Align HyperRAG fallback decisions with Karpathy codebase indexing state:
+  - Qdrant `codebase_chunks_768`
+  - Redis `gpu:karpathy:scores`
+- Surface audit artifacts in `docs/reports/messy-query-routing-eval.json` and `docs/reports/messy-query-routing-eval.md`.
+- Engineering docs: `docs/operator/PHASE_18_MESSY_QUERY_ROUTING.md`.
+- Run via `npm run atlas:messy-routing` or the VS Code task `Messy Query Routing Evaluation`.
+
 ### Production Readiness Recommendations
 - **Database**: Ensure `pgvector` and `pg_trgm` are enabled in Postgres for hybrid search.
 - **Cache**: Increase Redis TTL for `rag:exact:*` hits to 24h for stable architectures.

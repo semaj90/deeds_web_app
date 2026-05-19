@@ -495,6 +495,11 @@
   "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts": [
     "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.test.ts"
   ],
+  "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.ts": [
+    "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
+    "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
+    "sveltekit-frontend/tests/agents-regen-writers.spec.ts"
+  ],
   "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.ts": [
     "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts"
   ],
@@ -560,6 +565,11 @@
     "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
     "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/rag/search.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/search/ace/+server.ts": [
+    "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/search/hyperrag/+server.ts": [
     "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts",
@@ -655,9 +665,6 @@
   ],
   "sveltekit-frontend/src/lib/server/agents/regen/telemetry.ts": [
     "sveltekit-frontend/tests/agents-regen-telemetry.spec.ts"
-  ],
-  "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.ts": [
-    "sveltekit-frontend/tests/agents-regen-writers.spec.ts"
   ],
   "sveltekit-frontend/tests/utils/seed-cases.ts": [
     "sveltekit-frontend/tests/ai-analysis-pipeline.spec.ts",
@@ -1293,7 +1300,7 @@
   "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": [
     "sveltekit-frontend/tests/openai-facade.spec.ts",
     "sveltekit-frontend/tests/openai-facade.spec.ts",
-    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/persons-of-interest/+server.ts": [
@@ -1340,6 +1347,9 @@
     "sveltekit-frontend/tests/routes/all-routes-page-server.test.ts",
     "sveltekit-frontend/tests/routes/all-routes-page-server.test.ts",
     "sveltekit-frontend/tests/routes/all-routes-page-server.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/context/compact-search/+server.ts": [
+    "sveltekit-frontend/tests/routes/api/ai/context-compact-search.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/ai/contextual-chat/+server.ts": [
     "sveltekit-frontend/tests/routes/api/ai/contextual-chat.spec.ts"

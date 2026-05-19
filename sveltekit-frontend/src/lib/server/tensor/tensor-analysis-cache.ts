@@ -10,7 +10,7 @@
  * Redis stores the full row as JSON so the common path avoids SQL entirely.
  */
 
-import db from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client.js';
 import { tensorAnalysisCache } from '$lib/server/db/schema/topology.js';
 import { eq, sql, or, and } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';

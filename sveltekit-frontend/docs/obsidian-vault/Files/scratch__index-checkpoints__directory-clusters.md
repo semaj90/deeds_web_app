@@ -4,7 +4,7 @@ path: "scratch/index-checkpoints/directory-clusters.json"
 aliases: ["directory-clusters.json","scratch/index-checkpoints/directory-clusters.json"]
 clusterId: -1
 ext: ".json"
-lineCount: 156279
+lineCount: 156347
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/scratch/index-checkpoints/directory-clusters.json"
-last_updated_by_llm: "2026-05-17T00:47:15.229Z"
+last_updated_by_llm: "2026-05-18T18:20:08.357Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/json","t/json"]
 > JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 156279
+lines:: 156347
 ## Summary
 
 JSON data file

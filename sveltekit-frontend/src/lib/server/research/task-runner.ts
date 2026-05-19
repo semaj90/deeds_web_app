@@ -71,7 +71,7 @@ async function persistResearchSummary(
       summary: answer.slice(0, 4000),
       entityTags: [],
       relevanceScore: 0.8,
-      userId: task?.userId ? parseInt(task.userId, 10) : null,
+      userId: task?.userId ?? null,
     })
     .returning({ id: researchSummaries.id });
 

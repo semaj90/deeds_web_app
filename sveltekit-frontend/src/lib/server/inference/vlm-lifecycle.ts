@@ -237,7 +237,8 @@ async function unloadOllamaModel(model: string): Promise<void> {
  * Polls the TurboQuant status/health endpoint until it responds with 200 OK or times out
  */
 async function waitForTurboQuant(port: number, maxSeconds: number): Promise<boolean> {
-  const url = `http://127.0.0.1:${port}/health`;
+  const { hostname, protocol } = new URL(ENV.TURBOQUANT_BASE_URL);
+  const url = `${protocol}//${hostname}:${port}/health`;
   const startTime = Date.now();
   const timeoutMs = maxSeconds * 1000;
   
