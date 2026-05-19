@@ -185,9 +185,11 @@ A separate small model guesses ahead; Gemma4 verifies in parallel.
   --flash-attn
 ```
 
-**Speed boost**: moderate (15–25% on matched vocabulary drafters)  
-**Requirement**: draft model must share Gemma4's vocabulary exactly — `gemma3-270m` is the safest candidate since it shares the Gemma tokenizer  
+**Speed boost**: moderate (15–25% on matched vocabulary drafters)
+**Requirement**: draft model must share Gemma4's vocabulary exactly — `gemma3-270m` is the safest candidate since it shares the Gemma tokenizer
 **Risk**: mismatched vocab causes rejection storms (0% acceptance) and actually slows down — verify with `--verbose` and check `draft_accepted / draft_total` ratio; target >60%
+
+`gpt-tokenizer` does not solve the draft-model compatibility problem. It is a BPE tokenizer/decoder used for token counting, chat token estimation, and context-budget checks, so it helps validate whether a prompt packet fits the window, but it does not make two GGUF weights compatible or improve speculative decoding acceptance by itself.
 
 When to use: you already have a small Gemma GGUF and want a quick win with no binary changes.
 
@@ -207,9 +209,11 @@ Multi-Token Prediction is **built into the Gemma4 model weights** as a separate 
   --flash-attn
 ```
 
-**Speed boost**: large (30–50% on RTX 3060 Ti)  
-**Requirement**: the Gemma4 checkpoint must have been trained with MTP enabled (the `test1111…/llama-cpp-turboquant-gemma4` fork adds D=256/512 kernel support; check whether it also ships `--mtp-head` support)  
+**Speed boost**: large (30–50% on RTX 3060 Ti)
+**Requirement**: the Gemma4 checkpoint must have been trained with MTP enabled (the `test1111…/llama-cpp-turboquant-gemma4` fork adds D=256/512 kernel support; check whether it also ships `--mtp-head` support)
 **Status**: not yet available for the current `gemma4-legal-vlm` weights — deferred until the MTP head is extractable from the HF checkpoint
+
+For this lane, `gpt-tokenizer` is still only useful as a budgeting helper: it can verify the compact packet that enters the decode stream, but it cannot add an MTP head or bridge a kernel/weight mismatch.
 
 ### Comparison
 
