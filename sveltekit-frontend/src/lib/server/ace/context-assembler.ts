@@ -2231,12 +2231,14 @@ export async function assembleACEContext(opts: {
           id: c.id,
           score: c.score,
           rerankScore: c.rerankScore ?? c.finalScore ?? null,
+          gpuCluster: c.gpuCluster ?? c.somCluster ?? null,
           somCluster: c.somCluster ?? null,
         })),
         ...finalContext.caseChunks.map((c) => ({
           id: c.id,
           score: c.score,
           rerankScore: c.rerankScore ?? c.finalScore ?? null,
+          gpuCluster: c.gpuCluster ?? c.somCluster ?? null,
           somCluster: c.somCluster ?? null,
         })),
       ];
@@ -2247,6 +2249,7 @@ export async function assembleACEContext(opts: {
             id: c.id,
             score: c.score,
             rerankScore: c.rerankScore ?? null,
+            gpuCluster: c.gpuCluster ?? c.somCluster ?? null,
             somCluster: c.somCluster ?? null,
           })),
           query,
@@ -2259,7 +2262,7 @@ export async function assembleACEContext(opts: {
           codebaseContext.map((c) => ({
             id: c.filePath,
             relativePath: c.filePath,
-            gpuCluster: c.gpuCluster ?? null,
+            gpuCluster: c.gpuCluster ?? c.somCluster ?? null,
             somCluster: c.somCluster ?? null,
             score: c.score,
             rerankScore: c.rerankBreakdown?.final,
@@ -5450,8 +5453,8 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
     const qdrant = new QdrantManager();
     const embedding = await embedText(query);
 
-    const results = await qdrant.client.search('feature_maps', {
-      vector: embedding,
+    const results = await qdrant.client.search(qdrant.collections.feature_maps, {
+      vector: { name: 'summary', vector: embedding },
       limit: 1,
       with_payload: true,
     });
@@ -5491,6 +5494,27 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
       };
     }
   } catch (err) {
+    const error = err as {
+      message?: string;
+      status?: number;
+      statusText?: string;
+      data?: { status?: { error?: string } };
+    };
+    const message = [
+      error.message,
+      error.statusText,
+      error.data?.status?.error,
+      typeof err === 'string' ? err : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+    if (
+      error.status === 404 ||
+      message.includes('Not Found') ||
+      message.includes("doesn't exist")
+    ) {
+      return null;
+    }
     console.warn('[ACE] FeatureContextPacket fetch failed:', err);
   }
   return null;

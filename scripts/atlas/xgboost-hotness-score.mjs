@@ -267,11 +267,13 @@ function normalizeByMax(arr, key) {
 
 function computeHotness(f) {
   return (
-    0.35 * (f.meanBlendNorm ?? 0) +
-    0.25 * (f.hitSignalNorm ?? 0) +
+    0.30 * (f.meanBlendNorm ?? 0) +
     0.20 * (f.pointCountNorm ?? 0) +
-    0.10 * (f.neighborCountNorm ?? 0) +
-    0.10 * (f.tagCountNorm ?? 0)
+    0.15 * (f.hitSignalNorm ?? 0) +
+    0.15 * (f.clusterPageRankNorm ?? 0) +
+    0.10 * (f.hyperedgeCountNorm ?? 0) +
+    0.05 * (f.meanAttn ?? 0) +
+    0.05 * (f.maxJaccard ?? 0)
   );
 }
 
@@ -321,6 +323,53 @@ async function main() {
   const karpathyMap = await loadKarpathyMap(redis);
   console.log(`[hotness] loaded ${karpathyMap.size / 2} Karpathy score entries from Redis`);
 
+  // --- Step 2.5: Load graph features from Redis ---
+  // a) CouchDB PageRank scores (plain string key, JSON object {[filePath]: {score: number}})
+  let prMap = {};
+  try {
+    const prRaw = await redis.get('couchdb:pagerank_scores');
+    if (prRaw) {
+      prMap = JSON.parse(prRaw);
+      console.log(`[hotness] step 2.5: loaded ${Object.keys(prMap).length} PageRank entries`);
+    } else {
+      console.warn('[hotness] step 2.5: couchdb:pagerank_scores absent — clusterPageRank will be 0');
+    }
+  } catch (err) {
+    console.warn('[hotness] step 2.5: failed to load PageRank scores (non-fatal):', err.message);
+  }
+
+  // b) Hyperedge data from hg:edge:idx ZSET + individual hg:edge:{hash} keys
+  const edgeList = []; // [{clusterA, clusterB}, ...]
+  try {
+    const edgeHashes = await redis.zrange('hg:edge:idx', 0, -1);
+    if (edgeHashes.length === 0) {
+      console.warn('[hotness] step 2.5: hg:edge:idx empty — hyperedge features will be 0');
+    } else {
+      const pipeline = redis.pipeline();
+      for (const hash of edgeHashes) {
+        pipeline.get(`hg:edge:${hash}`);
+      }
+      const results = await pipeline.exec();
+      for (const [err, raw] of results) {
+        if (err || !raw) continue;
+        try {
+          const edge = JSON.parse(raw);
+          // Support both snake_case and camelCase field names
+          const clusterA = edge.clusterA ?? edge.cluster_a ?? null;
+          const clusterB = edge.clusterB ?? edge.cluster_b ?? null;
+          if (clusterA != null && clusterB != null) {
+            edgeList.push({ clusterA, clusterB });
+          }
+        } catch {
+          // ignore malformed edge entries
+        }
+      }
+      console.log(`[hotness] step 2.5: loaded ${edgeList.length} hyperedges`);
+    }
+  } catch (err) {
+    console.warn('[hotness] step 2.5: failed to load hyperedge data (non-fatal):', err.message);
+  }
+
   // --- Build per-cluster feature structs ---
   const rawFeatures = [];
 
@@ -333,10 +382,30 @@ async function main() {
     const nFeatures = await getNeighborFeatures(redis, clusterId);
     const hFeatures = await getClusterHitFreq(pgPool, clusterId);
 
+    // Step 2.5: graph features — PageRank mean + hyperedge counts
+    const clusterPageRank = paths.length
+      ? paths.reduce((sum, p) => {
+          const stripped = p.replace(/^sveltekit-frontend\//, '');
+          const entry = prMap[p] ?? prMap[stripped];
+          return sum + (typeof entry?.score === 'number' ? entry.score : typeof entry === 'number' ? entry : 0);
+        }, 0) / paths.length
+      : 0;
+
+    const clusterEdges = edgeList.filter(
+      (e) => e.clusterA === clusterId || e.clusterB === clusterId
+    );
+    const hyperedgeCount = clusterEdges.length;
+    const crossEdges = clusterEdges.filter((e) => e.clusterA !== e.clusterB).length;
+    const hyperedgeCrossRate = crossEdges / (hyperedgeCount || 1);
+
     const feature = {
       ...kFeatures,
       ...nFeatures,
       ...hFeatures,
+      clusterPageRank,
+      hyperedgeCount,
+      crossEdges,
+      hyperedgeCrossRate,
     };
 
     rawFeatures.push(feature);
@@ -360,6 +429,9 @@ async function main() {
   features = normalizeByMax(features, 'hits24h');
   features = normalizeByMax(features, 'hits7d');
   features = normalizeByMax(features, 'languageCount');
+  // Step 2.5: normalize new graph dimensions
+  features = normalizeByMax(features, 'clusterPageRank');
+  features = normalizeByMax(features, 'hyperedgeCount');
 
   // --- Compute hotness ---
   features = features.map((f) => ({
