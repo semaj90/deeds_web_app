@@ -11,13 +11,16 @@
  * Usage:
  *   node scripts/turboquant/bench-model.mjs
  *   node scripts/turboquant/bench-model.mjs --label rotorquant --n 10
- *   node scripts/turboquant/bench-model.mjs --compare   (reads saved runs, prints table)
  *   node scripts/turboquant/bench-model.mjs --port 8091 --label my-run
+ *   node scripts/turboquant/bench-model.mjs --model gemma4-legal-vlm --mode vlm --label vlm
+ *   node scripts/turboquant/bench-model.mjs --mode text --label text-only
+ *   node scripts/turboquant/bench-model.mjs --auto-compare --baseline-model gemma4-legal.gguf --candidate-model gemma4-legal-iq4xs.gguf --port 8090 --n 5
+ *   node scripts/turboquant/bench-model.mjs --compare   (reads saved runs, prints table)
  *
  * Saves results to logs/turboquant/bench-<label>-<timestamp>.json
  */
 
-import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'fs';
+import { writeFileSync, mkdirSync, readdirSync, readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { performance } from 'perf_hooks';
@@ -35,9 +38,18 @@ const flag = (name, def) => {
 };
 const hasFlag = (name) => args.includes(name);
 
-const PORT    = flag('--port', process.env.TURBO_PORT ?? '8080');
-const LABEL   = flag('--label', `run-${Date.now()}`);
-const N       = parseInt(flag('--n', '5'), 10);
+const PORT = flag('--port', process.env.TURBO_PORT ?? '8080');
+const LABEL = flag('--label', `run-${Date.now()}`);
+const MODEL = flag('--model', process.env.BENCH_MODEL ?? 'local');
+const MODE = flag('--mode', 'text');
+const IMAGE = flag(
+  '--image',
+  join(ROOT, '..', 'scripts', 'tests', 'screenshots', 'cases-ui', 'poi-after-upload.png')
+);
+const N = parseInt(flag('--n', '5'), 10);
+const AUTO_COMPARE = hasFlag('--auto-compare');
+const BASELINE_MODEL = flag('--baseline-model', 'gemma4-legal.gguf');
+const CANDIDATE_MODEL = flag('--candidate-model', 'gemma4-legal-iq4xs.gguf');
 const COMPARE = hasFlag('--compare');
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
@@ -54,17 +66,32 @@ const PROMPTS = [
 ];
 
 // ── Single inference call ──────────────────────────────────────────────────────
-async function infer(prompt) {
+async function infer(prompt, model, mode = MODE) {
   const t0 = performance.now();
   let firstToken = null;
   let outputTokens = 0;
+
+  const content =
+    mode === 'vlm'
+      ? [
+          { type: 'text', text: prompt },
+          {
+            type: 'image_url',
+            image_url: { url: `data:image/png;base64,${readFileSync(IMAGE).toString('base64')}` },
+          },
+        ]
+      : prompt;
+
+  if (mode === 'vlm' && !existsSync(IMAGE)) {
+    throw new Error(`VLM image not found: ${IMAGE}`);
+  }
 
   const res = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'local',
-      messages: [{ role: 'user', content: prompt }],
+      model,
+      messages: [{ role: 'user', content }],
       max_tokens: 512,
       stream: true,
       temperature: 0.1,
@@ -78,7 +105,7 @@ async function infer(prompt) {
   const dec = new TextDecoder();
   let buf = '';
 
-  while (true) {
+  for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
     buf += dec.decode(value, { stream: true });
@@ -97,7 +124,9 @@ async function infer(prompt) {
           if (firstToken === null) firstToken = performance.now() - t0;
           outputTokens++;
         }
-      } catch { /* ignore malformed SSE chunk */ }
+      } catch {
+        /* ignore malformed SSE chunk */
+      }
     }
   }
 
@@ -111,19 +140,22 @@ async function ensureHealthy() {
     const res = await fetch(`${BASE_URL}/health`, { signal: AbortSignal.timeout(3_000) });
     if (!res.ok) throw new Error(`health ${res.status}`);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
 
 // ── Run benchmark ──────────────────────────────────────────────────────────────
-async function runBench() {
-  console.log(`\n📊 bench-model — label="${LABEL}", port=${PORT}, n=${N}`);
+async function runBench({ label = LABEL, model = MODEL, mode = MODE } = {}) {
+  console.log(`\n📊 bench-model — label="${label}", port=${PORT}, n=${N}, mode=${mode}`);
   console.log(`   Endpoint: ${BASE_URL}`);
+  if (mode === 'vlm') console.log(`   VLM image: ${IMAGE}`);
 
-  if (!await ensureHealthy()) {
+  if (!(await ensureHealthy())) {
     console.error(`\n❌  llama-server not healthy on ${BASE_URL}`);
-    console.error(`   Start it first: npm run turbo:start  (or turbo:start:rotorquant / turbo:start:atomicbot)`);
+    console.error(
+      `   Start it first: npm run turbo:start  (or turbo:start:rotorquant / turbo:start:atomicbot)`
+    );
     process.exit(1);
   }
   console.log(`   Server: healthy ✅\n`);
@@ -131,37 +163,44 @@ async function runBench() {
   // Probe model info
   let modelId = 'unknown';
   try {
-    const info = await fetch(`${BASE_URL}/v1/models`).then(r => r.json());
+    const info = await fetch(`${BASE_URL}/v1/models`).then((r) => r.json());
     modelId = info?.data?.[0]?.id ?? 'unknown';
-  } catch { /* not fatal */ }
+  } catch {
+    /* not fatal */
+  }
 
   const subset = PROMPTS.slice(0, Math.min(N, PROMPTS.length));
   // Pad to N if needed by repeating
   while (subset.length < N) subset.push(...PROMPTS.slice(0, N - subset.length));
 
   const results = [];
+  const activeModel = model || MODEL;
+
   for (let i = 0; i < subset.length; i++) {
     const prompt = subset[i];
     process.stdout.write(`  [${i + 1}/${subset.length}] inferring...`);
     try {
-      const r = await infer(prompt);
+      const r = await infer(prompt, activeModel, mode);
       const tps = r.outputTokens > 0 ? (r.outputTokens / (r.totalMs / 1000)).toFixed(1) : 'n/a';
       console.log(` TTFT=${r.ttftMs.toFixed(0)}ms  total=${r.totalMs.toFixed(0)}ms  tok/s=${tps}`);
       results.push({ prompt: prompt.slice(0, 40), ...r, tokPerSec: parseFloat(tps) || 0 });
-    } catch (e) {
-      console.log(` ERROR: ${e.message}`);
-      results.push({ prompt: prompt.slice(0, 40), error: e.message });
+    } catch (error) {
+      const msg = error?.message ?? String(error);
+      console.log(` ERROR: inference failed — ${msg}`);
+      results.push({ prompt: prompt.slice(0, 40), error: `inference failed: ${msg}` });
     }
   }
 
-  const ok = results.filter(r => !r.error);
-  const avgTtft   = ok.reduce((s, r) => s + r.ttftMs, 0) / (ok.length || 1);
-  const avgTotal  = ok.reduce((s, r) => s + r.totalMs, 0) / (ok.length || 1);
-  const avgTps    = ok.reduce((s, r) => s + r.tokPerSec, 0) / (ok.length || 1);
+  const ok = results.filter((r) => !r.error);
+  const avgTtft = ok.reduce((s, r) => s + r.ttftMs, 0) / (ok.length || 1);
+  const avgTotal = ok.reduce((s, r) => s + r.totalMs, 0) / (ok.length || 1);
+  const avgTps = ok.reduce((s, r) => s + r.tokPerSec, 0) / (ok.length || 1);
 
   console.log(`\n  ┌── Summary ──────────────────────────────────────`);
-  console.log(`  │  label     : ${LABEL}`);
+  console.log(`  │  label     : ${label}`);
+  console.log(`  │  request   : ${activeModel}`);
   console.log(`  │  model     : ${modelId}`);
+  console.log(`  │  mode      : ${mode}`);
   console.log(`  │  runs      : ${ok.length}/${results.length} ok`);
   console.log(`  │  avg TTFT  : ${avgTtft.toFixed(0)} ms`);
   console.log(`  │  avg total : ${avgTotal.toFixed(0)} ms`);
@@ -171,16 +210,42 @@ async function runBench() {
   // Persist
   mkdirSync(LOG_DIR, { recursive: true });
   const ts = new Date().toISOString().replace(/[:.]/g, '-');
-  const outPath = join(LOG_DIR, `bench-${LABEL}-${ts}.json`);
-  writeFileSync(outPath, JSON.stringify({
-    label: LABEL, modelId, port: PORT, n: N,
+  const outPath = join(LOG_DIR, `bench-${label}-${ts}.json`);
+  writeFileSync(
+    outPath,
+    JSON.stringify(
+      {
+        label: label,
+        modelId,
+        model: activeModel,
+        mode,
+        port: PORT,
+        n: N,
+        avgTtftMs: +avgTtft.toFixed(1),
+        avgTotalMs: +avgTotal.toFixed(1),
+        avgTokPerSec: +avgTps.toFixed(2),
+        okRuns: ok.length,
+        totalRuns: results.length,
+        runs: results,
+        timestamp: new Date().toISOString(),
+      },
+      null,
+      2
+    )
+  );
+  console.log(`  Saved: ${outPath}`);
+
+  return {
+    label,
+    model: activeModel,
+    modelId,
+    mode,
     avgTtftMs: +avgTtft.toFixed(1),
     avgTotalMs: +avgTotal.toFixed(1),
     avgTokPerSec: +avgTps.toFixed(2),
-    runs: results,
-    timestamp: new Date().toISOString(),
-  }, null, 2));
-  console.log(`  Saved: ${outPath}`);
+    okRuns: ok.length,
+    totalRuns: results.length,
+  };
 }
 
 // ── Compare saved runs ─────────────────────────────────────────────────────────
@@ -199,22 +264,98 @@ function compareSaved() {
   }).filter(Boolean).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
   console.log('\n📊 Benchmark comparison (sorted by time):');
-  console.log('  ' + ['Label'.padEnd(20), 'Model'.padEnd(24), 'TTFT(ms)'.padEnd(10), 'Total(ms)'.padEnd(12), 'Tok/s'].join('  '));
-  console.log('  ' + '─'.repeat(74));
+  console.log(
+    '  ' +
+      [
+        'Label'.padEnd(20),
+        'Model'.padEnd(24),
+        'Mode'.padEnd(6),
+        'TTFT(ms)'.padEnd(10),
+        'Total(ms)'.padEnd(12),
+        'Tok/s',
+      ].join('  ')
+  );
+  console.log('  ' + '─'.repeat(86));
   for (const r of runs) {
     const label = (r.label ?? 'unknown').padEnd(20);
     const model = (r.modelId ?? 'unknown').slice(0, 22).padEnd(24);
+    const mode = (r.mode ?? 'text').padEnd(6);
     const ttft  = String(r.avgTtftMs ?? 'n/a').padEnd(10);
     const total = String(r.avgTotalMs ?? 'n/a').padEnd(12);
     const tps   = String(r.avgTokPerSec ?? 'n/a');
-    console.log(`  ${label}  ${model}  ${ttft}  ${total}  ${tps}`);
+    console.log(`  ${label}  ${model}  ${mode}  ${ttft}  ${total}  ${tps}`);
   }
   console.log();
 }
 
 // ── Entry ────────────────────────────────────────────────────────────────────
+function printAutoCompareSummary(summaries) {
+  const byMode = summaries.reduce((acc, s) => {
+    const key = s.mode || 'text';
+    acc[key] = acc[key] || {};
+    acc[key][s.label] = s;
+    return acc;
+  }, {});
+
+  const baselineText = byMode.text?.['baseline-text'];
+  const candidateText = byMode.text?.['candidate-text'];
+  const baselineVlm = byMode.vlm?.['baseline-vlm'];
+  const candidateVlm = byMode.vlm?.['candidate-vlm'];
+
+  console.log('\n===== TEXT =====');
+  if (baselineText) console.log(`baseline: ${baselineText.avgTokPerSec.toFixed(1)} tok/s`);
+  if (candidateText) console.log(`iq4xs:    ${candidateText.avgTokPerSec.toFixed(1)} tok/s`);
+
+  console.log('\n===== VLM =====');
+  if (baselineVlm) console.log(`baseline: ${baselineVlm.avgTokPerSec.toFixed(1)} tok/s`);
+  if (candidateVlm) console.log(`iq4xs:    ${candidateVlm.avgTokPerSec.toFixed(1)} tok/s`);
+
+  const textDecision =
+    candidateText && baselineText && candidateText.avgTokPerSec >= baselineText.avgTokPerSec;
+  const vlmDecision = !!(
+    baselineVlm &&
+    candidateVlm &&
+    candidateVlm.okRuns === candidateVlm.totalRuns &&
+    baselineVlm.okRuns === baselineVlm.totalRuns
+  );
+  const promote = textDecision && vlmDecision;
+
+  console.log('\n===== DECISION =====');
+  if (promote) {
+    console.log('✔ promote IQ4_XS (text speed ok, VLM runs successful)');
+  } else {
+    console.log('❌ reject IQ4_XS for now');
+    if (!textDecision) console.log('  - text speed did not beat or match baseline');
+    if (!vlmDecision) console.log('  - VLM runs were not fully successful');
+  }
+}
+
+async function runAutoCompare() {
+  const sequence = [
+    { label: 'baseline-text', model: BASELINE_MODEL, mode: 'text' },
+    { label: 'candidate-text', model: CANDIDATE_MODEL, mode: 'text' },
+    { label: 'baseline-vlm', model: BASELINE_MODEL, mode: 'vlm' },
+    { label: 'candidate-vlm', model: CANDIDATE_MODEL, mode: 'vlm' },
+  ];
+
+  console.log('\n🚀 Auto-compare starting');
+  const summaries = [];
+  for (const item of sequence) {
+    summaries.push(await runBench(item));
+  }
+
+  console.log('\n🚀 Auto-compare complete — saved 4 benchmark files.\n');
+  printAutoCompareSummary(summaries);
+  compareSaved();
+}
+
 if (COMPARE) {
   compareSaved();
+} else if (AUTO_COMPARE) {
+  runAutoCompare().catch((e) => { console.error(e); process.exit(1); });
 } else {
-  runBench().catch(e => { console.error(e); process.exit(1); });
+  runBench().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
 }

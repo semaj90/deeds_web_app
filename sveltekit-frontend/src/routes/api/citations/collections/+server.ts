@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ locals, request }) => {
 			})
 			.from(citationCollections)
 			.leftJoin(collectionCitations, eq(collectionCitations.collectionId, citationCollections.id))
-			.where(eq(citationCollections.userId, locals.user.id))
+			.where(eq(citationCollections.userId, Number(locals.user.id)))
 			.groupBy(citationCollections.id)
 			.orderBy(citationCollections.createdAt);
 
@@ -75,7 +75,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		const [newCollection] = await db
 			.insert(citationCollections)
 			.values({
-				userId: locals.user.id,
+				userId: Number(locals.user.id),
 				name: parsed.data.name,
 				description: parsed.data.description ?? null,
 				color: parsed.data.color,

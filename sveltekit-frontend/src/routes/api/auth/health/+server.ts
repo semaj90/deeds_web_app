@@ -18,7 +18,7 @@ declare global {
 interface HealthWarning { code: string, message: string;
 }
 
-interface RecentSession { id: string, userId: string;
+interface RecentSession { id: string, userId: number | string;
  expiresAt: Date;
 }
 

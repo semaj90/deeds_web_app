@@ -31,7 +31,7 @@ export const MasterFeatureEntrySchema = z.object({
   stores: z.array(z.string()).describe('Datastores used (Redis, Qdrant, Neo4j, etc.)'),
   clusters: z.array(z.number()).describe('Topological cluster IDs associated with this feature'),
   status: FeatureStatusSchema,
-  params: z.record(z.any()).default({}),
+  params: z.record(z.string(), z.any()).default({}),
   pathMapping: z.array(z.string()).optional().describe('Relevant repository paths'),
   evidence: FeatureEvidenceSchema.optional(),
   failOpen: z.boolean().default(true).describe('Whether the system should continue if this feature fails')

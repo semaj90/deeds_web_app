@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
     .from(citationCollections)
     .leftJoin(collectionCitations, eq(collectionCitations.collectionId, citationCollections.id))
     .where(
-      and(eq(citationCollections.id, collectionId), eq(citationCollections.userId, locals.user.id))
+      and(eq(citationCollections.id, collectionId), eq(citationCollections.userId, Number(locals.user.id)))
     )
     .groupBy(citationCollections.id)
     .limit(1);
@@ -119,7 +119,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
       .where(
         and(
           eq(citationCollections.id, collectionId),
-          eq(citationCollections.userId, locals.user.id)
+          eq(citationCollections.userId, Number(locals.user.id))
         )
       )
       .limit(1);
@@ -162,7 +162,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
       .where(
         and(
           eq(citationCollections.id, collectionId),
-          eq(citationCollections.userId, locals.user.id)
+          eq(citationCollections.userId, Number(locals.user.id))
         )
       )
       .limit(1);

@@ -162,14 +162,23 @@
 	let hyperResult = $state<HyperRAGResult | null>(null);
 	let hyperError = $state('');
 	let hyperNoInfer = $state(false);
+	let phase18Loading = $state(false);
+	let phase18Error = $state('');
+	let phase18Report = $state<Record<string, unknown> | null>(null);
 	let hyperElapsedMs = $state(0);
+	let hyperTimedOut = $state(false);
 	let hyperAbortController: AbortController | null = null;
 	let hyperElapsedInterval: number | null = null;
+	let hyperTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
 	function clearHyperTimer() {
 		if (hyperElapsedInterval !== null) {
 			clearInterval(hyperElapsedInterval);
 			hyperElapsedInterval = null;
+		}
+		if (hyperTimeoutHandle !== null) {
+			clearTimeout(hyperTimeoutHandle);
+			hyperTimeoutHandle = null;
 		}
 	}
 
@@ -189,12 +198,19 @@
 		hyperError = '';
 		hyperResult = null;
 		hyperElapsedMs = 0;
+		hyperTimedOut = false;
 		hyperAbortController = new AbortController();
 		const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
 		if (typeof window !== 'undefined') {
 			hyperElapsedInterval = window.setInterval(() => {
 				hyperElapsedMs = Math.round((typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime);
 			}, 100);
+			// 60s cancel guard — abort automatically if pipeline stalls
+			hyperTimeoutHandle = setTimeout(() => {
+				hyperTimedOut = true;
+				hyperAbortController?.abort();
+				hyperAbortController = null;
+			}, 60_000);
 		}
 		try {
 			const r = await fetch('/api/admin/atlas/hyperrag', {
@@ -208,7 +224,9 @@
 			hyperResult = d;
 		} catch (e) {
 			if (e instanceof DOMException && e.name === 'AbortError') {
-				hyperError = 'HyperRAG request cancelled';
+				hyperError = hyperTimedOut
+					? 'HyperRAG timed out after 60s — pipeline stalled. Try a shorter query or check server logs.'
+					: 'HyperRAG request cancelled';
 			} else {
 				hyperError = String(e);
 			}
@@ -216,6 +234,26 @@
 			hyperRunning = false;
 			clearHyperTimer();
 			hyperAbortController = null;
+		}
+	}
+
+	async function loadPhase18Report() {
+		if (phase18Loading) return;
+		phase18Loading = true;
+		phase18Error = '';
+		phase18Report = null;
+		try {
+			const r = await fetch('/api/admin/atlas/messy-routing');
+			if (!r.ok) {
+				const d = await r.json().catch(() => ({}));
+				phase18Error = d.error ?? 'Failed to load Phase 18 report';
+				return;
+			}
+			phase18Report = await r.json();
+		} catch (e) {
+			phase18Error = String(e);
+		} finally {
+			phase18Loading = false;
 		}
 	}
 
@@ -358,8 +396,71 @@
 		}
 	}
 
+	// ── Cluster Search Panel ─────────────────────────────────────────────────
+	type SearchHit = {
+		id: string; score: number; filePath: string;
+		tags: string[]; cluster: string | null; somCluster: string | null; snippet: string;
+	};
+	let searchQuery       = $state('');
+	let searchTags        = $state<string[]>([]);
+	let searchTagInput    = $state('');
+	let searchClusters    = $state<number[]>([]);
+	let searchMultiQuery  = $state(false);
+	let searchLoading     = $state(false);
+	let searchResults     = $state<SearchHit[]>([]);
+	let searchMeta        = $state<{ queriesUsed: number; totalHits: number } | null>(null);
+	let synthesizeLoading = $state(false);
+	let synthesizeResult  = $state<{ clustersProcessed: number; durationMs: number } | null>(null);
+
+	function addSearchTag() {
+		const t = searchTagInput.trim();
+		if (t && !searchTags.includes(t)) searchTags = [...searchTags, t];
+		searchTagInput = '';
+	}
+
+	async function runClusterSearch() {
+		if (!searchQuery.trim()) return;
+		searchLoading = true;
+		searchResults = [];
+		searchMeta    = null;
+		try {
+			const r = await fetch('/api/admin/atlas/cluster-search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query:      searchQuery.trim(),
+					tags:       searchTags,
+					clusters:   searchClusters,
+					multiQuery: searchMultiQuery,
+					limit:      20,
+				}),
+			});
+			if (r.ok) {
+				const d = await r.json() as { results: SearchHit[]; queriesUsed: number; totalHits: number };
+				searchResults = d.results;
+				searchMeta    = { queriesUsed: d.queriesUsed, totalHits: d.totalHits };
+			}
+		} finally { searchLoading = false; }
+	}
+
+	async function runCouchSynthesize(dryRun: boolean) {
+		synthesizeLoading = true;
+		synthesizeResult  = null;
+		try {
+			const r = await fetch('/api/admin/atlas/couchdb-synthesize', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ maxClusters: 10, dryRun }),
+			});
+			if (r.ok) {
+				const d = await r.json() as { clustersProcessed: number; durationMs: number };
+				synthesizeResult = d;
+			}
+		} finally { synthesizeLoading = false; }
+	}
+
 	// ── Active Tab ────────────────────────────────────────────────────────────
-	type Tab = 'graph' | 'chunks' | 'trace' | 'cache' | 'turbovec' | 'couchdb' | 'hyperrag';
+	type Tab = 'graph' | 'chunks' | 'trace' | 'cache' | 'turbovec' | 'couchdb' | 'hyperrag' | 'search';
 	let activeTab = $state<Tab>('graph');
 
 	// ── Helpers ───────────────────────────────────────────────────────────────
@@ -639,6 +740,23 @@
 				<span class="font-bold">HYPERRAG_ERROR:</span> {hyperError}
 			</div>
 		{/if}
+		<button
+			onclick={loadPhase18Report}
+			disabled={phase18Loading}
+			class="w-full py-2 border border-[#5c594c] bg-[#1c1b18] hover:bg-[#2a3444] text-[#a39f90] hover:text-[#efede4] text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-30"
+		>
+			{phase18Loading ? 'LOADING_PHASE_18…' : 'LOAD_PHASE_18_REPORT'}
+		</button>
+		{#if phase18Error}
+			<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
+				<span class="font-bold">PHASE_18_ERROR:</span> {phase18Error}
+			</div>
+		{/if}
+		{#if phase18Report}
+			<div class="p-3 border border-[#3f3e37] bg-[#1c1b18]/60 text-xs text-[#d1d0c0] font-mono whitespace-pre-wrap overflow-x-auto max-h-72">
+				<pre>{JSON.stringify(phase18Report, null, 2)}</pre>
+			</div>
+		{/if}
 	</div>
 
 			<!-- Dynamic Parameter Indicators -->
@@ -850,7 +968,7 @@
 			<!-- Tabs Header -->
 			<div class="flex items-center justify-between px-4 py-2 border-b border-[#3f3e37] bg-[#23221c] z-10">
 				<div class="flex items-center gap-1.5">
-					{#each (['graph', 'chunks', 'trace', 'cache', 'turbovec', 'couchdb', 'hyperrag'] as Tab[]) as tab (tab)}
+					{#each (['graph', 'chunks', 'trace', 'cache', 'turbovec', 'couchdb', 'hyperrag', 'search'] as Tab[]) as tab (tab)}
 						<button
 							onclick={() => { activeTab = tab; if (tab === 'cache' && !cacheView) loadCache(); if (tab === 'turbovec' && !tvHealth) loadTurboVec(); if (tab === 'couchdb' && !couchDbStatus) loadCouchDb(); if (tab === 'hyperrag' && !hyperResult) runHyperRAG(); }}
 							class={`px-3 py-1 text-xs uppercase tracking-wider font-bold transition-all ${activeTab === tab ? 'bg-[#8b9dbb] text-[#1c1b18]' : 'text-[#a39f90] hover:text-[#efede4] hover:bg-[#313028]'} ${tab === 'hyperrag' ? 'border border-[#4a5568]' : ''} ${tab === 'hyperrag' && hyperRunning ? 'animate-pulse' : ''}`}
@@ -1373,6 +1491,122 @@
 				</div>
 			{/if}
 
+			<!-- ── Cluster Search Tab ────────────────────────────────────────────────── -->
+			{#if activeTab === 'search'}
+				<div class="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-[#d1cdb8]">
+
+					<!-- Query row -->
+					<div class="flex gap-2 items-start">
+						<input
+							bind:value={searchQuery}
+							onkeydown={(e) => e.key === 'Enter' && runClusterSearch()}
+							placeholder="search codebase clusters…"
+							class="flex-1 bg-[#1c1b18] border border-[#5c594c] text-[#efede4] px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-[#8b9dbb] placeholder:text-[#5c594c]"
+						/>
+						<label class="flex items-center gap-1.5 text-[0.65rem] text-[#a39f90] cursor-pointer select-none">
+							<input type="checkbox" bind:checked={searchMultiQuery} class="accent-[#8b9dbb]" />
+							MULTI_QUERY
+						</label>
+						<button
+							onclick={runClusterSearch}
+							disabled={searchLoading || !searchQuery.trim()}
+							class="px-3 py-1.5 border border-[#5c594c] bg-[#1c1b18] hover:bg-[#d1cdb8] hover:text-[#1c1b18] text-xs font-bold transition-all disabled:opacity-40"
+						>
+							{searchLoading ? 'SEARCHING…' : '[SEARCH]'}
+						</button>
+					</div>
+
+					<!-- Tag filter -->
+					<div class="space-y-1">
+						<div class="text-[#a39f90] text-[0.6rem] font-bold">CLUSTER TAGS</div>
+						<div class="flex gap-1.5 flex-wrap items-center">
+							{#each searchTags as tag}
+								<span class="inline-flex items-center gap-1 px-2 py-0.5 text-[0.6rem] border border-[#8b9dbb] text-[#8b9dbb] font-bold">
+									{tag}
+									<button onclick={() => { searchTags = searchTags.filter(t => t !== tag); }} class="hover:text-[#c25953]">×</button>
+								</span>
+							{/each}
+							<input
+								bind:value={searchTagInput}
+								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addSearchTag(); } }}
+								placeholder="add tag…"
+								class="bg-transparent border-b border-[#5c594c] text-[#efede4] px-1 py-0.5 text-[0.65rem] font-mono focus:outline-none focus:border-[#8b9dbb] w-28 placeholder:text-[#5c594c]"
+							/>
+						</div>
+					</div>
+
+					<!-- Meta row -->
+					{#if searchMeta}
+						<div class="text-[0.6rem] text-[#a39f90] flex gap-4">
+							<span>HITS: <span class="text-[#efede4] font-bold">{searchMeta.totalHits}</span></span>
+							<span>QUERIES_USED: <span class="text-[#efede4] font-bold">{searchMeta.queriesUsed}</span></span>
+						</div>
+					{/if}
+
+					<!-- Results -->
+					{#if searchResults.length > 0}
+						<div class="space-y-2">
+							{#each searchResults as hit}
+								<div class="border border-[#3f3e37] bg-[#1c1b18] p-3 space-y-1.5">
+									<div class="flex items-center justify-between gap-2">
+										<span class="text-[#8b9dbb] text-xs font-bold truncate">{hit.filePath || hit.id}</span>
+										<span class="text-[#8c9f7a] text-[0.6rem] font-bold shrink-0">
+											{hit.score.toFixed(4)}
+										</span>
+									</div>
+									<div class="flex flex-wrap gap-1">
+										{#if hit.cluster != null}
+											<span class="px-1.5 py-0.5 text-[0.55rem] border border-[#c8a635] text-[#c8a635] font-bold">GPU:{hit.cluster}</span>
+										{/if}
+										{#if hit.somCluster != null}
+											<span class="px-1.5 py-0.5 text-[0.55rem] border border-[#6b7f8b] text-[#6b7f8b]">SOM:{hit.somCluster}</span>
+										{/if}
+										{#each (hit.tags as string[]).slice(0, 5) as tag}
+											<span class="px-1.5 py-0.5 text-[0.55rem] border border-[#3f3e37] text-[#a39f90]">{tag}</span>
+										{/each}
+									</div>
+									{#if hit.snippet}
+										<div class="text-[#a39f90] text-[0.65rem] leading-relaxed border-l-2 border-[#3f3e37] pl-2 line-clamp-2">
+											{hit.snippet}
+										</div>
+									{/if}
+								</div>
+							{/each}
+						</div>
+					{:else if !searchLoading && searchMeta}
+						<div class="text-[#a39f90] text-xs">NO_RESULTS</div>
+					{/if}
+
+					<!-- CouchDB cluster synthesis -->
+					<div class="border-t border-[#3f3e37] pt-4 space-y-2">
+						<div class="text-[#a39f90] text-[0.6rem] font-bold">COUCHDB_MAPREDUCE_SYNTHESIS</div>
+						<p class="text-[0.6rem] text-[#5c594c]">Bootstrap `_design/cluster_synthesis` view and synthesize Gemma3 summaries per cluster into karpathy_wiki.</p>
+						<div class="flex gap-2">
+							<button
+								onclick={() => runCouchSynthesize(true)}
+								disabled={synthesizeLoading}
+								class="px-2.5 py-1 border border-[#5c594c] bg-[#1c1b18] text-[#a39f90] hover:text-[#efede4] text-xs font-bold transition-all disabled:opacity-40"
+							>
+								{synthesizeLoading ? '…' : '[DRY_RUN]'}
+							</button>
+							<button
+								onclick={() => runCouchSynthesize(false)}
+								disabled={synthesizeLoading}
+								class="px-2.5 py-1 border border-[#c8a635] bg-[#1c1b18] text-[#c8a635] hover:bg-[#c8a635] hover:text-[#1c1b18] text-xs font-bold transition-all disabled:opacity-40"
+							>
+								{synthesizeLoading ? 'RUNNING…' : '[SYNTHESIZE_10_CLUSTERS]'}
+							</button>
+						</div>
+						{#if synthesizeResult}
+							<div class="text-[0.65rem] text-[#8c9f7a]">
+								OK — {synthesizeResult.clustersProcessed} clusters processed in {synthesizeResult.durationMs}ms
+							</div>
+						{/if}
+					</div>
+
+				</div>
+			{/if}
+
 			<!-- ── HyperRAG Pipeline Results ───────────────────────────────────────── -->
 			{#if activeTab === 'hyperrag'}
 				<div class="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-[#d1cdb8]">
@@ -1380,13 +1614,14 @@
 						<div class="text-center py-12 text-[#8b9dbb]">
 							<div class="text-2xl font-bold uppercase mb-2 animate-pulse">⬡ HYPERRAG_EXEC…</div>
 							<p class="text-xs">Phases B→C→D→E running. Synthesis may take ~30s.</p>
-							<p class="text-xs mt-2 text-[#a39f90]">{(hyperElapsedMs / 1000).toFixed(1)}s elapsed</p>
-							{#if hyperElapsedMs >= 20000}
-								<button
-									onclick={cancelHyperRAG}
-									class="mt-4 px-4 py-1.5 border border-[#c25953]/60 bg-[#c25953]/10 hover:bg-[#c25953]/20 text-[#c25953] text-xs font-bold tracking-wider transition-all"
-								>[CANCEL]</button>
+							<p class="text-xs mt-2 text-[#a39f90]">{(hyperElapsedMs / 1000).toFixed(1)}s elapsed · auto-abort at 60s</p>
+							{#if hyperElapsedMs >= 30000}
+								<p class="text-xs mt-1 text-[#c8a635]">Taking longer than expected — server may be busy.</p>
 							{/if}
+							<button
+								onclick={cancelHyperRAG}
+								class="mt-4 px-4 py-1.5 border border-[#c25953]/60 bg-[#c25953]/10 hover:bg-[#c25953]/20 text-[#c25953] text-xs font-bold tracking-wider transition-all"
+							>[CANCEL]</button>
 						</div>
 					{:else if hyperError}
 						<div class="p-4 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-xs">

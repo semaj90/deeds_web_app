@@ -5243,6 +5243,235 @@ server.registerTool(
   }
 );
 
+// ── ace.compact_search ────────────────────────────────────────────────────────
+// Token-budgeted semantic + lexical search that returns a compact context tree
+// instead of raw chunks. Designed for agentic loops that must stay under a
+// model context window: each hit is a bounded snippet, the whole result fits in
+// a single MCP response, and a Redis cache (TTL 300s) prevents re-embedding on
+// repeated queries within the same session.
+//
+// Input schema matches the design spec in docs/CODEBASE_INDEXING_PIPELINE.md:
+//   query          — natural language search intent
+//   limit          — max hits (1–8, default 3 — matches getAdaptiveTopK() at 16k)
+//   tokenBudget    — total char budget for all snippets (default 1200 ≈ 300 tokens)
+//   includeFullText — include raw chunk text beyond snippet (default false)
+//   useCache       — check/write Redis ace:compact:{hash} (default true)
+//
+// Output shape:
+//   context_tree_id    — stable cache key for this result
+//   query              — echoed back for auditability
+//   hits[]             — ranked hits with chunkId, path, snippet, score, weights
+//   totalCharsEstimate — rough char count of snippets for budget accounting
+//   cacheHit           — true when result came from Redis
+//   nextAction         — suggested follow-up tool call
+
+server.registerTool(
+  'ace.compact_search',
+  {
+    description:
+      'Token-budgeted semantic search returning a compact context tree. ' +
+      'Use this instead of reading full files when you need focused retrieval within a token budget. ' +
+      'Checks Redis cache first (TTL 300s), then runs hybrid FTS + vector search, ' +
+      'applies Karpathy authority blend, and trims each snippet to fit tokenBudget.',
+    inputSchema: z.object({
+      query: z.string().min(1).max(2000).describe('Natural language search intent'),
+      limit: z.number().int().min(1).max(8).default(3).optional()
+        .describe('Max hits to return (1–8). Default 3 matches 16k context adaptive top_k.'),
+      tokenBudget: z.number().int().min(200).max(3000).default(1200).optional()
+        .describe('Total character budget for all snippets combined (default 1200 ≈ 300 tokens).'),
+      includeFullText: z.boolean().default(false).optional()
+        .describe('Include raw chunk text beyond the snippet (default false).'),
+      useCache: z.boolean().default(true).optional()
+        .describe('Check and write Redis ace:compact cache (TTL 300s, default true).'),
+    }),
+  },
+  async ({ query, limit = 3, tokenBudget = 1200, includeFullText = false, useCache = true }) => {
+    const t0 = Date.now();
+    const safeLimit = Math.max(1, Math.min(8, limit ?? 3));
+    const safeBudget = Math.max(200, Math.min(3000, tokenBudget ?? 1200));
+    const snippetCap = Math.floor(safeBudget / safeLimit);
+
+    // Stable cache key: query + limit + budget (budget affects snippet size)
+    const cacheKey = `ace:compact:${createHash('sha256')
+      .update(`${query.trim()}:${safeLimit}:${safeBudget}`)
+      .digest('hex')
+      .slice(0, 24)}`;
+
+    // ── 1. Redis cache check ─────────────────────────────────────────────────
+    if (useCache) {
+      try {
+        const redis = makeRedis();
+        await redis.connect().catch(() => {});
+        const hit = await redis.get(cacheKey).catch(() => null);
+        await redis.quit().catch(() => {});
+        if (hit) {
+          const cached = JSON.parse(hit) as Record<string, unknown>;
+          return {
+            content: [{
+              type: 'text' as const,
+              text: JSON.stringify({ ...cached, cacheHit: true, elapsedMs: Date.now() - t0 }, null, 2),
+            }],
+          };
+        }
+      } catch { /* non-fatal — proceed to live search */ }
+    }
+
+    // ── 2. Parallel FTS + embedding ──────────────────────────────────────────
+    const ftsPromise = pool.query<Record<string, unknown>>(
+      'SELECT * FROM search_code_lexical($1, $2, $3)',
+      [query, safeLimit * 3, null],
+    ).catch(() => ({ rows: [] as Record<string, unknown>[] }));
+
+    const embedPromise = getOrComputeEmbedding(query);
+
+    const qdrantPromise = embedPromise.then(({ embedding }) => {
+      if (!embedding.length) return { results: [] as Record<string, unknown>[] };
+      return fetch(`${SVELTEKIT}/api/code-intel/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, embedding, limit: safeLimit * 3 }),
+        signal: AbortSignal.timeout(10_000),
+      }).then(r => r.ok ? r.json() as Promise<{ results?: Record<string, unknown>[] }> : { results: [] })
+        .catch(() => ({ results: [] }));
+    });
+
+    // ── 3. Karpathy authority scores from Redis ──────────────────────────────
+    const karpathyPromise = (async () => {
+      try {
+        const redis = makeRedis();
+        await redis.connect().catch(() => {});
+        const raw = await redis.hgetall('gpu:karpathy:scores').catch(() => ({}));
+        await redis.quit().catch(() => {});
+        const scores: Record<string, number> = {};
+        for (const [k, v] of Object.entries(raw ?? {})) {
+          try {
+            const parsed = JSON.parse(v as string) as { blend?: number };
+            if (typeof parsed.blend === 'number') scores[k] = parsed.blend;
+          } catch { /* skip malformed */ }
+        }
+        return scores;
+      } catch { return {} as Record<string, number>; }
+    })();
+
+    const [pgRes, qdrantRes, embedResult, authorityScores] =
+      await Promise.all([ftsPromise, qdrantPromise, embedPromise, karpathyPromise]);
+
+    // ── 4. Merge + RRF blend ─────────────────────────────────────────────────
+    const merged = new Map<string, {
+      path: string;
+      text: string;
+      lexScore: number;
+      semScore: number;
+      authScore: number;
+      topoClass: string;
+      clusterKey: string;
+      sources: string[];
+    }>();
+
+    for (const r of pgRes.rows) {
+      const key = String(r.stable_key ?? r.file_path ?? '');
+      if (!key) continue;
+      merged.set(key, {
+        path:       String(r.file_path ?? r.stable_key ?? key),
+        text:       String(r.chunk_text ?? r.summary_text ?? r.content ?? ''),
+        lexScore:   Number(r.lexical_score ?? 0),
+        semScore:   0,
+        authScore:  authorityScores[key] ?? authorityScores[String(r.file_path ?? '')] ?? 0,
+        topoClass:  String(r.topo_class ?? ''),
+        clusterKey: String(r.cluster_key ?? ''),
+        sources:    ['fts'],
+      });
+    }
+
+    for (const r of (qdrantRes.results ?? [])) {
+      const key = String(r.stable_key ?? r.file_path ?? '');
+      if (!key) continue;
+      const ex = merged.get(key);
+      const semScore = Number(r.score ?? 0);
+      if (ex) {
+        ex.semScore = semScore;
+        ex.sources.push('qdrant');
+        if (!ex.text && r.content) ex.text = String(r.content);
+        if (!ex.topoClass && r.topo_class) ex.topoClass = String(r.topo_class);
+      } else {
+        merged.set(key, {
+          path:       String(r.file_path ?? key),
+          text:       String(r.content ?? ''),
+          lexScore:   0,
+          semScore,
+          authScore:  authorityScores[key] ?? authorityScores[String(r.file_path ?? '')] ?? 0,
+          topoClass:  String(r.topo_class ?? ''),
+          clusterKey: String(r.cluster_key ?? ''),
+          sources:    ['qdrant'],
+        });
+      }
+    }
+
+    // Karpathy blend: 0.45·lex + 0.35·sem + 0.20·authority
+    const ranked = Array.from(merged.entries())
+      .map(([key, v]) => ({
+        key,
+        ...v,
+        finalScore: v.lexScore * 0.45 + v.semScore * 0.35 + Math.min(v.authScore / 10, 1) * 0.20,
+      }))
+      .sort((a, b) => b.finalScore - a.finalScore)
+      .slice(0, safeLimit);
+
+    // ── 5. Build compact hits with snippet truncation ────────────────────────
+    const hits = ranked.map((r, i) => {
+      const snippet = r.text.replace(/\s+/g, ' ').trim().slice(0, snippetCap);
+      const entry: Record<string, unknown> = {
+        rank:      i + 1,
+        chunkId:   r.key,
+        path:      r.path,
+        snippet:   snippet.length < r.text.length ? snippet + '…' : snippet,
+        score:     Number(r.finalScore.toFixed(4)),
+        topoClass: r.topoClass || undefined,
+        sources:   r.sources,
+        weights: {
+          lex:       Number(r.lexScore.toFixed(4)),
+          semantic:  Number(r.semScore.toFixed(4)),
+          authority: Number((Math.min(r.authScore / 10, 1) * 0.20).toFixed(4)),
+        },
+      };
+      if (includeFullText && r.text.length > snippetCap) {
+        entry.fullText = r.text.slice(0, snippetCap * 4); // 4× budget cap for full text
+      }
+      return entry;
+    });
+
+    const totalCharsEstimate = hits.reduce((n, h) => n + String(h.snippet ?? '').length, 0);
+    const contextTreeId = `act:${cacheKey.slice(0, 16)}`;
+
+    const result: Record<string, unknown> = {
+      context_tree_id:    contextTreeId,
+      query,
+      hits,
+      totalCharsEstimate,
+      cacheHit:           false,
+      embedCached:        embedResult.cached,
+      elapsedMs:          Date.now() - t0,
+      nextAction:         hits.length > 0
+        ? `Use chunkId from hits[0] with context.get_compressed_card or read the path directly`
+        : `No hits — try broadening the query or use search.hybrid with mode=semantic-heavy`,
+    };
+
+    // ── 6. Write Redis cache ─────────────────────────────────────────────────
+    if (useCache) {
+      try {
+        const redis = makeRedis();
+        await redis.connect().catch(() => {});
+        await redis.setex(cacheKey, 300, JSON.stringify(result)).catch(() => {});
+        await redis.quit().catch(() => {});
+      } catch { /* non-fatal */ }
+    }
+
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+    };
+  }
+);
+
 nodeServer.listen(PORT, HOST, () => {
   console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
   console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');
@@ -5274,4 +5503,5 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       ops.gpu_pagerank (stream-queued PageRank, Redis shape-cache),');
   console.log('       ops.gpu_topk (GPU top-k index selection),');
   console.log('       ops.gpu_pipeline_stats (device config, queue depth, cache hit rate)');
+  console.log('       ace.compact_search (token-budgeted hybrid search → compact context tree, Redis TTL 300s)');
 });

@@ -50,6 +50,8 @@
   TURBO_CTX            default: 4096
   TURBO_NGL            default: 99
   MTP_HEAD_PATH        optional: path to .mtp sidecar file for AtomicBot --mtp-head speculative decoding
+  ENABLE_MTP_DRAFTER   optional: "true" enables speculative decoding benchmark lane when MTP_DRAFT_MODEL exists
+  MTP_DRAFT_MODEL      optional: path to a small compatible GGUF used only as a draft-model draft guesser
   LEGAL_LORA_PATH      optional: path to legal LoRA adapter GGUF (--lora injection for base-model GGUFs
                          like majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS that ship without the fine-tune)
   LEGAL_LORA_SCALE     optional: LoRA strength 0.0-1.0 (default 0.8; lower = more base, higher = more adapter)
@@ -82,10 +84,9 @@ if (Test-Path $envPath) {
             $name = $name.Trim()
             $value = $value.Trim().Trim('"').Trim("'")
             if (-not [string]::IsNullOrWhiteSpace($name)) {
-                # Only set if not already present in the environment (allows shell overrides)
-                if (-not (Test-Path "env:$name")) {
-                    [System.Environment]::SetEnvironmentVariable($name, $value)
-                }
+                # Load root .env as canonical launcher config for TurboQuant.
+                # This avoids stale shell env leaks such as an old TURBO_CTX value.
+                [System.Environment]::SetEnvironmentVariable($name, $value)
             }
         }
     }
@@ -116,7 +117,7 @@ $mmproj = if ($env:TURBO_MMPROJ_PATH) {
     else { $null }  # no fallback — set TURBO_MMPROJ_PATH or place file at models/mmproj-BF16.gguf
 }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
-$ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '4096' }
+$ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '32768' }
 
 # ── GPU Offload (NGL) ────────────────────────────────────────────────────
 $ngl = if ($env:TURBO_NGL) { $env:TURBO_NGL } else { "35" }
@@ -235,23 +236,41 @@ if ($turboRequested) {
   }
 }
 
-# ── Config Printout ──────────────────────────────────────────────────────
-$TurboDraftModel = $env:DRAFT_MODEL_PATH
-$TurboSpeculative = [bool]$TurboDraftModel
+# ── Speculative Draft Model Policy ───────────────────────────────────────
+$TurboDraftModel = $null
+$TurboSpeculative = $false
+
+if ($env:ENABLE_MTP_DRAFTER -and $env:ENABLE_MTP_DRAFTER.ToLower() -eq 'true') {
+  if ($env:MTP_DRAFT_MODEL) {
+    if (Test-Path $env:MTP_DRAFT_MODEL) {
+      $TurboDraftModel = $env:MTP_DRAFT_MODEL
+      $TurboSpeculative = $true
+    } else {
+      Write-Host ("Speculative decoding requested but MTP_DRAFT_MODEL not found at $($env:MTP_DRAFT_MODEL) — skipping") -ForegroundColor Yellow
+    }
+  } else {
+    Write-Host 'Speculative decoding requested but MTP_DRAFT_MODEL is not set — skipping' -ForegroundColor Yellow
+  }
+}
+
+if ($env:DRAFT_MODEL_PATH) {
+  Write-Host 'Deprecated DRAFT_MODEL_PATH is ignored by this launcher. Use ENABLE_MTP_DRAFTER=true and MTP_DRAFT_MODEL=<path> instead.' -ForegroundColor Yellow
+}
+
 $TurboFlashAttn = 'on' # Current script hardcodes -fa on
 
 Write-Host "`nTurboQuant resolved config:" -ForegroundColor Gray
 Write-Host "  URL:              http://127.0.0.1:$port"
 Write-Host "  Model:            $model"
+Write-Host "  Draft model:      $($TurboDraftModel ? $TurboDraftModel : 'none')"
+Write-Host "  Speculative:      $TurboSpeculative"
 Write-Host "  Context:          $ctxLen"
 Write-Host "  GPU layers:       $ngl"
 Write-Host "  Flash attention:  $TurboFlashAttn"
 Write-Host "  KV cache K:       $kvK"
 Write-Host "  KV cache V:       $kvV"
-Write-Host "  Speculative:      $TurboSpeculative"
-if ($TurboSpeculative) {
-    Write-Host "  Draft model:      $TurboDraftModel"
-}
+Write-Host "  Tokens/sec:       $($env:MEASURED_TOKENS_PER_SEC ? $env:MEASURED_TOKENS_PER_SEC : 'not measured')"
+Write-Host "  VRAM:             $($env:MEASURED_VRAM ? $env:MEASURED_VRAM : 'not measured')"
 
 # Diagnostic Warnings
 if ([string]::IsNullOrWhiteSpace($ngl) -or $ngl -eq "0") {
@@ -307,16 +326,17 @@ if ($kvProfile -eq 'atomicbot') {
     )
 }
 # ── Speculative Decoding: inject --model-draft for accelerated throughput ──
-if ($env:DRAFT_MODEL_PATH) {
-  if (Test-Path $env:DRAFT_MODEL_PATH) {
-    $draftN = if ($env:DRAFT_N) { $env:DRAFT_N } else { '5' }
-    Write-Host ("Speculative Decoding: --model-draft enabled ($($env:DRAFT_MODEL_PATH))") -ForegroundColor Cyan
-    Write-Host ("Speculative Decoding automatically disables vision/multimodal (--mmproj)") -ForegroundColor Yellow
-    $TextOnly = $true
-    $baseArgs = $baseArgs + @('--model-draft', $env:DRAFT_MODEL_PATH, '--draft', $draftN, '--n-gpu-layers-draft', '99')
-  } else {
-    Write-Host ("Speculative Decoding: DRAFT_MODEL_PATH set but file not found at $($env:DRAFT_MODEL_PATH) — skipping") -ForegroundColor Yellow
-  }
+if ($TurboDraftModel) {
+  Write-Host ("Speculative Decoding: --model-draft enabled ($TurboDraftModel)") -ForegroundColor Cyan
+  Write-Host ("Speculative Decoding automatically disables vision/multimodal (--mmproj)") -ForegroundColor Yellow
+  $TextOnly = $true
+  $baseArgs = $baseArgs + @(
+    '--model-draft', $TurboDraftModel,
+    '--draft-max', '8',
+    '--draft-min', '1',
+    '--draft-p-min', '0.6',
+    '--n-gpu-layers-draft', '99'
+  )
 }
 
 if (-not $TextOnly -and (Test-Path $mmproj)) {

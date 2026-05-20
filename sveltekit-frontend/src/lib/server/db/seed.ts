@@ -456,7 +456,7 @@ async function seed(): Promise<void> {
 			const reportRecords = [
 				{
 					caseId: caseRecord.id,
-					createdBy: String(userId),
+					createdBy: Number(userId),
 					title: `Initial Investigation Summary - ${caseRecord.caseNumber}`,
 					type: 'investigation_summary',
 					content: `
@@ -488,7 +488,7 @@ Investigation ongoing.
 				},
 				{
 					caseId: caseRecord.id,
-					createdBy: String(userId),
+					createdBy: Number(userId),
 					title: `Forensic Analysis - ${caseRecord.caseNumber}`,
 					type: 'forensic_analysis',
 					content: `

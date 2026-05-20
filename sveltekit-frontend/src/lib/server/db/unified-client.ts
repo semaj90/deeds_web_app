@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unified Database Client - Consolidation of Multiple Database Patterns
  * Combines patterns from client.ts, drizzle-vector-config.ts, and qdrant-integration.ts
  *
@@ -18,7 +18,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import path from 'path';
 import postgres from 'postgres';
-import * as schema from './schema-unified.js';
+import * as schema from './schema-postgres.js';
 import { ENV } from '$lib/server/env.server.js';
 
 // Define DocumentMetadata locally since it may not be exported from schema-unified
@@ -470,6 +470,6 @@ export const unifiedDb = {
     ensureCollection: (name: string, size?: number, distance?: 'Cosine' | 'Dot' | 'Euclid') => dbManager.ensureQdrantCollection(name, size, distance)
 };
 
-export * from './schema-unified.js';
+export * from './schema-postgres.js';
 export type { DatabaseConfig, DocumentMetadata, HybridSearchResult, VectorSearchOptions };
 export default unifiedDb;

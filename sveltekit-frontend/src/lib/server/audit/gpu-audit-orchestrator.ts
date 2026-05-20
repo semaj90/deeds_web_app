@@ -542,7 +542,7 @@ export async function persistAuditReport(report: AuditReport): Promise<string> {
     .insert(codebaseAuditReports)
     .values({
       caseId: report.caseId ?? null,
-      createdBy: report.createdBy || null,
+      createdBy: report.createdBy ? Number(report.createdBy) : null,
       reportType: 'codebase',
       cudaAvailable: cuda,
       gpuMemoryMb: mem.totalMB,

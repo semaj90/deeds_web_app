@@ -1,39 +1,39 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-18T08:27:52.934Z
+Generated: 2026-05-19T01:55:46.324Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 32886 |
-| Total edges | 76350 |
-| Resolved edges | 7351 |
-| Unresolved (local) | 8461 |
-| External refs | 58835 |
+| Nodes | 32959 |
+| Total edges | 76449 |
+| Resolved edges | 7361 |
+| Unresolved (local) | 8468 |
+| External refs | 58917 |
 | Neighborhoods computed | 100 |
-| Test-covered files | 819 |
+| Test-covered files | 821 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 26560 |
-| script | 3904 |
-| test | 1265 |
+| shared | 26071 |
+| script | 4462 |
+| test | 1269 |
 | types | 1017 |
 | config | 140 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 61352 |
-| test_covers_file | 4109 |
-| redis_dependency | 2940 |
+| imports_static | 61431 |
+| test_covers_file | 4120 |
+| redis_dependency | 2944 |
 | imports_dynamic | 2227 |
 | exports_from | 1756 |
 | env_dependency | 1723 |
-| qdrant_dependency | 1117 |
+| qdrant_dependency | 1118 |
 | neo4j_dependency | 423 |
-| mcp_tool_calls | 414 |
-| db_dependency | 286 |
+| mcp_tool_calls | 417 |
+| db_dependency | 287 |
 | svelte_route_uses_loader | 3 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
@@ -58,4 +58,4 @@ Generated: 2026-05-18T08:27:52.934Z
 | 17 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
 | 18 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
 | 19 | `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts` | shared | 27 | 1 |
-| 20 | `deeds_labs/dead-scripts/phase-scripts/phase90-enhanced-ast-fixer.mjs` | shared | 24 | 0 |
+| 20 | `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` | shared | 25 | 1 |

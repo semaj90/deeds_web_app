@@ -13,9 +13,9 @@
       }
     },
     "trace-mcp": {
-      "command": "node",
+      "command": "npx",
       "args": [
-        "--loader", "ts-node/esm",
+        "tsx",
         "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
       ],
       "env": {

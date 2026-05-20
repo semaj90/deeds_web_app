@@ -727,7 +727,7 @@
 
 	.sidebar-nav button.active {
 		background: var(--t-accent-gradient);
-		color: #white;
+		color: white;
 		box-shadow: 0 4px 16px rgba(168, 85, 247, 0.25);
 	}
 

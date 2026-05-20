@@ -1,4 +1,4 @@
-import { getRedis } from '$lib/server/redis.js';
+﻿import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -20,7 +20,7 @@ import { HypergraphRoutingService } from '$lib/server/retrieval/hypergraph-routi
 import { QueryProfileRouter, getClusterAlias } from '$lib/server/retrieval/query-profile-router.js';
 import { RoutingExplanationBuilder, type RoutingExplanation } from '$lib/server/retrieval/routing-explanation.js';
 import { getRouteClusterPriors } from '$lib/server/atlas/route-feature-map.js';
-import { ContextPacketBudgeter } from '$lib/server/ace/context-packet-budgeter.js';
+import { ContextPacketBudgeter, DEFAULT_BUDGET, type ContextBudget } from '$lib/server/ace/context-packet-budgeter.js';
 import { logAceRun } from '$lib/server/retrieval/ace-retrieval-logger.js';
 import { ColdStorageRetrievalService } from '$lib/server/retrieval/cold-storage-retrieval-service.js';
 import { execFileSync } from 'node:child_process';
@@ -48,6 +48,7 @@ export type HyperRagQuery = {
   useTurboVec?: boolean;
   useGraph?: boolean;
   useAceCache?: boolean;
+  tokenBudget?: number;
   userId?: string;
 };
 
@@ -57,20 +58,20 @@ export type HyperRagHit = {
   title?: string;
   text?: string;
   score: number;
-    signals: {
-      dense?: number;
-      graphAuthority?: number;
-      clusterMatch?: number;
-      pagerank?: number;
+  signals: {
+    dense?: number;
+    graphAuthority?: number;
+    clusterMatch?: number;
+    pagerank?: number;
     aceBoost?: number;
     turbovec?: number;
     topoClass?: string;
     lexicalBoost?: number;
-      taskBoost?: number;
-      activity_w?: number;
-      cluster_alias?: string;
-      recencyOrHitRate?: number;
-    };
+    taskBoost?: number;
+    activity_w?: number;
+    cluster_alias?: string;
+    recencyOrHitRate?: number;
+  };
   manifold4?: [number, number, number, number];
   manifold4Meta?: {
     som_x: number;
@@ -143,8 +144,27 @@ export class HyperRagFusionService {
       topologyTopK = 3,
       clusterField = 'gpu_cluster',
       useTaskDistillates = true,
+      tokenBudget,
       userId,
     } = params;
+
+    const effectiveTopK = tokenBudget
+      ? Math.max(2, Math.min(topK, Math.floor(tokenBudget / 450)))
+      : topK;
+    const effectiveTopologyTopK = tokenBudget
+      ? Math.max(1, Math.min(topologyTopK, Math.floor(tokenBudget / 800)))
+      : topologyTopK;
+
+    const contextBudget: ContextBudget = tokenBudget
+      ? {
+          maxTokens: tokenBudget,
+          maxTaskDistillates: tokenBudget < 1800 ? 1 : 2,
+          maxClusterCards: tokenBudget < 1800 ? 1 : 3,
+          maxGraphPaths: tokenBudget < 1800 ? 3 : 8,
+          maxRawChunks: Math.max(2, Math.min(DEFAULT_BUDGET.maxRawChunks, Math.floor(tokenBudget / 350))),
+          maxCitations: tokenBudget < 2000 ? 10 : 20,
+        }
+      : DEFAULT_BUDGET;
 
     const redis = typeof getRedis === 'function' ? getRedis() : null;
     const qdrantUrl = ENV.QDRANT_URL;
@@ -177,19 +197,21 @@ export class HyperRagFusionService {
         didYouMean: engramHint.didYouMean,
         bmuHints: engramHint.bmuHints,
         clusterHints: engramHint.clusterHints,
-        trust: 'low_hint'
+        trust: 'low_hint',
       });
     }
-    
+
     // Merge Profile Priors with Route Priors (if path is in query or passed in params)
     const profilePriors = QueryProfileRouter.getPriors(profile);
     const routePriors = getRouteClusterPriors(query); // Heuristic: check if query is a route
     const consolidatedPriors = [...new Set([...profilePriors, ...routePriors])];
-    
+
     explanation.setProfileClusters(consolidatedPriors);
     explanation.setProfileClusterAliases(consolidatedPriors);
 
-    const variants = useAceCache ? await MultiQueryGenerator.generate(query, 3).catch(() => [query]) : [query];
+    const variants = useAceCache
+      ? await MultiQueryGenerator.generate(query, 3).catch(() => [query])
+      : [query];
 
     const embedding = await generateSingleEmbedding(query).catch(() => null);
     if (!embedding) {
@@ -198,19 +220,23 @@ export class HyperRagFusionService {
 
     const clusterMatch = useAceCache ? await nearestCluster(embedding, 20).catch(() => null) : null;
     if (clusterMatch?.clusterId) explanation.addRedisCard(clusterMatch.clusterId);
-    
+
     const routingService = HypergraphRoutingService.getInstance();
-    
+
     // 2. Multi-Lane Discovery (Lane 0: Lexical, Lane 1: Topology, Lane 3: Task)
     const [lexicalHits, routing, taskDistillate] = await Promise.all([
       this.discoverLexicalClusters(query).catch(() => []),
-      useTopologyRouting ? routingService.route(embedding, query, topologyTopK) : Promise.resolve(null),
-      useTaskDistillates ? this.searchTaskDistillates(embedding, 1).catch(() => null) : Promise.resolve(null),
+      useTopologyRouting
+        ? routingService.route(embedding, query, topologyTopK)
+        : Promise.resolve(null),
+      useTaskDistillates
+        ? this.searchTaskDistillates(embedding, 1).catch(() => null)
+        : Promise.resolve(null),
       // Lane 4: Cold Storage (Postgres fallback)
-      ColdStorageRetrievalService.search(embedding, topK).catch(() => [])
+      ColdStorageRetrievalService.search(embedding, topK).catch(() => []),
     ]);
 
-    const lexicalClusterIds = lexicalHits.map(h => h.clusterId);
+    const lexicalClusterIds = lexicalHits.map((h) => h.clusterId);
     if (lexicalClusterIds.length > 0) explanation.setLexicalClusters(lexicalClusterIds);
     if (routing?.clusterIds.length) {
       provenance.topologyRouting = true;
@@ -228,20 +254,26 @@ export class HyperRagFusionService {
       ...(lexicalClusterIds || []),
       ...(routing?.clusterIds || []),
       ...(consolidatedPriors || []),
-      ...(taskDistillate?.clusters?.map((c: string) => parseInt(c, 10)) || [])
+      ...(taskDistillate?.clusters?.map((c: string) => parseInt(c, 10)) || []),
     ]);
-    
+
     explanation.setFinalClusters(Array.from(allClusterIds));
-    const hgFilter = allClusterIds.size > 0 ? { must: [{ key: clusterField, match: { any: Array.from(allClusterIds) } }] } : null;
+    const hgFilter =
+      allClusterIds.size > 0
+        ? { must: [{ key: clusterField, match: { any: Array.from(allClusterIds) } }] }
+        : null;
 
     const targetCollection = this.getCollectionForMode(mode);
 
     // 2.2 Parallel lane retrieval with Fallback Ladder
-    const minHits = Math.min(3, topK);
+    const minHits = Math.min(3, effectiveTopK);
     const filterLadder = [
       { name: 'strict_cluster', filter: hgFilter },
-      { name: 'topology_only', filter: routing ? routingService.buildFilter(routing, clusterField) : null },
-      { name: 'unfiltered', filter: null }
+      {
+        name: 'topology_only',
+        filter: routing ? routingService.buildFilter(routing, clusterField) : null,
+      },
+      { name: 'unfiltered', filter: null },
     ];
 
     let qdrantSemantic: HyperRagHit[] = [];
@@ -253,29 +285,56 @@ export class HyperRagFusionService {
 
     // Execute non-Qdrant lanes once
     [turbovecIds, graphAuthority, aceCacheHit, aceSummaryLenses] = await Promise.all([
-      useTurboVec ? this.searchTurboVec(turbovecUrl, embedding, topK * 5).catch(() => []) : Promise.resolve([]),
+      useTurboVec
+        ? this.searchTurboVec(turbovecUrl, embedding, effectiveTopK * 5).catch(() => [])
+        : Promise.resolve([]),
       useGraph ? getTopAuthorityNodes(100).catch(() => []) : Promise.resolve([]),
-      useAceCache ? loadAceContextPlannerHit(buildAceContextPlannerState({ query })).catch(() => null) : Promise.resolve(null),
-      useAceCache ? SummaryLensesService.searchByCluster(clusterMatch?.clusterId ?? -1, 5).catch(() => []) : Promise.resolve([]),
+      useAceCache
+        ? loadAceContextPlannerHit(buildAceContextPlannerState({ query })).catch(() => null)
+        : Promise.resolve(null),
+      useAceCache
+        ? SummaryLensesService.searchByCluster(clusterMatch?.clusterId ?? -1, 5).catch(() => [])
+        : Promise.resolve([]),
     ]);
 
     // Qdrant Fallback Ladder Execution
     for (const step of filterLadder) {
       if (step.name !== 'unfiltered' && !step.filter) continue;
-      
+
       console.log(`[HyperRagFusionService] Attempting Qdrant search: ${step.name}`);
       const [semantic, kag, externalDocs] = await Promise.all([
-        this.searchQdrantMulti(qdrantUrl, targetCollection, variants, topK, 'semantic', { [query]: embedding }, step.filter).catch(() => []),
-        this.searchQdrant(qdrantUrl, VECTOR_CONFIG.COLLECTIONS.summary_lenses, embedding, Math.ceil(topK / 2), 'kag').catch(() => []),
-        mode === 'codebase' 
-          ? this.searchQdrant(qdrantUrl, VECTOR_CONFIG.COLLECTIONS.programming_docs, embedding, 5, 'external_docs').catch(() => [])
-          : Promise.resolve([])
+        this.searchQdrantMulti(
+          qdrantUrl,
+          targetCollection,
+          variants,
+          effectiveTopK,
+          'semantic',
+          { [query]: embedding },
+          step.filter
+        ).catch(() => []),
+        this.searchQdrant(
+          qdrantUrl,
+          VECTOR_CONFIG.COLLECTIONS.summary_lenses,
+          embedding,
+          Math.ceil(effectiveTopK / 2),
+          'kag'
+        ).catch(() => []),
+        mode === 'codebase'
+          ? this.searchQdrant(
+              qdrantUrl,
+              VECTOR_CONFIG.COLLECTIONS.programming_docs,
+              embedding,
+              5,
+              'external_docs'
+            ).catch(() => [])
+          : Promise.resolve([]),
       ]);
-      
+
       if (semantic.length >= minHits || step.name === 'unfiltered') {
         qdrantSemantic = [...semantic, ...externalDocs];
         qdrantKag = kag;
-        if (step.name !== 'strict_cluster') explanation.addFallback(`Fell back to ${step.name} due to low hit count`);
+        if (step.name !== 'strict_cluster')
+          explanation.addFallback(`Fell back to ${step.name} due to low hit count`);
         break;
       }
     }
@@ -294,19 +353,23 @@ export class HyperRagFusionService {
       profile === 'agent_workflow' ||
       profile === 'db_schema' ||
       profile === 'auth' ||
-      String(clusterMatch?.topoClass ?? '').toLowerCase().includes('server');
+      String(clusterMatch?.topoClass ?? '')
+        .toLowerCase()
+        .includes('server');
     if (serverSideContext) clusterDirsSet.add('src/lib/server');
     const clusterDirs = Array.from(clusterDirsSet);
     let rgHits: any[] = [];
     if (clusterDirs.length > 0) {
-      console.log(`[HyperRagFusionService] Dynamic env mapping to ${clusterDirs.length} dense directories...`);
+      console.log(
+        `[HyperRagFusionService] Dynamic env mapping to ${clusterDirs.length} dense directories...`
+      );
       rgHits = await this.searchRgDynamic(query, clusterDirs).catch(() => []);
     }
 
     // 3. RRF Fusion + Boosting
     const allResults = [...qdrantSemantic, ...qdrantKag, ...rgHits];
     const turbovecSet = new Set(turbovecIds.map(String));
-    const authorityMap = new Map(graphAuthority.map(n => [n.stableKey, n]));
+    const authorityMap = new Map(graphAuthority.map((n) => [n.stableKey, n]));
 
     const scoreMap = new Map<string, HyperRagHit>();
 
@@ -314,81 +377,98 @@ export class HyperRagFusionService {
       const id = String(pt.id);
       const payload = (pt.payload as Record<string, unknown>) ?? {};
       const stableKey = String(payload.stable_key ?? id);
-      
+
       const authNode = authorityMap.get(stableKey);
       const pageRank = authNode?.graphPageRank ?? (payload.pageRank as number) ?? 0;
-      const authorityScore = authNode?.graphAuthorityScore ?? (payload.graph_authority_score as number) ?? 0;
-      
+      const authorityScore =
+        authNode?.graphAuthorityScore ?? (payload.graph_authority_score as number) ?? 0;
+
       const existing = scoreMap.get(id);
       const reasons: string[] = [];
-      
-      const hasClusterMatch = clusterMatch?.clusterId != null && payload.gpuCluster === clusterMatch.clusterId;
+
+      const hasClusterMatch =
+        clusterMatch?.clusterId != null && payload.gpuCluster === clusterMatch.clusterId;
       const isRgHit = pt.lane === 'rg_dynamic';
-      const clusterId = Number(payload[clusterField] ?? payload.gpuCluster ?? payload.somCluster ?? NaN);
+      const clusterId = Number(
+        payload[clusterField] ?? payload.gpuCluster ?? payload.somCluster ?? NaN
+      );
       const clusterAlias = getClusterAlias(clusterId);
       const hitRate = Number(payload.hit_rate ?? payload.hitRate ?? 0) || 0;
-      const lastUsedAt = typeof payload.last_used_at === 'string'
-        ? payload.last_used_at
-        : typeof payload.lastUsedAt === 'string'
-          ? payload.lastUsedAt
-          : undefined;
-      const recencyBoost = lastUsedAt ? Math.max(0, 1 - Math.min(1, (Date.now() - Date.parse(lastUsedAt)) / (1000 * 60 * 60 * 24 * 30))) : 0;
-      
+      const lastUsedAt =
+        typeof payload.last_used_at === 'string'
+          ? payload.last_used_at
+          : typeof payload.lastUsedAt === 'string'
+            ? payload.lastUsedAt
+            : undefined;
+      const recencyBoost = lastUsedAt
+        ? Math.max(
+            0,
+            1 - Math.min(1, (Date.now() - Date.parse(lastUsedAt)) / (1000 * 60 * 60 * 24 * 30))
+          )
+        : 0;
+
       // Scoring logic (v1.0)
-      const lexicalScore = lexicalHits.find(h => h.clusterId === (payload[clusterField] as number))?.score ?? 0;
-      
+      const lexicalScore =
+        lexicalHits.find((h) => h.clusterId === (payload[clusterField] as number))?.score ?? 0;
+
       const signals = {
         dense: pt.score,
         graphAuthority: authorityScore,
         clusterMatch: hasClusterMatch ? 0.1 : 0,
         pagerank: pageRank,
-        aceBoost: aceCacheHit ? 0.10 : 0,
+        aceBoost: aceCacheHit ? 0.1 : 0,
         turbovec: turbovecSet.has(id) ? 0.15 : 0,
         topoClass: (payload.topoClass ?? payload.topo_class) as string,
-        topologyRouted: routing?.clusterIds.includes((payload[clusterField] as number) ?? -1) ? 0.15 : 0,
+        topologyRouted: routing?.clusterIds.includes((payload[clusterField] as number) ?? -1)
+          ? 0.15
+          : 0,
         lexicalBoost: lexicalScore,
-        taskBoost: taskDistillate?.clusters?.includes(String(payload[clusterField])) ? 0.10 : 0,
+        taskBoost: taskDistillate?.clusters?.includes(String(payload[clusterField])) ? 0.1 : 0,
         activity_w: (payload.activity_w ?? payload.pagerank ?? 0) as number,
         cluster_alias: clusterAlias ?? undefined,
         recencyOrHitRate: Math.max(hitRate, recencyBoost),
         engramBoost: 0,
-        trustTier: (payload.trustTier ?? (pt.lane === 'external_docs' ? 'official_docs' : 'canonical')) as string,
-        isExternal: pt.lane === 'external_docs'
+        trustTier: (payload.trustTier ??
+          (pt.lane === 'external_docs' ? 'official_docs' : 'canonical')) as string,
+        isExternal: pt.lane === 'external_docs',
       };
 
       // Engram Boost (v1.1)
       // Restricted to validated workflow memory hits for specific profiles
       const memoryProfiles = ['agent_workflow', 'code_debug', 'retrieval_debug'];
-      if (memoryProfiles.includes(options.profile ?? '') && engramHint?.workflowMemories) {
+      if (memoryProfiles.includes(profile ?? '') && engramHint?.workflowMemories) {
         const hitCluster = String(payload[clusterField]);
         const hitFeature = (payload.featureKey ?? payload.feature_key) as string;
-        
-        const hasMatch = engramHint.workflowMemories.some(m => 
-          m.accepted && m.testsPassed && 
-          (m.clusters.includes(hitCluster) || m.featureKeys.includes(hitFeature))
+
+        const hasMatch = engramHint.workflowMemories.some(
+          (m) =>
+            m.accepted &&
+            m.testsPassed &&
+            (m.clusters.includes(hitCluster) || m.featureKeys.includes(hitFeature))
         );
-        
+
         if (hasMatch) {
           signals.engramBoost = 0.05;
         }
       }
 
-      let finalScore = 
-          (signals.dense * 0.35) 
-        + (signals.topologyRouted * 0.15)
-        + (signals.graphAuthority * 0.15)
-        + (signals.lexicalBoost * 0.10)
-        + (signals.taskBoost * 0.10)
-        + (signals.aceBoost * 0.10)
-        + (pt.lane === 'kag' ? 0.05 : 0);
+      let finalScore =
+        signals.dense * 0.35 +
+        signals.topologyRouted * 0.15 +
+        signals.graphAuthority * 0.15 +
+        signals.lexicalBoost * 0.1 +
+        signals.taskBoost * 0.1 +
+        signals.aceBoost * 0.1 +
+        (pt.lane === 'kag' ? 0.05 : 0);
 
       // Engram Boost (v1.1)
       finalScore += signals.engramBoost;
-      
+
       // Topological Class Consistency Boost (0.08)
       if (clusterMatch?.topoClass && signals.topoClass === clusterMatch.topoClass) {
         finalScore += 0.08;
-        if (includeReasons) reasons.push(`Matches query topological class (${clusterMatch.topoClass})`);
+        if (includeReasons)
+          reasons.push(`Matches query topological class (${clusterMatch.topoClass})`);
       }
 
       if (existing) {
@@ -398,13 +478,17 @@ export class HyperRagFusionService {
       if (includeReasons) {
         if (pt.lane === 'semantic') reasons.push('Semantic match in codebase');
         if (pt.lane === 'kag') reasons.push('Topological match in directory atlas');
-        if (pt.lane === 'external_docs') reasons.push(`Official documentation match (${payload.sourceId || 'external'})`);
-        if (hasClusterMatch) reasons.push(`Inferred same manifold cluster (${clusterMatch!.clusterId})`);
-        if (signals.topologyRouted > 0) reasons.push(`Routed via topological centroid lookup (${clusterField})`);
+        if (pt.lane === 'external_docs')
+          reasons.push(`Official documentation match (${payload.sourceId || 'external'})`);
+        if (hasClusterMatch)
+          reasons.push(`Inferred same manifold cluster (${clusterMatch!.clusterId})`);
+        if (signals.topologyRouted > 0)
+          reasons.push(`Routed via topological centroid lookup (${clusterField})`);
         if (signals.turbovec > 0) reasons.push('TurboVec ANN prefilter hit');
         if (signals.graphAuthority > 0.5) reasons.push('High graph authority (PageRank)');
         if (signals.aceBoost > 0) reasons.push('ACE Context cache hit');
-        if (signals.lexicalBoost > 0) reasons.push('Direct lexical match in dense semantic cluster');
+        if (signals.lexicalBoost > 0)
+          reasons.push('Direct lexical match in dense semantic cluster');
         if (signals.taskBoost > 0) reasons.push('Matched task distillate operational playbook');
         if (signals.recencyOrHitRate > 0.25) reasons.push('Recent/high-hit-rate payload');
       }
@@ -414,12 +498,7 @@ export class HyperRagFusionService {
       const somY = Number(payload.somCol ?? payload.som_y ?? 0) || 0;
       const semanticZ = signals.dense ?? 0;
       const activityW = Number(payload.pagerank ?? payload.activity_w ?? 0) || 0;
-      const manifold4: [number, number, number, number] = [
-        somX,
-        somY,
-        semanticZ,
-        activityW,
-      ];
+      const manifold4: [number, number, number, number] = [somX, somY, semanticZ, activityW];
       const manifold4Meta = {
         som_x: somX,
         som_y: somY,
@@ -450,23 +529,24 @@ export class HyperRagFusionService {
     }
 
     // 4. Sort and Trim
-    let ranked = [...scoreMap.values()]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, topK);
+    let ranked = [...scoreMap.values()].sort((a, b) => b.score - a.score).slice(0, effectiveTopK);
 
     // 4.5 Meta-Join for Evidence Mode
     if (mode === 'evidence' && ranked.length > 0) {
-      const objectKeys = ranked.map(r => String(r.payload?.object_key ?? '')).filter(Boolean);
+      const objectKeys = ranked.map((r) => String(r.payload?.object_key ?? '')).filter(Boolean);
       if (objectKeys.length > 0) {
-        const files = await db.select().from(uploadedFiles).where(inArray(uploadedFiles.objectKey, objectKeys));
-        const fileMap = new Map(files.map(f => [f.objectKey, f]));
-        ranked = ranked.map(r => {
+        const files = await db
+          .select()
+          .from(uploadedFiles)
+          .where(inArray(uploadedFiles.objectKey, objectKeys));
+        const fileMap = new Map(files.map((f) => [f.objectKey, f]));
+        ranked = ranked.map((r) => {
           const file = fileMap.get(String(r.payload?.object_key ?? ''));
           if (file) {
             return {
               ...r,
               payload: { ...r.payload, ...file },
-              signals: { ...r.signals, status: file.status }
+              signals: { ...r.signals, status: file.status },
             };
           }
           return r;
@@ -475,31 +555,39 @@ export class HyperRagFusionService {
     }
 
     // 5. GPU-Accelerated Attention Rerank
-    const rerankCandidates = ranked.filter(r => r.vector && Array.isArray(r.vector));
+    const rerankCandidates = ranked.filter((r) => r.vector && Array.isArray(r.vector));
     if (rerankCandidates.length > 1) {
       const queryArr = new Float32Array(embedding);
       const candArr = new Float32Array(rerankCandidates.length * 768);
       for (let i = 0; i < rerankCandidates.length; i++) {
         candArr.set(rerankCandidates[i].vector, i * 768);
       }
-      
+
       try {
-        const attentionScores = await LibTorchReranker.rerank(queryArr, candArr, rerankCandidates.length, 768);
+        const attentionScores = await LibTorchReranker.rerank(
+          queryArr,
+          candArr,
+          rerankCandidates.length,
+          768
+        );
         for (let i = 0; i < rerankCandidates.length; i++) {
           const r = rerankCandidates[i];
           // Fuse original score with attention weight (weighted towards attention)
-          r.score = (r.score * 0.3) + (attentionScores[i] * 0.7);
+          r.score = r.score * 0.3 + attentionScores[i] * 0.7;
         }
         // Re-sort after attention pass
         ranked = ranked.sort((a, b) => b.score - a.score);
       } catch (err) {
-        console.warn('[HyperRagFusionService] LibTorch rerank failed, falling back to original scores:', err);
+        console.warn(
+          '[HyperRagFusionService] LibTorch rerank failed, falling back to original scores:',
+          err
+        );
       }
     }
 
     // 5. Cluster-Aware Rerank
     const reranked = await applyClusterCoherenceBoost(
-      ranked.map(r => ({
+      ranked.map((r) => ({
         content: r.text ?? '',
         score: r.score,
         source: r.id,
@@ -508,13 +596,15 @@ export class HyperRagFusionService {
       { clusterBoost: 1.1 }
     );
 
-    ranked = ranked.map(r => {
-      const match = reranked.find(rr => rr.source === r.id);
-      if (match) {
-        return { ...r, score: match.score };
-      }
-      return r;
-    }).sort((a, b) => b.score - a.score);
+    ranked = ranked
+      .map((r) => {
+        const match = reranked.find((rr) => rr.source === r.id);
+        if (match) {
+          return { ...r, score: match.score };
+        }
+        return r;
+      })
+      .sort((a, b) => b.score - a.score);
 
     // 6. Graph Path Expansion (Impact Analysis)
     const graphPaths: unknown[] = [];
@@ -536,58 +626,43 @@ export class HyperRagFusionService {
       contextPack: aceCacheHit?.packet,
       summaryLenses: aceSummaryLenses,
       taskDistillate,
-      synthesis: synthesize ? await this.synthesize(query, ranked.slice(0, 5), aceSummaryLenses || [], routing?.cards || [], taskDistillate).catch(() => null) : null,
+      synthesis: synthesize
+        ? await this.synthesize(
+            query,
+            ranked.slice(0, 5),
+            aceSummaryLenses || [],
+            routing?.cards || [],
+            taskDistillate
+          ).catch(() => null)
+        : null,
       provenance,
-      routingExplanation: explanation.build()
+      routingExplanation: explanation.build(),
     };
 
     // 7. Context Budgeting & Persistence
-    const budgeted = ContextPacketBudgeter.budget(result);
-    
-    // Lane -1: Record Engram Transition (Fire and forget)
-    if (ranked.length > 0) {
-      const topHit = ranked[0];
-      const redis = getRedis();
-      
-      // If we have a userId, we can recover the previous query from Redis
-      // using the existing 'ace:engram:last:{userId}' logic in engram-bigram.ts
-      (async () => {
-        let previousQuery: string | undefined;
-        if (userId) {
-          const lastKey = `ace:engram:last:${userId}`;
-          const lastQuery = await redis.get(lastKey);
-          previousQuery = lastQuery || undefined;
-          // Update last query for next time
-          await redis.set(lastKey, query.toLowerCase().trim(), 'EX', 3600);
-        }
+    const budgeted = ContextPacketBudgeter.budget(result, contextBudget);
 
-        await engramAdapter.recordTransition({
-          previousQuery,
-          currentQuery: query,
-          somRow: topHit.manifold4Meta?.som_x,
-          somCol: topHit.manifold4Meta?.som_y,
-        }).catch(() => {});
-      })().catch(() => {});
-    }
-    
     // Log trace asynchronously
-    logAceRun({
-      query,
-      mode,
-      intent: profile,
-      model: ENV.GEMMA4_MODEL,
-      metadata: { 
-        routing: budgeted.routingExplanation,
-        fallbackCount: budgeted.routingExplanation?.fallbacks.length || 0
-      }
-    }, ranked.map(r => ({
-      ...r,
-      relativePath: r.sourcePath || 'unknown',
-      lineStart: 0, // Placeholder
-      qdrantId: r.id,
-      authorityScore: r.signals.graphAuthority || 0,
-      pageRankScore: r.signals.pagerank || 0,
-    })) as any).catch(err => console.error('[HyperRagFusionService] Persistence failed:', err));
+    logAceRun(
+      {
+        query,
+        mode,
+        intent: profile,
+        model: ENV.GEMMA4_MODEL,
+        metadata: {
+          routing: budgeted.routingExplanation,
+          fallbackCount: budgeted.routingExplanation?.fallbacks.length || 0,
+        },
+      },
+      ranked.map((r) => ({
+        ...r,
+        relativePath: r.sourcePath || 'unknown',
+        lineStart: 0, // Placeholder
+        qdrantId: r.id,
+        authorityScore: r.signals.graphAuthority || 0,
+        pageRankScore: r.signals.pagerank || 0,
+      })) as any
+    ).catch((err) => console.error('[HyperRagFusionService] Persistence failed:', err));
 
     return budgeted;
   }
@@ -595,16 +670,28 @@ export class HyperRagFusionService {
   /**
    * Synthesize a reasoning summary prioritizing topological clusters and task playbooks.
    */
-  private async synthesize(query: string, hits: HyperRagHit[], lenses: SummaryLensHit[], clusterCards: any[], taskDistillate: any | null): Promise<string | null> {
+  private async synthesize(
+    query: string,
+    hits: HyperRagHit[],
+    lenses: SummaryLensHit[],
+    clusterCards: any[],
+    taskDistillate: any | null
+  ): Promise<string | null> {
     if (hits.length === 0) return null;
 
     const clusters = new Set<string>();
-    hits.forEach(h => { if (h.signals.topoClass) clusters.add(h.signals.topoClass); });
-    lenses.forEach(l => { if (l.topoClass) clusters.add(l.topoClass); });
+    hits.forEach((h) => {
+      if (h.signals.topoClass) clusters.add(h.signals.topoClass);
+    });
+    lenses.forEach((l) => {
+      if (l.topoClass) clusters.add(l.topoClass);
+    });
 
-    const clusterContext = [...clusters].map(c => `[Cluster: ${c}]`).join(' ');
-    const cardsContext = clusterCards.map(c => `[Card ${c.clusterId}: ${c.summary}]`).join('\n');
-    const taskContext = taskDistillate ? `[OPERATIONAL PLAYBOOK: ${taskDistillate.task_key}]\nSummary: ${taskDistillate.summary}\nRecommended Actions:\n${taskDistillate.recommended_actions.map((a: string) => `- ${a}`).join('\n')}` : '';
+    const clusterContext = [...clusters].map((c) => `[Cluster: ${c}]`).join(' ');
+    const cardsContext = clusterCards.map((c) => `[Card ${c.clusterId}: ${c.summary}]`).join('\n');
+    const taskContext = taskDistillate
+      ? `[OPERATIONAL PLAYBOOK: ${taskDistillate.task_key}]\nSummary: ${taskDistillate.summary}\nRecommended Actions:\n${taskDistillate.recommended_actions.map((a: string) => `- ${a}`).join('\n')}`
+      : '';
 
     const prompt = `
 [HYPER-RAG SYNTHESIS]
@@ -614,10 +701,10 @@ Prioritize information from the dominant topological clusters: ${clusterContext}
 QUERY: "${query}"
 
 RELEVANT HITS:
-${hits.map(h => `- ${h.title}: ${h.text?.slice(0, 200)}... (Cluster: ${h.signals.topoClass ?? 'unclassified'})`).join('\n')}
+${hits.map((h) => `- ${h.title}: ${h.text?.slice(0, 200)}... (Cluster: ${h.signals.topoClass ?? 'unclassified'})`).join('\n')}
 
 SUMMARY LENSES (Thematic context):
-${lenses.map(l => `- ${l.title}: ${l.summary.slice(0, 200)}...`).join('\n')}
+${lenses.map((l) => `- ${l.title}: ${l.summary.slice(0, 200)}...`).join('\n')}
 
 ${taskContext}
 
@@ -631,13 +718,17 @@ INSTRUCTIONS:
     try {
       const reasoningModel = getReasoningModelId('legal');
       const response = await bifrostChat(
-        [{ role: 'system', content: 'You are an expert legal retrieval synthesizer.' }, { role: 'user', content: prompt }],
+        [
+          { role: 'system', content: 'You are an expert legal retrieval synthesizer.' },
+          { role: 'user', content: prompt },
+        ],
         ENV.GEMMA4_MODEL ?? reasoningModel,
         { temperature: 0.1, maxTokens: 384 }
       );
-      
+
       if (typeof response === 'string') return response;
-      if (response && typeof response === 'object' && 'content' in response) return (response as any).content;
+      if (response && typeof response === 'object' && 'content' in response)
+        return (response as any).content;
       return null;
     } catch (err) {
       console.error('[HyperRagFusionService] Synthesis failed:', err);
@@ -645,13 +736,23 @@ INSTRUCTIONS:
     }
   }
 
-  private async searchQdrantMulti(url: string, collection: string, queries: string[], limit: number, lane: string, cache: Record<string, number[]> = {}, filter?: any) {
-    const results = await Promise.all(queries.map(async (q) => {
-      const emb = cache[q] || await generateSingleEmbedding(q).catch(() => null);
-      if (!emb) return [];
-      return this.searchQdrant(url, collection, emb, limit, lane, filter);
-    }));
-    
+  private async searchQdrantMulti(
+    url: string,
+    collection: string,
+    queries: string[],
+    limit: number,
+    lane: string,
+    cache: Record<string, number[]> = {},
+    filter?: any
+  ) {
+    const results = await Promise.all(
+      queries.map(async (q) => {
+        const emb = cache[q] || (await generateSingleEmbedding(q).catch(() => null));
+        if (!emb) return [];
+        return this.searchQdrant(url, collection, emb, limit, lane, filter);
+      })
+    );
+
     const map = new Map<string, any>();
     for (const res of results.flat()) {
       const id = String(res.id);
@@ -662,7 +763,14 @@ INSTRUCTIONS:
     return [...map.values()];
   }
 
-  private async searchQdrant(url: string, collection: string, vector: number[], limit: number, lane: string, filter?: any) {
+  private async searchQdrant(
+    url: string,
+    collection: string,
+    vector: number[],
+    limit: number,
+    lane: string,
+    filter?: any
+  ) {
     try {
       const body = {
         vector: buildVectorPayload(collection, vector),
@@ -686,10 +794,14 @@ INSTRUCTIONS:
 
   private getCollectionForMode(mode: HyperRagMode): string {
     switch (mode) {
-      case 'evidence': return VECTOR_CONFIG.COLLECTIONS.evidence;
-      case 'legal': return VECTOR_CONFIG.COLLECTIONS.legal_canon_chunks;
-      case 'docs': return VECTOR_CONFIG.COLLECTIONS.knowledge;
-      case 'programming_docs': return VECTOR_CONFIG.COLLECTIONS.programming_docs;
+      case 'evidence':
+        return VECTOR_CONFIG.COLLECTIONS.evidence;
+      case 'legal':
+        return VECTOR_CONFIG.COLLECTIONS.legal_canon_chunks;
+      case 'docs':
+        return VECTOR_CONFIG.COLLECTIONS.knowledge;
+      case 'programming_docs':
+        return VECTOR_CONFIG.COLLECTIONS.programming_docs;
       case 'codebase':
       default:
         return VECTOR_CONFIG.COLLECTIONS.codebase_chunks;
@@ -717,7 +829,7 @@ INSTRUCTIONS:
    */
   private async searchRgDynamic(query: string, dirs: string[]): Promise<HyperRagHit[]> {
     if (dirs.length === 0) return [];
-    
+
     // Deduplicate and filter dirs.
     const uniqueDirs = [...new Set(dirs)].filter((d) => d && d !== '.');
     const searchPaths = uniqueDirs
@@ -735,10 +847,10 @@ INSTRUCTIONS:
         ['-F', '-i', '--json', '--mmap', '--threads', '4', '--', query, ...searchPaths],
         { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
       );
-      
+
       const hits: HyperRagHit[] = [];
       const lines = stdout.split('\n').filter(Boolean);
-      
+
       for (const line of lines) {
         try {
           const msg = JSON.parse(line);
@@ -746,7 +858,7 @@ INSTRUCTIONS:
             const path = msg.data.path.text;
             const snippet = msg.data.lines.text;
             const lineNum = msg.data.line_number;
-            
+
             hits.push({
               id: `rg_${path}_${lineNum}`,
               sourcePath: path,
@@ -756,12 +868,14 @@ INSTRUCTIONS:
               lane: 'rg_dynamic',
               payload: { path, line_number: lineNum, content: snippet },
               reasons: [],
-              signals: { dense: 0.8 }
+              signals: { dense: 0.8 },
             } as any);
           }
-        } catch (e) { /* ignore parse errors */ }
+        } catch (e) {
+          /* ignore parse errors */
+        }
       }
-      
+
       return hits;
     } catch (err: any) {
       if (err.status === 1) return [];
@@ -776,7 +890,7 @@ INSTRUCTIONS:
   private async searchTaskDistillates(embedding: number[], topK: number = 1): Promise<any | null> {
     const qdrantUrl = ENV.QDRANT_URL;
     const collection = 'task_distillates';
-    
+
     try {
       const res = await fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
         method: 'POST',
@@ -784,19 +898,19 @@ INSTRUCTIONS:
         body: JSON.stringify({
           vector: embedding,
           limit: topK,
-          with_payload: true
-        })
+          with_payload: true,
+        }),
       });
-      
+
       if (!res.ok) return null;
       const data = await res.json();
       const hits = data.result || [];
-      
+
       if (hits.length === 0) return null;
-      
+
       const topHit = hits[0];
       const taskKey = topHit.payload.task_key;
-      
+
       // Attempt to hydrate from Redis for the latest operational data
       const redis = typeof getRedis === 'function' ? getRedis() : null;
       if (redis) {
@@ -805,7 +919,7 @@ INSTRUCTIONS:
           return JSON.parse(cached);
         }
       }
-      
+
       return topHit.payload;
     } catch (err) {
       console.warn('[HyperRagFusionService] taskDistillate search failed:', err);
@@ -819,18 +933,18 @@ INSTRUCTIONS:
   private getClusterDirs(clusterIds: number[]): string[] {
     const jsonPath = resolve(process.cwd(), 'docs/graph/hypergraph-clusters.json');
     if (!existsSync(jsonPath)) return [];
-    
+
     try {
       const data = JSON.parse(readFileSync(jsonPath, 'utf8'));
       const dirs = new Set<string>();
-      
+
       for (const id of clusterIds) {
         const cluster = data.clusters.find((c: any) => c.id === id);
         if (cluster && cluster.topDirs) {
           cluster.topDirs.forEach((d: any) => dirs.add(d.dir));
         }
       }
-      
+
       return Array.from(dirs);
     } catch (err) {
       return [];
@@ -848,11 +962,11 @@ INSTRUCTIONS:
     try {
       const data = JSON.parse(readFileSync(clusterJson, 'utf-8'));
       const clusters = data.clusters || [];
-      
+
       for (const hit of hits) {
         const path = hit.sourcePath;
         if (!path) continue;
-        
+
         // Find clusters that mention this path
         for (const c of clusters) {
           if (c.topPaths?.some((p: any) => p.path === path)) {
@@ -860,7 +974,9 @@ INSTRUCTIONS:
           }
         }
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     return Array.from(ids);
   }
@@ -880,7 +996,7 @@ INSTRUCTIONS:
         ['-F', '-i', '--no-heading', '--line-number', '--context', '3', '--', query, digestPath],
         { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 }
       );
-      
+
       const hits: LexicalClusterHit[] = [];
       const lines = output.split('\n');
       let currentClusterId: number | null = null;
@@ -892,9 +1008,9 @@ INSTRUCTIONS:
           currentClusterId = parseInt(headerMatch[1], 10);
           hits.push({
             clusterId: currentClusterId,
-            score: 0.40, // Header match bonus
+            score: 0.4, // Header match bonus
             source: 'header',
-            text: line
+            text: line,
           });
           continue;
         }
@@ -903,11 +1019,11 @@ INSTRUCTIONS:
 
         // 2. Score based on context within cluster section
         if (line.includes('Top symbols:')) {
-          hits.push({ clusterId: currentClusterId, score: 0.30, source: 'symbol', text: line });
+          hits.push({ clusterId: currentClusterId, score: 0.3, source: 'symbol', text: line });
         } else if (line.includes('Top paths:') || line.includes('Top directories:')) {
           hits.push({ clusterId: currentClusterId, score: 0.25, source: 'path', text: line });
         } else if (line.includes('(tag:')) {
-          hits.push({ clusterId: currentClusterId, score: 0.20, source: 'tag', text: line });
+          hits.push({ clusterId: currentClusterId, score: 0.2, source: 'tag', text: line });
         } else if (line.trim().length > 0) {
           hits.push({ clusterId: currentClusterId, score: 0.05, source: 'detail', text: line });
         }
@@ -921,7 +1037,7 @@ INSTRUCTIONS:
           aggMap.set(h.clusterId, h);
         }
       }
-      
+
       return Array.from(aggMap.values()).sort((a, b) => b.score - a.score);
     } catch (err: any) {
       if (err.status === 1) return []; // rg no match

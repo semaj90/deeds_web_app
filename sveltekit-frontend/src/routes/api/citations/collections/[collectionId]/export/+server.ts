@@ -43,7 +43,7 @@ async function handleExport({ locals, params, format }: {
 		.where(
 			and(
 				eq(citationCollections.id, collectionId),
-				eq(citationCollections.userId, locals.user.id)
+				eq(citationCollections.userId, Number(locals.user.id))
 			)
 		)
 		.limit(1);

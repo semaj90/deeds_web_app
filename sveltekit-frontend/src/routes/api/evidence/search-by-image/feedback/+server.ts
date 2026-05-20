@@ -89,7 +89,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
       pipeline:      'image_search',
       hyperedgeHash: pid,
       query:         query ?? '',
-      userId:        locals.user.id,
+      userId:        Number(locals.user.id),
     }),
   }).catch(() => {});
 

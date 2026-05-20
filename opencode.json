@@ -5,16 +5,16 @@
   "provider": {
     "turboquant": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "TurboQuant llama-server local",
+      "name": "TurboQuant llama-server :8090",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
         "apiKey": "local"
       },
       "models": {
         "gemma4-tq": {
-          "name": "Gemma4 via TurboQuant",
+          "name": "Gemma4 IQ4_XS via TurboQuant (59.8 tok/s, legal+LoRA merged)",
           "limit": {
-            "context": 16384,
+            "context": 32768,
             "output": 2048
           }
         }
@@ -22,14 +22,45 @@
     },
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama local",
+      "name": "Ollama local :11434",
       "options": {
         "baseURL": "http://127.0.0.1:11434/v1",
         "apiKey": "ollama"
       },
       "models": {
         "gemma4-hermes-64k": {
-          "name": "Gemma4 Hermes 64k via Ollama",
+          "name": "Gemma4 Hermes 64k — legal+vision merged, 64K ctx (blob d9c7875f)",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+        "gemma4-legal": {
+          "name": "Gemma4 Legal — text-only, 8K ctx (blob a79de882)",
+          "limit": {
+            "context": 8192,
+            "output": 2048
+          }
+        }
+      }
+    },
+    "yorha": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "YorHA OpenAI facade :5173 (ACE/KAG pipeline)",
+      "options": {
+        "baseURL": "http://127.0.0.1:5173/api/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "yorha-hermes": {
+          "name": "Hermes via ACE facade → HERMES_API_URL → gemma4-hermes-64k:latest",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+        "yorha-legal": {
+          "name": "Legal via ACE facade → bifrostChat → gemma4-legal:latest",
           "limit": {
             "context": 32768,
             "output": 2048
@@ -43,7 +74,7 @@
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp",
       "enabled": true,
-      "timeout": 15000
+      "timeout": 20000
     },
     "gemma4-offload": {
       "type": "local",
@@ -87,7 +118,7 @@
       }
     },
     "audit-hermes": {
-      "description": "Tool-call sanity check via Ollama Hermes 64k — compare agent behavior against TurboQuant lane and atlas.compact_context",
+      "description": "Hermes 64K direct — legal+vision, 64K ctx, same weights as VLM (blob d9c7875f), direct to Ollama (no ACE enrichment)",
       "model": "ollama/gemma4-hermes-64k",
       "temperature": 0,
       "steps": 8,
@@ -117,6 +148,48 @@
         "bash": "deny",
         "webfetch": "deny",
         "websearch": "deny"
+      }
+    },
+    "hermes-ace": {
+      "description": "Hermes via YorHA ACE facade — full ACE/KAG context enrichment + HERMES_API_URL → gemma4-hermes-64k:latest. Requires SvelteKit dev server on :5173.",
+      "model": "yorha/yorha-hermes",
+      "temperature": 0,
+      "steps": 8,
+      "prompt": "Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "wiki_*": "allow",
+        "wiki.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "kag_*": "allow",
+        "kag.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "edit": "deny",
+        "bash": "deny",
+        "webfetch": "deny",
+        "websearch": "deny"
+      }
+    },
+    "audit": {
+      "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor (no MCP, local files only)",
+      "model": "turboquant/gemma4-tq",
+      "prompt": "You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
+      "tools": {
+        "write": false,
+        "edit": false
       }
     }
   },

@@ -231,6 +231,9 @@ async function fetchTopByPageRank(limit) {
 
 const QDRANT_BATCH_SIZE = 25;
 
+// Phase B: path→cluster reverse index built during Qdrant scroll
+const _pathToCluster = new Map(); // stableKey → clusterKey
+
 async function fetchEmbeddingsBatch(filePaths) {
   const result = new Map();
   if (!filePaths.length) return result;
@@ -265,6 +268,9 @@ async function fetchEmbeddingsBatch(filePaths) {
         if (Array.isArray(vec) && vec.length === 768) {
           if (!result.has(fp)) result.set(fp, new Float32Array(vec));
         }
+        // Phase B: capture cluster_key from payload for reverse index
+        const ck = pt.payload?.cluster_key ?? pt.payload?.clusterId ?? pt.payload?.cluster_id;
+        if (ck && !_pathToCluster.has(fp)) _pathToCluster.set(fp, String(ck));
       }
     } catch (err) {
       console.warn(`[karpathy] Qdrant batch error: ${err.message}`);
@@ -500,11 +506,30 @@ async function main() {
       pipe.hset('gpu:karpathy:scores', r.stableKey, JSON.stringify(r));
     }
     pipe.expire('gpu:karpathy:scores', 86400);
+
+    // Phase B: write path→cluster reverse index + cluster member sorted sets
+    const clusterPipe = redis.pipeline();
+    clusterPipe.del('ace:cluster:members:__index'); // sentinel reset
+    for (const r of finalResults) {
+      const ck = _pathToCluster.get(r.stableKey);
+      if (ck) {
+        clusterPipe.setex(`ace:path:cluster:${r.stableKey}`, 86400, ck);
+        clusterPipe.zadd(`ace:cluster:members:${ck}`, r.blend, r.stableKey);
+      }
+    }
+    // Set TTL on all cluster member sets
+    const seenClusters = new Set([..._pathToCluster.values()]);
+    for (const ck of seenClusters) {
+      clusterPipe.expire(`ace:cluster:members:${ck}`, 86400);
+    }
     await pipe.exec();
+    await clusterPipe.exec();
+
     await redis.setex('gpu:karpathy:summary', 86400, JSON.stringify({
       ts: new Date().toISOString(),
       candidates: finalResults.length,
-      topBlend: finalResults[0]?.blend ?? 0
+      topBlend: finalResults[0]?.blend ?? 0,
+      clustersIndexed: seenClusters.size,
     }));
     await redis.quit();
     

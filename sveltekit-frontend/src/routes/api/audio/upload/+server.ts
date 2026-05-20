@@ -72,7 +72,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const [evidenceRecord] = await db.insert(evidence).values({
       id: evidenceId,
       caseId: caseId || null,
-      userId: locals.user.id,
+      userId: Number(locals.user.id),
       title: fileName,
       fileName,
       filePath,
@@ -81,7 +81,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       evidenceType: 'audio',
       metadata: {
         processingStatus: 'queued',
-        uploadedBy: locals.user.id,
+        uploadedBy: Number(locals.user.id),
         uploadedAt: new Date().toISOString()
       }
     }).returning();
@@ -106,7 +106,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       filePath,
       fileName,
       caseId,
-      userId: locals.user.id,
+      userId: Number(locals.user.id),
       timestamp: Date.now()
     });
 
