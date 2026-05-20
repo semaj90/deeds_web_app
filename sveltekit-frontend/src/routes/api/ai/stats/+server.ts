@@ -10,6 +10,7 @@ import type { RequestHandler } from './$types';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 
 const ollamaTagsSchema = z.object({
 	models: z.array(z.object({
@@ -80,7 +81,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 		// DB unavailable — return zeros
 	}
 
-	return json(
+const runtime = resolveRuntimeConfig();
+
+  return json(
     {
       activeChats,
       ragQueries: 0,
@@ -91,6 +94,10 @@ export const GET: RequestHandler = async ({ locals }) => {
       embeddingModel,
       llmModel,
       ollamaStatus,
+      runtimeProfile: runtime.profile,
+      runtimeAvailable: runtime.runtimeAvailable,
+      turboQuantEnabled: runtime.turboQuant,
+      rotorQuantKv: runtime.rotorQuantKv,
     },
     { headers: cacheControl.short }
   );

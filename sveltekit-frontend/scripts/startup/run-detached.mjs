@@ -8,7 +8,7 @@
  * Use for any startup task that must not block the editor.
  */
 import { spawn } from 'node:child_process';
-import { mkdirSync, openSync } from 'node:fs';
+import { mkdirSync, openSync, writeSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,13 +23,38 @@ const safeName = script.replace(/[:/\\]/g, '-');
 const out = openSync(resolve(logDir, `${safeName}.out.log`), 'a');
 const err = openSync(resolve(logDir, `${safeName}.err.log`), 'a');
 
-const child = spawn('npm', ['run', script], {
+const isWindows = process.platform === 'win32';
+const npmCommand = isWindows ? 'cmd.exe' : 'npm';
+const launchArgs = isWindows ? ['/d', '/s', '/c', 'npm.cmd', 'run', script] : ['run', script];
+const child = spawn(npmCommand, launchArgs, {
   cwd: ROOT,
   detached: true,
   stdio: ['ignore', out, err],
-  shell: process.platform === 'win32',
+  windowsHide: true,
+});
+
+const startupMessage = `[detached] ${new Date().toISOString()} npm run ${script} pid=${child.pid} cwd=${ROOT} cmd=${npmCommand} ${launchArgs.join(' ')}\n`;
+writeSync(out, startupMessage);
+
+child.on('spawn', () => {
+  const spawnMessage = `Detached helper spawned child pid=${child.pid}\n`;
+  writeSync(out, spawnMessage);
+});
+
+child.on('error', (error) => {
+  const errMessage = `Detached startup failed: ${error.message}\n`;
+  writeSync(err, errMessage);
+});
+
+child.on('exit', (code, signal) => {
+  const exitMessage = `Detached child exited code=${code} signal=${signal}\n`;
+  if (code === 0) {
+    writeSync(out, exitMessage);
+  } else {
+    writeSync(err, exitMessage);
+  }
 });
 
 child.unref();
 
-console.log(`[detached] npm run ${script} pid=${child.pid} → logs/task-output/pipeline-test/${safeName}.{out,err}.log`);
+console.log(startupMessage.trim());

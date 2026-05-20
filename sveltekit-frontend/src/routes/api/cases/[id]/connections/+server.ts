@@ -86,7 +86,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
       label: label ?? null,
       notes: notes ?? null,
       strength: strength ?? 1.0,
-      createdBy: locals.user.id,
+      createdBy: Number(locals.user.id),
     })
     .returning();
 

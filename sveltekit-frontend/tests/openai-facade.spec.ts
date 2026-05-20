@@ -5,15 +5,16 @@ import type { AceHmmMeta, RetrievalTrace } from '$lib/server/ai/openai-types.js'
 // Mock the heavy deps so this is a unit test on the facade orchestration,
 // not a full integration test (the route handler test covers wiring).
 const mocks = vi.hoisted(() => ({
-  assembleACEContext:    vi.fn(),
-  buildACEPromptCached:  vi.fn(),
-  bifrostChat:           vi.fn(),
-  turboQuantChat:        vi.fn(),
-  runGemma4Agent:        vi.fn(),
-  recordRagAnswer:       vi.fn(),
-  buildDevContextPlan:   vi.fn(),
-  isCodingPrompt:        vi.fn(),
-  classifyQuerySection:  vi.fn(),
+  assembleACEContext: vi.fn(),
+  buildACEPromptCached: vi.fn(),
+  bifrostChat: vi.fn(),
+  turboQuantChat: vi.fn(),
+  runGemma4Agent: vi.fn(),
+  recordRagAnswer: vi.fn(),
+  buildDevContextPlan: vi.fn(),
+  isCodingPrompt: vi.fn(),
+  classifyQuerySection: vi.fn(),
+  callTraceMcp: vi.fn(),
 }));
 
 vi.mock('$lib/server/ace/context-assembler.js', () => ({
@@ -40,6 +41,10 @@ vi.mock('$lib/server/cache/code-llm-index.js', () => ({
   recordRagAnswer: mocks.recordRagAnswer,
 }));
 
+vi.mock('$lib/server/mcp/trace-http.js', () => ({
+  callTraceMcp: mocks.callTraceMcp,
+}));
+
 vi.mock('$lib/server/analysis/hmm-ace-analyzer.js', () => ({
   classifyQuerySection: mocks.classifyQuerySection,
 }));
@@ -57,6 +62,7 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.isCodingPrompt.mockReturnValue(false);
     // Default: TurboQuant throws so bifrostChat is used (existing test expectations)
     mocks.turboQuantChat.mockRejectedValue(new Error('TurboQuant unavailable'));
+    mocks.callTraceMcp.mockResolvedValue({ ok: false, ms: 0, data: null, error: 'stub' });
     // Default: HMM returns a real classification so the data path is exercised
     mocks.classifyQuerySection.mockReturnValue({ section: 'FACTS', confidence: 0.82 });
   });
@@ -123,6 +129,68 @@ describe('openai-facade — runChatCompletion', () => {
     expect(res.choices[0].message.content).toBe('Raw response');
     expect(mocks.assembleACEContext).not.toHaveBeenCalled();
     expect(res.yorha?.aceUsed).toBe(false);
+  });
+
+  it('calls ace.compact_search via MCP and injects compact hits into ACE context when use_mcp is true', async () => {
+    mocks.callTraceMcp.mockResolvedValue({
+      ok: true,
+      ms: 12,
+      error: undefined,
+      data: {
+        context_tree_id: 'ctx_123',
+        query: 'what is hearsay?',
+        hits: [
+          {
+            rank: 1,
+            chunkId: 'openai-facade.ts:300-420',
+            path: 'src/lib/server/ai/openai-facade.ts',
+            snippet:
+              'Hearsay is an out of court statement offered for the truth of the matter asserted.',
+            score: 0.92,
+            topoClass: 'legal',
+            sources: ['qdrant'],
+            weights: { lex: 0.45, semantic: 0.35, authority: 0.2 },
+          },
+        ],
+        totalCharsEstimate: 1200,
+        cacheHit: false,
+        elapsedMs: 12,
+        nextAction:
+          'Use chunkId from hits[0] with context.get_compressed_card or read the path directly',
+        embedCached: false,
+      },
+    });
+
+    mocks.assembleACEContext.mockResolvedValue({
+      ragChunks: [],
+      kbChunks: [],
+      caseChunks: [],
+      chatHistory: [],
+      agentsMd: null,
+      codeLlmHit: null,
+    });
+    mocks.buildACEPromptCached.mockResolvedValue({ systemPrompt: 'sys', contextWindow: '' });
+    mocks.bifrostChat.mockResolvedValue('MCP answer');
+
+    const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+    const res = await runChatCompletion({
+      model: 'yorha-legal',
+      messages: [{ role: 'user', content: 'what is hearsay?' }],
+      raw: false,
+      stream: false,
+      temperature: 0.3,
+      use_mcp: true,
+    });
+
+    expect(mocks.callTraceMcp).toHaveBeenCalledWith(
+      'ace.compact_search',
+      expect.objectContaining({ query: 'what is hearsay?' }),
+      expect.anything()
+    );
+    expect(res.choices[0].message.content).toBe('MCP answer');
+    expect(res.yorha?.mcpCompactSearchHitCount).toBe(1);
+    expect(res.yorha?.mcpCompactSearchCacheHit).toBe(false);
+    expect(res.yorha?.mcpCompactSearchMs).toBe(12);
   });
 
   it('reports yorha.cacheHit=prior-answer when codeLlmHit is present', async () => {
@@ -292,18 +360,39 @@ describe('openai-facade — POST /api/v1/chat/completions handler', () => {
     expect(body.error.code).toBe('unauthorized');
   });
 
-  it('returns 400 on stream:true', async () => {
+  it('streams SSE when stream:true is requested', async () => {
+    mocks.assembleACEContext.mockResolvedValue({
+      ragChunks: [],
+      kbChunks: [],
+      caseChunks: [],
+      chatHistory: [],
+      agentsMd: null,
+      codeLlmHit: null,
+    });
+    mocks.buildACEPromptCached.mockResolvedValue({
+      systemPrompt: 'You are YorHA.',
+      contextWindow: '...chunks...',
+    });
+    mocks.bifrostChat.mockResolvedValue('streamed response');
+
     const { POST } = await import('../src/routes/api/v1/chat/completions/+server.js');
     const res = await POST({
       request: new Request('http://x', {
         method: 'POST',
-        body:   JSON.stringify({ model: 'm', messages: [{ role: 'user', content: 'q' }], stream: true }),
+        body: JSON.stringify({
+          model: 'yorha-legal',
+          messages: [{ role: 'user', content: 'q' }],
+          stream: true,
+        }),
       }),
       locals: { user: { id: 'u1' } },
     } as Parameters<typeof POST>[0]);
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error.code).toBe('streaming_not_supported');
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('text/event-stream');
+    const text = await res.text();
+    expect(text).toContain('data: ');
+    expect(text).toContain('[DONE]');
   });
 
   it('returns 400 on missing messages', async () => {

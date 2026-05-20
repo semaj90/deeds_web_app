@@ -33,7 +33,7 @@ const EMPTY_SEARCH: TurboVecSearchResult = {
 };
 
 function sidecarUrl(): string {
-  return (ENV as any).TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8099';
+  return ENV.TURBOVEC_SIDECAR;
 }
 
 /**

@@ -54,7 +54,7 @@
       "problemMatcher": [],
       "presentation": {
         "echo": true,
-        "reveal": "silent",
+        "reveal": "always",
         "focus": false,
         "panel": "dedicated",
         "showReuseMessage": false,
@@ -210,6 +210,44 @@
         "clear": true
       },
       "detail": "Run the canonical graphRAG loop manually. No folderOpen auto-start, so GPU indexing stays single-sourced."
+    },
+    {
+      "label": "Messy Query Routing Evaluation",
+      "type": "shell",
+      "command": "npm run atlas:messy-routing",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run Phase 18 messy query router evaluation and write reports to docs/reports."
+    },
+    {
+      "label": "Messy Query Routing (custom)",
+      "type": "shell",
+      "command": "npm run atlas:messy-routing -- --query \"${input:messyRoutingQuery}\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run Phase 18 messy query router evaluation with a custom query prompt."
     },
     {
       "label": "ACE Cache Index Refresh",
@@ -10802,6 +10840,12 @@
       "type": "promptString",
       "description": "HyperRAG dense search query — TurboVec ANN prefilter -> Qdrant multi-lane -> Bifrost inference stream -> RRF -> CouchDB wiki enrichment",
       "default": "context assembler retrieval kag pipeline"
+    },
+    {
+      "id": "messyRoutingQuery",
+      "type": "promptString",
+      "description": "Messy query text for the Phase 18 routing evaluation",
+      "default": "explain the TurboVec ANN + HyperRAG fallback for a mixed query involving Neo4j, Redis, and CHR97"
     }
   ]
 }

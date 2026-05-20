@@ -1,4 +1,4 @@
-/**
+﻿/**
  * User Interaction History Tracking
  * Records clicks, views, saves, and other interactions for recommendation training
  *
@@ -65,7 +65,7 @@ export class UserHistoryTracker {
 		try {
 			await db.insert(userInteractionHistory).values({
 				id: uuidv4(),
-				userId: this.userId,
+				userId: Number(this.userId),
 				documentId,
 				caseId,
 				interactionType: 'view',
@@ -94,7 +94,7 @@ export class UserHistoryTracker {
 		try {
 			await db.insert(userInteractionHistory).values({
 				id: uuidv4(),
-				userId: this.userId,
+				userId: Number(this.userId),
 				recommendationId,
 				documentId,
 				caseId,
@@ -121,7 +121,7 @@ export class UserHistoryTracker {
 		try {
 			await db.insert(userInteractionHistory).values({
 				id: uuidv4(),
-				userId: this.userId,
+				userId: Number(this.userId),
 				documentId,
 				caseId,
 				interactionType: 'save',
@@ -148,7 +148,7 @@ export class UserHistoryTracker {
 		try {
 			await db.insert(userInteractionHistory).values({
 				id: uuidv4(),
-				userId: this.userId,
+				userId: Number(this.userId),
 				documentId,
 				caseId,
 				interactionType: 'share',
@@ -175,7 +175,7 @@ export class UserHistoryTracker {
 		try {
 			await db.insert(userInteractionHistory).values({
 				id: uuidv4(),
-				userId: this.userId,
+				userId: Number(this.userId),
 				recommendationId,
 				documentId,
 				interactionType: 'dismiss',
@@ -204,7 +204,7 @@ export class UserHistoryTracker {
 					createdAt: userInteractionHistory.createdAt
 				})
 				.from(userInteractionHistory)
-				.where(eq(userInteractionHistory.userId, this.userId))
+				.where(eq(userInteractionHistory.userId, Number(this.userId)))
 				.limit(500);
 
 			const topicMap = new Map<number, { affinity: number; lastMs: number; count: number }>();
@@ -263,12 +263,12 @@ export class UserHistoryTracker {
 			const interactions = await db
 				.select()
 				.from(userInteractionHistory)
-				.where(eq(userInteractionHistory.userId, this.userId))
+				.where(eq(userInteractionHistory.userId, Number(this.userId)))
 				.limit(limit);
 
 			return interactions.map((i) => ({
 				id: i.id,
-				userId: i.userId,
+				userId: String(i.userId),
 				recommendationId: i.recommendationId || undefined,
 				documentId: i.documentId || undefined,
 				caseId: i.caseId || undefined,
@@ -298,7 +298,7 @@ export class UserHistoryTracker {
 			const interactions = await db
 				.select()
 				.from(userInteractionHistory)
-				.where(eq(userInteractionHistory.userId, this.userId));
+				.where(eq(userInteractionHistory.userId, Number(this.userId)));
 
 			const byType: Record<string, number> = {
 				view: 0,

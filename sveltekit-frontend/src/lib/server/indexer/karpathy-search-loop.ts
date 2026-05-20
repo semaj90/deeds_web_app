@@ -12,7 +12,7 @@
 import { executeEnhancedRgSearch } from './rg-search-utility.js';
 import { batchCosineSimilarity, clusterEmbeddings } from '$lib/server/gpu/libtorch-bridge.js';
 import { ENV } from '$lib/server/env.server.js';
-import db from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client.js';
 import { rgSearchResults, searchCentroids } from '$lib/server/db/schema-search.js';
 import { SEMANTIC_TAGS, getTagEmbeddings } from './gpu-karpathy-tagger.js';
 

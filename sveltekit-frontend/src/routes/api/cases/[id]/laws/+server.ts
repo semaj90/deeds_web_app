@@ -169,7 +169,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
         statuteId: statute.id,
         linkType: body.link_type || 'CITED_IN',
         notes: body.notes || null,
-        createdBy: locals.user.id,
+        createdBy: Number(locals.user.id),
       })
       .returning();
 

@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const pub = getPublisher();
 		const message = JSON.stringify({
-			userId: locals.user.id,
+			userId: Number(locals.user.id),
 			userName: locals.user.email,
 			caseId,
 			type,

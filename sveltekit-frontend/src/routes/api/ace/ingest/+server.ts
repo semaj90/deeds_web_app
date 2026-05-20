@@ -865,7 +865,7 @@ async function createGraphNode(
           uniqueCitations.length > 0 ? { citations: uniqueCitations, domain: hostname } : null,
         relevance_score: 50,
         status: 'active',
-        created_by: userId,
+        created_by: Number(userId),
       })
       .returning({ id: yorhaEvidenceNodes.id });
 
@@ -909,7 +909,7 @@ async function createGraphNode(
                 strength: Math.round((hit.score ?? 0.5) * 100),
                 description: `Auto-discovered similarity between ingested source and existing evidence`,
                 confidence_score: Math.round((hit.score ?? 0.5) * 100),
-                created_by: userId,
+                created_by: Number(userId),
               })
               .onConflictDoNothing();
           }

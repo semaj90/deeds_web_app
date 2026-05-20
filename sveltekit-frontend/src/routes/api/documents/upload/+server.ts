@@ -118,7 +118,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         originalName: fileName,
         status: 'pending',
         metadata: {
-          uploadedBy: locals.user.id,
+          uploadedBy: Number(locals.user.id),
           uploadedAt: new Date().toISOString(),
           sessionId,
         },
@@ -140,7 +140,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           embedding_status: 'pending',
           metadata: {
             caseId,
-            uploadedBy: locals.user.id,
+            uploadedBy: Number(locals.user.id),
           },
         })
         .returning();
@@ -160,7 +160,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       fileName,
       sessionId,
       caseId,
-      userId: locals.user.id,
+      userId: Number(locals.user.id),
       timestamp: Date.now(),
     });
 

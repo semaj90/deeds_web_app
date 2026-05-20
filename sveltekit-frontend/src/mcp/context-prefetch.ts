@@ -351,7 +351,7 @@ export async function buildFeaturePrefetchContext(input: FeaturePrefetchContextI
     activity: {
       logPath: ACTIVITY_LOG_PATH,
       totalEntries: activityEntries.length,
-      recentFiles: recentUnique,
+      recentFiles: recentUnique.map(e => ({ ...e, symbols: e.symbols ?? [] })),
     },
     directoryContexts,
     communityContexts,

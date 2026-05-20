@@ -2063,6 +2063,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/admin/ace-metrics/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/admin/agent/fix/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -2111,6 +2117,30 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/admin/atlas/cluster-search/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/atlas/couchdb-rollback/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/atlas/couchdb-status/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/atlas/couchdb-synthesize/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/admin/atlas/graph/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -2129,6 +2159,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/admin/atlas/messy-routing/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/admin/atlas/node/[id]/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -2138,6 +2174,12 @@
   "sveltekit-frontend/src/routes/api/admin/atlas/query/+server.ts": {
     "zone": "shared",
     "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/atlas/turbovec-prefilter/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -2166,6 +2208,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/admin/diagnose/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/grpo/flush/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -2375,6 +2423,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ai/context/compact-search/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ai/contextual-chat/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -2460,6 +2514,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/ai/stats/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/status/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -5502,6 +5562,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/search/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/search/ace/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

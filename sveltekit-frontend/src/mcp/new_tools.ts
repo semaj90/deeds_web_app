@@ -59,7 +59,7 @@ export function registerNewTools(
       })),
       ...packet.directoryContexts.slice(0, 2).map((context) => ({
         sourceRef: context.agentsMd?.resolvedPath ?? context.dir,
-        kind: (context.agentsMd ? 'agents-md' : 'source') as const,
+        kind: (context.agentsMd ? 'agents-md' : 'source') as 'agents-md' | 'source',
         summary: compactText(context.summary, 220),
         score: Number(normalizeCompactScore(context.score).toFixed(3)),
       })),
@@ -491,12 +491,12 @@ export function registerNewTools(
     },
     async (options) => {
       try {
-        const packet = await loadAtlasCompactContext(options);
+        const compact = await loadAtlasCompactContext(options);
         return {
           content: [
             {
               type: 'text' as const,
-              text: JSON.stringify(buildAtlasCompactContext(packet), null, 2),
+              text: JSON.stringify(compact, null, 2),
             },
           ],
         };
@@ -517,8 +517,7 @@ export function registerNewTools(
     },
     async (options) => {
       try {
-        const packet = await loadAtlasCompactContext(options);
-        const compact = buildAtlasCompactContext(packet);
+        const compact = await loadAtlasCompactContext(options);
         return {
           content: [
             {
@@ -553,8 +552,7 @@ export function registerNewTools(
     },
     async (options) => {
       try {
-        const packet = await loadAtlasCompactContext(options);
-        const compact = buildAtlasCompactContext(packet);
+        const compact = await loadAtlasCompactContext(options);
         return {
           content: [
             {
@@ -589,8 +587,7 @@ export function registerNewTools(
     },
     async (options) => {
       try {
-        const packet = await loadAtlasCompactContext(options);
-        const compact = buildAtlasCompactContext(packet);
+        const compact = await loadAtlasCompactContext(options);
         return {
           content: [
             {
@@ -643,8 +640,7 @@ export function registerNewTools(
     },
     async ({ chunkId, chunkIndex, sourceRef, ...options }) => {
       try {
-        const packet = await loadAtlasCompactContext(options);
-        const compact = buildAtlasCompactContext(packet);
+        const compact = await loadAtlasCompactContext(options);
         const index = compact.chunk_index;
         const prioritizedChunk = chunkId
           ? index.find((chunk) => chunk.chunkId === chunkId)

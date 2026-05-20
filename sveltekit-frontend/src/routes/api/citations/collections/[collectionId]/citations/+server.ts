@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 			.where(
 				and(
 					eq(citationCollections.id, collectionId),
-					eq(citationCollections.userId, locals.user.id)
+					eq(citationCollections.userId, Number(locals.user.id))
 				)
 			)
 			.limit(1);
@@ -116,7 +116,7 @@ export const DELETE: RequestHandler = async ({ locals, params, request }) => {
 			.where(
 				and(
 					eq(citationCollections.id, collectionId),
-					eq(citationCollections.userId, locals.user.id)
+					eq(citationCollections.userId, Number(locals.user.id))
 				)
 			)
 			.limit(1);
@@ -177,7 +177,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 			.where(
 				and(
 					eq(citationCollections.id, collectionId),
-					eq(citationCollections.userId, locals.user.id)
+					eq(citationCollections.userId, Number(locals.user.id))
 				)
 			)
 			.limit(1);

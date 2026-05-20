@@ -1,0 +1,345 @@
+{
+  "generatedAt": "2026-05-19T02:31:44.583Z",
+  "queries": [
+    {
+      "query": "why does the evidence upload modal reject files when qdrant is healthy and the Redis cache shows old gpu:karpathy:scores values",
+      "parse": {
+        "files": [],
+        "ports": [],
+        "services": [
+          "qdrant",
+          "Redis"
+        ],
+        "errors": [],
+        "commands": [],
+        "concepts": [
+          "cache"
+        ]
+      },
+      "subqueries": [
+        "why does the evidence upload modal reject files when qdrant is healthy",
+        "the Redis cache shows old gpu:karpathy:scores values"
+      ],
+      "signal": {
+        "semantic": 0.9,
+        "lexical": 0.9,
+        "graph": 0.25,
+        "trust": 0.1,
+        "total": 0.6833333333333332,
+        "messy": true
+      },
+      "routing": {
+        "laneWeights": {
+          "chr97": 0.351,
+          "hyperrag": 0.286,
+          "graphrag": 0.202,
+          "mcp": 0.161
+        },
+        "dispatch": [
+          "chr97",
+          "hyperrag"
+        ],
+        "raw": [
+          1.1575,
+          0.9550000000000002,
+          0.6050000000000001,
+          0.37750000000000006
+        ],
+        "vector": [
+          0.9,
+          0.9,
+          0.25,
+          0.1
+        ]
+      },
+      "chr97": {
+        "path": "CHR97 fast path",
+        "selected": false,
+        "confidence": 0.351,
+        "verdict": "fallback",
+        "candidateFile": null
+      },
+      "fallback": {
+        "path": "HyperRAG fallback",
+        "lanes": [
+          "hyperrag"
+        ],
+        "gating": {
+          "chr97": 0.351,
+          "hyperrag": 0.286,
+          "graphrag": 0.202,
+          "mcp": 0.161
+        },
+        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 is not confident enough"
+      },
+      "toolPlan": [
+        {
+          "tool": "mcp:service-inspector",
+          "reason": "query references runtime services/protocols"
+        }
+      ]
+    },
+    {
+      "query": "find dependency path between src/lib/server/ace/context-assembler.ts and qdrant cluster prefilter code",
+      "parse": {
+        "files": [
+          "src/lib/server/ace/context-assembler.ts"
+        ],
+        "ports": [],
+        "services": [
+          "qdrant"
+        ],
+        "errors": [],
+        "commands": [],
+        "concepts": []
+      },
+      "subqueries": [
+        "find dependency path between src/lib/server/ace/context-assembler.ts",
+        "qdrant cluster prefilter code"
+      ],
+      "signal": {
+        "semantic": 0.4,
+        "lexical": 0.9,
+        "graph": 0.85,
+        "trust": 0.1,
+        "total": 0.7166666666666667,
+        "messy": true
+      },
+      "routing": {
+        "laneWeights": {
+          "chr97": 0.258,
+          "hyperrag": 0.266,
+          "graphrag": 0.303,
+          "mcp": 0.172
+        },
+        "dispatch": [
+          "graphrag"
+        ],
+        "raw": [
+          0.8825000000000001,
+          0.915,
+          1.045,
+          0.47750000000000004
+        ],
+        "vector": [
+          0.4,
+          0.9,
+          0.85,
+          0.1
+        ]
+      },
+      "chr97": {
+        "path": "CHR97 fast path",
+        "selected": false,
+        "confidence": 0.258,
+        "verdict": "fallback",
+        "candidateFile": "src/lib/server/ace/context-assembler.ts"
+      },
+      "fallback": {
+        "path": "HyperRAG fallback",
+        "lanes": [
+          "graphrag"
+        ],
+        "gating": {
+          "chr97": 0.258,
+          "hyperrag": 0.266,
+          "graphrag": 0.303,
+          "mcp": 0.172
+        },
+        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 is not confident enough"
+      },
+      "toolPlan": [
+        {
+          "tool": "mcp:service-inspector",
+          "reason": "query references runtime services/protocols"
+        },
+        {
+          "tool": "mcp:codebase-file-lens",
+          "reason": "query includes repo-relative files"
+        }
+      ]
+    },
+    {
+      "query": "check if Neo4j graph retrieval can explain failure of hermes tool output for TurboQuant router",
+      "parse": {
+        "files": [],
+        "ports": [],
+        "services": [
+          "Neo4j",
+          "hermes",
+          "TurboQuant"
+        ],
+        "errors": [
+          "failure"
+        ],
+        "commands": [],
+        "concepts": [
+          "retrieval",
+          "tool",
+          "router"
+        ]
+      },
+      "subqueries": [
+        "check if Neo4j graph retrieval can explain failure of hermes tool output for TurboQuant router"
+      ],
+      "signal": {
+        "semantic": 0.9,
+        "lexical": 0.9,
+        "graph": 0.85,
+        "trust": 0.1,
+        "total": 0.8833333333333333,
+        "messy": false
+      },
+      "routing": {
+        "laneWeights": {
+          "chr97": 0.327,
+          "hyperrag": 0.244,
+          "graphrag": 0.278,
+          "mcp": 0.15
+        },
+        "dispatch": [
+          "chr97"
+        ],
+        "raw": [
+          1.3074999999999999,
+          1.0150000000000001,
+          1.145,
+          0.5275
+        ],
+        "vector": [
+          0.9,
+          0.9,
+          0.85,
+          0.1
+        ]
+      },
+      "chr97": {
+        "path": "CHR97 fast path",
+        "selected": false,
+        "confidence": 0.327,
+        "verdict": "fallback",
+        "candidateFile": null
+      },
+      "fallback": {
+        "path": "HyperRAG fallback",
+        "lanes": [],
+        "gating": {
+          "chr97": 0.327,
+          "hyperrag": 0.244,
+          "graphrag": 0.278,
+          "mcp": 0.15
+        },
+        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 is not confident enough"
+      },
+      "toolPlan": [
+        {
+          "tool": "mcp:command-checker",
+          "reason": "query asks for action or execution",
+          "allowlist": [
+            "docker",
+            "npm",
+            "git",
+            "redis",
+            "qdrant",
+            "psql"
+          ]
+        },
+        {
+          "tool": "mcp:service-inspector",
+          "reason": "query references runtime services/protocols"
+        }
+      ]
+    },
+    {
+      "query": "run a safe grep for old postgres migrations and explain why user_id mismatch happens in drift cases",
+      "parse": {
+        "files": [],
+        "ports": [],
+        "services": [
+          "postgres"
+        ],
+        "errors": [
+          "mismatch"
+        ],
+        "commands": [],
+        "concepts": []
+      },
+      "subqueries": [
+        "run a safe grep for old postgres migrations",
+        "explain why user_id mismatch happens in drift cases"
+      ],
+      "signal": {
+        "semantic": 0.9,
+        "lexical": 0.9,
+        "graph": 0.25,
+        "trust": 0.1,
+        "total": 0.6833333333333332,
+        "messy": true
+      },
+      "routing": {
+        "laneWeights": {
+          "chr97": 0.351,
+          "hyperrag": 0.286,
+          "graphrag": 0.202,
+          "mcp": 0.161
+        },
+        "dispatch": [
+          "chr97",
+          "hyperrag"
+        ],
+        "raw": [
+          1.1575,
+          0.9550000000000002,
+          0.6050000000000001,
+          0.37750000000000006
+        ],
+        "vector": [
+          0.9,
+          0.9,
+          0.25,
+          0.1
+        ]
+      },
+      "chr97": {
+        "path": "CHR97 fast path",
+        "selected": false,
+        "confidence": 0.351,
+        "verdict": "fallback",
+        "candidateFile": null
+      },
+      "fallback": {
+        "path": "HyperRAG fallback",
+        "lanes": [
+          "hyperrag"
+        ],
+        "gating": {
+          "chr97": 0.351,
+          "hyperrag": 0.286,
+          "graphrag": 0.202,
+          "mcp": 0.161
+        },
+        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 is not confident enough"
+      },
+      "toolPlan": [
+        {
+          "tool": "mcp:command-checker",
+          "reason": "query asks for action or execution",
+          "allowlist": [
+            "docker",
+            "npm",
+            "git",
+            "redis",
+            "qdrant",
+            "psql"
+          ]
+        },
+        {
+          "tool": "mcp:service-inspector",
+          "reason": "query references runtime services/protocols"
+        }
+      ]
+    }
+  ],
+  "sampleKarpathy": [],
+  "summary": {}
+}
