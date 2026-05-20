@@ -8,8 +8,15 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { flushGrpoQueue } from '$lib/server/analytics/grpo-exporter.js';
 import { rewardQueueLength } from '$lib/server/analytics/reward-events.js';
+
+const FlushRequestSchema = z
+  .object({
+    batchSize: z.number().int().min(1).max(2000).optional(),
+  })
+  .strict();
 
 export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -21,11 +28,13 @@ export const GET: RequestHandler = async ({ locals }) => {
 export const POST: RequestHandler = async ({ locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-  let batchSize = 500;
-  try {
-    const body = await request.json().catch(() => ({}));
-    if (typeof body.batchSize === 'number') batchSize = Math.min(body.batchSize, 2000);
-  } catch { /* use default */ }
+  const body = await request.json().catch(() => ({}));
+  const parsedBody = FlushRequestSchema.safeParse(body);
+  if (!parsedBody.success) {
+    return json({ error: 'Invalid request body' }, { status: 400 });
+  }
+
+  const batchSize = parsedBody.data.batchSize ?? 500;
 
   const result = await flushGrpoQueue({
     batchSize,

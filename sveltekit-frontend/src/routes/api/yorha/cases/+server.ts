@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema.js';
 import { desc, sql } from 'drizzle-orm';
+import { insertCaseSchema } from '$lib/server/db/zod-schemas.js';
 
 const caseStatusValues = [
 	'open',
@@ -60,10 +61,10 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 };
 
 const createCaseSchema = z.object({
-	title: z.string().min(1).max(500),
-	description: z.string().max(10000).optional(),
-	status: z.enum(caseStatusValues).default('open'),
-	priority: z.enum(casePriorityValues).default('medium')
+	title: insertCaseSchema.shape.title,
+	description: insertCaseSchema.shape.description,
+	status: insertCaseSchema.shape.status.default('open'),
+	priority: insertCaseSchema.shape.priority.default('medium')
 });
 
 /** POST /api/yorha/cases — Create a new case */

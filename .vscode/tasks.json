@@ -2066,7 +2066,7 @@
     {
       "label": "🗄️ Local: Open DB Studio",
       "type": "shell",
-      "command": "npm run db:studio",
+      "command": "npm run drizzle:studio",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -6777,7 +6777,7 @@
     {
       "label": "⚡ TurboQuant: Start VLM (text + vision, :8090)",
       "type": "shell",
-      "command": "C:/Users/james/Desktop/llama-server-cuda/llama-server.exe -m C:/Users/james/.ollama/blobs/sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7 --mmproj C:/Users/james/Downloads/gemma4-mmproj/mmproj-BF16.gguf --host 0.0.0.0 --port 8090 -ngl 99 --ctx-size 8192 --threads 6",
+      "command": "C:/Users/james/Desktop/llama-server-cuda/llama-server.exe -m C:/Users/james/.ollama/blobs/sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7 --mmproj C:/Users/james/Downloads/gemma4-mmproj/mmproj-BF16.gguf --host 0.0.0.0 --port 8090 -ngl 99 --ctx-size 40000 --flash-attn --threads 6",
       "isBackground": true,
       "group": "build",
       "detail": "Launch TurboQuant llama-server with mmproj for unified text+vision inference (gemma4-legal-vlm Q4_K_M + SigLIP projector, ~6GB VRAM)",
@@ -7915,7 +7915,7 @@
         "--port",
         "8090",
         "--ctx-size",
-        "4096",
+        "40000",
         "--flash-attn",
         "on",
         "--ngl",

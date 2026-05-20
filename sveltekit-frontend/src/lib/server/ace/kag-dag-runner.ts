@@ -82,12 +82,16 @@ export class KagDagRunner {
       const node = this.nodes.get(nodeName);
       if (node && node.dependsOn.length > 0) {
         for (const dep of node.dependsOn) {
-          await db.insert(kagDagEdges).values({
-            runId,
-            fromNodeKey: dep,
-            toNodeKey: nodeName,
-            edgeType: 'depends_on'
-          }).catch(() => {}); // ignore duplicates
+          try {
+            await db.insert(kagDagEdges).values({
+              runId,
+              fromNodeKey: dep,
+              toNodeKey: nodeName,
+              edgeType: 'depends_on'
+            });
+          } catch {
+            // ignore duplicates
+          }
         }
       }
     }
@@ -143,31 +147,37 @@ export class KagDagRunner {
   }
 
   private async logNodeStart(runId: string, nodeName: string) {
-    await db.insert(kagDagNodes).values({
-      runId,
-      nodeKey: nodeName,
-      nodeType: nodeName,
-      status: 'running',
-    }).catch(() => {});
+    try {
+      await db.insert(kagDagNodes).values({
+        runId,
+        nodeKey: nodeName,
+        nodeType: nodeName,
+        status: 'running',
+      });
+    } catch {}
   }
 
   private async logNodeFinish(runId: string, nodeName: string, output: any, durationMs: number, cacheHit: boolean) {
-    await db.update(kagDagNodes).set({
-      status: 'success',
-      output,
-      durationMs,
-      cacheHit,
-      finishedAt: new Date()
-    }).where(and(eq(kagDagNodes.runId, runId), eq(kagDagNodes.nodeKey, nodeName))).catch(() => {});
+    try {
+      await db.update(kagDagNodes).set({
+        status: 'success',
+        output,
+        durationMs,
+        cacheHit,
+        finishedAt: new Date()
+      }).where(and(eq(kagDagNodes.runId, runId), eq(kagDagNodes.nodeKey, nodeName)));
+    } catch {}
   }
 
   private async logNodeError(runId: string, nodeName: string, error: Error, durationMs: number) {
-    await db.update(kagDagNodes).set({
-      status: 'error',
-      error: { message: error.message, stack: error.stack },
-      durationMs,
-      finishedAt: new Date()
-    }).where(and(eq(kagDagNodes.runId, runId), eq(kagDagNodes.nodeKey, nodeName))).catch(() => {});
+    try {
+      await db.update(kagDagNodes).set({
+        status: 'error',
+        error: { message: error.message, stack: error.stack },
+        durationMs,
+        finishedAt: new Date()
+      }).where(and(eq(kagDagNodes.runId, runId), eq(kagDagNodes.nodeKey, nodeName)));
+    } catch {}
   }
 }
 

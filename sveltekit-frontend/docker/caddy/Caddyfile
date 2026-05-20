@@ -102,6 +102,22 @@
 		reverse_proxy {$VECTOR_BACKEND:host.docker.internal:8095}
 	}
 
+	# ───── TRACE MCP ─────
+	handle /mcp* {
+		reverse_proxy host.docker.internal:8788 {
+			flush_interval -1
+			import proxy_headers
+		}
+	}
+
+	# ───── Optional direct llama-server lane ─────
+	handle_path /llama/* {
+		reverse_proxy host.docker.internal:8090 {
+			flush_interval -1
+			import proxy_headers
+		}
+	}
+
 	# ───── Default: all other traffic to SvelteKit ─────
 	reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
 		transport http {

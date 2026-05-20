@@ -1705,8 +1705,9 @@ export const themesRelations = relations(themes, ({ one }) => ({
  user: one(users, { fields: [themes.userId], references: [users.id] }),
 }));
 
-export const personsOfInterestRelations = relations(personsOfInterest, ({ many }) => ({
+export const personsOfInterestRelations = relations(personsOfInterest, ({ one, many }) => ({
 	photos: many(poiPhotos),
+	case: one(cases, { fields: [personsOfInterest.caseId], references: [cases.id] }),
 }));
 
 export const poiPhotosRelations = relations(poiPhotos, ({ one }) => ({

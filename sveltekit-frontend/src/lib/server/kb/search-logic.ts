@@ -23,6 +23,9 @@ export interface Card {
   confidence: string;
   status: string;
   updated_at: string;
+  card_type?: string;
+  cluster_key?: string;
+  route?: string;
 }
 
 export interface SearchResult {
@@ -52,6 +55,9 @@ export interface SearchFilters {
   tag?: string | string[];
   sourcePath?: string | string[];
   source_id?: string | string[];
+  card_type?: string | string[];
+  cluster_key?: string | string[];
+  route?: string | string[];
 }
 
 export interface NeighborExpansionResult {
@@ -93,6 +99,15 @@ function matchesFilters(card: Card, filters?: SearchFilters): boolean {
     const cardTags = new Set((card.tags || []).map(normalizeText));
     if (!tagFilters.some((tag) => cardTags.has(tag))) return false;
   }
+
+  const cardTypeFilters = normalizeList(filters.card_type).map(normalizeText);
+  if (cardTypeFilters.length > 0 && !cardTypeFilters.includes(normalizeText(card.card_type ?? (card as any).cardType))) return false;
+
+  const clusterKeyFilters = normalizeList(filters.cluster_key).map(normalizeText);
+  if (clusterKeyFilters.length > 0 && !clusterKeyFilters.includes(normalizeText(card.cluster_key ?? (card as any).clusterKey))) return false;
+
+  const routeFilters = normalizeList(filters.route).map(normalizeText);
+  if (routeFilters.length > 0 && !routeFilters.includes(normalizeText(card.route))) return false;
 
   const sourceFilters = [
     ...normalizeList(filters.sourcePath),

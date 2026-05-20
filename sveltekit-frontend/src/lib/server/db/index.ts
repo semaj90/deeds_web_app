@@ -12,6 +12,7 @@ export const sql = drizzleSql; // Export Drizzle's sql template tag, not the cli
 export const db: PostgresJsDatabase<typeof schema> = drizzle(client, { schema });
 
 export * from './schema';
+export * from './zod-schemas.js';
 
 // Export connection string for verification
 export const DB_CONNECTION_STRING = connectionString;

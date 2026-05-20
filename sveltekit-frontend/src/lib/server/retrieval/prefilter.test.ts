@@ -2,13 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { encodedClusterPrefilter } from './encoded-cluster-prefilter.js';
 import { Redis } from 'ioredis';
 import { encode768to64 } from '../gpu/encode-768-to-64.js';
+import { invalidateCentroids64Cache } from './prefilter.redis.js';
 
 // Mock Redis
 vi.mock('ioredis', () => {
 	const Redis = vi.fn();
 	Redis.prototype.hgetall = vi.fn();
 	Redis.prototype.disconnect = vi.fn();
-	return { Redis };
+	Redis.prototype.on = vi.fn();
+	return { default: Redis, Redis };
 });
 
 // Mock encoder
@@ -25,11 +27,20 @@ describe('Encoded Cluster Prefilter', () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		invalidateCentroids64Cache();
 	});
 
 	it('should return top-K clusters based on cosine similarity', async () => {
 		const hgetall = Redis.prototype.hgetall as any;
-		hgetall.mockResolvedValueOnce(mockCentroids);
+		hgetall.mockImplementation(async (key: string) => {
+			if (key === 'gpu:autoencoder:centroids_64_meta') {
+				return { trainedAt: '2026-05-19T21:00:00Z' };
+			}
+			if (key === 'gpu:autoencoder:centroids_64') {
+				return mockCentroids;
+			}
+			return {};
+		});
 
 		// Mock encoded query to be identical to cluster_1
 		(encode768to64 as any).mockResolvedValueOnce(new Float32Array(64).fill(0.5));

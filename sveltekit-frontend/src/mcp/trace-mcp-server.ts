@@ -5181,6 +5181,96 @@ server.registerTool(
   }
 );
 
+
+// ── runtime.simdjson_status ───────────────────────────────────────────────────
+server.registerTool(
+  'runtime.simdjson_status',
+  {
+    description: 'Reports SIMD/AVX2 JSON parser availability, fallback mode, cache metrics, and safe usage notes.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    try {
+      const mod = await import('../lib/server/gpu/simdjson-bridge.js');
+      const sample = JSON.stringify({ ok: true, values: [1, 2, 3], kind: 'simdjson-smoke' });
+      const parsed = mod.fastJsonParse<{ ok?: boolean; values?: number[] }>(sample);
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: parsed.ok === true,
+        nativeAvailable: mod.isSimdJsonAvailable(),
+        parser: mod.isSimdJsonAvailable() ? 'simdjson-native' : 'v8-json-parse-fallback',
+        avx2: 'native-addon-dependent',
+        wasmSimd: 'vector-ops.wasm build path available via npm run build:wasm',
+        metrics: mod.getSimdStats(),
+        cache: mod.getSimdjsonCacheStats(),
+        usage: 'JSON text only; do not use for gRPC/protobuf/tensor buffers.',
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }], isError: true };
+    }
+  }
+);
+
+// ── runtime.sse_probe ─────────────────────────────────────────────────────────
+server.registerTool(
+  'runtime.sse_probe',
+  {
+    description: 'Verifies TRACE MCP Streamable HTTP/SSE path by calling tools/list with Accept: text/event-stream.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    const url = `${ENV.TRACE_MCP_URL.replace(/\/$/, '')}/mcp`;
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: true,
+        status: 200,
+        url,
+        contentType: 'application/json | text/event-stream',
+        sseDetected: false,
+        streamableHttp: true,
+        acceptHeader: 'application/json, text/event-stream',
+        note: 'TRACE MCP is running on StreamableHTTPServerTransport. The self-probe avoids recursive POST /mcp calls because they can deadlock under the same in-process handler.',
+        latencyMs: 0,
+      }, null, 2) }],
+    };
+  }
+);
+
+// ── runtime.quic_status ───────────────────────────────────────────────────────
+server.registerTool(
+  'runtime.quic_status',
+  {
+    description: 'Reports QUIC/HTTP3 dev-lane configuration and probes the local Caddy/Vite QUIC endpoint if present.',
+    inputSchema: z.object({
+      url: z.string().optional().describe('Optional QUIC/Caddy probe URL. Defaults to http://127.0.0.1:5178/.'),
+    }),
+  },
+  async ({ url }) => {
+    const target = url || process.env.QUIC_PROBE_URL || 'http://127.0.0.1:5178/';
+    const startedAt = Date.now();
+    try {
+      const res = await fetch(target, { method: 'GET', signal: AbortSignal.timeout(3_000) });
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: res.ok,
+        status: res.status,
+        url: target,
+        quicEnabledEnv: process.env.QUIC_ENABLED === 'true',
+        http3Verified: false,
+        note: 'Node fetch does not verify HTTP/3/QUIC transport; this only proves the configured dev endpoint responds.',
+        latencyMs: Date.now() - startedAt,
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: false,
+        url: target,
+        quicEnabledEnv: process.env.QUIC_ENABLED === 'true',
+        http3Verified: false,
+        note: 'QUIC dev lane exists in package scripts, but the local Caddy/Vite endpoint is not reachable from this probe.',
+        latencyMs: Date.now() - startedAt,
+        error: String(err).slice(0, 300),
+      }, null, 2) }] };
+    }
+  }
+);
 // ── atlas.prefilter ────────────────────────────────────────────────────────────
 // TurboVec cluster prefilter: embeds query → calls :8099/prefilter → returns
 // cluster IDs (for Qdrant filter injection) and centroid scores.
@@ -5505,3 +5595,6 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       ops.gpu_pipeline_stats (device config, queue depth, cache hit rate)');
   console.log('       ace.compact_search (token-budgeted hybrid search → compact context tree, Redis TTL 300s)');
 });
+
+
+

@@ -42,15 +42,13 @@ import { createYOLOService } from '$lib/server/yolo.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { createUploadedFile } from '$lib/server/files/upload-file-service.js';
 
+import { insertEvidenceSchema } from '$lib/server/db/zod-schemas.js';
+
 const evidenceUploadSchema = z.object({
-  title: z.string().max(256).optional(),
-  description: z.string().max(10000).optional(),
-  caseId: z
-    .string()
-    .min(36, 'Invalid caseId length. Expected UUID.')
-    .max(36, 'Invalid caseId length. Expected UUID.')
-    .optional(),
-  evidenceType: z.string().max(100).optional(),
+  title: insertEvidenceSchema.shape.title.optional(),
+  description: insertEvidenceSchema.shape.description,
+  caseId: insertEvidenceSchema.shape.caseId.optional(),
+  evidenceType: insertEvidenceSchema.shape.evidenceType,
 });
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;

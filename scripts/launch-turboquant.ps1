@@ -117,7 +117,8 @@ $mmproj = if ($env:TURBO_MMPROJ_PATH) {
     else { $null }  # no fallback — set TURBO_MMPROJ_PATH or place file at models/mmproj-BF16.gguf
 }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
-$ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '32768' }
+$ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '40000' }
+$threads = if ($env:TURBO_THREADS)     { $env:TURBO_THREADS }     else { [System.Environment]::ProcessorCount.ToString() }
 
 # ── GPU Offload (NGL) ────────────────────────────────────────────────────
 $ngl = if ($env:TURBO_NGL) { $env:TURBO_NGL } else { "35" }
@@ -269,6 +270,7 @@ Write-Host "  GPU layers:       $ngl"
 Write-Host "  Flash attention:  $TurboFlashAttn"
 Write-Host "  KV cache K:       $kvK"
 Write-Host "  KV cache V:       $kvV"
+Write-Host "  CPU threads:      $threads"
 Write-Host "  Tokens/sec:       $($env:MEASURED_TOKENS_PER_SEC ? $env:MEASURED_TOKENS_PER_SEC : 'not measured')"
 Write-Host "  VRAM:             $($env:MEASURED_VRAM ? $env:MEASURED_VRAM : 'not measured')"
 
@@ -313,8 +315,19 @@ $baseArgs = @(
   '-fa',    'on',
   '-ctk',   $kvK,
   '-ctv',   $kvV,
-  '-c',     $ctxLen
+  '-c',     $ctxLen,
+  '-t',     $threads
 )
+
+# ── Parallel slots check (Multi-core / Concurrent processing) ─────────────
+$slots = if ($env:TURBO_PARALLEL) { $env:TURBO_PARALLEL } else { '4' }
+if (Test-LlamaFlag $llama '--parallel') {
+    $baseArgs = $baseArgs + @('--parallel', $slots)
+    Write-Host "Parallel slots: --parallel $slots enabled" -ForegroundColor Cyan
+} elseif (Test-LlamaFlag $llama '-np') {
+    $baseArgs = $baseArgs + @('-np', $slots)
+    Write-Host "Parallel slots: -np $slots enabled" -ForegroundColor Cyan
+}
 
 if ($kvProfile -eq 'atomicbot') {
     # Enable TriAttention v2 (2026) for Gemma 4
@@ -429,6 +442,12 @@ if (Test-LlamaFlag $llama '--cache-reuse') {
     Write-Host "KV cache: --cache-reuse 256 enabled" -ForegroundColor Cyan
 } else {
     Write-Host "KV cache: --cache-reuse not supported by this binary — skipping" -ForegroundColor DarkYellow
+}
+
+# ── Batch threads check ───────────────────────────────────────────────────
+if (Test-LlamaFlag $llama '--threads-batch') {
+    $baseArgs = $baseArgs + @('--threads-batch', $threads)
+    Write-Host "Batch threads: --threads-batch $threads enabled" -ForegroundColor Cyan
 }
 
 # ── Foreground branch ────────────────────────────────────────────────────

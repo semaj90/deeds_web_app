@@ -93,9 +93,12 @@ After each wire:
 
 ```bash
 npm run check            # type-check
+npm run smoke:graphify   # 5-pillar graph consistency validator
 npm run audit:d9         # confirm the file moved out of true-orphan-candidate
 node scripts/triage-d9-shallow-dynamic.mjs   # confirm bucket changed
 ```
+
+For workspace-start flows, run the lightweight startup guard first, then collect recent logs, rg related files, build the `.plan.md` / `graph-map.json` pair, and finish by validating `npm run smoke:graphify` before handing off the prompt.
 
 The orphan should drop into either `runtime-referenced` (static import added) or `dynamic-referenced` (lazy `await import()`).
 

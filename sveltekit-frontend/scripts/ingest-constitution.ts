@@ -1,5 +1,5 @@
 import { uploadLibraryDocument, runIngestionPipeline } from '../src/lib/server/legal/ingestion-worker.js';
-import { promises as fs } from 'fs';
+import { promises as fs, existsSync } from 'fs';
 import path from 'path';
 
 async function ingestConstitution() {
@@ -7,7 +7,9 @@ async function ingestConstitution() {
     console.log("  California Constitution Ingestion Pipeline    ");
     console.log("=================================================");
 
-    const pdfPath = path.resolve('lawpdfs', 'California_Constitution_2023-24.pdf');
+    const pdfPath = existsSync(path.resolve('lawpdfs', 'California_Constitution_2023-24.pdf'))
+        ? path.resolve('lawpdfs', 'California_Constitution_2023-24.pdf')
+        : path.resolve('..', 'lawpdfs', 'California_Constitution_2023-24.pdf');
     try {
         console.log(`[1] Reading PDF: ${pdfPath}`);
         const fileBuffer = await fs.readFile(pdfPath);

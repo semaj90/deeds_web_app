@@ -6,9 +6,11 @@ import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { trackTokenUsage, extractOllamaTokens } from '$lib/server/ai/token-tracker.js';
 
-const chatMessageSchema = z.object({
-	role: z.enum(['user', 'assistant', 'system']),
-	content: z.string().max(10000)
+import { insertChatMessageSchema } from '$lib/server/db/zod-schemas.js';
+
+const chatMessageSchema = insertChatMessageSchema.pick({
+	role: true,
+	content: true
 });
 
 const chatRequestSchema = z.object({

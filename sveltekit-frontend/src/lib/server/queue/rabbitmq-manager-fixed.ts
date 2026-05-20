@@ -86,6 +86,7 @@ export class RabbitMQManager extends EventEmitter {
     codebase_indexing: 'codebase.indexing',
     audio_processing: 'audio.processing',
     media_processing: 'media.processing',
+    legal_media: 'legal.media',
     dlx: 'dlx.dead-letter',
   };
 
@@ -197,10 +198,11 @@ export class RabbitMQManager extends EventEmitter {
   }
 
   private async assertMainQueue(queue: string): Promise<void> {
+    const isMediaQueue = queue === this.queues.media_download || queue === this.queues.media_transcribe;
     const options = {
       durable: true,
       arguments: {
-        'x-message-ttl': 300000,
+        'x-message-ttl': isMediaQueue ? 3_600_000 : 300000,
         'x-dead-letter-exchange': this.exchanges.dlx,
         'x-dead-letter-routing-key': queue,
       },
@@ -310,13 +312,13 @@ export class RabbitMQManager extends EventEmitter {
     );
     await this.bindQueue(
       this.queues.media_download,
-      this.exchanges.media_processing,
-      'media.download'
+      this.exchanges.legal_media,
+      'media.*'
     );
     await this.bindQueue(
       this.queues.media_transcribe,
-      this.exchanges.media_processing,
-      'media.transcribe'
+      this.exchanges.legal_media,
+      'media.*'
     );
     await this.bindQueue(
       this.queues.ace_evaluate,
@@ -348,16 +350,7 @@ export class RabbitMQManager extends EventEmitter {
       this.exchanges.document_processing,
       'glyph.tile.rebuild'
     );
-    await this.bindQueue(
-      this.queues.media_download,
-      this.exchanges.media_processing,
-      'media.download'
-    );
-    await this.bindQueue(
-      this.queues.media_transcribe,
-      this.exchanges.media_processing,
-      'media.transcribe'
-    );
+
 
     console.log('✅ Queue bindings configured (with DLQ)');
   }

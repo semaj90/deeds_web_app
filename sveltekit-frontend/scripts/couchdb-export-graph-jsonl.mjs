@@ -20,6 +20,9 @@
 
 import { createWriteStream } from 'fs';
 import { resolve } from 'path';
+import Redis from 'ioredis';
+import pg from 'pg';
+const { Pool } = pg;
 
 const COUCH_RAW = process.env.COUCHDB_URL ?? 'http://admin:deeds123@127.0.0.1:5984';
 const DB        = 'karpathy_wiki';
@@ -210,6 +213,57 @@ async function main() {
     for (const alias of (doc.did_you_mean ?? [])) {
       lines.push(edgeLine(srcId, srcId, 'HAS_ALIAS', { alias }));
     }
+  }
+
+  // 5. Karpathy GPU authority nodes (from Redis gpu:karpathy:scores)
+  let redis;
+  try {
+    redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', { lazyConnect: true, enableOfflineQueue: false });
+    await redis.connect();
+    const karpathyScores = await redis.hgetall('gpu:karpathy:scores');
+    let kCount = 0;
+    for (const [filePath, raw] of Object.entries(karpathyScores ?? {})) {
+      try {
+        const score = JSON.parse(raw);
+        const id = `file:${filePath}`;
+        if (!seenIds.has(id)) {
+          seenIds.add(id);
+          lines.push(nodeLine(id, ['CodebaseFile', 'KarpathyScored'], {
+            filePath,
+            blend:     score.blend,
+            pageRank:  score.pr,
+            attention: score.attn,
+            authority: score.authority,
+          }));
+          kCount++;
+        }
+      } catch (e) {}
+    }
+    console.log(`[export] ${kCount} Karpathy GPU score nodes`);
+  } catch (e) {
+    console.warn(`[export] Skipping Karpathy GPU export: ${e.message}`);
+  } finally {
+    if (redis) await redis.quit().catch(()=>{});
+  }
+
+  // 6. Obsidian vault (from Postgres hyperedge_sources where edge_type = 'vault_link')
+  try {
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL || 'postgres://postgres:postgres123@127.0.0.1:5434/deeds_web' });
+    const res = await pool.query(`SELECT source_id, target_id, meta FROM hyperedge_sources WHERE edge_type = 'vault_link'`);
+    let oCount = 0;
+    for (const row of res.rows) {
+      const sourceNoteId = `obsidian:${row.source_id}`;
+      if (!seenIds.has(sourceNoteId)) {
+        seenIds.add(sourceNoteId);
+        lines.push(nodeLine(sourceNoteId, ['ObsidianNote'], { noteId: row.source_id }));
+        oCount++;
+      }
+      lines.push(edgeLine(sourceNoteId, row.target_id, 'LINKED_TO', row.meta ?? {}));
+    }
+    console.log(`[export] ${oCount} Obsidian vault nodes and ${res.rows.length} LINKED_TO edges`);
+    await pool.end();
+  } catch (err) {
+    console.warn('[export] Skipping Obsidian vault export:', err.message);
   }
 
   console.log(`[export] Total lines: ${lines.length} (${[...seenIds].length} unique nodes)`);

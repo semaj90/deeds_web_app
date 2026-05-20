@@ -1,6 +1,12 @@
 import type { SkillRecipe } from './registry.js';
 
 export const VECTOR_CLUSTER_SKILLS: Record<string, SkillRecipe> = {
+  som_topology_stats: {
+    id: 'som_topology_stats',
+    family: 'VectorCluster',
+    description: 'Get statistics about the SOM topology from Redis',
+    tools: [{ name: 'som_topology_stats' }]
+  },
   qdrant_search: {
     id: 'qdrant_search',
     family: 'VectorCluster',

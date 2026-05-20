@@ -62,6 +62,9 @@ export interface GlyphRecord {
   // Render payload
   sourceName?: string;       // filename / display label
   entities?: string[];       // extracted named entities (merged into chr97 rune entities)
+  cartridge_kind?: string | null;
+  glyph_kind?: string | null;
+  cluster_key?: string | null;
 }
 
 // ─── GlyphBridge interface ────────────────────────────────────────────────────
@@ -171,6 +174,9 @@ class GlyphCartridgeBridge implements GlyphBridge {
         : record.embedding768.length,
       collections: ['glyph'],
       sources: record.sourceName ? [record.sourceName] : [],
+      cartridge_kind: record.cartridge_kind ?? null,
+      glyph_kind: record.glyph_kind ?? null,
+      cluster_key: record.cluster_key ?? null,
     };
     const buf = buildCartridge([rune], meta);
     return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
@@ -193,6 +199,9 @@ class GlyphCartridgeBridge implements GlyphBridge {
       embeddingDim: runes[0]?.embedding.length ?? 768,
       collections: [...new Set(glyphs.map((g) => g.type))],
       sources: [...new Set(glyphs.map((g) => g.sourceName).filter(Boolean) as string[])],
+      cartridge_kind: glyphs[0]?.cartridge_kind ?? null,
+      glyph_kind: glyphs[0]?.glyph_kind ?? null,
+      cluster_key: glyphs[0]?.cluster_key ?? null,
     };
     const buf = buildCartridge(runes, meta);
     return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);

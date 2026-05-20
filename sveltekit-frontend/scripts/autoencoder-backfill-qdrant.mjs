@@ -161,37 +161,44 @@ async function qdrantPut(path, body) {
     return res.json();
 }
 
-async function qdrantPatch(path, body) {
-    const res = await fetch(`${QDRANT_URL}${path}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error(`PATCH ${path} → ${res.status} ${await res.text()}`);
-    return res.json();
-}
-
 // ── Ensure encoded_64 vector slot exists in the collection schema ─────────────
 async function ensureVectorSlot() {
     const info = await qdrantGet(`/collections/${COLLECTION}`);
     const vectors = info.result?.config?.params?.vectors ?? {};
     if (vectors[ENCODED_NAME]) {
         log(`[qdrant] '${ENCODED_NAME}' slot already configured (dim=${vectors[ENCODED_NAME].size}).`);
-        return;
+        return true;
     }
-    log(`[qdrant] '${ENCODED_NAME}' slot not found — adding (dim=${ENCODED_DIM}, Cosine)...`);
+    log(
+      `[qdrant] '${ENCODED_NAME}' slot not found — adding via named-vector API (dim=${ENCODED_DIM}, Cosine)...`
+    );
     if (FLAGS.dryRun) {
-        log(`[dry-run] Would PATCH /collections/${COLLECTION} to add '${ENCODED_NAME}'.`);
-        return;
+        log(
+          `[dry-run] Would PUT /collections/${COLLECTION}/vectors/${ENCODED_NAME} to add '${ENCODED_NAME}'.`
+        );
+        return false;
     }
-    await qdrantPatch(`/collections/${COLLECTION}`, {
-        params: {
-            vectors: {
-                [ENCODED_NAME]: { size: ENCODED_DIM, distance: 'Cosine' },
-            },
-        },
-    });
-    log(`[qdrant] '${ENCODED_NAME}' slot added.`);
+    try {
+      await qdrantPut(`/collections/${COLLECTION}/vectors/${ENCODED_NAME}`, {
+        dense: { size: ENCODED_DIM, distance: 'Cosine' },
+      });
+      log(`[qdrant] '${ENCODED_NAME}' slot added via named-vector API.`);
+      const refreshed = await qdrantGet(`/collections/${COLLECTION}`);
+      return Boolean(refreshed.result?.config?.params?.vectors?.[ENCODED_NAME]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (
+        message.includes('409') ||
+        message.includes('404') ||
+        message.includes('already exists')
+      ) {
+        log(
+          `[qdrant] '${ENCODED_NAME}' slot could not be added via Qdrant vector-name API; using payload fallback.`
+        );
+        return false;
+      }
+      throw error;
+    }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -212,7 +219,7 @@ async function main() {
     }
 
     // 2. Ensure vector slot
-    await ensureVectorSlot();
+    const hasEncodedVectorSlot = await ensureVectorSlot();
 
     // 3. Scroll → encode → upsert
     let offset      = null;
@@ -274,38 +281,52 @@ async function main() {
             // Two-layer tanh encode (CPU)
             const encoded = encodeBatch(matrix, toEncode.length, weights);
 
-            // Build per-point upsert payloads
-            const vectorPoints = toEncode.map(({ id }, i) => ({
-                id,
-                vector: {
-                    [ENCODED_NAME]: Array.from(encoded.subarray(i * ENCODED_DIM, (i + 1) * ENCODED_DIM)),
-                },
-            }));
-            const payloadPoints = toEncode.map(({ id }) => ({ id }));
-            const encodedAtPayload = { encoded_at: weights.trainedAt };
+            const encoded64Vectors = toEncode.map((_, i) =>
+              Array.from(encoded.subarray(i * ENCODED_DIM, (i + 1) * ENCODED_DIM))
+            );
+            const pointIds = toEncode.map(({ id }) => id);
 
             if (!FLAGS.dryRun) {
-                // Update just the encoded_64 named vector (leaves content/signature intact)
+              if (hasEncodedVectorSlot) {
+                const vectorPoints = encoded64Vectors.map((encoded64, i) => ({
+                  id: pointIds[i],
+                  vector: {
+                    [ENCODED_NAME]: encoded64,
+                  },
+                }));
+
                 const upsertRes = await qdrantPut(
-                    `/collections/${COLLECTION}/points/vectors?wait=true`,
-                    { points: vectorPoints }
+                  `/collections/${COLLECTION}/points/vectors?wait=true`,
+                  { points: vectorPoints }
                 );
                 if (upsertRes.status !== 'ok' && upsertRes.result?.status !== 'completed') {
-                    totalFailed += toEncode.length;
-                    console.error(`[warn] Vector upsert failed: ${JSON.stringify(upsertRes)}`);
-                } else {
-                    // Also stamp the payload with encoded_at
-                    await qdrantPost(
-                        `/collections/${COLLECTION}/points/payload?wait=true`,
-                        {
-                            payload: encodedAtPayload,
-                            points: payloadPoints.map(p => p.id),
-                        }
-                    );
-                    totalEncoded += toEncode.length;
+                  console.error(
+                    `[warn] Vector upsert failed; falling back to payload-only writes: ${JSON.stringify(upsertRes)}`
+                  );
                 }
+              }
+
+              if (hasEncodedVectorSlot) {
+                await qdrantPost(`/collections/${COLLECTION}/points/payload?wait=true`, {
+                  payload: { encoded_at: weights.trainedAt },
+                  points: pointIds,
+                });
+              } else {
+                await Promise.all(
+                  toEncode.map(({ id }, index) =>
+                    qdrantPost(`/collections/${COLLECTION}/points/payload?wait=true`, {
+                      payload: {
+                        encoded_at: weights.trainedAt,
+                        [ENCODED_NAME]: encoded64Vectors[index],
+                      },
+                      points: [id],
+                    })
+                  )
+                );
+              }
+              totalEncoded += toEncode.length;
             } else {
-                totalEncoded += toEncode.length;
+              totalEncoded += toEncode.length;
             }
         }
 

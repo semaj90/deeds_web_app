@@ -1,6 +1,6 @@
 /**
  * Hermes Stable Tool Registry
- * 
+ *
  * Defines the primitive building blocks (Layer 1) for Hermes skills.
  * These are the atomic actions that can be executed.
  */
@@ -10,6 +10,7 @@ import { executeWikiLookup } from '../../hermes-planner.js';
 import { db } from '$lib/server/db/client';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import { probeAutoencoderWeights } from '$lib/server/gpu/autoencoder-weights.js';
 
 export interface ToolDefinition {
   name: string;
@@ -67,7 +68,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
       const limit = typeof args.limit === 'number' ? args.limit : 20;
       const dbName = typeof args.db === 'string' ? args.db : 'karpathy_wiki';
       const design = typeof args.design === 'string' ? args.design : 'wiki';
-      
+
       const result = await couchdb.view(dbName, design, view, { limit: String(limit) });
       return {
         view,
@@ -131,10 +132,10 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
       const query = args.query || ctx.userQuery;
       const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
       const qEmbed = await generateSingleEmbedding(query);
-      
+
       const chunkEmbeds = args.hits.map((h: any) => h.embedding || []);
       const scores = await attentionScoreChunks(qEmbed, chunkEmbeds);
-      
+
       return args.hits.map((h: any, i: number) => ({
         ...h,
         attentionScore: scores[i] || 0
@@ -152,7 +153,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
 
       const centroids = JSON.parse(centroidsRaw) as number[][];
       const { batchCosineSimilarity } = await import('$lib/server/gpu/libtorch-bridge.js');
-      
+
       const filtered = [];
       for (const hit of args.hits) {
         if (!hit.embedding) {
@@ -164,7 +165,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
         const maxSim = Math.max(...scores);
         filtered.push({ ...hit, topoDistance: 1.0 - maxSim });
       }
-      
+
       return filtered.sort((a, b) => a.topoDistance - b.topoDistance);
     }
   },
@@ -185,7 +186,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
       const { transcribeViaServer } = await import('$lib/server/ai/whisper.js');
       const { transcribeAudio } = await import('$lib/server/analysis/media-processing.js').catch(() => ({ transcribeAudio: null }));
       const fs = await import('fs/promises');
-      
+
       let buffer: Buffer | null = null;
       let filename = 'audio.wav';
 
@@ -263,7 +264,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
     description: 'General system health check (Redis, Postgres, Qdrant, gRPC)',
     handler: async () => {
       const results: Record<string, any> = {};
-      
+
       // Redis
       try {
         const redis = getRedis();
@@ -433,29 +434,33 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
     description: 'Infer missing states in indexing pipeline',
     handler: async () => {
       const redis = getRedis();
-      const [clusterKeys, karpathyFiles, centroidsMeta, weightsMeta] =
+      const [clusterKeys, karpathyFiles, centroidsMeta, autoencoderProbe] =
         await Promise.allSettled([
           redis.keys('cluster:summary:*'),
           redis.hlen('gpu:karpathy:scores'),
           redis.hget('gpu:autoencoder:centroids_64_meta', 'count'),
-          redis.hget('ace:autoencoder:meta', 'trainedAt'),
+          probeAutoencoderWeights(),
         ]);
 
       const clusterCount = clusterKeys.status === 'fulfilled' ? clusterKeys.value.length : 0;
       const karpathyCount = karpathyFiles.status === 'fulfilled' ? karpathyFiles.value : 0;
       const centroidCount = centroidsMeta.status === 'fulfilled' ? Number(centroidsMeta.value ?? 0) : 0;
-      const weightsAt = weightsMeta.status === 'fulfilled' ? weightsMeta.value : null;
+      const probe = autoencoderProbe.status === 'fulfilled' ? autoencoderProbe.value : null;
+      const weightsAt = probe?.ok ? probe.trainedAt : null;
+      const autoencoderReason = probe?.ok ? null : (probe?.reason ?? 'Autoencoder weights unavailable');
 
       const missing: string[] = [];
       if (clusterCount === 0) missing.push('CLUSTER_SUMMARIZED');
       if (karpathyCount === 0) missing.push('KARPATHY_SCORED');
       if (centroidCount === 0) missing.push('ENCODED_64_READY');
+      if (!weightsAt) missing.push('AUTOENCODER_WEIGHTS_TRAINED');
 
       return {
         clusterSummaryCount: clusterCount,
         karpathyScoredFiles: karpathyCount,
         centroidCount,
         autoencoderWeightsAt: weightsAt,
+        autoencoderProbeReason: autoencoderReason,
         missingStates: missing,
         healthy: missing.length === 0,
       };
@@ -723,10 +728,10 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
       const res = await fetch(`${ENV.PUBLIC_API_URL}/api/ai/agent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          task: args.task, 
+        body: JSON.stringify({
+          task: args.task,
           parentTaskId: ctx.runId,
-          userId: ctx.userId 
+          userId: ctx.userId
         })
       });
       return await res.json();
@@ -756,7 +761,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
       const redis = getRedis();
       const summary = await redis.hgetall('gpu:karpathy:summary');
       const centroidsMeta = await redis.hgetall('gpu:autoencoder:centroids_64_meta');
-      
+
       return {
         grid: {
           rows: parseInt(summary.gridRows || '0'),
@@ -777,9 +782,9 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
     handler: async (args) => {
       const { couchdb } = await import('$lib/server/services/couchdb-client.js');
       const lang = typeof args.language === 'string' ? args.language.toLowerCase() : 'en';
-      const result = await couchdb.view('playbooks', 'by_language', 'active', { 
+      const result = await couchdb.view('playbooks', 'by_language', 'active', {
         key: lang,
-        limit: '5' 
+        limit: '5'
       });
       return {
         language: lang,
@@ -823,5 +828,160 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
         timestamp: new Date().toISOString()
       };
     }
+  }
+};
+
+STABLE_TOOLS['attention_rank_files'] = {
+  name: 'attention_rank_files',
+  description: 'Rank top-N files by GPU attention score relative to a query using libtorch/tensorrt_bridge',
+  handler: async (args, ctx) => {
+    const { getRedis } = await import('$lib/server/redis.js');
+    const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
+    const { attentionScoreChunks } = await import('$lib/server/gpu/libtorch-bridge.js');
+    const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+
+    const redis = getRedis();
+    const query = typeof args.query === 'string' ? args.query : (ctx?.userQuery ?? '');
+    const topN = typeof args.topN === 'number' ? args.topN : 20;
+
+    // 1. Embed query via /api/embed (Redis L1 + Bifrost L2 cached via grpc client)
+    const qEmbed = await generateSingleEmbedding(query).catch(() => null);
+    if (!qEmbed) return { query, files: [], count: 0 };
+
+    // 2. Fetch top-200 files from gpu:karpathy:scores (blend order)
+    const allScores = await redis.hgetall('gpu:karpathy:scores').catch(() => ({}));
+    const candidates = Object.entries(allScores)
+      .map(([filePath, raw]) => {
+        try { return { filePath, blend: (JSON.parse(raw as string) as { blend?: number }).blend ?? 0 }; }
+        catch { return { filePath, blend: 0 }; }
+      })
+      .sort((a, b) => b.blend - a.blend)
+      .slice(0, 200);
+
+    if (candidates.length === 0) return { query, files: [], count: 0 };
+
+    // 3. Fetch 768-dim embeddings from Qdrant for attentionScoreGPU
+    const filePaths = candidates.map(c => c.filePath);
+    const variants = filePaths.flatMap(fp => [fp, `sveltekit-frontend/${fp}`, `deeds-web-app/${fp}`]);
+    const filter = {
+      should: ['file_path', 'filePath', 'relativePath', 'relative_path', 'path', 'stable_key', 'stableKey'].map(k => ({
+        key: k,
+        match: { any: variants }
+      }))
+    };
+    
+    const qdrantPoints = await qdrant.client.scroll('codebase_chunks_768', {
+      filter,
+      limit: 200 * 5, // generous limit to catch all chunks
+      with_vector: true,
+      with_payload: true
+    }).catch(() => ({ points: [] }));
+
+    const points = Array.isArray(qdrantPoints?.points) ? qdrantPoints.points : [];
+
+    const fileEmbeddings = new Map<string, number[]>();
+    for (const pt of points) {
+      const pl = pt.payload || {};
+      const fp = String(pl.file_path || pl.filePath || pl.path || pl.stableKey || '');
+      const origFp = filePaths.find(f => fp.endsWith(f)) || fp;
+      if (origFp && pt.vector && Array.isArray(pt.vector) && !fileEmbeddings.has(origFp)) {
+        fileEmbeddings.set(origFp, pt.vector as number[]);
+      }
+    }
+
+    const scoredFiles = [];
+    for (const cand of candidates) {
+      const vec = fileEmbeddings.get(cand.filePath);
+      if (!vec) continue;
+      scoredFiles.push({ ...cand, embedding: vec });
+    }
+
+    if (scoredFiles.length === 0) return { query, files: [], count: 0 };
+
+    // 4. attentionScoreGPU(probe, 768, embeddings, n)
+    const chunkEmbeds = scoredFiles.map(sf => sf.embedding as number[]);
+    const scores = await attentionScoreChunks(qEmbed, chunkEmbeds).catch(() => Array.from({ length: scoredFiles.length }, () => 0) as number[]);
+
+    for (let i = 0; i < scoredFiles.length; i++) {
+      scoredFiles[i].attentionScore = scores[i] || 0;
+      delete scoredFiles[i].embedding;
+    }
+
+    // 5. Sort by score desc, return top-N
+    scoredFiles.sort((a, b) => b.attentionScore - a.attentionScore);
+    const topFiles = scoredFiles.slice(0, topN);
+
+    return {
+      query,
+      files: topFiles,
+      count: topFiles.length
+    };
+  }
+};
+
+STABLE_TOOLS['som_topology_stats'] = {
+  name: 'som_topology_stats',
+  description: 'Get statistics about the SOM topology from Redis',
+  handler: async (args, ctx) => STABLE_TOOLS['gpu:som_topology'].handler(args, ctx),
+};
+
+STABLE_TOOLS['language_distribution'] = {
+  name: 'language_distribution',
+  description: 'Get language tag distribution across Qdrant-tagged clusters',
+  handler: async (args, ctx) => STABLE_TOOLS['gpu:language_distribution'].handler(args, ctx),
+};
+
+STABLE_TOOLS['playbook_lookup_by_language'] = {
+  name: 'playbook_lookup_by_language',
+  description: 'Retrieve legal/compliance playbooks for a specific language intersecting with top codebase files',
+  handler: async (args) => {
+    const { couchdb } = await import('$lib/server/services/couchdb-client.js');
+    const { getRedis } = await import('$lib/server/redis.js');
+    const redis = getRedis();
+    
+    const lang = typeof args.language === 'string' ? args.language.toLowerCase() : 'en';
+    const symptom = args.symptom?.toLowerCase() || '';
+
+    // 1. From gpu:karpathy:scores, get top-50 files matching language extension
+    const allScores = await redis.hgetall('gpu:karpathy:scores').catch(() => ({}));
+    const topFiles = Object.entries(allScores)
+      .filter(([file]) => lang ? file.toLowerCase().endsWith('.' + lang) : true)
+      .map(([filePath, raw]) => {
+        try { return { filePath, blend: (JSON.parse(raw as string) as { blend?: number }).blend ?? 0 }; }
+        catch { return { filePath, blend: 0 }; }
+      })
+      .sort((a, b) => b.blend - a.blend)
+      .slice(0, 50)
+      .map(x => x.filePath);
+
+    // 2. listWikiNotes('playbook') from CouchDB via view
+    const result = await couchdb.view('playbooks', 'by_language', 'active', {
+      key: lang,
+      limit: '100'
+    }).catch(() => ({ rows: [] }));
+    const playbooks = (result.rows ?? []).map((r: any) => r.value);
+
+    // 3. Filter: note.codeAreas overlaps with those file paths
+    // 4. If symptom given: also fuzzy-filter by note.symptom
+    const filtered = playbooks.filter((note: any) => {
+      let match = false;
+      if (Array.isArray(note.codeAreas) && note.codeAreas.length > 0) {
+        match = note.codeAreas.some((area: string) => topFiles.some(tf => tf.includes(area)));
+      } else {
+        match = true;
+      }
+      if (match && symptom) {
+        const noteSymptom = String(note.symptom || '').toLowerCase();
+        match = noteSymptom.includes(symptom);
+      }
+      return match;
+    });
+
+    return {
+      language: lang,
+      matchedFileCount: topFiles.length,
+      notes: filtered.slice(0, 5),
+      topFiles
+    };
   }
 };
