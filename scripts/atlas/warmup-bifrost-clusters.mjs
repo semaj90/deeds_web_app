@@ -38,7 +38,7 @@ dotenv.config({ path: resolve(FE_ROOT, '.env') });
 const REDIS_URL      = process.env.REDIS_URL      || 'redis://127.0.0.1:6379';
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 const BIFROST_URL    = process.env.BIFROST_URL     || 'http://127.0.0.1:3040';
-const BIFROST_MODEL  = process.env.BIFROST_MODEL   || 'gemma3-legal:latest';
+const BIFROST_MODEL  = process.env.BIFROST_MODEL   || 'ollama/ibm/granite-docling:258m';
 
 const args      = process.argv.slice(2);
 const DRY_RUN   = args.includes('--dry-run');
@@ -104,6 +104,7 @@ async function main() {
           'content-type': 'application/json',
           'x-bf-cache-ttl': String(CACHE_TTL),
           'x-bf-cache-type': 'semantic',
+          'x-bf-cache-key': 'legal-ai-global',
         },
         body: JSON.stringify({
           model: BIFROST_MODEL,
@@ -114,7 +115,7 @@ async function main() {
           max_tokens: 32,
           temperature: 0,
         }),
-        signal: AbortSignal.timeout(15_000),
+        signal: AbortSignal.timeout(120_000),
       });
 
       if (res.ok) {

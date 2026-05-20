@@ -317,6 +317,27 @@ function sourceHash(content) {
   return createHash('sha256').update(content).digest('hex').slice(0, 16);
 }
 
+// ── NES Glyph data loader ────────────────────────────────────────────────────
+
+const NES_GLYPH_JSON = join(ROOT, 'docs', 'graph', 'nes-glyph-architecture.json');
+
+function loadNesGlyphData() {
+  if (!existsSync(NES_GLYPH_JSON)) return new Map();
+  try {
+    const raw = JSON.parse(readFileSync(NES_GLYPH_JSON, 'utf-8'));
+    const map = new Map();
+    const nodes = raw.nodes ?? [];
+    for (const node of nodes) {
+      if (node.stableKey) {
+        map.set(node.stableKey, node);
+      }
+    }
+    return map;
+  } catch {
+    return new Map();
+  }
+}
+
 // ── Graph data loader (codebase-graph.json → SOM coords) ─────────────────────
 
 function loadGraphData() {
@@ -416,7 +437,7 @@ async function enrichFromRedis(cartridges) {
 
 // ── Core cartridge builder ────────────────────────────────────────────────────
 
-function buildCartridge(filePath, graphData) {
+function buildCartridge(filePath, graphData, nesGlyphData) {
   const relPath = relative(ROOT, filePath).replace(/\\/g, '/');
   let src;
   try { src = readFileSync(filePath, 'utf-8'); }
@@ -438,6 +459,12 @@ function buildCartridge(filePath, graphData) {
   // SOM / pagerank from graph JSON
   const gd = graphData.get(relPath) ?? graphData.get(basename(relPath)) ?? {};
 
+  // Lookup in nes-glyph-architecture.json for cartridge_kind, glyph_kind, and cluster_key
+  const node = nesGlyphData.get("file:" + relPath) ?? nesGlyphData.get(relPath) ?? {};
+  const cluster_key = node.clusterKey ?? node.cluster_key ?? null;
+  const glyph_kind = node.kind ?? kind;
+  const cartridge_kind = node.cartridge_kind ?? 'module';
+
   return {
     stable_key:   relPath,
     kind,
@@ -448,6 +475,9 @@ function buildCartridge(filePath, graphData) {
     tables,
     mcp_tools:    tools,
     tags,
+    cartridge_kind,
+    glyph_kind,
+    cluster_key,
     ...(gd.pagerank != null ? { pagerank: gd.pagerank }   : {}),
     ...(gd.som_row  != null ? { som_row:  gd.som_row  }   : {}),
     ...(gd.som_col  != null ? { som_col:  gd.som_col  }   : {}),
@@ -504,10 +534,16 @@ async function main() {
     console.log(`[cartridge] Loaded graph data for ${graphData.size} nodes`);
   }
 
+  // Load NES/glyph data
+  const nesGlyphData = loadNesGlyphData();
+  if (nesGlyphData.size > 0) {
+    console.log(`[cartridge] Loaded NES glyph data for ${nesGlyphData.size} nodes`);
+  }
+
   // Build cartridges
   const cartridges = [];
   for (const filePath of allFiles) {
-    const c = buildCartridge(filePath, graphData);
+    const c = buildCartridge(filePath, graphData, nesGlyphData);
     if (c) cartridges.push(c);
   }
   console.log(`[cartridge] Built ${cartridges.length} cartridges`);
@@ -544,6 +580,9 @@ async function main() {
     t:  c.kind,
     e:  c.exports.slice(0, 20),
     tg: c.tags,
+    ck: c.cluster_key,
+    gk: c.glyph_kind,
+    ctk: c.cartridge_kind,
     ...(c.pagerank != null ? { pr: Math.round(c.pagerank * 1000) / 1000 } : {}),
     h:  c.source_hash.slice(0, 12),
   }));
@@ -554,7 +593,13 @@ async function main() {
   // 3. Index JSON (stable_key → { kind, source_hash })
   const idxPath = join(MEM_DIR, 'module-cartridges.idx.json');
   const idxEntries = Object.fromEntries(
-    cartridges.map(c => [c.stable_key, { kind: c.kind, source_hash: c.source_hash }])
+    cartridges.map(c => [c.stable_key, {
+      kind: c.kind,
+      source_hash: c.source_hash,
+      cartridge_kind: c.cartridge_kind,
+      glyph_kind: c.glyph_kind,
+      cluster_key: c.cluster_key
+    }])
   );
   const idx = {
     version:      '1.0.0',

@@ -44,6 +44,7 @@ import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/aut
 import { SYSTEM_YORHA_LEGAL } from '$lib/ai/prompts.js';
 import { sortByBestScore, assignRanks } from '$lib/server/types/retrieval.js';
 import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js';
+import { normalizeLabels } from '$lib/server/labels/normalize-labels.js';
 import {
   traceGraph,
   traceCache,
@@ -249,6 +250,32 @@ function buildClusterContext(
       const suggestion = artifact
         ? `Cluster ${clusterKey} (${artifact.fileCount} files). Domains: ${topoClasses.slice(0, 3).join(', ')}. Tags: ${enrichedTags.slice(0, 4).join(', ')}.`
         : `Cluster ${clusterId} (${hint}): focus on ${topTags.slice(0, 3).join(', ')} patterns.`;
+      const labels = normalizeLabels({
+        jsonb: {
+          cluster_key: clusterKey,
+          centroid_label: `gpu:${clusterId}`,
+          topology_label: artifact?.topoClasses?.[0] ?? topoClass,
+          feature_family: artifact?.topoClasses?.[0] ?? topoClass,
+          summary: artifact?.summary ?? suggestion,
+          purpose: artifact?.purpose,
+          risk_level: artifact?.risk_level,
+          top_tags: enrichedTags,
+          top_files: topFiles.length ? topFiles : artifactTopFiles,
+        },
+        centroid: {
+          label: `gpu:${clusterId}`,
+          topology: artifact?.topoClasses?.[0] ?? topoClass,
+          clusterKey,
+        },
+        karpathy: {
+          blend: Math.min(1, count / 4),
+          score:
+            typeof artifact?.fileCount === 'number' && artifact.fileCount > 0
+              ? Math.min(1, count / artifact.fileCount)
+              : undefined,
+          bucket: artifact?.risk_level ?? undefined,
+        },
+      });
       return {
         clusterId,
         clusterKey,
@@ -262,8 +289,19 @@ function buildClusterContext(
         graphAuthorityScore: null,
         summary: artifact?.summary,
         purpose: artifact?.purpose,
-        riskLevel: artifact?.risk_level,
+        riskLevel:
+          artifact?.risk_level ??
+          (labels.hotness_bucket === 'hot'
+            ? 'high'
+            : labels.hotness_bucket === 'warm'
+              ? 'medium'
+              : 'low'),
         protocols: artifact?.mitigation_protocols,
+        centroidLabel: labels.centroid_label ?? `gpu:${clusterId}`,
+        hotnessBucket: labels.hotness_bucket,
+        featureFamily: labels.feature_family,
+        summaryLens: `${labels.feature_family} · ${labels.hotness_bucket}`,
+        topoLabel: labels.topology_label ?? topoClass,
       };
     });
 }
@@ -2791,6 +2829,33 @@ export async function fetchCachedACEChunks(
  * Changes when any meaningful input changes (new chunks, neighbors, history, etc.).
  */
 function computeContextFingerprint(context: ACEContext, query: string): string {
+  const codebaseLabelSignature = (context.codebaseContext ?? [])
+    .slice(0, 3)
+    .map((c) =>
+      [
+        c.filePath ?? '',
+        c.clusterKey ?? '',
+        c.centroidLabel ?? '',
+        c.topologyLabel ?? c.topoClass ?? '',
+        c.hotnessBucket ?? '',
+        c.featureFamily ?? '',
+      ].join(':')
+    )
+    .join('|');
+
+  const clusterLabelSignature = (context.clusterContext ?? [])
+    .slice(0, 3)
+    .map((c) =>
+      [
+        c.clusterKey ?? '',
+        c.centroidLabel ?? '',
+        c.topoLabel ?? '',
+        c.hotnessBucket ?? '',
+        c.featureFamily ?? '',
+      ].join(':')
+    )
+    .join('|');
+
   const parts = [
     query.slice(0, 80),
     context.caseContext?.slice(0, 40) ?? '',
@@ -2805,6 +2870,8 @@ function computeContextFingerprint(context: ACEContext, query: string): string {
     String(context.evidenceConnections?.length ?? 0),
     String(context.glossaryMatches?.length ?? 0),
     context.persona ?? 'neutral',
+    codebaseLabelSignature,
+    clusterLabelSignature,
   ];
   // Fast non-crypto hash (FNV-1a 32-bit)
   let h = 0x811c9dc5;
@@ -2879,7 +2946,7 @@ function buildACEContextWeightsBlock(
 
 /**
  * Build ACE prompt with Redis caching (Stage 4 — ace_context_bundle).
- * Returns cached prompt if context fingerprint hasn't changed (2min TTL).
+ * Returns cached prompt if context fingerprint hasn't changed (24h TTL).
  * Falls through to sync buildACEPrompt() on cache miss.
  */
 export async function buildACEPromptCached(
@@ -2964,8 +3031,8 @@ export async function buildACEPromptCached(
     }
   }
 
-  // Cache assembled prompt (2 min — invalidated when any input tier changes)
-  setCachedACEBundle(cacheKey, prompt, 120).catch(() => {});
+  // Cache assembled prompt (24h — invalidated when any input tier changes)
+  setCachedACEBundle(cacheKey, prompt, TTL.ACE_PROMPT).catch(() => {});
   return prompt;
 }
 
@@ -3235,7 +3302,16 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
           const loc = c.lineStart ? `:${c.lineStart}${c.lineEnd ? `-${c.lineEnd}` : ''}` : '';
           const meta = [
             c.routeType ? `type:${c.routeType}` : '',
-            c.gpuCluster != null ? `cluster:${c.gpuCluster}` : '',
+            c.clusterKey
+              ? `cluster:${c.clusterKey}`
+              : c.gpuCluster != null
+                ? `cluster:${c.gpuCluster}`
+                : '',
+            c.topoClass ? `topo:${c.topoClass}` : '',
+            c.topologyLabel ? `topology:${c.topologyLabel}` : '',
+            c.centroidLabel ? `centroid:${c.centroidLabel}` : '',
+            c.hotnessBucket ? `hot:${c.hotnessBucket}` : '',
+            c.featureFamily ? `family:${c.featureFamily}` : '',
             c.pageRankScore != null ? `rank:${c.pageRankScore.toFixed(2)}` : '',
             c.hasAuthGuard ? 'auth-guarded' : '',
           ]
@@ -3271,13 +3347,21 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
         .map((c) => {
           const tags = c.topTags?.length ? `Tags: ${c.topTags.slice(0, 6).join(', ')}` : '';
           const files = c.topFiles?.length ? `Files: ${c.topFiles.slice(0, 3).join(', ')}` : '';
+          const labels = [
+            c.centroidLabel ? `centroid:${c.centroidLabel}` : '',
+            c.topoLabel ? `topology:${c.topoLabel}` : '',
+            c.hotnessBucket ? `hot:${c.hotnessBucket}` : '',
+            c.featureFamily ? `family:${c.featureFamily}` : '',
+          ]
+            .filter(Boolean)
+            .join(' ');
           const synthesized = c.summary
             ? `\n  Summary: ${c.summary}${c.purpose ? ` (Purpose: ${c.purpose})` : ''}`
             : '';
           const audit = c.riskLevel
             ? `\n  Audit: Risk=${c.riskLevel.toUpperCase()}${c.protocols?.length ? ` Protocols: ${c.protocols.join(', ')}` : ''}`
             : '';
-          return `**${c.clusterKey}** (${c.topoClass ?? c.topoLabel ?? 'unknown'}): ${c.summaryLens ?? ''}${synthesized}${audit}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
+          return `**${c.clusterKey}** (${c.topoClass ?? c.topoLabel ?? 'unknown'}${labels ? ` | ${labels}` : ''}): ${c.summaryLens ?? ''}${synthesized}${audit}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
         })
         .join('\n');
       lines.push(`\n## Codebase Clusters\n${clusterLines}`);
@@ -4843,6 +4927,7 @@ export async function fetchCodebaseContext(
       lineEnd: typeof r.chunk.lineEnd === 'number' ? r.chunk.lineEnd : undefined,
       tags: Array.isArray(r.chunk.tags) ? (r.chunk.tags as string[]) : undefined,
       gpuCluster: r.chunk.neo4j_gpuCluster != null ? Number(r.chunk.neo4j_gpuCluster) : null,
+      clusterKey: r.chunk.cluster_key != null ? String(r.chunk.cluster_key) : null,
       pageRankScore:
         r.chunk.neo4j_pageRankScore != null ? Number(r.chunk.neo4j_pageRankScore) : null,
       routeType: r.chunk.neo4j_routeType != null ? String(r.chunk.neo4j_routeType) : null,
@@ -4850,6 +4935,10 @@ export async function fetchCodebaseContext(
       somCluster: r.chunk.som_cluster != null ? Number(r.chunk.som_cluster) : null,
       somBmuRow: r.chunk.som_bmu_row != null ? Number(r.chunk.som_bmu_row) : null,
       somBmuCol: r.chunk.som_bmu_col != null ? Number(r.chunk.som_bmu_col) : null,
+      centroidLabel: r.chunk.centroid_label != null ? String(r.chunk.centroid_label) : null,
+      topologyLabel: r.chunk.topology_label != null ? String(r.chunk.topology_label) : null,
+      hotnessBucket: r.chunk.hotness_bucket != null ? String(r.chunk.hotness_bucket) : null,
+      featureFamily: r.chunk.feature_family != null ? String(r.chunk.feature_family) : null,
       // Pre-computed by nightly GDS job; avoids Neo4j RTT per ACE call
       graphAuthorityScore:
         r.chunk.graph_authority_score != null ? Number(r.chunk.graph_authority_score) : null,

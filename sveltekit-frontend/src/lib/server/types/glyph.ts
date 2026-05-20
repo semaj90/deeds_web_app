@@ -134,6 +134,10 @@ export interface GlyphRecord {
   topology: GlyphTopologyLayer;
   render: GlyphRenderLayer;
 
+  cartridge_kind?: string | null;
+  glyph_kind?: string | null;
+  cluster_key?: string | null;
+
   createdAt?: string;
   updatedAt?: string;
 }

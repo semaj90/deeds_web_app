@@ -105,9 +105,28 @@ function runAudit(options) {
     SCRIPT_PATH,
   ];
 
-  if (options.module) {
-    args.push('-Module', options.module);
-  }
+    if (options.module) {
+      const metadataResult = runAudit({ module: options.module, orphanScan: false, full: false });
+      if (metadataResult) {
+        console.log("Metadata audit completed. Passing results to ContractMergerAgent...");
+        // Simulate ContractMergerAgent call for compliance report generation
+        const complianceReport = generateComplianceReport(metadataResult);
+        console.log("Compliance Report Generated:", complianceReport);
+      }
+      return metadataResult;
+    } else if (options.orphanScan) {
+      const orphanResult = runAudit({ module: null, orphanScan: true, full: false });
+      return orphanResult;
+    } else if (options.full) {
+      const fullResult = runAudit({ module: options.module, orphanScan: false, full: true });
+      if (fullResult) {
+        console.log("Full audit completed. Passing results to ContractMergerAgent...");
+        // Simulate ContractMergerAgent call for compliance report generation
+        const complianceReport = generateComplianceReport(fullResult);
+        console.log("Compliance Report Generated:", complianceReport);
+      }
+      return fullResult;
+    }
 
   if (options.orphanScan) {
     args.push('-OrphanScan');

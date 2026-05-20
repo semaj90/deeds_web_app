@@ -183,6 +183,41 @@ export const documentRelationshipsJsonb = pgTable('document_relationships_jsonb'
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
+export const JSONB_METADATA_LABEL_FIELDS = [
+  'documentType',
+  'practiceArea',
+  'caseNumber',
+  'evidenceType',
+  'admissibility',
+  'chainOfCustody',
+  'aiMetadata',
+] as const;
+
+export type JsonbMetadataLabelField = (typeof JSONB_METADATA_LABEL_FIELDS)[number];
+
+export function buildJsonbMetadataLabels(input: {
+  documentTypes?: string[];
+  practiceAreas?: string[];
+  caseNumbers?: string[];
+  evidenceTypes?: string[];
+  hasAdmissibility?: boolean;
+  hasChainOfCustody?: boolean;
+  hasAiMetadata?: boolean;
+}): string[] {
+  const labels = new Set<string>();
+
+  for (const value of input.documentTypes ?? []) labels.add(`documentType:${value}`);
+  for (const value of input.practiceAreas ?? []) labels.add(`practiceArea:${value}`);
+  for (const value of input.caseNumbers ?? []) labels.add(`caseNumber:${value}`);
+  for (const value of input.evidenceTypes ?? []) labels.add(`evidenceType:${value}`);
+
+  if (input.hasAdmissibility) labels.add('admissibility');
+  if (input.hasChainOfCustody) labels.add('chainOfCustody');
+  if (input.hasAiMetadata) labels.add('aiMetadata');
+
+  return [...labels].sort((left, right) => left.localeCompare(right));
+}
+
 // ============================================================================
 // JSONB QUERY HELPERS
 // ============================================================================

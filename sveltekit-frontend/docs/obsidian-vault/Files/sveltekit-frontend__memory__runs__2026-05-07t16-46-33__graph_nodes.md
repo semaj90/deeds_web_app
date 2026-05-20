@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/memory/runs/2026-05-07T16-46-33/graph_nodes.json"
-last_updated_by_llm: "2026-05-18T18:20:08.357Z"
+last_updated_by_llm: "2026-05-19T19:31:50.322Z"
 ai-first: true
 confidence: "high"
 up: []

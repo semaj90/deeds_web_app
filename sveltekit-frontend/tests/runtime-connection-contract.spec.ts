@@ -39,6 +39,7 @@ vi.mock('$lib/server/env.server.js', () => ({
     TRITON_VLM_MODEL: 'gemma_vlm_ensemble',
     TRITON_VISION_MODEL: 'siglip_vision',
   },
+  SEAWEED_MASTER_PORT: '9333',
 }));
 
 vi.mock('$lib/config/env.server.js', () => ({

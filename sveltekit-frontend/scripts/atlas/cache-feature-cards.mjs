@@ -38,6 +38,7 @@ import Redis   from 'ioredis';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
+const CARD_TYPES = new Set(['graph', 'route', 'glyph', 'cartridge', 'feature']);
 
 // ── Args ─────────────────────────────────────────────────────────────────────
 const argv      = process.argv.slice(2);
@@ -68,6 +69,13 @@ function deriveErrorHash(text) {
   return m ? `TS${m[1]}` : null;
 }
 
+function normalizeCardType(value) {
+  const candidate = String(value ?? '')
+    .trim()
+    .toLowerCase();
+  return CARD_TYPES.has(candidate) ? candidate : 'feature';
+}
+
 // ── Build card map from records ────────────────────────────────────────────────
 function buildCards(records) {
   // Map: featureKey → card
@@ -82,14 +90,21 @@ function buildCards(records) {
     // ─ Feature card ─
     if (!featureCards.has(featureKey)) {
       featureCards.set(featureKey, {
-        feature_key:  featureKey,
-        tags:         new Set(rec.tags ?? []),
-        source_type:  rec.source_type ?? 'notes',
-        chunk_ids:    [],
-        file_refs:    new Set(),
-        rg_paths:     new Set(),
+        schema_version: 2,
+        feature_key: featureKey,
+        card_type: normalizeCardType(rec.card_type),
+        tags: new Set(rec.tags ?? []),
+        source_type: rec.source_type ?? 'notes',
+        compact_summary: rec.compact_summary ?? rec.summary ?? (rec.text ?? '').slice(0, 300),
+        route: rec.route ?? null,
+        cluster_key: rec.cluster_key ?? null,
+        glyph_kind: rec.glyph_kind ?? null,
+        cartridge_kind: rec.cartridge_kind ?? null,
+        chunk_ids: [],
+        file_refs: new Set(),
+        rg_paths: new Set(),
         top_snippets: [],
-        indexed_at:   new Date().toISOString(),
+        indexed_at: new Date().toISOString(),
       });
     }
     const fc = featureCards.get(featureKey);
@@ -105,13 +120,18 @@ function buildCards(records) {
     if (errorCode) {
       if (!errorCards.has(errorCode)) {
         errorCards.set(errorCode, {
-          error_code:   errorCode,
-          feature_key:  featureKey,
-          tags:         new Set(rec.tags ?? []),
-          chunk_ids:    [],
-          file_refs:    new Set(),
+          schema_version: 2,
+          error_code: errorCode,
+          feature_key: featureKey,
+          card_type: normalizeCardType(rec.card_type),
+          tags: new Set(rec.tags ?? []),
+          compact_summary: rec.compact_summary ?? rec.summary ?? (rec.text ?? '').slice(0, 300),
+          route: rec.route ?? null,
+          cluster_key: rec.cluster_key ?? null,
+          chunk_ids: [],
+          file_refs: new Set(),
           top_snippets: [],
-          indexed_at:   new Date().toISOString(),
+          indexed_at: new Date().toISOString(),
         });
       }
       const ec = errorCards.get(errorCode);
@@ -160,6 +180,17 @@ async function main() {
     console.log('[cache-cards] DRY RUN — sample feature card:');
     if (featureList[0]) console.log(JSON.stringify(featureList[0], null, 2));
     if (errorList[0])   console.log('[cache-cards] Sample error card:', JSON.stringify(errorList[0], null, 2));
+    console.log(
+      '[cache-cards] Schema preview:',
+      JSON.stringify(
+        {
+          feature_keys: featureList[0] ? Object.keys(featureList[0]).sort() : [],
+          error_keys: errorList[0] ? Object.keys(errorList[0]).sort() : [],
+        },
+        null,
+        2
+      )
+    );
     console.log(`[cache-cards] Would write ${featureList.length + errorList.length} keys to Redis`);
     return;
   }

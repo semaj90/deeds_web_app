@@ -593,6 +593,31 @@
   "sveltekit-frontend/tests/accessibility/accessibility-tester.ts": [
     "sveltekit-frontend/tests/accessibility/accessibility.test.ts"
   ],
+  "src/lib/server/ace/context-assembler.ts": [
+    "sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    "sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    "sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    "sveltekit-frontend/tests/ace-context-glossary.spec.ts",
+    "sveltekit-frontend/tests/ace-context-glossary.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-rerank-spine.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/retrieval-path-wiring.spec.ts",
+    "sveltekit-frontend/tests/retrieval-path-wiring.spec.ts"
+  ],
   "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts": [
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
@@ -1305,11 +1330,17 @@
     "sveltekit-frontend/tests/multi-lane-retrieval.spec.ts",
     "sveltekit-frontend/tests/multi-lane-rrf-and-rerank.spec.ts"
   ],
-  "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": [
+  "src/lib/server/ai/openai-facade.ts": [
     "sveltekit-frontend/tests/openai-facade.spec.ts",
     "sveltekit-frontend/tests/openai-facade.spec.ts",
-    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
-    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts"
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/persons-of-interest/+server.ts": [
     "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
@@ -3031,6 +3062,9 @@
   "sveltekit-frontend/src/routes/api/research/search/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/research/search.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/research/topological-encyclopedia/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/research/topological-encyclopedia.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/route-operations/log/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/route-operations/log.test.ts"
   ],
@@ -3280,6 +3314,10 @@
   ],
   "sveltekit-frontend/src/routes/api/v1/ai/summary-cache/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/v1/ai/summary-cache.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/v1/chat/messages/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/v1/chat/messages.test.ts"

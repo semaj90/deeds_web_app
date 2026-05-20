@@ -1,39 +1,40 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-19T18:51:32.935Z
+Generated: 2026-05-20T03:38:40.795Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 32995 |
-| Total edges | 76537 |
-| Resolved edges | 7374 |
-| Unresolved (local) | 8468 |
-| External refs | 58992 |
+| Nodes | 33065 |
+| Total edges | 76630 |
+| Resolved edges | 7436 |
+| Unresolved (local) | 8474 |
+| External refs | 59017 |
 | Neighborhoods computed | 100 |
-| Test-covered files | 825 |
+| Test-covered files | 828 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 26645 |
-| script | 3920 |
-| test | 1273 |
+| shared | 26704 |
+| script | 3925 |
+| test | 1275 |
 | types | 1017 |
 | config | 140 |
+| server | 4 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 61470 |
-| test_covers_file | 4129 |
-| redis_dependency | 2966 |
-| imports_dynamic | 2228 |
-| exports_from | 1756 |
+| imports_static | 61533 |
+| test_covers_file | 4133 |
+| redis_dependency | 2979 |
+| imports_dynamic | 2230 |
+| exports_from | 1759 |
 | env_dependency | 1723 |
-| qdrant_dependency | 1133 |
-| neo4j_dependency | 425 |
+| qdrant_dependency | 1137 |
+| neo4j_dependency | 426 |
 | mcp_tool_calls | 417 |
-| db_dependency | 287 |
+| db_dependency | 290 |
 | svelte_route_uses_loader | 3 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
@@ -53,9 +54,9 @@ Generated: 2026-05-19T18:51:32.935Z
 | 12 | `deeds_labs/dead_code/contradictionEngine/types.ts` | types | 41 | 0 |
 | 13 | `deeds_labs/dead_code/contradictionEngine/types.ts` | types | 41 | 0 |
 | 14 | `deeds_labs/dead-scripts/syntax-repair/pattern-matcher.ts` | shared | 38 | 0 |
-| 15 | `sveltekit-frontend/src/lib/server/redis.ts` | shared | 31 | 0 |
-| 16 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
+| 15 | `src/lib/server/ace/context-assembler.ts` | server | 38 | 0 |
+| 16 | `sveltekit-frontend/src/lib/server/redis.ts` | shared | 31 | 0 |
 | 17 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
 | 18 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
-| 19 | `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts` | shared | 27 | 1 |
-| 20 | `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` | shared | 25 | 1 |
+| 19 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/types/gaming-types.ts` | types | 27 | 0 |
+| 20 | `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts` | shared | 27 | 1 |

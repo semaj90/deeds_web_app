@@ -202,6 +202,11 @@ export interface ACEContext {
     lineEnd?: number;
     tags?: string[];
     gpuCluster?: number | null;
+    clusterKey?: string | null;
+    centroidLabel?: string | null;
+    topologyLabel?: string | null;
+    hotnessBucket?: string | null;
+    featureFamily?: string | null;
     pageRankScore?: number | null;
     routeType?: string | null;
     hasAuthGuard?: boolean | null;
@@ -341,6 +346,7 @@ export interface ACEContext {
 export interface ClusterContextPacket {
   clusterId: number;
   clusterKey?: string;
+  centroidLabel?: string;
   topoClass: string;
   topoClasses?: string[];
   topTags: string[];
@@ -350,6 +356,8 @@ export interface ClusterContextPacket {
   summary?: string;
   purpose?: string;
   riskLevel?: string;
+  hotnessBucket?: string;
+  featureFamily?: string;
   protocols?: string[];
   communityId?: string | null;
   graphAuthorityScore?: number | null;

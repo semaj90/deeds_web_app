@@ -393,14 +393,16 @@ async function getOrCreateJurisdiction(code: string, name?: string, level?: stri
 	const r = await pool.query<{ id: number }>('SELECT id FROM jurisdictions WHERE code = $1 LIMIT 1', [code]);
 	if (r.rows[0]) return r.rows[0].id;
 	if (!name) return null; // can't create without a name
-	const ins = await pool.query<{ id: number }>(
-		'INSERT INTO jurisdictions (code, name, level) VALUES ($1, $2, $3) ON CONFLICT (code) DO NOTHING RETURNING id',
-		[code, name, level ?? 'federal']
-	);
-	// ON CONFLICT DO NOTHING returns 0 rows on conflict — re-select
-	if (ins.rows[0]) return ins.rows[0].id;
-	const r2 = await pool.query<{ id: number }>('SELECT id FROM jurisdictions WHERE code = $1 LIMIT 1', [code]);
-	return r2.rows[0]?.id ?? null;
+	try {
+		const ins = await pool.query<{ id: number }>(
+			'INSERT INTO jurisdictions (code, name, level) VALUES ($1, $2, $3) RETURNING id',
+			[code, name, level ?? 'federal']
+		);
+		return ins.rows[0]?.id ?? null;
+	} catch (e) {
+		const r2 = await pool.query<{ id: number }>('SELECT id FROM jurisdictions WHERE code = $1 LIMIT 1', [code]);
+		return r2.rows[0]?.id ?? null;
+	}
 }
 
 async function setDocumentStatus(docId: string, status: string): Promise<void> {

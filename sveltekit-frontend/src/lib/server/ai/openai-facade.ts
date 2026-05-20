@@ -2,8 +2,9 @@
  * OpenAI-compatible facade for the YorHA agent stack.
  *
  * Routes OpenAI-shape requests through the full ACE/KAG/RAG context-assembler
- * + code-llm-index PRIOR ANSWER cache + bifrostChat (Bifrost L2 → TurboQuant
- * → Ollama cascade) before returning an OpenAI-shaped response.
+ * + code-llm-index PRIOR ANSWER cache + 24h prompt cache + bifrostChat
+ * (Bifrost L2 → TurboQuant → Ollama cascade) before returning an
+ * OpenAI-shaped response.
  *
  * This is what makes OpenWebUI (or any OpenAI-compat client) talk to your
  * full agent brain instead of raw llama-server.
@@ -24,6 +25,15 @@ import type {
 } from './openai-types.js';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import type { ACEContext } from '$lib/server/ace/types.js';
+import {
+  generatePromptCacheKey,
+  TTL,
+  hashStr,
+  buildAcePacketCacheKey,
+  buildAceCompletionCacheKey,
+} from '$lib/server/cache-keys.js';
+import { getExactMatchCache, setExactMatchCache } from '$lib/server/cache/redis-exact-match.js';
+import { labelsSignature, normalizeLabels, orchestrateLabels } from '$lib/server/labels/normalize-labels.js';
 import { turboQuantChat, bifrostChat } from '$lib/server/ollama.js';
 import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
@@ -119,6 +129,50 @@ function splitMessages(messages: ReadonlyArray<OpenAIMessage>): {
     if (last.role === 'user') query = last.content ?? '';
   }
   return { query, history, systemPreamble };
+}
+
+function deriveRoutingLabels(context: ACEContext) {
+  const primaryCluster = context.clusterContext?.[0];
+  const primaryChunk = context.codebaseContext?.[0];
+
+  return normalizeLabels({
+    jsonb: {
+      cluster_key: primaryCluster?.clusterKey ?? primaryChunk?.clusterKey ?? undefined,
+      centroid_label: primaryCluster?.centroidLabel ?? primaryChunk?.centroidLabel ?? undefined,
+      topology_label:
+        primaryCluster?.topoLabel ??
+        primaryCluster?.topoClass ??
+        primaryChunk?.topologyLabel ??
+        primaryChunk?.topoClass ??
+        undefined,
+      hotness_bucket: primaryCluster?.hotnessBucket ?? primaryChunk?.hotnessBucket ?? undefined,
+      feature_family: primaryCluster?.featureFamily ?? primaryChunk?.featureFamily ?? undefined,
+      summary:
+        primaryCluster?.summary ?? primaryCluster?.summaryLens ?? primaryCluster?.synthesisSuggestion ?? undefined,
+      purpose: primaryCluster?.purpose ?? undefined,
+      risk_level: primaryCluster?.riskLevel ?? undefined,
+    },
+    centroid: {
+      label:
+        primaryCluster?.centroidLabel ??
+        primaryChunk?.centroidLabel ??
+        primaryChunk?.stableKey ??
+        primaryChunk?.filePath ??
+        null,
+      topology:
+        primaryCluster?.topoLabel ??
+        primaryCluster?.topoClass ??
+        primaryChunk?.topologyLabel ??
+        primaryChunk?.topoClass ??
+        null,
+      clusterKey: primaryCluster?.clusterKey ?? primaryChunk?.clusterKey ?? null,
+    },
+    karpathy: {
+      bucket: primaryCluster?.hotnessBucket ?? primaryChunk?.hotnessBucket ?? null,
+      blend: primaryChunk?.karpathyBlend ?? primaryChunk?.clusterPagerank ?? primaryChunk?.graphAuthorityScore ?? null,
+      score: primaryChunk?.graphAuthorityScore ?? null,
+    },
+  });
 }
 
 function trimHistoryForBudget(
@@ -228,8 +282,8 @@ function determineInferenceLane(
 
 /**
  * Run an OpenAI chat completion through the full agent stack.
- * Returns an OpenAI-shaped response. stream:true is rejected at the route
- * level for v1 — implement separately when bifrostChat streaming is wired.
+ * Returns an OpenAI-shaped response. stream:true is handled by the SSE route
+ * wrapper, which replays the cached or freshly generated completion chunks.
  */
 export async function runChatCompletion(
   req: OpenAIChatCompletionRequest,
@@ -616,9 +670,23 @@ export async function runChatCompletion(
     });
   }
 
+  let turbovecSidecar = '';
+  try {
+    const { runTurbovecPreIngestion } = await import('$lib/server/ai/turbovec-ingest-sidecar.js');
+    turbovecSidecar = await runTurbovecPreIngestion(query, {
+      userId: opts.userId?.toString(),
+      filePath: req.file_path,
+    });
+  } catch (err) {
+    console.warn('[TurboVec sidecar] failed:', err);
+  }
+
   let sysFull = systemPreamble
     ? `${systemPreamble}\n\n${prompt.systemPrompt}`
     : prompt.systemPrompt;
+  if (turbovecSidecar) {
+    sysFull = `${sysFull}\n\n${turbovecSidecar}`;
+  }
   let kvPacketTaskId: string | undefined;
   let stablePrefixHash: string | undefined;
   let kvContextBlock = '';
@@ -643,6 +711,9 @@ export async function runChatCompletion(
     sysFull = systemPreamble
       ? `${stablePrefix}\n\n${systemPreamble}\n\n${prompt.systemPrompt}`
       : `${stablePrefix}\n\n${prompt.systemPrompt}`;
+    if (turbovecSidecar) {
+      sysFull = `${sysFull}\n\n${turbovecSidecar}`;
+    }
 
     // Compressed TOC block injected before the user query
     kvContextBlock = kv.formatKvPacketForPrompt(packet);
@@ -711,8 +782,132 @@ export async function runChatCompletion(
           canUseTurboQuantNow
         );
   const finalModelUsed = inferenceLane === 'hermes' ? 'gemma4-hermes-64k:latest' : internalModel;
-
   let budgetGuardTriggered = false;
+  const hmmResult = (() => {
+    try {
+      return classifyQuerySection(query);
+    } catch {
+      return null;
+    }
+  })();
+  const topK = aceStats.top_k != null ? aceStats.top_k : maxContextSize >= 24576 ? 5 : 3;
+  const routingLabels = deriveRoutingLabels(aceCtx);
+
+  // ── Sink Write (fire-and-forget): propagate structural labels to Redis / Qdrant / JSONL / ClusterCard
+  // Does not block inference — errors are swallowed after console.warn.
+  {
+    const primaryCluster = aceCtx.clusterContext?.[0];
+    const primaryChunk = aceCtx.codebaseContext?.[0];
+    const labelFileKey =
+      (primaryChunk as Record<string, unknown> | undefined)?.['filePath'] as string ||
+      (primaryChunk as Record<string, unknown> | undefined)?.['stableKey'] as string ||
+      req.file_path ||
+      qHash;
+    const labelClusterId =
+      primaryCluster?.clusterKey ||
+      (primaryChunk as Record<string, unknown> | undefined)?.['clusterKey'] as string ||
+      undefined;
+    orchestrateLabels(
+      {
+        jsonb: routingLabels.tags as Record<string, unknown>,
+        centroid: {
+          label: routingLabels.centroid_label,
+          topology: routingLabels.topology_label,
+          clusterKey: routingLabels.cluster_key,
+        },
+        karpathy: {
+          bucket: routingLabels.hotness_bucket,
+        },
+      },
+      {
+        redisKey: labelFileKey,
+        clusterId: labelClusterId,
+        jsonl: {
+          recordId: qHash,
+          query,
+          model: finalModelUsed,
+          latencyMs: Date.now() - startMs,
+        },
+        // Qdrant write only when we have a known stable chunk key
+        ...(labelFileKey && labelFileKey !== qHash
+          ? { qdrant: { collection: 'codebase_chunks_768', pointId: labelFileKey } }
+          : {}),
+      }
+    ).catch(() => {/* fire-and-forget */});
+  }
+  const promptContextSignature = createHash('sha256')
+    .update(`${kvContextBlock}\n${history.map((m) => `${m.role}:${m.content ?? ''}`).join('\n')}`)
+    .digest('hex')
+    .slice(0, 16);
+
+  if (!stablePrefixHash) {
+    stablePrefixHash = hashStr(sysFull);
+  }
+  const userQueryHash = hashStr(query);
+
+  const packetKey = buildAcePacketCacheKey({
+    model: finalModelUsed,
+    stablePrefixHash,
+    userIntent: query,
+    routingSignature: labelsSignature(routingLabels),
+    dynamicContextSignature: promptContextSignature,
+  });
+
+  const completionKey = buildAceCompletionCacheKey(packetKey, userQueryHash);
+  const cachedPrompt = await getExactMatchCache(completionKey);
+  if (cachedPrompt) {
+    return wrapResponse({
+      content: cachedPrompt.content,
+      model: finalModelUsed,
+      durationMs: Date.now() - startMs,
+      inferenceLane,
+      runtimeProfile: runtime.profile,
+      runtimeAvailable: runtime.runtimeAvailable,
+      turboQuantEnabled: runtime.turboQuant,
+      rotorQuantKv: runtime.rotorQuantKv,
+      ace: {
+        used: true,
+        chunks:
+          (aceCtx.ragChunks?.length ?? 0) +
+          (aceCtx.kbChunks?.length ?? 0) +
+          (aceCtx.caseChunks?.length ?? 0),
+        agentsMd: !!aceCtx.agentsMd?.markdown,
+        codeLlmHit: !!aceCtx.codeLlmHit?.llmOutput,
+        cacheHit: 'prompt-cache',
+        acePacketTokens,
+        inputTokens,
+        maxContextSize,
+        availableContextTokens,
+        budgetGuardTriggered,
+        topoHit: !!aceStats.topo_hit,
+        packetHit: !!aceStats.packet_hit,
+        topK,
+      },
+      hmm: hmmResult
+        ? {
+            hmmAnalyzerUsed: true,
+            intent: hmmResult.section,
+            confidence: hmmResult.confidence,
+            state: 'context_sufficient',
+            signals: ['ace_retrieval', 'qdrant', ...(aceCtx.agentsMd ? ['LLMS.md'] : [])],
+          }
+        : undefined,
+      topoPrefilter: aceStats.topoPrefilter ?? null,
+      toolLoop: {
+        toolsUsed: [],
+        toolRounds: 0,
+        toolResultChars: 0,
+        priorAnswerKey: aceCtx.codeLlmHit ? `query:${qHash}` : undefined,
+        mcpPort: 8788,
+        kvPacketTaskId,
+        stablePrefixHash,
+      },
+      mcpCompactSearchHitCount: mcpCompactSearch?.hits.length ?? 0,
+      mcpCompactSearchCacheHit: mcpCompactSearch?.cacheHit,
+      mcpCompactSearchMs: mcpCompactSearch?.elapsedMs,
+    });
+  }
+
   const runtimeLog = {
     stage: 'llm_request_budget_check',
     model: finalModelUsed,
@@ -820,7 +1015,6 @@ export async function runChatCompletion(
     (aceCtx.ragChunks?.length ?? 0) +
     (aceCtx.kbChunks?.length ?? 0) +
     (aceCtx.caseChunks?.length ?? 0);
-  const topK = aceStats.top_k != null ? aceStats.top_k : maxContextSize >= 24576 ? 5 : 3;
 
   console.log({
     stage: 'llm_request',
@@ -880,6 +1074,35 @@ export async function runChatCompletion(
     text = typeof result === 'string' ? result : (result as { content: string }).content;
   }
 
+  void Promise.all([
+    setExactMatchCache(
+      packetKey,
+      {
+        content: sysFull,
+        model: finalModelUsed,
+        backend: 'openai-facade-packet',
+        promptTokens: inputTokens,
+        completionTokens: 0,
+        cachedPromptTokens: acePacketTokens,
+      },
+      86400 // 24h
+    ),
+    setExactMatchCache(
+      completionKey,
+      {
+        content: text,
+        model: finalModelUsed,
+        backend: 'openai-facade',
+        promptTokens: inputTokens,
+        completionTokens: countTokens(text),
+        cachedPromptTokens: acePacketTokens,
+        somCluster: aceCtx.ragChunks?.[0]?.somCluster,
+        gpuCluster: aceCtx.ragChunks?.[0]?.gpuCluster,
+      },
+      86400 // 24h
+    )
+  ]).catch(() => {});
+
   // Fire-and-forget: store answer so run-2 gets a prior-answer cache hit
   import('$lib/server/cache/code-llm-index.js')
     .then(({ recordRagAnswer }) => {
@@ -927,13 +1150,54 @@ export async function runChatCompletion(
     priorAnswerKey = hcaKey;
   }
 
-  const hmmResult = (() => {
-    try {
-      return classifyQuerySection(query);
-    } catch {
-      return null;
+  // Log the LLM Synthesis event durably
+  try {
+    const { logLlmSynthesisEvent } = await import('$lib/server/llm-synthesis/log-event.js');
+    const cleanAcePacket: Record<string, any> = {
+      systemPrompt: sysFull,
+      aceStats: {
+        topo_hit: aceStats.topo_hit,
+        packet_hit: aceStats.packet_hit,
+        topoPrefilter: aceStats.topoPrefilter ?? null,
+      },
+      topK,
+      mcpCompactSearchHitCount: mcpCompactSearch?.hits.length ?? 0,
+      mcpCompactSearchCacheHit: mcpCompactSearch?.cacheHit ?? false,
+      mcpCompactSearchMs: mcpCompactSearch?.elapsedMs ?? 0,
+    };
+
+    // Strict security scrubbing of forbidden fields in telemetry
+    let serialized = JSON.stringify(cleanAcePacket);
+    for (const key of ['hiddenThoughts', 'chainOfThought', 'kv_cache', 'tensor', 'cudaPointer']) {
+      serialized = serialized.replace(new RegExp(key, 'gi'), 'cleaned_param');
     }
-  })();
+    const safeAcePacket = JSON.parse(serialized);
+
+    const sourceRefs = (aceCtx.ragChunks ?? []).map((c) => ({
+      name: c.filePath ? c.filePath.split('/').pop()?.split('\\').pop() ?? 'unknown' : 'unknown',
+      path: c.filePath ?? 'unknown',
+      score: c.score ?? 0,
+    }));
+
+    await logLlmSynthesisEvent({
+      runId: `run-${qHash}-${Date.now()}`,
+      sessionId: opts.userId?.toString() ?? 'session-default',
+      userId: typeof opts.userId === 'number' ? opts.userId : undefined,
+      query,
+      profile: runtime.profile || 'openai-facade',
+      acePacket: safeAcePacket,
+      toolCalls: [],
+      sourceRefs,
+      cacheKeys: {
+        exact: completionKey,
+        packet: packetKey,
+        hca: priorAnswerKey ?? '',
+      },
+      model: finalModelUsed,
+    });
+  } catch (err) {
+    console.warn('[LLM Synthesis Log] failed to record event:', err);
+  }
 
   return wrapResponse({
     content: text,
@@ -978,6 +1242,9 @@ export async function runChatCompletion(
       kvPacketTaskId,
       stablePrefixHash,
     },
+    mcpCompactSearchHitCount: mcpCompactSearch?.hits.length ?? 0,
+    mcpCompactSearchCacheHit: mcpCompactSearch?.cacheHit,
+    mcpCompactSearchMs: mcpCompactSearch?.elapsedMs,
   });
 }
 

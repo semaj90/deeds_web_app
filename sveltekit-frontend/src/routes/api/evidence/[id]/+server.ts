@@ -16,16 +16,19 @@ function parseMetadata(value: unknown): unknown {
   }
 }
 
-const updateEvidenceSchema = z.object({
-  title: z.string().trim().min(1).max(255).optional(),
-  description: z.string().max(5000).optional(),
-  type: z.string().max(100).optional(),
-  evidenceNumber: z.string().max(50).optional(),
-  source: z.string().max(255).optional(),
-  summary: z.string().max(10000).optional(),
-  tags: z.array(z.string()).optional(),
-  caseId: z.string().uuid().nullable().optional(),
-});
+import { insertEvidenceSchema } from '$lib/server/db/zod-schemas.js';
+
+const updateEvidenceSchema = insertEvidenceSchema.pick({
+  title: true,
+  description: true,
+  type: true,
+  evidenceNumber: true,
+  source: true,
+  summary: true,
+  tags: true,
+}).extend({
+  caseId: insertEvidenceSchema.shape.caseId.nullable().optional(),
+}).partial();
 
 /**
  * GET /api/evidence/[id]

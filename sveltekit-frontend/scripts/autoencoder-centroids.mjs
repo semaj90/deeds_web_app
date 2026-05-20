@@ -5,8 +5,8 @@
  * Computes mean centroids in 64d encoded space for each som_cluster,
  * then writes them to Redis at gpu:autoencoder:centroids_64.
  *
- * Primary path: reads 'encoded_64' named vectors already backfilled by
- * autoencoder-backfill-qdrant.mjs (run that first).
+ * Primary path: reads encoded_64 from payloads or named vectors already
+ * backfilled by autoencoder-backfill-qdrant.mjs (run that first).
  *
  * Fallback: if a point lacks encoded_64, encodes from 'content' on-the-fly
  * using weights loaded from Redis.
@@ -198,19 +198,24 @@ async function main() {
                 continue;
             }
 
-            // Try encoded_64 first, fall back to encoding content on-the-fly
-            let encoded64 = pt.vector?.encoded_64;
+            // Try encoded_64 payload/vector first, fall back to encoding content on-the-fly
+            let encoded64 = pt.payload?.encoded_64;
             if (Array.isArray(encoded64) && encoded64.length === ENCODED_DIM) {
                 primary++;
             } else {
-                const contentVec = pt.vector?.content;
-                if (!Array.isArray(contentVec) || contentVec.length !== CONTENT_DIM) {
-                    noVector++;
-                    continue;
+                encoded64 = pt.vector?.encoded_64;
+                if (Array.isArray(encoded64) && encoded64.length === ENCODED_DIM) {
+                    primary++;
+                } else {
+                    const contentVec = pt.vector?.content;
+                    if (!Array.isArray(contentVec) || contentVec.length !== CONTENT_DIM) {
+                        noVector++;
+                        continue;
+                    }
+                    const z = encode768to64(new Float32Array(contentVec), weights);
+                    encoded64 = Array.from(z);
+                    fallback++;
                 }
-                const z = encode768to64(new Float32Array(contentVec), weights);
-                encoded64 = Array.from(z);
-                fallback++;
             }
 
             if (!clusters.has(clusterId)) {

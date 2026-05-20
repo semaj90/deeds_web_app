@@ -1,8 +1,16 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { switchVlmMode, getVlmState, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
+import { z } from 'zod';
 
-const VALID_MODES = new Set<string>(Object.values(VlmMode).filter(m => m !== VlmMode.SWITCHING));
+const SWITCHABLE_VLM_MODES = [VlmMode.OFF, VlmMode.TEXT, VlmMode.VISION, VlmMode.GPU_WORK] as const;
+const SwitchModeRequestSchema = z
+  .object({
+    mode: z.enum(SWITCHABLE_VLM_MODES),
+  })
+  .strict();
+
+const VALID_MODES = new Set<string>(SWITCHABLE_VLM_MODES);
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) {
@@ -16,15 +24,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const mode = (body as Record<string, unknown>)?.mode;
-  if (typeof mode !== 'string' || !VALID_MODES.has(mode)) {
+  const parsedBody = SwitchModeRequestSchema.safeParse(body);
+  if (!parsedBody.success) {
     return json(
       { error: `Invalid mode. Must be one of: ${[...VALID_MODES].join(', ')}` },
       { status: 400 }
     );
   }
 
-  const result = await switchVlmMode(mode as VlmMode);
+  const result = await switchVlmMode(parsedBody.data.mode);
   if (!result.success) {
     return json({ error: result.error ?? 'Mode switch failed' }, { status: 409 });
   }

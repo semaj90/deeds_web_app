@@ -504,7 +504,50 @@ async function generateViaHttp(
   }
 }
 
-/** Sequential fallback using old /api/embeddings (single prompt per request) */
+/** Sequential fallback using /api/embed then legacy /api/embeddings (single prompt per request) */
+async function fetchOllamaEmbeddingSingle(
+  text: string,
+  options: EmbeddingOptions = {}
+): Promise<number[]> {
+  const urlCandidates = [
+    `${ENV.OLLAMA_BASE_URL}/api/embed`,
+    `${ENV.OLLAMA_BASE_URL}/api/embeddings`,
+  ];
+  const simpleModelName = SERVER_EMBEDDING_MODEL.split(':')[0];
+
+  for (const url of urlCandidates) {
+    try {
+      const body = url.endsWith('/api/embed')
+        ? JSON.stringify({ text, model: simpleModelName })
+        : JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text });
+
+      const res = await ollamaFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        signal: AbortSignal.timeout(options.httpSingleTimeoutMs ?? HTTP_SINGLE_TIMEOUT_MS),
+      });
+
+      if (!res.ok) continue;
+
+      const data = await res.json();
+      const embedding = Array.isArray(data.embedding)
+        ? data.embedding
+        : Array.isArray((data as any).embeddings?.[0])
+          ? (data as any).embeddings[0]
+          : null;
+
+      if (Array.isArray(embedding) && embedding.length > 0) {
+        return embedding;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error('Ollama embedding failed for all endpoint variants');
+}
+
 async function generateViaHttpSingle(
   texts: string[],
   options: EmbeddingOptions = {}
@@ -512,16 +555,8 @@ async function generateViaHttpSingle(
   const vectors: number[][] = [];
 
   for (const text of texts) {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),
-      signal: AbortSignal.timeout(options.httpSingleTimeoutMs ?? HTTP_SINGLE_TIMEOUT_MS),
-    });
-
-    if (!res.ok) throw new Error(`Ollama embedding failed: ${res.status}`);
-    const data = await res.json();
-    vectors.push(data.embedding);
+    const embedding = await fetchOllamaEmbeddingSingle(text, options);
+    vectors.push(embedding);
   }
 
   return vectors;

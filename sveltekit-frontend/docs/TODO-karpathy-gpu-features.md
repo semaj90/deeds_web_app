@@ -7,7 +7,7 @@
 ## Legend
 
 - ✅ Done — scripts exist and are wired
-- 🔧 Partial — script exists, not yet wired end-to-end  
+- 🔧 Partial — script exists, not yet wired end-to-end
 - ☐ TODO — needs implementation
 - 🔗 Depends on — blocks or is blocked by another item
 
@@ -23,10 +23,10 @@ The 64-dim encoded prefilter currently uses Xavier placeholder weights. Every it
 | 1b | Verify weights land in Redis `ace:autoencoder:weights` (W1/b1/W2/b2) | ☐ | `docker exec legal-ai-redis redis-cli EXISTS ace:autoencoder:weights` |
 | 1c | Backfill Qdrant `codebase_chunks_768` with `encoded_64` payload field | 🔧 script exists | `npm run ae:backfill` |
 | 1d | Recompute centroids in Redis `gpu:autoencoder:centroids_64_meta` | 🔧 script exists | `npm run ae:centroids` |
-| 1e | Add `graphify:autoencoder:train` npm alias for full train→centroids→backfill pipeline | ☐ | Add to `package.json`: `ae:train:js && ae:centroids && ae:backfill` |
+| 1e | Add `graphify:autoencoder:train` npm alias for full train→centroids→backfill pipeline | ✅ | Add to `package.json`: `ae:train:js && ae:centroids && ae:backfill` |
 | 1f | Verify HMM `AUTOENCODER_WEIGHTS_TRAINED` state in `hermes-executor.ts` reads `ace:autoencoder:weights` (not null check) | 🔧 state added | `src/lib/server/ai/hermes-executor.ts` — HMM gap checker |
-| 1g | Add autoencoder health column to `npm run graphify:health` output (real vs xavier placeholder) | ☐ | `scripts/graphify-health.mjs` |
-| 1h | Add `ace:autoencoder:weights` check to `smoke:graphify` 5-pillar | ☐ | `scripts/tests/smoke-graphify.mjs` |
+| 1g | Add autoencoder health column to `npm run graphify:health` output (real vs xavier placeholder) | ✅ | `scripts/graphify-health.mjs` |
+| 1h | Add `ace:autoencoder:weights` check to `smoke:graphify` 5-pillar | ✅ | `scripts/tests/smoke-graphify.mjs` |
 
 **After 1a–1e complete**: `ACE_ENCODED_PREFILTER_MODE` switches from Xavier noise to real cluster scores → cluster prefilter actually filters rather than passing everything through.
 
@@ -283,12 +283,12 @@ POST /api/ai/hermes-run { aceMode: "analyze", userQuery: "what handles authentic
 | Priority | Task | Effort | Value | Blocker |
 |----------|------|--------|-------|---------|
 | **P1** | 6 — RabbitMQ media.download queue registration | 15 min | Unblocks video ingest | — |
-| **P1** | 1e — `graphify:autoencoder:train` alias | 5 min | Discoverability | — |
+| **P1** | 1e — `graphify:autoencoder:train` alias | 5 min | Discoverability | ✅ wired |
 | **P1** | 1f — verify HMM AUTOENCODER_WEIGHTS_TRAINED reads Redis | 15 min | Honesty fix | — |
 | **P2** | 2A — `attention_rank_files` Hermes tool | 1h | ACE context quality | tensorrt_bridge loaded |
 | **P2** | 2B — `som_topology_stats` Hermes tool | 30 min | Topology transparency | graphify:som run |
 | **P2** | 2C — `language_distribution` Hermes tool | 30 min | KAG rapid proto | cluster:summary:* in Redis |
-| **P2** | 4A — graph:export:jsonl npm aliases | 5 min | Pipeline discoverability | — |
+| **P2** | 4A — graph:export:jsonl npm aliases | 5 min | Pipeline discoverability | ✅ wired |
 | **P2** | 4B — Karpathy nodes in JSONL export | 1h | Cross-pipeline traceability | karpathy:gpu run |
 | **P2** | 8 — autoencoder smoke:graphify pillar | 30 min | Health visibility | — |
 | **P3** | 3 — topological encyclopedia API route | 2h | DYM search quality | 1a–1e complete |
