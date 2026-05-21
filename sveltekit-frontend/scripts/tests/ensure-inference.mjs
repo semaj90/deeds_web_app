@@ -106,6 +106,16 @@ function findGemmaGguf() {
   return candidates[0]?.file ?? null;
 }
 
+const RUNTIME_CONTEXT_SIZE = Number(
+  process.env.LLM_CONTEXT_SIZE ??
+    process.env.TURBO_CTX_SIZE ??
+    process.env.LLAMA_CTX_SIZE ??
+    process.env.TURBO_CTX ??
+    process.env.LLAMA_SERVER_CTX ??
+    process.env.OLLAMA_CONTEXT_LENGTH ??
+    65536
+);
+
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 /**
@@ -183,17 +193,25 @@ export async function ensureInference({
   const child = spawn(
     llamaExe,
     [
-      '-m', modelPath,
-      '-ngl', '99',
-      '-c', '32768',
-      '--flash-attn', 'on',
-      '-ctk', kvCache,
-      '-ctv', kvCache,
-      '--host', '127.0.0.1',
-      '--port', '8090',
+      '-m',
+      modelPath,
+      '-ngl',
+      '99',
+      '-c',
+      String(RUNTIME_CONTEXT_SIZE),
+      '--flash-attn',
+      'on',
+      '-ctk',
+      kvCache,
+      '-ctv',
+      kvCache,
+      '--host',
+      '127.0.0.1',
+      '--port',
+      '8090',
       '--log-disable',
     ],
-    { detached: true, stdio: 'ignore', windowsHide: true },
+    { detached: true, stdio: 'ignore', windowsHide: true }
   );
   child.unref();
 

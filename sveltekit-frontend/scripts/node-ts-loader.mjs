@@ -4,9 +4,15 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import ts from 'typescript';
 
+const LOADER_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
 export async function resolve(specifier, context, nextResolve) {
   if (specifier.startsWith('$lib/')) {
-    const candidate = path.resolve('src/lib', `${specifier.slice('$lib/'.length).replace(/\.js$/, '')}.ts`);
+    const candidate = path.resolve(
+      LOADER_ROOT,
+      'src/lib',
+      `${specifier.slice('$lib/'.length).replace(/\.js$/, '')}.ts`
+    );
     if (existsSync(candidate)) {
       return { url: pathToFileURL(candidate).href, shortCircuit: true };
     }

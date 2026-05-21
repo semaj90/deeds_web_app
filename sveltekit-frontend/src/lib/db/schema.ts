@@ -1,6 +1,10 @@
 /**
  * Deprecated compatibility barrel.
- * LEGACY_RAG_LAYER: archived RAG-era schema lives under deeds_labs/snapshots/2026-03-10/bucket-c-stale/.
- * Prefer `src/lib/server/db/schema-postgres.js` for all new imports.
+ * This file is preserved only for legacy imports from `$lib/db/schema`.
+ * Do not add new Zod schemas or schema generation helpers here.
+ * Use `src/lib/server/db/schema-postgres.js` as the canonical source of truth.
+ *
+ * NOTE: `createInsertSchema` should be generated from the canonical Drizzle schema
+ * in the server package, not duplicated in this compatibility layer.
  */
 export * from '$lib/server/db/schema-postgres.js';

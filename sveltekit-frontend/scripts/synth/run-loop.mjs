@@ -197,7 +197,7 @@ async function lane1Retrieval() {
   lane(1, `retrieval — query="${QUERY?.slice(0, 60)}"`);
   const t0 = Date.now();
   // Lane 1 tool calls. Tool names must match what TRACE MCP actually
-  // registers (see `curl http://127.0.0.1:8788/mcp tools/list`). Required
+  // registers (see `scripts/smoke/mcp-trace-smoke.mjs`; MCP is JSON-RPC POST, not GET). Required
   // args verified against inputSchema in src/mcp/trace-mcp-server.ts:
   //   - trace.kag_search           : { query, limit }
   //   - kag.multi_lane_search      : { query, isError?, topK? }   ← swapped from graph.pagerank_top (not registered)

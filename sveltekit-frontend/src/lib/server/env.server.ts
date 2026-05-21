@@ -275,8 +275,13 @@ export const ENV = {
   // LangGraph synthesis service (Docker GPU profile, port 8091)
   LANGGRAPH_URL: privateEnv.LANGGRAPH_URL ?? `http://${LOOPBACK_IP}:8091`,
   LANGGRAPH_ENABLED: (privateEnv.LANGGRAPH_ENABLED ?? 'false') === 'true',
+  // Local Deep Research service (port 5000) — multi-engine research agent
+  LDR_BASE_URL: privateEnv.LDR_BASE_URL ?? `http://${LOOPBACK_IP}:5000`,
+  LDR_ENABLED: (privateEnv.LDR_ENABLED ?? 'true') === 'true',
   // RAG microservice (port 8103)
   RAG_SERVICE_URL: privateEnv.RAG_SERVICE_URL ?? `http://${LOOPBACK_IP}:8103`,
+  // Image Synthesis + 3D Reconstruction service (Wan2.1 + DepthAnything, port 8092)
+  IMAGE_SYNTHESIS_URL: privateEnv.IMAGE_SYNTHESIS_URL ?? `http://${LOOPBACK_IP}:8092`,
   // Redis host + port (for ioredis explicit config)
   REDIS_HOST: privateEnv.REDIS_HOST ?? LOOPBACK_IP,
   REDIS_PORT: Number(privateEnv.REDIS_PORT ?? '6379'),

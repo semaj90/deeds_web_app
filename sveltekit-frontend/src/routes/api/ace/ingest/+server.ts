@@ -28,7 +28,7 @@ const pdfFilePattern = /\.pdf$/i;
 const imageFilePattern = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i;
 const MIN_EXTRACTED_TEXT_LENGTH = 30;
 const MIN_PDF_TEXT_LENGTH = 100;
-const ACE_EMBED_BATCH_TIMEOUT_MS = ENV.ACE_EMBED_BATCH_TIMEOUT_MS;
+const ACE_EMBED_BATCH_TIMEOUT_MS = Number(ENV.ACE_EMBED_BATCH_TIMEOUT_MS ?? 20_000);
 
 type ProgressEmitter = (stage: string, progress: number, extra?: Record<string, unknown>) => void;
 

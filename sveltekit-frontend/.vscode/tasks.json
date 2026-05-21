@@ -1,6 +1,14 @@
 	{
 	"$schema": "vscode://schemas/tasks",
 	"version": "2.0.0",
+	"inputs": [
+		{
+			"id": "rgSearchQuery",
+			"type": "promptString",
+			"description": "Enter the ripgrep query (regex or literal) to search for",
+			"default": ""
+		}
+	],
 	"tasks": [
 		{
 			"label": "Diagnostics Regression Slice",
@@ -65,6 +73,58 @@
 			},
 			"group": "build",
 			"detail": "Generate docs/graph/sveltekit-route-map.json and .md"
+		},
+		{
+			"label": "Search Repo Docs with rg",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"if (-not \"${input:rgSearchQuery}\") { Write-Error 'Query required'; exit 1 }; rg -n --glob '!node_modules' \"${input:rgSearchQuery}\" docs ."
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "dedicated",
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"detail": "Prompt for a ripgrep query and search repo docs plus root files for matching references."
+		},
+		{
+			"label": "Search SvelteKit App Docs with rg",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"if (-not \"${input:rgSearchQuery}\") { Write-Error 'Query required'; exit 1 }; rg -n --glob '!node_modules' \"${input:rgSearchQuery}\" docs src"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "dedicated",
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"detail": "Prompt for a ripgrep query and search app docs + SvelteKit source files."
 		},
 		{
 			"label": "Atlas: route gaps",
@@ -369,7 +429,7 @@
 			"isBackground": true,
 			"group": "build",
 			"problemMatcher": [],
-			"detail": "Ensure llama-server is running on :8090 with IQ4_XS, 40K ctx, prompt-cache, cache-reuse, and env-driven KV types"
+			"detail": "Ensure llama-server is running on :8090 with IQ4_XS, 64K ctx, prompt-cache, cache-reuse, and env-driven KV types"
 		},
 
         {
@@ -381,15 +441,11 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-Command",
-                "npm run opencode:startup:mcp; npm run opencode:startup; Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8090/health | Out-Null; Invoke-WebRequest -UseBasicParsing http://127.0.0.1:5173/api/v1/models | Out-Null; Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8788/health | Out-Null"
+				"npm run opencode:startup:mcp; npm run opencode:startup; Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8090/health | Out-Null; Invoke-WebRequest -UseBasicParsing http://127.0.0.1:5173/api/v1/models | Out-Null; $rb = Invoke-RestMethod -UseBasicParsing http://127.0.0.1:5173/api/rabbitmq/health; if (-not $rb.connected) { throw 'RabbitMQ API reports connected=false' }; Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8788/health | Out-Null"
             ],
             "options": { "cwd": "${workspaceFolder}" },
             "group": "test",
             "problemMatcher": [],
-            "detail": "Validate llama-server :8090, YorHA facade :5173, and TRACE MCP :8788 startup path"
-        },
-			"group": "test",
-			"problemMatcher": [],
 			"detail": "Validate llama-server :8090, YorHA facade :5173, and TRACE MCP :8788 startup path"
 		},
 		// ── GPU hardening + deep AST audit ────────────────────────────────────────

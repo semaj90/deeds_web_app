@@ -1486,8 +1486,8 @@
         },
         {
           "filePath": "src/lib/server/db/relations.ts",
-          "pageRank": 1.8346582262300366,
-          "karpathyBlend": 0.9981295339312428
+          "pageRank": 1.8346582262300362,
+          "karpathyBlend": 0.9981295339312426
         },
         {
           "filePath": "src/lib/server/db/schema/legal-relations.ts",
@@ -1503,8 +1503,8 @@
         },
         {
           "filePath": "src/lib/server/db/relations.ts",
-          "pageRank": 1.8346582262300366,
-          "karpathyBlend": 0.9981295339312428
+          "pageRank": 1.8346582262300362,
+          "karpathyBlend": 0.9981295339312426
         },
         {
           "filePath": "src/lib/server/db/schema/legal-relations.ts",
@@ -1702,12 +1702,12 @@
         },
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
-          "pageRank": 1.7821034441546986,
-          "karpathyBlend": 0.9696920496763416
+          "pageRank": 1.7821034441546988,
+          "karpathyBlend": 0.9696920496763418
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
-          "pageRank": 1.7597118175744617,
+          "pageRank": 1.759711817574462,
           "karpathyBlend": 0.9660065201549021
         }
       ],
@@ -1719,12 +1719,12 @@
         },
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
-          "pageRank": 1.7821034441546986,
-          "karpathyBlend": 0.9696920496763416
+          "pageRank": 1.7821034441546988,
+          "karpathyBlend": 0.9696920496763418
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
-          "pageRank": 1.7597118175744617,
+          "pageRank": 1.759711817574462,
           "karpathyBlend": 0.9660065201549021
         }
       ]
@@ -1922,8 +1922,8 @@
         },
         {
           "filePath": "src/lib/server/minio.ts",
-          "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.8941135632154192
+          "pageRank": 1.6395923150748422,
+          "karpathyBlend": 0.8941135632154191
         }
       ],
       "topBlendFiles": [
@@ -1934,8 +1934,8 @@
         },
         {
           "filePath": "src/lib/server/minio.ts",
-          "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.8941135632154192
+          "pageRank": 1.6395923150748422,
+          "karpathyBlend": 0.8941135632154191
         }
       ]
     },
@@ -2283,25 +2283,25 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
-          "pageRank": 1.8989401144504943,
-          "karpathyBlend": 1.0016486897507326
+          "pageRank": 1.898940114450495,
+          "karpathyBlend": 1.0016486897507328
         },
         {
           "filePath": "src/lib/server/cache/pdf-export-cache.ts",
-          "pageRank": 1.6097200311485362,
-          "karpathyBlend": 0.8819559300652065
+          "pageRank": 1.6097200311485358,
+          "karpathyBlend": 0.8819559300652063
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
-          "pageRank": 1.8989401144504943,
-          "karpathyBlend": 1.0016486897507326
+          "pageRank": 1.898940114450495,
+          "karpathyBlend": 1.0016486897507328
         },
         {
           "filePath": "src/lib/server/cache/pdf-export-cache.ts",
-          "pageRank": 1.6097200311485362,
-          "karpathyBlend": 0.8819559300652065
+          "pageRank": 1.6097200311485358,
+          "karpathyBlend": 0.8819559300652063
         }
       ]
     },
@@ -2485,15 +2485,15 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/server/lucia.ts",
-          "pageRank": 1.7783166924245377,
-          "karpathyBlend": 0.9552279602550586
+          "pageRank": 1.7783166924245373,
+          "karpathyBlend": 0.9552279602550585
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/lucia.ts",
-          "pageRank": 1.7783166924245377,
-          "karpathyBlend": 0.9552279602550586
+          "pageRank": 1.7783166924245373,
+          "karpathyBlend": 0.9552279602550585
         }
       ]
     },
@@ -2689,15 +2689,15 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.9469606041482612
+          "pageRank": 1.7872801029204415,
+          "karpathyBlend": 0.946960604148261
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.9469606041482612
+          "pageRank": 1.7872801029204415,
+          "karpathyBlend": 0.946960604148261
         }
       ]
     },
@@ -2893,25 +2893,25 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.9469606041482612
+          "pageRank": 1.7872801029204415,
+          "karpathyBlend": 0.946960604148261
         },
         {
           "filePath": "src/lib/server/retrieval/context-buffer.ts",
-          "pageRank": 1.719915480779479,
-          "karpathyBlend": 0.9341958051762649
+          "pageRank": 1.7199154807794785,
+          "karpathyBlend": 0.9341958051762647
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.9469606041482612
+          "pageRank": 1.7872801029204415,
+          "karpathyBlend": 0.946960604148261
         },
         {
           "filePath": "src/lib/server/retrieval/context-buffer.ts",
-          "pageRank": 1.719915480779479,
-          "karpathyBlend": 0.9341958051762649
+          "pageRank": 1.7199154807794785,
+          "karpathyBlend": 0.9341958051762647
         }
       ]
     },
@@ -3590,15 +3590,15 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.6746478680990662,
-          "karpathyBlend": 0.8906088616221666
+          "pageRank": 1.6746478680990655,
+          "karpathyBlend": 0.8906088616221663
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.6746478680990662,
-          "karpathyBlend": 0.8906088616221666
+          "pageRank": 1.6746478680990655,
+          "karpathyBlend": 0.8906088616221663
         }
       ]
     },
@@ -3789,38 +3789,48 @@
     "authority": {
       "maxBlend": 0.8906,
       "maxPr": 1.6746,
-      "avgBlend": 0.8769,
-      "avgPr": 1.6464,
-      "totalBlend": 1.7537,
-      "clusterAuthorityScore": 1.6662,
-      "scoredFiles": 2,
+      "avgBlend": 0.8685,
+      "avgPr": 1.629,
+      "totalBlend": 2.6054,
+      "clusterAuthorityScore": 1.6609,
+      "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.6746478680990662,
-          "karpathyBlend": 0.8906088616221666
+          "pageRank": 1.6746478680990655,
+          "karpathyBlend": 0.8906088616221663
         },
         {
           "filePath": "src/lib/webgpu/wire-telemetry.ts",
-          "pageRank": 1.6181393953058547,
-          "karpathyBlend": 0.8631309901247453
+          "pageRank": 1.6181393953058538,
+          "karpathyBlend": 0.8631309901247448
+        },
+        {
+          "filePath": "src/lib/polyfills.ts",
+          "pageRank": 1.5941067673292448,
+          "karpathyBlend": 0.8516876518374408
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.6746478680990662,
-          "karpathyBlend": 0.8906088616221666
+          "pageRank": 1.6746478680990655,
+          "karpathyBlend": 0.8906088616221663
         },
         {
           "filePath": "src/lib/webgpu/wire-telemetry.ts",
-          "pageRank": 1.6181393953058547,
-          "karpathyBlend": 0.8631309901247453
+          "pageRank": 1.6181393953058538,
+          "karpathyBlend": 0.8631309901247448
+        },
+        {
+          "filePath": "src/lib/polyfills.ts",
+          "pageRank": 1.5941067673292448,
+          "karpathyBlend": 0.8516876518374408
         }
       ]
     },
-    "clusterBlend": 0.8865
+    "clusterBlend": 0.884
   },
   {
     "id": 46,
@@ -3914,15 +3924,15 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/server/ai/langgraph-client.ts",
-          "pageRank": 1.5968087879198707,
-          "karpathyBlend": 0.8801285314801472
+          "pageRank": 1.5968087879198698,
+          "karpathyBlend": 0.880128531480147
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/ai/langgraph-client.ts",
-          "pageRank": 1.5968087879198707,
-          "karpathyBlend": 0.8801285314801472
+          "pageRank": 1.5968087879198698,
+          "karpathyBlend": 0.880128531480147
         }
       ]
     },
@@ -4091,11 +4101,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.8753,
+      "maxBlend": 0.8765,
       "maxPr": 1.6162,
-      "avgBlend": 0.8753,
+      "avgBlend": 0.8765,
       "avgPr": 1.6162,
-      "totalBlend": 0.8753,
+      "totalBlend": 0.8765,
       "clusterAuthorityScore": 1.6162,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -4103,18 +4113,18 @@
         {
           "filePath": "src/lib/db/schema/ace-web.ts",
           "pageRank": 1.6161655316884023,
-          "karpathyBlend": 0.8753176058816773
+          "karpathyBlend": 0.8765017227238636
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/db/schema/ace-web.ts",
           "pageRank": 1.6161655316884023,
-          "karpathyBlend": 0.8753176058816773
+          "karpathyBlend": 0.8765017227238636
         }
       ]
     },
-    "clusterBlend": 0.8753
+    "clusterBlend": 0.8765
   },
   {
     "id": 92,
@@ -4298,15 +4308,15 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.6042923723218951,
-          "karpathyBlend": 0.8542998612215914
+          "pageRank": 1.6042923723218954,
+          "karpathyBlend": 0.8542998612215915
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.6042923723218951,
-          "karpathyBlend": 0.8542998612215914
+          "pageRank": 1.6042923723218954,
+          "karpathyBlend": 0.8542998612215915
         }
       ]
     },

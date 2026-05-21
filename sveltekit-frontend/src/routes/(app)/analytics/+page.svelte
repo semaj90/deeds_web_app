@@ -189,9 +189,15 @@
 		answer: string;
 		pipeline: string;
 		durationMs: number | null;
-		provider: 'ollama';
+		provider: 'ollama' | 'ldr';
+		cached?: boolean;
 		topicId?: string;
 		topicTitle?: string;
+		sources?: Array<{
+			url: string;
+			title?: string;
+			snippet?: string;
+		}>;
 	}
 
 	// Self-prompt execution state
@@ -250,7 +256,7 @@
 		promptResult = null;
 		promptExecutionError = null;
 		queuedTaskMessage = null;
-		promptExecutionStatus = 'Running via Ollama…';
+		promptExecutionStatus = 'Running deep research...';
 		try {
 			const res = await fetch('/api/analytics/deep-research', {
 				method: 'POST',
@@ -263,13 +269,53 @@
 			});
 			if (res.ok) {
 				const result = await res.json();
-				promptResult = {
-					...result,
-					topicId: topic.id,
-					topicTitle: topic.title,
-					provider: 'ollama',
-				};
-				promptExecutionStatus = 'Ollama deep research complete.';
+				if (result.status === 'running' && result.taskId) {
+					promptExecutionStatus = 'Local Deep Research agent started. Compiling context and executing tools (polling)...';
+					const taskId = result.taskId;
+					
+					// Poll LDR status
+					let success = false;
+					for (let i = 0; i < 40; i++) {
+						await new Promise(r => setTimeout(r, 3000));
+						if (executingPromptId !== topic.id) return; // cancelled or switched
+						
+						try {
+							const statusRes = await fetch(`/api/research/ldr-status?action=status&taskId=${taskId}`);
+							if (statusRes.ok) {
+								const statusData = await statusRes.json();
+								if (statusData.result && statusData.result.status === 'completed') {
+									promptResult = {
+										answer: statusData.result.summary,
+										pipeline: topic.pipelineHint || 'ace',
+										durationMs: statusData.result.durationMs,
+										cached: false,
+										provider: 'ldr',
+										topicId: topic.id,
+										topicTitle: topic.title,
+										sources: statusData.result.sources,
+									};
+									promptExecutionStatus = 'Local Deep Research execution complete.';
+									success = true;
+									break;
+								}
+							}
+						} catch (pollErr) {
+							console.warn('Polling deep research task failed:', pollErr);
+						}
+					}
+					
+					if (!success) {
+						promptExecutionError = 'Local Deep Research execution timed out or failed.';
+					}
+				} else {
+					promptResult = {
+						...result,
+						topicId: topic.id,
+						topicTitle: topic.title,
+						provider: result.provider || 'ollama',
+					};
+					promptExecutionStatus = 'Ollama deep research complete.';
+				}
 			} else {
 				promptExecutionError = 'Failed to execute self-prompt';
 			}
@@ -868,6 +914,23 @@
 							<div class="dr-status-note">{promptExecutionStatus}</div>
 						{/if}
 						<div class="dr-result-text">{promptResult.answer}</div>
+						{#if promptResult.sources && promptResult.sources.length > 0}
+							<div class="dr-result-sources" style="margin-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 0.75rem;">
+								<h5 style="margin-bottom: 0.5rem; font-size: 0.9rem; color: #94a3b8;">Research Sources:</h5>
+								<ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+									{#each promptResult.sources as src}
+										<li style="margin-bottom: 0.5rem;">
+											<a href={src.url} target="_blank" rel="noreferrer" style="color: #60a5fa; text-decoration: none; hover:text-decoration: underline;">
+												{src.title || src.url}
+											</a>
+											{#if src.snippet}
+												<p style="color: #64748b; margin: 0.125rem 0 0 0; font-size: 0.8rem; line-height: 1.3;">{src.snippet}</p>
+											{/if}
+										</li>
+									{/each}
+								</ul>
+							</div>
+						{/if}
 					</div>
 				{:else if promptExecutionError}
 					<div class="ana-card" style="margin-top: 0.75rem; border-color: rgba(248, 113, 113, 0.2)">

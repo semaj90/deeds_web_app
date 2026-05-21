@@ -20,20 +20,21 @@ import { createHash } from 'crypto';
 // ── Event Types ──────────────────────────────────────────────────────────
 
 export type AnalyticsEventType =
-	| 'chat_query'
-	| 'tool_search'
-	| 'codebase_search'
-	| 'route_opened'
-	| 'case_created'
-	| 'case_updated'
-	| 'evidence_uploaded'
-	| 'rag_search'
-	| 'embedding_generated'
-	| 'cache_hit'
-	| 'cache_miss'
-	| 'error_analyzed'
-	| 'patch_applied'
-	| 'document_indexed';
+  | 'chat_query'
+  | 'intent_eval'
+  | 'tool_search'
+  | 'codebase_search'
+  | 'route_opened'
+  | 'case_created'
+  | 'case_updated'
+  | 'evidence_uploaded'
+  | 'rag_search'
+  | 'embedding_generated'
+  | 'cache_hit'
+  | 'cache_miss'
+  | 'error_analyzed'
+  | 'patch_applied'
+  | 'document_indexed';
 
 export interface AnalyticsEvent {
 	userId?: string;

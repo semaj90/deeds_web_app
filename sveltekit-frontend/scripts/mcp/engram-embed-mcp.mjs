@@ -20,8 +20,35 @@ import { createHash } from 'node:crypto';
 const PORT = parseInt(process.env.ENGRAM_MCP_PORT ?? '8792', 10);
 const OLLAMA_URL = process.env.OLLAMA_URL ?? process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
+const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const EMBED_DIM = 768;
+let redisClient = null;
+let redisClientPromise = null;
+
+async function getRedis() {
+  if (redisClient) return redisClient;
+  if (redisClientPromise) return redisClientPromise;
+
+  redisClientPromise = (async () => {
+    const { default: Redis } = await import('ioredis');
+    const client = new Redis(REDIS_URL, {
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      enableOfflineQueue: false,
+      connectTimeout: 2000,
+      commandTimeout: 3000,
+      retryStrategy: () => null,
+    });
+    await client.connect();
+    redisClient = client;
+    return client;
+  })().finally(() => {
+    redisClientPromise = null;
+  });
+
+  return redisClientPromise;
+}
 
 // ── Health check mode ──────────────────────────────────────────────────────────
 if (process.argv.includes('--health')) {
@@ -176,21 +203,132 @@ const TOOLS = {
       required: ['run_id', 'context_blob'],
     },
     handler: async (args) => {
-      // Use Redis HTTP API if available, otherwise note the required Redis client
       const key = `ace:packet:${args.run_id}`;
       const ttl = args.ttl_seconds ?? 3600;
-      return {
-        key,
-        ttl,
-        size_bytes: Buffer.byteLength(args.context_blob, 'utf8'),
-        note: 'Write via: redis.set(key, context_blob, "EX", ttl) in embedding-client.ts or direct Redis call.',
-        status: 'stub — wire to getRedis() in calling context',
-      };
+      const sizeBytes = Buffer.byteLength(args.context_blob, 'utf8');
+      try {
+        const redis = await getRedis();
+        await redis.set(key, args.context_blob, 'EX', ttl);
+        const [exists, storedTtl, storedSize] = await Promise.all([
+          redis.exists(key),
+          redis.ttl(key),
+          redis.strlen(key),
+        ]);
+        return {
+          ok: exists === 1,
+          key,
+          ttl,
+          stored_ttl: storedTtl,
+          size_bytes: sizeBytes,
+          stored_size_bytes: storedSize,
+          status: 'written',
+        };
+      } catch (err) {
+        return {
+          ok: false,
+          key,
+          ttl,
+          size_bytes: sizeBytes,
+          error: err instanceof Error ? err.message : String(err),
+          status: 'degraded',
+        };
+      }
+    },
+  },
+
+  'engram.ace_packet_read': {
+    description: 'Read back an ACE context packet from Redis: ace:packet:{runId}',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        run_id: { type: 'string' },
+      },
+      required: ['run_id'],
+    },
+    handler: async (args) => {
+      const key = `ace:packet:${args.run_id}`;
+      try {
+        const redis = await getRedis();
+        const [value, ttl] = await Promise.all([redis.get(key), redis.ttl(key)]);
+        return {
+          ok: value !== null,
+          key,
+          ttl,
+          size_bytes: value ? Buffer.byteLength(value, 'utf8') : 0,
+          context_blob: value,
+          status: value === null ? 'miss' : 'hit',
+        };
+      } catch (err) {
+        return {
+          ok: false,
+          key,
+          error: err instanceof Error ? err.message : String(err),
+          status: 'degraded',
+        };
+      }
+    },
+  },
+
+  'engram.chat_memory_recent': {
+    description: 'Read recent chat memory turns from Redis sorted set: user:memory:{userId}',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        user_id: { type: 'string' },
+        limit: { type: 'number', default: 10 },
+      },
+      required: ['user_id'],
+    },
+    handler: async (args) => {
+      const key = `user:memory:${args.user_id}`;
+      const limit = Math.max(1, Math.min(args.limit ?? 10, 100));
+      try {
+        const redis = await getRedis();
+        const rows = await redis.zrevrange(key, 0, limit - 1, 'WITHSCORES');
+        const turns = [];
+        for (let i = 0; i < rows.length; i += 2) {
+          const raw = rows[i];
+          const score = Number(rows[i + 1]);
+          try {
+            turns.push({ score, turn: JSON.parse(raw) });
+          } catch {
+            turns.push({ score, turn: raw });
+          }
+        }
+        return {
+          ok: true,
+          redis_key: key,
+          count: turns.length,
+          turns,
+          status: 'read',
+        };
+      } catch (err) {
+        return {
+          ok: false,
+          redis_key: key,
+          error: err instanceof Error ? err.message : String(err),
+          status: 'degraded',
+        };
+      }
+    },
+  },
+
+  'engram.redis_health': {
+    description: 'Check Redis availability used by Engram memory tools',
+    inputSchema: { type: 'object', properties: {} },
+    handler: async () => {
+      try {
+        const redis = await getRedis();
+        const pong = await redis.ping();
+        return { ok: pong === 'PONG', redis_url: REDIS_URL, pong };
+      } catch (err) {
+        return { ok: false, redis_url: REDIS_URL, error: err instanceof Error ? err.message : String(err) };
+      }
     },
   },
 
   'engram.chat_memory_store': {
-    description: 'Append a chat turn to user memory store (Redis sorted set + Postgres llm_synthesis_events)',
+    description: 'Append a chat turn to user memory store (Redis sorted set + bounded trim)',
     inputSchema: {
       type: 'object',
       properties: {
@@ -205,21 +343,47 @@ const TOOLS = {
           required: ['role', 'content'],
         },
         max_turns: { type: 'number', default: 50 },
+        ttl_seconds: { type: 'number', default: 604800 },
       },
       required: ['user_id', 'turn'],
     },
     handler: async (args) => {
       const key = `user:memory:${args.user_id}`;
       const score = Date.now();
+      const maxTurns = Math.max(1, Math.min(args.max_turns ?? 50, 500));
+      const ttl = args.ttl_seconds ?? 604800;
       const member = JSON.stringify({ ...args.turn, ts: score });
-      return {
-        redis_key: key,
-        score,
-        member_size: member.length,
-        max_turns: args.max_turns ?? 50,
-        note: `Write: redis.zadd("${key}", score, member); redis.zremrangebyrank("${key}", 0, -(max_turns+1))`,
-        status: 'stub — wire to getRedis() in ace-injector-mcp.ts or context-assembler.ts',
-      };
+      try {
+        const redis = await getRedis();
+        await redis
+          .multi()
+          .zadd(key, score, member)
+          .zremrangebyrank(key, 0, -(maxTurns + 1))
+          .expire(key, ttl)
+          .exec();
+        const count = await redis.zcard(key);
+        return {
+          ok: true,
+          redis_key: key,
+          score,
+          member_size: member.length,
+          max_turns: maxTurns,
+          count,
+          ttl,
+          status: 'written',
+        };
+      } catch (err) {
+        return {
+          ok: false,
+          redis_key: key,
+          score,
+          member_size: member.length,
+          max_turns: maxTurns,
+          ttl,
+          error: err instanceof Error ? err.message : String(err),
+          status: 'degraded',
+        };
+      }
     },
   },
 
@@ -238,6 +402,7 @@ const TOOLS = {
           embed_model_present: hasEmbedModel,
           models_available: models,
           qdrant_url: QDRANT_URL,
+          redis_url: REDIS_URL,
         };
       } catch (err) {
         return { ollama_ok: false, error: err.message };

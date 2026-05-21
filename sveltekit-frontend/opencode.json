@@ -1,53 +1,72 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "turboquant/gemma4-iq4xs",
-  "small_model": "turboquant/gemma4-iq4xs",
+  "model": "turboquant/gemma4-tq",
+  "small_model": "turboquant/gemma4-tq",
   "default_agent": "hermes-ace",
+  "shell": "pwsh.exe",
+  "permission": {
+    "read": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "lsp": "allow",
+    "todowrite": "allow",
+    "bash": {
+      "npm run tools:check:structural": "allow",
+      "npm run index:*": "allow",
+      "npm run graphify:dependency:audit": "allow",
+      "npm --prefix * run index:*": "allow",
+      "npm --prefix * run graphify:dependency:audit": "allow",
+      "node scripts/index/*": "allow",
+      "rg *": "allow",
+      "ast-grep *": "allow",
+      "sg *": "allow",
+      "jq *": "allow",
+      "git status": "allow",
+      "git diff *": "allow",
+      "rm *": "deny",
+      "del *": "deny",
+      "Remove-Item *": "deny",
+      "*": "ask"
+    }
+  },
   "provider": {
     "turboquant": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "llama-server :8090 — gemma4-legal-iq4xs-direct.gguf (CUDA IQ4_XS, KV q8_0/turbo3)",
+      "name": "Local llama-server :8090",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
         "apiKey": "local"
       },
       "models": {
         "gemma4-iq4xs": {
-          "name": "Gemma4 Legal IQ4_XS Direct — gemma4-legal-iq4xs-direct.gguf, 40K ctx, KV q8_0/turbo3, CUDA IQ4_XS",
-          "limit": {
-            "context": 40960,
-            "output": 4096
-          }
-        },
-        "gemma4-tq": {
-          "name": "Gemma4 IQ4_XS via TurboQuant (helper/small lane, 40K ctx, legacy alias)",
-          "limit": {
-            "context": 40000,
-            "output": 4097
-          }
-        }
-      }
-    },
-    "ollama": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama local :11434",
-      "options": {
-        "baseURL": "http://127.0.0.1:11434/v1",
-        "apiKey": "ollama"
-      },
-      "models": {
-        "gemma4-hermes-64k": {
-          "name": "Gemma4 Hermes 64K - direct fallback lane",
+          "name": "Gemma4 Legal 64K",
           "limit": {
             "context": 65536,
             "output": 4096
           }
         },
-        "gemma4-legal": {
-          "name": "Gemma4 Legal — text-only, 8K ctx (blob a79de882)",
+        "gemma4-tq": {
+          "name": "Gemma4 TurboQuant 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        }
+      }
+    },
+    "ollama_disabled": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama local :11434 (fallback only)",
+      "options": {
+        "baseURL": "http://127.0.0.1:11434/v1",
+        "apiKey": "ollama"
+      },
+      "models": {
+        "embeddinggemma": {
+          "name": "EmbeddingGemma — 768-dim embeddings (primary embed model)",
           "limit": {
             "context": 8192,
-            "output": 2048
+            "output": 0
           }
         }
       }
@@ -61,16 +80,16 @@
       },
       "models": {
         "yorha-hermes": {
-          "name": "Hermes via ACE facade -> stable KV prefix + prompt cache + HERMES_API_URL -> gemma4-hermes-64k:latest",
+          "name": "YorHA ACE Hermes 64K",
           "limit": {
             "context": 65536,
             "output": 4096
           }
         },
         "yorha-legal": {
-          "name": "Legal via ACE facade -> stable KV prefix + prompt cache + bifrostChat -> gemma4-legal:latest",
+          "name": "YorHA ACE Legal 64K",
           "limit": {
-            "context": 40000,
+            "context": 65536,
             "output": 4097
           }
         }
@@ -94,42 +113,41 @@
       "timeout": 15000
     },
     "turbovec-sidecar": {
-      "type": "local",
-      "command": [
-        "node",
-        "scripts/mcp/turbovec-sidecar-mcp.mjs"
-      ],
+      "type": "remote",
+      "url": "http://127.0.0.1:8791/mcp",
       "enabled": true,
-      "timeout": 10000,
+      "timeout": 30000,
       "description": "TurboVec cosine-ranking sidecar: chunk-id cosine ranking, quantization deque, multi-core SIMD scoring, AVX2 vector ops, NES cartridge JSONB label injection"
     },
     "langextract": {
-      "type": "local",
-      "command": [
-        "node",
-        "--loader",
-        "sveltekit-frontend/scripts/node-ts-loader.mjs",
-        "sveltekit-frontend/src/lib/server/langextract/mcp-langextract.ts"
-      ],
+      "type": "remote",
+      "url": "http://127.0.0.1:8793/mcp",
       "enabled": true,
-      "timeout": 12000,
+      "timeout": 30000,
       "description": "LangExtract MCP: citation extraction, statute parsing, entity recognition, structural label normalization — TypeScript native (replaces Python FastAPI :8095)"
     },
     "engram-embed": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8792/mcp",
+      "enabled": true,
+      "timeout": 30000,
+      "description": "Engram Go embedding bridge: 768-dim embeddinggemma via gRPC :50051, QUIC/NATS :4222 fallback, Bifrost ingestion pipeline, ACE packet injection, user chat memory store"
+    },
+    "ldr-research": {
       "type": "local",
       "command": [
         "node",
-        "sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"
+        "scripts/mcp/ldr-mcp.mjs"
       ],
       "enabled": true,
-      "timeout": 20000,
-      "description": "Engram Go embedding bridge: 768-dim embeddinggemma via gRPC :50051, QUIC/NATS :4222 fallback, Bifrost ingestion pipeline, ACE packet injection, user chat memory store"
+      "timeout": 120000,
+      "description": "Local Deep Research: async multi-engine research via Gemma4 + SearXNG + Wikipedia. Tools: ldr.start_research, ldr.poll_status, ldr.search_history, ldr.quick_summary"
     }
   },
   "agent": {
     "trace-audit": {
-      "description": "Read-only audit agent via YorHA ACE facade with stable-prefix prompt caching + TRACE MCP context tools",
-      "model": "turboquant/gemma4-iq4xs",
+      "description": "Read-only TRACE audit agent with compact context tools.",
+      "model": "turboquant/gemma4-tq",
       "temperature": 0,
       "steps": 8,
       "prompt": "Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval, keep the stable system prefix unchanged, and prefer cached compressed cards over raw file expansion. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
@@ -140,6 +158,7 @@
         "glob": "allow",
         "grep": "allow",
         "lsp": "allow",
+        "todowrite": "allow",
         "atlas_*": "allow",
         "atlas.*": "allow",
         "context_*": "allow",
@@ -155,14 +174,31 @@
         "search_*": "allow",
         "search.*": "allow",
         "edit": "deny",
-        "bash": "deny",
+        "bash": {
+          "npm run tools:check:structural": "allow",
+          "npm run index:*": "allow",
+          "npm run graphify:dependency:audit": "allow",
+          "npm --prefix * run index:*": "allow",
+          "npm --prefix * run graphify:dependency:audit": "allow",
+          "node scripts/index/*": "allow",
+          "rg *": "allow",
+          "ast-grep *": "allow",
+          "sg *": "allow",
+          "jq *": "allow",
+          "git status": "allow",
+          "git diff *": "allow",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item *": "deny",
+          "*": "ask"
+        },
         "webfetch": "allow",
         "websearch": "allow"
       }
     },
     "audit-hermes": {
       "description": "Hermes 64K direct fallback lane via Ollama; no ACE enrichment",
-      "model": "ollama/gemma4-hermes-64k",
+      "model": "ollama_disabled/gemma4-hermes-64k",
       "temperature": 0,
       "steps": 8,
       "prompt": "Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval, keep the stable system prefix unchanged, and prefer cached compressed cards over raw file expansion. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
@@ -173,6 +209,7 @@
         "glob": "allow",
         "grep": "allow",
         "lsp": "allow",
+        "todowrite": "allow",
         "atlas_*": "allow",
         "atlas.*": "allow",
         "context_*": "allow",
@@ -188,17 +225,34 @@
         "search_*": "allow",
         "search.*": "allow",
         "edit": "deny",
-        "bash": "deny",
+        "bash": {
+          "npm run tools:check:structural": "allow",
+          "npm run index:*": "allow",
+          "npm run graphify:dependency:audit": "allow",
+          "npm --prefix * run index:*": "allow",
+          "npm --prefix * run graphify:dependency:audit": "allow",
+          "node scripts/index/*": "allow",
+          "rg *": "allow",
+          "ast-grep *": "allow",
+          "sg *": "allow",
+          "jq *": "allow",
+          "git status": "allow",
+          "git diff *": "allow",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item *": "deny",
+          "*": "ask"
+        },
         "webfetch": "allow",
         "websearch": "allow"
       }
     },
     "hermes-ace": {
-      "description": "Hermes via YorHA ACE facade — full ACE/KAG context enrichment + HERMES_API_URL → gemma4-hermes-64k:latest. Requires SvelteKit dev server on :5173.",
-      "model": "turboquant/gemma4-iq4xs",
+      "description": "Hermes-ACE local agent using ACE context, MCP tools, and local Gemma4 64K.",
+      "model": "turboquant/gemma4-tq",
       "temperature": 0,
       "steps": 12,
-      "prompt": "You are the Hermes-ACE legal AI agent running on gemma4-legal-iq4xs-direct.gguf via TurboQuant :8090. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use MCP tools in this priority order: (1) trace.kag_search or trace.atlas_query for knowledge retrieval, (2) turbovec-sidecar for cosine ranking and chunk-id scoring, (3) engram-embed for 768-dim embeddings and Bifrost ingestion, (4) langextract for citation and entity extraction. Always include chunk_ids and cluster_labels in synthesis context. Do not edit files without explicit user approval. Do not mutate live Postgres schema.",
+      "prompt": "You are the Hermes-ACE legal AI agent running on gemma4-legal-iq4xs-direct.gguf via TurboQuant :8090. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use MCP tools in this priority order: (1) trace.kag_search or trace.atlas_query for knowledge retrieval, (2) turbovec-sidecar for cosine ranking and chunk-id scoring, (3) engram-embed for 768-dim embeddings and Bifrost ingestion, (4) langextract for citation and entity extraction, (5) ldr.search_history then ldr.quick_summary for external research context, (6) ldr.start_research + ldr.poll_status for deep async research on complex legal questions. Always include chunk_ids and cluster_labels in synthesis context. For image evidence, depth maps are stored in MinIO at evidence/{caseId}/{evidenceId}-depth.png — reference via ai_analysis.depthAnalysis.depthMapUrl. Do not edit files without explicit user approval. Do not mutate live Postgres schema.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -206,6 +260,7 @@
         "glob": "allow",
         "grep": "allow",
         "lsp": "allow",
+        "todowrite": "allow",
         "atlas_*": "allow",
         "atlas.*": "allow",
         "context_*": "allow",
@@ -221,14 +276,31 @@
         "search_*": "allow",
         "search.*": "allow",
         "edit": "deny",
-        "bash": "deny",
+        "bash": {
+          "npm run tools:check:structural": "allow",
+          "npm run index:*": "allow",
+          "npm run graphify:dependency:audit": "allow",
+          "npm --prefix * run index:*": "allow",
+          "npm --prefix * run graphify:dependency:audit": "allow",
+          "node scripts/index/*": "allow",
+          "rg *": "allow",
+          "ast-grep *": "allow",
+          "sg *": "allow",
+          "jq *": "allow",
+          "git status": "allow",
+          "git diff *": "allow",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item *": "deny",
+          "*": "ask"
+        },
         "webfetch": "deny",
         "websearch": "deny"
       }
     },
     "audit": {
       "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor (no MCP, local files only)",
-      "model": "turboquant/gemma4-iq4xs",
+      "model": "turboquant/gemma4-tq",
       "prompt": "You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
       "tools": {
         "write": false,

@@ -3293,6 +3293,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/clusters/cards/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/code-intel/claude-plan/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -5484,6 +5490,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/research/ingest/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/research/ldr-status/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

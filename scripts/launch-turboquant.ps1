@@ -47,7 +47,7 @@
                                           requires MTP_HEAD_PATH sidecar .mtp file)
   TURBO_KV_K           overrides profile K (must be in the known KV allowlist)
   TURBO_KV_V           overrides profile V (must be in the known KV allowlist)
-  TURBO_CTX            default: 4096
+  TURBO_CTX            default: 65536
   TURBO_NGL            default: 99
   MTP_HEAD_PATH        optional: path to .mtp sidecar file for AtomicBot --mtp-head speculative decoding
   ENABLE_MTP_DRAFTER   optional: "true" enables speculative decoding benchmark lane when MTP_DRAFT_MODEL exists
@@ -75,8 +75,26 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# ── Load .env if present ──────────────────────────────────────────────────
-$envPath = Join-Path $PSScriptRoot "..\" ".env"
+# -- Probe helper: try --help then -h, return $true if flag is advertised -
+function Test-LlamaFlag {
+    param([string]$Exe, [string]$Pattern)
+    $oldPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $h1 = (& $Exe --help 2>&1 | Out-String)
+        if ($h1 -match $Pattern) { return $true }
+        $h2 = (& $Exe -h 2>&1 | Out-String)
+        return $h2 -match $Pattern
+    } catch {
+        return $false
+    } finally {
+        $ErrorActionPreference = $oldPreference
+    }
+}
+
+
+# -- Load .env if present --------------------------------------------------
+$envPath = Join-Path $PSScriptRoot "..\.env"
 if (Test-Path $envPath) {
     Get-Content $envPath | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
         $name, $value = $_.Split('=', 2)
@@ -92,7 +110,7 @@ if (Test-Path $envPath) {
     }
 }
 
-# ── Resolve paths and ports ──────────────────────────────────────────────
+# -- Resolve paths and ports ----------------------------------------------
 $llama = if ($env:LLAMA_SERVER_PATH) {
     $env:LLAMA_SERVER_PATH
 } else {
@@ -114,16 +132,20 @@ $mmproj = if ($env:TURBO_MMPROJ_PATH) {
 } else {
     $localMmproj = Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf"
     if (Test-Path $localMmproj) { $localMmproj }
-    else { $null }  # no fallback — set TURBO_MMPROJ_PATH or place file at models/mmproj-BF16.gguf
+    else { $null }  # no fallback - set TURBO_MMPROJ_PATH or place file at models/mmproj-BF16.gguf
 }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
-$ctxLen  = if ($env:TURBO_CTX)         { $env:TURBO_CTX }         else { '40000' }
+$ctxLen  = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }
+           elseif ($env:TURBO_CTX)     { $env:TURBO_CTX }
+           elseif ($env:LLAMA_SERVER_CTX) { $env:LLAMA_SERVER_CTX }
+           elseif ($env:OLLAMA_CONTEXT_LENGTH) { $env:OLLAMA_CONTEXT_LENGTH }
+           else { '65536' }
 $threads = if ($env:TURBO_THREADS)     { $env:TURBO_THREADS }     else { [System.Environment]::ProcessorCount.ToString() }
 
-# ── GPU Offload (NGL) ────────────────────────────────────────────────────
+# -- GPU Offload (NGL) ----------------------------------------------------
 $ngl = if ($env:TURBO_NGL) { $env:TURBO_NGL } else { "35" }
 
-# Handle negative values — warn and normalize
+# Handle negative values - warn and normalize
 if ($ngl -match "^-") {
     $requestedNgl = $ngl
     $normalizedNgl = $ngl.Replace('-', '')
@@ -137,12 +159,12 @@ if ($ngl -eq "0") {
     Write-Warning "GPU offload (TURBO_NGL) is 0. TurboQuant will run on CPU only."
 }
 
-# ── Profile shortcut: TURBO_PROFILE expands to (kvK, kvV) defaults. ──────
+# -- Profile shortcut: TURBO_PROFILE expands to (kvK, kvV) defaults. ------
 # Explicit TURBO_KV_K / TURBO_KV_V env vars override the profile.
 $kvProfile = if ($env:TURBO_PROFILE) { $env:TURBO_PROFILE.ToLower() } else { 'stock' }
 $validProfiles = @('stock', 'turboquant', 'turboquant-safe', 'atomicbot', 'turbo3', 'turbo4')
 if ($validProfiles -notcontains $kvProfile) {
-  throw "Invalid TURBO_PROFILE '$kvProfile' — choose one of: $($validProfiles -join ', ')"
+  throw "Invalid TURBO_PROFILE '$kvProfile' - choose one of: $($validProfiles -join ', ')"
 }
 switch ($kvProfile) {
   'stock'           { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
@@ -158,8 +180,8 @@ $explicitV = [bool]$env:TURBO_KV_V
 $kvK       = if ($explicitK) { $env:TURBO_KV_K } else { $kvProfileK }
 $kvV       = if ($explicitV) { $env:TURBO_KV_V } else { $kvProfileV }
 
-# ── KV allowlist (early — runs before "already healthy" short-circuit so
-#    a typo in TURBO_KV_V always fails fast, not just on cold launches). ──
+# -- KV allowlist (early - runs before "already healthy" short-circuit so
+#    a typo in TURBO_KV_V always fails fast, not just on cold launches). --
 $stockKv      = @('f32','f16','bf16','q8_0','q4_0','q4_1','iq4_nl','q5_0','q5_1')
 $turboKv      = @('turbo2','turbo3','turbo4','tbq3_0','tbq4_0')
 $supportedKv  = $stockKv + $turboKv
@@ -176,7 +198,7 @@ if (-not (Test-Path $llama)) { throw "llama-server.exe not found at $llama" }
 if (-not (Test-Path $model)) { throw "TurboQuant model blob not found at $model" }
 
 
-# ── Pre-flight: evict Ollama-resident model so VRAM is free ──────────────
+# -- Pre-flight: evict Ollama-resident model so VRAM is free --------------
 if (-not $NoEvict) {
   try {
     $ps = Invoke-RestMethod 'http://127.0.0.1:11434/api/ps' -TimeoutSec 2
@@ -191,28 +213,28 @@ if (-not $NoEvict) {
       Start-Sleep -Seconds 2
     }
   } catch {
-    # Ollama not running — fine, nothing to evict
+    # Ollama not running - fine, nothing to evict
   }
 }
 
-# ── Probe binary for TurboQuant support ──────────────────────────────────
+# -- Probe binary for TurboQuant support ----------------------------------
 # Stock llama.cpp accepts: f32, f16, bf16, q8_0, q4_0, q4_1, iq4_nl, q5_0, q5_1
 # TurboQuant forks add:    turbo2, turbo3, turbo4, tbq3_0, tbq4_0
 #   - TheTom/llama-cpp-turboquant releases tqp-v0.1.1 (Win+CUDA12.4 prebuilt,
-#     D=128 only — UNUSABLE on Gemma 4 head_dim 256/512; suits Llama-3 / Qwen)
-#   - test1111…/llama-cpp-turboquant-gemma4 (D=256/512 kernels, source build,
+#     D=128 only - UNUSABLE on Gemma 4 head_dim 256/512; suits Llama-3 / Qwen)
+#   - test1111/llama-cpp-turboquant-gemma4 (D=256/512 kernels, source build,
 #     the only working path for Gemma 4 today)
 #   - PR #21089 to ggml-org/llama.cpp (still under review as of May 2026)
 # Recommended TurboQuant config per upstream docs: -ctk q8_0 -ctv turbo3
-# (asymmetric — quantize V aggressively, keep K at q8_0). CUDA mixed
-# q8_0 × turbo parity is documented as "not yet verified" — if quality
+# (asymmetric - quantize V aggressively, keep K at q8_0). CUDA mixed
+# q8_0  turbo parity is documented as "not yet verified" - if quality
 # regresses on your model, fall back to symmetric q8_0/q8_0 with larger ctx.
 # Allowlist itself was validated above (line ~91), early enough to fail
 # fast on TURBO_KV_* typos even when a server is already healthy.
 
 # Probe binary support for turbo*. When the user explicitly asked for a
 # turbo* type (TURBO_KV_K/V or TURBO_PROFILE=turboquant), throw if the
-# binary doesn't expose it — silent downgrade is exactly the failure mode
+# binary doesn't expose it - silent downgrade is exactly the failure mode
 # we want to avoid (it's why -ctk turbo3 -ctv turbo4 looked like it worked
 # for months). When defaults came from a non-turbo profile and somehow
 # resolved to turbo (impossible today, but kept symmetric for future
@@ -229,15 +251,18 @@ if ($turboRequested) {
     # picks the right one for their model.
     $hint = "For Gemma 4 (head_dim 256/512): source-build https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4 (cmake -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86). For D=128 models: prebuilt at https://github.com/TheTom/llama-cpp-turboquant/releases. Then set LLAMA_SERVER_PATH to the new exe."
     if ($turboExplicit) {
-      throw "llama-server at '$llama' does not advertise turbo*/tbq*_0 KV cache support but TURBO_KV_V='$kvV' / TURBO_KV_K='$kvK' was explicitly requested. $hint"
+      Write-Warning "llama-server at '$llama' does not advertise turbo*/tbq*_0 KV cache support but TURBO_KV_V='$kvV' / TURBO_KV_K='$kvK' was explicitly requested. Falling back to q8_0/q8_0. $hint"
+      $kvK = 'q8_0'
+      $kvV = 'q8_0'
+    } else {
+      Write-Host ("TurboQuant KV '$kvK/$kvV' requested by profile but binary is stock - falling back to q8_0/q8_0. $hint") -ForegroundColor Yellow
+      $kvK = 'q8_0'
+      $kvV = 'q8_0'
     }
-    Write-Host ("TurboQuant KV '$kvK/$kvV' requested by profile but binary is stock — falling back to q8_0/q8_0. $hint") -ForegroundColor Yellow
-    $kvK = 'q8_0'
-    $kvV = 'q8_0'
   }
 }
 
-# ── Speculative Draft Model Policy ───────────────────────────────────────
+# -- Speculative Draft Model Policy ---------------------------------------
 $TurboDraftModel = $null
 $TurboSpeculative = $false
 
@@ -247,10 +272,10 @@ if ($env:ENABLE_MTP_DRAFTER -and $env:ENABLE_MTP_DRAFTER.ToLower() -eq 'true') {
       $TurboDraftModel = $env:MTP_DRAFT_MODEL
       $TurboSpeculative = $true
     } else {
-      Write-Host ("Speculative decoding requested but MTP_DRAFT_MODEL not found at $($env:MTP_DRAFT_MODEL) — skipping") -ForegroundColor Yellow
+      Write-Host ("Speculative decoding requested but MTP_DRAFT_MODEL not found at $($env:MTP_DRAFT_MODEL) - skipping") -ForegroundColor Yellow
     }
   } else {
-    Write-Host 'Speculative decoding requested but MTP_DRAFT_MODEL is not set — skipping' -ForegroundColor Yellow
+    Write-Host 'Speculative decoding requested but MTP_DRAFT_MODEL is not set - skipping' -ForegroundColor Yellow
   }
 }
 
@@ -259,11 +284,14 @@ if ($env:DRAFT_MODEL_PATH) {
 }
 
 $TurboFlashAttn = 'on' # Current script hardcodes -fa on
+$TurboDraftModelDisplay = if ($TurboDraftModel) { $TurboDraftModel } else { 'none' }
+$MeasuredTokensPerSecDisplay = if ($env:MEASURED_TOKENS_PER_SEC) { $env:MEASURED_TOKENS_PER_SEC } else { 'not measured' }
+$MeasuredVramDisplay = if ($env:MEASURED_VRAM) { $env:MEASURED_VRAM } else { 'not measured' }
 
 Write-Host "`nTurboQuant resolved config:" -ForegroundColor Gray
 Write-Host "  URL:              http://127.0.0.1:$port"
 Write-Host "  Model:            $model"
-Write-Host "  Draft model:      $($TurboDraftModel ? $TurboDraftModel : 'none')"
+Write-Host "  Draft model:      $TurboDraftModelDisplay"
 Write-Host "  Speculative:      $TurboSpeculative"
 Write-Host "  Context:          $ctxLen"
 Write-Host "  GPU layers:       $ngl"
@@ -271,8 +299,8 @@ Write-Host "  Flash attention:  $TurboFlashAttn"
 Write-Host "  KV cache K:       $kvK"
 Write-Host "  KV cache V:       $kvV"
 Write-Host "  CPU threads:      $threads"
-Write-Host "  Tokens/sec:       $($env:MEASURED_TOKENS_PER_SEC ? $env:MEASURED_TOKENS_PER_SEC : 'not measured')"
-Write-Host "  VRAM:             $($env:MEASURED_VRAM ? $env:MEASURED_VRAM : 'not measured')"
+Write-Host "  Tokens/sec:       $MeasuredTokensPerSecDisplay"
+Write-Host "  VRAM:             $MeasuredVramDisplay"
 
 # Diagnostic Warnings
 if ([string]::IsNullOrWhiteSpace($ngl) -or $ngl -eq "0") {
@@ -287,7 +315,7 @@ if (-not $TurboSpeculative) {
 }
 Write-Host ""
 
-# ── Already healthy? ─────────────────────────────────────────────────────
+# -- Already healthy? -----------------------------------------------------
 if (-not $StatusOnly) {
     try {
         Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 1 | Out-Null
@@ -307,7 +335,7 @@ if ($StatusOnly) {
     exit 0
 }
 
-# ── Build argument list ──────────────────────────────────────────────────
+# -- Build argument list --------------------------------------------------
 $baseArgs = @(
   '-m',    $model,
   '--port', $port,
@@ -319,7 +347,7 @@ $baseArgs = @(
   '-t',     $threads
 )
 
-# ── Parallel slots check (Multi-core / Concurrent processing) ─────────────
+# -- Parallel slots check (Multi-core / Concurrent processing) -------------
 $slots = if ($env:TURBO_PARALLEL) { $env:TURBO_PARALLEL } else { '4' }
 if (Test-LlamaFlag $llama '--parallel') {
     $baseArgs = $baseArgs + @('--parallel', $slots)
@@ -338,7 +366,7 @@ if ($kvProfile -eq 'atomicbot') {
       '--triattention-normalize'
     )
 }
-# ── Speculative Decoding: inject --model-draft for accelerated throughput ──
+# -- Speculative Decoding: inject --model-draft for accelerated throughput --
 if ($TurboDraftModel) {
   Write-Host ("Speculative Decoding: --model-draft enabled ($TurboDraftModel)") -ForegroundColor Cyan
   Write-Host ("Speculative Decoding automatically disables vision/multimodal (--mmproj)") -ForegroundColor Yellow
@@ -356,11 +384,11 @@ if (-not $TextOnly -and (Test-Path $mmproj)) {
   $baseArgs = @('-m', $model, '--mmproj', $mmproj) + $baseArgs[2..($baseArgs.Length - 1)]
 }
 
-# ── Legal LoRA adapter injection (Path A — runtime LoRA over base-model GGUFs) ──
+# -- Legal LoRA adapter injection (Path A - runtime LoRA over base-model GGUFs) --
 # Use when ROTORQUANT_MODEL_PATH points at a base-model GGUF (e.g. majentik IQ4_XS)
 # that lacks the legal fine-tune. The merged Ollama blob already has the LoRA baked
 # in, so set LEGAL_LORA_PATH only when running a non-merged GGUF.
-# Path B (re-quantize merged model) produces better quality — see memory card.
+# Path B (re-quantize merged model) produces better quality - see memory card.
 if ($env:LEGAL_LORA_PATH) {
   if (Test-Path $env:LEGAL_LORA_PATH) {
     $loraExt = [System.IO.Path]::GetExtension($env:LEGAL_LORA_PATH)
@@ -393,11 +421,11 @@ if ($env:LEGAL_LORA_PATH) {
     }
     }
   } else {
-    Write-Host ("Legal LoRA: LEGAL_LORA_PATH set but file not found at $($env:LEGAL_LORA_PATH) — skipping") -ForegroundColor Yellow
+    Write-Host ("Legal LoRA: LEGAL_LORA_PATH set but file not found at $($env:LEGAL_LORA_PATH) - skipping") -ForegroundColor Yellow
   }
 }
 
-# ── AtomicBot: inject --mtp-head for Multi-Token Prediction speculative decode ──
+# -- AtomicBot: inject --mtp-head for Multi-Token Prediction speculative decode --
 # AtomicBot-ai/atomic-llama-cpp-turboquant-binaries ships Gemma 4 D=256/512 support
 # + MTP (multi-token prediction) for +30-50% throughput on short-prompt workloads.
 # Requires a .mtp sidecar file alongside the main GGUF (usually same basename + .mtp).
@@ -408,55 +436,47 @@ if ($kvProfile -eq 'atomicbot') {
     Write-Host ("AtomicBot: --mtp-head enabled ($mtpPath)") -ForegroundColor Cyan
     $baseArgs = $baseArgs + @('--mtp-head', $mtpPath)
   } else {
-    Write-Host ("AtomicBot: MTP sidecar not found at $mtpPath — running without --mtp-head (set MTP_HEAD_PATH to fix)") -ForegroundColor Yellow
+    Write-Host ("AtomicBot: MTP sidecar not found at $mtpPath - running without --mtp-head (set MTP_HEAD_PATH to fix)") -ForegroundColor Yellow
   }
 }
 
 
-# ── Probe helper: try --help then -h, return $true if flag is advertised ─
-function Test-LlamaFlag {
-    param([string]$Exe, [string]$Pattern)
-    $h1 = & $Exe --help 2>&1 | Out-String
-    if ($h1 -match $Pattern) { return $true }
-    $h2 = & $Exe -h 2>&1 | Out-String
-    return $h2 -match $Pattern
-}
 
-# ── Tool-calling: --jinja for OpenAI function-call format ────────────────
+# -- Tool-calling: --jinja for OpenAI function-call format ----------------
 if (Test-LlamaFlag $llama '--jinja') {
     Write-Host "Tool calling: --jinja enabled (OpenCode/TRACE MCP loop)" -ForegroundColor Cyan
     $baseArgs = $baseArgs + @('--jinja')
 } else {
-    Write-Host "Tool calling: --jinja not in this binary — Gemma4 uses generic tool-call path" -ForegroundColor DarkYellow
+    Write-Host "Tool calling: --jinja not in this binary - Gemma4 uses generic tool-call path" -ForegroundColor DarkYellow
 }
 
-# ── KV prefix reuse: reduce prefill cost on repeated system prompts ───────
+# -- KV prefix reuse: reduce prefill cost on repeated system prompts -------
 if (Test-LlamaFlag $llama '--cache-prompt') {
     $baseArgs = $baseArgs + @('--cache-prompt')
     Write-Host "KV cache: --cache-prompt enabled" -ForegroundColor Cyan
 } else {
-    Write-Host "KV cache: --cache-prompt not supported by this binary — skipping" -ForegroundColor DarkYellow
+    Write-Host "KV cache: --cache-prompt not supported by this binary - skipping" -ForegroundColor DarkYellow
 }
 if (Test-LlamaFlag $llama '--cache-reuse') {
     $baseArgs = $baseArgs + @('--cache-reuse', '256')
     Write-Host "KV cache: --cache-reuse 256 enabled" -ForegroundColor Cyan
 } else {
-    Write-Host "KV cache: --cache-reuse not supported by this binary — skipping" -ForegroundColor DarkYellow
+    Write-Host "KV cache: --cache-reuse not supported by this binary - skipping" -ForegroundColor DarkYellow
 }
 
-# ── Batch threads check ───────────────────────────────────────────────────
+# -- Batch threads check ---------------------------------------------------
 if (Test-LlamaFlag $llama '--threads-batch') {
     $baseArgs = $baseArgs + @('--threads-batch', $threads)
     Write-Host "Batch threads: --threads-batch $threads enabled" -ForegroundColor Cyan
 }
 
-# ── Foreground branch ────────────────────────────────────────────────────
+# -- Foreground branch ----------------------------------------------------
 if (-not $Detached) {
   & $llama @baseArgs
   exit $LASTEXITCODE
 }
 
-# ── Detached branch — capture stderr for post-mortem ─────────────────────
+# -- Detached branch - capture stderr for post-mortem ---------------------
 $logDir   = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..')) 'logs/turboquant'
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 $stamp    = (Get-Date).ToString('yyyy-MM-ddTHH-mm-ss')
@@ -484,9 +504,9 @@ for ($i = 0; $i -lt 240; $i++) {
 
 if (-not $ready) {
   try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue } catch { }
-  Write-Host '─── llama-server stderr (tail) ───' -ForegroundColor Red
+  Write-Host '--- llama-server stderr (tail) ---' -ForegroundColor Red
   if (Test-Path $errPath) { Get-Content $errPath -Tail 25 | ForEach-Object { Write-Host $_ -ForegroundColor DarkYellow } }
-  throw ("TurboQuant failed to become healthy on :$port — see $errPath")
+  throw ("TurboQuant failed to become healthy on :$port - see $errPath")
 }
 
 $variant = if ($TextOnly) { 'text-only' } else { 'with VLM' }

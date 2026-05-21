@@ -69,6 +69,8 @@
     "format": "prettier --write src/**/*.{ts,js,svelte}",
     "test": "cd sveltekit-frontend && vitest",
     "test:run": "cd sveltekit-frontend && vitest run",
+    "test:triage": "node scripts/test-triage-vitest.mjs --run",
+    "test:triage:demo": "node scripts/test-triage-vitest.mjs --demo",
     "validate:glyph": "node sveltekit-frontend/scripts/validate-nes-glyph-architecture.mjs",
     "validate:glyph:strict": "node sveltekit-frontend/scripts/validate-nes-glyph-architecture.mjs --strict",
     "parse:svelte-errors": "node tools/parse-svelte-errors.cjs",
@@ -112,6 +114,7 @@
     "audit:drizzle": "node scripts/atlas/audit-drizzle-postgres-contracts.mjs",
     "audit:drizzle:json": "node scripts/atlas/audit-drizzle-postgres-contracts.mjs --json",
     "services:health": "node scripts/atlas/validate-dev-services.mjs",
+    "services:health:json": "node scripts/atlas/validate-dev-services.mjs --json",
     "services:health:strict": "node scripts/atlas/validate-dev-services.mjs --strict",
     "backup:state": "node scripts/operator/backup-atlas-state.mjs",
     "restore:state": "node scripts/operator/restore-atlas-state.mjs",
@@ -123,6 +126,7 @@
     "atlas:ingest:full": "node sveltekit-frontend/scripts/atlas/chunk-text-notes.mjs --input ../data/parents-atlas --out tmp/chunks/parents-corpus-all.ndjson && node sveltekit-frontend/scripts/atlas/build-rg-search-matrix.mjs --input tmp/chunks/parents-corpus-all.ndjson --out tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/embed-chunks.mjs --input tmp/chunks/parents-corpus-rg.ndjson --collection parents_atlas_chunks && node sveltekit-frontend/scripts/atlas/qdrant-tag-backfill.mjs --collection parents_atlas_chunks --from-ndjson tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs --input tmp/chunks/parents-corpus-rg.ndjson --out tmp/chunks/parents-corpus-expanded.ndjson && node sveltekit-frontend/scripts/atlas/topology-project-4d.mjs --input tmp/chunks/parents-corpus-expanded.ndjson --out tmp/chunks/parents-corpus-4d.ndjson"
   },
   "devDependencies": {
+    "@ast-grep/cli": "0.42.3",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@types/chokidar": "1.7.5",
@@ -137,6 +141,7 @@
     "@unocss/core": "^66.0.0",
     "@unocss/preset-uno": "^66.0.0",
     "@unocss/vite": "^66.0.0",
+    "dotenv": "17.4.2",
     "eslint": "^8.0.0",
     "eslint-plugin-svelte": "^2.0.0",
     "fast-check": "4.4.0",

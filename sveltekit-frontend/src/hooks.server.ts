@@ -48,6 +48,16 @@ const SKIP_BOOT_WARMUP = process.env.SKIP_BOOT_WARMUP === 'true';
 const isClusterWorker1 = !process.env.CLUSTER_WORKER_ID || process.env.CLUSTER_WORKER_ID === '1';
 const shouldRunSingletonTasks = shouldRunBootTasks && isClusterWorker1;
 
+function isRunnerClosedError(err: unknown): boolean {
+  const message = err instanceof Error ? err.message : String(err);
+  const lower = message.toLowerCase();
+  return (
+    lower.includes('module runner has been closed') ||
+    lower.includes('vite module runner has been closed') ||
+    lower.includes('module has been disposed')
+  );
+}
+
 // ── Per-Route Rate Limiting (Sprint 4 → Sprint 6: Redis-backed) ──────────
 // Tiers + Redis counters live in middleware/rate-limiter.ts
 if (shouldRunBootTasks) {
@@ -153,10 +163,7 @@ async function checkCodebaseChunkIndexMirror(): Promise<CodebaseChunkIndexMirror
  * Check all required services for readiness.
  */
 async function checkServicesReady() {
-  const [redis, db] = await Promise.all([
-    checkRedis(),
-    checkDb()
-  ]);
+  const [redis, db] = await Promise.all([checkRedis(), checkDb()]);
 
   return { redis, db };
 }
@@ -307,6 +314,7 @@ function runSingletonBootTasks(): void {
         );
     })
     .catch((err) => {
+      if (isRunnerClosedError(err)) return;
       console.warn('[Boot] RabbitMQ unavailable (non-fatal):', (err as Error).message);
     });
 
@@ -317,6 +325,7 @@ function runSingletonBootTasks(): void {
       console.log('[Boot] Qdrant collections verified');
     })
     .catch((err) => {
+      if (isRunnerClosedError(err)) return;
       console.warn('[Boot] Qdrant initialization failed (non-fatal):', (err as Error).message);
     });
 

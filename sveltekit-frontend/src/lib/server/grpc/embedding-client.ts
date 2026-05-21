@@ -513,12 +513,10 @@ async function fetchOllamaEmbeddingSingle(
     `${ENV.OLLAMA_BASE_URL}/api/embed`,
     `${ENV.OLLAMA_BASE_URL}/api/embeddings`,
   ];
-  const simpleModelName = SERVER_EMBEDDING_MODEL.split(':')[0];
-
   for (const url of urlCandidates) {
     try {
       const body = url.endsWith('/api/embed')
-        ? JSON.stringify({ text, model: simpleModelName })
+        ? JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: text })
         : JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text });
 
       const res = await ollamaFetch(url, {

@@ -33,7 +33,12 @@ import {
   buildAceCompletionCacheKey,
 } from '$lib/server/cache-keys.js';
 import { getExactMatchCache, setExactMatchCache } from '$lib/server/cache/redis-exact-match.js';
-import { labelsSignature, normalizeLabels, orchestrateLabels } from '$lib/server/labels/normalize-labels.js';
+import { scoreIntent, logIntentEvalEvent } from '$lib/server/ai/intent-ranker.js';
+import {
+  labelsSignature,
+  normalizeLabels,
+  orchestrateLabels,
+} from '$lib/server/labels/normalize-labels.js';
 import { turboQuantChat, bifrostChat } from '$lib/server/ollama.js';
 import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
@@ -55,6 +60,19 @@ const OPENAI_RESERVED_COMPLETION_TOKENS = Number(
 );
 const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
 const ACE_PACKET_TOKEN_CAP = Number(process.env.ACE_PACKET_TOKEN_CAP ?? '3500');
+const RUNTIME_CONTEXT_SIZE = Math.max(
+  65536,
+  ...[
+    process.env.LLM_CONTEXT_SIZE,
+    process.env.TURBO_CTX_SIZE,
+    process.env.LLAMA_CTX_SIZE,
+    process.env.TURBO_CTX,
+    process.env.LLAMA_SERVER_CTX,
+    process.env.OLLAMA_CONTEXT_LENGTH,
+  ]
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value) && value > 0)
+);
 
 export class BudgetExceededError extends Error {
   constructor(message: string) {
@@ -148,7 +166,10 @@ function deriveRoutingLabels(context: ACEContext) {
       hotness_bucket: primaryCluster?.hotnessBucket ?? primaryChunk?.hotnessBucket ?? undefined,
       feature_family: primaryCluster?.featureFamily ?? primaryChunk?.featureFamily ?? undefined,
       summary:
-        primaryCluster?.summary ?? primaryCluster?.summaryLens ?? primaryCluster?.synthesisSuggestion ?? undefined,
+        primaryCluster?.summary ??
+        primaryCluster?.summaryLens ??
+        primaryCluster?.synthesisSuggestion ??
+        undefined,
       purpose: primaryCluster?.purpose ?? undefined,
       risk_level: primaryCluster?.riskLevel ?? undefined,
     },
@@ -169,7 +190,11 @@ function deriveRoutingLabels(context: ACEContext) {
     },
     karpathy: {
       bucket: primaryCluster?.hotnessBucket ?? primaryChunk?.hotnessBucket ?? null,
-      blend: primaryChunk?.karpathyBlend ?? primaryChunk?.clusterPagerank ?? primaryChunk?.graphAuthorityScore ?? null,
+      blend:
+        primaryChunk?.karpathyBlend ??
+        primaryChunk?.clusterPagerank ??
+        primaryChunk?.graphAuthorityScore ??
+        null,
       score: primaryChunk?.graphAuthorityScore ?? null,
     },
   });
@@ -311,9 +336,7 @@ export async function runChatCompletion(
     }));
 
     const rawContextSize =
-      internalModel === 'gemma4-hermes-64k:latest'
-        ? 65536
-        : Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 32768);
+      internalModel === 'gemma4-hermes-64k:latest' ? 65536 : RUNTIME_CONTEXT_SIZE;
     const requestedMaxTokens = clampRequestedMaxTokens(req.max_tokens);
     const rawInputTokens = countTokens(mappedMsgs.map((m) => m.content).join('\n'));
     const rawInferenceLane: InferenceLane =
@@ -742,7 +765,7 @@ export async function runChatCompletion(
   }
 
   let inputTokens = countTokens(messages.map((m) => m.content ?? '').join('\n'));
-  const maxContextSize = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 32768);
+  const maxContextSize = RUNTIME_CONTEXT_SIZE;
   let availableContextTokens = maxContextSize - inputTokens;
 
   if (inputTokens > OPENAI_HARD_INPUT_CAP) {
@@ -799,14 +822,17 @@ export async function runChatCompletion(
     const primaryCluster = aceCtx.clusterContext?.[0];
     const primaryChunk = aceCtx.codebaseContext?.[0];
     const labelFileKey =
-      (primaryChunk as Record<string, unknown> | undefined)?.['filePath'] as string ||
-      (primaryChunk as Record<string, unknown> | undefined)?.['stableKey'] as string ||
+      ((primaryChunk as Record<string, unknown> | undefined)?.['filePath'] as string) ||
+      ((primaryChunk as Record<string, unknown> | undefined)?.['stableKey'] as string) ||
       req.file_path ||
       qHash;
     const labelClusterId =
       primaryCluster?.clusterKey ||
-      (primaryChunk as Record<string, unknown> | undefined)?.['clusterKey'] as string ||
+      ((primaryChunk as Record<string, unknown> | undefined)?.['clusterKey'] as string) ||
       undefined;
+    const labelQdrantPointId = (primaryChunk as Record<string, unknown> | undefined)?.[
+      'pointId'
+    ] as string | number | undefined;
     orchestrateLabels(
       {
         jsonb: routingLabels.tags as Record<string, unknown>,
@@ -828,12 +854,14 @@ export async function runChatCompletion(
           model: finalModelUsed,
           latencyMs: Date.now() - startMs,
         },
-        // Qdrant write only when we have a known stable chunk key
-        ...(labelFileKey && labelFileKey !== qHash
-          ? { qdrant: { collection: 'codebase_chunks_768', pointId: labelFileKey } }
+        // Qdrant setPayload requires a real point id, not a file path/stable key.
+        ...(labelQdrantPointId != null
+          ? { qdrant: { collection: 'codebase_chunks_768', pointId: labelQdrantPointId } }
           : {}),
       }
-    ).catch(() => {/* fire-and-forget */});
+    ).catch(() => {
+      /* fire-and-forget */
+    });
   }
   const promptContextSignature = createHash('sha256')
     .update(`${kvContextBlock}\n${history.map((m) => `${m.role}:${m.content ?? ''}`).join('\n')}`)
@@ -855,6 +883,38 @@ export async function runChatCompletion(
 
   const completionKey = buildAceCompletionCacheKey(packetKey, userQueryHash);
   const cachedPrompt = await getExactMatchCache(completionKey);
+
+  const intentScorerDecision = await scoreIntent({
+    query,
+    model: finalModelUsed,
+    userId: opts.userId,
+    history,
+    completionKey,
+    packetKey,
+    exactCacheEntry: cachedPrompt,
+    exactCacheChecked: true,
+    caseId: req.case_id,
+    filePath: req.file_path,
+  });
+
+  void logIntentEvalEvent({
+    userId: opts.userId,
+    sessionId: undefined,
+    model: finalModelUsed,
+    queryHash: intentScorerDecision.queryHash,
+    decision: intentScorerDecision.decision,
+    confidence: intentScorerDecision.confidence,
+    rankedCandidates: intentScorerDecision.rankedCandidates,
+    rankingLoss: intentScorerDecision.rankingLoss,
+    intentLabel: intentScorerDecision.intentLabel,
+    intentConfidence: intentScorerDecision.intentConfidence,
+    cacheKeys: intentScorerDecision.cacheKeys,
+    featureInputs: intentScorerDecision.selectedFeatureInputs,
+    didYouMean: intentScorerDecision.didYouMean,
+    durationMs: Date.now() - startMs,
+    queryPreview: query,
+  });
+
   if (cachedPrompt) {
     return wrapResponse({
       content: cachedPrompt.content,
@@ -1100,7 +1160,7 @@ export async function runChatCompletion(
         gpuCluster: aceCtx.ragChunks?.[0]?.gpuCluster,
       },
       86400 // 24h
-    )
+    ),
   ]).catch(() => {});
 
   // Fire-and-forget: store answer so run-2 gets a prior-answer cache hit
@@ -1174,7 +1234,7 @@ export async function runChatCompletion(
     const safeAcePacket = JSON.parse(serialized);
 
     const sourceRefs = (aceCtx.ragChunks ?? []).map((c) => ({
-      name: c.filePath ? c.filePath.split('/').pop()?.split('\\').pop() ?? 'unknown' : 'unknown',
+      name: c.filePath ? (c.filePath.split('/').pop()?.split('\\').pop() ?? 'unknown') : 'unknown',
       path: c.filePath ?? 'unknown',
       score: c.score ?? 0,
     }));

@@ -207,7 +207,7 @@ Respond as JSON: { "witness": "${witnessName}", "questions": [...], "strategy": 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'gemma4-legal:latest', prompt, stream: false, format: 'json' }),
-        signal: AbortSignal.timeout(60_000),
+        signal: AbortSignal.timeout(18_000),
       });
       if (!res.ok) return { content: [{ type: 'text', text: JSON.stringify({ error: `Ollama ${res.status}` }) }] };
       const data = await res.json() as { response?: string };

@@ -88,7 +88,11 @@ try {
       }
     } catch { /* try next port */ }
   }
-  if (!turboquantUp) fail('llama-server', 'unreachable on :8090 and :8099 — start with: llama-server.exe -m ... -c 32768 --port 8090');
+  if (!turboquantUp)
+    fail(
+      'llama-server',
+      'unreachable on :8090 and :8099 — start with: llama-server.exe -m ... -c 65536 --port 8090'
+    );
 } catch (e) {
   fail('llama-server check', e.message);
 }
