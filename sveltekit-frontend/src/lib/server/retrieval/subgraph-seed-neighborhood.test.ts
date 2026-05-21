@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 import {
   buildSubgraphV1SeedNeighborhood,
   fromStableFileKey,
-  normalizeFeatureLabel,
   toStableFileKey,
 } from './subgraph-seed-neighborhood.js';
+import { normalizeFeatureLabel } from '$lib/server/labels/feature-label-registry.js';
 
 describe('subgraph_v1_seed_neighborhood', () => {
   it('builds deterministic seeds from route, file, symbol, and cluster priors', async () => {

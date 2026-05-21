@@ -1,5 +1,6 @@
 import { fromStableFileKey, type SubgraphSeedNeighborhoodInput, type SubgraphSeedNeighborhoodResult } from '$lib/server/retrieval/subgraph-seed-neighborhood.js';
-import { buildSubgraphV1SeedNeighborhood, normalizeFeatureLabel } from '$lib/server/retrieval/subgraph-seed-neighborhood.js';
+import { buildSubgraphV1SeedNeighborhood } from '$lib/server/retrieval/subgraph-seed-neighborhood.js';
+import { normalizeFeatureLabel } from '$lib/server/labels/feature-label-registry.js';
 import { expandNeighbours, fetchAuthorityScores } from '$lib/server/search/neo4j-rerank.js';
 
 export const SUBGRAPH_V2_VERSION = 'subgraph_v2_structural_multihop';
