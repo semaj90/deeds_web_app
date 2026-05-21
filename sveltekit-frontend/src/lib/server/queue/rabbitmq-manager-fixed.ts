@@ -158,14 +158,14 @@ export class RabbitMQManager extends EventEmitter {
         const { getRedis } = await import('../redis.js');
         this.redisService = getRedis();
       } catch (e) {
-        console.warn('⚠️ Redis failed:', this.formatError(e));
+        this.logServiceLoadIssue('Redis', e);
       }
 
       try {
         const dbModule = await import('../db/client.js');
         this.db = dbModule.db;
       } catch (e) {
-        console.warn('⚠️ DB failed:', this.formatError(e));
+        this.logServiceLoadIssue('DB', e);
       }
 
       // Initialize embeddings if needed (mock or load)
@@ -175,18 +175,34 @@ export class RabbitMQManager extends EventEmitter {
         const mediaModule = await import('../analysis/media-processing.js');
         this.mediaProcessing = mediaModule;
       } catch (e) {
-        console.warn('⚠️ Media processing failed:', this.formatError(e));
+        this.logServiceLoadIssue('Media processing', e);
       }
 
       console.log('✅ Services loaded (partial/full)');
     } catch (error) {
-      console.warn('⚠️ Some services failed to load:', this.formatError(error));
+      const message = this.formatError(error);
+      if (this.shouldSilenceError(message)) {
+        console.warn('[RabbitMQ] Service loading aborted during dev reload');
+        return;
+      }
+      console.warn('⚠️ Some services failed to load:', message);
     }
+  }
+
+  private logServiceLoadIssue(serviceName: string, error: unknown): void {
+    const message = this.formatError(error);
+    if (this.shouldSilenceError(message)) {
+      console.warn(`[RabbitMQ] ${serviceName} load aborted during dev reload`);
+      return;
+    }
+    console.warn(`⚠️ ${serviceName} failed:`, message);
   }
 
   private attachChannelListeners(channel: AmqpChannel): void {
     channel.on('error', (err: unknown) => {
-      console.error('❌ RabbitMQ channel error:', (err as Error)?.message ?? err);
+      const message = this.formatError(err);
+      if (this.shouldSilenceError(message)) return;
+      console.error('❌ RabbitMQ channel error:', message);
       if (this.channel === channel) {
         this.channel = null;
       }
@@ -198,7 +214,10 @@ export class RabbitMQManager extends EventEmitter {
     return (
       normalized.includes('module runner has been closed') ||
       normalized.includes('vite module runner has been closed') ||
-      normalized.includes('module has been disposed')
+      normalized.includes('module has been disposed') ||
+      normalized.includes('channel not available') ||
+      normalized.includes('rabbitmq channel not ready') ||
+      normalized.includes('rabbitmq connection not available')
     );
   }
 
@@ -414,7 +433,7 @@ export class RabbitMQManager extends EventEmitter {
           } catch (err) {
             const message = this.formatError(err);
             // If the environment is closing, don't log as fatal
-            if (message.includes('module runner has been closed')) {
+            if (this.shouldSilenceError(message)) {
               console.warn(`[RabbitMQ] Environment closed during processing (queue: ${queue})`);
               return;
             }
@@ -1692,7 +1711,9 @@ export class RabbitMQManager extends EventEmitter {
       this.isInitialized = false;
       console.log('🔌 RabbitMQ connection closed');
     } catch (err) {
-      console.error('❌ RabbitMQ close error:', this.formatError(err));
+      const message = this.formatError(err);
+      if (this.shouldSilenceError(message)) return;
+      console.error('❌ RabbitMQ close error:', message);
     }
   }
 

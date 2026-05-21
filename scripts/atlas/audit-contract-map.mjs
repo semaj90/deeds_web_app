@@ -22,6 +22,12 @@ import pg from 'pg';
 
 // ── shared atlas utilities ────────────────────────────────────────────────────
 import { REPO_ROOT, readJson } from './_atlas-utils.mjs';
+import {
+  classifyDrizzlePendingSql,
+  loadDocumentedSidecars,
+  sidecarResolutionAdvice,
+  undocumentedSqlAdvice,
+} from './drizzle-sidecar-policy.mjs';
 
 const FRONTEND     = join(REPO_ROOT, 'sveltekit-frontend');
 const SCHEMA_DIR   = join(FRONTEND, 'src/lib/server/db');
@@ -355,51 +361,43 @@ async function auditMigrationsAndMeta() {
 
   // 4b. migrations missing from journal — load sidecar manifest first
   if (existsSync(DRIZZLE_DIR)) {
-    const sidecarManifest = join(DRIZZLE_DIR, 'sidecar-migrations.json');
-    const sidecarFiles = new Set(
-      existsSync(sidecarManifest)
-        ? (readJson(sidecarManifest, { sidecars: [] }).sidecars ?? []).map(s => s.file)
-        : [],
-    );
-
     const sqlFiles = readdirSync(DRIZZLE_DIR).filter(f => /^\d{4}_/.test(f) && f.endsWith('.sql'));
     const journalPath = join(DRIZZLE_META, '_journal.json');
     const journal = readJson(journalPath, { entries: [] });
     const journaledSnaps = new Set((journal.entries ?? []).map(e => e.tag));
+    const documentedSidecars = loadDocumentedSidecars(join(DRIZZLE_DIR, 'sidecar-migrations.json'));
+    const { documented, undocumented } = classifyDrizzlePendingSql(sqlFiles, journaledSnaps, documentedSidecars);
 
-    for (const sql of sqlFiles) {
-      const tag = sql.replace('.sql', '');
-      if (journaledSnaps.has(tag)) continue;
+    for (const sql of documented) {
+      const advice = sidecarResolutionAdvice(sql);
+      findings.push(makeFinding({
+        layer: 'drizzle-meta',
+        hmmState: advice.status,
+        severity: advice.severity,
+        localSourceRefs: [join(DRIZZLE_DIR, sql)],
+        externalSourceRefs: ['drizzle-kit:journal', 'drizzle-sidecar-migrations.json'],
+        problem: advice.problem,
+        expected: advice.expected,
+        suggestedFix: advice.suggestedFix,
+        validationCommands: ['npm run audit:drizzle-meta'],
+        agentCommandKeys: ['drizzle.meta.check'],
+      }));
+    }
 
-      if (sidecarFiles.has(sql)) {
-        // Documented sidecar — low-severity informational only
-        findings.push(makeFinding({
-          layer: 'drizzle-meta',
-          hmmState: 'stale_migration',
-          severity: 'low',
-          localSourceRefs: [join(DRIZZLE_DIR, sql)],
-          externalSourceRefs: ['drizzle-kit:journal'],
-          problem: `Documented sidecar "${sql}" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).`,
-          expected: 'Sidecar migrations are applied manually and excluded from the journal by design.',
-          suggestedFix: 'No action required — verify it was applied: see validationCommand in sidecar-migrations.json.',
-          validationCommands: ['npm run audit:drizzle-meta'],
-          agentCommandKeys: ['drizzle.meta.check'],
-        }));
-      } else {
-        // Unknown unjournaled SQL — this is a real problem
-        findings.push(makeFinding({
-          layer: 'drizzle-meta',
-          hmmState: 'stale_migration',
-          severity: 'medium',
-          localSourceRefs: [join(DRIZZLE_DIR, sql)],
-          externalSourceRefs: ['drizzle-kit:journal'],
-          problem: `"${sql}" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.`,
-          expected: 'Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.',
-          suggestedFix: `Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/${sql}) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.`,
-          validationCommands: ['npm run audit:drizzle-meta', 'npm run db:check'],
-          agentCommandKeys: ['drizzle.meta.check', 'db.check'],
-        }));
-      }
+    for (const sql of undocumented) {
+      const advice = undocumentedSqlAdvice(sql);
+      findings.push(makeFinding({
+        layer: 'drizzle-meta',
+        hmmState: advice.status,
+        severity: advice.severity,
+        localSourceRefs: [join(DRIZZLE_DIR, sql)],
+        externalSourceRefs: ['drizzle-kit:journal', 'drizzle-sidecar-migrations.json'],
+        problem: advice.problem,
+        expected: advice.expected,
+        suggestedFix: advice.suggestedFix,
+        validationCommands: ['npm run audit:drizzle-meta', 'npm run db:check'],
+        agentCommandKeys: ['drizzle.meta.check', 'db.check'],
+      }));
     }
   }
 
@@ -648,6 +646,7 @@ function writeReports(allFindings, elapsed) {
       high:   allFindings.filter(f => f.severity === 'high').length,
       medium: allFindings.filter(f => f.severity === 'medium').length,
       low:    allFindings.filter(f => f.severity === 'low').length,
+      info:   allFindings.filter(f => f.severity === 'info').length,
     },
     findings: allFindings,
   };
@@ -659,7 +658,7 @@ function writeReports(allFindings, elapsed) {
   const md = [
     '# Cross-Layer Contract Error Map',
     '',
-    `Generated: ${report.generatedAt}  |  Findings: ${report.totalFindings}  |  High: ${report.bySeverity.high}  Medium: ${report.bySeverity.medium}  Low: ${report.bySeverity.low}`,
+    `Generated: ${report.generatedAt}  |  Findings: ${report.totalFindings}  |  High: ${report.bySeverity.high}  Medium: ${report.bySeverity.medium}  Low: ${report.bySeverity.low}  Info: ${report.bySeverity.info}`,
     '',
     '## Findings',
     '',
@@ -760,7 +759,7 @@ async function main() {
     }
     const dur = Date.now() - lt0;
     const n = result.findings.length;
-    const status = n === 0 ? 'pass' : result.findings.some(f => f.severity === 'high') ? 'fail' : 'warn';
+    const status = n === 0 ? 'pass' : result.findings.some(f => f.severity === 'high') ? 'fail' : result.findings.some(f => f.severity === 'medium' || f.severity === 'low') ? 'warn' : 'pass';
     if (!OPT_JSON) {
       console.log(`  Layer ${layer.id}  ${layer.name.padEnd(30)} ${badge(status)}  ${n} findings  ${C.gray}${dur}ms${C.reset}`);
       for (const f of result.findings) {
@@ -775,6 +774,7 @@ async function main() {
   const high = allFindings.filter(f => f.severity === 'high').length;
   const med  = allFindings.filter(f => f.severity === 'medium').length;
   const low  = allFindings.filter(f => f.severity === 'low').length;
+  const info = allFindings.filter(f => f.severity === 'info').length;
 
   if (!OPT_DRY) {
     const report = writeReports(allFindings, elapsed);
@@ -800,7 +800,7 @@ async function main() {
 
   if (!OPT_JSON) {
     console.log(`\n${'─'.repeat(56)}`);
-    console.log(`  Total: ${C.red}${high} high${C.reset}  ${C.yellow}${med} medium${C.reset}  ${C.gray}${low} low${C.reset}     Elapsed: ${elapsed}ms`);
+    console.log(`  Total: ${C.red}${high} high${C.reset}  ${C.yellow}${med} medium${C.reset}  ${C.gray}${low} low${C.reset}  ${C.gray}${info} info${C.reset}     Elapsed: ${elapsed}ms`);
     console.log(`${'─'.repeat(56)}\n`);
   }
 

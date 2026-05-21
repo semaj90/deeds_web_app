@@ -1,0 +1,985 @@
+{
+  "cards": [
+    {
+      "hash": "bcfc28633a09dfdd",
+      "id": "feature-map:gpu-compute-plane",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/gpu",
+        "path:src/lib/server/graph",
+        "path:src/lib/server/retrieval",
+        "path:src/lib/server/topology",
+        "path:src/mcp-gpu-orchestrator.ts",
+        "service:GpuPipeline",
+        "status:active",
+        "store:Postgres",
+        "store:Qdrant",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "gpu-compute-plane",
+        "intent": "resilient GPU-accelerated graph analysis and retrieval fallback coordination",
+        "name": "GPU Compute Plane Integration",
+        "params": {
+          "docRef": "docs/features/feature_gpu_compute_plane.md",
+          "executionModel": "queued-gpu-with-cpu-fallback",
+          "synthesisBoundary": "bifrost-only"
+        },
+        "pathMapping": [
+          "src/mcp-gpu-orchestrator.ts",
+          "src/lib/server/gpu",
+          "src/lib/server/retrieval",
+          "src/lib/server/graph",
+          "src/lib/server/topology"
+        ],
+        "service": "GpuPipeline",
+        "status": "active",
+        "stores": [
+          "Redis",
+          "Qdrant",
+          "Postgres"
+        ]
+      },
+      "scores": {
+        "authority": 0.55,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "docs/features/feature_gpu_compute_plane.md",
+        "src/mcp-gpu-orchestrator.ts",
+        "src/lib/server/gpu/gpu-pipeline.ts",
+        "src/lib/server/retrieval/gpu-reranker.ts",
+        "src/lib/server/audit/gpu-audit-orchestrator.ts",
+        "src/lib/server/gpu",
+        "src/lib/server/retrieval",
+        "src/lib/server/graph",
+        "src/lib/server/topology"
+      ],
+      "summary": "GPU Compute Plane Integration — resilient GPU-accelerated graph analysis and retrieval fallback coordination. Status active. Service GpuPipeline; stores Redis, Qdrant, Postgres; clusters none"
+    },
+    {
+      "hash": "7c2e39eb7393cfe6",
+      "id": "feature-map:hyperrag-fusion",
+      "kind": "feature",
+      "labels": [
+        "cluster:20",
+        "cluster:23",
+        "cluster:25",
+        "cluster:32",
+        "cluster:47",
+        "cluster:72",
+        "cluster:73",
+        "cluster:80",
+        "cluster:82",
+        "cluster:92",
+        "cluster:94",
+        "feature-map",
+        "path:src/lib/server/retrieval",
+        "service:HyperRagFusionService",
+        "status:active",
+        "store:Neo4j",
+        "store:Postgres",
+        "store:Qdrant",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [
+          72,
+          73,
+          94,
+          25,
+          32,
+          47,
+          92,
+          82,
+          20,
+          23,
+          80
+        ],
+        "failOpen": true,
+        "id": "hyperrag-fusion",
+        "intent": "multi-signal retrieval fusion (Lexical/Topology/Task/Graph)",
+        "name": "HyperRAG Retrieval (L0-L11)",
+        "params": {
+          "budget": 12000,
+          "fusion": "RRF",
+          "lanes": 6
+        },
+        "pathMapping": [
+          "src/lib/server/retrieval"
+        ],
+        "service": "HyperRagFusionService",
+        "status": "active",
+        "stores": [
+          "Qdrant",
+          "Redis",
+          "Neo4j",
+          "Postgres"
+        ]
+      },
+      "scores": {
+        "authority": 0.45,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/retrieval/hyperrag-fusion-service.ts",
+        "src/lib/server/retrieval"
+      ],
+      "summary": "HyperRAG Retrieval (L0-L11) — multi-signal retrieval fusion (Lexical/Topology/Task/Graph). Status active. Service HyperRagFusionService; stores Qdrant, Redis, Neo4j, Postgres; clusters 72, 73, 94, 25, 32, 47, 92, 82, 20…"
+    },
+    {
+      "hash": "922164e4798dad0d",
+      "id": "feature-map:atlas-reconciliation",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:scripts/atlas/detect-manifold-drift.mjs",
+        "service:ManifoldDriftMonitor",
+        "status:active",
+        "store:Postgres",
+        "store:Qdrant",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "atlas-reconciliation",
+        "intent": "drift detection and automatic manifold repair",
+        "name": "Master Atlas Reconciliation",
+        "params": {
+          "checkInterval": 3600
+        },
+        "pathMapping": [
+          "scripts/atlas/detect-manifold-drift.mjs"
+        ],
+        "service": "ManifoldDriftMonitor",
+        "status": "active",
+        "stores": [
+          "Redis",
+          "Postgres",
+          "Qdrant"
+        ]
+      },
+      "scores": {
+        "authority": 0.35000000000000003,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "scripts/atlas/detect-manifold-drift.mjs"
+      ],
+      "summary": "Master Atlas Reconciliation — drift detection and automatic manifold repair. Status active. Service ManifoldDriftMonitor; stores Redis, Postgres, Qdrant; clusters none"
+    },
+    {
+      "hash": "4f0812863f81ddc7",
+      "id": "feature-map:ace-envelope",
+      "kind": "feature",
+      "labels": [
+        "cluster:72",
+        "cluster:94",
+        "feature-map",
+        "path:src/lib/server/ace",
+        "service:ContextPacketBudgeter",
+        "status:active",
+        "store:Postgres",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [
+          72,
+          94
+        ],
+        "failOpen": true,
+        "id": "ace-envelope",
+        "intent": "low-latency context assembly and budgeting",
+        "name": "ACE / BitFrost Context Cache",
+        "params": {
+          "entities": 50,
+          "tokenLimit": 12288
+        },
+        "pathMapping": [
+          "src/lib/server/ace"
+        ],
+        "service": "ContextPacketBudgeter",
+        "status": "active",
+        "stores": [
+          "Redis",
+          "Postgres"
+        ]
+      },
+      "scores": {
+        "authority": 0.25,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/ace/context-packet-budgeter.ts",
+        "src/lib/server/ace"
+      ],
+      "summary": "ACE / BitFrost Context Cache — low-latency context assembly and budgeting. Status active. Service ContextPacketBudgeter; stores Redis, Postgres; clusters 72, 94"
+    },
+    {
+      "hash": "08fb613522e8eef9",
+      "id": "feature-map:hypergraph-4d",
+      "kind": "feature",
+      "labels": [
+        "cluster:72",
+        "cluster:73",
+        "feature-map",
+        "path:src/lib/server/retrieval",
+        "service:HypergraphRoutingService",
+        "status:active",
+        "store:Qdrant",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [
+          72,
+          73
+        ],
+        "failOpen": true,
+        "id": "hypergraph-4d",
+        "intent": "4D manifold routing (som_x, som_y, semantic_z, activity_w)",
+        "name": "Manifold4 / Hypergraph / Topological Routing",
+        "params": {
+          "compression": "64d",
+          "dimensions": 4,
+          "manifold": "SOM-Kmeans"
+        },
+        "pathMapping": [
+          "src/lib/server/retrieval"
+        ],
+        "service": "HypergraphRoutingService",
+        "status": "active",
+        "stores": [
+          "Redis",
+          "Qdrant"
+        ]
+      },
+      "scores": {
+        "authority": 0.25,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/retrieval/hypergraph-routing-service.ts",
+        "src/lib/server/retrieval"
+      ],
+      "summary": "Manifold4 / Hypergraph / Topological Routing — 4D manifold routing (som_x, som_y, semantic_z, activity_w). Status active. Service HypergraphRoutingService; stores Redis, Qdrant; clusters 72, 73"
+    },
+    {
+      "hash": "cc98c38983a20ea5",
+      "id": "feature-map:ingestion-layer",
+      "kind": "feature",
+      "labels": [
+        "cluster:32",
+        "cluster:92",
+        "feature-map",
+        "path:src/lib/server/db/schema/topology.ts",
+        "service:TopologyProcessor",
+        "status:active",
+        "store:Postgres",
+        "store:Qdrant"
+      ],
+      "payload": {
+        "clusters": [
+          32,
+          92
+        ],
+        "failOpen": true,
+        "id": "ingestion-layer",
+        "intent": "multimodal document and code ingestion pipeline",
+        "name": "Docling / LangExtract / OCR Ingestion",
+        "params": {
+          "batchSize": 1000
+        },
+        "pathMapping": [
+          "src/lib/server/db/schema/topology.ts"
+        ],
+        "service": "TopologyProcessor",
+        "status": "active",
+        "stores": [
+          "Postgres",
+          "Qdrant"
+        ]
+      },
+      "scores": {
+        "authority": 0.25,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/db/schema/topology.ts"
+      ],
+      "summary": "Docling / LangExtract / OCR Ingestion — multimodal document and code ingestion pipeline. Status active. Service TopologyProcessor; stores Postgres, Qdrant; clusters 32, 92"
+    },
+    {
+      "hash": "d843391b541940d5",
+      "id": "feature-map:legal-product",
+      "kind": "feature",
+      "labels": [
+        "cluster:47",
+        "feature-map",
+        "path:src/lib/server/ai",
+        "path:src/lib/server/kag",
+        "service:Gemma4Synthesizer",
+        "status:active",
+        "store:Neo4j",
+        "store:Postgres"
+      ],
+      "payload": {
+        "clusters": [
+          47
+        ],
+        "failOpen": true,
+        "id": "legal-product",
+        "intent": "high-level legal reasoning and synthesis",
+        "name": "Legal-AI Product Layer (KAG/DAG)",
+        "params": {
+          "model": "gemma4-legal-vlm"
+        },
+        "pathMapping": [
+          "src/lib/server/ai",
+          "src/lib/server/kag"
+        ],
+        "service": "Gemma4Synthesizer",
+        "status": "active",
+        "stores": [
+          "Neo4j",
+          "Postgres"
+        ]
+      },
+      "scores": {
+        "authority": 0.25,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/ai/gemma4-agent.ts",
+        "src/lib/server/ai",
+        "src/lib/server/kag"
+      ],
+      "summary": "Legal-AI Product Layer (KAG/DAG) — high-level legal reasoning and synthesis. Status active. Service Gemma4Synthesizer; stores Neo4j, Postgres; clusters 47"
+    },
+    {
+      "hash": "8d68f79a3dc30cdb",
+      "id": "feature-map:feature-atlas",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/atlas/master-feature-map.ts",
+        "service:MasterFeatureMap",
+        "status:active",
+        "store:Postgres"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "feature-atlas",
+        "intent": "central registry for architectural intents and anchors",
+        "name": "Feature Mapping Atlas",
+        "params": {
+          "families": 11
+        },
+        "pathMapping": [
+          "src/lib/server/atlas/master-feature-map.ts"
+        ],
+        "service": "MasterFeatureMap",
+        "status": "active",
+        "stores": [
+          "Postgres"
+        ]
+      },
+      "scores": {
+        "authority": 0.15000000000000002,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts"
+      ],
+      "summary": "Feature Mapping Atlas — central registry for architectural intents and anchors. Status active. Service MasterFeatureMap; stores Postgres; clusters none"
+    },
+    {
+      "hash": "baa699e1263abdc8",
+      "id": "feature-map:karpathy-blend",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/ace",
+        "service:KarpathyBlendOrchestrator",
+        "status:active",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "karpathy-blend",
+        "intent": "NanoFlow streaming context synthesis and autoencoding",
+        "name": "Karpathy / GPU Blend / Codebase Indexing",
+        "params": {
+          "blendMode": "streaming",
+          "latencyTarget": 200
+        },
+        "pathMapping": [
+          "src/lib/server/ace"
+        ],
+        "service": "KarpathyBlendOrchestrator",
+        "status": "active",
+        "stores": [
+          "Redis"
+        ]
+      },
+      "scores": {
+        "authority": 0.15000000000000002,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/ace/karpathy-blend-orchestrator.ts",
+        "src/lib/server/ace"
+      ],
+      "summary": "Karpathy / GPU Blend / Codebase Indexing — NanoFlow streaming context synthesis and autoencoding. Status active. Service KarpathyBlendOrchestrator; stores Redis; clusters none"
+    },
+    {
+      "hash": "9a25c608934a4829",
+      "id": "feature-map:route-map",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/atlas/route-feature-map.ts",
+        "service:RouteFeatureMap",
+        "status:active",
+        "store:Postgres"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "route-map",
+        "intent": "mapping routes to services, envs, and sidecars",
+        "name": "Route / Env / Sidecar Map",
+        "params": {
+          "edges": [
+            "USES_ENV",
+            "USES_STORE"
+          ]
+        },
+        "pathMapping": [
+          "src/lib/server/atlas/route-feature-map.ts"
+        ],
+        "service": "RouteFeatureMap",
+        "status": "active",
+        "stores": [
+          "Postgres"
+        ]
+      },
+      "scores": {
+        "authority": 0.15000000000000002,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/atlas/route-feature-map.ts"
+      ],
+      "summary": "Route / Env / Sidecar Map — mapping routes to services, envs, and sidecars. Status active. Service RouteFeatureMap; stores Postgres; clusters none"
+    },
+    {
+      "hash": "b2a43551dd5512f0",
+      "id": "feature-map:trace-mcp",
+      "kind": "feature",
+      "labels": [
+        "cluster:82",
+        "feature-map",
+        "path:src/mcp",
+        "service:TraceMcpService",
+        "status:active",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [
+          82
+        ],
+        "failOpen": true,
+        "id": "trace-mcp",
+        "intent": "model context protocol tool orchestration",
+        "name": "TRACE MCP / Agentic Tool Surface",
+        "params": {
+          "protocol": "MCP 1.0",
+          "tools": 12
+        },
+        "pathMapping": [
+          "src/mcp"
+        ],
+        "service": "TraceMcpService",
+        "status": "active",
+        "stores": [
+          "Redis"
+        ]
+      },
+      "scores": {
+        "authority": 0.15000000000000002,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/mcp/trace-mcp-server.ts",
+        "src/mcp"
+      ],
+      "summary": "TRACE MCP / Agentic Tool Surface — model context protocol tool orchestration. Status active. Service TraceMcpService; stores Redis; clusters 82"
+    },
+    {
+      "hash": "a585a5e92427aba7",
+      "id": "feature-map:grpc-mcp",
+      "kind": "feature",
+      "labels": [
+        "cluster:82",
+        "feature-map",
+        "path:src/routes/api/mcp",
+        "service:GrpcMcpService",
+        "status:active"
+      ],
+      "payload": {
+        "clusters": [
+          82
+        ],
+        "failOpen": true,
+        "id": "grpc-mcp",
+        "intent": "multi-language function calling",
+        "name": "gRPC MCP Functions",
+        "params": {
+          "ports": [
+            50051,
+            50057
+          ]
+        },
+        "pathMapping": [
+          "src/routes/api/mcp"
+        ],
+        "service": "GrpcMcpService",
+        "status": "active",
+        "stores": []
+      },
+      "scores": {
+        "authority": 0.05,
+        "rank": 95
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/routes/api/mcp/+server.ts",
+        "src/routes/api/mcp"
+      ],
+      "summary": "gRPC MCP Functions — multi-language function calling. Status active. Service GrpcMcpService; stores ; clusters 82"
+    },
+    {
+      "hash": "72926422e5651748",
+      "id": "feature-map:import-atlas",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:scripts/graph/build-codebase-relationships.mjs",
+        "service:DeepImportGraph",
+        "status:partial",
+        "store:Neo4j",
+        "store:Postgres"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "import-atlas",
+        "intent": "dependency graph and topological sorting",
+        "name": "Static / Dynamic Import Atlas",
+        "params": {
+          "edgeTypes": [
+            "STATIC_IMPORTS",
+            "DYNAMIC_IMPORTS"
+          ]
+        },
+        "pathMapping": [
+          "scripts/graph/build-codebase-relationships.mjs"
+        ],
+        "service": "DeepImportGraph",
+        "status": "partial",
+        "stores": [
+          "Neo4j",
+          "Postgres"
+        ]
+      },
+      "scores": {
+        "authority": 0.25,
+        "rank": 82
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "scripts/graph/build-codebase-relationships.mjs"
+      ],
+      "summary": "Static / Dynamic Import Atlas — dependency graph and topological sorting. Status partial. Service DeepImportGraph; stores Neo4j, Postgres; clusters none"
+    },
+    {
+      "hash": "276ece07bb31548a",
+      "id": "feature-map:trust-tiers",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/security",
+        "service:TrustManager",
+        "status:partial",
+        "store:Postgres"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "trust-tiers",
+        "intent": "tiered verification and retrieval",
+        "name": "Trust Tiers (L1-L3)",
+        "params": {
+          "levels": [
+            "verified",
+            "trusted",
+            "candidate"
+          ]
+        },
+        "pathMapping": [
+          "src/lib/server/security"
+        ],
+        "service": "TrustManager",
+        "status": "partial",
+        "stores": [
+          "Postgres"
+        ]
+      },
+      "scores": {
+        "authority": 0.15000000000000002,
+        "rank": 82
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/db/client.ts",
+        "src/lib/server/security"
+      ],
+      "summary": "Trust Tiers (L1-L3) — tiered verification and retrieval. Status partial. Service TrustManager; stores Postgres; clusters none"
+    },
+    {
+      "hash": "65fb5f52623030bf",
+      "id": "feature-map:bit-glyphs",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:scripts/atlas",
+        "service:ManifoldAutocoder",
+        "status:dry_run",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "bit-glyphs",
+        "intent": "rapid topological pattern matching",
+        "name": "Bit-Glyphs / HMM",
+        "params": {
+          "size": 64
+        },
+        "pathMapping": [
+          "scripts/atlas"
+        ],
+        "service": "ManifoldAutocoder",
+        "status": "dry_run",
+        "stores": [
+          "Redis"
+        ]
+      },
+      "scores": {
+        "authority": 0.15000000000000002,
+        "rank": 68
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "scripts/atlas/compress-manifold-vectors.mjs",
+        "scripts/atlas"
+      ],
+      "summary": "Bit-Glyphs / HMM — rapid topological pattern matching. Status dry_run. Service ManifoldAutocoder; stores Redis; clusters none"
+    },
+    {
+      "hash": "990c53ca67d66a41",
+      "id": "feature-map:gpu-ast",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/atlas",
+        "service:GpuAstMapper",
+        "status:dry_run"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "gpu-ast",
+        "intent": "fast multi-language parsing",
+        "name": "GPU AST Mapping",
+        "params": {
+          "engines": [
+            "simdjson",
+            "libtorch"
+          ]
+        },
+        "pathMapping": [
+          "src/lib/server/atlas"
+        ],
+        "service": "GpuAstMapper",
+        "status": "dry_run",
+        "stores": []
+      },
+      "scores": {
+        "authority": 0.05,
+        "rank": 68
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/db/schema/topology.ts",
+        "src/lib/server/atlas"
+      ],
+      "summary": "GPU AST Mapping — fast multi-language parsing. Status dry_run. Service GpuAstMapper; stores ; clusters none"
+    },
+    {
+      "hash": "7ebc2accd4391735",
+      "id": "feature-map:context-dag",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/kag",
+        "service:ContextDagSynthesis",
+        "status:planned",
+        "store:Neo4j"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "context-dag",
+        "intent": "knowledge synthesis graph",
+        "name": "Context DAG",
+        "params": {},
+        "pathMapping": [
+          "src/lib/server/kag"
+        ],
+        "service": "ContextDagSynthesis",
+        "status": "planned",
+        "stores": [
+          "Neo4j"
+        ]
+      },
+      "scores": {
+        "authority": 0.1,
+        "rank": 54
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/kag"
+      ],
+      "summary": "Context DAG — knowledge synthesis graph. Status planned. Service ContextDagSynthesis; stores Neo4j; clusters none"
+    },
+    {
+      "hash": "90d547ffa270ba9c",
+      "id": "feature-map:dense-hmm-search",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/search",
+        "service:DenseHmmSearchService",
+        "status:planned",
+        "store:Redis"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "dense-hmm-search",
+        "intent": "manifold pattern search",
+        "name": "Hyper Dense HMM Search",
+        "params": {},
+        "pathMapping": [
+          "src/lib/server/search"
+        ],
+        "service": "DenseHmmSearchService",
+        "status": "planned",
+        "stores": [
+          "Redis"
+        ]
+      },
+      "scores": {
+        "authority": 0.1,
+        "rank": 54
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/search"
+      ],
+      "summary": "Hyper Dense HMM Search — manifold pattern search. Status planned. Service DenseHmmSearchService; stores Redis; clusters none"
+    },
+    {
+      "hash": "18309d5a44f81879",
+      "id": "feature-map:cuda-streams",
+      "kind": "feature",
+      "labels": [
+        "feature-map",
+        "path:src/lib/server/gpu",
+        "service:CudaStreamManager",
+        "status:planned"
+      ],
+      "payload": {
+        "clusters": [],
+        "failOpen": true,
+        "id": "cuda-streams",
+        "intent": "batch GPU synthesis",
+        "name": "CUDA Kernel Streams",
+        "params": {},
+        "pathMapping": [
+          "src/lib/server/gpu"
+        ],
+        "service": "CudaStreamManager",
+        "status": "planned",
+        "stores": []
+      },
+      "scores": {
+        "authority": 0,
+        "rank": 54
+      },
+      "sourceRefs": [
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/gpu"
+      ],
+      "summary": "CUDA Kernel Streams — batch GPU synthesis. Status planned. Service CudaStreamManager; stores ; clusters none"
+    },
+    {
+      "hash": "b0feee8ad63dc491",
+      "id": "tool:trace.bifrost_dispatch",
+      "kind": "tool",
+      "labels": [
+        "bifrost",
+        "dispatcher",
+        "llm",
+        "tool"
+      ],
+      "payload": {
+        "tiers": [
+          "model",
+          "cache",
+          "rerank",
+          "embedding"
+        ],
+        "tool": "trace.bifrost_dispatch"
+      },
+      "scores": {
+        "authority": 0.95,
+        "rank": 0.92
+      },
+      "sourceRefs": [
+        "src/mcp/bifrost_tools.ts",
+        "src/lib/server/ollama.ts"
+      ],
+      "summary": "Bifrost gateway dispatcher for model, cache, rerank, and embedding tiers."
+    },
+    {
+      "hash": "2bc20be9622eb4da",
+      "id": "memory:ace-prefix",
+      "kind": "memory",
+      "labels": [
+        "ace",
+        "memory",
+        "prefix",
+        "prompt-cache"
+      ],
+      "payload": {
+        "cache": "ace-prefix",
+        "format": "toon"
+      },
+      "scores": {
+        "rank": 0.9,
+        "recency": 0.95
+      },
+      "sourceRefs": [
+        "scripts/index/ace-prefix-toon.mjs",
+        "memory/index/ace-prefix.toon"
+      ],
+      "summary": "TOON-encoded ACE prefix packet used to keep the stable prefix byte-identical."
+    },
+    {
+      "hash": "20a5b06e225b2c48",
+      "id": "tool:trace.kag_search",
+      "kind": "tool",
+      "labels": [
+        "kag",
+        "search",
+        "tool",
+        "trace"
+      ],
+      "payload": {
+        "tool": "trace.kag_search"
+      },
+      "scores": {
+        "authority": 0.91,
+        "rank": 0.89
+      },
+      "sourceRefs": [
+        "src/mcp/trace-mcp-server.ts",
+        "src/lib/server/retrieval"
+      ],
+      "summary": "TRACE/KAG hybrid search path for graph expansion and contextual retrieval."
+    },
+    {
+      "hash": "55c4b222ac4bb9fe",
+      "id": "tool:engram.ace_packet_inject",
+      "kind": "tool",
+      "labels": [
+        "ace",
+        "engram",
+        "memory",
+        "tool"
+      ],
+      "payload": {
+        "tool": "engram.ace_packet_inject"
+      },
+      "scores": {
+        "authority": 0.89,
+        "rank": 0.87
+      },
+      "sourceRefs": [
+        "src/lib/server/ai/engram-memory.ts",
+        "src/lib/server/ai/engram-registry.ts"
+      ],
+      "summary": "Writes ACE packets and chat-memory hints into the Redis hot path."
+    },
+    {
+      "hash": "9dd57728cf1c9090",
+      "id": "memory:bifrost-prefix-cache",
+      "kind": "memory",
+      "labels": [
+        "bifrost",
+        "kv-cache",
+        "memory",
+        "prefix"
+      ],
+      "payload": {
+        "cache": "bifrost:kv:prefix"
+      },
+      "scores": {
+        "rank": 0.84,
+        "recency": 0.88
+      },
+      "sourceRefs": [
+        "src/lib/server/ai/bifrost-cache-manager.ts"
+      ],
+      "summary": "Bifrost KV prefix cache for shareable system prompts and warm prefixes."
+    }
+  ],
+  "generatedAt": "2026-05-21T19:26:43.730Z",
+  "kind": "selected-cards",
+  "sourceSummary": {
+    "cluster": 20,
+    "feature": 50,
+    "featureMap": 19,
+    "memory": 4,
+    "pathway": 50,
+    "tool": 6
+  }
+}

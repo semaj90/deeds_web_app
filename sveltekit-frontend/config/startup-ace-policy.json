@@ -43,6 +43,7 @@
     "seed:hypergraph:lane-c",
     "seed:hypergraph:lane-d",
     "smoke:hypergraph:vault",
+    "startup:napi-bridge:warm",
     "turbovec:sidecar:detached",
     "graphify:semantic-cluster",
     "graphify:semantic-cluster:force",

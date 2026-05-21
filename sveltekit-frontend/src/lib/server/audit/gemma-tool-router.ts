@@ -17,140 +17,152 @@
  */
 
 import { z } from 'zod';
-import { ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
+import { assertDirectOllamaAllowed, ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 
 // ── Tool Definitions (OpenAI-compatible format for Ollama) ────────────
 
 export const AUDIT_TOOLS = [
-	{
-		type: 'function' as const,
-		function: {
-			name: 'run_gpu_audit',
-			description:
-				'Run a full GPU-accelerated codebase audit combining Neo4j graph algorithms (PageRank, community detection) with LibTorch CUDA (similarity matrix, K-means clustering) on Qdrant codebase vectors. Returns central files, communities, near-duplicates, and code clusters. Persists report to Postgres.',
-			parameters: {
-				type: 'object',
-				properties: {
-					caseId: { type: 'string', description: 'Optional case UUID to scope the graph analysis' },
-					maxNodes: { type: 'number', description: 'Max Neo4j nodes to analyze (default: 500)' },
-					clusterCount: { type: 'number', description: 'K-means cluster count (default: auto)' },
-					maxVectors: { type: 'number', description: 'Max Qdrant vectors to fetch (default: 500)' },
-					dupThreshold: { type: 'number', description: 'Similarity threshold for near-duplicate detection (default: 0.92)' },
-					halfPrecision: { type: 'boolean', description: 'Use FP16 for 2x VRAM savings (default: false)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'analyze_graph',
-			description:
-				'Run Neo4j graph analysis only: PageRank to find central files/dependency bottlenecks, and community detection to discover subsystem boundaries. Faster than full audit — skips vector/GPU phases.',
-			parameters: {
-				type: 'object',
-				properties: {
-					caseId: { type: 'string', description: 'Optional case UUID to scope the graph' },
-					maxNodes: { type: 'number', description: 'Max graph nodes (default: 500)' },
-					includeCommunities: { type: 'boolean', description: 'Run community detection (default: true)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'search_codebase',
-			description:
-				'Semantic search through codebase vectors in Qdrant. Use to find code related to a specific concept, module, or pattern. Returns ranked code chunks with file paths and similarity scores.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'What to search for in the codebase' },
-					limit: { type: 'number', description: 'Max results (default: 10)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'get_audit_report',
-			description:
-				'Retrieve the latest GPU audit report from Postgres. Use when the user asks about previous audit results, central files, duplicate code, or codebase structure without running a new audit.',
-			parameters: {
-				type: 'object',
-				properties: {
-					caseId: { type: 'string', description: 'Optional case UUID filter' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'gpu_status',
-			description:
-				'Check GPU/CUDA availability and VRAM usage. Use before recommending full audit or half-precision mode.',
-			parameters: {
-				type: 'object',
-				properties: {},
-			},
-		},
-	},
+  {
+    type: 'function' as const,
+    function: {
+      name: 'run_gpu_audit',
+      description:
+        'Run a full GPU-accelerated codebase audit combining Neo4j graph algorithms (PageRank, community detection) with LibTorch CUDA (similarity matrix, K-means clustering) on Qdrant codebase vectors. Returns central files, communities, near-duplicates, and code clusters. Persists report to Postgres.',
+      parameters: {
+        type: 'object',
+        properties: {
+          caseId: { type: 'string', description: 'Optional case UUID to scope the graph analysis' },
+          maxNodes: { type: 'number', description: 'Max Neo4j nodes to analyze (default: 500)' },
+          clusterCount: { type: 'number', description: 'K-means cluster count (default: auto)' },
+          maxVectors: { type: 'number', description: 'Max Qdrant vectors to fetch (default: 500)' },
+          dupThreshold: {
+            type: 'number',
+            description: 'Similarity threshold for near-duplicate detection (default: 0.92)',
+          },
+          halfPrecision: {
+            type: 'boolean',
+            description: 'Use FP16 for 2x VRAM savings (default: false)',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'analyze_graph',
+      description:
+        'Run Neo4j graph analysis only: PageRank to find central files/dependency bottlenecks, and community detection to discover subsystem boundaries. Faster than full audit — skips vector/GPU phases.',
+      parameters: {
+        type: 'object',
+        properties: {
+          caseId: { type: 'string', description: 'Optional case UUID to scope the graph' },
+          maxNodes: { type: 'number', description: 'Max graph nodes (default: 500)' },
+          includeCommunities: {
+            type: 'boolean',
+            description: 'Run community detection (default: true)',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'search_codebase',
+      description:
+        'Semantic search through codebase vectors in Qdrant. Use to find code related to a specific concept, module, or pattern. Returns ranked code chunks with file paths and similarity scores.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: { type: 'string', description: 'What to search for in the codebase' },
+          limit: { type: 'number', description: 'Max results (default: 10)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'get_audit_report',
+      description:
+        'Retrieve the latest GPU audit report from Postgres. Use when the user asks about previous audit results, central files, duplicate code, or codebase structure without running a new audit.',
+      parameters: {
+        type: 'object',
+        properties: {
+          caseId: { type: 'string', description: 'Optional case UUID filter' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'gpu_status',
+      description:
+        'Check GPU/CUDA availability and VRAM usage. Use before recommending full audit or half-precision mode.',
+      parameters: {
+        type: 'object',
+        properties: {},
+      },
+    },
+  },
 ] as const;
 
 // ── Zod Validation Schemas ────────────────────────────────────────────
 
 const TOOL_ARG_SCHEMAS: Record<string, z.ZodType> = {
-	run_gpu_audit: z.object({
-		caseId: z.string().uuid().optional(),
-		maxNodes: z.number().int().min(10).max(5000).optional(),
-		clusterCount: z.number().int().min(2).max(50).optional(),
-		maxVectors: z.number().int().min(10).max(2000).optional(),
-		dupThreshold: z.number().min(0.80).max(0.99).optional(),
-		halfPrecision: z.boolean().optional(),
-	}),
-	analyze_graph: z.object({
-		caseId: z.string().uuid().optional(),
-		maxNodes: z.number().int().min(10).max(5000).optional(),
-		includeCommunities: z.boolean().optional(),
-	}),
-	search_codebase: z.object({
-		query: z.string().min(1),
-		limit: z.number().int().min(1).max(50).optional(),
-	}),
-	get_audit_report: z.object({
-		caseId: z.string().uuid().optional(),
-	}),
-	gpu_status: z.object({}),
+  run_gpu_audit: z.object({
+    caseId: z.string().uuid().optional(),
+    maxNodes: z.number().int().min(10).max(5000).optional(),
+    clusterCount: z.number().int().min(2).max(50).optional(),
+    maxVectors: z.number().int().min(10).max(2000).optional(),
+    dupThreshold: z.number().min(0.8).max(0.99).optional(),
+    halfPrecision: z.boolean().optional(),
+  }),
+  analyze_graph: z.object({
+    caseId: z.string().uuid().optional(),
+    maxNodes: z.number().int().min(10).max(5000).optional(),
+    includeCommunities: z.boolean().optional(),
+  }),
+  search_codebase: z.object({
+    query: z.string().min(1),
+    limit: z.number().int().min(1).max(50).optional(),
+  }),
+  get_audit_report: z.object({
+    caseId: z.string().uuid().optional(),
+  }),
+  gpu_status: z.object({}),
 };
 
 const TOOL_TIMEOUT_MS: Record<string, number> = {
-	run_gpu_audit: 60_000,
-	analyze_graph: 30_000,
-	search_codebase: 10_000,
-	get_audit_report: 5_000,
-	gpu_status: 3_000,
+  run_gpu_audit: 60_000,
+  analyze_graph: 30_000,
+  search_codebase: 10_000,
+  get_audit_report: 5_000,
+  gpu_status: 3_000,
 };
 
-function validateToolArgs(name: string, args: Record<string, unknown>): Record<string, unknown> | null {
-	const schema = TOOL_ARG_SCHEMAS[name];
-	if (!schema) return args;
-	const result = schema.safeParse(args);
-	return result.success ? (result.data as Record<string, unknown>) : null;
+function validateToolArgs(
+  name: string,
+  args: Record<string, unknown>
+): Record<string, unknown> | null {
+  const schema = TOOL_ARG_SCHEMAS[name];
+  if (!schema) return args;
+  const result = schema.safeParse(args);
+  return result.success ? (result.data as Record<string, unknown>) : null;
 }
 
 // ── Tool Result Type ──────────────────────────────────────────────────
 
 export interface AuditToolResult {
-	ok: boolean;
-	tool: string;
-	result: string;
-	durationMs: number;
-	data?: Record<string, unknown>;
+  ok: boolean;
+  tool: string;
+  result: string;
+  durationMs: number;
+  data?: Record<string, unknown>;
 }
 
 // ── Tool Executor ─────────────────────────────────────────────────────
@@ -488,6 +500,11 @@ export async function runAuditPlanner(req: AuditPlannerRequest): Promise<AuditPl
   while (toolRounds < MAX_TOOL_ROUNDS) {
     let res: Response;
     try {
+      assertDirectOllamaAllowed(
+        'audit/gemma-tool-router',
+        'audit-planner',
+        'Planner loop needs native tools payload with local executor roundtrips.'
+      );
       res = await ollamaFetch(`${ollamaUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -566,6 +583,11 @@ export async function runAuditPlanner(req: AuditPlannerRequest): Promise<AuditPl
 
   // If we exhausted rounds without a final response, make one last call without tools
   try {
+    assertDirectOllamaAllowed(
+      'audit/gemma-tool-router',
+      'audit-planner',
+      'Final synthesis call in planner loop remains direct by design.'
+    );
     const finalRes = await ollamaFetch(`${ollamaUrl}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

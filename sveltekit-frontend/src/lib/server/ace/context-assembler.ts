@@ -53,7 +53,7 @@ import {
   traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
 
-const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 32768);
+const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 65536);
 const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
 const ACE_PACKET_TOKEN_CAP = Number(process.env.ACE_PACKET_TOKEN_CAP ?? '3500');
 const MCP_RESULT_TOKEN_CAP = Number(process.env.MCP_RESULT_TOKEN_CAP ?? '800');
@@ -458,10 +458,10 @@ async function fetchWebResearchRows(
   }
 }
 
-// ctx-size aware retrieval limit: 3 at 16k, 5 at 32k, 8 at 64k
-// Effective context = model ctx - (MCP outputs + chat history + query) — stay conservative at 16k
-function getAdaptiveTopK(): number {
-  const ctx = TURBO_CTX_SIZE;
+// ctx-size aware retrieval limit: 3 at smaller windows, 5 at 32k, 8 at 64k
+// Effective context = model ctx - (MCP outputs + chat history + query) — keep the 64k default conservative
+export function getAdaptiveTopK(contextSize: number = TURBO_CTX_SIZE): number {
+  const ctx = Number.isFinite(contextSize) ? contextSize : TURBO_CTX_SIZE;
   if (ctx >= 49152) return 8;
   if (ctx >= 32768) return 5;
   return 3;

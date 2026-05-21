@@ -14,6 +14,7 @@ import { ENV } from '$lib/server/env.server.js';
 import crypto from 'node:crypto';
 import type { AceCodeIntelContext } from './codeintel-datastore.js';
 import {
+  assertDirectOllamaAllowed,
   bifrostChat,
   getChatModelKeepAlive,
   getOllamaRequestTimeoutMs,
@@ -276,6 +277,11 @@ export async function callGemma4WithAceContext(
     const assistantStartedAt = Date.now();
     const content = formatField
       ? await (async () => {
+          assertDirectOllamaAllowed(
+            'ace/gemma4-codeintel',
+            'json-schema',
+            'Structured JSON schema format is required for this lane.'
+          );
           const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -560,6 +566,11 @@ export async function callGemma4WithTools(
 
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      assertDirectOllamaAllowed(
+        'ace/gemma4-codeintel',
+        'tool-calls',
+        'Native tool-calling loop requires direct /api/chat tools payload.'
+      );
       const assistantStartedAt = Date.now();
       const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
         method: 'POST',

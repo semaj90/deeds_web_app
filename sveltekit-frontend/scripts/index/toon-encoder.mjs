@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 function scalar(value) {
   if (value === null || value === undefined) return '';
@@ -54,4 +57,29 @@ export function toToon(value, name = 'packet', depth = 0) {
     }
   }
   return lines.join('\n');
+}
+
+const isMain = process.argv[1]
+  ? path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+  : false;
+
+if (isMain && process.argv.length >= 3) {
+  const inputPath = path.resolve(process.argv[2]);
+  const outputPath = process.argv[3] ? path.resolve(process.argv[3]) : null;
+  const packetName = process.argv[4] ?? 'packet';
+
+  try {
+    const raw = readFileSync(inputPath, 'utf8');
+    const value = JSON.parse(raw);
+    const toon = toToon(value, packetName);
+
+    if (outputPath) {
+      writeFileSync(outputPath, `${toon}\n`, 'utf8');
+    } else {
+      process.stdout.write(`${toon}\n`);
+    }
+  } catch (error) {
+    console.error(`[toon-encoder] ${error?.message ?? String(error)}`);
+    process.exit(1);
+  }
 }

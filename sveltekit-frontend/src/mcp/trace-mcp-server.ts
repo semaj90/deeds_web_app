@@ -92,6 +92,8 @@ import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { registerEngramTools } from './engram_tools.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
+import { buildSubgraphV1SeedNeighborhood } from '../lib/server/retrieval/subgraph-seed-neighborhood.js';
+import { buildGraphRagStagePlan } from '../lib/server/retrieval/graphrag-stage-plan.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
 const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
@@ -616,15 +618,38 @@ server.registerTool(
       stableKey: z.string().describe('Stable key of the center node (e.g. "file:src/lib/server/ace/context-assembler.ts")'),
       depth:     z.number().int().min(1).max(3).default(2).describe('Hop depth (1–3)'),
       limit:     z.number().int().min(1).max(100).default(40).describe('Max neighbors returned'),
+      query:     z.string().optional().describe('Optional free-text query used only for deterministic seed-envelope labeling'),
+      route:     z.string().optional().describe('Optional route used only for deterministic seed-envelope labeling'),
+      symbol:    z.string().optional().describe('Optional symbol used only for deterministic seed-envelope labeling'),
+      filePath:  z.string().optional().describe('Optional explicit file path when the stable key is not a file:* key'),
     })
   },
-  async ({ stableKey, depth, limit }) => {
+  async ({ stableKey, depth, limit, query, route, symbol, filePath }) => {
+    const derivedFilePath = filePath ?? (stableKey.startsWith('file:') ? stableKey.slice(5) : undefined);
+    const seedEnvelope = await buildSubgraphV1SeedNeighborhood({
+      query,
+      route,
+      symbol,
+      filePath: derivedFilePath,
+      maxHops: depth >= 2 ? 2 : 1,
+      maxNeighbors: Math.min(limit, 24),
+    }).catch(() => null);
+
     // Try SvelteKit traverse API first (has auth-free path)
     try {
       const data = await svelteGet(
         `/api/graph/traverse?nodeId=${encodeURIComponent(stableKey)}&mode=ego&depth=${depth}&limit=${limit}`
       ) as { nodes?: unknown[]; edges?: unknown[] };
-      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            center: stableKey,
+            seedEnvelope,
+            graph: data,
+          }, null, 2),
+        }],
+      };
     } catch {
       // Fall back to direct Neo4j
       const rows = await neo4jQuery(
@@ -640,7 +665,12 @@ server.registerTool(
         nodeType:  d.row?.[2],
         relation:  d.row?.[3],
       }));
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ center: stableKey, neighbors }, null, 2) }] };
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({ center: stableKey, seedEnvelope, neighbors }, null, 2),
+        }],
+      };
     }
   }
 );
@@ -739,6 +769,13 @@ server.registerTool(
       }
 
       const synthesis = {
+        stagePlan: buildGraphRagStagePlan({
+          startKey,
+          endKey,
+          maxHops,
+          somRadius: 1,
+          clusterCardLimit: 3,
+        }),
         path: steps,
         sharedTags,
         crossClusterLeaps: leaps,
@@ -5616,5 +5653,3 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       ops.gpu_pipeline_stats (device config, queue depth, cache hit rate)');
   console.log('       ace.compact_search (token-budgeted hybrid search → compact context tree, Redis TTL 300s)');
 });
-
-

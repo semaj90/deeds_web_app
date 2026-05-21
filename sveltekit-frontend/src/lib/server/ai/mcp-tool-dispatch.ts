@@ -12,6 +12,7 @@
 import { searchCodeLexical }       from '$lib/server/search/postgres-fts.js';
 import { searchQdrantCode }        from '$lib/server/search/qdrant-search.js';
 import { expandNeighbours }        from '$lib/server/search/neo4j-rerank.js';
+import { buildSubgraphV1SeedNeighborhood } from '$lib/server/retrieval/subgraph-seed-neighborhood.js';
 import { fetchCodebaseContext }    from '$lib/server/ace/context-assembler.js';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
 import { getRedis }                from '$lib/server/redis.js';
@@ -196,6 +197,10 @@ export async function tool_search_qdrant_topology(args: {
 export async function tool_graph_expand_neighborhood(args: {
   stableKeys: string[];
   maxHops?: number;
+  query?: string;
+  route?: string;
+  symbol?: string;
+  filePath?: string;
 }): Promise<MCPToolResult> {
   const t0 = Date.now();
   try {
@@ -214,12 +219,29 @@ export async function tool_graph_expand_neighborhood(args: {
       /* non-fatal — return neighbours without scores */
     }
 
+    const primaryStableKey = keys[0] ?? '';
+    const derivedFilePath =
+      args.filePath ??
+      (primaryStableKey.startsWith('file:') ? primaryStableKey.slice(5) : undefined);
+    const seedEnvelope = await buildSubgraphV1SeedNeighborhood({
+      query: args.query,
+      route: args.route,
+      symbol: args.symbol,
+      filePath: derivedFilePath,
+      maxHops: args.maxHops === 2 ? 2 : 1,
+      maxNeighbors: 24,
+    });
+
     return ok(
       'graph.expand_neighborhood',
-      allNeighbours.map((key) => ({
-        stable_key: key,
-        pagerank: pageRankMap[key] ?? null,
-      })),
+      {
+        center: primaryStableKey,
+        seedEnvelope,
+        neighbors: allNeighbours.map((key) => ({
+          stable_key: key,
+          pagerank: pageRankMap[key] ?? null,
+        })),
+      },
       Date.now() - t0
     );
   } catch (e) {

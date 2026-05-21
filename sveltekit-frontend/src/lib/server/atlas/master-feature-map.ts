@@ -112,6 +112,38 @@ export const MASTER_FEATURE_MAP: Record<string, MasterFeatureEntry> = {
     },
     failOpen: true
   },
+  // Family 5b: GPU Compute Plane / Resilient Context Retrieval
+  'gpu-compute-plane': {
+    id: 'gpu-compute-plane',
+    name: 'GPU Compute Plane Integration',
+    intent: 'resilient GPU-accelerated graph analysis and retrieval fallback coordination',
+    service: 'GpuPipeline',
+    stores: ['Redis', 'Qdrant', 'Postgres'],
+    clusters: [],
+    status: 'active',
+    params: {
+      executionModel: 'queued-gpu-with-cpu-fallback',
+      synthesisBoundary: 'bifrost-only',
+      docRef: 'docs/features/feature_gpu_compute_plane.md'
+    },
+    pathMapping: [
+      'src/mcp-gpu-orchestrator.ts',
+      'src/lib/server/gpu',
+      'src/lib/server/retrieval',
+      'src/lib/server/graph',
+      'src/lib/server/topology'
+    ],
+    evidence: {
+      files: [
+        'docs/features/feature_gpu_compute_plane.md',
+        'src/mcp-gpu-orchestrator.ts',
+        'src/lib/server/gpu/gpu-pipeline.ts',
+        'src/lib/server/retrieval/gpu-reranker.ts',
+        'src/lib/server/audit/gpu-audit-orchestrator.ts'
+      ]
+    },
+    failOpen: true
+  },
   // Family 6: Feature Mapping Atlas
   'feature-atlas': {
     id: 'feature-atlas',

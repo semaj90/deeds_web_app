@@ -1,0 +1,42 @@
+{
+  "cardCounts": {
+    "cluster": 20,
+    "feature": 69,
+    "memory": 4,
+    "pathway": 50,
+    "tool": 6
+  },
+  "generatedAt": "2026-05-21T19:26:43.732Z",
+  "outputs": {
+    "clusterCards": "memory/exports/cluster-cards.jsonl",
+    "featureMapCards": "memory/exports/feature-map-cards.jsonl",
+    "graphRefreshManifest": "memory/exports/graph-refresh-manifest.json",
+    "pathwayCards": "memory/exports/pathway-cards.jsonl",
+    "selectedCards": "memory/cards/selected-cards.json",
+    "selectedToon": "memory/cards/selected-cards.toon"
+  },
+  "repoRoot": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend",
+  "sources": {
+    "atlasTop": {
+      "count": 50,
+      "hash": "b398852e5bd550ab",
+      "path": "memory/atlas/codebase-atlas.top.json"
+    },
+    "clusterSummaries": {
+      "count": 20,
+      "hash": "f75d410b8782b40c",
+      "path": "docs/graph/cluster-summaries.json"
+    },
+    "deepImportGraph": {
+      "edgeCount": 76786,
+      "hash": "63c4e39b5d1fe21f",
+      "nodeCount": 33218,
+      "path": "memory/graphify/deep/deep-import-graph.json"
+    },
+    "featureMap": {
+      "count": 19,
+      "hash": "23962a32f350652f",
+      "path": "src/lib/server/atlas/master-feature-map.ts"
+    }
+  }
+}

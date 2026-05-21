@@ -20,6 +20,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { db, qdrant } from '$lib/server/db/unified-client.js';
 import { sql } from 'drizzle-orm';
+import { assertDirectOllamaAllowed, ollamaFetch } from '$lib/server/ollama.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -37,22 +38,22 @@ export interface ErrorKagInput {
 }
 
 export interface ErrorSummary {
-  errorType:     string;   // e.g. "TypeScript type mismatch", "SSR hydration failure"
-  rootCause:     string;   // one-sentence root cause
+  errorType: string; // e.g. "TypeScript type mismatch", "SSR hydration failure"
+  rootCause: string; // one-sentence root cause
   affectedFiles: string[]; // files mentioned in the error
-  fixHint:       string;   // actionable one-liner
-  severity:      'low' | 'medium' | 'high' | 'critical';
-  tags:          string[]; // KAG tags for Qdrant
+  fixHint: string; // actionable one-liner
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  tags: string[]; // KAG tags for Qdrant
 }
 
 export interface ErrorKagResult {
-  ok:           boolean;
-  summaryId?:   string;    // UUID of the research_summaries row
-  summary?:     ErrorSummary;
-  qdrantPoint?: string;    // Qdrant point ID
-  degraded:     boolean;
-  error?:       string;
-  latencyMs:    number;
+  ok: boolean;
+  summaryId?: string; // UUID of the research_summaries row
+  summary?: ErrorSummary;
+  qdrantPoint?: string; // Qdrant point ID
+  degraded: boolean;
+  error?: string;
+  latencyMs: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,9 +72,17 @@ Given raw error output, extract a structured JSON summary with exactly these fie
 }
 Respond with ONLY the JSON object, no markdown fences.`;
 
-async function callGemma4ForErrorSummary(errorText: string, model: string): Promise<ErrorSummary | null> {
+async function callGemma4ForErrorSummary(
+  errorText: string,
+  model: string
+): Promise<ErrorSummary | null> {
   try {
-    const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+    assertDirectOllamaAllowed(
+      'ace/ace-error-kag',
+      'error-summary',
+      'Schema-constrained error object extraction currently uses direct /api/chat format.'
+    );
+    const resp = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -87,12 +96,12 @@ async function callGemma4ForErrorSummary(errorText: string, model: string): Prom
             schema: {
               type: 'object',
               properties: {
-                errorType:     { type: 'string' },
-                rootCause:     { type: 'string' },
+                errorType: { type: 'string' },
+                rootCause: { type: 'string' },
                 affectedFiles: { type: 'array', items: { type: 'string' } },
-                fixHint:       { type: 'string' },
-                severity:      { type: 'string', enum: ['low', 'medium', 'high', 'critical'] },
-                tags:          { type: 'array', items: { type: 'string' } },
+                fixHint: { type: 'string' },
+                severity: { type: 'string', enum: ['low', 'medium', 'high', 'critical'] },
+                tags: { type: 'array', items: { type: 'string' } },
               },
               required: ['errorType', 'rootCause', 'affectedFiles', 'fixHint', 'severity', 'tags'],
             },
@@ -100,13 +109,13 @@ async function callGemma4ForErrorSummary(errorText: string, model: string): Prom
         },
         messages: [
           { role: 'system', content: ERROR_SYSTEM },
-          { role: 'user',   content: `Error output:\n\n${errorText.slice(0, 4000)}` },
+          { role: 'user', content: `Error output:\n\n${errorText.slice(0, 4000)}` },
         ],
       }),
       signal: AbortSignal.timeout(60_000),
     });
     if (!resp.ok) throw new Error(`Ollama HTTP ${resp.status}`);
-    const data = await resp.json() as { message: { content: string } };
+    const data = (await resp.json()) as { message: { content: string } };
     return JSON.parse(data.message.content) as ErrorSummary;
   } catch {
     return null;

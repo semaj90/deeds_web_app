@@ -257,6 +257,9 @@ async function main() {
     return true;
   });
 
+  // Informational findings do not participate in the error-fix DAG.
+  findings = findings.filter(f => (f.severity ?? 'medium') !== 'info');
+
   // Classify into HMM states
   const stateFindings = classifyFindings(findings);
 

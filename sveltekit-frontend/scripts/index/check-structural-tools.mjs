@@ -1,14 +1,27 @@
 #!/usr/bin/env node
-import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { delimiter, join } from 'node:path';
 
-function probe(command, args = ['--version']) {
-  const result = spawnSync(command, args, {
-    encoding: 'utf8',
-    shell: process.platform === 'win32'
-  });
-  const ok = result.status === 0;
-  const out = `${result.stdout || ''}${result.stderr || ''}`.trim();
-  return { ok, out };
+function resolveOnPath(command) {
+  const pathEnv = process.env.PATH ?? '';
+  const dirs = pathEnv.split(delimiter).filter(Boolean);
+  const candidates = process.platform === 'win32'
+    ? [command, `${command}.cmd`, `${command}.exe`, `${command}.bat`, `${command}.ps1`]
+    : [command];
+
+  for (const dir of dirs) {
+    for (const candidate of candidates) {
+      const resolved = join(dir, candidate);
+      if (existsSync(resolved)) return resolved;
+    }
+  }
+
+  return null;
+}
+
+function probe(command) {
+  const resolved = resolveOnPath(command);
+  return { ok: Boolean(resolved), out: resolved ?? '' };
 }
 
 const sg = probe('sg');

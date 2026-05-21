@@ -880,6 +880,11 @@ async function G33() {
  * `drizzle/*.sql` whose tag is NOT in `drizzle/meta/_journal.json` (i.e.
  * still pending) and fails on any destructive op.
  *
+ * If `drizzle/sidecar-migrations.json` documents a file as a manual sidecar,
+ * the file is treated as intentional out-of-band migration state and is
+ * reported as a warning with a recommendation to keep the sidecar manifest in
+ * sync. Only undocumented unjournaled SQL remains an audit failure.
+ *
  * Excludes `drizzle/manual/` and `drizzle/archived/` — those are operator-
  * curated and don't run automatically.
  *
@@ -891,6 +896,14 @@ async function G29() {
   if (!(await exists(journalPath))) return skip('drizzle/meta/_journal.json missing');
   const journal = await readJson(journalPath);
   const appliedTags = new Set((journal.entries ?? []).map(e => e.tag));
+  const sidecarManifestPath = 'drizzle/sidecar-migrations.json';
+  const documentedSidecars = new Set();
+  if (await exists(sidecarManifestPath)) {
+    const sidecarManifest = await readJson(sidecarManifestPath);
+    for (const entry of sidecarManifest.sidecars ?? []) {
+      if (entry?.file) documentedSidecars.add(String(entry.file));
+    }
+  }
 
   let entries;
   try { entries = await readdir(resolve(ROOT, 'drizzle')); }
@@ -898,11 +911,14 @@ async function G29() {
 
   const sqlFiles = entries.filter(f => /^\d{4}_.+\.sql$/.test(f));
   const pending = sqlFiles.filter(f => !appliedTags.has(f.replace(/\.sql$/, '')));
-  if (pending.length === 0) return pass(`0 pending migrations (${sqlFiles.length} applied)`);
+  const undocumented = pending.filter(f => !documentedSidecars.has(f));
+  const documented = pending.filter(f => documentedSidecars.has(f));
+
+  if (undocumented.length === 0 && documented.length === 0) return pass(`0 pending migrations (${sqlFiles.length} applied)`);
 
   const DESTRUCTIVE = /\b(DROP\s+(TABLE|COLUMN|SCHEMA|DATABASE|INDEX)|TRUNCATE|DELETE\s+FROM(?!\s+\w+\s+WHERE))\b/i;
   const findings = [];
-  for (const file of pending) {
+  for (const file of undocumented) {
     const sql = await readFile(resolve(ROOT, 'drizzle', file), 'utf8');
     const lines = sql.split('\n');
     lines.forEach((line, i) => {
@@ -912,8 +928,13 @@ async function G29() {
       }
     });
   }
-  if (findings.length === 0) return pass(`${pending.length} pending, no destructive ops`);
-  return warn(`${findings.length} destructive op(s) in pending: ${findings.slice(0, 3).join(' | ')}${findings.length > 3 ? ` (+${findings.length - 3} more)` : ''}`);
+  if (findings.length === 0) {
+    if (documented.length > 0) {
+      return warn(`${documented.length} documented sidecar migration(s) pending journal sync: ${documented.slice(0, 3).join(' | ')}${documented.length > 3 ? ` (+${documented.length - 3} more)` : ''} — solution: keep them in drizzle/sidecar-migrations.json or promote them into drizzle/meta/_journal.json if they become first-class migrations`);
+    }
+    return pass(`${pending.length} pending, no destructive ops`);
+  }
+  return warn(`${findings.length} destructive op(s) in undocumented pending SQL: ${findings.slice(0, 3).join(' | ')}${findings.length > 3 ? ` (+${findings.length - 3} more)` : ''} — solution: add the file to drizzle/sidecar-migrations.json if intentional, or move it into drizzle/meta/_journal.json if it should be applied by drizzle-kit`);
 }
 
 /**
