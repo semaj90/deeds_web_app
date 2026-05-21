@@ -27,7 +27,8 @@ const MCP_ENDPOINTS = [
   { name: 'turbovec-sidecar',url: 'http://127.0.0.1:8791/mcp', transport: 'jsonrpc' },
   { name: 'engram-embed',    url: 'http://127.0.0.1:8792/mcp', transport: 'jsonrpc' },
   { name: 'langextract',     url: 'http://127.0.0.1:8793/mcp', transport: 'jsonrpc' },
-  { name: 'ldr-mcp',        url: 'http://127.0.0.1:3001/mcp', transport: 'jsonrpc' },
+  // stdio transport — launched as opencode subprocess, not HTTP-reachable
+  { name: 'ldr-mcp', url: null, transport: 'stdio', note: 'Launched by opencode via scripts/mcp/ldr-mcp.mjs' },
 ];
 
 const TIMEOUT_MS = 5000;
@@ -60,8 +61,11 @@ async function probeSSEEndpoint(name, url) {
   return result;
 }
 
-async function probeEndpoint({ name, url, transport = 'jsonrpc' }) {
+async function probeEndpoint({ name, url, transport = 'jsonrpc', note = '' }) {
   if (transport === 'sse') return probeSSEEndpoint(name, url);
+  if (transport === 'stdio') {
+    return { name, url: 'stdio', transport: 'stdio', status: 'SKIP', toolCount: 0, latencyMs: 0, error: note || 'Stdio MCP — probe via subprocess only' };
+  }
 
   const result = { name, url, status: 'DOWN', toolCount: 0, latencyMs: 0, error: null };
   const t0 = Date.now();
@@ -132,9 +136,10 @@ if (IS_JSON) {
 } else {
   console.log('\n=== MCP Endpoint Probe Results ===\n');
   for (const r of results) {
-    const icon = r.status === 'UP' ? '✅' : r.status === 'PARTIAL' ? '⚠️ ' : '❌';
+    const icon = r.status === 'UP' ? '✅' : r.status === 'PARTIAL' ? '⚠️ ' : r.status === 'SKIP' ? '⏭️ ' : '❌';
     const detail = r.status === 'UP'
-      ? `${r.toolCount} tools, ${r.latencyMs}ms`
+      ? r.toolCount === -1 ? `SSE connected, ${r.latencyMs}ms` : `${r.toolCount} tools, ${r.latencyMs}ms`
+      : r.status === 'SKIP' ? r.error
       : r.error ?? 'unknown error';
     console.log(`  ${icon} ${r.name.padEnd(20)} ${r.status.padEnd(8)} ${detail}`);
   }
@@ -143,10 +148,11 @@ if (IS_JSON) {
 
 const failCount = results.filter((r) => r.status === 'DOWN').length;
 const partialCount = results.filter((r) => r.status === 'PARTIAL').length;
+const skipCount = results.filter((r) => r.status === 'SKIP').length;
 
 if (!IS_JSON) {
-  const upCount = results.length - failCount - partialCount;
-  console.log(`  Summary: ${upCount}/${results.length} UP, ${partialCount} PARTIAL, ${failCount} DOWN\n`);
+  const upCount = results.length - failCount - partialCount - skipCount;
+  console.log(`  Summary: ${upCount}/${results.length - skipCount} UP, ${partialCount} PARTIAL, ${failCount} DOWN, ${skipCount} SKIP (stdio)\n`);
 }
 
 if (IS_STRICT && failCount > 0) {

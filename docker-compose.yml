@@ -560,8 +560,10 @@ services:
       resources:
         limits:
           memory: 128M
+          cpus: '0.50'
         reservations:
           memory: 32M
+          cpus: '0.25'
     logging:
       driver: json-file
       options:
