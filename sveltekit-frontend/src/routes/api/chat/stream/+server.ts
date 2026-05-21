@@ -5,11 +5,20 @@ import type { RequestHandler } from './$types';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
+import { getRedis } from '$lib/server/redis.js';
+import { storeChatMemoryTurn } from '$lib/server/ai/engram-registry.js';
+import { buildFeatureLabels } from '$lib/server/ai/feature-builder.js';
+import {
+  buildToonPacket,
+  buildOpenCodeContextPacket,
+  rerankFeaturesWithBreakdown,
+} from '$lib/server/ai/toon.js';
 
 const chatStreamPostSchema = z.object({
-	sessionId: z.string().min(1, 'Missing sessionId').max(200),
-	message: z.string().min(1, 'Missing message').max(50000),
-	caseId: z.string().uuid().optional()
+  sessionId: z.string().min(1, 'Missing sessionId').max(200),
+  message: z.string().min(1, 'Missing message').max(50000),
+  caseId: z.string().uuid().optional(),
 });
 
 /**
@@ -21,47 +30,47 @@ const chatStreamPostSchema = z.object({
  * 2. Session mode: ?sessionId=xxx (full chat history + streaming)
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
-	const query = url.searchParams.get('q');
-	const mode = url.searchParams.get('mode') ?? 'ollama';
-	const sessionId = url.searchParams.get('sessionId');
-	const caseId = url.searchParams.get('caseId');
-	const persona = url.searchParams.get('persona') ?? 'neutral';
+  const query = url.searchParams.get('q');
+  const mode = url.searchParams.get('mode') ?? 'ollama';
+  const sessionId = url.searchParams.get('sessionId');
+  const caseId = url.searchParams.get('caseId');
+  const persona = url.searchParams.get('persona') ?? 'neutral';
 
-	// Query mode: Simple streaming without authentication/session
-	if (query && !sessionId) {
-		if (!locals.user?.id) {
+  // Query mode: Simple streaming without authentication/session
+  if (query && !sessionId) {
+    if (!locals.user?.id) {
       return new Response('Unauthorized', { status: 401 });
     }
     if (caseId && !isUuid(caseId)) {
       return new Response('Invalid case ID format', { status: 400 });
     }
     return handleQueryMode(query, mode, caseId, persona, locals.user.id);
-	}
+  }
 
-	// Session mode: Requires authentication
-	if (!locals.user) {
-		return new Response('Unauthorized', { status: 401 });
-	}
+  // Session mode: Requires authentication
+  if (!locals.user) {
+    return new Response('Unauthorized', { status: 401 });
+  }
 
-	if (!sessionId) {
-		return new Response('Missing query or sessionId parameter', { status: 400 });
-	}
+  if (!sessionId) {
+    return new Response('Missing query or sessionId parameter', { status: 400 });
+  }
 
-	// Verify session belongs to user via chatMetadata
-	const sessionMeta = await db
-		.select()
-		.from(chatMetadata)
-		.where(eq(chatMetadata.chatId, sessionId))
-		.limit(1);
+  // Verify session belongs to user via chatMetadata
+  const sessionMeta = await db
+    .select()
+    .from(chatMetadata)
+    .where(eq(chatMetadata.chatId, sessionId))
+    .limit(1);
 
-	if (sessionMeta.length > 0 && sessionMeta[0].userId !== Number(locals.user.id)) {
+  if (sessionMeta.length > 0 && sessionMeta[0].userId !== Number(locals.user.id)) {
     return new Response('Session not found or unauthorized', { status: 404 });
   }
 
-	// Get case association from metadata
-	const sessionCaseId = sessionMeta[0]?.caseId ?? caseId ?? null;
+  // Get case association from metadata
+  const sessionCaseId = sessionMeta[0]?.caseId ?? caseId ?? null;
 
-	return handleSessionMode(sessionId, sessionCaseId, Number(locals.user.id));
+  return handleSessionMode(sessionId, sessionCaseId, Number(locals.user.id));
 };
 
 /**
@@ -74,7 +83,9 @@ async function loadCaseContext(caseId: string, userId?: string): Promise<string 
     const caseRows = await db
       .select()
       .from(cases)
-      .where(userId ? and(eq(cases.id, caseId), eq(cases.userId, Number(userId))) : eq(cases.id, caseId))
+      .where(
+        userId ? and(eq(cases.id, caseId), eq(cases.userId, Number(userId))) : eq(cases.id, caseId)
+      )
       .limit(1);
 
     if (!caseRows.length) return null;
@@ -146,10 +157,33 @@ function handleQueryMode(
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
+      let fullResponse = '';
 
       const send = (data: unknown) => {
         const message = `data: ${JSON.stringify(data)}\n\n`;
         controller.enqueue(encoder.encode(message));
+      };
+
+      const loadRecentMemory = async (id?: string): Promise<string[]> => {
+        if (!id) return [];
+        try {
+          const redis = getRedis();
+          const key = `user:memory:${id}`;
+          const raw = await redis.zrevrange(key, 0, 2);
+          return raw
+            .map((entry) => {
+              try {
+                const parsed = JSON.parse(entry) as { content?: string };
+                return parsed.content ?? '';
+              } catch {
+                return '';
+              }
+            })
+            .filter((entry) => entry.length > 0)
+            .reverse();
+        } catch {
+          return [];
+        }
       };
 
       try {
@@ -174,6 +208,111 @@ function handleQueryMode(
           send({ type: 'status', stage: 'retrieval', message: 'no-case-selected' });
         }
 
+        const traceResult = await callTraceMcp(
+          'trace.kag_search',
+          { query, limit: 8 },
+          { timeoutMs: 4000 }
+        );
+        const features = buildFeatureLabels({
+          trace: traceResult.ok ? traceResult.data : [],
+        });
+
+        const seedStableKeys = features
+          .slice(0, 3)
+          .map((feature) => feature.path)
+          .filter((path) => path && path !== 'unknown')
+          .map((path) => (path.startsWith('file:') ? path : `file:${path}`));
+
+        const multiHop =
+          seedStableKeys.length > 0
+            ? await callTraceMcp(
+                'graph.expand_neighborhood',
+                { stableKeys: seedStableKeys, maxHops: 2, query, filePath: features[0]?.path },
+                { timeoutMs: 3500 }
+              )
+            : { ok: false, ms: 0, data: null, error: 'no-seed-features' };
+
+        const neighborPaths =
+          multiHop.ok && multiHop.data && typeof multiHop.data === 'object'
+            ? Array.from(
+                new Set(
+                  (
+                    (multiHop.data as { neighbors?: Array<{ stable_key?: string }> }).neighbors ??
+                    []
+                  )
+                    .map((neighbor) => neighbor.stable_key ?? '')
+                    .filter((key) => key.startsWith('file:'))
+                    .map((key) => key.replace(/^file:/, ''))
+                )
+              )
+            : [];
+
+        const graphFeatures = neighborPaths.map((path) => ({
+          path,
+          feature: 'graph-neighbor',
+          labels: ['multihop', 'graph'],
+          summary: 'Expanded from graph neighborhood',
+          symbols: [],
+          score: 0.25,
+        }));
+
+        const { features: reranked, breakdown: rerankBreakdown } = rerankFeaturesWithBreakdown(
+          query,
+          [...features, ...graphFeatures]
+        );
+
+        send({
+          type: 'feature_labels',
+          source: 'trace.kag_search',
+          ok: traceResult.ok,
+          tookMs: traceResult.ms,
+          count: reranked.length,
+          features: reranked,
+        });
+        send({
+          type: 'multihop',
+          source: 'graph.expand_neighborhood',
+          ok: multiHop.ok,
+          tookMs: multiHop.ms,
+          seedStableKeys,
+          neighborCount: neighborPaths.length,
+          neighbors: neighborPaths.slice(0, 8),
+        });
+        send({
+          type: 'rerank_breakdown',
+          source: 'toon.rerankFeaturesWithBreakdown',
+          query,
+          count: rerankBreakdown.length,
+          top: rerankBreakdown.slice(0, 8),
+        });
+
+        const memory = await loadRecentMemory(userId);
+        const memoryWithCase = caseContext
+          ? [...memory, `case-context:${caseContext.replace(/\s+/g, ' ').slice(0, 700)}`]
+          : memory;
+
+        const toon = buildToonPacket({
+          query,
+          features: reranked,
+          memory: memoryWithCase,
+        });
+        send({ type: 'context', format: 'toon', data: toon });
+
+        const openCodePacket = buildOpenCodeContextPacket({
+          goal: 'Answer the user query with retrieved feature labels and recent memory context.',
+          query,
+          features: reranked,
+          memory: memoryWithCase,
+          files: [
+            {
+              path: 'src/routes/api/chat/stream/+server.ts',
+              lines: '1-260',
+              change: 'TOON packet generation and SSE context streaming',
+            },
+          ],
+        });
+        send({ type: 'context_packet', format: 'opencode_json', data: openCodePacket });
+
         // Apply persona styling to prompt
         let systemPrefix = '';
         if (persona && persona !== 'neutral') {
@@ -183,8 +322,7 @@ function handleQueryMode(
         }
 
         // Build prompt with case context + persona
-        const prompt =
-          systemPrefix + (caseContext ? `${caseContext}\n\n## User Question\n${query}` : query);
+        const prompt = systemPrefix + JSON.stringify(toon);
 
         // Import LLM router dynamically
         send({ type: 'status', stage: 'tool', message: 'invoking-llm-router' });
@@ -198,7 +336,31 @@ function handleQueryMode(
         });
 
         for await (const chunk of responseStream) {
-          send({ type: 'token', content: chunk?.content || chunk.text });
+          const token = chunk?.content || chunk.text || '';
+          if (token.length > 0) {
+            fullResponse += token;
+            send({ type: 'token', content: token });
+          }
+        }
+
+        if (userId && fullResponse.length > 0) {
+          const redis = getRedis();
+          await storeChatMemoryTurn(redis, {
+            user_id: userId,
+            turn: { role: 'user', content: query, metadata: { source: 'api/chat/stream' } },
+            max_turns: 50,
+            ttl_seconds: 604800,
+          }).catch(() => {});
+          await storeChatMemoryTurn(redis, {
+            user_id: userId,
+            turn: {
+              role: 'assistant',
+              content: fullResponse.slice(0, 12000),
+              metadata: { source: 'api/chat/stream' },
+            },
+            max_turns: 50,
+            ttl_seconds: 604800,
+          }).catch(() => {});
         }
 
         send({ type: 'status', stage: 'done', message: 'stream-complete' });

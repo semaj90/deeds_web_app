@@ -1,27 +1,29 @@
 {
-  "generatedAt": "2026-05-21T04:17:07.260Z",
-  "elapsedMs": 2682,
+  "generatedAt": "2026-05-21T16:40:24.564Z",
+  "elapsedMs": 17975,
   "totalFindings": 5,
   "bySeverity": {
     "high": 0,
     "medium": 0,
-    "low": 5
+    "low": 0,
+    "info": 5
   },
   "findings": [
     {
-      "findingId": "contract:drizzle-meta-stale_migration-001-d6a201cf",
-      "severity": "low",
+      "findingId": "contract:drizzle-meta-documented_sidecar-001-3b35ccb8",
+      "severity": "info",
       "layer": "drizzle-meta",
-      "hmmState": "stale_migration",
+      "hmmState": "documented_sidecar",
       "localSourceRefs": [
         "sveltekit-frontend\\drizzle\\0013_codeintel_indexes.sql"
       ],
       "externalSourceRefs": [
-        "drizzle-kit:journal"
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
       ],
       "problem": "Documented sidecar \"0013_codeintel_indexes.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
       "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
-      "suggestedFix": "No action required — verify it was applied: see validationCommand in sidecar-migrations.json.",
+      "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
       "validationCommands": [
         "npm run audit:drizzle-meta"
       ],
@@ -31,19 +33,20 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-002-033419d2",
-      "severity": "low",
+      "findingId": "contract:drizzle-meta-documented_sidecar-002-f1ac684e",
+      "severity": "info",
       "layer": "drizzle-meta",
-      "hmmState": "stale_migration",
+      "hmmState": "documented_sidecar",
       "localSourceRefs": [
         "sveltekit-frontend\\drizzle\\0016_codeintel_schema.sql"
       ],
       "externalSourceRefs": [
-        "drizzle-kit:journal"
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
       ],
       "problem": "Documented sidecar \"0016_codeintel_schema.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
       "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
-      "suggestedFix": "No action required — verify it was applied: see validationCommand in sidecar-migrations.json.",
+      "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
       "validationCommands": [
         "npm run audit:drizzle-meta"
       ],
@@ -53,19 +56,20 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-003-3f91ba5e",
-      "severity": "low",
+      "findingId": "contract:drizzle-meta-documented_sidecar-003-4b9906be",
+      "severity": "info",
       "layer": "drizzle-meta",
-      "hmmState": "stale_migration",
+      "hmmState": "documented_sidecar",
       "localSourceRefs": [
         "sveltekit-frontend\\drizzle\\0016_courtroom_3d_animation.sql"
       ],
       "externalSourceRefs": [
-        "drizzle-kit:journal"
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
       ],
       "problem": "Documented sidecar \"0016_courtroom_3d_animation.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
       "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
-      "suggestedFix": "No action required — verify it was applied: see validationCommand in sidecar-migrations.json.",
+      "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
       "validationCommands": [
         "npm run audit:drizzle-meta"
       ],
@@ -75,19 +79,20 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-004-1486163b",
-      "severity": "low",
+      "findingId": "contract:drizzle-meta-documented_sidecar-004-92d38fb9",
+      "severity": "info",
       "layer": "drizzle-meta",
-      "hmmState": "stale_migration",
+      "hmmState": "documented_sidecar",
       "localSourceRefs": [
         "sveltekit-frontend\\drizzle\\0018_output_meta_manifold4.sql"
       ],
       "externalSourceRefs": [
-        "drizzle-kit:journal"
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
       ],
       "problem": "Documented sidecar \"0018_output_meta_manifold4.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
       "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
-      "suggestedFix": "No action required — verify it was applied: see validationCommand in sidecar-migrations.json.",
+      "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
       "validationCommands": [
         "npm run audit:drizzle-meta"
       ],
@@ -97,19 +102,20 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-005-187064cc",
-      "severity": "low",
+      "findingId": "contract:drizzle-meta-documented_sidecar-005-827010f8",
+      "severity": "info",
       "layer": "drizzle-meta",
-      "hmmState": "stale_migration",
+      "hmmState": "documented_sidecar",
       "localSourceRefs": [
         "sveltekit-frontend\\drizzle\\0019_llm_context_cache.sql"
       ],
       "externalSourceRefs": [
-        "drizzle-kit:journal"
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
       ],
       "problem": "Documented sidecar \"0019_llm_context_cache.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
       "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
-      "suggestedFix": "No action required — verify it was applied: see validationCommand in sidecar-migrations.json.",
+      "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
       "validationCommands": [
         "npm run audit:drizzle-meta"
       ],

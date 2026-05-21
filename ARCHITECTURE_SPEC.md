@@ -18,9 +18,26 @@
 **Find missing links**: Neo4j orphan queries + CouchDB low-confidence logs
 **GPU-accelerated**: simdjson (5× faster parsing) + LibTorch (100× faster similarity)
 
----
+## Component Layer Rules (Enforced Standard)
 
-## Table of Contents
+This section dictates the mandatory implementation patterns for all frontend components to ensure consistency and adherence to the modern Svelte 5/Bits UI v2 stack.
+
+### 1. Svelte 5 Runes Mandate
+All component logic must use Svelte 5 runes.
+- **State**: Use `$state()` for local mutable state.
+- **Derived Values**: Use `$derived()` for values that depend on state.
+- **Effects**: Use `$effect()` for side effects (e.g., data fetching side effects).
+- **Event Handling**: Use event handlers directly on elements (`onclick={...}`) rather than wrapper directives.
+
+### 2. Bits UI v2 Pattern
+All UI component consumption must use Bits UI v2 primitives with namespace imports.
+- **Usage**: Import components like `import { Dialog } from 'bits-ui'` and use the `child` snippet pattern for content injection.
+- **Example**: `<Dialog.Root><Dialog.Trigger>...</Dialog.Trigger><Dialog.Content><slot name="default" /></Dialog.Content></Dialog.Root>`
+
+### 3. UnoCSS Styling Baseline
+All styling must leverage UnoCSS utilities (Tailwind-compatible).
+- **Constraint**: Direct use of raw Tailwind classes is forbidden; all utility classes must pass through the UnoCSS pipeline.
+- **Safelist**: For dynamic classes, the project's safelist mechanism must be employed to prevent build failures.
 
 1. [System Overview](#system-overview)
 2. [Data Layer Contracts](#data-layer-contracts)

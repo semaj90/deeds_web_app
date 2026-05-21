@@ -394,6 +394,15 @@
 			"detail": "Smoke-test all TRACE services in one shot"
 		},
 		{
+			"label": "🧾 Observability: Inference Log Smoke",
+			"type": "shell",
+			"command": "npm run smoke:inference-log",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"problemMatcher": [],
+			"detail": "Verify the async inference-log module exports and stats surface used by CouchDB-backed inference writes"
+		},
+		{
 			"label": "🔌 TRACE: Start MCP Server",
 			"type": "shell",
 			"command": "npm run mcp:trace",

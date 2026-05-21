@@ -507,8 +507,22 @@
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/tests/agents-regen-writers.spec.ts"
   ],
+  "sveltekit-frontend/src/lib/server/ai/engram-registry.ts": [
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts": [
+    "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts"
+  ],
   "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.ts": [
     "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts": [
+    "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts"
+  ],
+  "sveltekit-frontend/scripts/cards/master-feature-cards.mjs": [
+    "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/evidence/docling-structure.ts": [
     "sveltekit-frontend/src/lib/server/evidence/docling-structure.test.ts"
@@ -535,9 +549,24 @@
   "sveltekit-frontend/src/lib/server/models/model-registry.ts": [
     "sveltekit-frontend/src/lib/server/models/model-registry.spec.ts"
   ],
+  "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts": [
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts"
+  ],
   "sveltekit-frontend/src/lib/server/retrieval/context-buffer.ts": [
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts": [
     "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
@@ -553,6 +582,18 @@
   "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.ts": [
     "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.test.ts",
     "sveltekit-frontend/tests/unit/routing-explanation.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/clusters/cards/+server.ts": [
+    "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
+    "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/types/retrieval.ts": [
     "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts"
@@ -984,16 +1025,6 @@
   ],
   "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts": [
     "sveltekit-frontend/tests/codebase-index-postgres-fallback.spec.ts"
-  ],
-  "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts": [
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase-index/+server.ts": [
     "sveltekit-frontend/tests/codebase-indexer.spec.ts",

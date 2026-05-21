@@ -1,7 +1,7 @@
 ace_prefix:
   cache:
-    digest: a7b3fd7bc74538b8
-    key: deeds:v1:gemma4-rotorquant:ace-prefix:a7b3fd7bc74538b8
+    digest: 191738a0ca7f94ab
+    key: deeds:v1:gemma4-rotorquant:ace-prefix:191738a0ca7f94ab
   endpoints[name,role,url]:
     llama-server	Gemma4 synthesis, 64K ctx	http://127.0.0.1:8090/v1
     trace	graph and compact context MCP	http://127.0.0.1:8788/mcp
@@ -9,92 +9,92 @@ ace_prefix:
     engram-embed	embedding, ACE packet, chat memory Redis writes	http://127.0.0.1:8792/mcp
     langextract	entity/citation extraction and compression	http://127.0.0.1:8793/mcp
   features[calls,defined,feature,file,kind,language,stubs]:
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	getErrorFixMemory|hashError|saveErrorFixMemory	src/lib/server	src/lib/server/ai/error-fix-memory.ts	module	typescript	15
-    OPENAI|llama-server|TURBO_CTX|LLM_CONTEXT_SIZE|OLLAMA_CONTEXT_LENGTH|Qdrant|cosine|embeddinggemma	GEMMA4_ALLOWED_TOOLS|LLMS.md|apply_shadow_patch|audit_hotspots	src/lib/server	src/lib/server/ai/gemma4-agent.ts	module	typescript	14
-    qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	buildResearchDag|executeDeepResearch	src/lib/server	src/lib/server/ai/hermes/deep-research-dag.ts	module	typescript	2
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	CODEBASE_SKILLS|fs:read|language_distribution|llm:generate	src/lib/server	src/lib/server/ai/hermes/skills/codebase.ts	module	typescript	4
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	runTurbovecPreIngestion	mcp-tools	src/lib/server/ai/turbovec-ingest-sidecar.ts	module	typescript	3
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	getExperiment|getVariant|getWinRates|listExperiments	validation	src/lib/server/ai/ab-test.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	searchAce	src/lib/server	src/lib/server/ai/ace-search.ts	module	typescript	0
-    embedTexts|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	attentionHeadRanker	src/lib/server	src/lib/server/ai/attention-head-ranker.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	canUseTurboQuant|gatePreferredBackend	src/lib/server	src/lib/server/ai/backend-runtime-guards.ts	module	typescript	0
-    getExactMatchCache|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|setExactMatchCache	getCachedStreamResponse|storeCachedStreamResponse	cache-memory	src/lib/server/ai/cached-stream.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	cachingLayer|warmupCachingLayer	src/lib/server	src/lib/server/ai/caching-layer.ts	module	typescript	0
-    qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	checkSystemHealth|generateClaudePlan|getClusterDetails|getClusterSummaryLenses	src/lib/server	src/lib/server/ai/code-intel-service.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	buildAttentionToc|compressChunkToSentence|compressFileToCard|compressResearchToCard	src/lib/server	src/lib/server/ai/context-compression.ts	module	typescript	0
+    embedTexts	attentionHeadRanker	src/lib/server	src/lib/server/ai/attention-head-ranker.ts	module	typescript	0
+    getExactMatchCache|setExactMatchCache	getCachedStreamResponse|storeCachedStreamResponse	cache-memory	src/lib/server/ai/cached-stream.ts	module	typescript	0
+    redis.get|redis.set	cachingLayer|warmupCachingLayer	src/lib/server	src/lib/server/ai/caching-layer.ts	module	typescript	0
+    qdrant	checkSystemHealth|generateClaudePlan|getClusterDetails|getClusterSummaryLenses	src/lib/server	src/lib/server/ai/code-intel-service.ts	module	typescript	0
+    Qdrant|redis.get|redis.set	buildAttentionToc|compressChunkToSentence|compressFileToCard|compressResearchToCard	src/lib/server	src/lib/server/ai/context-compression.ts	module	typescript	0
     Cosine|Qdrant|cosine|qdrant	CONTEXTUAL_TOOLS|authority_drill|case_search|crawl_legal_corpus	src/lib/server	src/lib/server/ai/contextual-tools.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	buildDevContextPlan|extractDevContextHits|isCodingPrompt|needsExplanation	src/lib/server	src/lib/server/ai/dev-context-planner.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	getDidYouMeanFromEngram|hashQuery|recordEngramTransition	mcp-tools	src/lib/server/ai/engram-memory.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	performExternalResearch	src/lib/server	src/lib/server/ai/external-research-agent.ts	module	typescript	0
-    qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.set	ALLOWED_MCP_TOOLS|buildToolResultMessage|dispatchToolCall|runGemma4ToolLoop	src/lib/server	src/lib/server/ai/gemma4-tool-controller.ts	module	typescript	0
-    Qdrant|qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	buildWhyLabels|quaternionSimilarity|rerankHits|scoreCandidate	src/lib/server	src/lib/server/ai/graph-reranker.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	compressToHCACard|hcaCardToContextSnippet|hcaCardTokens	src/lib/server	src/lib/server/ai/hca-compressor.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get	AceContextValidationSchema|GapRepairPlanSchema|HermesPlanSchema|buildFallbackPlan	src/lib/server	src/lib/server/ai/hermes-planner.ts	module	typescript	0
-    Qdrant|qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	assembleContext|synthesize	src/lib/server	src/lib/server/ai/hermes-synth.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	BATCH_SKILLS|batch:run|llm:generate|memory:write_note	src/lib/server	src/lib/server/ai/hermes/skills/batch.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	GRAPH_SKILLS|batch:run|diagnostics:health|graph:export_jsonl	src/lib/server	src/lib/server/ai/hermes/skills/graph.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	LEGAL_CASE_SKILLS|extract:metadata|gpu:rerank|llm:generate	src/lib/server	src/lib/server/ai/hermes/skills/legal-case.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	MEMORY_SKILLS|diagnostics:health|extract:metadata|llm:generate	src/lib/server	src/lib/server/ai/hermes/skills/memory.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	REPAIR_SKILLS|llm:generate|memory:write_note|search:couchdb	src/lib/server	src/lib/server/ai/hermes/skills/repair.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	SYSTEM_AUDIT_SKILLS|diagnostics:health|llm:generate|search:sql	src/lib/server	src/lib/server/ai/hermes/skills/system-audit.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	VECTOR_CLUSTER_SKILLS|gpu:rerank|llm:generate|search:couchdb	semantic-retrieval	src/lib/server/ai/hermes/skills/vector-cluster.ts	module	typescript	0
-    Qdrant|qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get	STABLE_TOOLS|ace:pack_context|attention:rank_files|attention_rank_files	src/lib/server	src/lib/server/ai/hermes/tools/registry.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	finalizeSession|linkKnowledgeToSession|linkResearchBatchToSession|linkResearchToSession	src/lib/server	src/lib/server/ai/hypergraph-store.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	heuristicQualityCheck|validateInformationGain	src/lib/server	src/lib/server/ai/information-gain-validator.ts	module	typescript	0
-    getExactMatchCache|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|searchSemanticCache	logIntentEvalEvent|scoreIntent	src/lib/server	src/lib/server/ai/intent-ranker.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	IntentLabelSchema|IntentResultSchema|OperatorChainStepSchema|RouterDecisionSchema	api-routes	src/lib/server/ai/intent-router.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	buildKvContextPacket|explainCompression|formatKvPacketForPrompt|getCompressedCard	src/lib/server	src/lib/server/ai/kv-context-controller.ts	module	typescript	0
-    OPENAI|llama-server|TURBO_CTX|LLM_CONTEXT_SIZE|OLLAMA_CONTEXT_LENGTH|Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	CodeErrorSchema|LegalCitationSchema|MLSchemaMetadataSchema|chatCompletionViaOpenAICompat	src/lib/server	src/lib/server/ai/lang-extract.ts	module	typescript	0
-    qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	isLangGraphAvailable|langGraphCacheStats|langGraphHMMAdapt|langGraphHMMStats	src/lib/server	src/lib/server/ai/langgraph-client.ts	module	typescript	0
-    Qdrant|embeddinggemma|pgvector|vector\(768\)|embedding_cache|research_summaries|cosine|hnsw|qdrant	content|formatGraphForClaudeCode|runConcurrentResearch	src/lib/server	src/lib/server/ai/langgraph-research.ts	module	typescript	0
-    OPENAI|llama-server|TURBO_CTX|LLM_CONTEXT_SIZE|OLLAMA_CONTEXT_LENGTH|Qdrant|pgvector|vector\(768\)|embedding_cache|research_summaries|cosine|hnsw|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	LLAMA_TOOL_DEFINITIONS|LLAMA_TO_MCP_NAME|clusters__get_members|clusters__get_summary_lenses	src/lib/server	src/lib/server/ai/llama-tool-definitions.ts	module	typescript	0
-    Qdrant|qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	cleanExpiredCache|lookupCachedResponse|query|storeCachedResponse	cache-memory	src/lib/server/ai/llm-cache.ts	module	typescript	0
-    Qdrant|qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get	TOOL_DISPATCH|tool_clusters_get_summary_lenses|tool_codebase_rg_search|tool_context_build_kv_packet	mcp-tools	src/lib/server/ai/mcp-tool-dispatch.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	bifrost|getModelStatus|getPreferredBackend|isBackendAlive	src/lib/server	src/lib/server/ai/model-loader.ts	module	typescript	0
-    embeddinggemma|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	MODELS|resolveModel|routeQuery	api-routes	src/lib/server/ai/model-router.ts	module	typescript	0
+    redis.get|redis.set	getDidYouMeanFromEngram|hashQuery|recordEngramTransition	mcp-tools	src/lib/server/ai/engram-memory.ts	module	typescript	0
+    redis.set	buildAcePacketKey|buildChatMemoryKey|engramAcePacketInjectSchema|engramChatMemoryStoreSchema	mcp-tools	src/lib/server/ai/engram-registry.ts	module	typescript	0
+    redis.get|redis.set	getErrorFixMemory|hashError|saveErrorFixMemory	src/lib/server	src/lib/server/ai/error-fix-memory.ts	module	typescript	0
+    Qdrant	performExternalResearch	src/lib/server	src/lib/server/ai/external-research-agent.ts	module	typescript	0
+    Qdrant|cosine|embeddinggemma|qdrant	GEMMA4_ALLOWED_TOOLS|LLMS.md|apply_shadow_patch|audit_hotspots	src/lib/server	src/lib/server/ai/gemma4-agent.ts	module	typescript	0
+    qdrant|redis.set	ALLOWED_MCP_TOOLS|buildToolResultMessage|dispatchToolCall|runGemma4ToolLoop	src/lib/server	src/lib/server/ai/gemma4-tool-controller.ts	module	typescript	0
+    Qdrant|qdrant	buildWhyLabels|quaternionSimilarity|rerankHits|scoreCandidate	src/lib/server	src/lib/server/ai/graph-reranker.ts	module	typescript	0
+    Qdrant|redis.get	AceContextValidationSchema|GapRepairPlanSchema|HermesPlanSchema|buildFallbackPlan	src/lib/server	src/lib/server/ai/hermes-planner.ts	module	typescript	0
+    Qdrant|qdrant	assembleContext|synthesize	src/lib/server	src/lib/server/ai/hermes-synth.ts	module	typescript	0
+    qdrant	buildResearchDag|executeDeepResearch	src/lib/server	src/lib/server/ai/hermes/deep-research-dag.ts	module	typescript	0
+    Qdrant	CODEBASE_SKILLS|fs:read|language_distribution|llm:generate	src/lib/server	src/lib/server/ai/hermes/skills/codebase.ts	module	typescript	0
+    Qdrant	MEMORY_SKILLS|diagnostics:health|extract:metadata|llm:generate	src/lib/server	src/lib/server/ai/hermes/skills/memory.ts	module	typescript	0
+    Qdrant	REPAIR_SKILLS|llm:generate|memory:write_note|search:couchdb	src/lib/server	src/lib/server/ai/hermes/skills/repair.ts	module	typescript	0
+    Qdrant	SYSTEM_AUDIT_SKILLS|diagnostics:health|llm:generate|search:sql	src/lib/server	src/lib/server/ai/hermes/skills/system-audit.ts	module	typescript	0
+    Qdrant	VECTOR_CLUSTER_SKILLS|gpu:rerank|llm:generate|search:couchdb	semantic-retrieval	src/lib/server/ai/hermes/skills/vector-cluster.ts	module	typescript	0
+    Qdrant|qdrant|redis.get|redis.mget	STABLE_TOOLS|ace:pack_context|attention:rank_files|attention_rank_files	src/lib/server	src/lib/server/ai/hermes/tools/registry.ts	module	typescript	0
+    getExactMatchCache|searchSemanticCache	logIntentEvalEvent|scoreIntent	src/lib/server	src/lib/server/ai/intent-ranker.ts	module	typescript	0
+    redis.get|redis.set	buildKvContextPacket|explainCompression|formatKvPacketForPrompt|getCompressedCard	src/lib/server	src/lib/server/ai/kv-context-controller.ts	module	typescript	0
+    Qdrant	CodeErrorSchema|LegalCitationSchema|MLSchemaMetadataSchema|chatCompletionViaOpenAICompat	src/lib/server	src/lib/server/ai/lang-extract.ts	module	typescript	0
+    qdrant	isLangGraphAvailable|langGraphCacheStats|langGraphHMMAdapt|langGraphHMMStats	src/lib/server	src/lib/server/ai/langgraph-client.ts	module	typescript	0
+    Qdrant|embeddinggemma|qdrant|redis.get	content|formatGraphForClaudeCode|runConcurrentResearch	src/lib/server	src/lib/server/ai/langgraph-research.ts	module	typescript	0
+    Qdrant	LLAMA_TOOL_DEFINITIONS|LLAMA_TO_MCP_NAME|clusters__get_members|clusters__get_summary_lenses	src/lib/server	src/lib/server/ai/llama-tool-definitions.ts	module	typescript	0
+    Qdrant|qdrant	cleanExpiredCache|lookupCachedResponse|query|storeCachedResponse	cache-memory	src/lib/server/ai/llm-cache.ts	module	typescript	0
+    Qdrant|qdrant|redis.get|redis.mget	TOOL_DISPATCH|tool_clusters_get_summary_lenses|tool_codebase_rg_search|tool_context_build_kv_packet	mcp-tools	src/lib/server/ai/mcp-tool-dispatch.ts	module	typescript	0
+    redis.get|redis.set	bifrost|getModelStatus|getPreferredBackend|isBackendAlive	src/lib/server	src/lib/server/ai/model-loader.ts	module	typescript	0
+    embeddinggemma	MODELS|resolveModel|routeQuery	api-routes	src/lib/server/ai/model-router.ts	module	typescript	0
     embeddinggemma	fetchFromOllama|generateCompletion|generateEmbedding|getOllamaBaseUrl	src/lib/server	src/lib/server/ai/ollama-client.ts	module	typescript	0
     EmbeddingGemma|embeddinggemma	FALLBACK_CHAIN|MODELS|OLLAMA_CONFIG|embeddinggemma	src/lib/server	src/lib/server/ai/ollama-config.ts	module	typescript	0
     embeddinggemma	clearServerSessionCache|getLoadedModels|getServerOnnxSession|isModelLoaded	src/lib/server	src/lib/server/ai/onnx-server.ts	module	typescript	0
     Qdrant|embeddinggemma|getExactMatchCache|qdrant	ADVERTISED_MODELS|runChatCompletion	src/lib/server	src/lib/server/ai/openai-facade.ts	module	typescript	0
-    OPENAI|llama-server|TURBO_CTX|LLM_CONTEXT_SIZE|OLLAMA_CONTEXT_LENGTH|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	openAIChatCompletionRequestSchema|openAIMessageSchema	src/lib/server	src/lib/server/ai/openai-types.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	formatOpenAISseChunk	cache-memory	src/lib/server/ai/streaming-cache.ts	module	typescript	0
-    QDRANT|Qdrant|getExactMatchCache|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	getTieredCacheStats|tieredLLMQuery	cache-memory	src/lib/server/ai/tiered-llm-cache.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	extractOllamaTokens|getKVBudgetSummary|getTokenUsageStats|trackKVCacheEvent	src/lib/server	src/lib/server/ai/token-tracker.ts	module	typescript	0
-    qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	traceRerank	mcp-tools	src/lib/server/ai/trace-reranker.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	ace_rerank|check_prior_answer_cache|gemma4_synthesis|normalize_query	validation	src/lib/server/ace/kag-dag-runner.test.ts	test	typescript	2
-    Qdrant|embeddinggemma|pgvector|vector\(768\)|embedding_cache|research_summaries|cosine|hnsw|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	ACE_TOOLS|get_cluster_summary|get_system_health|lookup_research_summary	src/lib/server	src/lib/server/ace/ace-agent.ts	module	typescript	0
-    Qdrant|embeddinggemma|pgvector|vector\(768\)|embedding_cache|research_summaries|cosine|hnsw|qdrant	error_summary|summarizeErrorToKag	src/lib/server	src/lib/server/ace/ace-error-kag.ts	module	typescript	0
-    Qdrant|qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	getChunkHitCount|getChunkHitCountBulk|syncHitCountsToQdrant|tagAceHits	src/lib/server	src/lib/server/ace/ace-hit-tagger.ts	module	typescript	0
-    Qdrant|cosine|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	hmmErrorRisk|selectAcePayload|selectAcePayloads	src/lib/server	src/lib/server/ace/ace-payload-selector.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	generateAceWiki	src/lib/server	src/lib/server/ace/ace-wiki.ts	module	typescript	0
-    Qdrant|qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	buildAdaptivePrefetch	src/lib/server	src/lib/server/ace/adaptive-prefetch.ts	module	typescript	0
-    Qdrant|qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	agentsContextHitSchema|getAgentsContextForQuery	src/lib/server	src/lib/server/ace/agents-context-source.ts	module	typescript	0
-    Qdrant|embeddinggemma|pgvector|vector\(768\)|embedding_cache|research_summaries|cosine|hnsw|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	autoTagDocument	src/lib/server	src/lib/server/ace/auto-tagger.ts	module	typescript	0
-    embeddinggemma|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	aceErrorFpKey|aceHitsKey|aceTopkKey|wikiFileKey	cache-memory	src/lib/server/ace/cache-keys.ts	module	typescript	0
-    Cosine|Qdrant|embeddinggemma|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	getChatMemorySettings|hashToQdrantId|indexChatMessage|readChatMemoryMetrics	src/lib/server	src/lib/server/ace/chat-memory.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	readLatestQdrantClusterTags|readLatestRelationSynthesis|scoreClusterRelevance	cache-memory	src/lib/server/ace/cluster-tags-cache.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	assembleAceContext|getChunkForAce|getClusterSummariesForAce|getClusterSummaryForAce	src/lib/server	src/lib/server/ace/codeintel-datastore.ts	module	typescript	0
+    QDRANT|Qdrant|getExactMatchCache|setExactMatchCache	getTieredCacheStats|tieredLLMQuery	cache-memory	src/lib/server/ai/tiered-llm-cache.ts	module	typescript	0
+    qdrant	traceRerank	mcp-tools	src/lib/server/ai/trace-reranker.ts	module	typescript	0
+    Qdrant|embeddinggemma	ACE_TOOLS|get_cluster_summary|get_system_health|lookup_research_summary	src/lib/server	src/lib/server/ace/ace-agent.ts	module	typescript	0
+    Qdrant|embeddinggemma|qdrant	error_summary|summarizeErrorToKag	src/lib/server	src/lib/server/ace/ace-error-kag.ts	module	typescript	0
+    Qdrant|qdrant	getChunkHitCount|getChunkHitCountBulk|syncHitCountsToQdrant|tagAceHits	src/lib/server	src/lib/server/ace/ace-hit-tagger.ts	module	typescript	0
+    Qdrant|cosine	hmmErrorRisk|selectAcePayload|selectAcePayloads	src/lib/server	src/lib/server/ace/ace-payload-selector.ts	module	typescript	0
+    Qdrant|qdrant	buildAdaptivePrefetch	src/lib/server	src/lib/server/ace/adaptive-prefetch.ts	module	typescript	0
+    Qdrant|qdrant	agentsContextHitSchema|getAgentsContextForQuery	src/lib/server	src/lib/server/ace/agents-context-source.ts	module	typescript	0
+    Qdrant|embeddinggemma	autoTagDocument	src/lib/server	src/lib/server/ace/auto-tagger.ts	module	typescript	0
+    embeddinggemma	aceErrorFpKey|aceHitsKey|aceTopkKey|wikiFileKey	cache-memory	src/lib/server/ace/cache-keys.ts	module	typescript	0
+    Cosine|Qdrant|embeddinggemma|redis.get	getChatMemorySettings|hashToQdrantId|indexChatMessage|readChatMemoryMetrics	src/lib/server	src/lib/server/ace/chat-memory.ts	module	typescript	0
     Qdrant|cosine|embedTexts|embeddinggemma	assembleACEContext|buildACEPrompt|buildACEPromptCached|content	src/lib/server	src/lib/server/ace/context-assembler.ts	module	typescript	0
-    embeddinggemma|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	buildAceContextPlannerState|loadAceContextPlannerHit|storeAceContextPlannerHit	cache-memory	src/lib/server/ace/context-cache-planner.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	buildAceContextRegistryPacket|readAceContextRegistry|toFeatureWikiPacket|writeAceContextRegistry	cache-memory	src/lib/server/ace/context-cache-registry.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	extractFilePaths|extractSymbols|findSimilarErrors|fingerprintError	src/lib/server	src/lib/server/ace/error-fingerprint.ts	module	typescript	0
-    Qdrant|cosine|embeddinggemma|pgvector|vector\(768\)|embedding_cache|research_summaries|cosine|hnsw	writeErrorToKag	src/lib/server	src/lib/server/ace/error-kag-writer.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	getCachedCluster|getCachedCtxPacket|getCachedFeatureCard|getCachedPacket	cache-memory	src/lib/server/ace/feature-context-cache.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	ACE_TOOLS|buildGemma4AcePrompt|callGemma4WithAceContext|callGemma4WithTools	src/lib/server	src/lib/server/ace/gemma4-codeintel.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.mget	fetchDeepImportGraphExpansion	src/lib/server	src/lib/server/ace/graph-expander.ts	module	typescript	0
-    Qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.mget	SECTION_W|glyphPoolHash|logHMMAnalysis|logHMMBatch	src/lib/server	src/lib/server/ace/hmm-wiki-logger.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get	buildClusterWarmupPrompt|readHotClusters	src/lib/server	src/lib/server/ace/hot-cluster-reader.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get	getClusterContextForQuery|kagClusterIndexSchema|kagClusterNodeSchema|pickClusterByQuery	src/lib/server	src/lib/server/ace/kag-cluster-source.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get|redis.set	buildContextCacheKey|bumpContextCacheHit|getContextCache|getContextCachePath	cache-memory	src/lib/server/ace/llm-context-cache.ts	module	typescript	0
-    qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp	getCellForDirPath|getCellForFilePath|getCellsForFeature|getCellsForTag	cache-memory	src/lib/server/ace/mini-active-cache.ts	module	typescript	0
-    Qdrant|cosine|pgvector|vector\(768\)|embedding_cache|research_summaries|cosine|hnsw|qdrant	multiLaneSearch	src/lib/server	src/lib/server/ace/multi-lane-retrieval.ts	module	typescript	0
-    qdrant|qdrant|redis|neo4j|couchdb|bifrost|engram|langextract|turbovec|mcp|redis.get	extractTopFiles|extractTopSymbols|mergeContextHits|runRetrievalLanes	src/lib/server	src/lib/server/ace/retrieval-lanes.ts	module	typescript	0
+    embeddinggemma	buildAceContextPlannerState|loadAceContextPlannerHit|storeAceContextPlannerHit	cache-memory	src/lib/server/ace/context-cache-planner.ts	module	typescript	0
+    redis.get|redis.set	buildAceContextRegistryPacket|readAceContextRegistry|toFeatureWikiPacket|writeAceContextRegistry	cache-memory	src/lib/server/ace/context-cache-registry.ts	module	typescript	0
+    redis.get|redis.set	extractFilePaths|extractSymbols|findSimilarErrors|fingerprintError	src/lib/server	src/lib/server/ace/error-fingerprint.ts	module	typescript	0
+    Qdrant|cosine|embeddinggemma|redis.set	writeErrorToKag	src/lib/server	src/lib/server/ace/error-kag-writer.ts	module	typescript	0
+    redis.get|redis.set	getCachedCluster|getCachedCtxPacket|getCachedFeatureCard|getCachedPacket	cache-memory	src/lib/server/ace/feature-context-cache.ts	module	typescript	0
+    Qdrant	ACE_TOOLS|buildGemma4AcePrompt|callGemma4WithAceContext|callGemma4WithTools	src/lib/server	src/lib/server/ace/gemma4-codeintel.ts	module	typescript	0
+    redis.mget	fetchDeepImportGraphExpansion	src/lib/server	src/lib/server/ace/graph-expander.ts	module	typescript	0
+    Qdrant|redis.get|redis.mget|redis.set	SECTION_W|glyphPoolHash|logHMMAnalysis|logHMMBatch	src/lib/server	src/lib/server/ace/hmm-wiki-logger.ts	module	typescript	0
+    redis.get	buildClusterWarmupPrompt|readHotClusters	src/lib/server	src/lib/server/ace/hot-cluster-reader.ts	module	typescript	0
+    redis.get	getClusterContextForQuery|kagClusterIndexSchema|kagClusterNodeSchema|pickClusterByQuery	src/lib/server	src/lib/server/ace/kag-cluster-source.ts	module	typescript	0
+    redis.get|redis.set	buildContextCacheKey|bumpContextCacheHit|getContextCache|getContextCachePath	cache-memory	src/lib/server/ace/llm-context-cache.ts	module	typescript	0
+    Qdrant|cosine|qdrant|redis.get	multiLaneSearch	src/lib/server	src/lib/server/ace/multi-lane-retrieval.ts	module	typescript	0
+    qdrant|redis.get	extractTopFiles|extractTopSymbols|mergeContextHits|runRetrievalLanes	src/lib/server	src/lib/server/ace/retrieval-lanes.ts	module	typescript	0
+    Qdrant|cosine|qdrant	clusterPivot|loadAutoencoderCentroids	src/lib/server	src/lib/server/ace/rg-cluster-pivot.ts	module	typescript	0
+    redis.set	evaluateResponse|generateCorrectionPrompt	src/lib/server	src/lib/server/ace/self-prompt.ts	module	typescript	0
+    Qdrant|qdrant	getDocumentTags|mirrorTag|mirrorTags|searchTagsBySemantic	src/lib/server	src/lib/server/ace/tag-sync.ts	module	typescript	0
+    qdrant	estimateTokens|packAceContext|scoreContextCandidate	src/lib/server	src/lib/server/ace/token-aware-context-packer.ts	module	typescript	0
+    qdrant	packContext|serializePacket	src/lib/server	src/lib/server/ace/token-aware-packer.ts	module	typescript	0
+    redis.get|redis.set	buildKVBudgetReport|summarizeToolResponse	src/lib/server	src/lib/server/ace/tool-response-summarizer.ts	module	typescript	0
+    Qdrant	ALL_LANE_IDS|LANE_TRUST_TIER|SYSTEM_FENCE_T1|SYSTEM_FENCE_T2_T3	src/lib/server	src/lib/server/ace/trust-tiers.ts	module	typescript	0
+    Qdrant|cosine|qdrant	LANE_DEFAULT_TRUST_TIER|TILE_SCORE_WEIGHTS|TOKEN_BUDGET|TRUST_SCORE_MULTIPLIER	src/lib/server	src/lib/server/ace/types.ts	module	typescript	0
+    Qdrant	fetchTopQueryTags|fetchUserAnalyticsContext	src/lib/server	src/lib/server/ace/user-analytics-context.ts	module	typescript	0
+    	handleQuery	validation	src/lib/server/ai/__tests__/feature-toon-pipeline.test.ts	test	typescript	0
+    	getExperiment|getVariant|getWinRates|listExperiments	validation	src/lib/server/ai/ab-test.ts	module	typescript	0
+    	searchAce	src/lib/server	src/lib/server/ai/ace-search.ts	module	typescript	0
+    	canUseTurboQuant|gatePreferredBackend	src/lib/server	src/lib/server/ai/backend-runtime-guards.ts	module	typescript	0
+    	ASSIST_BUDGETS|COMPACT_DEFAULTS	src/lib/server	src/lib/server/ai/compact-budgets.ts	module	typescript	0
+    	buildDevContextPlan|extractDevContextHits|isCodingPrompt|needsExplanation	src/lib/server	src/lib/server/ai/dev-context-planner.ts	module	typescript	0
+    	buildFeatureLabels	src/lib/server	src/lib/server/ai/feature-builder.ts	module	typescript	0
+    	compressToHCACard|hcaCardToContextSnippet|hcaCardTokens	src/lib/server	src/lib/server/ai/hca-compressor.ts	module	typescript	0
+    	executeHermesPlan	src/lib/server	src/lib/server/ai/hermes-executor.ts	module	typescript	0
+    	hermesDispatcher	src/lib/server	src/lib/server/ai/hermes/dispatcher.ts	module	typescript	0
   lanes:
     docs_rows: 25378
-    feature_rows: 5843
-    lexical_rows: 42100
-    structural_parser: regex-fallback
-    structural_rows: 17037
+    feature_rows: 9340
+    lexical_rows: 45936
+    structural_parser: ast-grep+regex
+    structural_rows: 33662
   policy:
     retrieval_order: rg -> ast/regex structure -> docs map -> semantic recall -> ACE packet -> Gemma4
     stable_prefix: true

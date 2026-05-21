@@ -1,5 +1,17 @@
 import { z } from 'zod';
 import type Redis from 'ioredis';
+import { db } from '$lib/server/db/client';
+import { contextTimeline } from '$lib/server/db/schema-postgres.js';
+
+function emitTimeline(eventType: string, payload: Record<string, unknown>, sessionId: string): void {
+  void db.insert(contextTimeline).values({
+    userId: null,
+    sessionId,
+    eventType,
+    pipeline: 'engram-memory',
+    payload,
+  }).catch(() => {});
+}
 
 export const engramAcePacketInjectSchema = z.object({
   run_id: z.string().min(1).max(200),
@@ -55,6 +67,17 @@ export async function injectAcePacket(
     redis.strlen(key),
   ]);
 
+  emitTimeline('tool_call', {
+    kind: 'engram.ace_packet_inject',
+    run_id: input.run_id,
+    redis_key: key,
+    ttl,
+    stored_ttl: storedTtl,
+    size_bytes: sizeBytes,
+    stored_size_bytes: storedSize,
+    status: 'written',
+  }, input.run_id);
+
   return {
     ok: exists === 1,
     key,
@@ -93,6 +116,18 @@ export async function storeChatMemoryTurn(
     .exec();
 
   const count = await redis.zcard(key);
+  emitTimeline('tool_call', {
+    kind: 'engram.chat_memory_store',
+    user_id: input.user_id,
+    redis_key: key,
+    score,
+    member_size: member.length,
+    max_turns: maxTurns,
+    count,
+    ttl,
+    status: 'written',
+    turn: input.turn,
+  }, input.user_id);
 
   return {
     ok: true,

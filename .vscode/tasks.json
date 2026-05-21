@@ -4319,6 +4319,22 @@
       "detail": "L2 Bifrost semantic cache health + Qdrant collection stats"
     },
     {
+      "label": "🩺 Observability: Async Inference Log + CouchDB/RabbitMQ Audit",
+      "type": "shell",
+      "command": "npm run audit:inference-observability",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Verifies async inference logging design (buffer + non-blocking flush + _bulk_docs) and checks CouchDB/RabbitMQ runtime reachability."
+    },
+    {
       "label": "📊 Cache: Full Stack Stats (L1 + L2 + Qdrant Collections)",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"Write-Host '=== L1: Redis Exact-Match ===' -ForegroundColor Cyan; try { $l1 = Invoke-RestMethod http://localhost:5173/api/cache/exact-match/stats -TimeoutSec 5; Write-Host \\\"  Hits: $($l1.hits)  Misses: $($l1.misses)  Keys: $($l1.size)\\\" -ForegroundColor Green } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== L2: Bifrost Semantic ===' -ForegroundColor Cyan; try { $l2 = Invoke-RestMethod http://localhost:3040/health -TimeoutSec 5; Write-Host \\\"  Status: $($l2.status)\\\" -ForegroundColor Green } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== Qdrant Collections ===' -ForegroundColor Cyan; try { $q = Invoke-RestMethod http://localhost:6333/collections -TimeoutSec 5; $q.result.collections | ForEach-Object { Write-Host \\\"  $($_.name)\\\" -ForegroundColor Yellow } } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== Redis Memory ===' -ForegroundColor Cyan; try { redis-cli INFO memory 2>$null | Select-String 'used_memory_human' | ForEach-Object { Write-Host \\\"  $($_.Line)\\\" -ForegroundColor Green } } catch { Write-Host '  Unavailable' -ForegroundColor Red }\"",

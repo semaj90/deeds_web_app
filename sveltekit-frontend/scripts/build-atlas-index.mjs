@@ -43,6 +43,7 @@
 import { mkdir, rename, unlink, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
 import pg from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -69,9 +70,32 @@ const RETRYABLE_FS_CODES = new Set(['EBUSY', 'EPERM', 'EACCES', 'UNKNOWN']);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function writeTempFileWithRetry(filePath, content, encoding = 'utf8', retries = 8) {
+  const tempCandidates = [
+    `${filePath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    resolve(tmpdir(), `deeds-atlas-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}.tmp`),
+  ];
+
+  let lastError;
+  for (const tempPath of tempCandidates) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        await writeFile(tempPath, content, encoding);
+        return tempPath;
+      } catch (err) {
+        lastError = err;
+        const shouldRetry = RETRYABLE_FS_CODES.has(err?.code) && attempt < retries;
+        if (!shouldRetry) break;
+        await sleep(40 * (attempt + 1));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
 async function atomicWriteFile(filePath, content, encoding = 'utf8', retries = 8) {
-  const tempPath = `${filePath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  await writeFile(tempPath, content, encoding);
+  const tempPath = await writeTempFileWithRetry(filePath, content, encoding, retries);
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {

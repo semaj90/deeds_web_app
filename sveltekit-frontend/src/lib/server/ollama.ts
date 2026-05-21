@@ -107,6 +107,34 @@ const BIFROST_GATEWAY_FAILURE_COOLDOWN_MS = parseTimeoutMs(
 );
 let bifrostGatewayUnavailableUntil = 0;
 
+export type DirectOllamaCapability =
+  | 'json-schema'
+  | 'tool-calls'
+  | 'audit-planner'
+  | 'error-summary';
+
+const DIRECT_OLLAMA_ALLOWLIST: Readonly<Record<string, readonly DirectOllamaCapability[]>> = {
+  'ace/gemma4-codeintel': ['json-schema', 'tool-calls'],
+  'ace/ace-error-kag': ['error-summary'],
+  'audit/gemma-tool-router': ['audit-planner'],
+};
+
+export function assertDirectOllamaAllowed(
+  caller: string,
+  capability: DirectOllamaCapability,
+  note?: string
+): void {
+  const allowed = DIRECT_OLLAMA_ALLOWLIST[caller] ?? [];
+  if (!allowed.includes(capability)) {
+    throw new Error(
+      `[bifrost-boundary] Direct Ollama denied for ${caller} (${capability}). Route this through bifrostChat or add explicit allowlist review.`
+    );
+  }
+  if (note) {
+    console.info(`[bifrost-boundary] direct allow ${caller}:${capability} - ${note}`);
+  }
+}
+
 // Populate VLM_MODELS from ENV now that ENV is initialized
 VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL;
 VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL;
@@ -296,10 +324,7 @@ async function isTurboQuantHealthy(): Promise<boolean> {
  * Only intercepts non-streaming requests (stream: false). Streaming stays
  * on Ollama since TurboQuant SSE → Ollama ndjson conversion is non-trivial.
  */
-async function tryTurboQuantIntercept(
-  url: string,
-  init?: RequestInit
-): Promise<Response | null> {
+async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<Response | null> {
   if (!TURBOQUANT_INTERCEPT_ENABLED) return null;
   if (typeof init?.body !== 'string') return null;
 
@@ -404,14 +429,18 @@ async function tryTurboQuantIntercept(
 
     // Convert OpenAI tool_calls format to Ollama format
     // OpenAI: arguments is a JSON string; Ollama: arguments is a parsed object
-    let ollamaToolCalls: Array<{ function: { name: string; arguments: Record<string, unknown> } }> | undefined;
+    let ollamaToolCalls:
+      | Array<{ function: { name: string; arguments: Record<string, unknown> } }>
+      | undefined;
     if (choice?.tool_calls?.length) {
       ollamaToolCalls = choice.tool_calls.map((tc) => {
         let args: Record<string, unknown> = {};
         if (typeof tc.function.arguments === 'string') {
           try {
             args = JSON.parse(tc.function.arguments);
-          } catch { /* keep empty */ }
+          } catch {
+            /* keep empty */
+          }
         } else if (typeof tc.function.arguments === 'object' && tc.function.arguments !== null) {
           args = tc.function.arguments as Record<string, unknown>;
         }
@@ -498,7 +527,7 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
   const startedAt = Date.now();
 
   // TurboQuant intercept: route /api/chat and /api/generate through GPU llama-server
-    const turboResponse = await tryTurboQuantIntercept(url, init);
+  const turboResponse = await tryTurboQuantIntercept(url, init);
   if (turboResponse && turboResponse.ok) {
     logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200, undefined, 'turboquant');
     return turboResponse;
@@ -507,7 +536,7 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
   // VRAM Contention Guard: If this is a large model call (VLM/Gemma4) to Ollama,
   // but TurboQuant is already active, we risk an OOM or massive swapping.
   const isLargeModel = meta.model === VLM_MODELS.vision || meta.model === VLM_MODELS.gemma4;
-  if (isLargeModel && await isGpuCongested()) {
+  if (isLargeModel && (await isGpuCongested())) {
     const msg = `[ollama] VRAM congestion: skipping Ollama ${meta.model} while TurboQuant is active`;
     console.warn(msg);
     return new Response(JSON.stringify({ error: 'GPU_CONGESTION', message: msg }), {
@@ -521,21 +550,31 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
       ...init,
       dispatcher: ollamaDispatcher,
     } as RequestInit);
-    logOllamaDiagnostics('success', meta, Date.now() - startedAt, response.status, undefined, 'ollama');
+    logOllamaDiagnostics(
+      'success',
+      meta,
+      Date.now() - startedAt,
+      response.status,
+      undefined,
+      'ollama'
+    );
     return response;
   } catch (error) {
     const duration = Date.now() - startedAt;
     logOllamaDiagnostics('error', meta, duration, undefined, error);
-    
+
     // Normalize error response so agents get a consistent JSON envelope
-    return new Response(JSON.stringify({ 
-      error: 'FETCH_ERROR', 
-      message: (error as Error)?.message ?? String(error),
-      duration 
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'FETCH_ERROR',
+        message: (error as Error)?.message ?? String(error),
+        duration,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
