@@ -26,8 +26,6 @@ import type {
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import type { ACEContext } from '$lib/server/ace/types.js';
 import {
-  generatePromptCacheKey,
-  TTL,
   hashStr,
   buildAcePacketCacheKey,
   buildAceCompletionCacheKey,
@@ -283,6 +281,43 @@ function clampRequestedMaxTokens(requested: number | undefined): number {
   return Math.min(requested ?? OPENAI_DEFAULT_MAX_TOKENS, 4096, OPENAI_MAX_OUTPUT_TOKENS);
 }
 
+function extractAssistantText(result: unknown): string {
+  if (typeof result === 'string') return result;
+  if (!result || typeof result !== 'object') return '';
+
+  const rec = result as Record<string, unknown>;
+
+  const direct = rec.content;
+  if (typeof direct === 'string') return direct;
+
+  const message = rec.message;
+  if (message && typeof message === 'object') {
+    const msg = message as Record<string, unknown>;
+    if (typeof msg.content === 'string') return msg.content;
+  }
+
+  const choices = rec.choices;
+  if (Array.isArray(choices) && choices.length > 0) {
+    const first = choices[0];
+    if (first && typeof first === 'object') {
+      const choice = first as Record<string, unknown>;
+      const choiceMessage = choice.message;
+      if (choiceMessage && typeof choiceMessage === 'object') {
+        const msg = choiceMessage as Record<string, unknown>;
+        if (typeof msg.content === 'string') return msg.content;
+      }
+      if (typeof choice.content === 'string') return choice.content;
+      const delta = choice.delta;
+      if (delta && typeof delta === 'object') {
+        const d = delta as Record<string, unknown>;
+        if (typeof d.content === 'string') return d.content;
+      }
+    }
+  }
+
+  return '';
+}
+
 function determineInferenceLane(
   inputTokens: number,
   acePacketTokens: number,
@@ -389,21 +424,22 @@ export async function runChatCompletion(
           temperature: req.temperature,
           maxTokens: requestedMaxTokens,
         });
-        text = typeof result === 'string' ? result : (result as { content: string }).content;
+        text = extractAssistantText(result);
       } catch {
         const result = await bifrostChat(mappedMsgs, internalModel, {
           temperature: req.temperature,
           maxTokens: requestedMaxTokens,
         });
-        text = typeof result === 'string' ? result : (result as { content: string }).content;
+        text = extractAssistantText(result);
       }
     } else {
       const result = await bifrostChat(mappedMsgs, internalModel, {
         temperature: req.temperature,
         maxTokens: requestedMaxTokens,
       });
-      text = typeof result === 'string' ? result : (result as { content: string }).content;
+      text = extractAssistantText(result);
     }
+    text = text.trim() || '[No assistant content returned by model]';
     return wrapResponse({
       content: text,
       model: rawModel,
@@ -1103,13 +1139,13 @@ export async function runChatCompletion(
           temperature: req.temperature,
           maxTokens: requestedMaxTokens,
         });
-        text = typeof result === 'string' ? result : (result as { content: string }).content;
+        text = extractAssistantText(result);
       } else {
         const result = await bifrostChat(messages, internalModel, {
           temperature: req.temperature,
           maxTokens: requestedMaxTokens,
         });
-        text = typeof result === 'string' ? result : (result as { content: string }).content;
+        text = extractAssistantText(result);
       }
     }
   } else if (canUseTurboQuantNow) {
@@ -1118,21 +1154,23 @@ export async function runChatCompletion(
         temperature: req.temperature,
         maxTokens: requestedMaxTokens,
       });
-      text = typeof result === 'string' ? result : (result as { content: string }).content;
+      text = extractAssistantText(result);
     } catch {
       const result = await bifrostChat(messages, internalModel, {
         temperature: req.temperature,
         maxTokens: requestedMaxTokens,
       });
-      text = typeof result === 'string' ? result : (result as { content: string }).content;
+      text = extractAssistantText(result);
     }
   } else {
     const result = await bifrostChat(messages, internalModel, {
       temperature: req.temperature,
       maxTokens: requestedMaxTokens,
     });
-    text = typeof result === 'string' ? result : (result as { content: string }).content;
+    text = extractAssistantText(result);
   }
+
+  text = text.trim() || '[No assistant content returned by model]';
 
   void Promise.all([
     setExactMatchCache(
@@ -1353,10 +1391,12 @@ function wrapResponse(args: {
   mcpCompactSearchCacheHit?: boolean;
   mcpCompactSearchMs?: number;
 }): OpenAIChatCompletionResponse {
+  const assistantContent = args.content.trim() || '[No assistant content returned by model]';
+
   // Token counts: rough estimate (chars/4). Real counts only available when
   // bifrostChat returns them, which it does for direct Ollama but not always
   // for cached Bifrost hits.
-  const completionTokens = Math.ceil(args.content.length / 4);
+  const completionTokens = Math.ceil(assistantContent.length / 4);
 
   return {
     id: `chatcmpl-yorha-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -1372,7 +1412,7 @@ function wrapResponse(args: {
     choices: [
       {
         index: 0,
-        message: { role: 'assistant', content: args.content },
+        message: { role: 'assistant', content: assistantContent },
         finish_reason: 'stop',
       },
     ],

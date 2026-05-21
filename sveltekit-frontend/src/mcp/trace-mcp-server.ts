@@ -89,6 +89,7 @@ import { registerBifrostTools } from './bifrost_tools.js';
 import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
+import { registerEngramTools } from './engram_tools.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
 
@@ -125,6 +126,7 @@ registerNewTools(server, { rerankUrl: RERANK_URL }, ENABLE_LEGACY_ALIASES);
 registerAdminTools(server);
 registerSkillTools(server);
 registerLegalSkillsTools(server);
+registerEngramTools(server, REDIS_URL);
 if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server);
   registerResearchTools(server);

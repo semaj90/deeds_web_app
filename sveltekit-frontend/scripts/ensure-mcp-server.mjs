@@ -80,12 +80,35 @@ function stopTraceMcpListener() {
   }
 }
 
+function hasTraceMcpListener() {
+  if (process.platform !== 'win32') return false;
+
+  try {
+    const ps = spawnSync(
+      'powershell',
+      [
+        '-NoProfile',
+        '-Command',
+        `$tcp = Get-NetTCPConnection -LocalPort ${PORT} -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; if ($tcp) { exit 0 } else { exit 1 }`,
+      ],
+      { stdio: 'ignore' }
+    );
+    return ps.status === 0;
+  } catch {
+    return false;
+  }
+}
+
 export async function ensureTraceMcp() {
   if (await isTraceMcpHealthy()) {
     const tools = await getTraceMcpTools();
     if (!tools || REQUIRED_TOOLS.every((tool) => tools.includes(tool))) return true;
 
     console.warn('[ensure-mcp-server] TRACE MCP is healthy but missing required tools; restarting listener...');
+    stopTraceMcpListener();
+    await new Promise((r) => setTimeout(r, 500));
+  } else if (hasTraceMcpListener()) {
+    console.warn('[ensure-mcp-server] TRACE MCP listener exists but health check failed; replacing listener...');
     stopTraceMcpListener();
     await new Promise((r) => setTimeout(r, 500));
   }

@@ -156,16 +156,22 @@ function handleQueryMode(
         // Acquire GPU lease for Ollama streaming (non-blocking)
         await acquireGpuLease('ollama', 120).catch(() => null);
 
+        send({ type: 'status', stage: 'status', message: 'stream-started' });
         send({ type: 'start', query, mode, caseId, timestamp: new Date().toISOString() });
 
         // Load case context if available
+        send({ type: 'status', stage: 'retrieval', message: 'loading-context' });
         let caseContext = '';
         if (caseId) {
           const ctx = await loadCaseContext(caseId, userId);
           if (ctx) {
             caseContext = ctx;
             send({ type: 'case_context', caseId, hasContext: true });
+          } else {
+            send({ type: 'status', stage: 'retrieval', message: 'no-case-context' });
           }
+        } else {
+          send({ type: 'status', stage: 'retrieval', message: 'no-case-selected' });
         }
 
         // Apply persona styling to prompt
@@ -181,6 +187,7 @@ function handleQueryMode(
           systemPrefix + (caseContext ? `${caseContext}\n\n## User Question\n${query}` : query);
 
         // Import LLM router dynamically
+        send({ type: 'status', stage: 'tool', message: 'invoking-llm-router' });
         const { llmRouter } = await import('$lib/server/llm-router');
 
         // Stream response
@@ -194,6 +201,7 @@ function handleQueryMode(
           send({ type: 'token', content: chunk?.content || chunk.text });
         }
 
+        send({ type: 'status', stage: 'done', message: 'stream-complete' });
         send({ type: 'done' });
         controller.close();
       } catch (error) {
