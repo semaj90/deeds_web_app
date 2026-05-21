@@ -66,7 +66,12 @@ const PARALLEL = Math.max(
   1,
   parseInt(process.env.LLAMA_SERVER_PARALLEL ?? process.env.TURBO_PARALLEL ?? '1', 10)
 );
-const CTX = process.env.TURBO_CTX ?? process.env.LLAMA_SERVER_CTX ?? '16384';
+const CTX =
+  process.env.LLM_CONTEXT_SIZE ??
+  process.env.TURBO_CTX ??
+  process.env.LLAMA_SERVER_CTX ??
+  process.env.OLLAMA_CONTEXT_LENGTH ??
+  '65536';
 const NGL = process.env.TURBO_NGL ?? process.env.LLAMA_SERVER_NGL ?? '99';
 const CACHE_TYPE_K = process.env.LLAMA_CACHE_TYPE_K ?? process.env.TURBO_KV_K ?? 'q8_0';
 const CACHE_TYPE_V = process.env.LLAMA_CACHE_TYPE_V ?? process.env.TURBO_KV_V ?? 'q8_0';

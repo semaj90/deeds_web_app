@@ -70,19 +70,19 @@ search.dev_context({ query: "expandNeighbours neo4j rerank" })
 
 | File | Authority | Flags |
 |------|-----------|-------|
-| `semantic-cache.ts` | 0.150 | 0x9 |
 | `neo4j-rerank.ts` | 0.000 | 0x9 |
 | `mla-kv-compress.ts` | 0.000 | 0x9 |
 | `gpu-rerank.ts` | 0.000 | 0x9 |
 | `engram-bigram.ts` | 0.000 | 0x9 |
 | `bow-utils.ts` | 0.000 | 0x8 |
+| `semantic-cache.ts` | 0.000 | 0x9 |
 | `retrieval-explainer.ts` | 0.000 | 0x9 |
 | `marco-reranker.ts` | 0.000 | 0x9 |
 | `postgres-fts.ts` | 0.000 | 0x9 |
 | `index.ts` | 0.000 | 0x8 |
 ## Audit Gates — General
 
-> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-19
+> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-20
 > Run each check from the **sveltekit-frontend/** root.
 
 ### Tier A — Code Connectivity

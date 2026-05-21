@@ -911,6 +911,12 @@ async function processAndEmbed(
   evidenceType: string = 'document'
 ): Promise<void> {
   const diagnostics = createProcessingDiagnostics();
+  let depthAnalysis: {
+    depthMapUrl: string;
+    width: number;
+    height: number;
+    processingTimeMs: number;
+  } | null = null;
   markStage(diagnostics, 'extraction', 'pending', 'Awaiting text extraction');
   markStage(diagnostics, 'chunking', 'pending', 'Awaiting chunk generation');
   markStage(diagnostics, 'embedding', 'pending', 'Awaiting chunk embeddings');
@@ -939,6 +945,12 @@ async function processAndEmbed(
     'Awaiting Granite-Docling structural analysis'
   );
   markStage(diagnostics, 'docling_vlm_rerank', 'pending', 'Awaiting VLM section reranking');
+  markStage(
+    diagnostics,
+    'scene_reconstruction',
+    'pending',
+    'Awaiting monocular depth and 3D scene reconstruction'
+  );
 
   updateJob(jobId, { step: 'embedding', progress: 65, message: 'Extracting text...' });
 
@@ -1692,7 +1704,7 @@ async function processAndEmbed(
   > | null = null;
 
   if (isImage) {
-    const [pipelineResult, vlmResult] = await Promise.allSettled([
+    const [pipelineResult, vlmResult, depthResult] = await Promise.allSettled([
       // Full analysis pipeline: YOLO (Redis-cached) → LLM escalation → graph connections → DB cache
       (async () => {
         const { runEvidenceAnalysisPipeline } = await import(
@@ -1713,6 +1725,39 @@ async function processAndEmbed(
         );
         return analyzeEvidenceImage({ buffer, fileName });
       })(),
+      // DepthAnything v2 depth estimation from the image-synthesis container
+      (async () => {
+        const base64Image = buffer.toString('base64');
+        const resp = await fetch(`${ENV.IMAGE_SYNTHESIS_URL}/depth`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image_base64: base64Image }),
+          signal: AbortSignal.timeout(60_000),
+        });
+        if (!resp.ok) {
+          throw new Error(`Depth estimation service returned status ${resp.status}`);
+        }
+        const data = await resp.json();
+        if (!data.depth_base64) {
+          throw new Error('Depth estimation response missing depth_base64');
+        }
+
+        // Upload the generated depth map back to MinIO/SeaweedFS
+        const depthBuffer = Buffer.from(data.depth_base64, 'base64');
+        const depthKey = `evidence/${caseId ?? 'default'}/${evidenceId}-depth.png`;
+        await uploadFile(BUCKET, depthKey, depthBuffer, {
+          'Content-Type': 'image/png',
+          'X-Evidence-Id': evidenceId,
+          'X-Analysis-Type': 'depth_map',
+        });
+
+        return {
+          depthMapUrl: `minio://${BUCKET}/${depthKey}`,
+          width: data.width,
+          height: data.height,
+          processingTimeMs: data.processing_time_ms,
+        };
+      })(),
     ]);
 
     // Extract pipeline results
@@ -1725,11 +1770,14 @@ async function processAndEmbed(
       };
     }
     visionAnalysis = vlmResult.status === 'fulfilled' ? vlmResult.value : null;
+    depthAnalysis = depthResult.status === 'fulfilled' ? depthResult.value : null;
 
     if (pipelineResult.status === 'rejected')
       console.warn('[Upload] Analysis pipeline skipped:', pipelineResult.reason);
     if (vlmResult.status === 'rejected')
       console.warn('[Upload] VLM analysis skipped:', vlmResult.reason);
+    if (depthResult.status === 'rejected')
+      console.warn('[Upload] Depth estimation skipped/failed:', depthResult.reason);
 
     const pipelineOk = pipelineResult.status === 'fulfilled';
     const vlmOk = vlmResult.status === 'fulfilled' && vlmResult.value?.model !== 'none';
@@ -1757,8 +1805,34 @@ async function processAndEmbed(
         vlmCached: visionAnalysis?.cached ?? false,
       });
     }
+
+    if (depthAnalysis) {
+      markStage(
+        diagnostics,
+        'scene_reconstruction',
+        'success',
+        'Completed monocular depth estimation and stored depth map',
+        {
+          depthMapUrl: depthAnalysis.depthMapUrl,
+          width: depthAnalysis.width,
+          height: depthAnalysis.height,
+          processingTimeMs: depthAnalysis.processingTimeMs,
+        }
+      );
+    } else {
+      markStage(
+        diagnostics,
+        'scene_reconstruction',
+        'warning',
+        'Monocular depth estimation failed or was skipped',
+        {
+          reason: depthResult.status === 'rejected' ? String(depthResult.reason) : 'No data returned',
+        }
+      );
+    }
   } else {
     markStage(diagnostics, 'vision', 'skipped', 'File type is not image evidence');
+    markStage(diagnostics, 'scene_reconstruction', 'skipped', 'File type is not image evidence');
   }
 
   // 6c. LangExtract + NLP classification in parallel (both independent, non-fatal)
@@ -2139,6 +2213,7 @@ async function processAndEmbed(
       doclingVlmSections: doclingVlmSections.length > 0 ? doclingVlmSections : null,
       visionAnalysis: visionAnalysis ?? null,
       yoloDetections: yoloDetections ?? null,
+      depthAnalysis: depthAnalysis ?? null,
       nlpClassification: nlpClassification ?? null,
       evidenceProfile: evidenceProfile ?? null,
       admissibilityIndicators: evidenceProfile?.admissibility_indicators ?? null,

@@ -33,15 +33,15 @@ export interface Message {
 }
 
 export interface GenerateOptions {
-  temperature?: number;                // 0.0-2.0 (default: 0.7)
-  maxTokens?: number;                  // Max completion tokens
-  topP?: number;                       // Nucleus sampling
-  topK?: number;                       // Top-K sampling
-  stop?: string[];                     // Stop sequences
-  numCtx?: number;                     // Context window (default: 32768)
-  stream?: boolean;                    // Enable streaming
-  repeatPenalty?: number;              // Repetition penalty
-  seed?: number;                       // Random seed
+  temperature?: number; // 0.0-2.0 (default: 0.7)
+  maxTokens?: number; // Max completion tokens
+  topP?: number; // Nucleus sampling
+  topK?: number; // Top-K sampling
+  stop?: string[]; // Stop sequences
+  numCtx?: number; // Context window (default: 65536)
+  stream?: boolean; // Enable streaming
+  repeatPenalty?: number; // Repetition penalty
+  seed?: number; // Random seed
 }
 
 export interface GenerateResponse {

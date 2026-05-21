@@ -60,7 +60,7 @@ export async function attentionHeadRanker(
         chunk.documentId ??
         chunk.source ??
         `chunk-${index + 1}`,
-      content: chunk.content.trim(),
+      content: String(chunk.content ?? '').trim(),
       summary: chunk.summary,
       tags: chunk.tags,
       cacheLayer: chunk.cacheLayer ?? null,
@@ -77,7 +77,7 @@ export async function attentionHeadRanker(
   if (!candidates.length) return [];
 
   const texts = candidates.map((chunk) => chunk.content);
-  const queryText = query.trim();
+  const queryText = String(query ?? '').trim();
   if (!queryText) return [];
 
   const embeddings = await embedTexts([...texts, queryText]);

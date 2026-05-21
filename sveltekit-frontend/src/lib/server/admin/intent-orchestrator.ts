@@ -1,11 +1,11 @@
 import { bifrostChat } from '$lib/server/ollama.js';
 
-export type UserIntent = 
-  | 'code_search'      // Finding files/symbols in the codebase
-  | 'system_diagnose'  // Checking system health/metrics/logs
-  | 'deep_research'    // Web search / external info
-  | 'architectural'    // High-level "how does this work"
-  | 'chat_direct';     // Simple Q&A without tools
+export type UserIntent =
+  | 'code_search' // Finding files/symbols in the codebase
+  | 'system_diagnose' // Checking system health/metrics/logs
+  | 'deep_research' // Web search / external info
+  | 'architectural' // High-level "how does this work"
+  | 'chat_direct'; // Simple Q&A without tools
 
 export interface ExecutionPlan {
   intent: UserIntent;
@@ -26,7 +26,10 @@ export class IntentOrchestrator {
     if (!Array.isArray(history) || history.length === 0) return '';
     return history
       .slice(-limit)
-      .map((entry) => `${String(entry.role ?? 'unknown').toUpperCase()}: ${String(entry.content ?? '')}`)
+      .map(
+        (entry) =>
+          `${String(entry.role ?? 'unknown').toUpperCase()}: ${String(entry.content ?? '')}`
+      )
       .join('\n');
   }
 
@@ -35,17 +38,23 @@ export class IntentOrchestrator {
    */
   static getFallbackPlan(query: string): ExecutionPlan {
     const lower = query.toLowerCase();
-    const intent: UserIntent =
-      /\b(code|file|symbol|search|grep|find)\b/.test(lower) ? 'code_search'
-      : /\b(health|status|error|failure|index|redis|db|database|mcp|model|weight|weights)\b/.test(lower) ? 'system_diagnose'
-      : /\b(web|docs|research|latest|current|external)\b/.test(lower) ? 'deep_research'
-      : /\b(architecture|design|why|how does|how do)\b/.test(lower) ? 'architectural'
-      : 'chat_direct';
+    const intent: UserIntent = /\b(code|file|symbol|search|grep|find)\b/.test(lower)
+      ? 'code_search'
+      : /\b(health|status|error|failure|index|redis|db|database|mcp|model|weight|weights)\b/.test(
+            lower
+          )
+        ? 'system_diagnose'
+        : /\b(web|docs|research|latest|current|external)\b/.test(lower)
+          ? 'deep_research'
+          : /\b(architecture|design|why|how does|how do)\b/.test(lower)
+            ? 'architectural'
+            : 'chat_direct';
 
     return {
       intent,
       confidence: 0.35,
-      reasoning: 'Fallback heuristic plan used after classifier failure.',
+      reasoning:
+        'Fallback heuristic plan used after classifier failure. Lower confidence makes the fallback safer while still allowing ranking-based routing.',
       suggestedTools: this.getSuggestedTools(intent),
     };
   }
@@ -103,23 +112,23 @@ RESPONSE FORMAT (JSON only):
 
     try {
       // Use Gemma3:270m for sub-200ms latency classification
-      const text = await bifrostChat(
-        [{ role: 'user', content: prompt }],
-        'gemma3:270m',
-        { temperature: 0.1 }
-      ) || '{}';
+      const text =
+        (await bifrostChat([{ role: 'user', content: prompt }], 'gemma3:270m', {
+          temperature: 0.1,
+        })) || '{}';
       const match = text.match(/\{[\s\S]*\}/);
       const parsed = JSON.parse(match ? match[0] : '{}');
 
       const intent = (parsed.intent || 'chat_direct') as UserIntent;
-      
+
       return {
         intent,
         confidence: parsed.confidence || 0.5,
         reasoning: parsed.reasoning || 'Default fallback',
-        suggestedTools: Array.isArray(parsed.suggestedTools) && parsed.suggestedTools.length > 0
-          ? parsed.suggestedTools
-          : this.getSuggestedTools(intent)
+        suggestedTools:
+          Array.isArray(parsed.suggestedTools) && parsed.suggestedTools.length > 0
+            ? parsed.suggestedTools
+            : this.getSuggestedTools(intent),
       };
     } catch (err) {
       console.error('[IntentOrchestrator] Error:', err);

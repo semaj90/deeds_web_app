@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-19T19:36:25.706Z",
-  "graphFiles": 33009,
+  "generatedAt": "2026-05-20T21:43:45.584Z",
+  "graphFiles": 33084,
   "gates": {
     "D9": {
       "name": "Likely orphans (0 fanIn, no dynImport ref)",
-      "count": 12186,
+      "count": 12198,
       "findings": [
         {
           "file": ".claude/hooks/posttooluse-audit.mjs",
@@ -2293,11 +2293,6 @@
         },
         {
           "file": "deeds_labs/db-schema-archive/enhanced-legal-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "deeds_labs/db-schema-archive/legal-schema.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -13572,6 +13567,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/schema/cutlass.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/schema/gpuInferenceDemo.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -14403,16 +14403,6 @@
         },
         {
           "file": "deeds_labs/dead-orphans-2026-04-06/index-unified.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/jsonb-legal-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "deeds_labs/db-schema-archive/legal-schema.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -19883,11 +19873,6 @@
         },
         {
           "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/json-fast.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/jsonb-legal-schema.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -38307,17 +38292,17 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/rag/DocumentModal.svelte",
+          "file": "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/components/rag/DocumentModal.svelte",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "deeds_labs/frontend/orphaned-components/rag-stubs/GPURAGSearch.svelte",
+          "file": "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/components/rag/GPURAGSearch.svelte",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "deeds_labs/frontend/orphaned-components/rag-stubs/GPURAGSearch.svelte",
+          "file": "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/components/rag/GPURAGSearch.svelte",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -40272,6 +40257,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/schema/cutlass.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/schema/gpuInferenceDemo.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -41107,16 +41097,6 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/jsonb-legal-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "deeds_labs/db-schema-archive/legal-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
           "file": "deeds_labs/db-schema-archive/lucia-schema.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -41617,7 +41597,7 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/rag/cache-old.ts",
+          "file": "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/server/rag/cache-old.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -45593,11 +45573,6 @@
         },
         {
           "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/json-fast.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/jsonb-legal-schema.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -52872,6 +52847,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scratch/debug-connections.js",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scratch/test-minio-config.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -53218,6 +53198,11 @@
         },
         {
           "file": "scripts/atlas/fetch-llm-wiki-corpus.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/generate-daily-todo.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -54132,6 +54117,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/sync-labels/redis-sync.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/sync-to-obsidian.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -54677,7 +54667,7 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "scripts/atlas/cache-feature-cards.mjs",
+          "file": "sveltekit-frontend/scripts/atlas/cache-feature-cards.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -54902,6 +54892,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "sveltekit-frontend/scripts/backfill-manifold4.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "sveltekit-frontend/scripts/backfill-research-embeddings.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -55057,6 +55052,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "sveltekit-frontend/scripts/check-library.js",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "sveltekit-frontend/scripts/check-neo4j.cjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -55113,6 +55113,11 @@
         },
         {
           "file": "sveltekit-frontend/scripts/couchdb-push-wiki-views.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/count-all.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -55512,6 +55517,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "sveltekit-frontend/scripts/graphify-kag-notes-missing.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "sveltekit-frontend/scripts/graphify-neo4j-clusters.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -55882,6 +55892,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -55908,6 +55923,11 @@
         },
         {
           "file": "sveltekit-frontend/scripts/mcp/test-svelte5-migration.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/mcp/turbovec-sidecar-mcp.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -57627,6 +57647,16 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "sveltekit-frontend/scripts/seed-ontology-d27.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/seed-redis-clusters.js",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "sveltekit-frontend/scripts/show-recommendations.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -57758,6 +57788,11 @@
         },
         {
           "file": "sveltekit-frontend/scripts/smoke-atlas-prompt-mapper.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/smoke-attention-rank.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -58027,6 +58062,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "sveltekit-frontend/scripts/test-bifrost.js",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "sveltekit-frontend/scripts/test-cache-invalidate.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -58098,6 +58138,21 @@
         },
         {
           "file": "sveltekit-frontend/scripts/test-neo4j-connection.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/test-ollama-docling.js",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/test-ollama-inference.js",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/test-ollama.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -58497,6 +58552,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "sveltekit-frontend/src/lib/db/schema/cutlass.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "sveltekit-frontend/src/lib/db/schema/gpuInferenceDemo.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -58562,12 +58622,12 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "sveltekit-frontend/src/lib/server/admin/intent-orchestrator.ts",
+          "file": "sveltekit-frontend/src/lib/server/admin/retrieval-analytics-service.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "sveltekit-frontend/src/lib/server/admin/retrieval-analytics-service.ts",
+          "file": "sveltekit-frontend/src/lib/server/agents/contract-merger-agent.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -58652,11 +58712,6 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "sveltekit-frontend/src/lib/server/cache/redis-semantic-cache.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
           "file": "sveltekit-frontend/src/lib/server/cache/tensor-similarity-cache.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -58693,11 +58748,6 @@
         },
         {
           "file": "deeds_labs/db-schema-archive/enhanced-legal-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "deeds_labs/db-schema-archive/legal-schema.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -58748,11 +58798,6 @@
         },
         {
           "file": "sveltekit-frontend/src/lib/server/db/index-new.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -58973,6 +59018,11 @@
         },
         {
           "file": "sveltekit-frontend/src/lib/server/langextract/google-langextract.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/src/lib/server/langextract/mcp-langextract.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -59863,6 +59913,11 @@
         },
         {
           "file": "scripts/atlas/fetch-llm-wiki-corpus.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/generate-daily-todo.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -60773,6 +60828,11 @@
         },
         {
           "file": "scripts/setup-ace-qdrant.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/sync-labels/redis-sync.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },

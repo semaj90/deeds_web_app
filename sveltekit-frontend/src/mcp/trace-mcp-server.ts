@@ -4516,7 +4516,7 @@ server.registerTool(
       try {
         const kbRes = await fetch(`${KB_URL}/mcp`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
           body: JSON.stringify({
             jsonrpc: '2.0', id: 1, method: 'tools/call',
             params: { name: 'kb.hybrid_search', arguments: { query: opts.query, top_k: Math.min(topK, 5) } },
@@ -5043,6 +5043,25 @@ const nodeServer = http.createServer(async (req, res) => {
 });
 
 async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
+  const acceptHeader = req.headers.accept;
+  const acceptValues = Array.isArray(acceptHeader)
+    ? acceptHeader
+    : acceptHeader
+      ? [acceptHeader]
+      : [];
+
+  const hasJson = acceptValues.some((value) => value.includes('application/json'));
+  const hasEventStream = acceptValues.some((value) => value.includes('text/event-stream'));
+
+  if (acceptValues.length === 0 || acceptValues.includes('*/*')) {
+    req.headers.accept = 'application/json, text/event-stream';
+  } else if (!hasJson || !hasEventStream) {
+    const missing = [];
+    if (!hasJson) missing.push('application/json');
+    if (!hasEventStream) missing.push('text/event-stream');
+    req.headers.accept = `${acceptValues.join(', ')}, ${missing.join(', ')}`;
+  }
+
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   (transport as any).onerror = (e: any) => console.error('[MCP transport.onerror]', e?.message || e);
   try {
@@ -5595,6 +5614,5 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       ops.gpu_pipeline_stats (device config, queue depth, cache hit rate)');
   console.log('       ace.compact_search (token-budgeted hybrid search → compact context tree, Redis TTL 300s)');
 });
-
 
 

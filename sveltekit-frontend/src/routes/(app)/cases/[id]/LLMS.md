@@ -178,15 +178,15 @@ Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.
 
 | File | Authority | Flags |
 |------|-----------|-------|
-| `+layout.svelte` | 0.538 | 0x9 |
-| `+layout.ts` | 0.150 | 0xb |
-| `+page.ts` | 0.150 | 0x208 |
-| `+page.svelte` | 0.150 | 0x209 |
-| `+page.server.ts` | 0.150 | 0x205 |
-| `+layout.server.ts` | 0.150 | 0x5 |
+| `+layout.ts` | 0.000 | 0xb |
+| `+layout.svelte` | 0.000 | 0x9 |
+| `+page.ts` | 0.000 | 0x208 |
+| `+page.svelte` | 0.000 | 0x209 |
+| `+page.server.ts` | 0.000 | 0x205 |
+| `+layout.server.ts` | 0.000 | 0x5 |
 ## Audit Gates — General
 
-> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-19
+> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-20
 > Run each check from the **sveltekit-frontend/** root.
 
 ### Tier A — Code Connectivity

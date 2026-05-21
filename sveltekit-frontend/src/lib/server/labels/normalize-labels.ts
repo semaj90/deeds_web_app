@@ -299,31 +299,48 @@ export async function writeLabelsToJsonl(
   }
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 /**
- * Upsert ClusterCard metadata in Postgres (kag_cluster_cards table).
- * No-ops gracefully if table does not yet exist.
+ * Upsert ClusterCard metadata in Postgres.
+ * Canonical schema is `cluster_cards(centroid_id uuid, collection, ...)`;
+ * route labels often carry logical keys like `cluster:gpu:12`, which are
+ * valid Redis/ACE keys but not valid durable ClusterCard primary keys.
  */
 export async function writeLabelsToClusterCard(
   labels: NormalizedLabels,
   clusterId: string,
-  cardType = 'cluster'
+  collection = 'codebase_chunks_768'
 ): Promise<void> {
+  if (!UUID_RE.test(clusterId)) {
+    return;
+  }
+
   try {
     const { db } = await import('$lib/server/db/client.js');
     const { sql } = await import('drizzle-orm');
+    const topTags = Object.values(labels.tags ?? {})
+      .map((value) => String(value ?? '').trim())
+      .filter(Boolean)
+      .slice(0, 16);
+    const summary =
+      labels.tags?.summary != null
+        ? String(labels.tags.summary).slice(0, 2000)
+        : [labels.topology_label, labels.hotness_bucket].filter(Boolean).join(' · ') || null;
+
     await db.execute(sql`
-      INSERT INTO kag_cluster_cards (cluster_id, card_type, cluster_key, labels, updated_at)
+      INSERT INTO cluster_cards (centroid_id, collection, top_tags, cluster_summary, last_rebuilt_at)
       VALUES (
-        ${clusterId},
-        ${cardType},
-        ${labels.cluster_key ?? clusterId},
-        ${JSON.stringify(labels)}::jsonb,
+        ${clusterId}::uuid,
+        ${collection},
+        ${topTags}::text[],
+        ${summary},
         NOW()
       )
-      ON CONFLICT (cluster_id) DO UPDATE
-        SET labels    = EXCLUDED.labels,
-            card_type = EXCLUDED.card_type,
-            updated_at = NOW()
+      ON CONFLICT (centroid_id) DO UPDATE
+        SET top_tags        = EXCLUDED.top_tags,
+            cluster_summary = EXCLUDED.cluster_summary,
+            last_rebuilt_at = NOW()
     `);
   } catch (err) {
     // Table may not exist yet — silently skip
@@ -389,4 +406,4 @@ export async function orchestrateLabels(
   }
 
   return labels;
-}
+}

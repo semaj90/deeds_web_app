@@ -111,6 +111,7 @@ export class RabbitMQManager extends EventEmitter {
   };
 
   private mediaProcessing: any = null;
+  private isShuttingDown = false;
 
   constructor() {
     super();
@@ -127,6 +128,7 @@ export class RabbitMQManager extends EventEmitter {
 
   async initialize(): Promise<boolean> {
     try {
+      this.isShuttingDown = false;
       await this.loadServices();
       await this.connect();
       await this.setupInfrastructure();
@@ -137,7 +139,12 @@ export class RabbitMQManager extends EventEmitter {
       console.log('🚀 RabbitMQ Manager initialized successfully');
       return true;
     } catch (error) {
-      console.error('❌ RabbitMQ initialization failed:', this.formatError(error));
+      const message = this.formatError(error);
+      if (this.shouldSilenceError(message)) {
+        console.warn('[RabbitMQ] Initialization aborted during dev reload');
+        return false;
+      }
+      console.error('❌ RabbitMQ initialization failed:', message);
       return false;
     }
   }
@@ -186,6 +193,23 @@ export class RabbitMQManager extends EventEmitter {
     });
   }
 
+  private shouldSilenceError(message: string): boolean {
+    const normalized = message.toLowerCase();
+    return (
+      normalized.includes('module runner has been closed') ||
+      normalized.includes('vite module runner has been closed') ||
+      normalized.includes('module has been disposed')
+    );
+  }
+
+  private async ensureChannel(): Promise<AmqpChannel> {
+    if (this.channel) return this.channel;
+    if (!this.connection) {
+      throw new Error('RabbitMQ connection not available');
+    }
+    return this.recreateChannel();
+  }
+
   private async recreateChannel(): Promise<AmqpChannel> {
     if (!this.connection) {
       throw new Error('RabbitMQ connection not available');
@@ -198,7 +222,8 @@ export class RabbitMQManager extends EventEmitter {
   }
 
   private async assertMainQueue(queue: string): Promise<void> {
-    const isMediaQueue = queue === this.queues.media_download || queue === this.queues.media_transcribe;
+    const isMediaQueue =
+      queue === this.queues.media_download || queue === this.queues.media_transcribe;
     const options = {
       durable: true,
       arguments: {
@@ -208,12 +233,10 @@ export class RabbitMQManager extends EventEmitter {
       },
     };
 
-    if (!this.channel) {
-      throw new Error('Channel not available');
-    }
+    const channel = await this.ensureChannel();
 
     try {
-      await this.channel.assertQueue(queue, options);
+      await channel.assertQueue(queue, options);
     } catch (error) {
       const message = this.formatError(error);
       if (!/PRECONDITION_FAILED/i.test(message)) {
@@ -244,36 +267,37 @@ export class RabbitMQManager extends EventEmitter {
       this.connection.on('error', (err: unknown) => {
         const message = this.formatError(err);
         // Silence "Vite module runner has been closed" during reloads
-        if (message.includes('module runner has been closed')) return;
-        
+        if (this.shouldSilenceError(message)) return;
+
         console.error('❌ RabbitMQ connection error:', message);
         this.emit('connection_lost');
       });
       this.connection.on('close', () => {
+        if (this.isShuttingDown) return;
         this.emit('connection_lost');
       });
 
       console.log('✅ RabbitMQ connected');
     } catch (error) {
       const message = this.formatError(error);
-      if (message.includes('module runner has been closed')) return;
+      if (this.shouldSilenceError(message)) return;
       throw new Error(`RabbitMQ connection failed: ${message}`);
     }
   }
 
   private async setupInfrastructure(): Promise<void> {
-    if (!this.channel) throw new Error('Channel not available');
+    const channel = await this.ensureChannel();
 
     // Declare exchanges (including dead-letter exchange)
     for (const [, exchange] of Object.entries(this.exchanges)) {
-      await this.channel.assertExchange(exchange, 'topic', { durable: true });
+      await channel.assertExchange(exchange, 'topic', { durable: true });
     }
 
     // Declare DLQ queues (one per main queue)
     for (const [, queue] of Object.entries(this.queues)) {
       const dlqName = `${queue}.dlq`;
-      await this.channel.assertQueue(dlqName, { durable: true });
-      await this.channel.bindQueue(dlqName, this.exchanges.dlx, queue);
+      await channel.assertQueue(dlqName, { durable: true });
+      await channel.bindQueue(dlqName, this.exchanges.dlx, queue);
     }
 
     // Declare main queues with dead-letter routing
@@ -310,16 +334,8 @@ export class RabbitMQManager extends EventEmitter {
       this.exchanges.codebase_indexing,
       'codebase.index.*'
     );
-    await this.bindQueue(
-      this.queues.media_download,
-      this.exchanges.legal_media,
-      'media.*'
-    );
-    await this.bindQueue(
-      this.queues.media_transcribe,
-      this.exchanges.legal_media,
-      'media.*'
-    );
+    await this.bindQueue(this.queues.media_download, this.exchanges.legal_media, 'media.*');
+    await this.bindQueue(this.queues.media_transcribe, this.exchanges.legal_media, 'media.*');
     await this.bindQueue(
       this.queues.ace_evaluate,
       this.exchanges.document_processing,
@@ -351,22 +367,20 @@ export class RabbitMQManager extends EventEmitter {
       'glyph.tile.rebuild'
     );
 
-
     console.log('✅ Queue bindings configured (with DLQ)');
   }
 
   private async bindQueue(queue: string, exchange: string, routingKey: string) {
-    if (this.channel) {
-      await this.channel.bindQueue(queue, exchange, routingKey);
-    }
+    const channel = await this.ensureChannel();
+    await channel.bindQueue(queue, exchange, routingKey);
   }
 
   private async startConsumers(): Promise<void> {
-    if (!this.channel) return;
+    const channel = await this.ensureChannel();
 
     // Set prefetch per processing speed:
     // Fast (Redis/analytics): 50, Medium (embedding/evidence): 10, Slow (LLM/ACE): 2
-    await this.channel.prefetch(10); // Default for most queues
+    await channel.prefetch(10); // Default for most queues
 
     await this.consume(this.queues.cache_invalidate, this.handleCacheInvalidation.bind(this)); // fast
     await this.consume(this.queues.document_embed, this.handleDocumentEmbedding.bind(this)); // medium
@@ -392,21 +406,25 @@ export class RabbitMQManager extends EventEmitter {
 
   async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>, noAck = false) {
     if (this.channel) {
-      await this.channel.consume(queue, async (msg) => {
-        try {
-          await handler(msg);
-        } catch (err) {
-          const message = this.formatError(err);
-          // If the environment is closing, don't log as fatal
-          if (message.includes('module runner has been closed')) {
-            console.warn(`[RabbitMQ] Environment closed during processing (queue: ${queue})`);
-            return;
+      await this.channel.consume(
+        queue,
+        async (msg) => {
+          try {
+            await handler(msg);
+          } catch (err) {
+            const message = this.formatError(err);
+            // If the environment is closing, don't log as fatal
+            if (message.includes('module runner has been closed')) {
+              console.warn(`[RabbitMQ] Environment closed during processing (queue: ${queue})`);
+              return;
+            }
+            console.error(`[RabbitMQ] Handler error (queue: ${queue}):`, message);
+            // Manager handlers usually have their own try/catch/ack/nack
+            // but we catch here to prevent unhandled promise rejections
           }
-          console.error(`[RabbitMQ] Handler error (queue: ${queue}):`, message);
-          // Manager handlers usually have their own try/catch/ack/nack
-          // but we catch here to prevent unhandled promise rejections
-        }
-      }, { noAck });
+        },
+        { noAck }
+      );
     } else {
       throw new Error(`RabbitMQ channel not ready (queue: ${queue})`);
     }
@@ -1666,6 +1684,7 @@ export class RabbitMQManager extends EventEmitter {
 
   async close(): Promise<void> {
     try {
+      this.isShuttingDown = true;
       if (this.channel) await this.channel.close();
       if (this.connection) await this.connection.close();
       this.channel = null;
@@ -1678,6 +1697,9 @@ export class RabbitMQManager extends EventEmitter {
   }
 
   private async attemptReconnect(): Promise<void> {
+    if (this.isShuttingDown) {
+      return;
+    }
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error(
         `☠️ RabbitMQ: exhausted ${this.maxReconnectAttempts} reconnect attempts — giving up. ` +
@@ -2040,16 +2062,16 @@ export class RabbitMQManager extends EventEmitter {
         try {
           const result = await this.mediaProcessing.downloadMedia(url, jobId);
           console.log(`[media.download] Job ${jobId} download complete: ${result.audioPath}`);
-          
+
           await redis.setex(
             `hermes:job:${jobId}`,
             3600,
-            JSON.stringify({ 
-              status: 'downloaded', 
-              audioPath: result.audioPath, 
+            JSON.stringify({
+              status: 'downloaded',
+              audioPath: result.audioPath,
               metadata: result.metadata,
-              caseId, 
-              updatedAt: new Date().toISOString() 
+              caseId,
+              updatedAt: new Date().toISOString(),
             })
           );
 
@@ -2057,14 +2079,18 @@ export class RabbitMQManager extends EventEmitter {
           await this.publish(this.exchanges.media_processing, 'media.transcribe', {
             jobId,
             audioPath: result.audioPath,
-            caseId
+            caseId,
           });
         } catch (downloadErr) {
           console.error(`[media.download] Download failed for job ${jobId}:`, downloadErr);
           await redis.setex(
             `hermes:job:${jobId}`,
             3600,
-            JSON.stringify({ status: 'failed', error: String(downloadErr), updatedAt: new Date().toISOString() })
+            JSON.stringify({
+              status: 'failed',
+              error: String(downloadErr),
+              updatedAt: new Date().toISOString(),
+            })
           );
         }
       } else {
@@ -2114,18 +2140,20 @@ export class RabbitMQManager extends EventEmitter {
       if (this.mediaProcessing) {
         try {
           const result = await this.mediaProcessing.transcribeAudio(audioPath, jobId);
-          console.log(`[media.transcribe] Job ${jobId} transcription complete: ${result.text.slice(0, 50)}...`);
-          
+          console.log(
+            `[media.transcribe] Job ${jobId} transcription complete: ${result.text.slice(0, 50)}...`
+          );
+
           await redis.setex(
             `hermes:job:${jobId}`,
             3600,
-            JSON.stringify({ 
-              status: 'completed', 
-              text: result.text, 
+            JSON.stringify({
+              status: 'completed',
+              text: result.text,
               chunks: result.chunks,
               language: result.language,
-              caseId, 
-              updatedAt: new Date().toISOString() 
+              caseId,
+              updatedAt: new Date().toISOString(),
             })
           );
 
@@ -2134,20 +2162,23 @@ export class RabbitMQManager extends EventEmitter {
             documentId: jobId, // Use jobId as temp doc ID
             text: result.text,
             collection: 'evidence_items',
-            metadata: { 
-              jobId, 
-              caseId, 
+            metadata: {
+              jobId,
+              caseId,
               source: 'media_transcription',
-              language: result.language
-            }
+              language: result.language,
+            },
           });
-
         } catch (transcribeErr) {
           console.error(`[media.transcribe] Transcription failed for job ${jobId}:`, transcribeErr);
           await redis.setex(
             `hermes:job:${jobId}`,
             3600,
-            JSON.stringify({ status: 'failed', error: String(transcribeErr), updatedAt: new Date().toISOString() })
+            JSON.stringify({
+              status: 'failed',
+              error: String(transcribeErr),
+              updatedAt: new Date().toISOString(),
+            })
           );
         }
       } else {
@@ -2160,7 +2191,6 @@ export class RabbitMQManager extends EventEmitter {
       channel.nack(msg, false, false);
     }
   }
-
 }
 
 // ── Singleton Export ─────────────────────────────────────────────────────────

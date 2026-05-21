@@ -17,8 +17,11 @@
 
 import { createConnection } from 'node:net';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { REPO_ROOT } from './_atlas-utils.mjs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = resolve(__dirname, '..', '..');
 
 const REPORTS_DIR   = join(REPO_ROOT, 'docs/reports');
 const ARGS          = process.argv.slice(2);
@@ -33,16 +36,36 @@ const C = {
 
 /** @type {Array<{name:string, host:string, port:number, required:boolean, envVar:string|null, skip?:boolean}>} */
 const SERVICES = [
-  { name: 'Postgres',        host: '127.0.0.1', port: 5434,  required: true,  envVar: 'DATABASE_URL' },
-  { name: 'Redis',           host: '127.0.0.1', port: 6379,  required: true,  envVar: 'REDIS_URL' },
-  { name: 'Qdrant',          host: '127.0.0.1', port: 6333,  required: false, envVar: null },
-  { name: 'Neo4j bolt',      host: '127.0.0.1', port: 7687,  required: false, envVar: null },
-  { name: 'Neo4j browser',   host: '127.0.0.1', port: 7474,  required: false, envVar: null },
-  { name: 'TurboQuant',      host: '127.0.0.1', port: 8090,  required: false, envVar: 'LLAMA_SERVER_URL' },
-  { name: 'Ollama',          host: '127.0.0.1', port: 11434, required: false, envVar: 'OLLAMA_HOST' },
-  { name: 'RabbitMQ',        host: '127.0.0.1', port: 5672,  required: false, envVar: null },
-  { name: 'SeaweedFS S3',    host: '127.0.0.1', port: 8333,  required: false, envVar: 'SEAWEED_S3_PORT' },
-  { name: 'SvelteKit dev',   host: '127.0.0.1', port: 5173,  required: false, envVar: null, skip: NO_PLAYWRIGHT },
+  { name: 'Postgres', host: '127.0.0.1', port: 5434, required: true, envVar: 'DATABASE_URL' },
+  { name: 'Redis', host: '127.0.0.1', port: 6379, required: true, envVar: 'REDIS_URL' },
+  { name: 'Qdrant', host: '127.0.0.1', port: 6333, required: false, envVar: null },
+  { name: 'TRACE MCP', host: '127.0.0.1', port: 8788, required: false, envVar: 'TRACE_MCP_URL' },
+  { name: 'Neo4j bolt', host: '127.0.0.1', port: 7687, required: false, envVar: null },
+  { name: 'Neo4j browser', host: '127.0.0.1', port: 7474, required: false, envVar: null },
+  {
+    name: 'TurboQuant',
+    host: '127.0.0.1',
+    port: 8090,
+    required: false,
+    envVar: 'LLAMA_SERVER_URL',
+  },
+  { name: 'Ollama', host: '127.0.0.1', port: 11434, required: false, envVar: 'OLLAMA_HOST' },
+  { name: 'RabbitMQ', host: '127.0.0.1', port: 5672, required: false, envVar: null },
+  {
+    name: 'SeaweedFS S3',
+    host: '127.0.0.1',
+    port: 8333,
+    required: false,
+    envVar: 'SEAWEED_S3_PORT',
+  },
+  {
+    name: 'SvelteKit dev',
+    host: '127.0.0.1',
+    port: 5173,
+    required: false,
+    envVar: null,
+    skip: NO_PLAYWRIGHT,
+  },
 ];
 
 function tcpProbe(host, port, timeoutMs = 2500) {
@@ -63,6 +86,44 @@ function tcpProbe(host, port, timeoutMs = 2500) {
       resolve({ up: false, latencyMs: Date.now() - t0, error: err.code ?? err.message });
     });
   });
+}
+
+async function traceMcpProtocolProbe(baseUrl, timeoutMs = 4000) {
+  const signal = AbortSignal.timeout(timeoutMs);
+
+  const healthRes = await fetch(`${baseUrl}/health`, { signal });
+  if (!healthRes.ok) {
+    throw new Error(`/health HTTP ${healthRes.status}`);
+  }
+
+  // GET /mcp is often 406 by design on streamable HTTP MCP endpoints.
+  const getRes = await fetch(`${baseUrl}/mcp`, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+    signal,
+  });
+  const getStatus = getRes.status;
+  const getExpected = getStatus === 406 || getStatus === 405 || getStatus === 415;
+
+  const postRes = await fetch(`${baseUrl}/mcp`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json, text/event-stream',
+    },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} }),
+    signal,
+  });
+  if (!postRes.ok) {
+    throw new Error(`POST /mcp HTTP ${postRes.status}`);
+  }
+
+  return {
+    healthStatus: healthRes.status,
+    getMcpStatus: getStatus,
+    getMcpExpected: getExpected,
+    postMcpStatus: postRes.status,
+  };
 }
 
 async function main() {
@@ -97,6 +158,47 @@ async function main() {
         ? `${C.gray}${probe.latencyMs}ms${C.reset}`
         : `${C.gray}${probe.error ?? 'refused'}${C.reset}`;
       console.log(`  ${icon}  ${String(svc.name).padEnd(18)} :${svc.port}  ${lag}`);
+    }
+  }
+
+  const traceMcpService = results.find((r) => r.name === 'TRACE MCP');
+  if (traceMcpService?.status === 'up') {
+    try {
+      const details = await traceMcpProtocolProbe('http://127.0.0.1:8788');
+      results.push({
+        name: 'TRACE MCP protocol',
+        host: '127.0.0.1',
+        port: 8788,
+        required: false,
+        envVar: 'TRACE_MCP_URL',
+        status: 'up',
+        latencyMs: 0,
+        error: null,
+        details,
+      });
+      if (!JSON_OUT) {
+        const getLabel = details.getMcpExpected
+          ? `GET /mcp=${details.getMcpStatus} (expected)`
+          : `GET /mcp=${details.getMcpStatus}`;
+        console.log(
+          `  ${C.green}✓${C.reset}  TRACE MCP protocol  ${C.gray}${getLabel}, POST /mcp=${details.postMcpStatus}${C.reset}`
+        );
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      results.push({
+        name: 'TRACE MCP protocol',
+        host: '127.0.0.1',
+        port: 8788,
+        required: false,
+        envVar: 'TRACE_MCP_URL',
+        status: 'down_optional',
+        latencyMs: 0,
+        error: message,
+      });
+      if (!JSON_OUT) {
+        console.log(`  ${C.yellow}○${C.reset}  TRACE MCP protocol  ${C.gray}${message}${C.reset}`);
+      }
     }
   }
 

@@ -22,6 +22,16 @@ import {
 import * as Hypergraph from '../ai/hypergraph-store.js';
 import { retrievalClient } from '../grpc/retrieval-client.js';
 
+const RUNTIME_CONTEXT_SIZE = Number(
+  process.env.LLM_CONTEXT_SIZE ??
+    process.env.TURBO_CTX_SIZE ??
+    process.env.LLAMA_CTX_SIZE ??
+    process.env.TURBO_CTX ??
+    process.env.LLAMA_SERVER_CTX ??
+    process.env.OLLAMA_CONTEXT_LENGTH ??
+    65536
+);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -281,7 +291,7 @@ export async function callGemma4WithAceContext(
               options: {
                 temperature,
                 num_predict: maxTokens,
-                num_ctx: 32768,
+                num_ctx: RUNTIME_CONTEXT_SIZE,
                 repeat_penalty: 1.05,
               },
             }),
@@ -563,7 +573,7 @@ export async function callGemma4WithTools(
           options: {
             temperature,
             num_predict: maxTokens,
-            num_ctx: 32768,
+            num_ctx: RUNTIME_CONTEXT_SIZE,
             repeat_penalty: 1.05,
           },
         }),

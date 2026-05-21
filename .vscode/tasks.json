@@ -1,6 +1,14 @@
 {
   "$schema": "vscode://schemas/tasks",
   "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "rgSearchQuery",
+      "type": "promptString",
+      "description": "Enter the ripgrep query (regex or literal) to search for",
+      "default": ""
+    }
+  ],
   // TODO: split VS Code tasks into grouped include files or generate tasks from scripts.
   "tasks": [
     {
@@ -114,7 +122,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Spawn TurboQuant llama-server.exe as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache and adds mmproj automatically if present."
+      "detail": "Spawn TurboQuant llama-server.exe as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache, 64K ctx, and adds mmproj automatically if present."
     },
     {
       "label": "MCP TRACE Server (detached)",
@@ -248,6 +256,58 @@
         "clear": true
       },
       "detail": "Run Phase 18 messy query router evaluation with a custom query prompt."
+    },
+    {
+      "label": "Search Repo Docs with rg",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (-not \"${input:rgSearchQuery}\") { Write-Error 'Query required'; exit 1 }; rg -n --glob '!node_modules' \"${input:rgSearchQuery}\" docs ."
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Prompt for a ripgrep query and search repo docs plus root files for matching references."
+    },
+    {
+      "label": "Search SvelteKit App Docs with rg",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (-not \"${input:rgSearchQuery}\") { Write-Error 'Query required'; exit 1 }; rg -n --glob '!node_modules' \"${input:rgSearchQuery}\" sveltekit-frontend/docs sveltekit-frontend/src"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Prompt for a ripgrep query and search the SvelteKit app docs + source files."
     },
     {
       "label": "ACE Cache Index Refresh",
@@ -1187,7 +1247,7 @@
     {
       "label": "🩺 Startup: Service Health Check",
       "type": "shell",
-      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"$services = @(@{Name='Redis'; Kind='redis'}, @{Name='Qdrant'; Url='http://127.0.0.1:6333/collections'}, @{Name='Ollama'; Url='http://127.0.0.1:11434/api/tags'}, @{Name='Postgres'; Kind='postgres'}, @{Name='Go Retrieval'; Url='http://127.0.0.1:8100/health'}, @{Name='Go Search'; Url='http://127.0.0.1:8096/health'}, @{Name='Bifrost'; Url='http://127.0.0.1:3040/health'}, @{Name='TurboQuant'; Url='http://127.0.0.1:8090/health'}, @{Name='MCP Server'; Url='http://127.0.0.1:8788/health'}); Write-Host '── Startup Health Check ──'; foreach ($s in $services) { try { if ($s.Kind -eq 'redis') { redis-cli PING | Out-Null; Write-Host '✅ Redis' } elseif ($s.Kind -eq 'postgres') { docker ps --format '{{.Names}}' | Select-String -Pattern 'postgres' | Out-Null; Write-Host '✅ Postgres container' } else { Invoke-WebRequest -Uri $s.Url -TimeoutSec 2 | Out-Null; Write-Host ('✅ ' + $s.Name) } } catch { Write-Host ('❌ ' + $s.Name) } }; Write-Host '── done ──'\"",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"$services = @(@{Name='Redis'; Kind='redis'}, @{Name='Qdrant'; Url='http://127.0.0.1:6333/collections'}, @{Name='Ollama'; Url='http://127.0.0.1:11434/api/tags'}, @{Name='Postgres'; Kind='postgres'}, @{Name='Go Retrieval'; Url='http://127.0.0.1:8100/health'}, @{Name='Go Search'; Url='http://127.0.0.1:8096/health'}, @{Name='Bifrost'; Url='http://127.0.0.1:3040/health'}, @{Name='TurboQuant'; Url='http://127.0.0.1:8090/health'}, @{Name='MCP Server'; Url='http://127.0.0.1:8788/health'}, @{Name='RabbitMQ API'; Kind='http-json'; Url='http://127.0.0.1:5173/api/rabbitmq/health'; ExpectConnected=$true}); $pass=0; $fail=0; Write-Host '── Startup Health Check ──'; foreach ($s in $services) { try { if ($s.Kind -eq 'redis') { redis-cli PING | Out-Null; Write-Host '✅ Redis'; $pass++ } elseif ($s.Kind -eq 'postgres') { docker ps --format '{{.Names}}' | Select-String -Pattern 'postgres' | Out-Null; Write-Host '✅ Postgres container'; $pass++ } elseif ($s.Kind -eq 'http-json') { $resp = Invoke-RestMethod -Uri $s.Url -TimeoutSec 2; if ($s.ExpectConnected -and -not $resp.connected) { throw 'connected=false' }; Write-Host ('✅ ' + $s.Name + ' (connected=' + [string]$resp.connected + ')'); $pass++ } else { Invoke-WebRequest -Uri $s.Url -TimeoutSec 2 | Out-Null; Write-Host ('✅ ' + $s.Name); $pass++ } } catch { Write-Host ('❌ ' + $s.Name); $fail++ } }; Write-Host ('── summary: PASS=' + $pass + ' FAIL=' + $fail + ' ──')\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -6777,7 +6837,7 @@
     {
       "label": "⚡ TurboQuant: Start VLM (text + vision, :8090)",
       "type": "shell",
-      "command": "C:/Users/james/Desktop/llama-server-cuda/llama-server.exe -m C:/Users/james/.ollama/blobs/sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7 --mmproj C:/Users/james/Downloads/gemma4-mmproj/mmproj-BF16.gguf --host 0.0.0.0 --port 8090 -ngl 99 --ctx-size 40000 --flash-attn --threads 6",
+      "command": "C:/Users/james/Desktop/llama-server-cuda/llama-server.exe -m C:/Users/james/.ollama/blobs/sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7 --mmproj C:/Users/james/Downloads/gemma4-mmproj/mmproj-BF16.gguf --host 0.0.0.0 --port 8090 -ngl 99 --ctx-size 65536 --flash-attn --threads 6",
       "isBackground": true,
       "group": "build",
       "detail": "Launch TurboQuant llama-server with mmproj for unified text+vision inference (gemma4-legal-vlm Q4_K_M + SigLIP projector, ~6GB VRAM)",
@@ -7915,7 +7975,7 @@
         "--port",
         "8090",
         "--ctx-size",
-        "40000",
+        "65536",
         "--flash-attn",
         "on",
         "--ngl",

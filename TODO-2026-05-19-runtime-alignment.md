@@ -75,3 +75,34 @@ Capture the current runtime truth for TurboQuant + GraphRAG + Qdrant + Redis and
 
 ## 8. Follow-up note
 This note was created as the runtime alignment repo note requested on 2026-05-19.
+
+## 9. 2026-05-20 TRACE false-failure triage
+
+### Observed mismatch
+- `npm run smoke:mcp:trace` passes (`8/8 gates passed`).
+- `GET http://127.0.0.1:8788/health` returns `200` with `{ ok: true }`.
+- `GET http://127.0.0.1:8788/mcp` returns `406 Not Acceptable`.
+
+### Root cause
+- The external status probe treats MCP as a plain HTTP GET endpoint.
+- TRACE MCP expects JSON-RPC over `POST /mcp` with content negotiation.
+- The smoke script already uses the correct handshake path in `sveltekit-frontend/scripts/smoke/mcp-trace-smoke.mjs`.
+
+### Fix checklist
+1. Keep `/health` probe for liveness only.
+2. Replace `GET /mcp` probes with JSON-RPC `POST /mcp` initialize or `tools/list`.
+3. Require headers: `Content-Type: application/json` and `Accept: application/json, text/event-stream`.
+4. Keep `npm run smoke:mcp:trace` as the canonical CI/ops check.
+5. Mark `406` from `GET /mcp` as expected protocol mismatch, not outage.
+
+## 10. 64K runtime gate (must pass)
+1. Ensure both env files declare:
+  - `TURBO_CTX=65536`
+  - `LLM_CONTEXT_SIZE=65536`
+  - `TURBO_PARALLEL=1`
+2. Hard-restart launcher (`scripts/launch-turboquant.ps1 -Detached`) after killing existing `:8090` PID.
+3. Verify live runtime only from `/props`:
+  - `default_generation_settings.n_ctx == 65536`
+  - `total_slots == 1`
+4. Verify OpenCode wiring still passes:
+  - `npm run opencode:turbo:check`

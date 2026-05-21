@@ -4,7 +4,7 @@ path: "sveltekit-frontend/memory/codebase/module-cartridges.idx.json"
 aliases: ["module-cartridges.idx.json","sveltekit-frontend/memory/codebase/module-cartridges.idx.json"]
 clusterId: -1
 ext: ".json"
-lineCount: 18035
+lineCount: 35581
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/memory/codebase/module-cartridges.idx.json"
-last_updated_by_llm: "2026-05-19T19:31:50.322Z"
+last_updated_by_llm: "2026-05-20T21:32:13.151Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/json","t/json"]
 > JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 18035
+lines:: 35581
 ## Summary
 
 JSON data file

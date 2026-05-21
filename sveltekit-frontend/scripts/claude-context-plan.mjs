@@ -73,7 +73,7 @@ if (!noGraph) {
     };
     const res = await fetch('http://127.0.0.1:8788/mcp', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(6_000),
     });

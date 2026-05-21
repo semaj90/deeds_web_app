@@ -87,7 +87,7 @@ if (!skipGraph) {
   await check('trace.kag_search', async () => {
     const res = await fetch('http://127.0.0.1:8788/mcp', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
       body: JSON.stringify({
         jsonrpc: '2.0', method: 'tools/call', id: 1,
         params: { name: 'trace.kag_search', arguments: { query: 'auth route gaps', limit: 3 } },
@@ -103,7 +103,7 @@ if (!skipGraph) {
   await check('topology.search_near', async () => {
     const res = await fetch('http://127.0.0.1:8788/mcp', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
       body: JSON.stringify({
         jsonrpc: '2.0', method: 'tools/call', id: 2,
         params: { name: 'topology.search_near', arguments: { query: 'GPU indexer pipeline', limit: 3 } },

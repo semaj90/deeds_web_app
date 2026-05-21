@@ -29,7 +29,13 @@ const GEMMA4_DEFAULTS = {
   temperature: 0.1,
   top_k: 20,
   top_p: 0.8,
-  num_ctx: 32768, // Gemma 4 supports 131K; 32K is practical for 8GB VRAM with Q8_0 KV
+  num_ctx: Number(
+    process.env.LLM_CONTEXT_SIZE ??
+      process.env.OLLAMA_CONTEXT_LENGTH ??
+      process.env.TURBO_CTX_SIZE ??
+      process.env.LLAMA_CTX_SIZE ??
+      65536
+  ),
   repeat_penalty: 1.05,
   num_predict: 4096, // Gemma 4 can handle longer completions
 } as const;

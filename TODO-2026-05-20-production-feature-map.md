@@ -83,3 +83,36 @@
   - [x] Add dynamic parallel slots (`--parallel` / `-np`) support to `launch-turboquant.ps1` to enable multi-core concurrent request processing.
   - [x] Validate cache key mapping and integration via targeted Vitest runs (`tests/openai-facade.spec.ts`).
 
+---
+
+## Track F - TRACE Failure Reporter Alignment (2026-05-20)
+
+### Findings
+- TRACE toolchain is operational (`smoke:mcp:trace` passes all gates).
+- False failure is caused by probing `GET /mcp` which correctly returns `406` for non-MCP requests.
+- Correct MCP checks require JSON-RPC POST with MCP headers and payload.
+
+### Tasks
+- [ ] Replace all plain `GET /mcp` status checks with JSON-RPC `POST /mcp` initialize or `tools/list` handshake.
+- [ ] Keep `/health` as liveness-only status, not capability status.
+- [ ] Add a short operator note: `406` on `GET /mcp` is expected and should not trip incident alerts.
+- [ ] Add regression check in startup scripts to run `npm run smoke:mcp:trace` after TRACE server boot.
+
+## Track G - Stub vs Implemented Feature Map (rg + ast-grep plan)
+
+### Current scan status
+- `rg` scan found concrete placeholder/stub hotspots in code paths, including:
+  - `sveltekit-frontend/src/lib/ai/onnx/inference.ts`
+  - `sveltekit-frontend/src/mcp-gpu-orchestrator.ts`
+  - `sveltekit-frontend/src/lib/webgpu/legal-document-graph.ts`
+  - `sveltekit-frontend/src/lib/webgpu/dimensional-tensor-store.ts`
+  - `sveltekit-frontend/src/routes/api/yorha/cluster-health/+server.ts`
+- Implemented API surface is broad (`export const GET/POST/...: RequestHandler` across many `src/routes/api/**/+server.ts`).
+- `ast-grep` is not currently installed in this workspace (`sg` unavailable), so structural pass is pending.
+
+### Tasks
+- [ ] Install `ast-grep` and add `npm run audit:stubs:ast` for structural stub detection.
+- [ ] Keep lexical scan (`rg`) and structural scan (`ast-grep`) as separate outputs.
+- [ ] Build feature-map buckets: `implemented`, `placeholder`, `mock/test-only`, `archived`.
+- [ ] Diff those buckets against `next_steps` markdown commitments and mark drift items.
+

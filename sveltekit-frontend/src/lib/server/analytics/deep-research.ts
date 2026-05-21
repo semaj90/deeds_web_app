@@ -494,6 +494,16 @@ export async function generateDeepResearch(
 				),
 			)
 			.catch(() => {}); // fully non-fatal
+
+		import('$lib/server/analytics/ldr-client.js')
+			.then(({ startLdrResearch }) =>
+				Promise.all(
+					highPriority.map(t =>
+						startLdrResearch(t.selfPrompt, { maxIterations: 3 }).catch(() => null),
+					),
+				),
+			)
+			.catch(() => {}); // fully non-fatal
 	}
 
 	return result;

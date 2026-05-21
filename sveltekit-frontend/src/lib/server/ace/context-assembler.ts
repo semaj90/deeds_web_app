@@ -2233,6 +2233,65 @@ export async function assembleACEContext(opts: {
           .join('\n');
       }
 
+      // ─── LangGraph deep synthesis injection ───────────────────────────────
+      // When LANGGRAPH_ENABLED=true and budget tier is 'large', 'web_augmented',
+      // or 'authority_heavy', call the LangGraph DAG service (HMM-adapted):
+      //   web_search + rg_search -> retrieve_rag -> retrieve_kag -> tag_chunks
+      //   -> assemble_ace -> merge -> synthesize -> self_eval
+      // Result is prepended as a T2-trust block in webSearchContext.
+      // Falls back silently -- in-process pipeline handles the gap.
+      if (
+        (policyDecision.budget.tier === 'large' ||
+          policyDecision.budget.tier === 'web_augmented' ||
+          policyDecision.budget.tier === 'authority_heavy') &&
+        (baseContext.webSearchContext?.length ?? 0) < 24_000
+      ) {
+        try {
+          const { isLangGraphAvailable, langGraphSynthesize } = await import(
+            '$lib/server/ai/langgraph-client.js'
+          );
+          if (await isLangGraphAvailable()) {
+            const lgResult = await langGraphSynthesize(
+              {
+                query,
+                case_id: opts.caseId ?? null,
+                temperature: 0.1,
+                max_tokens: 1200,
+                skip_cache: false,
+              },
+              45_000
+            );
+            if (lgResult?.answer) {
+              const lgCitations = (lgResult.citations ?? [])
+                .slice(0, 6)
+                .map((c) => `  [${c.index}] ${c.title} (score: ${c.score.toFixed(3)})\n${c.text.slice(0, 300)}`)
+                .join('\n\n');
+
+              const lgBlock = [
+                '\n\n-- LangGraph Synthesis [T2-trust | HMM-adapted] --',
+                `Confidence: ${(lgResult.confidence * 100).toFixed(1)}% | ` +
+                `RAG hits: ${lgResult.rag_hits} | KAG neighbors: ${lgResult.kag_neighbors} | ` +
+                `Web results: ${lgResult.web_results} | Cache: ${lgResult.cache}`,
+                '',
+                lgResult.answer,
+                lgCitations ? `\nSources:\n${lgCitations}` : '',
+              ]
+                .filter(Boolean)
+                .join('\n');
+
+              baseContext.webSearchContext = [baseContext.webSearchContext ?? '', lgBlock]
+                .filter(Boolean)
+                .join('\n');
+            }
+          }
+        } catch (lgErr) {
+          console.warn(
+            '[ACE langgraph] synthesis skipped:',
+            (lgErr as Error)?.message ?? lgErr
+          );
+        }
+      }
+
       const finalContext = {
         ...baseContext,
         policyDecision,

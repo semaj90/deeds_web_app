@@ -25,23 +25,35 @@ type AmqpConnection = {
 
 let connection: AmqpConnection | null = null;
 let channel: AmqpChannel | null = null;
+let isShuttingDown = false;
+
+function shouldSilenceError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  const lower = message.toLowerCase();
+  return (
+    lower.includes('module runner has been closed') ||
+    lower.includes('vite module runner has been closed') ||
+    lower.includes('module has been disposed')
+  );
+}
 
 export const QUEUES = {
-  evidence: { process: 'evidence.process.queue',
+  evidence: {
+    process: 'evidence.process.queue',
     analyze: 'evidence.analyze.queue',
     response: 'evidence.response.queue',
   },
-	ai: { analysis: 'ai.analysis.queue',
+  ai: {
+    analysis: 'ai.analysis.queue',
     embedding: 'ai.embedding.queue',
     response: 'ai.response.queue',
   },
-	notification: { email: 'notification.email.queue',
-    webhook: 'notification.webhook.queue',
-  },
-	};
+  notification: { email: 'notification.email.queue', webhook: 'notification.webhook.queue' },
+};
 
 export async function getConnection(): Promise<AmqpConnection> {
   if (connection) return connection;
+  isShuttingDown = false;
   const rabbitmqUrl = ENV.RABBITMQ_URL;
   console.log('🐰 Connecting to RabbitMQ:', rabbitmqUrl);
   try {
@@ -58,6 +70,7 @@ export async function getConnection(): Promise<AmqpConnection> {
         on: (evt: string, cb: (...a: unknown[]) => void) => void;
       }
     ).on('error', (err: Error) => {
+      if (shouldSilenceError(err)) return;
       console.error('❌ RabbitMQ connection error:', err);
       connection = null;
       channel = null;
@@ -67,48 +80,69 @@ export async function getConnection(): Promise<AmqpConnection> {
         on: (evt: string, cb: (...a: unknown[]) => void) => void;
       }
     ).on('close', () => {
+      if (isShuttingDown) return;
       console.log('🔌 RabbitMQ connection closed');
       connection = null;
       channel = null;
     });
     return connection;
   } catch (err) {
+    if (shouldSilenceError(err)) {
+      throw new Error('RabbitMQ connection skipped during dev reload');
+    }
     console.error('Failed to connect to RabbitMQ:', err);
     throw err;
   }
 }
 
+async function recreateChannel(): Promise<AmqpChannel> {
+  if (!connection) {
+    throw new Error('RabbitMQ connection not available');
+  }
+
+  channel = await connection.createChannel();
+  await (
+    channel as Record<string, unknown> & {
+      prefetch: (n: number) => Promise<void>;
+      on: (evt: string, cb: (...a: unknown[]) => void) => void;
+    }
+  ).prefetch(1);
+
+  (
+    channel as Record<string, unknown> & {
+      prefetch: (n: number) => Promise<void>;
+      on: (evt: string, cb: (...a: unknown[]) => void) => void;
+    }
+  ).on('error', (err: Error) => {
+    if (shouldSilenceError(err)) return;
+    console.error('❌ RabbitMQ channel error:', err);
+    channel = null;
+  });
+
+  (
+    channel as Record<string, unknown> & {
+      prefetch: (n: number) => Promise<void>;
+      on: (evt: string, cb: (...a: unknown[]) => void) => void;
+    }
+  ).on('close', () => {
+    if (isShuttingDown) return;
+    console.log('📺 RabbitMQ channel closed');
+    channel = null;
+  });
+
+  return channel;
+}
+
 export async function getChannel(): Promise<AmqpChannel> {
   if (channel) return channel;
-  const conn = await getConnection();
+
+  await getConnection();
   try {
-    channel = await conn.createChannel();
-    await (
-      channel as Record<string, unknown> & {
-        prefetch: (n: number) => Promise<void>;
-        on: (evt: string, cb: (...a: unknown[]) => void) => void;
-      }
-    ).prefetch(1);
-    (
-      channel as Record<string, unknown> & {
-        prefetch: (n: number) => Promise<void>;
-        on: (evt: string, cb: (...a: unknown[]) => void) => void;
-      }
-    ).on('error', (err: Error) => {
-      console.error('❌ RabbitMQ channel error:', err);
-      channel = null;
-    });
-    (
-      channel as Record<string, unknown> & {
-        prefetch: (n: number) => Promise<void>;
-        on: (evt: string, cb: (...a: unknown[]) => void) => void;
-      }
-    ).on('close', () => {
-      console.log('📺 RabbitMQ channel closed');
-      channel = null;
-    });
-    return channel;
+    return await recreateChannel();
   } catch (err) {
+    if (shouldSilenceError(err)) {
+      throw new Error('RabbitMQ channel skipped during dev reload');
+    }
     console.error('Failed to create channel:', err);
     throw err;
   }
@@ -227,6 +261,7 @@ export async function setupQueues(): Promise<void> {
 
 export async function closeRabbitMQ(): Promise<void> {
   try {
+    isShuttingDown = true;
     if (channel) {
       await channel.close();
       channel = null;
