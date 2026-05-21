@@ -52,6 +52,7 @@ After the canonical loop is current, run a codebase mapping pass against the act
 - Docker runtime is present on this machine (`docker.exe` found on PATH) and `dockerode@4.0.9` is installed in the app repo.
 - OpenCode config already advertises 64K TurboQuant context and remote MCP endpoints for TRACE / TurboVec / Engram / LangExtract.
 - Added a read-only inference-log smoke task: `npm run smoke:inference-log` and a VS Code task `🧾 Observability: Inference Log Smoke`.
+- `npm run audit:inference-observability` passes against live native CouchDB `http://127.0.0.1:5984/` and RabbitMQ `http://127.0.0.1:15672/api/overview`; Docker containers are not required for the audit to pass.
 
 ## Feature Map Update
 - Added `gpu-compute-plane` to `src/lib/server/atlas/master-feature-map.ts`.
@@ -60,3 +61,4 @@ After the canonical loop is current, run a codebase mapping pass against the act
 - Regression guard added: `src/lib/server/atlas/master-feature-map.test.ts` validates the entry and schema shape.
 - Downstream export now emits `memory/exports/feature-map-cards.jsonl` and includes `feature-map:gpu-compute-plane` in the selected card bundle.
 - `npm run cards:pipeline` is passing with the feature-map export wired through Redis and TOON.
+- Canonical feature labels now flow through `src/lib/server/labels/feature-label-registry.ts` and are shared by retrieval subgraphs, label sinks, and the feature-card pipeline.

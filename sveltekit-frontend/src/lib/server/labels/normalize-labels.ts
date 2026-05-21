@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { normalizeFeatureLabel } from '$lib/server/labels/feature-label-registry.js';
 
 export type HotnessBucket = 'cold' | 'cool' | 'warm' | 'hot';
 
@@ -65,14 +66,6 @@ function bucketFromScore(score: number): HotnessBucket {
   return 'cold';
 }
 
-function cleanFamily(value: string): string {
-  const cleaned = value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  return cleaned || 'general';
-}
-
 function deriveFeatureFamily(input: LabelNormalizationInput, topologyLabel: string | null): string {
   const candidate =
     asText(input.jsonb?.feature_family) ??
@@ -83,30 +76,7 @@ function deriveFeatureFamily(input: LabelNormalizationInput, topologyLabel: stri
     asText(input.jsonb?.topo_class) ??
     topologyLabel;
 
-  const family = cleanFamily(candidate ?? 'general');
-  if (family.includes('api') || family.includes('route')) return 'api-route';
-  if (family.includes('ui') || family.includes('component') || family.includes('page') || family.includes('view')) {
-    return 'ui-component';
-  }
-  if (family.includes('evidence') || family.includes('document') || family.includes('pdf')) {
-    return 'evidence';
-  }
-  if (family.includes('graph') || family.includes('neo4j') || family.includes('topolog') || family.includes('som') || family.includes('cluster')) {
-    return 'graph';
-  }
-  if (family.includes('db') || family.includes('sql') || family.includes('drizzle') || family.includes('postgres')) {
-    return 'database';
-  }
-  if (family.includes('search') || family.includes('retrieval') || family.includes('rag') || family.includes('query')) {
-    return 'retrieval';
-  }
-  if (family.includes('agent') || family.includes('mcp') || family.includes('tool')) {
-    return 'agent';
-  }
-  if (family.includes('cache') || family.includes('redis')) {
-    return 'cache';
-  }
-  return family;
+  return normalizeFeatureLabel(candidate ?? 'general');
 }
 
 function extractJsonbTags(

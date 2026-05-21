@@ -4,6 +4,7 @@ import {
   type LabelNormalizationInput,
   type NormalizedLabels,
 } from '$lib/server/labels/normalize-labels.js';
+import { normalizeFeatureLabel, type CanonicalFeatureLabel } from '$lib/server/labels/feature-label-registry.js';
 import { expandNeighbours, fetchAuthorityScores } from '$lib/server/search/neo4j-rerank.js';
 
 export const SUBGRAPH_V1_VERSION = 'subgraph_v1_seed_neighborhood';
@@ -11,20 +12,6 @@ export const DEFAULT_MAX_SEEDS = 8;
 export const DEFAULT_MAX_NEIGHBORS = 24;
 export const DEFAULT_MAX_HOPS = 1;
 
-export const CANONICAL_FEATURE_LABELS = [
-  'api-route',
-  'ui-component',
-  'evidence',
-  'graph',
-  'database',
-  'retrieval',
-  'agent',
-  'cache',
-  'symbol',
-  'general',
-] as const;
-
-export type CanonicalFeatureLabel = (typeof CANONICAL_FEATURE_LABELS)[number];
 export type SeedInputKind = 'query' | 'file' | 'route' | 'symbol' | 'cluster';
 export type NeighborhoodNodeKind = 'file' | 'cluster' | 'route' | 'symbol';
 
@@ -126,25 +113,6 @@ export function toStableFileKey(filePath: string): string {
 
 export function fromStableFileKey(stableKey: string): string {
   return stableKey.startsWith('file:') ? stableKey.slice(5) : stableKey;
-}
-
-export function normalizeFeatureLabel(value: string | null | undefined): CanonicalFeatureLabel {
-  const normalized = (value ?? 'general').trim().toLowerCase();
-  if (
-    (CANONICAL_FEATURE_LABELS as readonly string[]).includes(normalized)
-  ) {
-    return normalized as CanonicalFeatureLabel;
-  }
-  if (normalized.includes('route') || normalized.includes('api')) return 'api-route';
-  if (normalized.includes('ui') || normalized.includes('component') || normalized.includes('page')) return 'ui-component';
-  if (normalized.includes('graph') || normalized.includes('cluster') || normalized.includes('topolog')) return 'graph';
-  if (normalized.includes('db') || normalized.includes('sql') || normalized.includes('drizzle')) return 'database';
-  if (normalized.includes('cache') || normalized.includes('redis')) return 'cache';
-  if (normalized.includes('mcp') || normalized.includes('tool') || normalized.includes('agent')) return 'agent';
-  if (normalized.includes('search') || normalized.includes('retrieval') || normalized.includes('rag')) return 'retrieval';
-  if (normalized.includes('evidence') || normalized.includes('document') || normalized.includes('pdf')) return 'evidence';
-  if (normalized.includes('symbol')) return 'symbol';
-  return 'general';
 }
 
 function scoreClusterSeed(index: number): number {
