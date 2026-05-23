@@ -150,10 +150,18 @@ async function kagRecall(states) {
         try { recalls[state] = JSON.parse(raw); } catch { recalls[state] = [raw]; }
       }
     }
-    await redis.disconnect().catch(() => {});
+    try {
+      redis.disconnect();
+    } catch {
+      // best-effort cleanup
+    }
     return recalls;
   } catch {
-    await redis?.disconnect().catch(() => {});
+    try {
+      redis?.disconnect();
+    } catch {
+      // best-effort cleanup
+    }
     return {};
   }
 }

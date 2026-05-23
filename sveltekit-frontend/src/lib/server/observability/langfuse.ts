@@ -18,7 +18,7 @@ import { ENV } from '$lib/server/env.server.js';
 let _langfuse: any = null;
 let _langfuseCtorPromise: Promise<any> | null = null;
 
-async function getLangfuse() {
+export async function getLangfuse() {
   if (_langfuse) return _langfuse;
   if (!ENV.LANGFUSE_ENABLED || !ENV.LANGFUSE_PUBLIC_KEY || !ENV.LANGFUSE_SECRET_KEY) {
     return null;

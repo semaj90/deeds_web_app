@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-05-23T03:50:41.449Z",
+  "totalTraces": 0,
+  "hitRates": {
+    "redisExact": 0,
+    "redisSemantic": 0,
+    "qdrant": 0,
+    "postgresHybrid": 0
+  },
+  "avgLatencyMs": 0
+}

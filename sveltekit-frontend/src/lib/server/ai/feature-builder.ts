@@ -5,6 +5,9 @@ export interface FeatureLabel {
   summary: string;
   symbols: string[];
   score: number;
+  protocols?: string[];
+  languages?: string[];
+  sourceRefs?: string[];
 }
 
 type TraceRow = {

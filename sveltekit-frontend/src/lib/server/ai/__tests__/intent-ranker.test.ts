@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { logIntentEvalEvent, scoreIntent } from '../intent-ranker.js';
+import { logIntentEvalEvent, rankIntent } from '../intent-ranker.js';
 
 const emptyEngramAdapter = {
   getRoutingHints: async (query: string) => ({
@@ -16,9 +16,9 @@ const emptyEngramAdapter = {
   recordWorkflowMemory: async () => {},
 };
 
-describe('ACE Engram intent scorer', () => {
+describe('ACE Engram intent ranker', () => {
   it('returns exact_cache_answer when exact cache feature is injected', async () => {
-    const decision = await scoreIntent(
+    const decision = await rankIntent(
       {
         query: 'repeat query',
         model: 'gemma4-legal-vlm:latest',
@@ -47,7 +47,7 @@ describe('ACE Engram intent scorer', () => {
   });
 
   it('returns show_did_you_mean for strong Engram or BMU signal', async () => {
-    const decision = await scoreIntent(
+    const decision = await rankIntent(
       {
         query: 'where is the ace cache retrival',
         model: 'gemma4-legal-vlm:latest',
@@ -77,7 +77,7 @@ describe('ACE Engram intent scorer', () => {
   });
 
   it('returns prior query reformulation suggestions when only priorQueries exist', async () => {
-    const decision = await scoreIntent(
+    const decision = await rankIntent(
       {
         query: 'find evidence chain',
         model: 'gemma4-legal-vlm:latest',
@@ -106,7 +106,7 @@ describe('ACE Engram intent scorer', () => {
   });
 
   it('returns run_retrieval when confidence is low and no shortcut signal exists', async () => {
-    const decision = await scoreIntent(
+    const decision = await rankIntent(
       {
         query: 'ambiguous thing',
         model: 'gemma4-legal-vlm:latest',
@@ -123,7 +123,7 @@ describe('ACE Engram intent scorer', () => {
   });
 
   it('does not use the model-backed classifier by default', async () => {
-    const decision = await scoreIntent(
+    const decision = await rankIntent(
       {
         query: 'find code files for Redis cache',
         model: 'gemma4-legal-vlm:latest',
@@ -139,7 +139,7 @@ describe('ACE Engram intent scorer', () => {
 
   it('does not refetch exact cache when caller already checked it', async () => {
     let fetchCount = 0;
-    const decision = await scoreIntent(
+    const decision = await rankIntent(
       {
         query: 'already checked cache',
         model: 'gemma4-legal-vlm:latest',
@@ -162,7 +162,7 @@ describe('ACE Engram intent scorer', () => {
   });
 
   it('never throws when dependencies fail', async () => {
-    await expect(scoreIntent(
+    await expect(rankIntent(
       {
         query: 'redis is down',
         model: 'gemma4-legal-vlm:latest',
@@ -186,7 +186,7 @@ describe('ACE Engram intent scorer', () => {
 
 
   it('calculates target loss for best-fit evaluation labels', async () => {
-    const decision = await scoreIntent(
+    const decision = await rankIntent(
       {
         query: 'evaluate this target',
         model: 'gemma4-legal-vlm:latest',
@@ -204,7 +204,7 @@ describe('ACE Engram intent scorer', () => {
   });
 
   it('normalizes candidate scores to a 0-1 distribution', async () => {
-    const decision = await scoreIntent(
+    const decision = await rankIntent(
       {
         query: 'check normalization',
         model: 'gemma4-legal-vlm:latest',

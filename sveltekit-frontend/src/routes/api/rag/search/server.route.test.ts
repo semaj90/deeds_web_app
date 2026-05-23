@@ -104,6 +104,7 @@ vi.mock('$lib/server/redis.js', () => ({
 vi.mock('$lib/server/analytics/search-analytics.js', () => ({
 	recordSearchQuery: (...args: unknown[]) => mocks.recordSearchQuery(...args),
 	recordQueryLog: (...args: unknown[]) => mocks.recordQueryLog(...args),
+	recordChunkHits: vi.fn(),
 	queryHash: vi.fn(() => 'hash'),
 }));
 

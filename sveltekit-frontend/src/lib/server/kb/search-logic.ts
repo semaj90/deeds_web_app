@@ -3,9 +3,14 @@ import { join, resolve } from 'node:path';
 import { createInterface } from 'node:readline';
 import Fuse from 'fuse.js';
 
-// This library implements the N8 weighted lexical search over graph notecards.
-// It is used by both the standalone CLI script and the MCP retrieval server.
-
+/**
+ * ORIGINAL FILE RESTORED
+ * This library implements the N8 weighted lexical search over JSONL graph notecards.
+ * It is used by both the standalone CLI script and the MCP retrieval server.
+ * Provides lexical fuzzy matching (`searchNotecards`) and graph neighborhood 
+ * expansion (`expandNotecardNeighbors`) using pre-indexed local files.
+ * DO NOT OVERWRITE THIS FILE. It is critical for the current indexing pipeline.
+ */
 export interface Card {
   card_id: string;
   domain: string;

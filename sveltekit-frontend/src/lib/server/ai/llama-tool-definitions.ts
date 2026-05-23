@@ -91,19 +91,24 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
     function: {
       name: 'graph__expand_neighborhood',
       description:
-        'Expand the ego-graph of a file or symbol in Neo4j. Returns neighbors with relationship types.',
+        'Expand graph neighborhood from sourceRefs. Returns nodes/edges/sourceRefs/confidence and compatibility neighbors.',
       parameters: {
         type: 'object',
         properties: {
+          sourceRefs: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Preferred input: source refs or stable keys to expand from',
+          },
           stableKey: {
             type: 'string',
-            description:
-              'Stable key of the center node (e.g. "file:src/lib/server/ai/gemma4-tool-controller.ts")',
+            description: 'Legacy single center stable key (optional when sourceRefs is provided)',
           },
-          depth: { type: 'integer', description: 'Hop depth 1–3 (default 2)' },
+          maxHops: { type: 'integer', description: 'Hop depth 1–2 (default 2)' },
+          depth: { type: 'integer', description: 'Legacy alias for maxHops (default 2)' },
           limit: { type: 'integer', description: 'Max neighbors (default 40)' },
         },
-        required: ['stableKey'],
+        required: [],
       },
     },
   },

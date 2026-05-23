@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-05-23T03:29:38.787Z",
+  "count": 6,
+  "retry": [
+    {
+      "featureKey": "cache_trace",
+      "date": "2026-05-22T20:15:00.000Z",
+      "errorSignature": "EXISTS obs:cache-trace:recent = 0",
+      "failedQuery": [],
+      "tryAgainWith": "where CacheLogger.trace is called at runtime",
+      "filesTouched": [],
+      "sourceRefs": []
+    },
+    {
+      "featureKey": "toon_packet_shape",
+      "date": "2026-05-22T20:16:00.000Z",
+      "errorSignature": "",
+      "failedQuery": [],
+      "tryAgainWith": "",
+      "filesTouched": [],
+      "sourceRefs": []
+    },
+    {
+      "featureKey": "qdrant_payload_parity",
+      "date": "2026-05-22T20:17:00.000Z",
+      "errorSignature": "",
+      "failedQuery": [],
+      "tryAgainWith": "",
+      "filesTouched": [],
+      "sourceRefs": []
+    },
+    {
+      "featureKey": "check_script",
+      "date": "2026-05-22T20:19:00.000Z",
+      "errorSignature": "tsc execution takes too long or hangs",
+      "failedQuery": [],
+      "tryAgainWith": "",
+      "filesTouched": [],
+      "sourceRefs": []
+    },
+    {
+      "featureKey": "atlas_build",
+      "date": "2026-05-22T20:20:00.000Z",
+      "errorSignature": "",
+      "failedQuery": [],
+      "tryAgainWith": "",
+      "filesTouched": [],
+      "sourceRefs": []
+    },
+    {
+      "featureKey": "unknown",
+      "date": "2026-05-23T03:28:26.412Z",
+      "errorSignature": "",
+      "failedQuery": [],
+      "tryAgainWith": "",
+      "filesTouched": [],
+      "sourceRefs": []
+    }
+  ]
+}

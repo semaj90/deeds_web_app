@@ -162,20 +162,22 @@ describe('/api/codebase-index/summarize-dirs', () => {
     });
     expect(body).toHaveProperty('success', true);
 
-    expect(mockIngestDirectorySummaries).toHaveBeenCalledTimes(1);
-    expect(mockIngestDirectorySummaries).toHaveBeenCalledWith([
+    expect(mockIngestDirectorySummaries).toHaveBeenCalledTimes(2);
+    expect(mockIngestDirectorySummaries).toHaveBeenNthCalledWith(1, [
       expect.objectContaining({
         rel: 'src/lib/server/cache',
         score: 60,
         metrics: expect.objectContaining({ fileCount: 1, tsErrors: 0, apiCount: 0 }),
-        ragSummary: 'src/lib/server/cache/redis-exact-match.ts',
-      }),
+        ragSummary: 'src/lib/server/cache/redis-exact-match.ts: Cache helper',
+      })
+    ]);
+    expect(mockIngestDirectorySummaries).toHaveBeenNthCalledWith(2, [
       expect.objectContaining({
         rel: 'src/routes/api/codebase-index/summarize-dirs',
         score: 80,
         metrics: expect.objectContaining({ fileCount: 2, tsErrors: 0, apiCount: 2 }),
         ragSummary: expect.stringContaining('src/routes/api/codebase-index/summarize-dirs/+server.ts'),
-      }),
+      })
     ]);
   });
 

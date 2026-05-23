@@ -13,6 +13,11 @@ Finish the canonical graphRAG indexing loop once, then reuse it everywhere: grap
 - Scope: routes, services, schemas, docs, memory surfaces, and scripts
 - Outputs: feature-flow maps, doc-feature alignment, gap clusters, recommendations
 - Use this as the single mapping contract for `.md` / `.txt` coverage scans and gap reports
+- Karpathy publish split is now wired through `npm run karpathy:publish-split`, which materializes `ace:cluster:hot`, `ace:cluster:tags:__meta`, and the `memory/exports/karpathy-publish-split.*` artifacts from `docs/graph/hypergraph-clusters.json`.
+- Cluster payload backfill is wired through `npm run karpathy:qdrant-backfill`, which patches matching Qdrant points with cluster narrative / hotness metadata and emits `memory/exports/karpathy-qdrant-cluster-backfill.*`.
+- `npm run karpathy:gpu:insights` now runs publish split, Qdrant backfill, and the repo-root XGBoost hotness scorer in one chain.
+- `HypergraphRoutingService` now pulls `ace:cluster:hot` directly and exposes the hot cluster ids in routing explanations.
+- Postgres hybrid retrieval is now wired through `search:sync:pg`, `search_code_hybrid_pg`, `search:fts:smoke`, and `search:hybrid:smoke`.
 
 ## Canonical Loop
 1. `npm run graphify:daily` refreshes the graph ingestion surface.
@@ -26,7 +31,9 @@ Finish the canonical graphRAG indexing loop once, then reuse it everywhere: grap
 
 ## No Duplicate Paths
 `graphify:daily` is the shared ingest entrypoint.
-`karpathy:gpu:insights` now rebuilds Atlas first.
+`karpathy:gpu:insights` now rebuilds Atlas first and materializes the hot-cluster publish split, Qdrant cluster payload backfill, and XGBoost hotness scoring in one lane.
+`HypergraphRoutingService` now merges the hot set into the routed cluster ids so retrieval sees the same hot-cluster lane as ACE warmup.
+`search:sync:pg` now mirrors Qdrant content vectors into `code_retrieval_chunks` and the Postgres hybrid smoke checks the FTS/vector lane.
 `create:todo` is the single TODO generator; `skill:codebase-todo:*` aliases to it.
 
 ## Next Step
@@ -62,3 +69,10 @@ After the canonical loop is current, run a codebase mapping pass against the act
 - Downstream export now emits `memory/exports/feature-map-cards.jsonl` and includes `feature-map:gpu-compute-plane` in the selected card bundle.
 - `npm run cards:pipeline` is passing with the feature-map export wired through Redis and TOON.
 - Canonical feature labels now flow through `src/lib/server/labels/feature-label-registry.ts` and are shared by retrieval subgraphs, label sinks, and the feature-card pipeline.
+
+## Summary Card Update
+- `scripts/normalize-codebase-summary-cards.mjs` now generates deterministic file, symbol, route, table, tool, error, and test summary cards.
+- The lane writes `memory/cards/codebase-summary-cards.jsonl`, `memory/cards/top-100-codebase-summary-cards.json`, `memory/cards/top-100-codebase-summary-cards.toon`, and `docs/reports/top-100-codebase-summary-cards.md`.
+- Storage is wired through Postgres `summary_cards`, Qdrant `summary_cards_768`, and Redis hot-card keys.
+- `LLMS.md` gets an append-only dated section instead of destructive replacement.
+- Operational probes now exist for `duckdb:cards:inspect`, `prompt:cache:verify`, and `redis:cards:keys`.

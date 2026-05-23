@@ -172,7 +172,7 @@ export async function buildSubgraphV2StructuralMultihop(
     frontierSeeds.add(stableKey);
     visited.add(stableKey);
     nodes.set(stableKey, {
-      kind: classifyFile(filePath, seed),
+      kind: classifyFile(filePath),
       stableKey,
       filePath,
       score: 1,

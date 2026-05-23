@@ -62,7 +62,7 @@ const progressMode: 'tty' | 'lines' =
 // ─── File Extensions ─────────────────────────────────────────────────────────
 const CODE_EXTENSIONS = new Set([
   '.ts', '.svelte', '.js', '.mjs', '.mts', '.json', '.css',
-  '.go', '.py', '.sql', '.proto', '.wgsl', '.md',
+  '.go', '.py', '.sql', '.proto', '.wgsl', '.md', '.txt',
 ]);
 const IGNORE_PATTERNS = [
   'node_modules', '.svelte-kit', 'build', 'dist', '.git',
@@ -550,3 +550,5 @@ main().catch((err) => {
   console.error('\n  ✗ Fatal error:', err.message);
   process.exit(1);
 });
+
+

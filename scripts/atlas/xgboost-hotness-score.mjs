@@ -50,6 +50,11 @@ const DEEP_IMPORT_GRAPH_PATH = resolve(ROOT, 'docs/graph/deep-import-graph.json'
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const SKIP_BACKFILL = args.includes('--skip-backfill');
+const exportPathArgIndex = args.indexOf('--export-path');
+const EXPORT_PATH_ARG =
+  exportPathArgIndex !== -1 && args[exportPathArgIndex + 1] && !args[exportPathArgIndex + 1].startsWith('--')
+    ? args[exportPathArgIndex + 1]
+    : null;
 const TOP_N = (() => {
   const idx = args.indexOf('--top');
   return idx !== -1 ? parseInt(args[idx + 1], 10) : null;
@@ -626,7 +631,9 @@ async function main() {
     delete feature.paths;
   }
 
-  const exportPath = resolve(REPO_ROOT, 'models/xgboost-hotness/features.json');
+  const exportPath = EXPORT_PATH_ARG
+    ? resolve(ROOT, EXPORT_PATH_ARG)
+    : resolve(REPO_ROOT, 'models/xgboost-hotness/features.json');
   mkdirSync(dirname(exportPath), { recursive: true });
   writeFileSync(
     exportPath,

@@ -1263,10 +1263,17 @@ async function dispatchTool(
 
     // ── TRACE MCP graph tools — proxy to :8788 ─────────────────────────────
     if (name === 'graph_expand' || name === 'graph.expand_neighborhood') {
+      const sourceRefs = Array.isArray(args.sourceRefs)
+        ? args.sourceRefs.map((ref) => String(ref)).filter(Boolean)
+        : [];
       const stableKey = String(args.stableKey ?? '');
-      const depth     = Math.min(Math.max(Number(args.depth ?? 2), 1), 3);
-      const limit     = Math.min(Number(args.limit ?? 30), 80);
-      const data = await callTraceMcp('graph.expand_neighborhood', { stableKey, depth, limit });
+      const maxHops = Math.min(Math.max(Number(args.maxHops ?? args.depth ?? 2), 1), 2);
+      const limit = Math.min(Number(args.limit ?? 30), 80);
+      const payload =
+        sourceRefs.length > 0
+          ? { sourceRefs, maxHops, limit }
+          : { stableKey, depth: maxHops, limit };
+      const data = await callTraceMcp('graph.expand_neighborhood', payload);
       return { tool: name, result: data };
     }
 

@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 7
 embedding_id: "qdrant://codebase_chunks_768/deeds_labs/snapshots/2026-03-10/bucket-c-stale/.vite-concurrent/deps/bits-ui.js"
-last_updated_by_llm: "2026-05-20T21:32:13.151Z"
+last_updated_by_llm: "2026-05-23T02:58:14.645Z"
 ai-first: true
 confidence: "medium"
 up: []

@@ -84,6 +84,10 @@ const GRAPH_PATH = path.resolve(
   process.cwd(),
   'docs/graph/codebase-graph.json',
 );
+const CODEBASE_MAP_PATH = path.resolve(
+  process.cwd(),
+  'docs/graph/codebase-map.md',
+);
 
 async function loadGraph(): Promise<RawGraph> {
   if (!existsSync(GRAPH_PATH)) return { files: [], directories: [] };
@@ -93,6 +97,35 @@ async function loadGraph(): Promise<RawGraph> {
   _graph = JSON.parse(raw) as RawGraph;
   _graphMtime = mtimeMs;
   return _graph;
+}
+
+function parseDirectoryScorecard(markdown: string, limit: number): PageRankEntry[] {
+  const rows: PageRankEntry[] = [];
+  for (const line of markdown.split(/\r?\n/)) {
+    if (!line.startsWith('| ⚠️ |') && !line.startsWith('| ✅ |')) continue;
+    const parts = line.split('|').map((part) => part.trim()).filter(Boolean);
+    if (parts.length < 3) continue;
+    const [, directory, score] = parts;
+    const parsedScore = Number(score);
+    if (!Number.isFinite(parsedScore)) continue;
+    rows.push({
+      rel: directory.replace(/`/g, ''),
+      score: parsedScore,
+      source: 'map',
+    });
+    if (rows.length >= limit) break;
+  }
+  return rows;
+}
+
+async function loadDirectoryScorecard(limit: number): Promise<PageRankEntry[]> {
+  try {
+    if (!existsSync(CODEBASE_MAP_PATH)) return [];
+    const markdown = await readFile(CODEBASE_MAP_PATH, 'utf8');
+    return parseDirectoryScorecard(markdown, limit);
+  } catch {
+    return [];
+  }
 }
 
 // ── Public types ──────────────────────────────────────────────────────────────
@@ -146,7 +179,7 @@ export interface GraphNodeDetail {
 export interface PageRankEntry {
   rel:    string;
   score:  number;
-  source: 'redis' | 'fanin';  // redis = computed by pytorch-graph; fanin = fallback
+  source: 'redis' | 'fanin' | 'map';  // redis = computed by pytorch-graph; fanin = fallback; map = codebase-map directory scorecard
 }
 
 export interface EgoGraphNode {
@@ -288,11 +321,16 @@ export async function getGraphPageRankTop(n = 25): Promise<PageRankEntry[]> {
         // Fallback: fanIn rank from graph JSON
         const graph = await loadGraph();
         const files = graph.files ?? [];
-        return files
+        const fanInRows = files
           .filter(f => (f.fanIn ?? 0) > 0)
           .sort((a, b) => (b.fanIn ?? 0) - (a.fanIn ?? 0))
           .slice(0, n)
           .map(f => ({ rel: f.rel, score: f.fanIn ?? 0, source: 'fanin' as const }));
+        if (fanInRows.length) return fanInRows;
+
+        // Last-resort fallback: directory scorecard from codebase-map.md
+        const directoryRows = await loadDirectoryScorecard(n);
+        return directoryRows.length ? directoryRows : [];
       },
       { transport: 'remote-function', method: 'getGraphPageRankTop', ttlSeconds: 300 },
     )

@@ -10,6 +10,8 @@ import {
   ollamaFetch,
 } from '$lib/server/ollama.js';
 import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
+import { buildSummaryCardPromptSection, retrieveSummaryCards } from '$lib/server/retrieval/summary-card-retrieval.js';
+
 import { getGraphContext, getCaseGraphNeighborIds, buildGraphShouldFilter, applyGraphAuthorityScoring, getNeo4jMultiHopNeighbors, formatNeo4jContext, type GraphNeighbor } from '$lib/server/retrieval/graph-context.js';
 import { graphExpandRetrieval } from '$lib/server/retrieval/graph-informed-retrieval.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
@@ -1203,6 +1205,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         chunks: Array<{ relativePath: string; symbol: string; score: number }>;
       } | null = null;
       let codeGlyphHit = false;
+      let summaryCardResult: Awaited<ReturnType<typeof retrieveSummaryCards>> | null = null;
+
       if (wantsCode) {
         const codeGlyphKey = `glyph:code:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
         const cachedCodeCtx = getFragment(codeGlyphKey);
@@ -1348,7 +1352,42 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         setFragment(codeGlyphKey, freshCodebaseResult.context, FragmentType.CODE, 5 * 60_000);
       }
 
+      if (wantsCode) {
+        summaryCardResult = await retrieveSummaryCards(message, {
+          limit: 8,
+        }).catch(() => null);
+        if (summaryCardResult?.cards.length) {
+          send({
+            id,
+            type: 'summary_cards',
+            queryHash: summaryCardResult.queryHash,
+            cacheHit: summaryCardResult.cacheHit,
+            source: summaryCardResult.source,
+            qdrantCollection: summaryCardResult.qdrantCollection,
+            cards: summaryCardResult.cards,
+          });
+          send({
+            id,
+            type: 'retrieval_refinement',
+            mode: 'summary_cards',
+            selectedCount: summaryCardResult.cards.length,
+            topScore: summaryCardResult.cards[0]?.score ?? 0,
+            redisKey: summaryCardResult.cacheKey,
+            cacheHit: summaryCardResult.cacheHit,
+            qdrantScore: summaryCardResult.cards[0]?.qdrantScore ?? null,
+          });
+          send({
+            id,
+            type: 'context_packet',
+            format: 'summary_cards',
+            hash: summaryCardResult.packetHash,
+            data: summaryCardResult.packetSection,
+          });
+        }
+      }
+
       // ── Merge ACE chunks into context docs (deduplicate by content prefix) ──
+
       if (aceChunks.length > 0) {
         const existingPrefixes = new Set(rawContextDocs.map((d) => d.content.slice(0, 100)));
         for (const ac of aceChunks) {
@@ -1742,10 +1781,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         systemPrompt += neo4jContext;
       }
 
+      // Inject summary-card context (compact retrieval refinement packet)
+      if (summaryCardResult?.cards.length) {
+        systemPrompt += `\n\n${buildSummaryCardPromptSection(summaryCardResult.cards)}`;
+      }
+
       // Inject codebase context (recall→rerank pipeline)
       if (codebaseResult) {
         systemPrompt += `\n\n${codebaseResult.context}`;
       }
+
 
       // Inject emotion context from client-side detection (text + face + behavioral)
       if (emotionPrompt) {

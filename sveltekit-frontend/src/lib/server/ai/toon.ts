@@ -22,7 +22,7 @@ export function buildToonPacket({
   memory: MemoryItem[];
 }): {
   q: string;
-  f: Array<{ p: string; l: string[]; s: string }>;
+  f: Array<{ p: string; l: string[]; s: string; pr?: string[]; la?: string[]; sr?: string[] }>;
   m: string[];
 } {
   return {
@@ -31,6 +31,9 @@ export function buildToonPacket({
       p: feature.path,
       l: feature.labels.slice(0, 3),
       s: feature.summary,
+      pr: feature.protocols ?? [],
+      la: feature.languages ?? [],
+      sr: feature.sourceRefs ?? [],
     })),
     m: normalizeMemory(memory).slice(-3),
   };
@@ -52,7 +55,7 @@ export function buildOpenCodeContextPacket({
   goal: string;
   context: {
     query: string;
-    features: Array<{ path: string; labels: string[]; summary: string }>;
+    features: Array<{ path: string; labels: string[]; summary: string; protocols?: string[]; languages?: string[]; sourceRefs?: string[] }>;
     memory: Array<{ type: string; value: string }>;
   };
   files: Array<{ path: string; lines: string; change: string }>;
@@ -68,6 +71,9 @@ export function buildOpenCodeContextPacket({
         path: feature.path,
         labels: feature.labels.slice(0, 3),
         summary: feature.summary,
+        protocols: feature.protocols ?? [],
+        languages: feature.languages ?? [],
+        sourceRefs: feature.sourceRefs ?? [],
       })),
       memory: normalizeMemory(memory)
         .slice(-3)

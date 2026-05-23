@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-05-23T03:51:06.517Z",
+  "source": {
+    "graph": "docs/graph/codebase-graph.json",
+    "batch": "docs/graph/batch-gpu-analysis-report.json",
+    "atlas": "memory/atlas/codebase-atlas.latest.md"
+  },
+  "sourceFiles": 3223,
+  "runtime": {
+    "bridge": {
+      "loaded": true,
+      "bridgePath": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\Release\\tensorrt_bridge.node",
+      "avx2SimdJson": true,
+      "cuda": false,
+      "bridgeError": "Cannot find module 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\simd-bridge\\cpp\\build\\Release\\tensorrt_bridge.node'\nRequire stack:\n- C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\scripts\\lib\\avx2-simdjson-bridge.mjs"
+    }
+  },
+  "cardCount": 13874,
+  "edgeCount": 205996,
+  "cardTypes": {
+    "file_summary": 3223,
+    "symbol_summary": 3758,
+    "route_summary": 2350,
+    "database_touchpoint": 992,
+    "test_coverage": 3223,
+    "error_risk": 309,
+    "tool_api_call": 19
+  },
+  "outputs": {
+    "cardsJsonl": "memory/cards/codebase-summary-cards.jsonl",
+    "edgesJsonl": "memory/cards/codebase-summary-card-edges.jsonl",
+    "top100Json": "memory/cards/top-100-codebase-summary-cards.json",
+    "top100Toon": "memory/cards/top-100-codebase-summary-cards.toon",
+    "top100Md": "docs/reports/top-100-codebase-summary-cards.md"
+  },
+  "storage": {
+    "postgres": false,
+    "qdrant": false,
+    "redis": false
+  },
+  "dryRun": false
+}

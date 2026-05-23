@@ -63,3 +63,8 @@ export * from './legal-relations.js';
 
 // Codebase intelligence persistence layer (code_repos, enrichment_jobs)
 export * from './codebase-intelligence.js';
+
+// Codebase document atlas, features index, and cache traces
+export * from './documents-atlas.js';
+export * from './feature-registry.js';
+

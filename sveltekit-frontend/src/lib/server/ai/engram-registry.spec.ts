@@ -2,7 +2,12 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mockInsertValues = vi.fn(async () => ({ rows: [] }));
+const mockOnConflictDoUpdate = vi.fn(async () => ({ rows: [] }));
+const mockInsertValues = vi.fn(() => {
+  const promise = Promise.resolve({ rows: [] }) as any;
+  promise.onConflictDoUpdate = mockOnConflictDoUpdate;
+  return promise;
+});
 const mockInsert = vi.fn(() => ({ values: mockInsertValues }));
 
 vi.mock('$lib/server/db/client', () => ({
@@ -10,9 +15,10 @@ vi.mock('$lib/server/db/client', () => ({
     insert: mockInsert,
   },
 }));
-
-vi.mock('$lib/server/db/schema-postgres.js', () => ({
+vi.mock('$lib/server/db/schema.js', () => ({
   contextTimeline: { table: 'context_timeline' },
+  engramCards: { table: 'engram_cards' },
+  memoryRegistry: { table: 'memory_registry' },
 }));
 
 function makeRedis(overrides: Partial<Record<string, any>> = {}) {
@@ -36,6 +42,7 @@ describe('engram registry', () => {
   beforeEach(() => {
     mockInsert.mockClear();
     mockInsertValues.mockClear();
+    mockOnConflictDoUpdate.mockClear();
   });
 
   it('writes an ACE packet and emits a durable registry event', async () => {
@@ -49,7 +56,7 @@ describe('engram registry', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(mockInsert).toHaveBeenCalledTimes(1);
+    expect(mockInsert).toHaveBeenCalledTimes(2);
 
     const row = mockInsertValues.mock.calls[0]?.[0];
     expect(row).toMatchObject({
@@ -79,7 +86,7 @@ describe('engram registry', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(mockInsert).toHaveBeenCalledTimes(1);
+    expect(mockInsert).toHaveBeenCalledTimes(3);
 
     const row = mockInsertValues.mock.calls[0]?.[0];
     expect(row).toMatchObject({
@@ -99,7 +106,11 @@ describe('engram registry', () => {
   });
 
   it('does not throw if the durable registry insert fails', async () => {
-    mockInsertValues.mockRejectedValueOnce(new Error('postgres unavailable'));
+    mockInsertValues.mockImplementationOnce(() => {
+      const promise = Promise.reject(new Error('postgres unavailable')) as any;
+      promise.onConflictDoUpdate = mockOnConflictDoUpdate;
+      return promise;
+    });
     const redis = makeRedis();
     const { injectAcePacket } = await import('./engram-registry.js');
 

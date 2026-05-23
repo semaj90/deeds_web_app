@@ -149,22 +149,38 @@ export async function hybridSearch(
   const merged = new Map<string, HybridSearchResult>();
 
   for (const r of pgRows) {
-    merged.set(r.stable_key, {
-      stable_key:      r.stable_key,
-      file_path:       r.file_path,
-      symbol_name:     r.symbol_name ?? undefined,
-      symbol_kind:     r.symbol_kind ?? undefined,
-      language:        r.language    ?? undefined,
-      content:         r.content,
-      tags:            r.tags,
-      topo_class:      r.topo_class  ?? undefined,
-      lexical_score:   r.lexical_score,
-      semantic_score:  'semantic_score' in r ? (r as { semantic_score: number }).semantic_score : undefined,
-      authority_score: r.graph_authority_score ?? 0,
-      final_score:     r.lexical_score * (weights.lexical ?? 0.35),
-      headline:        r.headline,
-      sources:         ['postgres_fts'],
-    });
+    if ('path' in r) {
+      // It is a HybridPgResult
+      merged.set(r.stable_key, {
+        stable_key:      r.stable_key,
+        file_path:       r.path,
+        symbol_name:     r.symbol ?? undefined,
+        content:         r.content,
+        lexical_score:   r.lex_rank != null ? 1 / (60 + r.lex_rank) : undefined,
+        semantic_score:  r.sem_rank != null ? 1 / (60 + r.sem_rank) : undefined,
+        authority_score: 0,
+        final_score:     r.hybrid_score,
+        sources:         ['postgres_fts'],
+      });
+    } else {
+      // It is a FTSResult
+      merged.set(r.stable_key, {
+        stable_key:      r.stable_key,
+        file_path:       r.file_path,
+        symbol_name:     r.symbol_name ?? undefined,
+        symbol_kind:     r.symbol_kind ?? undefined,
+        language:        r.language ?? undefined,
+        content:         r.content,
+        tags:            r.tags,
+        topo_class:      r.topo_class ?? undefined,
+        lexical_score:   r.lexical_score,
+        semantic_score:  r.graph_authority_score,
+        authority_score: 0,
+        final_score:     r.lexical_score,
+        headline:        r.headline,
+        sources:         ['postgres_fts'],
+      });
+    }
   }
 
   for (const r of qdrantRows) {

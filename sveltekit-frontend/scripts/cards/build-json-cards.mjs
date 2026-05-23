@@ -28,6 +28,16 @@ function readText(relPath) {
   return fs.readFileSync(path.join(ROOT, relPath), 'utf8');
 }
 
+function readJsonl(relPath, fallback = []) {
+  try {
+    const raw = fs.readFileSync(path.join(ROOT, relPath), 'utf8').trim();
+    if (!raw) return fallback;
+    return raw.split(/\r?\n/).map((line) => JSON.parse(line));
+  } catch {
+    return fallback;
+  }
+}
+
 function exists(relPath) {
   return fs.existsSync(path.join(ROOT, relPath));
 }
@@ -304,6 +314,21 @@ function memoryCards() {
   ];
 }
 
+function summaryCards() {
+  const cards = readJsonl('memory/cards/codebase-summary-cards.jsonl', []);
+  return cards
+    .filter((card) => card && typeof card === 'object')
+    .map((card) => makeCard({
+      ...card,
+      kind: 'summary',
+      labels: Array.isArray(card.labels) ? card.labels : [],
+      sourceRefs: Array.isArray(card.sourceRefs) ? card.sourceRefs : [],
+      scores: card.scores ?? {},
+      payload: card.payload ?? {},
+    }))
+    .sort((a, b) => scoreOf(b) - scoreOf(a) || a.id.localeCompare(b.id));
+}
+
 function featureMapCards() {
   return buildMasterFeatureCards();
 }
@@ -358,10 +383,11 @@ const feature = featureCards(Array.isArray(atlasTop) ? atlasTop : []);
 const cluster = clusterCards(clusterSummaries);
 const pathway = pathwayCards(deepGraph);
 const featureMap = featureMapCards();
+const summary = summaryCards();
 const tools = toolCards();
 const memory = memoryCards();
 
-const allCards = [...featureMap, ...feature, ...cluster, ...pathway, ...tools, ...memory]
+const allCards = [...featureMap, ...feature, ...summary, ...cluster, ...pathway, ...tools, ...memory]
   .sort((a, b) => scoreOf(b) - scoreOf(a) || a.kind.localeCompare(b.kind) || a.id.localeCompare(b.id));
 
 const selectedCards = {
@@ -371,6 +397,7 @@ const selectedCards = {
   sourceSummary: {
     featureMap: featureMap.length,
     feature: feature.length,
+    summary: summary.length,
     cluster: cluster.length,
     pathway: pathway.length,
     tool: tools.length,

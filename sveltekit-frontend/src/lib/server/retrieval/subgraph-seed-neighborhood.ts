@@ -4,7 +4,7 @@ import {
   type LabelNormalizationInput,
   type NormalizedLabels,
 } from '$lib/server/labels/normalize-labels.js';
-import { normalizeFeatureLabel, type CanonicalFeatureLabel } from '$lib/server/labels/feature-label-registry.js';
+import { normalizeFeatureLabel, type FeatureLabelKey } from '$lib/server/labels/feature-label-registry.js';
 import { expandNeighbours, fetchAuthorityScores } from '$lib/server/search/neo4j-rerank.js';
 
 export const SUBGRAPH_V1_VERSION = 'subgraph_v1_seed_neighborhood';
@@ -29,7 +29,7 @@ export interface SubgraphSeedTarget {
   kind: SeedInputKind;
   key: string;
   score: number;
-  label: CanonicalFeatureLabel;
+  label: FeatureLabelKey;
   reasons: string[];
   stableKey?: string;
   filePath?: string;
@@ -42,7 +42,7 @@ export interface SubgraphNeighborhoodNode {
   kind: NeighborhoodNodeKind;
   key: string;
   score: number;
-  label: CanonicalFeatureLabel;
+  label: FeatureLabelKey;
   reasons: string[];
   stableKey?: string;
   filePath?: string;

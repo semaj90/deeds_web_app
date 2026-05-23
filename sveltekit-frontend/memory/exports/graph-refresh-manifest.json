@@ -4,9 +4,10 @@
     "feature": 69,
     "memory": 4,
     "pathway": 50,
+    "summary": 13874,
     "tool": 6
   },
-  "generatedAt": "2026-05-21T19:26:43.732Z",
+  "generatedAt": "2026-05-23T03:51:11.920Z",
   "outputs": {
     "clusterCards": "memory/exports/cluster-cards.jsonl",
     "featureMapCards": "memory/exports/feature-map-cards.jsonl",
@@ -19,7 +20,7 @@
   "sources": {
     "atlasTop": {
       "count": 50,
-      "hash": "b398852e5bd550ab",
+      "hash": "3fe67a9673b4af22",
       "path": "memory/atlas/codebase-atlas.top.json"
     },
     "clusterSummaries": {
@@ -28,9 +29,9 @@
       "path": "docs/graph/cluster-summaries.json"
     },
     "deepImportGraph": {
-      "edgeCount": 76786,
-      "hash": "63c4e39b5d1fe21f",
-      "nodeCount": 33218,
+      "edgeCount": 77187,
+      "hash": "2c527f4819e17202",
+      "nodeCount": 33471,
       "path": "memory/graphify/deep/deep-import-graph.json"
     },
     "featureMap": {

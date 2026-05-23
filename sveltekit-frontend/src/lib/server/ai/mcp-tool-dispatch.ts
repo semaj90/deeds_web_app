@@ -17,9 +17,11 @@ import { fetchCodebaseContext }    from '$lib/server/ace/context-assembler.js';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
 import { getRedis }                from '$lib/server/redis.js';
 import { db }                      from '$lib/server/db/client';
-import { sql }                     from 'drizzle-orm';
+import { engramCards } from '$lib/server/db/schema.js';
+import { desc, eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { runRg } from '../../../../scripts/rg-atlas/run-rg.mjs';
+import { injectSummary } from '$lib/server/ai/opencode-skill.js';
 
 // ── Shared result shape ───────────────────────────────────────────────────────
 
@@ -36,6 +38,53 @@ function ok(tool: string, data: unknown, durationMs: number, cached = false): MC
 }
 function err(tool: string, error: string, durationMs: number): MCPToolResult {
   return { tool, success: false, data: null, error, meta: { durationMs } };
+}
+
+function asStableKey(sourceRef: string): string {
+  const trimmed = String(sourceRef ?? '').trim();
+  if (!trimmed) return '';
+  if (trimmed.startsWith('file:')) return trimmed;
+  if (/^[a-z]+:/i.test(trimmed)) return trimmed;
+  return `file:${trimmed}`;
+}
+
+function asSourceRef(stableKey: string): string {
+  return stableKey.startsWith('file:') ? stableKey.slice(5) : stableKey;
+}
+
+function clamp01(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(1, value));
+}
+
+function tokenizeLower(text: string): string[] {
+  return text
+    .toLowerCase()
+    .split(/[^a-z0-9_]+/)
+    .filter((token) => token.length > 2);
+}
+
+function overlapScore(query: string, value: string): number {
+  const q = new Set(tokenizeLower(query));
+  if (q.size === 0) return 0;
+  const tokens = tokenizeLower(value);
+  if (tokens.length === 0) return 0;
+  const overlap = tokens.filter((token) => q.has(token)).length;
+  return clamp01(overlap / Math.max(2, q.size));
+}
+
+function trustBucketToScore(bucket: string): number {
+  const normalized = bucket.trim().toLowerCase();
+  if (normalized === 'local_verified') return 1.0;
+  if (normalized === 'external_verified') return 0.8;
+  if (normalized === 'synthetic') return 0.45;
+  if (normalized === 'web_unverified') return 0.25;
+  return 0.45;
+}
+
+function trustTierToScore(tier: number): number {
+  const clampedTier = Math.max(-1, Math.min(2, tier));
+  return (clampedTier + 1) / 3;
 }
 
 // ── Tool implementations ──────────────────────────────────────────────────────
@@ -193,10 +242,13 @@ export async function tool_search_qdrant_topology(args: {
   }
 }
 
-/** graph.expand_neighborhood — Neo4j neighbor expansion for a set of stable_keys */
+/** graph.expand_neighborhood — sourceRefs-first graph neighborhood expansion */
 export async function tool_graph_expand_neighborhood(args: {
-  stableKeys: string[];
-  maxHops?: number;
+  sourceRefs?: string[];
+  stableKeys?: string[];
+  maxHops?: 1 | 2;
+  depth?: number;
+  limit?: number;
   query?: string;
   route?: string;
   symbol?: string;
@@ -204,10 +256,35 @@ export async function tool_graph_expand_neighborhood(args: {
 }): Promise<MCPToolResult> {
   const t0 = Date.now();
   try {
-    // expandNeighbours(stableKey) returns string[] — fan out over each seed key
-    const keys = args.stableKeys.slice(0, 20);
-    const neighbourSets = await Promise.all(keys.map((k) => expandNeighbours(k)));
-    const allNeighbours = [...new Set(neighbourSets.flat())];
+    const requestedSourceRefs = Array.isArray(args.sourceRefs)
+      ? args.sourceRefs.map((ref) => String(ref)).filter(Boolean)
+      : [];
+    const requestedStableKeys = Array.isArray(args.stableKeys)
+      ? args.stableKeys.map((key) => String(key)).filter(Boolean)
+      : [];
+
+    const seedKeys = Array.from(
+      new Set(
+        [...requestedSourceRefs.map(asStableKey), ...requestedStableKeys.map(asStableKey)]
+          .filter(Boolean)
+          .slice(0, 20)
+      )
+    );
+
+    if (seedKeys.length === 0) {
+      return ok(
+        'graph.expand_neighborhood',
+        { ok: true, nodes: [], edges: [], sourceRefs: [], confidence: 0 },
+        Date.now() - t0
+      );
+    }
+
+    const maxHops: 1 | 2 = args.maxHops === 2 || Number(args.depth ?? 0) >= 2 ? 2 : 1;
+    const limit = Math.min(Math.max(Number(args.limit ?? 40), 1), 120);
+
+    const neighbourSets = await Promise.all(seedKeys.map((k) => expandNeighbours(k, maxHops)));
+    const neighborKeys = Array.from(new Set(neighbourSets.flat())).slice(0, limit);
+    const allKeys = Array.from(new Set([...seedKeys, ...neighborKeys]));
 
     // PageRank scores live in Redis at couchdb:pagerank_scores (written by run-pagerank.ts)
     let pageRankMap: Record<string, number> = {};
@@ -219,7 +296,7 @@ export async function tool_graph_expand_neighborhood(args: {
       /* non-fatal — return neighbours without scores */
     }
 
-    const primaryStableKey = keys[0] ?? '';
+    const primaryStableKey = seedKeys[0] ?? '';
     const derivedFilePath =
       args.filePath ??
       (primaryStableKey.startsWith('file:') ? primaryStableKey.slice(5) : undefined);
@@ -228,24 +305,200 @@ export async function tool_graph_expand_neighborhood(args: {
       route: args.route,
       symbol: args.symbol,
       filePath: derivedFilePath,
-      maxHops: args.maxHops === 2 ? 2 : 1,
+      maxHops,
       maxNeighbors: 24,
     });
+
+    const nodes = allKeys.map((key) => ({
+      id: key,
+      stableKey: key,
+      sourceRef: asSourceRef(key),
+      pagerank: pageRankMap[key] ?? null,
+      kind: key.startsWith('file:') ? 'file' : 'node',
+      isSeed: seedKeys.includes(key),
+    }));
+
+    const edges = seedKeys.flatMap((seed) =>
+      neighborKeys
+        .filter((neighbor) => neighbor !== seed)
+        .map((neighbor) => ({
+          from: seed,
+          to: neighbor,
+          relation: 'IMPORTS',
+        }))
+    );
+
+    const sourceRefs = Array.from(new Set(nodes.map((node) => node.sourceRef))).slice(0, limit);
+    const confidence = clamp01(
+      (seedKeys.length > 0 ? 0.45 : 0) +
+        Math.min(0.35, neighborKeys.length / Math.max(1, seedKeys.length * 8)) +
+        (Object.keys(pageRankMap).length > 0 ? 0.2 : 0)
+    );
+
+    const legacyNeighbors = neighborKeys.map((key) => ({
+      stable_key: key,
+      pagerank: pageRankMap[key] ?? null,
+    }));
 
     return ok(
       'graph.expand_neighborhood',
       {
+        ok: true,
+        nodes,
+        edges,
+        sourceRefs,
+        confidence,
+        graphPaths: edges.map((edge) => `${asSourceRef(edge.from)} -> ${asSourceRef(edge.to)}`),
+        maxHops,
         center: primaryStableKey,
         seedEnvelope,
-        neighbors: allNeighbours.map((key) => ({
-          stable_key: key,
-          pagerank: pageRankMap[key] ?? null,
-        })),
+        neighbors: legacyNeighbors,
       },
       Date.now() - t0
     );
   } catch (e) {
     return err('graph.expand_neighborhood', String(e), Date.now() - t0);
+  }
+}
+
+/** turbovec.rank_chunks — read-only RotorQuant blended rerank for source refs */
+export async function tool_turbovec_rank_chunks(args: {
+  query: string;
+  sourceRefs: string[];
+  limit?: number;
+  graphNodes?: Array<{ sourceRef?: string; stableKey?: string; isSeed?: boolean }>;
+  trustTiers?: Record<string, number>;
+  trustBuckets?: Record<string, string>;
+  recency?: Record<string, number>;
+  vectorScores?: Record<string, number>;
+  graphScores?: Record<string, number>;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const refs = Array.from(new Set((args.sourceRefs ?? []).map((ref) => String(ref)).filter(Boolean)));
+    if (refs.length === 0) {
+      return ok(
+        'turbovec.rank_chunks',
+        { ok: true, ranked: [], formula: '0.45*vector + 0.25*graph + 0.20*trust + 0.10*recency' },
+        Date.now() - t0
+      );
+    }
+
+    const graphRefSet = new Set(
+      (args.graphNodes ?? [])
+        .map((node) => {
+          if (typeof node.sourceRef === 'string' && node.sourceRef.trim().length > 0) return node.sourceRef;
+          if (typeof node.stableKey === 'string' && node.stableKey.trim().length > 0) return asSourceRef(node.stableKey);
+          return '';
+        })
+        .filter(Boolean)
+    );
+
+    const ranked = refs
+      .map((sourceRef) => {
+        const vector = clamp01(args.vectorScores?.[sourceRef] ?? overlapScore(args.query, sourceRef));
+        const graph = clamp01(
+          args.graphScores?.[sourceRef] ?? (graphRefSet.has(sourceRef) ? 0.9 : 0.35)
+        );
+        const trust = clamp01(
+          typeof args.trustTiers?.[sourceRef] === 'number'
+            ? trustTierToScore(args.trustTiers[sourceRef] as number)
+            : trustBucketToScore(args.trustBuckets?.[sourceRef] ?? 'synthetic')
+        );
+        const recency = clamp01(args.recency?.[sourceRef] ?? 0.5);
+
+        const finalScore =
+          0.45 * vector +
+          0.25 * graph +
+          0.2 * trust +
+          0.1 * recency;
+
+        return {
+          sourceRef,
+          finalScore: Number(finalScore.toFixed(6)),
+          scores: {
+            vector,
+            graph,
+            trust,
+            recency,
+          },
+          reason: `vector=${vector.toFixed(2)} graph=${graph.toFixed(2)} trust=${trust.toFixed(2)} recency=${recency.toFixed(2)}`,
+        };
+      })
+      .sort((a, b) => b.finalScore - a.finalScore)
+      .slice(0, Math.min(args.limit ?? 10, 30));
+
+    const furtherResearch = (ranked[0]?.finalScore ?? 0) < 0.6 || ranked.length < 3;
+
+    return ok(
+      'turbovec.rank_chunks',
+      {
+        ok: true,
+        formula: '0.45*vector + 0.25*graph + 0.20*trust + 0.10*recency',
+        ranked,
+        sourceRefs: ranked.map((item) => item.sourceRef),
+        furtherResearch,
+      },
+      Date.now() - t0
+    );
+  } catch (e) {
+    return err('turbovec.rank_chunks', String(e), Date.now() - t0);
+  }
+}
+
+/** engram.chat_memory_recent — read-only recent memory fetch from engram_cards */
+export async function tool_engram_chat_memory_recent(args: {
+  userId?: string;
+  sourceRefs?: string[];
+  limit?: number;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const limit = Math.min(Math.max(Number(args.limit ?? 8), 1), 40);
+    const refs = Array.isArray(args.sourceRefs)
+      ? Array.from(new Set(args.sourceRefs.map((ref) => String(ref)).filter(Boolean)))
+      : [];
+
+    const scopedRows =
+      args.userId && String(args.userId).trim().length > 0
+        ? await db
+            .select()
+            .from(engramCards)
+            .where(eq(engramCards.memoryId, `chat:${String(args.userId).trim()}`))
+            .orderBy(desc(engramCards.createdAt))
+            .limit(limit)
+        : await db
+            .select()
+            .from(engramCards)
+            .where(eq(engramCards.scope, 'user'))
+            .orderBy(desc(engramCards.createdAt))
+            .limit(limit * 2);
+
+    const filtered = refs.length
+      ? scopedRows.filter((row) => {
+          const rowRefs = Array.isArray(row.sourceRefs) ? row.sourceRefs.map(String) : [];
+          return refs.some((ref) => rowRefs.some((rowRef) => rowRef.includes(ref)));
+        })
+      : scopedRows;
+
+    return ok(
+      'engram.chat_memory_recent',
+      {
+        ok: true,
+        count: Math.min(filtered.length, limit),
+        memories: filtered.slice(0, limit).map((row) => ({
+          memoryId: row.memoryId,
+          scope: row.scope,
+          summary: row.summary,
+          sourceRefs: Array.isArray(row.sourceRefs) ? row.sourceRefs : [],
+          createdAt: row.createdAt,
+        })),
+      },
+      Date.now() - t0,
+      true
+    );
+  } catch (e) {
+    return err('engram.chat_memory_recent', String(e), Date.now() - t0);
   }
 }
 
@@ -591,6 +844,17 @@ export async function tool_context_explain_compression(args: {
   }
 }
 
+/** opencode.inject_summary — strictly validated LLM context injection from OpenCode agents */
+export async function tool_opencode_inject_summary(args: Record<string, unknown>): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const result = await injectSummary(args);
+    return ok('opencode.inject_summary', result, Date.now() - t0);
+  } catch (e) {
+    return err('opencode.inject_summary', String(e), Date.now() - t0);
+  }
+}
+
 // ── Dispatch table ────────────────────────────────────────────────────────────
 
 export const TOOL_DISPATCH: Record<
@@ -614,6 +878,10 @@ export const TOOL_DISPATCH: Record<
     tool_search_qdrant_topology(a as Parameters<typeof tool_search_qdrant_topology>[0]),
   'graph.expand_neighborhood': (a) =>
     tool_graph_expand_neighborhood(a as Parameters<typeof tool_graph_expand_neighborhood>[0]),
+  'turbovec.rank_chunks': (a) =>
+    tool_turbovec_rank_chunks(a as Parameters<typeof tool_turbovec_rank_chunks>[0]),
+  'engram.chat_memory_recent': (a) =>
+    tool_engram_chat_memory_recent(a as Parameters<typeof tool_engram_chat_memory_recent>[0]),
   'graph.shortest_path': (a) =>
     tool_graph_shortest_path(a as Parameters<typeof tool_graph_shortest_path>[0]),
   'clusters.get_summary_lenses': (a) =>
@@ -632,4 +900,6 @@ export const TOOL_DISPATCH: Record<
     tool_kb_expand_neighbors(a as Parameters<typeof tool_kb_expand_neighbors>[0]),
   'kb.explain_retrieval': (a) =>
     tool_kb_explain_retrieval(a as Parameters<typeof tool_kb_explain_retrieval>[0]),
+  'opencode.inject_summary': (a) =>
+    tool_opencode_inject_summary(a as Parameters<typeof tool_opencode_inject_summary>[0]),
 };

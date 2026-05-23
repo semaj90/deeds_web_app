@@ -10,6 +10,7 @@ export type RoutingExplanation = {
   profile: string;
   lexicalClusters: string[];
   topologyClusters: string[];
+  hotClusters: string[];
   profileClusters: string[];
   taskClusters: string[];
   finalClusters: string[];
@@ -80,6 +81,7 @@ export class RoutingExplanationBuilder {
     profile: 'general',
     lexicalClusters: [],
     topologyClusters: [],
+    hotClusters: [],
     profileClusters: [],
     taskClusters: [],
     finalClusters: [],
@@ -101,6 +103,11 @@ export class RoutingExplanationBuilder {
 
   public setTopologyClusters(ids: number[]) {
     this.explanation.topologyClusters = ids.map(String);
+    return this;
+  }
+
+  public setHotClusters(ids: number[]) {
+    this.explanation.hotClusters = [...new Set(ids)].map(String);
     return this;
   }
 
