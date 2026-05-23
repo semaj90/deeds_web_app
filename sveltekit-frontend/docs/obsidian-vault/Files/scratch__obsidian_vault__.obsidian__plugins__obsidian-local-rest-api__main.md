@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/scratch/obsidian_vault/.obsidian/plugins/obsidian-local-rest-api/main.js"
-last_updated_by_llm: "2026-05-20T21:32:13.151Z"
+last_updated_by_llm: "2026-05-23T02:58:14.645Z"
 ai-first: true
 confidence: "high"
 up: []

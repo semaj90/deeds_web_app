@@ -1,8 +1,8 @@
 {
   "artifact": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\index\\ace-prefix.toon",
-  "bytes": 12802,
-  "cache_key": "deeds:v1:gemma4-rotorquant:ace-prefix:191738a0ca7f94ab",
-  "digest": "50e4f71be838867d",
+  "bytes": 12896,
+  "cache_key": "deeds:v1:gemma4-rotorquant:ace-prefix:0ed7a18d32cc75a1",
+  "digest": "55339e723e7f63d1",
   "generated_by": "scripts/index/ace-prefix-toon.mjs",
-  "source_digest": "191738a0ca7f94ab"
+  "source_digest": "0ed7a18d32cc75a1"
 }

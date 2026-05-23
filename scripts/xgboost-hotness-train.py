@@ -14,7 +14,32 @@ import sys
 import os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-FEATURES_PATH = os.path.join(SCRIPT_DIR, '../models/xgboost-hotness/features.json')
+
+
+def _pick_features_path():
+    cli_path = None
+    if '--features-path' in sys.argv:
+        idx = sys.argv.index('--features-path')
+        if idx + 1 < len(sys.argv):
+            cli_path = sys.argv[idx + 1]
+
+    env_path = os.environ.get('XGBOOST_HOTNESS_FEATURES_PATH')
+    if cli_path:
+        return cli_path
+    if env_path:
+        return env_path
+
+    candidates = [
+        os.path.join(SCRIPT_DIR, '../models/xgboost-hotness/features.json'),
+        os.path.join(SCRIPT_DIR, '../sveltekit-frontend/memory/exports/xgboost-hotness/features.json'),
+    ]
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+    return candidates[0]
+
+
+FEATURES_PATH = _pick_features_path()
 
 
 def main():

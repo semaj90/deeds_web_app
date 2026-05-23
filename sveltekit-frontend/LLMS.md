@@ -1,5 +1,14 @@
 # AGENTS.md — `sveltekit-frontend`
 
+## 2026-05-21 - Codebase Map / Atlas / Semantic Index Update
+
+- Analyzed 3,223 deterministic source files.
+- Enriched top 45 files with Gemma4 summaries.
+- Wrote `docs/graph/batch-gpu-analysis-report.json`.
+- Updated `docs/graph/codebase-map.md`.
+- Updated `memory/atlas/codebase-atlas.latest.md`.
+- Generated summary-card plan for path, symbol, route, table, tool, error, and test mappings.
+- Next: top-100 summary cards, Qdrant centroid tags, Neo4j GraphRAG report, CouchDB report snapshot, DuckDB analytics report.
 <!-- AGENTS-GEN v1 · do not edit below this line -->
 <!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->
 

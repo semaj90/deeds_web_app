@@ -93,23 +93,51 @@ async function fetchSomCoordsFromQdrant(
 const GRAPH_JSON = path.resolve('docs/graph/codebase-graph.json');
 const SOURCE_EXTENSIONS = new Set(['.ts', '.svelte', '.js', '.mjs', '.mts']);
 
-function isNoisyDirectory(dir: string): { noisy: boolean; category?: 'skipped_generated_dir' | 'skipped_archive_or_log' } {
-  const parts = dir.split('/');
-  
-  const generatedDirs = new Set([
-    'node_modules', '.git', '.svelte-kit', 'dist', 'build', '.cache', 'tmp',
-    'docs/graph', 'docs/reports', 'graph', 'reports'
-  ]);
-  const archiveDirs = new Set([
-    'coverage', 'logs', 'archive', 'backup', 'archived-schemas'
-  ]);
+const MAX_FILES_PER_DIR_HARD_CAP = 40;
+const MAX_BYTES_PER_DIR_HARD_CAP = 250_000;
+const SUMMARY_TIMEOUT_MS = 60_000;
 
-  if (parts.some(p => generatedDirs.has(p))) {
+// Candidate dedupe caps (required bounds):
+// - chunks/file: 3-5  -> use 4
+// - files/dir: 10-20   -> use 15
+// - candidates/cluster: 25-50 -> use 40
+const MAX_CHUNKS_PER_FILE = 4;
+const MAX_FILES_PER_DIRECTORY = 15;
+const MAX_CANDIDATES_PER_CLUSTER = 40;
+
+const GENERATED_DIR_NAMES = new Set([
+  'node_modules',
+  '.git',
+  '.svelte-kit',
+  'dist',
+  'build',
+  '.cache',
+  'tmp',
+]);
+
+const ARCHIVE_OR_LOG_DIR_NAMES = new Set(['coverage', 'logs', 'archive', 'backup']);
+
+const GENERATED_DIR_PATHS = new Set(['docs/graph', 'docs/reports']);
+
+function isNoisyDirectory(dir: string): {
+  noisy: boolean;
+  category?: 'skipped_generated_dir' | 'skipped_archive_or_log';
+} {
+  const normalised = dir.replace(/\\/g, '/');
+  const parts = normalised.split('/').filter(Boolean);
+
+  if (
+    GENERATED_DIR_PATHS.has(normalised) ||
+    [...GENERATED_DIR_PATHS].some((p) => normalised.startsWith(`${p}/`)) ||
+    parts.some((p) => GENERATED_DIR_NAMES.has(p))
+  ) {
     return { noisy: true, category: 'skipped_generated_dir' };
   }
-  if (parts.some(p => archiveDirs.has(p))) {
+
+  if (parts.some((p) => ARCHIVE_OR_LOG_DIR_NAMES.has(p))) {
     return { noisy: true, category: 'skipped_archive_or_log' };
   }
+
   return { noisy: false };
 }
 
@@ -119,13 +147,25 @@ export const POST: RequestHandler = async ({ locals }) => {
   }
 
   if (!existsSync(GRAPH_JSON)) {
-    return json({
-      error: 'Fast AST graph not found. Run `npm run index:codebase:fast` first.',
-      hint: GRAPH_JSON,
-    }, { status: 424 });
+    return json(
+      {
+        error: 'Fast AST graph not found. Run `npm run index:codebase:fast` first.',
+        hint: GRAPH_JSON,
+      },
+      { status: 424 }
+    );
   }
 
-  let graphData: { files?: Array<{ rel: string; tags: string[]; summary: string; routeHandlers: string[]; todos: string[]; isRoute: boolean }> };
+  let graphData: {
+    files?: Array<{
+      rel: string;
+      tags: string[];
+      summary: string;
+      routeHandlers: string[];
+      todos: string[];
+      isRoute: boolean;
+    }>;
+  };
   try {
     graphData = JSON.parse(await readFile(GRAPH_JSON, 'utf8'));
   } catch (e) {
@@ -138,15 +178,28 @@ export const POST: RequestHandler = async ({ locals }) => {
   }
 
   // Group files into directories
-  const dirMap = new Map<string, { files: string[]; tags: Set<string>; todos: number; apis: number }>();
+  const dirMap = new Map<
+    string,
+    {
+      files: string[];
+      fileSummaries: Map<string, string>;
+      tags: Set<string>;
+      todos: number;
+      apis: number;
+    }
+  >();
   for (const f of files) {
     const parts = f.rel.split('/').filter(Boolean);
     const dir = parts.length > 1 ? parts.slice(0, -1).join('/') : '.';
-    if (!dirMap.has(dir)) dirMap.set(dir, { files: [], tags: new Set(), todos: 0, apis: 0 });
+    if (!dirMap.has(dir))
+      dirMap.set(dir, { files: [], fileSummaries: new Map(), tags: new Set(), todos: 0, apis: 0 });
     const d = dirMap.get(dir)!;
     d.files.push(f.rel);
+    if (typeof f.summary === 'string' && f.summary.trim().length > 0) {
+      d.fileSummaries.set(f.rel, f.summary.trim());
+    }
     d.todos += f.todos?.length ?? 0;
-    d.apis  += f.routeHandlers?.length ?? 0;
+    d.apis += f.routeHandlers?.length ?? 0;
     for (const t of f.tags ?? []) d.tags.add(t);
   }
 
@@ -167,11 +220,19 @@ export const POST: RequestHandler = async ({ locals }) => {
     summary_failed: 0,
   };
 
+  const timeoutDiagnostics: Array<{
+    directory: string;
+    fileCount: number;
+    totalBytes: number;
+    timeoutMs: number;
+    recommendation: string;
+  }> = [];
+
+  const clusterCandidateTotals = new Map<string, number>();
+
   const redis = getRedis();
 
-  const { ingestDirectorySummaries } = await import(
-    '$lib/server/indexer/directory-summarizer.js'
-  );
+  const { ingestDirectorySummaries } = await import('$lib/server/indexer/directory-summarizer.js');
 
   // Process directories sequentially to maintain stability and prevent resource thrashing
   for (const [rel, d] of dirMap.entries()) {
@@ -183,7 +244,7 @@ export const POST: RequestHandler = async ({ locals }) => {
     }
 
     // 2. Skip directories with no source files (e.g. static assets, raw markdown logs, config stubs)
-    const sourceFiles = d.files.filter(f => {
+    const sourceFiles = d.files.filter((f) => {
       const ext = path.extname(f).toLowerCase();
       return SOURCE_EXTENSIONS.has(ext);
     });
@@ -192,19 +253,21 @@ export const POST: RequestHandler = async ({ locals }) => {
       continue;
     }
 
-    const fileCount = d.files.length;
+    const fileCount = sourceFiles.length;
 
     // 3. Apply file count cap (max files per dir: 40)
-    if (fileCount > 40) {
+    if (fileCount > MAX_FILES_PER_DIR_HARD_CAP) {
       outcomes.skipped_too_many_files++;
       continue;
     }
 
     // Calculate total bytes
     let totalBytes = 0;
-    for (const f of d.files) {
+    for (const f of sourceFiles) {
       try {
-        const absPath = path.resolve(f);
+        const directPath = path.resolve(f);
+        const srcPrefixedPath = path.resolve('src', f);
+        const absPath = existsSync(directPath) ? directPath : srcPrefixedPath;
         if (existsSync(absPath)) {
           const stats = statSync(absPath);
           totalBytes += stats.size;
@@ -215,16 +278,18 @@ export const POST: RequestHandler = async ({ locals }) => {
     }
 
     // 4. Apply total bytes cap (max bytes per dir: 250,000)
-    if (totalBytes > 250000) {
+    if (totalBytes > MAX_BYTES_PER_DIR_HARD_CAP) {
       outcomes.skipped_too_many_bytes++;
       continue;
     }
 
     // 5. Cache Unchanged check: compare directory contents hash
     let mtimes = '';
-    for (const f of d.files) {
+    for (const f of sourceFiles) {
       try {
-        const absPath = path.resolve(f);
+        const directPath = path.resolve(f);
+        const srcPrefixedPath = path.resolve('src', f);
+        const absPath = existsSync(directPath) ? directPath : srcPrefixedPath;
         if (existsSync(absPath)) {
           const stats = statSync(absPath);
           mtimes += `${f}:${stats.mtimeMs};`;
@@ -246,36 +311,67 @@ export const POST: RequestHandler = async ({ locals }) => {
 
     // 6. Check if directory has matching Qdrant points
     const som = somCoords.get(rel);
-    const hasQdrantPoints = som && (som.somCluster !== undefined || som.somBmuRow !== undefined || som.somBmuCol !== undefined);
+    const hasQdrantPoints =
+      som &&
+      (som.somCluster !== undefined || som.somBmuRow !== undefined || som.somBmuCol !== undefined);
     if (!hasQdrantPoints) {
       outcomes.no_qdrant_points++;
       continue;
     }
 
-    // 7. Enforce candidate dedupe caps (max files per dir: 15, max chunks per file: 4)
-    // We slice files to process to max 15 to prevent long-running loops
-    const filesToProcess = d.files.slice(0, 15);
+    // 7. Candidate dedupe caps: max files/dir, chunks/file, candidates/cluster
+    const uniqueFiles = [...new Set(sourceFiles)].slice(0, MAX_FILES_PER_DIRECTORY);
+    const candidateChunks: string[] = [];
+
+    for (const filePath of uniqueFiles) {
+      const summary = d.fileSummaries.get(filePath) ?? '';
+      const rawChunks = summary
+        .split(/(?<=[.!?])\s+|\n+/)
+        .map((chunk) => chunk.trim())
+        .filter((chunk) => chunk.length > 0);
+
+      const chunks = (rawChunks.length > 0 ? rawChunks : [filePath]).slice(0, MAX_CHUNKS_PER_FILE);
+      for (const chunk of chunks) {
+        candidateChunks.push(`${filePath}: ${chunk}`);
+      }
+    }
+
+    const somClusterKey = String(som?.somCluster ?? 'unclustered');
+    const clusterUsed = clusterCandidateTotals.get(somClusterKey) ?? 0;
+    const clusterBudgetRemaining = Math.max(0, MAX_CANDIDATES_PER_CLUSTER - clusterUsed);
+    const cappedCandidates = candidateChunks.slice(0, clusterBudgetRemaining);
+
+    if (cappedCandidates.length === 0) {
+      outcomes.summary_failed++;
+      continue;
+    }
+
+    clusterCandidateTotals.set(somClusterKey, clusterUsed + cappedCandidates.length);
 
     const entry = {
       rel,
-      score: Math.min(100, Math.round(
-        (d.apis > 0 && d.tags.has('auth') ? 20 : 0) +
-        (d.todos === 0 ? 20 : d.todos < 3 ? 10 : 0) +
-        (d.tags.has('db') ? 15 : 0) +
-        (d.tags.has('route') ? 15 : 0) +
-        (filesToProcess.length > 2 ? 10 : 5) +
-        (d.tags.has('has-todo') ? 0 : 20)
-      )),
+      score: Math.min(
+        100,
+        Math.round(
+          (d.apis > 0 && d.tags.has('auth') ? 20 : 0) +
+            (d.todos === 0 ? 20 : d.todos < 3 ? 10 : 0) +
+            (d.tags.has('db') ? 15 : 0) +
+            (d.tags.has('route') ? 15 : 0) +
+            (uniqueFiles.length > 2 ? 10 : 5) +
+            (d.tags.has('has-todo') ? 0 : 20)
+        )
+      ),
       metrics: {
-        fileCount: filesToProcess.length,
+        fileCount: uniqueFiles.length,
+        candidateCount: cappedCandidates.length,
         tsErrors: d.todos,
         apiCount: d.apis,
       },
-      ragSummary: filesToProcess.slice(0, 5).join(', '),
+      ragSummary: cappedCandidates.join(' | '),
       agentSummary: null as string | null,
-      hyperedge: null as any,
-      somBmuRow:  som?.somBmuRow,
-      somBmuCol:  som?.somBmuCol,
+      hyperedge: null,
+      somBmuRow: som?.somBmuRow,
+      somBmuCol: som?.somBmuCol,
       somCluster: som?.somCluster,
     };
 
@@ -283,7 +379,7 @@ export const POST: RequestHandler = async ({ locals }) => {
     try {
       const ingestPromise = ingestDirectorySummaries([entry]);
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('TIMEOUT')), 60000)
+        setTimeout(() => reject(new Error('TIMEOUT')), SUMMARY_TIMEOUT_MS)
       );
 
       const ingestRes = await Promise.race([ingestPromise, timeoutPromise]);
@@ -296,13 +392,16 @@ export const POST: RequestHandler = async ({ locals }) => {
     } catch (err: any) {
       if (err.message === 'TIMEOUT') {
         outcomes.timeout++;
-        console.warn('Timeout diagnostics:', {
+        const diagnostic = {
           directory: rel,
           fileCount,
           totalBytes,
-          timeoutMs: 60000,
-          recommendation: 'Break directory into smaller folders or increase the summary timeout limit.'
-        });
+          timeoutMs: SUMMARY_TIMEOUT_MS,
+          recommendation:
+            'Break directory into smaller folders or increase the summary timeout limit.',
+        };
+        timeoutDiagnostics.push(diagnostic);
+        console.warn('Timeout diagnostics:', diagnostic);
       } else {
         outcomes.summary_failed++;
       }
@@ -313,6 +412,17 @@ export const POST: RequestHandler = async ({ locals }) => {
     success: true,
     directoriesFound: dirMap.size,
     outcomes,
+    timeoutDiagnostics,
+    limits: {
+      maxFilesPerDir: MAX_FILES_PER_DIR_HARD_CAP,
+      maxBytesPerDir: MAX_BYTES_PER_DIR_HARD_CAP,
+      summaryTimeoutMs: SUMMARY_TIMEOUT_MS,
+      candidateDedupe: {
+        maxChunksPerFile: MAX_CHUNKS_PER_FILE,
+        maxFilesPerDirectory: MAX_FILES_PER_DIRECTORY,
+        maxCandidatesPerCluster: MAX_CANDIDATES_PER_CLUSTER,
+      },
+    },
   });
 };
 

@@ -252,6 +252,9 @@ export class HyperRagFusionService {
     if (routing?.clusterIds.length) {
       provenance.topologyRouting = true;
       explanation.setTopologyClusters(routing.clusterIds);
+      if (routing.hotClusterIds?.length) {
+        explanation.setHotClusters(routing.hotClusterIds);
+      }
     }
     if (taskDistillate) {
       explanation.addTaskDistillate(taskDistillate.task_key);
@@ -264,6 +267,7 @@ export class HyperRagFusionService {
     const allClusterIds = new Set<number>([
       ...(lexicalClusterIds || []),
       ...(routing?.clusterIds || []),
+      ...(routing?.hotClusterIds || []),
       ...(consolidatedPriors || []),
       ...(taskDistillate?.clusters?.map((c: string) => parseInt(c, 10)) || []),
     ]);

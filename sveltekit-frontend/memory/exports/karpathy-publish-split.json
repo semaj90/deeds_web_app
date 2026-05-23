@@ -1,0 +1,1246 @@
+{
+  "generatedAt": "2026-05-23T02:57:30.137Z",
+  "sourceCount": 100,
+  "selectedCount": 16,
+  "maxRawHotness": 1.9208,
+  "selectedClusters": [
+    {
+      "clusterKey": "cluster:gpu:55",
+      "clusterId": 55,
+      "hotness": 1,
+      "source": "ace:cluster:hot",
+      "fileCount": 577,
+      "summary": "table-def chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "embedding",
+        "vector"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/server/db/schema",
+        "src/lib/db/schema"
+      ],
+      "metadataSummary": "table-def chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
+      "scalarSeed": 0.8279
+    },
+    {
+      "clusterKey": "cluster:gpu:95",
+      "clusterId": 95,
+      "hotness": 1,
+      "source": "ace:cluster:hot",
+      "fileCount": 183,
+      "summary": "type chunks in `src/lib/server/db/schema` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "auth",
+        "embedding"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db/schema",
+        "src/lib/server/db",
+        "src/lib/db/schema"
+      ],
+      "metadataSummary": "type chunks in `src/lib/server/db/schema` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db/schema, src/lib/server/db, src/lib/db/schema",
+      "scalarSeed": 0.7947
+    },
+    {
+      "clusterKey": "cluster:gpu:91",
+      "clusterId": 91,
+      "hotness": 1,
+      "source": "ace:cluster:hot",
+      "fileCount": 162,
+      "summary": "type chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "embedding",
+        "auth"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/server/db/schema",
+        "src/lib/db"
+      ],
+      "metadataSummary": "type chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, auth | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db",
+      "scalarSeed": 0.7912
+    },
+    {
+      "clusterKey": "cluster:gpu:51",
+      "clusterId": 51,
+      "hotness": 1,
+      "source": "ace:cluster:hot",
+      "fileCount": 100,
+      "summary": "table-def chunks in `src/lib/db/schema` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "vector",
+        "redis"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/db/schema",
+        "src/lib/server/db"
+      ],
+      "metadataSummary": "table-def chunks in `src/lib/db/schema` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/db/schema, src/lib/server/db",
+      "scalarSeed": 0.7669
+    },
+    {
+      "clusterKey": "cluster:gpu:84",
+      "clusterId": 84,
+      "hotness": 1,
+      "source": "ace:cluster:hot",
+      "fileCount": 69,
+      "summary": "function chunks in `src/lib/server/audit` (tag: vector)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "vector",
+        "embedding",
+        "database",
+        "schema",
+        "drizzle"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/audit",
+        "src/lib/server/db",
+        "src/routes/api/audit/gpu"
+      ],
+      "metadataSummary": "function chunks in `src/lib/server/audit` (tag: vector) | Risk: high | Tags: vector, embedding, database, schema, drizzle | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/audit, src/lib/server/db, src/routes/api/audit/gpu",
+      "scalarSeed": 0.7667
+    },
+    {
+      "clusterKey": "cluster:gpu:13",
+      "clusterId": 13,
+      "hotness": 1,
+      "source": "ace:cluster:hot",
+      "fileCount": 41,
+      "summary": "table-def chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "embedding",
+        "auth"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/db/schema",
+        "src/routes/api/persons-of-interest/[id]/timeline"
+      ],
+      "metadataSummary": "table-def chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, auth | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/db/schema, src/routes/api/persons-of-interest/[id]/timeline",
+      "scalarSeed": 0.752
+    },
+    {
+      "clusterKey": "cluster:gpu:65",
+      "clusterId": 65,
+      "hotness": 1,
+      "source": "ace:cluster:hot",
+      "fileCount": 1,
+      "summary": "const chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "vector",
+        "redis"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db"
+      ],
+      "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db",
+      "scalarSeed": 0.643
+    },
+    {
+      "clusterKey": "cluster:gpu:76",
+      "clusterId": 76,
+      "hotness": 1,
+      "source": "ace:cluster:hot",
+      "fileCount": 1,
+      "summary": "type chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "vector",
+        "redis"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db"
+      ],
+      "metadataSummary": "type chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db",
+      "scalarSeed": 0.643
+    },
+    {
+      "clusterKey": "cluster:gpu:88",
+      "clusterId": 88,
+      "hotness": 0.9712,
+      "source": "ace:cluster:hot",
+      "fileCount": 123,
+      "summary": "const chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "auth",
+        "embedding"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/relations.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/server/db/schema",
+        "src/lib/db/schema"
+      ],
+      "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/relations.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
+      "scalarSeed": 0.7779
+    },
+    {
+      "clusterKey": "cluster:gpu:53",
+      "clusterId": 53,
+      "hotness": 0.9256,
+      "source": "ace:cluster:hot",
+      "fileCount": 84,
+      "summary": "const chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "embedding",
+        "vector"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema/legal-citations.ts",
+        "src/lib/server/db/schema-evidence-crud.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/types",
+        "src/lib/server/db/schema"
+      ],
+      "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/schema/legal-citations.ts, src/lib/server/db/schema-evidence-crud.ts | Topo: src/lib/server/db, src/lib/types, src/lib/server/db/schema",
+      "scalarSeed": 0.7523
+    },
+    {
+      "clusterKey": "cluster:gpu:75",
+      "clusterId": 75,
+      "hotness": 0.6697,
+      "source": "ace:cluster:hot",
+      "fileCount": 416,
+      "summary": "function chunks in `src/lib/config` (tag: embedding)",
+      "purpose": "",
+      "riskLevel": "medium",
+      "mitigationProtocols": [],
+      "topTags": [
+        "embedding",
+        "vector",
+        "redis",
+        "rabbitmq",
+        "ai"
+      ],
+      "topFiles": [
+        "src/lib/config/env.server.ts",
+        "src/lib/server/minio.ts"
+      ],
+      "topoClasses": [
+        "src/lib/config",
+        "src/lib/server",
+        "src/lib/server/config"
+      ],
+      "metadataSummary": "function chunks in `src/lib/config` (tag: embedding) | Risk: medium | Tags: embedding, vector, redis, rabbitmq, ai | Files: src/lib/config/env.server.ts, src/lib/server/minio.ts | Topo: src/lib/config, src/lib/server, src/lib/server/config",
+      "scalarSeed": 0.6471
+    },
+    {
+      "clusterKey": "cluster:gpu:59",
+      "clusterId": 59,
+      "hotness": 0.5672,
+      "source": "ace:cluster:hot",
+      "fileCount": 36,
+      "summary": "function chunks in `src/lib/server/observability` (tag: vector)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "vector",
+        "embedding",
+        "auth"
+      ],
+      "topFiles": [
+        "src/lib/server/observability/inference-log.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/observability",
+        "src/lib/components/evidence"
+      ],
+      "metadataSummary": "function chunks in `src/lib/server/observability` (tag: vector) | Risk: low | Tags: vector, embedding, auth | Files: src/lib/server/observability/inference-log.ts | Topo: src/lib/server/observability, src/lib/components/evidence",
+      "scalarSeed": 0.479
+    },
+    {
+      "clusterKey": "cluster:gpu:94",
+      "clusterId": 94,
+      "hotness": 0.5302,
+      "source": "ace:cluster:hot",
+      "fileCount": 921,
+      "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "redis",
+        "cache",
+        "api",
+        "server",
+        "embedding"
+      ],
+      "topFiles": [
+        "src/lib/server/cache.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/cache",
+        "src/lib/server",
+        "src/lib/cache"
+      ],
+      "metadataSummary": "function chunks in `src/lib/server/cache` (tag: redis) | Risk: low | Tags: redis, cache, api, server, embedding | Files: src/lib/server/cache.ts | Topo: src/lib/server/cache, src/lib/server, src/lib/cache",
+      "scalarSeed": 0.583
+    },
+    {
+      "clusterKey": "cluster:gpu:90",
+      "clusterId": 90,
+      "hotness": 0.4973,
+      "source": "ace:cluster:hot",
+      "fileCount": 158,
+      "summary": "function chunks in `src/lib/server` (tag: auth)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "auth",
+        "api",
+        "server"
+      ],
+      "topFiles": [
+        "src/lib/server/lucia.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server",
+        "src/routes/api/auth/logout",
+        "src/lib/types"
+      ],
+      "metadataSummary": "function chunks in `src/lib/server` (tag: auth) | Risk: low | Tags: auth, api, server | Files: src/lib/server/lucia.ts | Topo: src/lib/server, src/routes/api/auth/logout, src/lib/types",
+      "scalarSeed": 0.4932
+    },
+    {
+      "clusterKey": "cluster:gpu:20",
+      "clusterId": 20,
+      "hotness": 0.4969,
+      "source": "ace:cluster:hot",
+      "fileCount": 883,
+      "summary": "function chunks in `src/lib/webgpu` (tag: embedding)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "embedding",
+        "redis",
+        "vector",
+        "auth",
+        "schema"
+      ],
+      "topFiles": [
+        "src/lib/server/gpu/libtorch-bridge.ts"
+      ],
+      "topoClasses": [
+        "src/lib/webgpu",
+        "src/lib/server/gpu",
+        "src/lib/gpu"
+      ],
+      "metadataSummary": "function chunks in `src/lib/webgpu` (tag: embedding) | Risk: low | Tags: embedding, redis, vector, auth, schema | Files: src/lib/server/gpu/libtorch-bridge.ts | Topo: src/lib/webgpu, src/lib/server/gpu, src/lib/gpu",
+      "scalarSeed": 0.5635
+    },
+    {
+      "clusterKey": "cluster:gpu:57",
+      "clusterId": 57,
+      "hotness": 0.4953,
+      "source": "ace:cluster:hot",
+      "fileCount": 1099,
+      "summary": "const chunks in `src/lib/shims` (tag: embedding)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "embedding",
+        "vector",
+        "auth",
+        "server-module",
+        "config"
+      ],
+      "topFiles": [
+        "src/lib/server/gpu/libtorch-bridge.ts",
+        "src/lib/server/retrieval/context-buffer.ts"
+      ],
+      "topoClasses": [
+        "src/lib/shims",
+        "src/lib/server/vector",
+        "src/lib"
+      ],
+      "metadataSummary": "const chunks in `src/lib/shims` (tag: embedding) | Risk: low | Tags: embedding, vector, auth, server-module, config | Files: src/lib/server/gpu/libtorch-bridge.ts, src/lib/server/retrieval/context-buffer.ts | Topo: src/lib/shims, src/lib/server/vector, src/lib",
+      "scalarSeed": 0.5766
+    }
+  ],
+  "scrollRows": [
+    {
+      "clusterKey": "cluster:gpu:55",
+      "clusterId": 55,
+      "rawHotness": 1.9208,
+      "hotness": 1,
+      "fileCount": 577,
+      "summary": "table-def chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "embedding",
+        "vector"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/server/db/schema",
+        "src/lib/db/schema"
+      ],
+      "scalarSeed": 0.8279,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:95",
+      "clusterId": 95,
+      "rawHotness": 1.9208,
+      "hotness": 1,
+      "fileCount": 183,
+      "summary": "type chunks in `src/lib/server/db/schema` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "auth",
+        "embedding"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db/schema",
+        "src/lib/server/db",
+        "src/lib/db/schema"
+      ],
+      "scalarSeed": 0.7947,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:91",
+      "clusterId": 91,
+      "rawHotness": 1.9208,
+      "hotness": 1,
+      "fileCount": 162,
+      "summary": "type chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "embedding",
+        "auth"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/server/db/schema",
+        "src/lib/db"
+      ],
+      "scalarSeed": 0.7912,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:51",
+      "clusterId": 51,
+      "rawHotness": 1.9208,
+      "hotness": 1,
+      "fileCount": 100,
+      "summary": "table-def chunks in `src/lib/db/schema` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "vector",
+        "redis"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/db/schema",
+        "src/lib/server/db"
+      ],
+      "scalarSeed": 0.7669,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:84",
+      "clusterId": 84,
+      "rawHotness": 1.9208,
+      "hotness": 1,
+      "fileCount": 69,
+      "summary": "function chunks in `src/lib/server/audit` (tag: vector)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "vector",
+        "embedding",
+        "database",
+        "schema",
+        "drizzle"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/audit",
+        "src/lib/server/db",
+        "src/routes/api/audit/gpu"
+      ],
+      "scalarSeed": 0.7667,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:13",
+      "clusterId": 13,
+      "rawHotness": 1.9208,
+      "hotness": 1,
+      "fileCount": 41,
+      "summary": "table-def chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "embedding",
+        "auth"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/db/schema",
+        "src/routes/api/persons-of-interest/[id]/timeline"
+      ],
+      "scalarSeed": 0.752,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:65",
+      "clusterId": 65,
+      "rawHotness": 1.9208,
+      "hotness": 1,
+      "fileCount": 1,
+      "summary": "const chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "vector",
+        "redis"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db"
+      ],
+      "scalarSeed": 0.643,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:76",
+      "clusterId": 76,
+      "rawHotness": 1.9208,
+      "hotness": 1,
+      "fileCount": 1,
+      "summary": "type chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "vector",
+        "redis"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db"
+      ],
+      "scalarSeed": 0.643,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:88",
+      "clusterId": 88,
+      "rawHotness": 1.8655,
+      "hotness": 0.9712,
+      "fileCount": 123,
+      "summary": "const chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "auth",
+        "embedding"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/relations.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/server/db/schema",
+        "src/lib/db/schema"
+      ],
+      "scalarSeed": 0.7779,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:53",
+      "clusterId": 53,
+      "rawHotness": 1.7779,
+      "hotness": 0.9256,
+      "fileCount": 84,
+      "summary": "const chunks in `src/lib/server/db` (tag: database)",
+      "purpose": "",
+      "riskLevel": "high",
+      "mitigationProtocols": [],
+      "topTags": [
+        "database",
+        "schema",
+        "drizzle",
+        "embedding",
+        "vector"
+      ],
+      "topFiles": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema/legal-citations.ts",
+        "src/lib/server/db/schema-evidence-crud.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/db",
+        "src/lib/types",
+        "src/lib/server/db/schema"
+      ],
+      "scalarSeed": 0.7523,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:75",
+      "clusterId": 75,
+      "rawHotness": 1.2863,
+      "hotness": 0.6697,
+      "fileCount": 416,
+      "summary": "function chunks in `src/lib/config` (tag: embedding)",
+      "purpose": "",
+      "riskLevel": "medium",
+      "mitigationProtocols": [],
+      "topTags": [
+        "embedding",
+        "vector",
+        "redis",
+        "rabbitmq",
+        "ai"
+      ],
+      "topFiles": [
+        "src/lib/config/env.server.ts",
+        "src/lib/server/minio.ts"
+      ],
+      "topoClasses": [
+        "src/lib/config",
+        "src/lib/server",
+        "src/lib/server/config"
+      ],
+      "scalarSeed": 0.6471,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:59",
+      "clusterId": 59,
+      "rawHotness": 1.0894,
+      "hotness": 0.5672,
+      "fileCount": 36,
+      "summary": "function chunks in `src/lib/server/observability` (tag: vector)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "vector",
+        "embedding",
+        "auth"
+      ],
+      "topFiles": [
+        "src/lib/server/observability/inference-log.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/observability",
+        "src/lib/components/evidence"
+      ],
+      "scalarSeed": 0.479,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:94",
+      "clusterId": 94,
+      "rawHotness": 1.0184,
+      "hotness": 0.5302,
+      "fileCount": 921,
+      "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "redis",
+        "cache",
+        "api",
+        "server",
+        "embedding"
+      ],
+      "topFiles": [
+        "src/lib/server/cache.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/cache",
+        "src/lib/server",
+        "src/lib/cache"
+      ],
+      "scalarSeed": 0.583,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:90",
+      "clusterId": 90,
+      "rawHotness": 0.9552,
+      "hotness": 0.4973,
+      "fileCount": 158,
+      "summary": "function chunks in `src/lib/server` (tag: auth)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "auth",
+        "api",
+        "server"
+      ],
+      "topFiles": [
+        "src/lib/server/lucia.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server",
+        "src/routes/api/auth/logout",
+        "src/lib/types"
+      ],
+      "scalarSeed": 0.4932,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:20",
+      "clusterId": 20,
+      "rawHotness": 0.9545,
+      "hotness": 0.4969,
+      "fileCount": 883,
+      "summary": "function chunks in `src/lib/webgpu` (tag: embedding)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "embedding",
+        "redis",
+        "vector",
+        "auth",
+        "schema"
+      ],
+      "topFiles": [
+        "src/lib/server/gpu/libtorch-bridge.ts"
+      ],
+      "topoClasses": [
+        "src/lib/webgpu",
+        "src/lib/server/gpu",
+        "src/lib/gpu"
+      ],
+      "scalarSeed": 0.5635,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:57",
+      "clusterId": 57,
+      "rawHotness": 0.9514,
+      "hotness": 0.4953,
+      "fileCount": 1099,
+      "summary": "const chunks in `src/lib/shims` (tag: embedding)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "embedding",
+        "vector",
+        "auth",
+        "server-module",
+        "config"
+      ],
+      "topFiles": [
+        "src/lib/server/gpu/libtorch-bridge.ts",
+        "src/lib/server/retrieval/context-buffer.ts"
+      ],
+      "topoClasses": [
+        "src/lib/shims",
+        "src/lib/server/vector",
+        "src/lib"
+      ],
+      "scalarSeed": 0.5766,
+      "source": "ace:cluster:hot"
+    }
+  ],
+  "redis": {
+    "hotSet": [
+      {
+        "clusterKey": "cluster:gpu:55",
+        "hotness": 1
+      },
+      {
+        "clusterKey": "cluster:gpu:95",
+        "hotness": 1
+      },
+      {
+        "clusterKey": "cluster:gpu:91",
+        "hotness": 1
+      },
+      {
+        "clusterKey": "cluster:gpu:51",
+        "hotness": 1
+      },
+      {
+        "clusterKey": "cluster:gpu:84",
+        "hotness": 1
+      },
+      {
+        "clusterKey": "cluster:gpu:13",
+        "hotness": 1
+      },
+      {
+        "clusterKey": "cluster:gpu:65",
+        "hotness": 1
+      },
+      {
+        "clusterKey": "cluster:gpu:76",
+        "hotness": 1
+      },
+      {
+        "clusterKey": "cluster:gpu:88",
+        "hotness": 0.9712
+      },
+      {
+        "clusterKey": "cluster:gpu:53",
+        "hotness": 0.9256
+      },
+      {
+        "clusterKey": "cluster:gpu:75",
+        "hotness": 0.6697
+      },
+      {
+        "clusterKey": "cluster:gpu:59",
+        "hotness": 0.5672
+      },
+      {
+        "clusterKey": "cluster:gpu:94",
+        "hotness": 0.5302
+      },
+      {
+        "clusterKey": "cluster:gpu:90",
+        "hotness": 0.4973
+      },
+      {
+        "clusterKey": "cluster:gpu:20",
+        "hotness": 0.4969
+      },
+      {
+        "clusterKey": "cluster:gpu:57",
+        "hotness": 0.4953
+      }
+    ],
+    "meta": {
+      "clusterKeys": [
+        "cluster:gpu:55",
+        "cluster:gpu:95",
+        "cluster:gpu:91",
+        "cluster:gpu:51",
+        "cluster:gpu:84",
+        "cluster:gpu:13",
+        "cluster:gpu:65",
+        "cluster:gpu:76",
+        "cluster:gpu:88",
+        "cluster:gpu:53",
+        "cluster:gpu:75",
+        "cluster:gpu:59",
+        "cluster:gpu:94",
+        "cluster:gpu:90",
+        "cluster:gpu:20",
+        "cluster:gpu:57"
+      ],
+      "generatedAt": "2026-05-23T02:57:30.137Z",
+      "sourceCount": 100,
+      "selectedCount": 16,
+      "maxRawHotness": 1.9208
+    },
+    "clusterHashes": {
+      "cluster:gpu:55": {
+        "summary": "table-def chunks in `src/lib/server/db` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"embedding\",\"vector\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\"]",
+        "topoClasses": "[\"src/lib/server/db\",\"src/lib/server/db/schema\",\"src/lib/db/schema\"]",
+        "fileCount": "577",
+        "source": "ace:cluster:hot",
+        "clusterId": "55",
+        "hotness": "1",
+        "scalarSeed": "0.8279",
+        "metadataSummary": "table-def chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:95": {
+        "summary": "type chunks in `src/lib/server/db/schema` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"auth\",\"embedding\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\"]",
+        "topoClasses": "[\"src/lib/server/db/schema\",\"src/lib/server/db\",\"src/lib/db/schema\"]",
+        "fileCount": "183",
+        "source": "ace:cluster:hot",
+        "clusterId": "95",
+        "hotness": "1",
+        "scalarSeed": "0.7947",
+        "metadataSummary": "type chunks in `src/lib/server/db/schema` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db/schema, src/lib/server/db, src/lib/db/schema",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:91": {
+        "summary": "type chunks in `src/lib/server/db` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"embedding\",\"auth\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\"]",
+        "topoClasses": "[\"src/lib/server/db\",\"src/lib/server/db/schema\",\"src/lib/db\"]",
+        "fileCount": "162",
+        "source": "ace:cluster:hot",
+        "clusterId": "91",
+        "hotness": "1",
+        "scalarSeed": "0.7912",
+        "metadataSummary": "type chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, auth | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:51": {
+        "summary": "table-def chunks in `src/lib/db/schema` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"vector\",\"redis\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\"]",
+        "topoClasses": "[\"src/lib/db/schema\",\"src/lib/server/db\"]",
+        "fileCount": "100",
+        "source": "ace:cluster:hot",
+        "clusterId": "51",
+        "hotness": "1",
+        "scalarSeed": "0.7669",
+        "metadataSummary": "table-def chunks in `src/lib/db/schema` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/db/schema, src/lib/server/db",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:84": {
+        "summary": "function chunks in `src/lib/server/audit` (tag: vector)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"vector\",\"embedding\",\"database\",\"schema\",\"drizzle\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\"]",
+        "topoClasses": "[\"src/lib/server/audit\",\"src/lib/server/db\",\"src/routes/api/audit/gpu\"]",
+        "fileCount": "69",
+        "source": "ace:cluster:hot",
+        "clusterId": "84",
+        "hotness": "1",
+        "scalarSeed": "0.7667",
+        "metadataSummary": "function chunks in `src/lib/server/audit` (tag: vector) | Risk: high | Tags: vector, embedding, database, schema, drizzle | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/audit, src/lib/server/db, src/routes/api/audit/gpu",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:13": {
+        "summary": "table-def chunks in `src/lib/server/db` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"embedding\",\"auth\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\"]",
+        "topoClasses": "[\"src/lib/server/db\",\"src/lib/db/schema\",\"src/routes/api/persons-of-interest/[id]/timeline\"]",
+        "fileCount": "41",
+        "source": "ace:cluster:hot",
+        "clusterId": "13",
+        "hotness": "1",
+        "scalarSeed": "0.752",
+        "metadataSummary": "table-def chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, auth | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/db/schema, src/routes/api/persons-of-interest/[id]/timeline",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:65": {
+        "summary": "const chunks in `src/lib/server/db` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"vector\",\"redis\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\"]",
+        "topoClasses": "[\"src/lib/server/db\"]",
+        "fileCount": "1",
+        "source": "ace:cluster:hot",
+        "clusterId": "65",
+        "hotness": "1",
+        "scalarSeed": "0.643",
+        "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:76": {
+        "summary": "type chunks in `src/lib/server/db` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"vector\",\"redis\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\"]",
+        "topoClasses": "[\"src/lib/server/db\"]",
+        "fileCount": "1",
+        "source": "ace:cluster:hot",
+        "clusterId": "76",
+        "hotness": "1",
+        "scalarSeed": "0.643",
+        "metadataSummary": "type chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:88": {
+        "summary": "const chunks in `src/lib/server/db` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"auth\",\"embedding\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\",\"src/lib/server/db/relations.ts\"]",
+        "topoClasses": "[\"src/lib/server/db\",\"src/lib/server/db/schema\",\"src/lib/db/schema\"]",
+        "fileCount": "123",
+        "source": "ace:cluster:hot",
+        "clusterId": "88",
+        "hotness": "0.9712",
+        "scalarSeed": "0.7779",
+        "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/relations.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:53": {
+        "summary": "const chunks in `src/lib/server/db` (tag: database)",
+        "purpose": "",
+        "risk_level": "high",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"database\",\"schema\",\"drizzle\",\"embedding\",\"vector\"]",
+        "topFiles": "[\"src/lib/server/db/schema-postgres.ts\",\"src/lib/server/db/schema/legal-citations.ts\",\"src/lib/server/db/schema-evidence-crud.ts\"]",
+        "topoClasses": "[\"src/lib/server/db\",\"src/lib/types\",\"src/lib/server/db/schema\"]",
+        "fileCount": "84",
+        "source": "ace:cluster:hot",
+        "clusterId": "53",
+        "hotness": "0.9256",
+        "scalarSeed": "0.7523",
+        "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/schema/legal-citations.ts, src/lib/server/db/schema-evidence-crud.ts | Topo: src/lib/server/db, src/lib/types, src/lib/server/db/schema",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:75": {
+        "summary": "function chunks in `src/lib/config` (tag: embedding)",
+        "purpose": "",
+        "risk_level": "medium",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"embedding\",\"vector\",\"redis\",\"rabbitmq\",\"ai\"]",
+        "topFiles": "[\"src/lib/config/env.server.ts\",\"src/lib/server/minio.ts\"]",
+        "topoClasses": "[\"src/lib/config\",\"src/lib/server\",\"src/lib/server/config\"]",
+        "fileCount": "416",
+        "source": "ace:cluster:hot",
+        "clusterId": "75",
+        "hotness": "0.6697",
+        "scalarSeed": "0.6471",
+        "metadataSummary": "function chunks in `src/lib/config` (tag: embedding) | Risk: medium | Tags: embedding, vector, redis, rabbitmq, ai | Files: src/lib/config/env.server.ts, src/lib/server/minio.ts | Topo: src/lib/config, src/lib/server, src/lib/server/config",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:59": {
+        "summary": "function chunks in `src/lib/server/observability` (tag: vector)",
+        "purpose": "",
+        "risk_level": "low",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"vector\",\"embedding\",\"auth\"]",
+        "topFiles": "[\"src/lib/server/observability/inference-log.ts\"]",
+        "topoClasses": "[\"src/lib/server/observability\",\"src/lib/components/evidence\"]",
+        "fileCount": "36",
+        "source": "ace:cluster:hot",
+        "clusterId": "59",
+        "hotness": "0.5672",
+        "scalarSeed": "0.479",
+        "metadataSummary": "function chunks in `src/lib/server/observability` (tag: vector) | Risk: low | Tags: vector, embedding, auth | Files: src/lib/server/observability/inference-log.ts | Topo: src/lib/server/observability, src/lib/components/evidence",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:94": {
+        "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+        "purpose": "",
+        "risk_level": "low",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"redis\",\"cache\",\"api\",\"server\",\"embedding\"]",
+        "topFiles": "[\"src/lib/server/cache.ts\"]",
+        "topoClasses": "[\"src/lib/server/cache\",\"src/lib/server\",\"src/lib/cache\"]",
+        "fileCount": "921",
+        "source": "ace:cluster:hot",
+        "clusterId": "94",
+        "hotness": "0.5302",
+        "scalarSeed": "0.583",
+        "metadataSummary": "function chunks in `src/lib/server/cache` (tag: redis) | Risk: low | Tags: redis, cache, api, server, embedding | Files: src/lib/server/cache.ts | Topo: src/lib/server/cache, src/lib/server, src/lib/cache",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:90": {
+        "summary": "function chunks in `src/lib/server` (tag: auth)",
+        "purpose": "",
+        "risk_level": "low",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"auth\",\"api\",\"server\"]",
+        "topFiles": "[\"src/lib/server/lucia.ts\"]",
+        "topoClasses": "[\"src/lib/server\",\"src/routes/api/auth/logout\",\"src/lib/types\"]",
+        "fileCount": "158",
+        "source": "ace:cluster:hot",
+        "clusterId": "90",
+        "hotness": "0.4973",
+        "scalarSeed": "0.4932",
+        "metadataSummary": "function chunks in `src/lib/server` (tag: auth) | Risk: low | Tags: auth, api, server | Files: src/lib/server/lucia.ts | Topo: src/lib/server, src/routes/api/auth/logout, src/lib/types",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:20": {
+        "summary": "function chunks in `src/lib/webgpu` (tag: embedding)",
+        "purpose": "",
+        "risk_level": "low",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"embedding\",\"redis\",\"vector\",\"auth\",\"schema\"]",
+        "topFiles": "[\"src/lib/server/gpu/libtorch-bridge.ts\"]",
+        "topoClasses": "[\"src/lib/webgpu\",\"src/lib/server/gpu\",\"src/lib/gpu\"]",
+        "fileCount": "883",
+        "source": "ace:cluster:hot",
+        "clusterId": "20",
+        "hotness": "0.4969",
+        "scalarSeed": "0.5635",
+        "metadataSummary": "function chunks in `src/lib/webgpu` (tag: embedding) | Risk: low | Tags: embedding, redis, vector, auth, schema | Files: src/lib/server/gpu/libtorch-bridge.ts | Topo: src/lib/webgpu, src/lib/server/gpu, src/lib/gpu",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      },
+      "cluster:gpu:57": {
+        "summary": "const chunks in `src/lib/shims` (tag: embedding)",
+        "purpose": "",
+        "risk_level": "low",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"embedding\",\"vector\",\"auth\",\"server-module\",\"config\"]",
+        "topFiles": "[\"src/lib/server/gpu/libtorch-bridge.ts\",\"src/lib/server/retrieval/context-buffer.ts\"]",
+        "topoClasses": "[\"src/lib/shims\",\"src/lib/server/vector\",\"src/lib\"]",
+        "fileCount": "1099",
+        "source": "ace:cluster:hot",
+        "clusterId": "57",
+        "hotness": "0.4953",
+        "scalarSeed": "0.5766",
+        "metadataSummary": "const chunks in `src/lib/shims` (tag: embedding) | Risk: low | Tags: embedding, vector, auth, server-module, config | Files: src/lib/server/gpu/libtorch-bridge.ts, src/lib/server/retrieval/context-buffer.ts | Topo: src/lib/shims, src/lib/server/vector, src/lib",
+        "generatedAt": "2026-05-23T02:57:30.137Z"
+      }
+    }
+  }
+}

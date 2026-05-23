@@ -5,58 +5,58 @@
     {
       "command": "ast-grep",
       "error": null,
-      "events": 15930,
+      "events": 16129,
       "kind": "import_static",
       "rows": 0,
       "src_capture_present": 0,
       "status": 0,
       "stderr_len": 205,
-      "stdout_len": 5726919,
+      "stdout_len": 5787866,
       "symbol_after_regex": 0,
       "symbol_after_trim": 0
     },
     {
       "command": "ast-grep",
       "error": null,
-      "events": 3859,
+      "events": 3881,
       "kind": "import_dynamic",
-      "rows": 3858,
-      "src_capture_present": 3859,
+      "rows": 3880,
+      "src_capture_present": 3881,
       "status": 0,
       "stderr_len": 0,
-      "stdout_len": 2410716,
+      "stdout_len": 2422832,
       "symbol_after_regex": 0,
-      "symbol_after_trim": 3859
+      "symbol_after_trim": 3881
     },
     {
       "command": "sg",
       "error": null,
-      "events": 15919,
+      "events": 16129,
       "kind": "import_static",
       "rows": 0,
       "src_capture_present": 0,
       "status": 0,
       "stderr_len": 205,
-      "stdout_len": 5722742,
+      "stdout_len": 5787866,
       "symbol_after_regex": 0,
       "symbol_after_trim": 0
     },
     {
       "command": "sg",
       "error": null,
-      "events": 3859,
+      "events": 3881,
       "kind": "import_dynamic",
       "rows": 0,
-      "src_capture_present": 3859,
+      "src_capture_present": 3881,
       "status": 0,
       "stderr_len": 0,
-      "stdout_len": 2410716,
+      "stdout_len": 2422832,
       "symbol_after_regex": 0,
-      "symbol_after_trim": 3859
+      "symbol_after_trim": 3881
     }
   ],
-  "ast_import_rows": 3858,
-  "count": 33662,
+  "ast_import_rows": 3880,
+  "count": 34015,
   "generated_by": "scripts/index/ast-grep-map.mjs",
   "lane": "ast-grep+regex"
 }

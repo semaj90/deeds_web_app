@@ -4,7 +4,7 @@ path: "sveltekit-frontend/reports/deep-audit/d9-orphan-verification.json"
 aliases: ["d9-orphan-verification.json","sveltekit-frontend/reports/deep-audit/d9-orphan-verification.json"]
 clusterId: -1
 ext: ".json"
-lineCount: 12215
+lineCount: 12227
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/reports/deep-audit/d9-orphan-verification.json"
-last_updated_by_llm: "2026-05-20T21:32:13.151Z"
+last_updated_by_llm: "2026-05-22T01:55:37.591Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/json","t/json"]
 > JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 12215
+lines:: 12227
 ## Summary
 
 JSON data file

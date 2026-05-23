@@ -45,8 +45,14 @@ export async function searchCodeLexical(
   }
 }
 
-export interface HybridPgResult extends FTSResult {
-  semantic_score: number;
+export interface HybridPgResult {
+  stable_key: string;
+  path: string;
+  symbol: string | null;
+  content: string;
+  summary: string;
+  lex_rank: number | null;
+  sem_rank: number | null;
   hybrid_score: number;
 }
 
@@ -177,12 +183,13 @@ export async function syncCodeRetrievalChunks(opts: {
 
 export async function searchCodeHybridPg(
   query: string,
-  embedding: number[],
+  embedding: number[] | null,
   opts: FTSOptions = {}
 ): Promise<HybridPgResult[]> {
   const { limit = 20, topoClass = null } = opts;
 
   if (!query.trim()) return [];
+  if (!Array.isArray(embedding) || embedding.length !== 768) return [];
 
   try {
     const embStr = `[${embedding.join(',')}]`;

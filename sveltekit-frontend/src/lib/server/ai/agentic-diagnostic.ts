@@ -44,4 +44,35 @@ export class AgenticDiagnosticService {
 			rootCauseAnalysis: 'Vector-matched codebase chunks based on error signature.'
 		};
 	}
+
+	/**
+	 * Enhanced health check for OpenCode skills and deep research fallback.
+	 */
+	static async healthCheck(): Promise<{ ok: boolean, status: string }> {
+		const checks = {
+			mcpServer: false,
+			deepResearch: false
+		};
+
+		// 1. Check trace MCP
+		try {
+			const res = await fetch('http://127.0.0.1:8788/mcp', { method: 'OPTIONS' });
+			checks.mcpServer = res.ok;
+		} catch {
+			checks.mcpServer = false;
+		}
+
+		// 2. Check deep research (LangGraph Synthesis container)
+		try {
+			const res = await fetch('http://127.0.0.1:8091/health');
+			checks.deepResearch = res.ok;
+		} catch {
+			checks.deepResearch = false;
+		}
+
+		return {
+			ok: checks.mcpServer || checks.deepResearch,
+			status: `MCP: ${checks.mcpServer ? 'UP' : 'DOWN'} | Deep Research: ${checks.deepResearch ? 'UP' : 'DOWN'}`
+		};
+	}
 }

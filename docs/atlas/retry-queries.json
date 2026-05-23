@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-05-23T03:51:04.011Z",
+  "count": 6,
+  "retries": [
+    {
+      "featureKey": "cache_trace",
+      "status": "failed",
+      "summary": "Redis cache trace key still missing",
+      "errorSignature": "EXISTS obs:cache-trace:recent = 0",
+      "retryQuery": "where CacheLogger.trace is called at runtime",
+      "lastAttempted": "2026-05-22T20:15:00.000Z",
+      "commandsRun": [],
+      "filesChanged": []
+    },
+    {
+      "featureKey": "toon_packet_shape",
+      "status": "partial",
+      "summary": "TOON packet shape needs schema integration",
+      "errorSignature": "",
+      "retryQuery": "where toon_packet_shape is configured",
+      "lastAttempted": "2026-05-22T20:16:00.000Z",
+      "commandsRun": [],
+      "filesChanged": []
+    },
+    {
+      "featureKey": "qdrant_payload_parity",
+      "status": "partial",
+      "summary": "Qdrant schema has partial parity with database",
+      "errorSignature": "",
+      "retryQuery": "where qdrant_payload_parity is configured",
+      "lastAttempted": "2026-05-22T20:17:00.000Z",
+      "commandsRun": [],
+      "filesChanged": []
+    },
+    {
+      "featureKey": "check_script",
+      "status": "blocked",
+      "summary": "Type check script is stalling/blocking",
+      "errorSignature": "tsc execution takes too long or hangs",
+      "retryQuery": "where check_script is configured",
+      "lastAttempted": "2026-05-22T20:19:00.000Z",
+      "commandsRun": [
+        "npm run check"
+      ],
+      "filesChanged": []
+    },
+    {
+      "featureKey": "atlas_build",
+      "status": "partial",
+      "summary": "Atlas build partially complete but long-running",
+      "errorSignature": "",
+      "retryQuery": "where atlas_build is configured",
+      "lastAttempted": "2026-05-22T20:20:00.000Z",
+      "commandsRun": [
+        "npm run atlas:build"
+      ],
+      "filesChanged": []
+    },
+    {
+      "featureKey": "unknown",
+      "status": "partial",
+      "summary": "",
+      "errorSignature": "",
+      "retryQuery": "where unknown is configured",
+      "lastAttempted": "2026-05-23T03:28:26.412Z",
+      "commandsRun": [],
+      "filesChanged": []
+    }
+  ]
+}

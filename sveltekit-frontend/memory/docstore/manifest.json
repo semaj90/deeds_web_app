@@ -1,13 +1,13 @@
 {
-  "runId": "2026-05-20T21-28-24",
-  "indexedAt": "2026-05-21T16:51:00.128Z",
+  "runId": "2026-05-23T02-44-53",
+  "indexedAt": "2026-05-23T05:52:52.432Z",
   "clusterCount": 92,
   "relTypeCount": 5,
   "totalCards": 99,
   "sinks": {
     "couchdb": {
       "ok": true,
-      "written": 99,
+      "written": 96,
       "db": "wiki_cards"
     },
     "redis": {

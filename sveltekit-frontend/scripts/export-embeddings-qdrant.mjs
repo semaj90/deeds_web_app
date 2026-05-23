@@ -38,13 +38,15 @@ function resolveVector(raw, preferredName) {
 
 async function main() {
   const cfg = parseArgs();
-  if (cfg.help || !cfg.collection) {
-    console.log('Usage: node export-embeddings-qdrant.mjs --collection <name> --output <file> [--qdrant-url http://localhost:6333] [--batch 500]');
-    process.exit(cfg.help ? 0 : 1);
+  if (cfg.help) {
+    console.log(
+      'Usage: node export-embeddings-qdrant.mjs --collection <name> --output <file> [--qdrant-url http://localhost:6333] [--batch 500]'
+    );
+    process.exit(0);
   }
   const qdrant = cfg.qdrant || 'http://127.0.0.1:6333';
-  const coll = cfg.collection;
-  const out = cfg.output || `sveltekit-frontend/tmp/${coll}-embeddings.ndjson`;
+  const coll = cfg.collection || process.env.QDRANT_EXPORT_COLLECTION || 'codebase_chunks_768';
+  const out = cfg.output || process.env.QDRANT_EXPORT_OUTPUT || `tmp/${coll}-embeddings.ndjson`;
   const batch = cfg.batch || 500;
 
   fs.mkdirSync(path.dirname(out), { recursive: true });
@@ -56,7 +58,7 @@ async function main() {
   let totalExported = 0;
   while (true) {
     const url = `${qdrant}/collections/${encodeURIComponent(coll)}/points/scroll`;
-    const body = { limit: batch, with_vector: true, with_payload: false };
+    const body = { limit: batch, with_vector: true, with_payload: true };
     if (cursor !== null) body.offset = cursor;
     const headers = { 'Content-Type': 'application/json' };
     if (cfg.apiKey) headers['api-key'] = cfg.apiKey;
@@ -65,17 +67,24 @@ async function main() {
     const j = await res.json();
     // Handle both { result: { points, next_page_offset } } and legacy { points }
     const result = j.result ?? {};
-    const points = Array.isArray(result.points) ? result.points
-                  : Array.isArray(result)         ? result
-                  : Array.isArray(j.points)        ? j.points
-                  : [];
+    const points = Array.isArray(result.points)
+      ? result.points
+      : Array.isArray(result)
+        ? result
+        : Array.isArray(j.points)
+          ? j.points
+          : [];
     if (points.length === 0) break;
     for (const p of points) {
       const id = p.id ?? p.point_id ?? null;
       const rawVec = p.vector ?? p.payload?.vector ?? p.payload?.embedding ?? null;
       const flat = resolveVector(rawVec, cfg.vectorName);
+      const stable_key = p.payload?.stable_key ?? p.payload?.stableKey ?? null;
+      const source_ref = p.payload?.source_ref ?? p.payload?.sourceRef ?? null;
+      const protocols = p.payload?.protocols ?? p.payload?.protocolDetected ?? [];
+
       if (Array.isArray(flat) && flat.length > 0) {
-        ws.write(JSON.stringify({ id, embedding: flat }) + '\n');
+        ws.write(JSON.stringify({ id, stable_key, source_ref, protocols, embedding: flat }) + '\n');
         totalExported++;
       }
     }

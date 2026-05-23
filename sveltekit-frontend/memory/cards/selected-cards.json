@@ -972,7 +972,7 @@
       "summary": "Bifrost KV prefix cache for shareable system prompts and warm prefixes."
     }
   ],
-  "generatedAt": "2026-05-21T19:26:43.730Z",
+  "generatedAt": "2026-05-23T03:51:11.919Z",
   "kind": "selected-cards",
   "sourceSummary": {
     "cluster": 20,
@@ -980,6 +980,7 @@
     "featureMap": 19,
     "memory": 4,
     "pathway": 50,
+    "summary": 13874,
     "tool": 6
   }
 }

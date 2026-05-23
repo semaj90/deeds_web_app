@@ -31,7 +31,7 @@ import {
   buildAceCompletionCacheKey,
 } from '$lib/server/cache-keys.js';
 import { getExactMatchCache, setExactMatchCache } from '$lib/server/cache/redis-exact-match.js';
-import { scoreIntent, logIntentEvalEvent } from '$lib/server/ai/intent-ranker.js';
+import { rankIntent, logIntentEvalEvent } from '$lib/server/ai/intent-ranker.js';
 import {
   labelsSignature,
   normalizeLabels,
@@ -920,7 +920,7 @@ export async function runChatCompletion(
   const completionKey = buildAceCompletionCacheKey(packetKey, userQueryHash);
   const cachedPrompt = await getExactMatchCache(completionKey);
 
-  const intentScorerDecision = await scoreIntent({
+  const intentRankerDecision = await rankIntent({
     query,
     model: finalModelUsed,
     userId: opts.userId,
@@ -937,16 +937,16 @@ export async function runChatCompletion(
     userId: opts.userId,
     sessionId: undefined,
     model: finalModelUsed,
-    queryHash: intentScorerDecision.queryHash,
-    decision: intentScorerDecision.decision,
-    confidence: intentScorerDecision.confidence,
-    rankedCandidates: intentScorerDecision.rankedCandidates,
-    rankingLoss: intentScorerDecision.rankingLoss,
-    intentLabel: intentScorerDecision.intentLabel,
-    intentConfidence: intentScorerDecision.intentConfidence,
-    cacheKeys: intentScorerDecision.cacheKeys,
-    featureInputs: intentScorerDecision.selectedFeatureInputs,
-    didYouMean: intentScorerDecision.didYouMean,
+    queryHash: intentRankerDecision.queryHash,
+    decision: intentRankerDecision.decision,
+    confidence: intentRankerDecision.confidence,
+    rankedCandidates: intentRankerDecision.rankedCandidates,
+    rankingLoss: intentRankerDecision.rankingLoss,
+    intentLabel: intentRankerDecision.intentLabel,
+    intentConfidence: intentRankerDecision.intentConfidence,
+    cacheKeys: intentRankerDecision.cacheKeys,
+    featureInputs: intentRankerDecision.selectedFeatureInputs,
+    didYouMean: intentRankerDecision.didYouMean,
     durationMs: Date.now() - startMs,
     queryPreview: query,
   });

@@ -7,7 +7,7 @@ import {
 export const load: PageServerLoad = async () => {
   const [overview, pageRankTop] = await Promise.all([
     getGraphOverview().catch(() => null),
-    getGraphPageRankTop(30).catch(() => []),
+    getGraphPageRankTop(100).catch(() => []),
   ]);
 
   return { overview, pageRankTop };

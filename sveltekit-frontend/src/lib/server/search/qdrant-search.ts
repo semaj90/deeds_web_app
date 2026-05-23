@@ -30,12 +30,13 @@ function getManager(): QdrantManager {
 export async function searchQdrantCode(
   embedding: number[],
   limit = 30,
-  topoClass?: string
+  topoClass?: string,
+  collection = 'codebase_chunks_768'
 ): Promise<QdrantCodeResult[]> {
   try {
     const mgr = getManager();
     const mustConditions: any[] = [];
-    
+
     if (topoClass) {
       mustConditions.push({ key: 'topo_class', match: { value: topoClass } });
     }
@@ -55,7 +56,7 @@ export async function searchQdrantCode(
     const filter = mustConditions.length > 0 ? { must: mustConditions } : undefined;
 
     const res = await mgr.hybridSearch({
-      collection: 'codebase_chunks_768',
+      collection,
       query: '',
       queryEmbedding: embedding,
       limit,
@@ -65,18 +66,18 @@ export async function searchQdrantCode(
     return (res.results ?? []).map((r) => {
       const p = r.payload ?? {};
       return {
-        stable_key:            String(p.stable_key ?? p.chunk_id ?? r.id),
-        file_path:             String(p.file_path ?? ''),
-        symbol_name:           p.symbol_name ? String(p.symbol_name) : undefined,
-        symbol_kind:           p.symbol_kind ? String(p.symbol_kind) : undefined,
-        language:              p.language    ? String(p.language)    : undefined,
-        content:               String(p.content ?? p.chunk_text ?? ''),
-        tags:                  p.tags        ? String(p.tags)        : undefined,
-        topo_class:            p.topo_class  ? String(p.topo_class)  : undefined,
-        graph_authority_score: typeof p.graph_authority_score === 'number'
-                                 ? p.graph_authority_score : undefined,
-        semantic_score:        r.score,
-        qdrant_id:             String(r.id),
+        stable_key: String(p.stable_key ?? p.chunk_id ?? r.id),
+        file_path: String(p.file_path ?? ''),
+        symbol_name: p.symbol_name ? String(p.symbol_name) : undefined,
+        symbol_kind: p.symbol_kind ? String(p.symbol_kind) : undefined,
+        language: p.language ? String(p.language) : undefined,
+        content: String(p.content ?? p.chunk_text ?? ''),
+        tags: p.tags ? String(p.tags) : undefined,
+        topo_class: p.topo_class ? String(p.topo_class) : undefined,
+        graph_authority_score:
+          typeof p.graph_authority_score === 'number' ? p.graph_authority_score : undefined,
+        semantic_score: r.score,
+        qdrant_id: String(r.id),
       };
     });
   } catch {

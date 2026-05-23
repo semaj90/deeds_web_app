@@ -1,7 +1,7 @@
 ace_prefix:
   cache:
-    digest: 191738a0ca7f94ab
-    key: deeds:v1:gemma4-rotorquant:ace-prefix:191738a0ca7f94ab
+    digest: 0ed7a18d32cc75a1
+    key: deeds:v1:gemma4-rotorquant:ace-prefix:0ed7a18d32cc75a1
   endpoints[name,role,url]:
     llama-server	Gemma4 synthesis, 64K ctx	http://127.0.0.1:8090/v1
     trace	graph and compact context MCP	http://127.0.0.1:8788/mcp
@@ -31,9 +31,9 @@ ace_prefix:
     Qdrant	SYSTEM_AUDIT_SKILLS|diagnostics:health|llm:generate|search:sql	src/lib/server	src/lib/server/ai/hermes/skills/system-audit.ts	module	typescript	0
     Qdrant	VECTOR_CLUSTER_SKILLS|gpu:rerank|llm:generate|search:couchdb	semantic-retrieval	src/lib/server/ai/hermes/skills/vector-cluster.ts	module	typescript	0
     Qdrant|qdrant|redis.get|redis.mget	STABLE_TOOLS|ace:pack_context|attention:rank_files|attention_rank_files	src/lib/server	src/lib/server/ai/hermes/tools/registry.ts	module	typescript	0
-    getExactMatchCache|searchSemanticCache	logIntentEvalEvent|scoreIntent	src/lib/server	src/lib/server/ai/intent-ranker.ts	module	typescript	0
+    cosine|getExactMatchCache|searchSemanticCache	logIntentEvalEvent|macroRerank|rankIntent|recallEngramsForIntent	src/lib/server	src/lib/server/ai/intent-ranker.ts	module	typescript	0
     redis.get|redis.set	buildKvContextPacket|explainCompression|formatKvPacketForPrompt|getCompressedCard	src/lib/server	src/lib/server/ai/kv-context-controller.ts	module	typescript	0
-    Qdrant	CodeErrorSchema|LegalCitationSchema|MLSchemaMetadataSchema|chatCompletionViaOpenAICompat	src/lib/server	src/lib/server/ai/lang-extract.ts	module	typescript	0
+    Qdrant|qdrant	CodeErrorSchema|LegalCitationSchema|MLSchemaMetadataSchema|QueryFeaturesSchema	src/lib/server	src/lib/server/ai/lang-extract.ts	module	typescript	0
     qdrant	isLangGraphAvailable|langGraphCacheStats|langGraphHMMAdapt|langGraphHMMStats	src/lib/server	src/lib/server/ai/langgraph-client.ts	module	typescript	0
     Qdrant|embeddinggemma|qdrant|redis.get	content|formatGraphForClaudeCode|runConcurrentResearch	src/lib/server	src/lib/server/ai/langgraph-research.ts	module	typescript	0
     Qdrant	LLAMA_TOOL_DEFINITIONS|LLAMA_TO_MCP_NAME|clusters__get_members|clusters__get_summary_lenses	src/lib/server	src/lib/server/ai/llama-tool-definitions.ts	module	typescript	0
@@ -85,16 +85,16 @@ ace_prefix:
     	canUseTurboQuant|gatePreferredBackend	src/lib/server	src/lib/server/ai/backend-runtime-guards.ts	module	typescript	0
     	ASSIST_BUDGETS|COMPACT_DEFAULTS	src/lib/server	src/lib/server/ai/compact-budgets.ts	module	typescript	0
     	buildDevContextPlan|extractDevContextHits|isCodingPrompt|needsExplanation	src/lib/server	src/lib/server/ai/dev-context-planner.ts	module	typescript	0
+    	runWorkflowLoopLangGraph	src/lib/server	src/lib/server/ai/error-agent/workflow-loop-langgraph.ts	module	typescript	0
+    	classifyWorkflowInput|runWorkflowLoop	src/lib/server	src/lib/server/ai/error-agent/workflow-loop.ts	module	typescript	0
     	buildFeatureLabels	src/lib/server	src/lib/server/ai/feature-builder.ts	module	typescript	0
     	compressToHCACard|hcaCardToContextSnippet|hcaCardTokens	src/lib/server	src/lib/server/ai/hca-compressor.ts	module	typescript	0
-    	executeHermesPlan	src/lib/server	src/lib/server/ai/hermes-executor.ts	module	typescript	0
-    	hermesDispatcher	src/lib/server	src/lib/server/ai/hermes/dispatcher.ts	module	typescript	0
   lanes:
-    docs_rows: 25378
-    feature_rows: 9340
-    lexical_rows: 45936
+    docs_rows: 25695
+    feature_rows: 9459
+    lexical_rows: 47011
     structural_parser: ast-grep+regex
-    structural_rows: 33662
+    structural_rows: 34015
   policy:
     retrieval_order: rg -> ast/regex structure -> docs map -> semantic recall -> ACE packet -> Gemma4
     stable_prefix: true

@@ -1,6 +1,6 @@
 # Legal AI Platform — Developer Strategy Guide
 
-**Last updated: 2026-05-10**
+**Last updated: 2026-05-22**
 Status: `svelte-check 0 errors` · `vite build PASS` · Atlas smoke 8/10 · 73 MCP tools
 
 This is the "how to play this game" guide. It assumes you can read the code. It tells you the non-obvious things: which path to take when there are three options, which tool to call first, which port to use, and where prior mistakes are buried.
@@ -248,6 +248,10 @@ npm run smoke:hyperrag         # G-HR1–G-HR10 gates (9/9 pass when Docker+MCP 
 npm run seed:feature-atlas     # (Re-)seed 18 features / 34 edges
 npm run seed:feature-atlas:dry # Preview SQL
 
+# OpenCode sidecar MCPs (TurboVec/Engram/LangExtract)
+npm run mcp:opencode-sidecars       # start all three sidecars (:8791/:8792/:8793)
+npm run smoke:mcp:opencode-sidecars # tool surface + engram memory write/read smoke
+
 # Karpathy GPU authority blend
 npm run karpathy:gpu           # → Redis gpu:karpathy:scores / by_lane (top-50)
 npm run karpathy:ace:hits      # Cross-ref ACE hits vs Karpathy index (hit-rate report)
@@ -255,6 +259,28 @@ npm run karpathy:ace:hits      # Cross-ref ACE hits vs Karpathy index (hit-rate 
 # Type checking
 npm run typecheck:native       # tsgo 10× faster parallel audit
 npx svelte-check               # Must pass before commit
+
+# KAG phase gate
+npm run kag:phase-gate         # local mode (ast-grep optional if not installed)
+npm run kag:phase-gate:ci      # strict CI mode (missing ast-grep is a hard fail)
+```
+
+`kag:phase-gate` now auto-syncs Phase 0/1 checklist checkboxes in `../CODEX-KAG-CHECKLIST.md` from the generated report.
+
+### VS Code task shortcuts
+
+When working from the command palette (`Tasks: Run Task`), these two tasks are the quickest way to stay aligned with docs and strategy:
+
+| Task label | Purpose |
+|-----------|---------|
+| `📖 Open Codebase Strategy Guide` | Opens `docs/DEVELOPER_STRATEGY_GUIDE.md` directly in the editor. |
+| `📚 Docs: Refresh Programming Hub (web+rg)` | Rebuilds `docs/architecture/programming-docs-hub.md` by combining latest web docs fetches with local `rg` mappings. |
+| `🧪 Startup: OpenCode Sidecars Smoke (detached)` | Folder-open startup task; validates TurboVec/Engram/LangExtract sidecars when ports :8791/:8792/:8793 are live. |
+
+Equivalent npm command for the docs hub refresh:
+
+```bash
+npm run docs:programming:refresh
 ```
 
 ---
@@ -458,3 +484,549 @@ To activate, implement `scripts/hooks/check-tool-authority.mjs` and `scripts/hoo
 | `memory/karpathy-gpu-redis-ace.md` | Redis key layout, embed cascade, MLA revival path |
 | `memory/reconstruction-3-tracks.md` | 3-track timeline/image/3D architecture |
 | `memory/ioredis-coldstart-pattern.md` | Standalone script Redis connection pattern |
+
+---
+
+## 19. Engram Token-Mapping Policy
+
+Continue using EmbeddingGemma 768d as the canonical vector identity.
+
+### Core pipeline
+
+```txt
+User query
+  -> Intent guess
+  -> Engram recall
+  -> Cluster/card expansion
+  -> Qdrant/pgvector retrieval
+  -> Macro rerank
+  -> ACE packet
+  -> Redis/Bifrost cache
+  -> Gemma4 only after context is compact
+```
+
+### Required object IDs
+
+- [ ] source_id
+- [ ] chunk_id
+- [ ] summary_id
+- [ ] embedding_id
+- [ ] cluster_id
+- [ ] packet_id
+- [ ] memory_id
+
+### Registry rule
+
+Every answer should be traceable:
+
+```txt
+answer
+  -> packet_id
+  -> selected_cards
+  -> selected_clusters
+  -> source_id / chunk_id / summary_id
+  -> embedding_id
+  -> memory_id (if reused)
+```
+
+---
+
+## 20. Durable Memory Registry Schema
+
+### Table: memory_registry
+
+Suggested fields:
+
+```ts
+{
+  id: uuid;
+  sourceId: text;
+  chunkId: text | null;
+  summaryId: text | null;
+  embeddingId: text | null;
+  clusterId: text | null;
+  packetId: text | null;
+  memoryId: text | null;
+  featureFamily: text;
+  userIntent: text;
+  tags: jsonb;
+  hotness: real;
+  metadata: jsonb;
+  createdAt: timestamp;
+  updatedAt: timestamp;
+}
+```
+
+### Table: engram_cards
+
+Suggested fields:
+
+```ts
+{
+  id: uuid;
+  memoryId: text unique;
+  scope: text; // user | case | repo | agent | global
+  summary: text;
+  labels: jsonb;
+  relatedPaths: jsonb;
+  relatedTools: jsonb;
+  didYouMean: jsonb;
+  sourceRefs: jsonb;
+  embeddingId: text | null;
+  qdrantPointId: text | null;
+  ttlSeconds: integer | null;
+  createdAt: timestamp;
+}
+```
+
+### Table: intent_eval_runs
+
+Suggested fields:
+
+```ts
+{
+  id: uuid;
+  runId: text;
+  userQuery: text;
+  predictedIntent: text;
+  confidence: real;
+  selectedCards: jsonb;
+  selectedClusters: jsonb;
+  cacheHit: boolean;
+  userAccepted: boolean | null;
+  correctionLabel: text | null;
+  reward: real | null;
+  metadata: jsonb;
+  createdAt: timestamp;
+}
+```
+
+---
+
+## 21. Did-You-Mean + Intent Scorer Contract
+
+### Input
+
+```ts
+type IntentScorerInput = {
+  query: string;
+  userId?: string;
+  route?: string;
+  filePath?: string;
+  recentErrors?: string[];
+  conversationSummary?: string;
+};
+```
+
+### Output
+
+```ts
+type IntentScorerOutput = {
+  intent: string;
+  confidence: number;
+  nextAction: string;
+  didYouMean: Array<{
+    label: string;
+    intent: string;
+    confidence: number;
+    source: 'redis_engram' | 'qdrant_engram' | 'bifrost' | 'pg_trgm' | 'heuristic';
+    cards: string[];
+  }>;
+  routing: {
+    featureFamily?: string;
+    candidateClusters: string[];
+    qdrantFilters: Record<string, unknown>;
+  };
+};
+```
+
+### Feature blend
+
+Score intent using:
+
+- [ ] Redis hot Engram hit
+- [ ] Qdrant Engram cosine similarity
+- [ ] BMU/SOM cluster match
+- [ ] feature_family tag match
+- [ ] pg_trgm/FTS typo match
+- [ ] accepted reformulation history
+- [ ] current route/file context
+- [ ] previous user corrections
+
+### Confidence policy
+
+```txt
+confidence >= 0.80
+  -> route directly
+
+0.50 <= confidence < 0.80
+  -> return did_you_mean options + compact context
+
+confidence < 0.50
+  -> broad ACE retrieval + ask one clarifying question only if needed
+```
+
+---
+
+## 22. Macro Reranker Contract
+
+### Candidate card features
+
+```ts
+type RerankFeatureRow = {
+  candidateId: string;
+  intentFit: number;
+  cosine: number;
+  bm25: number;
+  tagOverlap: number;
+  clusterHotness: number;
+  recency: number;
+  authority: number;
+  engramMatch: number;
+  tokenCost: number;
+  historicalReward: number;
+};
+```
+
+### Ranking formula (first pass)
+
+```txt
+score =
+  0.25 intentFit
++ 0.20 cosine
++ 0.15 tagOverlap
++ 0.15 clusterHotness
++ 0.10 authority
++ 0.05 engramMatch
++ 0.05 recency
+- 0.05 tokenCost
+```
+
+### Later
+
+- [ ] Replace formula with XGBoost after enough logs exist.
+- [ ] Export GRPO rows later.
+- [ ] Do not train before logging enough accepted/rejected outcomes.
+
+---
+
+## 23. LangExtract Hooks
+
+Use LangExtract-style extraction before reranking.
+
+### Extract from user query
+
+- [ ] DB terms: table, index, sqlstate, constraint
+- [ ] Legal terms: statute, party, claim, date
+- [ ] Code terms: file, route, function, error
+- [ ] Tool terms: MCP tool name, command, failed service
+- [ ] Intent hints: why, fix, summarize, compare, test
+
+### Output
+
+```json
+{
+  "entities": [],
+  "error_labels": [],
+  "candidate_intents": [],
+  "candidate_feature_families": [],
+  "candidate_tools": []
+}
+```
+
+---
+
+## 24. ACE Packet Contextual Retrieval
+
+### Quick "do we already have this?" order
+
+```txt
+1. Redis exact completion cache
+2. Redis packet cache
+3. Redis hot EngramCards
+4. Bifrost semantic cache
+5. Qdrant Engram/Card search
+6. pgvector fallback
+7. rg/codebase search
+8. raw file read only as last resort
+```
+
+### ACE packet should include
+
+- [ ] intent
+- [ ] confidence
+- [ ] did_you_mean suggestions
+- [ ] selected EngramCards
+- [ ] selected ClusterCards
+- [ ] selected source refs
+- [ ] token estimate
+- [ ] cache keys
+- [ ] fallback reason if raw files are needed
+
+---
+
+## 25. OpenCode Workflow Timing Tests
+
+### Test A - tool surface
+
+```powershell
+npm run opencode:startup:mcp
+npm run opencode:startup
+```
+
+Expected:
+
+- [ ] context.build_kv_packet visible
+- [ ] atlas.compact_context visible
+- [ ] ace.compact_search visible
+- [ ] graph.expand_neighborhood visible
+- [ ] trace.kag_search visible
+- [ ] search.rerank visible
+
+### Test B - cache timing
+
+Run the same query twice.
+
+Expected:
+
+```txt
+first run:
+  packetCacheHit = false or partial
+  completionCacheHit = false
+
+second run:
+  packetCacheHit = true
+  completionCacheHit = true
+  lower latency
+```
+
+### Test C - did-you-mean timing
+
+Queries:
+
+```txt
+why does username already taken happen?
+postgres 23505 email bug
+user signup duplicate key
+```
+
+Expected:
+
+- [ ] All route to db_constraint_error.
+- [ ] All retrieve same ConstraintCard.
+- [ ] Did-you-mean offers Postgres unique violation 23505.
+- [ ] ACE packet stays under 1,500 tokens.
+
+### Test D - wrong-intent correction
+
+Run query:
+
+```txt
+why is my route timing out?
+```
+
+Then correct:
+
+```txt
+I meant OpenCode TRACE MCP tool timeout.
+```
+
+Expected:
+
+- [ ] First run logs uncertain or wrong intent.
+- [ ] Correction creates/updates EngramCard.
+- [ ] Third similar query recalls corrected EngramCard.
+
+### 25.1 OpenCode MCP Tool Calling (Minimal-by-default)
+
+Goal: make tool calling work reliably without calling every MCP tool.
+
+Core MCP tools (default-on):
+
+- [x] `trace.kag_search`
+- [x] `trace.atlas_query`
+- [x] `context.build_kv_packet`
+- [x] `ace.compact_search`
+- [x] `gemma4-offload` (runtime diagnostics only)
+
+Optional MCP tools (opt-in only):
+
+- [ ] `engram-embed` (enable only when embedding lane is required)
+- [ ] `turbovec-sidecar` (enable only when vector-sidecar is healthy)
+- [ ] `langextract` (enable only for extraction workloads)
+
+Why: this avoids cascading failures when sidecars are degraded while preserving core retrieval + packet assembly.
+
+### 25.2 Vercel AI SDK in VS Code Workspace
+
+The workspace uses the Vercel AI SDK packages with an OpenAI-compatible provider for local Gemma4 endpoints.
+
+Install commands:
+
+```powershell
+# workspace root
+npm install ai @ai-sdk/openai-compatible --save
+
+# app workspace (if needed)
+cd sveltekit-frontend
+npm install ai @ai-sdk/openai-compatible --save
+```
+
+Core startup gate command (fail-fast core, warn-only optional sidecars):
+
+```powershell
+cd sveltekit-frontend
+npm run opencode:startup:mcp
+```
+
+Strict optional mode (fails if optional sidecars are down):
+
+```powershell
+cd sveltekit-frontend
+npm run smoke:mcp:core-gate:strict-optional
+```
+
+### 25.3 VS Code OpenAI-Compatible Tool Calling (Gemma4)
+
+```ts
+import { generateText, tool } from 'ai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { z } from 'zod';
+
+const provider = createOpenAICompatible({
+  name: 'turboquant',
+  apiKey: 'local',
+  baseURL: 'http://127.0.0.1:8090/v1'
+});
+
+const result = await generateText({
+  model: provider('gemma4-tq'),
+  prompt: 'Find likely root cause for MCP timeout and build a compact context card.',
+  tools: {
+    kagSearch: tool({
+      inputSchema: z.object({ query: z.string(), limit: z.number().default(5) }),
+      execute: async ({ query, limit }) => ({ tool: 'trace.kag_search', query, limit })
+    })
+  }
+});
+
+console.log(result.text);
+```
+
+### 25.4 Official Library URLs (Docs / Fetching)
+
+- Vercel AI SDK docs: `https://ai-sdk.dev/docs`
+- OpenAI-compatible provider docs: `https://ai-sdk.dev/providers/openai-compatible`
+- AI SDK core API reference: `https://ai-sdk.dev/docs/reference/ai-sdk-core`
+- MCP spec (tool-calling transport): `https://modelcontextprotocol.io/introduction`
+- OpenCode config schema URL (in config files): `https://opencode.ai/config.json`
+
+---
+
+## 26. Eval Dataset
+
+Create JSONL: tests/fixtures/intent-eval.jsonl
+
+Row shape:
+
+```json
+{
+  "query": "why does username or email already taken happen?",
+  "expectedIntent": "db_constraint_error",
+  "expectedCards": ["constraint:users:email_unique"],
+  "expectedDidYouMean": ["Postgres unique violation 23505"]
+}
+```
+
+Suggested categories:
+
+- [ ] DB constraint errors
+- [ ] OpenCode tool errors
+- [ ] Qdrant no-hit retrieval gaps
+- [ ] legal issue spotting
+- [ ] evidence analysis
+- [ ] model runtime / llama-server errors
+- [ ] schema drift / Drizzle audit
+- [ ] frontend SvelteKit routing errors
+
+---
+
+## 27. Vitest Eval Harness
+
+Create: tests/intent-scorer.spec.ts
+
+Test assertions:
+
+- [ ] intent matches expected
+- [ ] confidence above threshold
+- [ ] expected cards included
+- [ ] did_you_mean includes expected label
+- [ ] reranker selects correct top card
+- [ ] ACE packet token estimate under budget
+- [ ] cache keys deterministic
+
+---
+
+## 28. Redis / Qdrant Eval Checks
+
+### Redis
+
+```powershell
+docker exec legal-ai-redis redis-cli KEYS "ace:engram:*"
+docker exec legal-ai-redis redis-cli KEYS "ace:packet:*"
+docker exec legal-ai-redis redis-cli KEYS "ace:completion:*"
+```
+
+### Qdrant payload checks
+
+- [ ] memory_id
+- [ ] feature_family
+- [ ] intent
+- [ ] tags
+- [ ] cluster_key
+- [ ] summary
+- [ ] source_refs
+
+---
+
+## 29. Build Order
+
+Implementation status (2026-05-22):
+
+- [x] Drizzle TypeScript tables added: `memory_registry`, `engram_cards`, `intent_eval_runs`.
+- [x] Manual SQL migration drafted: `drizzle/manual/20260522_engram_registry.sql`.
+- [x] Manual SQL migration applied on live dev Postgres (`localhost:5434` / `legal_ai_db`) and verified.
+- [x] Redis Engram writes now mirror into Postgres in fail-open mode (`engram-registry.ts`).
+- [x] Unit coverage added for durable mirror writes (`tests/engram-registry.spec.ts`).
+- [x] DB integration coverage added and passing (`tests/engram-registry-db.integration.spec.ts`, opt-in via `RUN_DB_INTEGRATION=1`).
+
+### Now
+
+- [x] Define memory_registry schema.
+- [x] Define engram_cards schema.
+- [x] Define intent_eval_runs schema.
+- [x] Implement `rankIntent` (cosine-assisted ranker; alias from `scoreIntent` kept for compatibility).
+- [x] Implement `recallEngramsForIntent()`.
+- [x] Implement did-you-mean blend.
+- [ ] Add eval fixture JSONL.
+- [ ] Add Vitest eval harness.
+
+### Next
+
+- [ ] Add macro reranker feature-row logging.
+- [ ] Add LangExtract extraction stage.
+- [ ] Add Bifrost semantic cache lookup before Qdrant.
+- [ ] Add OpenCode timing metrics.
+- [ ] Add correction feedback loop.
+- [ ] Keep OpenCode default tool-calling on core MCP tools only (`trace/context/ace`), opt-in sidecars.
+- [ ] Add CI smoke that fails only when core MCP tools are unavailable; warn-only for optional sidecars.
+- [ ] Add per-run telemetry field: `toolPlan.coreOnly` vs `toolPlan.withOptionalSidecars`.
+
+### Later
+
+- [ ] Train XGBoost reranker.
+- [ ] Export GRPO rows.
+
+Execution checklist reference:
+
+- `../CODEX-KAG-CHECKLIST.md` (workspace root)

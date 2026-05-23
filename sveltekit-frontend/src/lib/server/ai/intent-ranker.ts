@@ -13,8 +13,11 @@ import { logEvent } from '$lib/server/analytics/event-logger.js';
 import { hashStr } from '$lib/server/cache-keys.js';
 import type { CachedLLMResponse } from '$lib/server/cache/redis-exact-match.js';
 import type { SemanticHit } from '$lib/server/cache/redis-semantic-cache.js';
+import { db } from '$lib/server/db/client.js';
+import { engramCards, intentEvalRuns } from '$lib/server/db/schema.js';
+import { eq } from 'drizzle-orm';
 
-export type IntentScorerDecision = {
+export type IntentRankerDecision = {
   queryHash: string;
   decision:
     | 'exact_cache_answer'
@@ -25,18 +28,18 @@ export type IntentScorerDecision = {
     | 'run_full_synthesis';
   confidence: number;
   rankedCandidates: Array<{
-    decision: IntentScorerDecision['decision'];
+    decision: IntentRankerDecision['decision'];
     score: number; // normalized 0-1 ranking score
     rawScore: number; // original routing signal before softmax
     probability: number;
     reasons: string[];
   }>;
   rankingLoss: {
-    bestDecision: IntentScorerDecision['decision'];
+    bestDecision: IntentRankerDecision['decision'];
     margin: number;
     entropy: number;
     negativeLogLikelihood: number;
-    targetDecision?: IntentScorerDecision['decision'];
+    targetDecision?: IntentRankerDecision['decision'];
     targetLoss?: number;
   };
   intentLabel: string;
@@ -58,33 +61,33 @@ export type IntentEvalEvent = {
   sessionId?: string;
   model: string;
   queryHash: string;
-  decision: IntentScorerDecision['decision'];
+  decision: IntentRankerDecision['decision'];
   confidence: number;
   rankedCandidates: Array<{
-    decision: IntentScorerDecision['decision'];
+    decision: IntentRankerDecision['decision'];
     score: number; // normalized 0-1 ranking score
     rawScore: number; // original routing signal before softmax
     probability: number;
     reasons: string[];
   }>;
   rankingLoss: {
-    bestDecision: IntentScorerDecision['decision'];
+    bestDecision: IntentRankerDecision['decision'];
     margin: number;
     entropy: number;
     negativeLogLikelihood: number;
-    targetDecision?: IntentScorerDecision['decision'];
+    targetDecision?: IntentRankerDecision['decision'];
     targetLoss?: number;
   };
   intentLabel: string;
   intentConfidence: number;
   cacheKeys: string[];
   featureInputs: Record<string, number | string | boolean | null>;
-  didYouMean?: IntentScorerDecision['didYouMean'];
+  didYouMean?: IntentRankerDecision['didYouMean'];
   durationMs: number;
   queryPreview: string;
 };
 
-export interface IntentScorerInput {
+export interface IntentRankerInput {
   query: string;
   model: string;
   userId?: string;
@@ -97,10 +100,10 @@ export interface IntentScorerInput {
   embedding?: Float32Array | number[];
   exactCacheEntry?: CachedLLMResponse | null;
   exactCacheChecked?: boolean;
-  targetDecision?: IntentScorerDecision['decision'];
+  targetDecision?: IntentRankerDecision['decision'];
 }
 
-export interface IntentScorerDependencies {
+export interface IntentRankerDependencies {
   engramAdapter?: LocalEngramMemoryAdapter;
   exactMatchCacheFetcher?: (cacheKey: string) => Promise<CachedLLMResponse | null>;
   semanticSearcher?: (
@@ -120,6 +123,33 @@ const DEFAULT_DECISION_CONFIDENCE = 0.35;
 const MIN_DYM_CONFIDENCE = 0.48;
 const DEFAULT_SCOPE = 5;
 
+// Zero Hidden Thoughts sanitization helper
+export function sanitizeZeroHiddenThoughts<T>(obj: T): T {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map((item) => sanitizeZeroHiddenThoughts(item)) as unknown as T;
+  }
+  if (typeof obj === 'object') {
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (
+        key === 'hiddenThoughts' ||
+        key === 'chainOfThought' ||
+        key === 'kv_cache' ||
+        key === 'tensor' ||
+        key === 'cudaPointer'
+      ) {
+        continue;
+      }
+      cleaned[key] = sanitizeZeroHiddenThoughts(value);
+    }
+    return cleaned as T;
+  }
+  return obj;
+}
+
 function buildEvalTraceId(queryHash: string): string {
   return createHash('sha256')
     .update(`${queryHash}:${Date.now()}:${Math.random()}`)
@@ -134,7 +164,7 @@ function normalizeQuery(query: string): string {
 function buildDidYouMeanCandidates(
   hints: NonNullable<Awaited<ReturnType<LocalEngramMemoryAdapter['getRoutingHints']>>>
 ) {
-  const candidates: IntentScorerDecision['didYouMean'] = [];
+  const candidates: IntentRankerDecision['didYouMean'] = [];
   const seen = new Set<string>();
 
   if (hints.didYouMean) {
@@ -173,7 +203,7 @@ function buildDidYouMeanCandidates(
   return candidates.length > 0 ? candidates : undefined;
 }
 
-function buildCacheKeys(input: IntentScorerInput): string[] {
+function buildCacheKeys(input: IntentRankerInput): string[] {
   return [input.completionKey, input.packetKey].filter((value): value is string => Boolean(value));
 }
 
@@ -183,7 +213,7 @@ function buildFeatureInputs(
   hints: NonNullable<Awaited<ReturnType<LocalEngramMemoryAdapter['getRoutingHints']>>>,
   intentPlan: ExecutionPlan,
   semanticHit: SemanticHit | null,
-  input: IntentScorerInput
+  input: IntentRankerInput
 ) {
   return {
     exactCacheHit: exactHit,
@@ -218,8 +248,8 @@ function buildRankedCandidates(
   semanticHit: SemanticHit | null,
   hints: NonNullable<Awaited<ReturnType<LocalEngramMemoryAdapter['getRoutingHints']>>>,
   intentPlan: ExecutionPlan,
-  input: IntentScorerInput
-): IntentScorerDecision['rankedCandidates'] {
+  input: IntentRankerInput
+): IntentRankerDecision['rankedCandidates'] {
   const engramSignal = Number(Boolean(hints.didYouMean)) + hints.priorQueries.length * 0.2 + hints.bmuHints.length * 0.25;
   const workflowSignal = Math.min(0.6, hints.workflowMemories.length * 0.2);
   const semanticScore = semanticHit?.score ?? 0;
@@ -272,14 +302,15 @@ function buildRankedCandidates(
       rawScore: candidate.score,
       score: probabilities[index],
       probability: probabilities[index],
+      reasons: candidate.reasons,
     }))
     .sort((a, b) => b.rawScore - a.rawScore);
 }
 
 function buildRankingLoss(
-  rankedCandidates: IntentScorerDecision['rankedCandidates'],
-  targetDecision?: IntentScorerDecision['decision']
-): IntentScorerDecision['rankingLoss'] {
+  rankedCandidates: IntentRankerDecision['rankedCandidates'],
+  targetDecision?: IntentRankerDecision['decision']
+): IntentRankerDecision['rankingLoss'] {
   const best = rankedCandidates[0];
   const second = rankedCandidates[1];
   const probabilities = rankedCandidates.map((candidate) => candidate.probability);
@@ -298,10 +329,10 @@ function buildRankingLoss(
   };
 }
 
-export async function scoreIntent(
-  input: IntentScorerInput,
-  deps: IntentScorerDependencies = {}
-): Promise<IntentScorerDecision> {
+export async function rankIntent(
+  input: IntentRankerInput,
+  deps: IntentRankerDependencies = {}
+): Promise<IntentRankerDecision> {
   const nowMs = deps.nowMs?.() ?? Date.now();
   const query = normalizeQuery(input.query);
   const queryHash = hashStr(query);
@@ -335,7 +366,9 @@ export async function scoreIntent(
 
   let intentPlan: ExecutionPlan;
   try {
-    const classify = deps.intentClassifier ?? ((q: string) => Promise.resolve(IntentOrchestrator.getFallbackPlan(q)));
+    const classify =
+      deps.intentClassifier ??
+      ((q: string) => Promise.resolve(IntentOrchestrator.getFallbackPlan(q)));
     intentPlan = await classify(query, input.history ?? []);
   } catch {
     intentPlan = IntentOrchestrator.getFallbackPlan(query);
@@ -346,16 +379,21 @@ export async function scoreIntent(
     const redis = deps.redisClient ?? getRedis();
     if (redis) {
       try {
-        semanticHit = await (deps.semanticSearcher ?? searchSemanticCache)(redis, input.embedding, input.model).catch(() => null);
+        semanticHit = await (deps.semanticSearcher ?? searchSemanticCache)(
+          redis,
+          input.embedding,
+          input.model
+        ).catch(() => null);
       } catch {
         semanticHit = null;
       }
     }
   }
 
-  const exactAgeSeconds = exactCacheEntry && exactCacheEntry.cachedAt
-    ? Math.round((nowMs - new Date(exactCacheEntry.cachedAt).getTime()) / 1000)
-    : null;
+  const exactAgeSeconds =
+    exactCacheEntry && exactCacheEntry.cachedAt
+      ? Math.round((nowMs - new Date(exactCacheEntry.cachedAt).getTime()) / 1000)
+      : null;
 
   const featureInputs = buildFeatureInputs(
     Boolean(exactCacheEntry),
@@ -374,50 +412,186 @@ export async function scoreIntent(
     input
   );
   const rankingLoss = buildRankingLoss(rankedCandidates, input.targetDecision);
-  const decision = rankedCandidates[0]?.decision ?? 'run_retrieval';
-  const confidence = rankedCandidates[0]?.probability ?? DEFAULT_DECISION_CONFIDENCE;
+
+  // Apply confidence policy on intentConfidence
+  const intentConfidence = intentPlan.confidence;
+  let finalDecision = rankedCandidates[0]?.decision ?? 'run_retrieval';
+
+  if (finalDecision !== 'exact_cache_answer' && finalDecision !== 'semantic_cache_answer') {
+    const hasDym = buildDidYouMeanCandidates(engramHints);
+    if (finalDecision === 'show_did_you_mean' && hasDym && hasDym.length > 0) {
+      // keep show_did_you_mean
+    } else {
+      if (intentConfidence >= 0.8) {
+        // Route directly
+      } else if (intentConfidence >= 0.5) {
+        // Show did-you-mean suggestions + compact context
+        finalDecision = 'show_did_you_mean';
+      } else {
+        // Broad retrieval + clarifying question
+        finalDecision = 'run_retrieval';
+      }
+    }
+  }
+
+  const matchingCandidate = rankedCandidates.find((c) => c.decision === finalDecision);
+  const confidence = matchingCandidate
+    ? matchingCandidate.probability
+    : (rankedCandidates[0]?.probability ?? DEFAULT_DECISION_CONFIDENCE);
+
+  const evalRunId = buildEvalTraceId(queryHash);
+
+  // Save the evaluation run to DB
+  try {
+    const cards = engramHints.workflowMemories.map((m) => m.summary);
+    const clusters = engramHints.clusterHints || [];
+
+    const dbPayload = sanitizeZeroHiddenThoughts({
+      runId: evalRunId,
+      userQuery: query,
+      predictedIntent: intentPlan.intent,
+      confidence: intentConfidence,
+      selectedCards: cards,
+      selectedClusters: clusters,
+      cacheHit: Boolean(exactCacheEntry),
+      metadata: {
+        decision: finalDecision,
+        rankedCandidates,
+        rankingLoss,
+        didYouMean: buildDidYouMeanCandidates(engramHints),
+        featureInputs,
+        model: input.model,
+      },
+    });
+
+    await db.insert(intentEvalRuns).values(dbPayload);
+  } catch (dbErr) {
+    // degrade silently so DB issues do not crash the ranker
+    console.error('[IntentRanker] Failed to persist eval run:', dbErr);
+  }
 
   return {
     queryHash,
-    decision,
+    decision: finalDecision,
     confidence,
     rankedCandidates,
     rankingLoss,
     intentLabel: intentPlan.intent,
-    intentConfidence: intentPlan.confidence,
+    intentConfidence,
     didYouMean: buildDidYouMeanCandidates(engramHints),
     selectedFeatureInputs: featureInputs,
     cacheKeys: buildCacheKeys(input),
     expectedTokenSavings: null,
-    evalTraceId: buildEvalTraceId(queryHash),
+    evalTraceId: evalRunId,
   };
 }
 
-export async function logIntentEvalEvent(event: Omit<IntentEvalEvent, 'durationMs'> & { durationMs?: number }): Promise<void> {
+// Alias kept for compatibility.
+export const scoreIntent = rankIntent;
+
+export async function logIntentEvalEvent(
+  event: Omit<IntentEvalEvent, 'durationMs'> & { durationMs?: number }
+): Promise<void> {
   try {
-    await logEvent({
-      userId: event.userId,
-      sessionId: event.sessionId,
-      eventType: 'intent_eval',
-      payload: {
-        queryHash: event.queryHash,
-        confidence: event.confidence,
-        queryPreview: event.queryPreview.slice(0, 120),
-        metadata: {
-          decision: event.decision,
-          intentLabel: event.intentLabel,
-          intentConfidence: event.intentConfidence,
-          cacheKeys: event.cacheKeys,
-          featureInputs: event.featureInputs,
-          rankedCandidates: event.rankedCandidates,
-          rankingLoss: event.rankingLoss,
-          didYouMean: event.didYouMean,
-          durationMs: event.durationMs ?? 0,
-          model: event.model,
+    await logEvent(
+      sanitizeZeroHiddenThoughts({
+        userId: event.userId,
+        sessionId: event.sessionId,
+        eventType: 'intent_eval',
+        payload: {
+          queryHash: event.queryHash,
+          confidence: event.confidence,
+          queryPreview: event.queryPreview.slice(0, 120),
+          metadata: {
+            decision: event.decision,
+            intentLabel: event.intentLabel,
+            intentConfidence: event.intentConfidence,
+            cacheKeys: event.cacheKeys,
+            featureInputs: event.featureInputs,
+            rankedCandidates: event.rankedCandidates,
+            rankingLoss: event.rankingLoss,
+            didYouMean: event.didYouMean,
+            durationMs: event.durationMs ?? 0,
+            model: event.model,
+          },
         },
-      },
-    });
+      })
+    );
   } catch {
     // Never break the main flow for analytics
   }
+}
+
+/**
+ * Query engramCards by scope/intent with optional Redis caching.
+ */
+export async function recallEngramsForIntent(intent: string, limit = 5, redis?: Redis) {
+  const client = redis ?? getRedis();
+  if (client) {
+    const cached = await client.get(`engram:intent:${intent}`);
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch {
+        // degrade silently
+      }
+    }
+  }
+
+  const cards = await db
+    .select()
+    .from(engramCards)
+    .where(eq(engramCards.scope, intent))
+    .limit(limit);
+
+  if (client && cards.length > 0) {
+    try {
+      await client.set(`engram:intent:${intent}`, JSON.stringify(cards), 'EX', 3600); // 1 hour cache
+    } catch {
+      // degrade silently
+    }
+  }
+
+  return cards;
+}
+
+export interface MacroRerankCandidate {
+  id: string;
+  intentFit: number;       // 0 to 1
+  cosine: number;          // 0 to 1
+  tagOverlap: number;      // 0 to 1
+  clusterHotness: number;  // 0 to 1
+  authority: number;       // 0 to 1
+  engramMatch: number;     // 0 to 1
+  recency: number;         // 0 to 1
+  tokenCost: number;       // 0 to 1 (normalized token cost)
+  payload?: any;
+}
+
+/**
+ * Rerank retrieval candidates using a linear weighted scoring formula:
+ * score = 0.25 * intentFit + 0.20 * cosine + 0.15 * tagOverlap + 0.15 * clusterHotness
+ *       + 0.10 * authority + 0.05 * engramMatch + 0.05 * recency - 0.05 * tokenCost
+ */
+export function macroRerank(
+  candidates: MacroRerankCandidate[]
+): Array<MacroRerankCandidate & { finalScore: number }> {
+  return candidates
+    .map((candidate) => {
+      const finalScore =
+        0.25 * (candidate.intentFit ?? 0) +
+        0.20 * (candidate.cosine ?? 0) +
+        0.15 * (candidate.tagOverlap ?? 0) +
+        0.15 * (candidate.clusterHotness ?? 0) +
+        0.10 * (candidate.authority ?? 0) +
+        0.05 * (candidate.engramMatch ?? 0) +
+        0.05 * (candidate.recency ?? 0) -
+        0.05 * (candidate.tokenCost ?? 0);
+
+      return {
+        ...candidate,
+        finalScore,
+      };
+    })
+    .sort((a, b) => b.finalScore - a.finalScore);
 }

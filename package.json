@@ -54,6 +54,10 @@
     "graphify:karpathy-batch:write": "node scripts/graphify/graphify-batch-karpathy-analysis.mjs --write",
     "graphify:batch-gpu-analysis": "node scripts/graphify/graphify-batch-gpu-analysis.mjs",
     "smoke:graphify": "cd sveltekit-frontend && node scripts/tests/smoke-graphify.mjs",
+    "neo4j:cards:write": "cd sveltekit-frontend && npm run neo4j:cards:write",
+    "neo4j:cards:write:report": "cd sveltekit-frontend && npm run neo4j:cards:write:report",
+    "neo4j:cards:write:fail-open": "cd sveltekit-frontend && npm run neo4j:cards:write:fail-open",
+    "codebase:semantic-index": "node scripts/codebase-semantic-indexer.mjs",
     "graphify:health": "cd sveltekit-frontend && npm run graphify:health",
     "atlas:build": "npm run atlas:root:index && npm run atlas:workspace && npm run atlas:language && npm run atlas:imports && npm run atlas:env && npm run atlas:routes && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:validate",
     "atlas:root:full": "npm run atlas:root:index && npm run atlas:routes:import && npm run atlas:imports:static && npm run atlas:imports:dynamic && npm run atlas:env:map && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:engram:sync && npm run agents:write && npm run atlas:validate",
@@ -64,6 +68,8 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:typescript": "tsc --noEmit",
+    "check:fast": "cd sveltekit-frontend && npm run check:fast",
+    "check:bounded": "node scripts/check-with-timeout.mjs npm run check:fast",
     "lint": "eslint src/**/*.{ts,js,svelte}",
     "lint:fix": "eslint src/**/*.{ts,js,svelte} --fix",
     "format": "prettier --write src/**/*.{ts,js,svelte}",
@@ -126,7 +132,11 @@
     "atlas:hyperrag:rerank": "node sveltekit-frontend/scripts/atlas/topology-rerank.mjs",
     "atlas:hyperrag:trace": "node sveltekit-frontend/scripts/atlas/atlas-answer-trace.mjs",
     "atlas:messy-routing": "node scripts/atlas/eval-messy-query-routing.mjs",
-    "atlas:ingest:full": "node sveltekit-frontend/scripts/atlas/chunk-text-notes.mjs --input ../data/parents-atlas --out tmp/chunks/parents-corpus-all.ndjson && node sveltekit-frontend/scripts/atlas/build-rg-search-matrix.mjs --input tmp/chunks/parents-corpus-all.ndjson --out tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/embed-chunks.mjs --input tmp/chunks/parents-corpus-rg.ndjson --collection parents_atlas_chunks && node sveltekit-frontend/scripts/atlas/qdrant-tag-backfill.mjs --collection parents_atlas_chunks --from-ndjson tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs --input tmp/chunks/parents-corpus-rg.ndjson --out tmp/chunks/parents-corpus-expanded.ndjson && node sveltekit-frontend/scripts/atlas/topology-project-4d.mjs --input tmp/chunks/parents-corpus-expanded.ndjson --out tmp/chunks/parents-corpus-4d.ndjson"
+    "atlas:ingest:full": "node sveltekit-frontend/scripts/atlas/chunk-text-notes.mjs --input ../data/parents-atlas --out tmp/chunks/parents-corpus-all.ndjson && node sveltekit-frontend/scripts/atlas/build-rg-search-matrix.mjs --input tmp/chunks/parents-corpus-all.ndjson --out tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/embed-chunks.mjs --input tmp/chunks/parents-corpus-rg.ndjson --collection parents_atlas_chunks && node sveltekit-frontend/scripts/atlas/qdrant-tag-backfill.mjs --collection parents_atlas_chunks --from-ndjson tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs --input tmp/chunks/parents-corpus-rg.ndjson --out tmp/chunks/parents-corpus-expanded.ndjson && node sveltekit-frontend/scripts/atlas/topology-project-4d.mjs --input tmp/chunks/parents-corpus-expanded.ndjson --out tmp/chunks/parents-corpus-4d.ndjson",
+    "progress:log": "node scripts/ai-os/log-progress.mjs",
+    "progress:query": "node scripts/ai-os/query-progress.mjs",
+    "atlas:retry-index": "node scripts/ai-os/build-atlas-retry-index.mjs",
+    "atlas:rlm": "npx tsx scripts/atlas/rlm-condense-index.ts"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
@@ -162,9 +172,12 @@
     "vitest": "^3.0.0"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "2.0.47",
     "@google/genai": "1.50.1",
     "@langchain/community": "^1.0.0",
     "@langchain/core": "^1.0.0",
+    "@langchain/langgraph": "1.3.2",
+    "@langchain/langgraph-checkpoint-postgres": "1.0.1",
     "@langchain/ollama": "^1.0.0",
     "@langchain/openai": "^1.0.0",
     "@langchain/textsplitters": "^1.0.0",
@@ -172,6 +185,7 @@
     "@mozilla/readability": "0.6.0",
     "@qdrant/js-client-rest": "1.15.1",
     "@types/cheerio": "0.22.35",
+    "ai": "6.0.190",
     "amqplib": "0.10.9",
     "bits-ui": "^2.0.0",
     "express": "5.1.0",
@@ -184,7 +198,9 @@
     "ollama": "^0.6.0",
     "pdf-parse": "2.4.5",
     "pg": "^8.0.0",
-    "sveltekit-superforms": "^2.0.0"
+    "svelte-preprocess": "6.0.4",
+    "sveltekit-superforms": "^2.0.0",
+    "zod": "4.4.3"
   },
   "overrides": {
     "zod-to-json-schema": "file:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/mcp/zod-to-json-schema-bridge"

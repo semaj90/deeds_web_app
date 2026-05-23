@@ -310,6 +310,44 @@
       "detail": "Prompt for a ripgrep query and search the SvelteKit app docs + source files."
     },
     {
+      "label": "📚 Docs: Refresh Programming Hub (web+rg)",
+      "type": "shell",
+      "command": "npm run docs:programming:refresh",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Fetch latest docs (Bifrost, Firecrawl, Redis, WebGPU, CUDA, cuVS, Go, Drizzle, UnoCSS, Bits UI, shadcn-svelte) and merge with repo rg mappings."
+    },
+    {
+      "label": "✅ KAG: Phase 0/1/8 Gate (JSON)",
+      "type": "shell",
+      "command": "npm run kag:phase-gate",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Runs checklist Phase 0/1/8 health + memory + Bifrost boundary checks and writes docs/reports/kag-phase-gate-latest.json."
+    },
+    {
       "label": "ACE Cache Index Refresh",
       "type": "shell",
       "command": "npm run ace:cache:index:refresh",
@@ -1535,6 +1573,30 @@
         "instanceLimit": 1
       },
       "isBackground": true,
+      "dependsOn": "🧪 Startup: OpenCode Sidecars Smoke (detached)",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Aggregates chunk_hit_log (last 24h) into Redis ace:rank:demand hash so contextForFile() rank includes a real-time agent-query feedback signal. Read-only Postgres → atomic Redis HSET replace, 1h TTL self-evicts stale data. Fires after sidecar + atlas smoke gates so data and sidecar regressions are caught before re-seeding. 5-min cooldown debounces rapid VS Code restarts."
+    },
+    {
+      "label": "🧪 Startup: OpenCode Sidecars Smoke (detached)",
+      "type": "shell",
+      "command": "$stamp = 'logs/task-output/.opencode-sidecar-smoke-last-run'; $cooldownSec = 900; $portsReady = (Test-NetConnection 127.0.0.1 -Port 8791 -InformationLevel Quiet) -and (Test-NetConnection 127.0.0.1 -Port 8792 -InformationLevel Quiet) -and (Test-NetConnection 127.0.0.1 -Port 8793 -InformationLevel Quiet); if (-not $portsReady) { Write-Host '🧪 sidecar smoke skipped — one or more sidecar ports are down (:8791/:8792/:8793)'; exit 0 } elseif ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🧪 sidecar smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run smoke:mcp:opencode-sidecars 2>&1 | Tee-Object -FilePath logs/task-output/smoke-opencode-sidecars-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🧪 sidecar smoke green' } else { Write-Host '🧪 sidecar smoke FAILED — sidecar MCP regression detected' } }",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": true,
       "dependsOn": "🩺 Startup: Atlas Smoke Gate (16 probes, detached)",
       "problemMatcher": [],
       "presentation": {
@@ -1545,7 +1607,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Aggregates chunk_hit_log (last 24h) into Redis ace:rank:demand hash so contextForFile() rank includes a real-time agent-query feedback signal. Read-only Postgres → atomic Redis HSET replace, 1h TTL self-evicts stale data. Fires after the atlas smoke gate so any data inconsistency is caught before re-seeding. 5-min cooldown debounces rapid VS Code restarts."
+      "detail": "Runs smoke:mcp:opencode-sidecars in startup chain after atlas smoke. Skips cleanly when sidecar ports are not running, otherwise validates TurboVec/Engram/LangExtract tool surfaces and engram memory write/read path. 15-min cooldown stamp: logs/task-output/.opencode-sidecar-smoke-last-run."
     },
     {
       "label": "🩺 Atlas Smoke: Manual Run (force, foreground)",
@@ -4333,6 +4395,22 @@
       },
       "problemMatcher": [],
       "detail": "Verifies async inference logging design (buffer + non-blocking flush + _bulk_docs) and checks CouchDB/RabbitMQ runtime reachability."
+    },
+    {
+      "label": "🧠 HMM Loop: redis_logger_stubs → 🩺 Observability Audit",
+      "type": "shell",
+      "command": "npm run audit:hmm-error-loop:full",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Runs HMM error-agentic workflow loop checks (DAG + runtime wiring + redis logger stubs) and then executes the async inference observability audit."
     },
     {
       "label": "📊 Cache: Full Stack Stats (L1 + L2 + Qdrant Collections)",
@@ -10048,6 +10126,22 @@
       "problemMatcher": []
     },
 
+    {
+      "label": "📖 Open Codebase Strategy Guide",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"code docs/DEVELOPER_STRATEGY_GUIDE.md\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Open docs/DEVELOPER_STRATEGY_GUIDE.md — consolidated codebase strategy guide for architecture, workflows, and operator conventions.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      },
+      "problemMatcher": []
+    },
     {
       "label": "🤖 Agent: Batch Error Fix — Dry Run (list hotspots)",
       "type": "shell",

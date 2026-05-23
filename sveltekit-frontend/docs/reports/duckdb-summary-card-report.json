@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-05-23T03:51:06.517Z",
+  "mode": "analytics-only",
+  "suggestedSql": [
+    "SELECT summary_type, COUNT(*) AS cnt FROM read_json_auto('memory/cards/codebase-summary-cards.jsonl') GROUP BY 1 ORDER BY 2 DESC;",
+    "SELECT path, scores.rank_score FROM read_json_auto('memory/cards/top-100-codebase-summary-cards.json') ORDER BY scores.rank_score DESC LIMIT 25;"
+  ],
+  "cards": 13874,
+  "edges": 205996,
+  "clusterTraversal": {
+    "topDirectories": [
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/validate",
+        "count": 12
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/reports",
+        "count": 12
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/synthesize",
+        "count": 12
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/analyze-evidence",
+        "count": 10
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/dev/qdrant",
+        "count": 10
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/demo/legal-workflow",
+        "count": 7
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/demo-login",
+        "count": 6
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/notes",
+        "count": 6
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/documents",
+        "count": 6
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/reset-password",
+        "count": 5
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/summary/similar",
+        "count": 5
+      },
+      {
+        "directory": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/export",
+        "count": 5
+      }
+    ],
+    "topFeatures": [
+      {
+        "feature": "ts",
+        "count": 100
+      },
+      {
+        "feature": "scripts",
+        "count": 100
+      },
+      {
+        "feature": "api-cleanup",
+        "count": 100
+      },
+      {
+        "feature": "reports",
+        "count": 100
+      },
+      {
+        "feature": "db-schema",
+        "count": 100
+      },
+      {
+        "feature": "postgres",
+        "count": 100
+      },
+      {
+        "feature": "static-imports",
+        "count": 100
+      },
+      {
+        "feature": "dns-networking-server-client",
+        "count": 100
+      },
+      {
+        "feature": "database",
+        "count": 100
+      },
+      {
+        "feature": "summary-card",
+        "count": 100
+      },
+      {
+        "feature": "api-handler",
+        "count": 88
+      },
+      {
+        "feature": "route",
+        "count": 88
+      },
+      {
+        "feature": "zod",
+        "count": 84
+      },
+      {
+        "feature": "auth",
+        "count": 72
+      },
+      {
+        "feature": "redis",
+        "count": 33
+      },
+      {
+        "feature": "ace-redis-hot-cache",
+        "count": 33
+      },
+      {
+        "feature": "symbol",
+        "count": 23
+      },
+      {
+        "feature": "db-touchpoint",
+        "count": 14
+      },
+      {
+        "feature": "test-coverage",
+        "count": 13
+      },
+      {
+        "feature": "route-summary",
+        "count": 12
+      }
+    ],
+    "summary": "top-100 traversal across 12 high-density directories and 20 feature labels"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T02:25:07.325Z",
+  "generatedAt": "2026-05-22T22:44:56.119Z",
   "strict": false,
   "services": [
     {
@@ -8,7 +8,7 @@
       "port": 5434,
       "required": true,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 2,
       "error": null,
       "envVar": "DATABASE_URL"
     },
@@ -18,7 +18,7 @@
       "port": 6379,
       "required": true,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": "REDIS_URL"
     },
@@ -28,7 +28,7 @@
       "port": 6333,
       "required": false,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": null
     },
@@ -48,7 +48,7 @@
       "port": 7687,
       "required": false,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": null
     },
@@ -78,7 +78,7 @@
       "port": 11434,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": "OLLAMA_HOST"
     },
@@ -108,7 +108,7 @@
       "port": 5173,
       "required": false,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": null
     },

@@ -36,8 +36,20 @@ export * from './schema-phase89-preserved';
 // Warden Legal Evidence Schema (Phase 103 Integration)
 export * from './warden-schema';
 
-// Saved Citations Schema (user-saved citation bookmarks)
-export { savedCitations } from './schema/citations';
+// Saved citation flow schema (citation bookmarks + annotations + board edges)
+export {
+	savedCitations,
+	savedCitationAnnotations,
+	evidenceBoardEdges,
+	CITATION_ANNOTATION_EVENTS,
+	CITATION_ANNOTATION_PROGRESS_STATES,
+	type CitationAnnotationProgressState,
+	citationAnnotationRedisKeys,
+	type SavedCitationAnnotation,
+	type NewSavedCitationAnnotation,
+	type EvidenceBoardEdge,
+	type NewEvidenceBoardEdge,
+} from './schema/citations';
 
 // Analytics events (used by event-logger.ts)
 export { userAnalyticsEvents, type UserAnalyticsEvent, type NewUserAnalyticsEvent } from './schema/analytics';
@@ -147,9 +159,20 @@ export {
 	type GpuClusterCentroid,
 	type NewGpuClusterCentroid
 } from './schema/codebase-intelligence';
+export {
+	summaryCards,
+	type SummaryCard,
+	type NewSummaryCard
+} from './schema/summary-cards';
 // schema-search defines rgSearchRuns/rgSearchHits which also live in schema-postgres.
 // Export only the unique tables from schema-search to avoid barrel ambiguity.
 export { rgSearchResults, searchCentroids } from './schema-search';
 export * from './schema/models';
 export * from './schema/admin-model-weights';
 export * from './schema/files';
+export * from './schema/memory-registry';
+export * from './schema/schema-graph.js';
+export * from './schema/schema-semantic-cache.js';
+export * from './schema/documents-atlas.js';
+export * from './schema/feature-registry.js';
+

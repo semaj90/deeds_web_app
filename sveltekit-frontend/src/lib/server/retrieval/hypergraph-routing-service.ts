@@ -1,11 +1,13 @@
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 import { QueryProfileRouter } from '$lib/server/retrieval/query-profile-router.js';
+import { readHotClusters } from '$lib/server/ace/hot-cluster-reader.js';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 export interface ClusterRoutingResult {
   clusterIds: number[];
+  hotClusterIds: number[];
   clusterField: 'gpu_cluster' | 'som_cluster';
   cards: any[];
   method: string;
@@ -32,6 +34,7 @@ export class HypergraphRoutingService {
   public async route(embedding: number[], queryText: string, topK = 3): Promise<ClusterRoutingResult> {
     const result: ClusterRoutingResult = {
       clusterIds: [],
+      hotClusterIds: [],
       clusterField: 'gpu_cluster',
       cards: [],
       method: 'greedy-topology'
@@ -58,12 +61,18 @@ export class HypergraphRoutingService {
     // 2. Merge with Profile Priors
     const profile = QueryProfileRouter.route(queryText);
     const priors = QueryProfileRouter.getPriors(profile);
+    const hotClusters = await readHotClusters(getRedis(), topK, { preferHotSet: true }).catch(() => []);
+    const hotClusterIds = hotClusters.map((cluster) => cluster.clusterId).filter((id) => Number.isFinite(id) && id >= 0);
+    result.hotClusterIds = hotClusterIds.slice(0, topK + 2);
     
     // 3. Neighbor Expansion
     const neighbors = this.getNeighbors(result.clusterIds);
     
-    const uniqueIds = new Set([...result.clusterIds, ...priors, ...neighbors]);
+    const uniqueIds = new Set([...result.clusterIds, ...priors, ...neighbors, ...result.hotClusterIds]);
     result.clusterIds = Array.from(uniqueIds).slice(0, topK + 5);
+    if (result.hotClusterIds.length > 0) {
+      result.method = `${result.method}+hot-set`;
+    }
 
     // 3. Fetch Cluster Cards from Redis
     if (result.clusterIds.length > 0) {

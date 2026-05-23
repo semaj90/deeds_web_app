@@ -6,13 +6,14 @@ export type DagNodeName =
   | 'normalize_query'
   | 'extract_entities'
   | 'embed_query'
-  | 'check_prior_answer_cache'
-  | 'search_centroid_clusters'
-  | 'search_qdrant_chunks'
-  | 'expand_graph_neighbors'
-  | 'resolve_LLMS.md_context'
-  | 'fetch_llm_summaries'
-  | 'ace_rerank'
+  | 'L1_redis_exact'
+  | 'L1_5_redis_semantic'
+  | 'L2_postgres_feature_index'
+  | 'L2_5_postgres_documents_atlas'
+  | 'L3_qdrant_semantic'
+  | 'L4_graph_multihop'
+  | 'L5_rg_ast_grep'
+  | 'L6_raw_file_read'
   | 'gemma4_synthesis'
   | 'record_cache'
   | 'write_audit';
@@ -65,13 +66,14 @@ export class KagDagRunner {
       'normalize_query',
       'extract_entities',
       'embed_query',
-      'check_prior_answer_cache',
-      'search_centroid_clusters',
-      'search_qdrant_chunks',
-      'expand_graph_neighbors',
-      'resolve_LLMS.md_context',
-      'fetch_llm_summaries',
-      'ace_rerank',
+      'L1_redis_exact',
+      'L1_5_redis_semantic',
+      'L2_postgres_feature_index',
+      'L2_5_postgres_documents_atlas',
+      'L3_qdrant_semantic',
+      'L4_graph_multihop',
+      'L5_rg_ast_grep',
+      'L6_raw_file_read',
       'gemma4_synthesis',
       'record_cache',
       'write_audit'

@@ -201,7 +201,7 @@ llama-server \
   --mmproj /models/mmproj-gemma4-BF16.gguf \
    -ctk q8_0 -ctv q8_0 \
   --port 8090 \
-  --ctx-size 32768 \
+  --ctx-size 64000 \
   --n-gpu-layers 40 \
   --flash-attn
 ```
@@ -639,18 +639,20 @@ ENABLE_REDIS_L1=true
 ENABLE_BIFROST_L2=true
 ENABLE_QDRANT_INT8=true
 
-# Inference Tiers
-ENABLE_TURBOQUANT=true
-ENABLE_TENSORRT=false
-ENABLE_LITERT=false
-ENABLE_OLLAMA=true
-
 # Observability
 LANGFUSE_ENABLED=true
 LANGFUSE_PUBLIC_KEY=pk-...
 LANGFUSE_SECRET_KEY=sk-...
 LANGFUSE_HOST=http://localhost:3030
 ```
+
+# Inference Tiers
+ENABLE_TURBOQUANT=true
+ENABLE_TENSORRT=false
+ENABLE_LITERT=false
+ENABLE_OLLAMA=true
+
+
 
 ---
 
@@ -672,7 +674,7 @@ LANGFUSE_HOST=http://localhost:3030
 | gRPC Embedding | 50051 | gRPC | Batch embeddings |
 | TensorRT (opt) | 8099 | HTTP/1.1 | INT4 quantized inference |
 | Langfuse | 3030 | HTTP/1.1 | LLM observability |
-| MinIO | 9000 | S3 API | Object storage |
+| seaweedfs/MinIO | 9000 | S3 API | Object storage |
 | CouchDB | 5984 | HTTP/1.1 | Document store |
 
 ---

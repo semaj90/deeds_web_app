@@ -19,11 +19,8 @@ const DEFAULT_MAX_INPUT_TOKENS = 256;
 const DEFAULT_MAX_GENERATION_TOKENS = 64;
 const EOS_TOKEN_ID = 2;
 
-let cachedTokenizer: ((input: string, options?: Record<string, unknown>) => Promise<any>) | null =
-  null;
-let cachedTokenizerDecoder:
-  | ((tokens: number[], options?: Record<string, unknown>) => string)
-  | null = null;
+let cachedTokenizer: any = null;
+let cachedTokenizerDecoder: any = null;
 
 function encodeFallback(text: string, maxLen: number): number[] {
   const chars = Array.from(text.slice(0, maxLen * 4));
