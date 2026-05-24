@@ -311,6 +311,7 @@ export const ENV = {
   SEAWEED_ACCESS_KEY: privateEnv.SEAWEED_ACCESS_KEY ?? 'admin',
   SEAWEED_SECRET_KEY: privateEnv.SEAWEED_SECRET_KEY ?? 'admin',
   PUBLIC_APP_URL: privateEnv.PUBLIC_APP_URL ?? `http://${LOOPBACK_IP}:5173`,
+  ENABLE_LEGACY_ATLAS_FIELDS: privateEnv.ENABLE_LEGACY_ATLAS_FIELDS ?? 'false',
 };
 
 

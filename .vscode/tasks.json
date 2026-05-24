@@ -12,6 +12,19 @@
   // TODO: split VS Code tasks into grouped include files or generate tasks from scripts.
   "tasks": [
     {
+      "label": "🤖 LangGraph NATS Worker",
+      "type": "shell",
+      "command": "npx tsx scripts/agent-worker.ts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Dev Server",
       "type": "shell",
       "command": "npm run dev",

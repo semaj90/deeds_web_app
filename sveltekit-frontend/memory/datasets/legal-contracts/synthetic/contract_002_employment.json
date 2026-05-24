@@ -1,0 +1,6 @@
+{
+  "sourceRef": "memory/datasets/legal-contracts/synthetic/contract_002_employment.json",
+  "title": "Synthetic Employment Contract",
+  "content": "This Employment Agreement is for John Doe (SSN: 000-11-2222). Employee agrees to work for ACME Corp. Salary is $100,000 per year. Contains intellectual property clauses.",
+  "type": "Employment"
+}

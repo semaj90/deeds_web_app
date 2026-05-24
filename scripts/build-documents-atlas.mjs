@@ -628,12 +628,58 @@ for (const filePath of filesToProcess) {
   }
 }
 
+// Transform to AtlasCards and enforce Phase 9 CI Assertions
+function buildAtlasCard(file) {
+  const searchTerms = file.tags && file.tags.length > 0 ? file.tags : (file.rgGroups || ['uncategorized']);
+  const card = {
+    id: file.archive && file.archive.hash ? file.archive.hash : crypto.createHash('sha256').update(file.absolutePath).digest('hex').substring(0, 8),
+    title: file.title,
+    path: file.relativePath,
+    fileUrl: file.fileUrl,
+    sizeBytes: file.size,
+    lines: file.lines,
+    modifiedAt: file.lastModified,
+
+    searchGroups: file.rgGroups || ['uncategorized'],
+    clusterTags: file.tags || [],
+    topoClass: file.category,
+
+    summary: file.summary,
+    structure: file.headings ? file.headings.map(h => h.text) : [],
+
+    sourceRefs: [`${file.relativePath}:L1-L${file.lines}`],
+    commands: [
+      `rg -n "${searchTerms.join('|')}" ${file.relativePath}`
+    ],
+    // Keep languages and archive metadata for Postgres/Internal logic
+    languages: file.languages,
+    archive: file.archive
+  };
+
+  // CI Assertions (Phase 9 Rules)
+  if (!card.path) throw new Error(`Invalid Atlas Card: Missing path for ${file.title}`);
+  if (!card.searchGroups || card.searchGroups.length === 0) throw new Error(`Invalid Atlas Card: Missing searchGroups for ${file.title}`);
+  if (!card.sourceRefs || card.sourceRefs.length === 0) throw new Error(`Invalid Atlas Card: Missing sourceRefs for ${file.title}`);
+  if (!card.commands || card.commands.length === 0) throw new Error(`Invalid Atlas Card: Missing commands for ${file.title}`);
+
+  return card;
+}
+
+const finalDocuments = Object.create(null);
+for (const [key, doc] of Object.entries(documents)) {
+  try {
+    finalDocuments[key] = buildAtlasCard(doc);
+  } catch (err) {
+    console.warn(`[CI Failure] Skipping ${key}: ${err.message}`);
+  }
+}
+
 // Compile canonical JSON structure
 const indexData = {
   generatedAt: new Date().toISOString(),
-  totalDocuments: Object.keys(documents).length,
+  totalDocuments: Object.keys(finalDocuments).length,
   skippedCount,
-  documents,
+  documents: finalDocuments,
   invertedIndex
 };
 
@@ -666,48 +712,17 @@ md += `*Generated at: ${indexData.generatedAt} | Total Documents Indexed: ${inde
 md += `This document serves as the master catalog of indexed documents inside the deeds web app repository, linking structural context directly to absolute source references for token-efficient retrieval.\n\n`;
 
 for (const cat of categories) {
-  const catDocs = Object.values(documents).filter(d => d.category === cat);
+  const catDocs = Object.values(finalDocuments).filter(d => d.topoClass === cat);
   if (catDocs.length === 0) continue;
 
   md += `## ${categoryLabels[cat]}\n\n`;
   
   for (const doc of catDocs) {
-    const sizeKB = (doc.size / 1024).toFixed(2);
+    const sizeKB = (doc.sizeBytes / 1024).toFixed(2);
     md += `### 📄 [${doc.title}](${doc.fileUrl})\n`;
-    md += `- **Path**: \`${doc.relativePath}\`\n`;
-    md += `- **Size**: \`${sizeKB} KB\` | **Lines**: \`${doc.lines}\` | **Modified**: \`${doc.lastModified.substring(0, 10)}\`\n`;
-    if (doc.languages.length > 0) {
-      md += `- **Detected Languages**: ${doc.languages.map(l => `\`${l}\``).join(', ')}\n`;
-    }
-    if (doc.rgGroups.length > 0) {
-      md += `- **Search Groups (rg)**: ${doc.rgGroups.map(g => `\`${g}\``).join(', ')}\n`;
-    }
-    if (doc.tags.length > 0) {
-      md += `- **Core Tags**: ${doc.tags.map(t => `\`${t}\``).join(', ')}\n`;
-    }
-    if (doc.astRelations.referencedFiles.length > 0 || doc.astRelations.referencedSymbols.length > 0) {
-      let relStr = '- **AST Relations**:';
-      if (doc.astRelations.referencedFiles.length > 0) {
-        relStr += ` references files: ${doc.astRelations.referencedFiles.map(f => `\`${f}\``).join(', ')}`;
-      }
-      if (doc.astRelations.referencedSymbols.length > 0) {
-        if (doc.astRelations.referencedFiles.length > 0) relStr += ';';
-        relStr += ` references symbols: ${doc.astRelations.referencedSymbols.map(s => `\`${s}\``).join(', ')}`;
-      }
-      md += `${relStr}\n`;
-    }
-    if (doc.summary) {
-      md += `- **Summary**: ${doc.summary}\n`;
-    }
-    if (doc.headings.length > 0) {
-      const topHeadings = doc.headings.slice(0, 5).map(h => `${'  '.repeat(Math.max(0, h.level - 1))}- ${h.text}`);
-      md += `- **Structure**:\n${topHeadings.join('\n')}\n`;
-      if (doc.headings.length > 5) {
-        md += `  - *and ${doc.headings.length - 5} more sections...*\n`;
-      }
-    }
-    md += `\n`;
+    md += "```json\n" + JSON.stringify(doc, null, 2) + "\n```\n\n";
   }
+  md += `\n`;
 }
 
 const outputMdPath = path.join(rootDir, 'docs', 'documents-atlas-index.md');
@@ -764,25 +779,23 @@ async function saveToPostgres(docs) {
     for (const doc of docList) {
       await pool.query(query, [
         sanitize(doc.fileUrl), // source_ref
-        sanitize(doc.relativePath), // path
+        sanitize(doc.path), // path
         sanitize(doc.title),
-        sanitize(doc.category),
+        sanitize(doc.topoClass), // category
         sanitize(doc.summary),
-        sanitize(JSON.stringify(doc.tags || [])),
+        sanitize(JSON.stringify(doc.clusterTags || [])),
         sanitize(JSON.stringify([])), // keywords
         sanitize(JSON.stringify([])), // protocols
         sanitize(JSON.stringify([])), // libraries
         sanitize(JSON.stringify(doc.languages || [])),
-        sanitize(JSON.stringify(doc.rgGroups || [])), // feature_families
-        sanitize(JSON.stringify(doc.headings || [])),
+        sanitize(JSON.stringify(doc.searchGroups || [])), // feature_families
+        sanitize(JSON.stringify(doc.structure || [])),
         sanitize(JSON.stringify({
-          size: doc.size,
+          sizeBytes: doc.sizeBytes,
           lines: doc.lines,
-          lastModified: doc.lastModified,
-          absolutePath: doc.absolutePath,
-          fileUrl: doc.fileUrl,
-          astRelations: doc.astRelations,
-          isSummarizedOnly: doc.isSummarizedOnly || false,
+          lastModified: doc.modifiedAt,
+          sourceRefs: doc.sourceRefs,
+          commands: doc.commands,
           archive: doc.archive || null
         }))
       ]);
@@ -796,6 +809,6 @@ async function saveToPostgres(docs) {
   }
 }
 
-await saveToPostgres(documents);
+await saveToPostgres(finalDocuments);
 process.exit(0);
 

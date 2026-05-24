@@ -1,115 +1,130 @@
 <script>
-import { onMount } from 'svelte';
-import { $state, $derived, $effect } from 'svelte';
+  import { onMount } from 'svelte';
+  import { writable } from 'svelte/store';
+  import { $state, $derived, $effect } from 'svelte';
+  import Button from '$lib/components/ui/Button.svelte';
 
-// Mock API calls for demonstration purposes
-async function fetchAtlasData(query) {
-    // Simulate fetching data from the LangGraph router/Atlas MCP
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
-    if (query.includes('auth flow')) {
-        return { 
-            sourceRefs: [{ path: '...', source: 'atlas_run', confidence: 0.95 }],
-            commands: ["npm run atlas:query"],
-            validationFailures: [],
-            bestAnswer: "The auth flow is managed by the service layer.",
-            skeletonCode: "<!-- Svelte component skeleton here -->"
-        };
+  // --- State Management using runes ---
+  let query = $state('');
+  let loading = $state(false);
+  let results = $state([]);
+  let sourceRefs = $state([]);
+  let commands = $state([]);
+  let bestAnswer = $state('');
+
+  // --- Derived State ---
+  const hasSources = $derived(sourceRefs.length > 0);
+  const isLoading = $derived(loading);
+
+  // --- Simulated API Handler ---
+  async function handleAtlasAudit() {
+    if (!query) {
+        results = $state([]);
+        return;
     }
-    return { sourceRefs: [], commands: [], validationFailures: [], bestAnswer: "No specific data found for this query." };
-}
-</script>
-
-<div class="p-8 max-w-4xl mx-auto bg-white shadow-xl rounded-lg">
-    <h1 class="text-3xl font-bold text-panel mb-6">OpenCode Control Panel</h1>
-    
-    <div class="mb-6 border-b pb-4">
-        <label class="block text-sm font-medium text-gray-700">Query</label>
-        <input type="text" bind:value={query} placeholder="e.g., 'What is the auth flow?'" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-        <button on:click={handleQuery} class="mt-3 bg-accent hover:bg-accent/80 text-white font-semibold py-2 px-4 rounded-lg">
-            Run Atlas Audit & Query
-        </button>
-    </div>
-
-    {#if loading}
-        <div class="text-center py-10">
-            <div class="animate-spin inline-block w-8 h-8 border-4 border-accent border-t-transparent rounded-full"></div>
-            <p class="mt-2 text-gray-600">Analyzing codebase and querying Atlas...</p>
-        </div>
-    {:else if results.hasSources}
-        <!-- Success View -->
-        <div class="space-y-6">
-            <!-- 1. Source References & Commands -->
-            <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-md">
-                <h2 class="text-xl font-semibold mb-2 flex items-center"><span class="mr-2">🔍</span> Source References & Commands</h2>
-                <p class="text-sm text-gray-700 mb-2">SourceRefs: {results.sourceRefs.length > 0 ? results.sourceRefs.map(r => `[${r.source}]`).join(', ') : 'None'}</p>
-                <div class="flex flex-wrap gap-2">
-                    {#each results.commands as cmd}
-                        <span class="bg-blue-200 text-blue-800 text-xs px-3 py-1 rounded-full">{cmd}</span>
-                    {/each}
-                </div>
-            </div>
-
-            <!-- 2. Validation & Answer -->
-            <div class="p-4 bg-green-50 border-l-4 border-green-500 rounded-md">
-                <h2 class="text-xl font-semibold mb-2 flex items-center"><span class="mr-2">✅</span> Best Evidence-Backed Answer</h2>
-                <p class="whitespace-pre-wrap">{results.bestAnswer}</p>
-                {#if results.skeletonCode}
-                    <h3 class="text-lg font-medium mt-4">Generated Skeleton Code:</h3>
-                    <pre class="bg-gray-800 text-green-300 p-3 rounded-md whitespace-pre-wrap">{results.skeletonCode}</pre>
-                {/if}
-            </div>
-
-            <!-- 3. Failure/Audit Log -->
-            {#if results.validationFailures.length > 0}
-                <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-md">
-                    <h2 class="text-xl font-semibold mb-2 flex items-center"><span class="mr-2">⚠️</span> Validation Failures ({results.validationFailures.length})</h2>
-                    <pre class="text-sm whitespace-pre-wrap">{results.validationFailures.join('\n')}</pre>
-                </div>
-            {/if}
-        </div>
-    {:else}
-        <div class="text-center py-10 text-gray-500">
-            <p>Enter a query and click the button to initiate the Parent Atlas audit and query cycle.</p>
-        </div>
-    {/if}
-</div>
-<script>
-// --- SVELTE 5 STATE MANAGEMENT ---
-let query = $state('');
-let results = $state([]);
-let loading = $state(false);
-
-// --- COMPUTED STATE ---
-const hasSources = $derived(results.sourceRefs?.length > 0);
-
-async function handleQuery() {
-    if (!query) return;
-
     loading = $state(true);
-    results = $state([]); // Reset previous results
-    
-    // *** SIMULATION OF LANGGRAPH/ATLAS CALL ***
-    // In a real setup, this would call the MCP endpoint:
-    // const response = await callMcp('atlas.query', { query: query });
-    
-    // Using the simulation from the previous task:
-    const simulatedData = await fetchAtlasData(query);
+    results = $state([]);
+    bestAnswer = $state('Running audit...');
 
-    // Simulate the LangGraph router's final output structure
-    results = $state([
-        { 
-            sourceRefs: simulatedData.sourceRefs, 
-            commands: simulatedData.commands, 
-            validationFailures: simulatedData.validationFailures, 
-            bestAnswer: simulatedData.bestAnswer,
-            skeletonCode: simulatedData.skeletonCode
-        }
-    ]);
+    // Simulate API latency and complex processing
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
+    // Simulate a successful audit response
+    const mockAuditResult = {
+        sourceRefs: [{ path: 'src/lib/schema/user.ts', line: 10, snippet: 'userId: uuid' }],
+        commands: ['npm run audit:drizzle-meta', 'npm run audit:contracts'],
+        answer: "Audit complete. Found potential schema drift between User table and Drizzle schema definitions. Review the generated reports for details."
+    };
+    
+    sourceRefs = $state(mockAuditResult.sourceRefs);
+    commands = $state(mockAuditResult.commands);
+    bestAnswer = $state(mockAuditResult.answer);
+    
     loading = $state(false);
-}
+    results = $state(mockAuditResult.sourceRefs); // Use sourceRefs for 'results' display
+  }
+
+  // --- Side Effect Logic ---
+  // Use $effect to react to query changes (simulating API call trigger)
+  $effect(() => {
+    if (query.length > 5 && !isLoading) {
+      // In a real app, this would call the actual API endpoint.
+      // For simulation, we'll only trigger the audit display if the query is present.
+      // We call handleAtlasAudit here to show the effect of the query change.
+      // Note: In a real Svelte 5 context, you'd need a way to prevent infinite loops,
+      // perhaps by only calling it once or using a dedicated trigger state.
+      // For this simulation, we will rely on the button click for the main action.
+    }
+  });
+
 </script>
 
-<style>
-/* Global styles for the component */
-</style>
+<div class="p-8 max-w-6xl mx-auto">
+  <h1 class="text-3xl font-bold mb-6 text-primary">OpenCode Control Panel</h1>
+  <p class="mb-8 text-muted-foreground">Query the Atlas to retrieve context, commands, and synthesized answers.</p>
+
+  <!-- Query Input Area -->
+  <div class="mb-10 p-6 border rounded-lg bg-background/50">
+    <div class="flex gap-3 mb-4">
+      <input 
+        type="text" 
+        bind:value={query} 
+        placeholder="e.g., 'Where is the user ID managed in the DB schema?'"
+        class="flex-grow p-3 border rounded-md focus:ring-accent focus:border-accent"
+      />
+      <Button on:click={handleAtlasAudit} disabled={isLoading || !query} class="w-auto">
+        {isLoading ? 'Loading...' : 'Run Atlas Audit'}
+      </Button>
+    </div>
+  </div>
+
+  <!-- Results Display -->
+  {#if results.length > 0 || bestAnswer}
+    <div class="grid grid-cols-3 gap-8">
+      
+      <!-- 1. SourceRefs Panel -->
+      <div class="col-span-1 bg-card p-6 rounded-xl shadow-lg">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2"><span class="text-accent">📚</span> SourceRefs</h2>
+        {#if sourceRefs.length > 0}
+          <div class="space-y-3">
+            {#each sourceRefs as ref (ref.path)}
+              <div class="border-b pb-3 last:border-b-0">
+                <p class="text-sm font-medium text-primary truncate">{ref.path}:<span class="text-gray-600 ml-2">({ref.line})</span></p>
+                <pre class="text-xs bg-gray-100 p-2 rounded mt-1 overflow-x-auto"><code>{ref.snippet ? ref.snippet.trim() : 'Context snippet not available'}</code></pre>
+              </div>
+            {/{#if}}
+          </div>
+        {:else}
+            <p class="text-sm text-muted-foreground">No direct source references found for this query.</p>
+        {/{#if}}
+      </div>
+
+      <!-- 2. Commands Panel -->
+      <div class="col-span-1 bg-card p-6 rounded-xl shadow-lg">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2"><span class="text-accent">🛠️</span> Suggested Commands</h2>
+        <div class="space-y-3">
+          {#if commands.length > 0}
+            {#each commands as cmd (cmd)}
+              <div class="bg-gray-50 p-3 rounded-lg border border-dashed border-gray-200">
+                <code class="text-sm font-mono text-green-700">{cmd}</code>
+              </div>
+            {/{#if}}
+          {:else}
+            <p class="text-sm text-muted-foreground">No specific commands suggested by the audit.</p>
+          {/{#if}}
+        </div>
+      </div>
+
+      <!-- 3. Best Answer / Skeleton Code Panel -->
+      <div class="col-span-1 bg-card p-6 rounded-xl shadow-lg">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2"><span class="text-accent">💡</span> Best Answer / Code Skeleton</h2>
+        <div class="whitespace-pre-wrap break-words">
+          <p class="text-sm text-muted-foreground mb-3">Summary of findings:</p>
+          <div class="p-4 bg-white border border-gray-200 rounded-md">
+            <p class="whitespace-pre-wrap">{bestAnswer}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  {/if}
+</div>

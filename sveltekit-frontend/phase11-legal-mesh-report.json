@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-05-24T06:12:57.438Z",
+  "status": "Operational",
+  "mesh_components": {
+    "nats_broker": "ONLINE",
+    "agent_worker": "ONLINE",
+    "go_retrieval_sidecar": "ONLINE"
+  },
+  "guardrails_status": {
+    "redaction_pii": "PASS",
+    "sourceRefs": "PASS",
+    "dead_letter_queue": "PASS",
+    "no_legal_advice": "PASS",
+    "human_review_mode": "PASS"
+  },
+  "synthesis_logs": {
+    "async_feedback": "ACTIVE",
+    "storage": "POSTGRES",
+    "routing": "ENGRAM_REGISTRY"
+  }
+}

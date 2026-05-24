@@ -155,3 +155,36 @@ export async function invalidateCodeIndex(pathHash: string): Promise<void> {
 export async function invalidateDomain(domain: CacheDomain): Promise<InvalidateResult> {
   return invalidateCache({ domain });
 }
+
+// ---------------------------------------------------------------------------
+// System Digest Triggers (Phase 8C)
+// ---------------------------------------------------------------------------
+
+export async function onGraphDigestChange(newDigest: string): Promise<void> {
+  const redis = await getRedis();
+  await redis.set('system:digest:graphify', newDigest);
+  await invalidateDomain('dag');
+  await invalidateDomain('rag-kb');
+}
+
+export async function onDocumentsAtlasChange(newDigest: string): Promise<void> {
+  const redis = await getRedis();
+  await redis.set('system:digest:documents_atlas', newDigest);
+  await invalidateDomain('research');
+  await invalidateDomain('code');
+}
+
+export async function onModelChange(newModelId: string): Promise<void> {
+  const redis = await getRedis();
+  await redis.set('system:digest:model_id', newModelId);
+  await invalidateDomain('llm');
+  await invalidateDomain('ace');
+}
+
+export async function onToonSchemaChange(newDigest: string): Promise<void> {
+  const redis = await getRedis();
+  await redis.set('system:digest:toon_schema', newDigest);
+  await invalidateDomain('embedding');
+  await invalidateDomain('cartridge');
+}
+
