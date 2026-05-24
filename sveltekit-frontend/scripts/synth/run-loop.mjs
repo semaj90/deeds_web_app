@@ -39,7 +39,7 @@ const ROOT = resolve(__dirname, '..', '..');
 const MCP_BASE     = process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
 const TURBO_BASE   = process.env.TURBO_BASE    ?? 'http://127.0.0.1:8090';
 const OLLAMA_BASE  = process.env.OLLAMA_BASE   ?? 'http://127.0.0.1:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL  ?? 'gemma4-legal-vlm:latest';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL  ?? 'gemma4-rotorquant:latest';
 
 const RERANK_CONFIDENCE_THRESHOLD = 0.6;   // below → trigger KAG/web_search fallback
 const MAX_LANE1_HITS              = 12;

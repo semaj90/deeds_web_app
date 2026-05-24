@@ -52,7 +52,7 @@ Run 3 (Hot):   6ms (479× faster) ✨
 - ✅ phase66-rabbitmq (message queue)
 - ✅ phase66-minio (object storage)
 - ✅ phase66-langextract (entity extraction)
-- ✅ Ollama native (gemma4-legal-fast loaded)
+- ✅ Ollama native (gemma4-rotorquant:latest-fast loaded)
 - ✅ GPU RTX 3060 Ti (2.8GB/8GB, 2% utilization)
 - ✅ SvelteKit dev server (port 5173)
 
@@ -159,7 +159,7 @@ Run 3 (Hot):   6ms (479× faster) ✨
 - Verified Bifrost health (OK status)
 - Confirmed Qdrant cache (7 responses)
 - Validated GPU status (healthy, 2.8GB/8GB)
-- Tested Ollama (gemma4-legal-fast loaded)
+- Tested Ollama (gemma4-rotorquant:latest-fast loaded)
 
 ### Phase 4: Documentation (25 min)
 - Created 6 comprehensive production guides
@@ -211,7 +211,7 @@ Run 3 (Hot):   6ms (479× faster) ✨
 - 11/11 critical services healthy
 - 105,249 Redis keys cached
 - GPU healthy (RTX 3060 Ti, 2.8GB/8GB)
-- Ollama optimized (gemma4-legal-fast)
+- Ollama optimized (gemma4-rotorquant:latest-fast)
 
 **Documentation Complete**:
 - Deployment guide (step-by-step)
@@ -263,7 +263,7 @@ Run 3 (Hot):   6ms (479× faster) ✨
 ### Long-Term (Optional Enhancements)
 
 1. **TensorRT INT4 Integration** (Phase 2)
-   - Convert gemma4-legal to TensorRT INT4
+   - Convert gemma4-rotorquant:latest to TensorRT INT4
    - Target: 0.8-1.4s inference (vs 2.8s current)
    - Expected: 3-5× additional speedup
    - Enables reliable Bifrost L2 semantic cache

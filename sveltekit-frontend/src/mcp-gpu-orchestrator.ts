@@ -139,8 +139,8 @@ class MCPGPUOrchestrator {
 
 	private initializeModels(): void {
 		// Gemma3 Legal Configuration
-		this.modelConfigs.set('gemma4-legal', {
-			name: 'gemma4-legal, latest',
+		this.modelConfigs.set('gemma4-rotorquant:latest', {
+			name: 'gemma4-rotorquant:latest, latest',
 			port: 11434,
 			capabilities: ['legal_analysis', 'document_processing', 'contract_review'],
 			gpu_layers: 35,
@@ -319,7 +319,7 @@ class MCPGPUOrchestrator {
 			'/api/v1/ai/legal-analysis',
 			{
 				prompt,
-				model: task.config?.model ?? 'gemma4-legal',
+				model: task.config?.model ?? 'gemma4-rotorquant:latest',
 				useGPU: task.config?.useGPU !== false,
 				temperature: task.config?.temperature ?? 0.1,
 				maxTokens: task.config?.maxTokens ?? 2048
@@ -395,7 +395,7 @@ class MCPGPUOrchestrator {
 			'/api/v1/ai/attention-analysis',
 			{
 				text: task.data.text,
-				model: task.config?.model ?? 'gemma4-legal',
+				model: task.config?.model ?? 'gemma4-rotorquant:latest',
 				layer_analysis: true
 			},
 			{

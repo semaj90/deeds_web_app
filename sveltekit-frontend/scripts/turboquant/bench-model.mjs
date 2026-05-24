@@ -12,9 +12,9 @@
  *   node scripts/turboquant/bench-model.mjs
  *   node scripts/turboquant/bench-model.mjs --label rotorquant --n 10
  *   node scripts/turboquant/bench-model.mjs --port 8091 --label my-run
- *   node scripts/turboquant/bench-model.mjs --model gemma4-legal-vlm --mode vlm --label vlm
+ *   node scripts/turboquant/bench-model.mjs --model gemma4-rotorquant:latest --mode vlm --label vlm
  *   node scripts/turboquant/bench-model.mjs --mode text --label text-only
- *   node scripts/turboquant/bench-model.mjs --auto-compare --baseline-model gemma4-legal.gguf --candidate-model gemma4-legal-iq4xs.gguf --port 8090 --n 5
+ *   node scripts/turboquant/bench-model.mjs --auto-compare --baseline-model gemma4-rotorquant:latest.gguf --candidate-model gemma4-rotorquant:latest-iq4xs.gguf --port 8090 --n 5
  *   node scripts/turboquant/bench-model.mjs --compare   (reads saved runs, prints table)
  *
  * Saves results to logs/turboquant/bench-<label>-<timestamp>.json
@@ -48,8 +48,8 @@ const IMAGE = flag(
 );
 const N = parseInt(flag('--n', '5'), 10);
 const AUTO_COMPARE = hasFlag('--auto-compare');
-const BASELINE_MODEL = flag('--baseline-model', 'gemma4-legal.gguf');
-const CANDIDATE_MODEL = flag('--candidate-model', 'gemma4-legal-iq4xs.gguf');
+const BASELINE_MODEL = flag('--baseline-model', 'gemma4-rotorquant:latest.gguf');
+const CANDIDATE_MODEL = flag('--candidate-model', 'gemma4-rotorquant:latest-iq4xs.gguf');
 const COMPARE = hasFlag('--compare');
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 

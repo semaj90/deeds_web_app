@@ -263,7 +263,7 @@ describe('POST /api/codeintel/clusters/[id] — shape contract', () => {
     // DB upsert
     mockDbExecute.mockResolvedValueOnce({ rows: [] });
 
-    const res = await POST(makeRequest(1, { model: 'gemma4-legal-fast:latest', repoId: 'default' }));
+    const res = await POST(makeRequest(1, { model: 'gemma4-rotorquant:latest-fast:latest', repoId: 'default' }));
     expect(res.status).toBe(200);
     const body = await res.json();
     assertShape(body);
@@ -274,7 +274,7 @@ describe('POST /api/codeintel/clusters/[id] — shape contract', () => {
     expect(body.item).not.toBeNull();
     expect(body.item).toHaveProperty('gpuCluster', 1);
     expect(body.item).toHaveProperty('summary', summaryText);
-    expect(body.item).toHaveProperty('summaryModel', 'gemma4-legal-fast:latest');
+    expect(body.item).toHaveProperty('summaryModel', 'gemma4-rotorquant:latest-fast:latest');
     expect(body.item).toHaveProperty('hasSummaryEmbedding', true);
   });
 

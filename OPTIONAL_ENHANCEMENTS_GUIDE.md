@@ -7,7 +7,7 @@
 cd C:\Users\james\Desktop\llama-server-cuda
 
 llama-server.exe ^
-  -m "C:\Users\james\Downloads\gemma4-legal-vlm-q4_k_m.gguf" ^
+  -m "C:\Users\james\Downloads\gemma4-rotorquant:latest-q4_k_m.gguf" ^
   --mmproj "C:\Users\james\Downloads\gemma4-mmproj\mmproj-BF16.gguf" ^
   --port 8090 ^
   --host 0.0.0.0 ^
@@ -94,7 +94,7 @@ session-abc123 (35.2s)
 ├─ graph-expand-retrieval (3.5s)
 │  └─ neighbors: 8, expanded: 3
 └─ llm-synthesis (30.3s)
-   └─ model: gemma4-legal, backend: bifrost
+   └─ model: gemma4-rotorquant:latest, backend: bifrost
       tokens: 1523→312, cache: HIT
 ```
 

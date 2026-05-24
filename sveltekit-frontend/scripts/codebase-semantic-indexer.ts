@@ -4,7 +4,7 @@
  *
  * Indexes the entire codebase into Qdrant `codebase_chunks_768` with:
  * - embeddinggemma:latest for 768-dim vectors
- * - gemma4-legal:latest for agentic tag extraction (function purpose, domain, complexity)
+ * - gemma4-rotorquant:latest for agentic tag extraction (function purpose, domain, complexity)
  * - Redis bifrost cache for deduplication (SHA-256 content hashing)
  * - Concurrent parallelism (configurable worker count)
  * - RTX GPU acceleration via Ollama GPU layers
@@ -35,7 +35,7 @@ const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-const TAG_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-legal:latest';
+const TAG_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
 const COLLECTION = 'codebase_chunks_768';
 const VECTOR_DIM = 768;
 

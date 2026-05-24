@@ -67,7 +67,7 @@ cross-env DEV_BYPASS_AUTH=true ENABLE_GPU=true ROTORQUANT_URL=http://127.0.0.1:8
   npx vite dev --host 0.0.0.0 --port 5173
 ```
 
-Cline → OpenAI Compatible, Base URL: `http://127.0.0.1:8090/v1`, Model: `gemma4-legal`, Context Window: `16384`.
+Cline → OpenAI Compatible, Base URL: `http://127.0.0.1:8090/v1`, Model: `gemma4-rotorquant:latest`, Context Window: `16384`.
 
 ## What NOT to do
 

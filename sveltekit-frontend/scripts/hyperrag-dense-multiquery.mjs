@@ -52,7 +52,7 @@ const COUCH_URL         = process.env.COUCH_URL         ?? 'http://127.0.0.1:598
 const TURBOVEC_SIDECAR  = process.env.TURBOVEC_SIDECAR  ?? 'http://127.0.0.1:8099';
 const BITFROST_URL      = process.env.BITFROST_URL      ?? process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090';
 const EMBED_MODEL       = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-const BITFROST_MODEL     = process.env.BITFROST_MODEL    ?? 'gemma4-legal:latest';
+const BITFROST_MODEL     = process.env.BITFROST_MODEL    ?? 'gemma4-rotorquant:latest';
 
 const CODEBASE_COL  = 'codebase_chunks_768';
 const GLYPH_COL     = 'glyph_atlas';

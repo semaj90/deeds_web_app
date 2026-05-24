@@ -150,7 +150,7 @@
 #### Cell 15-16: Create Modelfile ✅
 ```python
 # Expected: Instant
-# Creates: Modelfile.gemma4-legal-e4b
+# Creates: Modelfile.gemma4-rotorquant:latest-e4b
 ```
 
 **Verify**: Modelfile references correct GGUF file
@@ -168,13 +168,13 @@
 
 ```bash
 # Colab will prompt to download:
-gemma4-legal-e4b-deployment.zip
+gemma4-rotorquant:latest-e4b-deployment.zip
 
 # Contains:
-1. gemma4-legal-e4b-q4_k_m.gguf (~2.5GB) ⭐ MAIN FILE
-2. Modelfile.gemma4-legal-e4b
-3. gemma4-legal-e4b-q8_0.gguf (~4.8GB)
-4. gemma4-legal-e4b-q2_k.gguf (~1.3GB)
+1. gemma4-rotorquant:latest-e4b-q4_k_m.gguf (~2.5GB) ⭐ MAIN FILE
+2. Modelfile.gemma4-rotorquant:latest-e4b
+3. gemma4-rotorquant:latest-e4b-q8_0.gguf (~4.8GB)
+4. gemma4-rotorquant:latest-e4b-q2_k.gguf (~1.3GB)
 5. MODEL_CARD.md
 6. DEPLOYMENT_INSTRUCTIONS.txt
 ```
@@ -186,16 +186,16 @@ gemma4-legal-e4b-deployment.zip
 **Extract ZIP**:
 ```bash
 # Extract to models directory
-unzip gemma4-legal-e4b-deployment.zip -d C:/Users/james/Videos/deeds-web-app/models/
+unzip gemma4-rotorquant:latest-e4b-deployment.zip -d C:/Users/james/Videos/deeds-web-app/models/
 ```
 
 **Import to Ollama**:
 ```bash
 # Navigate to models directory
-cd C:/Users/james/Videos/deeds-web-app/models/gemma4-legal-e4b-deployment/
+cd C:/Users/james/Videos/deeds-web-app/models/gemma4-rotorquant:latest-e4b-deployment/
 
 # Create Ollama model
-ollama create gemma4-legal-e4b -f Modelfile.gemma4-legal-e4b
+ollama create gemma4-rotorquant:latest-e4b -f Modelfile.gemma4-rotorquant:latest-e4b
 
 # Expected output:
 # transferring model data
@@ -206,7 +206,7 @@ ollama create gemma4-legal-e4b -f Modelfile.gemma4-legal-e4b
 
 **Test**:
 ```bash
-ollama run gemma4-legal-e4b "What is hearsay evidence and list 3 exceptions?"
+ollama run gemma4-rotorquant:latest-e4b "What is hearsay evidence and list 3 exceptions?"
 ```
 
 **Expected**: Legal definition with 3 exceptions (excited utterance, present sense impression, dying declaration or similar)
@@ -346,7 +346,7 @@ After execution, verify:
 4. Use with `onnxruntime-web`
 
 **OR use existing LiteRT**:
-- Already exists: `Semaj90/gemma4-legal-litert-lm` (3.65GB)
+- Already exists: `Semaj90/gemma4-rotorquant:latest-litert-lm` (3.65GB)
 - For Android/iOS deployment
 - Use with `ai-edge-torch`
 
@@ -362,8 +362,8 @@ After execution, verify:
 // Add E4B as middle tier
 const MODEL_TIERS = {
   micro: 'gemma3:270m',        // 418MB, <1s
-  balanced: 'gemma4-legal-e4b', // 2.5GB, 5-10s ⭐ NEW
-  deep: 'gemma4-legal:latest',  // 11.8GB, 25s
+  balanced: 'gemma4-rotorquant:latest-e4b', // 2.5GB, 5-10s ⭐ NEW
+  deep: 'gemma4-rotorquant:latest',  // 11.8GB, 25s
 };
 ```
 
@@ -371,7 +371,7 @@ const MODEL_TIERS = {
 
 **Test with new model**:
 ```bash
-node scripts/cache-warmup.mjs --model gemma4-legal-e4b --domain evidence --batch-size 5
+node scripts/cache-warmup.mjs --model gemma4-rotorquant:latest-e4b --domain evidence --batch-size 5
 ```
 
 **Expected**: 5-10s per query (vs 25s with 11.8B model)

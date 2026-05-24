@@ -30,7 +30,7 @@ export interface SceneIntentExtractInput {
   evidenceIds?:  string[];
   aceContext?:   string;
   aestheticHint?: 'ps1' | 'n64' | 'modern-low-poly';
-  model?:        string;     // default: gemma4-legal-vlm
+  model?:        string;     // default: gemma4-rotorquant:latest
   temperature?:  number;     // default: 0.2 — deterministic intent extraction
 }
 
@@ -130,7 +130,7 @@ export async function extractSceneIntent(
   input: SceneIntentExtractInput,
 ): Promise<SceneIntentExtractResult> {
   const startedAt = Date.now();
-  const model = input.model ?? 'gemma4-legal-vlm:latest';
+  const model = input.model ?? 'gemma4-rotorquant:latest';
 
   const messages = [
     { role: 'system' as const, content: `${SCENE_INTENT_SYSTEM_PROMPT}\n\n${SCENE_INTENT_SHAPE_HINT}` },

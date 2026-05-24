@@ -88,7 +88,7 @@ export class SupervisorAgent {
 
 		this.routerLlm = new ChatOllama({
 			baseUrl: ENV.OLLAMA_BASE_URL,
-			model: 'gemma4-legal:latest',
+			model: 'gemma4-rotorquant:latest',
 			temperature: 0, // deterministic routing
 		});
 

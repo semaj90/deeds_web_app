@@ -21,11 +21,11 @@ describe('ACE Engram intent ranker', () => {
     const decision = await rankIntent(
       {
         query: 'repeat query',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
         completionKey: 'cache-key-12345678',
         exactCacheEntry: {
           content: 'cached answer',
-          model: 'gemma4-legal-vlm:latest',
+          model: 'gemma4-rotorquant:latest',
           backend: 'test',
           cachedAt: new Date().toISOString(),
           promptTokens: 12,
@@ -50,7 +50,7 @@ describe('ACE Engram intent ranker', () => {
     const decision = await rankIntent(
       {
         query: 'where is the ace cache retrival',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
       },
       {
         engramAdapter: {
@@ -80,7 +80,7 @@ describe('ACE Engram intent ranker', () => {
     const decision = await rankIntent(
       {
         query: 'find evidence chain',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
       },
       {
         engramAdapter: {
@@ -109,7 +109,7 @@ describe('ACE Engram intent ranker', () => {
     const decision = await rankIntent(
       {
         query: 'ambiguous thing',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
       },
       {
         engramAdapter: emptyEngramAdapter,
@@ -126,7 +126,7 @@ describe('ACE Engram intent ranker', () => {
     const decision = await rankIntent(
       {
         query: 'find code files for Redis cache',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
       },
       {
         engramAdapter: emptyEngramAdapter,
@@ -142,7 +142,7 @@ describe('ACE Engram intent ranker', () => {
     const decision = await rankIntent(
       {
         query: 'already checked cache',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
         completionKey: 'cache-key',
         exactCacheEntry: null,
         exactCacheChecked: true,
@@ -165,7 +165,7 @@ describe('ACE Engram intent ranker', () => {
     await expect(rankIntent(
       {
         query: 'redis is down',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
         completionKey: 'cache-key',
         embedding: [0.1, 0.2, 0.3],
       },
@@ -189,7 +189,7 @@ describe('ACE Engram intent ranker', () => {
     const decision = await rankIntent(
       {
         query: 'evaluate this target',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
         targetDecision: 'run_retrieval',
       },
       {
@@ -207,7 +207,7 @@ describe('ACE Engram intent ranker', () => {
     const decision = await rankIntent(
       {
         query: 'check normalization',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
       },
       {
         engramAdapter: emptyEngramAdapter,
@@ -227,7 +227,7 @@ describe('ACE Engram intent ranker', () => {
     await expect(logIntentEvalEvent({
       userId: 'user-1',
       sessionId: 'session-1',
-      model: 'gemma4-legal-vlm:latest',
+      model: 'gemma4-rotorquant:latest',
       queryHash: 'hash',
       decision: 'run_retrieval',
       confidence: 0.4,

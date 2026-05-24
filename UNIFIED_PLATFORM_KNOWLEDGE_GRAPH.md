@@ -228,7 +228,7 @@ CREATE (ollama:Lane {
   tier: 7,
   type: 'server',
   runtime: 'Ollama',
-  model: 'gemma4-legal Q4_K_M',
+  model: 'gemma4-rotorquant:latest Q4_K_M',
   backend: 'CUDA',
   latency_ms: 25000,
   vram_gb: 5.8,

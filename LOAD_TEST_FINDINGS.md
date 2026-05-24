@@ -38,7 +38,7 @@ Run 2 (Warm):
 ### LLM Chat Endpoint Test ❌
 
 **Script**: `scripts/tests/redis-load-test.mjs`
-**Endpoint**: `/api/chat` (gemma4-legal:latest model)
+**Endpoint**: `/api/chat` (gemma4-rotorquant:latest model)
 **Result**: ❌ **All requests timeout after 30-35s**
 
 **Error**:
@@ -46,7 +46,7 @@ Run 2 (Warm):
 { "error": "Request timeout", "timeout": 30000 }
 ```
 
-**Root Cause**: Ollama `gemma4-legal:latest` (11.8B Q4_K_M) takes >35 seconds per request
+**Root Cause**: Ollama `gemma4-rotorquant:latest` (11.8B Q4_K_M) takes >35 seconds per request
 
 ---
 
@@ -55,7 +55,7 @@ Run 2 (Warm):
 ### Ollama Status
 
 **Models Loaded** (via `/api/tags`):
-- ✅ `gemma4-legal:latest` — 7.5B Q4_K_M (580MB VRAM)
+- ✅ `gemma4-rotorquant:latest` — 7.5B Q4_K_M (580MB VRAM)
 - ✅ `embeddinggemma:latest` — 307M (768-dim embeddings)
 - ✅ `gemma3:270m` — Small model alternative
 - ✅ `gemma4:e4b-it-q4_K_M` — Larger variant
@@ -66,7 +66,7 @@ Run 2 (Warm):
 | Endpoint | Model | Latency | Status |
 |----------|-------|---------|--------|
 | `/api/embed` | embeddinggemma | ~2.9s avg, 9.8s p99 | ⚠️ Slower than expected |
-| `/api/chat` | gemma4-legal | >35s | ❌ Too slow |
+| `/api/chat` | gemma4-rotorquant:latest | >35s | ❌ Too slow |
 
 **Expected Performance**:
 | Endpoint | Expected | Actual | Gap |
@@ -85,7 +85,7 @@ Run 2 (Warm):
 
 ### 2. Model Configuration
 - **Possible**: Ollama configured with suboptimal settings
-- **Check**: `ollama show gemma4-legal --modelfile`
+- **Check**: `ollama show gemma4-rotorquant:latest --modelfile`
 - **Fix**: Adjust `num_ctx`, `num_gpu` parameters
 
 ### 3. Context Length
@@ -111,7 +111,7 @@ Run 2 (Warm):
 
 **Option 1: Use Smaller Model** ⭐ **Recommended**
 
-Replace `gemma4-legal:latest` with `gemma3:270m` for load testing:
+Replace `gemma4-rotorquant:latest` with `gemma3:270m` for load testing:
 
 ```javascript
 // In redis-load-test.mjs, change:
@@ -159,13 +159,13 @@ done
 ```bash
 # Check GPU usage during request
 nvidia-smi dmon -s u -c 10 &
-curl -X POST http://localhost:11434/api/chat -d '{"model":"gemma4-legal:latest","messages":[{"role":"user","content":"hi"}],"stream":false}' -H "Content-Type: application/json"
+curl -X POST http://localhost:11434/api/chat -d '{"model":"gemma4-rotorquant:latest","messages":[{"role":"user","content":"hi"}],"stream":false}' -H "Content-Type: application/json"
 
 # Check Ollama logs
 docker logs ollama -f
 
 # Test with minimal context
-curl -X POST http://localhost:11434/api/generate -d '{"model":"gemma4-legal:latest","prompt":"hi","stream":false,"options":{"num_ctx":512}}' -H "Content-Type: application/json"
+curl -X POST http://localhost:11434/api/generate -d '{"model":"gemma4-rotorquant:latest","prompt":"hi","stream":false,"options":{"num_ctx":512}}' -H "Content-Type: application/json"
 ```
 
 **2. Optimize Ollama Configuration**
@@ -173,7 +173,7 @@ curl -X POST http://localhost:11434/api/generate -d '{"model":"gemma4-legal:late
 Create optimized Modelfile:
 
 ```dockerfile
-FROM gemma4-legal:latest
+FROM gemma4-rotorquant:latest
 
 # Reduce context for faster inference
 PARAMETER num_ctx 2048
@@ -187,7 +187,7 @@ PARAMETER num_thread 8
 
 Save and reload:
 ```bash
-ollama create gemma4-legal-fast -f Modelfile.fast
+ollama create gemma4-rotorquant:latest-fast -f Modelfile.fast
 ```
 
 **3. Alternative: TensorRT-LLM**
@@ -208,7 +208,7 @@ The codebase has TensorRT-LLM infrastructure (currently inactive). Consider:
 **2. Model Optimization**
 
 - Fine-tune smaller model (1-3B) for legal domain
-- Use distillation from gemma4-legal → gemma3:270m
+- Use distillation from gemma4-rotorquant:latest → gemma3:270m
 - Deploy optimized GGUF with Q4_K_S quantization
 
 **3. Caching Strategy**
@@ -219,7 +219,7 @@ Current 3-tier cache design is sound:
 - L3 Ollama (target: <5s) — ❌ Currently >35s
 
 **Fix L3**:
-- Replace gemma4-legal with faster model for cached responses
+- Replace gemma4-rotorquant:latest with faster model for cached responses
 - Or pre-generate common responses offline
 - Or use TensorRT for 5-10× speedup
 
@@ -312,7 +312,7 @@ Since full load testing is blocked, we can still validate:
 **Immediate** (Today):
 1. ✅ Run cache validation test (embedding endpoint) — **COMPLETE** (April 13, 2026)
 2. ✅ Diagnose Ollama performance issue — **COMPLETE** (April 13, 2026)
-   - gemma4-legal: 34.3s (56.7 tokens/sec) — Normal for 11.8B Q4_K_M on RTX 3060 Ti
+   - gemma4-rotorquant:latest: 34.3s (56.7 tokens/sec) — Normal for 11.8B Q4_K_M on RTX 3060 Ti
    - gemma3:270m: 2.6s — 13× faster, viable for load testing
    - Root cause: Large model is inherently slow, not a configuration issue
 3. ✅ Test with `gemma3:270m` (smaller model) — **COMPLETE** (2.6s vs 34.3s)
@@ -353,7 +353,7 @@ Since full load testing is blocked, we can still validate:
 **Testing Results** (April 13, 2026):
 - ✅ Embedding endpoint: 1,239 QPM, 100% success rate, 63% p99 improvement on warm cache
 - ✅ gemma3:270m: 2.6s response time (viable for load testing)
-- ❌ gemma4-legal: 34.3s response time (too slow for 12,000 QPM target)
+- ❌ gemma4-rotorquant:latest: 34.3s response time (too slow for 12,000 QPM target)
 
 **Root Cause Identified**:
 - 11.8B Q4_K_M model on RTX 3060 Ti = 56.7 tokens/sec throughput
@@ -371,7 +371,7 @@ Since full load testing is blocked, we can still validate:
 ```
 
 **Path B: Production Optimization Required**
-- For 12,000 QPM with gemma4-legal (34s/request), need **68 parallel GPU instances**
+- For 12,000 QPM with gemma4-rotorquant:latest (34s/request), need **68 parallel GPU instances**
 - Alternatives:
   1. **TensorRT-LLM**: 3-10× speedup (5-10s/request) → 10-14 GPU instances
   2. **Smaller fine-tuned model**: gemma3:270m + legal fine-tune (2-3s) → 2-3 GPUs
@@ -384,7 +384,7 @@ Since full load testing is blocked, we can still validate:
 **Confidence**:
 - HIGH on infrastructure readiness
 - HIGH on cache system design
-- MEDIUM on achieving 12,000 QPM with current hardware (gemma4-legal too slow)
+- MEDIUM on achieving 12,000 QPM with current hardware (gemma4-rotorquant:latest too slow)
 
 ---
 

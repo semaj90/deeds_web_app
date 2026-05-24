@@ -56,7 +56,7 @@ describe('ACE Intent Ranker Evaluation', () => {
 
       it('asserts intent matches expected', async () => {
         const decision = await rankIntent(
-          { query: tc.query, model: 'gemma4-legal-vlm:latest' },
+          { query: tc.query, model: 'gemma4-rotorquant:latest' },
           { engramAdapter: mockEngramAdapter, intentClassifier: mockIntentClassifier }
         );
         expect(decision.intentLabel).toBe(tc.expectedIntent);
@@ -64,7 +64,7 @@ describe('ACE Intent Ranker Evaluation', () => {
 
       it('asserts confidence is >= 0.70', async () => {
         const decision = await rankIntent(
-          { query: tc.query, model: 'gemma4-legal-vlm:latest' },
+          { query: tc.query, model: 'gemma4-rotorquant:latest' },
           { engramAdapter: mockEngramAdapter, intentClassifier: mockIntentClassifier }
         );
         expect(decision.intentConfidence).toBeGreaterThanOrEqual(0.70);
@@ -72,7 +72,7 @@ describe('ACE Intent Ranker Evaluation', () => {
 
       it('asserts did_you_mean includes expected label', async () => {
         const decision = await rankIntent(
-          { query: tc.query, model: 'gemma4-legal-vlm:latest' },
+          { query: tc.query, model: 'gemma4-rotorquant:latest' },
           { engramAdapter: mockEngramAdapter, intentClassifier: mockIntentClassifier }
         );
         expect(decision.decision).toBe('show_did_you_mean');
@@ -97,11 +97,11 @@ describe('ACE Intent Ranker Evaluation', () => {
 
       it('asserts cache key is deterministic', async () => {
         const decision1 = await rankIntent(
-          { query: tc.query, model: 'gemma4-legal-vlm:latest' },
+          { query: tc.query, model: 'gemma4-rotorquant:latest' },
           { engramAdapter: mockEngramAdapter, intentClassifier: mockIntentClassifier }
         );
         const decision2 = await rankIntent(
-          { query: tc.query, model: 'gemma4-legal-vlm:latest' },
+          { query: tc.query, model: 'gemma4-rotorquant:latest' },
           { engramAdapter: mockEngramAdapter, intentClassifier: mockIntentClassifier }
         );
         expect(decision1.queryHash).toBe(decision2.queryHash);

@@ -23,7 +23,7 @@ const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? 'neo4j123';
 const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://admin:deeds123@localhost:5984';
 const OLLAMA_URL  = process.env.OLLAMA_URL ?? 'http://localhost:11434';
-const MODEL       = 'gemma4-legal:latest';
+const MODEL       = 'gemma4-rotorquant:latest';
 
 const couchUrlParsed = new URL(COUCHDB_URL);
 const couchAuthHeader = couchUrlParsed.username

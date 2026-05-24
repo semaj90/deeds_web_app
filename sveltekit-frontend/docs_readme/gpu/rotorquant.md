@@ -5,7 +5,7 @@
 
 ## Do I need Google Colab?
 
-**No.** The legal fine-tune already exists as the merged Ollama blob (`gemma4-legal-vlm`).
+**No.** The legal fine-tune already exists as the merged Ollama blob (`gemma4-rotorquant:latest`).
 Colab is only needed if you want to **re-train** the LoRA adapter from scratch.
 
 | Goal | Colab needed? | Path |
@@ -96,13 +96,13 @@ and run all cells — it copies + re-quantises the blob automatically.
 ```powershell
 # The Ollama blob is already a GGUF — just copy it
 $blob = "$env:USERPROFILE\.ollama\models\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43"
-Copy-Item $blob "gemma4-legal-merged-q4km.gguf"
+Copy-Item $blob "gemma4-rotorquant:latest-merged-q4km.gguf"
 
 # Dequantize to F16 (needs llama-quantize from your llama-server build)
-llama-quantize.exe gemma4-legal-merged-q4km.gguf gemma4-legal-f16.gguf F16
+llama-quantize.exe gemma4-rotorquant:latest-merged-q4km.gguf gemma4-rotorquant:latest-f16.gguf F16
 
 # Re-quantize to IQ4_XS (block-diagonal rotation baked in)
-llama-quantize.exe gemma4-legal-f16.gguf gemma4-legal-iq4xs.gguf IQ4_XS
+llama-quantize.exe gemma4-rotorquant:latest-f16.gguf gemma4-rotorquant:latest-iq4xs.gguf IQ4_XS
 ```
 
 **Option 2 — from Colab safetensors (preferred — no round-trip loss):**
@@ -110,16 +110,16 @@ llama-quantize.exe gemma4-legal-f16.gguf gemma4-legal-iq4xs.gguf IQ4_XS
 # On a machine with the Colab output:
 python llama.cpp/convert_hf_to_gguf.py \
   --outtype f16 \
-  --outfile gemma4-legal-f16.gguf \
+  --outfile gemma4-rotorquant:latest-f16.gguf \
   ./colab-output/merged-model/
 
 python llama.cpp/llama-quantize \
-  gemma4-legal-f16.gguf gemma4-legal-iq4xs.gguf IQ4_XS
+  gemma4-rotorquant:latest-f16.gguf gemma4-rotorquant:latest-iq4xs.gguf IQ4_XS
 ```
 
 - [ ] Set in `.env`:
       ```
-      ROTORQUANT_MODEL_PATH=C:\path\to\gemma4-legal-iq4xs.gguf
+      ROTORQUANT_MODEL_PATH=C:\path\to\gemma4-rotorquant:latest-iq4xs.gguf
       # Remove or clear LEGAL_LORA_PATH — LoRA is now baked in
       LEGAL_LORA_PATH=
       ```

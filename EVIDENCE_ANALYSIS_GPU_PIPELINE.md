@@ -54,7 +54,7 @@ Poll GET ?jobId=<id> for status
 {
   "domain": "evidence-analysis",  // 'evidence' | 'evidence-analysis' | 'all'
   "batchSize": 5,                 // 1-20 queries per batch
-  "model": "gemma3:270m",         // Default (4.5s avg) or 'gemma4-legal:latest' (22s avg)
+  "model": "gemma3:270m",         // Default (4.5s avg) or 'gemma4-rotorquant:latest' (22s avg)
   "maxQueries": 20                // Optional limit
 }
 ```
@@ -230,7 +230,7 @@ evidence-analyze started: <jobId>
 | Model | Avg Latency | P99 Latency | Success Rate | Recommendation |
 |-------|-------------|-------------|--------------|----------------|
 | **gemma3:270m** | 4.5s | 7.5s | 100% (72/72) | ✅ **Default** |
-| gemma4-legal | 22s | 29s | 100% | Use for complex analysis |
+| gemma4-rotorquant:latest | 22s | 29s | 100% | Use for complex analysis |
 
 ### Cache Performance (3-Tier System)
 

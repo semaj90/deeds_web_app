@@ -74,7 +74,7 @@ curl -X POST http://localhost:3040/api/providers \
     "keys": [{
       "name": "ollama-key",
       "value": "ollama",
-      "models": ["gemma4-legal:latest", "embeddinggemma:latest", "gemma3:latest", "nomic-embed-text:latest", "gemma3:270m"],
+      "models": ["gemma4-rotorquant:latest", "embeddinggemma:latest", "gemma3:latest", "nomic-embed-text:latest", "gemma3:270m"],
       "enabled": true,
       "weight": 1
     }],

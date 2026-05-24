@@ -122,7 +122,7 @@
 **Impact**: Blocks AI analysis features in production
 
 **Recommendation**: 
-1. Use faster model (gemma3:270m instead of gemma4-legal)
+1. Use faster model (gemma3:270m instead of gemma4-rotorquant:latest)
 2. Increase timeout to 60s
 3. Add L1 Redis cache for repeated analysis queries
 
@@ -141,7 +141,7 @@ Based on CLAUDE.md and memory, the evidence pipeline consists of:
 5. **Dual Storage**: pgvector `evidence_vectors` + Qdrant `evidence_items`
 6. **Entity Extraction**: EMAIL, PHONE, DATE, CITATION, STATUTE, MONEY
 7. **Forensic Pattern Detection**: SSN, CC, contact density, legal keywords
-8. **Summarization**: Ollama gemma4-legal (non-fatal)
+8. **Summarization**: Ollama gemma4-rotorquant:latest (non-fatal)
 9. **GPU Background Analysis** ✅: Similarity + clustering + case embedding
 
 ---
@@ -163,7 +163,7 @@ Based on CLAUDE.md and memory, the evidence pipeline consists of:
 ✅ **SvelteKit Dev Server**: Running on port 5173  
 ✅ **PostgreSQL**: Connected (17 evidence records)  
 ✅ **Redis**: Connected (99.15% hit rate)  
-✅ **Ollama**: GPU inference active (slow on gemma4-legal)  
+✅ **Ollama**: GPU inference active (slow on gemma4-rotorquant:latest)  
 ⚠️  **Qdrant**: Connected but evidence search returning 0 results  
 ⚠️  **GPU Analysis**: Triggered but logs not showing completion  
 
@@ -173,7 +173,7 @@ Based on CLAUDE.md and memory, the evidence pipeline consists of:
 
 ### Priority 1 - Performance
 
-1. **Replace gemma4-legal with gemma3:270m for analysis endpoint**
+1. **Replace gemma4-rotorquant:latest with gemma3:270m for analysis endpoint**
    - Current: 30s+ timeout
    - Target: <5s response time
    - Benefit: 6× faster, same quality for short analysis tasks

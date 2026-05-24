@@ -18,7 +18,7 @@ This codebase **already runs a LangGraph container** — `legal-ai-langgraph` on
 | Routes | `POST /synthesize`, `POST /synthesize/stream`, `GET /health`, `GET /cache/stats`, `GET /hmm/stats`, `POST /hmm/adapt` |
 | Cache stack | L1 Redis exact-match → L2 Bifrost semantic → L3 LangGraph DAG |
 | State | `SynthesisState = { entities, web_results, rg_results, rag_hits, kag_neighbors, kag_source, ace_context, merged_context, llm_response, confidence, retried, trace_id }` |
-| LLM | `gemma4-legal-vlm:latest` via Ollama (`host.docker.internal:11434`) — auto-picks up `gemma4-hermes-64k:latest` too |
+| LLM | `gemma4-rotorquant:latest` via Ollama (`host.docker.internal:11434`) — auto-picks up `gemma4-rotorquant:latest` too |
 | Auto-discovers Ollama models | ✅ confirmed via `/health` |
 | GPU | RTX 3060 Ti, nvidia runtime, 6 GB limit |
 | Persistence | torch.compile inductor + Triton caches mounted; no graph-state checkpoint table (yet) |
@@ -115,7 +115,7 @@ test failure → ingest stack trace into error_fingerprints (existing table)
        inspect changed files (git diff)
        inspect related schema (Drizzle definitions)
        inspect failing route handler
-       synthesize patch plan via gemma4-legal-vlm
+       synthesize patch plan via gemma4-rotorquant:latest
        write patch_plan to error_fix_history
        notify operator via SSE
 ```
@@ -143,7 +143,7 @@ langgraph-worker:
     - QUEUE_NAME=research.langgraph
     - DLQ_NAME=research.langgraph.dlq
     - CHECKPOINT_TABLE=langgraph_checkpoints
-    - LLM_MODEL=gemma4-hermes-64k:latest  # 64K context for multi-step flows
+    - LLM_MODEL=gemma4-rotorquant:latest  # 64K context for multi-step flows
   depends_on:
     - rabbitmq
     - postgres

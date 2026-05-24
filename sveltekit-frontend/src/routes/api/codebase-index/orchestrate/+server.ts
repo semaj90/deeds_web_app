@@ -87,6 +87,7 @@ const ALL_STAGES = [
 	'tag',
 	'wiki_export',
 	'hypergraph_4d',
+	'relation_extraction',
 	'complete',
 ] as const;
 
@@ -116,6 +117,7 @@ const orchestrateSchema = z.object({
   hypergraph: z.boolean().default(false),
   communityGraph: z.boolean().default(false),
   deepResearch: z.boolean().default(false),
+  relationExtraction: z.boolean().default(true),
   // Checkpoint / resume
   runId: z.string().max(64).optional(),
   resume: z.boolean().default(false),
@@ -625,6 +627,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
 	} = parsed.data;
 	const deepResearch = parsed.data.deepResearch ?? false;
 	const communityGraph = parsed.data.communityGraph ?? false;
+	const relationExtraction = parsed.data.relationExtraction ?? true;
 	const runId = parsed.data.runId ?? randomUUID().slice(0, 8);
 	const runIndexing = parsed.data.runIndexing ?? mode === 'sync';
 	if (mode === 'async' && dryRun) {
@@ -687,6 +690,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
           'wiki_export',
           'hypergraph_4d',
           'deep_research',
+          'relation_extraction',
         ]) {
           const cached = await getCachedStage(runId, stageName);
           if (cached) cachedStages.set(stageName, cached);
@@ -716,6 +720,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
         exportWiki,
         hypergraph,
         deepResearch,
+        relationExtraction,
       });
 
 			// Save run metadata for polling
@@ -1488,6 +1493,55 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
           });
         }
 
+        // ── Stage 10b: Relation extraction (AST-grep + ripgrep graph builder) ──
+        if (relationExtraction && !dryRun) {
+          const cached = cachedStages.get('relation_extraction');
+          if (cached) {
+            emit('stage', {
+              stage: 'relation_extraction',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('relation_extraction_done', { stage: 'relation_extraction', ...cached.result });
+            stageTimings.relation_extraction = cached.durationMs;
+            completedStages.push('relation_extraction');
+          } else {
+            const stageStart = Date.now();
+            emit('relation_extraction_started', { stage: 'relation_extraction' });
+
+            try {
+              const { execSync } = await import('child_process');
+              execSync('npx tsx ../scripts/graph/build-deep-relations-jsonl.mjs build', {
+                cwd: process.cwd(),
+                stdio: 'pipe',
+                env: { ...process.env, LANGFUSE_ENABLED: 'true' }
+              });
+
+              const resultData = {
+                success: true,
+                message: 'Successfully generated relation graph and persisted to Redis and file.',
+              };
+              emit('relation_extraction_done', { stage: 'relation_extraction', ...resultData });
+              stageTimings.relation_extraction = Date.now() - stageStart;
+              completedStages.push('relation_extraction');
+              void cacheStage(runId, 'relation_extraction', resultData, stageTimings.relation_extraction);
+            } catch (err) {
+              emit('stage', {
+                stage: 'relation_extraction',
+                step: 'failed',
+                error: (err as Error).message,
+              });
+            }
+          }
+        } else {
+          emit('stage', {
+            stage: 'relation_extraction',
+            step: 'skipped',
+            reason: dryRun ? 'dryRun' : 'relationExtraction disabled',
+          });
+        }
+
         // ── Stage 11: Postgres FTS sync (code_retrieval_chunks) ───────────
         // Runs after hypergraph/community to capture fresh topo/cluster data.
         // Fire-and-forget: failures are logged but don't block the complete event.
@@ -1649,6 +1703,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
       pageRank: 'boolean (default false) — optional CouchDB power-iteration PageRank',
       exportWiki: 'boolean (default false) — generate Karpathy wiki notes per cluster',
       hypergraph: 'boolean (default false) — build 4D SOM×cosine×GRPO hypergraph',
+      relationExtraction: 'boolean (default true) — run AST-grep + ripgrep graph builder',
       runId: 'string (auto-generated if omitted) — checkpoint ID for resume on disconnect',
       resume: 'boolean (default false) — skip stages already cached under this runId (2h TTL)',
     },

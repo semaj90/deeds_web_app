@@ -405,7 +405,7 @@ function buildLangGraphWorkflow({
         stage: 'synthesize',
         status: 'ok',
         output: {
-          model: 'gemma4-legal',
+          model: 'gemma4-rotorquant:latest',
           includeSourceRefs: true,
           packetMergeStrategy: 'merge lane packets + synthesis log',
         },
@@ -432,7 +432,7 @@ function buildFallbackPlan(query, routing, parse) {
       sourceRefs: parse.files.length > 0 ? parse.files : ['derived from query semantics'],
     },
     synthesis: {
-      model: 'gemma4-legal',
+      model: 'gemma4-rotorquant:latest',
       includeSourceRefs: true,
       tools: buildToolPlan(query, parse),
     },

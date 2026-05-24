@@ -6,7 +6,7 @@ export async function compareDocuments(document1: string, document2: string): Pr
         method: "POST",
         headers: { "Content-Type": "application/json" },
 	body: JSON.stringify({
-	model: "gemma4-legal:latest",
+	model: "gemma4-rotorquant:latest",
             prompt: `Compare the two legal documents and provide differences, risks, and recommendations.
 
 Document 1:

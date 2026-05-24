@@ -7,7 +7,7 @@ Capture the current runtime truth, required infra fixes, validation steps that b
 
 ## 1. Current runtime truth
 - `TURBO_KV_K=q8_0` and `TURBO_KV_V=turbo3` are the active KV flags in `sveltekit-frontend/.env`.
-- `sveltekit-frontend/scripts/ensure-llama-server.mjs` already wires these via `-ctk` / `-ctv` and now prefers `models/gemma4-legal-iq4xs-direct.gguf` when present.
+- `sveltekit-frontend/scripts/ensure-llama-server.mjs` already wires these via `-ctk` / `-ctv` and now prefers `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` when present.
 - `LLAMA_SERVER_PATH` is configured to the local CUDA llama-server binary.
 - `simdjson-bridge.ts` is already in use across Redis, Qdrant, GraphRAG, codebase indexing, and inference tooling.
 

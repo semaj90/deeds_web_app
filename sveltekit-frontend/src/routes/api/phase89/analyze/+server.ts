@@ -8,7 +8,7 @@ import { ENV } from '$lib/server/env.server.js';
 
 const analyzeSchema = z.object({
 	cluster_id: z.number().int().min(1, 'Missing cluster_id'),
-	model: z.string().max(200).optional().default('gemma4-legal'),
+	model: z.string().max(200).optional().default('gemma4-rotorquant:latest'),
 	ace_context: z.boolean().optional().default(true),
 });
 

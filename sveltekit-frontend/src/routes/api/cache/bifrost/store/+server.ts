@@ -15,7 +15,7 @@ import { ENV } from '$lib/server/env.server.js';
 const requestSchema = z.object({
 	prompt: z.string().min(1).max(10_000),
 	response: z.string().min(1).max(50_000),
-	model: z.string().optional().default('gemma4-legal'),
+	model: z.string().optional().default('gemma4-rotorquant:latest'),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {

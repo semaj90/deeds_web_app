@@ -65,7 +65,7 @@ const NOTES = [
     clusterId: 997,
     clusterType: 'gpu',
     purpose: 'Gemma4 inference cascade — TensorRT-LLM > Bifrost > TurboQuant > Ollama',
-    summary: '8-tier inference fallback. TurboQuant (llama-server) hits 70-79 tok/s with cache_prompt + KV q8_0. Unified gemma4-legal-vlm:latest serves text + vision in one process — no VRAM swap.',
+    summary: '8-tier inference fallback. TurboQuant (llama-server) hits 70-79 tok/s with cache_prompt + KV q8_0. Unified gemma4-rotorquant:latest serves text + vision in one process — no VRAM swap.',
     dominantTags: ['gemma4', 'turboquant', 'bifrost', 'inference-cascade', 'vlm'],
     representativeFiles: ['src/lib/server/ai/openai-facade.ts', 'src/lib/server/ollama.ts'],
     topologicalNeighbors: [],

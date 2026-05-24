@@ -9,7 +9,7 @@ Replaces 44 scattered next_steps docs. Updated by auditing live code, not aspira
 
 ```
 CLIENT (Browser)                    SERVER (SvelteKit + Docker)
-├─ Gemma4 E2B 2.3B (WebGPU)       ├─ Ollama gemma4-legal-vlm (5.3GB GPU)
+├─ Gemma4 E2B 2.3B (WebGPU)       ├─ Ollama gemma4-rotorquant:latest (5.3GB GPU)
 ├─ LiteRT-LM E2B (CPU :8070)      ├─ Ollama embeddinggemma (300MB shared)
 ├─ Gemma3 270M ONNX (WASM)        ├─ Ollama granite-docling-258m (on-demand)
 ├─ EmbeddingGemma 300M ONNX       ├─ TurboQuant llama.cpp (:8090 turbo3 KV)
@@ -119,7 +119,7 @@ Per-stage selection via `stages` array. Configurable k, SOM grid, maxChunks (up 
 
 #### GAP-6: VLM LoRA Merge (Colab)
 **Status**: GRPO training complete (10,214 steps). LoRA adapter exists. Unsloth PR #4807 merged upstream. GGUF not yet generated.
-**What's missing**: Run `Gemma4_E4B_Legal_VLM_Reattach.ipynb` on Colab G4 → merge adapter → export GGUF → `ollama create gemma4-legal-vlm:latest`
+**What's missing**: Run `Gemma4_E4B_Legal_VLM_Reattach.ipynb` on Colab G4 → merge adapter → export GGUF → `ollama create gemma4-rotorquant:latest`
 **Files**: `scripts/unsloth-training/Gemma4_E4B_Legal_VLM_Reattach.ipynb`
 **Effort**: Medium (Colab runtime, ~2hrs)
 

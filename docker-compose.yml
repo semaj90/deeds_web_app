@@ -110,8 +110,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 3G  # Increased to accommodate 2GB maxmemory + overhead
-          cpus: '2.0'
+          memory: 4G  # Increased to accommodate 2GB maxmemory + overhead + Atlas
         reservations:
           memory: 1G
           cpus: '1.0'
@@ -159,8 +158,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 3G
-          cpus: '2.0'
+          memory: 4G
         reservations:
           memory: 1536M
           cpus: '1.0'
@@ -456,8 +454,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 6G
-          cpus: '2.0'
+          memory: 8G
         reservations:
           memory: 2G
           cpus: '1.0'

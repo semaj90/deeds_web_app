@@ -185,14 +185,14 @@ Summary:`;
     console.warn(`⚠️ TurboQuant not available for summary, falling back to Ollama: ${e.message}`);
   }
 
-  // 2. Try Ollama (gemma4-legal:latest)
+  // 2. Try Ollama (gemma4-rotorquant:latest)
   try {
-    console.log(`💬 Summarizing Cluster ${clusterId} via Ollama fallback (gemma4-legal:latest)...`);
+    console.log(`💬 Summarizing Cluster ${clusterId} via Ollama fallback (gemma4-rotorquant:latest)...`);
     const res = await fetch(`${OLLAMA_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal:latest',
+        model: 'gemma4-rotorquant:latest',
         messages: [{ role: 'user', content: prompt }],
         options: { num_predict: 400 },
         stream: false

@@ -112,11 +112,17 @@ export interface RerankBreakdown {
   sameAgentsDir?: number;
   /** Boost from manifold4 quaternion similarity to top candidate (≤0.06 cap) */
   quaternion?: number;
+  /** Boost from relation graph connectivity */
+  relationBoost?: number;
   /** Final composite score (semantic + all boosts) */
   final: number;
 }
 
 export interface ACEContext {
+  selectedRelationCards?: string | null;
+  selectedClusterSummaries?: string | null;
+  cacheTrace?: string | null;
+  topRuntimeDependencies?: string | null;
   /** User behavioral profile from analytics */
   userProfile: ACEUserProfile | null;
   /** Case context string (from DB load) */

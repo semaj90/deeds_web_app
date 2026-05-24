@@ -2,7 +2,7 @@ import { pgRows } from '$lib/server/db/client';
 /**
  * Evidence Analysis Pipeline
  *
- * Orchestrates: YOLO detection → Redis cache → LLM escalation (gemma4-legal)
+ * Orchestrates: YOLO detection → Redis cache → LLM escalation (gemma4-rotorquant:latest)
  * → graph connection creation → Drizzle analysis cache persist → Qdrant tag update
  *
  * Called from evidence upload route (step 6b) and RabbitMQ evidence.process handler.
@@ -280,7 +280,7 @@ Respond with ONLY valid JSON (no markdown):
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal:latest',
+        model: 'gemma4-rotorquant:latest',
         prompt,
         stream: false,
         options: { temperature: 0.3, num_predict: 800 },

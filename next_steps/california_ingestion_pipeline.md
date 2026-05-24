@@ -149,7 +149,7 @@ Our SvelteKit 2 frontend uses **Drizzle-ORM** to fetch metadata and structured s
 ### 2. Gemma4 AI Analysis Button
 An `Analyze Case` button is added directly to document cards and reader views. Clicking it:
 *   Extracts the local layout document segments and citation references.
-*   Submits the context to the local Ollama `gemma4-legal:latest` or `TurboQuant` endpoint.
+*   Submits the context to the local Ollama `gemma4-rotorquant:latest` or `TurboQuant` endpoint.
 *   Streams a real-time compliance analysis or summarization report into an interactive card panel.
 
 ### 3. AI Contextual Chat Component

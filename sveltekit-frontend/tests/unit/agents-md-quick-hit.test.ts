@@ -27,7 +27,7 @@ vi.mock('$lib/server/db/client', () => ({
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
-    OLLAMA_CHAT_MODEL: 'gemma4-legal-vlm:latest',
+    OLLAMA_CHAT_MODEL: 'gemma4-rotorquant:latest',
     NEO4J_URI: 'bolt://127.0.0.1:7687',
     NEO4J_USER: 'neo4j',
     NEO4J_PASSWORD: 'legal_ai_pass',

@@ -66,7 +66,7 @@ curl http://localhost:8070/health
 **Technology Stack**:
 - **Runtime**: Ollama v0.5.2 (native binary)
 - **Acceleration**: CUDA 12.1 (RTX 3060 Ti, 8GB VRAM)
-- **Model**: `gemma4-legal:latest` (Gemma 4 E4B 11.8B Q4_K_M, 7.3GB)
+- **Model**: `gemma4-rotorquant:latest` (Gemma 4 E4B 11.8B Q4_K_M, 7.3GB)
 - **Embeddings**: `embeddinggemma:latest` (307M BF16, 768-dim, 622MB)
 - **KV Cache**: Q8_0 quantized (50% memory vs FP16)
 - **Flash Attention**: Enabled (2× context capacity)
@@ -88,7 +88,7 @@ PROTOCOL: HTTP/1.1 (Ollama native API + OpenAI-compatible)
 **Models**:
 | Model | Size | Purpose | VRAM |
 |-------|------|---------|------|
-| `gemma4-legal:latest` | 7.3GB | Legal reasoning, synthesis | 5.8GB |
+| `gemma4-rotorquant:latest` | 7.3GB | Legal reasoning, synthesis | 5.8GB |
 | `embeddinggemma:latest` | 622MB | 768-dim embeddings | 800MB |
 | `gemma3:12b-vlm` | 8.2GB | Vision + text multimodal | 6.5GB |
 | `llama3.2:latest` | 2.0GB | Lightweight fallback | 2.5GB |
@@ -107,7 +107,7 @@ PROTOCOL: HTTP/1.1 (Ollama native API + OpenAI-compatible)
 **Health Check**:
 ```bash
 curl http://localhost:11434/api/tags
-# Expected: {"models":[{"name":"gemma4-legal:latest","size":7837466624,...}]}
+# Expected: {"models":[{"name":"gemma4-rotorquant:latest","size":7837466624,...}]}
 ```
 
 **Status**: ✅ **PRODUCTION** (primary inference engine, 100% uptime)
@@ -197,7 +197,7 @@ PROTOCOL: HTTP/1.1 (OpenAI-compatible /v1/chat/completions)
 **llama-server Command**:
 ```bash
 llama-server \
-  -m /models/gemma4-legal-Q4_K_M.gguf \
+  -m /models/gemma4-rotorquant:latest-Q4_K_M.gguf \
   --mmproj /models/mmproj-gemma4-BF16.gguf \
    -ctk q8_0 -ctv q8_0 \
   --port 8090 \
@@ -220,7 +220,7 @@ llama-server \
 **Health Check**:
 ```bash
 curl http://localhost:8090/health
-# Expected: {"status":"ok","model":"gemma4-legal","kv_cache":"q8_0","vram_usage":"3.2GB"}
+# Expected: {"status":"ok","model":"gemma4-rotorquant:latest","kv_cache":"q8_0","vram_usage":"3.2GB"}
 ```
 
 **Status**: ✅ **INTEGRATED** (inference-router.ts lines 421-496, health monitoring lines 1209-1214)
@@ -548,7 +548,7 @@ SERVER CASCADE (SvelteKit Backend):
    ├─ Success → Store in L1+L2, return
    └─ Fail → Tier 7
 
-7. Ollama (gemma4-legal, 20-30s)
+7. Ollama (gemma4-rotorquant:latest, 20-30s)
    → ALWAYS SUCCEEDS (final fallback)
    → Store in L1+L2, return
 ```
@@ -874,7 +874,7 @@ curl http://localhost:8090/health  # TurboQuant
 - Restart: `pkill llama-server && llama-server -m ... -ctk q8_0 -ctv q8_0 --port 8090`
 
 **Ollama timeout**:
-- Check VRAM: `nvidia-smi` (need ≥2GB free for gemma4-legal)
+- Check VRAM: `nvidia-smi` (need ≥2GB free for gemma4-rotorquant:latest)
 - Verify model loaded: `curl localhost:11434/api/ps`
 - Increase timeout: `OLLAMA_REQUEST_TIMEOUT=120` (default 60s)
 
@@ -914,7 +914,7 @@ curl http://localhost:8090/health  # TurboQuant
 │  │  ├─ TurboQuant llama-server (q8_0 KV) — 15-20s                  │ │
 │  │  ├─ VLM Server (HF NF4 + mmproj) — 25-30s                       │ │
 │  │  ├─ LiteRT Sidecar (CPU XNNPACK) — 30-40s                       │ │
-│  │  └─ Ollama (gemma4-legal Q4_K_M) — 20-30s ────────── ALWAYS ✅  │ │
+│  │  └─ Ollama (gemma4-rotorquant:latest Q4_K_M) — 20-30s ────────── ALWAYS ✅  │ │
 │  └─────────────────────────────────────────────────────────────────┘ │
 │                                  ↓                                    │
 │  ┌──────────────┬──────────────┬──────────────┬──────────────────┐  │

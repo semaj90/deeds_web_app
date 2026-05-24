@@ -247,7 +247,7 @@ if (!dryRun) {
 Next steps:
   # QLoRA fine-tuning (Unsloth)
   python finetune/train_qlora.py \\
-    --model gemma4-legal-vlm \\
+    --model gemma4-rotorquant:latest \\
     --dataset ${outPath} \\
     --output finetune/adapters/$(date +%Y%m%d)
 

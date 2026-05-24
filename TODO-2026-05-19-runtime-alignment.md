@@ -12,7 +12,7 @@ Capture the current runtime truth for TurboQuant + GraphRAG + Qdrant + Redis and
   - `turbo:start` → `pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/launch-turboquant.ps1`
   - `turbo:start:detached` → same launcher with `-Detached`
 - `scripts/launch-turboquant.ps1` is the actual TurboQuant startup helper.
-- `sveltekit-frontend/scripts/ensure-llama-server.mjs` is the safe population/health-check helper for `llama:ensure` and now prefers `models/gemma4-legal-iq4xs-direct.gguf` when present.
+- `sveltekit-frontend/scripts/ensure-llama-server.mjs` is the safe population/health-check helper for `llama:ensure` and now prefers `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` when present.
 - The `dev:grpc` script is the active retrieval dev startup path, and it launches:
   - `npm run turbo:start:detached`
   - `npm run go:retrieval:run`

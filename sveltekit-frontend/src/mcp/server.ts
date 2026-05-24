@@ -433,7 +433,7 @@ export function setupToolHandlers() {
             },
             useAI: {
               type: 'boolean',
-              description: 'Use AI (Ollama gemma4-legal) to generate case-specific content',
+              description: 'Use AI (Ollama gemma4-rotorquant:latest) to generate case-specific content',
               default: false,
             },
           },
@@ -529,7 +529,7 @@ export function setupToolHandlers() {
           type: 'object',
           properties: {
             prompt: { type: 'string', description: 'The inference prompt' },
-            model: { type: 'string', description: 'Model name (default: gemma4-legal:latest)' },
+            model: { type: 'string', description: 'Model name (default: gemma4-rotorquant:latest)' },
             maxTokens: { type: 'number', description: 'Max output tokens', default: 2048 },
             temperature: { type: 'number', description: 'Sampling temperature', default: 0.3 },
             stream: { type: 'boolean', description: 'Enable streaming', default: false },
@@ -676,12 +676,12 @@ export function setupToolHandlers() {
       },
       // ─────────────────────────────────────────────────────────────────────
       // LangExtract Tools — Google's official structured extraction library
-      // Uses local Ollama (gemma4-legal) instead of Gemini API
+      // Uses local Ollama (gemma4-rotorquant:latest) instead of Gemini API
       // ─────────────────────────────────────────────────────────────────────
       {
         name: 'langextract:legal',
         description:
-          'Extract structured legal entities from text using Google LangExtract + gemma4-legal. Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.',
+          'Extract structured legal entities from text using Google LangExtract + gemma4-rotorquant:latest. Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -2803,7 +2803,7 @@ export function setupToolHandlers() {
           const { routeInference } = await import('../lib/server/inference/inference-router.js');
           const result = await routeInference({
             prompt,
-            model: model ?? 'gemma4-legal:latest',
+            model: model ?? 'gemma4-rotorquant:latest',
             maxTokens: maxTokens ?? 2048,
             temperature: temperature ?? 0.3,
             stream: stream ?? false,
@@ -2817,7 +2817,7 @@ export function setupToolHandlers() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: model ?? 'gemma4-legal:latest',
+              model: model ?? 'gemma4-rotorquant:latest',
               prompt,
               stream: false,
               options: { num_predict: maxTokens ?? 2048, temperature: temperature ?? 0.3 },
@@ -2959,7 +2959,7 @@ export function setupToolHandlers() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: process.env.LLM_MODEL || 'gemma4-legal:latest',
+            model: process.env.LLM_MODEL || 'gemma4-rotorquant:latest',
             prompt: aceQuery,
             system: acePrompt.systemPrompt,
             stream: false,
@@ -3777,7 +3777,7 @@ export function setupToolHandlers() {
             'Compute avg search_time_ms per pipeline grouped by day.',
           ],
           ollama: [
-            'Optimal KV cache quantisation for gemma4-legal at 8K context?',
+            'Optimal KV cache quantisation for gemma4-rotorquant:latest at 8K context?',
             'Flash Attention trade-offs on RTX 3060 Ti.',
           ],
         };

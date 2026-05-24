@@ -132,7 +132,7 @@ Return fixes in JSON format:
 
 	try {
     // L1/L2/L3 cache path: Redis exact → Qdrant semantic → Bifrost gateway
-    const text = await bifrostChat([{ role: 'user', content: prompt }], 'gemma4-legal-vlm:latest', {
+    const text = await bifrostChat([{ role: 'user', content: prompt }], 'gemma4-rotorquant:latest', {
       temperature: 0.3,
       maxTokens: 2048,
     });

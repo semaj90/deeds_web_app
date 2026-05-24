@@ -30,7 +30,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **AI Models**: 
     - **Embeddings Lane**: Ollama (`embeddinggemma:latest` via `/api/embed`)
     - **Generation Lane**: `Gemma4` / `Qwen` via `llama-server` (TurboQuant + Bitfrost)
-    - **Vision**: `gemma4-legal-vlm` (unified text+vision, GRPO legal LoRA merged)
+    - **Vision**: `gemma4-rotorquant:latest` (unified text+vision, GRPO legal LoRA merged)
 - **Client AI**: ONNX Runtime (WebGPU → WASM SIMD → CPU) + gemma 270M quantized
 - **Real-Time**: Server-Sent Events (SSE)
 - **State Machines**: XState v5 (client orchestration) + RabbitMQ (server async)
@@ -106,7 +106,7 @@ Write back to L0-L3
 5. Dual storage: pgvector `evidence_vectors` + Qdrant `evidence_items`
 6. Entity extraction (EMAIL, PHONE, DATE, CITATION, STATUTE, MONEY)
 7. Forensic pattern detection (SSN, CC, contact density, legal keywords)
-8. Summarization via Ollama gemma4-legal (non-fatal)
+8. Summarization via Ollama gemma4-rotorquant:latest (non-fatal)
 
 ### Key Client-Side Files
 | File | Purpose |
@@ -182,7 +182,7 @@ import { bifrostChat } from '$lib/server/ollama.js';
 // L1 → L2 → L3 fallback happens automatically
 const response = await bifrostChat(
   [{ role: 'user', content: 'What is hearsay evidence?' }],
-  'gemma4-legal',
+  'gemma4-rotorquant:latest',
   { temperature: 0.3, maxTokens: 200 }
 );
 ```
@@ -1603,7 +1603,7 @@ Ollama :11434 (final fallback)
 - **Aggressive ceiling**: `-ctk q8_0 -ctv turbo4` — only after q8_0/turbo3 passes the 20-generation stability harness
 - **Fallback**: if q8_0/turbo3 fails parity on Gemma4's `head_dim=256` (CUDA mixed-quant parity is documented as "not yet verified" by upstream), drop to `-ctk q8_0 -ctv q8_0` and keep `TURBO_CTX=16384` — you still win 4× context vs the 4096 default.
 - **Binary requirement (Gemma4-critical)**: `turbo2/turbo3/turbo4/tbq3_0/tbq4_0` are rejected by stock `ggml-org/llama.cpp` builds, and **picking the right fork matters more than picking the right cache type** for Gemma 4. Gemma 4 attention has `head_dim=256` on SWA layers and `head_dim=512` on global layers, but most TurboQuant forks ship `D=128`-only attention kernels:
-  - **[TheTom/llama-cpp-turboquant](https://github.com/TheTom/llama-cpp-turboquant/releases) tqp-v0.1.1 (Win+CUDA12.4 prebuilt)** — D=128 only. The `-h` probe advertises turbo support so the launcher passes flags through, but the model **crashes or produces garbage at the first attention pass on `gemma4-legal-vlm`**. Suitable for D=128 models (Llama-3 8B, Qwen2.5 7B). **Do not pair with Gemma 4.**
+  - **[TheTom/llama-cpp-turboquant](https://github.com/TheTom/llama-cpp-turboquant/releases) tqp-v0.1.1 (Win+CUDA12.4 prebuilt)** — D=128 only. The `-h` probe advertises turbo support so the launcher passes flags through, but the model **crashes or produces garbage at the first attention pass on `gemma4-rotorquant:latest`**. Suitable for D=128 models (Llama-3 8B, Qwen2.5 7B). **Do not pair with Gemma 4.**
   - **[test1111…/llama-cpp-turboquant-gemma4](https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4)** — source build, MSVC + CUDA 13.0. Adds D=256/512 kernels with lazy K (Q pre-transform), lazy V (deferred WHT post-loop), batch centroid decode, warp-cooperative writes. Reaches 100% of f16 throughput. **The only working path to turbo4 on Gemma 4 today.**
 
   Build:
@@ -1615,7 +1615,7 @@ Ollama :11434 (final fallback)
   ```
   Drop `build/bin/llama-server.exe` in a separate folder (e.g. `C:\Users\james\Desktop\llama-server-turboquant\`), point `LLAMA_SERVER_PATH` at it. The launcher's `-h` turbo-support probe **cannot detect head-dim incompatibility** — operator owns matching binary capability to model architecture.
 
-  Expected on RTX 3060 Ti / 8GB vs the test1111 RTX 3090 numbers: tokens/sec roughly halves (448 GB/s vs 936 GB/s memory bandwidth), but VRAM footprint is identical. `gemma4-legal-vlm` (5.3 GB) + turbo4 KV @ 256K ≈ 6.3 GB total — fits 8GB.
+  Expected on RTX 3060 Ti / 8GB vs the test1111 RTX 3090 numbers: tokens/sec roughly halves (448 GB/s vs 936 GB/s memory bandwidth), but VRAM footprint is identical. `gemma4-rotorquant:latest` (5.3 GB) + turbo4 KV @ 256K ≈ 6.3 GB total — fits 8GB.
 - **Validation harness**: `npm run turbo:test:stability:turbo` (requires server already running with the matching profile — the harness does NOT start llama-server)
 - **TurboQuant `cache_prompt: true`**: safe for system prompt KV reuse across communities/clusters
 
@@ -1738,7 +1738,7 @@ llama-server.exe -m model.gguf -ctk q8_0 -ctv turbo4 -fa on -ngl 99 -c 16384
 llama-server.exe -m model.gguf -ctk q8_0 -ctv q8_0 -fa on -ngl 99 -c 16384
 ```
 
-**RTX 3060 Ti (8GB) with gemma4-legal-vlm (5.3GB model)**:
+**RTX 3060 Ti (8GB) with gemma4-rotorquant:latest (5.3GB model)**:
 - Baseline f16 KV: ~7.5GB total → barely fits
 - turbo3 KV: ~3.4GB total → 4GB free for batch/context
 - Enables 32K+ context without OOM
@@ -1837,7 +1837,7 @@ Top-N from Neo4j (graphPageRank)
 2. **Direct Ollama `/api/embeddings`** — fallback when dev server is down
 3. **TurboQuant** — chat-only, never embeddings unless restarted with `--embeddings` (which OOMs with current `ctk/ctv q8_0` config on 8GB GPU)
 
-**Why TurboQuant chat config wins on RTX 3060 Ti (8GB)**: gemma4-legal-vlm + q8_0 KV uses ~5.8GB VRAM; tensorrt_bridge.node shares the remaining ~2.3GB for autoencoder/attention compute. Adding `--embeddings` would OOM or force a separate server instance.
+**Why TurboQuant chat config wins on RTX 3060 Ti (8GB)**: gemma4-rotorquant:latest + q8_0 KV uses ~5.8GB VRAM; tensorrt_bridge.node shares the remaining ~2.3GB for autoencoder/attention compute. Adding `--embeddings` would OOM or force a separate server instance.
 
 ### Why autoencoder is bypassed for attention scoring
 
@@ -1949,7 +1949,7 @@ NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `a
 - **MANDATORY: Wiring audit before moving files**: NEVER move/archive files without checking ALL import consumers first. Use `grep -r 'from.*module-name'` across entire `src/`. Root layout (`+layout.svelte`) imports from `$lib/webgpu/` — would have broken every page if moved. The cartridge system (`ChatSession.svelte.ts` → `/api/cartridge/export` → `chr97-builder.ts` → `cartridge-tensor-bridge.ts`) was 70% wired but appeared phantom. Always check: (1) grep for `from.*$lib/module`, (2) check root layout, (3) check `+page.svelte` dynamic imports, (4) check barrel `index.ts` re-exports, (5) check API routes. Files in `deeds_labs/` are gitignored — permanent deletion if lost
 - **Phantom vs wired detection**: A file re-exported by `index.ts` but never imported downstream IS dead. A file with phantom CHR-ROM97 comments but real LokiJS/IndexedDB/Fuse.js code is NOT dead. Check call sites, not just file names
 - **Cartridge API endpoints**: `/api/cartridge/export` (POST, build+cache), `/api/cartridge/search` (POST, tensor similarity), `/api/cartridge/stats` (GET, Redis cache stats), `/api/cartridge/invalidate` (POST, evict cached cartridge)
-- **Unified model (April 2026)**: `gemma4-legal-vlm:latest` serves BOTH text and vision — eliminates VRAM swap on 8GB GPU. Stock `gemma4:e4b-it-q4_K_M` has NO legal fine-tuning
+- **Unified model (April 2026)**: `gemma4-rotorquant:latest` serves BOTH text and vision — eliminates VRAM swap on 8GB GPU. Stock `gemma4:e4b-it-q4_K_M` has NO legal fine-tuning
 - **pgvector imports**: Use `import { vector } from 'drizzle-orm/pg-core'` (native), NOT `'pgvector/drizzle-orm'` (legacy experimental)
 - **Docker VHDX**: Never auto-shrinks on Windows 10. After `docker rmi` / prune, must `wsl --shutdown` then `diskpart` → `compact vdisk`
 - **ES2025 usable now**: `Promise.withResolvers()` (SSE streams), Iterator Helpers (`.map()/.filter()` on iterators), Set methods (`.union()/.intersection()`), `Object.groupBy()`
@@ -2016,7 +2016,7 @@ Connections → Add Provider →
   API Key:  any-non-empty-string  (real auth via session cookie)
 ```
 
-Available models: `yorha-legal`, `yorha-fast`, `gemma4-legal`, `gemma3-legal`, `gemma3:270m`. Friendly IDs map to internal Ollama tags via `resolveInternalModel()`.
+Available models: `yorha-legal`, `yorha-fast`, `gemma4-rotorquant:latest`, `gemma3-legal`, `gemma3:270m`. Friendly IDs map to internal Ollama tags via `resolveInternalModel()`.
 
 **YorHA-only request extensions** (ignored by stock OpenAI clients):
 - `file_path` — triggers nes-arch AGENTS.md preflight + same-dir rerank boost
@@ -2048,7 +2048,7 @@ Available models: `yorha-legal`, `yorha-fast`, `gemma4-legal`, `gemma3-legal`, `
 Three connected tracks for evidence → timeline → visual reconstruction:
 
 **Track 1 — model layer per binary** (multiple llama-server.exe paths, switch via `LLAMA_SERVER_PATH`):
-- `gemma4-legal-vlm:latest` → stock `-ctk q8_0 -ctv q8_0` (head dim 256+, D=128 TurboQuant kernels crash). VLM + legal reasoning.
+- `gemma4-rotorquant:latest` → stock `-ctk q8_0 -ctv q8_0` (head dim 256+, D=128 TurboQuant kernels crash). VLM + legal reasoning.
 - `qwen2.5-7b-instruct` / `qwen3-7b` → candidate for `-ctk q8_0 -ctv turbo3` (head_dim=128, 28 Q-heads / 4 KV-heads — matches stock D=128 TurboQuant prebuilts). Long-context planning, JSON timeline extraction, ComfyUI workflow generation.
 
 **Track 2 — ComfyUI image/keyframe generation**: HTTP API only (`POST /prompt` → `GET /history/{prompt_id}` → fetch outputs). Operator builds workflow in ComfyUI Desktop, exports `workflow_api.json`, app submits as POST payload. RabbitMQ queue `comfyui.render` + SSE stream `/api/comfyui/render/stream`. **Do NOT shell out to Python** — the Desktop "Export to Python" is a dev-only debugging convenience.

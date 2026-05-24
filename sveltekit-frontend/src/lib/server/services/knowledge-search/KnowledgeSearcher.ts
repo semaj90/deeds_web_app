@@ -259,7 +259,7 @@ Answer:`;
   }
 
   /**
-   * Call Ollama API (gemma4-legal:latest)
+   * Call Ollama API (gemma4-rotorquant:latest)
    */
   private async callOllama(prompt: string): Promise<string> {
     try {
@@ -267,7 +267,7 @@ Answer:`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal:latest',
+          model: 'gemma4-rotorquant:latest',
           prompt,
           stream: false,
           options: {

@@ -76,7 +76,7 @@ export const GET: RequestHandler = async ({ locals }) => {
             stats.models = {
                 chat: models.includes(ENV.OLLAMA_CHAT_MODEL) ? 'Available' : 'Missing',
                 embed: models.includes(ENV.OLLAMA_EMBED_MODEL) ? 'Available' : 'Missing',
-                rerank: models.includes('gemma4-legal:latest') ? 'Available' : 'Missing',
+                rerank: models.includes('gemma4-rotorquant:latest') ? 'Available' : 'Missing',
             };
         } else {
             stats.services.ollama = `Error (${modelsRes.status})`;

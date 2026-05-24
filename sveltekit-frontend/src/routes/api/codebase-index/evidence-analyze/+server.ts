@@ -7,7 +7,7 @@
  *   3. Tracks success/failure rates and latency metrics
  *   4. Writes analysis summary to CouchDB evidence_analysis
  *
- * Default model: gemma3:270m (fast, 4.5s avg) — use model: 'gemma4-legal:latest' for complex analysis
+ * Default model: gemma3:270m (fast, 4.5s avg) — use model: 'gemma4-rotorquant:latest' for complex analysis
  *
  * Returns immediately with jobId. Poll GET ?jobId=<id> for status.
  *
@@ -31,7 +31,7 @@ const COUCH_DB = 'evidence_analysis';
 const bodySchema = z.object({
 	domain: z.enum(['evidence', 'evidence-analysis', 'all']).optional().default('evidence-analysis'),
 	batchSize: z.number().int().min(1).max(20).optional().default(5),
-	// Default to gemma3:270m (fast, 4.5s avg) — use gemma4-legal for complex analysis
+	// Default to gemma3:270m (fast, 4.5s avg) — use gemma4-rotorquant:latest for complex analysis
 	model: z.string().optional().default('gemma3:270m'),
 	maxQueries: z.number().int().min(1).max(200).optional(),
 });

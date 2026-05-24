@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ locals }) => {
         casesProcessed: 0,
         assistantSessions: 0,
         embeddingModel: 'embeddinggemma:latest',
-        llmModel: 'gemma4-legal:latest',
+        llmModel: 'gemma4-rotorquant:latest',
         ollamaStatus: 'unauthorized',
       },
       { status: 401 }
@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
 	let ollamaStatus = 'disconnected';
 	let embeddingModel = 'embeddinggemma:latest';
-	let llmModel = 'gemma4-legal:latest';
+	let llmModel = 'gemma4-rotorquant:latest';
 
 	// Check Ollama connectivity + discover loaded models
 	try {

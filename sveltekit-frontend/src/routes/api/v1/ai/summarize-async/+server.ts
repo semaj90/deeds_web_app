@@ -5,7 +5,7 @@ import { z } from 'zod';
 const summarizeSchema = z.object({
 	content: z.string().min(1).max(200000),
 	textHash: z.string().min(1).max(128),
-	model: z.string().max(100).default('gemma4-legal'),
+	model: z.string().max(100).default('gemma4-rotorquant:latest'),
 	embedModel: z.string().max(100).optional()
 });
 
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						model: 'gemma4-legal:latest',
+						model: 'gemma4-rotorquant:latest',
 						prompt: `Summarize the following legal text concisely. Focus on key facts, legal issues, and conclusions.\n\nText:\n${content.slice(0, 50000)}`,
 						stream: false,
 						options: { temperature: 0.3 }

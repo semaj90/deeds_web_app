@@ -99,7 +99,7 @@
 ### GPU Status
 - **Device**: NVIDIA GeForce RTX 3060 Ti
 - **Free VRAM**: 2084 MB (sufficient for inference)
-- **Models Loaded**: 6 (gemma4-legal, embeddinggemma, nomic-embed-text, + 3 others)
+- **Models Loaded**: 6 (gemma4-rotorquant:latest, embeddinggemma, nomic-embed-text, + 3 others)
 - **Inference Latency**: 10.256s (G9 gate, within acceptable range)
 
 ---

@@ -201,7 +201,7 @@ export const MASTER_FEATURE_MAP: Record<string, MasterFeatureEntry> = {
     stores: ['Neo4j', 'Postgres'],
     clusters: [47],
     status: 'active',
-    params: { model: 'gemma4-legal-vlm' },
+    params: { model: 'gemma4-rotorquant:latest' },
     pathMapping: ['src/lib/server/ai', 'src/lib/server/kag'],
     evidence: {
       files: ['src/lib/server/ai/gemma4-agent.ts']

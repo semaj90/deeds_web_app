@@ -48,7 +48,7 @@ for angular similarity ranking on S³.
 | **Hot cache** | Redis fast lookup | `ace:authority:top` (200 entries, 6h), `taxonomy:children:*` (24h), `gpu:karpathy:scores` (24h), `texture:bow:chunk:*` (1h), `embed:mcp:*` (1h) |
 | **Context packet** | compressed set of cards | `chr97_runs` table + Redis `chr97:tensor:*` cache + MCP `context.build_kv_packet` |
 | **Reranking** | choose best cards before LLM | `graph-reranker.ts` (FTS + pgvector + Qdrant fan-out), MCP `search.hybrid` (10s cold / 7s warm) |
-| **Synthesis** | LLM-generated narrative / plan | `synthesis.generate` RabbitMQ queue → Ollama gemma4-legal — outputs to `memory/runs/<runId>/synthesis_summary.json` |
+| **Synthesis** | LLM-generated narrative / plan | `synthesis.generate` RabbitMQ queue → Ollama gemma4-rotorquant:latest — outputs to `memory/runs/<runId>/synthesis_summary.json` |
 | **Fallback lane** | backup retrieval path when a layer is down | inline TypeScript when `*_GRPC_ENABLED=false`; pg_trgm when Qdrant offline; OCR + filename when VLM caption fails |
 | **Evidence atlas** | visual + text + graph browser | `screenshot_artifacts` + Bits UI Dialog evidence-tray pattern (P3 in visual-evidence-lane TODO) |
 

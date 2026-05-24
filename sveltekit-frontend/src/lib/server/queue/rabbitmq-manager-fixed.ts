@@ -1965,7 +1965,7 @@ export class RabbitMQManager extends EventEmitter {
             ...((row.entity_statutes as string[]) ?? []),
             ...((row.entity_cases as string[]) ?? []),
           ]);
-          const modelVersion = process.env.OLLAMA_MODEL ?? 'gemma4-legal';
+          const modelVersion = process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
           await this.db.execute(drizzleSql`
             INSERT INTO qlora_examples
               (query, query_hash, instruction, context_chunks, graph_summary,

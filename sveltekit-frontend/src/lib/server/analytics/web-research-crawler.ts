@@ -5,7 +5,7 @@
  *   1. webSearch() → top-N results (SearXNG → Google → DuckDuckGo fallback)
  *   2. Embed query + title+snippet → 768-dim embeddinggemma vectors
  *   3. batchCosineSimilarity() (GPU LibTorch) → relevance-rank results
- *   4. Summarize top-3 with Ollama gemma4-legal (ACE-style)
+ *   4. Summarize top-3 with Ollama gemma4-rotorquant:latest (ACE-style)
  *   5. Extract entity tags (regex legal terms + LLM extraction)
  *   6. Store in Redis web:research:sum:{urlHash} (2h TTL)
  *   7. Add to Redis ZSET web:research:idx:{pipeline} (relevanceScore)
@@ -34,7 +34,7 @@ const GRAPH_REBUILD_EVERY = 100;             // trigger rebuild every N new embe
 const WEB_SUM_KEY         = (h: string) => `web:research:sum:${h}`;
 const WEB_IDX_KEY         = (pl: string) => `web:research:idx:${pl}`;
 const BUILT_AT_KEY        = 'web:research:built_at';
-const MODEL               = 'gemma4-legal:latest';
+const MODEL               = 'gemma4-rotorquant:latest';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -440,11 +440,11 @@ export async function invalidateWebResearchCache(): Promise<void> {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// LEGAL CORPUS SEARCH — search local Qdrant collections with gemma4-legal
+// LEGAL CORPUS SEARCH — search local Qdrant collections with gemma4-rotorquant:latest
 //
 // Searches authoritative canon/opinion collections plus contextual legal documents
 // (768-dim embeddinggemma vectors) and summarises top chunks via the same
-// gemma4-legal bifrostChat pipeline used for web results.  Data stored in
+// gemma4-rotorquant:latest bifrostChat pipeline used for web results.  Data stored in
 // Redis alongside web results so research-topics surfaces both sources.
 //
 // Redis schema:
@@ -602,7 +602,7 @@ export async function crawlLegalCorpus(
 		.sort((a, b) => b.score - a.score)
 		.slice(0, maxResults * 2);
 
-	// 4. Summarise top-3 with gemma4-legal; rest use chunk text directly
+	// 4. Summarise top-3 with gemma4-rotorquant:latest; rest use chunk text directly
 	const summaries: CorpusChunkSummary[] = await Promise.all(
 		allHits.map(async (hit, idx): Promise<CorpusChunkSummary> => {
 			const payload       = hit.payload ?? {};

@@ -34,7 +34,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				prompt: `Generate a JSON descriptor for a legal evidence visualization glyph.
 Style: ${style}
 Dimensions: ${dimensions[0]}x${dimensions[1]}

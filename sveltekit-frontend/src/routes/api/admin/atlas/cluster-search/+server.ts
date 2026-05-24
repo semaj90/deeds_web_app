@@ -72,7 +72,7 @@ async function rewriteQueries(query: string): Promise<string[]> {
 			method:  'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body:    JSON.stringify({
-				model:      'gemma4-legal',
+				model:      'gemma4-rotorquant:latest',
 				max_tokens: 800,
 				messages: [{
 					role:    'user',

@@ -497,7 +497,7 @@ function handleQueryMode(
         const modelAlias =
           process.env.BIFROST_MODEL_ID ??
           process.env.BIFROST_SMOKE_MODEL ??
-          'ollama/gemma4-legal:latest';
+          'ollama/gemma4-rotorquant:latest';
 
         const exactCompletionKey = `ace:completion:${queryHash}`;
         const packetId = createHash('sha1')
@@ -742,6 +742,19 @@ function handleQueryMode(
             key: summaryCards.cacheKey,
             source: summaryCards.source,
           });
+          void CacheLogger.logTrace({
+            runId: `run-${Date.now()}`,
+            queryHash,
+            cacheHit: summaryCards.cacheHit,
+            cacheLayerUsed: summaryCards.cacheHit ? 'redis_semantic' : 'qdrant',
+            packetId: packetId,
+            latencyMs: 0,
+            traceDetails: {
+              tier: summaryCards.cacheHit ? 'L1.5_semantic_redis' : 'L2_qdrant_semantic',
+              cacheKey: summaryCards.cacheKey,
+              source: summaryCards.source
+            }
+          });
           send({
             type: 'selected_cards',
             source: summaryCards.source,
@@ -887,9 +900,8 @@ function handleQueryMode(
           for (const r of reranked) {
             const dbFeat = dbFeaturesMap.get(r.path);
             if (dbFeat) {
-              r.protocols = dbFeat.protocols ?? [];
-              const ext = (dbFeat.metadata as { extension?: string })?.extension;
-              r.languages = ext ? [ext] : [];
+              r.protocols = dbFeat.protocolDetected ?? [];
+              r.languages = dbFeat.programmingLanguage ? [dbFeat.programmingLanguage] : [];
               r.sourceRefs = [r.path];
             } else {
               r.protocols = r.protocols ?? [];

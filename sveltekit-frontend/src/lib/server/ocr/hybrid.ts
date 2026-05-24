@@ -11,7 +11,7 @@ import { ENV } from '$lib/server/env.server.js';
 /** VLM OCR endpoints — tries llama-server VLM first, then Ollama as fallback */
 const VLM_BASE_URL = ENV.VLM_BASE_URL;
 const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
-const VLM_MODEL_NAME = process.env.VLM_MODEL ?? 'gemma4-legal-vlm';
+const VLM_MODEL_NAME = process.env.VLM_MODEL ?? 'gemma4-rotorquant:latest';
 /** Confidence threshold below which Tesseract result triggers VLM supplement */
 const VLM_OCR_THRESHOLD = 0.6;
 
@@ -108,7 +108,7 @@ async function classifyDocType(imageBase64: string): Promise<DocType> {
 }
 
 /**
- * Extract text from an image buffer using the Gemma 4 VLM (gemma4-legal-vlm).
+ * Extract text from an image buffer using the Gemma 4 VLM (gemma4-rotorquant:latest).
  * Two-step: classify document type, then apply a type-specific extraction prompt.
  * Tries llama-server :8085 first, falls back to Ollama :11434.
  */

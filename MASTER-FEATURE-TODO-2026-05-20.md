@@ -49,7 +49,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
   - [x] Sub-task A1: Table census (count, size, row counts)
   - [x] Sub-task A2: Index audit (tables missing indexes)
   - [x] Sub-task A3: Domain mapping (schema-postgres.ts → feature areas)
-  - [x] Sub-task A4: gemma4-hermes-64k synthesis (natural language summary)
+  - [x] Sub-task A4: gemma4-rotorquant:latest synthesis (natural language summary)
   - [x] Sub-task A5: Gap report (production checklist)
   - [x] Write `artifacts/db-analysis-report.md`
 

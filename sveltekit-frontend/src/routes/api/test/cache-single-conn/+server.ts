@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Generate cache key
     const cacheKey = generateCacheKey({
-      model: 'gemma4-legal',
+      model: 'gemma4-rotorquant:latest',
       messages: [{ role: 'user', content: query }],
       temperature: 0.3,
       maxTokens: 200,
@@ -43,7 +43,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const testResponse = {
       content:
         'Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.',
-      model: 'gemma4-legal',
+      model: 'gemma4-rotorquant:latest',
       backend: 'test',
       cachedAt: new Date().toISOString(),
     };

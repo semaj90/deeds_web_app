@@ -12,11 +12,11 @@ vi.mock('$env/dynamic/public', () => ({ env: {} }));
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
-    OLLAMA_CHAT_MODEL: 'gemma4-legal:latest',
+    OLLAMA_CHAT_MODEL: 'gemma4-rotorquant:latest',
     OLLAMA_EMBED_MODEL: 'embeddinggemma:latest',
-    OLLAMA_VLM_MODEL: 'gemma4-legal-vlm:latest',
-    GEMMA4_MODEL: 'gemma4-legal-vlm:latest',
-    FUNCTION_GEMMA_MODEL: 'gemma4-legal-vlm:latest',
+    OLLAMA_VLM_MODEL: 'gemma4-rotorquant:latest',
+    GEMMA4_MODEL: 'gemma4-rotorquant:latest',
+    FUNCTION_GEMMA_MODEL: 'gemma4-rotorquant:latest',
     NODE_ENV: 'test',
   },
 }));
@@ -182,7 +182,7 @@ describe('Phase 76 ACP tool registry', () => {
     await fc.assert(
       fc.asyncProperty(
         fc.string({ minLength: 1, maxLength: 300 }),
-        fc.constantFrom('gemma4-legal:latest', 'custom-model:latest'),
+        fc.constantFrom('gemma4-rotorquant:latest', 'custom-model:latest'),
         async (prompt, model) => {
           const result = await executeACPTool('llm:generate', { prompt, model }, { dryRun: true });
 

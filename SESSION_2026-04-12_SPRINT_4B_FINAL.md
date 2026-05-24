@@ -106,7 +106,7 @@ Upload:               ~200ms (larger files)
 Whisper CUDA:          ~3s (60s audio on GPU)
 Whisper CPU:           ~9s (60s audio on CPU, current config)
 LangExtract:         ~200ms (entity extraction)
-ACE analysis:          ~2s (Ollama gemma4-legal summary)
+ACE analysis:          ~2s (Ollama gemma4-rotorquant:latest summary)
 Qdrant indexing:     ~500ms (embedding + upsert)
 ───────────────────────────
 Total GPU:            ~6s
@@ -733,7 +733,7 @@ nvidia-smi
 | RabbitMQ publish | 10ms | 10ms | AMQP message |
 | Whisper transcription (60s audio) | 9,000ms | 3,000ms | base model, 99 languages |
 | LangExtract entities | 200ms | 200ms | spaCy NER |
-| ACE analysis (Ollama) | 2,000ms | 2,000ms | gemma4-legal summary |
+| ACE analysis (Ollama) | 2,000ms | 2,000ms | gemma4-rotorquant:latest summary |
 | Embedding (1 chunk) | 150ms | 150ms | embeddinggemma |
 | Qdrant indexing | 500ms | 500ms | HTTP upsert |
 | Evidence metadata update | 20ms | 20ms | PostgreSQL UPDATE |

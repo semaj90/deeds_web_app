@@ -2,7 +2,7 @@
  * Gemma4 Tool-Calling Agent
  *
  * Runs an agentic loop against Ollama's native tool-calling API
- * (gemma4-legal-vlm:latest — unified legal+VLM for tool-calling + agentic tasks).
+ * (gemma4-rotorquant:latest — unified legal+VLM for tool-calling + agentic tasks).
  *
  * Loop:
  *   1. Send messages + tool definitions to /api/chat

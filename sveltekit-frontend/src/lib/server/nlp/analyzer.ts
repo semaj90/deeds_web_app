@@ -2,7 +2,7 @@
  * NLP Analyzer — Sentiment + Document Classification via Ollama
  *
  * Uses Ollama's GBNF-constrained structured output (Zod → JSON Schema)
- * from gemma4-legal for:
+ * from gemma4-rotorquant:latest for:
  *   1. Sentiment analysis (positive/negative/neutral + confidence)
  *   2. Document classification (contract, deed, brief, motion, etc.)
  *   3. Key phrase extraction

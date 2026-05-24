@@ -31,7 +31,7 @@ import crypto from 'node:crypto';
 const CONFIG = {
   ollamaUrl:     process.env.OLLAMA_URL        ?? 'http://localhost:11434',
   turboUrl:      process.env.TURBOQUANT_URL    ?? 'http://127.0.0.1:8090',
-  model:         process.env.OLLAMA_MODEL      ?? 'gemma4-legal-vlm:latest',
+  model:         process.env.OLLAMA_MODEL      ?? 'gemma4-rotorquant:latest',
   embedModel:    process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
   pgUrl:         process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
   redisUrl:      process.env.REDIS_URL         ?? 'redis://localhost:6379',
@@ -265,7 +265,7 @@ async function callTurbo(messages: ChatMessage[]): Promise<{ content?: string; t
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal',
+        model: 'gemma4-rotorquant:latest',
         messages,
         tools: TOOLS,
         tool_choice: 'auto',

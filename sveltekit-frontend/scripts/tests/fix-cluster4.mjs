@@ -3,7 +3,7 @@ import { createClient } from 'redis';
 
 const QDRANT = 'http://localhost:6333';
 const OLLAMA = 'http://127.0.0.1:11434';
-const MODEL  = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
+const MODEL  = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-rotorquant:latest';
 const CLUSTER_ID = 4;
 
 const res = await fetch(`${QDRANT}/collections/codebase_chunks_768/points/scroll`, {

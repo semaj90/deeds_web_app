@@ -1,0 +1,45 @@
+{
+  "rules": {
+    "clineMemoryBehavior": {
+      "description": "Implements state and memory persistence to prevent tool loops and track agent reasoning flow.",
+      "checkPastMemory": {
+        "enabled": true,
+        "logic": "Before any tool call, check .cline/memory/cline-memory.jsonl for identical failure patterns. If a failure is detected, use fallback logic instead of retrying the failing tool."
+      },
+      "logging": {
+        "requiredFields": [
+          "task",
+          "toolsTried",
+          "fallbackUsed",
+          "result",
+          "success"
+        ],
+        "actionOnFailure": "Log the attempt, the failure reason, and the fallback used, but do not re-execute the failed tool."
+      }
+    },
+    "toolDecisionGate": {
+      "description": "Acts as a pre-tool call guardrail to ensure tool usage is necessary and prevents blind retries.",
+      "evaluation": {
+        "shouldUseTool": "true|false",
+        "reason": "Concise explanation of why the tool is/is not needed.",
+        "fallback": "If false, specify the preferred fallback mechanism (e.g., 'rg search', 'direct reasoning')."
+      },
+      "rules": [
+        "Use tool ONLY if explicitly required by the task or knowledge gap.",
+        "If uncertain about tool necessity, default to using 'rg' or direct reasoning.",
+        "If a tool has failed once, it MUST NOT be retried automatically."
+      ]
+    },
+    "semiAgentMode": {
+      "trigger": "Tool failure or detected loop/stalemate.",
+      "fallbackProcedure": [
+        "Stop all tool attempts.",
+        "Switch execution context to shell reasoning:",
+        "   - Use 'rg' for targeted code/text searching.",
+        "   - Perform direct file inspection and reasoning.",
+        "   - Return results as plain text, bypassing structured tool schema."
+      ],
+      "memoryLogging": "After fallback, log the failure and the manual steps taken to avoid repetition."
+    }
+  }
+}

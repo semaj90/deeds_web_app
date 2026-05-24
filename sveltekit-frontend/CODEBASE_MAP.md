@@ -173,7 +173,7 @@ The current repo already follows the clean split: EmbeddingGemma is the vector b
 | Embedding lane | `src/lib/ai/model-ids.ts`, `src/lib/server/vector/embedding-gemma.ts`, `src/routes/api/embed/+server.ts`, `static/embeddinggemma_300m_onnx/` | ACTIVE | `embeddinggemma:latest` is the authoritative server embedding model at 768 dimensions, and the client also carries the 300M EmbeddingGemma ONNX assets. This is the retrieval/Qdrant/cache embedding path, not a Gemma 4 text-model fallback. |
 | Server reasoning and synthesis lane | `src/lib/server/env.server.ts`, `src/lib/server/ollama.ts`, `src/lib/server/inference/inference-router.ts`, `src/lib/server/ai/gemma4-agent.ts` | ACTIVE | The generation lane is Gemma 4-family reasoning and synthesis work. `gemma4-agent.ts` now uses a PLANNER_MODEL / TOOL_MODEL split (`VLM_MODELS.legal` / `VLM_MODELS.tool`), carries 9 in-process tools (`rag_search`, `case_search`, `memory_recall`, `hyperedge_stats`, `web_search`, `read_file`, `verify_fix`, `apply_shadow_patch`, `revert_fix`), accepts a `metadata` option, and returns `cacheTrace`, `errorFixMemoryHit`, and `verificationStatus` on `AgentRunResult`. |
 | Smaller local generation lanes | `src/lib/ai/model-ids.ts`, `src/lib/ai/client-router.ts`, `src/lib/components/ai/Gemma270MWebAssembly.svelte` | ACTIVE | Yes, this repo does use smaller models: Gemma 4 E2B ONNX/WebGPU, LiteRT Gemma 4 E2B/E4B, and the legacy Gemma 3 270M ONNX fallback. |
-| Optional small tool-call normalizer | `src/lib/server/ollama.ts` (`VLM_MODELS.tool`), `src/lib/server/env.server.ts` (`FUNCTION_GEMMA_MODEL`), `src/lib/server/ai/gemma4-agent.ts` (`TOOL_MODEL`) | WIRED (env-gated) | `VLM_MODELS.tool` is now defined and populated from `ENV.FUNCTION_GEMMA_MODEL` (defaults to `gemma4-legal-vlm:latest` until `functiongemma:latest` is pulled). `gemma4-agent.ts` uses it as `TOOL_MODEL` for the structured-call translation slot. Pull `functiongemma:latest` and set `FUNCTION_GEMMA_MODEL=functiongemma:latest` in `.env` to activate the dedicated tool-call lane. |
+| Optional small tool-call normalizer | `src/lib/server/ollama.ts` (`VLM_MODELS.tool`), `src/lib/server/env.server.ts` (`FUNCTION_GEMMA_MODEL`), `src/lib/server/ai/gemma4-agent.ts` (`TOOL_MODEL`) | WIRED (env-gated) | `VLM_MODELS.tool` is now defined and populated from `ENV.FUNCTION_GEMMA_MODEL` (defaults to `gemma4-rotorquant:latest` until `functiongemma:latest` is pulled). `gemma4-agent.ts` uses it as `TOOL_MODEL` for the structured-call translation slot. Pull `functiongemma:latest` and set `FUNCTION_GEMMA_MODEL=functiongemma:latest` in `.env` to activate the dedicated tool-call lane. |
 
 ### Gemma PLE vs Retrieval Embeddings
 Some smaller Gemma-family edge models use Per-Layer Embeddings (PLE) and MatFormer-style parameter-efficient execution. PLE is an internal inference/runtime optimization that helps smaller effective-parameter models run efficiently on local devices. It is not the same thing as the semantic embeddings used for vector search.
@@ -544,7 +544,7 @@ simd-bridge/cpp/
 5. Dual storage: pgvector `evidence_vectors` + Qdrant `evidence_items`
 6. Entity extraction (EMAIL, PHONE, DATE, CITATION, STATUTE, MONEY)
 7. Forensic pattern detection (SSN, CC, contact density, legal keywords)
-8. Summarization via Ollama gemma4-legal (non-fatal)
+8. Summarization via Ollama gemma4-rotorquant:latest (non-fatal)
 9. **GPU Background Analysis** (fire-and-forget) — similarity, clustering, case embedding via LibTorch CUDA
 ### Active Go Microservice Entry Points
 | Service | Port | Protocol | Purpose |
@@ -569,7 +569,7 @@ simd-bridge/cpp/
 |-----------|--------|---------|
 | RTX 3060 Ti | ACTIVE | 8192 MiB VRAM, driver 580.88 |
 | Ollama (native) | RUNNING | Port 11434, GPU, 4 models loaded |
-| gemma4-legal | LOADED | 11.8B Q4_K_M (7.3GB) |
+| gemma4-rotorquant:latest | LOADED | 11.8B Q4_K_M (7.3GB) |
 | embeddinggemma | LOADED | 307M BF16 (622MB, 768-dim) |
 | TRT-LLM | AVAILABLE | API routes exist, engine not built |
 ---
@@ -677,7 +677,7 @@ Client Router (client-router.ts)
   │   ├── Client GPU reranks with cosine similarity
   │   └── Falls back to server if local answer < confidence
   │
-  └── COMPLEX (score > 0.6): gemma4-legal server — full pipeline
+  └── COMPLEX (score > 0.6): gemma4-rotorquant:latest server — full pipeline
       ├── RAG+KAG+DAG (dual search, graph-hop, doc context)
       ├── Entity extraction + forensic detection
       ├── Citation-grounded answers
@@ -797,7 +797,7 @@ Status note: percentages below are carried forward from earlier project tracking
 - **bits-ui Dialog**: TDZ bug in Svelte 5.46.0 SSR — routes with Dialog need `ssr = false`
 - **VAPID keys**: Currently empty defaults — push notifications skip when empty
 - **GPU VRAM**: RTX 3060 Ti 8GB — Ollama + TRT-LLM cannot coexist (gpu-arbiter.ts mutex)
-- **VRAM budget (measured May 3)**: Windows/browser overhead ~3.5GB; `gemma4-legal-vlm` needs 1.5–3GB; embedding model (`embeddinggemma:latest`) needs 0.6GB. Running both LLM + embedding simultaneously is borderline — eject other models first. Use `ollama ps` to check active VRAM usage.
+- **VRAM budget (measured May 3)**: Windows/browser overhead ~3.5GB; `gemma4-rotorquant:latest` needs 1.5–3GB; embedding model (`embeddinggemma:latest`) needs 0.6GB. Running both LLM + embedding simultaneously is borderline — eject other models first. Use `ollama ps` to check active VRAM usage.
 - **TurboQuant** (`llama-server.exe`): 1.6s/call vs Ollama ~34s. Generative GGUFs do NOT support `--embeddings` (pooling type incompatible). Start with `--embeddings` only for dedicated embedding models.
 - **gemma4-agent embedding timeout**: All `generateEmbedding()` calls in `gemma4-agent.ts` now wrapped in a 12s `Promise.race` timeout. If embedding VRAM is unavailable, `rag_search` falls back to Qdrant scroll (keyword tag filter) rather than hanging 180s.
 - **ACP+ACE+schema wired** (confirmed May 3): `ACPToolRegistry.knowledgeSearch` → `qdrant.hybridSearch(codebase_chunks_768)`; `fetchACPKnowledgeResults` live with ACP_MAX_RESULTS=8, ACP_MAX_SCORE=0.08; `gemma4-agent` includes `codebase_chunks_768` in VALID collections + `logInference(model_role='gemma4-agent-planner')`; `communityReports` + `hypergraphEdges` Drizzle tables exist; ollama.ts L3 `logInference` with `model_role`, `cache_tier=L3_ollama`, `tokenizerFamily=gemma`.

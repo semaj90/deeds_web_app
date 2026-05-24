@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userMessage }
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return json({
 			analysis: content,
 			scope,
-			model: data.model || 'gemma4-legal:latest',
+			model: data.model || 'gemma4-rotorquant:latest',
 			performance: {
 				total_duration: data.total_duration,
 				eval_count: data.eval_count

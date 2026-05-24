@@ -54,13 +54,13 @@ Latency Distribution:
 
 ---
 
-## Comparison: gemma4-legal vs gemma3:270m
+## Comparison: gemma4-rotorquant:latest vs gemma3:270m
 
 ### Model Specs
 
 | Model | Parameters | Quantization | Size | Expected Speed |
 |-------|-----------|--------------|------|----------------|
-| **gemma4-legal** | 11.8B | Q4_K_M | 7.5GB | 34.3s per request |
+| **gemma4-rotorquant:latest** | 11.8B | Q4_K_M | 7.5GB | 34.3s per request |
 | **gemma3:270m** | 268M | Q8_0 | 291MB | 2.6s per request |
 
 **Speedup**: **13.2× faster** (34.3s → 2.6s)
@@ -69,12 +69,12 @@ Latency Distribution:
 
 | Model | Concurrency | Success Rate | Avg Latency | QPM |
 |-------|-------------|--------------|-------------|-----|
-| **gemma4-legal** | 20 workers | 0% | N/A (all timeout) | 0 |
-| **gemma4-legal** | 5 workers | 0% | N/A (all timeout) | 0 |
+| **gemma4-rotorquant:latest** | 20 workers | 0% | N/A (all timeout) | 0 |
+| **gemma4-rotorquant:latest** | 5 workers | 0% | N/A (all timeout) | 0 |
 | **gemma3:270m** | 20 workers | 49.4% | 7581ms | 153 |
 | **gemma3:270m** | 5 workers | ✅ **100%** | ✅ **2141ms** | ✅ **140** |
 
-**Conclusion**: gemma3:270m is viable for load testing, gemma4-legal is too slow without optimization.
+**Conclusion**: gemma3:270m is viable for load testing, gemma4-rotorquant:latest is too slow without optimization.
 
 ---
 
@@ -87,7 +87,7 @@ Latency Distribution:
 3. **Low GPU contention**: 5 concurrent requests don't saturate RTX 3060 Ti
 4. **Stable throughput**: No timeouts, consistent latency
 
-### Why gemma4-legal Fails
+### Why gemma4-rotorquant:latest Fails
 
 1. **Large model size**: 11.8B params → slow even with Q4 quantization
 2. **High latency**: 34.3s per request exceeds most reasonable timeouts
@@ -155,10 +155,10 @@ M  scripts/tests/redis-load-test.mjs
    - Run load test through main `/api/ai/chat` endpoint
    - Measure L1 (Redis) + L2 (Bifrost) + L3 (Ollama) hit rates
 
-2. **Optimize Ollama configuration** for gemma4-legal:
+2. **Optimize Ollama configuration** for gemma4-rotorquant:latest:
    ```bash
    # Create optimized Modelfile
-   FROM gemma4-legal:latest
+   FROM gemma4-rotorquant:latest
    PARAMETER num_ctx 2048       # Reduce from 8192 for speed
    PARAMETER num_gpu 50          # Ensure full GPU utilization
    PARAMETER num_thread 8        # Match CPU cores
@@ -173,7 +173,7 @@ M  scripts/tests/redis-load-test.mjs
 ### Long-Term (This Week)
 
 1. **TensorRT-LLM conversion**:
-   - Convert gemma4-legal to TensorRT INT4 format
+   - Convert gemma4-rotorquant:latest to TensorRT INT4 format
    - Expected speedup: 3-5× (34s → 7-10s)
    - Enables load testing with production model
 
@@ -201,7 +201,7 @@ M  scripts/tests/redis-load-test.mjs
 
 ### For Production (Week 1)
 
-**Optimize gemma4-legal** via TensorRT:
+**Optimize gemma4-rotorquant:latest** via TensorRT:
 1. Export to GGUF → TensorRT INT4
 2. Deploy on TensorRT-LLM server (:8099)
 3. Update inference router to prioritize TensorRT
@@ -211,7 +211,7 @@ M  scripts/tests/redis-load-test.mjs
 
 **Hybrid approach**:
 - **Simple queries**: gemma3:270m via Ollama (~2s, 90% of traffic)
-- **Complex queries**: gemma4-legal via TensorRT (~8s, 10% of traffic)
+- **Complex queries**: gemma4-rotorquant:latest via TensorRT (~8s, 10% of traffic)
 - **Cache hit rate**: 90%+ via L1 Redis + L2 Bifrost
 - **Effective latency**: 0.1s avg (cache) + 0.2s (simple) + 0.8s (complex) = 1.1s p50
 
@@ -221,7 +221,7 @@ M  scripts/tests/redis-load-test.mjs
 
 **Infrastructure**: ✅ **VALIDATED**
 **gemma3:270m**: ✅ **PRODUCTION READY** for simple queries
-**gemma4-legal**: ⚠️ **NEEDS OPTIMIZATION** for load testing
+**gemma4-rotorquant:latest**: ⚠️ **NEEDS OPTIMIZATION** for load testing
 **Next Session**: Cache layer validation with TurboQuant bypass
 
 ---

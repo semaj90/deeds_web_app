@@ -148,7 +148,7 @@ async function embedText(text: string): Promise<number[] | null> {
 
 export async function summarizeErrorToKag(input: ErrorKagInput): Promise<ErrorKagResult> {
   const start   = Date.now();
-  const model   = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-fast:latest';
+  const model   = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-rotorquant:latest-fast:latest';
   const source  = input.source ?? 'unknown';
 
   // ── 1. LLM summarization ────────────────────────────────────────────────

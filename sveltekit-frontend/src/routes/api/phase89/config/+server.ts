@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		// Ollama Configuration
 		ollama: { url: ENV.OLLAMA_BASE_URL,
 			models: { embedding: 'embeddinggemma:latest',
-				legal: 'gemma4-legal:latest'
+				legal: 'gemma4-rotorquant:latest'
 			}
 		},
 

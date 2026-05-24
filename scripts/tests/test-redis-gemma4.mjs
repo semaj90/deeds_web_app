@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-// Test L1 Redis cache + gemma4-legal-fast (bypassing broken Bifrost L2)
+// Test L1 Redis cache + gemma4-rotorquant:latest-fast (bypassing broken Bifrost L2)
 
 const query = 'What is hearsay evidence in California criminal law?';
 
 async function test() {
-  console.log('Testing L1 Redis + gemma4-legal-fast (Bifrost L2 bypassed)\n');
+  console.log('Testing L1 Redis + gemma4-rotorquant:latest-fast (Bifrost L2 bypassed)\n');
 
   console.log('Run 1 (Cold - direct Ollama via bifrostChat L1 miss)...');
   let start = Date.now();
@@ -15,7 +15,7 @@ async function test() {
     body: JSON.stringify({
       query,
       runs: 1,
-      model: 'gemma4-legal-fast',
+      model: 'gemma4-rotorquant:latest-fast',
       // bifrostChat will try L1 Redis → fail → try Bifrost L2 → timeout → ERROR
       // We need to bypass bifrostChat and use direct Ollama
     })
@@ -33,7 +33,7 @@ async function test() {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       message: query,
-      model: 'gemma4-legal-fast',
+      model: 'gemma4-rotorquant:latest-fast',
       temperature: 0.3
     })
   }).then(r => r.json());
@@ -48,7 +48,7 @@ async function test() {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       message: query,
-      model: 'gemma4-legal-fast',
+      model: 'gemma4-rotorquant:latest-fast',
       temperature: 0.3
     })
   }).then(r => r.json());
@@ -59,7 +59,7 @@ async function test() {
   console.log(`  Run 1: ${(direct1Time/1000).toFixed(1)}s`);
   console.log(`  Run 2: ${(direct2Time/1000).toFixed(1)}s`);
   console.log(`  Avg: ${((direct1Time + direct2Time)/2000).toFixed(1)}s`);
-  console.log(`\n✅ gemma4-legal-fast working via direct Ollama`);
+  console.log(`\n✅ gemma4-rotorquant:latest-fast working via direct Ollama`);
   console.log(`⚠️  L1 Redis cache not active on /api/ai/chat-direct endpoint`);
   console.log(`💡 To enable L1 cache: use bifrostChat() but it tries broken Bifrost L2`);
 }

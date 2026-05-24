@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				prompt: `Provide a concise 1-2 sentence legal summary of the following text. Focus on the key legal point or holding.\n\nText: "${text.slice(0, 2000)}"\n\nSummary:`,
 				stream: false
 			}),
@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			0.5 + (text.length > 100 ? 0.2 : 0) + (summary.length > 20 ? 0.15 : 0) + (summary.length > 80 ? 0.1 : 0)
 		);
 
-		return json({ summary, confidence, model: 'gemma4-legal:latest' });
+		return json({ summary, confidence, model: 'gemma4-rotorquant:latest' });
 	} catch (err) {
 		console.error('[summarize] Error:', err);
 		return json({ error: 'Summarization failed' }, { status: 500 });

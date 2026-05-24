@@ -32,9 +32,9 @@ const LLAMA_EXE_CANDIDATES = [
 const MODEL_CANDIDATES = [
   process.env.ROTORQUANT_MODEL_PATH,
   process.env.TURBO_MODEL_PATH,
-  path.join(projectRoot, 'models', 'gemma4-legal-iq4xs-direct.gguf'),
-  path.join(projectRoot, 'models', 'gemma4-legal-iq4xs.gguf'),
-  path.join(projectRoot, 'models', 'gemma4-legal-q4_k_m.gguf'),
+  path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-iq4xs-direct.gguf'),
+  path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-iq4xs.gguf'),
+  path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-q4_k_m.gguf'),
 ].filter(Boolean);
 
 const MMPROJ_CANDIDATES = [

@@ -208,7 +208,7 @@ Return JSON: { "suggestions": [{ "fix": "...", "confidence": 0.0-1.0, "explanati
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
         prompt,
         stream: false,
         format: 'json',

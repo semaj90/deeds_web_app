@@ -474,7 +474,7 @@ ${errorContext || 'No past error matches'}`;
 	const { raw } = await traceLLM(
 		'error-diagnosis',
 		{
-			model: 'gemma4-legal:latest',
+			model: 'gemma4-rotorquant:latest',
 			mode,
 			backend: ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama',
 			queryLength: query.length,
@@ -491,7 +491,7 @@ ${errorContext || 'No past error matches'}`;
 						{ role: 'system', content: systemPrompt },
 						{ role: 'user', content: userPrompt },
 					],
-					'gemma4-legal',
+					'gemma4-rotorquant:latest',
 					{
 						temperature: 0.3,
 						maxTokens: 2048,
@@ -513,7 +513,7 @@ ${errorContext || 'No past error matches'}`;
 			gen.end({ output: content.slice(0, 1000), usage: { completionTokens: estimatedTokens } });
 			trackTokenUsage({
 				endpoint: '/api/error-brain/diagnose',
-				model: 'gemma4-legal',
+				model: 'gemma4-rotorquant:latest',
 				promptTokens: 0,
 				completionTokens: estimatedTokens,
 				durationMs,

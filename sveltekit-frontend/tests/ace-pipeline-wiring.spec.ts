@@ -141,7 +141,7 @@ vi.mock('$lib/server/ollama.js', () => ({
     ok:   true,
     json: async () => ({
       response:         'test response',
-      model:            'gemma4-legal',
+      model:            'gemma4-rotorquant:latest',
       eval_count:       100,
       prompt_eval_count: 50,
     }),
@@ -149,11 +149,11 @@ vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat:          vi.fn(async () => 'test response'),
   getChatModelKeepAlive: vi.fn(() => '24h'),
   VLM_MODELS: {
-    vision:    'gemma4-legal-vlm:latest',
+    vision:    'gemma4-rotorquant:latest',
     embedding: 'embeddinggemma:latest',
-    legal:     'gemma4-legal-vlm:latest',
-    gemma4:    'gemma4-legal-vlm:latest',
-    tool:      'gemma4-legal-vlm:latest',
+    legal:     'gemma4-rotorquant:latest',
+    gemma4:    'gemma4-rotorquant:latest',
+    tool:      'gemma4-rotorquant:latest',
   },
 }));
 

@@ -11,7 +11,7 @@
  *   2. Fetch pipeline memory: RAG/KAG/DAG/ACE hit breakdown
  *   3. Fetch graph analysis: centrality scores, connected cases
  *   4. Fetch user analytics: recent queries, practice areas, similar queries
- *   5. Generate research topics: Ollama self-prompting via gemma4-legal
+ *   5. Generate research topics: Ollama self-prompting via gemma4-rotorquant:latest
  *   6. Cache results in Redis with per-user key (30-min TTL)
  *
  * Data sources:
@@ -25,7 +25,7 @@
  *            — response_feedback        (thumbs-up/down per query hash)
  *            — qlora_examples           (gold/silver/bronze training examples)
  *   Neo4j   — graph centrality          (connected cases, authority ranking)
- *   Ollama  — gemma4-legal:latest       (deep research topic generation)
+ *   Ollama  — gemma4-rotorquant:latest       (deep research topic generation)
  */
 
 import { getRedis } from '$lib/server/redis.js';

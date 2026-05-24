@@ -32,7 +32,7 @@
 
 ```powershell
 C:\Users\james\Desktop\llama-server-cuda\llama-server.exe `
-  -m C:\Users\james\Videos\deeds-web-app\vendor\models\gemma4-legal.gguf `
+  -m C:\Users\james\Videos\deeds-web-app\vendor\models\gemma4-rotorquant:latest.gguf `
   --host 127.0.0.1 `
   --port 8090 `
   --ctx-size 16384 `
@@ -62,7 +62,7 @@ curl http://127.0.0.1:8090/v1/models
   "provider": "openai-compatible",
   "baseURL": "http://127.0.0.1:8090/v1",
   "apiKey": "local",
-  "model": "gemma4-legal",
+  "model": "gemma4-rotorquant:latest",
   "context": 16384,
   "maxTokens": 2048,
   "temperature": 0.2,
@@ -120,7 +120,7 @@ input_tokens + max_tokens > ctx
 ```powershell
 curl -X POST http://127.0.0.1:8090/v1/chat/completions `
   -H "Content-Type: application/json" `
-  -d '{"model":"gemma4-legal","messages":[{"role":"user","content":"Say ready."}],"max_tokens":32}'
+  -d '{"model":"gemma4-rotorquant:latest","messages":[{"role":"user","content":"Say ready."}],"max_tokens":32}'
 ```
 
 - [ ] Verify tool-like JSON output is returned cleanly:

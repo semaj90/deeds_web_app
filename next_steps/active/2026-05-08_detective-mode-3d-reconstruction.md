@@ -129,7 +129,7 @@ Annotation overlay shows: "Evidence #N — Photo from <date>, witness <id>"
 
 **On RTX 3060 Ti**: TRELLIS runs in ~30-60s per image at 256×256 input
 (quality acceptable for PS1-budget targets). VRAM peak ~6 GB. Coexists
-with TurboQuant `gemma4-legal-vlm` if loaded sequentially — never both at
+with TurboQuant `gemma4-rotorquant:latest` if loaded sequentially — never both at
 once. RabbitMQ queue serializes naturally.
 
 **Fallback**: if local TRELLIS OOMs, fall back to **Replicate API** (same

@@ -84,7 +84,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-legal:latest',
+					model: 'gemma4-rotorquant:latest',
 					prompt: `Given this investigation query and result, suggest 4 follow-up investigation queries that would deepen the analysis. For each, rate your confidence (0.0-1.0) that this follow-up will yield useful results, and explain briefly why.
 
 Investigation Query: ${query.slice(0, 300)}

@@ -1,27 +1,26 @@
-import fs from 'node:fs/promises';
+import fs from 'fs';
+import path from 'path';
 
-const logPath = 'docs/ai-os/agentic-progress-log.ndjson';
-const outPath = 'docs/ai-os/atlas-retry-index.json';
+export function buildAtlasRetryIndex() {
+    const logPath = path.resolve('docs/ai-os/agentic-progress-log.ndjson');
+    const indexPath = path.resolve('docs/ai-os/atlas-retry-index.json');
+    
+    if (!fs.existsSync(logPath)) return;
+    
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+    const retryPlans = [];
+    
+    for (const line of lines) {
+        const entry = JSON.parse(line);
+        if (entry.type === 'error' || entry.type === 'retry') {
+            retryPlans.push(entry);
+        }
+    }
+    
+    fs.writeFileSync(indexPath, JSON.stringify({ failedFeatures: retryPlans, retryPlans }, null, 2));
+    console.log(`Rebuilt retry index with ${retryPlans.length} items`);
+}
 
-const raw = await fs.readFile(logPath, 'utf8').catch(() => '');
-const entries = raw.split('\n').filter(Boolean).map((line) => JSON.parse(line));
-
-const retry = entries
-  .filter((e) => ['failed', 'partial', 'blocked', 'retry_needed'].includes(e.status))
-  .map((e) => ({
-    featureKey: e.featureKey,
-    date: e.date,
-    errorSignature: e.errorSignature,
-    failedQuery: e.attemptedQueries,
-    tryAgainWith: e.nextAttempt?.query,
-    filesTouched: e.filesTouched,
-    sourceRefs: e.sourceRefs
-  }));
-
-await fs.writeFile(outPath, JSON.stringify({
-  generatedAt: new Date().toISOString(),
-  count: retry.length,
-  retry
-}, null, 2));
-
-console.log(JSON.stringify({ ok: true, outPath, count: retry.length }, null, 2));
+if (process.argv[1] === import.meta.url.replace('file://', '')) {
+    buildAtlasRetryIndex();
+}

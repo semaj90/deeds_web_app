@@ -52,7 +52,7 @@ Provide your verdict in JSON:
 }
 `.trim()
 			}
-		], 'gemma4-legal-vlm');
+		], 'gemma4-rotorquant:latest');
 
 		const content = response.trim();
 		const jsonMatch = content.match(/\{[\s\S]*\}/);

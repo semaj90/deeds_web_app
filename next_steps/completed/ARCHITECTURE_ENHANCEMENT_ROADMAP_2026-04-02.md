@@ -29,7 +29,7 @@ User Query
     ├─► Bifrost Gateway (semantic cache, Go :3040, disabled by default)
     │       └── Redis-backed semantic similarity cache (28x speedup)
     │
-    ├─► Ollama gemma4-legal:latest (RTX 3060 Ti, Flash Attention, Q8_0 KV)
+    ├─► Ollama gemma4-rotorquant:latest (RTX 3060 Ti, Flash Attention, Q8_0 KV)
     │       └── Structured output via GBNF grammar
     │
     ├─► ACE Self-Evaluation (async via RabbitMQ → Redis → /api/synthesis/evaluation/[id])
@@ -136,7 +136,7 @@ The system is production-ready when a California opinion can be fetched, stored 
 **Current state**: Archived notebook (`phase77-unsloth-finetuning.ipynb`), conversion scripts in `deeds_labs/`.
 
 **What needs to happen**:
-1. **Fine-tune gemma4-legal with legal corpus** via Unsloth 4-bit QLoRA
+1. **Fine-tune gemma4-rotorquant:latest with legal corpus** via Unsloth 4-bit QLoRA
 2. **Merge LoRA adapters** back into base model weights
 3. **Export to GGUF** for Ollama consumption
 4. **Validate** legal domain accuracy vs base model
@@ -159,7 +159,7 @@ legal_corpus (PostgreSQL + Qdrant chunks)
     │     └── llama.cpp convert-hf-to-gguf.py
     │
     └─► Create Ollama Modelfile + push
-          └── ollama create gemma4-legal-finetuned -f Modelfile
+          └── ollama create gemma4-rotorquant:latest-finetuned -f Modelfile
 ```
 
 **Dependencies**: Unsloth (pip), CUDA 13.0, 8GB+ VRAM, ~2-4 hours training
@@ -390,7 +390,7 @@ CHR97 Binary Format:
 
 **Recommended next**:
 1. **P1**: Run Gemma4_E4B_Legal_GRPO.ipynb on Colab A100 (3-5 hours, ~$10)
-2. **P1**: Deploy resulting GGUF to Ollama: `ollama create gemma4-legal:latest -f Modelfile`
+2. **P1**: Deploy resulting GGUF to Ollama: `ollama create gemma4-rotorquant:latest -f Modelfile`
 3. **P2**: Runtime-test VLM pipeline with live Ollama (evidence upload + /api/vision/analyze)
 4. **P6**: Pull Triton TRT-LLM Docker image for Gemma 4 (needs ~8GB C: drive); build INT4 engine
 5. Watch TurboQuant for Ollama (~Q3 2026) — free 6x KV cache memory savings

@@ -7,12 +7,12 @@
  * Architecture:
  * - L1 Redis (5ms):     Exact-match via SHA-256 hash (100% precision, instant)
  * - L2 Qdrant (100ms):  Semantic similarity via vector search (88% threshold)
- * - L3 Ollama (2.8s):   Cold inference via GPU (gemma4-legal-fast)
+ * - L3 Ollama (2.8s):   Cold inference via GPU (gemma4-rotorquant:latest-fast)
  *
  * Performance:
  * - Exact repeat queries: 5ms (560× speedup vs 2.8s)
  * - Semantic variants:    100ms (28× speedup vs 2.8s)
- * - Novel queries:        2.8s (gemma4-legal-fast baseline)
+ * - Novel queries:        2.8s (gemma4-rotorquant:latest-fast baseline)
  *
  * Expected hit rates:
  * - L1: 30-50% (exact repeats)
@@ -72,7 +72,7 @@ export async function tieredLLMQuery(
   const startTime = performance.now();
 
   const {
-    model = 'gemma4-legal-fast',  // Use optimized model (10.7× faster)
+    model = 'gemma4-rotorquant:latest-fast',  // Use optimized model (10.7× faster)
     temperature = 0.7,
     maxTokens = 2048,
     context = 'default',

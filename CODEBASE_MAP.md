@@ -441,11 +441,11 @@ The repo uses smaller Gemma-family models across multiple lanes. A FunctionGemma
 | Client Tier 2 | LiteRT Gemma 4 E2B/E4B | LiteRT-LM (XNNPACK/MTP) | CPU/iGPU fallback with MTP speculative heads |
 | Client Tier 3 | Gemma 3 270M ONNX | onnxruntime-web | Legacy fallback, any device |
 | Client embeddings | EmbeddingGemma 300M ONNX | onnxruntime-web | 768-dim client-side vectors |
-| Server LLM | `gemma4-legal-vlm:latest` | Ollama + CUDA RTX | Synthesis, planning, vision (`PLANNER_MODEL`) |
+| Server LLM | `gemma4-rotorquant:latest` | Ollama + CUDA RTX | Synthesis, planning, vision (`PLANNER_MODEL`) |
 | Server tool-call | `FUNCTION_GEMMA_MODEL` env var | Ollama | Structured-call translation (`TOOL_MODEL` slot in `gemma4-agent.ts`) — defaults to unified model; set `FUNCTION_GEMMA_MODEL=functiongemma:latest` to activate the 270M lane once the Ollama tag is available |
 | Server embeddings | `embeddinggemma:latest` | Ollama | Qdrant vectors, semantic cache, clustering, SOM |
 
-**Model broker boundary:** `gemma4-agent.ts` now separates `PLANNER_MODEL` (full Gemma 4 legal VLM — reasoning, planning, synthesis) from `TOOL_MODEL` (structured-call translation — FunctionGemma target slot). Both currently resolve to `gemma4-legal-vlm:latest`. To activate the lighter lane: `ollama pull functiongemma:latest` then set `FUNCTION_GEMMA_MODEL=functiongemma:latest` in `.env`.
+**Model broker boundary:** `gemma4-agent.ts` now separates `PLANNER_MODEL` (full Gemma 4 legal VLM — reasoning, planning, synthesis) from `TOOL_MODEL` (structured-call translation — FunctionGemma target slot). Both currently resolve to `gemma4-rotorquant:latest`. To activate the lighter lane: `ollama pull functiongemma:latest` then set `FUNCTION_GEMMA_MODEL=functiongemma:latest` in `.env`.
 
 **PLE (Per-Layer Embeddings) clarification:** Some smaller Gemma edge models (E2B/E4B) use Per-Layer Embeddings and MatFormer-style parameter-efficient execution as internal inference optimizations. PLE helps smaller effective-parameter models run efficiently on local devices. It is **not** the same as the retrieval embeddings used for Qdrant vector search. Retrieval remains anchored on EmbeddingGemma (`embeddinggemma:latest` server-side, EmbeddingGemma 300M ONNX client-side). The PLE internal tensors are not stored in Qdrant and are not part of the semantic cache or clustering pipeline.
 

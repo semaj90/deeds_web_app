@@ -135,7 +135,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				{ role: 'system', content: system + caseContext },
 				{ role: 'user', content: selfPrompt },
 			],
-			'gemma4-legal:latest',
+			'gemma4-rotorquant:latest',
 			{
 				temperature: 0.3,
 				maxTokens: 1536,
@@ -148,7 +148,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			pipeline: pipelineHint ?? 'ace',
 			durationMs: Date.now() - start,
 			cached: false,
-			provider: 'gemma4-legal',
+			provider: 'gemma4-rotorquant:latest',
 		});
 	} catch (err) {
 		return json({

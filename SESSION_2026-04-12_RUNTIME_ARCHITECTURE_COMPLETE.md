@@ -26,7 +26,7 @@ User asked for a comprehensive runtime matrix document covering:
 **Sections**:
 - **Lane Architecture** (4 lanes):
   - LiteRT CPU (XNNPACK + MTP 4-head speculative decode)
-  - Ollama (primary GPU inference, gemma4-legal)
+  - Ollama (primary GPU inference, gemma4-rotorquant:latest)
   - LibTorch Analysis (N-API addon, 100× GPU speedup)
   - TurboQuant (turbo3 KV cache, 5× VRAM compression)
 

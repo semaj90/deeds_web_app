@@ -11,7 +11,7 @@ async function debugBifrost() {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: 'ollama-local/gemma4-legal:latest',
+			model: 'ollama-local/gemma4-rotorquant:latest',
 			messages: [{ role: 'user', content: 'What is negligence? Answer in 10 words.' }],
 			temperature: 0.7,
 			max_tokens: 50,

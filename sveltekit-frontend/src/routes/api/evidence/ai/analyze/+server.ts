@@ -13,7 +13,7 @@ const analyzeSchema = z.object({
 		confidence: z.number().optional(),
 		metadata: z.record(z.string(), z.unknown()).optional()
 	}),
-	// Optional: use gemma4-legal for complex tasks like codebase summarization
+	// Optional: use gemma4-rotorquant:latest for complex tasks like codebase summarization
 	useComplexModel: z.boolean().optional()
 });
 
@@ -39,8 +39,8 @@ export const POST: RequestHandler = async (event) => {
 		const { node, useComplexModel = false } = parsed.data;
 		const text = node.description || node.title || '';
 
-		// Choose model: gemma3:270m (fast, 4.5s avg) or gemma4-legal (complex, 25s avg)
-		const model = useComplexModel ? 'gemma4-legal:latest' : 'gemma3:270m';
+		// Choose model: gemma3:270m (fast, 4.5s avg) or gemma4-rotorquant:latest (complex, 25s avg)
+		const model = useComplexModel ? 'gemma4-rotorquant:latest' : 'gemma3:270m';
 
 		// ── L1 Redis Cache Lookup (5ms) ──
 		const cacheKey = generateCacheKey({
@@ -84,7 +84,7 @@ export const POST: RequestHandler = async (event) => {
 			console.warn('[Evidence AI] Cache lookup failed (non-fatal):', cacheErr);
 		}
 
-		// ── Ollama Inference (gemma3:270m = 4.5s, gemma4-legal = 25s) ──
+		// ── Ollama Inference (gemma3:270m = 4.5s, gemma4-rotorquant:latest = 25s) ──
 		const { ollamaFetch } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 

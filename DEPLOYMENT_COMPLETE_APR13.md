@@ -26,7 +26,7 @@ let cacheHit = false;
 
 try {
   const cachedResponse = await getCachedStreamResponse(ollamaMessages, {
-    model: model ?? 'gemma4-legal:latest',
+    model: model ?? 'gemma4-rotorquant:latest',
     temperature: 0.7,
     maxTokens: 2048,
   });
@@ -59,14 +59,14 @@ storeCachedResponse({
   queryEmbedding: embedData.embedding,
   context: systemPrompt,
   response: fullResponse,
-  model: model ?? 'gemma4-legal:latest',
+  model: model ?? 'gemma4-rotorquant:latest',
   confidence,
 }).catch((err) => console.warn('[SSE Chat] L2 Qdrant cache storage failed:', err));
 
 // Store in L1 Redis exact-match cache (NEW - for instant 2ms future hits)
 import('$lib/server/cache/redis-exact-match.js').then(({ generateCacheKey, setExactMatchCache }) => {
   const exactCacheKey = generateCacheKey({
-    model: model ?? 'gemma4-legal:latest',
+    model: model ?? 'gemma4-rotorquant:latest',
     messages: [
       { role: 'system', content: systemPrompt },
       ...conversationHistory,
@@ -158,7 +158,7 @@ L3: TRT → Triton → Ollama streaming (2-30s)
 3. L2 Qdrant: MISS
 4. L3 Ollama: Streams response (2-3s)
 5. **Stores in L0 + L2** ⭐
-6. Console: `[ollama-diag] endpoint=/api/chat model=gemma4-legal-fast duration_ms=2872`
+6. Console: `[ollama-diag] endpoint=/api/chat model=gemma4-rotorquant:latest-fast duration_ms=2872`
 
 **Run 2 (Warm - Exact same query)**:
 1. L0.5 Glyph: MISS
@@ -233,7 +233,7 @@ http://localhost:5173/terminal
 [SSE Chat] Cache HIT — similarity: 0.923
 
 # L3 Ollama cold inference (TARGET: <10% of queries)
-[ollama-diag] endpoint=/api/chat model=gemma4-legal-fast duration_ms=2800
+[ollama-diag] endpoint=/api/chat model=gemma4-rotorquant:latest-fast duration_ms=2800
 ```
 
 **Check Redis stats**:
@@ -361,7 +361,7 @@ npm run dev
 
 ### L3 Cold Inference (Existing)
 ```
-[ollama-diag] endpoint=/api/chat model=gemma4-legal-fast duration_ms=2800 keep_alive=10m
+[ollama-diag] endpoint=/api/chat model=gemma4-rotorquant:latest-fast duration_ms=2800 keep_alive=10m
 ```
 
 ### Cache Storage (New)

@@ -1,7 +1,7 @@
 # Cross-Encoder Reranker — Path Wiring Guide
 
 **Module**: `src/lib/server/retrieval/cross-encoder-reranker.ts`
-**Model**: `gemma4-legal:latest` (pointwise scoring, `format: 'json'`)
+**Model**: `gemma4-rotorquant:latest` (pointwise scoring, `format: 'json'`)
 **Cache**: L0 result-set list (Redis, 1h TTL) + L1 per-score pairs (Redis, 24h TTL)
 **Fallback**: Web search when `maxScore < 0.45`, then re-ranks expanded set
 

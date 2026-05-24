@@ -31,7 +31,7 @@ const RequestSchema = z.object({
   /** Lift ACE retrieval over caseId. Off by default in Phase 1 — clients
    *  pass `useAce: true` once the dev server + retrieval stack are warm. */
   useAce:        z.boolean().default(false),
-  /** Optional override; defaults to gemma4-legal-vlm:latest in the extractor. */
+  /** Optional override; defaults to gemma4-rotorquant:latest in the extractor. */
   model:         z.string().min(1).max(100).optional(),
   temperature:   z.number().min(0).max(1.5).optional(),
 });

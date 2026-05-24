@@ -23,7 +23,7 @@ Query: "${query}"
     try {
         const response = await ollamaCachedChat(
             [{ role: 'user', content: prompt }],
-            'gemma4-legal-fast',
+            'gemma4-rotorquant:latest-fast',
             { temperature: 0.1, maxTokens: 512 }
         );
 

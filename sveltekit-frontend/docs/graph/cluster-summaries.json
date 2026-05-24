@@ -44,7 +44,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -95,7 +95,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -144,7 +144,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -199,7 +199,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -249,7 +249,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -304,7 +304,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -360,7 +360,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -410,7 +410,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -465,7 +465,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -514,7 +514,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -567,7 +567,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -618,7 +618,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -667,7 +667,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -719,7 +719,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -776,7 +776,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -814,7 +814,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": false,
       "metadata": {
         "topFiles": [
@@ -867,7 +867,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -918,7 +918,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [
@@ -970,7 +970,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": true,
       "metadata": {
         "topFiles": [],
@@ -1004,7 +1004,7 @@
       "llmPathCount": 0,
       "llmTotalHits": 0,
       "centroidDistanceMean": null,
-      "summaryModel": "gemma4-legal-vlm:latest",
+      "summaryModel": "gemma4-rotorquant:latest",
       "hasEmbedding": false,
       "metadata": {
         "topFiles": [

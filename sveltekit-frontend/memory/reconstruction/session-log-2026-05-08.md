@@ -133,7 +133,7 @@ Verification sweep + new wiring summary. State at 2026-05-08T10:47Z.
 | TurboQuant `:8090` | ✅ |
 | SvelteKit dev `:5173` | ❌ not started |
 | ComfyUI Desktop `:8000` / portable `:8188` | ❌ not started |
-| Ollama `:11434` | ✅ up, gemma4-legal-vlm cold |
+| Ollama `:11434` | ✅ up, gemma4-rotorquant:latest cold |
 
 ## Two operator clicks to flip the remaining gates green
 

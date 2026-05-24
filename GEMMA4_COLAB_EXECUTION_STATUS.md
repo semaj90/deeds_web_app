@@ -120,7 +120,7 @@ Merging LoRA adapter into base model...
 
 **Expected Output**:
 ```
-Saving merged model to ./gemma4-legal-e4b-merged/
+Saving merged model to ./gemma4-rotorquant:latest-e4b-merged/
 
 Saved files:
 - config.json
@@ -147,18 +147,18 @@ Saved files:
 **Expected Output**:
 ```
 Exporting GGUF: Q4_K_M
-✅ gemma4-legal-e4b-q4_k_m.gguf (2.5 GB)
+✅ gemma4-rotorquant:latest-e4b-q4_k_m.gguf (2.5 GB)
 
 Exporting GGUF: Q8_0
-✅ gemma4-legal-e4b-q8_0.gguf (4.8 GB)
+✅ gemma4-rotorquant:latest-e4b-q8_0.gguf (4.8 GB)
 
 Exporting GGUF: Q2_K
-✅ gemma4-legal-e4b-q2_k.gguf (1.3 GB)
+✅ gemma4-rotorquant:latest-e4b-q2_k.gguf (1.3 GB)
 
 GGUF Export Summary:
-  q4_k_m   |   2.5 GB | gemma4-legal-e4b-q4_k_m.gguf
-  q8_0     |   4.8 GB | gemma4-legal-e4b-q8_0.gguf
-  q2_k     |   1.3 GB | gemma4-legal-e4b-q2_k.gguf
+  q4_k_m   |   2.5 GB | gemma4-rotorquant:latest-e4b-q4_k_m.gguf
+  q8_0     |   4.8 GB | gemma4-rotorquant:latest-e4b-q8_0.gguf
+  q2_k     |   1.3 GB | gemma4-rotorquant:latest-e4b-q2_k.gguf
 ```
 
 **Time**: 10-15 minutes (on A100)
@@ -173,10 +173,10 @@ GGUF Export Summary:
 ```
 Creating Ollama Modelfile...
 
-✅ Modelfile created: Modelfile.gemma4-legal-e4b
+✅ Modelfile created: Modelfile.gemma4-rotorquant:latest-e4b
 
 Contents:
-FROM ./gemma4-legal-e4b-q4_k_m.gguf
+FROM ./gemma4-rotorquant:latest-e4b-q4_k_m.gguf
 
 TEMPLATE """<start_of_turn>user
 {{ .Prompt }}<end_of_turn>
@@ -207,15 +207,15 @@ SYSTEM """You are a legal AI assistant specialized in U.S. law..."""
 
 **Purpose**: Package all outputs for local deployment
 
-**Expected File**: `gemma4-legal-e4b-deployment.zip` (~10 GB)
+**Expected File**: `gemma4-rotorquant:latest-e4b-deployment.zip` (~10 GB)
 
 **Contents**:
 ```
-gemma4-legal-e4b-deployment/
-├── gemma4-legal-e4b-q4_k_m.gguf      (2.5 GB) ⭐ Main file
-├── gemma4-legal-e4b-q8_0.gguf        (4.8 GB)
-├── gemma4-legal-e4b-q2_k.gguf        (1.3 GB)
-├── Modelfile.gemma4-legal-e4b        (1 KB)
+gemma4-rotorquant:latest-e4b-deployment/
+├── gemma4-rotorquant:latest-e4b-q4_k_m.gguf      (2.5 GB) ⭐ Main file
+├── gemma4-rotorquant:latest-e4b-q8_0.gguf        (4.8 GB)
+├── gemma4-rotorquant:latest-e4b-q2_k.gguf        (1.3 GB)
+├── Modelfile.gemma4-rotorquant:latest-e4b        (1 KB)
 ├── MODEL_CARD.md                     (metadata)
 └── DEPLOYMENT_INSTRUCTIONS.txt       (Ollama setup)
 ```
@@ -247,16 +247,16 @@ gemma4-legal-e4b-deployment/
 ```bash
 # Extract to models directory
 cd C:\Users\james\Videos\deeds-web-app\models
-unzip gemma4-legal-e4b-deployment.zip
+unzip gemma4-rotorquant:latest-e4b-deployment.zip
 ```
 
 ### 2. Import to Ollama
 
 ```bash
-cd gemma4-legal-e4b-deployment
+cd gemma4-rotorquant:latest-e4b-deployment
 
 # Create Ollama model from GGUF + Modelfile
-ollama create gemma4-legal-e4b -f Modelfile.gemma4-legal-e4b
+ollama create gemma4-rotorquant:latest-e4b -f Modelfile.gemma4-rotorquant:latest-e4b
 
 # Expected output:
 # transferring model data
@@ -268,7 +268,7 @@ ollama create gemma4-legal-e4b -f Modelfile.gemma4-legal-e4b
 ### 3. Test Locally
 
 ```bash
-ollama run gemma4-legal-e4b "What is hearsay evidence and list 3 exceptions?"
+ollama run gemma4-rotorquant:latest-e4b "What is hearsay evidence and list 3 exceptions?"
 ```
 
 **Expected**: Legal definition with 3 exceptions (excited utterance, present sense impression, dying declaration)
@@ -356,14 +356,14 @@ After downloading the deployment ZIP:
    ```typescript
    const MODEL_TIERS = {
      micro: 'gemma3:270m',        // 418MB, <1s
-     balanced: 'gemma4-legal-e4b', // 2.5GB, 5-10s ⭐ NEW
-     deep: 'gemma4-legal:latest',  // 11.8GB, 25s
+     balanced: 'gemma4-rotorquant:latest-e4b', // 2.5GB, 5-10s ⭐ NEW
+     deep: 'gemma4-rotorquant:latest',  // 11.8GB, 25s
    };
    ```
 
 2. **Test cache warm-up**:
    ```bash
-   node scripts/cache-warmup.mjs --model gemma4-legal-e4b --domain evidence --batch-size 5
+   node scripts/cache-warmup.mjs --model gemma4-rotorquant:latest-e4b --domain evidence --batch-size 5
    ```
 
 3. **Measure performance**: Expect 5-10s per query (vs 25s with 11.8B model)

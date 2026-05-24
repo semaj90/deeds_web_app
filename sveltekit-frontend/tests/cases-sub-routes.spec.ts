@@ -27,7 +27,7 @@ const mockOllamaFetch = vi.fn(async () =>
 	new Response(JSON.stringify({
 		message: { content: 'Mock LLM response' },
 		response: '{"keyPoints":["Point 1","Point 2","Point 3"],"confidence":0.85}',
-		model: 'gemma4-legal:latest',
+		model: 'gemma4-rotorquant:latest',
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } })
 );
 vi.mock('$lib/server/middleware/cache-headers.js', () => ({
@@ -39,7 +39,7 @@ vi.mock('$lib/server/middleware/cache-headers.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-legal:latest',
+	getChatModel: () => 'gemma4-rotorquant:latest',
 	getEmbedModel: () => 'embeddinggemma:latest',
 	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));

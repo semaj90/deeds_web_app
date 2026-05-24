@@ -17,7 +17,7 @@ async function testBifrost() {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: 'ollama-local/gemma4-legal:latest',
+			model: 'ollama-local/gemma4-rotorquant:latest',
 			messages: [{ role: 'user', content: query }],
 			temperature: 0.7,
 			max_tokens: 50,
@@ -42,7 +42,7 @@ async function testBifrost() {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: 'ollama-local/gemma4-legal:latest',
+			model: 'ollama-local/gemma4-rotorquant:latest',
 			messages: [{ role: 'user', content: query }],
 			temperature: 0.7,
 			max_tokens: 50,

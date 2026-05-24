@@ -174,7 +174,7 @@ const COMMON_QUERIES = [
  *
  * @param options.batchSize - Number of queries to process in parallel (default: 5)
  * @param options.delayMs - Delay between batches in milliseconds (default: 1000)
- * @param options.model - LLM model to use (default: gemma4-legal:latest)
+ * @param options.model - LLM model to use (default: gemma4-rotorquant:latest)
  * @param options.dryRun - If true, only log queries without calling LLM (default: false)
  */
 export async function warmUpCache(options: {
@@ -186,7 +186,7 @@ export async function warmUpCache(options: {
 	const {
 		batchSize = 5,
 		delayMs = 1000,
-		model = 'gemma4-legal:latest',
+		model = 'gemma4-rotorquant:latest',
 		dryRun = false,
 	} = options;
 

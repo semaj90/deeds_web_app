@@ -66,7 +66,7 @@ Client Router (query complexity scoring)
   │
   ├─ Complex (case reasoning, RAG synthesis) → Server Ollama
   │   ├─ SSE stream /api/sse/chat
-  │   ├─ LLM: gemma4-legal:latest (11.8B Q4_K_M)
+  │   ├─ LLM: gemma4-rotorquant:latest (11.8B Q4_K_M)
   │   └─ Embeddings: embeddinggemma:latest (server-cached)
   │
   └─ Degraded (GPU OOM, network error) → CPU fallback
