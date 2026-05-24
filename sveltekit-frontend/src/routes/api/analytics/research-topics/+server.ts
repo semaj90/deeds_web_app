@@ -74,7 +74,7 @@ const CODEBASE_SEED_TOPICS: Record<string, string[]> = {
 		'Compute average search_time_ms per pipeline from rag_query_log grouped by day.',
 	],
 	ollama: [
-		'What is the optimal KV cache quantisation strategy for gemma4-legal at 8K context?',
+		'What is the optimal KV cache quantisation strategy for gemma4-rotorquant:latest at 8K context?',
 		'How does Flash Attention affect memory bandwidth for the 11B parameter model on RTX 3060 Ti?',
 		'What are the trade-offs between TurboQuant INT4 and full-precision for legal reasoning tasks?',
 	],
@@ -120,7 +120,7 @@ async function generatePromptChain(
 			method:  'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model:  'gemma4-legal:latest',
+				model:  'gemma4-rotorquant:latest',
 				prompt,
 				stream:  false,
 				options: { temperature: 0.6, num_predict: 256 },

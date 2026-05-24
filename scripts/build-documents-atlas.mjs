@@ -2,11 +2,90 @@ import fs from 'fs';
 import path from 'path';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import readline from 'readline';
+import crypto from 'crypto';
+import { extractLogSignals, summarizeLog } from "./atlas/extract-log-signals.mjs";
+import { indexAtlasCard } from "./atlas/index-atlas-card.mjs";
+import { cacheFailure } from "./cache/log-failure-pattern.mjs";
 
 dotenv.config();
 
+async function gemmaClient(prompt) {
+  const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
+  try {
+    const res = await fetch(`${ollamaUrl}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma4-rotorquant:latest',
+        prompt: prompt,
+        stream: false,
+        format: 'json'
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      try {
+        return JSON.parse(data.response);
+      } catch {
+        return data.response;
+      }
+    }
+  } catch (err) {
+    console.warn(`[warning] gemmaClient invocation failed:`, err.message);
+  }
+  return null;
+}
+
 // Target folders and root directory configurations
 const rootDir = process.cwd().replace(/\\/g, '/');
+
+// --- HELPER FUNCTIONS FOR SIGNAL EXTRACTION & ARCHIVING ---
+
+async function archiveLargeFile(filePath, hash, size) {
+  const archiveDir = path.join(rootDir, 'archive', 'logs');
+  if (!fs.existsSync(archiveDir)) {
+    fs.mkdirSync(archiveDir, { recursive: true });
+  }
+  const baseName = path.basename(filePath);
+  const hashPrefix = hash.replace('sha256:', '').substring(0, 8);
+  const destPath = path.join(archiveDir, `${hashPrefix}_${baseName}`);
+  fs.copyFileSync(filePath, destPath);
+  fs.unlinkSync(filePath);
+  return destPath;
+}
+
+function isLogFile(filePath) {
+  const nameLower = path.basename(filePath).toLowerCase();
+  return nameLower.includes('log') || nameLower.includes('trace') || nameLower.includes('audit') || nameLower.endsWith('.log') || nameLower.includes('failed') || nameLower.includes('results');
+}
+
+function getDocType(filePath, content) {
+  const nameLower = path.basename(filePath).toLowerCase();
+  const contentLower = content.toLowerCase();
+  
+  if (nameLower.endsWith('.md') && !nameLower.includes('log') && !nameLower.includes('audit')) {
+    return 'docs';
+  }
+  if (nameLower.includes('log') || nameLower.includes('audit') || nameLower.endsWith('.log') || contentLower.includes('error') || contentLower.includes('exception')) {
+    return 'log';
+  }
+  return 'notes';
+}
+
+function relevanceScore(doc) {
+  let score = 0;
+
+  if (doc.type === "docs") score += 3;
+  if (doc.type === "log") score += 1;
+
+  if (/feature|api|schema/i.test(doc.content)) score += 3;
+  if (/error|fail/i.test(doc.content)) score += 1;
+
+  return score;
+}
+
+
 
 const recursiveDirs = [
   path.join(rootDir, 'docs'),
@@ -284,56 +363,208 @@ for (const filePath of filesToProcess) {
     const fileUrl = getFileUrl(absolutePath);
     const stats = fs.statSync(filePath);
     
+    let content = '';
+    let isLarge = false;
+    let reduced = null;
+
     // Check file size safety
     if (stats.size > MAX_FILE_SIZE) {
-      console.log(`Skipping file ${relativePath} as it exceeds the 5 MB limit (${(stats.size / 1024 / 1024).toFixed(2)} MB)`);
-      skippedCount++;
+      if (/error|log|trace|svelte|tsc/i.test(filePath)) {
+        console.log(`[atlas] compressing log: ${filePath}`);
+        const reduced = extractLogSignals(filePath);
+        const summary = await summarizeLog(gemmaClient, reduced);
+        if (summary) {
+          let summaryObj = summary;
+          if (typeof summary === 'string') {
+            try {
+              const jsonMatch = summary.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                summaryObj = JSON.parse(jsonMatch[0]);
+              } else {
+                summaryObj = JSON.parse(summary);
+              }
+            } catch {
+              summaryObj = { patterns: [summary], modules: [], rootCauses: [] };
+            }
+          }
+
+          await indexAtlasCard({
+            type: "log_summary",
+            file: filePath,
+            summary: summaryObj,
+          });
+
+          // Hook into extractor: cache failure patterns
+          if (summaryObj && summaryObj.patterns && Array.isArray(summaryObj.patterns)) {
+            for (const p of summaryObj.patterns) {
+              await cacheFailure(p);
+            }
+          }
+        }
+
+        // Archive raw log
+        const hash = 'sha256:' + crypto.createHash('sha256').update(reduced).digest('hex');
+        const archivedPath = await archiveLargeFile(filePath, hash, stats.size);
+        console.log(`[atlas] archived raw log to: ${archivedPath}`);
+
+        // Register document metadata card
+        documents[relativePath] = {
+          title: `Signal Card: ${path.basename(filePath)}`,
+          relativePath,
+          absolutePath,
+          fileUrl,
+          size: stats.size,
+          lines: reduced.split(/\r?\n/).length,
+          lastModified: stats.mtime.toISOString(),
+          headings: [],
+          category: 'audit-report',
+          tags: ['log_summary'],
+          summary: summary ? JSON.stringify(summary) : 'Log signal summary',
+          languages: [],
+          astRelations: { referencedFiles: [], referencedSymbols: [] },
+          rgGroups: ['archive'],
+          isSummarizedOnly: true,
+          archive: {
+            path: path.relative(rootDir, archivedPath).replace(/\\/g, '/'),
+            hash,
+            size: (stats.size / 1024 / 1024).toFixed(2) + 'MB',
+            indexed: true,
+            summaryRef: fileUrl
+          }
+        };
+
+        // Tokenize summary for searchability
+        const tokensText = `${path.basename(filePath)} ${summary ? JSON.stringify(summary) : ''}`.toLowerCase();
+        const tokens = tokensText.match(/[a-z0-9]+/g) || [];
+        const uniqueTokens = new Set(
+          tokens
+            .filter(t => t.length >= 3 && t.length <= 25 && !stopWords.has(t) && !/^\d+$/.test(t))
+        );
+        for (const token of uniqueTokens) {
+          if (!invertedIndex[token]) {
+            invertedIndex[token] = [];
+          }
+          invertedIndex[token].push(relativePath);
+        }
+
+        continue;
+      } else {
+        console.log(`[atlas] skipping large non-log file: ${filePath}`);
+        skippedCount++;
+        continue;
+      }
+    } else {
+      content = fs.readFileSync(filePath, 'utf-8');
+    }
+
+    // Determine document type and calculate relevance score
+    const docType = getDocType(filePath, content);
+    const score = relevanceScore({ type: docType, content });
+
+    // Archive raw logs and files with low relevance (score < 2)
+    if (score < 2) {
+      console.log(`Archiving low-relevance file ${relativePath} (score: ${score})...`);
+      const hash = isLarge && reduced ? reduced.hash : ('sha256:' + crypto.createHash('sha256').update(content).digest('hex'));
+      const archivedPath = await archiveLargeFile(filePath, hash, stats.size);
+      
+      const archiveMeta = {
+        path: path.relative(rootDir, archivedPath).replace(/\\/g, '/'),
+        hash,
+        size: (stats.size / 1024 / 1024).toFixed(2) + 'MB',
+        indexed: false,
+        summaryRef: fileUrl
+      };
+
+      documents[relativePath] = {
+        title: path.basename(filePath),
+        relativePath,
+        absolutePath,
+        fileUrl,
+        size: stats.size,
+        lines: isLarge && reduced ? reduced.lineCount : content.split(/\r?\n/).length,
+        lastModified: stats.mtime.toISOString(),
+        headings: [],
+        category: 'archive-metadata',
+        tags: [],
+        summary: `Archived log metadata: ${JSON.stringify(archiveMeta)}`,
+        languages: [],
+        astRelations: { referencedFiles: [], referencedSymbols: [] },
+        rgGroups: ['archive'],
+        isSummarizedOnly: true,
+        archive: archiveMeta
+      };
+      
+      // We skip content indexing/tokenizing for archived files
       continue;
     }
 
-    const content = fs.readFileSync(filePath, 'utf-8');
+    // For large log files, archive the raw file and index the summary
+    let archiveMeta = null;
+    if (isLarge && reduced) {
+      const archivedPath = await archiveLargeFile(filePath, reduced.hash, stats.size);
+      archiveMeta = {
+        path: path.relative(rootDir, archivedPath).replace(/\\/g, '/'),
+        hash: reduced.hash,
+        size: (stats.size / 1024 / 1024).toFixed(2) + 'MB',
+        indexed: true,
+        summaryRef: fileUrl
+      };
+    }
+
+    const isSummarizedOnly = (score >= 2 && score <= 3) || isLarge;
+
     const lines = content.split(/\r?\n/);
-    const lineCount = lines.length;
+    const lineCount = isLarge && reduced ? reduced.lineCount : lines.length;
 
     // Extract Title
     let title = path.basename(filePath);
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('#')) {
-        title = trimmed.replace(/^#+\s*/, '').trim();
-        break;
-      } else if (trimmed.length > 0 && title === path.basename(filePath)) {
-        title = trimmed;
+    if (isLarge && reduced) {
+      title = reduced.title;
+    } else {
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('#')) {
+          title = trimmed.replace(/^#+\s*/, '').trim();
+          break;
+        } else if (trimmed.length > 0 && title === path.basename(filePath)) {
+          title = trimmed;
+        }
       }
     }
 
-    // Extract Headings
+    // Extract Headings (skip for large summarized files as they represent log samples)
     const headings = [];
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('#')) {
-        const match = trimmed.match(/^(#+)\s+(.*)$/);
-        if (match) {
-          headings.push({
-            level: match[1].length,
-            text: match[2].trim()
-          });
+    if (!isLarge) {
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('#')) {
+          const match = trimmed.match(/^(#+)\s+(.*)$/);
+          if (match) {
+            headings.push({
+              level: match[1].length,
+              text: match[2].trim()
+            });
+          }
         }
       }
     }
 
     // Categorization
-    const nameLower = path.basename(filePath).toLowerCase();
-    const pathLower = relativePath.toLowerCase();
     let category = 'reference';
-    if (nameLower.includes('session') || nameLower.includes('timeline') || nameLower.includes('loop') || /\d+[-_]\d+[-_]\d+/.test(nameLower)) {
-      category = 'session-log';
-    } else if (nameLower.includes('todo') || nameLower.includes('checklist') || nameLower.includes('task') || nameLower.includes('action')) {
-      category = 'todo-list';
-    } else if (nameLower.includes('audit') || nameLower.includes('report') || nameLower.includes('analysis') || nameLower.includes('check') || nameLower.includes('findings') || nameLower.includes('error') || nameLower.includes('failed') || nameLower.includes('results')) {
+    if (isLarge) {
       category = 'audit-report';
-    } else if (nameLower.includes('architecture') || nameLower.includes('guide') || nameLower.includes('spec') || nameLower.includes('plan') || nameLower.includes('design') || nameLower.includes('wiring') || nameLower.includes('setup') || nameLower.includes('installation') || nameLower.includes('matrix') || nameLower.includes('blueprint') || nameLower.includes('readme') || nameLower.includes('llms') || nameLower.includes('llm')) {
-      category = 'design-doc';
+    } else {
+      const nameLower = path.basename(filePath).toLowerCase();
+      const pathLower = relativePath.toLowerCase();
+      if (nameLower.includes('session') || nameLower.includes('timeline') || nameLower.includes('loop') || /\d+[-_]\d+[-_]\d+/.test(nameLower)) {
+        category = 'session-log';
+      } else if (nameLower.includes('todo') || nameLower.includes('checklist') || nameLower.includes('task') || nameLower.includes('action')) {
+        category = 'todo-list';
+      } else if (nameLower.includes('audit') || nameLower.includes('report') || nameLower.includes('analysis') || nameLower.includes('check') || nameLower.includes('findings') || nameLower.includes('error') || nameLower.includes('failed') || nameLower.includes('results')) {
+        category = 'audit-report';
+      } else if (nameLower.includes('architecture') || nameLower.includes('guide') || nameLower.includes('spec') || nameLower.includes('plan') || nameLower.includes('design') || nameLower.includes('wiring') || nameLower.includes('setup') || nameLower.includes('installation') || nameLower.includes('matrix') || nameLower.includes('blueprint') || nameLower.includes('readme') || nameLower.includes('llms') || nameLower.includes('llm')) {
+        category = 'design-doc';
+      }
     }
 
     // Extract vocabulary-based tags
@@ -344,10 +575,10 @@ for (const filePath of filesToProcess) {
     });
 
     // Clean summary
-    const summary = cleanSummary(content);
+    const summary = isLarge && reduced ? reduced.summary : cleanSummary(content);
 
     // Programming Languages Detected
-    const languages = detectLanguages(content);
+    const languages = isLarge ? [] : detectLanguages(content);
 
     // AST path mapping relations
     const astRelations = extractAstRelations(content);
@@ -370,11 +601,16 @@ for (const filePath of filesToProcess) {
       summary,
       languages,
       astRelations,
-      rgGroups
+      rgGroups,
+      isSummarizedOnly,
+      archive: archiveMeta
     };
 
-    // Tokenize text and build inverted index
-    const textToTokenize = `${title} ${summary} ${headings.map(h => h.text).join(' ')} ${content}`.toLowerCase();
+    // Tokenize text and build inverted index (tokenize summary only if summarized index is requested)
+    const textToTokenize = isSummarizedOnly
+      ? `${title} ${summary} ${headings.map(h => h.text).join(' ')}`.toLowerCase()
+      : `${title} ${summary} ${headings.map(h => h.text).join(' ')} ${content}`.toLowerCase();
+      
     const tokens = textToTokenize.match(/[a-z0-9]+/g) || [];
     const uniqueTokens = new Set(
       tokens
@@ -403,9 +639,14 @@ const indexData = {
 
 // Write docs/documents-atlas-index.json
 const outputJsonPath = path.join(rootDir, 'docs', 'documents-atlas-index.json');
+const memoryJsonPath = path.join(rootDir, 'memory', 'atlas', 'documents-atlas.inverted.json');
 try {
   fs.writeFileSync(outputJsonPath, JSON.stringify(indexData, null, 2), 'utf-8');
   console.log(`Successfully wrote canonical index JSON: ${outputJsonPath}`);
+
+  fs.mkdirSync(path.dirname(memoryJsonPath), { recursive: true });
+  fs.writeFileSync(memoryJsonPath, JSON.stringify(indexData.invertedIndex, null, 2), 'utf-8');
+  console.log(`Successfully wrote inverted index JSON: ${memoryJsonPath}`);
 } catch (err) {
   console.error(`Failed to write JSON index: ${err.message}`);
 }
@@ -470,9 +711,14 @@ for (const cat of categories) {
 }
 
 const outputMdPath = path.join(rootDir, 'docs', 'documents-atlas-index.md');
+const memoryMdPath = path.join(rootDir, 'memory', 'atlas', 'documents-atlas.latest.md');
 try {
   fs.writeFileSync(outputMdPath, md, 'utf-8');
   console.log(`Successfully wrote markdown report catalog: ${outputMdPath}`);
+
+  fs.mkdirSync(path.dirname(memoryMdPath), { recursive: true });
+  fs.writeFileSync(memoryMdPath, md, 'utf-8');
+  console.log(`Successfully wrote latest markdown catalog: ${memoryMdPath}`);
 } catch (err) {
   console.error(`Failed to write Markdown report: ${err.message}`);
 }
@@ -535,7 +781,9 @@ async function saveToPostgres(docs) {
           lastModified: doc.lastModified,
           absolutePath: doc.absolutePath,
           fileUrl: doc.fileUrl,
-          astRelations: doc.astRelations
+          astRelations: doc.astRelations,
+          isSummarizedOnly: doc.isSummarizedOnly || false,
+          archive: doc.archive || null
         }))
       ]);
     }
@@ -549,4 +797,5 @@ async function saveToPostgres(docs) {
 }
 
 await saveToPostgres(documents);
+process.exit(0);
 

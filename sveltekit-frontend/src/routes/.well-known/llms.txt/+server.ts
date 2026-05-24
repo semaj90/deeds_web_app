@@ -170,7 +170,7 @@ export const GET: RequestHandler = async () => {
   lines.push('- **Database**: PostgreSQL 16 + Drizzle ORM 0.44 + pgvector 0.8.1');
   lines.push('- **Cache**: Redis (ioredis) — L1 exact-match (5ms) + L2 Bifrost semantic (2-5s)');
   lines.push('- **Vector DB**: Qdrant (GPU-accelerated, 9 collections, 768-dim embeddings)');
-  lines.push('- **LLM**: Ollama `gemma4-legal-vlm:latest` (text+vision, 5.3GB, GRPO legal LoRA)');
+  lines.push('- **LLM**: Ollama `gemma4-rotorquant:latest` (text+vision, 5.3GB, GRPO legal LoRA)');
   lines.push('- **Embeddings**: `embeddinggemma:latest` 768-dim via Ollama / gRPC');
   lines.push('- **GPU**: N-API LibTorch + TensorRT on RTX 3060 Ti (CUDA 12.1) — 100× cosine ops');
   lines.push('- **Graph**: Neo4j (community graph, SIMILAR_TOPOLOGY edges) + CouchDB (Karpathy wiki)');

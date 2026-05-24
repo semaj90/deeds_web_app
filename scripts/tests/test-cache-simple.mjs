@@ -9,7 +9,7 @@ async function testCache() {
   const query = 'What is hearsay evidence in California criminal law?';
   
   console.log('Query:', query);
-  console.log('\nRun 1 (Cold - expect ~30s with gemma4-legal)...');
+  console.log('\nRun 1 (Cold - expect ~30s with gemma4-rotorquant:latest)...');
   let start = Date.now();
   
   const run1 = await fetch('http://localhost:5173/api/test/cache-demo', {

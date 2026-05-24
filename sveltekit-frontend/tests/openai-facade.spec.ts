@@ -48,7 +48,7 @@ vi.mock('$lib/server/ai/inference-configs.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat:    mocks.bifrostChat,
   turboQuantChat: mocks.turboQuantChat,
-  VLM_MODELS:     { legal: 'gemma4-legal-vlm:latest', tool: 'gemma4-legal-vlm:latest' },
+  VLM_MODELS:     { legal: 'gemma4-rotorquant:latest', tool: 'gemma4-rotorquant:latest' },
 }));
 
 vi.mock('$lib/server/ai/gemma4-agent.js', () => ({
@@ -131,12 +131,12 @@ describe('openai-facade — runChatCompletion', () => {
     expect(res.choices).toHaveLength(1);
     expect(res.choices[0].message.content).toBe('Test response');
     expect(res.choices[0].finish_reason).toBe('stop');
-    expect(res.model).toBe('gemma4-legal-vlm:latest'); // mapped from yorha-legal
+    expect(res.model).toBe('gemma4-rotorquant:latest'); // mapped from yorha-legal
     expect(mocks.setExactMatchCache).toHaveBeenCalledWith(
       expect.stringMatching(/^ace:completion:/),
       expect.objectContaining({
         content: 'Test response',
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
         backend: 'openai-facade',
       }),
       86400
@@ -169,7 +169,7 @@ describe('openai-facade — runChatCompletion', () => {
     });
     mocks.getExactMatchCache.mockResolvedValueOnce({
       content: 'Cached prompt answer',
-      model: 'gemma4-legal-vlm:latest',
+      model: 'gemma4-rotorquant:latest',
       backend: 'openai-facade',
       cachedAt: new Date().toISOString(),
     });
@@ -436,7 +436,7 @@ describe('openai-facade — runChatCompletion', () => {
 
     const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
     const res = await runChatCompletion({
-      model:    'gemma4-legal',
+      model:    'gemma4-rotorquant:latest',
       messages: [{ role: 'user', content: 'q' }],
       file_path: 'src/foo.ts',
       raw:      false,

@@ -106,7 +106,7 @@ test.describe('Legal AI Chat Functionality', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             text: 'What is consideration in contract law?',
-            model: 'gemma4-legal',
+            model: 'gemma4-rotorquant:latest',
             config: { temperature: 0.7 },
           }),
         });

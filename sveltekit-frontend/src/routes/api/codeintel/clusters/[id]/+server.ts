@@ -16,7 +16,7 @@ const resummarizeSchema = z.object({
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const DEFAULT_MODEL = 'gemma4-legal-fast:latest';
+const DEFAULT_MODEL = 'gemma4-rotorquant:latest-fast:latest';
 const EMBED_MODEL = 'embeddinggemma:latest';
 
 // ─── GET ─────────────────────────────────────────────────────────────────────

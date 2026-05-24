@@ -55,7 +55,7 @@ gguf_outputs = []
 
 for quant_method in quantization_methods:
     output_file = model.save_pretrained_gguf(
-        "gemma4-legal-2b",
+        "gemma4-rotorquant:latest-2b",
         tokenizer,
         quantization_method=quant_method,
     )
@@ -245,7 +245,7 @@ for quant_method in quantization_methods:
 
     try:
         output_file = model.save_pretrained_gguf(
-            "gemma4-legal-2b",
+            "gemma4-rotorquant:latest-2b",
             tokenizer,
             quantization_method=quant_method,
         )

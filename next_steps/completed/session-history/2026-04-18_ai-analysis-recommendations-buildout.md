@@ -11,7 +11,7 @@ collection point counts only. The agentic error analysis page shows these plus r
 collection stats but no deeper insight.
 
 The GEMINI_API_KEY warning in the UI means AI-generated recommendations are blocked.
-We should not require Gemini — use Ollama/gemma4-legal:latest which is already available.
+We should not require Gemini — use Ollama/gemma4-rotorquant:latest which is already available.
 
 ---
 
@@ -39,7 +39,7 @@ recommendations: Array<{
 
 ### 2. Ollama-Driven Analysis Summary
 
-After computing collection stats, call gemma4-legal with a structured prompt:
+After computing collection stats, call gemma4-rotorquant:latest with a structured prompt:
 - Input: collection names + point counts + health status
 - Output: 2-3 sentence narrative + top 3 actionable recommendations
 - Timeout: 15s, non-fatal (fall back to static recommendations)

@@ -21,7 +21,7 @@ async function test() {
   ];
 
   const cacheKey = generateCacheKey({
-    model: 'gemma4-legal-fast',
+    model: 'gemma4-rotorquant:latest-fast',
     messages: testMessages,
     temperature: 0.3,
     maxTokens: 200,
@@ -38,7 +38,7 @@ async function test() {
   console.log('\n2. Store response in cache...');
   await setExactMatchCache(cacheKey, {
     content: 'Test response content',
-    model: 'gemma4-legal-fast',
+    model: 'gemma4-rotorquant:latest-fast',
     backend: 'ollama-direct',
   });
   console.log('✓ Stored');
@@ -59,7 +59,7 @@ async function test() {
   // Test 4: Verify same key generation
   console.log('\n4. Verify cache key consistency...');
   const cacheKey2 = generateCacheKey({
-    model: 'gemma4-legal-fast',
+    model: 'gemma4-rotorquant:latest-fast',
     messages: testMessages,
     temperature: 0.3,
     maxTokens: 200,

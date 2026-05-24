@@ -12,9 +12,9 @@
 
 | Model tag | Blob SHA | Size | Purpose | Status |
 |-----------|----------|------|---------|--------|
-| `gemma4-legal:latest` | `a79de882` | ~5.3 GB | Primary chat — text-only, 8K ctx, GRPO legal (10,214 steps). `OLLAMA_CHAT_MODEL` | **ACTIVE** |
-| `gemma4-legal-vlm:latest` | `d9c7875f` | ~5.3 GB | VLM — legal+vision merged, same weights as hermes-64k. `OLLAMA_VLM_MODEL`. Used by `vlm-lifecycle.ts` for vision tasks. | **ACTIVE** |
-| `gemma4-hermes-64k:latest` | `d9c7875f` | 0 extra disk (shared blob) | Hermes agent prose model — 64K ctx, same weights as VLM. `HERMES_API_URL` → Ollama `:11434`. Routed through OpenAI facade + ACE pipeline. | **ACTIVE** |
+| `gemma4-rotorquant:latest` | `a79de882` | ~5.3 GB | Primary chat — text-only, 8K ctx, GRPO legal (10,214 steps). `OLLAMA_CHAT_MODEL` | **ACTIVE** |
+| `gemma4-rotorquant:latest` | `d9c7875f` | ~5.3 GB | VLM — legal+vision merged, same weights as hermes-64k. `OLLAMA_VLM_MODEL`. Used by `vlm-lifecycle.ts` for vision tasks. | **ACTIVE** |
+| `gemma4-rotorquant:latest` | `d9c7875f` | 0 extra disk (shared blob) | Hermes agent prose model — 64K ctx, same weights as VLM. `HERMES_API_URL` → Ollama `:11434`. Routed through OpenAI facade + ACE pipeline. | **ACTIVE** |
 | `embeddinggemma:latest` | — | 621 MB | 768-dim embeddings. `OLLAMA_EMBED_MODEL`. Only embedding source (TurboQuant is chat-only). | **ACTIVE** |
 | `gemma3:270m` | `sha256-735af...` | 279 MB | Draft model candidate for speculative decoding (Type 1 GGUF drafter). Hold until test completed. | **HOLD** |
 | `ibm/granite-docling:258m` | — | 522 MB | Document structure understanding. `GRANITE_DOCLING_MODEL`. | **ON-DEMAND** |
@@ -23,50 +23,50 @@
 
 | Model tag | Size | Reason |
 |-----------|------|--------|
-| `gemma4:e4b-it-q4_K_M` | 9.6 GB | Stock community model — CPU-only, no legal fine-tune, no LoRA. Superseded by `gemma4-legal:latest`. |
-| `gemma4-legal:final` | ~5 GB | Duplicate tag — same weights as `gemma4-legal:latest`. |
+| `gemma4:e4b-it-q4_K_M` | 9.6 GB | Stock community model — CPU-only, no legal fine-tune, no LoRA. Superseded by `gemma4-rotorquant:latest`. |
+| `gemma4-rotorquant:latest:final` | ~5 GB | Duplicate tag — same weights as `gemma4-rotorquant:latest`. |
 | `ssfdre38/gemma4-turbo:e4b` | ~5 GB | CPU-only community RotorQuant model. No legal fine-tune. |
-| `gemma4-legal-fast:latest` | ~5 GB | Superseded by `gemma4-legal-iq4xs-direct.gguf` via llama-server. |
+| `gemma4-rotorquant:latest-fast:latest` | ~5 GB | Superseded by `gemma4-rotorquant:latest-iq4xs-direct.gguf` via llama-server. |
 
 ```powershell
 ollama rm "gemma4:e4b-it-q4_K_M"
-ollama rm "gemma4-legal:final"
+ollama rm "gemma4-rotorquant:latest:final"
 ollama rm "ssfdre38/gemma4-turbo:e4b"
-ollama rm "gemma4-legal-fast:latest"
+ollama rm "gemma4-rotorquant:latest-fast:latest"
 ```
 
 ### GGUFs (llama-server) — Keep
 
 | Path | Size | Env var | Notes |
 |------|------|---------|-------|
-| `models/gemma4-legal-iq4xs-direct.gguf` | 4.8 GB | `TURBO_MODEL_PATH`, `ROTORQUANT_MODEL_PATH` | **Canonical production GGUF.** 59.8 tok/s, 220ms TTFT. Direct IQ4_XS (not round-trip). |
+| `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | 4.8 GB | `TURBO_MODEL_PATH`, `ROTORQUANT_MODEL_PATH` | **Canonical production GGUF.** 59.8 tok/s, 220ms TTFT. Direct IQ4_XS (not round-trip). |
 | `models/mmproj-F16.gguf` | 945 MB | `MMPROJ_PATH` | VLM SigLIP projector sidecar. Required for `--mmproj` vision mode. |
 
 ### GGUFs (Desktop) — Delete (~14.6 GB)
 
-These are in `C:\Users\james\Desktop\gemma4-legal-iq4xs\`:
+These are in `C:\Users\james\Desktop\gemma4-rotorquant:latest-iq4xs\`:
 
 | File | Size | Reason |
 |------|------|--------|
-| `gemma4-legal-iq4xs-direct.gguf` | 4.8 GB | Exact duplicate of `models/gemma4-legal-iq4xs-direct.gguf` |
-| `gemma4-legal-iq4xs.gguf` | 4.8 GB | Slow round-trip version (21.6 tok/s, 1762ms TTFT) — superseded by -direct |
-| `gemma4-legal-merged-q4km.gguf` | 5.0 GB | Q4_K_M format — superseded by IQ4_XS direct |
+| `gemma4-rotorquant:latest-iq4xs-direct.gguf` | 4.8 GB | Exact duplicate of `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` |
+| `gemma4-rotorquant:latest-iq4xs.gguf` | 4.8 GB | Slow round-trip version (21.6 tok/s, 1762ms TTFT) — superseded by -direct |
+| `gemma4-rotorquant:latest-merged-q4km.gguf` | 5.0 GB | Q4_K_M format — superseded by IQ4_XS direct |
 
 ```powershell
-Remove-Item "C:\Users\james\Desktop\gemma4-legal-iq4xs" -Recurse -Force
+Remove-Item "C:\Users\james\Desktop\gemma4-rotorquant:latest-iq4xs" -Recurse -Force
 ```
 
 ### Model Env Pins (`.env` — canonical as of May 2026)
 
 ```env
-OLLAMA_CHAT_MODEL=gemma4-legal:latest
-GEMMA4_MODEL=gemma4-legal:latest
-OLLAMA_VLM_MODEL=gemma4-legal-vlm:latest
+OLLAMA_CHAT_MODEL=gemma4-rotorquant:latest
+GEMMA4_MODEL=gemma4-rotorquant:latest
+OLLAMA_VLM_MODEL=gemma4-rotorquant:latest
 OLLAMA_EMBED_MODEL=embeddinggemma:latest
 GRANITE_DOCLING_MODEL=ibm/granite-docling:258m
 HERMES_API_URL=http://127.0.0.1:11434
-TURBO_MODEL_PATH=C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf
-ROTORQUANT_MODEL_PATH=C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf
+TURBO_MODEL_PATH=C:\Users\james\Videos\deeds-web-app\models\gemma4-rotorquant:latest-iq4xs-direct.gguf
+ROTORQUANT_MODEL_PATH=C:\Users\james\Videos\deeds-web-app\models\gemma4-rotorquant:latest-iq4xs-direct.gguf
 MMPROJ_PATH=C:\Users\james\Videos\deeds-web-app\models\mmproj-F16.gguf
 ENABLE_MTP_DRAFTER=false
 ```
@@ -83,14 +83,14 @@ ENABLE_MTP_DRAFTER=false
 
 1. Open `scripts/unsloth-training/Gemma4_E4B_Legal_VLM_Reattach.ipynb` on Colab G4
 2. `pip install --upgrade unsloth` (gets ClippableLinear fix)
-3. Upload `gemma4-legal-text-only-adapter/` (146 MB) from Downloads
+3. Upload `gemma4-rotorquant:latest-text-only-adapter/` (146 MB) from Downloads
 4. Set `USE_LOCAL_ADAPTER = True` in Cell 3
 5. Run all cells → merge adapter onto FULL base model (vision+audio towers preserved)
-6. Export: `gemma4-legal-vlm-Q4_K_M.gguf` (~5 GB) + `gemma4-legal-vlm-mmproj-BF16.gguf` (~1.5 GB)
-7. Download from Google Drive → `trt_artifacts/gemma4-legal-vlm/`
-8. `ollama create gemma4-legal-vlm:latest -f Modelfile`
-9. Test: `ollama run gemma4-legal-vlm:latest "Describe this image" --images test.jpg`
-10. Update `.env`: `OLLAMA_VLM_MODEL=gemma4-legal-vlm:latest`
+6. Export: `gemma4-rotorquant:latest-Q4_K_M.gguf` (~5 GB) + `gemma4-rotorquant:latest-mmproj-BF16.gguf` (~1.5 GB)
+7. Download from Google Drive → `trt_artifacts/gemma4-rotorquant:latest/`
+8. `ollama create gemma4-rotorquant:latest -f Modelfile`
+9. Test: `ollama run gemma4-rotorquant:latest "Describe this image" --images test.jpg`
+10. Update `.env`: `OLLAMA_VLM_MODEL=gemma4-rotorquant:latest`
 
 **Result**: Single unified model for text+vision, eliminates VRAM swap on 8GB GPU.
 
@@ -98,7 +98,7 @@ ENABLE_MTP_DRAFTER=false
 
 | File | Size | Purpose |
 |------|------|---------|
-| `gemma4-legal-text-only-adapter/adapter_model.safetensors` | 146 MB | Text-only LoRA adapter (588 language tensors) |
+| `gemma4-rotorquant:latest-text-only-adapter/adapter_model.safetensors` | 146 MB | Text-only LoRA adapter (588 language tensors) |
 | `gemma4-e4b-legal-final-gguf (1)/model.safetensors` | 9.62 GB | Full merged model (TRT-LLM input) |
 
 ### Files SAFE TO DELETE After VLM Deploy
@@ -106,7 +106,7 @@ ENABLE_MTP_DRAFTER=false
 | File | Size |
 |------|------|
 | `gemma4-e4b-legal-ollama/gemma4-e4b-legal.Q4_K_M.gguf` | 4.97 GB |
-| `gemma4-legal-ollama/gemma4-e4b-legal.Q4_K_M.gguf` | 4.97 GB |
+| `gemma4-rotorquant:latest-ollama/gemma4-e4b-legal.Q4_K_M.gguf` | 4.97 GB |
 | `gemma4-e4b-legal-ollama.zip` | 5.0 GB |
 
 ---

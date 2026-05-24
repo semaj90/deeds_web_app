@@ -1,7 +1,7 @@
 /**
  * Hermes Planner — structured tool-call router / dispatcher brain.
  *
- * Hermes (gemma4-hermes-64k via gateway :8642) handles:
+ * Hermes (gemma4-rotorquant:latest via gateway :8642) handles:
  *   - Choosing which retrieval tools to call
  *   - Returning strict JSON plans (Zod-validated)
  *   - Routing ACE queries to the right store
@@ -215,7 +215,7 @@ async function callHermesJsonMode(
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'gemma4-hermes-64k',
+        model: 'gemma4-rotorquant:latest',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage },

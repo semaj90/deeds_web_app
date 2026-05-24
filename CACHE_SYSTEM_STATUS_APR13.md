@@ -29,7 +29,7 @@ L1: Redis Exact-Match (5ms, 20-30% hit rate)
   ↓ miss
 L2: Bifrost Semantic Cache (2-5s, 70-90% hit rate, threshold 0.8)
   ↓ miss
-L3: Ollama GPU Inference (4.5s avg for gemma3:270m, 22s for gemma4-legal)
+L3: Ollama GPU Inference (4.5s avg for gemma3:270m, 22s for gemma4-rotorquant:latest)
   ↓
 Store in L1 + L2 for future hits
 ```
@@ -102,9 +102,9 @@ curl http://localhost:3040/health
 | Model | Size | Latency (avg) | P99 | Success Rate | Use Case |
 |-------|------|---------------|-----|--------------|----------|
 | **gemma3:270m** | 268M | 4.5s | 7.5s | 100% (72/72) | ✅ **Default** (fast inference) |
-| gemma4-legal | 11.8B | 22s | 29s | 100% | Complex legal analysis |
+| gemma4-rotorquant:latest | 11.8B | 22s | 29s | 100% | Complex legal analysis |
 
-**Recommendation**: Use `gemma3:270m` for production cache warm-up and high-throughput scenarios. Use `gemma4-legal` for complex analysis requiring deeper reasoning.
+**Recommendation**: Use `gemma3:270m` for production cache warm-up and high-throughput scenarios. Use `gemma4-rotorquant:latest` for complex analysis requiring deeper reasoning.
 
 ---
 
@@ -169,7 +169,7 @@ curl -X POST http://localhost:5173/api/cache/warm-up \
   "config": {
     "batchSize": 5,
     "delayMs": 1000,
-    "model": "gemma4-legal:latest",
+    "model": "gemma4-rotorquant:latest",
     "domain": "evidence-analysis",
     "totalQueries": 20,
     "estimatedDurationSeconds": 192
@@ -218,7 +218,7 @@ curl -X POST http://localhost:5173/api/cache/warm-up \
 {
   "domain": "evidence-analysis",  // 'evidence' | 'evidence-analysis' | 'all'
   "batchSize": 5,                 // 1-20 queries per batch
-  "model": "gemma3:270m",         // Default (fast) or 'gemma4-legal:latest'
+  "model": "gemma3:270m",         // Default (fast) or 'gemma4-rotorquant:latest'
   "maxQueries": 20                // Optional limit
 }
 ```
@@ -403,7 +403,7 @@ curl "http://localhost:5173/api/codebase-index/evidence-analyze?list=true"
 | Model | Avg Latency | P99 Latency | Success Rate | Requests | Recommendation |
 |-------|-------------|-------------|--------------|----------|----------------|
 | **gemma3:270m** | 4.5s | 7.5s | **100%** (72/72) | 72 | ✅ **Production Default** |
-| gemma4-legal | 22s | 29s | 100% | N/A | Complex analysis only |
+| gemma4-rotorquant:latest | 22s | 29s | 100% | N/A | Complex analysis only |
 
 ### Cache Performance
 
@@ -430,7 +430,7 @@ curl "http://localhost:5173/api/codebase-index/evidence-analyze?list=true"
    - **Solution**: Created `/api/ai/chat-direct` endpoint (bypasses 7-tier cascade)
    - **Status**: Validated (100% success with direct endpoint)
 
-2. **Model Speed Bottleneck** — gemma4-legal too slow for high-throughput (22s avg)
+2. **Model Speed Bottleneck** — gemma4-rotorquant:latest too slow for high-throughput (22s avg)
    - **Solution**: Default to gemma3:270m (4.5s avg, 100% success)
    - **Status**: Implemented in evidence-analyze endpoint
 
@@ -453,7 +453,7 @@ curl "http://localhost:5173/api/codebase-index/evidence-analyze?list=true"
 
 - [x] **Load Testing** — 72/72 requests successful (100%)
 - [x] **Cache Hit Rate** — 98.61% validated
-- [x] **Model Performance** — gemma3:270m 4.5s avg, gemma4-legal 22s avg
+- [x] **Model Performance** — gemma3:270m 4.5s avg, gemma4-rotorquant:latest 22s avg
 - [x] **CouchDB Storage** — Persistence validated
 - [x] **Job Queue** — In-memory tracking with polling
 
@@ -485,7 +485,7 @@ curl "http://localhost:5173/api/codebase-index/evidence-analyze?list=true"
    - **Mitigation**: `/api/ai/chat-direct` endpoint created
    - **Status**: Workaround validated, router optimization needed
 
-3. **gemma4-legal Performance** — 22s avg latency too slow for high-throughput
+3. **gemma4-rotorquant:latest Performance** — 22s avg latency too slow for high-throughput
    - **Impact**: Not suitable for production cache warm-up
    - **Mitigation**: Default to gemma3:270m (4.5s avg)
    - **Status**: Resolved (gemma3:270m now default)

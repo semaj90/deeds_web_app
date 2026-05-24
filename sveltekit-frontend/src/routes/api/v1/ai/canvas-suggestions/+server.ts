@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				messages: [
 					{ role: 'system', content: prompt },
 					{ role: 'user', content: JSON.stringify(parsed.data.evidenceData ?? {}).slice(0, 5000) }

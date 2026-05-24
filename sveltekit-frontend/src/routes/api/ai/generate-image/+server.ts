@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				prompt: `Describe a visual representation for: "${prompt.slice(0, 500)}". Style: ${style}. Return JSON: { "description": "...", "dominantColors": ["#hex"], "elements": ["..."], "mood": "..." }`,
 				stream: false,
 				options: { temperature: 0.7 }

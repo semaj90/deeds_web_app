@@ -154,7 +154,7 @@ export async function cacheAIContent(
 	templateType: string,
 	caseId: string,
 	content: string,
-	model: string = 'gemma4-legal:latest',
+	model: string = 'gemma4-rotorquant:latest',
 	tokenCount?: number
 ): Promise<void> {
 	const redis = redisPool.getConnection();

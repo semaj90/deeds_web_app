@@ -11,7 +11,7 @@
  *   → docs/graph/llm-summaries.json
  *   → Qdrant codebase_chunks_768 payload enrichment (if --qdrant)
  *
- * Model choice: gemma3:270m (< 1GB VRAM, runs alongside gemma4-legal-vlm).
+ * Model choice: gemma3:270m (< 1GB VRAM, runs alongside gemma4-rotorquant:latest).
  * Batches: 4 concurrent requests, 15s per-request timeout.
  * Skips: test files, generated files, files < 10 lines, already-summarized.
  *

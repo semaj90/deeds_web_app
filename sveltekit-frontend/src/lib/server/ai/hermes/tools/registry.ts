@@ -111,7 +111,7 @@ export const STABLE_TOOLS: Record<string, ToolDefinition> = {
       const { ollamaFetch } = await import('$lib/server/ollama.js');
       const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
         method: 'POST',
-        body: JSON.stringify({ model: args.model || 'gemma4-legal:latest', prompt: args.prompt, stream: false })
+        body: JSON.stringify({ model: args.model || 'gemma4-rotorquant:latest', prompt: args.prompt, stream: false })
       });
       return await res.json();
     }

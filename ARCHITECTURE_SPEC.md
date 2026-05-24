@@ -222,7 +222,7 @@ interface EvidenceMetadata {
 
 // Chat message metadata (LLM inference + retrieval)
 interface ChatMessageMetadata {
-  modelUsed?: string; // 'gemma4-legal' | 'embeddinggemma'
+  modelUsed?: string; // 'gemma4-rotorquant:latest' | 'embeddinggemma'
   temperature?: number;
   maxTokens?: number;
   inferenceMs?: number;
@@ -484,7 +484,7 @@ interface InferenceLogDoc {
   sessionId?: string;
 
   // Request
-  model: string; // 'gemma4-legal' | 'embeddinggemma'
+  model: string; // 'gemma4-rotorquant:latest' | 'embeddinggemma'
   prompt: string; // First 500 chars
   temperature: number;
   maxTokens: number;
@@ -627,7 +627,7 @@ interface SynthesisGeneratePayload {
     retrievalContext?: string[];
   };
   options?: {
-    model?: string; // Default: 'gemma4-legal'
+    model?: string; // Default: 'gemma4-rotorquant:latest'
     temperature?: number; // Default: 0.3
     maxTokens?: number; // Default: 1000
     selfEvaluation?: boolean; // Default: true

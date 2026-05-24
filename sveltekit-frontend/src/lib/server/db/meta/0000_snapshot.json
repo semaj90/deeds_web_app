@@ -2315,7 +2315,7 @@
  "type": "varchar(100)",
  "primaryKey": false,
  "notNull": false,
- "default": "'gemma4-legal'"
+ "default": "'gemma4-rotorquant:latest'"
  },
  "processing_time": {
  "name": "processing_time",
@@ -2784,7 +2784,7 @@
  "type": "varchar(100)",
  "primaryKey": false,
  "notNull": true,
- "default": "'gemma4-legal'"
+ "default": "'gemma4-rotorquant:latest'"
  },
  "query_type": {
  "name": "query_type",

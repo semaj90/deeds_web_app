@@ -82,9 +82,24 @@ async function main() {
 
     // 2. Fetch document entries from Postgres
     console.log("Fetching documents_atlas_entries from Postgres...");
-    const { rows: docs } = await pool.query(
-      `SELECT relative_path, title, category, tags, summary, size, lines FROM documents_atlas_entries`
+    const { rows: docsRaw } = await pool.query(
+      `SELECT path AS relative_path, title, category, tags, summary, metadata FROM documents_atlas_entries`
     );
+    const docs = docsRaw.map(row => {
+      const meta = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata || {};
+      const tags = typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags || [];
+      return {
+        relative_path: row.relative_path,
+        title: row.title,
+        category: row.category,
+        tags: tags,
+        summary: row.summary,
+        size: meta.size ?? 0,
+        lines: meta.lines ?? 0,
+        isSummarizedOnly: meta.isSummarizedOnly ?? false,
+        archive: meta.archive ?? null
+      };
+    });
     console.log(`Found ${docs.length} documents in database.`);
 
     // 3. Loop and generate embeddings, preparing points
@@ -124,7 +139,9 @@ async function main() {
               summary: doc.summary || '',
               size: doc.size,
               lines: doc.lines,
-              source: 'documents_atlas'
+              source: 'documents_atlas',
+              isSummarizedOnly: doc.isSummarizedOnly,
+              archive: doc.archive
             })
           });
         }

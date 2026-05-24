@@ -118,7 +118,7 @@ function getEndpointForTask(task: GpuTask): { url: string; body: Record<string, 
 		case 'chat':
 			return {
 				url: '/api/chat',
-				body: { message: task.payload.message, model: task.payload.model ?? 'gemma4-legal:latest' }
+				body: { message: task.payload.message, model: task.payload.model ?? 'gemma4-rotorquant:latest' }
 			};
 		case 'embedding':
 			return {

@@ -197,7 +197,7 @@ Hermes is an **agentic orchestration layer** on top of Ollama. It adds:
 - **Skill system** (reusable named workflows triggered by slash-commands or API)
 - **MCP tool surface** (TRACE :8788 tools + 42 registered tools available to the model)
 - **Scheduled jobs** (Cron syntax, folder-open triggers, idle triggers)
-- **Gateway API** (:8642/v1 — OpenAI-compatible, routes to gemma4-hermes-64k)
+- **Gateway API** (:8642/v1 — OpenAI-compatible, routes to gemma4-rotorquant:latest)
 - **Workspace UI** (React UI at :3000 — Skills, Sessions, Memory, Jobs browser)
 
 ---

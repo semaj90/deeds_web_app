@@ -20,7 +20,7 @@ const suggestFixSchema = z.object({
 
 /**
  * POST /api/phase72/suggest-fix
- * AI-powered fix suggestions using local Ollama (gemma4-legal).
+ * AI-powered fix suggestions using local Ollama (gemma4-rotorquant:latest).
  * Falls back to static suggestions if Ollama is unavailable.
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -56,7 +56,7 @@ Respond in JSON: {"plan": "...", "suggestions": ["..."], "related_routes": ["...
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-legal:latest',
+					model: 'gemma4-rotorquant:latest',
 					prompt,
 					stream: false,
 					options: { temperature: 0.2, num_predict: 512 },

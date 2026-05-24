@@ -3477,7 +3477,7 @@
     "featureKey": "turboquant_setup_inference_layer",
     "title": "TurboQuant Setup (Inference Layer)",
     "status": "implemented",
-    "summary": "TurboQuant's cacheprompt: true computes the system-prompt KV state once and reuses it across all 20 cluster summaries, saving ~18s per run on an 8GB GPU. | Port | Service | Model | VRAM | |---|---|---|---| | 8090 | llama-server.exe (TurboQuant) | gemma4-legal-vlm.gguf + mmproj-BF16.gguf | 5.8 GB |",
+    "summary": "TurboQuant's cacheprompt: true computes the system-prompt KV state once and reuses it across all 20 cluster summaries, saving ~18s per run on an 8GB GPU. | Port | Service | Model | VRAM | |---|---|---|---| | 8090 | llama-server.exe (TurboQuant) | gemma4-rotorquant:latest.gguf + mmproj-BF16.gguf | 5.8 GB |",
     "sourceRefs": [
       "local:docs/CODEBASE_INDEXING_PIPELINE.md#L113"
     ],
@@ -3554,7 +3554,7 @@
     "featureKey": "gemma4_embeddinggemma_summary_path",
     "title": "Gemma4 → embeddinggemma Summary Path",
     "status": "implemented",
-    "summary": "Stage 6 (summarize) writes: 1. Text summary → Postgres clustersummaries.summary (gemma4-legal-vlm via Ollama/TurboQuant) 2. 768-dim embedding → Postgres clustersummaries.summaryembedding halfvec (embeddinggemma) 3. Qdrant mirror → codebasechunks768 payload summaryembedding vector (named-vector mode) 4. Minified → Int8 quantized via minified-research-cache.ts (serves L1/L2/L3 cache tiers)",
+    "summary": "Stage 6 (summarize) writes: 1. Text summary → Postgres clustersummaries.summary (gemma4-rotorquant:latest via Ollama/TurboQuant) 2. 768-dim embedding → Postgres clustersummaries.summaryembedding halfvec (embeddinggemma) 3. Qdrant mirror → codebasechunks768 payload summaryembedding vector (named-vector mode) 4. Minified → Int8 quantized via minified-research-cache.ts (serves L1/L2/L3 cache tiers)",
     "sourceRefs": [
       "local:docs/CODEBASE_INDEXING_PIPELINE.md#L217"
     ],
@@ -6436,7 +6436,7 @@
     "featureKey": "active_model_variables_env",
     "title": "Active Model Variables (.env)",
     "status": "implemented",
-    "summary": "TURBOMODELPATH=C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\gemma4-legal.gguf TURBOMMPROJPATH=C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\mmproj-gemma4.gguf LLAMASERVERPATH=C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe TURBOPROFILE=stock TURBOCTX=16384",
+    "summary": "TURBOMODELPATH=C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\gemma4-rotorquant:latest.gguf TURBOMMPROJPATH=C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\mmproj-gemma4.gguf LLAMASERVERPATH=C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe TURBOPROFILE=stock TURBOCTX=16384",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L12"
     ],
@@ -6447,7 +6447,7 @@
     "featureKey": "component_breakdown",
     "title": "🧱 Component Breakdown",
     "status": "implemented",
-    "summary": "1. Model Core (gemma4-legal.gguf): A Gemma4 E4B (4.4B) base model merged with a specialized GRPO (Group Relative Policy Optimization) fine-tuned legal LoRA. Quantized in Q4KM (5.33 GB) format on disk. 2. Vision Tower (mmproj-gemma4.gguf): A multimodal projector file (991 MB) based on SigLIP enabling image inputs and OCR capabilities when the VLM projector tower is active. 3. Execution Context (llama-server-cuda): Runs with complete GPU offloading (--n-gpu-layers 99) and a 16k tokens context window (--ctx-size 16384). ---",
+    "summary": "1. Model Core (gemma4-rotorquant:latest.gguf): A Gemma4 E4B (4.4B) base model merged with a specialized GRPO (Group Relative Policy Optimization) fine-tuned legal LoRA. Quantized in Q4KM (5.33 GB) format on disk. 2. Vision Tower (mmproj-gemma4.gguf): A multimodal projector file (991 MB) based on SigLIP enabling image inputs and OCR capabilities when the VLM projector tower is active. 3. Execution Context (llama-server-cuda): Runs with complete GPU offloading (--n-gpu-layers 99) and a 16k tokens context window (--ctx-size 16384). ---",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L21"
     ],
@@ -6469,7 +6469,7 @@
     "featureKey": "1_active_app_vendor_directory_vendor_models",
     "title": "1. Active App Vendor Directory (`vendor/models/`)",
     "status": "implemented",
-    "summary": "Located at: C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\ | File / Subfolder | Size | Created | Status / Purpose | | :--- | :--- | :--- | :--- | | gemma4-legal.gguf | 5.0 GB | Apr 5, 2026 | ACTIVE. The primary merged GRPO legal text-reasoning model. | | mmproj-gemma4.gguf | 946 MB | Apr 11, 2026 | ACTIVE. Multimodal visual projector (SigLIP). |",
+    "summary": "Located at: C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\ | File / Subfolder | Size | Created | Status / Purpose | | :--- | :--- | :--- | :--- | | gemma4-rotorquant:latest.gguf | 5.0 GB | Apr 5, 2026 | ACTIVE. The primary merged GRPO legal text-reasoning model. | | mmproj-gemma4.gguf | 946 MB | Apr 11, 2026 | ACTIVE. Multimodal visual projector (SigLIP). |",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L30"
     ],
@@ -6478,14 +6478,14 @@
   },
   {
     "featureKey": "2_desktop_model_inventory_desktop_gemma4_legal_iq4xs",
-    "title": "2. Desktop Model Inventory (`Desktop/gemma4-legal-iq4xs/`)",
+    "title": "2. Desktop Model Inventory (`Desktop/gemma4-rotorquant:latest-iq4xs/`)",
     "status": "implemented",
-    "summary": "Located at: C:\\Users\\james\\Desktop\\gemma4-legal-iq4xs\\ This directory acts as the pipeline export and quantization workspace for E4B Legal models. | File Name | Size | Quantization | Recommendation / Utility | | :--- | :--- | :--- | :--- | | gemma4-legal-iq4xs.gguf | 4.8 GB | IQ4XS (iMatrix) | KEEP / RECOMMEND UPGRADE. Features importance matrix calibration. Saves ~200MB VRAM over Q4KM while matching or exceeding token quality. |",
+    "summary": "Located at: C:\\Users\\james\\Desktop\\gemma4-rotorquant:latest-iq4xs\\ This directory acts as the pipeline export and quantization workspace for E4B Legal models. | File Name | Size | Quantization | Recommendation / Utility | | :--- | :--- | :--- | :--- | | gemma4-rotorquant:latest-iq4xs.gguf | 4.8 GB | IQ4XS (iMatrix) | KEEP / RECOMMEND UPGRADE. Features importance matrix calibration. Saves ~200MB VRAM over Q4KM while matching or exceeding token quality. |",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L42"
     ],
     "missing": [],
-    "nextQuery": "rg \"2. Desktop Model Inventory (`Desktop/gemma4-legal-iq4xs/`)\" src docs tests"
+    "nextQuery": "rg \"2. Desktop Model Inventory (`Desktop/gemma4-rotorquant:latest-iq4xs/`)\" src docs tests"
   },
   {
     "featureKey": "merge_vlm_reattachment_workflow",
@@ -6502,7 +6502,7 @@
     "featureKey": "key_action_items_recommendations",
     "title": "💡 Key Action Items & Recommendations",
     "status": "implemented",
-    "summary": "1. VRAM Safety Upgrade: Swap the active gemma4-legal.gguf in vendor/models/ from Q4KM (5.0 GB) to the newer IQ4XS (iMatrix) variant gemma4-legal-iq4xs.gguf (4.8 GB).  Benefit: Reduces workstation VRAM foot-print by ~200 MB which is critical for our 8GB RTX 3060 Ti limits, while improving inference perplexity via iMatrix calibration. 2. Desktop Cleanup Allowlist:  Keep: gemma4-legal-iq4xs.gguf (as our primary backup/upgrade file).",
+    "summary": "1. VRAM Safety Upgrade: Swap the active gemma4-rotorquant:latest.gguf in vendor/models/ from Q4KM (5.0 GB) to the newer IQ4XS (iMatrix) variant gemma4-rotorquant:latest-iq4xs.gguf (4.8 GB).  Benefit: Reduces workstation VRAM foot-print by ~200 MB which is critical for our 8GB RTX 3060 Ti limits, while improving inference perplexity via iMatrix calibration. 2. Desktop Cleanup Allowlist:  Keep: gemma4-rotorquant:latest-iq4xs.gguf (as our primary backup/upgrade file).",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L74"
     ],
@@ -6513,7 +6513,7 @@
     "featureKey": "three_development_model_lanes_opencode_local_dev",
     "title": "Three Development Model Lanes (OpenCode / local dev)",
     "status": "implemented",
-    "summary": "When Copilot or Claude are unavailable, the workspace has three local LLM lanes configured in opencode.json: | Lane | Model | Server | Context | Purpose | |---|---|---|---|---| | A — Hermes | gemma4-hermes-64k (Ollama alias of gemma4-legal-vlm:latest) | Ollama :11434 | 65 536 | Tool-calling sanity check, web search, agent behavior comparison | | B — TurboQuant | gemma4-legal.gguf via llama-server.exe | :8090 | 16 384 (TURBOCTX) | Long-context code audit, TRACE MCP loop — default OpenCode lane |",
+    "summary": "When Copilot or Claude are unavailable, the workspace has three local LLM lanes configured in opencode.json: | Lane | Model | Server | Context | Purpose | |---|---|---|---|---| | A — Hermes | gemma4-rotorquant:latest (Ollama alias of gemma4-rotorquant:latest) | Ollama :11434 | 65 536 | Tool-calling sanity check, web search, agent behavior comparison | | B — TurboQuant | gemma4-rotorquant:latest.gguf via llama-server.exe | :8090 | 16 384 (TURBOCTX) | Long-context code audit, TRACE MCP loop — default OpenCode lane |",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L86"
     ],
@@ -6524,7 +6524,7 @@
     "featureKey": "lane_a",
     "title": "Lane A",
     "status": "implemented",
-    "summary": "opencode run -m ollama/gemma4-hermes-64k --agent audit-hermes \"...\"",
+    "summary": "opencode run -m ollama/gemma4-rotorquant:latest --agent audit-hermes \"...\"",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L99"
     ],
@@ -6557,7 +6557,7 @@
     "featureKey": "1_point_at_the_candidate_iq4_xs_file_without_touching_vendor",
     "title": "1. Point at the candidate IQ4_XS file (without touching vendor/)",
     "status": "implemented",
-    "summary": "$env:TURBOMODELPATH = \"C:\\Users\\james\\Desktop\\gemma4-legal-iq4xs\\gemma4-legal-iq4xs.gguf\"",
+    "summary": "$env:TURBOMODELPATH = \"C:\\Users\\james\\Desktop\\gemma4-rotorquant:latest-iq4xs\\gemma4-rotorquant:latest-iq4xs.gguf\"",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L111"
     ],
@@ -6590,7 +6590,7 @@
     "featureKey": "4_if_throughput_and_tool_calls_both_pass_promote",
     "title": "4. If throughput and tool_calls both pass, promote:",
     "status": "implemented",
-    "summary": "copy \"C:\\Users\\james\\Desktop\\gemma4-legal-iq4xs\\gemma4-legal-iq4xs.gguf\"  \"C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\gemma4-legal.gguf\"",
+    "summary": "copy \"C:\\Users\\james\\Desktop\\gemma4-rotorquant:latest-iq4xs\\gemma4-rotorquant:latest-iq4xs.gguf\"  \"C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\gemma4-rotorquant:latest.gguf\"",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L122"
     ],
@@ -6599,14 +6599,14 @@
   },
   {
     "featureKey": "env_turbo_model_path_stays_the_same_it_points_to_vendor_models_gemma4_legal_gguf",
-    "title": ".env TURBO_MODEL_PATH stays the same — it points to vendor/models/gemma4-legal.gguf",
+    "title": ".env TURBO_MODEL_PATH stays the same — it points to vendor/models/gemma4-rotorquant:latest.gguf",
     "status": "implemented",
-    "summary": "The gemma4-legal-iq4xs-direct.gguf (no imatrix) is a fallback if the calibrated variant shows quality regressions on legal text. Run both through bench:turbo:8k before deciding. ---",
+    "summary": "The gemma4-rotorquant:latest-iq4xs-direct.gguf (no imatrix) is a fallback if the calibrated variant shows quality regressions on legal text. Run both through bench:turbo:8k before deciding. ---",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L125"
     ],
     "missing": [],
-    "nextQuery": "rg \".env TURBO_MODEL_PATH stays the same — it points to vendor/models/gemma4-legal.gguf\" src docs tests"
+    "nextQuery": "rg \".env TURBO_MODEL_PATH stays the same — it points to vendor/models/gemma4-rotorquant:latest.gguf\" src docs tests"
   },
   {
     "featureKey": "context_window_upgrade",
@@ -6645,7 +6645,7 @@
     "featureKey": "lora_adapter_gguf_conversion_when_needed",
     "title": "LoRA adapter GGUF conversion (when needed)",
     "status": "implemented",
-    "summary": "The .safetensors LoRAs in vendor/models/lora/ are already merged into gemma4-legal.gguf. If you want a hot-swappable adapter on top of a base E4B model instead: bash",
+    "summary": "The .safetensors LoRAs in vendor/models/lora/ are already merged into gemma4-rotorquant:latest.gguf. If you want a hot-swappable adapter on top of a base E4B model instead: bash",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L150"
     ],
@@ -6656,7 +6656,7 @@
     "featureKey": "convert_grpo_adapter_to_gguf_lora_format",
     "title": "Convert GRPO adapter to GGUF LoRA format",
     "status": "implemented",
-    "summary": "python llama.cpp/convertloratogguf.py \\ --base  <path-to-base-gemma4-e4b-F16.gguf> \\ --lora  vendor/models/lora/gemma4-legal-grpo/adaptermodel.safetensors \\ --outfile vendor/models/lora/gemma4-legal-grpo.gguf \\ --outtype f16",
+    "summary": "python llama.cpp/convertloratogguf.py \\ --base  <path-to-base-gemma4-e4b-F16.gguf> \\ --lora  vendor/models/lora/gemma4-rotorquant:latest-grpo/adaptermodel.safetensors \\ --outfile vendor/models/lora/gemma4-rotorquant:latest-grpo.gguf \\ --outtype f16",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L156"
     ],
@@ -6676,14 +6676,14 @@
   },
   {
     "featureKey": "legal_lora_path_c_vendor_models_lora_gemma4_legal_grpo_gguf",
-    "title": "LEGAL_LORA_PATH=C:\\...\\vendor\\models\\lora\\gemma4-legal-grpo.gguf",
+    "title": "LEGAL_LORA_PATH=C:\\...\\vendor\\models\\lora\\gemma4-rotorquant:latest-grpo.gguf",
     "status": "implemented",
     "summary": "Feature documentation located in docs/llms/gguf-model-lanes.md",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L164"
     ],
     "missing": [],
-    "nextQuery": "rg \"LEGAL_LORA_PATH=C:\\...\\vendor\\models\\lora\\gemma4-legal-grpo.gguf\" src docs tests"
+    "nextQuery": "rg \"LEGAL_LORA_PATH=C:\\...\\vendor\\models\\lora\\gemma4-rotorquant:latest-grpo.gguf\" src docs tests"
   },
   {
     "featureKey": "and_in_launch_turboquant_ps1_probe_baseargs_lora_env_legal_lora_path",
@@ -6777,7 +6777,7 @@
     "featureKey": "gguf_model_upgrade_plan__root",
     "title": "gguf-model-upgrade-plan",
     "status": "implemented",
-    "summary": "This plan documents the next steps for testing and promoting the desktop IQ4XS model candidate into the repo-backed TurboQuant/RotorQuant runtime. - Active repo model: vendor/models/gemma4-legal.gguf - This is the active merged GRPO legal model in the repository. - Desktop upgrade candidate: C:\\Users\\james\\Desktop\\gemma4-legal-iq4xs\\gemma4-legal-iq4xs.gguf - This is the IQ4XS upgrade candidate.",
+    "summary": "This plan documents the next steps for testing and promoting the desktop IQ4XS model candidate into the repo-backed TurboQuant/RotorQuant runtime. - Active repo model: vendor/models/gemma4-rotorquant:latest.gguf - This is the active merged GRPO legal model in the repository. - Desktop upgrade candidate: C:\\Users\\james\\Desktop\\gemma4-rotorquant:latest-iq4xs\\gemma4-rotorquant:latest-iq4xs.gguf - This is the IQ4XS upgrade candidate.",
     "sourceRefs": [
       "local:docs/llms/gguf-model-upgrade-plan.md#L1"
     ],
@@ -9401,7 +9401,7 @@
     "featureKey": "environmental_context",
     "title": "🧠 Environmental Context",
     "status": "implemented",
-    "summary": "Base Model: models/gemma4-legal-iq4xs-direct.gguf (~5.09 GB)  Vision Plugin: models/mmproj-F16.gguf (~990 MB) (loaded only when VLM mode is toggled)  VLM Mode: DISABLED ---",
+    "summary": "Base Model: models/gemma4-rotorquant:latest-iq4xs-direct.gguf (~5.09 GB)  Vision Plugin: models/mmproj-F16.gguf (~990 MB) (loaded only when VLM mode is toggled)  VLM Mode: DISABLED ---",
     "sourceRefs": [
       "local:docs/reports/inference-backend-benchmark.md#L18"
     ],
@@ -9599,7 +9599,7 @@
     "featureKey": "manifest_status",
     "title": "Manifest Status",
     "status": "implemented",
-    "summary": "| Model ID | Runtime | Filename | Discovered | Size | |----------|---------|----------|------------|------| | gemma4-legal-vlm | llama-server | (env-resolved) | ✓ | 0.04 MB | | gemma4-mmproj | llama-server | mmproj-BF16.gguf | ✓ | 0 MB | | embeddinggemma-768d | ollama | (env-resolved) | ✓ | 0.04 MB |",
+    "summary": "| Model ID | Runtime | Filename | Discovered | Size | |----------|---------|----------|------------|------| | gemma4-rotorquant:latest | llama-server | (env-resolved) | ✓ | 0.04 MB | | gemma4-mmproj | llama-server | mmproj-BF16.gguf | ✓ | 0 MB | | embeddinggemma-768d | ollama | (env-resolved) | ✓ | 0.04 MB |",
     "sourceRefs": [
       "local:docs/reports/model-inventory.md#L12"
     ],
@@ -28901,7 +28901,7 @@
     "featureKey": "current_status_2026_04_11",
     "title": "Current Status (2026-04-11)",
     "status": "implemented",
-    "summary": "| Tier | Port | Status | Model | Speed | VRAM | |------|------|--------|-------|-------|------| | TensorRT-LLM | :8099 | OFFLINE | — | — | — | | Triton | :8000 | OFFLINE | — | — | — | | llama-server | :8090 | RUNNING + VLM | gemma4-legal Q4KM + mmproj-BF16 | 80 tok/s gen, 601 tok/s prompt | ~5.8 GB (text+vision) |",
+    "summary": "| Tier | Port | Status | Model | Speed | VRAM | |------|------|--------|-------|-------|------| | TensorRT-LLM | :8099 | OFFLINE | — | — | — | | Triton | :8000 | OFFLINE | — | — | — | | llama-server | :8090 | RUNNING + VLM | gemma4-rotorquant:latest Q4KM + mmproj-BF16 | 80 tok/s gen, 601 tok/s prompt | ~5.8 GB (text+vision) |",
     "sourceRefs": [
       "local:scripts/INFERENCE_INFRASTRUCTURE.md#L35"
     ],
@@ -28954,14 +28954,14 @@
   },
   {
     "featureKey": "text_gguf_c_users_james_downloads_gemma4_legal_vlm_q4_k_m_gguf_5_0_gb_e4b_legal_lora",
-    "title": "Text GGUF: C:\\Users\\james\\Downloads\\gemma4-legal-vlm-q4_k_m.gguf (5.0 GB, E4B + legal LoRA)",
+    "title": "Text GGUF: C:\\Users\\james\\Downloads\\gemma4-rotorquant:latest-q4_k_m.gguf (5.0 GB, E4B + legal LoRA)",
     "status": "implemented",
     "summary": "Feature documentation located in scripts/INFERENCE_INFRASTRUCTURE.md",
     "sourceRefs": [
       "local:scripts/INFERENCE_INFRASTRUCTURE.md#L65"
     ],
     "missing": [],
-    "nextQuery": "rg \"Text GGUF: C:\\Users\\james\\Downloads\\gemma4-legal-vlm-q4_k_m.gguf (5.0 GB, E4B + legal LoRA)\" src docs tests"
+    "nextQuery": "rg \"Text GGUF: C:\\Users\\james\\Downloads\\gemma4-rotorquant:latest-q4_k_m.gguf (5.0 GB, E4B + legal LoRA)\" src docs tests"
   },
   {
     "featureKey": "vision_mmproj_c_users_james_downloads_gemma4_mmproj_mmproj_bf16_gguf_992_mb_unsloth_stock_siglip",
@@ -28978,7 +28978,7 @@
     "featureKey": "total_vram_5_8_gb_fits_in_8_gb_rtx_3060_ti_with_room_for_kv_cache",
     "title": "Total VRAM: ~5.8 GB (fits in 8 GB RTX 3060 Ti with room for KV cache)",
     "status": "implemented",
-    "summary": "C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe \\ -m \"C:\\Users\\james\\Downloads\\gemma4-legal-vlm-q4km.gguf\" \\ --mmproj \"C:\\Users\\james\\Downloads\\gemma4-mmproj/mmproj-BF16.gguf\" \\ --port 8090 -ngl 99 --flash-attn on -ctk q40 -ctv q40 -c 4096",
+    "summary": "C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe \\ -m \"C:\\Users\\james\\Downloads\\gemma4-rotorquant:latest-q4km.gguf\" \\ --mmproj \"C:\\Users\\james\\Downloads\\gemma4-mmproj/mmproj-BF16.gguf\" \\ --port 8090 -ngl 99 --flash-attn on -ctk q40 -ctv q40 -c 4096",
     "sourceRefs": [
       "local:scripts/INFERENCE_INFRASTRUCTURE.md#L67"
     ],
@@ -29097,14 +29097,14 @@
   },
   {
     "featureKey": "python3_app_py_model_google_gemma_4_e4b_it_adapter_gemma4_legal_lora_port_8085",
-    "title": "python3 app.py --model google/gemma-4-E4B-it --adapter ./gemma4-legal-lora --port 8085",
+    "title": "python3 app.py --model google/gemma-4-E4B-it --adapter ./gemma4-rotorquant:latest-lora --port 8085",
     "status": "implemented",
     "summary": "Feature documentation located in scripts/INFERENCE_INFRASTRUCTURE.md",
     "sourceRefs": [
       "local:scripts/INFERENCE_INFRASTRUCTURE.md#L95"
     ],
     "missing": [],
-    "nextQuery": "rg \"python3 app.py --model google/gemma-4-E4B-it --adapter ./gemma4-legal-lora --port 8085\" src docs tests"
+    "nextQuery": "rg \"python3 app.py --model google/gemma-4-E4B-it --adapter ./gemma4-rotorquant:latest-lora --port 8085\" src docs tests"
   },
   {
     "featureKey": "ollama_tier_7_windows_native",
@@ -29130,14 +29130,14 @@
   },
   {
     "featureKey": "gemma4_legal_latest_7_5b_q4_k_m_5_0_gb_primary_llm",
-    "title": "gemma4-legal:latest    — 7.5B Q4_K_M (5.0 GB) — primary LLM",
+    "title": "gemma4-rotorquant:latest    — 7.5B Q4_K_M (5.0 GB) — primary LLM",
     "status": "implemented",
     "summary": "Feature documentation located in scripts/INFERENCE_INFRASTRUCTURE.md",
     "sourceRefs": [
       "local:scripts/INFERENCE_INFRASTRUCTURE.md#L101"
     ],
     "missing": [],
-    "nextQuery": "rg \"gemma4-legal:latest    — 7.5B Q4_K_M (5.0 GB) — primary LLM\" src docs tests"
+    "nextQuery": "rg \"gemma4-rotorquant:latest    — 7.5B Q4_K_M (5.0 GB) — primary LLM\" src docs tests"
   },
   {
     "featureKey": "embeddinggemma_latest_307m_bf16_622_mb_768_dim_embeddings",
@@ -29236,7 +29236,7 @@
     "featureKey": "resolved_colab_vlm_gguf_reconversion_not_needed",
     "title": "RESOLVED: Colab VLM GGUF reconversion — NOT NEEDED",
     "status": "implemented",
-    "summary": "~~The existing gemma4-legal-vlm-q4km.gguf (5 GB) is text-only (720 tensors, 0 vision/audio).~~ Solution: llama.cpp supports vision via a separate mmproj GGUF file (the SigLIP vision encoder + projector). No need to bake vision tensors into the text GGUF. - Text GGUF: gemma4-legal-vlm-q4km.gguf (5.0 GB) — legal fine-tuned, text-only - Vision mmproj: gemma4-mmproj/mmproj-BF16.gguf (992 MB) — stock Unsloth SigLIP, compatible with legal fine-tune (LoRA trained with vision tower frozen) - Combined: llama-server -m text.gguf --mmproj mmproj.gguf → unified text+vision at 80 tok/s",
+    "summary": "~~The existing gemma4-rotorquant:latest-q4km.gguf (5 GB) is text-only (720 tensors, 0 vision/audio).~~ Solution: llama.cpp supports vision via a separate mmproj GGUF file (the SigLIP vision encoder + projector). No need to bake vision tensors into the text GGUF. - Text GGUF: gemma4-rotorquant:latest-q4km.gguf (5.0 GB) — legal fine-tuned, text-only - Vision mmproj: gemma4-mmproj/mmproj-BF16.gguf (992 MB) — stock Unsloth SigLIP, compatible with legal fine-tune (LoRA trained with vision tower frozen) - Combined: llama-server -m text.gguf --mmproj mmproj.gguf → unified text+vision at 80 tok/s",
     "sourceRefs": [
       "local:scripts/INFERENCE_INFRASTRUCTURE.md#L146"
     ],
@@ -29293,7 +29293,7 @@
     "featureKey": "on_disk_model_files_c_drive",
     "title": "On-Disk Model Files (C: drive)",
     "status": "implemented",
-    "summary": "| Location | Size | Format | VLM? | Purpose | |----------|------|--------|------|---------| | Downloads/gemma4-e4b-legal-final-gguf (1)/.../model.safetensors | 9.7 GB | HF safetensors (single file) | YES — 435 vision + 344 audio + 2 embed keys, LoRA baked in | Merged VLM checkpoint for app.py (HF Transformers + NF4) | | Downloads/gemma4-legal-vlm-q4km.gguf | 5.0 GB | GGUF Q4KM | No — 720 tensors, text-only. Vision via separate mmproj | TurboQuant / llama-server text model | | Downloads/gemma4-mmproj/mmproj-BF16.gguf | 992 MB | GGUF BF16 | YES — SigLIP vision encoder + projector | --mmproj for llama-server VLM (stock, compatible with legal fine-tune) |",
+    "summary": "| Location | Size | Format | VLM? | Purpose | |----------|------|--------|------|---------| | Downloads/gemma4-e4b-legal-final-gguf (1)/.../model.safetensors | 9.7 GB | HF safetensors (single file) | YES — 435 vision + 344 audio + 2 embed keys, LoRA baked in | Merged VLM checkpoint for app.py (HF Transformers + NF4) | | Downloads/gemma4-rotorquant:latest-q4km.gguf | 5.0 GB | GGUF Q4KM | No — 720 tensors, text-only. Vision via separate mmproj | TurboQuant / llama-server text model | | Downloads/gemma4-mmproj/mmproj-BF16.gguf | 992 MB | GGUF BF16 | YES — SigLIP vision encoder + projector | --mmproj for llama-server VLM (stock, compatible with legal fine-tune) |",
     "sourceRefs": [
       "local:scripts/INFERENCE_INFRASTRUCTURE.md#L170"
     ],
@@ -43639,7 +43639,7 @@
     "featureKey": "satisfies_operator_5_0",
     "title": "`satisfies` operator (5.0+)",
     "status": "implemented",
-    "summary": "typescript const config = { model: 'gemma4-legal-vlm:latest', temperature: 0.2, } satisfies OllamaOptions; // validates without widening type",
+    "summary": "typescript const config = { model: 'gemma4-rotorquant:latest', temperature: 0.2, } satisfies OllamaOptions; // validates without widening type",
     "sourceRefs": [
       "local:sveltekit-frontend/scripts/docs/typescript-7-release-notes.md#L140"
     ],
@@ -43815,7 +43815,7 @@
     "featureKey": "integration_with_this_codebase",
     "title": "Integration with This Codebase",
     "status": "implemented",
-    "summary": "tsgo (Go, CPU-parallel)            ← TypeScript compilation only └─ .tsbuildinfo cache tensorrtbridge.node (CUDA)        ← GPU k-means, PageRank, cosine sim └─ RTX 3060 Ti, CUDA 12.1 embeddinggemma / gemma4-legal-vlm  ← Ollama GPU inference",
+    "summary": "tsgo (Go, CPU-parallel)            ← TypeScript compilation only └─ .tsbuildinfo cache tensorrtbridge.node (CUDA)        ← GPU k-means, PageRank, cosine sim └─ RTX 3060 Ti, CUDA 12.1 embeddinggemma / gemma4-rotorquant:latest  ← Ollama GPU inference",
     "sourceRefs": [
       "local:sveltekit-frontend/scripts/docs/typescript-7-release-notes.md#L326"
     ],

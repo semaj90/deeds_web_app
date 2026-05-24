@@ -34,7 +34,7 @@ const bodySchema = z.object({
   download: z.boolean().optional().default(false),
 });
 
-const MODEL = () => ENV.OLLAMA_VLM_MODEL ?? ENV.GEMMA4_MODEL ?? 'gemma4-legal-vlm:latest';
+const MODEL = () => ENV.OLLAMA_VLM_MODEL ?? ENV.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest';
 const OLLAMA = () => ENV.OLLAMA_BASE_URL.replace(/\/$/, '');
 
 function minioInternalBase(): string {

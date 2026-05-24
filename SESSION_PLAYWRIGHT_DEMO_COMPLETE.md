@@ -240,7 +240,7 @@ curl -X POST http://localhost:5173/api/dev/login-demo
 
 ## Performance Optimization Applied
 
-**Entity Extraction**: Changed from `gemma4-legal` (25s avg) to `gemma3:270m` (4.5s avg)
+**Entity Extraction**: Changed from `gemma4-rotorquant:latest` (25s avg) to `gemma3:270m` (4.5s avg)
 - Reason: Entity extraction benefits from speed over model complexity
 - Impact: 5× faster processing with equivalent accuracy for extraction tasks
 

@@ -36,7 +36,7 @@ export async function generateSummaryLenses(params: {
 				sourceHash: 'T2_SUMMARY', // Tier 2 summary marker
 				summaryType: lensType,
 				summaryText: lensText,
-				model: 'gemma4-legal-vlm',
+				model: 'gemma4-rotorquant:latest',
 				embeddingModel: 'embeddinggemma',
 				qdrantCollection: 'summary_lenses_768',
 				somBmuRow: params.somBmuRow,
@@ -93,7 +93,7 @@ async function generateLensText(content: string, lensType: string, targetType: s
 	const response = await bifrostChat([
 		{ role: 'system', content: 'You are a technical architect specializing in SvelteKit and agentic retrieval. Provide concise, high-density summaries.' },
 		{ role: 'user', content: `${prompt}\n\nContent:\n${content.slice(0, 4000)}` }
-	], 'gemma4-legal-vlm');
+	], 'gemma4-rotorquant:latest');
 
 	return response.trim();
 }

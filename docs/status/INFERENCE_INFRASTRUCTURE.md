@@ -40,7 +40,7 @@ User Query (text)
    ├─ XNNPACK CPU backend, no VRAM
    └─ Fallback: FastAPI server not running
   ↓
-7. Ollama (:11434)               — Final fallback, gemma4-legal Q4_K_M
+7. Ollama (:11434)               — Final fallback, gemma4-rotorquant:latest Q4_K_M
    ├─ Always available (dev + prod)
    └─ 7.3GB VRAM, ~50 tok/s
 ```
@@ -91,7 +91,7 @@ User Query (image + text)
 ```bash
 # Text + Vision (unified)
 llama-server \
-  -m gemma4-legal.gguf \
+  -m gemma4-rotorquant:latest.gguf \
   --mmproj siglip.gguf \
   -ctk q8_0 \
   -ctv q8_0 \
@@ -102,7 +102,7 @@ llama-server \
 
 # Text-only (fallback if mmproj unavailable)
 llama-server \
-  -m gemma4-legal.gguf \
+  -m gemma4-rotorquant:latest.gguf \
   -ctk q8_0 \
   -ctv q8_0 \
   --port 8090 \
@@ -207,7 +207,7 @@ Response:
 ```json
 {
   "text": "This image shows a signed contract dated March 15, 2024...",
-  "model": "gemma4-legal-q8_0",
+  "model": "gemma4-rotorquant:latest-q8_0",
   "backend": "turboquant",
   "usage": {
     "prompt_tokens": 156,
@@ -307,7 +307,7 @@ Buffered writes to `inference_log` database:
 import { logLLMInference } from '$lib/server/observability/inference-log.js';
 
 logLLMInference({
-  model: 'gemma4-legal-q8_0',
+  model: 'gemma4-rotorquant:latest-q8_0',
   backend: 'turboquant',
   latencyMs: 1847,
   tokenCount: 245,
@@ -351,7 +351,7 @@ ollama serve
 **New setup** (unified):
 ```bash
 # Single process handles both text + vision
-llama-server -m gemma4-legal.gguf --mmproj siglip.gguf \
+llama-server -m gemma4-rotorquant:latest.gguf --mmproj siglip.gguf \
   -ctk q8_0 -ctv q8_0 --port 8090 -ngl 99 --flash-attn on
 ```
 
@@ -380,7 +380,7 @@ Expected:
 
 If `vision: false`, restart with `--mmproj`:
 ```bash
-llama-server -m gemma4-legal.gguf --mmproj siglip.gguf ...
+llama-server -m gemma4-rotorquant:latest.gguf --mmproj siglip.gguf ...
 ```
 
 ### VRAM OOM on Vision Requests

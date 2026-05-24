@@ -78,7 +78,7 @@ ${input}`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal',
+          model: 'gemma4-rotorquant:latest',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.1,
           max_tokens: 4096,

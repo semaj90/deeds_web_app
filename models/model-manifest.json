@@ -3,7 +3,7 @@
   "_lastUpdated": "2026-05-16",
   "models": [
     {
-      "id": "gemma4-legal-vlm",
+      "id": "gemma4-rotorquant:latest",
       "displayName": "Gemma 4 Legal VLM (merged)",
       "description": "Gemma 4 E4B with GRPO legal LoRA merged. Serves text + vision (unified model). Primary generation lane.",
       "runtime": "llama-server",
@@ -78,13 +78,13 @@
       "tags": ["client-side", "onnx", "embeddings", "768d", "fallback"]
     },
     {
-      "id": "gemma4-legal-vendor-gguf",
+      "id": "gemma4-rotorquant:latest-vendor-gguf",
       "displayName": "Gemma 4 Legal (vendor canonical GGUF)",
       "description": "Canonical merged Gemma 4 legal GGUF in vendor/models/. Used when TURBO_MODEL_PATH points here.",
       "runtime": "llama-server",
       "pathEnv": "TURBO_MODEL_PATH",
-      "localPath": "vendor/models/gemma4-legal.gguf",
-      "filename": "gemma4-legal.gguf",
+      "localPath": "vendor/models/gemma4-rotorquant:latest.gguf",
+      "filename": "gemma4-rotorquant:latest.gguf",
       "notes": "gitignored binary blob in vendor/models/. Set TURBO_MODEL_PATH to this absolute path in .env.",
       "embeddingDim": null,
       "port": 8090,
@@ -108,14 +108,14 @@
       "tags": ["vlm", "sidecar", "vision", "vendor"]
     },
     {
-      "id": "gemma4-legal-iq4xs-direct",
+      "id": "gemma4-rotorquant:latest-iq4xs-direct",
       "displayName": "Gemma 4 Legal IQ4_XS Direct (canonical merged)",
       "description": "LoRA-merged Gemma 4 E4B in IQ4_XS quant. Legal fine-tune baked in — no runtime LoRA injection needed. 59.8 tok/s, 220ms TTFT on RTX 3060 Ti. This is the canonical production GGUF.",
       "runtime": "llama-server",
       "pathEnv": "ROTORQUANT_MODEL_PATH",
-      "localPath": "models/gemma4-legal-iq4xs-direct.gguf",
-      "filename": "gemma4-legal-iq4xs-direct.gguf",
-      "notes": "Place at models/gemma4-legal-iq4xs-direct.gguf. ROTORQUANT_MODEL_PATH and TURBO_MODEL_PATH both point here in .env. Runs on stock llama.cpp (no TurboQuant binary needed). 59.8 tok/s vs 21.6 for round-trip variant. DO NOT replace with the non-direct (round-trip) build.",
+      "localPath": "models/gemma4-rotorquant:latest-iq4xs-direct.gguf",
+      "filename": "gemma4-rotorquant:latest-iq4xs-direct.gguf",
+      "notes": "Place at models/gemma4-rotorquant:latest-iq4xs-direct.gguf. ROTORQUANT_MODEL_PATH and TURBO_MODEL_PATH both point here in .env. Runs on stock llama.cpp (no TurboQuant binary needed). 59.8 tok/s vs 21.6 for round-trip variant. DO NOT replace with the non-direct (round-trip) build.",
       "embeddingDim": null,
       "port": 8090,
       "contextLen": 16384,
@@ -129,7 +129,7 @@
       "runtime": "llama-server",
       "pathEnv": "ROTORQUANT_MODEL_PATH",
       "filename": "gemma-4-E4B-RotorQuant-GGUF-IQ4_XS.gguf",
-      "notes": "Non-merged base model. 21.6 tok/s, 1762ms TTFT on RTX 3060 Ti — use gemma4-legal-iq4xs-direct instead for production. Only keep if round-trip LoRA injection testing is needed.",
+      "notes": "Non-merged base model. 21.6 tok/s, 1762ms TTFT on RTX 3060 Ti — use gemma4-rotorquant:latest-iq4xs-direct instead for production. Only keep if round-trip LoRA injection testing is needed.",
       "embeddingDim": null,
       "port": 8090,
       "contextLen": 16384,
@@ -138,7 +138,7 @@
     }
   ],
   "envVarPolicy": {
-    "TURBO_MODEL_PATH":           "Absolute path to primary Gemma 4 GGUF. Required for llama-server launch. Points to models/gemma4-legal-iq4xs-direct.gguf in canonical setup.",
+    "TURBO_MODEL_PATH":           "Absolute path to primary Gemma 4 GGUF. Required for llama-server launch. Points to models/gemma4-rotorquant:latest-iq4xs-direct.gguf in canonical setup.",
     "ROTORQUANT_MODEL_PATH":      "Alias for TURBO_MODEL_PATH — read first by vlm-lifecycle.ts fallback chain. Same value in canonical setup.",
     "TURBOQUANT_MODEL_PATH":      "Alias for TURBO_MODEL_PATH — read first by inference-router.ts fallback chain.",
     "TURBOQUANT_MMPROJ_PATH":     "Absolute path to mmproj-F16.gguf. Read first by vlm-lifecycle.ts. Falls back to MMPROJ_PATH.",
@@ -153,7 +153,7 @@
     "TURBO_NGL":                  "GPU offload layers (default: 99 for full-GPU on RTX 3060 Ti).",
     "DRAFT_MODEL_PATH":           "Optional speculative decoding draft model path. Set to empty string to disable in VLM mode.",
     "DRAFT_N":                    "Number of speculative tokens (default: 5).",
-    "LEGAL_LORA_PATH":            "Optional LoRA adapter GGUF for runtime injection into base-model GGUFs. Not needed for gemma4-legal-iq4xs-direct (LoRA already merged).",
+    "LEGAL_LORA_PATH":            "Optional LoRA adapter GGUF for runtime injection into base-model GGUFs. Not needed for gemma4-rotorquant:latest-iq4xs-direct (LoRA already merged).",
     "LEGAL_LORA_SCALE":           "LoRA adapter strength 0.0-1.0 (default: 0.8).",
     "MTP_HEAD_PATH":              "AtomicBot MTP sidecar .mtp file path (optional)."
   }

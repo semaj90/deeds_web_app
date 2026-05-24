@@ -94,12 +94,12 @@ interface RunOpts {
 function resolveInternalModel(requested: string): string {
   // Drop any trailing `:latest` to normalise comparisons
   const m = requested.toLowerCase().replace(/:latest$/, '');
-  if (m === 'yorha-hermes' || m === 'gemma4-hermes-64k') return 'gemma4-hermes-64k:latest';
+  if (m === 'yorha-hermes' || m === 'gemma4-rotorquant:latest') return 'gemma4-rotorquant:latest';
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
-    return 'gemma4-legal-vlm:latest';
+    return 'gemma4-rotorquant:latest';
   }
   if (m === 'gemma4-agent' || m === 'gemma4-raw' || m.startsWith('gemma4')) {
-    return 'gemma4-legal-vlm:latest';
+    return 'gemma4-rotorquant:latest';
   }
   if (m.startsWith('gemma3')) return 'gemma3-legal:latest';
   if (m.startsWith('gemma270') || m.startsWith('gemma3:270')) return 'gemma3:270m';
@@ -260,7 +260,7 @@ async function runHermesChat(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-hermes-64k:latest',
+      model: 'gemma4-rotorquant:latest',
       messages,
       max_tokens: maxTokens,
       temperature: temperature ?? 0.2,
@@ -371,14 +371,14 @@ export async function runChatCompletion(
     }));
 
     const rawContextSize =
-      internalModel === 'gemma4-hermes-64k:latest' ? 65536 : RUNTIME_CONTEXT_SIZE;
+      internalModel === 'gemma4-rotorquant:latest' ? 65536 : RUNTIME_CONTEXT_SIZE;
     const requestedMaxTokens = clampRequestedMaxTokens(req.max_tokens);
     const rawInputTokens = countTokens(mappedMsgs.map((m) => m.content).join('\n'));
     const rawInferenceLane: InferenceLane =
-      internalModel === 'gemma4-hermes-64k:latest'
+      internalModel === 'gemma4-rotorquant:latest'
         ? 'hermes'
         : determineInferenceLane(rawInputTokens, 0, requestedMaxTokens, false, canUseTurboQuantNow);
-    const rawModel = rawInferenceLane === 'hermes' ? 'gemma4-hermes-64k:latest' : internalModel;
+    const rawModel = rawInferenceLane === 'hermes' ? 'gemma4-rotorquant:latest' : internalModel;
 
     const runtimeLog = {
       stage: 'raw_openai_passthrough_budget_check',
@@ -542,7 +542,7 @@ export async function runChatCompletion(
   }
 
   // ── ACE path: full retrieval + prompt assembly ──
-  // 20s guard: embeddinggemma won't load when VRAM is occupied by gemma4-legal-vlm.
+  // 20s guard: embeddinggemma won't load when VRAM is occupied by gemma4-rotorquant:latest.
   // On timeout we fall through with an empty context — bifrostChat still fires.
   const ACE_TIMEOUT_MS = 20_000;
   const aceStats: Record<string, any> = {};
@@ -831,7 +831,7 @@ export async function runChatCompletion(
   const hasSpecializedRetrieval =
     hasTools || isCodingQuery || Boolean(req.file_path || req.case_id);
   const inferenceLane: InferenceLane =
-    internalModel === 'gemma4-hermes-64k:latest'
+    internalModel === 'gemma4-rotorquant:latest'
       ? 'hermes'
       : determineInferenceLane(
           inputTokens,
@@ -840,7 +840,7 @@ export async function runChatCompletion(
           hasSpecializedRetrieval,
           canUseTurboQuantNow
         );
-  const finalModelUsed = inferenceLane === 'hermes' ? 'gemma4-hermes-64k:latest' : internalModel;
+  const finalModelUsed = inferenceLane === 'hermes' ? 'gemma4-rotorquant:latest' : internalModel;
   let budgetGuardTriggered = false;
   const hmmResult = (() => {
     try {
@@ -1462,12 +1462,12 @@ function wrapResponse(args: {
 // ── Models list ────────────────────────────────────────────────────────────
 
 export const ADVERTISED_MODELS = [
-  { id: 'gemma4-agent',   owned_by: 'local' },  // → gemma4-legal-vlm (ACE/KAG/RAG brain)
-  { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-legal-vlm (direct, no ACE)
-  { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-legal-vlm (alias)
+  { id: 'gemma4-agent',   owned_by: 'local' },  // → gemma4-rotorquant:latest (ACE/KAG/RAG brain)
+  { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-rotorquant:latest (direct, no ACE)
+  { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-rotorquant:latest (alias)
   { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
-  { id: 'yorha-hermes',   owned_by: 'yorha' },   // → hermes composer (HERMES_API_URL → bifrostChat gemma4-legal)
-  { id: 'gemma4-legal',   owned_by: 'yorha' },   // → gemma4-legal-vlm explicit
+  { id: 'yorha-hermes',   owned_by: 'yorha' },   // → hermes composer (HERMES_API_URL → bifrostChat gemma4-rotorquant:latest)
+  { id: 'gemma4-rotorquant:latest',   owned_by: 'yorha' },   // → gemma4-rotorquant:latest explicit
   { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },
 ] as const;

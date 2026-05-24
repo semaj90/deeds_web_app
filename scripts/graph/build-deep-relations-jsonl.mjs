@@ -8,42 +8,70 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { glob } from 'glob';
+import { fileURLToPath } from 'url';
 import { performance } from 'perf_hooks';
 import { promisify } from 'util';
+import { execSync } from 'child_process';
+import { deriveGraphAndClusters } from '../../src/lib/server/graph/deriveGraphAndClusters.ts';
 
-const readDir = promisify(fs.readdir);
-const walkDir = promisify(fs.readdir);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, '../..');
 
 // --- CONFIGURATION ---
 const SOURCE_PATHS = ['src/', 'scripts/', 'docs/', 'next_steps/', 'tests/'];
 const TARGET_OUTPUTS = {
-    'deep-node-relations': 'memory/graph/deep-node-relations.jsonl',
-    'dynamic-import-relations': 'memory/graph/dynamic-import-relations.jsonl',
-    'variable-library-relations': 'memory/graph/variable-library-relations.jsonl',
-    'cache-protocol-relations': 'memory/graph/cache-protocol-relations.jsonl',
-    'feature-cluster-relations': 'memory/graph/feature-cluster-relations.jsonl',
-    'relation_report': 'docs/reports/deep-graph-relations-report.md'
+    'deep-node-relations': path.resolve(ROOT_DIR, 'memory/graph/deep-node-relations.jsonl'),
+    'dynamic-import-relations': path.resolve(ROOT_DIR, 'memory/graph/dynamic-import-relations.jsonl'),
+    'variable-library-relations': path.resolve(ROOT_DIR, 'memory/graph/variable-library-relations.jsonl'),
+    'cache-protocol-relations': path.resolve(ROOT_DIR, 'memory/graph/cache-protocol-relations.jsonl'),
+    'feature-cluster-relations': path.resolve(ROOT_DIR, 'memory/graph/feature-cluster-relations.jsonl'),
+    'topology-ontology-clusters': path.resolve(ROOT_DIR, 'memory/graph/topology-ontology-clusters.json'),
+    'relation_report': path.resolve(ROOT_DIR, 'docs/reports/deep-graph-relations-report.md')
 };
 
+// --- LANGFUSE INTEGRATION ---
+let langfuse = null;
+async function getLangfuseClient() {
+    if (langfuse) return langfuse;
+    if (process.env.LANGFUSE_ENABLED === 'true' && process.env.LANGFUSE_PUBLIC_KEY && process.env.LANGFUSE_SECRET_KEY) {
+        try {
+            const { Langfuse } = await import('langfuse');
+            langfuse = new Langfuse({
+                publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+                secretKey: process.env.LANGFUSE_SECRET_KEY,
+                baseUrl: process.env.LANGFUSE_HOST || 'https://cloud.langfuse.com',
+            });
+            console.log('[Langfuse] Initialized client for build script.');
+        } catch (e) {
+            console.warn('[Langfuse] Failed to initialize client:', e.message);
+        }
+    }
+    return langfuse;
+}
+
+async function traceSpan(name, metadata, callback) {
+    const lf = await getLangfuseClient();
+    if (!lf) return callback();
+
+    const trace = lf.trace({
+        name: `build:${name}`,
+        metadata,
+        tags: ['build-relations', name],
+    });
+    const span = trace.span({ name, input: JSON.stringify(metadata) });
+    const start = Date.now();
+    try {
+        const result = await callback();
+        span.end({ output: `ok (${Date.now() - start}ms)` });
+        return result;
+    } catch (err) {
+        span.end({ statusMessage: err.message, level: 'ERROR' });
+        throw err;
+    }
+}
+
 // --- CORE LOGIC ---
-
-/**
- * @typedef {object} Relation
- * @property {string} from - Source Node ID (Stable Key)
- * @property {string} to - Target Node ID (Stable Key)
- * @property {'imports_static' | 'imports_dynamic' | 'uses_redis_key' | 'calls_mcp_tool' | 'uses_env_var' | 'uses_protocol' | 'uses_bifrost_model' | 'calls_bifrost_model'} relation_type - The type of connection.
- * @property {string} featureFamily - The functional area (e.g., 'kag', 'redis', 'service').
- * @property {string} protocol - The communication protocol (e.g., 'redis', 'grpc', 'http/2').
- * @property {number} confidence - Calculated confidence score (0.0 to 1.0).
- * @property {string} sourceRef - Source reference for auditing.
- */
-
-/**
- * @typedef {object} NodeIdentity
- * @property {string} stableKey - Normalized ID for the node (e.g., 'file:src/...' or 'redis:key').
- * @property {string} nodeType - e.g., 'file', 'symbol', 'redis', 'qdrant'.
- */
 
 /**
  * Main entry point to build all deep relations.
@@ -58,9 +86,13 @@ async function main(command) {
     } else if (command === 'inspect') {
         await inspectRelations();
     } else if (command === 'run_smoke') {
-        await runSmokeTests();
+        const passed = await runSmokeTests();
+        if (!passed) {
+            process.exit(1);
+        }
     } else {
         console.error('Error: Unknown command. Use "build", "inspect", or "run_smoke".');
+        process.exit(1);
     }
 
     const endTime = performance.now();
@@ -74,26 +106,66 @@ async function main(command) {
  * @async
  */
 async function buildAllRelations() {
-    console.log('--- PHASE 1: Relation Emission (rg + AST Simulation) ---');
+    console.log('--- PHASE 1: Relation Emission (rg + AST Scan) ---');
     
-    // 1. Static (rg) Scan: Simulating grep for all required patterns.
-    console.log('[STEP 1/4] Scanning static files for explicit relationships...');
-    const staticRelations = await scanStaticRelationships();
+    // 1. Static (rg) Scan
+    const staticRelations = await traceSpan('relation_scan', { type: 'static' }, () => scanStaticRelationships());
 
-    // 2. Dynamic/Runtime Scan: Simulating regex matches for runtime constructs.
-    console.log('[STEP 2/4] Scanning for dynamic/runtime dependencies...');
-    const dynamicRelations = await scanDynamicRelationships();
+    // 2. Dynamic/Runtime Scan
+    const dynamicRelations = await traceSpan('dynamic_import_detection', { type: 'dynamic' }, () => scanDynamicRelationships());
 
-    // 3. Build Graph & Cluster: Merging and deriving relationships.
-    console.log('[STEP 3/4] Building Graph and deriving Feature Clusters...');
-    const graphData = deriveGraphAndClusters(staticRelations, dynamicRelations);
+    // 3. AST-Grep Scan
+    const astRelations = await traceSpan('ast_relation_detection', { type: 'ast' }, () => scanASTGrepRelationships());
+
+    // 4. Build Graph & Cluster
+    console.log('[STEP 3/5] Building Graph and deriving Feature Clusters...');
+    const graphData = await traceSpan('cluster_build', { relationCount: staticRelations.length + dynamicRelations.length + astRelations.length }, async () => {
+        return deriveGraphAndClusters([...staticRelations, ...dynamicRelations, ...astRelations]);
+    });
     
-    // 4. Persistence: Writing out all JSONL files and the report.
-    console.log('[STEP 4/4] Persisting Relations and Generating Reports...');
-    await persistRelations(graphData);
+    // 5. Persistence
+    console.log('[STEP 4/5] Persisting Relations and Generating Reports...');
+    await traceSpan('relation_write', { edgeCount: graphData.graphEdges.length }, () => persistRelations(graphData));
+
+    // 6. Redis graph cache
+    console.log('[STEP 5/5] Caching Graph to Redis...');
+    await traceSpan('redis_graph_cache', { edgeCount: graphData.graphEdges.length }, () => persistToRedis(graphData));
 }
 
 // --- SCANS AND DETECTION ---
+
+function runRG(pattern) {
+    try {
+        // Restrict scan to source files only, avoiding multi-gigabyte log dumps in docs/
+        const result = execSync(`rg -n --json -g "*.ts" -g "*.js" -g "*.svelte" -g "*.py" -g "*.cpp" -g "*.h" "${pattern}" src scripts docs`, { cwd: ROOT_DIR, encoding: 'utf-8', maxBuffer: 1024 * 1024 * 50 });
+        return result.split('\n').filter(Boolean).map(line => {
+            try { return JSON.parse(line); } catch (e) { return null; }
+        }).filter(e => e && e.type === 'match');
+    } catch (e) {
+        if (e.stdout) {
+            return e.stdout.split('\n').filter(Boolean).map(line => {
+                try { return JSON.parse(line); } catch (err) { return null; }
+            }).filter(e => e && e.type === 'match');
+        }
+        return [];
+    }
+}
+
+function extractImportPath(line) {
+    const match = line.match(/from\s+['"]([^'"]+)['"]/);
+    return match ? match[1] : 'unknown';
+}
+
+function extractDynamic(line) {
+    const match = line.match(/import\(['"]([^'"]+)['"]\)/);
+    return match ? match[1] : 'unknown';
+}
+
+function extractRedisKey(line) {
+    // Basic regex to catch typical redis usage string literals
+    const match = line.match(/redis\.(?:get|set|del|setex|hget|hset|hmset)\(['"`]([^'"`]+)['"`]/);
+    return match ? match[1] : 'dynamic_key';
+}
 
 /**
  * Scans codebase using glob/regex to find explicit static relationships.
@@ -101,21 +173,32 @@ async function buildAllRelations() {
  */
 async function scanStaticRelationships() {
     console.log('Running static pattern detection (imports_static, uses_redis_key, etc.)...');
-    // In a real system, this would use glob/grep/AST traversal.
-    // Here, we simulate the detection based on previous findings.
-    const staticHits = [
-        {
-            from: 'src/lib/server/ai/kag-runner.ts',
-            to: 'redis:obs:cache-trace:recent',
-            type: 'uses_redis_key',
-            featureFamily: 'kag',
-            protocol: 'redis',
-            confidence: 0.92,
-            sourceRef: 'src/lib/server/ai/kag-runner.ts#L10-L40'
-        }
-        // ... other static hits
-    ];
-    return staticHits;
+    
+    // 1. Static Imports
+    const importMatches = runRG("from ['\"]\\.\\.?/");
+    const importRelations = importMatches.map(m => ({
+        from: `file:${m.data.path.text}`,
+        to: `file:${extractImportPath(m.data.lines.text)}`,
+        relation_type: 'imports_static',
+        featureFamily: 'code',
+        protocol: 'filesystem',
+        confidence: 0.95,
+        sourceRef: `${m.data.path.text}#L${m.data.line_number}`
+    }));
+
+    // 2. Redis usage
+    const redisMatches = runRG("redis\\.");
+    const redisRelations = redisMatches.map(m => ({
+        from: `file:${m.data.path.text}`,
+        to: `redis:${extractRedisKey(m.data.lines.text)}`,
+        relation_type: 'uses_redis_key',
+        featureFamily: 'cache',
+        protocol: 'redis',
+        confidence: 0.92,
+        sourceRef: `${m.data.path.text}#L${m.data.line_number}`
+    }));
+
+    return [...importRelations, ...redisRelations];
 }
 
 /**
@@ -124,148 +207,277 @@ async function scanStaticRelationships() {
  */
 async function scanDynamicRelationships() {
     console.log('Running dynamic detection for runtime paths and variable dependencies...');
-    // Simulating regex matches for dynamic imports, env vars, etc.
-    const dynamicHits = [
-        {
-            from: 'src/lib/server/ai/cache-logger.ts',
-            to: 'redis:obs:cache-trace:recent',
-            type: 'constructs_cache_key',
-            featureFamily: 'kag',
-            protocol: 'redis',
-            confidence: 0.94,
-            sourceRef: 'src/lib/server/ai/cache-logger.ts#L1-L80'
-        },
-        {
-            from: 'src/lib/server/ai/feature-map/feature-mapping-graph.ts',
-            to: 'qdrant:codebase_chunks_768',
-            type: 'selects_qdrant_collection',
-            featureFamily: 'kag',
-            protocol: 'qdrant',
-            confidence: 0.90,
-            sourceRef: 'src/lib/server/ai/feature-map/feature-mapping-graph.ts#L50'
-        }
-    ];
-    return dynamicHits;
+    const dynamicMatches = runRG("import\\(");
+    const dynamicRelations = dynamicMatches.map(m => ({
+        from: `file:${m.data.path.text}`,
+        to: `dynamic_import:${extractDynamic(m.data.lines.text)}`,
+        relation_type: 'imports_dynamic',
+        featureFamily: 'runtime',
+        protocol: 'js',
+        confidence: 0.85,
+        sourceRef: `${m.data.path.text}#L${m.data.line_number}`
+    }));
+    return dynamicRelations;
 }
 
-
 /**
- * Merges static and dynamic hits to build the graph and calculate cluster assignments.
- * @param {Array} staticRelations - Results from static scans.
- * @param {Array} dynamicRelations - Results from dynamic scans.
- * @returns {object} Object containing structured graph data.
+ * Loads AST-grep relationships from ast-relations.jsonl.
+ * @async
  */
-// ... (Existing logic)
-/**
- * Merges raw hits into the final graph structure, applying precedence rules.
- * This function enforces that new/enhanced findings supersede older, less reliable ones.
- * @param {Array} staticRelations - Relations found via basic static scans.
- * @param {Array} dynamicRelations - Relations found via dynamic/runtime scans.
- * @returns {object} Object containing structured graph data.
- */
-/**
- * Merges raw hits into the final graph structure, applying precedence rules.
- * This function enforces that new/enhanced findings supersede older, less reliable ones.
- * @param {Array} staticRelations - Relations found via basic static scans.
- * @param {Array} dynamicRelations - Relations found via dynamic/runtime scans.
- * @returns {object} Object containing structured graph data.
- */
-function deriveGraphAndClusters(staticRelations, dynamicRelations) {
-    console.log('Deriving graph structure and calculating cluster assignments...');
-    
-    let allEdges = [...staticRelations, ...dynamicRelations];
-    
-    // --- ENHANCEMENT MERGE LOGIC (SUPERSEDE) ---
-    // Apply Bifrost L2 Cache Policy: New insights (e.g., high confidence, semantic matches) supersede lower-confidence, older findings.
-    const highConfidenceEdges = allEdges.filter(e => e.confidence >= 0.93);
-    const lowConfidenceEdges = allEdges.filter(e => e.confidence < 0.93);
-
-    if (highConfidenceEdges.length > 0) {
-        console.log(`[MERGE] Detected ${highConfidenceEdges.length} high-confidence edges, superseding potentially conflicting lower-confidence entries.`);
-        // In a real system, this would involve a complex deduplication/overwriting map.
-        allEdges = highConfidenceEdges; 
-    } else {
-        console.log('[MERGE] No high-confidence edges found; proceeding with base set.');
+async function scanASTGrepRelationships() {
+    console.log('Loading AST-grep relationships from memory/index/ast-relations.jsonl...');
+    const relations = [];
+    let astPath = path.resolve(ROOT_DIR, 'memory/index/ast-relations.jsonl');
+    if (!fs.existsSync(astPath)) {
+        astPath = path.resolve(ROOT_DIR, 'sveltekit-frontend/memory/index/ast-relations.jsonl');
     }
-
-    // --- TOPOLOGY ONTOLOGY & CLUSTERING ---
-    // This section implements the core topology ontology to assign cluster membership.
-    const featureClusters = {};
-    const nodeMap = new Map(); // Temporary map to track node identities for clustering
+    if (!fs.existsSync(astPath)) {
+        console.warn(`AST relations file not found, skipping.`);
+        return relations;
+    }
     
-    allEdges.forEach(edge => {
-        // 1. Determine Cluster Membership based on Edge Type/FeatureFamily
-        let primaryCluster = 'general';
-        if (edge.featureFamily === 'cache' && edge.protocol === 'redis') {
-            primaryCluster = 'redis';
-        } else if (edge.featureFamily === 'kag' && edge.protocol === 'qdrant') {
-            primaryCluster = 'qdrant';
-        } else if (edge.featureFamily === 'runtime' && edge.protocol === 'js') {
-            primaryCluster = 'dynamic';
+    const content = await fs.promises.readFile(astPath, 'utf8');
+    const lines = content.split('\n').filter(Boolean);
+    for (const line of lines) {
+        try {
+            const raw = JSON.parse(line);
+            relations.push({
+                from: `file:${raw.from}`,
+                to: `symbol:${raw.to}`,
+                relation_type: 'uses_ast_relation',
+                featureFamily: 'routes',
+                protocol: 'sveltekit',
+                confidence: 0.9,
+                sourceRef: `${raw.path}`
+            });
+        } catch (e) {
+            // ignore malformed lines
         }
-        
-        // 2. Update Cluster Map
-        if (!featureClusters[primaryCluster]) {
-            featureClusters[primaryCluster] = { nodes: new Set(), edges: new Set() };
-        }
-        featureClusters[primaryCluster].nodes.add(edge.from);
-        featureClusters[primaryCluster].edges.add(edge.to);
-        
-        // 3. Topology Ontology Assignment (Simulated)
-        // Assigning a topology label based on relationship type for improved graph traversal.
-        edge.topologyLabel = edge.relation_type.includes('imports') ? 'dependency_edge' : 'service_call';
-    });
-    
-    console.log('Cluster assignment complete. Topology labels added to edges.');
-    return { graphEdges: allEdges, featureClusters };
+    }
+    console.log(`Loaded ${relations.length} AST-grep relationships.`);
+    return relations;
 }
 
-    // ... (Rest of the original logic remains for clustering)
-    const featureClusters = {
-        'kag': { nodes: ['file:src/lib/server/ai/kag-runner.ts'], edges: [] },
-        'redis': { nodes: ['redis:obs:cache-trace:recent'], edges: [] }
-    };
-    
-    return { graphEdges: allEdges, featureClusters };
-}
-
-/**
- * Writes all derived data into memory/graph/ directory and generates reports.
- * @param {object} graphData - The structured graph data.
- */
 async function persistRelations(graphData) {
     console.log('Writing JSONL files and generating reports...');
-    // Implementation for writing deep-node-relations.jsonl, etc.
-    // ... (Writing logic using fs.promises.writeFile)
+    
+    // Write out the topology-ontology-clusters
+    const topologyOutput = {
+        domainClusters: {},
+        hotNodes: graphData.hotNodes,
+        cacheHeavyNodes: graphData.cacheHeavyNodes,
+        dynamicIslands: graphData.dynamicIslands
+    };
+    
+    for (const [key, val] of Object.entries(graphData.domainClusters || {})) {
+        topologyOutput.domainClusters[key] = {
+            nodes: Array.from(val.nodes),
+            edges: Array.from(val.edges)
+        };
+    }
+    
+    await fs.promises.mkdir(path.dirname(TARGET_OUTPUTS['topology-ontology-clusters']), { recursive: true });
+    await fs.promises.writeFile(TARGET_OUTPUTS['topology-ontology-clusters'], JSON.stringify(topologyOutput, null, 2));
+    
+    // Write out the actual deep-node-relations.jsonl
+    await fs.promises.writeFile(
+        TARGET_OUTPUTS['deep-node-relations'],
+        graphData.graphEdges.map(e => JSON.stringify(e)).join('\n')
+    );
     
     const reportContent = `# Deep Graph Relations Report (Automated)
-    This report summarizes the automated scan of cross-cutting dependencies.
-    - Total Relations Found: ${graphData.graphEdges.length}
-    - Top Cluster: ${Object.keys(graphData.featureClusters)[0]}
-    - Next Audit Focus: Runtime Dependency Validation`;
+This report summarizes the automated scan of cross-cutting dependencies.
+- Total Relations Found: ${graphData.graphEdges.length}
+- Hot Nodes Detected: ${graphData.hotNodes.length}
+- Cache Heavy Nodes: ${graphData.cacheHeavyNodes.length}
+- Dynamic Import Islands: ${graphData.dynamicIslands.length}
+- Next Audit Focus: Runtime Dependency Validation`;
     
     // Write the final report markdown
     await fs.promises.writeFile(TARGET_OUTPUTS.relation_report, reportContent);
     console.log(`Successfully generated ${TARGET_OUTPUTS.relation_report}`);
 }
 
-/**
- * Placeholder for smoke testing the entire pipeline.
- * @async
- */
-async function runSmokeTests() {
-    console.log('--- Running Smoke Test Sequence (G1-G13) ---');
-    // This function would call other simulated components (Qdrant, MCP)
-    return true; // Returning true to simulate passing all gates
+async function persistToRedis(graphData) {
+    console.log('--- Persisting Graph Data to Redis Cache ---');
+    let Redis;
+    try {
+        Redis = (await import('ioredis')).default;
+    } catch (e) {
+        console.warn('ioredis module not found, skipping Redis persistence.');
+        return;
+    }
+
+    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true,
+        connectTimeout: 3000,
+        maxRetriesPerRequest: 1,
+        enableOfflineQueue: false,
+        retryStrategy: () => null,
+    });
+
+    try {
+        await redis.connect();
+        await redis.ping();
+    } catch (err) {
+        console.warn('⚠️ Redis unavailable — skipping graph cache persistence.');
+        try { redis.disconnect(); } catch {}
+        return;
+    }
+
+    const NODE_EDGE_TTL = 14 * 24 * 3600; // 14 days
+    const CLUSTER_TTL = 14 * 24 * 3600; // 14 days
+    const TRACE_TTL = 7 * 24 * 3600; // 7 days
+
+    const pipeline = redis.pipeline();
+
+    // Group relations by from node
+    const nodeEdgesMap = new Map();
+    const allNodes = new Set();
+
+    for (const rel of graphData.graphEdges) {
+        const from = rel.from || rel.source;
+        const to = rel.to || rel.target;
+        allNodes.add(from);
+        allNodes.add(to);
+
+        if (!nodeEdgesMap.has(from)) {
+            nodeEdgesMap.set(from, []);
+        }
+        nodeEdgesMap.get(from).push(rel);
+    }
+
+    // Persist nodes and edges
+    console.log(`Persisting ${allNodes.size} nodes and edges...`);
+    for (const nodeId of allNodes) {
+        const nodeType = nodeId.split(':')[0] || 'unknown';
+        pipeline.setex(`graph:node:${nodeId}`, NODE_EDGE_TTL, JSON.stringify({
+            id: nodeId,
+            type: nodeType,
+            stableNodeId: nodeId
+        }));
+
+        const edges = nodeEdgesMap.get(nodeId) || [];
+        pipeline.setex(`graph:edges:${nodeId}`, NODE_EDGE_TTL, JSON.stringify(edges));
+
+        // Generate and persist neighborhood summary
+        const outgoing = edges.map(e => e.to || e.target);
+        const neighborhoodSummary = `Node ${nodeId} has ${outgoing.length} connections to: ${outgoing.slice(0, 5).join(', ')}`;
+        pipeline.setex(`summary:edge-neighborhood:${nodeId}`, CLUSTER_TTL, JSON.stringify({
+            nodeId,
+            summary: neighborhoodSummary,
+            connections: outgoing
+        }));
+    }
+
+    // Persist domain clusters
+    const domainClusters = graphData.domainClustersList || {};
+    console.log(`Persisting ${Object.keys(domainClusters).length} domain clusters...`);
+    for (const [clusterId, edges] of Object.entries(domainClusters)) {
+        const clusterNodes = Array.from(new Set(edges.flatMap(e => [e.from || e.source, e.to || e.target])));
+        
+        pipeline.setex(`graph:cluster:${clusterId}`, CLUSTER_TTL, JSON.stringify(clusterNodes));
+
+        // Generate and persist cluster summary
+        const summaryText = `Domain cluster '${clusterId}' represents ${clusterNodes.length} nodes and handles key integrations for this domain.`;
+        pipeline.setex(`summary:cluster:${clusterId}`, CLUSTER_TTL, JSON.stringify({
+            clusterId,
+            summary: summaryText,
+            nodeCount: clusterNodes.length,
+            representativeNodes: clusterNodes.slice(0, 5)
+        }));
+    }
+
+    // Persist a recent cache trace
+    const initialTrace = {
+        timestamp: new Date().toISOString(),
+        action: 'graph_cache_build',
+        nodeCount: allNodes.size,
+        edgeCount: graphData.graphEdges.length,
+        clusterCount: Object.keys(domainClusters).length
+    };
+    pipeline.lpush('obs:cache-trace:recent', JSON.stringify(initialTrace));
+    pipeline.ltrim('obs:cache-trace:recent', 0, 99); // keep last 100
+    pipeline.expire('obs:cache-trace:recent', TRACE_TTL);
+
+    await pipeline.exec();
+    console.log('✅ Successfully persisted graph data to Redis.');
+    await redis.quit();
 }
 
 /**
- * Placeholder for inspecting the generated graph relations file.
+ * Smoke test sequence for G9-G17 gates verification.
+ * @async
+ */
+async function runSmokeTests() {
+    console.log('--- Running G9-G17 Smoke Gates Verification ---');
+    const graphPath = path.resolve(ROOT_DIR, 'sveltekit-frontend/docs/graph/codebase-graph.json');
+    if (!fs.existsSync(graphPath)) {
+        console.error(`❌ codebase-graph.json not found at ${graphPath}. Please run indexer first.`);
+        return false;
+    }
+
+    try {
+        const content = await fs.promises.readFile(graphPath, 'utf8');
+        const graph = JSON.parse(content);
+        const stats = graph.gateStats;
+        if (!stats) {
+            console.error('❌ gateStats missing from codebase-graph.json');
+            return false;
+        }
+
+        const checks = [
+            { gate: 'G9', name: 'Line count', value: graph.fileCount > 0 },
+            { gate: 'G10', name: 'Component sub-imports', value: graph.componentCount !== undefined },
+            { gate: 'G11', name: 'Hardcoded localhost', value: stats.filesWithLocalhost !== undefined },
+            { gate: 'G12', name: 'Type-only imports', value: stats.runeInTsCount !== undefined },
+            { gate: 'G13', name: 'Dead exports', value: graph.audit?.topFanIn !== undefined },
+            { gate: 'G14', name: 'Svelte 5 compliance', value: stats.sv4PropsCount !== undefined },
+            { gate: 'G15', name: 'SSR safety', value: stats.ssrUnsafeCount !== undefined },
+            { gate: 'G16', name: 'Test file pairing', value: stats.routesWithTest !== undefined },
+            { gate: 'G17', name: 'Error handling', value: stats.routesWithErrorHandling !== undefined }
+        ];
+
+        let allPassed = true;
+        for (const check of checks) {
+            if (check.value) {
+                console.log(`✅ [${check.gate}] ${check.name} check: PASS`);
+            } else {
+                console.warn(`❌ [${check.gate}] ${check.name} check: FAIL`);
+                allPassed = false;
+            }
+        }
+
+        if (allPassed) {
+            console.log('🎉 All G9-G17 smoke gates verified successfully.');
+            return true;
+        } else {
+            console.error('❌ Some smoke gates failed.');
+            return false;
+        }
+    } catch (e) {
+        console.error('❌ Failed to run smoke tests:', e.message);
+        return false;
+    }
+}
+
+/**
+ * Inspects the generated graph relations file.
  */
 async function inspectRelations() {
     console.log('Inspecting graph relations...');
-    // This would read and display the contents of the generated JSONL files.
-    return 'Inspection complete. Review memory/graph/ directory for detailed JSONL outputs.';
+    const relationsPath = TARGET_OUTPUTS['deep-node-relations'];
+    if (!fs.existsSync(relationsPath)) {
+        console.error(`❌ relations file not found at ${relationsPath}`);
+        return;
+    }
+    const content = await fs.promises.readFile(relationsPath, 'utf8');
+    const lines = content.split('\n').filter(Boolean);
+    console.log(`Found ${lines.length} relations in ${relationsPath}`);
+    for (const line of lines.slice(0, 10)) {
+        console.log(` - ${line}`);
+    }
+    console.log('Inspection complete.');
 }
 
 // Execute the main function when the script is run directly

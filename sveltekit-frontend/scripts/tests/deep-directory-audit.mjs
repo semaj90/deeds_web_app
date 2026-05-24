@@ -117,14 +117,14 @@ async function directLLMCall(prompt, { timeoutMs = 60_000 } = {}) {
       name: 'turboquant',
       healthUrl: `${TURBO_URL}/health`,
       url: `${TURBO_URL}/v1/chat/completions`,
-      body: (p) => ({ model: 'gemma4-legal', messages: [{ role: 'user', content: p }], max_tokens: 1024, temperature: 0.3 }),
+      body: (p) => ({ model: 'gemma4-rotorquant:latest', messages: [{ role: 'user', content: p }], max_tokens: 1024, temperature: 0.3 }),
       extract: (d) => d?.choices?.[0]?.message?.content,
     },
     {
       name: 'ollama',
       healthUrl: `http://localhost:11434/api/tags`,
       url: `http://localhost:11434/api/chat`,
-      body: (p) => ({ model: 'gemma4-legal-vlm:latest', messages: [{ role: 'user', content: p }], stream: false }),
+      body: (p) => ({ model: 'gemma4-rotorquant:latest', messages: [{ role: 'user', content: p }], stream: false }),
       extract: (d) => d?.message?.content,
     },
   ];

@@ -12,7 +12,7 @@
  *   4b. Bifrost full fallback — Ollama round-trip, only when TurboQuant is also down
  *   5. VLM server (:8085) — Gemma 4 E4B HF Transformers + NF4, text fallback
  *   6. LiteRT-LM (:8070) — CPU sidecar, Gemma 4 E2B with MTP 4-head speculative decode
- *   7. Ollama (gemma4-legal, Q4_K_M + Q8_0 KV) — default local/dev fallback
+ *   7. Ollama (gemma4-rotorquant:latest, Q4_K_M + Q8_0 KV) — default local/dev fallback
  *
  * VISION (IMAGE + TEXT) CASCADE:
  *   1. TurboQuant with --mmproj (:8090) — unified VLM at ~80 tok/s, NO VRAM swap needed
@@ -24,7 +24,7 @@
  * 8x attention speedup on GPU, 5x VRAM savings. OpenAI-compatible API.
  *
  * Startup with vision:
- *   llama-server -m gemma4-legal.gguf --mmproj siglip.gguf \
+ *   llama-server -m gemma4-rotorquant:latest.gguf --mmproj siglip.gguf \
  *     -ctk turbo3 -ctv turbo3 --port 8090 -ngl 99 --flash-attn on
  *
  * GPU arbiter ensures TRT-LLM and Ollama don't fight for VRAM.
@@ -126,7 +126,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
     }
     return {
       text: '',
-      model: 'gemma4-legal-vlm',
+      model: 'gemma4-rotorquant:latest',
       backend: 'vlm-hf',
       latencyMs: Math.round(performance.now() - start),
       error:
@@ -210,7 +210,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
       const cartridgePayload = {
         kvProfile: 'turbo3/4',
         backend: 'turboquant',
-        model: 'gemma4-legal-turbo3',
+        model: 'gemma4-rotorquant:latest-turbo3',
         stabilityTestPassed: true,
         promotedAt,
         grpoReward: 1.0,
@@ -327,7 +327,7 @@ async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse
 
 		return {
 			text: result.text,
-			model: 'gemma4-legal-trt',
+			model: 'gemma4-rotorquant:latest-trt',
 			backend: 'tensorrt',
 			usage: result.usage,
 			latencyMs: 0
@@ -440,7 +440,7 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
 
     return {
       text,
-      model: 'gemma4-legal-turbo3',
+      model: 'gemma4-rotorquant:latest-turbo3',
       backend: 'turboquant',
       kvProfile: 'turbo3/4',
       usage: data.usage
@@ -536,7 +536,7 @@ async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), CACHE_HIT_TIMEOUT_MS);
 
-  const model = 'gemma4-legal';
+  const model = 'gemma4-rotorquant:latest';
   // Normalize prompt to increase semantic cache hit rate
   const normalizedPrompt = normalizePromptForCache(request.prompt);
   const messages: Array<{ role: string; content: string }> = [];
@@ -590,7 +590,7 @@ async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number
 
     return {
       text: content,
-      model: 'gemma4-legal-bifrost-cache',
+      model: 'gemma4-rotorquant:latest-bifrost-cache',
       backend: 'bifrost',
       latencyMs: Math.round(performance.now() - startTime),
     };
@@ -604,7 +604,7 @@ async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number
 }
 
 async function tryBifrost(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-	const model = 'gemma4-legal';
+	const model = 'gemma4-rotorquant:latest';
 	const messages: Array<OllamaMessage> = [];
 	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
 	messages.push({ role: 'user', content: request.prompt });
@@ -622,7 +622,7 @@ async function tryBifrost(request: InferenceRequest, startTime: number): Promise
 
 		return {
 			text,
-			model: 'gemma4-legal-bifrost',
+			model: 'gemma4-rotorquant:latest-bifrost',
 			backend: 'bifrost',
 			latencyMs: Math.round(performance.now() - startTime)
 		};
@@ -685,7 +685,7 @@ async function tryHfVlmServer(request: InferenceRequest, startTime: number): Pro
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal-vlm',
+				model: 'gemma4-rotorquant:latest',
 				messages,
 				max_tokens: request.maxTokens ?? 512,
 				temperature: request.temperature ?? 0.3,
@@ -702,7 +702,7 @@ async function tryHfVlmServer(request: InferenceRequest, startTime: number): Pro
 
 		return {
 			text,
-			model: 'gemma4-legal-vlm',
+			model: 'gemma4-rotorquant:latest',
 			backend: 'vlm-hf',
 			usage: data.usage ? {
 				prompt_tokens: data.usage.prompt_tokens ?? 0,
@@ -856,7 +856,7 @@ async function tryLiteRT(request: InferenceRequest, startTime: number): Promise<
 }
 
 async function ollamaInference(request: InferenceRequest, startTime: number): Promise<InferenceResponse> {
-	const model = 'gemma4-legal:latest';
+	const model = 'gemma4-rotorquant:latest';
 	const prompt = request.systemPrompt
 		? `${request.systemPrompt}\n\n${request.prompt}`
 		: request.prompt;
@@ -1077,7 +1077,7 @@ export async function* routeStreamingInference(
 
 	// Tier 5: Ollama (uses /api/chat if messages provided, /api/generate otherwise)
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
-	const model = request.model ?? 'gemma4-legal:latest';
+	const model = request.model ?? 'gemma4-rotorquant:latest';
 
 	const [endpoint, body] = request.messages
 		? [`${ollamaUrl}/api/chat`, { model, messages: request.messages, stream: true, keep_alive: '24h' }]
@@ -1163,7 +1163,7 @@ export async function getRouterStatus() {
     vlm: {
       available: vlmOk,
       url: VLM_BASE_URL,
-      model: 'gemma4-legal-vlm',
+      model: 'gemma4-rotorquant:latest',
       backend: 'hf-nf4',
       visionCapable: true,
     },

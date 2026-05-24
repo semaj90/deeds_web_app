@@ -3,16 +3,16 @@
  *
  * This is a simplified version of bifrostChat() that:
  * - Checks L1 Redis exact-match cache (5ms on hit)
- * - Falls back to direct Ollama (2.8s with gemma4-legal-fast)
+ * - Falls back to direct Ollama (2.8s with gemma4-rotorquant:latest-fast)
  * - Stores result in L1 for future hits
  * - SKIPS Bifrost L2 semantic cache (broken: base_url issue in v1.4.19)
  *
- * Use this for gemma4-legal-fast until Bifrost config is fixed.
+ * Use this for gemma4-rotorquant:latest-fast until Bifrost config is fixed.
  *
  * @example
  * const response = await ollamaCachedChat(
  *   [{ role: 'user', content: 'What is hearsay?' }],
- *   'gemma4-legal-fast',
+ *   'gemma4-rotorquant:latest-fast',
  *   { temperature: 0.3, maxTokens: 200 }
  * );
  */

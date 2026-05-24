@@ -107,7 +107,7 @@ let note = SYNTHETIC_NOTE;
 if (USE_GEMMA4) {
   console.log(c.cyan('▶ Generating note via Gemma4 on :8090...'));
   const body = {
-    model: 'gemma4-legal',
+    model: 'gemma4-rotorquant:latest',
     messages: [
       { role: 'system', content: 'You are a codebase analyst. Return STRICT JSON ONLY (no prose, no markdown fence) with keys: summary (string, ≤300 chars), dominantTags (array of 5 lowercase strings), auditScore (0-100). Nothing else.' },
       { role: 'user',   content: `Directory: ${TARGET_DIR}\nFiles: redis-exact-match.ts, dag-cache.ts, llm-cache.ts, cache-keys.ts\nAnalyze for production readiness.` },

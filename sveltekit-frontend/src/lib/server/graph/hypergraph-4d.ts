@@ -34,7 +34,7 @@
  *   (default 5) with Promise.allSettled — 5× throughput vs sequential awaits.
  *
  * Deep research summarization:
- *   Each hyperedge gets an ACE-style summary via bifrostChat (gemma4-legal).
+ *   Each hyperedge gets an ACE-style summary via bifrostChat (gemma4-rotorquant:latest).
  *   Summary cached in Redis hg:edge:{hash} (4h TTL) + Postgres hypergraph_edges.
  */
 
@@ -76,7 +76,7 @@ const HG_IDX_TTL      = 4 * 60 * 60;
 const MAX_ROWS        = 4_000;        // cap DB fetch
 const SOM_GRID_W           = 12;   // research SOM grid (smaller than codebase 44×44)
 const SOM_GRID_H           = 12;
-const MODEL                = 'gemma4-legal:latest';
+const MODEL                = 'gemma4-rotorquant:latest';
 const SUMMARIZE_BATCH_SIZE = 5;    // parallel hyperedge summarization batch width
 
 // Grade thresholds
@@ -111,7 +111,7 @@ export interface HyperEdge {
   centroid:     number[];                  // 768-dim mean of member embeddings
   gradeScore:   number;                    // GRPO reward score [0,1]
   gradeLabel:   HyperEdgeGrade;
-  summary:      string;                    // ACE-style gemma4-legal summary
+  summary:      string;                    // ACE-style gemma4-rotorquant:latest summary
   pipeline:     string;                    // dominant pipeline label
   memberCount:  number;
   builtAt:      string;
@@ -895,7 +895,7 @@ async function persistToRedis(
  *   5. rewardScoreGPU → edge weights W (GRPO)
  *   6. hgnnPropagate → enriched hyperedge representations X'
  *   7. Grade hyperedges (A/B/C/D)
- *   8. Summarize each hyperedge with gemma4-legal
+ *   8. Summarize each hyperedge with gemma4-rotorquant:latest
  *   9. Write to Redis + Neo4j
  */
 export async function buildHypergraph4D(): Promise<HypergraphBuildResult> {
@@ -1337,7 +1337,7 @@ export interface MemoryModule {
   gradeLabel:     HyperEdgeGrade;
   gradeScore:     number;
   pipeline:       string;
-  summary:        string;        // gemma4-legal ACE synthesis of cluster members
+  summary:        string;        // gemma4-rotorquant:latest ACE synthesis of cluster members
   xPrimeCentroid: number[];      // 768-dim HGNN-enriched centroid (reward-weighted)
   memberCount:    number;
   similarity:     number;        // cosine similarity to the incoming query embedding

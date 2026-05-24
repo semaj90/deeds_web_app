@@ -146,7 +146,7 @@ In a second PowerShell:
 
 ```powershell
 ollama list
-ollama pull gemma4-legal-vlm:latest   # or whatever model you've fine-tuned
+ollama pull gemma4-rotorquant:latest   # or whatever model you've fine-tuned
 ```
 
 If you need the long-context variant Hermes prefers (per Hermes docs
@@ -154,12 +154,12 @@ multi-step tool workflows want ~64 K context), build a Modelfile:
 
 ```text
 # C:\…\Modelfile.gemma4-64k
-FROM gemma4-legal-vlm:latest
+FROM gemma4-rotorquant:latest
 PARAMETER num_ctx 65536
 ```
 
 ```powershell
-ollama create gemma4-hermes-64k -f C:\path\to\Modelfile.gemma4-64k
+ollama create gemma4-rotorquant:latest -f C:\path\to\Modelfile.gemma4-64k
 ```
 
 Then in **WSL Hermes**:
@@ -168,7 +168,7 @@ Then in **WSL Hermes**:
 hermes model
 # choose Custom Endpoint / OpenAI-compatible:
 #   Base URL: http://<WINDOWS_HOST_IP>:11434/v1
-#   Model:    gemma4-hermes-64k       (or gemma4-legal-vlm:latest)
+#   Model:    gemma4-rotorquant:latest       (or gemma4-rotorquant:latest)
 #   API key:  ollama
 ```
 

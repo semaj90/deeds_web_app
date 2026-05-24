@@ -19,7 +19,7 @@ import pg from 'pg';
 
 const PG_URL      = process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const OLLAMA_URL  = process.env.OLLAMA_URL         ?? 'http://localhost:11434';
-const MODEL       = process.env.OLLAMA_MODEL       ?? 'gemma4-legal-vlm:latest';
+const MODEL       = process.env.OLLAMA_MODEL       ?? 'gemma4-rotorquant:latest';
 const EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const REDIS_URL   = process.env.REDIS_URL          ?? 'redis://localhost:6379';
 

@@ -108,7 +108,7 @@ Generate the complete report content in HTML format, maintaining the structure b
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'gemma4-legal:latest',
+              model: 'gemma4-rotorquant:latest',
               prompt: aiPrompt,
               stream: false,
               options: {
@@ -138,7 +138,7 @@ Generate the complete report content in HTML format, maintaining the structure b
                 templateType,
                 caseId,
                 content,
-                'gemma4-legal:latest',
+                'gemma4-rotorquant:latest',
                 aiResult.eval_count || undefined
               ).catch(err => console.warn('[ReportGen] Failed to cache AI content:', err));
             }

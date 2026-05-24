@@ -13,7 +13,7 @@
  * Options:
  *   --batch-size <n>     Number of queries to process in parallel (default: 5)
  *   --delay <ms>         Delay between batches in milliseconds (default: 1000)
- *   --model <name>       LLM model to use (default: gemma4-legal:latest)
+ *   --model <name>       LLM model to use (default: gemma4-rotorquant:latest)
  *   --domain <name>      Warm up specific domain only (evidence, civil-procedure, torts, contracts, criminal)
  *   --dry-run            Log queries without calling LLM
  *   --url <url>          API base URL (default: http://localhost:5173)
@@ -55,7 +55,7 @@ Usage:
 Options:
   --batch-size <n>     Number of queries to process in parallel (default: 5)
   --delay <ms>         Delay between batches in milliseconds (default: 1000)
-  --model <name>       LLM model to use (default: gemma4-legal:latest)
+  --model <name>       LLM model to use (default: gemma4-rotorquant:latest)
   --domain <name>      Warm up specific domain only:
                        - evidence
                        - civil-procedure
@@ -110,7 +110,7 @@ if (values.help) {
 // Parse options
 const batchSize = values['batch-size'] ? parseInt(values['batch-size'], 10) : 5;
 const delay = values.delay ? parseInt(values.delay, 10) : 1000;
-const model = values.model || 'gemma4-legal:latest';
+const model = values.model || 'gemma4-rotorquant:latest';
 const domain = values.domain;
 const dryRun = values['dry-run'] || false;
 const apiUrl = values.url || 'http://localhost:5173';

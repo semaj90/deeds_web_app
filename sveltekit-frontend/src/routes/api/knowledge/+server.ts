@@ -35,7 +35,7 @@ const qd = qdrant as QdrantClient & {
 const OLLAMA_URL_VAR = ENV.OLLAMA_BASE_URL;
 
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
-const LOCAL_LLM = 'gemma4-legal:latest';
+const LOCAL_LLM = 'gemma4-rotorquant:latest';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 const MAX_CHUNKS = 500;
@@ -486,7 +486,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
 
     // 3. Route to LLM (Gemini for complex, Gemma for simple)
     let response = '';
-    const llmUsed = 'gemma4-legal:latest';
+    const llmUsed = 'gemma4-rotorquant:latest';
     const ollamaRes = await ollamaFetch(`${OLLAMA_URL_VAR}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

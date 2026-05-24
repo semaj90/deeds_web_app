@@ -10,7 +10,7 @@
 
 ```
 CLIENT (Browser)                    SERVER (SvelteKit + Docker)
-├─ Gemma4 E2B 2.3B (WebGPU)       ├─ Ollama gemma4-legal-vlm (5.3GB GPU)
+├─ Gemma4 E2B 2.3B (WebGPU)       ├─ Ollama gemma4-rotorquant:latest (5.3GB GPU)
 ├─ Gemma3 270M ONNX (WASM)        ├─ Ollama embeddinggemma (300MB shared)
 ├─ EmbeddingGemma 300M ONNX       ├─ LibTorch N-API (CUDA direct, 7 GPU functions)
 │                                   ├─ Worker Threads (compute-pool.ts)

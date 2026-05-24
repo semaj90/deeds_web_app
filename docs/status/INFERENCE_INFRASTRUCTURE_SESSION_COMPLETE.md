@@ -44,7 +44,7 @@
 
 **TurboQuant Unified VLM**:
 ```bash
-llama-server -m gemma4-legal-vlm-q4_k_m.gguf \
+llama-server -m gemma4-rotorquant:latest-q4_k_m.gguf \
              --mmproj gemma4-mmproj/mmproj-BF16.gguf \
              --ctx-size 32768
 ```

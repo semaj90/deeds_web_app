@@ -206,7 +206,7 @@ Respond as JSON: { "witness": "${witnessName}", "questions": [...], "strategy": 
       const res = await fetch(`${ollamaUrl}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'gemma4-legal:latest', prompt, stream: false, format: 'json' }),
+        body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, format: 'json' }),
         signal: AbortSignal.timeout(18_000),
       });
       if (!res.ok) return { content: [{ type: 'text', text: JSON.stringify({ error: `Ollama ${res.status}` }) }] };
@@ -422,7 +422,7 @@ Return ONLY valid JSON: { "events": [...] }`;
         const res = await fetch(`${ollamaUrl}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'gemma4-legal:latest', prompt, stream: false, format: 'json' }),
+          body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, format: 'json' }),
           signal: AbortSignal.timeout(90_000),
         });
         if (!res.ok) return { content: [{ type: 'text', text: JSON.stringify({ error: `Ollama ${res.status}` }) }] };
@@ -556,7 +556,7 @@ Return JSON with exactly these fields:
         const res = await fetch(`${ollamaUrl}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'gemma4-legal:latest', prompt, stream: false, format: 'json' }),
+          body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, format: 'json' }),
           signal: AbortSignal.timeout(90_000),
         });
         if (!res.ok) return { content: [{ type: 'text', text: JSON.stringify({ error: `Ollama ${res.status}` }) }] };
@@ -780,7 +780,7 @@ Return JSON with exactly these fields:
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gemma4-legal:latest',
+            model: 'gemma4-rotorquant:latest',
             prompt: `${ctx}\n\n${userPrompt}`,
             stream: false,
             format: 'json',

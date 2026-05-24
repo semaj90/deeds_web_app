@@ -129,7 +129,7 @@ async function runLlmSynthesis(ctx: TraceSubagentContext, runUuid: string): Prom
 		].join('\n');
 
 		const messages = [{ role: 'user' as const, content: prompt }];
-		const response = await bifrostChat(messages, 'gemma4-legal', { temperature: 0.2, maxTokens: 600 });
+		const response = await bifrostChat(messages, 'gemma4-rotorquant:latest', { temperature: 0.2, maxTokens: 600 });
 		const text = String(response ?? '');
 
 		// Fire-and-forget archive to synthesis_memory_768

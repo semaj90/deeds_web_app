@@ -376,7 +376,7 @@
             "stage": "synthesize",
             "status": "ok",
             "output": {
-              "model": "gemma4-legal",
+              "model": "gemma4-rotorquant:latest",
               "includeSourceRefs": true,
               "packetMergeStrategy": "merge lane packets + synthesis log"
             }
@@ -810,7 +810,7 @@
             "stage": "synthesize",
             "status": "ok",
             "output": {
-              "model": "gemma4-legal",
+              "model": "gemma4-rotorquant:latest",
               "includeSourceRefs": true,
               "packetMergeStrategy": "merge lane packets + synthesis log"
             }
@@ -1197,7 +1197,7 @@
             "stage": "synthesize",
             "status": "ok",
             "output": {
-              "model": "gemma4-legal",
+              "model": "gemma4-rotorquant:latest",
               "includeSourceRefs": true,
               "packetMergeStrategy": "merge lane packets + synthesis log"
             }
@@ -1641,7 +1641,7 @@
             "stage": "synthesize",
             "status": "ok",
             "output": {
-              "model": "gemma4-legal",
+              "model": "gemma4-rotorquant:latest",
               "includeSourceRefs": true,
               "packetMergeStrategy": "merge lane packets + synthesis log"
             }

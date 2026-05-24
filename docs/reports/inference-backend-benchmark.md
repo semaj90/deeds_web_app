@@ -16,7 +16,7 @@ This report audits and evaluates local inference performance between **TurboQuan
 ---
 
 ## 🧠 Environmental Context
-* **Base Model**: `models/gemma4-legal-iq4xs-direct.gguf` (~5.09 GB)
+* **Base Model**: `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` (~5.09 GB)
 * **Vision Plugin**: `models/mmproj-F16.gguf` (~990 MB) (loaded only when VLM mode is toggled)
 * **VLM Mode**: `DISABLED`
 

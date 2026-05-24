@@ -110,7 +110,7 @@ export const couchdb = {
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 export const aceLLM = {
-  async summarize(text: string, model = 'gemma4-legal:latest'): Promise<string> {
+  async summarize(text: string, model = 'gemma4-rotorquant:latest'): Promise<string> {
     try {
       const res = await ollamaFetch(OLLAMA_URL + '/api/generate', {
         method: 'POST',

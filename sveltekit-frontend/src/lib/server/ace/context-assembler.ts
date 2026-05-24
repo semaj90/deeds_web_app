@@ -1301,6 +1301,10 @@ export async function assembleACEContext(opts: {
             }
 
             const fastContext: ACEContext = {
+              selectedRelationCards: '',
+              selectedClusterSummaries: '',
+              cacheTrace: '',
+              topRuntimeDependencies: '',
               userProfile: userId
                 ? await fetchUserAnalyticsContext(userId, query, caseId).catch(() => null)
                 : null,
@@ -1606,6 +1610,14 @@ export async function assembleACEContext(opts: {
       const allRag = ragChunks.map(toUnified);
       await applyQloraBoost(allRag).catch(() => {});
 
+      // Fetch graph relation summaries (selectedRelationCards, selectedClusterSummaries, cacheTrace, topRuntimeDependencies)
+      const graphRelationSummaries = await fetchGraphRelationSummaries(query, codebaseContext ?? []).catch(() => ({
+        selectedRelationCards: '',
+        selectedClusterSummaries: '',
+        cacheTrace: '',
+        topRuntimeDependencies: ''
+      }));
+
       // ── Multi-lane parallel retrieval (allSettled — degradation-safe) ──────
       const { pool: pgPool } = await import('$lib/server/db/client');
       const multiLaneOutput: MultiLaneOutput | null = await runRetrievalLanes({
@@ -1628,6 +1640,10 @@ export async function assembleACEContext(opts: {
       };
 
       const baseContext: ACEContext = {
+        selectedRelationCards: graphRelationSummaries.selectedRelationCards,
+        selectedClusterSummaries: graphRelationSummaries.selectedClusterSummaries,
+        cacheTrace: graphRelationSummaries.cacheTrace,
+        topRuntimeDependencies: graphRelationSummaries.topRuntimeDependencies,
         userProfile,
         caseContext,
         glossaryMatches,
@@ -3343,6 +3359,20 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   if (context.userAnalyticsContext) {
     lines.push(`\n${context.userAnalyticsContext}`);
     confidenceFactors.userAnalytics = 0.5;
+  }
+
+  // 14. Graph Relation Summaries (selectedRelationCards, selectedClusterSummaries, cacheTrace, topRuntimeDependencies)
+  if (context.selectedRelationCards) {
+    lines.push(`\n## Relation Cards (Graph Neighbors)\n${context.selectedRelationCards}`);
+  }
+  if (context.selectedClusterSummaries) {
+    lines.push(`\n## Domain Cluster Summaries\n${context.selectedClusterSummaries}`);
+  }
+  if (context.topRuntimeDependencies) {
+    lines.push(`\n## Runtime Dependencies\n${context.topRuntimeDependencies}`);
+  }
+  if (context.cacheTrace) {
+    lines.push(`\n## Recent Cache Trace Logs\n${context.cacheTrace}`);
   }
 
   // 13b. Token-aware compressed ACE packet (inject packed context when enabled)
@@ -5308,9 +5338,22 @@ async function applyKarpathyBoost(
   if (!candidates || candidates.length === 0) return candidates;
 
   let redisScores: Record<string, string> = {};
+  let edgeResults: any[] | null = null;
   try {
     const r = getRedis();
     redisScores = await r.hgetall('gpu:karpathy:scores').catch(() => ({}));
+    const pipeline = r.pipeline();
+    for (const c of candidates) {
+      if (c.filePath) {
+        const normalizedPath = c.filePath.replaceAll('\\', '/');
+        pipeline.get(`graph:edges:file:${normalizedPath}`);
+        pipeline.get(`graph:edges:file:sveltekit-frontend/${normalizedPath}`);
+      } else {
+        pipeline.get('dummy-nonexistent-key');
+        pipeline.get('dummy-nonexistent-key');
+      }
+    }
+    edgeResults = await pipeline.exec().catch(() => null);
   } catch {}
 
   // Normalise the LLMS.md resolved dir for fast prefix-match checks.
@@ -5380,7 +5423,7 @@ async function applyKarpathyBoost(
   const queryTerms = tokenizeBowQuery(query);
 
   // Step 3–6: apply boosts and build breakdown
-  const boosted = candidates.map((c) => {
+  const boosted = candidates.map((c, i) => {
     const semantic = c.score;
     let qdrantTagBoost = 0;
     let clusterBoost = 0;
@@ -5511,6 +5554,25 @@ async function applyKarpathyBoost(
 
     // §7 HyperRAG trust multiplier — codebase_chunks_768 are T3 (verified code).
     // When Qdrant payload carries `trust_tier`, use it; else default to T3 (0.95).
+    let relationScore = 0;
+    if (edgeResults && i < candidates.length) {
+      const res1 = edgeResults[2 * i];
+      const res2 = edgeResults[2 * i + 1];
+      const rawEdges1 = res1 && Array.isArray(res1) ? res1[1] : null;
+      const rawEdges2 = res2 && Array.isArray(res2) ? res2[1] : null;
+      const rawEdges = rawEdges1 || rawEdges2;
+      if (rawEdges && typeof rawEdges === 'string') {
+        try {
+          const edges = JSON.parse(rawEdges);
+          if (Array.isArray(edges)) {
+            const sumConfidence = edges.reduce((sum, edge) => sum + (typeof edge.confidence === 'number' ? edge.confidence : 1.0), 0);
+            relationScore = Math.min(sumConfidence, 5.0);
+          }
+        } catch {}
+      }
+    }
+    const relationBoost = relationScore * 0.05;
+
     const rawFinal =
       semantic +
       qdrantTagBoost +
@@ -5520,7 +5582,8 @@ async function applyKarpathyBoost(
       pagerankBoost +
       pairedTestBoost +
       sameAgentsDirBoost +
-      quaternionBoost;
+      quaternionBoost +
+      relationBoost;
     const chunkTrustTier = (c as Record<string, unknown>).trust_tier as string | undefined;
     const trustMultiplier =
       chunkTrustTier === 'T1'
@@ -5543,6 +5606,7 @@ async function applyKarpathyBoost(
       pairedTest: pairedTestBoost,
       sameAgentsDir: sameAgentsDirBoost,
       quaternion: quaternionBoost,
+      relationBoost,
       final,
     };
 
@@ -5666,4 +5730,123 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
     console.warn('[ACE] FeatureContextPacket fetch failed:', err);
   }
   return null;
+}
+
+
+async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]) {
+  const result = {
+    selectedRelationCards: '',
+    selectedClusterSummaries: '',
+    cacheTrace: '',
+    topRuntimeDependencies: ''
+  };
+
+  try {
+    const redis = getRedis();
+    const ping = await redis.ping().catch(() => null);
+    if (ping) {
+      // 1. Cache Trace: obs:cache-trace:recent (Lrange first 5)
+      const traces = await redis.lrange('obs:cache-trace:recent', 0, 4).catch(() => []);
+      if (traces.length > 0) {
+        result.cacheTrace = traces
+          .map(t => {
+            try {
+              const parsed = JSON.parse(t);
+              return `- [${parsed.timestamp}] Action: ${parsed.action} | Nodes: ${parsed.nodeCount} | Edges: ${parsed.edgeCount}`;
+            } catch {
+              return `- ${t}`;
+            }
+          })
+          .join('\n');
+      }
+
+      // 2. Selected Cluster Summaries
+      const domains = ['bifrost', 'ace', 'kag', 'engram', 'redis', 'qdrant', 'postgres', 'neo4j', 'duckdb', 'mcp', 'langgraph', 'gpu', 'sveltekit'];
+      const queryLower = query.toLowerCase();
+      const matchedDomains = domains.filter(d => 
+        queryLower.includes(d) || 
+        codebaseContext?.some(c => c.filePath.toLowerCase().includes(d))
+      );
+      const domainsToFetch = matchedDomains.length > 0 ? matchedDomains.slice(0, 3) : ['ace', 'kag', 'bifrost'];
+      
+      const clusterSummariesList: string[] = [];
+      for (const dom of domainsToFetch) {
+        const raw = await redis.get(`summary:cluster:${dom}`).catch(() => null);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            clusterSummariesList.push(`### Cluster: ${parsed.clusterId} (${parsed.nodeCount} nodes)\nSummary: ${parsed.summary}\nNodes: ${parsed.representativeNodes.join(', ')}`);
+          } catch {}
+        }
+      }
+      if (clusterSummariesList.length > 0) {
+        result.selectedClusterSummaries = clusterSummariesList.join('\n\n');
+      }
+
+      // 3. Selected Relation Cards
+      const topFiles = codebaseContext?.slice(0, 3).map(c => `file:${c.filePath.replaceAll('\\', '/')}`) || [];
+      const relationCardsList: string[] = [];
+      const runtimeDepsList: string[] = [];
+
+      for (const fileNode of topFiles) {
+        const rawNeigh = await redis.get(`summary:edge-neighborhood:${fileNode}`).catch(() => null);
+        if (rawNeigh) {
+          try {
+            const parsed = JSON.parse(rawNeigh);
+            relationCardsList.push(`- **${parsed.nodeId}** connections: ${parsed.connections.join(', ')}\n  *Summary*: ${parsed.summary}`);
+          } catch {}
+        }
+
+        const rawEdges = await redis.get(`graph:edges:${fileNode}`).catch(() => null);
+        if (rawEdges) {
+          try {
+            const edges = JSON.parse(rawEdges);
+            if (Array.isArray(edges)) {
+              for (const edge of edges) {
+                if (edge.relation_type === 'imports_dynamic' || edge.topologyClass === 'dynamic_import_island') {
+                  runtimeDepsList.push(`- **${edge.from}** dynamic import -> **${edge.to}** (confidence: ${edge.confidence})`);
+                }
+              }
+            }
+          } catch {}
+        }
+      }
+
+      if (relationCardsList.length > 0) {
+        result.selectedRelationCards = relationCardsList.join('\n');
+      }
+      if (runtimeDepsList.length > 0) {
+        result.topRuntimeDependencies = runtimeDepsList.slice(0, 5).join('\n');
+      }
+    }
+  } catch (err) {
+    console.warn('[ACE] Failed to fetch graph relation summaries from Redis:', err);
+  }
+
+  // File fallback if Redis returned empty (or was offline)
+  try {
+    const { readFileSync, existsSync } = await import('node:fs');
+    let topoPath = resolve(process.cwd(), 'memory/graph/topology-ontology-clusters.json');
+    if (!existsSync(topoPath)) {
+      topoPath = resolve(process.cwd(), '../memory/graph/topology-ontology-clusters.json');
+    }
+    if (existsSync(topoPath)) {
+      const topoData = JSON.parse(readFileSync(topoPath, 'utf-8'));
+      if (!result.selectedClusterSummaries && topoData.domainClusters) {
+        const fallbackClustersList: string[] = [];
+        for (const [clusterId, val] of Object.entries(topoData.domainClusters) as [string, any][]) {
+          fallbackClustersList.push(`### Cluster: ${clusterId} (${val.nodes.length} nodes)\nNodes: ${val.nodes.slice(0, 5).join(', ')}`);
+        }
+        result.selectedClusterSummaries = fallbackClustersList.slice(0, 3).join('\n\n');
+      }
+      if (!result.topRuntimeDependencies && topoData.dynamicIslands) {
+        result.topRuntimeDependencies = topoData.dynamicIslands
+          .slice(0, 5)
+          .map(node => `- Dynamic import island node: ${node}`)
+          .join('\n');
+      }
+    }
+  } catch {}
+
+  return result;
 }

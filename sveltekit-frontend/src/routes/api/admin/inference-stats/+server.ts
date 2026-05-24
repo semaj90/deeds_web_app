@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		// 2. Get active model weights (from config or a dedicated table)
 		// For now, we'll return some baseline info from ENV and what's in the DB
 		const modelWeights = [
-			{ component: 'llm:gemma4-legal', version: '1.4.0', status: 'active' },
+			{ component: 'llm:gemma4-rotorquant:latest', version: '1.4.0', status: 'active' },
 			{ component: 'embedding:gemma', version: '1.2.1', status: 'active' },
 			{ component: 'vlm:yolo-v8', version: '0.9.4', status: 'candidate' },
 			{ component: 'audio:whisper-v3', version: '1.0.0', status: 'active' }

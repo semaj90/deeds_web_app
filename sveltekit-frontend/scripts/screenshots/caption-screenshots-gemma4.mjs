@@ -7,11 +7,11 @@
  * caption_embedding (768-dim via embeddinggemma).
  *
  * Endpoint: Ollama /api/generate with images: [<base64>]. Uses the
- * gemma4-legal-vlm:latest tag which has the vision tower attached.
+ * gemma4-rotorquant:latest tag which has the vision tower attached.
  *
  * Stack:
  *   - Ollama @ OLLAMA_URL (default http://127.0.0.1:11434)
- *   - gemma4-legal-vlm:latest         (VLM, ~5.3GB)
+ *   - gemma4-rotorquant:latest         (VLM, ~5.3GB)
  *   - embeddinggemma:latest           (768-dim caption embedding)
  *   - sharp                           (compress full image to ~512px JPEG before send,
  *                                      cheaper for VLM inference)
@@ -48,7 +48,7 @@ const LIMIT     = parseInt(
 
 const OLLAMA_URL     = process.env.OLLAMA_BASE_URL ?? process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
 const TURBOQUANT_URL = process.env.TURBOQUANT_URL  ?? 'http://127.0.0.1:8090';
-const VLM_MODEL      = process.env.VLM_MODEL   ?? 'gemma4-legal-vlm:latest';
+const VLM_MODEL      = process.env.VLM_MODEL   ?? 'gemma4-rotorquant:latest';
 const EMBED_MODEL    = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
 const DB_URL         = process.env.DATABASE_URL;
 
@@ -61,7 +61,7 @@ console.log(`\n🖼️  Gemma4 VLM caption pass${DRY_RUN ? ' [DRY RUN]' : ''}`);
 console.log(`   model:  ${VLM_MODEL}`);
 console.log(`   limit:  ${LIMIT}  force: ${FORCE}  embed: ${!NO_EMBED}\n`);
 
-// Tightest prompt that reliably keeps gemma4-legal-vlm in direct-answer mode.
+// Tightest prompt that reliably keeps gemma4-rotorquant:latest in direct-answer mode.
 // Empirical finding: longer prompts (4+ lines) push the model into chain-of-
 // thought, which routes output to `reasoning_content` and runs out of tokens
 // before the actual caption lands. This 3-sentence prompt produces a clean
@@ -99,7 +99,7 @@ async function compressForVlm(absPath) {
 /**
  * Caption cascade — TurboQuant llama-server :8090 first, Ollama :11434 fallback.
  *
- * Why TurboQuant first: llama-server with the gemma4-legal-vlm GGUF + mmproj
+ * Why TurboQuant first: llama-server with the gemma4-rotorquant:latest GGUF + mmproj
  * already holds VRAM (q8_0 KV cache, persistent). Routing captions through it
  * avoids loading a second copy of the same weights into Ollama (which competes
  * for the 8GB GPU and goes empty under VRAM pressure — same pattern fixed
@@ -115,7 +115,7 @@ async function compressForVlm(absPath) {
 /**
  * Strip a leading chain-of-thought block from a Gemma4 response.
  *
- * gemma4-legal-vlm reliably emits 400-600 tokens of reasoning before the
+ * gemma4-rotorquant:latest reliably emits 400-600 tokens of reasoning before the
  * final caption — patterns observed: "Here's a thinking process to arrive
  * at the desired output: 1. **Analyze the Request Constraints:**…". Without
  * stripping, the CoT itself ends up persisted as the caption (verified
@@ -169,7 +169,7 @@ async function captionWithTurboQuant(imageB64) {
             { type: 'text',      text: PROMPT },
           ],
         }],
-        max_tokens:   800,    // gemma4-legal-vlm reliably emits 400-600 tokens of CoT
+        max_tokens:   800,    // gemma4-rotorquant:latest reliably emits 400-600 tokens of CoT
                               // before the actual caption — give it room to land the answer
         temperature:  0.2,
         stream:       false,
@@ -180,7 +180,7 @@ async function captionWithTurboQuant(imageB64) {
     if (!res.ok) return null;
     const j   = await res.json();
     const msg = j.choices?.[0]?.message;
-    // gemma4-legal-vlm is a thinking model: it sometimes puts the actual
+    // gemma4-rotorquant:latest is a thinking model: it sometimes puts the actual
     // caption in `content` and the analysis in `reasoning_content`, but other
     // times the CoT opener lands in `content` and the real answer is buried
     // in reasoning_content. Concatenate both and let stripReasoning() pick
@@ -220,7 +220,7 @@ async function captionWithOllama(imageB64) {
 }
 
 /**
- * Strip leaked chain-of-thought scaffolding that gemma4-legal-vlm sometimes
+ * Strip leaked chain-of-thought scaffolding that gemma4-rotorquant:latest sometimes
  * emits despite the "no reasoning, no numbered list" prompt directive. The
  * post-processor handles three observed leak patterns:
  *   1. "Here's a thinking process to..." opener followed by numbered analysis

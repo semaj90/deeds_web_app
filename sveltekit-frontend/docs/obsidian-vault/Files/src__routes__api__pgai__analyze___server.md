@@ -24,13 +24,13 @@ tags: ["file","ext/ts","route","auth","zod","t/ts","t/src","t/routes"]
 
 # `src/routes/api/pgai/analyze/+server.ts`
 ## For future Claude
-> POST /api/pgai/analyze — Custom analysis via Ollama gemma4-legal
+> POST /api/pgai/analyze — Custom analysis via Ollama gemma4-rotorquant:latest
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 33
 ## Summary
 
-POST /api/pgai/analyze — Custom analysis via Ollama gemma4-legal
+POST /api/pgai/analyze — Custom analysis via Ollama gemma4-rotorquant:latest
 
 ## Imports
 

@@ -2,7 +2,7 @@
 
 > Generated: 2026-05-11T02:20:41Z | Query: "Explain the provenance of research synthesis results"
 > Pipeline: Qdrant (5 hits) + pgvector (0 hits) + quaternion rerank + Gemma4 synthesis
-> Model: gemma4-hermes-64k:latest | Embedding: embeddinggemma:latest
+> Model: gemma4-rotorquant:latest | Embedding: embeddinggemma:latest
 
 ## LLM Analysis
 

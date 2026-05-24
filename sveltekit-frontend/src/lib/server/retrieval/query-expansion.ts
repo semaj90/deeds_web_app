@@ -144,7 +144,7 @@ export async function expandWithOllama(query: string): Promise<ExpandedQuery> {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				prompt: `List 3-5 synonyms or related legal terms for this query. Return ONLY the terms separated by commas, nothing else.\n\nQuery: "${query}"`,
 				stream: false,
 				options: { temperature: 0.3, num_predict: 50 }

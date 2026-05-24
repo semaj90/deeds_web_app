@@ -211,7 +211,7 @@ Multi-Token Prediction is **built into the Gemma4 model weights** as a separate 
 
 **Speed boost**: large (30–50% on RTX 3060 Ti)
 **Requirement**: the Gemma4 checkpoint must have been trained with MTP enabled (the `test1111…/llama-cpp-turboquant-gemma4` fork adds D=256/512 kernel support; check whether it also ships `--mtp-head` support)
-**Status**: not yet available for the current `gemma4-legal-vlm` weights — deferred until the MTP head is extractable from the HF checkpoint
+**Status**: not yet available for the current `gemma4-rotorquant:latest` weights — deferred until the MTP head is extractable from the HF checkpoint
 
 For this lane, `gpt-tokenizer` is still only useful as a budgeting helper: it can verify the compact packet that enters the decode stream, but it cannot add an MTP head or bridge a kernel/weight mismatch.
 
@@ -238,7 +238,7 @@ npm run turbo:start:detached
 npm run turbo:test:stability:turbo
 ```
 
-For Gemma4 (D=256/512 layers), only the `test1111…/llama-cpp-turboquant-gemma4` source build supports turbo V-cache. Do not pair the TheTom prebuilt with `gemma4-legal-vlm` — see CLAUDE.md §KV Cache Policy.
+For Gemma4 (D=256/512 layers), only the `test1111…/llama-cpp-turboquant-gemma4` source build supports turbo V-cache. Do not pair the TheTom prebuilt with `gemma4-rotorquant:latest` — see CLAUDE.md §KV Cache Policy.
 
 ---
 
@@ -360,7 +360,7 @@ The launcher injects `--model-draft` + `-draft-ngl 99` automatically. Restart `l
 
 | Path | Size | Role |
 |---|---|---|
-| `models/gemma4-legal-iq4xs-direct.gguf` | **4.8 GB** | Production GGUF — `TURBO_MODEL_PATH` / `ROTORQUANT_MODEL_PATH`. 59.8 tok/s, 220ms TTFT. |
+| `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | **4.8 GB** | Production GGUF — `TURBO_MODEL_PATH` / `ROTORQUANT_MODEL_PATH`. 59.8 tok/s, 220ms TTFT. |
 | `models/mmproj-F16.gguf` | **945 MB** | VLM mmproj (SigLIP projector) — `MMPROJ_PATH`. Required for vision mode with `--mmproj`. |
 | `models/embeddinggemma_300m_onnx/` | **329 MB** | Browser ONNX embeddings, mirrored into `static/embeddinggemma_300m_onnx/`. |
 | `models/gemma3-client-onnx/` | **872 MB** | Browser ONNX LLM — `CLIENT_LLM_MODEL` in `src/lib/ai/model-ids.ts`. Contains `gemma3_270m_w8a16.onnx` + `gemma3_client_quantized.onnx`. |

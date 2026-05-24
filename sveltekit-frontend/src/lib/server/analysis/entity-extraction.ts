@@ -17,7 +17,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
 
-// Use gemma3:270m (fast, 4.5s avg) instead of gemma4-legal (slow, 25s avg)
+// Use gemma3:270m (fast, 4.5s avg) instead of gemma4-rotorquant:latest (slow, 25s avg)
 // Entity extraction benefits from speed over complexity
 const MODEL = 'gemma3:270m';
 const CACHE_TTL = 1800; // 30 minutes

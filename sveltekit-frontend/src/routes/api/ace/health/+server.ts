@@ -2,7 +2,7 @@
  * GET /api/ace/health
  *
  * Live end-to-end health check for the ACE agentic pipeline:
- *   1. ollama         — embed + chat reachability (gemma4-legal-fast model)
+ *   1. ollama         — embed + chat reachability (gemma4-rotorquant:latest-fast model)
  *   2. qdrant         — codebase_chunks_768 collection reachability + point count
  *   3. semantic_search — single round-trip embed → search to confirm the path works
  *   4. postgres       — research_summaries count + embedding coverage
@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     const r = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: T(5000) });
     const data = await r.json() as { models?: { name: string }[] };
     const models = data.models?.map(m => m.name) ?? [];
-    const chatModel  = ENV.OLLAMA_CHAT_MODEL    ?? 'gemma4-legal-fast:latest';
+    const chatModel  = ENV.OLLAMA_CHAT_MODEL    ?? 'gemma4-rotorquant:latest-fast:latest';
     const embedModel = ENV.OLLAMA_EMBED_MODEL   ?? 'embeddinggemma:latest';
     checks.ollama = {
       ok: r.ok,

@@ -16,19 +16,19 @@
 // Callers use VLM_MODELS.legal / .vision / .embedding / .gemma4 as before.
 export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4' | 'tool', string> = {
   /** Unified legal+VLM model (GRPO legal LoRA merged, mmproj vision, 5.3GB) */
-  vision: 'gemma4-legal-vlm:latest',
+  vision: 'gemma4-rotorquant:latest',
   embedding: 'embeddinggemma:latest',
   /** Legal text reasoning / chat / agentic tool-calling (same unified model) */
-  legal: 'gemma4-legal-vlm:latest',
+  legal: 'gemma4-rotorquant:latest',
   /** Gemma 4 unified — tool calling + thinking + vision */
-  gemma4: 'gemma4-legal-vlm:latest',
+  gemma4: 'gemma4-rotorquant:latest',
   /**
    * Structured-call translator (broker boundary).
    * Defaults to unified Gemma 4. Set FUNCTION_GEMMA_MODEL=functiongemma:latest
    * to route structured tool-call translation through the lighter 270M model
    * once `ollama pull functiongemma:latest` has completed.
    */
-  tool: 'gemma4-legal-vlm:latest',
+  tool: 'gemma4-rotorquant:latest',
 };
 
 export type VLMModel = string;
@@ -457,7 +457,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
         message.tool_calls = ollamaToolCalls;
       }
       ollamaResponse = {
-        model: ollamaBody.model ?? 'gemma4-legal:latest',
+        model: ollamaBody.model ?? 'gemma4-rotorquant:latest',
         created_at: new Date().toISOString(),
         message,
         done: true,
@@ -471,7 +471,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
     } else {
       // /api/generate response format
       ollamaResponse = {
-        model: ollamaBody.model ?? 'gemma4-legal:latest',
+        model: ollamaBody.model ?? 'gemma4-rotorquant:latest',
         created_at: new Date().toISOString(),
         response: content,
         done: true,
@@ -996,69 +996,87 @@ export async function bifrostChat(
   };
 
   try {
-    if (Date.now() < bifrostGatewayUnavailableUntil) {
-      logInference({
-        type: 'llm',
+    await traceLLM(
+      'bifrost_synthesis',
+      {
         model: bifrostModel,
-        backend: 'bifrost',
-        latencyMs: 0,
-        cacheHit: false,
-        error: 'gateway cooldown active',
-        metadata: {
-          source: 'bifrostChat',
-          stage: 'gateway-skip',
-          fallback: 'ollama-direct',
-          retryAt: new Date(bifrostGatewayUnavailableUntil).toISOString(),
-        },
-      });
-      await callDirectOllamaFallback();
-    } else {
-      const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-bf-cache-key': cacheKey,
-        },
-        body: JSON.stringify({
-          model: bifrostModel,
-          messages: normalizedMessages,
-          temperature: options?.temperature ?? 0.7,
-          max_tokens: options?.maxTokens ?? 2048,
-          stream: false,
-          ...(options?.tools ? { tools: options.tools } : {}),
-          ...(options?.toolChoice ? { tool_choice: options.toolChoice } : {}),
-        }),
-        signal: AbortSignal.timeout(bifrostGatewayTimeoutMs),
-      });
+        messages: normalizedMessages,
+        temperature: options?.temperature ?? 0.7,
+        maxTokens: options?.maxTokens ?? 2048,
+      },
+      async (gen) => {
+        if (Date.now() < bifrostGatewayUnavailableUntil) {
+          logInference({
+            type: 'llm',
+            model: bifrostModel,
+            backend: 'bifrost',
+            latencyMs: 0,
+            cacheHit: false,
+            error: 'gateway cooldown active',
+            metadata: {
+              source: 'bifrostChat',
+              stage: 'gateway-skip',
+              fallback: 'ollama-direct',
+              retryAt: new Date(bifrostGatewayUnavailableUntil).toISOString(),
+            },
+          });
+          await callDirectOllamaFallback();
+        } else {
+          const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-bf-cache-key': cacheKey,
+            },
+            body: JSON.stringify({
+              model: bifrostModel,
+              messages: normalizedMessages,
+              temperature: options?.temperature ?? 0.7,
+              max_tokens: options?.maxTokens ?? 2048,
+              stream: false,
+              ...(options?.tools ? { tools: options.tools } : {}),
+              ...(options?.toolChoice ? { tool_choice: options.toolChoice } : {}),
+            }),
+            signal: AbortSignal.timeout(bifrostGatewayTimeoutMs),
+          });
 
-      if (!res.ok) {
-        const text = await res.text().catch(() => '');
-        throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
+          if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
+          }
+
+          // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
+          const rawText = await res.text();
+          const data = fastJsonParse<{
+            choices?: Array<{ message?: { content?: string; tool_calls?: any[] } }>;
+            extra_fields?: {
+              cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
+            };
+          }>(rawText);
+          const debug = data.extra_fields?.cache_debug;
+          const choice = data.choices?.[0]?.message;
+          content = choice?.content ?? '';
+          tool_calls = choice?.tool_calls;
+          cacheHit = !!debug?.cache_hit;
+          hitType = debug?.hit_type;
+          bifrostGatewayUnavailableUntil = 0;
+
+          t_l3 = performance.now() - bifrostStart;
+          if (debug?.cache_hit) {
+            console.debug(
+              `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
+            );
+          }
+        }
+
+        gen.end({
+          output: content,
+          usage: {
+            totalTokens: Math.round(content.length / 4),
+          },
+        });
       }
-
-      // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
-      const rawText = await res.text();
-      const data = fastJsonParse<{
-        choices?: Array<{ message?: { content?: string; tool_calls?: any[] } }>;
-        extra_fields?: {
-          cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
-        };
-      }>(rawText);
-      const debug = data.extra_fields?.cache_debug;
-      const choice = data.choices?.[0]?.message;
-      content = choice?.content ?? '';
-      tool_calls = choice?.tool_calls;
-      cacheHit = !!debug?.cache_hit;
-      hitType = debug?.hit_type;
-      bifrostGatewayUnavailableUntil = 0;
-
-      t_l3 = performance.now() - bifrostStart;
-      if (debug?.cache_hit) {
-        console.debug(
-          `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
-        );
-      }
-    }
+    );
 
     if (tool_calls?.length) {
       logBifrostCacheTrace(

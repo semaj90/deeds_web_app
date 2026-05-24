@@ -194,7 +194,7 @@ Summary (2-3 sentences, no bullet points, focus on the "why"):`;
       const endpoint = model ? `${url}/api/generate` : `${url}/v1/chat/completions`;
       const body = model
         ? { model, prompt, stream: false, options: { temperature: 0.2, num_predict: 256 } }
-        : { model: 'gemma4-legal-vlm', messages: [{ role: 'user', content: prompt }], stream: false, max_tokens: 256 };
+        : { model: 'gemma4-rotorquant:latest', messages: [{ role: 'user', content: prompt }], stream: false, max_tokens: 256 };
 
       const res = await fetch(endpoint, {
         method:  'POST',

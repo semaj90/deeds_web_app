@@ -17,10 +17,10 @@ export type { QuantRuntimeConfig, RuntimeBackend } from './quant-config.js';
  *   2. Triton (:8000)
  *   3. TurboQuant llama-server (turbo3 KV cache, :8090)
  *   4. Bifrost/LiteLLM (semantic cache)
- *   5. Ollama (gemma4-legal, Q4_K_M + Q8_0 KV)
+ *   5. Ollama (gemma4-rotorquant:latest, Q4_K_M + Q8_0 KV)
  *
  * Server models (Ollama):
- *   - gemma4-legal:latest for LLM (CUDA RTX)
+ *   - gemma4-rotorquant:latest for LLM (CUDA RTX)
  *   - embeddinggemma:latest for embeddings (768-dim)
  */
 
@@ -85,8 +85,8 @@ export const CLIENT_EMBEDDING_TOKENIZER_PATH = '/embeddinggemma_300m_onnx/tokeni
 
 // ── Server-side models (Ollama + CUDA RTX) ───────────────────────────────
 
-/** gemma4-legal:latest — Gemma 4 E4B fine-tuned legal LLM via Ollama (GRPO-trained) */
-export const SERVER_CHAT_MODEL = 'gemma4-legal:latest';
+/** gemma4-rotorquant:latest — Gemma 4 E4B fine-tuned legal LLM via Ollama (GRPO-trained) */
+export const SERVER_CHAT_MODEL = 'gemma4-rotorquant:latest';
 
 /** gemma4:e4b Q4_K_M — 8B params, 131K context, native tool calling + thinking via Ollama */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
@@ -101,8 +101,8 @@ export const SERVER_EMBEDDING_FALLBACK = 'nomic-embed-text';
 /** IBM Granite-Docling-258M — document understanding VLM via Ollama (522 MB) */
 export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';
 
-/** gemma4-legal-vlm:latest — merged Gemma 4 legal VLM exposed through the VLM server */
-export const SERVER_VLM_MODEL = 'gemma4-legal-vlm:latest';
+/** gemma4-rotorquant:latest — merged Gemma 4 legal VLM exposed through the VLM server */
+export const SERVER_VLM_MODEL = 'gemma4-rotorquant:latest';
 
 export type ModelRole =
 	| 'planner'
@@ -177,13 +177,13 @@ export const MODEL_CAPABILITIES: Record<string, ModelCapabilities> = {
 	},
 	[SERVER_CHAT_MODEL]: {
 		id: SERVER_CHAT_MODEL,
-		roles: ['planner', 'synthesizer', 'reward_scorer'],
+		roles: ['planner', 'synthesizer', 'vlm', 'reward_scorer'],
 		supportsFunctionCalling: true,
 		supportsPLE: false,
-		supportsVision: false,
+		supportsVision: true,
 		supportsAudio: false,
 		recommendedRuntime: 'ollama',
-		notes: 'Primary server reasoning/synthesis model. Do not use for retrieval vectors.',
+		notes: 'Primary server reasoning/synthesis and VLM model. Served via Ollama (synthesis) or FastAPI VLM server (multimodal).',
 	},
 	[SERVER_GEMMA4_MODEL]: {
 		id: SERVER_GEMMA4_MODEL,
@@ -195,16 +195,6 @@ export const MODEL_CAPABILITIES: Record<string, ModelCapabilities> = {
 		contextWindow: 131072,
 		recommendedRuntime: 'ollama',
 		notes: 'General Gemma 4 reasoning model. Treat as planning/synthesis only.',
-	},
-	[SERVER_VLM_MODEL]: {
-		id: SERVER_VLM_MODEL,
-		roles: ['planner', 'synthesizer', 'vlm', 'reward_scorer'],
-		supportsFunctionCalling: true,
-		supportsPLE: false,
-		supportsVision: true,
-		supportsAudio: false,
-		recommendedRuntime: 'transformers',
-		notes: 'Merged legal VLM served by the FastAPI VLM server.',
 	},
 	[CLIENT_E2B_MODEL_ID]: {
 		id: CLIENT_E2B_MODEL_ID,
@@ -290,7 +280,7 @@ export function assertEmbeddingModel(modelId: string): string {
 // Uses bitsandbytes NF4 quantization (~4 GB VRAM on RTX 3060 Ti).
 // This is the ONLY backend that supports vision (image analysis).
 // Text + GGUF runners (TurboQuant, Ollama) are text-only.
-// Run: python scripts/vlm-server/app.py --model gemma4-legal-vlm-merged --port 8085
+// Run: python scripts/vlm-server/app.py --model gemma4-rotorquant:latest-merged --port 8085
 
 /** VLM server endpoint (FastAPI + HF Transformers + NF4) */
 export const VLM_BASE_URL = 
@@ -313,7 +303,7 @@ export const VLM_BASE_URL =
 export const TURBOQUANT_BASE_URL = 
   (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
   `http://${['127', '0', '0', '1'].join('.')}:8080`;
-export const TURBOQUANT_MODEL = 'gemma4-legal';
+export const TURBOQUANT_MODEL = 'gemma4-rotorquant:latest';
 
 /** TurboQuant KV cache quantization levels */
 export type TurboQuantLevel = 'turbo2' | 'turbo3' | 'turbo4';

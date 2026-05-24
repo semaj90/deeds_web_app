@@ -1,4 +1,4 @@
-/** POST /api/pgai/analyze — Custom analysis via Ollama gemma4-legal */
+/** POST /api/pgai/analyze — Custom analysis via Ollama gemma4-rotorquant:latest */
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';

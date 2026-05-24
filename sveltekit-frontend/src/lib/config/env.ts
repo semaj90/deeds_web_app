@@ -53,7 +53,7 @@ function validateAndBuildEnv(): EnvConfig {
 
   const cfg: EnvConfig = {
     OLLAMA_URL: RAW_ENV?.OLLAMA_URL ?? '',
-    OLLAMA_MODEL: RAW_ENV?.OLLAMA_MODEL ?? 'gemma4-legal:latest',
+    OLLAMA_MODEL: RAW_ENV?.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest',
     PUBLIC_APP_URL: RAW_ENV?.PUBLIC_APP_URL ?? '',
     GPU_ACCELERATION: coerceBoolean(RAW_ENV.VITE_GPU_ACCELERATION, true),
     WEBGPU_ENABLED: coerceBoolean(RAW_ENV.VITE_WEBGPU_ENABLED, true),

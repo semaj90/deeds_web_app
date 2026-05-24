@@ -57,7 +57,7 @@ const QUERY     = (() => {
 
 const REDIS_URL  = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-const LLM_MODEL = process.env.LLM_MODEL ?? 'gemma4-legal-vlm:latest';
+const LLM_MODEL = process.env.LLM_MODEL ?? 'gemma4-rotorquant:latest';
 // Inference cascade per CLAUDE.md "Inference Cascade" section:
 //   TurboQuant llama-server :8090  (KV cache, cache_prompt:true, primary)
 //   Bifrost :3040                  (L2 semantic cache wrapper)
@@ -272,7 +272,7 @@ async function gemma4Rerank(top, agentsRules, timelineMd) {
   ].join('\n');
 
   // Wrap the prompt in explicit Gemma turn markers. The fine-tuned
-  // gemma4-legal-vlm breaks Ollama's auto-applied chat template AND
+  // gemma4-rotorquant:latest breaks Ollama's auto-applied chat template AND
   // TurboQuant's /v1/chat/completions endpoint (both return empty when GPU
   // is under VRAM pressure). Raw /v1/completions with explicit
   // <start_of_turn>...<end_of_turn> tokens works reliably (~3s, 800+ chars

@@ -63,7 +63,7 @@ describe('GET /api/ai/models', () => {
 
 	it('returns 200 with model list when Ollama responds OK', async () => {
 		const models = [
-			{ name: 'gemma4-legal:latest', size: '5000000000', modified_at: '2026-01-01', digest: 'abc123def456' },
+			{ name: 'gemma4-rotorquant:latest', size: '5000000000', modified_at: '2026-01-01', digest: 'abc123def456' },
 			{ name: 'embeddinggemma:latest', size: '1000000000', modified_at: '2026-01-01', digest: 'def456abc789' },
 		];
 		global.fetch = vi.fn().mockResolvedValueOnce(ollamaResponse(models)) as any;
@@ -74,7 +74,7 @@ describe('GET /api/ai/models', () => {
 
 		expect(res.status).toBe(200);
 		expect(body.models).toHaveLength(2);
-		expect(body.models[0].name).toBe('gemma4-legal:latest');
+		expect(body.models[0].name).toBe('gemma4-rotorquant:latest');
 		expect(body.models[0].digest).toHaveLength(12); // sliced to 12
 	});
 
@@ -103,7 +103,7 @@ describe('GET /api/ai/models', () => {
 	});
 
 	it('returns 304 Not Modified when ETag matches', async () => {
-		global.fetch = vi.fn().mockResolvedValueOnce(ollamaResponse([{ name: 'gemma4-legal:latest', size: '5GB', modified_at: '2026-01-01', digest: 'abc123def456' }])) as any;
+		global.fetch = vi.fn().mockResolvedValueOnce(ollamaResponse([{ name: 'gemma4-rotorquant:latest', size: '5GB', modified_at: '2026-01-01', digest: 'abc123def456' }])) as any;
 		mockCheckETag.mockReturnValue({ etag: '"abc123"', isMatch: true });
 		mockNotModified.mockReturnValue(new Response(null, { status: 304 }));
 

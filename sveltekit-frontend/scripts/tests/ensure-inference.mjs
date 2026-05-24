@@ -29,14 +29,14 @@ const DEFAULT_MODEL_DIRS = [
   'C:\\Users\\james\\Desktop\\models',
   'C:\\Users\\james\\Desktop\\llama-server-cuda\\models',
   'C:\\Users\\james\\Videos\\deeds-web-app\\models',
-  // Ollama blob cache — gemma4-legal merged GRPO LoRA
+  // Ollama blob cache — gemma4-rotorquant:latest merged GRPO LoRA
   path.join(
     process.env.USERPROFILE ?? 'C:\\Users\\james',
     '.ollama', 'blobs'
   ),
 ].filter(Boolean);
 
-// Known gemma4-legal blob hash (fallback for USERPROFILE/.ollama/blobs)
+// Known gemma4-rotorquant:latest blob hash (fallback for USERPROFILE/.ollama/blobs)
 const KNOWN_BLOB =
   process.env.GEMMA4_GGUF_PATH ??
   path.join(

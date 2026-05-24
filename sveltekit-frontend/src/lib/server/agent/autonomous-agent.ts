@@ -111,7 +111,7 @@ export class AutonomousAgent {
     // Initialize Ollama LLM
     this.llm = new ChatOllama({
       baseUrl: ENV.OLLAMA_BASE_URL,
-      model: 'gemma4-legal:latest',
+      model: 'gemma4-rotorquant:latest',
       temperature: this.config.temperature,
     });
 
@@ -1110,7 +1110,7 @@ export class AutonomousAgent {
             const queryHash = createHash('sha256').update(query).digest('hex').slice(0, 16);
             const cacheKey = buildContextCacheKey({
               queryHash,
-              modelName: 'gemma4-legal-vlm:latest',
+              modelName: 'gemma4-rotorquant:latest',
               modelQuant: 'iq4_xs',
               backend: 'gemma4-agent',
               tokenizerHash: 'embeddinggemma:latest:768',
@@ -1144,7 +1144,7 @@ export class AutonomousAgent {
               query,
               userId: 'agent',
               caseId: 'auto',
-              modelName: 'gemma4-legal-vlm:latest',
+              modelName: 'gemma4-rotorquant:latest',
               modelQuant: 'iq4_xs',
               backend: 'gemma4-agent',
               tokenizerHash: 'embeddinggemma:latest:768',
@@ -1523,7 +1523,7 @@ export class AutonomousAgent {
       toolCount: this.tools.length,
       maxIterations: this.config.maxIterations,
       temperature: this.config.temperature,
-      model: 'gemma4-legal:latest',
+      model: 'gemma4-rotorquant:latest',
       hasACEContext: !!(this.config.userId || this.config.caseId),
     };
   }

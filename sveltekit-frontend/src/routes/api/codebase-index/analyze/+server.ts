@@ -113,7 +113,7 @@ ${contentForLLM}
 		const raw = await traceLLM(
 			'codebase-analysis',
 			{
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				backend: ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama',
 				filePath: relPath,
 				lines: fileStats.lines,
@@ -128,7 +128,7 @@ ${contentForLLM}
 							{ role: 'system', content: systemPrompt },
 							{ role: 'user', content: userPrompt },
 						],
-						'gemma4-legal',
+						'gemma4-rotorquant:latest',
 						{
 							temperature: 0.3,
 							maxTokens: 2048,

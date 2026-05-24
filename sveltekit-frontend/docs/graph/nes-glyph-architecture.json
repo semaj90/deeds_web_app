@@ -33514,7 +33514,7 @@
         "lib",
         "server"
       ],
-      "summary": "Legal document summarization via Ollama (gemma4-legal).",
+      "summary": "Legal document summarization via Ollama (gemma4-rotorquant:latest).",
       "lineCount": 48,
       "hasAuth": false,
       "hasZod": false,
@@ -96622,7 +96622,7 @@
         "auth",
         "zod"
       ],
-      "summary": "POST /api/pgai/analyze — Custom analysis via Ollama gemma4-legal",
+      "summary": "POST /api/pgai/analyze — Custom analysis via Ollama gemma4-rotorquant:latest",
       "lineCount": 33,
       "hasAuth": true,
       "hasZod": true,

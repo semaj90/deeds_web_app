@@ -20,7 +20,7 @@ import { createInterface } from 'node:readline';
 
 const TURBO_BASE  = process.env.TURBO_BASE  ?? 'http://127.0.0.1:8090';
 const OLLAMA_BASE = process.env.OLLAMA_BASE ?? 'http://127.0.0.1:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-legal-vlm:latest';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
 const REQUEST_TIMEOUT_MS = Number(process.env.GEMMA4_TIMEOUT_MS ?? 60_000);
 
 const PROTOCOL_VERSION = '2024-11-05';

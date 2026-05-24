@@ -20,7 +20,7 @@
 
 ### 3. Test Runs
 ```bash
-# Run 1: evidence-analysis domain (gemma4-legal, batch 3)
+# Run 1: evidence-analysis domain (gemma4-rotorquant:latest, batch 3)
 node scripts/cache-warmup.mjs --domain evidence-analysis --batch-size 3 --delay 500
 ✅ Started successfully (~3 min estimated)
 
@@ -41,7 +41,7 @@ node scripts/cache-warmup.mjs --domain evidence --batch-size 2 --model gemma3:27
 ### Timeline
 | Time | Event | Cache Keys |
 |------|-------|------------|
-| 08:49 | Started evidence-analysis (gemma4-legal) | 4 |
+| 08:49 | Started evidence-analysis (gemma4-rotorquant:latest) | 4 |
 | 08:50 | Check after 15s | 4 |
 | 08:51 | Check after 45s | 4 |
 | 08:53 | Started evidence (gemma3:270m) | 4 |

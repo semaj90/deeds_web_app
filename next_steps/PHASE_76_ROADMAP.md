@@ -13,7 +13,7 @@ The AST audit identified **972 failed repairs**, primarily in the `src/lib/compo
 ## 🟠 Priority 2: Inference Track Hardening — ⚠️ VRAM CRITICAL
 Aligning with `4_9_26_inference_tracks_cpu_fallback.md`:
 - **Status**: ⚠️ **VRAM at 90.4%** (7,405 / 8,192 MiB). Ollama + llama-server dual-loaded.
-- **Action**: Unload one backend before any GPU-intensive operation. Run `ollama stop gemma4-legal:latest` or set `OLLAMA_KEEP_ALIVE=0`.
+- **Action**: Unload one backend before any GPU-intensive operation. Run `ollama stop gemma4-rotorquant:latest` or set `OLLAMA_KEEP_ALIVE=0`.
 - **Goal**: Bring VRAM below 7,200 MiB target. Current idle headroom: only 620 MiB.
 
 ## 🟡 Priority 3: Semantic Search Integration — ✅ INFRASTRUCTURE READY
@@ -31,7 +31,7 @@ Aligning with local hardware constraints (8GB VRAM):
 - **Result**: 78.27 tok/s (+11.8% over target), Ollama as automatic fallback.
 
 ## 🏁 Verification Checklist: 3060 Ti 8GB
-- [x] **Ollama Baseline**: `gemma4-legal:latest` responds in **1,177ms** warm. Moot — TurboQuant interceptor now handles all chat/generate routes at **77-79 tok/s**.
+- [x] **Ollama Baseline**: `gemma4-rotorquant:latest` responds in **1,177ms** warm. Moot — TurboQuant interceptor now handles all chat/generate routes at **77-79 tok/s**.
 - [x] **Tier 3 (llama-server)**: Verified healthy on `:8090`, ctx=4096, multimodal enabled. `--flash-attn on`, `--ngl 99`.
 - [x] **VRAM Audit**: ✅ **5,601 MiB** (68.4%) — well under 7,200 MiB target. Ollama model unloaded, TurboQuant only.
 - [x] **KV Compression**: Not needed — **77-79 tok/s** already exceeds 70 tok/s target without `-ctk turbo3`. Available as headroom.

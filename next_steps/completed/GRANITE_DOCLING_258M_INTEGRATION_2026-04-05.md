@@ -96,7 +96,7 @@ Stage 2: Granite-Docling-258M (Ollama, 522 MB)
 Stage 2b: LangExtract (port 8095)
     ├─ Input: Extracted structured text from Granite-Docling
     ├─ spaCy NER: Named entities (people, orgs, dates, money)
-    ├─ Ollama NER: Legal entities via gemma4-legal (citations, statutes)
+    ├─ Ollama NER: Legal entities via gemma4-rotorquant:latest (citations, statutes)
     ├─ Regex: Patterns (SSN, phone, email, case numbers)
     └─ Output: Enriched text + entities + practice area classification
     ↓
@@ -120,7 +120,7 @@ Stage 7: Retrieval (RAG + KAG + DAG)
     ├─ Authority Chain: Multi-hop statute/case expansion
     └─ Corrective RAG: LLM query reformulation on low confidence
     ↓
-Stage 8: Summarization via gemma4-legal:latest
+Stage 8: Summarization via gemma4-rotorquant:latest
     ↓
 Stage 9: GPU Background Analysis (CUDA clustering/similarity)
 ```
@@ -237,17 +237,17 @@ export async function extractDocumentWithGraniteDocling(
 
 | Model | VRAM | Purpose | When Loaded |
 |-------|------|---------|-------------|
-| `gemma4-legal:latest` | 5.3 GB | Legal text LLM | Chat/synthesis/ACE |
+| `gemma4-rotorquant:latest` | 5.3 GB | Legal text LLM | Chat/synthesis/ACE |
 | `embeddinggemma:latest` | 621 MB | 768-dim embeddings | Always |
 | `ibm/granite-docling:258m` | ~522 MB | Document extraction | During evidence upload |
 | **Total (concurrent)** | **~6.4 GB** | Embedding + Granite-Docling | Fits! |
 
-**Key insight**: Granite-Docling (522 MB) can run **concurrently** with embeddinggemma (621 MB) within our 8 GB VRAM budget. Ollama swaps gemma4-legal out during document processing, then swaps it back for chat. This is handled automatically by Ollama's `keep_alive` model management.
+**Key insight**: Granite-Docling (522 MB) can run **concurrently** with embeddinggemma (621 MB) within our 8 GB VRAM budget. Ollama swaps gemma4-rotorquant:latest out during document processing, then swaps it back for chat. This is handled automatically by Ollama's `keep_alive` model management.
 
 For batch evidence uploads, the pipeline would be:
 1. Load Granite-Docling + embeddinggemma (~1.1 GB)
 2. Process all documents (extract → chunk → embed)
-3. Unload Granite-Docling, load gemma4-legal for summarization
+3. Unload Granite-Docling, load gemma4-rotorquant:latest for summarization
 4. Generate summaries for all processed evidence
 
 ---
@@ -268,7 +268,7 @@ For batch evidence uploads, the pipeline would be:
                     ┌──────────────▼──────────────────────────────┐
                     │         LangExtract (Port 8095)             │
                     │  ├─ spaCy NER (en_core_web_md)              │
-                    │  ├─ Ollama NER (gemma4-legal)               │
+                    │  ├─ Ollama NER (gemma4-rotorquant:latest)               │
                     │  ├─ Regex patterns (SSN, phone, citations)  │
                     │  └─ Practice area classification (14 areas) │
                     └──────────────┬──────────────────────────────┘
@@ -306,7 +306,7 @@ For batch evidence uploads, the pipeline would be:
                     └──────────────┬──────────────────────────────┘
                                    │
                     ┌──────────────▼──────────────────────────────┐
-                    │  Synthesis (gemma4-legal:latest)             │
+                    │  Synthesis (gemma4-rotorquant:latest)             │
                     │  ├─ SSE streaming via /api/sse/chat          │
                     │  ├─ ACE self-eval → retry (quality < 0.6)   │
                     │  ├─ Tool calling (glossary, RAG, web search) │

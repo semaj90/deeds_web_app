@@ -183,7 +183,7 @@ curl -X POST http://localhost:5173/api/test/ollama-cached \
 1. **Increase TTL**: 1hr → 6hrs for legal queries (low churn rate)
 2. **Pre-warm cache**: Index 100 common legal questions
 3. **Query normalization**: Strip filler words before hashing
-4. **Model upgrade**: gemma3:270m (3.2s) → gemma4-legal-fast (2.2s)
+4. **Model upgrade**: gemma3:270m (3.2s) → gemma4-rotorquant:latest-fast (2.2s)
 
 ---
 

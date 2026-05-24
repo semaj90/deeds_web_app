@@ -9,7 +9,7 @@
  *
  *   const response = await fetch('http://turboquant:8090/v1/chat/completions', {
  *     method: 'POST',
- *     body: JSON.stringify({ model: 'gemma4-legal', messages, tools: LLAMA_TOOL_DEFINITIONS }),
+ *     body: JSON.stringify({ model: 'gemma4-rotorquant:latest', messages, tools: LLAMA_TOOL_DEFINITIONS }),
  *   });
  *   // response.choices[0].message.tool_calls → dispatch via llamaToolCall()
  */

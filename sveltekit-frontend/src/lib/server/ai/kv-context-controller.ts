@@ -153,7 +153,7 @@ export async function buildKvContextPacket(opts: {
     taskId,
     stablePrefixHash,
     level1Runtime: {
-      model:       'gemma4-legal-vlm:latest',
+      model:       'gemma4-rotorquant:latest',
       cachePolicy: 'reuse-stable-prefix',
       cacheTypeK:  'q8_0',
       cacheTypeV:  'q8_0',

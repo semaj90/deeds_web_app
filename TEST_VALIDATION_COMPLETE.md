@@ -20,7 +20,7 @@
 | **Bifrost Health** | OK | OK | **PASS** |
 | **Qdrant Cache** | >0 points | 7 points | **PASS** |
 | **GPU Status** | healthy | 2.8GB/8GB | **PASS** |
-| **Ollama** | running | gemma4-legal-fast | **PASS** |
+| **Ollama** | running | gemma4-rotorquant:latest-fast | **PASS** |
 
 ---
 
@@ -56,7 +56,7 @@
 
 **Ollama (Native Windows Service):**
 - ✅ Service: Running on port 11434
-- ✅ Model: gemma4-legal-fast:latest (5.3GB)
+- ✅ Model: gemma4-rotorquant:latest-fast:latest (5.3GB)
 - ✅ Performance: 2.8s avg (10.7× faster than baseline)
 
 **GPU (NVIDIA RTX 3060 Ti):**
@@ -97,7 +97,7 @@ User Query
     ↓ (miss)
 ┌─────────────────────────────────────────┐
 │  L3: Direct Ollama GPU Inference        │
-│  • Latency: 2.8s (gemma4-legal-fast)    │  ⭐ OPTIMIZED
+│  • Latency: 2.8s (gemma4-rotorquant:latest-fast)    │  ⭐ OPTIMIZED
 │  • Model: 7.5B Q4_K_M (5.3GB)           │     (10.7× speedup)
 │  • Context: 2048 tokens                 │
 │  • Throughput: 81 tokens/sec            │
@@ -123,7 +123,7 @@ User Query
 - [x] RabbitMQ message queue healthy
 - [x] Object storage accessible
 - [x] LangExtract entity extraction service running
-- [x] Ollama inference engine operational (gemma4-legal-fast)
+- [x] Ollama inference engine operational (gemma4-rotorquant:latest-fast)
 - [x] GPU acceleration enabled (RTX 3060 Ti, 2.8GB/8GB)
 - [x] Dev server running (port 5173)
 
@@ -149,8 +149,8 @@ User Query
 
 This is **better than the 5ms target** from the original cache validation plan.
 
-### 2. gemma4-legal-fast Model Optimized
-**10.7× speedup** vs baseline gemma4-legal:
+### 2. gemma4-rotorquant:latest-fast Model Optimized
+**10.7× speedup** vs baseline gemma4-rotorquant:latest:
 - Baseline: 34.3s
 - Optimized: 2.8s
 - Throughput: 81 tokens/sec vs 56.7 baseline (43% faster)
@@ -176,7 +176,7 @@ All 11 critical services operational with 11+ hours uptime.
 **Use the proven 2-tier + optimized L3 system:**
 1. **L1 Redis** (2ms) — exact-match cache
 2. **L2 Bifrost** (2-5s) — semantic cache (optional, already working)
-3. **L3 gemma4-legal-fast** (2.8s) — optimized GPU inference
+3. **L3 gemma4-rotorquant:latest-fast** (2.8s) — optimized GPU inference
 
 **Expected production performance:**
 - 90-95% queries: sub-second response (L1+L2 cache hits)

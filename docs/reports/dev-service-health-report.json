@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T22:44:56.119Z",
+  "generatedAt": "2026-05-23T22:38:51.515Z",
   "strict": false,
   "services": [
     {
@@ -38,7 +38,7 @@
       "port": 8788,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": "TRACE_MCP_URL"
     },
@@ -48,7 +48,7 @@
       "port": 7687,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": null
     },
@@ -78,7 +78,7 @@
       "port": 11434,
       "required": false,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": "OLLAMA_HOST"
     },
@@ -108,7 +108,7 @@
       "port": 5173,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": null
     },

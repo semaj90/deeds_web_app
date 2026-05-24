@@ -67,4 +67,4 @@ export * from './codebase-intelligence.js';
 // Codebase document atlas, features index, and cache traces
 export * from './documents-atlas.js';
 export * from './feature-registry.js';
-
+export * from './atlas-cards.js';

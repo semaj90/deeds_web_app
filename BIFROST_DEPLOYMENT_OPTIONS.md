@@ -162,7 +162,7 @@ services:
     networks: [legal-ai-network]
     ports: [8000:8000]
     command: >
-      --model /models/gemma4-legal
+      --model /models/gemma4-rotorquant:latest
       --tensor-parallel-size 1
       --dtype float16
       --max-model-len 8192
@@ -238,9 +238,9 @@ services:
 ### LiteLLM Config
 ```yaml
 model_list:
-  - model_name: gemma4-legal
+  - model_name: gemma4-rotorquant:latest
     litellm_params:
-      model: openai/gemma4-legal
+      model: openai/gemma4-rotorquant:latest
       api_base: http://triton-tensorrt:8099/v1
       api_key: dummy
 
@@ -299,7 +299,7 @@ Redis L1 (3ms) → Direct Ollama (3.2s)
 ```
 Redis L1 (3ms) → Bifrost L2 (2-5s) → TRT-LLM L3 (2-5s)
 ```
-- Convert gemma4-legal to TensorRT INT4
+- Convert gemma4-rotorquant:latest to TensorRT INT4
 - Update Bifrost config to point to TRT-LLM Docker container
 - Expect Bifrost semantic cache to work reliably (Docker networking)
 
@@ -317,7 +317,7 @@ LiteRT L0 (0.5-2s) → Redis L1 (3ms) → Bifrost L2 (2-5s) → TRT-LLM L3 (2-5s
 
 ### Priority 1: TRT-LLM Integration
 1. ✅ Verify TensorRT conversion notebook works
-2. [ ] Convert gemma4-legal to INT4 TensorRT engine
+2. [ ] Convert gemma4-rotorquant:latest to INT4 TensorRT engine
 3. [ ] Start Triton server with TRT engine
 4. [ ] Update Bifrost config to use `http://triton-tensorrt:8099`
 5. [ ] Test Bifrost semantic cache with TRT backend

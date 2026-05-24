@@ -181,7 +181,7 @@ async function startTier2() {
   const blobPath  = join(process.env.USERPROFILE ?? 'C:\\Users\\james', '.ollama', 'blobs',
     'sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43');
   const modelPath = process.env.TURBO_MODEL_PATH ??
-    (existsSync(blobPath) ? blobPath : join(ROOT, 'models', 'gemma4-legal-q4_k_m.gguf'));
+    (existsSync(blobPath) ? blobPath : join(ROOT, 'models', 'gemma4-rotorquant:latest-q4_k_m.gguf'));
 
   if (!llamaExe) {
     logEvent('T2', 'Inference', 'skip', { note: 'llama-server.exe not found' });

@@ -1,46 +1,36 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import crypto from 'node:crypto';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import Redis from 'ioredis';
 
-const ROOT = process.cwd();
-const LOG = path.join(ROOT, 'docs/ai-os/agentic-progress-log.ndjson');
-const MD = path.join(ROOT, 'docs/ai-os/progress-log.md');
+const __filename = fileURLToPath(import.meta.url);
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', { lazyConnect: true });
 
-function arg(name, fallback = '') {
-  const i = process.argv.indexOf(`--${name}`);
-  return i >= 0 ? process.argv[i + 1] : fallback;
+export async function logProgress(message, type = 'info', metadata = {}) {
+    const logPath = path.resolve('docs/ai-os/agentic-progress-log.ndjson');
+    const entry = { timestamp: new Date().toISOString(), type, message, ...metadata };
+    fs.appendFileSync(logPath, JSON.stringify(entry) + '\n');
+    
+    const mdPath = path.resolve('docs/ai-os/progress-log.md');
+    fs.appendFileSync(mdPath, `- **${entry.timestamp}** [${type.toUpperCase()}]: ${message}\n`);
+
+    // Wire up Bifrost caching with strictly enforced TTLs
+    try {
+        await redis.connect();
+        const runId = metadata.runId || Date.now().toString();
+        const clusterId = metadata.clusterId || 'default-cluster';
+        
+        await redis.set(`ace:packet:${runId}`, JSON.stringify(entry), 'EX', 3600); // 1h TTL
+        await redis.set(`ace:cluster:${clusterId}`, JSON.stringify(entry), 'EX', 86400); // 24h TTL
+        console.log(`[Bifrost] Cached progress packet ${runId}`);
+    } catch (err) {
+        console.warn('[Bifrost] Redis offline. Caching skipped.', err.message);
+    } finally {
+        redis.disconnect();
+    }
 }
 
-const entry = {
-  id: `log_${new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)}_${crypto.randomUUID().slice(0, 8)}`,
-  date: new Date().toISOString(),
-  featureKey: arg('feature', 'unknown'),
-  status: arg('status', 'partial'),
-  summary: arg('summary', ''),
-  problem: arg('problem', ''),
-  errorSignature: arg('error', ''),
-  filesTouched: arg('files', '').split(',').filter(Boolean),
-  commandsRun: arg('commands', '').split(';;').filter(Boolean),
-  sourceRefs: arg('sourceRefs', '').split(',').filter(Boolean),
-  attemptedQueries: arg('queries', '').split(';;').filter(Boolean),
-  rootCause: arg('rootCause', ''),
-  fixApplied: arg('fix', ''),
-  verification: {
-    passed: arg('passed', 'false') === 'true',
-    commands: arg('verify', '').split(';;').filter(Boolean)
-  },
-  nextAttempt: {
-    tryDifferentQuery: arg('tryDifferentQuery', 'true') === 'true',
-    query: arg('nextQuery', ''),
-    notes: arg('nextNotes', '')
-  },
-  trustTier: arg('trustTier', 'synthetic')
-};
-
-await fs.mkdir(path.dirname(LOG), { recursive: true });
-await fs.appendFile(LOG, JSON.stringify(entry) + '\n');
-
-const mdBlock = `\n## ${entry.date} — ${entry.featureKey} — ${entry.status}\n\n${entry.summary}\n\n- Error: ${entry.errorSignature || 'n/a'}\n- Files: ${entry.filesTouched.join(', ') || 'n/a'}\n- Verification: ${entry.verification.passed ? 'passed' : 'not passed'}\n`;
-await fs.appendFile(MD, mdBlock);
-
-console.log(JSON.stringify({ ok: true, id: entry.id, log: LOG }, null, 2));
+if (process.argv[1] === __filename) {
+    const msg = process.argv[2] || 'Update';
+    logProgress(msg).catch(console.error);
+}

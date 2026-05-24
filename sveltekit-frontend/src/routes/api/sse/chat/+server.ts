@@ -823,7 +823,7 @@ async function correctiveRetrieval(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal:latest',
+        model: 'gemma4-rotorquant:latest',
         prompt: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${originalQuery}"`,
         stream: false,
         keep_alive: getChatModelKeepAlive(),
@@ -1827,7 +1827,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           toolResults = await Promise.race([
             runToolDetectionPass(
               OLLAMA_URL,
-              model ?? 'gemma4-legal:latest',
+              model ?? 'gemma4-rotorquant:latest',
               systemPrompt,
               conversationHistory,
               message,
@@ -1888,7 +1888,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const sKey = synthesisKey.forQuery(
           synthCaseId,
           message,
-          model ?? 'gemma4-legal:latest',
+          model ?? 'gemma4-rotorquant:latest',
           'v1',
           synthCaseVersion
         );
@@ -1922,7 +1922,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             '$lib/server/cache/redis-exact-match.js'
           );
           const exactCacheKey = generateCacheKey({
-            model: model ?? 'gemma4-legal:latest',
+            model: model ?? 'gemma4-rotorquant:latest',
             messages: [
               { role: 'system', content: systemPrompt },
               ...conversationHistory,
@@ -1961,7 +1961,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             : await lookupCachedResponseWithBudget({
                 query: message,
                 context: systemPrompt,
-                model: model ?? 'gemma4-legal:latest',
+                model: model ?? 'gemma4-rotorquant:latest',
               });
       }
 
@@ -2024,7 +2024,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             citations: extractedCitations,
           },
           conversationTurns: conversationHistory.length,
-          model: model ?? 'gemma4-legal:latest',
+          model: model ?? 'gemma4-rotorquant:latest',
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           cachedResponse: true,
           cachedAt: cacheResult.cachedAt,
@@ -2100,7 +2100,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         await traceLLM(
           'sse-chat-generation',
           {
-            model: model ?? 'gemma4-legal:latest',
+            model: model ?? 'gemma4-rotorquant:latest',
             backend: 'auto',
             prompt: flatPrompt,
             policyAction: policyDecision.action,
@@ -2133,7 +2133,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
             try {
               const cachedResponse = await getCachedStreamResponse(ollamaMessages, {
-                model: model ?? 'gemma4-legal:latest',
+                model: model ?? 'gemma4-rotorquant:latest',
                 temperature: 0.7,
                 maxTokens: 2048,
               });
@@ -2208,7 +2208,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  model: model ?? 'gemma4-legal:latest',
+                  model: model ?? 'gemma4-rotorquant:latest',
                   messages: ollamaMessages,
                   stream: true,
                   keep_alive: getChatModelKeepAlive(),
@@ -2264,7 +2264,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Note: cacheHit tracking removed - always attempt to cache successful responses
         if (fullResponse) {
           storeCachedStreamResponse(ollamaMessages, fullResponse, {
-            model: model ?? 'gemma4-legal:latest',
+            model: model ?? 'gemma4-rotorquant:latest',
             temperature: 0.7,
             maxTokens: 2048,
           }).catch((cacheErr) => {
@@ -2440,7 +2440,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      model: model ?? 'gemma4-legal:latest',
+                      model: model ?? 'gemma4-rotorquant:latest',
                       messages: [
                         { role: 'system', content: systemPrompt },
                         ...conversationHistory,
@@ -2526,7 +2526,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             citations: extractedCitations,
           },
           conversationTurns: conversationHistory.length,
-          model: model ?? 'gemma4-legal:latest',
+          model: model ?? 'gemma4-rotorquant:latest',
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           ...(aceEvaluation
             ? {
@@ -2563,7 +2563,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           logInference({
             type: 'llm',
             model:
-              inferenceBackend === 'ollama' ? (model ?? 'gemma4-legal:latest') : inferenceBackend,
+              inferenceBackend === 'ollama' ? (model ?? 'gemma4-rotorquant:latest') : inferenceBackend,
             backend: inferenceBackend,
             latencyMs: Math.round(performance.now() - llmStreamStart),
             tokenCount: tokenSeq,
@@ -2590,7 +2590,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               sessionId: conversationId,
               message: fullResponse.slice(0, 5000),
               role: 'assistant',
-              metadata: { model: model ?? 'gemma4-legal:latest', confidence },
+              metadata: { model: model ?? 'gemma4-rotorquant:latest', confidence },
             });
           })
           .catch((err) => {
@@ -2624,7 +2624,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 queryEmbedding: embedData.embedding,
                 context: systemPrompt,
                 response: fullResponse,
-                model: model ?? 'gemma4-legal:latest',
+                model: model ?? 'gemma4-rotorquant:latest',
                 confidence,
               }).catch((err) => console.warn('[SSE Chat] L2 Qdrant cache storage failed:', err));
 
@@ -2632,7 +2632,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               import('$lib/server/cache/redis-exact-match.js')
                 .then(({ generateCacheKey, setExactMatchCache }) => {
                   const exactCacheKey = generateCacheKey({
-                    model: model ?? 'gemma4-legal:latest',
+                    model: model ?? 'gemma4-rotorquant:latest',
                     messages: [
                       { role: 'system', content: systemPrompt },
                       ...conversationHistory,
@@ -2643,7 +2643,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   });
                   setExactMatchCache(exactCacheKey, {
                     content: fullResponse,
-                    model: model ?? 'gemma4-legal:latest',
+                    model: model ?? 'gemma4-rotorquant:latest',
                     backend: inferenceBackend,
                   }).catch((err) => console.warn('[SSE Chat] L1 Redis cache storage failed:', err));
                 })
@@ -2664,13 +2664,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           const sKey = synthesisKey.forQuery(
             synthCaseId,
             message,
-            model ?? 'gemma4-legal:latest',
+            model ?? 'gemma4-rotorquant:latest',
             'v1',
             synthCaseVersion
           );
           setCache(
             sKey,
-            { response: fullResponse, confidence, model: model ?? 'gemma4-legal:latest' },
+            { response: fullResponse, confidence, model: model ?? 'gemma4-rotorquant:latest' },
             TTL.SYNTHESIS * 1000
           ).catch((err) => {
             console.warn(

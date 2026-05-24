@@ -48,7 +48,7 @@ export async function getCachedStreamResponse(
   messages: Array<{ role: string; content: string }>,
   options: CachedStreamOptions = {}
 ): Promise<string | null> {
-  const { model = 'gemma4-legal:latest', temperature = 0.7, maxTokens = 2048 } = options;
+  const { model = 'gemma4-rotorquant:latest', temperature = 0.7, maxTokens = 2048 } = options;
 
   const cacheKey = generateCacheKey({
     model,
@@ -76,7 +76,7 @@ export async function storeCachedStreamResponse(
   options: CachedStreamOptions = {}
 ): Promise<void> {
   const {
-    model = 'gemma4-legal:latest',
+    model = 'gemma4-rotorquant:latest',
     temperature = 0.7,
     maxTokens = 2048,
     ttlSeconds = TTL.ACE_PROMPT,

@@ -107,7 +107,7 @@ export type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 
 /** Configuration for callGemma4WithTools */
 export interface Gemma4ToolLoopOpts {
-  /** Ollama model name (default: ENV.GEMMA4_MODEL / gemma4-legal-vlm:latest) */
+  /** Ollama model name (default: ENV.GEMMA4_MODEL / gemma4-rotorquant:latest) */
   model?: string;
   /** Temperature (default: 0.1 for tool precision) */
   temperature?: number;

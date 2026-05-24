@@ -4,7 +4,7 @@ Live state as of 2026-05-08:
 
 - **ComfyUI Desktop** — installed (`C:\Users\james\AppData\Local\Programs\@comfyorgcomfyui-electron\`), not running. Operator launches manually.
 - **TurboQuant** :8090 — healthy, serves Gemma4-legal-vlm via llama-server.exe (chat + VLM).
-- **Ollama** :11434 — running, `gemma4-legal-vlm:latest` registered but cold.
+- **Ollama** :11434 — running, `gemma4-rotorquant:latest` registered but cold.
 - **Phase 0B compiler** — done, deterministic (`2240019055…`).
 - **ComfyUI HTTP bridge** — done, smoke ready.
 - **Phase 1 SceneIntent extractor** — appears in flight (operator-authored).
@@ -83,7 +83,7 @@ curl http://127.0.0.1:8090/health
 # Operator: load Gemma4 into Ollama (only if TurboQuant is down)
 curl -X POST http://127.0.0.1:11434/api/generate `
   -H "Content-Type: application/json" `
-  -d '{"model":"gemma4-legal-vlm:latest","prompt":"warm","keep_alive":"1h"}'
+  -d '{"model":"gemma4-rotorquant:latest","prompt":"warm","keep_alive":"1h"}'
 
 # Engineer: Phase 0B compiler (deterministic, byte-identical re-runs)
 npm run reconstruction:compile-demo

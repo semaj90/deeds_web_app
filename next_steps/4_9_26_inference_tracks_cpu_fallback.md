@@ -26,7 +26,7 @@ Added KAG/RAG/DAG + L1-L4 compression section. Intel 10th gen CPU cache tier tab
 ## The 3 Parallel Tracks
 
 ### Track 1 — NVIDIA GPU (RTX 3060 Ti, 8 GB VRAM)
-**Goal**: Benchmark TurboQuant turbo3 KV cache compression vs baseline Q8_0 on gemma4-legal GGUF
+**Goal**: Benchmark TurboQuant turbo3 KV cache compression vs baseline Q8_0 on gemma4-rotorquant:latest GGUF
 
 ```bash
 # 1. Clone turboquant_plus fork
@@ -39,7 +39,7 @@ cmake --build build --target llama-server -j8
 
 # 3. Run TurboQuant server (port 8090, OpenAI-compatible)
 ./build/bin/llama-server \
-  -m /path/to/gemma4-legal-vlm-Q4_K_M.gguf \
+  -m /path/to/gemma4-rotorquant:latest-Q4_K_M.gguf \
   -ctk turbo3 -ctv turbo3 \
   --port 8090 \
   --ctx-size 24576 \
@@ -49,7 +49,7 @@ cmake --build build --target llama-server -j8
 #    or curl directly:
 curl http://localhost:8090/v1/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"gemma4-legal","prompt":"Explain chain of custody defects.","max_tokens":256}'
+  -d '{"model":"gemma4-rotorquant:latest","prompt":"Explain chain of custody defects.","max_tokens":256}'
 ```
 
 **KV Cache Compression Reference (Intel 10th gen + RTX 3060 Ti)**
@@ -134,9 +134,9 @@ Steps (open in Colab):
 3. Run All (§1 through §13)
 
 Expected outputs:
-- `gemma4-legal-vlm-merged/` — 16 GB safetensors (canonical)
-- `gemma4-legal-vlm-gguf/gemma4-legal-vlm-Q4_K_M.gguf` — ~5 GB (Ollama/Track 1 GGUF)
-- `gemma4-legal-vlm-litert/gemma4-legal.litertlm` — if §9 succeeds
+- `gemma4-rotorquant:latest-merged/` — 16 GB safetensors (canonical)
+- `gemma4-rotorquant:latest-gguf/gemma4-rotorquant:latest-Q4_K_M.gguf` — ~5 GB (Ollama/Track 1 GGUF)
+- `gemma4-rotorquant:latest-litert/gemma4-rotorquant:latest.litertlm` — if §9 succeeds
 
 After Track 3 completes → Track 1 gets the GGUF → Track 2 gets the .litertlm
 

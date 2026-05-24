@@ -35,7 +35,7 @@
 |-----------|------------|---------|--------|
 | Embedding API | 1,239 QPM | 973ms avg, 2.1s p99 (warm) | ✅ |
 | gemma3:270m | ~1,380 QPM | 2.6s | ✅ Fast enough |
-| gemma4-legal | ~100 QPM | 34.3s | ⚠️ Too slow |
+| gemma4-rotorquant:latest | ~100 QPM | 34.3s | ⚠️ Too slow |
 | Redis L1 (target) | - | 5ms | Ready |
 | Bifrost L2 (target) | - | 2-5s | Ready |
 
@@ -73,7 +73,7 @@
 ### ⚠️ TurboQuant Missing (Would Give 2-3× Speedup)
 
 **Status**: Defined but not running on port 8090
-**Impact**: gemma4-legal stuck at 34.3s instead of ~11-15s
+**Impact**: gemma4-rotorquant:latest stuck at 34.3s instead of ~11-15s
 **Fix**: Install turboquant_plus llama.cpp fork + start llama-server
 
 ### ✅ 4-Pillar Codebase Intelligence System
@@ -111,7 +111,7 @@ Run 3 (Hot):   <100ms  (Redis L1 hit!) 🚀
 ```
 
 **Short-Term** (this week):
-1. Enable TurboQuant (2-3× speedup on gemma4-legal)
+1. Enable TurboQuant (2-3× speedup on gemma4-rotorquant:latest)
 2. Run full load test suite with gemma3:270m
 3. Set up monitoring dashboard
 
@@ -193,8 +193,8 @@ curl http://localhost:11434/api/tags
 ```
 
 **Result**: 7 models loaded
-- gemma4-legal:latest (5.3GB, Q4_K_M)
-- gemma4-legal-fast (5.3GB, Q4_K_M)
+- gemma4-rotorquant:latest (5.3GB, Q4_K_M)
+- gemma4-rotorquant:latest-fast (5.3GB, Q4_K_M)
 - gemma4:e4b-it-q4_K_M (9.6GB, VLM)
 - embeddinggemma:latest (622MB, BF16, 768-dim)
 - gemma3:270m (292MB, Q8_0)

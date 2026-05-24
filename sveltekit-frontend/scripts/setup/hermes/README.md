@@ -138,7 +138,7 @@ The starter:
 | `OLLAMA_NUM_GPU` | `999` | Offload all model layers to GPU |
 | `OLLAMA_LLM_LIBRARY` | `cuda_v12` | Explicit CUDA 12 — avoids detection ambiguity |
 
-VRAM budget for `gemma4-hermes-64k:latest` on RTX 3060 Ti:
+VRAM budget for `gemma4-rotorquant:latest` on RTX 3060 Ti:
 
 | Component | VRAM |
 |---|---|

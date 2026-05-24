@@ -78,7 +78,7 @@ export const POST: RequestHandler = async (event) => {
 			},
 			metadata: {
 				timestamp: new Date().toISOString(),
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				stepsCompleted: chain.steps.length
 			}
 		});

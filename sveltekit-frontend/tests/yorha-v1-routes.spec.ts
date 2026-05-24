@@ -30,13 +30,13 @@ const mockOllamaFetch = vi.fn(async () =>
 	new Response(JSON.stringify({
 		message: { content: 'Mock LLM response' },
 		response: 'Mock LLM response',
-		model: 'gemma4-legal:latest',
+		model: 'gemma4-rotorquant:latest',
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } })
 );
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-legal:latest',
+	getChatModel: () => 'gemma4-rotorquant:latest',
 	getEmbedModel: () => 'embeddinggemma:latest',
 	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
@@ -456,7 +456,7 @@ describe('/api/v1/evidence/analyze (POST)', () => {
 		}) as any);
 		const data = await jsonBody(res);
 		expect(data.analysis).toBeTruthy();
-		expect(data.model).toBe('gemma4-legal:latest');
+		expect(data.model).toBe('gemma4-rotorquant:latest');
 	});
 
 	it('returns 400 for no content or evidenceId', async () => {

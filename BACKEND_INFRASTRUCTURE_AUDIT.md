@@ -84,7 +84,7 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:3040/health
 # Test semantic cache endpoint
 curl -s -X POST http://localhost:3040/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model":"ollama/gemma4-legal","messages":[{"role":"user","content":"Test"}],"max_tokens":5}' \
+  -d '{"model":"ollama/gemma4-rotorquant:latest","messages":[{"role":"user","content":"Test"}],"max_tokens":5}' \
   | grep -o '"choices"'
 # Expected: "choices" (valid response structure)
 ```
@@ -129,8 +129,8 @@ curl -s http://localhost:11434/api/tags | grep -o '"models"'
 # Expected: "models"
 
 # Check GPU acceleration
-curl -s http://localhost:11434/api/ps | grep -o 'gemma4-legal'
-# Expected: gemma4-legal (if model is loaded)
+curl -s http://localhost:11434/api/ps | grep -o 'gemma4-rotorquant:latest'
+# Expected: gemma4-rotorquant:latest (if model is loaded)
 ```
 
 **What it checks**: Ollama service on port 11434, models loaded, GPU available.
@@ -151,7 +151,7 @@ nvidia-smi --query-gpu=name,memory.free --format=csv
 
 # Check Ollama can use GPU
 curl -s http://localhost:11434/api/chat \
-  -d '{"model":"gemma4-legal","messages":[{"role":"user","content":"Hi"}],"stream":false,"options":{"num_predict":5}}' \
+  -d '{"model":"gemma4-rotorquant:latest","messages":[{"role":"user","content":"Hi"}],"stream":false,"options":{"num_predict":5}}' \
   | grep -o '"content"'
 # Expected: Fast response (<5s) indicates GPU usage
 ```
@@ -165,18 +165,18 @@ curl -s http://localhost:11434/api/chat \
 #### **G8: Model Files Exist**
 ```bash
 # Check critical models are available
-curl -s http://localhost:11434/api/tags | grep -E 'gemma4-legal|embeddinggemma'
+curl -s http://localhost:11434/api/tags | grep -E 'gemma4-rotorquant:latest|embeddinggemma'
 # Expected: Both models present
 
 # Check model sizes (should be 5-10GB for legal models)
-ls -lh ~/.ollama/models/manifests/registry.ollama.ai/library/gemma4-legal/
+ls -lh ~/.ollama/models/manifests/registry.ollama.ai/library/gemma4-rotorquant:latest/
 ```
 
 **What it checks**: Required models downloaded and valid.
 
 **Fix if fails**:
 ```bash
-ollama pull gemma4-legal
+ollama pull gemma4-rotorquant:latest
 ollama pull embeddinggemma
 ```
 
@@ -187,7 +187,7 @@ ollama pull embeddinggemma
 # Benchmark GPU inference speed
 START=$(date +%s%3N)
 curl -s -X POST http://localhost:11434/api/chat \
-  -d '{"model":"gemma4-legal","messages":[{"role":"user","content":"What is hearsay?"}],"stream":false,"options":{"num_predict":200}}' >/dev/null
+  -d '{"model":"gemma4-rotorquant:latest","messages":[{"role":"user","content":"What is hearsay?"}],"stream":false,"options":{"num_predict":200}}' >/dev/null
 END=$(date +%s%3N)
 echo "Latency: $((END - START))ms"
 # Expected: <30,000ms (GPU), <60,000ms (CPU)
@@ -611,7 +611,7 @@ curl -s http://localhost:11434/api/ps
 
 # Force CPU-only test
 curl -s -X POST http://localhost:11434/api/chat \
-  -d '{"model":"gemma4-legal","options":{"num_gpu":0},...}'
+  -d '{"model":"gemma4-rotorquant:latest","options":{"num_gpu":0},...}'
 ```
 
 ---

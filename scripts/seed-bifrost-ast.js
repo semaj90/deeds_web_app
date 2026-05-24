@@ -39,7 +39,7 @@ async function seed() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer dummy-key' },
                     body: JSON.stringify({
-                        model: 'gemma4-legal:latest',
+                        model: 'gemma4-rotorquant:latest',
                         messages: [
                             { role: 'user', content: prompt }
                         ],

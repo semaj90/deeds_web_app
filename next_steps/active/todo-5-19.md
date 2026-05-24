@@ -144,7 +144,7 @@ Current state: memory limits ✅, healthchecks ✅, restart policies ✅, log ro
 #### 4C — Redis Bifrost → Gemma4 Cache Warm Start
 - [ ] Verify Bifrost is up and caching: `curl http://localhost:3040/health` + send a test chat request twice, confirm 2nd is faster
 - [ ] Add cold-start warm-up script: pre-populate Bifrost cache with 10 common legal queries after wiki:loop completes
-- [ ] Add `OLLAMA_CHAT_KEEP_ALIVE=10m` to ensure gemma4-legal-vlm KV stays hot between requests (already in dev:gpu CLI — verify it hits the server)
+- [ ] Add `OLLAMA_CHAT_KEEP_ALIVE=10m` to ensure gemma4-rotorquant:latest KV stays hot between requests (already in dev:gpu CLI — verify it hits the server)
 - [ ] Wire ACE `ace:topo:*` cache hit rate into `/api/analytics/search-patterns` dashboard (currently tracked in retrievalTrace but not surfaced in UI)
 - [ ] Verify HyperRAG pipeline uses bifrost for Phase D synthesis (check `hyperrag-fusion-service.ts` → bifrostChat call)
 
@@ -174,24 +174,24 @@ Current state: memory limits ✅, healthchecks ✅, restart policies ✅, log ro
 
 ### 5B — OpenCode Config
 - [x] Add `yorha` provider to root + sveltekit `opencode.json` → `POST /api/v1/chat/completions` (ACE/KAG pipeline via dev server `:5173`)
-- [x] Add `hermes-ace` agent using `yorha/yorha-hermes` — full ACE enrichment before hitting `gemma4-hermes-64k:latest`
+- [x] Add `hermes-ace` agent using `yorha/yorha-hermes` — full ACE enrichment before hitting `gemma4-rotorquant:latest`
 - [x] Fix `audit-hermes` description: "direct to Ollama (no ACE enrichment)"
 - [x] Fix Hermes context limit: `32768 → 65536`
-- [x] Add `gemma4-legal` model entry to `ollama` provider
+- [x] Add `gemma4-rotorquant:latest` model entry to `ollama` provider
 - [x] Sync both `opencode.json` files (root + `sveltekit-frontend/`)
 
 ### 5C — Ollama Model Cleanup
 - [ ] `ollama rm "gemma4:e4b-it-q4_K_M"` — CPU-only, no legal fine-tune
-- [ ] `ollama rm "gemma4-legal:final"` — duplicate tag
+- [ ] `ollama rm "gemma4-rotorquant:latest:final"` — duplicate tag
 - [ ] `ollama rm "ssfdre38/gemma4-turbo:e4b"` — CPU-only community model
-- [ ] `ollama rm "gemma4-legal-fast:latest"` — superseded by IQ4_XS direct GGUF
+- [ ] `ollama rm "gemma4-rotorquant:latest-fast:latest"` — superseded by IQ4_XS direct GGUF
 - [x] Keep `gemma3:270m` — speculative decoding Type 1 test candidate
 
 ### 5D — Desktop GGUF Cleanup
-Desktop path: `C:\Users\james\Desktop\gemma4-legal-iq4xs\`
-- [ ] Delete `gemma4-legal-iq4xs-direct.gguf` (4.8 GB) — exact duplicate of `models/gemma4-legal-iq4xs-direct.gguf`
-- [ ] Delete `gemma4-legal-iq4xs.gguf` (4.8 GB) — slow round-trip build, superseded
-- [ ] Delete `gemma4-legal-merged-q4km.gguf` (5.0 GB) — Q4_K_M format, superseded by IQ4_XS
+Desktop path: `C:\Users\james\Desktop\gemma4-rotorquant:latest-iq4xs\`
+- [ ] Delete `gemma4-rotorquant:latest-iq4xs-direct.gguf` (4.8 GB) — exact duplicate of `models/gemma4-rotorquant:latest-iq4xs-direct.gguf`
+- [ ] Delete `gemma4-rotorquant:latest-iq4xs.gguf` (4.8 GB) — slow round-trip build, superseded
+- [ ] Delete `gemma4-rotorquant:latest-merged-q4km.gguf` (5.0 GB) — Q4_K_M format, superseded by IQ4_XS
 
 ### 5E — Empty Model Shell Cleanup
 - [ ] `Remove-Item models/gemma3-legal -Recurse -Force` (276 B stub — no weights)

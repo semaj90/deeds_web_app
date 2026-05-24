@@ -102,7 +102,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     if (request.tag_config?.generate_summaries) {
       summary = await generateClusterSummary(
         clusterPoints.map(p => String(p.id)),
-        request.tag_config.model ?? 'gemma4-legal:latest'
+        request.tag_config.model ?? 'gemma4-rotorquant:latest'
       );
     }
 

@@ -166,7 +166,7 @@ psql -U legal_admin -d legal_ai_db -c \
 # Expected output:
 # version | bytes_length | vlm_model
 # --------|--------------|----------------------------------
-#    1    |     450-600  | gemma4-legal-turbo3 (turboquant)
+#    1    |     450-600  | gemma4-rotorquant:latest-turbo3 (turboquant)
 ```
 
 ---
@@ -224,7 +224,7 @@ psql -U legal_admin -d legal_ai_db -c \
 
 ```bash
 llama-server \
-  -m gemma4-legal-vlm-q4_k_m.gguf \
+  -m gemma4-rotorquant:latest-q4_k_m.gguf \
   --mmproj gemma4-mmproj/mmproj-BF16.gguf \
   --port 8090 \
   --ctx-size 32768

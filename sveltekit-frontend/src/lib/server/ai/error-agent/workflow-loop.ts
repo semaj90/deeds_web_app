@@ -171,7 +171,7 @@ async function defaultLog(entry: WorkflowLogEntry): Promise<void> {
       toonHash: (entry.metadata.toonHash as string) ?? entry.runId,
       mcpCalls: (entry.metadata.mcpCalls as any[]) ?? [],
       cacheHits: (entry.metadata.cacheHits as any) ?? 0,
-      bifrostModel: (entry.metadata.bifrostModel as string) ?? 'gemma4-legal:latest',
+      bifrostModel: (entry.metadata.bifrostModel as string) ?? 'gemma4-rotorquant:latest',
       output: (entry.metadata.output as string) ?? String(entry.metadata.repairSummary ?? ''),
       error: entry.passed ? undefined : (entry.metadata.error || new Error(`Workflow smoke check failed for ${entry.hmmErrorClass}`)),
     });

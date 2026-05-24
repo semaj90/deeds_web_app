@@ -341,7 +341,7 @@
         "intent": "high-level legal reasoning and synthesis",
         "name": "Legal-AI Product Layer (KAG/DAG)",
         "params": {
-          "model": "gemma4-legal-vlm"
+          "model": "gemma4-rotorquant:latest"
         },
         "pathMapping": [
           "src/lib/server/ai",
