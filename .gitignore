@@ -770,6 +770,9 @@ scripts/tests/screenshots/cases-ui/
 # GPU TypeScript source files (override gpu-* Go binary pattern)
 !sveltekit-frontend/src/**/gpu-*
 
+# Debug routes (override [Dd]ebug/ VS template rule)
+!sveltekit-frontend/src/routes/debug/
+
 # GPU demo and route pages (override gpu-* pattern for directories)
 !sveltekit-frontend/src/routes/**/gpu-*/
 

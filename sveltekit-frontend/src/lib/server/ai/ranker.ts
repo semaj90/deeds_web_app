@@ -20,17 +20,21 @@ function prioritizeFailures(atlasCards: any[], failures: string[]) {
     .sort((a, b) => (b.frequency || 0) - (a.frequency || 0));
 }
 
+import { getTopClusters } from './cluster-hotness-ranker.js';
+
 function prioritizeCode(vectorHits: any[], graphHits: any[]) {
+  // Promote Graph -> First-Class Retrieval
   return [
-    ...vectorHits.slice(0, 8),
-    ...graphHits.slice(0, 4)
+    ...graphHits.slice(0, 8),
+    ...vectorHits.slice(0, 4)
   ];
 }
 
 function hybridRank(vector: any[], graph: any[], atlas: any[]) {
+  // Promote Graph -> First-Class Retrieval
   return [
-    ...vector.slice(0, 6),
-    ...graph.slice(0, 4),
+    ...graph.slice(0, 6),
+    ...vector.slice(0, 4),
     ...atlas.slice(0, 2)
   ];
 }

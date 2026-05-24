@@ -27,23 +27,25 @@ async function main() {
   }
 
   // 3. Serialize and parse with SIMDJSON AVX2
-  const rawJson = JSON.stringify(result);
+  const rawJson = JSON.stringify(result, null, 2);
+  const jsoncContent = `// Phase 9 Preflight Trace Output\n// DAG Loop Success: ${result.success}\n${rawJson}`;
   
   try {
     console.log('⚡ Loading SIMDJSON AVX2 Bridge...');
-    const simdBridge = require('../simd-bridge/cpp/build/Release/simd_bridge.node');
+    const simdBridge = require('../simd-bridge/cpp/build/Release/tensorrt_bridge.node');
     const optimizedJson = simdBridge.simdJsonParse(rawJson);
     
-    const outPath = path.join(process.cwd(), '..', 'memory', 'clusters', 'graph_analysis_ready.json');
+    const outPath = path.join(process.cwd(), '..', 'memory', 'clusters', 'graph_analysis_ready.jsonc');
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
-    fs.writeFileSync(outPath, optimizedJson);
+    // Write the JSONC formatted trace
+    fs.writeFileSync(outPath, `// Phase 9 Preflight Trace Output\n// DAG Loop Success: ${result.success}\n${optimizedJson}`);
     console.log(`💾 Saved AVX2-optimized trace to: ${outPath}`);
   } catch (err) {
-    console.warn('⚠️ Could not load simd_bridge.node or parse failed. Ensure it is compiled.', err.message);
+    console.warn('⚠️ Could not load tensorrt_bridge.node or parse failed. Ensure it is compiled.', err.message);
     // Fallback
-    const outPath = path.join(process.cwd(), '..', 'memory', 'clusters', 'graph_analysis_ready.json');
+    const outPath = path.join(process.cwd(), '..', 'memory', 'clusters', 'graph_analysis_ready.jsonc');
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
-    fs.writeFileSync(outPath, rawJson);
+    fs.writeFileSync(outPath, jsoncContent);
     console.log(`💾 Saved native JSON trace to: ${outPath}`);
   }
 }

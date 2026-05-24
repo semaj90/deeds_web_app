@@ -11,18 +11,12 @@ export async function checkSidecars() {
   let allHealthy = true;
 
   // 1. Check SIMD Bridge
-  const simdPath = path.join(process.cwd(), '..', 'simd-bridge', 'cpp', 'build', 'Release', 'simd_bridge.node');
+  const simdPath = path.join(process.cwd(), '..', 'simd-bridge', 'cpp', 'build', 'Release', 'tensorrt_bridge.node');
   if (fs.existsSync(simdPath)) {
     console.log('✅ SIMD AVX2 Bridge: ONLINE');
   } else {
-    console.log('⚠️ SIMD AVX2 Bridge: OFFLINE. Attempting to build...');
-    try {
-      await execPromise('npm run build', { cwd: path.join(process.cwd(), '..', 'simd-bridge', 'cpp') });
-      console.log('✅ SIMD AVX2 Bridge: BUILT AND ONLINE');
-    } catch (err) {
-      console.error('❌ Failed to build SIMD Bridge:', err.message);
-      allHealthy = false;
-    }
+    console.log('⚠️ SIMD AVX2 Bridge: OFFLINE. (tensorrt_bridge.node not found)');
+    allHealthy = false;
   }
 
   // 2. Check MCP Servers (8791, 8792, 8793)

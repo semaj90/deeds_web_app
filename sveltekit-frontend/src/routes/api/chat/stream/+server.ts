@@ -27,6 +27,7 @@ import {
   buildOpenCodeContextPacket,
   rerankFeaturesWithBreakdown,
 } from '$lib/server/ai/toon.js';
+import { logSynthesisRun } from '$lib/server/observability/synthesis-logger.js';
 
 const chatStreamPostSchema = z.object({
   sessionId: z.string().min(1, 'Missing sessionId').max(200),
@@ -1054,6 +1055,25 @@ function handleQueryMode(
             ttl_seconds: 604800,
           }).catch(() => {});
         }
+
+        void logSynthesisRun({
+          runId,
+          queryHash,
+          sourceStage: 'bifrostStream',
+          selectedNodes: rerankedPaths,
+          pathMapping: reranked.map(r => ({ path: r.path, protocols: r.protocols, languages: r.languages })),
+          protocols: Array.from(new Set(reranked.flatMap(r => r.protocols || []))),
+          summary: fullResponse.slice(0, 5000),
+          metadata: {
+            featureFamily,
+            routeFlow: ["/api/chat/stream", "bifrostStream"],
+            runtimeDependencies: ["redis", "qdrant", "bifrost"],
+            moduleSystem: "esm",
+            protocols: ["http", "sse", "redis"],
+            cacheLayerUsed: "redis_semantic",
+            confidence: intentRanked?.intentConfidence ?? intentRanked?.confidence ?? 0.91
+          }
+        }).catch(() => {});
 
         send({ type: 'status', stage: 'done', message: 'stream-complete' });
         send({ type: 'done' });

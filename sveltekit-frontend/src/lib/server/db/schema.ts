@@ -176,3 +176,4 @@ export * from './schema/schema-semantic-cache.js';
 export * from './schema/documents-atlas.js';
 export * from './schema/feature-registry.js';
 export * from './schema/atlas-cards.js';
+export * from './schema/synthesis-logs.js';

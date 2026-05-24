@@ -117,6 +117,15 @@
       "appliedAt": "2026-05-22",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('saved_citation_annotations','evidence_board_edges');\""
+    },
+    {
+      "file": "20260524_synthesis_cache_layer.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds cache_layer_used column to synthesis_logs to support fast analytics filters on cache hitting.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='synthesis_logs' AND column_name='cache_layer_used';\""
     }
   ]
 }

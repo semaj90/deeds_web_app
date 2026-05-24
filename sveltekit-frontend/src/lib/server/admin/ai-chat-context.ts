@@ -11,6 +11,16 @@ import { resolve } from 'node:path';
 
 const BROWSER_REDIS_KEY = (userId: string) => `browser-context:snapshot:${userId}`;
 
+export const ALLOWED_ADMIN_TOOLS = [
+  'kb.hybrid_search',
+  'kb.search_pathways',
+  'kb.search_notecards',
+  'kb.explain_context_pack',
+  'search.rerank',
+  'graph.semantic_path_synthesis',
+  'topology.search_som_neighborhood',
+];
+
 // Relative to the sveltekit-frontend package (dev) or repo root (production node)
 const SOAK_HISTORY_PATH = resolve(process.cwd(), '../docs/reports/workstation-soak-history.jsonl');
 const SOAK_REPORT_PATH  = resolve(process.cwd(), '../docs/reports/workstation-soak-report.json');

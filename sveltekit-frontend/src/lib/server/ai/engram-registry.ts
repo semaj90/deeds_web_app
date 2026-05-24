@@ -258,6 +258,73 @@ function persistMemoryRegistry(entry: {
     .catch(() => {});
 }
 
+export async function reinforceEngramPath(
+  memoryId: string, 
+  success: boolean, 
+  reward: number = 0.1, 
+  clusterId?: string, 
+  stableKey?: string,
+  metrics: { successRate?: number, cacheHitRate?: number, clusterHotness?: number, recency?: number, pathConfidence?: number } = {}
+) {
+  try {
+    const redis = getRedis();
+    
+    // Ranked reinforcement in Redis (Phase 8C)
+    // Store: engram:path:{stableKey} and engram:cluster:{clusterId}
+    if (redis) {
+      // New composite engramScore formula
+      const successRate = metrics.successRate || (success ? 1.0 : 0.0);
+      const cacheHitRate = metrics.cacheHitRate || 0.0;
+      const clusterHotness = metrics.clusterHotness || 0.0;
+      const recency = metrics.recency || 1.0; // default to max recency if just called
+      const pathConfidence = metrics.pathConfidence || 0.5;
+
+      const engramScore = 
+        (successRate * 0.35) + 
+        (cacheHitRate * 0.20) + 
+        (clusterHotness * 0.20) + 
+        (recency * 0.15) + 
+        (pathConfidence * 0.10);
+
+      const increment = success ? engramScore : -engramScore;
+      
+      if (clusterId) {
+        await redis.zincrby('engram:cluster_ranks', increment, clusterId);
+        await redis.set(`engram:cluster:${clusterId}:last_update`, Date.now());
+      }
+      if (stableKey) {
+        await redis.zincrby('engram:path_ranks', increment, stableKey);
+        await redis.set(`engram:path:${stableKey}:last_update`, Date.now());
+      }
+    }
+
+    // Basic RL reinforcement/decay in Postgres
+    const [existing] = await db
+      .select({ hotness: memoryRegistry.hotness })
+      .from(memoryRegistry)
+      .where(eq(memoryRegistry.memoryId, memoryId))
+      .limit(1);
+
+    if (existing) {
+      let currentHotness = existing.hotness ?? 0;
+      if (success) {
+        currentHotness = Math.min(1.0, currentHotness + reward);
+      } else {
+        currentHotness = Math.max(0.0, currentHotness - reward);
+      }
+
+      await db
+        .update(memoryRegistry)
+        .set({ hotness: currentHotness })
+        .where(eq(memoryRegistry.memoryId, memoryId));
+        
+      console.log(`🧠 Engram Reinforcement: ${memoryId} -> ${success ? 'REINFORCED' : 'DECAYED'} (score: ${currentHotness})`);
+    }
+  } catch (err) {
+    console.error(`Failed to reinforce engram path ${memoryId}`, err);
+  }
+}
+
 function persistEngramCard(entry: {
   memoryId: string;
   scope: string;
