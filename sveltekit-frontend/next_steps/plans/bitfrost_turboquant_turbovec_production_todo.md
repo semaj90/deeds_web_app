@@ -23,7 +23,7 @@ Gemma4 / RotorQuant GGUF
 Recent runtime state:
 
 ```text
-Endpoint: http://127.0.0.1:8080
+Endpoint: http://127.0.0.1:8090
 Mode: text-only
 Speculative decoding: enabled
 KV cache: q8_0 / q8_0
@@ -42,6 +42,50 @@ This is enough for:
 It is **not** the right runtime for image/video/VLM work when speculative decoding is enabled.
 
 Use Ollama or a separate non-draft VLM server for image/video analysis.
+
+Launcher/model discovery note:
+
+- `scripts/launch-turboquant.ps1` resolves the real repo-local runtime paths when the older fallbacks are missing:
+  - `tools\\llama-server\\llama-server.exe`
+  - `vendor\\models\\gemma4-legal.gguf`
+  - `vendor\\models\\mmproj-gemma4.gguf`
+- The missing-model case is covered by `npm run turbo:smoke`.
+- The smoke checks `/health` and `/v1/models` and confirms `gemma4-legal.gguf` is present.
+- TurboQuant launcher stabilization checklist:
+  - [x] fix launcher path resolution
+    - include `tools/llama-server/llama-server.exe`
+    - fallback to `vendor/models` and `models/`
+  - [x] add GGUF discovery logic
+    - `gemma4-legal.gguf`
+    - `iq4xs` variants
+    - `mmproj` fallback
+  - [x] confirm health check behavior
+    - launcher short-circuits if `:8090` is already alive
+  - [ ] add explicit mode flags
+    - `--force-restart`
+    - `--kill-existing`
+    - `--debug-path-resolution`
+  - [ ] add logging
+    - resolved binary path
+    - resolved model path
+    - mmproj used
+    - skip reason if already running
+  - [ ] add validation step
+    - verify GGUF exists before launch
+
+Retrieval / storage lane note:
+
+- `npm run dev:grpc` is the retrieval gRPC lane test. It starts TurboQuant, the Go retrieval service, and the frontend with gRPC enabled.
+- Qdrant stays split by protocol:
+  - REST `:6333` for HTTP health and direct collection inspection
+  - gRPC `:6334` for retrieval-service integration
+- Bifrost vector-store health checks currently expect the gRPC lane on `:6334`; switching that field to `:6333` breaks Bifrost startup in the live container.
+- DuckDB is offline-only reconciliation over exported artifacts. It does not power the online request path.
+- The `duckdb\smoke-duckdb.ps1` wrapper delegates to `scripts\duckdb\smoke-duckdb.ps1`, which reads `memory/exports/graph-refresh-manifest.json`, `cluster-cards.jsonl`, and `pathway-cards.jsonl`.
+- That smoke proves the export artifacts are readable; it does not mean the later phases are finished.
+- App OpenAI-shaped calls now use `BIFROST_OPENAI_BASE_URL`; the live default is `http://127.0.0.1:3040/v1` and `/openai/v1` stays an override-only deployment prefix.
+- The current Bifrost image logs `providers.turboquant_backend` as unsupported; keep TurboQuant routing app-side unless the gateway image adds provider support.
+- Bifrost custom plugin work is documented for WSL2 + Docker; do not use Windows host execution as the canonical path for plugin troubleshooting.
 
 ---
 
@@ -92,6 +136,8 @@ TurboQuant = speaks/generates
 TurboVec   = finds/sorts/matches
 ```
 
+For the full retrieval chain, see [docs/hyperrag-turbovec-rtx-pipeline.md](file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/docs/hyperrag-turbovec-rtx-pipeline.md). That pipeline is about context quality, not tok/sec: TurboVec 4-bit ANN prefilter, Qdrant dense search, 4D topology filtering, Atlas merge, and compact packet synthesis before Gemma4 decode.
+
 ---
 
 ### 2.3 BitFrost / NanoFlow-style cache
@@ -135,6 +181,171 @@ query
   → if miss: full retrieval
   → send compact prompt to TurboQuant
 ```
+
+### 2.4 Next cache follow-on: ACE Context Pack Cache
+
+The next documented cache task is not a rewrite of the storage layer. It is a compact retrieval-product cache that sits in front of Gemma4/Bifrost and stores only what the retriever needs to reuse.
+
+Use this shape:
+
+```text
+Redis hot pointer
+  → Postgres llm_context_cache audit row
+  → SeaweedFS or NVMe JSON snapshot
+  → compact ACE / NES packet to Gemma4 / Bifrost
+```
+
+Store only:
+
+```text
+chunkIds
+summaryIds
+sourceRefs
+graphPaths
+feature packets
+wiki cards
+tool policy
+retrieval trace
+nextSteps
+tsc diagnostics summary
+TurboVec candidates
+```
+
+Current implementation note:
+
+- `src/lib/server/cache/ace-context-pack-cache.ts` now exposes the ACE pack
+  builders and snapshot helpers.
+- `graphify:daily` now uses the `--tsc` index path, so TS diagnostics are
+  populated into `code:ts:diag:manifest` before pack reuse.
+- `npm run ace:context-pack:smoke` is available as the contract smoke for the
+  Redis pointer + local snapshot round-trip.
+- `npm run ace:retrieval-top-cache:smoke` covers the top-N query-hash retrieval
+  cache round-trip.
+- VS Code folder-open startup now includes `scripts/startup/run-ace-context-pack-startup.mjs`
+  so the cache layer is exercised alongside graphify and the service health check.
+- VS Code folder-open startup also includes `scripts/startup/run-ace-top-retrieval-startup.mjs`
+  so query-hash retrieval reuse is checked on open, not only during change-driven
+  incremental runs.
+- VS Code folder-open startup also includes `scripts/startup/run-feature-map-startup.mjs`
+  so feature labeling / consolidation smoke is checked on open.
+- The ACE incremental startup lane now runs the top-retrieval cache smoke too,
+  so startup validates both compact context reuse and query-hash result reuse.
+- The canonical startup ladder is WSL2/Docker-aware:
+  - Bifrost is a Docker/WSL2 lane for custom plugin/runtime work
+  - TurboQuant, VS Code task orchestration, and SvelteKit dev remain Windows-native lanes
+  - the startup orchestrator now writes `.tmp/ace-startup-status.json` as the compact rollup
+- The ACE startup wrapper writes `.tmp/ace-startup-status.json` on degraded runs
+  and surfaces the failing subsystem as `redis`, `postgres`, `snapshot`, or
+  `tscDiagnostics` instead of blocking workspace open.
+
+Do not store:
+
+```text
+raw KV tensors
+GPU pointers
+hidden reasoning
+native handles
+raw model memory
+```
+
+Naming transition note:
+
+- `MINIO_*` remains the legacy compatibility name in older code and docs
+- `SEAWEED_*` is the canonical new runtime naming in docs/env going forward
+- keep the existing MinIO-compatible SDK path until the SeaweedFS backend is fully normalized
+
+### 2.5 TurboVec / ACE storage contract
+
+Use the same retrieval-product shape across Postgres, Redis, and Qdrant. Keep
+the lanes separate:
+
+- Postgres stores durable JSONB metadata and audit truth.
+- Redis stores hot pointers, cluster membership, and short-lived packet state.
+- Qdrant stores semantic payload metadata for vector filtering and rerank.
+
+Postgres JSONB example:
+
+```json
+{
+  "embeddingModel": "embeddinggemma",
+  "dimension": 768,
+  "norm": 1.732,
+  "quantizer": "turbovec-4bit",
+  "rotationSeed": "rotorquant-v1",
+  "packedBytesRef": "redis:turbovec:vec:chunk_123",
+  "clusterId": "cluster_kag_12",
+  "manifold4": {
+    "x": 0.42,
+    "y": -0.13,
+    "z": 0.78,
+    "w": 0.21
+  },
+  "sourceRef": "src/lib/server/ai/kag-runner.ts#L10-L40"
+}
+```
+
+Redis keys:
+
+```text
+turbovec:vec:{chunkId}             packed bytes
+turbovec:norm:{chunkId}            original norm
+turbovec:cluster:{clusterId}       member ids
+turbovec:meta:{chunkId}            quantizer metadata
+ace:cluster:hot                    hot cluster sorted set
+ace:packet:{runId}                 final ACE packet
+semantic:bifrost:{model}:{prefixHash}:{suffixHash}
+llm_output:{queryHash}
+summary:cluster:{clusterId}
+ace:graph:edges:{nodeId}
+```
+
+Qdrant payload:
+
+```json
+{
+  "stable_key": "chunk_123",
+  "feature_family": "kag",
+  "cluster_id": "cluster_kag_12",
+  "manifold4": [0.42, -0.13, 0.78, 0.21],
+  "turbovec_ref": "redis:turbovec:vec:chunk_123",
+  "quantizer": "turbovec-4bit",
+  "source_ref": "src/lib/server/ai/kag-runner.ts#L10-L40"
+}
+```
+
+Rules:
+
+```text
+Do not use quaternion transforms for 768d TurboVec compression.
+Use random orthogonal rotation or Hadamard-style fast rotation for 768d compression.
+Use 4D / quaternion transforms only for visualization and routing surfaces.
+AVX2 / SIMD should handle bit-pack, unpack, and approximate dot-product prefilters.
+GPU should accelerate throughput, not define correctness.
+Autoencoder + SOM should produce topology signals, not semantic truth.
+```
+
+The practical blend score remains:
+
+```text
+finalScore =
+  0.35 * original768Cosine
++ 0.20 * turboVecApproxCosine
++ 0.20 * graphRelationScore
++ 0.15 * clusterHotness
++ 0.10 * manifold4Proximity
+```
+
+Cacheable retrieval products to keep in the ACE lane:
+
+- TypeScript diagnostics snapshots
+- `codebase-atlas.min.json` per commit
+- encoded64 TurboVec hot-file vectors
+- top-N retrieval results by query hash
+- per-file feature hash maps
+- cluster cards and pathway cards
+- authority-score top lists
+- KAG note manifests
+- ACE retrieval traces and next-step plans
 
 ---
 
@@ -762,6 +973,144 @@ Defer:
 - [ ] Google ADK
 - [ ] OpenAI hosted agents
 - [ ] direct cloud agent DB writers
+
+---
+
+### Phase 10B — TurboVec + Qdrant Optimization
+
+- [x] Find the actual gitignored GGUF path
+  - `vendor\models\gemma4-legal.gguf`
+  - `vendor\models\mmproj-gemma4.gguf`
+  - `models\gemma4-legal-iq4xs-direct.gguf`
+  - `models\mmproj-F16.gguf`
+- [x] Fix `ensure-llama-server.mjs` model candidate resolution
+- [ ] Normalize sidecar ports
+  - `8791 = atlas/OpenCode MCP`
+  - `8792 = TurboVec rerank sidecar`
+  - `8793 = RotorQuant helper`
+  - `8090 = llama-server Gemma4`
+  - `4222 = NATS`
+  - `6333 = Qdrant`
+  - `6379 = Redis`
+  - `5432/5434 = Postgres`
+- [x] Add `retrieval.turbovec.rerank` NATS subject
+- [x] Add fallback: TurboVec offline -> Qdrant order
+- [x] Enable Qdrant quantization before custom GPU search
+- [x] Add smoke query: `npm run ace:packet -- "where is auth?"`
+
+---
+
+### Phase 11 — cuVS / CUDA Sidecar Benchmark
+
+- [x] Create Python cuVS benchmark sidecar
+- [x] Do not use C++ N-API yet
+- [x] Add NATS subjects:
+  - `gpu.cuvs.search`
+  - `gpu.cuda.rank`
+- [x] Benchmark Qdrant vs cuVS on atlas chunks
+  - degraded runs are allowed
+  - the smoke must still write:
+    - Redis `cuvs:benchmark:latest`
+    - Redis `cuvs:benchmark:<hash>`
+    - Postgres `llm_context_cache`
+    - degraded reason
+- [x] Store benchmark traces in Redis/Postgres
+- [x] Keep cuVS behind feature flag: `ENABLE_CUVS_SEARCH=false`
+- [x] cuVS offline must not break retrieval
+
+---
+
+### Phase 12 — CUDA Streams / Tensor Bridge / RNN Experiments
+
+Experimental lane only. Do not block retrieval, and do not move into this work until the Phase 11 benchmark gate is writing Redis/Postgres traces and degraded reasons correctly.
+
+- [x] Export transition memory from Redis (Redis first; context_timeline fallback when Redis is empty)
+- [x] Build sequence memory dataset:
+  - `cache_miss -> atlas_lookup`
+  - `atlas_lookup -> qdrant_hit`
+  - `qdrant_hit -> graph_expand`
+  - `graph_expand -> turbovec_rerank`
+  - `turbovec_rerank -> gemma4_response`
+- [ ] Prototype CUDA/RNN reranker as experimental lane only
+- [ ] Add flag: `ENABLE_CUDA_RANKER=false`
+- [ ] Do not block retrieval on CUDA
+- [ ] Do not send raw prompts to CUDA lane; send IDs/scores only
+
+---
+
+### Phase 13 — Graph Synthesis + Feature MapReduce
+
+- [ ] Build feature graph from:
+  - paths
+  - imports
+  - env vars
+  - routes
+  - API endpoints
+  - DB tables
+  - MCP tools
+  - NATS subjects
+  - OpenCode tools
+  - package scripts
+- [ ] Add MapReduce summaries:
+  - chunk summary
+  - file summary
+  - folder summary
+  - feature summary
+  - system summary
+- [ ] Store summary layers in:
+  - `atlas_chunks.summary`
+  - `atlas_chunks.sub_summaries`
+  - `atlas_feature_cards`
+  - `atlas_feature_edges`
+- [x] Add command: `npm run atlas:graph:synthesize`
+- [ ] Output feature cards with:
+  - paths
+  - sourceRefs
+  - commands
+  - envVars
+  - qdrantTags
+  - chunkIds
+  - parentIds
+
+---
+
+### Phase 14 — DuckDB + LangGraph + Langfuse
+
+- [ ] Use DuckDB for offline analytics only
+- [ ] Export traces from Redis/Postgres to DuckDB
+- [ ] Add LangGraph run IDs to every ACE packet
+- [ ] Add Langfuse tracing for:
+  - retrieval events
+  - cache hits/misses
+  - Qdrant latency
+  - TurboVec rerank latency
+  - Gemma4 latency
+  - failureLookup retries
+- [ ] DuckDB and Langfuse observe the system
+- [ ] They do not sit in the request-critical correctness path
+
+---
+
+### Phase 15 — Feature Labeling + Pruning
+
+- [ ] Label every major feature:
+  - `auth`
+  - `ace-cache`
+  - `qdrant-search`
+  - `postgres-atlas`
+  - `opencode-tools`
+  - `sse-chat`
+  - `bifrost-gemma4`
+  - `turbovec-rerank`
+  - `langgraph-dag`
+  - `nats-sidecars`
+  - `feature-mapreduce`
+  - `browser-cache`
+- [ ] Detect orphaned files with no feature label
+- [ ] Detect duplicate feature implementations
+- [ ] Detect stale scripts
+- [ ] Detect stale docs
+- [ ] Add pruning report: `npm run atlas:feature:prune-report`
 
 ---
 

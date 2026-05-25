@@ -157,7 +157,9 @@
     "progress:log": "node scripts/ai-os/log-progress.mjs",
     "progress:query": "node scripts/ai-os/query-progress.mjs",
     "atlas:retry-index": "node scripts/ai-os/build-atlas-retry-index.mjs",
-    "atlas:rlm": "npx tsx scripts/atlas/rlm-condense-index.ts"
+    "atlas:rlm": "npx tsx scripts/atlas/rlm-condense-index.ts",
+    "graph:exports": "node scripts/atlas/generate-graph-exports.mjs",
+    "graph:exports:smoke": "npm run graph:exports && powershell -ExecutionPolicy Bypass -File duckdb\\smoke-duckdb.ps1"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

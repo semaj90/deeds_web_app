@@ -13,8 +13,8 @@ export async function buildACEPacket(query: string, ctx: any) {
   // We keep raw nodes only as fallback/debug.
   let clusteredContext = null;
   if (graphData.success && graphData.data) {
-    const rawNodes = graphData.data.nodes || [];
-    const topEdges = graphData.data.edges || [];
+    const rawNodes = (graphData.data as any).nodes || [];
+    const topEdges = (graphData.data as any).edges || [];
     
     // Group raw nodes into conceptual cluster summaries
     const clusters = rawNodes.reduce((acc: any, node: any) => {

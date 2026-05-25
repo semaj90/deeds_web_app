@@ -6,6 +6,7 @@
 
 import { db, pool } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { assertEmbeddingDimension, CANONICAL_EMBEDDING_DIMENSION } from './embedding-dimension-guard.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -45,7 +46,7 @@ const ALLOWED_FILTERS = new Set(['source', 'case_id', 'document_type', 'status']
 
 export class PgVectorService {
 	private readonly tableName = 'embeddings';
-	private readonly vectorDimension = 768;
+	private readonly vectorDimension = CANONICAL_EMBEDDING_DIMENSION;
 
 	/**
 	 * Cosine similarity search against pgvector
@@ -57,7 +58,7 @@ export class PgVectorService {
 		filters?: Record<string, string>
 	): Promise<PgVectorSearchResult[]> {
 		if (embedding.length !== this.vectorDimension) {
-			throw new Error(`Expected ${this.vectorDimension}-dim embedding, got ${embedding.length}`);
+			assertEmbeddingDimension(embedding, 'canonical_768d', this.vectorDimension);
 		}
 
 		const vectorStr = `[${embedding.join(',')}]`;
@@ -112,6 +113,7 @@ export class PgVectorService {
 			};
 
 			const vectorStr = `[${params.embedding.join(',')}]`;
+			assertEmbeddingDimension(params.embedding, 'canonical_768d', this.vectorDimension);
 
 			await pool.query(
 				`INSERT INTO ${this.tableName} (id, doc, vector)

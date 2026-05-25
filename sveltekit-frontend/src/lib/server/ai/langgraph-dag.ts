@@ -36,6 +36,7 @@ export type AgentState = {
   lastResult: string;
   success: boolean;
   suggestedFix?: string;
+  hasLookedUpFailure?: boolean;
 };
 
 // --- Utilities ---
@@ -169,7 +170,7 @@ async function failureLookupNode(state: AgentState): Promise<Partial<AgentState>
   const { reinforceEngramPath } = await import('./engram-registry.js');
   await reinforceEngramPath(`memory_${queryHash}`, false, 0.1, clusterId, stableKey);
 
-  return { suggestedFix: fix, success: false };
+  return { suggestedFix: fix, success: false, hasLookedUpFailure: true };
 }
 
 async function finalizeSuccessNode(state: AgentState): Promise<Partial<AgentState>> {
@@ -209,7 +210,11 @@ function evaluateExecution(state: AgentState) {
     return "finalizeSuccess";
   }
   
-  if (res.includes("duplicate_tool_call") || res.includes("Error:") || state.attempts >= state.maxAttempts) {
+  if (state.hasLookedUpFailure) {
+    return "finalizeFailure"; // We already tried fixing it once, exit now.
+  }
+  
+  if (res.includes("duplicate_tool_call") || res.includes("generic_answer") || res.includes("missing_sourceRefs") || res.includes("Error:") || state.attempts >= state.maxAttempts) {
     return "failureLookup";
   }
 
@@ -226,7 +231,8 @@ const workflow = new StateGraph<AgentState>({
     maxAttempts: { value: (a, b) => b ?? a },
     lastResult: { value: (a, b) => b ?? a },
     success: { value: (a, b) => b ?? a },
-    suggestedFix: { value: (a, b) => b ?? a }
+    suggestedFix: { value: (a, b) => b ?? a },
+    hasLookedUpFailure: { value: (a, b) => b ?? a }
   }
 });
 
@@ -241,11 +247,12 @@ workflow.setEntryPoint("synthesize");
 workflow.addConditionalEdges("synthesize", evaluateExecution, {
   synthesize: "synthesize",
   failureLookup: "failureLookup",
-  finalizeSuccess: "finalizeSuccess"
+  finalizeSuccess: "finalizeSuccess",
+  finalizeFailure: END
 });
 
 // @ts-expect-error TODO(TS-105): addEdge requires START/END node identifiers which changed in current version
-workflow.addEdge("failureLookup", END);
+workflow.addEdge("failureLookup", "synthesize");
 // @ts-expect-error TODO(TS-105): addEdge requires START/END node identifiers which changed in current version
 workflow.addEdge("finalizeSuccess", END);
 

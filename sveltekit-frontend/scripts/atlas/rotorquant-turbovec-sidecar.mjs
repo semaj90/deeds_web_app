@@ -3,7 +3,7 @@
  * rotorquant-turbovec-sidecar.mjs
  * Phase A: RotorQuant + TurboVec 4-bit ANN prefilter sidecar
  *
- * Exposes a fast ANN pre-filter HTTP service on port 8099.
+ * Exposes a fast ANN pre-filter HTTP service on port 8792.
  * Primary path: spawns turbovec_sidecar.py (Python + turbovec package).
  * Fallback:     JS-native 64d centroid cosine ANN from Redis keys:
  *                 gpu:autoencoder:centroids_64  (hash, field → "f1,f2,…")
@@ -18,7 +18,7 @@
  *                          resp: { clusterIds: number[], centroidScores: {id:score} }
  *
  * Usage:
- *   node scripts/atlas/rotorquant-turbovec-sidecar.mjs [--port 8099] [--no-python]
+ *   node scripts/atlas/rotorquant-turbovec-sidecar.mjs [--port 8792] [--no-python]
  */
 
 import { createServer } from 'node:http';
@@ -26,10 +26,10 @@ import { spawn }        from 'node:child_process';
 import Redis            from 'ioredis';
 
 // ── Config ─────────────────────────────────────────────────────────────────────
-const PORT         = Number(process.env.TURBOVEC_PORT ?? 8099);
+const PORT         = Number(process.env.TURBOVEC_PORT ?? 8792);
 const REDIS_URL    = process.env.REDIS_URL            ?? 'redis://127.0.0.1:6379';
 const PYTHON_EXE   = process.env.PYTHON_EXE           ?? 'python';
-const PYTHON_SIDE  = new URL('./turbovec_sidecar.py', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
+const PYTHON_SIDE  = new URL('../turbovec-sidecar.py', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
 const NO_PYTHON    = process.argv.includes('--no-python');
 const CENTROIDS_KEY = 'gpu:autoencoder:centroids_64';
 const WEIGHTS_KEY   = 'ace:autoencoder:weights';

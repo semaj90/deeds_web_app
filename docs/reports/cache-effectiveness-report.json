@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-05-24T17:10:29.064Z",
+  "total_runs_analyzed": 3,
+  "hit_rates": {
+    "llm_output": "0.00%",
+    "bifrost_prefix": "0.00%",
+    "centroid": "0.00%",
+    "graph_cache": "0.00%"
+  },
+  "latency_heuristics": {
+    "avg_non_cached_ms": 0,
+    "avg_cached_ms": 0,
+    "latency_saved_ms": 0
+  },
+  "fallback_count": 0
+}

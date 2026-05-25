@@ -612,6 +612,8 @@ export async function runChatCompletion(
     enableWebSearch: false,
     modelName: internalModel,
     modelQuant: runtime.profile,
+    kvQuant: `${runtime.kvCacheTypeK ?? 'q8_0'}/${runtime.kvCacheTypeV ?? 'q8_0'}`,
+    draftModel: canUseTurboQuantNow,
     backend: canUseTurboQuantNow ? 'turboquant' : 'bifrost',
     tokenizerHash: createHash('sha256')
       .update('embeddinggemma:latest:768')

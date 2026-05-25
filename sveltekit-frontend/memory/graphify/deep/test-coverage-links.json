@@ -505,6 +505,12 @@
   "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.ts": [
     "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts"
   ],
+  "sveltekit-frontend/src/lib/server/ace/tool-description.ts": [
+    "sveltekit-frontend/src/lib/server/ace/tool-description.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ace/variance-recovery.js": [
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery.test.ts"
+  ],
   "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.ts": [
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
@@ -612,8 +618,23 @@
     "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
     "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts"
   ],
+  "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.ts": [
+    "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/token-map/token-map-service.ts": [
+    "sveltekit-frontend/src/lib/server/token-map/token-map-service.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/token-map/token-map-types.ts": [
+    "sveltekit-frontend/src/lib/server/token-map/token-map-types.test.ts"
+  ],
   "sveltekit-frontend/src/lib/server/types/retrieval.ts": [
     "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/vector/embedding-dimension-guard.ts": [
+    "sveltekit-frontend/src/lib/server/vector/embedding-dimension-guard.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/vector/turbovec-contract.ts": [
+    "sveltekit-frontend/src/lib/server/vector/turbovec-contract.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.ts": [
     "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.test.ts"
@@ -2017,7 +2038,6 @@
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/chat/stream/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts",

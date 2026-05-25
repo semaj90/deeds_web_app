@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "command": {
+    "recover-graph": {
+      "description": "Recover graph export artifacts and validate DuckDB smoke",
+      "agent": "atlas-context",
+      "template": "Use the ACE recovery skill. Execute deterministic graph recovery only. Do not delegate. Discover files with rg --files -uu, patch fallback roots if needed, run npm run graph:exports, run DuckDB smoke, then write memory/agent-runs/latest-recovery.json."
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    ".opencode/skills/ace-recovery/SKILL.md"
+  ]
+}

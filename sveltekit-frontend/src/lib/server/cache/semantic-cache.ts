@@ -1,3 +1,46 @@
+// Lightweight semantic cache record schema and helpers
+// This module defines the TypeScript interface for a semantic cache record
+// used by Bifrost as the canonical shape stored in Qdrant / Postgres + Redis pointers.
+
+export interface SemanticCacheRecord {
+  queryHash: string;
+  semanticCacheKey: string;
+  model: string; // e.g., 'gemma4-rotorquant:latest'
+  provider: string; // e.g., 'bifrost/ollama' or 'turboquant/llama-server'
+  sourceRefs: string[]; // Postgres llm_context_cache ids or evidence ids
+  chunkIds: string[]; // canonical chunk ids referenced in the response
+  contextPackKey?: string; // 'ace:ctx:<hash>' pointer to Redis
+  responseHash: string; // content hash of the cached response
+  createdAt: string; // ISO timestamp
+  ttlSeconds?: number; // optional TTL for cache eviction
+  metadata?: Record<string, unknown>; // provider-specific metadata (latency, tokens)
+}
+
+// Placeholder functions — implement store/retrieve wiring to Qdrant + Postgres + Redis
+export async function storeSemanticCacheRecord(record: SemanticCacheRecord) {
+  // TODO: write to Postgres llm_context_cache (audit row)
+  // TODO: upsert into Qdrant collection `bifrost_semantic_cache` with vector = embedding
+  // TODO: write Redis pointer to `ace:semantic:<semanticCacheKey>` for quick lookup
+  return record;
+}
+
+export async function getSemanticCacheRecordByKey(
+  semanticCacheKey: string
+): Promise<SemanticCacheRecord | null> {
+  // TODO: check Redis pointer first, then fall back to Qdrant / Postgres
+  return null;
+}
+
+export function buildSemanticCacheKey(queryHash: string, model: string, provider: string) {
+  return `${queryHash}:${model}:${provider}`;
+}
+
+export default {
+  SemanticCacheRecord,
+  storeSemanticCacheRecord,
+  getSemanticCacheRecordByKey,
+  buildSemanticCacheKey,
+};
 import { db } from '../db/client.js';
 import { semanticCache } from '../db/schema/schema-semantic-cache.js';
 import { sql } from 'drizzle-orm';
@@ -16,14 +59,14 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     const res = await fetch('http://127.0.0.1:11434/api/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text })
+      body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),
     });
     if (!res.ok) throw new Error('Ollama not running');
     const data = await res.json();
     return data.embedding;
   } catch (e) {
     // Fallback stub if ollama is offline during test
-    console.warn("Ollama unavailable, using stub 768-dim embedding");
+    console.warn('Ollama unavailable, using stub 768-dim embedding');
     return new Array(768).fill(0.01);
   }
 }
@@ -31,15 +74,15 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 /**
  * Step 1-3 of the semantic cache flow.
  */
-export async function checkSemanticCache(prompt: string, modelName: string, threshold = 0.90) {
+export async function checkSemanticCache(prompt: string, modelName: string, threshold = 0.9) {
   const hash = crypto.createHash('sha256').update(prompt).digest('hex');
 
   // 1. Check exact match via hash
   const exact = await db.query.semanticCache.findFirst({
-    where: (cache, { eq }) => eq(cache.promptHash, hash)
+    where: (cache, { eq }) => eq(cache.promptHash, hash),
   });
   if (exact) {
-    console.log("[Semantic Cache] EXACT HIT:", hash);
+    console.log('[Semantic Cache] EXACT HIT:', hash);
     return exact.responseText;
   }
 
@@ -50,7 +93,7 @@ export async function checkSemanticCache(prompt: string, modelName: string, thre
   try {
     const redisHit = await searchRedisSemanticCache(getRedis(), embedding, modelName, threshold);
     if (redisHit?.response) {
-      console.log("[Semantic Cache] REDIS SEMANTIC HIT (score: " + redisHit.score + ")");
+      console.log('[Semantic Cache] REDIS SEMANTIC HIT (score: ' + redisHit.score + ')');
       return redisHit.response;
     }
   } catch (err) {
@@ -61,22 +104,25 @@ export async function checkSemanticCache(prompt: string, modelName: string, thre
   const vectorStr = `[${embedding.join(',')}]`;
 
   // PGVector cosine distance is <=>; Cosine similarity is 1 - distance
-  const results = await db.select({
-    id: semanticCache.id,
-    responseText: semanticCache.responseText,
-    similarity: sql<number>`1 - (${semanticCache.embedding} <=> ${vectorStr}::vector)`.as('similarity')
-  })
-  .from(semanticCache)
-  .where(sql`1 - (${semanticCache.embedding} <=> ${vectorStr}::vector) >= ${threshold}`)
-  .orderBy(sql`1 - (${semanticCache.embedding} <=> ${vectorStr}::vector) DESC`)
-  .limit(1);
+  const results = await db
+    .select({
+      id: semanticCache.id,
+      responseText: semanticCache.responseText,
+      similarity: sql<number>`1 - (${semanticCache.embedding} <=> ${vectorStr}::vector)`.as(
+        'similarity'
+      ),
+    })
+    .from(semanticCache)
+    .where(sql`1 - (${semanticCache.embedding} <=> ${vectorStr}::vector) >= ${threshold}`)
+    .orderBy(sql`1 - (${semanticCache.embedding} <=> ${vectorStr}::vector) DESC`)
+    .limit(1);
 
   if (results.length > 0) {
-    console.log("[Semantic Cache] SEMANTIC HIT (score: " + results[0].similarity + ")");
+    console.log('[Semantic Cache] SEMANTIC HIT (score: ' + results[0].similarity + ')');
     return results[0].responseText;
   }
 
-  console.log("[Semantic Cache] MISS");
+  console.log('[Semantic Cache] MISS');
   return null; // Call streamText()
 }
 
@@ -104,7 +150,7 @@ async function publishKarpathyEncodedStub(
   promptHash: string,
   embedding768: number[],
   modelName: string,
-  response: string,
+  response: string
 ) {
   try {
     const redis = getRedis();
@@ -137,14 +183,17 @@ export async function saveToSemanticCache(prompt: string, response: string, mode
   const hash = crypto.createHash('sha256').update(prompt).digest('hex');
   const embedding = await generateEmbedding(prompt);
 
-  await db.insert(semanticCache).values({
-    id: crypto.randomUUID(),
-    promptHash: hash,
-    promptText: prompt,
-    responseText: response,
-    embedding: embedding,
-    model: modelName
-  }).onConflictDoNothing(); // If exact hash already exists, ignore
+  await db
+    .insert(semanticCache)
+    .values({
+      id: crypto.randomUUID(),
+      promptHash: hash,
+      promptText: prompt,
+      responseText: response,
+      embedding: embedding,
+      model: modelName,
+    })
+    .onConflictDoNothing(); // If exact hash already exists, ignore
 
   // Phase 2 bridge: keep Redis semantic cache warm on misses.
   try {

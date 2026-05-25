@@ -106,6 +106,9 @@ export const ENV = {
   RETRIEVAL_HTTP_URL: privateEnv.RETRIEVAL_HTTP_URL ?? `http://${LOOPBACK_IP}:8100`,
   SDXL_SERVICE_URL: privateEnv.SDXL_SERVICE_URL ?? `http://${LOCALHOST}:8100`,
   RETRIEVAL_HTTP_ENABLED: (privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',
+  ENABLE_CUVS_SEARCH: (privateEnv.ENABLE_CUVS_SEARCH ?? 'false') === 'true',
+  CUVS_BENCH_URL: privateEnv.CUVS_BENCH_URL ?? `http://${LOOPBACK_IP}:8794`,
+  CUVS_BENCH_PORT: privateEnv.CUVS_BENCH_PORT ?? '8794',
   /** CHR97 cartridge gRPC (port 50059 — moved from 50055 which collides with go-search-service) */
   CHR97_GRPC_URL: privateEnv.CHR97_GRPC_URL ?? `${LOOPBACK_IP}:50059`,
   CHR97_GRPC_ENABLED: (privateEnv.CHR97_GRPC_ENABLED ?? 'false') === 'true',
@@ -167,6 +170,13 @@ export const ENV = {
   CUDA_DEVICE_ID: privateEnv.CUDA_DEVICE_ID !== undefined ? Number(privateEnv.CUDA_DEVICE_ID) : undefined,
   // Inference cascade: Bifrost L2 cache (:3040) → Reranker (:8090) → TurboQuant (:8080) → VLM (:8085) → LiteRT (:8070)
   BIFROST_URL: privateEnv.BIFROST_URL ?? `http://${LOOPBACK_IP}:3040`,
+  /**
+   * OpenAI-compatible Bifrost route base.
+   * Default matches the live gateway route. Override to /openai/v1 only if the
+   * deployment exposes that prefix.
+   */
+  BIFROST_OPENAI_BASE_URL:
+    privateEnv.BIFROST_OPENAI_BASE_URL ?? `http://${LOOPBACK_IP}:3040/v1`,
   TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
   // Alias — admin/inference-lane route references ENV.TURBOQUANT_URL; mirror BASE_URL.
   TURBOQUANT_URL: privateEnv.TURBOQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
@@ -245,7 +255,10 @@ export const ENV = {
   // Bifrost semantic cache gateway settings (URL already defined above in inference cascade)
   BIFROST_ENABLED: (privateEnv.BIFROST_ENABLED ?? 'false') === 'true',
   // OpenAI-compatible base URL (via Bifrost → Ollama) for pgai, LangChain, external tools
-  OPENAI_BASE_URL: privateEnv.OPENAI_BASE_URL ?? `http://${LOOPBACK_IP}:3040/v1`,
+  OPENAI_BASE_URL:
+    privateEnv.OPENAI_BASE_URL ??
+    privateEnv.BIFROST_OPENAI_BASE_URL ??
+    `http://${LOOPBACK_IP}:3040/v1`,
   OPENAI_API_KEY: privateEnv.OPENAI_API_KEY ?? 'dummy',
   // Auth secrets
   JWT_SECRET: privateEnv.JWT_SECRET ?? DEV.JWT_SECRET,

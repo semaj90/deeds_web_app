@@ -1,7 +1,7 @@
 {
   "ok": true,
-  "dryRun": false,
-  "applied": true,
+  "dryRun": true,
+  "applied": false,
   "current": {
     "name": "ollama",
     "keys": [],
@@ -21,7 +21,8 @@
     "send_back_raw_response": false,
     "store_raw_request_response": false,
     "provider_status": "active",
-    "status": "unknown"
+    "status": "unknown",
+    "config_hash": "300d2795bd23e6c483abfe643d822f10480ffb4c5d8399fe4b49171b14094950"
   },
   "desired": {
     "provider": "ollama",
@@ -33,6 +34,6 @@
       "retry_backoff_max": 10000
     }
   },
-  "reason": "Bifrost ollama provider updated successfully",
+  "reason": "Bifrost ollama provider already matches the desired config",
   "providerUrl": "http://127.0.0.1:3040"
 }

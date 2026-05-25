@@ -192,7 +192,7 @@ loop:
 
 ```powershell
 cd C:\Users\james\Videos\deeds-web-app\sveltekit-frontend
-$env:LLAMA_SERVER_PATH = "C:\Users\james\Desktop\llama-server-turboquant\llama-server.exe"
+$env:LLAMA_SERVER_PATH = "C:\Users\james\Videos\deeds-web-app\tools\llama-server\llama-server.exe"
 $env:TURBO_PROFILE     = "turboquant"   # or "stock" — see CLAUDE.md profiles
 $env:TURBO_CTX         = "65536"
 npm run turbo:start:detached

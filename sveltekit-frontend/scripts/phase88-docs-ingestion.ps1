@@ -172,14 +172,14 @@ $testQueries = @(
     "Bits UI Dialog Svelte 5"
 )
 
-$knowledgePlaneUrl = "http://127.0.0.1:8099"
+$knowledgePlaneUrl = "http://127.0.0.1:8792"
 $hasKnowledgePlane = $false
 
 try {
     Invoke-RestMethod -Uri "$knowledgePlaneUrl/health" -Method Get -TimeoutSec 2 -ErrorAction Stop | Out-Null
     $hasKnowledgePlane = $true
 } catch {
-    Write-Host "   ⚠️  Knowledge Plane not running (port 8099)" -ForegroundColor Yellow
+    Write-Host "   ⚠️  Knowledge Plane not running (port 8792)" -ForegroundColor Yellow
 }
 
 if ($hasKnowledgePlane) {

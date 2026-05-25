@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, integer, real, timestamp, jsonb } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 // Canonical document atlas used by deterministic sourceRef retrieval.
@@ -17,6 +17,16 @@ export const documentsAtlasEntries = pgTable('documents_atlas_entries', {
   featureFamilies: jsonb('feature_families').notNull().default(sql`'[]'::jsonb`),
   headings: jsonb('headings').notNull().default(sql`'[]'::jsonb`),
   metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+  somBmuRow: integer('som_bmu_row'),
+  somBmuCol: integer('som_bmu_col'),
+  auditScore: real('audit_score'),
+  dominantTags: jsonb('dominant_tags').default(sql`'[]'::jsonb`),
+  toon: jsonb('toon').default(sql`'{}'::jsonb`),
+  sourceRefs: jsonb('source_refs').default(sql`'[]'::jsonb`),
+  chunkIds: jsonb('chunk_ids').default(sql`'[]'::jsonb`),
+  clusterTags: jsonb('cluster_tags').default(sql`'[]'::jsonb`),
+  parentId: uuid('parent_id'),
+  featureFamily: text('feature_family'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
 });

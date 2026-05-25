@@ -465,6 +465,65 @@ const tools = {
         ]
       };
     }
+  },
+
+  'atlas.search': {
+    name: 'atlas.search',
+    description: 'Multi-query Qdrant + Postgres join for Parent Atlas',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Search query' }
+      },
+      required: ['query']
+    },
+    handler: async (args) => {
+      // Stub implementation for now
+      return {
+        success: true,
+        results: [],
+        sourceRefs: [],
+        commands: []
+      };
+    }
+  },
+
+  'atlas.lessons': {
+    name: 'atlas.lessons',
+    description: 'Retrieve lessons from previous runs and failures',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        failureType: { type: 'string', description: 'Type of failure' }
+      },
+      required: ['failureType']
+    },
+    handler: async (args) => {
+      return {
+        success: true,
+        lessons: []
+      };
+    }
+  },
+
+  'atlas.failureLookup': {
+    name: 'atlas.failureLookup',
+    description: 'Lookup missing context when generic answers fail validation',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        topic: { type: 'string', description: 'Missing topic' }
+      },
+      required: ['topic']
+    },
+    handler: async (args) => {
+      return {
+        success: true,
+        additionalContext: {},
+        sourceRefs: [],
+        commands: []
+      };
+    }
   }
 };
 

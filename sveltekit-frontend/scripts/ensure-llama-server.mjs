@@ -5,7 +5,7 @@ import 'dotenv/config';
  *
  * Ensures llama-server.exe is running on :8090 using the active local GGUF.
  * Prefers explicit env paths so the launcher follows the current Path B
- * runtime: stock llama.cpp CUDA + IQ4_XS model.
+ * runtime: stock llama.cpp CUDA + merged Gemma4 legal GGUF model.
  */
 
 import os from 'node:os';
@@ -25,13 +25,18 @@ const RETRIES = 60;
 
 const LLAMA_EXE_CANDIDATES = [
   process.env.LLAMA_SERVER_PATH,
+  path.join(projectRoot, 'tools', 'llama-server', 'llama-server.exe'),
   path.join(projectRoot, 'bin', 'llama-server.exe'),
+  path.join(projectRoot, 'vendor', 'llama-server', 'llama-server.exe'),
   'C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe',
 ].filter(Boolean);
 
 const MODEL_CANDIDATES = [
   process.env.ROTORQUANT_MODEL_PATH,
   process.env.TURBO_MODEL_PATH,
+  path.join(projectRoot, 'vendor', 'models', 'gemma4-legal.gguf'),
+  path.join(projectRoot, 'vendor', 'models', 'gemma4-rotorquant:latest.gguf'),
+  path.join(projectRoot, 'models', 'gemma4-legal-iq4xs-direct.gguf'),
   path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-iq4xs-direct.gguf'),
   path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-iq4xs.gguf'),
   path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-q4_k_m.gguf'),
@@ -39,6 +44,8 @@ const MODEL_CANDIDATES = [
 
 const MMPROJ_CANDIDATES = [
   process.env.MMPROJ_PATH,
+  path.join(projectRoot, 'models', 'mmproj-F16.gguf'),
+  path.join(projectRoot, 'vendor', 'models', 'mmproj-gemma4.gguf'),
   path.join(projectRoot, 'models', 'mmproj-BF16.gguf'),
 ].filter(Boolean);
 
@@ -105,6 +112,14 @@ export async function ensureLlamaServer() {
     return false;
   }
 
+  console.log(`[ensure-llama-server] Using binary: ${LLAMA_EXE}`);
+  console.log(`[ensure-llama-server] Using model: ${MODEL}`);
+  if (MMPROJ) {
+    console.log(`[ensure-llama-server] Using mmproj: ${MMPROJ}`);
+  } else {
+    console.log('[ensure-llama-server] No mmproj found; starting text-only');
+  }
+
   const args = [
     '-m',
     MODEL,
@@ -158,8 +173,9 @@ if (args.includes('--spawn')) {
 } else {
   const healthy = await isLlamaServerHealthy();
   console.log(healthy ? `llama-server: healthy (${BASE})` : `llama-server: not running (${BASE})`);
+  console.log(`[ensure-llama-server] binary=${LLAMA_EXE ?? 'n/a'}`);
+  console.log(`[ensure-llama-server] model=${MODEL ?? 'n/a'}`);
+  console.log(`[ensure-llama-server] mmproj=${MMPROJ ?? 'n/a'}`);
 }
-
-
 
 

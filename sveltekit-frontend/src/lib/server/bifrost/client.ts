@@ -1,5 +1,10 @@
 import { ENV } from '$lib/server/env.server.js';
 
+const BIFROST_OPENAI_BASE_URL = (
+  process.env.BIFROST_OPENAI_BASE_URL ?? ENV.BIFROST_OPENAI_BASE_URL
+).replace(/\/$/, '');
+const CHAT_COMPLETIONS_URL = `${BIFROST_OPENAI_BASE_URL}/chat/completions`;
+
 export interface BifrostChatMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string;
@@ -39,7 +44,7 @@ export async function* streamBifrostChatCompletions(
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
+    const response = await fetch(CHAT_COMPLETIONS_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

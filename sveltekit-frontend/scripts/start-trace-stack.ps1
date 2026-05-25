@@ -3,6 +3,8 @@
 # Full TRACE inference + indexing stack — detached background processes:
 #
 #   Tier 0 (pre-flight):   Langfuse :3030 health, Bifrost :3040 health
+#                          Bifrost custom plugin/runtime work is WSL2 + Docker
+#                          not Windows-native PowerShell
 #   Tier 1 (parallel):     llama-server.exe :8090  (TurboQuant + Gemma4 GGUF)
 #                          topology-search  :8101  (4D manifold search engine)
 #   Tier 2 (after Tier 1): TRACE MCP cluster :8788  (TypeScript agentic tools)
@@ -10,9 +12,10 @@
 #   Background (non-block):graphify:som — SOM centroid clustering refresh
 #
 # Artifacts written to memory/runs/<run_id>/:
-#   startup_health.json   — service reachability per tier
-#   trace_stack_pids.json — PIDs of launched background processes
-#   background_jobs.json  — async jobs kicked off (synthesis, SOM, etc.)
+#   startup_health.json    — service reachability per tier
+#   trace_stack_pids.json  — PIDs of launched background processes
+#   background_jobs.json   — async jobs kicked off (synthesis, SOM, etc.)
+#   .tmp/ace-startup-status.json — compact orchestration rollup
 #
 # Env overrides:
 #   LLAMA_SERVER_PATH   path to llama-server.exe
@@ -38,7 +41,9 @@ $Frontend = Join-Path $Root "sveltekit-frontend"
 
 $RunId  = (Get-Date -Format "yyyy-MM-ddTHH-mm-ss")
 $RunDir = Join-Path $Frontend "memory\runs\$RunId"
+$TmpDir = Join-Path $Frontend ".tmp"
 New-Item -ItemType Directory -Path $RunDir -Force | Out-Null
+New-Item -ItemType Directory -Path $TmpDir -Force | Out-Null
 
 # Mutable state accumulated during startup
 $health  = [ordered]@{}
@@ -49,6 +54,34 @@ function Write-RunArtifacts {
   $health  | ConvertTo-Json -Depth 4 | Set-Content -Path (Join-Path $RunDir "startup_health.json")   -Encoding UTF8
   $pids    | ConvertTo-Json -Depth 4 | Set-Content -Path (Join-Path $RunDir "trace_stack_pids.json") -Encoding UTF8
   $bgJobs  | ConvertTo-Json -Depth 4 | Set-Content -Path (Join-Path $RunDir "background_jobs.json")  -Encoding UTF8
+}
+
+function Write-AceStartupStatus {
+  $graphifySom = if ($bgJobs | Where-Object { $_.job -eq 'graphify:som' -and $_.pid }) { 'started' } else { 'failed' }
+  $graphSynthesize = if ($bgJobs | Where-Object { $_.job -eq 'graph:synthesize' -and $_.pid }) {
+    'started'
+  } elseif (Test-Path (Join-Path $Frontend "scripts\graph\synthesize-next-actions.mjs")) {
+    'failed'
+  } else {
+    'skipped'
+  }
+
+  $status = [ordered]@{
+    bifrost = if ($bifrostHealthy) { 'green' } else { 'yellow' }
+    retrievalGo = if ($retrievalUp) { 'green' } elseif ($retrievalPid) { 'yellow' } else { 'yellow' }
+    turboquant = if ($turboUp) { 'green' } else { 'red' }
+    topologySearch = if ($topoUp) { 'green' } elseif ($topoPid) { 'yellow' } else { 'red' }
+    traceMcp = if ($mcpUp) { 'green' } elseif ($mcpPid) { 'yellow' } else { 'red' }
+    sveltekit = if ($skProc?.Id) { 'yellow' } else { 'red' }
+    backgroundJobs = [ordered]@{
+      graphifySom = $graphifySom
+      graphSynthesize = $graphSynthesize
+    }
+    timestamp = (Get-Date -Format o)
+    runId = $RunId
+  }
+
+  $status | ConvertTo-Json -Depth 6 | Set-Content -Path (Join-Path $TmpDir "ace-startup-status.json") -Encoding UTF8
 }
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
@@ -365,7 +398,9 @@ Write-Host ""
 # ── Write artifacts ──────────────────────────────────────────────────────────
 
 Write-RunArtifacts
+Write-AceStartupStatus
 Write-Host "[Artifacts] Written to memory/runs/$RunId/" -ForegroundColor DarkGray
+Write-Host "  .tmp/ace-startup-status.json" -ForegroundColor DarkGray
 Write-Host "  startup_health.json   trace_stack_pids.json   background_jobs.json" -ForegroundColor DarkGray
 Write-Host ""
 

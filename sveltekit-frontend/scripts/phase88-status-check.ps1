@@ -25,9 +25,9 @@ Write-Host ""
 $allHealthy = $true
 
 # 1. Knowledge Plane Service
-Write-Host "🏥 Knowledge Plane (port 8099)" -ForegroundColor Cyan
+Write-Host "🏥 Knowledge Plane (port 8792)" -ForegroundColor Cyan
 try {
-    $kpHealth = Invoke-RestMethod -Uri "http://localhost:8099/health" -Method GET -TimeoutSec 3
+    $kpHealth = Invoke-RestMethod -Uri "http://localhost:8792/health" -Method GET -TimeoutSec 3
     Write-Host "   ✅ Running" -ForegroundColor Green
     if ($kpHealth.database) {
         Write-Host "      DB: $($kpHealth.database.current_database) as $($kpHealth.database.current_user)" -ForegroundColor Gray
@@ -167,7 +167,7 @@ try {
         context_lines = 3
     } | ConvertTo-Json
 
-    $docsResponse = Invoke-RestMethod -Uri "http://localhost:8099/svelte/docs/search" `
+    $docsResponse = Invoke-RestMethod -Uri "http://localhost:8792/svelte/docs/search" `
         -Method POST `
         -Body $docsBody `
         -ContentType 'application/json' `

@@ -11,6 +11,8 @@ export type ContextCacheIdentity = {
   queryHash: string;
   modelName: string;
   modelQuant: string;
+  kvQuant?: string;
+  draftModel?: boolean;
   backend: string;
   tokenizerHash: string;
   systemPromptHash: string;
@@ -41,6 +43,8 @@ export type CachedContextPacket = {
   backend: string;
   modelName: string;
   modelQuant: string;
+  kvQuant?: string;
+  draftModel?: boolean;
   tokenizerHash: string;
   systemPromptHash: string;
   toolDefinitionsHash: string;
@@ -119,6 +123,8 @@ export function buildContextCacheKey(identity: ContextCacheIdentity): string {
     toolDefinitionsHash: identity.toolDefinitionsHash,
     tokenAwarePacking: identity.tokenAwarePacking,
     userId: identity.userId ?? '',
+    ...(identity.kvQuant ? { kvQuant: identity.kvQuant } : {}),
+    ...(typeof identity.draftModel === 'boolean' ? { draftModel: identity.draftModel } : {}),
   };
   return `llmctx:${generateContextHash(stableStringify(normalized))}`;
 }
@@ -139,6 +145,8 @@ export function normalizeCachedContextPacket(pack: Partial<CachedContextPacket> 
     backend: pack.backend ?? 'unknown',
     modelName: pack.modelName ?? 'unknown',
     modelQuant: pack.modelQuant ?? 'unknown',
+    kvQuant: pack.kvQuant,
+    draftModel: pack.draftModel,
     tokenizerHash: pack.tokenizerHash ?? 'unknown',
     systemPromptHash: pack.systemPromptHash ?? 'unknown',
     toolDefinitionsHash: pack.toolDefinitionsHash ?? 'unknown',

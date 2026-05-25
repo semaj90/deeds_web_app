@@ -5,7 +5,7 @@ Write-Host "🔍 Testing KB-First Retrieval and Svelte 5 Grounding" -ForegroundC
 Write-Host "====================================================`n" -ForegroundColor Cyan
 
 $FastMCPUrl = "http://127.0.0.1:3002"
-$KnowledgePlaneUrl = "http://127.0.0.1:8099"
+$KnowledgePlaneUrl = "http://127.0.0.1:8792"
 $ErrorActionPreference = "Stop"
 
 # Test 1: Verify services are running

@@ -32,6 +32,27 @@ async function smoke() {
   await testService('go-retrieval-service', 'retrieval.service.ping');
   await testService('go-embedding-service', 'embedding.service.ping');
 
+  try {
+    const resp = await nc.request(
+      'retrieval.turbovec.rerank',
+      sc.encode(JSON.stringify({
+        vector: Array.from({ length: 64 }, (_, i) => (i + 1) / 64),
+        topK: 8,
+        topClusters: 3,
+        timeoutMs: 500,
+      })),
+      { timeout: 2000 }
+    );
+    const body = JSON.parse(sc.decode(resp.data));
+    if (body?.ok && Array.isArray(body?.search?.candidates)) {
+      console.log(`[Smoke] ✓ retrieval.turbovec.rerank responds (${body.search.candidates.length} candidates)`);
+    } else {
+      console.log('[Smoke] ✗ retrieval.turbovec.rerank returned an unexpected payload');
+    }
+  } catch (err) {
+    console.log(`[Smoke] ✗ retrieval.turbovec.rerank failed: ${err.message}`);
+  }
+
   // Verify timeout behavior
   try {
     await nc.request('non.existent.service', sc.encode('test'), { timeout: 500 });

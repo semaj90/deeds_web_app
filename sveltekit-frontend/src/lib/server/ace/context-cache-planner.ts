@@ -15,6 +15,8 @@ export type AceContextPlannerState = {
   cacheKey: string;
   modelName: string;
   modelQuant: string;
+  kvQuant: string;
+  draftModel: boolean;
   backend: string;
   tokenizerHash: string;
   systemPromptHash: string;
@@ -53,6 +55,8 @@ const PLANNER_STATE_KEYS: Array<keyof AceContextPlannerState> = [
   'queryHash',
   'modelName',
   'modelQuant',
+  'kvQuant',
+  'draftModel',
   'backend',
   'tokenizerHash',
   'systemPromptHash',
@@ -125,6 +129,8 @@ function toContextPack(
     backend: state.backend,
     modelName: state.modelName,
     modelQuant: state.modelQuant,
+    kvQuant: state.kvQuant,
+    draftModel: state.draftModel,
     tokenizerHash: state.tokenizerHash,
     systemPromptHash: state.systemPromptHash,
     toolDefinitionsHash: state.toolDefinitionsHash,
@@ -144,6 +150,8 @@ function toContextPack(
       queryHash: state.queryHash,
       modelName: state.modelName,
       modelQuant: state.modelQuant,
+      kvQuant: state.kvQuant,
+      draftModel: state.draftModel,
       backend: state.backend,
       tokenizerHash: state.tokenizerHash,
       systemPromptHash: state.systemPromptHash,
@@ -188,6 +196,8 @@ export function buildAceContextPlannerState(input: {
   filePath?: string;
   modelName?: string;
   modelQuant?: string;
+  kvQuant?: string;
+  draftModel?: boolean;
   backend?: string;
   tokenizerHash?: string;
   systemPromptHash?: string;
@@ -220,6 +230,8 @@ export function buildAceContextPlannerState(input: {
     queryHash: generateContextHash(input.query.trim()),
     modelName: input.modelName ?? 'gemma4-rotorquant:latest',
     modelQuant: input.modelQuant ?? 'iq4_xs',
+    kvQuant: input.kvQuant ?? 'q8_0/q8_0',
+    draftModel: input.draftModel ?? false,
     backend: input.backend ?? 'openai-facade',
     tokenizerHash: input.tokenizerHash ?? 'embeddinggemma:latest:768',
     systemPromptHash: input.systemPromptHash ?? generateContextHash('system:yorha-legal'),
@@ -243,6 +255,8 @@ export function buildAceContextPlannerState(input: {
     queryHash: state.queryHash,
     modelName: state.modelName,
     modelQuant: state.modelQuant,
+    kvQuant: state.kvQuant,
+    draftModel: state.draftModel,
     backend: state.backend,
     tokenizerHash: state.tokenizerHash,
     systemPromptHash: state.systemPromptHash,

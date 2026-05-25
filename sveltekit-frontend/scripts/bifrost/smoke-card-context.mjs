@@ -142,6 +142,7 @@ async function main() {
   mustExist('memory/cards/selected-cards.toon');
   const bundle = readJson('memory/cards/selected-cards.json');
   const toon = fs.readFileSync(rel('memory/cards/selected-cards.toon'), 'utf8').trim();
+  const compactPacket = JSON.stringify(buildToonPacket(bundle), null, 2);
 
   if (!toon) {
     throw new Error('memory/cards/selected-cards.toon is empty');
@@ -153,7 +154,7 @@ async function main() {
     messages: [
       {
         role: 'user',
-        content: toon,
+        content: compactPacket,
       },
     ],
     metadata: {
@@ -171,10 +172,12 @@ async function main() {
     'ollama/gemma4-rotorquant:latest',
     'ollama/gemma4-rotorquant:latest',
     'ollama/gemma4-rotorquant:latest',
-    'ollama/ssfdre38/gemma4-turbo:e4b',
   ];
 
-  const candidateModels = new Set([...preferredModelOrder, 'ollama/gemma4-rotorquant:latest']);
+  const candidateModels = new Set([
+    ...preferredModelOrder,
+    'ollama/gemma4-rotorquant:latest',
+  ]);
 
   try {
     const modelList = await fetch(`${BIFROST_URL}/v1/models`, {
@@ -212,6 +215,7 @@ async function main() {
       reportPath: REPORT ? REPORT_PATH : null,
       payload,
       toonPreview: toon.slice(0, 400),
+      packetPreview: compactPacket.slice(0, 400),
     };
     writeReport(unavailableResult);
 
@@ -238,6 +242,7 @@ async function main() {
       candidateModels: [...candidateModels].filter(Boolean),
       payload,
       toonPreview: toon.slice(0, 400),
+      packetPreview: compactPacket.slice(0, 400),
     };
     writeReport(failOpenProbe);
     console.log(JSON.stringify(failOpenProbe, null, 2));
@@ -339,6 +344,7 @@ async function main() {
               typeof parsed === 'string'
                 ? parsed.slice(0, 400)
                 : JSON.stringify(parsed).slice(0, 400),
+            packetPreview: compactPacket.slice(0, 400),
           };
           writeReport(successResult);
           console.log(JSON.stringify(successResult, null, 2));
@@ -387,6 +393,7 @@ async function main() {
       attempts: errors,
       payload,
       toonPreview: toon.slice(0, 400),
+      packetPreview: compactPacket.slice(0, 400),
     };
     writeReport(skippedResult);
     console.log(JSON.stringify(skippedResult, null, 2));
@@ -405,6 +412,7 @@ async function main() {
     attempts: errors,
     payload,
     toonPreview: toon.slice(0, 400),
+    packetPreview: compactPacket.slice(0, 400),
   };
   writeReport(strictFailure);
 

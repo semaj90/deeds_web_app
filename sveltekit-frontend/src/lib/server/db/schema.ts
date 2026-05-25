@@ -164,6 +164,11 @@ export {
 	type SummaryCard,
 	type NewSummaryCard
 } from './schema/summary-cards';
+export {
+	tokenMapCards,
+	type TokenMapCardRow,
+	type NewTokenMapCardRow
+} from './schema/token-map';
 // schema-search defines rgSearchRuns/rgSearchHits which also live in schema-postgres.
 // Export only the unique tables from schema-search to avoid barrel ambiguity.
 export { rgSearchResults, searchCentroids } from './schema-search';

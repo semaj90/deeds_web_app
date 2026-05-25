@@ -1,35 +1,32 @@
-param(
-    [string]$RepoRoot = 'c:\Users\james\Videos\deeds-web-app'
-)
+$ErrorActionPreference = "Stop"
 
-$ErrorActionPreference = 'Stop'
+$Root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+Set-Location $Root
 
-$defaultExe = Join-Path $env:LOCALAPPDATA 'Programs\DuckDB\duckdb.exe'
-$duckdbCmd = Get-Command duckdb -ErrorAction SilentlyContinue
-if ($duckdbCmd) {
-    $duckdbExe = $duckdbCmd.Source
-} elseif (Test-Path $defaultExe) {
-    $duckdbExe = $defaultExe
-} else {
-    throw 'DuckDB CLI not found. Run duckdb/install-duckdb-cli.ps1 first.'
+$DuckDb = "$env:LOCALAPPDATA\Programs\DuckDB\duckdb.exe"
+
+if (-not (Test-Path $DuckDb)) {
+  Write-Host "DuckDB CLI not found at $DuckDb"
+  exit 1
 }
 
-Write-Host "Using DuckDB CLI: $duckdbExe"
+Write-Host "Using DuckDB CLI: $DuckDb"
 
-& $duckdbExe ':memory:' -cmd "SELECT 42 AS duckdb_ok;" | Out-String | Write-Host
+& $DuckDb -c "SELECT 42 AS duckdb_ok;"
 
-$manifest = Join-Path $RepoRoot 'memory/exports/graph-refresh-manifest.json'
-$clusterCards = Join-Path $RepoRoot 'memory/exports/cluster-cards.jsonl'
-$pathwayCards = Join-Path $RepoRoot 'memory/exports/pathway-cards.jsonl'
+$Manifest = "memory\exports\graph-refresh-manifest.json"
+$ClusterCards = "memory\exports\cluster-cards.jsonl"
+$PathwayCards = "memory\exports\pathway-cards.jsonl"
 
-$targets = @($manifest, $clusterCards, $pathwayCards)
-foreach ($target in $targets) {
-    if (Test-Path $target) {
-        $size = (Get-Item $target).Length
-        Write-Host "FOUND $target ($size bytes)"
-    } else {
-        Write-Host "MISSING $target"
-    }
+$Required = @($Manifest, $ClusterCards, $PathwayCards)
+
+foreach ($File in $Required) {
+  if (-not (Test-Path $File)) {
+    Write-Host "Missing required export: $File"
+    exit 1
+  }
+
+  Write-Host "Found export: $File"
 }
 
-Write-Host 'DuckDB smoke complete (export-read mode only).'
+Write-Host "DuckDB smoke passed."

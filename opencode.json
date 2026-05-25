@@ -162,7 +162,7 @@
       "model": "gemma4-local/gemma4-local",
       "temperature": 0,
       "steps": 12,
-      "prompt": "Use MCP tools in this priority order: trace.kag_search or trace.atlas_query, turbovec for cosine ranking and chunk-id scoring, engram for memory, and langextract for citation and entity extraction. Always include chunk_ids and cluster_labels in synthesis context. Do not edit files without explicit approval. Do not mutate live Postgres schema.",
+      "prompt": "Use MCP tools in this priority order: trace.kag_search or trace.atlas_query, turbovec for cosine ranking and chunk-id scoring, engram for memory, and langextract for citation and entity extraction. Always include chunk_ids and cluster_labels in synthesis context. Do not edit files without explicit approval. Do not mutate live Postgres schema.\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -246,6 +246,19 @@
         "todowrite": "allow",
         "edit": "deny"
       }
+    },
+    "atlas-audit": {
+      "description": "Searches Parent Atlas/Qdrant before editing code",
+      "prompt": "Always retrieve sourceRefs first. Never answer architecture questions without file paths, line refs, and commands.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "bash": true,
+        "edit": false
+      }
+    },
+    "atlas-context": {
+      "prompt": "\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n"
     }
   },
   "instructions": [

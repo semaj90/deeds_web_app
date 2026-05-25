@@ -186,7 +186,10 @@ const { rows: authRows } = await pool.query(`
   FROM code_retrieval_chunks
   WHERE graph_authority_score IS NOT NULL
   GROUP BY file_path
-`);
+`).catch(err => {
+  console.warn(`  [atlas-index] authority score query failed: ${err.message} — continuing with 0 files`);
+  return { rows: [] };
+});
 const authMap = new Map(authRows.map(r => [r.file_path, parseFloat(r.ga) || 0]));
 console.log(`  authority scores:        ${authMap.size}`);
 
@@ -210,7 +213,10 @@ const { rows: agentsRows } = await pool.query(`
          array_length(qdrant_tags, 1) AS tags_n
   FROM agent_context_files
   ORDER BY length(directory_path) DESC
-`);
+`).catch(err => {
+  console.warn(`  [atlas-index] agent context query failed: ${err.message} — continuing with 0 directories`);
+  return { rows: [] };
+});
 const agentsDirs = agentsRows.map(r => ({
   dir:    r.directory_path,
   rules:  parseInt(r.rules_n,  10) || 0,

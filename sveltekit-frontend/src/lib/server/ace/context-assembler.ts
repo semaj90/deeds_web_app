@@ -1176,6 +1176,8 @@ export async function assembleACEContext(opts: {
   sectionTypes?: string[];
   modelName?: string;
   modelQuant?: string;
+  kvQuant?: string;
+  draftModel?: boolean;
   backend?: string;
   tokenizerHash?: string;
   systemPromptHash?: string;
@@ -1224,6 +1226,8 @@ export async function assembleACEContext(opts: {
         tokenAwarePacking: opts.tokenAwarePacking,
         modelName: opts.modelName,
         modelQuant: opts.modelQuant,
+        kvQuant: opts.kvQuant,
+        draftModel: opts.draftModel,
         backend: opts.backend,
         tokenizerHash: opts.tokenizerHash,
         systemPromptHash: opts.systemPromptHash,

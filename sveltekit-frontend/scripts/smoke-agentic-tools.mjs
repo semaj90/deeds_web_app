@@ -3,7 +3,7 @@
  * Smoke test for the agentic tool-calling stack.
  *
  * Checks (all read-only, <30s total):
- *   1. llama-server health   (TurboQuant :8090 or :8099)
+ *   1. llama-server health   (TurboQuant :8090)
  *   2. MCP server health     (stdio: checks the 29-tool list via http helper :8095 if available)
  *   3. web_search dispatch   (in-process: SearXNG probe, Qdrant fallback)
  *   4. trace_search dispatch (in-process: ACE multi-lens retrieval)
@@ -75,24 +75,16 @@ async function post(url, body) {
 
 console.log('\n[1] llama-server (TurboQuant)');
 try {
-  const ports = [8090, 8099];
-  let turboquantUp = false;
-  for (const port of ports) {
-    try {
-      const res = await get(`http://localhost:${port}/health`);
-      if (res.ok) {
-        const body = await res.json().catch(() => ({}));
-        ok(`port ${port} → ${body.status ?? 'ok'}`);
-        turboquantUp = true;
-        break;
-      }
-    } catch { /* try next port */ }
-  }
-  if (!turboquantUp)
+  const res = await get('http://localhost:8090/health');
+  if (res.ok) {
+    const body = await res.json().catch(() => ({}));
+    ok(`port 8090 → ${body.status ?? 'ok'}`);
+  } else {
     fail(
       'llama-server',
-      'unreachable on :8090 and :8099 — start with: llama-server.exe -m ... -c 65536 --port 8090'
+      'unreachable on :8090 — start with: llama-server.exe -m ... -c 65536 --port 8090'
     );
+  }
 } catch (e) {
   fail('llama-server check', e.message);
 }

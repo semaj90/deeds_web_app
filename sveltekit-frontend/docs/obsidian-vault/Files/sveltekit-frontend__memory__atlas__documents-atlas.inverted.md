@@ -1,0 +1,39 @@
+---
+type: "file"
+path: "sveltekit-frontend/memory/atlas/documents-atlas.inverted.json"
+aliases: ["documents-atlas.inverted.json","sveltekit-frontend/memory/atlas/documents-atlas.inverted.json"]
+clusterId: -1
+ext: ".json"
+lineCount: 529017
+pagerank: 0
+blend: 0
+isRoute: false
+isSvelteComp: false
+isTest: false
+hasAuth: false
+hasZod: false
+importCount: 0
+embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/memory/atlas/documents-atlas.inverted.json"
+last_updated_by_llm: "2026-05-24T16:40:21.009Z"
+ai-first: true
+confidence: "high"
+up: []
+imports: []
+tags: ["file","ext/json","t/json"]
+---
+
+# `sveltekit-frontend/memory/atlas/documents-atlas.inverted.json`
+## For future Claude
+> JSON data file
+pagerank:: 0.000000
+blend:: 0.000000
+lines:: 529017
+## Summary
+
+JSON data file
+
+## Backlinks (Dataview)
+```dataviewjs
+const cur = dv.current().file.path;
+dv.list(dv.pages().where(p => Array.isArray(p.imports) && p.imports.some(l => l && l.path === cur)).file.link);
+```

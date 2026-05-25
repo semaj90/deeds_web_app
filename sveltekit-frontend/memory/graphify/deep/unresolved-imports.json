@@ -81,6 +81,8 @@
     "deeds_labs/snapshots/2026-03-10/root-stale/tools/rank-svelte-errors.ts",
     "deeds_labs/snapshots/2026-03-10/root-stale/tools/update-codemod-readme.ts",
     "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_vite/getReset.ts",
+    "phase13graph_exportgenerator/generate-graph-exports.mjs",
+    "scripts/agent/log-subagent.mjs",
     "scripts/atlas/analyze-directory-roles.mjs",
     "scripts/atlas/append-soak-history.mjs",
     "scripts/atlas/audit-contract-map.mjs",
@@ -102,9 +104,11 @@
     "scripts/atlas/eval-lane-routing.mjs",
     "scripts/atlas/eval-messy-query-routing.mjs",
     "scripts/atlas/eval-real-world-routing.mjs",
+    "scripts/atlas/extract-log-signals.mjs",
     "scripts/atlas/extract-md-checkbox-features.ts",
     "scripts/atlas/fetch-llm-wiki-corpus.mjs",
     "scripts/atlas/generate-file-summaries.mjs",
+    "scripts/atlas/generate-graph-exports.mjs",
     "scripts/atlas/generate-soak-trends.mjs",
     "scripts/atlas/graphrag-kmeans-communities.mjs",
     "scripts/atlas/hermes-autotuner.mjs",
@@ -136,6 +140,7 @@
     "scripts/atlas/_atlas-utils.mjs",
     "scripts/audit-api-endpoints.mjs",
     "scripts/codebase-semantic-indexer.mjs",
+    "scripts/dev/patch-graph-export-roots.mjs",
     "scripts/docs-atlas/autoencode-som-clustering.mjs",
     "scripts/docs-atlas/build-llms-txt.mjs",
     "scripts/docs-atlas/chunk-programming-docs.mjs",
@@ -184,6 +189,7 @@
     "sveltekit-frontend/scripts/atlas/cache-task-distillates-redis.mjs",
     "sveltekit-frontend/scripts/atlas/enhance-graph-edges.mjs",
     "sveltekit-frontend/scripts/atlas/extract-cluster-aliases.mjs",
+    "sveltekit-frontend/scripts/atlas/generate-graph-exports.mjs",
     "sveltekit-frontend/scripts/atlas/hyperrag-couchdb-enrich.mjs",
     "sveltekit-frontend/scripts/atlas/hyperrag-cuda-stream.mjs",
     "sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs",
@@ -219,6 +225,11 @@
     "sveltekit-frontend/scripts/codebase-semantic-indexer.mjs",
     "sveltekit-frontend/scripts/comfyui/submit-workflow-smoke.mjs",
     "sveltekit-frontend/scripts/create-todo.mjs",
+    "sveltekit-frontend/scripts/db/apply-sidecar-migration.mjs",
+    "sveltekit-frontend/scripts/dev/apply-opencode-patches.mjs",
+    "sveltekit-frontend/scripts/dev/patch-graph-export-roots.mjs",
+    "sveltekit-frontend/scripts/dev/patch-opencode-agent-prompt.mjs",
+    "sveltekit-frontend/scripts/dev/recover-graph.mjs",
     "sveltekit-frontend/scripts/dev/run-with-analytics.mjs",
     "sveltekit-frontend/scripts/dev-everything.mjs",
     "sveltekit-frontend/scripts/diagnostics/playwright-live-recorder.mjs",
@@ -323,7 +334,9 @@
     "sveltekit-frontend/scripts/start-dev-stack.mjs",
     "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
     "sveltekit-frontend/scripts/startup/ensure-docker-gpu-stack.mjs",
+    "sveltekit-frontend/scripts/startup/run-ace-context-pack-startup.mjs",
     "sveltekit-frontend/scripts/startup/run-detached.mjs",
+    "sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs",
     "sveltekit-frontend/scripts/startup/warm-napi-libtorch-bridge.mjs",
     "sveltekit-frontend/scripts/startup-analysis.mjs",
     "sveltekit-frontend/scripts/startup-plan.mjs",
@@ -373,6 +386,7 @@
     "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
     "sveltekit-frontend/src/lib/server/ace/mini-active-cache.ts",
     "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery.js",
     "sveltekit-frontend/src/lib/server/admin/ai-chat-context.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/writers/markdown-writer.ts",
     "sveltekit-frontend/src/lib/server/ai/code-intel-service.ts",
@@ -527,6 +541,8 @@
     "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/eslint-plugin/src/rules/_.ts",
     "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_vite/getReset.ts",
     "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/vite/src/modes/global/build.ts",
+    "phase13graph_exportgenerator/generate-graph-exports.mjs",
+    "scripts/agent/log-subagent.mjs",
     "scripts/agents/generate-monorepo-agents.mjs",
     "scripts/atlas/analyze-directory-roles.mjs",
     "scripts/atlas/append-soak-history.mjs",
@@ -551,6 +567,7 @@
     "scripts/atlas/extract-md-checkbox-features.ts",
     "scripts/atlas/fetch-llm-wiki-corpus.mjs",
     "scripts/atlas/generate-file-summaries.mjs",
+    "scripts/atlas/generate-graph-exports.mjs",
     "scripts/atlas/generate-soak-trends.mjs",
     "scripts/atlas/graphrag-cluster-recommendations.mjs",
     "scripts/atlas/graphrag-kmeans-communities.mjs",
@@ -585,6 +602,7 @@
     "scripts/atlas/_atlas-utils.mjs",
     "scripts/audit-api-endpoints.mjs",
     "scripts/codebase-semantic-indexer.mjs",
+    "scripts/dev/patch-graph-export-roots.mjs",
     "scripts/docs-atlas/autoencode-som-clustering.mjs",
     "scripts/docs-atlas/build-llms-txt.mjs",
     "scripts/docs-atlas/chunk-programming-docs.mjs",
@@ -612,6 +630,8 @@
     "scripts/update-bits-ui-v2.mjs",
     "sveltekit-frontend/.tmp/mega-audit/generate-chunk2-report.mjs",
     "sveltekit-frontend/scratch/debug-mcp-indexes.mjs",
+    "sveltekit-frontend/scripts/ace/smoke-context-pack-cache.mjs",
+    "sveltekit-frontend/scripts/ace/smoke-top-retrieval-cache.mjs",
     "sveltekit-frontend/scripts/ace-policy-synthesis.ts",
     "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
     "sveltekit-frontend/scripts/agentic-batch-fix.mjs",
@@ -634,6 +654,7 @@
     "sveltekit-frontend/scripts/atlas/cache-task-distillates-redis.mjs",
     "sveltekit-frontend/scripts/atlas/enhance-graph-edges.mjs",
     "sveltekit-frontend/scripts/atlas/extract-cluster-aliases.mjs",
+    "sveltekit-frontend/scripts/atlas/generate-graph-exports.mjs",
     "sveltekit-frontend/scripts/atlas/hyperrag-couchdb-enrich.mjs",
     "sveltekit-frontend/scripts/atlas/hyperrag-cuda-stream.mjs",
     "sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs",
@@ -680,7 +701,13 @@
     "sveltekit-frontend/scripts/comfyui/smoke-comfyui-client.mjs",
     "sveltekit-frontend/scripts/comfyui/submit-workflow-smoke.mjs",
     "sveltekit-frontend/scripts/create-todo.mjs",
+    "sveltekit-frontend/scripts/datasets/seed-synthetic-contracts.mjs",
+    "sveltekit-frontend/scripts/db/apply-sidecar-migration.mjs",
     "sveltekit-frontend/scripts/deep-audit-ast.mjs",
+    "sveltekit-frontend/scripts/dev/apply-opencode-patches.mjs",
+    "sveltekit-frontend/scripts/dev/patch-graph-export-roots.mjs",
+    "sveltekit-frontend/scripts/dev/patch-opencode-agent-prompt.mjs",
+    "sveltekit-frontend/scripts/dev/recover-graph.mjs",
     "sveltekit-frontend/scripts/dev/run-with-analytics.mjs",
     "sveltekit-frontend/scripts/dev-everything.mjs",
     "sveltekit-frontend/scripts/diagnose/find-non-zod-tool-schemas.mjs",
@@ -753,6 +780,8 @@
     "sveltekit-frontend/scripts/kb/seed-notecards-qdrant.ts",
     "sveltekit-frontend/scripts/kb/train-lane-router.mjs",
     "sveltekit-frontend/scripts/kb/validate-knowledge-cards.mjs",
+    "sveltekit-frontend/scripts/legal/ingest-synthetic-contracts.mjs",
+    "sveltekit-frontend/scripts/legal/phase11-legal-contract-training.mjs",
     "sveltekit-frontend/scripts/lib/avx2-simdjson-bridge.mjs",
     "sveltekit-frontend/scripts/llms/build-llms-index.mjs",
     "sveltekit-frontend/scripts/llms/build-mini-active-cache.mjs",
@@ -814,12 +843,15 @@
     "sveltekit-frontend/scripts/smoke-pentagon-search.mjs",
     "sveltekit-frontend/scripts/smoke-stdio-mcp-tools.mjs",
     "sveltekit-frontend/scripts/smoke-trace-mcp-tools.mjs",
+    "sveltekit-frontend/scripts/smoke-turboquant-health.mjs",
     "sveltekit-frontend/scripts/smoke-video-ingest.mjs",
     "sveltekit-frontend/scripts/start-dev-stack.mjs",
     "sveltekit-frontend/scripts/start-trace-mcp-cluster.mjs",
     "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
     "sveltekit-frontend/scripts/startup/ensure-docker-gpu-stack.mjs",
+    "sveltekit-frontend/scripts/startup/run-ace-context-pack-startup.mjs",
     "sveltekit-frontend/scripts/startup/run-detached.mjs",
+    "sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs",
     "sveltekit-frontend/scripts/startup/warm-napi-libtorch-bridge.mjs",
     "sveltekit-frontend/scripts/startup-analysis.mjs",
     "sveltekit-frontend/scripts/startup-plan.mjs",
@@ -878,6 +910,7 @@
     "sveltekit-frontend/src/lib/server/ace/kag-cluster-source.ts",
     "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
     "sveltekit-frontend/src/lib/server/ace/mini-active-cache.ts",
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery.js",
     "sveltekit-frontend/src/lib/server/admin/ai-chat-context.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/loaders/activity.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/loaders/features.ts",
@@ -890,6 +923,7 @@
     "sveltekit-frontend/src/lib/server/ai/turbovec-ingest-sidecar.ts",
     "sveltekit-frontend/src/lib/server/atlas/atlas-loader.ts",
     "sveltekit-frontend/src/lib/server/atlas/rg-search-matrix.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-top-retrieval-cache.ts",
     "sveltekit-frontend/src/lib/server/evidence/video/transcript-service.ts",
     "sveltekit-frontend/src/lib/server/evidence/video/video-ingest-service.ts",
     "sveltekit-frontend/src/lib/server/evidence/video/vision-service.ts",
@@ -2164,6 +2198,7 @@
     "sveltekit-frontend/src/routes/+layout.svelte",
     "sveltekit-frontend/src/routes/admin/observability/+page.svelte",
     "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
+    "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte",
     "sveltekit-frontend/src/routes/debug/upload/+page.svelte",
     "sveltekit-frontend/src/types/components.d.ts",
     "sveltekit-frontend/src/types/ui-components.d.ts"
@@ -3892,7 +3927,8 @@
     "sveltekit-frontend/src/routes/(app)/terminal/+page.svelte",
     "sveltekit-frontend/src/routes/(dev)/cache-demo/+page.svelte",
     "sveltekit-frontend/src/routes/(dev)/demo/bits-ui/+page.svelte",
-    "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte"
+    "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
+    "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte"
   ],
   "EXTERNAL:$lib/components/ui/card/Card.svelte": [
     ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIAssistantPanel.svelte",
@@ -8550,6 +8586,7 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/worker/autotag/trigger/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/cases.disabled/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/cases.disabled/[id]/+server.ts",
+    "src/lib/server/ace/variance-recovery-schema.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/services/enhanced-api-client.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/(tools)_disabled/search/+page.server.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/v1/detective/patterns/+server.ts",
@@ -8567,6 +8604,7 @@
     "sveltekit-frontend/src/lib/server/ace/kag-cluster-source.ts",
     "sveltekit-frontend/src/lib/server/ace/mini-active-cache.ts",
     "sveltekit-frontend/src/lib/server/ace/self-prompt.ts",
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery-schema.ts",
     "sveltekit-frontend/src/lib/server/agent/autonomous-agent.ts",
     "sveltekit-frontend/src/lib/server/agent/tools/analyze-file.ts",
     "sveltekit-frontend/src/lib/server/agent/tools/analyze-imports.ts",
@@ -8785,7 +8823,6 @@
     "sveltekit-frontend/src/routes/api/chat/memory/settings/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/replay/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/chrrom/events/+server.ts",
     "sveltekit-frontend/src/routes/api/chrrom/precompute/+server.ts",
     "sveltekit-frontend/src/routes/api/chrrom/push/+server.ts",
@@ -9650,7 +9687,6 @@
     "sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.ts",
     "sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/versions/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/search/+server.ts",
     "sveltekit-frontend/src/routes/api/contextual/chat/+server.ts",
     "sveltekit-frontend/src/routes/api/document/[docId]/+server.ts",
@@ -10386,6 +10422,8 @@
     "sveltekit-frontend/scripts/test-db.ts",
     "sveltekit-frontend/scripts/test-kag-dag.ts",
     "sveltekit-frontend/scripts/test-pentagon-search.ts",
+    "sveltekit-frontend/scripts/tmp_check_columns.ts",
+    "sveltekit-frontend/scripts/tmp_query_metadata.ts",
     "sveltekit-frontend/scripts/verify-db-connection.ts",
     "sveltekit-frontend/scripts/verify-drizzle-runtime.ts",
     "sveltekit-frontend/src/hooks.server.ts",
@@ -10406,6 +10444,7 @@
     "sveltekit-frontend/src/lib/server/admin/subagent-orchestrator.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/loaders/activity.ts",
     "sveltekit-frontend/src/lib/server/agents/trace-subagent-orchestrator.ts",
+    "sveltekit-frontend/src/lib/server/ai/accelerator-capabilities.ts",
     "sveltekit-frontend/src/lib/server/ai/agentic-diagnostic.ts",
     "sveltekit-frontend/src/lib/server/ai/code-intel-service.ts",
     "sveltekit-frontend/src/lib/server/ai/engram-registry.ts",
@@ -10428,6 +10467,7 @@
     "sveltekit-frontend/src/lib/server/audit/evidence-audit.ts",
     "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
     "sveltekit-frontend/src/lib/server/auth.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
     "sveltekit-frontend/src/lib/server/cache/semantic-cache.ts",
     "sveltekit-frontend/src/lib/server/cases/caseSynthesis.ts",
     "sveltekit-frontend/src/lib/server/codeintel/fix-recommender.ts",
@@ -10471,6 +10511,7 @@
     "sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts",
     "sveltekit-frontend/src/lib/server/db/schema/state-constitution-sources.ts",
     "sveltekit-frontend/src/lib/server/db/schema/summary-cards.ts",
+    "sveltekit-frontend/src/lib/server/db/schema/token-map.ts",
     "sveltekit-frontend/src/lib/server/db/schema-ace.ts",
     "sveltekit-frontend/src/lib/server/db/schema-canvas.ts",
     "sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts",
@@ -10623,7 +10664,6 @@
     "sveltekit-frontend/src/routes/api/cases/[id]/timeline/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/memory/backfill/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/memory/search/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/annotations/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/collections/+server.ts",
@@ -13765,10 +13805,12 @@
     "sveltekit-frontend/src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
     "sveltekit-frontend/src/routes/admin/observability/+page.server.ts",
     "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
     "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
     "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
     "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
     "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
     "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
     "sveltekit-frontend/src/routes/api/ace/recommendations/+server.ts",
     "sveltekit-frontend/src/routes/api/ace/status/+server.ts",
@@ -14077,6 +14119,7 @@
     "sveltekit-frontend/src/routes/api/courtroom/models/+server.ts",
     "sveltekit-frontend/src/routes/api/dashboard/stats/+server.ts",
     "sveltekit-frontend/src/routes/api/db/health/+server.ts",
+    "sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts",
     "sveltekit-frontend/src/routes/api/detective/analyze/+server.ts",
     "sveltekit-frontend/src/routes/api/detective/connections/+server.ts",
     "sveltekit-frontend/src/routes/api/dev/login-demo/+server.ts",
@@ -15025,7 +15068,8 @@
     "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_vite/globalStylesPlugin.ts",
     "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_vite/index.ts",
     "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_vite/passPreprocessToSveltePlugin.ts",
-    "src/lib/server/ai/feature-map/feature-mapping-graph.ts"
+    "src/lib/server/ai/feature-map/feature-mapping-graph.ts",
+    "src/lib/server/observability/llm-stuck-logger.ts"
   ],
   "EXTERNAL:svelte/elements": [
     ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/bits/Button.svelte",
@@ -17713,7 +17757,6 @@
     "sveltekit-frontend/src/routes/api/chat/memory/settings/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/replay/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/chrrom/events/+server.ts",
     "sveltekit-frontend/src/routes/api/chrrom/precompute/+server.ts",
     "sveltekit-frontend/src/routes/api/chrrom/push/+server.ts",
@@ -19974,9 +20017,13 @@
     "scripts/apply-syntax-fixes.mjs",
     "scripts/atlas/append-llm-synthesis-jsonl.mjs",
     "scripts/atlas/audit-repo-hygiene.mjs",
+    "scripts/atlas/auto-schema-evolution.mjs",
+    "scripts/atlas/embed-atlas-cards.mjs",
     "scripts/atlas/generate-daily-todo.mjs",
     "scripts/atlas/smoke-llm-synthesis-event.mjs",
     "scripts/audit/md-task-audit.mjs",
+    "scripts/audit-legacy-atlas-fields.mjs",
+    "scripts/audit-retrieval-comparison.mjs",
     "scripts/batch-fix-ts-errors.mjs",
     "scripts/benchmark-migration.mjs",
     "scripts/build-documents-atlas.mjs",
@@ -19986,6 +20033,7 @@
     "scripts/codemod-svelte5-nonvoid-selfclose.mjs",
     "scripts/constitution-pipeline.mjs",
     "scripts/create-fix-matrix.mjs",
+    "scripts/dev/patch-opencode-agent-prompt.mjs",
     "scripts/error-resolution/services/validation-service.ts",
     "scripts/export-qdrant-384.mjs",
     "scripts/fix-binary-encoding.mjs",
@@ -20006,6 +20054,7 @@
     "scripts/graph/build-clusters.mjs",
     "scripts/graph/build-deep-relations-jsonl.mjs",
     "scripts/graph-analysis.mjs",
+    "scripts/health-check-sidecars.mjs",
     "scripts/index-lawpdfs-to-rag.ts",
     "scripts/migrate-codemod-memories.mjs",
     "scripts/migrate-lucide-to-unocss.mjs",
@@ -20023,12 +20072,16 @@
     "scripts/phase90-sync-evidence-schema.mjs",
     "scripts/qdrant-upsert-atlas.mjs",
     "scripts/redis/cache-graph-relations.mjs",
+    "scripts/reports/cache-effectiveness-report.mjs",
     "scripts/reports/cache-hit-protocol-report.mjs",
+    "scripts/reports/dynamic-import-report.mjs",
+    "scripts/reports/synthesis-log-report.mjs",
     "scripts/scan-feature-metadata.mjs",
     "scripts/sync-to-obsidian.js",
     "scripts/syntax-repair-cli.mjs",
     "scripts/test-core-routes.mjs",
     "scripts/test-docs-retrieval.mjs",
+    "scripts/test-phase8-loop.mjs",
     "scripts/test-route-scanner.ts",
     "scripts/test-single-file-fix.mjs",
     "scripts/test-ts1005-fix.mjs",
@@ -20052,6 +20105,9 @@
     "sveltekit-frontend/deeds_labs/archived/phase72/routeGraphAdapter.ts",
     "sveltekit-frontend/run_sql.mjs",
     "sveltekit-frontend/scratch/debug_g15.js",
+    "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+    "sveltekit-frontend/scripts/ace/build-packet.mjs",
+    "sveltekit-frontend/scripts/ace/export-browser-cache.mjs",
     "sveltekit-frontend/scripts/agent-diagnose.mjs",
     "sveltekit-frontend/scripts/ast-repair.ts",
     "sveltekit-frontend/scripts/backup-consolidation/analyze-bulk-delete.mjs",
@@ -20115,6 +20171,9 @@
     "sveltekit-frontend/scripts/propagate-manifold4-db.mjs",
     "sveltekit-frontend/scripts/reachability-analysis.ts",
     "sveltekit-frontend/scripts/repair-services.ts",
+    "sveltekit-frontend/scripts/reports/cache-effectiveness-report.mjs",
+    "sveltekit-frontend/scripts/reports/dynamic-import-report.mjs",
+    "sveltekit-frontend/scripts/reports/synthesis-log-report.mjs",
     "sveltekit-frontend/scripts/run-audit-rg.mjs",
     "sveltekit-frontend/scripts/run-authority-scores.mjs",
     "sveltekit-frontend/scripts/run-karpathy-hook.mjs",
@@ -20128,6 +20187,7 @@
     "sveltekit-frontend/scripts/smoke-trace-full-loop.mjs",
     "sveltekit-frontend/scripts/subsystem-classifier.ts",
     "sveltekit-frontend/scripts/test-migration.ts",
+    "sveltekit-frontend/scripts/test-phase11-training.mjs",
     "sveltekit-frontend/scripts/tests/deep-directory-audit.mjs",
     "sveltekit-frontend/scripts/tests/fix-phantom-icons.mjs",
     "sveltekit-frontend/scripts/tests/generate-codebase-directory-map.mjs",
@@ -20177,8 +20237,11 @@
     "sveltekit-frontend/src/lib/server/workers/video-vlm-processor.ts",
     "sveltekit-frontend/src/lib/server/yolo.ts",
     "sveltekit-frontend/src/lib/workers/ast-graph-worker.mjs",
+    "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/analysis/page-context/+server.ts",
     "sveltekit-frontend/src/routes/api/audio/upload/+server.ts",
+    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/analyze/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/related/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/route-components/+server.ts",
@@ -20187,6 +20250,7 @@
     "sveltekit-frontend/src/routes/api/ingest-constitution/+server.ts",
     "sveltekit-frontend/src/routes/api/library/ingest-codebase-docs/+server.ts",
     "sveltekit-frontend/src/routes/api/library/ingest-dev-docs/+server.ts",
+    "sveltekit-frontend/test-phase8-loop.mjs",
     "sveltekit-frontend/tests/ai-chat-live.spec.ts",
     "sveltekit-frontend/tests/e2e/chat.spec.ts",
     "sveltekit-frontend/tests/e2e/client-inference.spec.ts",
@@ -21273,11 +21337,17 @@
     "scripts/apply-syntax-fixes.mjs",
     "scripts/atlas/append-llm-synthesis-jsonl.mjs",
     "scripts/atlas/audit-repo-hygiene.mjs",
+    "scripts/atlas/auto-schema-evolution.mjs",
     "scripts/atlas/check-db-types.mjs",
+    "scripts/atlas/chunk-repo.ts",
+    "scripts/atlas/embed-atlas-cards.mjs",
     "scripts/atlas/generate-daily-todo.mjs",
     "scripts/atlas/graphify-cluster-summaries.mjs",
+    "scripts/atlas/index-atlas-card.mjs",
     "scripts/atlas/smoke-llm-synthesis-event.mjs",
     "scripts/audit/md-task-audit.mjs",
+    "scripts/audit-legacy-atlas-fields.mjs",
+    "scripts/audit-retrieval-comparison.mjs",
     "scripts/batch-fix-ts-errors.mjs",
     "scripts/benchmark-migration.mjs",
     "scripts/build-documents-atlas.mjs",
@@ -21287,6 +21357,7 @@
     "scripts/codemod-svelte5-nonvoid-selfclose.mjs",
     "scripts/constitution-pipeline.mjs",
     "scripts/create-fix-matrix.mjs",
+    "scripts/dev/patch-opencode-agent-prompt.mjs",
     "scripts/fix-binary-encoding.mjs",
     "scripts/fix-file-3-CaseScoringServiceGrpc.mjs",
     "scripts/fix-files-13-15-16-batch.mjs",
@@ -21302,8 +21373,10 @@
     "scripts/fix-security-service.mjs",
     "scripts/fix-tasks-json-v2.mjs",
     "scripts/fix-tasks-json.mjs",
+    "scripts/graph/backfill-synthesis-manifold4.mjs",
     "scripts/graph/build-clusters.mjs",
     "scripts/graph/build-deep-relations-jsonl.mjs",
+    "scripts/health-check-sidecars.mjs",
     "scripts/index-lawpdfs-to-rag.ts",
     "scripts/migrate-lucide-to-unocss.mjs",
     "scripts/parse-build-errors.mjs",
@@ -21321,13 +21394,17 @@
     "scripts/qdrant-upsert-atlas.mjs",
     "scripts/rabbitmq-ingest.js",
     "scripts/redis/cache-graph-relations.mjs",
+    "scripts/reports/cache-effectiveness-report.mjs",
     "scripts/reports/cache-hit-protocol-report.mjs",
+    "scripts/reports/dynamic-import-report.mjs",
+    "scripts/reports/synthesis-log-report.mjs",
     "scripts/safe-migrate.mjs",
     "scripts/scan-feature-metadata.mjs",
     "scripts/sync-to-obsidian.js",
     "scripts/syntax-repair-cli.mjs",
     "scripts/test-core-routes.mjs",
     "scripts/test-docs-retrieval.mjs",
+    "scripts/test-phase8-loop.mjs",
     "scripts/test-route-scanner.ts",
     "scripts/test-ts1005-fix.mjs",
     "scripts/tests/audit-zod-validation.mjs",
@@ -21355,6 +21432,9 @@
     "src/lib/server/ai/feature-map/scan-directory-node.ts",
     "sveltekit-frontend/deeds_labs/archived/phase72/routeGraphAdapter.ts",
     "sveltekit-frontend/scratch/check-db.mjs",
+    "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+    "sveltekit-frontend/scripts/ace/build-packet.mjs",
+    "sveltekit-frontend/scripts/ace/export-browser-cache.mjs",
     "sveltekit-frontend/scripts/agent-diagnose.mjs",
     "sveltekit-frontend/scripts/ast-repair.ts",
     "sveltekit-frontend/scripts/backup-consolidation/analyze-bulk-delete.mjs",
@@ -21370,14 +21450,17 @@
     "sveltekit-frontend/scripts/batch-merger-fixer-v2.mjs",
     "sveltekit-frontend/scripts/benchmark-whisper-cuda.mjs",
     "sveltekit-frontend/scripts/build-hypergraph-stream.mjs",
+    "sveltekit-frontend/scripts/cache/invalidate-stale-cache.mjs",
     "sveltekit-frontend/scripts/check-library.js",
     "sveltekit-frontend/scripts/classify-unreachable.ts",
     "sveltekit-frontend/scripts/codebase-semantic-indexer.ts",
     "sveltekit-frontend/scripts/couchdb-export-graph-jsonl.mjs",
     "sveltekit-frontend/scripts/count-all.js",
+    "sveltekit-frontend/scripts/diagnostics/audit-legacy-atlas-fields.mjs",
     "sveltekit-frontend/scripts/diff/applier.mjs",
     "sveltekit-frontend/scripts/diff/generator.mjs",
     "sveltekit-frontend/scripts/diff/reporter.mjs",
+    "sveltekit-frontend/scripts/engram/upgrade-engram-ranker.mjs",
     "sveltekit-frontend/scripts/enrich-wiki-with-audit-signals.mjs",
     "sveltekit-frontend/scripts/export-embeddings-qdrant.mjs",
     "sveltekit-frontend/scripts/export-langfuse-jsonl.mjs",
@@ -21388,6 +21471,7 @@
     "sveltekit-frontend/scripts/fix-missing-imports-enhanced.ts",
     "sveltekit-frontend/scripts/fix-missing-imports.ts",
     "sveltekit-frontend/scripts/fix-type-imports-usage.ts",
+    "sveltekit-frontend/scripts/graph/backfill-synthesis-manifold4.mjs",
     "sveltekit-frontend/scripts/graph/synthesize-semantic-edges.mjs",
     "sveltekit-frontend/scripts/graphify-cluster-pagerank.mjs",
     "sveltekit-frontend/scripts/graphify-deep-imports.mjs",
@@ -21420,6 +21504,9 @@
     "sveltekit-frontend/scripts/reachability-analysis.ts",
     "sveltekit-frontend/scripts/reembed-missing-chunks.ts",
     "sveltekit-frontend/scripts/repair-services.ts",
+    "sveltekit-frontend/scripts/reports/cache-effectiveness-report.mjs",
+    "sveltekit-frontend/scripts/reports/dynamic-import-report.mjs",
+    "sveltekit-frontend/scripts/reports/synthesis-log-report.mjs",
     "sveltekit-frontend/scripts/run-authority-scores.mjs",
     "sveltekit-frontend/scripts/run-karpathy-hook.mjs",
     "sveltekit-frontend/scripts/run-tensor-topology-mapreduce.ts",
@@ -21472,6 +21559,7 @@
     "sveltekit-frontend/src/lib/server/analysis/media-processing.ts",
     "sveltekit-frontend/src/lib/server/analytics/grpo-exporter.ts",
     "sveltekit-frontend/src/lib/server/api-metadata-extractor.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
     "sveltekit-frontend/src/lib/server/db/legal-db-init.ts",
     "sveltekit-frontend/src/lib/server/db/migrate.ts",
     "sveltekit-frontend/src/lib/server/db/unified-client.ts",
@@ -21519,11 +21607,15 @@
     "sveltekit-frontend/src/mcp/tools/video-analysis.ts",
     "sveltekit-frontend/src/routes/(app)/demos/agentic-errors/analysis/+page.server.ts",
     "sveltekit-frontend/src/routes/(app)/evidence/upload/+page.server.ts",
+    "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/admin/routes/+server.ts",
     "sveltekit-frontend/src/routes/api/admin/seed-knowledge/+server.ts",
     "sveltekit-frontend/src/routes/api/analysis/page-context/+server.ts",
     "sveltekit-frontend/src/routes/api/analyze-file/+server.ts",
     "sveltekit-frontend/src/routes/api/audio/upload/+server.ts",
+    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase/auto-research/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase/index/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/analyze/+server.ts",
@@ -21547,6 +21639,7 @@
     "sveltekit-frontend/src/routes/api/system/phase78/apply-patch/+server.ts",
     "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts",
     "sveltekit-frontend/src/routes/api/whisper/transcribe/+server.ts",
+    "sveltekit-frontend/test-phase8-loop.mjs",
     "sveltekit-frontend/tests/ai-chat-live.spec.ts",
     "sveltekit-frontend/tests/cases-page.spec.ts",
     "sveltekit-frontend/tests/e2e/chat.spec.ts",
@@ -22121,6 +22214,7 @@
     "scripts/fix-files-9-11-12-batch.mjs",
     "scripts/fix-tasks-json-v2.mjs",
     "scripts/fix-tasks-json.mjs",
+    "scripts/graph/backfill-synthesis-manifold4.mjs",
     "scripts/graph/build-clusters.mjs",
     "scripts/graph/build-deep-relations-jsonl.mjs",
     "scripts/index-lawpdfs-to-rag.ts",
@@ -22133,6 +22227,8 @@
     "scripts/phase46-indexer.mjs",
     "scripts/phase90-sync-evidence-schema.mjs",
     "scripts/redis/cache-graph-relations.mjs",
+    "scripts/reports/dynamic-import-report.mjs",
+    "scripts/reports/synthesis-log-report.mjs",
     "scripts/syntax-repair-cli.mjs",
     "scripts/test-core-routes.mjs",
     "scripts/test-ts1005-fix.mjs",
@@ -22162,12 +22258,16 @@
     "sveltekit-frontend/scripts/backup-consolidation/show-diff-samples.mjs",
     "sveltekit-frontend/scripts/backup-consolidation/tests/run-all-tests.mjs",
     "sveltekit-frontend/scripts/batch-merger-fixer-v2.mjs",
+    "sveltekit-frontend/scripts/cache/invalidate-stale-cache.mjs",
     "sveltekit-frontend/scripts/count-all.js",
+    "sveltekit-frontend/scripts/diagnostics/audit-legacy-atlas-fields.mjs",
     "sveltekit-frontend/scripts/diff/applier.mjs",
     "sveltekit-frontend/scripts/diff/generator.mjs",
     "sveltekit-frontend/scripts/diff/reporter.mjs",
+    "sveltekit-frontend/scripts/engram/upgrade-engram-ranker.mjs",
     "sveltekit-frontend/scripts/export-langfuse-jsonl.mjs",
     "sveltekit-frontend/scripts/export-qlora-dataset.mjs",
+    "sveltekit-frontend/scripts/graph/backfill-synthesis-manifold4.mjs",
     "sveltekit-frontend/scripts/graph/synthesize-semantic-edges.mjs",
     "sveltekit-frontend/scripts/graphify-cluster-pagerank.mjs",
     "sveltekit-frontend/scripts/graphify-deep-imports.mjs",
@@ -22183,6 +22283,9 @@
     "sveltekit-frontend/scripts/mcp/svelte5-migration-tools.mjs",
     "sveltekit-frontend/scripts/mcp/upload-svelte-docs-to-minio.mjs",
     "sveltekit-frontend/scripts/reembed-missing-chunks.ts",
+    "sveltekit-frontend/scripts/reports/cache-effectiveness-report.mjs",
+    "sveltekit-frontend/scripts/reports/dynamic-import-report.mjs",
+    "sveltekit-frontend/scripts/reports/synthesis-log-report.mjs",
     "sveltekit-frontend/scripts/run-authority-scores.mjs",
     "sveltekit-frontend/scripts/scale-turbovec-state.mjs",
     "sveltekit-frontend/scripts/seed-feature-atlas.mjs",
@@ -22212,6 +22315,7 @@
     "sveltekit-frontend/scripts/tests/test-production-readiness.mjs",
     "sveltekit-frontend/scripts/tests/test-screenshots.mjs",
     "sveltekit-frontend/scripts/turboquant/bench-model.mjs",
+    "sveltekit-frontend/src/lib/server/ai/agent-worker.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder-session.ts",
     "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
     "sveltekit-frontend/src/lib/server/gpu/mapreduce-runner.mjs",
@@ -23646,9 +23750,11 @@
     "scripts/error-resolution/services/error-scanner.ts",
     "scripts/error-resolution/services/validation-service.ts",
     "scripts/graph/build-deep-relations-jsonl.mjs",
+    "scripts/health-check-sidecars.mjs",
     "scripts/migrate-lucide-to-unocss.mjs",
     "scripts/phase2-run-all-fixes.mjs",
     "scripts/phase3-file-inventory.mjs",
+    "scripts/reports/cache-effectiveness-report.mjs",
     "scripts/safe-migrate.mjs",
     "scripts/scan-feature-metadata.mjs",
     "scripts/syntax-repair-cli.mjs",
@@ -23686,6 +23792,7 @@
     "sveltekit-frontend/src/lib/server/analysis/media-processing.ts",
     "sveltekit-frontend/src/lib/server/analytics/codebase-research.ts",
     "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
     "sveltekit-frontend/src/lib/server/ff1/agent/tool-registry.ts",
     "sveltekit-frontend/src/lib/server/ff1/audit/diagnostic-collector.ts",
     "sveltekit-frontend/src/lib/server/ff1/cli/ff1-audit.ts",
@@ -23700,7 +23807,11 @@
     "sveltekit-frontend/src/lib/server/workers/video-vlm-processor.ts",
     "sveltekit-frontend/src/lib/server/yolo.ts",
     "sveltekit-frontend/src/mcp/tools/video-analysis.ts",
+    "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/analyze-file/+server.ts",
+    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/ingest-errors/+server.ts",
     "sveltekit-frontend/src/routes/api/generate-cluster-summaries/+server.ts",
     "sveltekit-frontend/src/routes/api/phase89/agentic-fix/+server.ts",
@@ -23817,14 +23928,20 @@
     "scripts/error-resolution/services/error-scanner.ts",
     "scripts/error-resolution/services/validation-service.ts",
     "scripts/graph/build-deep-relations-jsonl.mjs",
+    "scripts/health-check-sidecars.mjs",
     "sveltekit-frontend/scripts/graphify-persist-couchdb.mjs",
     "sveltekit-frontend/scripts/tests/test-real-audio.mjs",
     "sveltekit-frontend/scripts/tests/verify-sprint4b-infrastructure.mjs",
     "sveltekit-frontend/src/lib/server/ai/linter-service.ts",
     "sveltekit-frontend/src/lib/server/analytics/codebase-research.ts",
     "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
     "sveltekit-frontend/src/lib/server/tools/handlers/scanRepo.ts",
+    "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/analyze-file/+server.ts",
+    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/ingest-errors/+server.ts",
     "sveltekit-frontend/src/routes/api/generate-cluster-summaries/+server.ts",
     "sveltekit-frontend/tests/codebase-indexer.spec.ts",
@@ -24191,7 +24308,9 @@
     "deeds_labs/snapshots/2026-03-15-root/ts/rag-query-implementation.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/repairs/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/reports/save/+server.ts",
+    "scripts/atlas/embed-atlas-cards.mjs",
     "scripts/backfill-section-types.mjs",
+    "scripts/inject-ace-engram.ts",
     "scripts/phase76-ace-prompt-engineer.mjs",
     "scripts/phase76-knowledge-builder.mjs",
     "scripts/phase76-mcp-server.mjs",
@@ -24927,6 +25046,7 @@
     "deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-30/src/lib/server/ai/enhanced-orchestrator.ts",
     "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/server/rag/cache.ts",
     "deeds_labs/snapshots/2026-03-10/root-stale/tools/extract-codemod-memories.ts",
+    "phase13graph_exportgenerator/generate-graph-exports.mjs",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/analyze/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/canvas/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/+server.ts",
@@ -24944,6 +25064,7 @@
     "scripts/atlas/chunk-text-notes.mjs",
     "scripts/atlas/extract-md-checkbox-features.ts",
     "scripts/atlas/generate-file-summaries.mjs",
+    "scripts/atlas/generate-graph-exports.mjs",
     "scripts/atlas/karpathy-gpu-enrich.mjs",
     "scripts/atlas/lib/phase89-cache.mjs",
     "scripts/atlas/lib/reference-verifier.mjs",
@@ -24965,6 +25086,7 @@
     "sveltekit-frontend/scripts/archive-llm-summaries.mjs",
     "sveltekit-frontend/scripts/atlas/build-parent-master-atlas.ts",
     "sveltekit-frontend/scripts/atlas/cache-feature-cards.mjs",
+    "sveltekit-frontend/scripts/atlas/generate-graph-exports.mjs",
     "sveltekit-frontend/scripts/backfill-llms-md-envelope.mjs",
     "sveltekit-frontend/scripts/backup-consolidation/comparison.mjs",
     "sveltekit-frontend/scripts/build-bow-tiles.mjs",
@@ -25043,6 +25165,7 @@
     "sveltekit-frontend/src/lib/server/ai/openai-facade.ts",
     "sveltekit-frontend/src/lib/server/ai/subagents/directory-analyzer.ts",
     "sveltekit-frontend/src/lib/server/atlas/rg-search-matrix.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-top-retrieval-cache.ts",
     "sveltekit-frontend/src/lib/server/cache/code-llm-index.ts",
     "sveltekit-frontend/src/lib/server/cache/redis-semantic-cache.ts",
     "sveltekit-frontend/src/lib/server/cache/semantic-cache.ts",
@@ -25072,9 +25195,10 @@
     "sveltekit-frontend/src/lib/server/retrieval/ace-retrieval-logger.ts",
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.ts",
     "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-service.ts",
     "sveltekit-frontend/src/lib/server/unified/legal-ai-service.ts",
     "sveltekit-frontend/src/lib/server/vector/image-search.ts",
-    "sveltekit-frontend/src/lib/server/vector/turbovec-client.ts",
     "sveltekit-frontend/src/lib/server/wiki/wiki-gap-analyzer.ts",
     "sveltekit-frontend/src/lib/workers/compute-worker.mjs",
     "sveltekit-frontend/src/mcp/server.ts",
@@ -25085,7 +25209,6 @@
     "sveltekit-frontend/src/routes/api/admin/weights/+server.ts",
     "sveltekit-frontend/src/routes/api/auth/reset-password/+server.ts",
     "sveltekit-frontend/src/routes/api/canon/ingest/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/deep-research/+server.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/summarize-dirs/+server.ts",
     "sveltekit-frontend/src/routes/api/evidence/search/+server.ts",
@@ -25322,6 +25445,10 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase78/suggestions/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/documents/upload/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/files/upload/+server.ts",
+    "scripts/atlas/update-parent-atlas.ts",
+    "src/lib/server/observability/llm-stuck-logger.ts",
+    "src/lib/server/observability/synthesis-logger.ts",
+    "src/lib/services/context-recovery-service.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/server/chat/history-service.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/services/gpu-llm-streaming-pipeline.ts",
     "sveltekit-frontend/scripts/smoke-compute-worker.mjs",
@@ -25570,7 +25697,6 @@
     "sveltekit-frontend/src/routes/api/chat/memory/backfill/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/memory/search/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/annotations/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/collections/+server.ts",
@@ -26404,6 +26530,9 @@
     "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.test.ts",
     "sveltekit-frontend/src/lib/server/ace/karpathy-qdrant-cluster-backfill.test.ts",
     "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts",
+    "sveltekit-frontend/src/lib/server/ace/tool-description.test.ts",
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery-schema.test.ts",
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery.test.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
     "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
@@ -26433,7 +26562,12 @@
     "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.test.ts",
     "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.test.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-service.test.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-types.test.ts",
     "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts",
+    "sveltekit-frontend/src/lib/server/vector/embedding-dimension-guard.test.ts",
+    "sveltekit-frontend/src/lib/server/vector/turbovec-contract.test.ts",
     "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.test.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/deep-research/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts",
@@ -27705,6 +27839,8 @@
     "scripts/atlas/lib/phase89-adaptive-chunker.mjs",
     "scripts/backfill-legal-definitions.mjs",
     "scripts/backfill-qdrant-legal.mjs",
+    "scripts/build-documents-atlas.mjs",
+    "scripts/cache/verify-bifrost-cache.mjs",
     "scripts/constitution-pg-insert.mjs",
     "scripts/constitution-pipeline.mjs",
     "scripts/docs-atlas/couchdb-turbovec-ingest.mjs",
@@ -27712,6 +27848,8 @@
     "scripts/index-lawpdfs-to-rag.ts",
     "scripts/qdrant-upsert-atlas.mjs",
     "scripts/scan-feature-metadata.mjs",
+    "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+    "sveltekit-frontend/scripts/ace/build-packet.mjs",
     "sveltekit-frontend/scripts/backup-consolidation/analyze-differences.mjs",
     "sveltekit-frontend/scripts/codebase-semantic-indexer.ts",
     "sveltekit-frontend/scripts/diff/generator.mjs",
@@ -27767,12 +27905,14 @@
     "sveltekit-frontend/src/lib/server/ai/hermes/tools/registry.ts",
     "sveltekit-frontend/src/lib/server/ai/hermes-synth.ts",
     "sveltekit-frontend/src/lib/server/ai/information-gain-validator.ts",
+    "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
     "sveltekit-frontend/src/lib/server/ai/model-security.ts",
     "sveltekit-frontend/src/lib/server/analysis/entity-extraction.ts",
     "sveltekit-frontend/src/lib/server/analysis/evidence-analysis-pipeline.ts",
     "sveltekit-frontend/src/lib/server/analysis/vlm-evidence-analyzer.ts",
     "sveltekit-frontend/src/lib/server/analytics/event-logger.ts",
     "sveltekit-frontend/src/lib/server/analytics/search-analytics.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
     "sveltekit-frontend/src/lib/server/cache/dag-cache.ts",
     "sveltekit-frontend/src/lib/server/cache/pdf-export-cache.ts",
     "sveltekit-frontend/src/lib/server/cache/rpc-cache.ts",
@@ -28172,6 +28312,7 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/documents/upload/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/startup/+server.ts",
     "scripts/apply-syntax-fixes.mjs",
+    "scripts/atlas/chunk-repo.ts",
     "scripts/audit/codebase-graph-audit.mjs",
     "scripts/build-codebase-graph.mjs",
     "scripts/error-resolution/services/import-fixer.ts",
@@ -28210,6 +28351,7 @@
     "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
     "sveltekit-frontend/src/lib/server/ai/model-security.ts",
     "sveltekit-frontend/src/lib/server/analysis/media-processing.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
     "sveltekit-frontend/src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
     "sveltekit-frontend/src/lib/server/graph/neo4j-jsonl-exporter.ts",
     "sveltekit-frontend/src/lib/server/indexer/ast-chunker.ts",
@@ -28421,7 +28563,8 @@
   ],
   "EXTERNAL:$lib/services/embedding": [
     "deeds_labs/api-legacy/api/legal/search/+server.ts",
-    "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/search/+server.ts"
+    "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/search/+server.ts",
+    "src/lib/services/context-recovery-service.ts"
   ],
   "EXTERNAL:$lib/database/connection": [
     "deeds_labs/api-legacy/api/legal/search/+server.ts",
@@ -28520,6 +28663,7 @@
     "scripts/atlas/build-rg-search-matrix.mjs",
     "scripts/atlas/eval-cross-domain-routing.mjs",
     "scripts/atlas/eval-real-world-routing.mjs",
+    "scripts/atlas/extract-log-signals.mjs",
     "scripts/atlas/hermes-self-healing-warden.mjs",
     "scripts/atlas/ingest-llm-wiki.mjs",
     "scripts/atlas/lib/reference-verifier.mjs",
@@ -28537,6 +28681,8 @@
     "scripts/probe-models.mjs",
     "scripts/test-triage-vitest.mjs",
     "sveltekit-frontend/scratch/append_ops_tool.js",
+    "sveltekit-frontend/scripts/ace/smoke-context-pack-cache.mjs",
+    "sveltekit-frontend/scripts/ace/smoke-top-retrieval-cache.mjs",
     "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
     "sveltekit-frontend/scripts/agentic-error-fix.mjs",
     "sveltekit-frontend/scripts/atlas/rotorquant-turbovec-sidecar.mjs",
@@ -28550,6 +28696,8 @@
     "sveltekit-frontend/scripts/check-with-timeout.mjs",
     "sveltekit-frontend/scripts/claude-context-plan.mjs",
     "sveltekit-frontend/scripts/codebase-semantic-indexer.mjs",
+    "sveltekit-frontend/scripts/db/apply-sidecar-migration.mjs",
+    "sveltekit-frontend/scripts/dev/recover-graph.mjs",
     "sveltekit-frontend/scripts/dev/run-with-analytics.mjs",
     "sveltekit-frontend/scripts/dev-everything.mjs",
     "sveltekit-frontend/scripts/docs/refresh-programming-docs-hub.mjs",
@@ -28583,7 +28731,10 @@
     "sveltekit-frontend/scripts/start-trace-mcp-cluster.mjs",
     "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
     "sveltekit-frontend/scripts/startup/ensure-docker-gpu-stack.mjs",
+    "sveltekit-frontend/scripts/startup/run-ace-context-pack-startup.mjs",
     "sveltekit-frontend/scripts/startup/run-detached.mjs",
+    "sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs",
+    "sveltekit-frontend/scripts/startup/run-service-health-check.mjs",
     "sveltekit-frontend/scripts/startup-analysis.mjs",
     "sveltekit-frontend/scripts/startup-plan.mjs",
     "sveltekit-frontend/scripts/tests/audit-gitignore-vs-indexer.mjs",
@@ -28598,7 +28749,9 @@
     "sveltekit-frontend/scripts/validate/dev-server-monitor.mjs",
     "sveltekit-frontend/scripts/validate/full-system.mjs",
     "sveltekit-frontend/scripts/verify-trace-startup.mjs",
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery.js",
     "sveltekit-frontend/src/lib/server/ai/code-intel-service.ts",
+    "sveltekit-frontend/src/lib/server/ai/tools/rg-tool.ts",
     "sveltekit-frontend/src/lib/server/atlas/rg-search-matrix.ts",
     "sveltekit-frontend/src/lib/server/evidence/video/transcript-service.ts",
     "sveltekit-frontend/src/lib/server/evidence/video/vision-service.ts",
@@ -29508,6 +29661,9 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/worker/autotag/trigger/+server.ts",
     "scripts/atlas/audit-contract-map.mjs",
     "scripts/atlas/check-db-types.mjs",
+    "src/lib/schema/llm-stuck-events.ts",
+    "src/lib/server/db/schema/agent-memory.ts",
+    "src/lib/server/db/schema/synthesis-logs.ts",
     "src/lib/server/db/schema-engram.ts",
     "sveltekit-frontend/drizzle/introspected/schema.ts",
     "sveltekit-frontend/drizzle/schema/evidence.ts",
@@ -29539,6 +29695,8 @@
     "sveltekit-frontend/src/lib/server/db/schema/admin-raptor-summaries.ts",
     "sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts",
     "sveltekit-frontend/src/lib/server/db/schema/analytics.ts",
+    "sveltekit-frontend/src/lib/server/db/schema/atlas-cards.ts",
+    "sveltekit-frontend/src/lib/server/db/schema/atlas-chunks.ts",
     "sveltekit-frontend/src/lib/server/db/schema/case-library-links.ts",
     "sveltekit-frontend/src/lib/server/db/schema/citations.ts",
     "sveltekit-frontend/src/lib/server/db/schema/codebase-intelligence.ts",
@@ -29575,6 +29733,8 @@
     "sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts",
     "sveltekit-frontend/src/lib/server/db/schema/state-constitution-sources.ts",
     "sveltekit-frontend/src/lib/server/db/schema/summary-cards.ts",
+    "sveltekit-frontend/src/lib/server/db/schema/synthesis-logs.ts",
+    "sveltekit-frontend/src/lib/server/db/schema/token-map.ts",
     "sveltekit-frontend/src/lib/server/db/schema/topology.ts",
     "sveltekit-frontend/src/lib/server/db/schema-ace.ts",
     "sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts",
@@ -30450,6 +30610,7 @@
     "scripts/atlas/graphrag-cluster-recommendations.mjs",
     "scripts/atlas/hermes-autotuner.mjs",
     "scripts/atlas/hermes-self-healing-warden.mjs",
+    "scripts/atlas/index-atlas-card.mjs",
     "scripts/atlas/karpathy-gpu-enrich.mjs",
     "scripts/atlas/neo4j-graph-enrich.mjs",
     "scripts/atlas/prewarm-compact-cache.mjs",
@@ -30466,13 +30627,19 @@
     "scripts/atlas/unified-atlas-trace.mjs",
     "scripts/atlas/warmup-bifrost-clusters.mjs",
     "scripts/atlas/xgboost-hotness-score.mjs",
+    "scripts/audit-legacy-atlas-fields.mjs",
+    "scripts/cache/log-failure-pattern.mjs",
+    "scripts/cache/verify-bifrost-cache.mjs",
+    "scripts/cache/warm-semantic-cache.mjs",
     "scripts/codebase-semantic-indexer.mjs",
     "scripts/constitution-pipeline.mjs",
     "scripts/docs-atlas/couchdb-turbovec-ingest.mjs",
     "scripts/graph/build-deep-relations-jsonl.mjs",
     "scripts/phase76-mcp-server.mjs",
     "scripts/phase76-storage-layer.mjs",
+    "scripts/qdrant/sync-centroids-to-redis.mjs",
     "scripts/redis/cache-graph-relations.mjs",
+    "scripts/reports/cache-effectiveness-report.mjs",
     "sveltekit-frontend/scratch/check-redis.mjs",
     "sveltekit-frontend/scratch/fix-redis-types.mjs",
     "sveltekit-frontend/scripts/ace-policy-synthesis.ts",
@@ -30499,12 +30666,15 @@
     "sveltekit-frontend/scripts/build-codebase-recommendations.mjs",
     "sveltekit-frontend/scripts/build-deep-import-graph.mjs",
     "sveltekit-frontend/scripts/build-topology-taxonomy.mjs",
+    "sveltekit-frontend/scripts/cache/invalidate-stale-cache.mjs",
     "sveltekit-frontend/scripts/cache/verify-prompt-cache.mjs",
     "sveltekit-frontend/scripts/cards/cache-json-cards-redis.mjs",
     "sveltekit-frontend/scripts/cards/redis-cards-keys.mjs",
     "sveltekit-frontend/scripts/check-all-tools.mjs",
     "sveltekit-frontend/scripts/codebase-semantic-indexer.ts",
     "sveltekit-frontend/scripts/couchdb-export-graph-jsonl.mjs",
+    "sveltekit-frontend/scripts/diagnostics/audit-legacy-atlas-fields.mjs",
+    "sveltekit-frontend/scripts/engram/upgrade-engram-ranker.mjs",
     "sveltekit-frontend/scripts/enrich-llms-md.mjs",
     "sveltekit-frontend/scripts/export-cluster-summaries.mjs",
     "sveltekit-frontend/scripts/export-codebase-pagerank-top.mjs",
@@ -30548,6 +30718,7 @@
     "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/embedding-worker-enhanced.ts",
     "sveltekit-frontend/scripts/redis/inspect-ace-keys.mjs",
     "sveltekit-frontend/scripts/redis/inspect-summary-card-keys.mjs",
+    "sveltekit-frontend/scripts/reports/cache-effectiveness-report.mjs",
     "sveltekit-frontend/scripts/restore-hypergraph-archive.mjs",
     "sveltekit-frontend/scripts/restore-llm-summaries.mjs",
     "sveltekit-frontend/scripts/run-authority-scores.mjs",
@@ -30596,14 +30767,22 @@
     "sveltekit-frontend/src/lib/server/ace/self-prompt.ts",
     "sveltekit-frontend/src/lib/server/acp/phase90-tools.ts",
     "sveltekit-frontend/src/lib/server/adapters/service-integrations.ts",
+    "sveltekit-frontend/src/lib/server/ai/accelerator-capabilities.ts",
+    "sveltekit-frontend/src/lib/server/ai/ace-builder.ts",
     "sveltekit-frontend/src/lib/server/ai/engram-memory.ts",
     "sveltekit-frontend/src/lib/server/ai/engram-registry.ts",
+    "sveltekit-frontend/src/lib/server/ai/execution-transition-memory.ts",
     "sveltekit-frontend/src/lib/server/ai/hermes/deep-research-dag.ts",
     "sveltekit-frontend/src/lib/server/ai/intent-ranker.ts",
+    "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+    "sveltekit-frontend/src/lib/server/ai/learning-loop.ts",
+    "sveltekit-frontend/src/lib/server/ai/preflight.ts",
     "sveltekit-frontend/src/lib/server/ai/tiered-llm-cache.ts",
     "sveltekit-frontend/src/lib/server/atlas/atlas-loader.ts",
     "sveltekit-frontend/src/lib/server/atlas/context-for-file.ts",
     "sveltekit-frontend/src/lib/server/atlas/feature-context-matrix.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+    "sveltekit-frontend/src/lib/server/cache/cache-invalidation.ts",
     "sveltekit-frontend/src/lib/server/cache/redis-semantic-cache.ts",
     "sveltekit-frontend/src/lib/server/cache/report-template-cache.ts",
     "sveltekit-frontend/src/lib/server/cache.ts",
@@ -30626,6 +30805,7 @@
     "sveltekit-frontend/src/lib/server/redisPubSub.ts",
     "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts",
     "sveltekit-frontend/src/lib/server/search/hybrid-search.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-service.ts",
     "sveltekit-frontend/src/lib/server/workers/audio-processor.ts",
     "sveltekit-frontend/src/mcp/engram_tools.ts",
     "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
@@ -30988,10 +31168,12 @@
     "scripts/atlas/audit-contract-map.mjs",
     "scripts/atlas/audit-drizzle-postgres-contracts.mjs",
     "scripts/atlas/audit-pgvector-schema.mjs",
+    "scripts/atlas/embed-atlas-cards.mjs",
     "scripts/atlas/eval-cross-domain-routing.mjs",
     "scripts/atlas/extract-md-checkbox-features.ts",
     "scripts/atlas/generate-file-summaries.mjs",
     "scripts/atlas/hermes-autotuner.mjs",
+    "scripts/atlas/index-atlas-card.mjs",
     "scripts/atlas/karpathy-gpu-enrich.mjs",
     "scripts/atlas/lib/phase89-sse-stream.mjs",
     "scripts/atlas/neo4j-graph-enrich.mjs",
@@ -31010,6 +31192,7 @@
     "scripts/eval-retrieval-harness.mjs",
     "scripts/generate-fictional-case-events.mjs",
     "scripts/generate-qlora-datasets.mjs",
+    "scripts/graph/backfill-synthesis-manifold4.mjs",
     "scripts/hydrate-manifold.mjs",
     "scripts/index-fictional-cases-qdrant.mjs",
     "scripts/ingest-fictional-cases.mjs",
@@ -31021,6 +31204,7 @@
     "scripts/phase76-storage-layer.mjs",
     "scripts/qdrant-upsert-atlas.mjs",
     "scripts/reports/cache-hit-protocol-report.mjs",
+    "scripts/reports/synthesis-log-report.mjs",
     "scripts/run-migration.mjs",
     "scripts/safe-migrate.mjs",
     "scripts/scan-feature-metadata.mjs",
@@ -31061,6 +31245,7 @@
     "sveltekit-frontend/scripts/export-cluster-summaries.mjs",
     "sveltekit-frontend/scripts/export-qlora-dataset.mjs",
     "sveltekit-frontend/scripts/generate-timeline-synthesis.mjs",
+    "sveltekit-frontend/scripts/graph/backfill-synthesis-manifold4.mjs",
     "sveltekit-frontend/scripts/graph/prune-graph-triples.mjs",
     "sveltekit-frontend/scripts/index-lawpdfs-to-rag.ts",
     "sveltekit-frontend/scripts/index-legal-pdfs.ts",
@@ -31094,6 +31279,8 @@
     "sveltekit-frontend/scripts/qdrant/write-rerank-feedback.mjs",
     "sveltekit-frontend/scripts/reembed-missing-chunks.ts",
     "sveltekit-frontend/scripts/repair-unknown-paths.ts",
+    "sveltekit-frontend/scripts/reports/cache-effectiveness-report.mjs",
+    "sveltekit-frontend/scripts/reports/synthesis-log-report.mjs",
     "sveltekit-frontend/scripts/restore-hypergraph-archive.mjs",
     "sveltekit-frontend/scripts/run-authority-scores.mjs",
     "sveltekit-frontend/scripts/run-hypergraph.ts",
@@ -31145,6 +31332,7 @@
     "sveltekit-frontend/scripts/tests/test-library-upload.mjs",
     "sveltekit-frontend/scripts/tests/test-real-audio.mjs",
     "sveltekit-frontend/scripts/tests/verify-common-vector.mjs",
+    "sveltekit-frontend/scripts/tmp_check_columns.mjs",
     "sveltekit-frontend/scripts/topology-search-server.mjs",
     "sveltekit-frontend/scripts/validate-demo-setup.mjs",
     "sveltekit-frontend/scripts/verify-db-connection.ts",
@@ -33121,8 +33309,7 @@
     "deeds_labs/services/python-middleware/python_codebase/utilities/scripts/backups/phase34b/lib/workers/queue-worker.ts",
     "sveltekit-frontend/scripts/fix-queue-worker.cjs",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/server/services/unified-search-service.ts",
-    "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/queue-worker.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
+    "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/queue-worker.ts"
   ],
   "EXTERNAL:$lib/server/cache/cache-events": [
     "deeds_labs/dead-orphans-2026-04-06/queue-worker.ts",
@@ -33305,10 +33492,12 @@
     "scripts/atlas/check-chat-data.mjs",
     "scripts/atlas/check-counts.mjs",
     "scripts/atlas/check-db-types.mjs",
+    "scripts/atlas/embed-atlas-cards.mjs",
     "scripts/atlas/eval-llm-wiki-routing.mjs",
     "scripts/atlas/extract-md-checkbox-features.ts",
     "scripts/atlas/generate-file-summaries.mjs",
     "scripts/atlas/graphrag-cluster-recommendations.mjs",
+    "scripts/atlas/index-atlas-card.mjs",
     "scripts/atlas/karpathy-gpu-enrich.mjs",
     "scripts/atlas/neo4j-graph-enrich.mjs",
     "scripts/atlas/qdrant-cluster-tag-audit.mjs",
@@ -33326,13 +33515,16 @@
     "scripts/atlas/xgboost-hotness-score.mjs",
     "scripts/atlas/_atlas-utils.mjs",
     "scripts/build-documents-atlas.mjs",
+    "scripts/cache/log-failure-pattern.mjs",
     "scripts/codebase-semantic-indexer.mjs",
+    "scripts/graph/backfill-synthesis-manifold4.mjs",
     "scripts/phase76-ace-prompt-engineer.mjs",
     "scripts/phase76-knowledge-builder.mjs",
     "scripts/phase76-mcp-server.mjs",
     "scripts/phase76-storage-layer.mjs",
     "scripts/qdrant-upsert-atlas.mjs",
     "scripts/reports/cache-hit-protocol-report.mjs",
+    "scripts/reports/synthesis-log-report.mjs",
     "scripts/run-migration.mjs",
     "scripts/scan-feature-metadata.mjs",
     "sveltekit-frontend/drizzle.config.ts",
@@ -33351,15 +33543,19 @@
     "sveltekit-frontend/scripts/build-atlas-index.mjs",
     "sveltekit-frontend/scripts/build-llms-md-relations.mjs",
     "sveltekit-frontend/scripts/build-topology-taxonomy.mjs",
+    "sveltekit-frontend/scripts/cache/invalidate-stale-cache.mjs",
     "sveltekit-frontend/scripts/check-all-tools.mjs",
     "sveltekit-frontend/scripts/check-library.js",
     "sveltekit-frontend/scripts/codebase-semantic-indexer.ts",
     "sveltekit-frontend/scripts/count-all.js",
+    "sveltekit-frontend/scripts/diagnostics/audit-legacy-atlas-fields.mjs",
+    "sveltekit-frontend/scripts/engram/upgrade-engram-ranker.mjs",
     "sveltekit-frontend/scripts/enrich-evidence-image-tags.mjs",
     "sveltekit-frontend/scripts/enrich-llms-md.mjs",
     "sveltekit-frontend/scripts/export-codebase-pagerank-top.mjs",
     "sveltekit-frontend/scripts/export-langfuse-jsonl.mjs",
     "sveltekit-frontend/scripts/export-qlora-dataset.mjs",
+    "sveltekit-frontend/scripts/graph/backfill-synthesis-manifold4.mjs",
     "sveltekit-frontend/scripts/graph/ingest-to-kag-notes.mjs",
     "sveltekit-frontend/scripts/graph/prune-graph-triples.mjs",
     "sveltekit-frontend/scripts/graphify-kag-notes-missing.mjs",
@@ -33390,6 +33586,8 @@
     "sveltekit-frontend/scripts/qdrant/write-rerank-feedback.mjs",
     "sveltekit-frontend/scripts/redis/inspect-summary-card-keys.mjs",
     "sveltekit-frontend/scripts/reembed-missing-chunks.ts",
+    "sveltekit-frontend/scripts/reports/cache-effectiveness-report.mjs",
+    "sveltekit-frontend/scripts/reports/synthesis-log-report.mjs",
     "sveltekit-frontend/scripts/restore-hypergraph-archive.mjs",
     "sveltekit-frontend/scripts/restore-llm-summaries.mjs",
     "sveltekit-frontend/scripts/run-mapreduce-full.mjs",
@@ -33588,6 +33786,7 @@
     "deeds_labs/snapshots/2026-03-15-root/node-scripts/fix-type-definitions.mjs",
     "deeds_labs/snapshots/2026-03-15-root/node-scripts/fix-use-directives.mjs",
     "deeds_labs/snapshots/2026-03-15-root/node-scripts/quick-fixes.mjs",
+    "scripts/atlas/chunk-repo.ts",
     "src/lib/server/ai/feature-map/scan-directory-node.ts",
     "sveltekit-frontend/scripts/deep-audit-ast.mjs",
     "sveltekit-frontend/scripts/fix-import-colons.ts",
@@ -33611,6 +33810,7 @@
     "deeds_labs/services/python-middleware/python_codebase/utilities/sveltekit_frontend_scripts/scripts/test-ux-manually.mjs",
     "deeds_labs/snapshots/2026-03-15-root/node-scripts/chr97.mjs",
     "deeds_labs/snapshots/2026-03-15-root/node-tests/test-integrated-system.mjs",
+    "scripts/test-phase8-loop.mjs",
     "scripts/tests/test-redis-cache-direct.mjs",
     "sveltekit-frontend/scripts/ci-smoke-hypergraph.mjs",
     "sveltekit-frontend/scripts/graphify-cluster-pagerank.mjs",
@@ -33646,6 +33846,7 @@
     "sveltekit-frontend/static/ort/ort-wasm-simd-threaded.jsep.mjs",
     "sveltekit-frontend/static/ort/ort-wasm-simd-threaded.mjs",
     "sveltekit-frontend/test-errors.svelte",
+    "sveltekit-frontend/test-phase8-loop.mjs",
     "sveltekit-frontend/vite.config.ts"
   ],
   "EXTERNAL:chalk": [
@@ -33748,6 +33949,7 @@
     "deeds_labs/snapshots/2026-03-10/root-stale/tools/yorha-agent.mjs",
     "scripts/10-layer-audit-cli.mjs",
     "scripts/ai-os/query-progress.mjs",
+    "scripts/build-documents-atlas.mjs",
     "sveltekit-frontend/scripts/extract-enhanced-graph.mjs",
     "sveltekit-frontend/scripts/hypergraph-build.mjs",
     "sveltekit-frontend/scripts/hypergraph-tag-qdrant.mjs",
@@ -34040,6 +34242,8 @@
     "scripts/tests/test-quickactions-full.mjs",
     "scripts/tests/test-quickactions-scroll.mjs",
     "scripts/tests/test-quickactions.mjs",
+    "sveltekit-frontend/scripts/ace/smoke-context-pack-cache.mjs",
+    "sveltekit-frontend/scripts/ace/smoke-top-retrieval-cache.mjs",
     "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
     "sveltekit-frontend/scripts/analyze-graph-ai.mjs",
     "sveltekit-frontend/scripts/analyze-graph.mjs",
@@ -34174,11 +34378,14 @@
     "sveltekit-frontend/scripts/smoke-neo4j-graph-enrich.mjs",
     "sveltekit-frontend/scripts/smoke-stdio-mcp-tools.mjs",
     "sveltekit-frontend/scripts/smoke-trace-mcp-tools.mjs",
+    "sveltekit-frontend/scripts/smoke-turboquant-health.mjs",
     "sveltekit-frontend/scripts/start-dev-stack.mjs",
     "sveltekit-frontend/scripts/start-trace-mcp-cluster.mjs",
     "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
     "sveltekit-frontend/scripts/startup/ensure-docker-gpu-stack.mjs",
+    "sveltekit-frontend/scripts/startup/run-ace-context-pack-startup.mjs",
     "sveltekit-frontend/scripts/startup/run-detached.mjs",
+    "sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs",
     "sveltekit-frontend/scripts/startup/warm-napi-libtorch-bridge.mjs",
     "sveltekit-frontend/scripts/startup-analysis.mjs",
     "sveltekit-frontend/scripts/startup-plan.mjs",
@@ -34341,10 +34548,12 @@
     "deeds_labs/snapshots/2026-03-15-root/node-tests/test-node-servers.js",
     "deeds_labs/snapshots/2026-03-15-root/node-tests/test-phase14-integration.mjs",
     "deeds_labs/snapshots/2026-03-15-root/node-tests/test-rag-kag-gpu-phase72.mjs",
+    "scripts/health-check-sidecars.mjs",
     "scripts/phase76-mcp-server.mjs",
     "scripts/test-gpu-wiki-e2e.mjs",
     "scripts/test-search-quick.mjs",
     "scripts/unified-audit-dashboard.mjs",
+    "sveltekit-frontend/scripts/diagnostics/validate-distributed-mesh.mjs",
     "sveltekit-frontend/scripts/hypergraph-lookup-server.mjs",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/services/aiAutoTagging.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts",
@@ -34652,6 +34861,8 @@
     "sveltekit-frontend/rebuild_hyper_tools.cjs",
     "sveltekit-frontend/rebuild_tools.cjs",
     "sveltekit-frontend/register-turbovec-feature.mjs",
+    "sveltekit-frontend/scripts/ace/smoke-context-pack-cache.mjs",
+    "sveltekit-frontend/scripts/ace/smoke-top-retrieval-cache.mjs",
     "sveltekit-frontend/scripts/agentic-batch-fix.mjs",
     "sveltekit-frontend/scripts/agentic-error-fix.mjs",
     "sveltekit-frontend/scripts/archive-llm-summaries.mjs",
@@ -34665,6 +34876,7 @@
     "sveltekit-frontend/scripts/backup-consolidation/scanner.mjs",
     "sveltekit-frontend/scripts/build-atlas-index.mjs",
     "sveltekit-frontend/scripts/create-todo.mjs",
+    "sveltekit-frontend/scripts/datasets/seed-synthetic-contracts.mjs",
     "sveltekit-frontend/scripts/deep-audit-ast.mjs",
     "sveltekit-frontend/scripts/diagnose/find-non-zod-tool-schemas.mjs",
     "sveltekit-frontend/scripts/enrich-evidence-image-tags.mjs",
@@ -34674,16 +34886,20 @@
     "sveltekit-frontend/scripts/graphify-obsidian-vault.mjs",
     "sveltekit-frontend/scripts/index-vault-md.mjs",
     "sveltekit-frontend/scripts/ingest-enhanced-jsonl.mjs",
+    "sveltekit-frontend/scripts/legal/ingest-synthetic-contracts.mjs",
+    "sveltekit-frontend/scripts/legal/phase11-legal-contract-training.mjs",
     "sveltekit-frontend/scripts/node-ts-loader.mjs",
     "sveltekit-frontend/scripts/operator/inspect-gemma-gguf.mjs",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/server/docling.ts",
     "sveltekit-frontend/scripts/reconstruction/compile-demo-scene.mjs",
     "sveltekit-frontend/scripts/reconstruction/emit-aesthetic-preset.mjs",
+    "sveltekit-frontend/scripts/reports/phase11-legal-mesh-report.mjs",
     "sveltekit-frontend/scripts/restore-llm-summaries.mjs",
     "sveltekit-frontend/scripts/screenshots/enrich-screenshots.mjs",
     "sveltekit-frontend/scripts/screenshots/index-screenshots.mjs",
     "sveltekit-frontend/scripts/smoke-admin-ai-chat.mjs",
     "sveltekit-frontend/scripts/smoke-feature-map-compiler.mjs",
+    "sveltekit-frontend/scripts/smoke-turboquant-health.mjs",
     "sveltekit-frontend/scripts/smoke-video-ingest.mjs",
     "sveltekit-frontend/scripts/swap-lora-adapter.mjs",
     "sveltekit-frontend/scripts/synth/handoff-to-claude.mjs",
@@ -34700,6 +34916,7 @@
     "sveltekit-frontend/src/lib/server/agents/regen/writers/markdown-writer.ts",
     "sveltekit-frontend/src/lib/server/ai/subagents/directory-analyzer.ts",
     "sveltekit-frontend/src/lib/server/atlas/atlas-loader.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-top-retrieval-cache.ts",
     "sveltekit-frontend/src/lib/server/evidence/video/transcript-service.ts",
     "sveltekit-frontend/src/lib/server/evidence/video/video-ingest-service.ts",
     "sveltekit-frontend/src/lib/server/evidence/video/vision-service.ts",
@@ -35703,6 +35920,7 @@
     "sveltekit-frontend/scripts/smoke-hybrid-search.mjs",
     "sveltekit-frontend/scripts/smoke-postgres-fts.mjs",
     "sveltekit-frontend/scripts/sync-code-retrieval-chunks.mjs",
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery.js",
     "sveltekit-frontend/src/mcp/admin_tools.ts",
     "sveltekit-frontend/src/mcp/codebase_tools.ts",
     "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
@@ -36583,6 +36801,7 @@
     "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
     "sveltekit-frontend/src/lib/server/services/knowledge-search/RedisCacheService.ts",
     "sveltekit-frontend/src/lib/server/tensor/tensor-analysis-cache.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-service.ts",
     "sveltekit-frontend/src/lib/server/trace/trace-collector.ts",
     "sveltekit-frontend/src/lib/server/vector/embedding-gemma.ts",
     "sveltekit-frontend/src/lib/server/vector/image-search.ts",
@@ -36626,7 +36845,6 @@
     "sveltekit-frontend/src/routes/api/cartridge/export/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/memory/settings/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/annotations/+server.ts",
     "sveltekit-frontend/src/routes/api/clusters/cards/+server.ts",
     "sveltekit-frontend/src/routes/api/code-intel/graph/gds-status/+server.ts",
@@ -41102,7 +41320,8 @@
     "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/utils/json-fast.ts",
     "deeds_labs/services/python-middleware/python_codebase/utilities/scripts/auto-fix-enums.mjs",
     "deeds_labs/services/python-middleware/python_codebase/utilities/sveltekit_frontend_scripts/scripts/phase43-gpu-json-parser.mjs",
-    "deeds_labs/services/ts-consolidation-archive/server-subdirs-orphans-2026-03-09/ingest/extractors.ts"
+    "deeds_labs/services/ts-consolidation-archive/server-subdirs-orphans-2026-03-09/ingest/extractors.ts",
+    "sveltekit-frontend/src/lib/server/ai/accelerator-capabilities.ts"
   ],
   "EXTERNAL:simdjson-wasm": [
     "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/ingest/simdjson-parser.ts",
@@ -41298,7 +41517,13 @@
     "deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/nats-quic-search-service.ts",
     "deeds_labs/services/python-middleware/python_codebase/utilities/scripts/backups/phase34b/lib/server/search/nats-quic-search-service.ts",
     "deeds_labs/services/ts-consolidation-archive/server-subdirs-orphans-2026-03-09/search/nats-quic-search-service.ts",
-    "sveltekit-frontend/src/lib/server/grpc/embedding-client.ts"
+    "sveltekit-frontend/scratch/test-nats.ts",
+    "sveltekit-frontend/scripts/diagnostics/nats-sidecar-smoke.mjs",
+    "sveltekit-frontend/scripts/diagnostics/validate-distributed-mesh.mjs",
+    "sveltekit-frontend/scripts/test-phase11-training.mjs",
+    "sveltekit-frontend/src/lib/server/ai/agent-worker.ts",
+    "sveltekit-frontend/src/lib/server/grpc/embedding-client.ts",
+    "sveltekit-frontend/src/lib/server/observability/synthesis-logger.ts"
   ],
   "EXTERNAL:$lib/server/db/schema-web": [
     "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/search/webVectorSearch.ts",
@@ -41455,6 +41680,7 @@
     "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
     "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.ts",
     "sveltekit-frontend/src/lib/server/tensor/tensor-analysis-cache.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-service.ts",
     "sveltekit-frontend/src/routes/api/clusters/cards/+server.ts",
     "sveltekit-frontend/src/routes/api/files/+server.ts",
     "sveltekit-frontend/src/routes/api/files/[id]/+server.ts"
@@ -41972,6 +42198,7 @@
     "sveltekit-frontend/src/lib/server/indexer/topology-tracker.ts",
     "sveltekit-frontend/src/lib/server/observability/tool-trace.ts",
     "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-service.ts",
     "sveltekit-frontend/src/routes/(app)/terminal/+page.server.ts",
     "sveltekit-frontend/src/routes/api/admin/chat/+server.ts",
     "sveltekit-frontend/src/routes/api/cases/[id]/persons/+server.ts",
@@ -46306,7 +46533,8 @@
     "deeds_labs/projects/agentic-error-resolution/fixed/phase2/lib/components/modals/EvidenceModal.svelte"
   ],
   "EXTERNAL:$lib/utils/file-utils": [
-    "deeds_labs/projects/agentic-error-resolution/fixed/phase2/lib/components/modals/EvidenceUploadModal.svelte"
+    "deeds_labs/projects/agentic-error-resolution/fixed/phase2/lib/components/modals/EvidenceUploadModal.svelte",
+    "scripts/atlas/update-parent-atlas.ts"
   ],
   "EXTERNAL:bits-ui/components/ui/dialog": [
     "deeds_labs/projects/agentic-error-resolution/fixed/phase2/lib/components/recommendations/FOAFModal.svelte"
@@ -49101,6 +49329,22 @@
   "UNRESOLVED:./$types \n\r\n\nconst supportedServices = [\r\n  ": [
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/yorha/services/[service]/restart/+server.ts"
   ],
+  "EXTERNAL:$lib/utils/text-utils": [
+    "scripts/atlas/chunk-repo.ts"
+  ],
+  "EXTERNAL:$lib/utils/jsonl-writer": [
+    "scripts/atlas/chunk-repo.ts"
+  ],
+  "EXTERNAL:$lib/utils/jsonl-reader": [
+    "scripts/atlas/embed-chunks.ts",
+    "scripts/atlas/update-parent-atlas.ts"
+  ],
+  "EXTERNAL:$lib/utils/qdrant-client": [
+    "scripts/atlas/embed-chunks.ts"
+  ],
+  "EXTERNAL:$lib/utils/embedding-model": [
+    "scripts/atlas/embed-chunks.ts"
+  ],
   "EXTERNAL:node:net": [
     "scripts/atlas/hermes-self-healing-warden.mjs",
     "scripts/atlas/validate-dev-services.mjs",
@@ -49110,6 +49354,9 @@
     "sveltekit-frontend/scripts/tests/smoke-graphify.mjs",
     "sveltekit-frontend/scripts/tests/smoke-kag-note-roundtrip.mjs",
     "sveltekit-frontend/scripts/tests/test-research-chat-runtime-smoke.mjs"
+  ],
+  "EXTERNAL:$lib/server/atlas/parent-atlas-service": [
+    "scripts/atlas/update-parent-atlas.ts"
   ],
   "UNRESOLVED:../components/MyComponent": [
     "scripts/error-resolution/tests/import-fixer.test.ts"
@@ -49131,8 +49378,21 @@
   "EXTERNAL:pdfjs-dist/legacy/build/pdf.mjs": [
     "scripts/index-lawpdfs-to-rag.ts"
   ],
+  "EXTERNAL:$lib/utils/codebase-loader": [
+    "scripts/mapreduce/map-code.ts"
+  ],
+  "EXTERNAL:$lib/utils/fact-writer": [
+    "scripts/mapreduce/map-code.ts",
+    "scripts/mapreduce/map-docs.ts"
+  ],
+  "EXTERNAL:$lib/utils/doc-loader": [
+    "scripts/mapreduce/map-docs.ts"
+  ],
   "UNRESOLVED:../sveltekit-frontend/src/lib/services/ace-web/qdrant-service": [
     "scripts/setup-ace-qdrant.ts"
+  ],
+  "UNRESOLVED:./src/lib/server/ai/gemma4-tool-controller.ts": [
+    "scripts/test-phase8-loop.mjs"
   ],
   "UNRESOLVED:../helpers/route-test-utils.js": [
     "scripts/tests/kag-ingest-notebook-contract.test.ts"
@@ -49190,6 +49450,12 @@
   "EXTERNAL:@/lib/server/utils/cache-utils": [
     "src/lib/server/ai/feature-map/write-feature-index-node.ts"
   ],
+  "EXTERNAL:@redis": [
+    "src/lib/server/ai/learning-loop.ts"
+  ],
+  "UNRESOLVED:./context": [
+    "src/lib/server/ai/learning-loop.ts"
+  ],
   "EXTERNAL:@/lib/server/ace/context-assembler": [
     "src/lib/server/ai/openai-facade.ts"
   ],
@@ -49210,6 +49476,30 @@
   ],
   "EXTERNAL:@redis/client": [
     "src/lib/server/mcp/engram-mcp-tools.ts"
+  ],
+  "EXTERNAL:$lib/server/redis/client": [
+    "src/lib/server/observability/llm-stuck-logger.ts"
+  ],
+  "UNRESOLVED:./schema/synthesis-logs.js": [
+    "src/lib/server/observability/synthesis-logger.ts"
+  ],
+  "EXTERNAL:$lib/services/redis": [
+    "src/lib/services/context-recovery-service.ts"
+  ],
+  "EXTERNAL:$lib/services/atlas": [
+    "src/lib/services/context-recovery-service.ts"
+  ],
+  "EXTERNAL:$lib/services/qdrant": [
+    "src/lib/services/context-recovery-service.ts"
+  ],
+  "EXTERNAL:$lib/services/pg-trgm": [
+    "src/lib/services/context-recovery-service.ts"
+  ],
+  "EXTERNAL:$lib/services/cluster": [
+    "src/lib/services/context-recovery-service.ts"
+  ],
+  "EXTERNAL:$lib/utils/hash": [
+    "src/lib/services/context-recovery-service.ts"
   ],
   "UNRESOLVED:../gateway/flow-enforcer": [
     "src/tests/gateway/flow-enforcer.test.ts"
@@ -49257,6 +49547,14 @@
   ],
   "UNRESOLVED:./topology_mgmt_tools.js": [
     "sveltekit-frontend/scratch/register_topo_tools.js"
+  ],
+  "EXTERNAL:@langchain/langgraph": [
+    "sveltekit-frontend/scratch/test-langgraph.ts",
+    "sveltekit-frontend/src/lib/server/agent/supervisor.ts",
+    "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop-langgraph.ts",
+    "sveltekit-frontend/src/lib/server/ai/hermes/deep-research-dag.ts",
+    "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+    "sveltekit-frontend/src/lib/server/analytics/research-graph-rl.ts"
   ],
   "EXTERNAL:ai": [
     "sveltekit-frontend/scripts/atlas/build-parent-master-atlas.ts",
@@ -50585,12 +50883,6 @@
   "EXTERNAL:$lib/server/ace/auto-tagger.js": [
     "sveltekit-frontend/src/lib/server/agent/autonomous-agent.ts"
   ],
-  "EXTERNAL:@langchain/langgraph": [
-    "sveltekit-frontend/src/lib/server/agent/supervisor.ts",
-    "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop-langgraph.ts",
-    "sveltekit-frontend/src/lib/server/ai/hermes/deep-research-dag.ts",
-    "sveltekit-frontend/src/lib/server/analytics/research-graph-rl.ts"
-  ],
   "EXTERNAL:$lib/server/services/couchdb-client": [
     "sveltekit-frontend/src/lib/server/agents/agents-card-store.ts"
   ],
@@ -50827,8 +51119,7 @@
   "EXTERNAL:$lib/server/mcp/trace-http.js": [
     "sveltekit-frontend/src/lib/server/ai/intent-router.ts",
     "sveltekit-frontend/src/lib/server/ai/openai-facade.ts",
-    "sveltekit-frontend/src/routes/api/ai/context/compact-search/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
+    "sveltekit-frontend/src/routes/api/ai/context/compact-search/+server.ts"
   ],
   "EXTERNAL:$lib/server/config.js": [
     "sveltekit-frontend/src/lib/server/ai/lang-extract.ts",
@@ -50889,8 +51180,7 @@
     "sveltekit-frontend/tests/compiled-knowledge-modules.spec.ts"
   ],
   "EXTERNAL:$lib/server/ai/intent-ranker.js": [
-    "sveltekit-frontend/src/lib/server/ai/openai-facade.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
+    "sveltekit-frontend/src/lib/server/ai/openai-facade.ts"
   ],
   "EXTERNAL:$lib/server/ai/gemma4-agent.js": [
     "sveltekit-frontend/src/lib/server/ai/openai-facade.ts",
@@ -51274,6 +51564,9 @@
     "sveltekit-frontend/src/lib/server/embedding/embed.ts",
     "sveltekit-frontend/src/lib/server/rg-atlas/embed.ts"
   ],
+  "EXTERNAL:$lib/server/vector/embedding-dimension-guard.js": [
+    "sveltekit-frontend/src/lib/server/embedding/embedding-persist.ts"
+  ],
   "EXTERNAL:$lib/server/notifications/push-service.js": [
     "sveltekit-frontend/src/lib/server/engagement/idle-reengagement.ts"
   ],
@@ -51481,7 +51774,6 @@
     "sveltekit-frontend/src/routes/api/ai/tensorrt/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/ai/tensorrt/vlm/+server.ts",
     "sveltekit-frontend/src/routes/api/chat/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/embed/+server.ts",
     "sveltekit-frontend/src/routes/api/evidence/[id]/analyze/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/gpu/lease/+server.ts",
@@ -51510,8 +51802,7 @@
     "sveltekit-frontend/src/lib/server/notifications/push-service.ts"
   ],
   "EXTERNAL:$lib/server/db/schema/documents-atlas.js": [
-    "sveltekit-frontend/src/lib/server/observability/cache-logger.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
+    "sveltekit-frontend/src/lib/server/observability/cache-logger.ts"
   ],
   "EXTERNAL:$lib/server/ocr/tesseract.js": [
     "sveltekit-frontend/src/lib/server/ocr/hybrid.ts"
@@ -51657,6 +51948,12 @@
     "sveltekit-frontend/src/routes/api/gpu-wasm-integration/+server.ts",
     "sveltekit-frontend/src/routes/api/health/capabilities/+server.ts",
     "sveltekit-frontend/src/routes/api/health/qdrant/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/db/schema/token-map": [
+    "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.ts"
+  ],
+  "EXTERNAL:$lib/server/vector/turbovec-contract": [
+    "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.ts"
   ],
   "EXTERNAL:$lib/server/gpu/topology-projection.js": [
     "sveltekit-frontend/src/lib/server/topology/gpu-topology-projection.ts",
@@ -52674,7 +52971,6 @@
     "sveltekit-frontend/src/routes/api/cases/[id]/related/+server.ts",
     "sveltekit-frontend/src/routes/api/cases/[id]/similar/+server.ts",
     "sveltekit-frontend/src/routes/api/cases/[id]/timeline/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/collections/[collectionId]/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/collections/[collectionId]/citations/+server.ts",
     "sveltekit-frontend/src/routes/api/citations/collections/[collectionId]/export/+server.ts",
@@ -53010,6 +53306,21 @@
     "sveltekit-frontend/src/routes/api/v1/legal/compare-pdf/+server.ts",
     "sveltekit-frontend/src/routes/api/web/crawl/+server.ts"
   ],
+  "EXTERNAL:$lib/server/cache/ace-packet-cache.js": [
+    "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.test-harness.ts"
+  ],
+  "EXTERNAL:$lib/server/ace/variance-recovery.js": [
+    "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/token-map/token-map-service.js": [
+    "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+    "sveltekit-frontend/src/routes/api/ace/stream/+server.ts"
+  ],
   "EXTERNAL:$lib/server/atlas/context-for-file.js": [
     "sveltekit-frontend/src/routes/api/ace/recommendations/+server.ts"
   ],
@@ -53256,8 +53567,7 @@
     "sveltekit-frontend/src/routes/api/ai/intent-dispatch/+server.ts"
   ],
   "EXTERNAL:$lib/server/ace/style-adapter.js": [
-    "sveltekit-frontend/src/routes/api/ai/personas/+server.ts",
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
+    "sveltekit-frontend/src/routes/api/ai/personas/+server.ts"
   ],
   "EXTERNAL:$lib/server/db/schema/context-timeline": [
     "sveltekit-frontend/src/routes/api/analytics/feedback/+server.ts"
@@ -53281,6 +53591,9 @@
   "EXTERNAL:$lib/server/qdrant-http": [
     "sveltekit-frontend/src/routes/api/analyze-tag/+server.ts",
     "sveltekit-frontend/src/routes/api/generate-cluster-summaries/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/agent-executor": [
+    "sveltekit-frontend/src/routes/api/atlas/audit/+server.ts"
   ],
   "EXTERNAL:$lib/server/audit/gemma-tool-router.js": [
     "sveltekit-frontend/src/routes/api/audit/planner/+server.ts"
@@ -53372,38 +53685,6 @@
   "EXTERNAL:$lib/server/redis-streams.js": [
     "sveltekit-frontend/src/routes/api/chat/replay/+server.ts",
     "sveltekit-frontend/src/routes/api/sse/[id]/+server.ts"
-  ],
-  "EXTERNAL:$lib/server/observability/cache-logger.js": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
-  ],
-  "EXTERNAL:$lib/server/ai/engram-registry.js": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
-    "sveltekit-frontend/tests/engram-recall.spec.ts",
-    "sveltekit-frontend/tests/engram-registry-db.integration.spec.ts",
-    "sveltekit-frontend/tests/engram-registry.spec.ts"
-  ],
-  "EXTERNAL:$lib/server/ai/feature-builder.js": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
-  ],
-  "EXTERNAL:$lib/server/retrieval/summary-card-retrieval.js": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
-    "sveltekit-frontend/src/routes/api/sse/chat/+server.ts"
-  ],
-  "EXTERNAL:$lib/server/ai/bifrost-cache-manager.js": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
-  ],
-  "EXTERNAL:$lib/server/bifrost/client.js": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
-  ],
-  "EXTERNAL:$lib/server/ai/error-agent/workflow-loop.js": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
-  ],
-  "EXTERNAL:$lib/server/ai/toon.js": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts"
-  ],
-  "EXTERNAL:$lib/server/streaming/chunked-response": [
-    "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
-    "sveltekit-frontend/src/routes/api/stream/+server.ts"
   ],
   "EXTERNAL:$lib/server/chrrom/predictor.js": [
     "sveltekit-frontend/src/routes/api/chrrom/events/+server.ts"
@@ -53531,6 +53812,9 @@
   "EXTERNAL:$lib/server/comfyui/comfyui-client.js": [
     "sveltekit-frontend/src/routes/api/comfyui/health/+server.ts",
     "sveltekit-frontend/src/routes/api/comfyui/render/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/db/legacy-read-detector": [
+    "sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts"
   ],
   "EXTERNAL:$lib/server/api-registry.js": [
     "sveltekit-frontend/src/routes/api/docs/+server.ts"
@@ -53822,8 +54106,14 @@
   "EXTERNAL:$lib/server/simulation/grpo-strategy.js": [
     "sveltekit-frontend/src/routes/api/simulation/[sessionId]/strategy/+server.ts"
   ],
+  "EXTERNAL:$lib/server/retrieval/summary-card-retrieval.js": [
+    "sveltekit-frontend/src/routes/api/sse/chat/+server.ts"
+  ],
   "EXTERNAL:$lib/server/retrieval/graph-informed-retrieval.js": [
     "sveltekit-frontend/src/routes/api/sse/chat/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/streaming/chunked-response": [
+    "sveltekit-frontend/src/routes/api/stream/+server.ts"
   ],
   "EXTERNAL:$lib/server/grpc/tool-calling-client.js": [
     "sveltekit-frontend/src/routes/api/system/health/+server.ts",
@@ -53916,6 +54206,11 @@
   ],
   "EXTERNAL:/src/lib/ai/client-llm-synthesis.ts": [
     "sveltekit-frontend/tests/e2e/e2b-client-inference.spec.ts"
+  ],
+  "EXTERNAL:$lib/server/ai/engram-registry.js": [
+    "sveltekit-frontend/tests/engram-recall.spec.ts",
+    "sveltekit-frontend/tests/engram-registry-db.integration.spec.ts",
+    "sveltekit-frontend/tests/engram-registry.spec.ts"
   ],
   "EXTERNAL:$lib/server/ai/gemma4-tool-controller.js": [
     "sveltekit-frontend/tests/gemma4-tool-controller.spec.ts"

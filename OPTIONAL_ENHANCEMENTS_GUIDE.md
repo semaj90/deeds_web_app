@@ -14,7 +14,7 @@ llama-server.exe ^
   -ctk q8_0 ^
   -ctv q8_0 ^
   --n-gpu-layers 99 ^
-  --ctx-size 32768 ^
+  --ctx-size 64000 ^
   --n-threads 8 ^
   --n-batch 2048 ^
   --flash-attn

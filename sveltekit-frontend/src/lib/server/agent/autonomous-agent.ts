@@ -1112,6 +1112,8 @@ export class AutonomousAgent {
               queryHash,
               modelName: 'gemma4-rotorquant:latest',
               modelQuant: 'iq4_xs',
+              kvQuant: 'q8_0/q8_0',
+              draftModel: false,
               backend: 'gemma4-agent',
               tokenizerHash: 'embeddinggemma:latest:768',
               systemPromptHash: createHash('sha256')
@@ -1146,6 +1148,8 @@ export class AutonomousAgent {
               caseId: 'auto',
               modelName: 'gemma4-rotorquant:latest',
               modelQuant: 'iq4_xs',
+              kvQuant: 'q8_0/q8_0',
+              draftModel: false,
               backend: 'gemma4-agent',
               tokenizerHash: 'embeddinggemma:latest:768',
               systemPromptHash: 'system:yorha-legal',

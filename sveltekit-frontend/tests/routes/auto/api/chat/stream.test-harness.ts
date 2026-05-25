@@ -5,6 +5,9 @@ const _chatStreamMocks = vi.hoisted(() => ({
   mockRedisGet: vi.fn(),
   mockRedisSetex: vi.fn(),
   mockRedisZrevrange: vi.fn(),
+  mockRedisGetAcePacket: vi.fn(),
+  mockRedisSetAcePacket: vi.fn(),
+  mockFetch: vi.fn(),
   mockDbUpdate: vi.fn(),
   mockCallTraceMcp: vi.fn(),
   mockRankIntent: vi.fn(),
@@ -29,6 +32,19 @@ vi.mock('$lib/server/redis.js', () => ({
     zrevrange: chatStreamMocks.mockRedisZrevrange,
   }),
 }));
+
+vi.mock('$lib/server/cache/ace-packet-cache.js', async () => {
+  const actual = await vi.importActual<typeof import('$lib/server/cache/ace-packet-cache.js')>(
+    '$lib/server/cache/ace-packet-cache.js'
+  );
+  return {
+    ...actual,
+    redisGetAcePacket: chatStreamMocks.mockRedisGetAcePacket,
+    redisSetAcePacket: chatStreamMocks.mockRedisSetAcePacket,
+  };
+});
+
+vi.stubGlobal('fetch', chatStreamMocks.mockFetch);
 
 vi.mock('$lib/server/ai/intent-ranker.js', () => ({
   rankIntent: chatStreamMocks.mockRankIntent,
@@ -84,6 +100,21 @@ export function resetChatStreamMocks(): void {
   chatStreamMocks.mockAcquireGpuLease.mockResolvedValue(null);
   chatStreamMocks.mockRedisSetex.mockResolvedValue('OK');
   chatStreamMocks.mockRedisZrevrange.mockResolvedValue([]);
+  chatStreamMocks.mockRedisGetAcePacket.mockResolvedValue(null);
+  chatStreamMocks.mockRedisSetAcePacket.mockResolvedValue(undefined);
+  chatStreamMocks.mockFetch.mockResolvedValue(
+    new Response(
+      [
+        'data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"cached-packet-answer"}}]}',
+        '',
+        'data: [DONE]',
+        '',
+      ].join('\n'),
+      {
+        headers: { 'content-type': 'text/event-stream' },
+      }
+    )
+  );
   chatStreamMocks.mockDbUpdate.mockReturnValue({
     set: () => ({ where: async () => [] }),
   });
@@ -121,13 +152,7 @@ export function resetChatStreamMocks(): void {
 }
 
 export function mockAceCacheMisses(): void {
-  chatStreamMocks.mockRedisGet.mockImplementation(async (key: string) => {
-    if (key.startsWith('ace:completion:')) return null;
-    if (key.startsWith('ace:packet:')) return null;
-    if (key.startsWith('ace:feature:')) return null;
-    if (key.startsWith('ace:ctx:')) return null;
-    return null;
-  });
+  chatStreamMocks.mockRedisGetAcePacket.mockResolvedValue(null);
 }
 
 type SummaryCard = {

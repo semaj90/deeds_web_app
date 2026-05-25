@@ -1,0 +1,72 @@
+{
+  "status": "pass",
+  "commandsRun": [
+    "apply-opencode-patches",
+    "patch-graph-export-roots",
+    "graph:exports",
+    "duckdb:smoke"
+  ],
+  "filesChanged": [
+    ".opencode/config-patches.json",
+    "opencode.json",
+    "scripts/atlas/generate-graph-exports.mjs",
+    "memory/exports/graph-refresh-manifest.json",
+    "memory/exports/cluster-cards.jsonl",
+    "memory/exports/pathway-cards.jsonl"
+  ],
+  "sourceRefs": [
+    "scripts/dev/apply-opencode-patches.mjs",
+    "scripts/dev/patch-graph-export-roots.mjs",
+    "scripts/atlas/generate-graph-exports.mjs",
+    "duckdb/smoke-duckdb.ps1"
+  ],
+  "nextSteps": [
+    "Inspect graph-refresh-manifest.json promotionState",
+    "Feed exports into downstream recovery if smoke was degraded",
+    "Use /recover:graph for repeatable recovery"
+  ],
+  "graphExportsResult": {
+    "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\exports\\graph-refresh-manifest.json",
+    "promotionState": "unpromoted",
+    "status": "generated",
+    "counts": {
+      "nodes": 33684,
+      "edges": 77580,
+      "clusterCards": 0,
+      "pathwayCards": 12,
+      "clusterCardRows": 0,
+      "pathwayCardRows": 12
+    }
+  },
+  "duckdbResult": {
+    "status": 0,
+    "stdout": "duckdb:smoke - export-only validation\nv1.5.3 (Variegata) 14eca11bd9\r\n┌───────────┐\r\n│ duckdb_ok │\r\n│   int32   │\r\n├───────────┤\r\n│        42 │\r\n└───────────┘\r\n┌───────┐\r\n│ rows  │\r\n│ int64 │\r\n├───────┤\r\n│     1 │\r\n└───────┘\r\n┌───────┐\r\n│ rows  │\r\n│ int64 │\r\n├───────┤\r\n│     0 │\r\n└───────┘\r\n┌───────┐\r\n│ rows  │\r\n│ int64 │\r\n├───────┤\r\n│    12 │\r\n└───────┘\r\nduckdb:smoke complete",
+    "stderr": ""
+  },
+  "events": [
+    {
+      "step": "apply-opencode-patches",
+      "status": "pass",
+      "stdout": "PATCH_OK C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\opencode.json",
+      "stderr": ""
+    },
+    {
+      "step": "patch-graph-export-roots",
+      "status": "pass",
+      "stdout": "{\n  \"status\": \"pass\",\n  \"filePath\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend\\\\scripts\\\\atlas\\\\generate-graph-exports.mjs\",\n  \"added\": [],\n  \"changed\": false\n}",
+      "stderr": ""
+    },
+    {
+      "step": "graph:exports",
+      "status": "pass",
+      "stdout": "[graph-exports] wrote: memory\\exports\\graph-refresh-manifest.json\n[graph-exports] wrote: memory\\exports\\cluster-cards.jsonl 0 rows\n[graph-exports] wrote: memory\\exports\\pathway-cards.jsonl 12 rows\n[graph-exports] status: generated, promotionState: unpromoted",
+      "stderr": ""
+    },
+    {
+      "step": "duckdb:smoke",
+      "status": "pass",
+      "stdout": "duckdb:smoke - export-only validation\nv1.5.3 (Variegata) 14eca11bd9\r\n┌───────────┐\r\n│ duckdb_ok │\r\n│   int32   │\r\n├───────────┤\r\n│        42 │\r\n└───────────┘\r\n┌───────┐\r\n│ rows  │\r\n│ int64 │\r\n├───────┤\r\n│     1 │\r\n└───────┘\r\n┌───────┐\r\n│ rows  │\r\n│ int64 │\r\n├───────┤\r\n│     0 │\r\n└───────┘\r\n┌───────┐\r\n│ rows  │\r\n│ int64 │\r\n├───────┤\r\n│    12 │\r\n└───────┘\r\nduckdb:smoke complete",
+      "stderr": ""
+    }
+  ]
+}
