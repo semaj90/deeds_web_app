@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/memory/graphify/gds/38524f9dac39.json"
-last_updated_by_llm: "2026-05-23T02:58:14.645Z"
+last_updated_by_llm: "2026-05-24T16:40:21.009Z"
 ai-first: true
 confidence: "high"
 up: []

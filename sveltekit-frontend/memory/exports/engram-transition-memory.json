@@ -1,0 +1,4747 @@
+{
+  "exportedAt": "2026-05-25T08:03:06.401Z",
+  "redisUrl": "redis://127.0.0.1:6379",
+  "databaseUrl": "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+  "bigramKeyCount": 0,
+  "recordCount": 136,
+  "records": [
+    {
+      "cacheKey": "context_timeline::research:summary:Mon Apr 20 2026 09:43:52 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "research",
+      "toState": "summary",
+      "pipeline": "rag",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "query",
+          "source",
+          "results",
+          "searchMs",
+          "queryHash"
+        ],
+        "nextKeys": [
+          "count",
+          "pipeline"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::summary:research:Mon Apr 20 2026 09:45:22 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "summary",
+      "toState": "research",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "count",
+          "pipeline"
+        ],
+        "nextKeys": [
+          "query",
+          "results",
+          "provider",
+          "searchMs",
+          "queryHash"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::research:summary:Mon Apr 20 2026 09:45:23 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "research",
+      "toState": "summary",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "query",
+          "results",
+          "provider",
+          "searchMs",
+          "queryHash"
+        ],
+        "nextKeys": [
+          "count",
+          "pipeline"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::summary:agent_run_ingested:Wed May 06 2026 16:24:37 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "summary",
+      "toState": "agent_run_ingested",
+      "pipeline": "kag",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "count",
+          "pipeline"
+        ],
+        "nextKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::agent_run_ingested:agent_run_ingested:Wed May 06 2026 16:25:16 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "agent_run_ingested",
+      "toState": "agent_run_ingested",
+      "pipeline": "kag",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ],
+        "nextKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::agent_run_ingested:agent_run_ingested:Wed May 06 2026 16:34:21 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "agent_run_ingested",
+      "toState": "agent_run_ingested",
+      "pipeline": "kag",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ],
+        "nextKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::agent_run_ingested:multi_lane_retrieval:Thu May 07 2026 16:01:20 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "agent_run_ingested",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 16:33:32 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 16:40:33 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 17:13:10 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 17:34:04 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 21:32:51 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 22:47:59 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 22:57:38 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 23:35:00 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 23:44:04 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 07 2026 23:53:44 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:agent_run_ingested:Fri May 08 2026 00:18:59 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "agent_run_ingested",
+      "pipeline": "kag",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::agent_run_ingested:multi_lane_retrieval:Fri May 08 2026 14:31:02 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "agent_run_ingested",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 15:19:37 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 15:46:17 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 15:49:24 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 15:50:33 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 20:10:31 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 20:17:37 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 20:23:23 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 20:23:41 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 20:39:46 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Fri May 08 2026 20:42:33 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 16:33:12 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 16:35:06 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:synthesis_handoff:Sat May 09 2026 16:35:41 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "synthesis_handoff",
+      "pipeline": "synth",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::synthesis_handoff:multi_lane_retrieval:Sat May 09 2026 16:37:55 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "synthesis_handoff",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 16:43:00 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 16:58:13 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 16:58:13 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 16:58:21 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 16:58:21 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:10:14 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:10:14 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:synthesis_handoff:Sat May 09 2026 17:10:47 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "synthesis_handoff",
+      "pipeline": "synth",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "usage",
+          "run_ts",
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at",
+          "cited_paths",
+          "duration_ms",
+          "verified_paths",
+          "verification_pct"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::synthesis_handoff:multi_lane_retrieval:Sat May 09 2026 17:15:53 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "synthesis_handoff",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "usage",
+          "run_ts",
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at",
+          "cited_paths",
+          "duration_ms",
+          "verified_paths",
+          "verification_pct"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:15:53 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:synthesis_handoff:Sat May 09 2026 17:16:47 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "synthesis_handoff",
+      "pipeline": "synth",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "usage",
+          "run_ts",
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at",
+          "cited_paths",
+          "duration_ms",
+          "verified_paths",
+          "verification_pct"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::synthesis_handoff:multi_lane_retrieval:Sat May 09 2026 17:31:10 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "synthesis_handoff",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "usage",
+          "run_ts",
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at",
+          "cited_paths",
+          "duration_ms",
+          "verified_paths",
+          "verification_pct"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:31:10 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:36:44 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:36:44 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:37:41 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:37:41 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:37:58 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:37:58 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:39:05 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:39:05 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:39:33 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:39:33 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:41:49 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:41:49 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:55:47 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 17:55:47 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:10:06 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:10:42 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:12:16 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:16:03 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:16:13 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:16:45 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:16:46 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:17:03 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:19:28 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:20:00 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:37:08 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:37:35 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:41:34 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:41:53 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:42:04 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:42:12 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:42:23 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:45:57 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:46:47 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 18:47:55 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 19:42:38 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 19:42:58 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:11:13 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:13:22 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:31:45 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:33:04 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:36:24 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:37:14 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:44:58 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:44:59 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:46:45 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:46:45 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:46:58 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:47:59 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:47:59 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:50:46 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 20:50:46 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 21:08:17 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sat May 09 2026 21:08:17 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 01:25:52 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 01:26:06 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 01:26:06 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 01:26:49 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 01:28:52 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 14:01:14 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 14:01:15 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 15:58:07 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 15:58:10 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 20:25:19 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 20:25:19 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 20:44:12 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Sun May 10 2026 20:44:13 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Tue May 12 2026 00:53:49 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Tue May 12 2026 00:54:00 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:synthesis_handoff:Tue May 12 2026 00:55:26 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "synthesis_handoff",
+      "pipeline": "synth",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "usage",
+          "run_ts",
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at",
+          "cited_paths",
+          "duration_ms",
+          "verified_paths",
+          "verification_pct"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::synthesis_handoff:multi_lane_retrieval:Tue May 12 2026 00:56:59 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "synthesis_handoff",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "usage",
+          "run_ts",
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at",
+          "cited_paths",
+          "duration_ms",
+          "verified_paths",
+          "verification_pct"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:synthesis_handoff:Tue May 12 2026 00:58:07 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "synthesis_handoff",
+      "pipeline": "synth",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "usage",
+          "run_ts",
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at",
+          "cited_paths",
+          "duration_ms",
+          "verified_paths",
+          "verification_pct"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::synthesis_handoff:multi_lane_retrieval:Tue May 12 2026 14:02:37 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "synthesis_handoff",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "usage",
+          "run_ts",
+          "backend",
+          "brief_name",
+          "brief_path",
+          "handoff_at",
+          "cited_paths",
+          "duration_ms",
+          "verified_paths",
+          "verification_pct"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Tue May 12 2026 14:03:24 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Tue May 12 2026 14:03:48 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Tue May 12 2026 14:04:10 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Tue May 12 2026 14:04:30 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Tue May 12 2026 23:33:15 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 14 2026 13:46:29 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 14 2026 13:46:30 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 14 2026 14:21:44 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 14 2026 14:21:45 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 14 2026 14:21:59 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 14 2026 14:22:00 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 14 2026 14:49:21 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Thu May 14 2026 14:49:26 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:multi_lane_retrieval:Wed May 20 2026 14:17:02 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "multi_lane_retrieval",
+      "pipeline": "ace",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline::multi_lane_retrieval:agent_run_ingested:Wed May 20 2026 16:17:14 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "",
+      "fromState": "multi_lane_retrieval",
+      "toState": "agent_run_ingested",
+      "pipeline": "kag",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "lanesHit",
+          "priorFix",
+          "topFiles",
+          "queryHash",
+          "totalHits",
+          "durationMs",
+          "knownError",
+          "lanesSkipped"
+        ],
+        "nextKeys": [
+          "id",
+          "tags",
+          "files",
+          "summary",
+          "confidence",
+          "ingested_at",
+          "patchResult",
+          "source_file",
+          "needsDeepResearch"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline:1:tool_call:tool_call:Sun May 10 2026 20:12:18 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "1",
+      "fromState": "tool_call",
+      "toState": "tool_call",
+      "pipeline": "error_analysis",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "query",
+          "rounds",
+          "toolsUsed",
+          "durationMs",
+          "inferenceBackend",
+          "requestedBackend",
+          "backendFallbackReason"
+        ],
+        "nextKeys": [
+          "query",
+          "rounds",
+          "toolsUsed",
+          "durationMs",
+          "inferenceBackend",
+          "requestedBackend",
+          "backendFallbackReason"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline:1:tool_call:tool_call:Mon May 11 2026 09:40:44 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "1",
+      "fromState": "tool_call",
+      "toState": "tool_call",
+      "pipeline": "error_analysis",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "query",
+          "rounds",
+          "toolsUsed",
+          "durationMs",
+          "inferenceBackend",
+          "requestedBackend",
+          "backendFallbackReason"
+        ],
+        "nextKeys": [
+          "query",
+          "rounds",
+          "toolsUsed",
+          "durationMs",
+          "inferenceBackend",
+          "requestedBackend",
+          "backendFallbackReason"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    },
+    {
+      "cacheKey": "context_timeline:1:tool_call:tool_call:Mon May 11 2026 16:31:28 GMT-0700 (Pacific Daylight Time)",
+      "source": "context_timeline",
+      "sessionId": "1",
+      "fromState": "tool_call",
+      "toState": "tool_call",
+      "pipeline": "error_analysis",
+      "signal": null,
+      "payloadHint": {
+        "prevSignal": null,
+        "nextSignal": null,
+        "prevKeys": [
+          "query",
+          "rounds",
+          "toolsUsed",
+          "durationMs",
+          "inferenceBackend",
+          "requestedBackend",
+          "backendFallbackReason"
+        ],
+        "nextKeys": [
+          "query",
+          "rounds",
+          "toolsUsed",
+          "durationMs",
+          "inferenceBackend",
+          "requestedBackend",
+          "backendFallbackReason"
+        ]
+      },
+      "score": 1,
+      "hitCount": 1
+    }
+  ]
+}

@@ -464,7 +464,8 @@ export type EnvUrlMapEntry = {
 | `NEO4J_URI` | `bolt://127.0.0.1:7687` | Neo4j | graph expansion/PageRank | yes |
 | `HG_LOOKUP_URL` | `127.0.0.1:9234` | hypergraph lookup | topology routing | yes |
 | `TOPOLOGY_SEARCH_URL` | fallback topology URL | topology search | topology routing fallback | yes |
-| `TURBOVEC_SIDECAR` | `127.0.0.1:8099` | TurboVec | ANN prefilter | yes |
+| `TURBOVEC_SIDECAR` | `127.0.0.1:8792` | TurboVec | ANN prefilter | yes |
+| `TURBOVEC_HELPER_URL` | `127.0.0.1:8793` | RotorQuant helper | helper/sidecar | yes |
 | `OLLAMA_BASE_URL` | `127.0.0.1:8090` | TurboQuant/llama-server | Gemma4 synthesis | yes, retrieval-only |
 | `SEAWEED_S3_ENDPOINT` | `127.0.0.1:8333` | SeaweedFS S3 | file upload/storage | no for upload |
 | `RABBITMQ_URL` | `amqp://...` | RabbitMQ | background workflows | yes, pending_retry |
@@ -655,7 +656,7 @@ Validation:
 - WebGPU/GPU routes to webgpu_similarity/webgpu_init/gpu_analysis
 - Static extractor resolves $lib aliases
 - Dynamic extractor detects import(), Worker, require(), .node native addons
-- Env map lists QDRANT_URL, REDIS_URL, DATABASE_URL, OLLAMA_BASE_URL, SEAWEED_S3_ENDPOINT, HG_LOOKUP_URL, TOPOLOGY_SEARCH_URL, TURBOVEC_SIDECAR
+- Env map lists QDRANT_URL, REDIS_URL, DATABASE_URL, OLLAMA_BASE_URL, SEAWEED_S3_ENDPOINT, HG_LOOKUP_URL, TOPOLOGY_SEARCH_URL, TURBOVEC_SIDECAR, TURBOVEC_HELPER_URL
 
 Return:
 - files changed

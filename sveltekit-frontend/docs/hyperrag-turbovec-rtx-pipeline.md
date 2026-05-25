@@ -6,7 +6,7 @@
 Query
   │
   ▼
-[RotorQuant / TurboVec 4-bit ANN prefilter]   ← Python sidecar (port 8099)
+[RotorQuant / TurboVec 4-bit ANN prefilter]   ← TurboVec wrapper (port 8792) → Python helper (port 8793)
   │  top-200 candidate IDs + scores
   ▼
 [Qdrant Multi-Lane Dense Search]               ← codebase_chunks_768 / glyph_atlas
@@ -233,7 +233,7 @@ When using the TheTom `tqp-v0.1.1` prebuilt (D=128 only — safe for Qwen/Llama-
 
 ```powershell
 $env:TURBO_PROFILE = 'turboquant'   # ctk q8_0 / ctv turbo3
-$env:LLAMA_SERVER_PATH = 'C:\Users\james\Desktop\llama-server-turboquant\llama-server.exe'
+$env:LLAMA_SERVER_PATH = 'C:\Users\james\Videos\deeds-web-app\tools\llama-server\llama-server.exe'
 npm run turbo:start:detached
 npm run turbo:test:stability:turbo
 ```
@@ -257,7 +257,7 @@ For Gemma4 (D=256/512 layers), only the `test1111…/llama-cpp-turboquant-gemma4
 
 The doc previously referenced `scripts/rotorquant-turbovec-sidecar.mjs` — that path does not exist. The canonical location is `scripts/atlas/rotorquant-turbovec-sidecar.mjs`, wired as `npm run atlas:hyperrag:sidecar`.
 
-The Python TurboVec sidecar lives at `scripts/turbovec-sidecar.py` and must be running on port 8099 for Step 2 of Phase B to activate. Without it, Phase B falls back to plain wide-lane Qdrant search.
+The TurboVec wrapper lives at `scripts/atlas/rotorquant-turbovec-sidecar.mjs` on port `8792`, and it spawns the Python helper at `scripts/turbovec-sidecar.py` on port `8793`. Without it, Phase B falls back to plain wide-lane Qdrant search.
 
 ### Phase B detail
 
@@ -265,7 +265,8 @@ Three dependencies must be live for full cluster prefilter:
 
 | Dependency | Redis key / service | How to refresh |
 |---|---|---|
-| TurboVec sidecar | port 8099 | `python scripts/turbovec-sidecar.py` |
+| TurboVec wrapper | port 8792 | `node scripts/atlas/rotorquant-turbovec-sidecar.mjs` |
+| TurboVec helper | port 8793 | `python scripts/turbovec-sidecar.py` |
 | 4D manifold centroids | `cluster:kmeans:k20:manifold4:all` | `npm run graphify:semantic-cluster` |
 | `glyph_atlas` Qdrant collection | collection must be non-empty | `npm run graphify:semantic` |
 

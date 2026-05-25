@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/drizzle/meta/0008_snapshot.json"
-last_updated_by_llm: "2026-05-22T01:55:37.591Z"
+last_updated_by_llm: "2026-05-24T16:40:21.009Z"
 ai-first: true
 confidence: "high"
 up: []

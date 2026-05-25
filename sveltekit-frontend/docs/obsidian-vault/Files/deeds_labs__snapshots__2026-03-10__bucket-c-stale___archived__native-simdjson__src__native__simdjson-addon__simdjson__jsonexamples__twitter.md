@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/native-simdjson/src/native/simdjson-addon/simdjson/jsonexamples/twitter.json"
-last_updated_by_llm: "2026-05-23T02:58:14.645Z"
+last_updated_by_llm: "2026-05-24T16:40:21.009Z"
 ai-first: true
 confidence: "high"
 up: []

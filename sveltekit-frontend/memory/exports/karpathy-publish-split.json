@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T02:57:30.137Z",
+  "generatedAt": "2026-05-24T16:39:48.774Z",
   "sourceCount": 100,
   "selectedCount": 16,
   "maxRawHotness": 1.9208,
@@ -979,7 +979,7 @@
         "cluster:gpu:20",
         "cluster:gpu:57"
       ],
-      "generatedAt": "2026-05-23T02:57:30.137Z",
+      "generatedAt": "2026-05-24T16:39:48.774Z",
       "sourceCount": 100,
       "selectedCount": 16,
       "maxRawHotness": 1.9208
@@ -999,7 +999,7 @@
         "hotness": "1",
         "scalarSeed": "0.8279",
         "metadataSummary": "table-def chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:95": {
         "summary": "type chunks in `src/lib/server/db/schema` (tag: database)",
@@ -1015,7 +1015,7 @@
         "hotness": "1",
         "scalarSeed": "0.7947",
         "metadataSummary": "type chunks in `src/lib/server/db/schema` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db/schema, src/lib/server/db, src/lib/db/schema",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:91": {
         "summary": "type chunks in `src/lib/server/db` (tag: database)",
@@ -1031,7 +1031,7 @@
         "hotness": "1",
         "scalarSeed": "0.7912",
         "metadataSummary": "type chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, auth | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:51": {
         "summary": "table-def chunks in `src/lib/db/schema` (tag: database)",
@@ -1047,7 +1047,7 @@
         "hotness": "1",
         "scalarSeed": "0.7669",
         "metadataSummary": "table-def chunks in `src/lib/db/schema` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/db/schema, src/lib/server/db",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:84": {
         "summary": "function chunks in `src/lib/server/audit` (tag: vector)",
@@ -1063,7 +1063,7 @@
         "hotness": "1",
         "scalarSeed": "0.7667",
         "metadataSummary": "function chunks in `src/lib/server/audit` (tag: vector) | Risk: high | Tags: vector, embedding, database, schema, drizzle | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/audit, src/lib/server/db, src/routes/api/audit/gpu",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:13": {
         "summary": "table-def chunks in `src/lib/server/db` (tag: database)",
@@ -1079,7 +1079,7 @@
         "hotness": "1",
         "scalarSeed": "0.752",
         "metadataSummary": "table-def chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, auth | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/db/schema, src/routes/api/persons-of-interest/[id]/timeline",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:65": {
         "summary": "const chunks in `src/lib/server/db` (tag: database)",
@@ -1095,7 +1095,7 @@
         "hotness": "1",
         "scalarSeed": "0.643",
         "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:76": {
         "summary": "type chunks in `src/lib/server/db` (tag: database)",
@@ -1111,7 +1111,7 @@
         "hotness": "1",
         "scalarSeed": "0.643",
         "metadataSummary": "type chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:88": {
         "summary": "const chunks in `src/lib/server/db` (tag: database)",
@@ -1127,7 +1127,7 @@
         "hotness": "0.9712",
         "scalarSeed": "0.7779",
         "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/relations.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:53": {
         "summary": "const chunks in `src/lib/server/db` (tag: database)",
@@ -1143,7 +1143,7 @@
         "hotness": "0.9256",
         "scalarSeed": "0.7523",
         "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/schema/legal-citations.ts, src/lib/server/db/schema-evidence-crud.ts | Topo: src/lib/server/db, src/lib/types, src/lib/server/db/schema",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:75": {
         "summary": "function chunks in `src/lib/config` (tag: embedding)",
@@ -1159,7 +1159,7 @@
         "hotness": "0.6697",
         "scalarSeed": "0.6471",
         "metadataSummary": "function chunks in `src/lib/config` (tag: embedding) | Risk: medium | Tags: embedding, vector, redis, rabbitmq, ai | Files: src/lib/config/env.server.ts, src/lib/server/minio.ts | Topo: src/lib/config, src/lib/server, src/lib/server/config",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:59": {
         "summary": "function chunks in `src/lib/server/observability` (tag: vector)",
@@ -1175,7 +1175,7 @@
         "hotness": "0.5672",
         "scalarSeed": "0.479",
         "metadataSummary": "function chunks in `src/lib/server/observability` (tag: vector) | Risk: low | Tags: vector, embedding, auth | Files: src/lib/server/observability/inference-log.ts | Topo: src/lib/server/observability, src/lib/components/evidence",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:94": {
         "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
@@ -1191,7 +1191,7 @@
         "hotness": "0.5302",
         "scalarSeed": "0.583",
         "metadataSummary": "function chunks in `src/lib/server/cache` (tag: redis) | Risk: low | Tags: redis, cache, api, server, embedding | Files: src/lib/server/cache.ts | Topo: src/lib/server/cache, src/lib/server, src/lib/cache",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:90": {
         "summary": "function chunks in `src/lib/server` (tag: auth)",
@@ -1207,7 +1207,7 @@
         "hotness": "0.4973",
         "scalarSeed": "0.4932",
         "metadataSummary": "function chunks in `src/lib/server` (tag: auth) | Risk: low | Tags: auth, api, server | Files: src/lib/server/lucia.ts | Topo: src/lib/server, src/routes/api/auth/logout, src/lib/types",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:20": {
         "summary": "function chunks in `src/lib/webgpu` (tag: embedding)",
@@ -1223,7 +1223,7 @@
         "hotness": "0.4969",
         "scalarSeed": "0.5635",
         "metadataSummary": "function chunks in `src/lib/webgpu` (tag: embedding) | Risk: low | Tags: embedding, redis, vector, auth, schema | Files: src/lib/server/gpu/libtorch-bridge.ts | Topo: src/lib/webgpu, src/lib/server/gpu, src/lib/gpu",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       },
       "cluster:gpu:57": {
         "summary": "const chunks in `src/lib/shims` (tag: embedding)",
@@ -1239,7 +1239,7 @@
         "hotness": "0.4953",
         "scalarSeed": "0.5766",
         "metadataSummary": "const chunks in `src/lib/shims` (tag: embedding) | Risk: low | Tags: embedding, vector, auth, server-module, config | Files: src/lib/server/gpu/libtorch-bridge.ts, src/lib/server/retrieval/context-buffer.ts | Topo: src/lib/shims, src/lib/server/vector, src/lib",
-        "generatedAt": "2026-05-23T02:57:30.137Z"
+        "generatedAt": "2026-05-24T16:39:48.774Z"
       }
     }
   }

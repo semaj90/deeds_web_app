@@ -114,10 +114,15 @@ if (Test-Path $envPath) {
 $llama = if ($env:LLAMA_SERVER_PATH) {
     $env:LLAMA_SERVER_PATH
 } else {
-    # Fallback order: 1. bin/ in workspace, 2. vendor/ in workspace, 3. system path
+    # Fallback order: 1. bin/ in workspace, 2. tools/ in workspace,
+    # 3. vendor/ in workspace, 4. system path
     $localBin = Join-Path $PSScriptRoot "..\bin\llama-server.exe"
+    $localTools = Join-Path $PSScriptRoot "..\tools\llama-server\llama-server.exe"
     $localVendor = Join-Path $PSScriptRoot "..\vendor\llama-server\llama-server.exe"
-    if (Test-Path $localBin) { $localBin } elseif (Test-Path $localVendor) { $localVendor } else { "llama-server.exe" }
+    if (Test-Path $localBin) { $localBin }
+    elseif (Test-Path $localTools) { $localTools }
+    elseif (Test-Path $localVendor) { $localVendor }
+    else { "llama-server.exe" }
 }
 
 # ROTORQUANT_MODEL_PATH overrides TURBO_MODEL_PATH when set.
@@ -126,13 +131,26 @@ $model = if ($env:ROTORQUANT_MODEL_PATH) {
 } elseif ($env:TURBO_MODEL_PATH) {
     $env:TURBO_MODEL_PATH
 } else {
+    $vendorModel = Join-Path $PSScriptRoot "..\vendor\models\gemma4-legal.gguf"
+    $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\gemma4-rotorquant:latest.gguf"
+    $localModel = Join-Path $PSScriptRoot "..\models\gemma4-legal-iq4xs-direct.gguf"
+    $localLegacy = Join-Path $PSScriptRoot "..\models\gemma4-turboquant-rotorquant.gguf"
+    if (Test-Path $vendorModel) { $vendorModel }
+    elseif (Test-Path $vendorDirect) { $vendorDirect }
+    elseif (Test-Path $localModel) { $localModel }
+    elseif (Test-Path $localLegacy) { $localLegacy }
+    else { $null }
 }
 $mmproj = if ($env:TURBO_MMPROJ_PATH) {
     $env:TURBO_MMPROJ_PATH
 } else {
-    $localMmproj = Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf"
+    $localMmproj = Join-Path $PSScriptRoot "..\models\mmproj-F16.gguf"
+    $vendorMmproj = Join-Path $PSScriptRoot "..\vendor\models\mmproj-gemma4.gguf"
+    $legacyMmproj = Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf"
     if (Test-Path $localMmproj) { $localMmproj }
-    else { $null }  # no fallback - set TURBO_MMPROJ_PATH or place file at models/mmproj-BF16.gguf
+    elseif (Test-Path $vendorMmproj) { $vendorMmproj }
+    elseif (Test-Path $legacyMmproj) { $legacyMmproj }
+    else { $null }  # no fallback - set TURBO_MMPROJ_PATH or place a mmproj file in one of the known locations
 }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
 $ctxLen  = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }

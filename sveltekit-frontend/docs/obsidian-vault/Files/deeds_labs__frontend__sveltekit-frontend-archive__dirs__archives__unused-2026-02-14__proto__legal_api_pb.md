@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/proto/legal_api_pb.js"
-last_updated_by_llm: "2026-05-22T01:55:37.591Z"
+last_updated_by_llm: "2026-05-24T16:40:21.009Z"
 ai-first: true
 confidence: "high"
 up: []

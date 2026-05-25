@@ -15,6 +15,7 @@
 import { dev } from '$app/environment';
 const privateEnv: Record<string, string | undefined> = process.env;
 import { ENV } from '$lib/server/env.server.js';
+import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 import type {
 	MinIOClient,
 	MinIOConfig,
@@ -328,7 +329,9 @@ export class QdrantAdapter implements QdrantClient {
 	async createCollection(name: string, vectorSize: number): Promise<void> {
 		await this.ensureClient();
 		await this.client.createCollection(name, {
-			vectors: { size: vectorSize, distance: 'Cosine' }
+			vectors: { size: vectorSize, distance: 'Cosine' },
+			hnsw_config: VECTOR_CONFIG.QDRANT_HNSW,
+			quantization_config: VECTOR_CONFIG.QDRANT_QUANTIZATION
 		});
 	}
 

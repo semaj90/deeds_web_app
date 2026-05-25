@@ -1,32 +1,47 @@
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
 
-Write-Host "duckdb:smoke — export-only validation"
+Write-Host 'duckdb:smoke - export-only validation'
 
-if (-not (Get-Command duckdb -ErrorAction SilentlyContinue)) {
-  throw "duckdb command not found on PATH"
+$duckdbCommand = Get-Command duckdb -ErrorAction SilentlyContinue
+if (-not $duckdbCommand) {
+  throw 'duckdb command not found on PATH'
 }
 
-duckdb --version
-duckdb -c "SELECT 42 AS duckdb_ok;"
+& duckdb --version
+& duckdb -c 'SELECT 42 AS duckdb_ok;'
 
-$root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
-$manifest = Join-Path $root "memory/exports/graph-refresh-manifest.json"
-$clusterCards = Join-Path $root "memory/exports/cluster-cards.jsonl"
-$pathwayCards = Join-Path $root "memory/exports/pathway-cards.jsonl"
+$root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$manifest = Join-Path $root 'memory/exports/graph-refresh-manifest.json'
+$clusterCards = Join-Path $root 'memory/exports/cluster-cards.jsonl'
+$pathwayCards = Join-Path $root 'memory/exports/pathway-cards.jsonl'
+
+function Invoke-DuckDbCount {
+  param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [switch]$Delimited
+  )
+
+  $duckPath = $Path -replace '\\', '/'
+  if ($Delimited) {
+    $sql = "SELECT count(*) AS rows FROM read_json_auto('$duckPath', format='newline_delimited');"
+  }
+  else {
+    $sql = "SELECT count(*) AS rows FROM read_json_auto('$duckPath');"
+  }
+
+  & duckdb -c $sql
+}
 
 if (Test-Path $manifest) {
-  $duckManifest = $manifest.Replace('\', '/')
-  duckdb -c "SELECT count(*) AS rows FROM read_json_auto('$duckManifest');"
+  Invoke-DuckDbCount -Path $manifest
 }
 
 if (Test-Path $clusterCards) {
-  $duckClusterCards = $clusterCards.Replace('\', '/')
-  duckdb -c "SELECT count(*) AS rows FROM read_json_auto('$duckClusterCards', format='newline_delimited');"
+  Invoke-DuckDbCount -Path $clusterCards -Delimited
 }
 
 if (Test-Path $pathwayCards) {
-  $duckPathwayCards = $pathwayCards.Replace('\', '/')
-  duckdb -c "SELECT count(*) AS rows FROM read_json_auto('$duckPathwayCards', format='newline_delimited');"
+  Invoke-DuckDbCount -Path $pathwayCards -Delimited
 }
 
-Write-Host "duckdb:smoke complete"
+Write-Host 'duckdb:smoke complete'

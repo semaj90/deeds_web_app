@@ -2,7 +2,7 @@
 scripts/turbovec-sidecar.py
 =============================
 TurboVec 4-bit ANN search sidecar.
-Listens on PORT (default 8099), accepts POST /search { vector, k }
+Listens on PORT (default 8793), accepts POST /search { vector, k }
 Returns { ids: [...], scores: [...] }
 
 Loaded at startup:
@@ -11,7 +11,7 @@ Loaded at startup:
   - Re-indexes on POST /reindex
 
 Usage:
-    python scripts/turbovec-sidecar.py [--port 8099] [--dim 64] [--qdrant http://localhost:6333]
+    python scripts/turbovec-sidecar.py [--port 8793] [--dim 64] [--qdrant http://localhost:6333]
 """
 
 import sys
@@ -35,7 +35,7 @@ except ImportError:
 
 # ── Config ────────────────────────────────────────────────────────────────────
 parser = argparse.ArgumentParser()
-parser.add_argument('--port', type=int, default=8099)
+parser.add_argument('--port', type=int, default=8793)
 parser.add_argument('--dim', type=int, default=64,  help='Projection dim for TurboVec index (max 64 for 4-bit speed)')
 parser.add_argument('--bits', type=int, default=4,   help='Quantization bits (4 or 8)')
 parser.add_argument('--qdrant', type=str, default='http://127.0.0.1:6333')

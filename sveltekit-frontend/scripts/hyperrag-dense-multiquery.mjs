@@ -23,7 +23,7 @@
  *   REDIS_URL        default redis://127.0.0.1:6379
  *   OLLAMA_URL       default http://127.0.0.1:11434
  *   COUCH_URL        default http://127.0.0.1:5984
- *   TURBOVEC_SIDECAR default http://127.0.0.1:8099
+ *   TURBOVEC_SIDECAR default http://127.0.0.1:8792
  */
 
 import { resolve, dirname } from 'node:path';
@@ -49,7 +49,7 @@ const QDRANT_URL        = process.env.QDRANT_URL        ?? 'http://127.0.0.1:633
 const REDIS_URL         = process.env.REDIS_URL         ?? 'redis://127.0.0.1:6379';
 const OLLAMA_URL        = process.env.OLLAMA_URL        ?? 'http://127.0.0.1:11434';
 const COUCH_URL         = process.env.COUCH_URL         ?? 'http://127.0.0.1:5984';
-const TURBOVEC_SIDECAR  = process.env.TURBOVEC_SIDECAR  ?? 'http://127.0.0.1:8099';
+const TURBOVEC_SIDECAR  = process.env.TURBOVEC_SIDECAR  ?? 'http://127.0.0.1:8792';
 const BITFROST_URL      = process.env.BITFROST_URL      ?? process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090';
 const EMBED_MODEL       = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const BITFROST_MODEL     = process.env.BITFROST_MODEL    ?? 'gemma4-rotorquant:latest';

@@ -96,6 +96,19 @@ Refresh the JSON anytime with `npm run graphify:daily`, then reload the viewer.
 
 **Minimum to use this guide:** Redis + llama-server :8090. Everything else is optional and gracefully skipped.
 
+Launcher path resolution note:
+
+- The TurboQuant launcher now resolves the actual repo-local runtime paths when the older fallbacks are missing:
+  - `tools\\llama-server\\llama-server.exe`
+  - `vendor\\models\\gemma4-legal.gguf`
+  - `vendor\\models\\mmproj-gemma4.gguf`
+- The missing-model case is covered by `npm run turbo:smoke`.
+- If the launcher reports healthy, confirm the model list with:
+
+```powershell
+npm run turbo:smoke
+```
+
 ---
 
 ## VS Code task reference (all under `Ctrl+Shift+P → Tasks: Run Task`)
@@ -138,6 +151,7 @@ VS Code's chat session serializes terminal output. Multi-MB outputs blow up the 
 | `⚡ TurboQuant: Health Check` | `curl :8090/health \| python -m json.tool` |
 | `⚡ TurboQuant: Test Inference (hearsay query)` | Cold inference timing |
 | `⚡ TurboQuant: Cache Validation (3-run cold→warm→hot)` | Validates L1 + L2 + L3 cascade speedup |
+| `⚡ TurboQuant: Model Smoke` | `npm run turbo:smoke` checks `/health` and `/v1/models` |
 
 ---
 

@@ -1,43 +1,39 @@
 {
-  "cardCounts": {
-    "cluster": 20,
-    "feature": 69,
-    "memory": 4,
-    "pathway": 50,
-    "summary": 13874,
-    "tool": 6
-  },
-  "generatedAt": "2026-05-23T03:51:11.920Z",
-  "outputs": {
+  "version": 1,
+  "status": "generated",
+  "promotionState": "unpromoted",
+  "generatedAt": "2026-05-25T00:27:35.213Z",
+  "generator": "scripts/atlas/generate-graph-exports.mjs",
+  "sources": [
+    "docs/graph/codebase-graph.json",
+    "memory/graphify/deep/deep-import-graph.json",
+    "memory/graphify/deep/deep-import-edges.jsonl",
+    "memory/docstore/manifest.json",
+    "memory/kag-notes/manifest.json"
+  ],
+  "exports": {
     "clusterCards": "memory/exports/cluster-cards.jsonl",
-    "featureMapCards": "memory/exports/feature-map-cards.jsonl",
-    "graphRefreshManifest": "memory/exports/graph-refresh-manifest.json",
-    "pathwayCards": "memory/exports/pathway-cards.jsonl",
-    "selectedCards": "memory/cards/selected-cards.json",
-    "selectedToon": "memory/cards/selected-cards.toon"
+    "pathwayCards": "memory/exports/pathway-cards.jsonl"
   },
-  "repoRoot": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend",
-  "sources": {
-    "atlasTop": {
-      "count": 50,
-      "hash": "3fe67a9673b4af22",
-      "path": "memory/atlas/codebase-atlas.top.json"
-    },
-    "clusterSummaries": {
-      "count": 20,
-      "hash": "f75d410b8782b40c",
-      "path": "docs/graph/cluster-summaries.json"
-    },
-    "deepImportGraph": {
-      "edgeCount": 77187,
-      "hash": "2c527f4819e17202",
-      "nodeCount": 33471,
-      "path": "memory/graphify/deep/deep-import-graph.json"
-    },
-    "featureMap": {
-      "count": 19,
-      "hash": "23962a32f350652f",
-      "path": "src/lib/server/atlas/master-feature-map.ts"
-    }
+  "counts": {
+    "nodes": 33684,
+    "edges": 77580,
+    "clusterCards": 0,
+    "pathwayCards": 12,
+    "clusterCardRows": 0,
+    "pathwayCardRows": 12
+  },
+  "hashes": {
+    "clusterCardsSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "pathwayCardsSha256": "d61198b8081c3ec5ec60df19bc36b0281d29b963955bcbda64ca5623ae0aa411"
+  },
+  "validation": {
+    "isStub": false,
+    "promoted": false,
+    "notes": [
+      "Generated from available graph artifacts.",
+      "promotionState remains unpromoted until downstream validation passes.",
+      "Do not treat as final graph truth until promoted."
+    ]
   }
 }

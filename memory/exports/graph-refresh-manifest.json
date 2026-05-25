@@ -1,0 +1,8 @@
+{
+  "graph-refresh-manifest": {
+    "status": "stub",
+    "promotionState": "unpromoted",
+    "lastUpdated": "YYYY-MM-DD_T12:00:00Z",
+    "sourceRefs": []
+  }
+}

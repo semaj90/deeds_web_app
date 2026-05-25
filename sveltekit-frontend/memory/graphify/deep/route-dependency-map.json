@@ -1,4 +1,10 @@
 {
+  "src/routes/api/chat/stream/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/(analysis)/+layout.svelte": {
     "zone": "shared",
     "directDeps": 0,
@@ -2003,6 +2009,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ace/ask/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ace/context/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -2027,6 +2039,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ace/packet/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ace/rank/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -2040,6 +2058,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/ace/status/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ace/stream/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -2760,6 +2784,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/analyze-tag/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/atlas/audit/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -3918,6 +3948,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/db/health/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -6222,6 +6258,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/yorha/search/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

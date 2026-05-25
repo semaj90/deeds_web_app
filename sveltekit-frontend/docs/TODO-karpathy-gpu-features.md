@@ -15,20 +15,20 @@
 
 ## 1. Autoencoder Pipeline — Unlock the Encoded Prefilter (P1)
 
-The 64-dim encoded prefilter currently uses Xavier placeholder weights. Every item below moves it toward real trained weights so `ACE_ENCODED_PREFILTER_MODE` produces meaningful cluster scores.
+The 64-dim encoded prefilter is now trained and wired. Phase 10A closed the 768→256→64→256→768 autoencoder lane, backfilled Qdrant `encoded_64`, and recomputed Redis centroids. The items below are the remaining legacy follow-on checks and downstream tool wiring.
 
 | # | Task | Status | Command / File |
 |---|------|--------|----------------|
-| 1a | Train autoencoder weights (768→256→64, Adam, reconstruction loss) | 🔧 script exists | `npm run ae:train:js` |
-| 1b | Verify weights land in Redis `ace:autoencoder:weights` (W1/b1/W2/b2) | ☐ | `docker exec legal-ai-redis redis-cli EXISTS ace:autoencoder:weights` |
-| 1c | Backfill Qdrant `codebase_chunks_768` with `encoded_64` payload field | 🔧 script exists | `npm run ae:backfill` |
-| 1d | Recompute centroids in Redis `gpu:autoencoder:centroids_64_meta` | 🔧 script exists | `npm run ae:centroids` |
+| 1a | Train autoencoder weights (768→256→64, Adam, reconstruction loss) | ✅ | `npm run ae:train:js` |
+| 1b | Verify weights land in Redis `ace:autoencoder:weights` (W1/b1/W2/b2) | ✅ | `docker exec legal-ai-redis redis-cli EXISTS ace:autoencoder:weights` |
+| 1c | Backfill Qdrant `codebase_chunks_768` with `encoded_64` payload field | ✅ | `npm run ae:backfill` |
+| 1d | Recompute centroids in Redis `gpu:autoencoder:centroids_64_meta` | ✅ | `npm run ae:centroids` |
 | 1e | Add `graphify:autoencoder:train` npm alias for full train→centroids→backfill pipeline | ✅ | Add to `package.json`: `ae:train:js && ae:centroids && ae:backfill` |
 | 1f | Verify HMM `AUTOENCODER_WEIGHTS_TRAINED` state in `hermes-executor.ts` reads `ace:autoencoder:weights` (not null check) | 🔧 state added | `src/lib/server/ai/hermes-executor.ts` — HMM gap checker |
 | 1g | Add autoencoder health column to `npm run graphify:health` output (real vs xavier placeholder) | ✅ | `scripts/graphify-health.mjs` |
 | 1h | Add `ace:autoencoder:weights` check to `smoke:graphify` 5-pillar | ✅ | `scripts/tests/smoke-graphify.mjs` |
 
-**After 1a–1e complete**: `ACE_ENCODED_PREFILTER_MODE` switches from Xavier noise to real cluster scores → cluster prefilter actually filters rather than passing everything through.
+**After 1a–1e complete**: `ACE_ENCODED_PREFILTER_MODE` uses trained weights and real centroids instead of Xavier noise, so cluster prefilter actually filters rather than passing everything through.
 
 ---
 

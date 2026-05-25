@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
-import { createHash } from 'node:crypto';
+import { assertTurboVecEmbedding, TURBOVEC_EMBEDDING_DIMENSION } from './turbovec-contract';
 
 /**
  * TurboVecClient
@@ -22,6 +22,7 @@ export class TurboVecClient {
   }): Promise<Array<{ id: string; score: number }>> {
     const topK = params.topK ?? 10;
     const indexPath = params.indexPath ?? '.cache/turbovec/evidence_text.tvim';
+    assertTurboVecEmbedding(params.vector, TURBOVEC_EMBEDDING_DIMENSION);
     
     return new Promise((resolve, reject) => {
       const args = [

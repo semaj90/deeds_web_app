@@ -44,10 +44,14 @@ async function verifyRetrieval() {
 
   if (graphWins >= vectorWins) {
     console.log('✅ Graph > Vector fallback. Weights are balanced.');
+    process.exit(0);
   } else {
     console.log('❌ Vector fallback > Graph. Adjust weights in MCP tool dispatch!');
     process.exit(1);
   }
 }
 
-verifyRetrieval().catch(console.error);
+verifyRetrieval().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

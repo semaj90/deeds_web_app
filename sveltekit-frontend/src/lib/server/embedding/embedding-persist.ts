@@ -16,8 +16,9 @@ import { db } from '$lib/server/db/client';
 import { embeddingCache } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { createHash } from 'crypto';
+import { assertEmbeddingDimension, CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/vector/embedding-dimension-guard.js';
 
-const EMBEDDING_DIM = 768;
+const EMBEDDING_DIM = CANONICAL_EMBEDDING_DIMENSION;
 const DEFAULT_MODEL = 'embeddinggemma:latest';
 
 /**
@@ -76,6 +77,7 @@ export async function persistEmbedding(
 ): Promise<void> {
 	try {
 		const hash = hashText(text);
+		assertEmbeddingDimension(embedding, 'canonical_768d', EMBEDDING_DIM);
 		const vectorLiteral = toVectorLiteral(embedding);
 
 		await db.execute(

@@ -69,7 +69,7 @@ try {
 # Knowledge Plane
 Write-Host "`n🔧 Knowledge Plane:" -ForegroundColor Yellow
 try {
-    $health = curl -s http://127.0.0.1:8099/health 2>$null | ConvertFrom-Json
+    $health = curl -s http://127.0.0.1:8792/health 2>$null | ConvertFrom-Json
     if ($health.status -eq "healthy") {
         Write-Host "   ✅ Running (v$($health.version))" -ForegroundColor Green
         Write-Host "   Checks:" -ForegroundColor Gray
@@ -81,7 +81,7 @@ try {
         Write-Host "   ⚠️  Status: $($health.status)" -ForegroundColor Yellow
     }
 } catch {
-    Write-Host "   ❌ Not running on port 8099" -ForegroundColor Red
+    Write-Host "   ❌ Not running on port 8792" -ForegroundColor Red
     Write-Host "      Start: cd ..\go-services\knowledge-plane; .\run.ps1" -ForegroundColor Gray
 }
 
@@ -129,7 +129,7 @@ if ($qdrantPoints -lt 600) {
 
 $kpRunning = $false
 try {
-    $kpRunning = (curl -s http://127.0.0.1:8099/health 2>$null | ConvertFrom-Json).status -eq "healthy"
+    $kpRunning = (curl -s http://127.0.0.1:8792/health 2>$null | ConvertFrom-Json).status -eq "healthy"
 } catch {}
 
 if (-not $kpRunning) {

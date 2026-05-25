@@ -19,7 +19,13 @@ async function generateReport() {
   console.log('📊 Generating Cache Effectiveness Report...');
 
   // 1. Fetch Synthesis Logs
-  const { rows } = await pool.query('SELECT cache_layer_used, cache_trace, metadata FROM synthesis_logs ORDER BY created_at DESC LIMIT 500');
+  let rows = [];
+  try {
+    const res = await pool.query('SELECT * FROM synthesis_logs ORDER BY created_at DESC LIMIT 500');
+    rows = res.rows;
+  } catch (err) {
+    console.error('Error fetching synthesis_logs:', err.message);
+  }
 
   let totalRuns = rows.length;
   let llmOutputHits = 0;
@@ -31,15 +37,17 @@ async function generateReport() {
   let cachedLatencies = [];
 
   for (const row of rows) {
-    const layer = row.cache_layer_used || 'none';
     const trace = row.cache_trace || {};
+    const metadata = row.metadata || {};
+    // Extract layer correctly from wherever it's stored in older vs newer rows
+    const layer = row.cache_layer_used || trace.layerUsed || metadata.cacheLayerUsed || 'none';
     
     if (layer === 'llm_output') llmOutputHits++;
     if (layer === 'bifrost_semantic') bifrostHits++;
     if (layer === 'centroid') centroidHits++;
     if (layer === 'graph' || trace.layerUsed === 'graph') graphCacheHits++;
     
-    const latencyMs = row.metadata?.latencyMs || 0;
+    const latencyMs = metadata.latencyMs || 0;
     if (latencyMs > 0) {
       if (layer === 'none') {
         nonCachedLatencies.push(latencyMs);
@@ -85,4 +93,7 @@ async function generateReport() {
   redis.disconnect();
 }
 
-generateReport().catch(console.error);
+generateReport().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

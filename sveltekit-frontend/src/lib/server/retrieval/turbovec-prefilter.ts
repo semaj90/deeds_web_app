@@ -1,6 +1,6 @@
 /**
  * turbovec-prefilter.ts
- * Thin client for the TurboVec ANN sidecar at :8099.
+ * Thin client for the TurboVec ANN sidecar wrapper (:8792) and Python helper (:8793).
  * Wraps /prefilter and /search endpoints with a configurable timeout + graceful fallback.
  */
 

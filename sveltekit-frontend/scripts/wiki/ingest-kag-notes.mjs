@@ -162,8 +162,13 @@ const manifest = {
 };
 if (!DRY_RUN) {
   mkdirSync(KAG_NOTES_DIR, { recursive: true });
-  writeFileSync(resolve(KAG_NOTES_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
-  console.log(`[kag-ingest] Manifest written to memory/kag-notes/manifest.json`);
+  const manifestPath = resolve(KAG_NOTES_DIR, 'manifest.json');
+  try {
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+    console.log(`[kag-ingest] Manifest written to memory/kag-notes/manifest.json`);
+  } catch (error) {
+    console.warn(`[kag-ingest] Manifest write failed: ${error.message} — continuing without durable manifest`);
+  }
 }
 
 const durationMs = Date.now() - t0;

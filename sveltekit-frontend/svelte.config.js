@@ -19,7 +19,7 @@ const config = {
   compilerOptions: {
     runes: true,
     compatibility: {
-      componentApi: 4
+      componentApi: 4,
     },
     warningFilter: (warning) => !suppressedWarnings.has(warning.code),
   },
@@ -31,13 +31,15 @@ const config = {
     dynamicCompileOptions({ filename }) {
       // Svelte 4 legacy packages (lucide-svelte uses $$props) need runes disabled.
       // svelte-sonner and bits-ui use $props() runes and must NOT be overridden.
-      if (filename.includes('node_modules') &&
-          !filename.includes('svelte-sonner') &&
-          !filename.includes('bits-ui') &&
-          !filename.includes('svelte-tiptap')) {
+      if (
+        filename.includes('node_modules') &&
+        !filename.includes('svelte-sonner') &&
+        !filename.includes('bits-ui') &&
+        !filename.includes('svelte-tiptap')
+      ) {
         return { runes: false };
       }
-    }
+    },
   },
 
   kit: {
@@ -71,11 +73,20 @@ const config = {
       '$lib/components/ui': './src/lib/components/ui',
       '$lib/utils': './src/lib/utils',
     },
+    // Vite server options were previously placed under `kit.vite` but newer
+    // SvelteKit validates that Vite options appear at the top-level `vite` key.
+    // See: https://kit.svelte.dev/docs#configuration
     // Configure environment variables to expose PUBLIC_OLLAMA_URL to client-side code.
     // This allows the client to directly access Ollama if needed, or via a proxy.
     env: {
       publicPrefix: 'PUBLIC_', // Ensures variables starting with PUBLIC_ are exposed to client
       privatePrefix: '', // Default: all non-PUBLIC_ vars accessible server-side via $env/dynamic/private
+    },
+  },
+  // Top-level Vite options (moved from kit.vite to satisfy SvelteKit validation)
+  vite: {
+    server: {
+      allowedHosts: ['host.docker.internal', 'localhost', '127.0.0.1'],
     },
   },
 };

@@ -309,8 +309,8 @@ async function runIncrementalLane(redis) {
     // Non-blocking — failures are recorded in log.services but don't abort the lane.
     log.services = await probeServices();
 
-    // ── TurboVec ANN sidecar (fire-and-forget, :8099) ────────────────────────
-    // Spawn the Python TurboVec 4-bit ANN sidecar if it's not already alive.
+    // ── TurboVec ANN sidecar (fire-and-forget, :8792) ────────────────────────
+    // Spawn the TurboVec ANN wrapper if it's not already alive.
     // Uses a 30-min Redis cooldown so it doesn't respawn on every folder-open.
     // Feeds hyperrag:multiquery prefilter — optional, degrades gracefully if down.
     const tvCooldownKey = 'startup:turbovec-sidecar:last_spawn';
@@ -318,18 +318,17 @@ async function runIncrementalLane(redis) {
     const tvAge = tvStampRaw ? (Date.now() - new Date(tvStampRaw).getTime()) / 60_000 : Infinity;
     let tvHealthy = false;
     try {
-      const tvProbe = await fetch('http://127.0.0.1:8099/health', {
+      const tvProbe = await fetch('http://127.0.0.1:8792/health', {
         signal: AbortSignal.timeout(1500),
       });
       tvHealthy = tvProbe.ok;
     } catch {}
 
     if (!tvHealthy && tvAge > 30) {
-      const pyExe = 'C:\\Users\\james\\AppData\\Local\\Programs\\Python\\Python311\\python.exe';
-      const sidecarScript = resolve(ROOT, 'scripts/turbovec-sidecar.py');
+      const sidecarScript = resolve(ROOT, 'scripts/atlas/rotorquant-turbovec-sidecar.mjs');
       const tvOut = openSync(resolve(LOG_DIR, 'turbovec-sidecar.out.log'), 'a');
       const tvErr = openSync(resolve(LOG_DIR, 'turbovec-sidecar.err.log'), 'a');
-      const tvChild = spawn(pyExe, [sidecarScript], {
+      const tvChild = spawn('node', [sidecarScript], {
         cwd: ROOT,
         detached: true,
         stdio: ['ignore', tvOut, tvErr],
@@ -342,7 +341,7 @@ async function runIncrementalLane(redis) {
       await redis.set(tvCooldownKey, new Date().toISOString(), 'EX', 3600).catch(() => {});
     } else if (tvHealthy) {
       log.turbovecSidecar = { status: 'already-up' };
-      console.log('[startup] TurboVec sidecar already healthy on :8099');
+      console.log('[startup] TurboVec sidecar already healthy on :8792');
     } else {
       log.turbovecSidecar = { status: 'cooldown', ageMin: tvAge.toFixed(1) };
     }
@@ -373,6 +372,15 @@ async function runIncrementalLane(redis) {
       required: false,
       timeout: 60_000,
       skipIfStdoutIncludes: 'SKIP GET /api/ace/recommendations responds — dev server down',
+    });
+
+    // ACE top-retrieval cache smoke — validates the query-hash top-N cache
+    // that sits next to the context pack cache. This stays required:false so
+    // workspace open never hard-blocks on retrieval cache drift, but it does
+    // surface a failure in startup-latest.json.
+    runStep('ACE top-retrieval cache smoke', 'ace:retrieval-top-cache:smoke', {
+      required: false,
+      timeout: 60_000,
     });
 
     // Update Redis state and sha baseline.

@@ -852,3 +852,8 @@ docs/graph/repo-root-atlas.json
 
 # Deep graphify artifacts >10MB (gitignored — pre-commit hook rejects them)
 sveltekit-frontend/memory/graphify/deep/deep-import-graph.json
+/docs/documents-atlas-index.json
+/memory/atlas/documents-atlas.inverted.json
+/sveltekit-frontend/docs/documents-atlas-index.json
+/sveltekit-frontend/memory/atlas/documents-atlas.inverted.json
+/sveltekit-frontend/memory/kb/notecards/graph_file_cards.rank.json

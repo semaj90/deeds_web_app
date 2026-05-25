@@ -4,6 +4,7 @@
  */
 
 import { pool as POOL } from '$lib/server/db/client';
+import { assertEmbeddingDimension, CANONICAL_EMBEDDING_DIMENSION } from './embedding-dimension-guard.js';
 
 // Centralized Party role/type defaults
 const DEFAULT_PARTY_ROLE = 'other' as const;
@@ -84,6 +85,7 @@ export async function upsertToPGVector(item: DocumentItem | VisionItem): Promise
 		source: (item as DocumentItem).source ?? null,
 		meta: (item as DocumentItem).meta ?? null
 	};
+	assertEmbeddingDimension(vector, 'canonical_768d', CANONICAL_EMBEDDING_DIMENSION);
 
 	const sql = `
 		INSERT INTO embeddings (id, doc, vector)

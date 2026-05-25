@@ -1,0 +1,545 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "turboquant/gemma4-tq",
+  "small_model": "turboquant/gemma4-tq",
+  "default_agent": "atlas-context",
+  "shell": "pwsh.exe",
+  "skills": {
+    "paths": [
+      "../.opencode/skills"
+    ]
+  },
+  "permission": {
+    "read": "ask",
+    "grep": "allow",
+    "glob": "allow",
+    "lsp": "allow",
+    "skill": "allow",
+    "todowrite": "allow",
+    "trace_*": "allow",
+    "turbovec_*": "allow",
+    "engram_*": "allow",
+    "langextract_*": "allow",
+    "bash": {
+      "npm run tools:check:structural": "allow",
+      "npm run index:*": "allow",
+      "npm run graphify:dependency:audit": "allow",
+      "npm --prefix * run index:*": "allow",
+      "npm --prefix * run graphify:dependency:audit": "allow",
+      "node scripts/index/*": "allow",
+      "rg *": "allow",
+      "ast-grep *": "allow",
+      "sg *": "allow",
+      "jq *": "allow",
+      "git status": "allow",
+      "git diff *": "allow",
+      "rm *": "deny",
+      "del *": "deny",
+      "Remove-Item *": "deny",
+      "npm run ace:packet -- *": "allow",
+      "npm run ace:ask -- *": "allow",
+      "npm run ace:stream -- *": "allow",
+      "npm run index:clusters:query -- *": "allow",
+      "node scripts/ace/*.mjs *": "allow",
+      "Get-Content * | Select-Object -Skip * -First *": "allow",
+      "cat *.md": "deny",
+      "cat *.txt": "deny",
+      "cat *.json": "deny",
+      "Get-Content docs/llms/generated/*": "deny",
+      "Get-Content *.json": "deny",
+      "*": "ask"
+    }
+  },
+  "provider": {
+    "turboquant": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Local llama-server :8090",
+      "options": {
+        "baseURL": "http://127.0.0.1:8090/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-iq4xs": {
+          "name": "Gemma4 Legal 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+        "gemma4-tq": {
+          "name": "Gemma4 TurboQuant 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        }
+      }
+    },
+    "ollama_disabled": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama local :11434 (fallback only)",
+      "options": {
+        "baseURL": "http://127.0.0.1:11434/v1",
+        "apiKey": "ollama"
+      },
+      "models": {
+        "embeddinggemma": {
+          "name": "EmbeddingGemma \u2014 768-dim embeddings (primary embed model)",
+          "limit": {
+            "context": 8192,
+            "output": 0
+          }
+        }
+      }
+    },
+    "yorha": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "YorHA OpenAI facade :5173 (ACE/KAG pipeline)",
+      "options": {
+        "baseURL": "http://127.0.0.1:5173/api/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "yorha-hermes": {
+          "name": "YorHA ACE Hermes 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+        "yorha-legal": {
+          "name": "YorHA ACE Legal 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4097
+          }
+        }
+      }
+    }
+  },
+  "tools": {
+    "ace_packet": {
+      "command": "node scripts/ace/build-packet.mjs"
+    },
+    "ace_ask": {
+      "command": "node scripts/ace/ask-gemma4.mjs"
+    }
+  },
+  "command": {
+    "atlas-context": {
+      "description": "Use Atlas-first retrieval without reading full files",
+      "agent": "atlas-context",
+      "subtask": true,
+      "prompt": "Use ace.packet first, then npm run index:clusters:query, then atlas.search, then rg exact section, then read only a 40-80 line window. Return sourceRefs, chunkIds, commands, clusterPath, and a short answer. Do not read full .md, .txt, .json, docs/llms/generated/*.txt, or large atlas maps."
+    },
+    "ace-packet": {
+      "description": "Build compact ACE packet for the current query",
+      "agent": "atlas-context",
+      "subtask": false,
+      "prompt": "Build an ACE packet for the user's query. Prefer cached summaries, sourceRefs, chunkIds, searchGroups, and commands. Do not read full files."
+    },
+    "atlas-cluster": {
+      "description": "Query the Atlas manifold cluster map before reading files",
+      "agent": "atlas-context",
+      "subtask": true,
+      "prompt": "Run npm run index:clusters:query for the user's query, identify the top cluster path, then use rg inside only that cluster. Return clusterId, clusterPath, sourceRefs, chunkIds, and commands."
+    }
+  },
+  "mcp": {
+    "trace": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8788/mcp",
+      "enabled": true,
+      "timeout": 60000
+    },
+    "turbovec": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8791/mcp",
+      "enabled": true,
+      "timeout": 30000
+    },
+    "engram": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8792/mcp",
+      "enabled": true,
+      "timeout": 60000
+    },
+    "langextract-remote": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8793/mcp",
+      "enabled": true,
+      "timeout": 60000
+    },
+    "gemma4-offload": {
+      "type": "local",
+      "command": "node",
+      "args": [
+        "scripts/mcp/gemma4-offload-mcp.mjs"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    },
+    "engram-embed": {
+      "type": "local",
+      "command": "node",
+      "args": [
+        "scripts/mcp/engram-embed-mcp.mjs"
+      ],
+      "enabled": false,
+      "timeout": 60000
+    },
+    "langextract": {
+      "type": "local",
+      "command": "node",
+      "args": [
+        "scripts/mcp/langextract-mcp.mjs"
+      ],
+      "enabled": false,
+      "timeout": 60000
+    },
+    "turbovec-sidecar": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8099/mcp",
+      "enabled": false,
+      "timeout": 30000
+    },
+    "ldr-research": {
+      "type": "local",
+      "command": "node",
+      "args": [
+        "scripts/mcp/ldr-mcp.mjs"
+      ],
+      "enabled": true,
+      "timeout": 120000,
+      "description": "Local Deep Research: async multi-engine research via Gemma4 + SearXNG + Wikipedia. Tools: ldr.start_research, ldr.poll_status, ldr.search_history, ldr.quick_summary"
+    }
+  },
+  "resources": [
+    {
+      "type": "git",
+      "name": "svelte",
+      "url": "https://github.com/sveltejs/svelte.dev",
+      "branch": "main",
+      "searchPath": "apps/svelte.dev",
+      "specialNotes": "Focus on docs content",
+      "labels": [
+        "docs",
+        "ssr",
+        "sveltekit",
+        "frontend"
+      ]
+    },
+    {
+      "type": "npm",
+      "name": "reactNpm",
+      "package": "react",
+      "version": "latest",
+      "labels": [
+        "docs",
+        "npm",
+        "web"
+      ]
+    },
+    {
+      "type": "npm",
+      "name": "drizzleNpm",
+      "package": "drizzle-orm",
+      "version": "latest",
+      "labels": [
+        "postgresql",
+        "drizzle",
+        "schema",
+        "contracts"
+      ]
+    },
+    {
+      "type": "npm",
+      "name": "qdrantNpm",
+      "package": "@qdrant/js-client-rest",
+      "version": "latest",
+      "labels": [
+        "qdrant",
+        "clusters",
+        "semantic",
+        "retrieval"
+      ]
+    },
+    {
+      "type": "npm",
+      "name": "redisNpm",
+      "package": "ioredis",
+      "version": "latest",
+      "labels": [
+        "redis",
+        "cards",
+        "cache-trace",
+        "hot-lane"
+      ]
+    },
+    {
+      "type": "npm",
+      "name": "pgNpm",
+      "package": "pg",
+      "version": "latest",
+      "labels": [
+        "postgresql",
+        "sql",
+        "driver",
+        "bitfrost"
+      ]
+    }
+  ],
+  "agent": {
+    "atlas-context": {
+      "description": "Atlas-first retrieval agent using ACE packets and strict context-budget rules.",
+      "model": "turboquant/gemma4-tq",
+      "temperature": 0.2,
+      "steps": 8,
+      "prompt": "Never read full files by default. Retrieval order: ace.packet(query) -> npm run index:clusters:query -- \"<query>\" -> atlas.search(query) -> rg exact section -> read a 40-80 line window. Prefer sourceRefs, chunkIds, summaries, searchGroups, cache keys, and commands. Do not load docs/llms/generated/*.txt fully. Do not inject raw 30MB JSON or full atlas maps. If context is missing or degraded, say what is missing instead of guessing.",
+      "permission": {
+        "*": "deny",
+        "read": "ask",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "ace_*": "allow",
+        "ace.*": "allow",
+        "turbovec_*": "allow",
+        "turbovec.*": "allow",
+        "engram_*": "allow",
+        "engram.*": "allow",
+        "langextract_*": "allow",
+        "langextract.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "edit": "deny",
+        "write": "deny",
+        "bash": {
+          "npm run ace:packet -- *": "allow",
+          "npm run ace:ask -- *": "allow",
+          "npm run ace:stream -- *": "allow",
+          "npm run index:clusters:query -- *": "allow",
+          "npm run index:*": "allow",
+          "node scripts/ace/*.mjs *": "allow",
+          "rg *": "allow",
+          "Get-Content * | Select-Object -Skip * -First *": "allow",
+          "git status": "allow",
+          "git diff *": "allow",
+          "cat *.md": "deny",
+          "cat *.txt": "deny",
+          "cat *.json": "deny",
+          "Get-Content docs/llms/generated/*": "deny",
+          "Get-Content *.json": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item *": "deny",
+          "*": "ask"
+        }
+      }
+    },
+    "antigravity": {
+      "description": "Minimal MCP-first Gemma4 agent that uses only core tools by default.",
+      "model": "turboquant/gemma4-tq",
+      "temperature": 0,
+      "steps": 10,
+      "prompt": "Use MCP tools first, but do not call every tool. Default order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Only call gemma4-offload for model/runtime diagnostics. Keep engram-embed, turbovec-sidecar, and langextract opt-in unless the user explicitly asks for those lanes.",
+      "permission": {
+        "*": "deny",
+        "read": "ask",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "ace_*": "allow",
+        "ace.*": "allow",
+        "graph.*": "allow",
+        "edit": "deny"
+      }
+    },
+    "trace-audit": {
+      "description": "Read-only TRACE audit agent with compact context tools.",
+      "model": "turboquant/gemma4-tq",
+      "temperature": 0,
+      "steps": 8,
+      "prompt": "Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval, keep the stable system prefix unchanged, and prefer cached compressed cards over raw file expansion. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "permission": {
+        "*": "deny",
+        "read": "ask",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "wiki_*": "allow",
+        "wiki.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "kag_*": "allow",
+        "kag.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "edit": "deny",
+        "bash": {
+          "npm run tools:check:structural": "allow",
+          "npm run index:*": "allow",
+          "npm run graphify:dependency:audit": "allow",
+          "npm --prefix * run index:*": "allow",
+          "npm --prefix * run graphify:dependency:audit": "allow",
+          "node scripts/index/*": "allow",
+          "rg *": "allow",
+          "ast-grep *": "allow",
+          "sg *": "allow",
+          "jq *": "allow",
+          "git status": "allow",
+          "git diff *": "allow",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item *": "deny",
+          "*": "ask"
+        },
+        "webfetch": "allow",
+        "websearch": "allow"
+      }
+    },
+    "audit-hermes": {
+      "description": "Hermes 64K direct fallback lane via Ollama; no ACE enrichment",
+      "model": "ollama_disabled/gemma4-rotorquant:latest",
+      "temperature": 0,
+      "steps": 8,
+      "prompt": "Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval, keep the stable system prefix unchanged, and prefer cached compressed cards over raw file expansion. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "permission": {
+        "*": "deny",
+        "read": "ask",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "wiki_*": "allow",
+        "wiki.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "kag_*": "allow",
+        "kag.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "edit": "deny",
+        "bash": {
+          "npm run tools:check:structural": "allow",
+          "npm run index:*": "allow",
+          "npm run graphify:dependency:audit": "allow",
+          "npm --prefix * run index:*": "allow",
+          "npm --prefix * run graphify:dependency:audit": "allow",
+          "node scripts/index/*": "allow",
+          "rg *": "allow",
+          "ast-grep *": "allow",
+          "sg *": "allow",
+          "jq *": "allow",
+          "git status": "allow",
+          "git diff *": "allow",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item *": "deny",
+          "*": "ask"
+        },
+        "webfetch": "allow",
+        "websearch": "allow"
+      }
+    },
+    "hermes-ace": {
+      "description": "Hermes-ACE local agent using ACE context, MCP tools, and local Gemma4 64K.",
+      "model": "turboquant/gemma4-tq",
+      "temperature": 0,
+      "steps": 12,
+      "prompt": "Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. You are the Hermes-ACE legal AI agent running on gemma4-rotorquant:latest-iq4xs-direct.gguf via TurboQuant :8090. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use MCP tools in this priority order: (1) trace.kag_search or trace.atlas_query for knowledge retrieval, (2) turbovec-sidecar for cosine ranking and chunk-id scoring, (3) engram-embed for 768-dim embeddings and Bifrost ingestion, (4) langextract for citation and entity extraction, (5) ldr.search_history then ldr.quick_summary for external research context, (6) ldr.start_research + ldr.poll_status for deep async research on complex legal questions. Always include chunk_ids and cluster_labels in synthesis context. For image evidence, depth maps are stored in MinIO at evidence/{caseId}/{evidenceId}-depth.png \u2014 reference via ai_analysis.depthAnalysis.depthMapUrl. Do not edit files without explicit user approval. Do not mutate live Postgres schema.",
+      "permission": {
+        "*": "deny",
+        "read": "ask",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "wiki_*": "allow",
+        "wiki.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "kag_*": "allow",
+        "kag.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "edit": "deny",
+        "bash": {
+          "npm run tools:check:structural": "allow",
+          "npm run index:*": "allow",
+          "npm run graphify:dependency:audit": "allow",
+          "npm --prefix * run index:*": "allow",
+          "npm --prefix * run graphify:dependency:audit": "allow",
+          "node scripts/index/*": "allow",
+          "rg *": "allow",
+          "ast-grep *": "allow",
+          "sg *": "allow",
+          "jq *": "allow",
+          "git status": "allow",
+          "git diff *": "allow",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item *": "deny",
+          "*": "ask"
+        },
+        "webfetch": "deny",
+        "websearch": "deny"
+      }
+    },
+    "audit": {
+      "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor (no MCP, local files only)",
+      "model": "turboquant/gemma4-tq",
+      "prompt": "Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    }
+  },
+  "instructions": [
+    "../.github/instructions/opencode-context-prefetch.instructions.md",
+    "docs/architecture/cline-opencode-system-prompt.md",
+    "../AGENTS.md",
+    "../.claude/skills/trace-mcp-tooling/SKILL.md",
+    "docs/architecture/gemma4-to-claude-code-handoff.md"
+  ],
+  "share": "disabled"
+}

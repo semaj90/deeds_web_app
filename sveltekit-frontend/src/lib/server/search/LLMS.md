@@ -82,7 +82,7 @@ search.dev_context({ query: "expandNeighbours neo4j rerank" })
 | `postgres-fts.ts` | 0.000 | 0x9 |
 ## Audit Gates — General
 
-> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-23
+> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-24
 > Run each check from the **sveltekit-frontend/** root.
 
 ### Tier A — Code Connectivity

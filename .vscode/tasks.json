@@ -471,7 +471,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Spawn TurboVec Python ANN sidecar on :8099 (detached). Scrolls codebase_chunks_768 from Qdrant, builds 4-bit quantized index for ultra-fast HyperRAG candidate prefilter. Logs → logs/task-output/pipeline-test/turbovec-sidecar.{out,err}.log. Health: GET http://127.0.0.1:8099/health"
+      "detail": "Spawn TurboVec ANN wrapper on :8792 (detached). It spawns the RotorQuant helper on :8793 when available, scrolls codebase_chunks_768 from Qdrant, builds 4-bit quantized index for ultra-fast HyperRAG candidate prefilter. Logs → logs/task-output/pipeline-test/turbovec-sidecar.{out,err}.log. Health: GET http://127.0.0.1:8792/health"
     },
     {
       "label": "RTX Pipeline: Semantic Cluster (4D Manifold to Redis)",
@@ -1298,9 +1298,9 @@
     {
       "label": "🩺 Startup: Service Health Check",
       "type": "shell",
-      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"$services = @(@{Name='Redis'; Kind='redis'}, @{Name='Qdrant'; Url='http://127.0.0.1:6333/collections'}, @{Name='Ollama'; Url='http://127.0.0.1:11434/api/tags'}, @{Name='Postgres'; Kind='postgres'}, @{Name='Go Retrieval'; Url='http://127.0.0.1:8100/health'}, @{Name='Go Search'; Url='http://127.0.0.1:8096/health'}, @{Name='Bifrost'; Url='http://127.0.0.1:3040/health'}, @{Name='TurboQuant'; Url='http://127.0.0.1:8090/health'}, @{Name='MCP Server'; Url='http://127.0.0.1:8788/health'}, @{Name='RabbitMQ API'; Kind='http-json'; Url='http://127.0.0.1:5173/api/rabbitmq/health'; ExpectConnected=$true}); $pass=0; $fail=0; Write-Host '── Startup Health Check ──'; foreach ($s in $services) { try { if ($s.Kind -eq 'redis') { redis-cli PING | Out-Null; Write-Host '✅ Redis'; $pass++ } elseif ($s.Kind -eq 'postgres') { docker ps --format '{{.Names}}' | Select-String -Pattern 'postgres' | Out-Null; Write-Host '✅ Postgres container'; $pass++ } elseif ($s.Kind -eq 'http-json') { $resp = Invoke-RestMethod -Uri $s.Url -TimeoutSec 2; if ($s.ExpectConnected -and -not $resp.connected) { throw 'connected=false' }; Write-Host ('✅ ' + $s.Name + ' (connected=' + [string]$resp.connected + ')'); $pass++ } else { Invoke-WebRequest -Uri $s.Url -TimeoutSec 2 | Out-Null; Write-Host ('✅ ' + $s.Name); $pass++ } } catch { Write-Host ('❌ ' + $s.Name); $fail++ } }; Write-Host ('── summary: PASS=' + $pass + ' FAIL=' + $fail + ' ──')\"",
+      "command": "node scripts/startup/run-service-health-check.mjs",
       "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "runOptions": {
         "runOn": "folderOpen"
@@ -1321,7 +1321,7 @@
     {
       "label": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
       "type": "shell",
-      "command": "$stamp = 'logs/task-output/.graphify-daily-last-run'; $cooldownSec = 3600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🗺️ graphify:daily skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { npm run graphify:daily 2>&1 | Tee-Object -FilePath logs/task-output/graphify-daily-startup.log; Set-Content $stamp (Get-Date -Format o); Write-Host '🗺️ graphify:daily complete' }",
+      "command": "node scripts/startup/run-graphify-daily-startup.mjs",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {
@@ -1346,6 +1346,78 @@
           "endsPattern": "graphify:daily complete"
         }
       },
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🧠 Startup: ACE Context Pack Smoke",
+      "type": "shell",
+      "command": "node scripts/startup/run-ace-context-pack-startup.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "dependsOn": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🧠 Startup: ACE Top Retrieval Smoke",
+      "type": "shell",
+      "command": "node scripts/startup/run-ace-top-retrieval-startup.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "dependsOn": "🧠 Startup: ACE Context Pack Smoke",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🧩 Startup: Feature Map Smoke",
+      "type": "shell",
+      "command": "node scripts/startup/run-feature-map-startup.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "dependsOn": "🧠 Startup: ACE Top Retrieval Smoke",
+      "group": "build",
+      "problemMatcher": [],
       "presentation": {
         "echo": false,
         "reveal": "silent",

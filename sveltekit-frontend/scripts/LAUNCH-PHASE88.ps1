@@ -72,7 +72,7 @@ Write-Host "🔧 Step 2/6: Knowledge Plane Service" -ForegroundColor Cyan
 # Check if already running
 $kpRunning = $false
 try {
-    $health = curl -s http://127.0.0.1:8099/health 2>$null | ConvertFrom-Json
+    $health = curl -s http://127.0.0.1:8792/health 2>$null | ConvertFrom-Json
     if ($health.status -eq "healthy") {
         Write-Host "   ✅ Knowledge Plane already running (v$($health.version))" -ForegroundColor Green
         $kpRunning = $true
@@ -118,7 +118,7 @@ try {
         topK = 3
     } | ConvertTo-Json -Compress
 
-    $result = curl -s http://127.0.0.1:8099/svelte/docs/search `
+    $result = curl -s http://127.0.0.1:8792/svelte/docs/search `
         -Method POST `
         -Body $testQuery `
         -ContentType "application/json" 2>$null | ConvertFrom-Json
@@ -130,7 +130,7 @@ try {
     }
 } catch {
     Write-Host "   ⚠️  Cannot test - Knowledge Plane not responding" -ForegroundColor Yellow
-    Write-Host "      Make sure it's running on port 8099" -ForegroundColor Gray
+    Write-Host "      Make sure it's running on port 8792" -ForegroundColor Gray
 }
 
 Write-Host ""
@@ -217,6 +217,6 @@ Write-Host "✅ Phase 88 Launch Complete!" -ForegroundColor Green
 Write-Host ""
 Write-Host "📊 Quick Status Check:" -ForegroundColor Yellow
 Write-Host "   - Qdrant collection: curl http://localhost:6333/collections/phase76_knowledge_base" -ForegroundColor Gray
-Write-Host "   - Knowledge Plane: curl http://127.0.0.1:8099/health" -ForegroundColor Gray
+Write-Host "   - Knowledge Plane: curl http://127.0.0.1:8792/health" -ForegroundColor Gray
 Write-Host "   - Check docs: PHASE88_QUICK_REFERENCE.md" -ForegroundColor Gray
 Write-Host ""
