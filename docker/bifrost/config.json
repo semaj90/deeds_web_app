@@ -18,7 +18,6 @@
         "provider": "ollama",
         "embedding_model": "embeddinggemma:latest",
         "dimension": 768,
-        "cleanup_on_shutdown": false,
         "ttl": "2h",
         "threshold": 0.82,
         "conversation_history_threshold": 3,
@@ -38,15 +37,41 @@
       "keys": [
         {
           "name": "ollama-key",
-          "value": "dummy",
+          "value": "",
           "weight": 1.0,
+          "models": [
+            "*"
+          ],
+          "ollama_key_config": {
+            "url": "http://host.docker.internal:11434"
+          }
+        }
+      ],
+      "network_config": {
+        "base_url": "http://host.docker.internal:11434",
+        "default_request_timeout_in_seconds": 180,
+        "max_retries": 1,
+        "retry_backoff_initial": 5000,
+        "retry_backoff_max": 10000
+      }
+    },
+    "turboquant_backend": {
+      "keys": [
+        {
+          "name": "turboquant-local",
+          "value": "local",
+          "weight": 1,
           "models": [
             "*"
           ]
         }
       ],
       "network_config": {
-        "base_url": "http://host.docker.internal:11434"
+        "base_url": "http://host.docker.internal:8090/v1",
+        "default_request_timeout_in_seconds": 180,
+        "max_retries": 1,
+        "retry_backoff_initial": 5000,
+        "retry_backoff_max": 10000
       }
     }
   }
