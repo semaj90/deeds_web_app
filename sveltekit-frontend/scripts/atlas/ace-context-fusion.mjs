@@ -11,7 +11,7 @@
  */
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -106,6 +106,41 @@ function uniqueStrings(values) {
   return [...new Set((values ?? []).filter(Boolean).map((value) => String(value)))];
 }
 
+function loadAuthoritySnapshot() {
+  const snapshotPath = path.join(ROOT, 'logs/authority/latest.json');
+  if (!existsSync(snapshotPath)) return new Map();
+
+  try {
+    const raw = JSON.parse(readFileSync(snapshotPath, 'utf8'));
+    const rows = Array.isArray(raw?.rows) ? raw.rows : [];
+    const map = new Map();
+    for (const row of rows) {
+      const key = normalizeSourceRef(row?.filePath ?? row?.source_ref ?? row?.sourceRef);
+      if (!key) continue;
+      map.set(key, {
+        source: snapshotPath,
+        combinedScore: clamp01(row?.combinedScore ?? row?.combined_score),
+        pagerank: clamp01(row?.pagerank),
+        graphAuthority: clamp01(row?.graphAuthority ?? row?.graph_authority),
+        karpathyBlend: clamp01(row?.karpathyBlend ?? row?.karpathy_blend),
+        aceAuthority: clamp01(row?.aceAuthority ?? row?.ace_authority),
+        topology: clamp01(row?.topology),
+        redisHot: clamp01(row?.redisHot ?? row?.redis_hot),
+      });
+    }
+    return map;
+  } catch {
+    return new Map();
+  }
+}
+
+const AUTHORITY_SNAPSHOT = loadAuthoritySnapshot();
+
+function authorityForCandidate(candidate) {
+  const key = sourceRefFromCandidate(candidate) ?? normalizeSourceRef(candidate?.filePath ?? candidate?.path ?? candidate?.stableKey ?? null);
+  return key ? AUTHORITY_SNAPSHOT.get(key) ?? null : null;
+}
+
 function mergeCandidate(existing, incoming) {
   const sourceRefs = uniqueStrings([
     ...(existing.sourceRefs ?? []),
@@ -143,17 +178,18 @@ function mergeCandidate(existing, incoming) {
 }
 
 export function scoreCandidate(candidate) {
+  const authority = authorityForCandidate(candidate);
   const qdrantScore = clamp01(
     candidate?.qdrant_score ?? candidate?.semantic_score ?? candidate?.score ?? candidate?.cosine ?? candidate?.similarity,
   );
   const pagerankScore = clamp01(
-    candidate?.pagerank_score ?? candidate?.pageRankScore ?? candidate?.pagerank ?? candidate?.authority ?? candidate?._pagerank_score,
+    candidate?.pagerank_score ?? candidate?.pageRankScore ?? candidate?.pagerank ?? candidate?.authority ?? candidate?._pagerank_score ?? authority?.pagerank ?? authority?.combinedScore,
   );
   const topologyScore = clamp01(
-    candidate?.topology_score ?? candidate?.topologyScore ?? candidate?.graph_score ?? candidate?._topology_score ?? candidate?.community_score,
+    candidate?.topology_score ?? candidate?.topologyScore ?? candidate?.graph_score ?? candidate?._topology_score ?? candidate?.community_score ?? authority?.topology,
   );
   const redisHot = clamp01(
-    candidate?.redis_hot ?? candidate?.redisHot ?? candidate?.hot_score ?? candidate?.hotScore ?? candidate?.cache_score,
+    candidate?.redis_hot ?? candidate?.redisHot ?? candidate?.hot_score ?? candidate?.hotScore ?? candidate?.cache_score ?? authority?.redisHot,
   );
   const freshness = clamp01(
     candidate?.freshness ?? candidate?.recency ?? candidate?.fresh_score ?? candidate?.ageScore,
@@ -177,6 +213,16 @@ export function scoreCandidate(candidate) {
     redis_hot: redisHot,
     freshness,
     llm_synthesis_weight: llmSynthesisWeight,
+    authoritySnapshot: authority ? {
+      source: authority.source,
+      combinedScore: authority.combinedScore,
+      pagerank: authority.pagerank,
+      graphAuthority: authority.graphAuthority,
+      karpathyBlend: authority.karpathyBlend,
+      aceAuthority: authority.aceAuthority,
+      topology: authority.topology,
+      redisHot: authority.redisHot,
+    } : null,
     score,
     scoreBreakdown: {
       cosine: qdrantScore,

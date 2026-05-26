@@ -1,5 +1,9 @@
 /**
- * MinIO Knowledge Store
+ * Legacy MinIO-compatible Knowledge Store.
+ *
+ * New SeaweedFS-first code should import the alias module:
+ * `SeaweedKnowledgeStore.ts`.
+ *
  * Phase 76 - Task 6.1: MinioKnowledgeStore class
  *
  * Provides S3-compatible object storage for full document content.

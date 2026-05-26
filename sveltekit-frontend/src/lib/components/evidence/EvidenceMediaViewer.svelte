@@ -12,7 +12,7 @@
     text   → <pre> with fetched text
     other  → "Download" button
 
-  Storage-agnostic — accepts any `url` (MinIO presigned, SeaweedFS S3, public URL).
+  Storage-agnostic — accepts any `url` (SeaweedFS S3, legacy object URL, public URL).
 -->
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';

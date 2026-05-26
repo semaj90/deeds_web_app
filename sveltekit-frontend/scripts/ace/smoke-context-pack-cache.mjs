@@ -41,17 +41,18 @@ async function main() {
   const snapshotPath = path.join(SNAPSHOT_DIR, `${sanitizeCacheKey(cacheKey)}.json`);
 
   const tscManifest = await readRedisJson('code:ts:diag:manifest');
-  const tscDiagnostics = tscManifest && typeof tscManifest === 'object'
-    ? {
-        errors: Number(tscManifest.total ?? 0),
-        warnings: 0,
-        rawOutputPath: 'redis://code:ts:diag:manifest',
-      }
-    : {
-        errors: 0,
-        warnings: 0,
-        rawOutputPath: '',
-      };
+  const tscDiagnostics =
+    tscManifest && typeof tscManifest === 'object'
+      ? {
+          errors: Number(tscManifest.total ?? 0),
+          warnings: 0,
+          rawOutputPath: 'redis://code:ts:diag:manifest',
+        }
+      : {
+          errors: 0,
+          warnings: 0,
+          rawOutputPath: '',
+        };
 
   const pack = {
     id: 'smoke-context-pack',
@@ -90,6 +91,57 @@ async function main() {
       nvmePath: `file://${snapshotPath}`,
     },
   };
+
+  // Best-effort: compute a compact authority score from Karpathy Redis if available.
+  try {
+    const filePaths = (pack.chunkIds ?? []).map((id) => String(id)).filter(Boolean);
+    if (filePaths.length) {
+      // HMGET returns one value per key
+      const args = [
+        'exec',
+        REDIS_CONTAINER,
+        'redis-cli',
+        'HMGET',
+        'gpu:karpathy:scores',
+        ...filePaths,
+      ];
+      const res = runDocker(args);
+      if (res.status === 0) {
+        const out = (res.stdout || '').trim();
+        // redis-cli HMGET prints values separated by newlines; parse each line
+        const lines = out
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter(Boolean);
+        let sum = 0;
+        let count = 0;
+        for (const line of lines) {
+          try {
+            const parsed = JSON.parse(line);
+            const a = parsed?.authority ?? parsed?.pr ?? parsed?.blend ?? null;
+            const n = Number(a ?? null);
+            if (Number.isFinite(n)) {
+              const norm = n > 1 ? Math.min(1, n / 100) : Math.max(0, n);
+              sum += norm;
+              count++;
+            }
+          } catch {
+            const n = Number(line);
+            if (Number.isFinite(n)) {
+              const norm = n > 1 ? Math.min(1, n / 100) : Math.max(0, n);
+              sum += norm;
+              count++;
+            }
+          }
+        }
+        // Always attach a best-effort authority number (0 if no scores found)
+        const score = count > 0 ? sum / count : 0;
+        pack.authority = { score, source: 'gpu' };
+      }
+    }
+  } catch {
+    // non-fatal
+  }
 
   await fs.writeFile(snapshotPath, JSON.stringify(pack, null, 2), 'utf8');
   await setRedisJson(`ace:ctx:${cacheKey}`, pack);

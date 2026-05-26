@@ -1,0 +1,378 @@
+{
+  "featureId": "env-module",
+  "query": "env module",
+  "cacheKey": "ace:feature:f956f526675a",
+  "registryHits": [
+    {
+      "featureKey": "inputs",
+      "title": "Inputs",
+      "status": "implemented",
+      "summary": "- Git repository metadata via a proper library-backed adapter - Repo-root atlas outputs - SvelteKit route/import/env maps - Redis hot cache summaries - Qdrant cluster payloads",
+      "sourceRefs": [
+        "local:docs/architecture/deepseek-engram-architecture-search.md#L18"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Inputs\" src docs tests"
+    },
+    {
+      "featureKey": "root_flow",
+      "title": "Root Flow",
+      "status": "implemented",
+      "summary": "1. Workspace discovery 2. Route import 3. Import and env maps 4. Qdrant payload tagging 5. Neo4j GraphRAG projection",
+      "sourceRefs": [
+        "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L18"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Root Flow\" src docs tests"
+    },
+    {
+      "featureKey": "command_surface",
+      "title": "Command Surface",
+      "status": "implemented",
+      "summary": "- npm run atlas:root:index - npm run atlas:routes - npm run atlas:imports - npm run atlas:env - npm run atlas:manifest:create",
+      "sourceRefs": [
+        "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L42"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Command Surface\" src docs tests"
+    },
+    {
+      "featureKey": "presentation_layer",
+      "title": "Presentation Layer",
+      "status": "implemented",
+      "summary": "- Use Svelte 5 runes for local component state, derived state, and side effects. - Do not build a global client sync layer; sync state through SvelteKit loads, actions, and fetches. - Use Bits UI for accessible primitives such as dialogs, tabs, selects, tooltips, command inputs, progress, and scroll areas. - Keep browser logic minimal and push business rules into server modules.",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L62"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Presentation Layer\" src docs tests"
+    },
+    {
+      "featureKey": "language_and_ui_stack",
+      "title": "Language and UI Stack",
+      "status": "implemented",
+      "summary": "- Use TypeScript across routes, server modules, and shared utilities. - Use Superforms v2 with Zod for all form validation and submit workflows. - Use Drizzle ORM as the typed database layer over Postgres. - Use WebGPU only where GPU-accelerated browser-side rendering or compute is warranted. - Keep these tools aligned with SvelteKit's server/client boundary rather than treating them as a standalone app framework.",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L68"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Language and UI Stack\" src docs tests"
+    },
+    {
+      "featureKey": "retrieval_and_graph_layer",
+      "title": "Retrieval and Graph Layer",
+      "status": "implemented",
+      "summary": "- Redis handles short-lived cache, coordination, and hot read paths. - Qdrant stores embeddings and vector search candidates. - Neo4j handles relationship traversal, topology expansion, and multi-hop graph reasoning. - CouchDB stores document-shaped ACE artifacts and flexible envelopes where versioned structure is useful.",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L85"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Retrieval and Graph Layer\" src docs tests"
+    },
+    {
+      "featureKey": "implementation_guidance",
+      "title": "Implementation Guidance",
+      "status": "implemented",
+      "summary": "- Prefer small server modules under src/lib/server/ for DB and worker orchestration. - Keep API routes thin and explicit. - Treat retrieval artifacts as derived outputs that can be rebuilt. - Add smoke coverage for UI, API, retrieval, and sidecar paths before expanding surface area. - During verification, cross-check the feature map above against the latest codebase indexing output so the spec stays synchronized with reality.",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L156"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Implementation Guidance\" src docs tests"
+    },
+    {
+      "featureKey": "5_drizzle_postgres",
+      "title": "5. Drizzle + Postgres",
+      "status": "implemented",
+      "summary": "Use Postgres for canonical app state and JSONB metadata envelopes via Drizzle ORM.",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L23"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"5. Drizzle + Postgres\" src docs tests"
+    },
+    {
+      "featureKey": "enhanced_bits_integration_analysis_report",
+      "title": "Enhanced Bits Integration Analysis Report",
+      "status": "implemented",
+      "summary": "This report details the usage, context, and architectural implications of the enhanced-bits component suite across the codebase. This suite appears to contain legacy or experimental components that rely heavily on custom CSS variables and direct module imports.",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#L1"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Enhanced Bits Integration Analysis Report\" src docs tests"
+    },
+    {
+      "featureKey": "2_cross_reference_mappings",
+      "title": "2. Cross-Reference Mappings",
+      "status": "implemented",
+      "summary": "| Source File | Dependency Type | Target Component/Module | Relevance to Analysis | | :--- | :--- | :--- | :--- | | ContractAnalyzer.svelte | Styling/Logic | --enhanced-bits- CSS variables | High: Directly uses custom CSS variables, indicating deep integration. | | CitationManager.svelte | Styling/Logic | --enhanced-bits- CSS variables | High: Relies on specific themed components. | | utils/dynamic-imports.ts | Dynamic Import | SSRWebGPULoader.svelte | Medium: Points to a specific, potentially complex, component within the suite. |",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#L14"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"2. Cross-Reference Mappings\" src docs tests"
+    },
+    {
+      "featureKey": "1_postgresql_port_architecture_verified",
+      "title": "1. PostgreSQL Port Architecture Verified",
+      "status": "implemented",
+      "summary": "- Port 5432: postgres-pgvector (isolated, not used) - Port 5434: deeds-postgres-prod-proxy (production DB) ✅ - All .env files correctly use 5434 ✅",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L233"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"1. PostgreSQL Port Architecture Verified\" src docs tests"
+    },
+    {
+      "featureKey": "postgresql",
+      "title": "PostgreSQL",
+      "status": "implemented",
+      "summary": "- Port 5434 is production (proxy to deeds-postgres-prod) - Port 5432 is isolated (postgres-pgvector, not used) - Always use .env DATABASEURL (port 5434)",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L284"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"PostgreSQL\" src docs tests"
+    },
+    {
+      "featureKey": "1_frontend_gateway",
+      "title": "1. Frontend gateway",
+      "status": "implemented",
+      "summary": "- Keep SvelteKit as the SSR shell, route layer, and API gateway. - Use server-only modules for secrets, DB access, and internal service calls. - Keep browser code thin and push business logic into +server.ts and shared server modules.",
+      "sourceRefs": [
+        "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L17"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"1. Frontend gateway\" src docs tests"
+    },
+    {
+      "featureKey": "4_ace_kag_layers",
+      "title": "4. ACE / KAG layers",
+      "status": "implemented",
+      "summary": "- Store retrieval-ready embeddings in Qdrant. - Use Neo4j for graph navigation, relationship expansion, and topology queries. - Use CouchDB for document-shaped or versioned ACE artifacts where flexible envelopes help. - Use Redis for hot cache, session-adjacent state, and task coordination.",
+      "sourceRefs": [
+        "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L32"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"4. ACE / KAG layers\" src docs tests"
+    },
+    {
+      "featureKey": "suggested_deliverables",
+      "title": "Suggested Deliverables",
+      "status": "implemented",
+      "summary": "- src/routes/ SSR pages and server actions. - src/lib/server/ service modules for DB, retrieval, and worker orchestration. - drizzle/ migrations for all truth-bearing tables. - Sidecar contracts for gRPC worker interfaces. - A sanitized dataset export for future tuning.",
+      "sourceRefs": [
+        "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L52"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Suggested Deliverables\" src docs tests"
+    },
+    {
+      "featureKey": "l3_precision_reranking",
+      "title": "L3: Precision Reranking",
+      "status": "implemented",
+      "summary": "Backend: AST-aware / symbol-aware / path-aware scoring Use for: - preferring fixes from similar import graphs - preferring fixes from the same route/package/module area - raising confidence for structurally similar failures",
+      "sourceRefs": [
+        "local:docs/error-analysis-architecture.md#L117"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"L3: Precision Reranking\" src docs tests"
+    },
+    {
+      "featureKey": "exclusion_policy",
+      "title": "Exclusion Policy",
+      "status": "implemented",
+      "summary": "The following directories should generally be excluded from workspace search/indexing unless debugging specifically requires them: - nodemodules - .svelte-kit - dist - build",
+      "sourceRefs": [
+        "local:docs/error-analysis-architecture.md#L177"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Exclusion Policy\" src docs tests"
+    },
+    {
+      "featureKey": "repo_env_map",
+      "title": "Repo Env Map",
+      "status": "implemented",
+      "summary": "- envKeys: 583 - envFiles: 802",
+      "sourceRefs": [
+        "local:docs/graph/repo-env-map.md#L1"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Repo Env Map\" src docs tests"
+    },
+    {
+      "featureKey": "repo_env_map__top_entries",
+      "title": "Top Entries",
+      "status": "implemented",
+      "summary": "- DATABASEURL: 180 - REDISURL: 130 - QDRANTURL: 122 - OLLAMAURL: 78 - PUBLICAPPURL: 70",
+      "sourceRefs": [
+        "local:docs/graph/repo-env-map.md#L6"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Top Entries\" src docs tests"
+    },
+    {
+      "featureKey": "repo_root_atlas__top_entries",
+      "title": "Top Entries",
+      "status": "implemented",
+      "summary": "- routes: 909 total (683 api, 223 page, 3 layout) - workspaces: repo-root, audit, data, deedslabs, docker, docs, drizzle, granite-docling-258M, logs, minio-data, models, nextsteps, qdrant-windows, scratch, scripts, simd-bridge, storage, sveltekit-frontend, test-results, tests, turbovec, vscode-extension - languages: json, javascript, svelte, typescript - top import: @sveltejs/kit - env keys: QUICSERVERURL, TENSORRTBRIDGEURL, OLLAMAURL, FASTAPILEGALBERTURL, NODEENV, GOMICROSERVICEURL, GOMICROSERVICETIMEOUT, OLLAMALLMMODEL, LLAMACPURL, TENSORRTURL",
+      "sourceRefs": [
+        "local:docs/graph/repo-root-atlas.md#L19"
+      ],
+      "missing": [],
+      "nextQuery": "rg \"Top Entries\" src docs tests"
+    }
+  ],
+  "ownerFiles": [
+    ".claude\\commands\\wire-modules.md",
+    ".env.truncated-20260512-125944.bak",
+    ".env.local",
+    ".env.example.production",
+    ".env.example",
+    ".env",
+    "vscode-extension\\node_modules\\undici-types\\websocket.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\webidl.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\util.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\retry-handler.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\retry-agent.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\README.md",
+    "vscode-extension\\node_modules\\undici-types\\readable.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\proxy-agent.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\pool.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\pool-stats.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\patch.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\package.json",
+    "vscode-extension\\node_modules\\undici-types\\mock-pool.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\mock-interceptor.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\mock-errors.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\mock-client.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\mock-agent.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\LICENSE",
+    "vscode-extension\\node_modules\\undici-types\\interceptors.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\index.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\header.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\handlers.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\global-origin.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\global-dispatcher.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\formdata.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\filereader.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\file.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\fetch.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\eventsource.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\errors.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\env-http-proxy-agent.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\dispatcher.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\diagnostics-channel.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\cookies.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\content-type.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\connector.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\client.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\cache.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\balanced-pool.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\api.d.ts",
+    "vscode-extension\\node_modules\\undici-types\\agent.d.ts",
+    "vscode-extension\\node_modules\\typescript\\ThirdPartyNoticeText.txt",
+    "vscode-extension\\node_modules\\typescript\\SECURITY.md",
+    "vscode-extension\\node_modules\\typescript\\README.md"
+  ],
+  "sourceRefs": [
+    "local:docs/architecture/deepseek-engram-architecture-search.md#L18",
+    "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L18",
+    "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L42",
+    "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L62",
+    "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L68",
+    "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L85",
+    "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L156",
+    "local:docs/architecture/trace-kag-web-development-guide.md#L23",
+    "local:docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#L1",
+    "local:docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#L14",
+    "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L233",
+    "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L284",
+    "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L17",
+    "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L32",
+    "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L52",
+    "local:docs/error-analysis-architecture.md#L117",
+    "local:docs/error-analysis-architecture.md#L177",
+    "local:docs/graph/repo-env-map.md#L1",
+    "local:docs/graph/repo-env-map.md#L6",
+    "local:docs/graph/repo-root-atlas.md#L19",
+    "local:docs/llms/generated/nodejs.llms-full.txt#L9",
+    "local:docs/llms/generated/nodejs.llms-full.txt#L15",
+    "local:docs/llms/gguf-model-lanes.md#L7",
+    "local:docs/llms/gguf-model-lanes.md#L12",
+    "local:docs/llms/gguf-model-lanes.md#L111",
+    "local:docs/llms/gguf-model-lanes.md#L125",
+    "local:docs/llms/gguf-model-lanes.md#L141",
+    "local:docs/llms/gguf-model-lanes.md#L163",
+    "local:docs/llms/gguf-model-lanes.md#L165",
+    "local:docs/llms/gguf-model-lanes.md#L209",
+    "local:docs/operator/DEPLOYMENT.md#L1",
+    "local:docs/operator/DEPLOYMENT.md#L29",
+    "local:docs/operator/DEPLOYMENT.md#L37",
+    "local:docs/operator/OPERATOR_RUNBOOK.md#L1",
+    "local:docs/reports/autoencoder-som-map.md#L118",
+    "local:docs/reports/autoencoder-som-map.md#L154",
+    "local:docs/reports/drizzle-shadow-tables-v2.txt#L1",
+    "local:docs/reports/drizzle-shadow-tables-v3.txt#L1",
+    "local:docs/reports/drizzle-shadow-tables-v4.txt#L1",
+    "local:docs/reports/drizzle-shadow-tables.txt#L1",
+    "local:docs/reports/inference-backend-benchmark.md#L18",
+    "local:docs/reports/model-inventory.md#L12",
+    "local:docs/reports/resilience-continuity-recommendations.md#L33",
+    "local:docs/reports/simd-bridge-memory-audit.md#L28",
+    "local:docs/reports/vram-hygiene-smoke-report.md#L20",
+    "local:docs/status/AUDIT_QUICK_REFERENCE.md#L1",
+    "local:docs/status/GPU_ACCELERATION_IMPLEMENTATION_MAP.md#L239",
+    "local:docs/status/GPU_ACCELERATION_IMPLEMENTATION_MAP.md#L468",
+    "local:docs/status/GPU_ACCELERATION_IMPLEMENTATION_MAP.md#L471",
+    "local:docs/visualization-stack.md#L41",
+    "local:docs/visualization-stack.md#L53",
+    "local:llm/llm.md#L12",
+    "local:llm/llm_dependencies.md#L16",
+    "local:llm/llm_recommendations.md#L20",
+    "local:scripts/api-cleanup/PRODUCTION_ROUTE_STRATEGY.md#L1",
+    "local:vscode-extension/src/LLMS.md#L42",
+    "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/analyze-element/LLMS.md#L29",
+    "local:vscode-extension/src/LLMS.md#L35",
+    "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/modules/LLMS.md#L1",
+    "local:scripts/neo4j/README.md#L157",
+    "local:scripts/tests/vlm-tests/test_image_b64.txt#L1",
+    "local:scripts/training-datasets/graphify-deep-summary.txt#L39",
+    "local:scripts/unsloth-training/NOTEBOOK_FINAL_STATUS.md#L72",
+    "local:scripts/unsloth-training/NOTEBOOK_OPTIMIZATIONS_2026.md#L103",
+    "local:scripts/unsloth-training/NOTEBOOK_OPTIMIZATIONS_2026.md#L567",
+    "local:sveltekit-frontend/src/lib/ai/e2b/LLMS.md#L105",
+    "local:sveltekit-frontend/src/lib/ai/e2b/LLMS.md#L112",
+    "local:sveltekit-frontend/src/lib/ai/e2b/LLMS.md#L119",
+    "local:sveltekit-frontend/src/lib/ai/e2b/LLMS.md#L133",
+    "local:sveltekit-frontend/src/lib/ai/e2b/LLMS.md#L136-sha256:caefa07c7d876a8e",
+    "local:sveltekit-frontend/src/workers/LLMS.md#L555",
+    "local:sveltekit-frontend/src/workers/LLMS.md#L567",
+    "local:sveltekit-frontend/src/routes/api/search/hyperrag/LLMS.md#L58",
+    "local:sveltekit-frontend/src/routes/api/search/hyperrag/LLMS.md#L75",
+    "local:sveltekit-frontend/src/workers/LLMS.md#L574",
+    "local:sveltekit-frontend/src/workers/LLMS.md#L577-sha256:caefa07c7d876a8e",
+    "local:sveltekit-frontend/src/lib/ai/onnx/LLMS.md#L7",
+    "local:sveltekit-frontend/src/lib/components/agentic/LLMS.md#L7",
+    "local:sveltekit-frontend/src/lib/components/courtroom/LLMS.md#L7",
+    "local:sveltekit-frontend/src/lib/components/modals/LLMS.md#L7"
+  ],
+  "packageScripts": [],
+  "qdrantQueryNeeded": true,
+  "turboVecRerankNeeded": true,
+  "nextSteps": [
+    "Inspect ownerFiles only",
+    "Patch confirmed files only",
+    "Do not read whole markdown docs",
+    "After patch, write an agent_memory_observation"
+  ],
+  "retrievalTrace": {
+    "registryHits": 133,
+    "fileHits": 80,
+    "contentHits": 0,
+    "qdrantHits": 0,
+    "redisHits": 0,
+    "turbovecReranked": false
+  }
+}

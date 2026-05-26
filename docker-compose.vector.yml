@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  redis:
+    image: redis/redis-stack:latest
+    container_name: deeds-redis-stack
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: deeds-qdrant
+    ports:
+      - "6333:6333"
+    restart: unless-stopped
+    volumes:
+      - qdrant-storage:/qdrant/storage
+
+volumes:
+  redis-data:
+  qdrant-storage:

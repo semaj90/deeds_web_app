@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-05-26T05:55:09.369Z",
+  "counts": {
+    "cards": 13,
+    "edges": 20
+  },
+  "sources": {
+    "sidecar": false,
+    "parentAtlas": true,
+    "opencodeCards": false
+  },
+  "langExtract": {
+    "enriched": true,
+    "file": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\document-knowledge-cards.langext.jsonl"
+  },
+  "graph": {
+    "enriched": true,
+    "input": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\document-knowledge-cards.langext.jsonl"
+  }
+}

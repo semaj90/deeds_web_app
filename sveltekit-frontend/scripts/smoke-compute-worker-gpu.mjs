@@ -29,11 +29,14 @@ import { resolve, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { existsSync } from 'fs';
+import { mkdir, writeFile } from 'fs/promises';
 
 const __dir   = dirname(fileURLToPath(import.meta.url));
 const ROOT    = resolve(__dir, '..');
 const WORKER  = resolve(ROOT, 'src/lib/workers/gpu-worker.mjs');
 const VERBOSE = process.argv.includes('--verbose');
+const LOG_DIR = resolve(ROOT, 'logs/webgpu-pagerank');
+const LOG_LATEST = join(LOG_DIR, 'latest.json');
 
 const color = {
   green:  s => `\x1b[32m${s}\x1b[0m`,
@@ -64,6 +67,15 @@ for (const cand of ADDON_CANDIDATES) {
 const libPath = LIB_PATHS.find(p => existsSync(p)) ?? null;
 
 if (!addonPath) {
+  await mkdir(LOG_DIR, { recursive: true });
+  await writeFile(LOG_LATEST, JSON.stringify({
+    timestamp: new Date().toISOString(),
+    status: 'skipped',
+    reason: 'tensorrt_bridge.node not found',
+    addonPath: null,
+    libPath,
+    results: [],
+  }, null, 2));
   console.log(`\n${color.yellow('SKIP')}  tensorrt_bridge.node not found`);
   console.log(`${color.dim('   Build: cd simd-bridge/cpp && cmake -B build && cmake --build build --config Release')}\n`);
   process.exit(0);
@@ -165,6 +177,16 @@ await test('attentionScoreGPU (query dim=32, n=64 keys)', async () => {
 const passed = results.filter(r => r.pass).length;
 const failed = results.filter(r => !r.pass).length;
 const totalMs = results.reduce((s, r) => s + r.ms, 0);
+
+await mkdir(LOG_DIR, { recursive: true });
+await writeFile(LOG_LATEST, JSON.stringify({
+  timestamp: new Date().toISOString(),
+  status: failed > 0 ? 'failed' : 'passed',
+  addonPath,
+  libPath,
+  summary: { passed, failed, totalMs },
+  results,
+}, null, 2));
 
 console.log('\n' + '-'.repeat(55));
 console.log(color.bold('GPU worker: ') + color.green(passed + ' passed') + '  ' + (failed > 0 ? color.red(failed + ' failed') : color.dim('0 failed')) + '  ' + color.dim(totalMs + 'ms total'));

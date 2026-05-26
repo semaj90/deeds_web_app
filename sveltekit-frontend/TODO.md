@@ -2,6 +2,14 @@
 
 This to-do list tracks the path to a high-concurrency, byte-stable production deployment of the Deeds Web App and its TRACE AI pipeline.
 
+## Redis 8 Eval Lane
+
+- Opt-in only; the Redis 7 app stack remains the default runtime.
+- Start + smoke: `npm run startup:redis8-eval`
+- Smoke only: `npm run smoke:redis8-eval`
+- TRACE startup opt-in: `$env:ENABLE_REDIS8_EVAL='true'; npm run trace:start`
+- OpenCode/Gemma4 hook: `npm run opencode:redis8-eval`
+
 ## 🚀 P0 — Production Infrastructure & Seeding
 - [ ] **Dependency Realization**: Run `npm install` to materialize `zod-to-json-schema` bridge and `ts-morph` dependencies.
 - [ ] **Hypergraph Seeding**: Run `npm run hypergraph:seed` to hydrate Neo4j and Qdrant with the codebase graph.

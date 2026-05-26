@@ -24,6 +24,12 @@ import { orderByDependency, extractCitationRefs } from './document-dag.js';
 import type { DAGDocument } from './document-dag.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { rerankChunksGRPO, type RerankableChunk } from '$lib/server/retrieval/langextract-reranker.js';
+import {
+	isCudaRnnRankerEnabled,
+	rerankChunksCudaExperimental,
+	buildCudaRnnSignals,
+	type CudaRnnChunkLike,
+} from '$lib/server/retrieval/cuda-rnn-reranker.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { ENV } from '$lib/server/env.server.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
@@ -356,6 +362,50 @@ export async function orchestrateRetrieval(req: RetrievalRequest): Promise<Retri
 			}));
 		} catch { /* non-fatal — skip rerank */ }
 		timings.rerank = Math.round(performance.now() - t45);
+	}
+
+	// Experimental CUDA ranker gate:
+	// off by default, query-text stays on CPU, GPU sees only feature vectors.
+	if (!req.skipRerank && req.pipeline !== 'codebase' && chunks.length > 1 && isCudaRnnRankerEnabled()) {
+		const t45b = performance.now();
+		try {
+			const originalBySource = new Map(
+				chunks.map((chunk) => [chunk.sourceId ?? chunk.documentId, chunk] as const)
+			);
+			const cudaInput: CudaRnnChunkLike[] = chunks.map((d) => ({
+				content: d.content,
+				score: d.similarity,
+				source: d.sourceId ?? d.documentId,
+				lengthScore: Math.min(1, d.content.length / 2400),
+			}));
+			const cuda = await rerankChunksCudaExperimental(
+				cudaInput,
+				buildCudaRnnSignals({
+					queryLength: req.query.length,
+					candidateCount: cudaInput.length,
+					sectionHintCount: 0,
+					graphNeighborCount: 1,
+					authorityAvailable: !req.skipAuthority,
+					clusterAvailable: false,
+					manifoldAvailable: true,
+					pipeline: req.pipeline ?? 'legal',
+				}),
+			);
+			if (cuda?.chunks.length) {
+				chunks = cuda.chunks.map((r, i) => {
+					const orig = originalBySource.get(r.source) ?? chunks[i];
+					return {
+						content: orig.content,
+						documentId: orig.documentId,
+						sourceId: orig.sourceId,
+						similarity: r.score,
+					};
+				});
+			}
+		} catch {
+			/* experimental CUDA ranker unavailable — keep prior rerank */
+		}
+		timings.rerank = Math.max(timings.rerank ?? 0, Math.round(performance.now() - t45b));
 	}
 
 	// 5. DAG ordering (citation dependency sorting)

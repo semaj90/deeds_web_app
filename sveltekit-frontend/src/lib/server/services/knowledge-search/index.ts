@@ -15,6 +15,7 @@ export * from './types.js';
 export { TOOLS as ACPToolRegistry, executeACPTool, getACPToolRegistry, getACPToolSchema, getAllTools as getACPTools } from './ACPToolRegistry.js';
 export { KnowledgeIndexer, getKnowledgeIndexer } from './KnowledgeIndexer.js';
 export { KnowledgeSearcher, getKnowledgeSearcher } from './KnowledgeSearcher.js';
+export { SeaweedKnowledgeStore, getSeaweedKnowledgeStore } from './SeaweedKnowledgeStore.js';
 export { MinioKnowledgeStore, getMinioKnowledgeStore } from './MinioKnowledgeStore.js';
 export { PostgresKnowledgeStore, getPostgresKnowledgeStore } from './PostgresKnowledgeStore.js';
 export { QdrantKnowledgeStore, getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
@@ -25,6 +26,7 @@ export { TfIdfRanker, getTfIdfRanker } from './TfIdfRanker.js';
 // Services to be implemented:
 // export { QdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 // export { PostgresKnowledgeStore } from './PostgresKnowledgeStore.js';
+// export { SeaweedKnowledgeStore } from './SeaweedKnowledgeStore.js';
 // export { MinioKnowledgeStore } from './MinioKnowledgeStore.js';
 // export { RedisCacheService } from './RedisCacheService.js';
 // export { TagExtractor } from './TagExtractor.js';

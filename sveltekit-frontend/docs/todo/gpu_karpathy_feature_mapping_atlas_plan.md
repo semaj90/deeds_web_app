@@ -276,6 +276,7 @@ Minimum feature record:
 Enhance next:
 
 ```txt
+[ ] `npm run feature-gap:registry:report` -> writes the live atlas-backed registry slice to `docs/reports/feature-gap-registry-live-latest.json`.
 [ ] scripts/features/record-feature-implementation.mjs
 [ ] scripts/features/derive-feature-map.mjs
 [ ] scripts/features/prefetch-feature-context.mjs

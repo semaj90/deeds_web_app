@@ -1,4 +1,4 @@
-<!-- Enhanced Evidence Upload Modal — Direct MinIO + 8-stage pipeline -->
+<!-- Enhanced Evidence Upload Modal — Direct SeaweedFS + 8-stage pipeline -->
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -21,7 +21,7 @@
 
 	// Pipeline stages (8-stage evidence pipeline)
 	const pipelineStages = [
-		{ id: 'upload', label: 'MinIO Upload', icon: 'upload', desc: 'SHA-256 hash + object storage' },
+		{ id: 'upload', label: 'SeaweedFS Upload', icon: 'upload', desc: 'SHA-256 hash + object storage' },
 		{ id: 'db-insert', label: 'Database Record', icon: 'database', desc: 'PostgreSQL evidence row' },
 		{ id: 'ocr', label: 'Text Extraction', icon: 'file-text', desc: 'pdf-parse → OCR fallback' },
 		{ id: 'chunking', label: 'Legal Chunking', icon: 'file-text', desc: 'ARTICLE/SECTION/§ hierarchy' },
@@ -122,7 +122,7 @@
 		stageStatuses = Array(8).fill('pending');
 
 		try {
-			// Stage 0: MinIO Upload
+			// Stage 0: SeaweedFS Upload
 			advanceStage(0, 'running');
 			const formData = new FormData();
 			formData.append('file', selectedFile);
@@ -229,7 +229,7 @@
 			<div class="upload-modal-header">
 				<div>
 					<h2 class="text-lg font-semibold text-sand">Evidence Upload Pipeline</h2>
-					<p class="text-xs text-sand/50 mt-0.5">MinIO + embeddinggemma + Qdrant + pgvector</p>
+					<p class="text-xs text-sand/50 mt-0.5">SeaweedFS + embeddinggemma + Qdrant + pgvector</p>
 				</div>
 				<button type="button" class="upload-modal-close" onclick={handleCancel}>
 					<Icon name="x" size={20} />

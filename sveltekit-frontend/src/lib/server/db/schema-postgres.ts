@@ -336,6 +336,71 @@ export const analysisJobs = pgTable('analysis_jobs', {
 export type AnalysisJob = typeof analysisJobs.$inferSelect;
 export type NewAnalysisJob = typeof analysisJobs.$inferInsert;
 
+// === INTENT SYNTHESIS (ACE captures non-blocking synthesis records) ===
+export const intentSynthesis = pgTable('intent_synthesis', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  queryHash: text('query_hash'),
+  contextPackKey: text('context_pack_key'),
+  authority: jsonb('authority').default({}),
+  sourceRefs: jsonb('source_refs').default([]).$type<string[]>(),
+  chunkIds: jsonb('chunk_ids').default([]).$type<string[]>(),
+  summaryIds: jsonb('summary_ids').default([]).$type<string[]>(),
+  retrievalTrace: jsonb('retrieval_trace').default({}),
+  cachedSteps: jsonb('cached_steps').default({}),
+  rewardScore: real('reward_score'),
+  degraded: boolean('degraded').notNull().default(false),
+  degradedReason: text('degraded_reason'),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+});
+
+export type IntentSynthesis = typeof intentSynthesis.$inferSelect;
+export type NewIntentSynthesis = typeof intentSynthesis.$inferInsert;
+
+// === AGENT MEMORY OBSERVATIONS (Claude-Mem/OpenCode mirror, Postgres canonical) ===
+export const agentMemoryObservations = pgTable('agent_memory_observations', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  source: varchar('source', { length: 100 }).notNull().default('claude-mem'),
+  ide: varchar('ide', { length: 50 }).default('opencode'),
+  sessionId: text('session_id'),
+  observationId: text('observation_id'),
+  projectPath: text('project_path'),
+  summary: text('summary').notNull(),
+  tags: jsonb('tags').default([]).$type<string[]>(),
+  sourceRefs: jsonb('source_refs').default([]).$type<string[]>(),
+  toolCalls: jsonb('tool_calls').default([]).$type<Array<Record<string, unknown> | string>>(),
+  rawJson: jsonb('raw_json').default({}),
+  embedding: vector('embedding', { dimensions: 768 }),
+  embeddingModel: varchar('embedding_model', { length: 100 }).default('embeddinggemma:latest'),
+  embeddingDim: integer('embedding_dim').default(768),
+  qdrantPointId: text('qdrant_point_id'),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+}, (table) => ({
+  sessionIdx: index('agent_memory_observations_session_idx').on(table.sessionId),
+  observationIdx: index('agent_memory_observations_observation_idx').on(table.observationId),
+  qdrantIdx: index('agent_memory_observations_qdrant_idx').on(table.qdrantPointId),
+  createdIdx: index('agent_memory_observations_created_idx').on(table.createdAt),
+}));
+
+export type AgentMemoryObservation = typeof agentMemoryObservations.$inferSelect;
+export type NewAgentMemoryObservation = typeof agentMemoryObservations.$inferInsert;
+
+// === AGENT OBSERVATIONS (OpenCode progressive memory timeline / ingest canonical) ===
+export const agentObservations = pgTable('agent_observations', {
+  id: serial('id').primaryKey().notNull(),
+  sessionType: text('session_type').notNull(), // 'decision', 'bugfix', 'feature'
+  filePath: text('file_path'),
+  observationText: text('observation_text').notNull(),
+  charIntervalStart: integer('char_interval_start'),
+  somClusterId: integer('som_cluster_id'), // 64D projected latent tag mapping to SOM centroid id
+  timestamp: timestamp('timestamp', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+}, (table) => ({
+  somIdx: index('agent_observations_som_idx').on(table.somClusterId),
+  tsIdx: index('agent_observations_ts_idx').on(table.timestamp),
+}));
+
+export type AgentObservation = typeof agentObservations.$inferSelect;
+export type NewAgentObservation = typeof agentObservations.$inferInsert;
+
 // === EVIDENCE RELATIONSHIPS ===
 export const evidenceRelationships = pgTable('evidence_relationships',
  {

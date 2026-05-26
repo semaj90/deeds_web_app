@@ -1,0 +1,93 @@
+services:
+  redis8-eval:
+    image: redis:8-alpine
+    container_name: deeds-redis8-eval
+    command:
+      - redis-server
+      - --requirepass
+      - redis8-eval
+      - --appendonly
+      - "no"
+      - --save
+      - ""
+      - --maxmemory
+      - 256mb
+      - --maxmemory-policy
+      - allkeys-lru
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis8-eval", "--raw", "PING"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    tmpfs:
+      - /data
+    restart: unless-stopped
+
+  agent-memory-api-eval:
+    image: redislabs/agent-memory-server:latest
+    container_name: deeds-agent-memory-api-eval
+    depends_on:
+      redis8-eval:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://:redis8-eval@redis8-eval:6379/0
+      AUTH_MODE: disabled
+      DISABLE_AUTH: "true"
+      ENABLE_TOPIC_EXTRACTION: "false"
+      ENABLE_NER: "false"
+      LONG_TERM_MEMORY: "true"
+      LOG_LEVEL: INFO
+      OPENAI_API_KEY: local-eval
+      GENERATION_MODEL: gpt-4o-mini
+      EMBEDDING_MODEL: text-embedding-3-small
+    command:
+      - agent-memory
+      - api
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --task-backend=asyncio
+    ports:
+      - "8010:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 24
+    restart: unless-stopped
+
+  agent-memory-mcp-eval:
+    image: redislabs/agent-memory-server:latest
+    container_name: deeds-agent-memory-mcp-eval
+    depends_on:
+      redis8-eval:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://:redis8-eval@redis8-eval:6379/0
+      AUTH_MODE: disabled
+      DISABLE_AUTH: "true"
+      ENABLE_TOPIC_EXTRACTION: "false"
+      ENABLE_NER: "false"
+      LONG_TERM_MEMORY: "true"
+      LOG_LEVEL: INFO
+      OPENAI_API_KEY: local-eval
+      GENERATION_MODEL: gpt-4o-mini
+      EMBEDDING_MODEL: text-embedding-3-small
+    command:
+      - agent-memory
+      - mcp
+      - --mode
+      - sse
+      - --port
+      - "9000"
+    ports:
+      - "9010:9000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsSI", "-H", "Accept: text/event-stream", "http://localhost:9000/sse"]
+      interval: 10s
+      timeout: 5s
+      retries: 24
+    restart: unless-stopped

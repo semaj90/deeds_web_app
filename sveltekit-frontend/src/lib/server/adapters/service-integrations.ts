@@ -632,7 +632,7 @@ export async function healthCheckServices() {
 		services.pgvector = false;
 	}
 
-	// Check MinIO
+	// Check SeaweedFS / legacy MinIO adapter
 	try {
 		await adapters.minio.bucketExists('health-check-bucket');
 		services.minio = true;

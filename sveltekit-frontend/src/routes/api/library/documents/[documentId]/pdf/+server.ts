@@ -6,7 +6,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
-import { statObject, getStream, getPartialStream } from '$lib/server/minio-client.js';
+import { statSeaweedObject as statObject, getSeaweedStream as getStream, getSeaweedPartialStream as getPartialStream } from '$lib/server/seaweed-client.js';
 import { isUuid } from '$lib/server/validation.js';
 import { ENV } from '$lib/server/env.server.js';
 

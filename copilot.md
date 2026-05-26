@@ -1,5 +1,24 @@
 # Copilot - Phase 78 AST-Aware Error Ranking + Svelte 5 Migration
 
+## Claude-Mem / OpenCode Bridge
+
+- OpenCode is a VS Code utility lane, not canonical memory truth.
+- Claude-Mem observations should be mirrored into the Engram stack:
+  - Postgres `agent_memory_observations`
+  - Qdrant semantic recall
+  - Redis hot summaries
+  - ACE/NES context cards
+- keep OpenCode packets compact; use embeddings + Qdrant for semantic meaning instead of stuffing context
+- write higher-level summaries separately into `llm_synthesis`
+- Do not make SQLite canonical.
+- Use the local helper when you need to post an observation payload:
+  - `node scripts/opencode/post-memory.mjs --file <observation.json>`
+  - `npm run opencode:post-memory -- --file <observation.json>`
+- Keep MCP / TurboVec transport drift cleanup separate from memory bridge work.
+- Audit ports and listener state with the stack audit playbook and the bridge doc:
+  - `docs/operations/stack-audit-playbook.md`
+  - `docs/architecture/opencode-claude-mem-bridge.md`
+
 ---
 
 ## ✅ January 19, 2026 – Backup Consolidation Spec Complete

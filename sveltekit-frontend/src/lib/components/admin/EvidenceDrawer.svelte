@@ -158,7 +158,7 @@
 							<span>{formatDate(data!.updated_at)}</span>
 						</div>
 						<div class="info-item">
-							<span class="info-label">MinIO Path</span>
+							<span class="info-label">Object Storage Path</span>
 							<code class="path">{data!.minio_path}</code>
 						</div>
 					</div>

@@ -8,7 +8,7 @@
  */
 
 import { pool } from '$lib/server/db/client';
-import { getFile, putObject } from '$lib/server/minio-client.js';
+import { getSeaweedFile as getFile, putSeaweedObject as putObject } from '$lib/server/seaweed-client.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { chunkLegalDocument } from '$lib/server/indexer/legal-chunker.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';

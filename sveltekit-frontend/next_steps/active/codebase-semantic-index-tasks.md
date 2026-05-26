@@ -1,7 +1,7 @@
 # Codebase Semantic Index Tasks
 
-- Generated: 2026-05-22T01:27:23.220Z
-- Open items: 2166
+- Generated: 2026-05-26T02:40:41.296Z
+- Open items: 2225
 
 ## Priority Tasks
 
@@ -20,6 +20,7 @@
 - [ ] .github/gemini.md:942 - **Upload to Qdrant**
 - [ ] .github/gemini.md:947 - **Create Knowledge Base**
 - [ ] .github/gemini.md:952 - **Test Semantic Search**
+- [ ] archive/logs/karpathy_cartridge_synthesis_audit.md:109 - Conduct full integration soak tests (`npm run atlas:parents:soak`) to benchmark average latency under high parallel load.
 - [ ] CACHE_MONITOR_INTEGRATION.md:365 - Redis `maxmemory` limit set (2GB recommended)
 - [ ] CACHE_MONITOR_INTEGRATION.md:366 - Eviction policy configured (`allkeys-lru`)
 - [ ] CACHE_MONITOR_INTEGRATION.md:367 - Cache warm-up script deployed
@@ -33,8 +34,9 @@
 - [ ] docs/agents_master_stack_checklist.dev.md:16 - Keep `npm run dev` and `npm run dev:full` working.
 - [ ] docs/agents_master_stack_checklist.dev.md:17 - Keep `svelte-check`, `vitest`, `eslint`, and `prettier` runnable locally.
 - [ ] docs/agents_master_stack_checklist.dev.md:18 - Document local service endpoints for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
-- [ ] docs/agents_master_stack_checklist.dev.md:19 - Keep dev bypasses isolated from production code paths.
-- [ ] docs/agents_master_stack_checklist.dev.md:20 - Include `dev-only` packages in local installs.
+- [ ] docs/agents_master_stack_checklist.dev.md:19 - Normalize object storage docs so SeaweedFS is canonical and MinIO remains legacy adapter wording only.
+- [ ] docs/agents_master_stack_checklist.dev.md:20 - Keep dev bypasses isolated from production code paths.
+- [ ] docs/agents_master_stack_checklist.dev.md:21 - Include `dev-only` packages in local installs.
 - [ ] docs/agents_master_stack_checklist.md:77 - Pin Node version and keep `package-lock.json` or workspace lockfile committed.
 - [ ] docs/agents_master_stack_checklist.md:78 - Keep Dockerfile system deps explicit for Python images (`git`, `curl`, `ffmpeg`, OpenCV libs).
 - [ ] docs/agents_master_stack_checklist.md:79 - Cache large Python wheels and avoid rebuilding heavy ML layers when app code changes.
@@ -48,18 +50,20 @@
 - [ ] docs/agents_master_stack_checklist.md:95 - `npm run dev` and `npm run dev:full` should start cleanly.
 - [ ] docs/agents_master_stack_checklist.md:96 - `svelte-check`, `vitest`, `eslint`, and `prettier` must remain runnable from the app workspace.
 - [ ] docs/agents_master_stack_checklist.md:97 - Local services should be documented for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
-- [ ] docs/agents_master_stack_checklist.md:98 - Any dev bypasses must be explicit and isolated from production code paths.
-- [ ] docs/agents_master_stack_checklist.md:99 - Keep `dev-only` packages available in local installs even when prod images omit them.
-- [ ] docs/agents_master_stack_checklist.md:104 - Keep unit tests under the repo's configured Vitest include paths.
-- [ ] docs/agents_master_stack_checklist.md:105 - Cover API contract behavior for auth, validation, and degraded response shapes.
-- [ ] docs/agents_master_stack_checklist.md:106 - Add image/build smokes for Python services that install heavy dependencies.
-- [ ] docs/agents_master_stack_checklist.md:107 - Keep one smoke for each critical external service integration.
-- [ ] docs/agents_master_stack_checklist.md:108 - Validate that `optional` packages fail gracefully when sidecars are absent.
-- [ ] docs/agents_master_stack_checklist.md:113 - Pin runtime versions for the app, Python services, and native addons.
-- [ ] docs/agents_master_stack_checklist.md:114 - Document required environment variables for every external service.
-- [ ] docs/agents_master_stack_checklist.md:115 - Keep optional integrations fail-open or behind a feature boundary.
-- [ ] docs/agents_master_stack_checklist.md:116 - Ensure prod images do not ship dev-only tooling or extra build caches.
-- [ ] docs/agents_master_stack_checklist.md:117 - Ship only `required` and `prod-only` packages in production images; exclude `dev-only` packages.
+- [ ] docs/agents_master_stack_checklist.md:98 - Normalize object storage docs so SeaweedFS is canonical and MinIO remains legacy adapter wording only.
+- [ ] docs/agents_master_stack_checklist.md:99 - Any dev bypasses must be explicit and isolated from production code paths.
+- [ ] docs/agents_master_stack_checklist.md:100 - Keep `dev-only` packages available in local installs even when prod images omit them.
+- [ ] docs/agents_master_stack_checklist.md:105 - Keep unit tests under the repo's configured Vitest include paths.
+- [ ] docs/agents_master_stack_checklist.md:106 - Cover API contract behavior for auth, validation, and degraded response shapes.
+- [ ] docs/agents_master_stack_checklist.md:107 - Add image/build smokes for Python services that install heavy dependencies.
+- [ ] docs/agents_master_stack_checklist.md:108 - Keep one smoke for each critical external service integration.
+- [ ] docs/agents_master_stack_checklist.md:109 - Validate that `optional` packages fail gracefully when sidecars are absent.
+- [ ] docs/agents_master_stack_checklist.md:114 - Pin runtime versions for the app, Python services, and native addons.
+- [ ] docs/agents_master_stack_checklist.md:115 - Document required environment variables for every external service.
+- [ ] docs/agents_master_stack_checklist.md:116 - Normalize object storage runtime docs so SeaweedFS is canonical and MinIO stays legacy-only.
+- [ ] docs/agents_master_stack_checklist.md:117 - Keep optional integrations fail-open or behind a feature boundary.
+- [ ] docs/agents_master_stack_checklist.md:118 - Ensure prod images do not ship dev-only tooling or extra build caches.
+- [ ] docs/agents_master_stack_checklist.md:119 - Ship only `required` and `prod-only` packages in production images; exclude `dev-only` packages.
 - [ ] docs/agents_master_stack_checklist.prod.md:17 - Pin runtime versions for app, Python services, and native addons.
 - [ ] docs/agents_master_stack_checklist.prod.md:18 - Document required env vars for every external service.
 - [ ] docs/agents_master_stack_checklist.prod.md:19 - Keep optional integrations behind a feature boundary or fail-open path.
@@ -101,7 +105,3 @@
 - [ ] docs/architecture/trace-kag-web-development-guide.md:424 - Audit log exists for every write (`evidenceAuditLog`, `context_timeline`, etc.)
 - [ ] docs/architecture/trace-kag-web-development-guide.md:425 - Source hashes / provenance exist for every piece of generated memory
 - [ ] docs/architecture/trace-kag-web-development-guide.md:426 - No raw infra access from Gemma4 — MCP tools only
-- [ ] docs/architecture/trace-kag-web-development-guide.md:427 - No GPU work on the Node main thread — RabbitMQ + sidecar
-- [ ] docs/architecture/trace-kag-web-development-guide.md:428 - No ambiguous ports (single source of truth in `env.server.ts`, no localhost literals)
-- [ ] docs/architecture/trace-kag-web-development-guide.md:429 - Smoke test exists and passes (`scripts/smoke/` or equivalent)
-- [ ] docs/architecture/trace-kag-web-development-guide.md:430 - G-gate coverage in `scripts/validate/full-system.mjs` if the feature crosses tier boundaries

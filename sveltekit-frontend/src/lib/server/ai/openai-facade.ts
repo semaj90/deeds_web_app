@@ -22,6 +22,7 @@ import type {
   OpenAIChatCompletionRequest,
   OpenAIChatCompletionResponse,
   OpenAIMessage,
+  TimingTrace,
 } from './openai-types.js';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import type { ACEContext } from '$lib/server/ace/types.js';
@@ -42,12 +43,21 @@ import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
+import { isVlmOrMmprojRequestModel } from '$lib/server/ai/request-classifiers.js';
+import { shouldUseDraftModel } from '$lib/server/ai/draft-model-policy.js';
 import { compressToHCACard } from '$lib/server/ai/hca-compressor.js';
 import { attentionHeadRanker } from '$lib/server/ai/attention-head-ranker.js';
 import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js';
+import { getRedis } from '$lib/server/redis.js';
+import { recordContextCacheAccess } from '$lib/server/cache/ace-context-cache-metrics.js';
 import { buildDevContextPlan, isCodingPrompt } from '$lib/server/ai/dev-context-planner.js';
 import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { ENV } from '$lib/server/env.server.js';
+import {
+  buildAcePromptPreflight,
+  AcePromptPreflightInput,
+  AcePromptPreflightResult,
+} from '$lib/server/ai/ace-prompt-preflight.js';
 
 const OPENAI_DEFAULT_MAX_TOKENS = Number(process.env.OPENAI_DEFAULT_MAX_TOKENS ?? '1024');
 const OPENAI_MAX_OUTPUT_TOKENS = Number(
@@ -340,6 +350,90 @@ function determineInferenceLane(
   return canUseTurboQuantNow ? 'turboquant' : 'hermes';
 }
 
+type AceSelectedLane = 'redis' | 'turboquant' | 'bifrost';
+
+function selectAceLane(opts: {
+  inputTokens: number;
+  acePacketTokens: number;
+  requestedMaxTokens: number;
+  hasSpecializedRetrieval: boolean;
+  canUseTurboQuantNow: boolean;
+}): {
+  selectedLane: Exclude<AceSelectedLane, 'redis'>;
+  fallbackReason: string | null;
+} {
+  const strictHeavy =
+    opts.inputTokens + opts.requestedMaxTokens > 24000 ||
+    opts.acePacketTokens > 6000 ||
+    opts.requestedMaxTokens > 4096;
+
+  const smallFast =
+    opts.inputTokens <= 1800 &&
+    opts.requestedMaxTokens <= 1024 &&
+    opts.acePacketTokens <= 3000 &&
+    !opts.hasSpecializedRetrieval;
+
+  if (strictHeavy) {
+    return {
+      selectedLane: opts.canUseTurboQuantNow ? 'turboquant' : 'bifrost',
+      fallbackReason: opts.canUseTurboQuantNow ? 'bifrost_timeout_risk' : 'turboquant_unavailable',
+    };
+  }
+
+  if (opts.hasSpecializedRetrieval) {
+    return { selectedLane: 'bifrost', fallbackReason: null };
+  }
+
+  if (smallFast) {
+    return {
+      selectedLane: opts.canUseTurboQuantNow ? 'turboquant' : 'bifrost',
+      fallbackReason: opts.canUseTurboQuantNow ? null : 'turboquant_unavailable',
+    };
+  }
+
+  return { selectedLane: 'bifrost', fallbackReason: null };
+}
+
+function uniqueStrings(values: Array<string | null | undefined>): string[] {
+  return [
+    ...new Set(
+      values.filter((value): value is string => typeof value === 'string' && value.length > 0)
+    ),
+  ];
+}
+
+function collectResponseContextMeta(aceCtx: ACEContext): {
+  sourceRefs: string[];
+  chunkIds: string[];
+  contextPacketVersion?: string;
+} {
+  const payloads = aceCtx.acePayloads ?? [];
+  const sourceRefs = uniqueStrings([
+    ...payloads.map((payload) => payload.source_ref),
+    ...((aceCtx.ragChunks ?? []).map((chunk) => chunk.filePath) as Array<
+      string | null | undefined
+    >),
+    ...((aceCtx.kbChunks ?? []).map((chunk) => chunk.filePath) as Array<string | null | undefined>),
+    ...((aceCtx.caseChunks ?? []).map((chunk) => chunk.filePath) as Array<
+      string | null | undefined
+    >),
+    ...((aceCtx.codebaseContext ?? []).map((chunk) => chunk.filePath) as Array<
+      string | null | undefined
+    >),
+  ]);
+  const chunkIds = uniqueStrings([
+    ...payloads.map((payload) => payload.chunk_id),
+    ...((aceCtx.ragChunks ?? []).map((chunk) => chunk.id) as Array<string | null | undefined>),
+    ...((aceCtx.acePayloads ?? []).map((payload) => payload.chunk_id) as Array<
+      string | null | undefined
+    >),
+    ...((aceCtx.codebaseContext ?? []).map((chunk) => chunk.stableKey ?? chunk.filePath) as Array<
+      string | null | undefined
+    >),
+  ]);
+  return { sourceRefs, chunkIds };
+}
+
 /**
  * Run an OpenAI chat completion through the full agent stack.
  * Returns an OpenAI-shaped response. stream:true is handled by the SSE route
@@ -357,6 +451,13 @@ export async function runChatCompletion(
   const systemPreamble = split.systemPreamble;
   const runtime = resolveRuntimeConfig();
   const canUseTurboQuantNow = canUseTurboQuant(runtime);
+  const draftModelEnabled = shouldUseDraftModel(req.model, canUseTurboQuantNow);
+  let redisMs = 0;
+  let qdrantMs = 0;
+  let postgresMs = 0;
+  let graphMs = 0;
+  let bifrostMs = 0;
+  let turboquantMs = 0;
 
   if (!query) {
     throw new Error('No user query found in messages — last message must be role:user');
@@ -374,11 +475,12 @@ export async function runChatCompletion(
       internalModel === 'gemma4-rotorquant:latest' ? 65536 : RUNTIME_CONTEXT_SIZE;
     const requestedMaxTokens = clampRequestedMaxTokens(req.max_tokens);
     const rawInputTokens = countTokens(mappedMsgs.map((m) => m.content).join('\n'));
-    const rawInferenceLane: InferenceLane =
-      internalModel === 'gemma4-rotorquant:latest'
-        ? 'hermes'
-        : determineInferenceLane(rawInputTokens, 0, requestedMaxTokens, false, canUseTurboQuantNow);
-    const rawModel = rawInferenceLane === 'hermes' ? 'gemma4-rotorquant:latest' : internalModel;
+    // For raw passthrough requests we intentionally bypass the ACE stack
+    // and route directly to the standard Bifrost backend so clients can
+    // benchmark the LLM path in isolation. This avoids invoking the
+    // Gemma4 agent tool-calling path for raw debugging requests.
+    const rawInferenceLane: InferenceLane = 'bifrost';
+    const rawModel = internalModel;
 
     const runtimeLog = {
       stage: 'raw_openai_passthrough_budget_check',
@@ -449,6 +551,7 @@ export async function runChatCompletion(
       runtimeAvailable: runtime.runtimeAvailable,
       turboQuantEnabled: runtime.turboQuant,
       rotorQuantKv: runtime.rotorQuantKv,
+      draftModel: draftModelEnabled,
       ace: {
         used: false,
         chunks: 0,
@@ -511,6 +614,7 @@ export async function runChatCompletion(
       runtimeAvailable: runtime.runtimeAvailable,
       turboQuantEnabled: runtime.turboQuant,
       rotorQuantKv: runtime.rotorQuantKv,
+      draftModel: draftModelEnabled,
       ace: {
         used: true,
         chunks: 0,
@@ -546,6 +650,7 @@ export async function runChatCompletion(
   // On timeout we fall through with an empty context — bifrostChat still fires.
   const ACE_TIMEOUT_MS = 20_000;
   const aceStats: Record<string, any> = {};
+  const qdrantStartMs = Date.now();
   let mcpCompactSearch: NonNullable<ACEContext['compactSearch']> | null = null;
   if (req.use_mcp) {
     const mcpResult = await callTraceMcp(
@@ -611,7 +716,7 @@ export async function runChatCompletion(
     enableCodebaseContext: true,
     enableWebSearch: false,
     modelName: internalModel,
-    modelQuant: runtime.profile,
+    modelQuant: canUseTurboQuantNow ? 'rotorquant' : runtime.profile,
     kvQuant: `${runtime.kvCacheTypeK ?? 'q8_0'}/${runtime.kvCacheTypeV ?? 'q8_0'}`,
     draftModel: canUseTurboQuantNow,
     backend: canUseTurboQuantNow ? 'turboquant' : 'bifrost',
@@ -667,6 +772,7 @@ export async function runChatCompletion(
       policyDecision: null,
     } as AceCtx;
   }
+  qdrantMs = Date.now() - qdrantStartMs;
 
   // The ACE context already includes its own chatHistory injection (per-user
   // semantic recall). Append the request's conversation history on top so the
@@ -714,8 +820,52 @@ export async function runChatCompletion(
     );
   }
 
+  // Build ACE preflight packet (compact prompt mapping + selected cards)
+  let acePreflight: AcePromptPreflightResult | undefined;
+  try {
+    if (typeof buildAcePromptPreflight === 'function') {
+      acePreflight = await buildAcePromptPreflight({
+        query,
+        intent: undefined,
+        modelName: internalModel,
+        backend: canUseTurboQuantNow ? 'turboquant' : 'bifrost',
+        tokenBudget: ACE_PACKET_TOKEN_CAP,
+        repoGitSha: process.env.GIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
+        aceCtx,
+      } as AcePromptPreflightInput);
+    } else {
+      console.warn(
+        '[ACE Preflight] buildAcePromptPreflight is not a function; skipping preflight.'
+      );
+    }
+    if (acePreflight) {
+      aceStats.preflight_selected = acePreflight.selectedCards.length;
+      aceStats.preflight_ms = acePreflight.timing.totalMs;
+    }
+  } catch (err) {
+    console.warn('[ACE Preflight] failed:', err instanceof Error ? err.message : err);
+  }
+
   const prompt = await buildACEPromptCached(aceCtx, query, aceStats);
+  if (acePreflight?.prompt?.context) {
+    const preflightPacket = [acePreflight.prompt.system, acePreflight.prompt.context]
+      .filter(Boolean)
+      .join('\n\n');
+    prompt.systemPrompt = preflightPacket
+      ? `${preflightPacket}\n\n${prompt.systemPrompt}`
+      : prompt.systemPrompt;
+  }
   const qHash = createHash('sha1').update(query).digest('hex').slice(0, 16);
+  const responseContextMeta = collectResponseContextMeta(aceCtx);
+  if (acePreflight) {
+    responseContextMeta.sourceRefs = [
+      ...new Set([...responseContextMeta.sourceRefs, ...acePreflight.sourceRefs]),
+    ];
+    responseContextMeta.chunkIds = [
+      ...new Set([...responseContextMeta.chunkIds, ...acePreflight.chunkIds]),
+    ];
+    responseContextMeta.contextPacketVersion = acePreflight.version;
+  }
 
   let acePacketTokens = countTokens(prompt.systemPrompt);
   if (acePacketTokens > ACE_PACKET_TOKEN_CAP) {
@@ -832,17 +982,7 @@ export async function runChatCompletion(
 
   const hasSpecializedRetrieval =
     hasTools || isCodingQuery || Boolean(req.file_path || req.case_id);
-  const inferenceLane: InferenceLane =
-    internalModel === 'gemma4-rotorquant:latest'
-      ? 'hermes'
-      : determineInferenceLane(
-          inputTokens,
-          acePacketTokens,
-          requestedMaxTokens,
-          hasSpecializedRetrieval,
-          canUseTurboQuantNow
-        );
-  const finalModelUsed = inferenceLane === 'hermes' ? 'gemma4-rotorquant:latest' : internalModel;
+  const finalModelUsed = internalModel;
   let budgetGuardTriggered = false;
   const hmmResult = (() => {
     try {
@@ -920,7 +1060,9 @@ export async function runChatCompletion(
   });
 
   const completionKey = buildAceCompletionCacheKey(packetKey, userQueryHash);
+  const redisLookupStartMs = Date.now();
   const cachedPrompt = await getExactMatchCache(completionKey);
+  redisMs = Date.now() - redisLookupStartMs;
 
   const intentRankerDecision = await rankIntent({
     query,
@@ -954,15 +1096,56 @@ export async function runChatCompletion(
   });
 
   if (cachedPrompt) {
+    // Emit cache access metrics for prompt-cache hit (best-effort, non-blocking)
+    try {
+      const redis = getRedis();
+      recordContextCacheAccess(redis, {
+        cacheKey: completionKey,
+        cacheSource: 'prompt-cache',
+        contextCacheHit: true,
+        reusedChunkCount:
+          (aceCtx.ragChunks?.length ?? 0) +
+          (aceCtx.kbChunks?.length ?? 0) +
+          (aceCtx.caseChunks?.length ?? 0),
+        promptTokensSavedEstimate: inputTokens - acePacketTokens,
+        packId: packetKey,
+        query,
+        contextBudgetTokens: ACE_PACKET_TOKEN_CAP,
+        finalContextTokens: acePacketTokens,
+      } as any).catch(() => {});
+    } catch {
+      /* best-effort */
+    }
     return wrapResponse({
       content: cachedPrompt.content,
       model: finalModelUsed,
       durationMs: Date.now() - startMs,
-      inferenceLane,
+      inferenceLane: undefined,
       runtimeProfile: runtime.profile,
       runtimeAvailable: runtime.runtimeAvailable,
       turboQuantEnabled: runtime.turboQuant,
       rotorQuantKv: runtime.rotorQuantKv,
+      draftModel: draftModelEnabled,
+      modelName: finalModelUsed,
+      backend: 'redis-exact-match',
+      kvQuant: `${runtime.kvCacheTypeK ?? 'q8_0'}/${runtime.kvCacheTypeV ?? 'q8_0'}`,
+      selectedLane: 'redis',
+      fallbackReason: null,
+      contextPackKey: packetKey,
+      contextPacketVersion: responseContextMeta.contextPacketVersion,
+      sourceRefs: responseContextMeta.sourceRefs,
+      chunkIds: responseContextMeta.chunkIds,
+      timingTrace: {
+        redisMs,
+        qdrantMs,
+        postgresMs: 0,
+        graphMs: 0,
+        bifrostMs: 0,
+        turboquantMs: 0,
+        totalMs: Date.now() - startMs,
+        selectedLane: 'redis',
+        fallbackReason: null,
+      },
       ace: {
         used: true,
         chunks:
@@ -1006,6 +1189,17 @@ export async function runChatCompletion(
     });
   }
 
+  const laneDecision = selectAceLane({
+    inputTokens,
+    acePacketTokens,
+    requestedMaxTokens,
+    hasSpecializedRetrieval,
+    canUseTurboQuantNow,
+  });
+  let selectedLane: AceSelectedLane = laneDecision.selectedLane;
+  let fallbackReason: string | null = laneDecision.fallbackReason;
+  let inferenceLane: InferenceLane = selectedLane;
+
   const runtimeLog = {
     stage: 'llm_request_budget_check',
     model: finalModelUsed,
@@ -1030,6 +1224,8 @@ export async function runChatCompletion(
       (aceCtx.kbChunks?.length ?? 0) +
       (aceCtx.caseChunks?.length ?? 0),
     inference_lane: inferenceLane,
+    selected_lane: selectedLane,
+    fallback_reason: fallbackReason,
   };
 
   const originalHistoryTokenCount = countTokens(history.map((m) => m.content).join('\n'));
@@ -1128,48 +1324,75 @@ export async function runChatCompletion(
     inference_lane: inferenceLane,
   });
 
-  // Choose the execution lane. Hermes is preferred when the request exceeds
-  // the TurboQuant/24k threshold or when the user explicitly requested it.
+  // ACE Inference Lane Router:
+  // Redis exact-match already short-circuited above. For generation, prefer
+  // TurboQuant for small/fast or strict/heavy requests, and Bifrost for the
+  // normal semantic-reuse path. If the primary lane fails, fall back once and
+  // record the reason in the timing trace.
   let text: string;
-  if (inferenceLane === 'hermes') {
-    try {
-      text = await runHermesChat(messages, requestedMaxTokens, req.temperature);
-    } catch (err) {
-      console.warn('[Hermes] fallback to TurboQuant/bifrost due to:', err);
-      if (canUseTurboQuantNow) {
-        const result = await turboQuantChat(messages, internalModel, {
-          temperature: req.temperature,
-          maxTokens: requestedMaxTokens,
-        });
-        text = extractAssistantText(result);
-      } else {
-        const result = await bifrostChat(messages, internalModel, {
-          temperature: req.temperature,
-          maxTokens: requestedMaxTokens,
-        });
-        text = extractAssistantText(result);
-      }
-    }
-  } else if (canUseTurboQuantNow) {
-    try {
-      const result = await turboQuantChat(messages, internalModel, {
-        temperature: req.temperature,
-        maxTokens: requestedMaxTokens,
-      });
-      text = extractAssistantText(result);
-    } catch {
-      const result = await bifrostChat(messages, internalModel, {
-        temperature: req.temperature,
-        maxTokens: requestedMaxTokens,
-      });
-      text = extractAssistantText(result);
-    }
-  } else {
+  const runTurboquant = async () => {
+    const turboStartedMs = Date.now();
+    const result = await turboQuantChat(messages, internalModel, {
+      temperature: req.temperature,
+      maxTokens: requestedMaxTokens,
+    });
+    turboquantMs = Date.now() - turboStartedMs;
+    selectedLane = 'turboquant';
+    inferenceLane = 'turboquant';
+    return extractAssistantText(result);
+  };
+  const runBifrost = async () => {
+    const bifrostStartedMs = Date.now();
     const result = await bifrostChat(messages, internalModel, {
       temperature: req.temperature,
       maxTokens: requestedMaxTokens,
     });
-    text = extractAssistantText(result);
+    bifrostMs = Date.now() - bifrostStartedMs;
+    selectedLane = 'bifrost';
+    inferenceLane = 'bifrost';
+    return extractAssistantText(result);
+  };
+
+  if (selectedLane === 'turboquant') {
+    try {
+      text = await runTurboquant();
+    } catch (err) {
+      fallbackReason = fallbackReason ?? 'turboquant_failed';
+      console.warn('[ACE Lane Router] TurboQuant failed; falling back to Bifrost:', err);
+      try {
+        text = await runBifrost();
+      } catch (bifrostErr) {
+        fallbackReason = `${fallbackReason};bifrost_failed`;
+        console.warn('[ACE Lane Router] Bifrost fallback failed; trying Hermes:', bifrostErr);
+        const hermesStartedMs = Date.now();
+        text = await runHermesChat(messages, requestedMaxTokens, req.temperature);
+        // Keep generation lane aligned with the actual fallback backend.
+        bifrostMs = Math.max(bifrostMs, Date.now() - hermesStartedMs);
+      }
+    }
+  } else {
+    try {
+      text = await runBifrost();
+    } catch (err) {
+      fallbackReason = fallbackReason ?? 'bifrost_failed';
+      console.warn('[ACE Lane Router] Bifrost failed; falling back to TurboQuant:', err);
+      if (canUseTurboQuantNow) {
+        try {
+          text = await runTurboquant();
+        } catch (turboErr) {
+          fallbackReason = `${fallbackReason};turboquant_failed`;
+          console.warn('[ACE Lane Router] TurboQuant fallback failed; trying Hermes:', turboErr);
+          const hermesStartedMs = Date.now();
+          text = await runHermesChat(messages, requestedMaxTokens, req.temperature);
+          bifrostMs = Math.max(bifrostMs, Date.now() - hermesStartedMs);
+        }
+      } else {
+        fallbackReason = `${fallbackReason};turboquant_unavailable`;
+        const hermesStartedMs = Date.now();
+        text = await runHermesChat(messages, requestedMaxTokens, req.temperature);
+        bifrostMs = Math.max(bifrostMs, Date.now() - hermesStartedMs);
+      }
+    }
   }
 
   text = text.trim() || '[No assistant content returned by model]';
@@ -1299,6 +1522,26 @@ export async function runChatCompletion(
     console.warn('[LLM Synthesis Log] failed to record event:', err);
   }
 
+  // Emit ACE metrics for fresh generation (best-effort, non-blocking)
+  try {
+    const redis = getRedis();
+    recordContextCacheAccess(redis, {
+      cacheKey: completionKey,
+      cacheSource: 'openai-facade',
+      contextCacheHit: false,
+      reusedChunkCount: chunkCount,
+      durationMs: Date.now() - startMs,
+      promptTokens: inputTokens,
+      completionTokens: countTokens(text),
+      promptTokensSavedEstimate: inputTokens - acePacketTokens,
+      packId: packetKey,
+      query,
+      contextBudgetTokens: ACE_PACKET_TOKEN_CAP,
+    } as any).catch(() => {});
+  } catch (_e) {
+    /* best-effort telemetry — ignore errors */
+  }
+
   return wrapResponse({
     content: text,
     model: finalModelUsed,
@@ -1308,6 +1551,27 @@ export async function runChatCompletion(
     runtimeAvailable: runtime.runtimeAvailable,
     turboQuantEnabled: runtime.turboQuant,
     rotorQuantKv: runtime.rotorQuantKv,
+    draftModel: draftModelEnabled,
+    modelName: finalModelUsed,
+    backend: selectedLane,
+    kvQuant: `${runtime.kvCacheTypeK ?? 'q8_0'}/${runtime.kvCacheTypeV ?? 'q8_0'}`,
+    selectedLane,
+    fallbackReason,
+    contextPackKey: packetKey,
+    contextPacketVersion: responseContextMeta.contextPacketVersion,
+    sourceRefs: responseContextMeta.sourceRefs,
+    chunkIds: responseContextMeta.chunkIds,
+    timingTrace: {
+      redisMs: typeof redisMs !== 'undefined' ? redisMs : 0,
+      qdrantMs: typeof qdrantMs !== 'undefined' ? qdrantMs : 0,
+      postgresMs: typeof postgresMs !== 'undefined' ? postgresMs : 0,
+      graphMs: typeof graphMs !== 'undefined' ? graphMs : 0,
+      bifrostMs: typeof bifrostMs !== 'undefined' ? bifrostMs : 0,
+      turboquantMs: typeof turboquantMs !== 'undefined' ? turboquantMs : 0,
+      totalMs: Date.now() - startMs,
+      selectedLane,
+      fallbackReason,
+    },
     ace: {
       used: true,
       chunks: chunkCount,
@@ -1374,6 +1638,16 @@ function wrapResponse(args: {
   runtimeAvailable?: boolean;
   turboQuantEnabled?: boolean;
   rotorQuantKv?: boolean;
+  draftModel?: boolean;
+  modelName?: string;
+  backend?: string;
+  kvQuant?: string;
+  selectedLane?: 'redis' | 'turboquant' | 'bifrost';
+  fallbackReason?: string | null;
+  contextPackKey?: string;
+  sourceRefs?: string[];
+  chunkIds?: string[];
+  timingTrace?: TimingTrace;
   hmm?: NonNullable<NonNullable<OpenAIChatCompletionResponse['yorha']>['hmm']>;
   topoPrefilter?: { used: boolean; hitCount?: number } | null;
   toolLoop?: {
@@ -1405,6 +1679,7 @@ function wrapResponse(args: {
     object: 'chat.completion',
     created: Math.floor(Date.now() / 1000),
     model: args.model,
+    timingTrace: args.timingTrace,
     retrievalTrace: args.hmm
       ? {
           hmm: args.hmm,
@@ -1453,6 +1728,16 @@ function wrapResponse(args: {
       runtimeAvailable: args.runtimeAvailable,
       turboQuantEnabled: args.turboQuantEnabled,
       rotorQuantKv: args.rotorQuantKv,
+      draftModel: args.draftModel,
+      modelName: args.modelName ?? args.model,
+      backend: args.backend,
+      kvQuant: args.kvQuant,
+      selectedLane: args.selectedLane,
+      fallbackReason: args.fallbackReason ?? null,
+      contextPackKey: args.contextPackKey,
+      sourceRefs: args.sourceRefs,
+      chunkIds: args.chunkIds,
+      timingTrace: args.timingTrace,
       mcpCompactSearchHitCount: args.mcpCompactSearchHitCount,
       mcpCompactSearchCacheHit: args.mcpCompactSearchCacheHit,
       mcpCompactSearchMs: args.mcpCompactSearchMs,

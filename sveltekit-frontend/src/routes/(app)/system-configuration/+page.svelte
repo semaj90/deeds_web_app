@@ -482,7 +482,7 @@
       <SystemStatusCard title="RabbitMQ" status="WARN" updatedAt={new Date()}>
        <p class="text-xs text-gray-400 mt-1">7 queues, 5 exchanges</p>
       </SystemStatusCard>
-      <SystemStatusCard title="MinIO Storage" status="OK" updatedAt={new Date()}>
+      <SystemStatusCard title="SeaweedFS Storage" status="OK" updatedAt={new Date()}>
        <p class="text-xs text-gray-400 mt-1">SHA-256 hash verification, evidence uploads</p>
       </SystemStatusCard>
      </div>

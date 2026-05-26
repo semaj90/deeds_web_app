@@ -393,7 +393,7 @@
 								<div class="space-y-4 text-xs">
 									<div class="flex flex-col gap-1">
 										<span class="text-neutral-600">Storage Location</span>
-										<span class="text-neutral-300 font-mono">MinIO S3 // bucket-1</span>
+										<span class="text-neutral-300 font-mono">SeaweedFS S3 // bucket-1</span>
 									</div>
 									<div class="flex flex-col gap-1">
 										<span class="text-neutral-600">Indexing Status</span>

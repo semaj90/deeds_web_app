@@ -17,13 +17,13 @@ import { ENV } from '$lib/server/env.server.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 import { getTfIdfRanker } from './TfIdfRanker.js';
-import { getMinioKnowledgeStore } from './MinioKnowledgeStore.js';
+import { getSeaweedKnowledgeStore } from './SeaweedKnowledgeStore.js';
 import { getRedisCacheService } from './RedisCacheService.js';
 
 export class KnowledgeSearcher {
   private qdrant = getQdrantKnowledgeStore();
   private tfidf = getTfIdfRanker();
-  private minio = getMinioKnowledgeStore();
+  private seaweed = getSeaweedKnowledgeStore();
   private cache = getRedisCacheService();
 
   /**
@@ -172,7 +172,7 @@ export class KnowledgeSearcher {
         return null;
       }
 
-      const content = await this.minio.getDocument(minioKey);
+      const content = await this.seaweed.getDocument(minioKey);
 
       return {
         id: point.id.toString(),

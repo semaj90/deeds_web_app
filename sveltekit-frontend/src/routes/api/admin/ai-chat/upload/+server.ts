@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getMinioS3Client, getMinioConfig } from '$lib/server/minio.js';
+import { getSeaweedClient, getSeaweedConfig } from '$lib/server/seaweed-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 
@@ -11,7 +11,7 @@ const uploadSchema = z.object({
 
 /**
  * Handles temporary file uploads for the Admin AI Assistant.
- * Stores files in MinIO and returns a metadata object.
+ * Stores files in SeaweedFS-compatible object storage and returns metadata.
  */
 export async function POST({ request, locals }) {
   if (!locals.user || locals.user.role !== 'admin') {
@@ -28,8 +28,8 @@ export async function POST({ request, locals }) {
       return json({ error: 'No file provided' }, { status: 400 });
     }
 
-    const client = getMinioS3Client();
-    const config = getMinioConfig();
+    const client = getSeaweedClient();
+    const config = getSeaweedConfig();
     const fileId = crypto.randomUUID();
     const fileName = `${locals.user.id}/${fileId}-${file.name}`;
     const buffer = Buffer.from(await file.arrayBuffer());

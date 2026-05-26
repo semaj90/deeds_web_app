@@ -36,7 +36,6 @@ export function buildSemanticCacheKey(queryHash: string, model: string, provider
 }
 
 export default {
-  SemanticCacheRecord,
   storeSemanticCacheRecord,
   getSemanticCacheRecordByKey,
   buildSemanticCacheKey,

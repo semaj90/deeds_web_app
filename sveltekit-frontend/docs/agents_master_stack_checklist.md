@@ -54,7 +54,7 @@ Legend: `required` means the current app or service expects it now; `optional` m
 | `@langchain/textsplitters` | dev/prod | optional | AI / LLM | Text chunking. |
 | `pg` | dev/prod | required | Data | Postgres access. |
 | `drizzle-orm` | dev/prod | required | Data | Typed SQL schema and migration layer used throughout the app. |
-| `SeaweedFS S3` | dev/prod | optional | Data | Object storage integration via the MinIO-compatible adapter. |
+| `SeaweedFS S3` | dev/prod | optional | Data | Object storage integration via the S3-compatible adapter. |
 | `amqplib` | dev/prod | optional | Data | Queueing / broker integration. |
 | `express` | dev/prod | optional | Data | Service adapter and compatibility layer. |
 | `docling-parse` | prod-only | required | Document / vision / audio | Document parsing and layout extraction. |
@@ -95,6 +95,7 @@ Compression here means artifact and image compression, not source minification a
 - [ ] `npm run dev` and `npm run dev:full` should start cleanly.
 - [ ] `svelte-check`, `vitest`, `eslint`, and `prettier` must remain runnable from the app workspace.
 - [ ] Local services should be documented for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
+- [ ] Normalize object storage docs so SeaweedFS is canonical and MinIO remains legacy adapter wording only.
 - [ ] Any dev bypasses must be explicit and isolated from production code paths.
 - [ ] Keep `dev-only` packages available in local installs even when prod images omit them.
 
@@ -112,6 +113,7 @@ Testing should cover both code and packaging boundaries. The current failure mod
 ### Prod
 - [ ] Pin runtime versions for the app, Python services, and native addons.
 - [ ] Document required environment variables for every external service.
+- [ ] Normalize object storage runtime docs so SeaweedFS is canonical and MinIO stays legacy-only.
 - [ ] Keep optional integrations fail-open or behind a feature boundary.
 - [ ] Ensure prod images do not ship dev-only tooling or extra build caches.
 - [ ] Ship only `required` and `prod-only` packages in production images; exclude `dev-only` packages.

@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-05-25T00:00:00Z",
+  "summary": {
+    "documented_sidecars_validated": 0,
+    "manual_files_needing_review": 0
+  },
+  "entries": [
+    {
+      "file": "0013_codeintel_indexes.sql",
+      "path": "sveltekit-frontend/drizzle/manual/0013_codeintel_indexes.sql",
+      "classification": "additive_safe",
+      "reason": "Creates GIN/trgm and B-tree indexes; non-destructive and CONCURRENTLY-safe.",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname LIKE '%trgm%' LIMIT 5;\"",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/0013_codeintel_indexes.sql'; ROLLBACK;\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/0013_codeintel_indexes.sql"
+    },
+    {
+      "file": "20260516_pgvector_repair.sql",
+      "path": "sveltekit-frontend/drizzle/manual/20260516_pgvector_repair.sql",
+      "classification": "destructive_risk",
+      "reason": "Alters column types to pgvector; can be disruptive if data present — requires backup and staged validation.",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name, data_type FROM information_schema.columns WHERE table_name='legal_documents' AND column_name='content_embedding';\"",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260516_pgvector_repair.sql'; ROLLBACK;\"",
+      "safe_apply": "# MANUAL OPERATOR ACTION REQUIRED: follow operator checklist in sidecar-audit-report.json before applying"
+    }
+  ],
+  "notes": {
+    "how_to_finish": [
+      "1. Run: 'rg --files sveltekit-frontend/drizzle/manual | sort' to list manual SQL files.",
+      "2. For each file, inspect the top comment and DDL to decide classification (additive_safe | destructive_risk | needs_review).",
+      "3. For additive files, run the provided safe_dry_run then safe_apply when satisfied.",
+      "4. For destructive files, prepare exports: 'pg_dump --data-only --table=<table> --file=backup.sql' and test in staging before applying.",
+      "5. Update this file's 'entries' array with each validated record and increment summary counts."
+    ],
+    "operator_checks": [
+      "Always run validationCommand from sidecar-audit-report.json before apply.",
+      "Take table-level backups for ALTER/TYPE changes.",
+      "Prefer 'CONCURRENTLY' for index creation on large tables.",
+      "If changing identity columns (integer <-> uuid), coordinate cross-system mapping and test in staging."
+    ]
+  }
+}

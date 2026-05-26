@@ -1,20 +1,20 @@
 /**
  * GET /api/evidence/[id]/download
- * Streams the evidence file from MinIO to the browser.
- * Resolves minio:// URLs and http:// MinIO URLs to actual file streams.
+ * Streams the evidence file from SeaweedFS-compatible object storage to the browser.
+ * Resolves minio:// URLs and http:// object-store URLs to actual file streams.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq } from 'drizzle-orm';
-import { getStream, statObject } from '$lib/server/minio-client.js';
+import { getSeaweedStream as getStream, statSeaweedObject as statObject } from '$lib/server/seaweed-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 
 const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 
-/** Extract MinIO object key from stored URL formats */
+/** Extract object-store key from stored URL formats */
 function extractObjectKey(fileUrl: string): { bucket: string; key: string } | null {
   if (!fileUrl) return null;
 
@@ -88,7 +88,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       // statObject failed — stream without Content-Length
     }
 
-    // Stream the file from MinIO
+    // Stream the file from object storage
     const stream = await getStream(parsed.bucket, parsed.key);
 
     const contentType = item.mimeType || item.fileType || 'application/octet-stream';

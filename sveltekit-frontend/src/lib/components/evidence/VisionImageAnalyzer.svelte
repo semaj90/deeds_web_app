@@ -334,7 +334,7 @@
           <div class="hash-row">
             <span class="text-sand/30 text-xs font-mono">SHA-256: {result.hash.slice(0, 16)}...</span>
             {#if result.minioUrl}
-              <span class="text-sand/30 text-xs">Stored in MinIO</span>
+              <span class="text-sand/30 text-xs">Stored in SeaweedFS</span>
             {/if}
           </div>
         {:else if error}

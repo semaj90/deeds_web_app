@@ -24,7 +24,7 @@
 		{ title: 'Repo Truth', detail: 'route + schema audit aligned', tools: ['rg', 'jq'], tone: 'blue' },
 		{ title: 'DB Truth', detail: 'rows inserted and citation labels resolved', tools: ['psql', 'pgvector'], tone: 'blue' },
 		{ title: 'Vector Truth', detail: 'semantic index hot and queryable', tools: ['Qdrant', 'Ollama'], tone: 'blue' },
-		{ title: 'Storage Truth', detail: 'raw PDFs + normalized text persisted', tools: ['mc', 'MinIO'], tone: 'slate' },
+		{ title: 'Storage Truth', detail: 'raw PDFs + normalized text persisted', tools: ['mc', 'SeaweedFS'], tone: 'slate' },
 		{ title: 'API Truth', detail: 'glossary, citations, corpus routes healthy', tools: ['curl', 'jq'], tone: 'amber' },
 	];
 
@@ -99,12 +99,12 @@
 		{ label: 'Version Lineage', value: 'v2023.11 -> v2024.05' },
 		{ label: 'Fetch Timestamp', value: '2026-03-17 09:42 UTC' },
 		{ label: 'Normalized Hash', value: 'sha256:f5b1...92e4' },
-		{ label: 'MinIO Object', value: 'legal-library/constitutions/ca-2024.pdf' },
+		{ label: 'SeaweedFS Object', value: 'legal-library/constitutions/ca-2024.pdf' },
 		{ label: 'Search Mode', value: 'fts + pgvector + citations' },
 	];
 
 	const lineageEvents = [
-		{ title: 'Official PDF fetched', detail: 'Raw PDF stored in MinIO and source hash stamped for provenance replay.' },
+		{ title: 'Official PDF fetched', detail: 'Raw PDF stored in SeaweedFS and source hash stamped for provenance replay.' },
 		{ title: 'Structure and chunking completed', detail: 'Article and section hierarchy resolved into legal_nodes and legal_chunks.' },
 		{ title: 'Embeddings cached', detail: 'Vector coverage backfilled for semantic search and citation page retrieval.' },
 		{ title: 'Truth-check validated', detail: 'Rows inserted, Qdrant indexed, glossary live, API routes healthy.' },

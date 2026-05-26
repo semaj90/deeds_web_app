@@ -14,6 +14,8 @@
  *   // response.choices[0].message.tool_calls → dispatch via llamaToolCall()
  */
 
+import { acePromptPreflightLlamaTool } from './ace-prompt-preflight-tool.js';
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 export interface LlamaToolFunction {
@@ -40,6 +42,8 @@ export interface LlamaToolCall {
 // ── Tool definitions (mirrors trace-mcp-server.ts allowlist) ──────────────────
 
 export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
+  acePromptPreflightLlamaTool,
+
   // ── Dev context (Step 5B default first tool) ────────────────────────────────
   {
     type: 'function',

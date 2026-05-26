@@ -130,6 +130,9 @@ export function buildTopoPrefilterStats(params: {
   qdrantCollectionEstimate: number | null;
   queryHash:                string;
   cartridge?:               'warm' | 'cold' | 'miss';
+  degraded?:                boolean;
+  degradedMessage?:         string;
+  operatorRecovery?:        string[];
 }): TopoPrefilterStats {
   return {
     used:               params.used,
@@ -142,6 +145,9 @@ export function buildTopoPrefilterStats(params: {
       : null,
     queryHash:          params.queryHash,
     cartridge:          params.cartridge,
+    degraded:           params.degraded,
+    degradedMessage:    params.degradedMessage,
+    operatorRecovery:   params.operatorRecovery,
   };
 }
 
@@ -155,4 +161,7 @@ export interface TopoPrefilterStats {
   candidateReduction: string | null;
   queryHash:          string;
   cartridge?:         'warm' | 'cold' | 'miss';
+  degraded?:          boolean;
+  degradedMessage?:   string;
+  operatorRecovery?:  string[];
 }

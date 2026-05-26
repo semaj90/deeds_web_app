@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-23T22:38:51.515Z",
-  "strict": false,
+  "generatedAt": "2026-05-26T02:34:12.611Z",
+  "strict": true,
   "services": [
     {
       "name": "Postgres",
@@ -28,7 +28,7 @@
       "port": 6333,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": null
     },
@@ -68,7 +68,7 @@
       "port": 8090,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": "LLAMA_SERVER_URL"
     },
@@ -78,7 +78,7 @@
       "port": 11434,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": "OLLAMA_HOST"
     },

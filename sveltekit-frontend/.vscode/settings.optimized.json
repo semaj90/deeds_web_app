@@ -7,8 +7,8 @@
   "editor.renderControlCharacters": false,
   "editor.renderWhitespace": "none",
 
-  // Multi-Core TypeScript Server (28GB Memory + All Cores)
-  "typescript.tsserver.maxTsServerMemory": 28672,
+  // Multi-Core TypeScript Server (12GB Memory + All Cores)
+  "typescript.tsserver.maxTsServerMemory": 12288,
   "typescript.tsserver.useSeparateSyntaxServer": true,
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.suggest.autoImports": true,

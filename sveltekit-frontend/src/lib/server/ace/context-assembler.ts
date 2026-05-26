@@ -78,6 +78,12 @@ import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { embedText, embedTexts } from '$lib/server/embedding/embed.js';
 import { runRgAsync } from '../../../../scripts/rg-atlas/run-rg.mjs';
 import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js';
+import {
+  buildCudaRnnSignals,
+  isCudaRnnRankerEnabled,
+  rerankChunksCudaExperimental,
+  type CudaRnnChunkLike,
+} from '$lib/server/retrieval/cuda-rnn-reranker.js';
 import { fetchCommunityRelationships } from './relationship-fetcher.js';
 import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js';
 import { eq, desc, sql as drizzleSql } from 'drizzle-orm';
@@ -89,6 +95,7 @@ import {
   loadAceContextPlannerHit,
   storeAceContextPlannerHit,
 } from './context-cache-planner.js';
+import { recordContextCacheAccess } from '$lib/server/cache/ace-context-cache-metrics.js';
 import { recallPastChats } from './chat-memory.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
@@ -113,6 +120,11 @@ import {
   TOPO_CLASS,
   TOPO_CLASS_LABEL,
 } from '$lib/server/tensor/topology-byte-mapper.js';
+import { getAuthorityForContext } from '$lib/server/graph/karpathy-authority.js';
+import {
+  setAceContextPackPointer,
+  buildAceContextPack,
+} from '$lib/server/cache/ace-context-pack-cache.js';
 import {
   quaternionSimilarity,
   toUnitQuaternion,
@@ -508,13 +520,20 @@ function project4DQuery(q: string): { x: number; y: number; z: number; w: number
   let x = 0.0;
   if (qt.includes('feature') || qt.includes('architecture')) x = 1.0;
   else if (qt.includes('tool') || qt.includes('script')) x = 0.5;
-  else if (qt.includes('store') || qt.includes('redis') || qt.includes('postgres') || qt.includes('qdrant')) x = -0.5;
+  else if (
+    qt.includes('store') ||
+    qt.includes('redis') ||
+    qt.includes('postgres') ||
+    qt.includes('qdrant')
+  )
+    x = -0.5;
   else if (qt.includes('error') || qt.includes('bug') || qt.includes('fail')) x = -1.0;
   let y = 0.5;
   if (qt.includes('why') || qt.includes('deep') || qt.includes('explain')) y = 0.8;
   else if (qt.includes('what is') || qt.includes('simple')) y = 0.2;
   let z = 0.5;
-  if (qt.includes('path') || qt.includes('import') || qt.includes('depend') || qt.includes('call')) z = 0.9;
+  if (qt.includes('path') || qt.includes('import') || qt.includes('depend') || qt.includes('call'))
+    z = 0.9;
   else if (qt.includes('isolated') || qt.includes('single')) z = 0.1;
   const w = qt.includes('rebuild') || qt.includes('deployment') || qt.includes('final') ? 0.9 : 0.0;
   return { x, y, z, w };
@@ -582,7 +601,7 @@ export async function runCHR97Search(
     });
     return {
       confidence: topScore,
-      topChunks: cached.map(c => ({ ...c, path: c.path ?? "" })),
+      topChunks: cached.map((c) => ({ ...c, path: c.path ?? '' })),
       results: cached.map((c) => ({
         id: c.stableKey,
         source: 'qdrant' as const,
@@ -815,7 +834,9 @@ async function fetchACPKnowledgeResults(
     if (collection === 'codebase_chunks_768') {
       const tvResult = await turbovecPrefilter(emb, { topClusters: 5, timeoutMs: 200 });
       if (tvResult.clusterIds.length > 0) {
-        turbovecFilter = { must: [{ key: 'neo4j_gpuCluster', match: { any: tvResult.clusterIds.map(String) } }] };
+        turbovecFilter = {
+          must: [{ key: 'neo4j_gpuCluster', match: { any: tvResult.clusterIds.map(String) } }],
+        };
       }
     }
     try {
@@ -910,7 +931,6 @@ async function fetchACPKnowledgeResults(
               embeddingModel: 'embeddinggemma:latest',
               collection,
               latencyMs: Date.now() - startedAt,
-
             },
           };
         } catch (rgErr) {
@@ -1274,7 +1294,11 @@ export async function assembleACEContext(opts: {
             ? parseFloat(configuredThresholdRaw)
             : CHR97_FAST_PATH_THRESHOLD;
 
-          cartridgeResults = await runCHR97Search(query, 8, userId ?? undefined) as typeof cartridgeResults;
+          cartridgeResults = (await runCHR97Search(
+            query,
+            8,
+            userId ?? undefined
+          )) as typeof cartridgeResults;
           if (cartridgeResults.confidence >= configuredThreshold) {
             // Retrieve codebase context from seeds and return immediately!
             const codebaseContext = await fetchCodebaseContext(
@@ -1291,7 +1315,9 @@ export async function assembleACEContext(opts: {
             if (topChunk?.gpuCluster != null) {
               const { readLatestQdrantClusterTags } = await import('./cluster-tags-cache.js');
               const entries = readLatestQdrantClusterTags();
-              const entry = entries.find((e) => String(e.clusterKey) === String(topChunk.gpuCluster));
+              const entry = entries.find(
+                (e) => String(e.clusterKey) === String(topChunk.gpuCluster)
+              );
               if (entry) {
                 activeClusterSummary = {
                   clusterId: entry.clusterKey,
@@ -1615,11 +1641,14 @@ export async function assembleACEContext(opts: {
       await applyQloraBoost(allRag).catch(() => {});
 
       // Fetch graph relation summaries (selectedRelationCards, selectedClusterSummaries, cacheTrace, topRuntimeDependencies)
-      const graphRelationSummaries = await fetchGraphRelationSummaries(query, codebaseContext ?? []).catch(() => ({
+      const graphRelationSummaries = await fetchGraphRelationSummaries(
+        query,
+        codebaseContext ?? []
+      ).catch(() => ({
         selectedRelationCards: '',
         selectedClusterSummaries: '',
         cacheTrace: '',
-        topRuntimeDependencies: ''
+        topRuntimeDependencies: '',
       }));
 
       // ── Multi-lane parallel retrieval (allSettled — degradation-safe) ──────
@@ -1642,6 +1671,29 @@ export async function assembleACEContext(opts: {
         sectionTypesHash: acePlannerState.sectionTypesHash,
         tokenAwarePacking: acePlannerState.tokenAwarePacking,
       };
+
+      // Emit minimal cache access metrics (best-effort, non-blocking)
+      try {
+        const redis = getRedis();
+        const metrics = {
+          cacheKey: acePlannerState.cacheKey,
+          cacheSource: acePlannerHit?.meta.source ?? (multiLaneOutput ? 'no-cache' : 'miss'),
+          contextCacheHit: Boolean(acePlannerHit),
+          reusedChunkCount: acePlannerHit?.meta?.reusedChunkCount ?? 0,
+          skippedRetrievalLanes:
+            multiLaneOutput?.lanes?.filter((l) => (l.hits?.length ?? 0) === 0).map((l) => l.lane) ??
+            [],
+          promptTokensSavedEstimate: acePlannerHit?.meta?.promptTokensSavedEstimate ?? undefined,
+          timeSavedMsEstimate: acePlannerHit?.meta?.timeSavedMsEstimate ?? undefined,
+          packId: acePlannerHit?.meta?.packId ?? undefined,
+          query,
+          contextBudgetTokens: ACE_PACKET_TOKEN_CAP,
+        };
+        // fire-and-forget
+        recordContextCacheAccess(redis, metrics as any).catch(() => {});
+      } catch {
+        // best-effort only
+      }
 
       const baseContext: ACEContext = {
         selectedRelationCards: graphRelationSummaries.selectedRelationCards,
@@ -2284,14 +2336,17 @@ export async function assembleACEContext(opts: {
             if (lgResult?.answer) {
               const lgCitations = (lgResult.citations ?? [])
                 .slice(0, 6)
-                .map((c) => `  [${c.index}] ${c.title} (score: ${c.score.toFixed(3)})\n${c.text.slice(0, 300)}`)
+                .map(
+                  (c) =>
+                    `  [${c.index}] ${c.title} (score: ${c.score.toFixed(3)})\n${c.text.slice(0, 300)}`
+                )
                 .join('\n\n');
 
               const lgBlock = [
                 '\n\n-- LangGraph Synthesis [T2-trust | HMM-adapted] --',
                 `Confidence: ${(lgResult.confidence * 100).toFixed(1)}% | ` +
-                `RAG hits: ${lgResult.rag_hits} | KAG neighbors: ${lgResult.kag_neighbors} | ` +
-                `Web results: ${lgResult.web_results} | Cache: ${lgResult.cache}`,
+                  `RAG hits: ${lgResult.rag_hits} | KAG neighbors: ${lgResult.kag_neighbors} | ` +
+                  `Web results: ${lgResult.web_results} | Cache: ${lgResult.cache}`,
                 '',
                 lgResult.answer,
                 lgCitations ? `\nSources:\n${lgCitations}` : '',
@@ -2305,10 +2360,7 @@ export async function assembleACEContext(opts: {
             }
           }
         } catch (lgErr) {
-          console.warn(
-            '[ACE langgraph] synthesis skipped:',
-            (lgErr as Error)?.message ?? lgErr
-          );
+          console.warn('[ACE langgraph] synthesis skipped:', (lgErr as Error)?.message ?? lgErr);
         }
       }
 
@@ -2560,6 +2612,42 @@ export async function assembleACEContext(opts: {
           if (topFiles?.length) clusterTopFilesById.set(id, topFiles);
         });
 
+        // Best-effort: compute pack-level Karpathy authority and apply a small
+        // conservative boost to candidate scores before building the packet so
+        // the authority influence is reflected in the constructed packet.
+        try {
+          const authority = await getAuthorityForContext(finalContext).catch(() => ({
+            score: 0,
+            source: 'gpu',
+          }));
+          (finalContext as any).authority = authority;
+          if (authority && typeof authority.score === 'number' && authority.score > 0) {
+            const alpha = Number(process.env.ACE_AUTHORITY_ALPHA ?? '0.12');
+            const factor = 1 + Math.min(0.2, alpha * authority.score);
+            if (Array.isArray(codebaseContext)) {
+              for (const c of codebaseContext) {
+                if (typeof c.score === 'number') c.score = Number((c.score * factor).toFixed(6));
+                if (typeof c.pageRankScore === 'number')
+                  c.pageRankScore = Number((c.pageRankScore * factor).toFixed(6));
+              }
+            }
+            if (Array.isArray(ragChunks)) {
+              for (const c of ragChunks)
+                if (typeof c.score === 'number') c.score = Number((c.score * factor).toFixed(6));
+            }
+            if (Array.isArray(kbChunks)) {
+              for (const c of kbChunks)
+                if (typeof c.score === 'number') c.score = Number((c.score * factor).toFixed(6));
+            }
+            if (Array.isArray(caseChunks)) {
+              for (const c of caseChunks)
+                if (typeof c.score === 'number') c.score = Number((c.score * factor).toFixed(6));
+            }
+          }
+        } catch {
+          // best-effort only; do not fail assembly on authority errors
+        }
+
         const packet = packAceContext({
           query,
           maxTokens: opts.maxTokens,
@@ -2616,6 +2704,68 @@ export async function assembleACEContext(opts: {
 
         finalContext.aceContextPacket = packet;
 
+        // Best-effort: persist a compact AceContextPack so authority is stored
+        // with the packet for auditing/observability. Fire-and-forget.
+        try {
+          // Recompute authority here (synchronously) so the persisted pack contains
+          // the most up-to-date aggregate (fallback to global Karpathy aggregate
+          // when file-level links are missing).
+          try {
+            const { getAuthorityForContext } = await import(
+              '$lib/server/graph/karpathy-authority.js'
+            );
+            const authority = await getAuthorityForContext(finalContext).catch(() => ({
+              score: 0,
+              source: 'gpu',
+            }));
+            (finalContext as any).authority = authority;
+          } catch {
+            // ignore authority recompute failures — best-effort
+          }
+
+          const packId = `pack:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
+          const acePack = buildAceContextPack({
+            id: packId,
+            contextId: acePlannerState.cacheKey,
+            createdAt: new Date().toISOString(),
+            summary: (finalContext as any).summary ?? packet.contextMarkdown?.slice(0, 200) ?? '',
+            chunkIds: (codebaseContext ?? []).map((c) => c.filePath).filter(Boolean),
+            sourceRefs: ((finalContext as any).sourceRefs ?? []) as string[],
+            graphPaths: (finalContext as any).graphPaths ?? [],
+            metadata: {
+              contextBudgetTokens: packet.tokenBudget?.maxInputTokens,
+              finalContextTokens: packet.tokenBudget?.estimatedInputTokens,
+            },
+            authority: (finalContext as any).authority ?? undefined,
+          });
+          void setAceContextPackPointer(acePlannerState.cacheKey, acePack).catch(() => {});
+          // Fire-and-forget: persist a lightweight intent_synthesis row for non-blocking analysis
+          try {
+            const { intentSynthesis } = await import('$lib/server/db/schema-postgres.js');
+            const synthRow = {
+              queryHash: qHash,
+              contextPackKey: acePlannerState.cacheKey,
+              authority: (finalContext as any).authority ?? null,
+              sourceRefs: ((finalContext as any).sourceRefs ?? []) as string[],
+              chunkIds: (codebaseContext ?? []).map((c: any) => c.filePath).filter(Boolean),
+              summaryIds: [],
+              retrievalTrace: (finalContext as any).topoPrefilter ?? {},
+              cachedSteps: finalContext.cachePlanner ?? {},
+              rewardScore: (finalContext as any).rewardScore ?? null,
+              degraded: false,
+              degradedReason: null,
+            } as any;
+            void db
+              .insert(intentSynthesis)
+              .values(synthRow)
+              .catch(() => {});
+          } catch {
+            // non-fatal
+          }
+        } catch {
+          // non-fatal
+        }
+
         finalContext.cachePlanner = {
           hit: Boolean(acePlannerHit),
           source: acePlannerHit?.meta.source ?? 'miss',
@@ -2654,6 +2804,42 @@ export async function assembleACEContext(opts: {
             activeClusterIds: packet.activeClusterIds,
             topAuthorityClusters: packet.clusterLenses.map((c) => c.clusterId).slice(0, 3),
           };
+        }
+
+        // Attach pack-level Karpathy authority (best-effort, non-blocking) and
+        // apply a small conservative boost to candidate chunk scores so authority
+        // biases selection without changing provenance.
+        try {
+          void (async () => {
+            const authority = await getAuthorityForContext(finalContext).catch(() => ({
+              score: 0,
+              source: 'gpu',
+            }));
+            if (authority && typeof authority.score === 'number' && authority.score > 0) {
+              const alpha = Number(process.env.ACE_AUTHORITY_ALPHA ?? '0.12'); // conservative default
+              const factor = 1 + Math.min(0.2, alpha * authority.score);
+              // boost ragChunks, kbChunks, and caseChunks when present
+              if (Array.isArray(finalContext.ragChunks)) {
+                for (const c of finalContext.ragChunks) {
+                  if (typeof c.score === 'number') c.score = Number((c.score * factor).toFixed(6));
+                }
+              }
+              if (Array.isArray(finalContext.kbChunks)) {
+                for (const c of finalContext.kbChunks) {
+                  if (typeof c.score === 'number') c.score = Number((c.score * factor).toFixed(6));
+                }
+              }
+              if (Array.isArray(finalContext.caseChunks)) {
+                for (const c of finalContext.caseChunks) {
+                  if (typeof c.score === 'number') c.score = Number((c.score * factor).toFixed(6));
+                }
+              }
+            }
+            // attach to finalContext metadata for downstream pack builders
+            (finalContext as any).authority = authority;
+          })();
+        } catch {
+          // non-fatal: authority enrichment is best-effort
         }
       }
 
@@ -4193,6 +4379,61 @@ async function fetchRAGChunks(
     }
   }
 
+  // Experimental CUDA ranker: off by default, uses feature vectors only.
+  if (ragChunks.length > 1 && isCudaRnnRankerEnabled()) {
+    try {
+      const cudaInput: CudaRnnChunkLike[] = ragChunks.map((c) => ({
+        content: c.content,
+        score: c.score,
+        source: c.source,
+        authorityScore: (c as Record<string, unknown>).graphAuthorityScore as number | undefined,
+        clusterHotness:
+          typeof (c as Record<string, unknown>).hotnessBucket === 'string'
+            ? (c as Record<string, unknown>).hotnessBucket === 'hot'
+              ? 1
+              : (c as Record<string, unknown>).hotnessBucket === 'warm'
+                ? 0.66
+                : 0.33
+            : undefined,
+        manifold4Proximity:
+          typeof (c as Record<string, unknown>).graphAuthorityScore === 'number'
+            ? Math.min(1, Number((c as Record<string, unknown>).graphAuthorityScore) / 10)
+            : undefined,
+        sectionScore: sectionTypes?.length ? Math.min(1, 0.55 + sectionTypes.length * 0.08) : 0.5,
+        citationDensity: /§|v\.|citation|cite/i.test(c.content) ? 0.8 : 0.2,
+        lengthScore: Math.min(1, c.content.length / 2400),
+      }));
+      const cuda = await rerankChunksCudaExperimental(
+        cudaInput,
+        buildCudaRnnSignals({
+          queryLength: query.length,
+          candidateCount: cudaInput.length,
+          sectionHintCount: sectionTypes?.length ?? 0,
+          graphNeighborCount: graphNeighbors.length,
+          authorityAvailable: graphNeighbors.length > 0,
+          clusterAvailable: ragChunks.some(
+            (c) => typeof (c as Record<string, unknown>).hotnessBucket === 'string'
+          ),
+          manifoldAvailable: graphNeighbors.length > 0,
+          pipeline: 'ace',
+        })
+      );
+      if (cuda?.chunks.length) {
+        const bySource = new Map(cudaInput.map((c) => [c.source, c]));
+        ragChunks = cuda.chunks.map((c, i) => {
+          const orig = bySource.get(c.source) ?? ragChunks[i];
+          return {
+            content: orig.content,
+            score: c.score,
+            source: orig.source,
+          };
+        });
+      }
+    } catch {
+      /* experimental CUDA ranker unavailable — keep existing scores */
+    }
+  }
+
   // P0-B: Write top-K chunk metadata to Redis so the ACE cache lane in multi-lane-retrieval.ts
   // can serve repeated queries at <2ms instead of re-running Qdrant (~200ms).
   try {
@@ -4562,6 +4803,9 @@ export interface CodebaseFetchStats {
     radius?: number;
     expanded?: number;
     newChunks?: number;
+    degraded?: boolean;
+    degradedMessage?: string;
+    operatorRecovery?: string[];
   };
   didYouMean?: {
     reconstructionError: number;
@@ -5112,6 +5356,7 @@ export async function fetchCodebaseContext(
           // Fire-and-forget pattern: failure is non-fatal, results are merged deduped.
           let manifold4Expanded = 0;
           let manifold4NewChunks = 0;
+          let manifold4Degraded = false;
           const MANIFOLD4_RADIUS = 0.3;
           if (manifold4Center) {
             try {
@@ -5148,6 +5393,7 @@ export async function fetchCodebaseContext(
               }
             } catch {
               // Postgres manifold4 search unavailable — expansion skipped, boost still applies
+              manifold4Degraded = true;
             }
           }
 
@@ -5172,6 +5418,9 @@ export async function fetchCodebaseContext(
                 zeroRtt: true,
               };
             }
+            const MANIFOLD4_DEGRADED_MSG =
+              'HyperRAG is working. Cluster prefilter is degraded until manifold4 topology is populated.';
+
             statsOut.manifold4 = {
               used: manifold4Center != null,
               boost: 0.16,
@@ -5179,7 +5428,36 @@ export async function fetchCodebaseContext(
               radius: MANIFOLD4_RADIUS,
               expanded: manifold4Expanded,
               newChunks: manifold4NewChunks,
+              degraded: manifold4Degraded,
+              degradedMessage: manifold4Degraded ? MANIFOLD4_DEGRADED_MSG : undefined,
+              operatorRecovery: manifold4Degraded
+                ? [
+                    'npm run graphify:semantic-cluster',
+                    'npm run atlas:hyperrag:sidecar',
+                    'npm run hyperrag:dense:multiquery -- "where is auth?"',
+                  ]
+                : undefined,
             };
+
+            // If topoPrefilter exists, mark it degraded too so telemetry and callers can react
+            if (manifold4Degraded && statsOut.topoPrefilter == null) {
+              statsOut.topoPrefilter = buildTopoPrefilterStats({
+                used: false,
+                topoClass: classifyQuery(query),
+                cacheHit: false,
+                candidateCountAfter: 0,
+                qdrantCollectionEstimate: null,
+                queryHash: queryHash(query),
+                cartridge: 'miss',
+                degraded: true,
+                degradedMessage: MANIFOLD4_DEGRADED_MSG,
+                operatorRecovery: [
+                  'npm run graphify:semantic-cluster',
+                  'npm run atlas:hyperrag:sidecar',
+                  'npm run hyperrag:dense:multiquery -- "where is auth?"',
+                ],
+              });
+            }
 
             // Phase 8c: "Did you mean" — fire-and-forget, non-fatal.
             // Uses true autoencoder reconstruction error when decoder weights are in Redis
@@ -5569,7 +5847,10 @@ async function applyKarpathyBoost(
         try {
           const edges = JSON.parse(rawEdges);
           if (Array.isArray(edges)) {
-            const sumConfidence = edges.reduce((sum, edge) => sum + (typeof edge.confidence === 'number' ? edge.confidence : 1.0), 0);
+            const sumConfidence = edges.reduce(
+              (sum, edge) => sum + (typeof edge.confidence === 'number' ? edge.confidence : 1.0),
+              0
+            );
             relationScore = Math.min(sumConfidence, 5.0);
           }
         } catch {}
@@ -5736,13 +6017,12 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
   return null;
 }
 
-
 async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]) {
   const result = {
     selectedRelationCards: '',
     selectedClusterSummaries: '',
     cacheTrace: '',
-    topRuntimeDependencies: ''
+    topRuntimeDependencies: '',
   };
 
   try {
@@ -5753,7 +6033,7 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
       const traces = await redis.lrange('obs:cache-trace:recent', 0, 4).catch(() => []);
       if (traces.length > 0) {
         result.cacheTrace = traces
-          .map(t => {
+          .map((t) => {
             try {
               const parsed = JSON.parse(t);
               return `- [${parsed.timestamp}] Action: ${parsed.action} | Nodes: ${parsed.nodeCount} | Edges: ${parsed.edgeCount}`;
@@ -5765,21 +6045,39 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
       }
 
       // 2. Selected Cluster Summaries
-      const domains = ['bifrost', 'ace', 'kag', 'engram', 'redis', 'qdrant', 'postgres', 'neo4j', 'duckdb', 'mcp', 'langgraph', 'gpu', 'sveltekit'];
+      const domains = [
+        'bifrost',
+        'ace',
+        'kag',
+        'engram',
+        'redis',
+        'qdrant',
+        'postgres',
+        'neo4j',
+        'duckdb',
+        'mcp',
+        'langgraph',
+        'gpu',
+        'sveltekit',
+      ];
       const queryLower = query.toLowerCase();
-      const matchedDomains = domains.filter(d => 
-        queryLower.includes(d) || 
-        codebaseContext?.some(c => c.filePath.toLowerCase().includes(d))
+      const matchedDomains = domains.filter(
+        (d) =>
+          queryLower.includes(d) ||
+          codebaseContext?.some((c) => c.filePath.toLowerCase().includes(d))
       );
-      const domainsToFetch = matchedDomains.length > 0 ? matchedDomains.slice(0, 3) : ['ace', 'kag', 'bifrost'];
-      
+      const domainsToFetch =
+        matchedDomains.length > 0 ? matchedDomains.slice(0, 3) : ['ace', 'kag', 'bifrost'];
+
       const clusterSummariesList: string[] = [];
       for (const dom of domainsToFetch) {
         const raw = await redis.get(`summary:cluster:${dom}`).catch(() => null);
         if (raw) {
           try {
             const parsed = JSON.parse(raw);
-            clusterSummariesList.push(`### Cluster: ${parsed.clusterId} (${parsed.nodeCount} nodes)\nSummary: ${parsed.summary}\nNodes: ${parsed.representativeNodes.join(', ')}`);
+            clusterSummariesList.push(
+              `### Cluster: ${parsed.clusterId} (${parsed.nodeCount} nodes)\nSummary: ${parsed.summary}\nNodes: ${parsed.representativeNodes.join(', ')}`
+            );
           } catch {}
         }
       }
@@ -5788,7 +6086,8 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
       }
 
       // 3. Selected Relation Cards
-      const topFiles = codebaseContext?.slice(0, 3).map(c => `file:${c.filePath.replaceAll('\\', '/')}`) || [];
+      const topFiles =
+        codebaseContext?.slice(0, 3).map((c) => `file:${c.filePath.replaceAll('\\', '/')}`) || [];
       const relationCardsList: string[] = [];
       const runtimeDepsList: string[] = [];
 
@@ -5797,7 +6096,9 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
         if (rawNeigh) {
           try {
             const parsed = JSON.parse(rawNeigh);
-            relationCardsList.push(`- **${parsed.nodeId}** connections: ${parsed.connections.join(', ')}\n  *Summary*: ${parsed.summary}`);
+            relationCardsList.push(
+              `- **${parsed.nodeId}** connections: ${parsed.connections.join(', ')}\n  *Summary*: ${parsed.summary}`
+            );
           } catch {}
         }
 
@@ -5807,8 +6108,13 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
             const edges = JSON.parse(rawEdges);
             if (Array.isArray(edges)) {
               for (const edge of edges) {
-                if (edge.relation_type === 'imports_dynamic' || edge.topologyClass === 'dynamic_import_island') {
-                  runtimeDepsList.push(`- **${edge.from}** dynamic import -> **${edge.to}** (confidence: ${edge.confidence})`);
+                if (
+                  edge.relation_type === 'imports_dynamic' ||
+                  edge.topologyClass === 'dynamic_import_island'
+                ) {
+                  runtimeDepsList.push(
+                    `- **${edge.from}** dynamic import -> **${edge.to}** (confidence: ${edge.confidence})`
+                  );
                 }
               }
             }
@@ -5839,14 +6145,16 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
       if (!result.selectedClusterSummaries && topoData.domainClusters) {
         const fallbackClustersList: string[] = [];
         for (const [clusterId, val] of Object.entries(topoData.domainClusters) as [string, any][]) {
-          fallbackClustersList.push(`### Cluster: ${clusterId} (${val.nodes.length} nodes)\nNodes: ${val.nodes.slice(0, 5).join(', ')}`);
+          fallbackClustersList.push(
+            `### Cluster: ${clusterId} (${val.nodes.length} nodes)\nNodes: ${val.nodes.slice(0, 5).join(', ')}`
+          );
         }
         result.selectedClusterSummaries = fallbackClustersList.slice(0, 3).join('\n\n');
       }
       if (!result.topRuntimeDependencies && topoData.dynamicIslands) {
         result.topRuntimeDependencies = topoData.dynamicIslands
           .slice(0, 5)
-          .map(node => `- Dynamic import island node: ${node}`)
+          .map((node) => `- Dynamic import island node: ${node}`)
           .join('\n');
       }
     }

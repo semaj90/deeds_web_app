@@ -11,7 +11,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
-import { uploadFile } from '$lib/server/minio-client.js';
+import { uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
 import { createYOLOService, type YOLOResult } from '$lib/server/yolo.js';
 import { GEMMA4_VLM_MAX_EDGE } from '$lib/server/image/resize-for-vlm.js';
 import { analyzeEvidenceImage } from '$lib/server/analysis/vlm-evidence-analyzer.js';

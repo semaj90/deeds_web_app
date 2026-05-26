@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-24T19:13:47.549Z",
-  "elapsedMs": 1602,
-  "totalFindings": 5,
+  "generatedAt": "2026-05-26T03:58:39.647Z",
+  "elapsedMs": 8230,
+  "totalFindings": 6,
   "bySeverity": {
     "high": 0,
-    "medium": 0,
+    "medium": 1,
     "low": 0,
     "info": 5
   },
@@ -121,6 +121,31 @@
       ],
       "agentCommandKeys": [
         "drizzle.meta.check"
+      ],
+      "trustTier": "canonical_local_code_plus_official_docs"
+    },
+    {
+      "findingId": "contract:drizzle-meta-stale_migration-006-9d10ac6b",
+      "severity": "medium",
+      "layer": "drizzle-meta",
+      "hmmState": "stale_migration",
+      "localSourceRefs": [
+        "sveltekit-frontend\\drizzle\\9999_agent_observations.sql"
+      ],
+      "externalSourceRefs": [
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
+      ],
+      "problem": "\"9999_agent_observations.sql\" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.",
+      "expected": "Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.",
+      "suggestedFix": "Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/9999_agent_observations.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.",
+      "validationCommands": [
+        "npm run audit:drizzle-meta",
+        "npm run db:check"
+      ],
+      "agentCommandKeys": [
+        "drizzle.meta.check",
+        "db.check"
       ],
       "trustTier": "canonical_local_code_plus_official_docs"
     }

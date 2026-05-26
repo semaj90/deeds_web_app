@@ -205,6 +205,21 @@ export class QdrantManager {
       // ── synthesis_memory — long-term agent memory ────────────────────
       { collection: this.collections.synthesis_memory, field: 'source', schema: 'keyword' },
       { collection: this.collections.synthesis_memory, field: 'tags', schema: 'keyword' },
+      { collection: this.collections.agent_memory_observations, field: 'source', schema: 'keyword' },
+      { collection: this.collections.agent_memory_observations, field: 'ide', schema: 'keyword' },
+      { collection: this.collections.agent_memory_observations, field: 'session_id', schema: 'keyword' },
+      { collection: this.collections.agent_memory_observations, field: 'observation_id', schema: 'keyword' },
+      { collection: this.collections.agent_memory_observations, field: 'project_path', schema: 'keyword' },
+      { collection: this.collections.agent_memory_observations, field: 'tags', schema: 'keyword' },
+      { collection: this.collections.agent_memory_observations, field: 'source_refs', schema: 'keyword' },
+      { collection: this.collections.document_knowledge, field: 'cardId', schema: 'keyword' },
+      { collection: this.collections.document_knowledge, field: 'kind', schema: 'keyword' },
+      { collection: this.collections.document_knowledge, field: 'status', schema: 'keyword' },
+      { collection: this.collections.document_knowledge, field: 'featureLabels', schema: 'keyword' },
+      { collection: this.collections.document_knowledge, field: 'sourceRefs', schema: 'keyword' },
+      { collection: this.collections.document_knowledge, field: 'chunkIds', schema: 'keyword' },
+      { collection: this.collections.document_knowledge, field: 'clusterTags', schema: 'keyword' },
+      { collection: this.collections.document_knowledge, field: 'topoClass', schema: 'keyword' },
     ];
 
     for (const { collection, field, schema } of indexConfigs) {

@@ -21,6 +21,7 @@ export const load: PageServerLoad = async ({ parent }) => {
     safe(legalAIService.healthCheck(), {
       postgresql: false,
       qdrant: false,
+      seaweed: false,
       minio: false,
       overall: 'down' as const,
     }),

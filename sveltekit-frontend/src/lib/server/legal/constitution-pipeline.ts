@@ -16,7 +16,7 @@
 
 import { randomUUID } from 'crypto';
 import { pool } from '$lib/server/db/client';
-import { getFile } from '$lib/server/minio-client.js';
+import { getSeaweedFile as getFile } from '$lib/server/seaweed-client.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client';
 import { chunkLegalDocument } from '$lib/server/indexer/legal-chunker';
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';

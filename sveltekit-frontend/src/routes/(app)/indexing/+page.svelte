@@ -159,7 +159,7 @@
 				<Icon name="database" size={24} />
 				<div>
 					<h1>CODEBASE INDEXER</h1>
-					<p class="header-sub">MinIO + Qdrant + Ollama Embedding Pipeline</p>
+					<p class="header-sub">SeaweedFS + Qdrant + Ollama Embedding Pipeline</p>
 				</div>
 			</div>
 			<button class="refresh-btn" onclick={loadStatus} disabled={loading}>
@@ -212,7 +212,7 @@
 						<div class="card-icon"><Icon name="hard-drive" size={24} /></div>
 						<div class="card-body">
 							<h3>Storage</h3>
-							<p class="card-number-sm">MinIO + Qdrant</p>
+							<p class="card-number-sm">SeaweedFS + Qdrant</p>
 							<p class="card-label">+ PostgreSQL</p>
 						</div>
 					</div>
@@ -244,7 +244,7 @@
 						</div>
 						<div class="pipeline-item ready">
 							<span class="pipeline-dot"></span>
-							MinIO object storage: Configured
+							SeaweedFS object storage: Configured
 						</div>
 					</div>
 				</div>

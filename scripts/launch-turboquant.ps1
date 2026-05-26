@@ -159,6 +159,8 @@ $ctxLen  = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }
            elseif ($env:OLLAMA_CONTEXT_LENGTH) { $env:OLLAMA_CONTEXT_LENGTH }
            else { '65536' }
 $threads = if ($env:TURBO_THREADS)     { $env:TURBO_THREADS }     else { [System.Environment]::ProcessorCount.ToString() }
+$batchSize = if ($env:TURBO_BATCH_SIZE) { $env:TURBO_BATCH_SIZE } else { $null }
+$ubatchSize = if ($env:TURBO_UBATCH_SIZE) { $env:TURBO_UBATCH_SIZE } else { $null }
 
 # -- GPU Offload (NGL) ----------------------------------------------------
 $ngl = if ($env:TURBO_NGL) { $env:TURBO_NGL } else { "35" }
@@ -317,6 +319,8 @@ Write-Host "  Flash attention:  $TurboFlashAttn"
 Write-Host "  KV cache K:       $kvK"
 Write-Host "  KV cache V:       $kvV"
 Write-Host "  CPU threads:      $threads"
+Write-Host "  Batch size:       $($batchSize ?? 'default')"
+Write-Host "  UBatch size:      $($ubatchSize ?? 'default')"
 Write-Host "  Tokens/sec:       $MeasuredTokensPerSecDisplay"
 Write-Host "  VRAM:             $MeasuredVramDisplay"
 
@@ -480,6 +484,30 @@ if (Test-LlamaFlag $llama '--cache-reuse') {
     Write-Host "KV cache: --cache-reuse 256 enabled" -ForegroundColor Cyan
 } else {
     Write-Host "KV cache: --cache-reuse not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+
+if ($batchSize) {
+    if (Test-LlamaFlag $llama '--batch-size') {
+        $baseArgs = $baseArgs + @('--batch-size', $batchSize)
+        Write-Host "Batch size: --batch-size $batchSize enabled" -ForegroundColor Cyan
+    } elseif (Test-LlamaFlag $llama '-b') {
+        $baseArgs = $baseArgs + @('-b', $batchSize)
+        Write-Host "Batch size: -b $batchSize enabled" -ForegroundColor Cyan
+    } else {
+        Write-Host "Batch size: binary does not advertise batch-size support - skipping" -ForegroundColor Yellow
+    }
+}
+
+if ($ubatchSize) {
+    if (Test-LlamaFlag $llama '--ubatch-size') {
+        $baseArgs = $baseArgs + @('--ubatch-size', $ubatchSize)
+        Write-Host "UBatch size: --ubatch-size $ubatchSize enabled" -ForegroundColor Cyan
+    } elseif (Test-LlamaFlag $llama '-ub') {
+        $baseArgs = $baseArgs + @('-ub', $ubatchSize)
+        Write-Host "UBatch size: -ub $ubatchSize enabled" -ForegroundColor Cyan
+    } else {
+        Write-Host "UBatch size: binary does not advertise ubatch-size support - skipping" -ForegroundColor Yellow
+    }
 }
 
 # -- Batch threads check ---------------------------------------------------

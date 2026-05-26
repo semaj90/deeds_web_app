@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T23:15:33.504Z",
+  "generatedAt": "2026-05-26T02:31:55.485Z",
   "checks": [
     {
       "check": "schema_top_level",
@@ -23,8 +23,8 @@
     },
     {
       "check": "api_routes_zod_validation",
-      "pass": true,
-      "findingCount": 0
+      "pass": false,
+      "findingCount": 4
     },
     {
       "check": "zod4_adapter",
@@ -42,12 +42,49 @@
       "findingCount": 0
     }
   ],
-  "findings": [],
+  "findings": [
+    {
+      "findingId": "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\ace\\ask\\+server.ts",
+      "severity": "high",
+      "layer": "api-contract",
+      "code": "api_route_parses_json_without_zod",
+      "file": "sveltekit-frontend\\src\\routes\\api\\ace\\ask\\+server.ts",
+      "problem": "API route (POST) reads request body via request.json()/formData() but does not validate it with Zod — untrusted input passes through unvalidated.",
+      "suggestedFix": "Import Zod schema and call schema.safeParse(body) before using the data. Return 400 on parse failure."
+    },
+    {
+      "findingId": "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\memory\\claude-mem\\import\\+server.ts",
+      "severity": "high",
+      "layer": "api-contract",
+      "code": "api_route_parses_json_without_zod",
+      "file": "sveltekit-frontend\\src\\routes\\api\\memory\\claude-mem\\import\\+server.ts",
+      "problem": "API route (UNKNOWN) reads request body via request.json()/formData() but does not validate it with Zod — untrusted input passes through unvalidated.",
+      "suggestedFix": "Import Zod schema and call schema.safeParse(body) before using the data. Return 400 on parse failure."
+    },
+    {
+      "findingId": "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\memory\\agent-observation\\+server.ts",
+      "severity": "high",
+      "layer": "api-contract",
+      "code": "api_route_parses_json_without_zod",
+      "file": "sveltekit-frontend\\src\\routes\\api\\memory\\agent-observation\\+server.ts",
+      "problem": "API route (UNKNOWN) reads request body via request.json()/formData() but does not validate it with Zod — untrusted input passes through unvalidated.",
+      "suggestedFix": "Import Zod schema and call schema.safeParse(body) before using the data. Return 400 on parse failure."
+    },
+    {
+      "findingId": "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\internal\\index-memory\\+server.ts",
+      "severity": "high",
+      "layer": "api-contract",
+      "code": "api_route_parses_json_without_zod",
+      "file": "sveltekit-frontend\\src\\routes\\api\\internal\\index-memory\\+server.ts",
+      "problem": "API route (POST) reads request body via request.json()/formData() but does not validate it with Zod — untrusted input passes through unvalidated.",
+      "suggestedFix": "Import Zod schema and call schema.safeParse(body) before using the data. Return 400 on parse failure."
+    }
+  ],
   "summary": {
-    "total": 0,
-    "high": 0,
+    "total": 4,
+    "high": 4,
     "medium": 0,
     "low": 0
   },
-  "status": "pass"
+  "status": "fail"
 }

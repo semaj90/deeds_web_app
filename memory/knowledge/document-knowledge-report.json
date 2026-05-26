@@ -1,0 +1,501 @@
+{
+  "generatedAt": "2026-05-26T05:55:19.964Z",
+  "manifest": {
+    "generatedAt": "2026-05-26T05:55:09.369Z",
+    "counts": {
+      "cards": 13,
+      "edges": 20
+    },
+    "sources": {
+      "sidecar": false,
+      "parentAtlas": true,
+      "opencodeCards": false
+    },
+    "langExtract": {
+      "enriched": true,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\document-knowledge-cards.langext.jsonl"
+    },
+    "graph": {
+      "enriched": true,
+      "input": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\document-knowledge-cards.langext.jsonl"
+    }
+  },
+  "counts": {
+    "cards": 13,
+    "active": 4,
+    "candidate_prune": 8,
+    "archive_to_deeds_lab": 0,
+    "production_ready": 1
+  },
+  "recommendations": [
+    {
+      "cardId": "947d923ec0eaf5ceb34ee5f4c993f18297554cfe",
+      "kind": "parent-atlas",
+      "title": "parent-atlas",
+      "summary": "YoRHa Legal Evidence AI Registry parent map. System consists of 4209 features in 6 clusters. Overall tasks: 108/246 complete (43.9%).",
+      "sourceRefs": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\atlas\\parent-atlas.json"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "e400848fa0dceaa9d8ff33e592f50a9920881f78",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for imports_static edges.",
+      "sourceRefs": [
+        ".claude/hooks/posttooluse-audit.mjs:L1",
+        "EXTERNAL:node:fs:L1",
+        "EXTERNAL:node:path:L1",
+        ".claude/hooks/pretooluse-deny.mjs:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AdvancedRichTextEditor.svelte:L1",
+        "EXTERNAL:svelte:L1",
+        "EXTERNAL:lucide-svelte:L1",
+        "EXTERNAL:svelte/store:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/agentic/AgenticController.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AgentOrchestrator.svelte:L1",
+        "EXTERNAL:$lib/components/ErrorBoundary.svelte:L1",
+        "EXTERNAL:$lib/components/ui/enhanced-bits:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "backup-only source"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "backup-only source"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "8e70ae88dd78bd383c851e4a9ed87b095f1b2125",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for imports_dynamic edges.",
+      "sourceRefs": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AdvancedRichTextEditor.svelte:L1",
+        "EXTERNAL:@tiptap/core:L1",
+        "EXTERNAL:@tiptap/starter-kit:L1",
+        "EXTERNAL:@tiptap/extension-image:L1",
+        "EXTERNAL:@tiptap/extension-text-align:L1",
+        "EXTERNAL:@tiptap/extension-highlight:L1",
+        "EXTERNAL:@tiptap/extension-typography:L1",
+        "EXTERNAL:@tiptap/extension-placeholder:L1",
+        "EXTERNAL:@tiptap/extension-table:L1",
+        "EXTERNAL:@tiptap/extension-table-row:L1",
+        "EXTERNAL:@tiptap/extension-table-header:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EvidenceCanvas.svelte:L1",
+        "EXTERNAL:fabric:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/MultiAgentAnalysisCard.svelte:L1",
+        "EXTERNAL:svelte:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "backup-only source"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "backup-only source"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "4df17d7c1449a050923e807005820122f9695146",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for env_dependency edges.",
+      "sourceRefs": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIAssistantButton.svelte:L1",
+        "SVELTEKIT:$app/navigation:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatInput.svelte:L1",
+        "SVELTEKIT:$app/environment:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatMessage.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AskAI.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/Enhanced3DLegalAIInterface.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedAIChatTest.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/IntegratedAIChat.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/IntelligentWebAnalysisDemo.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/ProactiveAIAssistant.svelte:L1",
+        "SVELTEKIT:$app/forms:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/EnhancedAuthForm.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/LoginButton.svelte:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "backup-only source"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "backup-only source"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "e0d3db1c8117a882c7ab32032becdc2b302a0c71",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for neo4j_dependency edges.",
+      "sourceRefs": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/Enhanced3DLegalAIInterface.svelte:L1",
+        "EXTERNAL:$lib/services/neo4j-recommendation-engine:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/FileUploadSection.svelte:L1",
+        "EXTERNAL:$lib/services/minio-neo4j-pgvector-integration:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/Neo4jRecommendation3DViewer.svelte:L1",
+        "EXTERNAL:$lib/services/neo4j-3d-recommendation-engine.js:L1",
+        "deeds_labs/api-legacy/api/graph/plan/+server.ts:L1",
+        "EXTERNAL:$lib/services/neo4j-planner-singleton:L1",
+        "deeds_labs/frontend/features-archive/ai/_core/enhanced-neo4j-reranker.ts:L1",
+        "EXTERNAL:$lib/types/sharedTypes:L1",
+        "EXTERNAL:neo4j-driver:L1",
+        "EXTERNAL:$lib/types/enhanced-svelte5-types:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/sdk/kag/index.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/adapter-ranking.ts:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "backup-only source"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "backup-only source"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "f16dcd2422cc7d1404e80e4476c7286e44d5591f",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for qdrant_dependency edges.",
+      "sourceRefs": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/SimpleFileUpload.svelte:L1",
+        "EXTERNAL:$lib/services/qdrantService:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EvidenceCanvasEditor.svelte:L1",
+        "EXTERNAL:$lib/ai/qdrant-service:L1",
+        "deeds_labs/api-legacy/api/ai/repairs/+server.ts:L1",
+        "EXTERNAL:@qdrant/js-client-rest:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ingest/qdrant_client.mjs:L1",
+        "EXTERNAL:node-fetch:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ingest/worker.mjs:L1",
+        "deeds_labs/archived-dead-code/lokiHybridStore.ts:L1",
+        "deeds_labs/archived-server-modules/connections/connection-pool.ts:L1",
+        "deeds_labs/dead-scripts/phase-scripts/agentic-knowledge-pipeline.mjs:L1",
+        "deeds_labs/dead-scripts/phase-scripts/analyze-legal-ai-features.mjs:L1",
+        "deeds_labs/dead-scripts/phase-scripts/context7-mcp-agentic-server.mjs:L1",
+        "deeds_labs/dead-scripts/phase-scripts/contextual-prompt-synthesizer.mjs:L1",
+        "deeds_labs/dead-scripts/phase-scripts/demo-policy-first-retrieval.mjs:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "archived source tree"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "archived source tree"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "4b9f0cc0b01685d67603effa7a287b5a57bb7b14",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for redis_dependency edges.",
+      "sourceRefs": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte:L1",
+        "EXTERNAL:$lib/server/redisPubSub:L1",
+        "EXTERNAL:$lib/config/redis-config:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor/RichTextEditor.svelte:L1",
+        "EXTERNAL:$lib/cache/loki-redis-integration:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/redis/AdvancedRedisMonitoringDashboard.svelte:L1",
+        "EXTERNAL:svelte:L1",
+        "EXTERNAL:svelte/store:L1",
+        "EXTERNAL:$lib/stores/unified:L1",
+        "EXTERNAL:$lib/services/unified-simd-parser:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/redis/RedisOrchestratorDashboard.svelte:L1",
+        "EXTERNAL:$lib/hooks/useRedisOrchestrator:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/admin/redis/+page.svelte:L1",
+        "EXTERNAL:$lib/components/redis/AdvancedRedisMonitoringDashboard.svelte:L1",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/admin/redis/detailed/+page.svelte:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "backup-only source"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "backup-only source"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "f555717f882d0e669e11a04e1f75d9bcb605b747",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for exports_from edges.",
+      "sourceRefs": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/tabs/TabsBits.svelte:L1",
+        "EXTERNAL:bits-ui/tabs:L1",
+        "deeds_labs/archived-dead-code/auth/authUtils.ts:L1",
+        "EXTERNAL:$lib/server/lucia:L1",
+        "deeds_labs/archived-dead-code/auth/lucia.ts:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/index.ts:L1",
+        "UNRESOLVED:./Card.svelte:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/Panel.svelte:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/Terminal.svelte:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/GridList.svelte:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/SectionHeader.svelte:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/TabsPanel.svelte:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/Modal.svelte:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/RetroButton.svelte:L1",
+        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/SearchBar.svelte:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "archived source tree"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "archived source tree"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "d5d36526391f0d0a3abab77c788eb4ffea726bd4",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for mcp_tool_calls edges.",
+      "sourceRefs": [
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/mcp/+page.svelte:L1",
+        "EXTERNAL:svelte:L1",
+        "EXTERNAL:$lib/api/mcp-client.js:L1",
+        "EXTERNAL:svelte/store:L1",
+        "deeds_labs/api-legacy/api/mcp/context72/get-library-docs/+server.ts:L1",
+        "EXTERNAL:@sveltejs/kit:L1",
+        "UNRESOLVED:./$types.js:L1",
+        "EXTERNAL:$lib/types/enhanced-svelte5-types:L1",
+        "deeds_labs/api-legacy/api/mcp/metrics/+server.ts:L1",
+        "EXTERNAL:$lib/services/mcp-registry:L1",
+        "deeds_labs/api-legacy/api/mcp/registry/+server.ts:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "unresolved source reference"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "unresolved source reference"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "e1eaaafb6c2ef71d35b9c092ab847c74a73be6a7",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for test_covers_file edges.",
+      "sourceRefs": [
+        "deeds_labs/api-legacy/api/error-brain/server.test.ts:L1",
+        "EXTERNAL:vitest:L1",
+        "deeds_labs/api-legacy/api/error-brain/+server.ts:L1",
+        "EXTERNAL:$lib/middleware/featureFlagEnforcer:L1",
+        "EXTERNAL:$lib/middleware/authSeparation:L1",
+        "EXTERNAL:$lib/services/dataIsolation:L1",
+        "EXTERNAL:$lib/services/featureLogger:L1",
+        "deeds_labs/api-legacy/api/legal-ai/server.test.ts:L1",
+        "deeds_labs/api-legacy/api/legal-ai/+server.ts:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "production_ready",
+        "confidence": 0.5,
+        "reason": "stable source refs and production indicators"
+      },
+      "graphLinks": [
+        {
+          "relation": "implements",
+          "targetId": "production",
+          "reason": "stable source refs and production indicators"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "dbf186c88911486003410fb324c298218d4f72be",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for db_dependency edges.",
+      "sourceRefs": [
+        "deeds_labs/dead_code/duplicate-embedding-auth/embeddings-client.ts:L1",
+        "deeds_labs/dead_code/duplicate-embedding-auth/schema-embeddings.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/database/connection.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/database/schema.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/queries/nes-command-center-archive.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/pool.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/auth.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/drizzle.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/embedding-cache-service.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/embedding-cache-utils.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/health-check.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/connections.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/legal-db-init.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/qdrant-sync.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/postgres-knowledge.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/evidence.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/cases.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/persons.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/reports.ts:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/seed-dev-user.ts:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "02e24784195e6d3ec3575bc38925cbf94549b503",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for svelte_route_uses_loader edges.",
+      "sourceRefs": [
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/backups/phase34-backups/src/routes/(tools)/search/+page.svelte:L1",
+        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/backups/phase34-backups/src/routes/(tools)/search/+page.server.ts:L1",
+        "sveltekit-frontend/src/routes/(app)/admin/document-search/+page.svelte:L1",
+        "sveltekit-frontend/src/routes/(app)/admin/document-search/+page.server.ts:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "41826fa5019f19cf93a74016eed2691910e0aaa0",
+      "kind": "json-card",
+      "title": "untitled",
+      "summary": "Generated pathway card for server_route_depends_on edges.",
+      "sourceRefs": [
+        "src/routes/api/chat/stream/+server.ts:L1",
+        "src/lib/server/observability/synthesis-logger.ts:L1"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    }
+  ],
+  "nextSteps": [
+    "Review candidate_prune cards for deletion or replacement.",
+    "Move archive_to_deeds_lab cards into deeds_lab only if they remain useful for reference.",
+    "Keep production_ready cards in active atlas exports and startup smokes.",
+    "Add embedding + Qdrant only after card classification stays stable across two refreshes."
+  ]
+}
