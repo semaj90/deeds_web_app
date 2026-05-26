@@ -36,7 +36,10 @@ export async function checkSidecars() {
     console.log('🔄 Attempting to start MCP Sidecars & Docker dependencies...');
     try {
       // Assuming a generic docker compose or pm2 start command here
-      exec('npm run mcp:opencode-sidecars', { cwd: process.cwd() }, (err) => {
+      const executionCwd = fs.existsSync(path.join(process.cwd(), 'sveltekit-frontend')) 
+        ? path.join(process.cwd(), 'sveltekit-frontend') 
+        : process.cwd();
+      exec('npm run mcp:opencode-sidecars', { cwd: executionCwd }, (err) => {
          if (err) console.log(`[Diagnostic] mcp:opencode-sidecars script may not exist or failed: ${err.message}`);
       });
       console.log('✅ Sent startup signal to MCP sidecars.');
@@ -68,7 +71,13 @@ function checkPort(port) {
   });
 }
 
+import { fileURLToPath } from 'url';
+
 // If run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+const isDirectRun = process.argv[1] && (
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))
+);
+
+if (isDirectRun) {
   checkSidecars();
 }
