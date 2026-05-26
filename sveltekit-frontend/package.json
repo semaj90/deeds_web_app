@@ -7,8 +7,6 @@
 		"node": ">=22.0.0"
 	},
 	"scripts": {
-		"db:hybrid-graph-indexes": "node scripts/db/apply-sidecar-migration.mjs drizzle/manual/0009_hybrid_graph_indexes.sql",
-		"smoke:postgres-hybrid-graph": "node scripts/smoke-postgres-hybrid-graph.mjs",
 		"worker:nats:smoke": "node scripts/diagnostics/nats-sidecar-smoke.mjs",
 		"cuvs:benchmark:sidecar": "python scripts/cuvs-benchmark-sidecar.py",
 		"cuvs:benchmark:smoke": "node scripts/smoke-cuvs-benchmark.mjs",
@@ -20,7 +18,6 @@
 		"engram:ranker:upgrade": "node scripts/engram/upgrade-engram-ranker.mjs",
 		"cache:invalidate:stale": "node scripts/cache/invalidate-stale-cache.mjs",
 		"phase8:cache:readiness": "echo \"Cache Readiness: OK\"",
-		"check:fast": "npm run check",
 		"audit:legacy-atlas-fields": "node scripts/diagnostics/audit-legacy-atlas-fields.mjs",
 		"phase8:graph-first:verify": "npm run audit:retrieval-comparison && npm run phase8:cache:effectiveness && npm run audit:legacy-atlas-fields && npm run ci:all",
 		"phase8:fortify": "npm run phase8:cache:readiness && npm run phase8:graph-first:verify && npm run engram:ranker:upgrade && npm run cache:invalidate:stale && npm run check:fast",
