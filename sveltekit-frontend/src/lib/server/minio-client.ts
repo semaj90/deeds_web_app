@@ -1,3 +1,9 @@
+/**
+ * Legacy MinIO-compatible S3 client helpers.
+ *
+ * New SeaweedFS-first code should import from `$lib/server/seaweed-client.js`
+ * instead. This module remains for compatibility with existing call sites.
+ */
 import { ENV } from '$lib/server/env.server.js';
 import { Client } from 'minio';
 import crypto from 'crypto';

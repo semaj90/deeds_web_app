@@ -2,7 +2,7 @@ import { db } from '$lib/server/db/client';
 import { poiPhotos, personsOfInterest } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
 import { and, eq, desc } from 'drizzle-orm';
-import { uploadFile, deleteFile } from '$lib/server/minio-client';
+import { uploadSeaweedFile as uploadFile, deleteSeaweedFile as deleteFile } from '$lib/server/seaweed-client.js';
 import { createHash } from 'crypto';
 import sharp from 'sharp';
 import { z } from 'zod';

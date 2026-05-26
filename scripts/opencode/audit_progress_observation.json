@@ -1,0 +1,17 @@
+{
+  "source": "opencode-audit",
+  "summary": "OpenCode audit progress summary: Redis8 eval lane added, Streams consumer patched, smoke scripts added, metrics added (pending verification).",
+  "details": {
+    "actions": [
+      "Replaced Pub/Sub with Redis Streams consumer",
+      "Added redis8-eval docker-compose",
+      "Added Node + PowerShell smoke scripts",
+      "Added periodic stream metrics logging in poller"
+    ],
+    "filesModified": [
+      "scripts/opencode/monitor-claude-mem-poll.mjs",
+      "scripts/vector/smoke-redis8-qdrant.js"
+    ]
+  },
+  "createdAt": "2026-05-26T03:14:40.168Z"
+}

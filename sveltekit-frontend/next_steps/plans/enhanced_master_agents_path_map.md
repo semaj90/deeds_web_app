@@ -142,7 +142,7 @@ Route/Import/Env Path Map
 | 91 | `db_insert_types` | database insert types, route health, error events | `src/lib/server/db` |
 | 88 | `db_relations` | database relations | `src/lib/server/db`, `src/lib/db/schema` |
 | 48 | `db_migrations` | SQL migrations and pgvector/jsonb indexes | `src/lib/server/db/migrations`, `src/lib/db/migrations` |
-| 75 | `dynamic_env_config` | env.server, model config, database/Redis/MinIO configs | `src/lib/config`, `src/lib/server/config` |
+| 75 | `dynamic_env_config` | env.server, model config, database/Redis/SeaweedFS configs | `src/lib/config`, `src/lib/server/config` |
 | 70 | `analytics_tools` | analytics, crawl, seeding, graph sync tools | `src/lib/server/analytics`, `src/lib/server/tools/handlers` |
 | 60 | `search_analytics` | chunk hit logs, query logs, quality signals | `src/lib/server/analytics`, `src/lib/server/db/schema/search-analytics.ts` |
 | 90 | `auth_core` | Lucia/auth/session/logout | `src/lib/server/auth.ts`, `src/lib/server/lucia.ts` |

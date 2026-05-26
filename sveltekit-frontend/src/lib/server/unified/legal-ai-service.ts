@@ -11,7 +11,7 @@ import { pgRows } from '$lib/server/db/client';
  *   - db                     → Drizzle PostgreSQL client
  */
 import { randomUUID } from 'node:crypto';
-import { uploadFile } from '$lib/server/minio-client.js';
+import { uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
@@ -67,6 +67,7 @@ export interface SearchResults {
 export interface HealthStatus {
   postgresql: boolean;
   qdrant: boolean;
+  seaweed: boolean;
   minio: boolean;
   overall: 'healthy' | 'degraded' | 'down';
 }
@@ -77,7 +78,7 @@ const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 
 export class UnifiedLegalAIService {
   /**
-   * Upload a document to MinIO and record in PostgreSQL.
+   * Upload a document to SeaweedFS and record in PostgreSQL.
    * The full embedding pipeline (chunk → embed → Qdrant) runs async
    * via /api/evidence/upload — this method handles storage + DB insert.
    */
@@ -244,6 +245,7 @@ export class UnifiedLegalAIService {
     const status: HealthStatus = {
       postgresql: false,
       qdrant: false,
+      seaweed: false,
       minio: false,
       overall: 'down',
     };
@@ -263,16 +265,17 @@ export class UnifiedLegalAIService {
       /* down */
     }
 
-    // MinIO
+    // SeaweedFS / S3-compatible object storage
     try {
-      const { checkHealth } = await import('$lib/server/minio-client.js');
+      const { checkSeaweedHealth: checkHealth } = await import('$lib/server/seaweed-client.js');
       const health = await checkHealth();
+      status.seaweed = health.healthy;
       status.minio = health.healthy;
     } catch {
       /* down */
     }
 
-    const upCount = [status.postgresql, status.qdrant, status.minio].filter(Boolean).length;
+    const upCount = [status.postgresql, status.qdrant, status.seaweed].filter(Boolean).length;
     status.overall = upCount === 3 ? 'healthy' : upCount >= 1 ? 'degraded' : 'down';
 
     return status;

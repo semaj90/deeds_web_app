@@ -11,7 +11,7 @@ import {
   evidenceProcessingJobs,
   evidenceTranscriptSegments,
 } from '$lib/server/db/schema/index.js';
-import { uploadFile } from '$lib/server/minio-client.js';
+import { uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
 import { getRedis } from '$lib/server/redis.js';
 import { embedText } from '$lib/server/evidence/services/embedding.js';
 import { ENV } from '$lib/server/env.server.js';

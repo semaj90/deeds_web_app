@@ -624,7 +624,7 @@
 					<ul class="space-y-1 text-xs text-gray-400 list-disc list-inside">
 						<li>Dev server running: <code class="text-gray-300 bg-white/5 px-1 rounded">npm run dev</code> (port 5173)</li>
 						<li>PostgreSQL with <code class="text-gray-300 bg-white/5 px-1 rounded">library_documents</code>, <code class="text-gray-300 bg-white/5 px-1 rounded">legal_nodes</code>, <code class="text-gray-300 bg-white/5 px-1 rounded">legal_chunks</code> tables</li>
-						<li>MinIO running at port 9000 (or set <code class="text-gray-300 bg-white/5 px-1 rounded">MINIO_LIBRARY_BUCKET</code>)</li>
+						<li>SeaweedFS S3 running at port 8333 (or set <code class="text-gray-300 bg-white/5 px-1 rounded">SEAWEED_S3_BUCKET</code>)</li>
 						<li>Ollama with <code class="text-gray-300 bg-white/5 px-1 rounded">embeddinggemma:latest</code> for embeddings</li>
 					</ul>
 				</section>

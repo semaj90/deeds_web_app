@@ -169,7 +169,11 @@ export function normalizeCachedContextPacket(pack: Partial<CachedContextPacket> 
 }
 
 function enrichForPersistence(cacheKey: string, pack: CachedContextPacket): CachedContextPacket {
-  return normalizeCachedContextPacket({ ...pack, cacheKey });
+  return normalizeCachedContextPacket({
+    ...pack,
+    cacheKey,
+    lastUsedAt: pack.lastUsedAt ?? new Date().toISOString(),
+  });
 }
 
 async function readRedisContextCache(cacheKey: string): Promise<CachedContextPacket | null> {

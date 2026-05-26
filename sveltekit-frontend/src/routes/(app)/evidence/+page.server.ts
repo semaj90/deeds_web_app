@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema';
-import { uploadFile, getMinioClient } from '$lib/server/minio-client';
+import { uploadSeaweedFile as uploadFile, getSeaweedClient as getMinioClient } from '$lib/server/seaweed-client.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
@@ -105,7 +105,7 @@ export const actions: Actions = {
     try {
       const { title, description, caseId } = form.data;
 
-      // 1. Upload to MinIO
+      // 1. Upload to SeaweedFS
       const fileExt = file.name.split('.').pop() ?? 'bin';
       const objectName = `evidence/${locals.user.id}/${randomUUID()}.${fileExt}`;
       const buffer = Buffer.from(await file.arrayBuffer());
@@ -147,7 +147,7 @@ export const actions: Actions = {
           console.error('[evidence/upload] Evidence dispatch failed (non-fatal):', err)
         );
 
-      // 4. Generate signed MinIO preview URL (24-hour expiry)
+      // 4. Generate signed SeaweedFS preview URL (24-hour expiry)
       let previewUrl = '';
       try {
         const client = getMinioClient();

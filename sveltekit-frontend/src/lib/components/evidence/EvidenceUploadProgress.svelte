@@ -4,9 +4,9 @@
  * Priority #3: Tracks 8-stage evidence upload pipeline
  *
  * Pipeline Stages:
- * 1. uploading - File upload to MinIO
+ * 1. uploading - File upload to SeaweedFS
  * 2. hashing - SHA-256 hash computation
- * 3. storing - MinIO storage
+ * 3. storing - SeaweedFS storage
  * 4. db-insert - PostgreSQL record creation
  * 5. embedding - Text extraction + chunking + embedding generation
  * 6. complete - Success
@@ -54,7 +54,7 @@ const MAX_RETRIES = 3;
 const STAGES = [
 	{ id: 'uploading', label: 'Uploading File', icon: 'upload', color: '#3b82f6' },
 	{ id: 'hashing', label: 'Computing Hash', icon: 'hash', color: '#8b5cf6' },
-	{ id: 'storing', label: 'Storing in MinIO', icon: 'database', color: '#06b6d4' },
+	{ id: 'storing', label: 'Storing in SeaweedFS', icon: 'database', color: '#06b6d4' },
 	{ id: 'db-insert', label: 'Creating Record', icon: 'file-plus', color: '#10b981' },
 	{ id: 'embedding', label: 'Processing Content', icon: 'cpu', color: '#f59e0b' },
 	{ id: 'complete', label: 'Complete', icon: 'circle-check', color: '#22c55e' },

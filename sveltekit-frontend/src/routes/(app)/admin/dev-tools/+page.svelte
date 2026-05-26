@@ -388,7 +388,7 @@
 					<div class="mb-3 flex items-center justify-between">
 						<div>
 							<div class="font-semibold text-black">Code Index</div>
-							<div class="text-xs text-black/60">TypeScript + Svelte files → Qdrant + MinIO</div>
+							<div class="text-xs text-black/60">TypeScript + Svelte files → Qdrant + SeaweedFS</div>
 						</div>
 						<span class="rounded-full bg-info/20 px-2 py-0.5 text-xs font-bold text-info">
 							{codebaseIndexed} points
@@ -861,7 +861,7 @@
 	{#if activeTab === 'knowledge'}
 		<div class="space-y-6">
 			<h3 class="text-lg font-semibold text-black uppercase tracking-wide">Legal Knowledge Base</h3>
-			<p class="text-sm text-black/60">Seed glossary terms, statutes, and legal precedents into PostgreSQL. Generate 768-dim embeddings via Ollama embeddinggemma for cosine similarity search. Index lawpdfs/ through the 8-stage RAG pipeline (MinIO → chunking → Qdrant + pgvector).</p>
+			<p class="text-sm text-black/60">Seed glossary terms, statutes, and legal precedents into PostgreSQL. Generate 768-dim embeddings via Ollama embeddinggemma for cosine similarity search. Index lawpdfs/ through the 8-stage RAG pipeline (SeaweedFS → chunking → Qdrant + pgvector).</p>
 
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
@@ -890,7 +890,7 @@
 
 				<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
 					<h4 class="font-semibold text-black mb-2 uppercase tracking-wide">Index PDFs</h4>
-					<p class="text-xs text-black/60 mb-3">Index 36 lawpdfs/ through evidence upload pipeline (MinIO → OCR → chunk → embed → Qdrant).</p>
+					<p class="text-xs text-black/60 mb-3">Index 36 lawpdfs/ through evidence upload pipeline (SeaweedFS → OCR → chunk → embed → Qdrant).</p>
 					<button
 						class="w-full rounded-md border-2 border-warning bg-warning/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-warning transition hover:bg-warning/20 disabled:opacity-50"
 						onclick={indexPdfs}

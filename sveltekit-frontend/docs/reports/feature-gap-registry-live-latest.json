@@ -1,0 +1,315 @@
+{
+  "generatedAt": "2026-05-26T06:01:46.407Z",
+  "mode": "live",
+  "root": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+  "inputStatus": {
+    "docsAtlasFeatureRegistry": {
+      "present": false,
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas\\feature-registry.json"
+    },
+    "docsAtlasIndex": {
+      "present": true,
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas-index\\codebase-atlas.min.json",
+      "generatedAt": "2026-05-25T07:04:22.335Z"
+    },
+    "authorityLatest": {
+      "present": true,
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\logs\\authority\\latest.json",
+      "generatedAt": "2026-05-26T00:44:26.664Z"
+    },
+    "aceContextPacks": {
+      "present": true,
+      "count": 2,
+      "paths": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.cache\\ace\\context-packs\\ace_context_local-json-hit_v1.json",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.cache\\ace\\context-packs\\ace_context_smoke-context-pack_v1.json"
+      ]
+    },
+    "qdrantClusterTags": {
+      "present": true,
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\runs\\2026-05-24T23-09-00\\qdrant_cluster_tags.json",
+      "clusterCount": 1289
+    },
+    "featureMapCards": {
+      "present": true,
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\exports\\feature-map-cards.jsonl",
+      "count": 19
+    }
+  },
+  "summary": {
+    "implementedRows": 8,
+    "missingLiveAtlasContract": true,
+    "missingLiveAtlasIndex": false,
+    "missingAuthoritySnapshot": false
+  },
+  "rows": [
+    {
+      "feature_id": "retrieval.spine",
+      "owner_file": "src/lib/server/retrieval/hyperrag-fusion-service.ts",
+      "sourceRefs": [
+        "src/lib/server/retrieval/hyperrag-fusion-service.ts",
+        "src/lib/server/retrieval/cluster-aware-reranker.ts",
+        "docs/architecture/hyperrag-feature-atlas-runtime.md",
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/retrieval"
+      ],
+      "status": "implemented",
+      "storage_lane": "Postgres + Redis + Qdrant + Neo4j",
+      "retrieval_lane": "L0-L11 fused retrieval",
+      "qdrantTags": [
+        "feature-map",
+        "retrieval",
+        "graph",
+        "lane:l0-l11",
+        "fusion",
+        "cluster:20",
+        "cluster:23",
+        "cluster:25"
+      ],
+      "turbovecLabel": "retrieval",
+      "smokeRefs": [
+        "npm run smoke:mcp:core-gate",
+        "npm run graph:exports:smoke"
+      ],
+      "reportRefs": [
+        "docs/reports/pgvector-integrity-lane-2026-05-20.md"
+      ],
+      "nextAction": "Keep the feature-registry overlay aligned with the live retrieval lanes."
+    },
+    {
+      "feature_id": "karpathy.hot_lane",
+      "owner_file": "src/lib/server/ace/karpathy-qdrant-cluster-backfill.ts",
+      "sourceRefs": [
+        "src/lib/server/ace/karpathy-qdrant-cluster-backfill.ts",
+        "scripts/karpathy-qdrant-cluster-backfill.ts",
+        "scripts/karpathy-gpu-enrich.mjs",
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/ace/karpathy-blend-orchestrator.ts",
+        "src/lib/server/ace"
+      ],
+      "status": "implemented",
+      "storage_lane": "Redis + Qdrant + Postgres",
+      "retrieval_lane": "L8 authority blend",
+      "qdrantTags": [
+        "feature-map",
+        "karpathy",
+        "hot-lane",
+        "qdrant",
+        "redis",
+        "path:src/lib/server/ace",
+        "service:KarpathyBlendOrchestrator",
+        "status:active"
+      ],
+      "turbovecLabel": "graph",
+      "smokeRefs": [
+        "npm run mcp-health",
+        "npm run atlas:hyperrag:rerank"
+      ],
+      "reportRefs": [
+        "memory/runs/2026-05-24T23-09-00/qdrant_cluster_tags.json"
+      ],
+      "nextAction": "Backfill the newest hot-cluster metadata after the registry overlay lands."
+    },
+    {
+      "feature_id": "ace.packet_flow",
+      "owner_file": "src/lib/server/ace/context-assembler.ts",
+      "sourceRefs": [
+        "src/lib/server/ace/context-assembler.ts",
+        "src/lib/server/ace/context-cache-registry.ts",
+        "src/lib/server/ace/llm-context-cache.ts",
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/ace/context-packet-budgeter.ts",
+        "src/lib/server/ace",
+        "src/lib/server/cache/ace-context-pack-cache.ts"
+      ],
+      "status": "implemented",
+      "storage_lane": "Postgres + Redis",
+      "retrieval_lane": "ACE context pack assembly",
+      "qdrantTags": [
+        "feature-map",
+        "ace",
+        "packet",
+        "context-pack",
+        "redis",
+        "postgres",
+        "cluster:72",
+        "cluster:94"
+      ],
+      "turbovecLabel": "cache",
+      "smokeRefs": [
+        "npm run memory:claude-mem:smoke",
+        "npm run memory:agent-observation:smoke"
+      ],
+      "reportRefs": [
+        "docs/architecture/opencode-claude-mem-bridge.md",
+        "docs/operations/stack-audit-playbook.md"
+      ],
+      "nextAction": "Keep packet persistence Postgres-first and treat Redis as hot-only."
+    },
+    {
+      "feature_id": "codebase.semantic_index",
+      "owner_file": "scripts/build-atlas-index.mjs",
+      "sourceRefs": [
+        "scripts/build-atlas-index.mjs",
+        "docs/atlas-index/codebase-atlas.min.json",
+        "memory/index/feature-map.jsonl",
+        "src/lib/server/atlas/master-feature-map.ts"
+      ],
+      "status": "implemented",
+      "storage_lane": "Atlas JSON + Postgres mirrors",
+      "retrieval_lane": "Codebase atlas indexing",
+      "qdrantTags": [
+        "feature-map",
+        "atlas",
+        "index",
+        "semantic",
+        "codebase",
+        "path:src/lib/server/atlas/master-feature-map.ts",
+        "service:MasterFeatureMap",
+        "status:active"
+      ],
+      "turbovecLabel": "database",
+      "smokeRefs": [
+        "npm run codebase:semantic-index:smoke",
+        "npm run codebase:semantic-index:report"
+      ],
+      "reportRefs": [
+        "docs/reports/codebase-semantic-index-latest.md"
+      ],
+      "nextAction": "Promote a real docs/atlas/feature-registry.json overlay once the file appears."
+    },
+    {
+      "feature_id": "feature.labeling",
+      "owner_file": "src/lib/server/labels/feature-label-registry.ts",
+      "sourceRefs": [
+        "src/lib/server/labels/feature-label-registry.ts",
+        "src/lib/server/labels/normalize-labels.ts",
+        "src/lib/server/atlas/master-feature-map.ts"
+      ],
+      "status": "implemented",
+      "storage_lane": "JSON registry + Postgres label consumers",
+      "retrieval_lane": "Label normalization and classification",
+      "qdrantTags": [
+        "feature-map",
+        "labeling",
+        "registry",
+        "path:src/lib/server/atlas/master-feature-map.ts",
+        "service:MasterFeatureMap",
+        "status:active",
+        "store:Postgres",
+        "src"
+      ],
+      "turbovecLabel": "general",
+      "smokeRefs": [
+        "npm run knowledge:documents:smoke",
+        "npm run knowledge:documents:embed:smoke"
+      ],
+      "reportRefs": [
+        "memory/knowledge/document-knowledge-report.md"
+      ],
+      "nextAction": "Use the label registry to seed the next live atlas overlay."
+    },
+    {
+      "feature_id": "cluster.cards",
+      "owner_file": "scripts/atlas/cache-hypergraph-cluster-cards.mjs",
+      "sourceRefs": [
+        "scripts/atlas/cache-hypergraph-cluster-cards.mjs",
+        "scripts/sync-cluster-summaries-to-qdrant.mjs",
+        "src/lib/server/ace/context-packet-budgeter.ts",
+        "src/lib/server/atlas/master-feature-map.ts",
+        "scripts/atlas/detect-manifold-drift.mjs",
+        "src/lib/server/cache/ace-context-pack-cache.ts"
+      ],
+      "status": "implemented",
+      "storage_lane": "Redis + Qdrant",
+      "retrieval_lane": "Cluster card prefetch and routing",
+      "qdrantTags": [
+        "feature-map",
+        "cluster-cards",
+        "topology",
+        "redis",
+        "qdrant",
+        "path:scripts/atlas/detect-manifold-drift.mjs",
+        "service:ManifoldDriftMonitor",
+        "status:active"
+      ],
+      "turbovecLabel": "graph",
+      "smokeRefs": [
+        "npm run smoke:cluster-cards",
+        "npm run cards:validate"
+      ],
+      "reportRefs": [
+        "docs/reports/top-100-codebase-summary-cards.md"
+      ],
+      "nextAction": "Refresh cluster-card tags from the live qdrant cluster-tag feed."
+    },
+    {
+      "feature_id": "semantic.cache.policy",
+      "owner_file": "src/lib/server/ace/context-cache-registry.ts",
+      "sourceRefs": [
+        "src/lib/server/ace/context-cache-registry.ts",
+        "src/lib/server/ace/llm-context-cache.ts",
+        "src/lib/server/ace/feature-context-cache.ts",
+        ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
+        ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/ace/context-packet-budgeter.ts",
+        "src/lib/server/ace",
+        "src/lib/server/cache/ace-context-pack-cache.ts"
+      ],
+      "status": "implemented",
+      "storage_lane": "Postgres + Redis hot cache",
+      "retrieval_lane": "Context cache selection and fallback",
+      "qdrantTags": [
+        "feature-map",
+        "cache-policy",
+        "redis-hot",
+        "postgres-first",
+        "cluster:72",
+        "cluster:94",
+        "path:src/lib/server/ace",
+        "service:ContextPacketBudgeter"
+      ],
+      "turbovecLabel": "cache",
+      "smokeRefs": [
+        "npm run knowledge:documents:synthesize:smoke"
+      ],
+      "reportRefs": [
+        "memory/knowledge/document-knowledge-synthesis-manifest.json"
+      ],
+      "nextAction": "Keep Redis evaluation-only and do not turn it into durable memory."
+    },
+    {
+      "feature_id": "memory.address.registry",
+      "owner_file": "src/lib/server/ace/feature-context-matrix.ts",
+      "sourceRefs": [
+        "src/lib/server/ace/feature-context-matrix.ts",
+        "src/lib/server/ace/feature-context-cache.ts",
+        ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
+        "src/lib/server/atlas/master-feature-map.ts",
+        "src/lib/server/cache/ace-context-pack-cache.ts"
+      ],
+      "status": "implemented",
+      "storage_lane": "Postgres memory-address placeholders",
+      "retrieval_lane": "Feature context lookup and packet hints",
+      "qdrantTags": [
+        "feature-map",
+        "memory-address",
+        "registry",
+        "placeholder",
+        "postgres",
+        "path:src/lib/server/atlas/master-feature-map.ts",
+        "service:MasterFeatureMap",
+        "status:active"
+      ],
+      "turbovecLabel": "database",
+      "smokeRefs": [
+        "npm run memory:claude-mem:smoke"
+      ],
+      "reportRefs": [
+        "src/routes/api/memory/status/+server.ts"
+      ],
+      "nextAction": "Replace placeholders with the Postgres-owned live address map later."
+    }
+  ]
+}

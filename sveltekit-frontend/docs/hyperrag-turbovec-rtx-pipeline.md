@@ -123,6 +123,16 @@ cd sveltekit-frontend
 
 This gives you an experimental 64k window via aggressive KV cache compression, but it is slower and more fragile than the stable 16k/32k lane. Use it only to validate whether the model can hold the larger window without spilling too far into RAM.
 
+Repo wrapper:
+
+```powershell
+npm run turbo:start:64k:experiment
+```
+
+The 64k experiment is a separate lane from the stable TurboQuant startup path. It should not be used as the default operator launch.
+
+For response handling, only persist the visible synthesis. If a Gemma4 build emits a thought channel, strip it before storing anything in Redis/Postgres.
+
 ### Two-lane architecture
 
 The safest wiring is two lanes, not one:

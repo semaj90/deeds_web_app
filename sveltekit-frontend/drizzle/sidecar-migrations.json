@@ -126,6 +126,24 @@
       "appliedAt": "2026-05-24",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='synthesis_logs' AND column_name='cache_layer_used';\""
+    },
+    {
+      "file": "20260525_agent_memory_observations.sql",
+      "status": "manual_sidecar",
+      "reason": "Mirrors Claude-Mem/OpenCode observations into Postgres as the durable Engram/ACE observation layer. SQLite remains an import source only.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_memory_observations';\""
+    },
+    {
+      "file": "20260525_agent_memory_observations_embedding.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds the pgvector embedding column and HNSW index for agent_memory_observations so worker API writes can persist embeddinggemma:latest vectors directly in Postgres.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='agent_memory_observations' AND column_name='embedding';\""
     }
   ]
 }

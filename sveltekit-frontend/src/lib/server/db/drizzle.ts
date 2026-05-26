@@ -5,7 +5,7 @@
 
 import qdrantClient from '$lib/server/services/qdrant-client';
 import { eq, sql } from 'drizzle-orm';
-import { getFile as getMinioFile } from '$lib/server/minio-client.js';
+import { getSeaweedFile as getMinioFile } from '$lib/server/seaweed-client.js';
 import lazyDb from './client.js';
 import * as schema from './schema.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';

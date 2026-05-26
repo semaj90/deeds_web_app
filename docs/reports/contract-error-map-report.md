@@ -1,6 +1,6 @@
 # Cross-Layer Contract Error Map
 
-Generated: 2026-05-24T19:13:47.549Z  |  Findings: 5  |  High: 0  Medium: 0  Low: 0  Info: 5
+Generated: 2026-05-26T03:58:39.647Z  |  Findings: 6  |  High: 0  Medium: 1  Low: 0  Info: 5
 
 ## Findings
 
@@ -68,3 +68,16 @@ Generated: 2026-05-24T19:13:47.549Z  |  Findings: 5  |  High: 0  Medium: 0  Low:
 **Files:** `sveltekit-frontend\drizzle\0019_llm_context_cache.sql`
 
 **Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-stale_migration-006-9d10ac6b
+**Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
+
+**Problem:** "9999_agent_observations.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
+
+**Expected:** Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.
+
+**Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/9999_agent_observations.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
+
+**Files:** `sveltekit-frontend\drizzle\9999_agent_observations.sql`
+
+**Validation:** `npm run audit:drizzle-meta`, `npm run db:check`

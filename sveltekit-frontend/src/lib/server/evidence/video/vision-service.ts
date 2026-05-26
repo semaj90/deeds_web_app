@@ -8,11 +8,11 @@ import { ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/db/unified-client.js';
 import { db } from '$lib/server/db/client.js';
 import { evidenceFrames } from '$lib/server/db/schema/index.js';
-import { MinIOService } from '$lib/server/minio.js';
+import { SeaweedService } from '$lib/server/seaweed-service.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 
 export class VisionService {
-  private minio = new MinIOService();
+  private seaweed = new SeaweedService();
 
   /**
    * Extracts keyframes from a video buffer.

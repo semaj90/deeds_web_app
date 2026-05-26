@@ -2109,6 +2109,30 @@ export const codebaseSearchCache = pgTable("codebase_search_cache", {
 	unique("codebase_search_cache_query_hash_key").on(table.queryHash),
 ]);
 
+export const agentMemoryObservations = pgTable("agent_memory_observations", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	source: varchar({ length: 100 }).default('claude-mem').notNull(),
+	ide: varchar({ length: 50 }).default('opencode'),
+	sessionId: text("session_id"),
+	observationId: text("observation_id"),
+	projectPath: text("project_path"),
+	summary: text().notNull(),
+	tags: jsonb().default([]),
+	sourceRefs: jsonb("source_refs").default([]),
+	toolCalls: jsonb("tool_calls").default([]),
+	rawJson: jsonb("raw_json").default({}),
+	embedding: vector("embedding", { dimensions: 768 }),
+	embeddingModel: varchar("embedding_model", { length: 100 }).default('embeddinggemma:latest'),
+	embeddingDim: integer("embedding_dim").default(768),
+	qdrantPointId: text("qdrant_point_id"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	index("agent_memory_observations_session_idx").using("btree", table.sessionId.asc().nullsLast().op("text_ops")),
+	index("agent_memory_observations_observation_idx").using("btree", table.observationId.asc().nullsLast().op("text_ops")),
+	index("agent_memory_observations_qdrant_idx").using("btree", table.qdrantPointId.asc().nullsLast().op("text_ops")),
+	index("agent_memory_observations_created_idx").using("btree", table.createdAt.desc().nullsLast().op("timestamptz_ops")),
+]);
+
 export const codebaseWikiPages = pgTable("codebase_wiki_pages", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	slug: varchar({ length: 200 }).notNull(),

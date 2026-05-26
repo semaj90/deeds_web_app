@@ -15,7 +15,7 @@ const documentUploadFieldsSchema = z.object({
 });
 import { documents, chatDocumentAttachments } from '$lib/server/db/schema-postgres';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed';
-import { minio } from '$lib/server/minio/client';
+import { getSeaweedClient as getMinioClient } from '$lib/server/seaweed-client.js';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
@@ -73,11 +73,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const fileName = file.name;
     const fileSize = file.size;
     const buffer = Buffer.from(await file.arrayBuffer());
+    const minio = getMinioClient();
 
-    // Upload to MinIO (primary) or fall back to local filesystem
+    // Upload to SeaweedFS-compatible object storage or fall back to local filesystem
     const BUCKET = 'documents';
     const objectName = `${documentId}/${fileName}`;
-    let filePath = objectName; // MinIO object path as default
+    let filePath = objectName; // object-store path as default
 
     try {
       await minio.bucketExists(BUCKET).catch(async () => {
@@ -90,9 +91,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         'x-amz-meta-uploaded-by': locals.user.id,
       });
     } catch (minioErr) {
-      // MinIO unavailable — fall back to local filesystem
+      // Object storage unavailable — fall back to local filesystem
       console.warn(
-        '[documents/upload] MinIO unavailable, saving locally:',
+        '[documents/upload] SeaweedFS/S3 unavailable, saving locally:',
         (minioErr as Error).message
       );
       const { writeFile, mkdir } = await import('fs/promises');

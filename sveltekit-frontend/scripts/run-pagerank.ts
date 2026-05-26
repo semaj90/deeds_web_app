@@ -16,6 +16,8 @@
 
 import 'dotenv/config';
 import Redis from 'ioredis';
+import { createHash } from 'node:crypto';
+import { pageRankGPU } from '../src/lib/server/gpu/pytorch-graph.js';
 
 const COUCHDB_URL   = process.env.COUCHDB_URL  ?? 'http://admin:legal_ai_pass@127.0.0.1:5984';
 const REDIS_URL     = process.env.REDIS_URL     ?? 'redis://127.0.0.1:6379';
@@ -29,6 +31,17 @@ const DAMPING   = 0.85;
 const MAX_ITER  = 100;
 const TOLERANCE = 1e-6;
 const REDIS_TTL = 6 * 3600;
+const REDIS_META_KEY = 'couchdb:pagerank_scores:meta';
+const GPU_MAX_NODES = Number(process.env.PAGERANK_GPU_MAX_NODES ?? '4096');
+const FORCE_REFRESH =
+  process.argv.includes('--force-refresh') ||
+  process.argv.includes('--refresh') ||
+  process.env.PAGERANK_FORCE_REFRESH === '1' ||
+  process.env.PAGERANK_FORCE_REFRESH === 'true';
+const SKIP_COUCH_WRITE =
+  process.argv.includes('--skip-couch-write') ||
+  process.env.PAGERANK_SKIP_COUCH_WRITE === '1' ||
+  process.env.PAGERANK_SKIP_COUCH_WRITE === 'true';
 
 // Strip credentials from URL for fetch
 function parseCouchUrl(rawUrl: string): { baseUrl: string; auth: Record<string, string> } {
@@ -56,6 +69,14 @@ redis.on('error', () => {});
 
 interface Edge { source: string; target: string }
 
+interface CachedPageRankMeta {
+  graphHash: string;
+  source: 'gpu' | 'cpu';
+  nodes: number;
+  edges: number;
+  generatedAt: string;
+}
+
 async function loadEdgesFromCouchDB(): Promise<Edge[]> {
   const res = await fetch(
     `${COUCH_BASE}/${DB}/_design/codebase_graph/_view/link_matrix?reduce=false`,
@@ -64,6 +85,15 @@ async function loadEdgesFromCouchDB(): Promise<Edge[]> {
   if (!res.ok) throw new Error(`CouchDB link_matrix failed: ${res.status}`);
   const data = await res.json() as { rows?: Array<{ key: [string, string] }> };
   return (data.rows ?? []).map(r => ({ source: r.key[0], target: r.key[1] }));
+}
+
+function buildGraphHash(edges: Edge[]): string {
+  const digest = createHash('sha256');
+  const sorted = [...edges]
+    .map((e) => `${e.source}→${e.target}`)
+    .sort();
+  for (const entry of sorted) digest.update(entry).update('\n');
+  return digest.digest('hex');
 }
 
 // ── Fallback: load edges from Neo4j IMPORTS relationships ─────────────────────
@@ -218,12 +248,67 @@ function computePageRank(edges: Edge[]): Map<string, number> {
   return rank;
 }
 
+function buildAdjacencyMatrix(edges: Edge[], nodeOrder: string[]): Float32Array {
+  const index = new Map(nodeOrder.map((node, i) => [node, i]));
+  const n = nodeOrder.length;
+  const adj = new Float32Array(n * n);
+  for (const edge of edges) {
+    const src = index.get(edge.source);
+    const dst = index.get(edge.target);
+    if (src == null || dst == null) continue;
+    adj[src * n + dst] += 1;
+  }
+  return adj;
+}
+
+async function computePageRankHybrid(edges: Edge[]): Promise<{ scores: Map<string, number>; source: 'gpu' | 'cpu' }> {
+  const nodes = [...new Set(edges.flatMap((e) => [e.source, e.target]))];
+  if (nodes.length === 0) return { scores: new Map(), source: 'cpu' };
+
+  const canTryGpu = nodes.length <= GPU_MAX_NODES;
+  if (canTryGpu) {
+    try {
+      const adj = buildAdjacencyMatrix(edges, nodes);
+      const { scores, source } = pageRankGPU(adj, nodes.length, DAMPING, MAX_ITER);
+      const out = new Map<string, number>();
+      for (let i = 0; i < nodes.length; i++) out.set(nodes[i], scores[i] ?? 0);
+      return { scores: out, source };
+    } catch (err) {
+      console.warn('[pr] GPU PageRank failed, falling back to CPU:', (err as Error).message);
+    }
+  } else {
+    console.log(`[pr] Graph has ${nodes.length} nodes — skipping GPU matrix build (limit ${GPU_MAX_NODES}).`);
+  }
+
+  return { scores: computePageRank(edges), source: 'cpu' };
+}
+
 // ── Persist scores to Redis ───────────────────────────────────────────────────
 
 async function cacheInRedis(scores: Map<string, number>): Promise<void> {
   const obj = Object.fromEntries(scores);
   await redis.setex('couchdb:pagerank_scores', REDIS_TTL, JSON.stringify(obj));
   console.log(`[pr] Cached ${scores.size} scores in Redis (TTL=${REDIS_TTL}s).`);
+}
+
+async function cacheMetaInRedis(meta: CachedPageRankMeta): Promise<void> {
+  await redis.setex(REDIS_META_KEY, REDIS_TTL, JSON.stringify(meta));
+}
+
+async function loadCachedPageRank(graphHash: string): Promise<{ scores: Map<string, number>; meta: CachedPageRankMeta } | null> {
+  try {
+    const [rawScores, rawMeta] = await Promise.all([
+      redis.get('couchdb:pagerank_scores'),
+      redis.get(REDIS_META_KEY),
+    ]);
+    if (!rawScores || !rawMeta) return null;
+    const meta = JSON.parse(rawMeta) as CachedPageRankMeta;
+    if (meta.graphHash !== graphHash) return null;
+    const obj = JSON.parse(rawScores) as Record<string, number>;
+    return { scores: new Map(Object.entries(obj)), meta };
+  } catch {
+    return null;
+  }
 }
 
 // ── Persist scores back to CouchDB docs ──────────────────────────────────────
@@ -279,19 +364,16 @@ async function main() {
   console.log('[pr] Redis connected.');
 
   // Load edges
+  let edgeSource: 'couchdb' | 'neo4j' = 'couchdb';
   let edges = await loadEdgesFromCouchDB().catch(() => [] as Edge[]);
   console.log(`[pr] CouchDB link_matrix: ${edges.length} edges.`);
 
   if (edges.length === 0) {
     // Fallback: load from Neo4j and repopulate CouchDB
     edges = await loadEdgesFromNeo4j();
+    edgeSource = 'neo4j';
     if (edges.length > 0) {
-      await writeEdgesToCouchDB(edges);
-      // Re-query link_matrix after write (view needs time to build)
-      console.log('[pr] Waiting 3s for CouchDB view to rebuild...');
-      await new Promise(r => setTimeout(r, 3000));
-      const reloaded = await loadEdgesFromCouchDB().catch(() => [] as Edge[]);
-      if (reloaded.length > 0) edges = reloaded;
+      console.log('[pr] Neo4j fallback will republish to CouchDB if the graph is recomputed.');
     }
   }
 
@@ -300,9 +382,44 @@ async function main() {
     process.exit(1);
   }
 
-  // Compute PageRank
-  console.log(`[pr] Computing PageRank on ${edges.length} edges...`);
-  const scores = computePageRank(edges);
+  const graphHash = buildGraphHash(edges);
+  const cached = FORCE_REFRESH ? null : await loadCachedPageRank(graphHash);
+  let scores: Map<string, number>;
+  let source: 'gpu' | 'cpu';
+  let usedCache = false;
+  const shouldRepublishEdges = edgeSource === 'neo4j' && !SKIP_COUCH_WRITE;
+
+  if (cached) {
+    scores = cached.scores;
+    source = cached.meta.source;
+    usedCache = true;
+    console.log(`[pr] Cache hit for graph ${graphHash.slice(0, 12)} (${scores.size} scores, source=${source}).`);
+    await cacheMetaInRedis(cached.meta);
+    if (shouldRepublishEdges) {
+      console.log('[pr] Graph hash matched cached scores — skipping CouchDB republish.');
+    }
+  } else {
+    if (shouldRepublishEdges) {
+      console.log('[pr] Republishing Neo4j edges to CouchDB before authority writeback.');
+    }
+    // Compute PageRank
+    console.log(`[pr] Computing PageRank on ${edges.length} edges...`);
+    const computed = await computePageRankHybrid(edges);
+    scores = computed.scores;
+    source = computed.source;
+    console.log(`[pr] PageRank path: ${source.toUpperCase()} bridge.`);
+    await cacheMetaInRedis({
+      graphHash,
+      source,
+      nodes: scores.size,
+      edges: edges.length,
+      generatedAt: new Date().toISOString(),
+    });
+    await cacheInRedis(scores);
+    if (shouldRepublishEdges) {
+      await writeEdgesToCouchDB(edges);
+    }
+  }
 
   // Top 10
   const top10 = [...scores.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
@@ -311,12 +428,9 @@ async function main() {
     console.log(`  ${score.toFixed(3)}  ${path}`);
   }
 
-  // Cache in Redis
-  await cacheInRedis(scores);
-
-  // Persist to CouchDB
-  const written = await persistToCouchDB(scores);
-  if (!SKIP_WRITE) console.log(`[pr] Persisted ${written} scores to CouchDB.`);
+  // Persist fresh results back to CouchDB only when we actually recomputed.
+  const written = usedCache ? 0 : await persistToCouchDB(scores);
+  if (!SKIP_COUCH_WRITE && !usedCache) console.log(`[pr] Persisted ${written} scores to CouchDB.`);
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
   console.log(`[pr] Done in ${elapsed}s — ${scores.size} nodes scored.`);

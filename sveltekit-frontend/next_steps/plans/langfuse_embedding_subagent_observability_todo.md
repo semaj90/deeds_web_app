@@ -403,7 +403,7 @@ private secrets
   - `LANGFUSE_ENABLED=true`
 - [ ] Add `src/lib/server/observability/langfuse.ts`.
 - [ ] Add fail-open wrapper so Langfuse outage never breaks retrieval.
-- [ ] Add smoke script: `scripts/smoke-langfuse-trace.mjs`.
+- [x] Add smoke script: `scripts/smoke-langfuse-trace.mjs`.
 
 ### Phase L2 — ACE trace wrapper
 

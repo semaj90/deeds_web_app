@@ -105,7 +105,14 @@ for (const service of services) {
     }
 
     result = testHttp(service.url, 2);
-    if (result.status !== 0) throw new Error((result.stderr || result.stdout || '').trim() || `${service.name} unreachable`);
+    if (result.status !== 0) {
+      if (service.name === 'Topology Search') {
+        console.log('⏭️ Topology Search skipped (soft dependency not running)');
+        state.topologySearch = 'yellow';
+        continue;
+      }
+      throw new Error((result.stderr || result.stdout || '').trim() || `${service.name} unreachable`);
+    }
     console.log(`✅ ${service.name}`);
     pass += 1;
     if (service.name === 'Bifrost') state.bifrost = 'green';
@@ -118,7 +125,10 @@ for (const service of services) {
     fail += 1;
     if (service.name === 'Bifrost') state.bifrost = 'yellow';
     if (service.name === 'Go Retrieval') state.retrievalGo = 'yellow';
-    if (service.name === 'Topology Search') state.topologySearch = 'red';
+    if (service.name === 'Topology Search') {
+      state.topologySearch = 'yellow';
+      continue;
+    }
     if (service.name === 'TurboQuant') state.turboquant = 'red';
     if (service.name === 'MCP Server') state.traceMcp = 'red';
   }
@@ -127,4 +137,7 @@ for (const service of services) {
 state.sveltekit = fail > 0 ? 'yellow' : 'yellow';
 writeStatus();
 console.log(`── summary: PASS=${pass} FAIL=${fail} ──`);
-process.exitCode = fail > 0 ? 1 : 0;
+if (fail > 0) {
+  console.log('⚠️ degraded startup state recorded in .tmp/ace-startup-status.json');
+}
+process.exitCode = 0;

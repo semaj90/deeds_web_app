@@ -19,6 +19,18 @@ Do not use Task/subagents for deterministic recovery.
 
 Every bash command must include a description.
 
+## No Raw Prompt Stuffing
+
+When asked to inspect, recover, or continue a GraphRAG or ACE task:
+
+1. Do not create a new markdown plan unless explicitly requested.
+2. Do not read whole files by default.
+3. Use `rg --files -uu` first.
+4. Use `rg -n` for anchors.
+5. Use 40-80 line windows only.
+6. Use Qdrant, Redis ACE packs, and sourceRefs for semantic recovery.
+7. Return commands and next actions, not a repo summary.
+
 For graph recovery:
 
 1. discover files with `rg --files -uu`

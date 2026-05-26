@@ -1,5 +1,25 @@
 # YoRHa Legal AI - Copilot Context (Updated 2026-02-04)
 
+## Claude-Mem / OpenCode Bridge
+
+- OpenCode in this workspace is a tooling lane, not canonical memory truth.
+- Claude-Mem observations should flow into:
+  - Postgres `agent_memory_observations`
+  - Qdrant recall
+  - Redis hot keys
+  - ACE/NES cards
+- keep packets compact and recover meaning via embeddings + Qdrant, not prompt stuffing
+- promote sanitized agentic summaries separately into `llm_synthesis`
+- The helper that OpenCode can call is:
+  - `node scripts/opencode/post-memory.mjs --file <observation.json>`
+  - `npm run opencode:post-memory -- --file <observation.json>`
+- Keep SQLite out of the canonical path.
+- Keep MCP / TurboVec drift cleanup separate from the memory bridge.
+- See:
+  - `docs/architecture/opencode-claude-mem-bridge.md`
+  - `docs/operations/stack-audit-playbook.md`
+  - `docs/security/CLAUDE_MEM.md`
+
 ## Current Diagnostics Regression Checkpoint
 
 - Run `npm run test:diagnostics` from `sveltekit-frontend` after diagnostics-related changes.

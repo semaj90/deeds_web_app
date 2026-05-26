@@ -1,6 +1,7 @@
-// Re-export shim: glyph-diffusion-service.ts imports minioService from this path.
-// The actual implementation lives in $lib/server/minio.
-import { MinIOService } from '$lib/server/minio';
+// Legacy compatibility shim.
+// New code should import from $lib/server/seaweed-service or
+// $lib/server/storage/seaweed.ts.
+import { SeaweedService } from '$lib/server/seaweed-service';
 
-export { MinIOService };
-export const minioService = new MinIOService();
+export { SeaweedService as MinIOService };
+export const minioService = new SeaweedService();

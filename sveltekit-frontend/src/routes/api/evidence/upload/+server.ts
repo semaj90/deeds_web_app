@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import crypto from 'crypto';
-import { deleteFile, uploadFile } from '$lib/server/minio-client';
+import { deleteSeaweedFile as deleteFile, uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { evidence } from '$lib/server/db/schema-postgres.js';

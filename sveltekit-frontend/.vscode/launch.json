@@ -24,7 +24,7 @@
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "development",
-        "NODE_OPTIONS": "--max-old-space-size=8092",
+        "NODE_OPTIONS": "--max-old-space-size=12288",
         "ENABLE_GPU": "true",
         "RTX_3060_OPTIMIZATION": "true",
         "CONTEXT7_MULTICORE": "true",

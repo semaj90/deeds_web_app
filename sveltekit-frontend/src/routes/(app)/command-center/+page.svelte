@@ -35,6 +35,7 @@
 	let serviceEntries = $derived.by(() =>
 		Object.entries(data.serviceHealth ?? {})
 			.filter(([key]) => key !== 'overall')
+			.filter(([key]) => key !== 'minio' || !('seaweed' in (data.serviceHealth ?? {})))
 			.map(([service, status]) => ({
 				service,
 				online: Boolean(status)
@@ -120,6 +121,8 @@
 	}
 
 	function serviceLabel(service: string) {
+		if (service === 'seaweed') return 'SEAWEEDFS';
+		if (service === 'minio') return 'MINIO (LEGACY)';
 		return service.replace(/[-_]/g, ' ').toUpperCase();
 	}
 

@@ -10,6 +10,7 @@
 #   Tier 2 (after Tier 1): TRACE MCP cluster :8788  (TypeScript agentic tools)
 #   Tier 3:                SvelteKit dev :5173
 #   Background (non-block):graphify:som — SOM centroid clustering refresh
+#                          Redis 8 eval lane (opt-in, eval-only)
 #
 # Artifacts written to memory/runs/<run_id>/:
 #   startup_health.json    — service reachability per tier
@@ -26,6 +27,7 @@
 #   TRACE_MCP_WORKERS   default min(cpuCount, 4)
 #   LANGFUSE_URL        default http://127.0.0.1:3030
 #   BIFROST_URL         default http://127.0.0.1:3040
+#   ENABLE_REDIS8_EVAL   set to "true" to opt into the Redis 8 eval lane
 #   STRICT_TRACE_HEALTH set to "true" to fail if Langfuse is down
 #
 # Usage:
@@ -42,6 +44,8 @@ $Frontend = Join-Path $Root "sveltekit-frontend"
 $RunId  = (Get-Date -Format "yyyy-MM-ddTHH-mm-ss")
 $RunDir = Join-Path $Frontend "memory\runs\$RunId"
 $TmpDir = Join-Path $Frontend ".tmp"
+$Redis8EvalScript = Join-Path $Frontend "scripts\startup\run-redis8-eval-startup.mjs"
+$Redis8EvalEnabled = $env:ENABLE_REDIS8_EVAL -eq "true"
 New-Item -ItemType Directory -Path $RunDir -Force | Out-Null
 New-Item -ItemType Directory -Path $TmpDir -Force | Out-Null
 
@@ -49,6 +53,9 @@ New-Item -ItemType Directory -Path $TmpDir -Force | Out-Null
 $health  = [ordered]@{}
 $pids    = [ordered]@{}
 $bgJobs  = [System.Collections.Generic.List[object]]::new()
+$redis8EvalRequested = $false
+$redis8EvalUp = $false
+$redis8EvalPid = $null
 
 function Write-RunArtifacts {
   $health  | ConvertTo-Json -Depth 4 | Set-Content -Path (Join-Path $RunDir "startup_health.json")   -Encoding UTF8
@@ -72,10 +79,12 @@ function Write-AceStartupStatus {
     turboquant = if ($turboUp) { 'green' } else { 'red' }
     topologySearch = if ($topoUp) { 'green' } elseif ($topoPid) { 'yellow' } else { 'red' }
     traceMcp = if ($mcpUp) { 'green' } elseif ($mcpPid) { 'yellow' } else { 'red' }
+    redis8Eval = if ($redis8EvalRequested) { if ($redis8EvalUp) { 'green' } else { 'yellow' } } else { 'skipped' }
     sveltekit = if ($skProc?.Id) { 'yellow' } else { 'red' }
     backgroundJobs = [ordered]@{
       graphifySom = $graphifySom
       graphSynthesize = $graphSynthesize
+      redis8Eval = if ($redis8EvalRequested) { if ($redis8EvalUp) { 'started' } else { 'warming' } } else { 'skipped' }
     }
     timestamp = (Get-Date -Format o)
     runId = $RunId
@@ -94,6 +103,15 @@ function Test-Service {
     return $true
   } catch {
     Write-Host "  x $Label unreachable ($Url) -- continuing" -ForegroundColor Yellow
+    return $false
+  }
+}
+
+function Test-Redis8EvalApi {
+  try {
+    Invoke-RestMethod "http://127.0.0.1:8010/v1/health" -TimeoutSec 2 -ErrorAction Stop | Out-Null
+    return $true
+  } catch {
     return $false
   }
 }
@@ -363,6 +381,42 @@ $health["sveltekit"] = @{ url = "http://127.0.0.1:5173"; healthy = "starting"; t
 if ($skProc?.Id) { $pids["sveltekit"] = $skProc.Id }
 Write-Host ""
 
+# ── BACKGROUND: Redis 8 eval lane (opt-in, non-blocking) ────────────────────
+
+$redis8EvalRequested = $Redis8EvalEnabled -and (Test-Path $Redis8EvalScript)
+if ($redis8EvalRequested) {
+  Write-Host "[Background] Launching Redis 8 eval lane (opt-in, eval-only)" -ForegroundColor DarkGray
+  $redis8EvalPid = (Start-Process -FilePath "node.exe" `
+    -ArgumentList @($Redis8EvalScript) `
+    -WorkingDirectory $Frontend -WindowStyle Hidden -PassThru)?.Id
+  if ($redis8EvalPid) {
+    $bgJobs.Add([ordered]@{
+      job       = "redis8:eval"
+      pid       = $redis8EvalPid
+      startedAt = (Get-Date -Format o)
+      evalOnly  = $true
+      optional  = $true
+      logFile   = "logs/task-output/pipeline-test/startup-redis8-eval.log"
+    })
+    $pids["redis8_eval"] = $redis8EvalPid
+    Start-Sleep -Seconds 2
+    $redis8EvalUp = Test-Redis8EvalApi
+    if ($redis8EvalUp) {
+      Write-Host "  v Redis 8 eval API :8010 is responding" -ForegroundColor Green
+    } else {
+      Write-Host "  x Redis 8 eval API not ready yet -- lane continues warming in background" -ForegroundColor Yellow
+    }
+  } else {
+    Write-Host "  x Failed to launch Redis 8 eval startup wrapper" -ForegroundColor Yellow
+  }
+} elseif ($Redis8EvalEnabled) {
+  Write-Host "[Background] Redis 8 eval lane requested but startup wrapper is missing" -ForegroundColor Yellow
+} else {
+  Write-Host "[Background] Redis 8 eval lane skipped (set ENABLE_REDIS8_EVAL=true to opt in)" -ForegroundColor DarkGray
+}
+$health["redis8_eval"] = @{ url = "http://127.0.0.1:8010/v1/health"; healthy = $redis8EvalUp; tier = "bg"; evalOnly = $true; optional = $true }
+Write-Host ""
+
 # ── BACKGROUND: SOM centroid clustering ─────────────────────────────────────
 
 Write-Host "[Background] Launching SOM + graphify:som (non-blocking)" -ForegroundColor DarkGray
@@ -414,6 +468,11 @@ Write-Host "  Bifrost KV cache $BifrostUrl"
 Write-Host "  TurboQuant GGUF  http://127.0.0.1:$TurboPort   (turbo3/4 KV, FA on)"
 Write-Host "  Topo search      http://127.0.0.1:8101/health"
 Write-Host "  TRACE MCP        http://127.0.0.1:$McpPort/health  ($McpWorkers workers)"
+if ($Redis8EvalEnabled) {
+  Write-Host "  Redis 8 eval     http://127.0.0.1:8010/v1/health + http://127.0.0.1:9010/sse (opt-in)" -ForegroundColor Cyan
+} else {
+  Write-Host "  Redis 8 eval     disabled (set ENABLE_REDIS8_EVAL=true)" -ForegroundColor DarkGray
+}
 Write-Host "  SvelteKit dev    http://127.0.0.1:5173"
 Write-Host ""
 Write-Host "  MCP endpoint:    http://127.0.0.1:$McpPort" -ForegroundColor Cyan

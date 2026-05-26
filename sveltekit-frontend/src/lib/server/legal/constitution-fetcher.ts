@@ -13,7 +13,7 @@
  */
 
 import { createHash } from 'crypto';
-import { ensureBucket, putObject } from '$lib/server/minio-client.js';
+import { ensureSeaweedBucket as ensureBucket, putSeaweedObject as putObject } from '$lib/server/seaweed-client.js';
 import { normalizeConstitutionHtml, normalizePlainText, type NormalizeResult } from './html-normalizer';
 import type { StateConstitutionSource } from './constitution-registry';
 

@@ -1,6 +1,6 @@
 # Karpathy GPU Authority Blend
 
-Generated: 2026-05-24T16:40:15.774Z
+Generated: 2026-05-26T00:44:09.286Z
 
 | File | PR | Auth | Attn | Blend |
 |---|---|---|---|---|
@@ -28,4 +28,4 @@ Generated: 2026-05-24T16:40:15.774Z
 | src/lib/server/lucia.ts | 1.778 | 0.225 | 0.588 | 0.955 |
 | src/lib/server/gpu/libtorch-bridge.ts | 1.787 | 0.207 | 0.592 | 0.954 |
 | src/lib/server/db/utils.ts | 1.690 | 0.270 | 0.601 | 0.937 |
-| src/lib/server/retrieval/context-buffer.ts | 1.720 | 0.197 | 0.623 | 0.934 |
+| src/lib/server/db/schema/legal-nodes.ts | 1.676 | 0.258 | 0.628 | 0.936 |

@@ -104,19 +104,19 @@
     "turbovec": {
       "type": "remote",
       "url": "http://127.0.0.1:8791/mcp",
-      "enabled": true,
+      "enabled": false,
       "timeout": 30000
     },
     "engram": {
       "type": "remote",
       "url": "http://127.0.0.1:8792/mcp",
-      "enabled": true,
+      "enabled": false,
       "timeout": 60000
     },
     "langextract": {
       "type": "remote",
       "url": "http://127.0.0.1:8793/mcp",
-      "enabled": true,
+      "enabled": false,
       "timeout": 60000
     },
     "gemma4-offload": {

@@ -29,7 +29,7 @@ export const engramPackets = pgTable('engram_packets', {
   isVerified: integer('is_verified').default(0), 
   
   // Link to the source of the context, if known (e.g., a specific API route or file)
-  sourceFile: text('source_file').references(() => files.path, column: { mode: 'any' }),
+  sourceFile: text('source_file').references(() => files.path, { onDelete: 'cascade' }),
   
   // Optional link to the calling agent/service
   callingAgent: text('calling_agent').default('unknown'),

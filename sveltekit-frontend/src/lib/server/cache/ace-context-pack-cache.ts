@@ -3,6 +3,10 @@ import path from 'path';
 import { promisify } from 'util';
 import childProcess from 'child_process';
 const exec = promisify(childProcess.exec);
+import {
+  recordContextCacheAccess,
+  type AceContextCacheMetrics,
+} from './ace-context-cache-metrics.js';
 
 // ACE Context Pack Cache — skeleton implementation
 // Purpose:
@@ -48,6 +52,11 @@ export type AceContextPack = {
   createdAt: string; // ISO
   summary?: string;
   metadata?: Record<string, unknown>;
+  authority?: {
+    score: number;
+    source: string;
+    graphHash?: string;
+  };
   pointers?: {
     // optional audit pointer into Postgres
     postgresRowId?: string;
@@ -101,6 +110,7 @@ export function buildAceContextPack(input: Partial<AceContextPack> & Pick<AceCon
     createdAt: input.createdAt,
     summary: input.summary,
     metadata: input.metadata ?? {},
+    authority: input.authority ?? undefined,
     pointers: input.pointers ?? {},
   };
   return pack;
@@ -115,7 +125,11 @@ export async function getAceContextPackPointer(key: string): Promise<AceContextP
     const { getRedis } = await import('../redis.js');
     const redis = getRedis();
     const raw = await redis.get(`ace:ctx:${key}`);
-    if (raw) return JSON.parse(raw) as AceContextPack;
+    if (raw) {
+      const parsed = JSON.parse(raw) as AceContextPack;
+      await recordAceContextPackAccess(parsed, 'redis', true);
+      return parsed;
+    }
   } catch {
     // ignore
   }
@@ -132,7 +146,7 @@ export async function getAceContextPackPointer(key: string): Promise<AceContextP
       .limit(1);
 
     if (row) {
-      return buildAceContextPack({
+      const pack = buildAceContextPack({
         id: row.id,
         contextId: key,
         cacheKey: row.cacheKey,
@@ -146,6 +160,8 @@ export async function getAceContextPackPointer(key: string): Promise<AceContextP
         degraded: false,
         metadata: { source: 'postgres' },
       });
+      await recordAceContextPackAccess(pack, 'postgres', true);
+      return pack;
     }
   } catch {
     // ignore
@@ -153,10 +169,20 @@ export async function getAceContextPackPointer(key: string): Promise<AceContextP
 
   try {
     const local = await readAceContextPackSnapshot(key);
-    if (local) return local;
+    if (local) {
+      await recordAceContextPackAccess(local, 'local-json', true);
+      return local;
+    }
   } catch {
     // ignore
   }
+
+  await recordContextCacheAccess(null, {
+    cacheKey: key,
+    cacheSource: 'miss',
+    contextCacheHit: false,
+    packId: key,
+  });
 
   return null;
 }
@@ -166,12 +192,53 @@ export async function getAceContextPackPointer(key: string): Promise<AceContextP
  * This should create/update a Postgres audit row in a real implementation.
  */
 export async function setAceContextPackPointer(key: string, pack: AceContextPack): Promise<void> {
-  const cacheKey = key || pack.cacheKey || buildAceContextCacheKey(pack.contextId, pack.version ?? 'v1');
-  const normalized = buildAceContextPack({ ...pack, cacheKey, createdAt: pack.createdAt, summary: pack.summary ?? '' });
-  await Promise.allSettled([
+  const cacheKey =
+    key || pack.cacheKey || buildAceContextCacheKey(pack.contextId, pack.version ?? 'v1');
+  const normalized = buildAceContextPack({
+    ...pack,
+    cacheKey,
+    createdAt: pack.createdAt,
+    summary: pack.summary ?? '',
+  });
+  const [redisRes, pgRes] = await Promise.allSettled([
     writeRedisPointer(cacheKey, normalized),
     persistAceContextPackAuditRow(normalized),
   ]);
+
+  // Record metric for the pointer set operation. Use 'postgres' when DB write succeeded,
+  // otherwise mark as 'redis' if Redis wrote, falling back to 'local-json' semantics.
+  try {
+    const source: 'redis' | 'postgres' | 'local-json' =
+      pgRes.status === 'fulfilled'
+        ? 'postgres'
+        : redisRes.status === 'fulfilled'
+          ? 'redis'
+          : 'local-json';
+    // best-effort metric emit
+    await recordAceContextPackAccess(normalized, source, true);
+  } catch {
+    // ignore metric failures
+  }
+
+  // Emit a short-lived Redis status key so external tools can observe
+  // whether pointer write and Postgres persist succeeded (best-effort).
+  try {
+    const { getRedis } = await import('../redis.js');
+    const r = getRedis();
+    const status = {
+      redis: redisRes.status,
+      postgres: pgRes.status,
+      ts: new Date().toISOString(),
+      normalizedAuthority: normalized.authority ?? null,
+      cacheKey,
+    };
+    // store for 5 minutes
+    await r
+      .set(`ace:ctx:meta:ptr_status:${cacheKey}`, JSON.stringify(status), 'EX', 300)
+      .catch(() => {});
+  } catch {
+    // ignore
+  }
 }
 
 /**
@@ -259,7 +326,17 @@ export async function writeAceContextPackSnapshot(pack: AceContextPack): Promise
   // Return the placeholder paths for SeaweedFS and NVMe (same file for now)
   const snapshotUrl = `file://${filePath}`;
   try {
-    await writeLocalIndexPointer(pack.cacheKey ?? pack.contextId, { ...pack, snapshotUrl, pointers: { ...(pack.pointers ?? {}), seaweedPath: snapshotUrl, nvmePath: snapshotUrl } });
+    await writeLocalIndexPointer(pack.cacheKey ?? pack.contextId, {
+      ...pack,
+      snapshotUrl,
+      pointers: { ...(pack.pointers ?? {}), seaweedPath: snapshotUrl, nvmePath: snapshotUrl },
+    });
+    // Emit a metric that a local snapshot was written
+    try {
+      await recordAceContextPackAccess(pack, 'local-json', true);
+    } catch {
+      // ignore
+    }
   } catch {
     // ignore
   }
@@ -270,7 +347,28 @@ export async function readAceContextPackSnapshot(key: string): Promise<AceContex
   const filePath = getAceContextPackSnapshotPath(key);
   try {
     const raw = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(raw) as AceContextPack;
+    const parsed = JSON.parse(raw) as AceContextPack;
+    // best-effort emit: record that a local-json pack was accessed
+    try {
+      const { getRedis } = await import('../redis.js');
+      // fire-and-forget; do not block main flow
+      void recordContextCacheAccess(getRedis(), {
+        cacheKey:
+          parsed.cacheKey ?? buildAceContextCacheKey(parsed.contextId, parsed.version ?? 'v1'),
+        cacheSource: 'local-json',
+        contextCacheHit: true,
+        packId: parsed.id,
+        query: parsed.queryHash ?? parsed.contextId,
+        mode: 'context-pack',
+        model: 'ace-context-pack',
+        contextBudgetTokens: Number(parsed.metadata?.contextBudgetTokens ?? 0) || undefined,
+        finalContextTokens: Number(parsed.metadata?.finalContextTokens ?? 0) || undefined,
+      }).catch(() => {});
+    } catch {
+      // ignore instrumentation failures
+    }
+
+    return parsed;
   } catch {
     return null;
   }
@@ -291,7 +389,8 @@ async function writeRedisPointer(cacheKey: string, pack: AceContextPack): Promis
   try {
     const { getRedis } = await import('../redis.js');
     const redis = getRedis();
-    await redis.set(`ace:ctx:${cacheKey}`, JSON.stringify(pack));
+    const ttlSeconds = pack.metadata?.repoGitSha ? 48 * 3600 : 6 * 3600;
+    await redis.set(`ace:ctx:${cacheKey}`, JSON.stringify(pack), 'EX', ttlSeconds);
   } catch {
     // ignore
   }
@@ -476,3 +575,56 @@ export default {
   writeAceContextPackSnapshot,
   auditAceContextPackToPostgres,
 };
+
+function estimatePromptTokensSaved(pack: AceContextPack): number {
+  const direct = pack.metadata?.promptTokensSavedEstimate ?? pack.metadata?.estimatedPrefixTokens;
+  const numeric = typeof direct === 'number' ? direct : Number(direct);
+  if (Number.isFinite(numeric) && numeric > 0) return Math.round(numeric);
+  const chunkCount = Array.isArray(pack.chunkIds) ? pack.chunkIds.length : 0;
+  const sourceCount = Array.isArray(pack.sourceRefs) ? pack.sourceRefs.length : 0;
+  return Math.max(0, (chunkCount + sourceCount) * 24);
+}
+
+async function recordAceContextPackAccess(
+  pack: AceContextPack,
+  cacheSource: 'redis' | 'postgres' | 'local-json',
+  contextCacheHit: boolean
+) {
+  const metrics: AceContextCacheMetrics = {
+    cacheKey: pack.cacheKey ?? buildAceContextCacheKey(pack.contextId, pack.version ?? 'v1'),
+    cacheSource,
+    contextCacheHit,
+    reusedChunkCount: Array.isArray(pack.chunkIds) ? pack.chunkIds.length : 0,
+    skippedRetrievalLanes: Array.isArray(pack.metadata?.skippedRetrievalLanes)
+      ? (pack.metadata?.skippedRetrievalLanes as string[])
+      : [],
+    promptTokensSavedEstimate: estimatePromptTokensSaved(pack),
+    timeSavedMsEstimate: Number(pack.metadata?.timeSavedMsEstimate ?? 0) || undefined,
+    repoGitSha:
+      typeof pack.metadata?.repoGitSha === 'string' ? pack.metadata.repoGitSha : undefined,
+    ragBundleHash:
+      typeof pack.metadata?.ragBundleHash === 'string' ? pack.metadata.ragBundleHash : undefined,
+    graphSnapshotHash:
+      typeof pack.metadata?.graphSnapshotHash === 'string'
+        ? pack.metadata.graphSnapshotHash
+        : undefined,
+    kvQuant: typeof pack.metadata?.kvQuant === 'string' ? pack.metadata.kvQuant : undefined,
+    draftModel:
+      typeof pack.metadata?.draftModel === 'boolean' ? pack.metadata.draftModel : undefined,
+    packId: pack.id,
+    query: pack.queryHash ?? pack.contextId,
+    intent: pack.intent,
+    mode: 'context-pack',
+    model: 'ace-context-pack',
+    queryEmbeddingModel: 'n/a',
+    contextBudgetTokens: Number(pack.metadata?.contextBudgetTokens ?? 0) || undefined,
+    finalContextTokens: Number(pack.metadata?.finalContextTokens ?? 0) || undefined,
+  };
+
+  try {
+    const { getRedis } = await import('../redis.js');
+    await recordContextCacheAccess(getRedis(), metrics);
+  } catch {
+    await recordContextCacheAccess(null, metrics);
+  }
+}

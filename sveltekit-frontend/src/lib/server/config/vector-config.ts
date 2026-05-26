@@ -71,6 +71,8 @@ export const VECTOR_CONFIG = {
     /** KAG/ACE summary lenses and synthesis memory */
     summary_lenses: 'summary_lenses_768',
     synthesis_memory: 'synthesis_memory_768',
+    agent_memory_observations: 'agent_memory_observations',
+    document_knowledge: 'document_knowledge_768',
     programming_docs: 'external_programming_docs_768',
     feature_maps: 'feature_maps',
   },
@@ -105,6 +107,8 @@ export const VECTOR_CONFIG = {
     /** KAG/ACE summary lenses and synthesis memory */
     summary_lenses_768: { vectors: ['summary'], on_disk_payload: true },
     synthesis_memory_768: { vectors: ['synthesis'], on_disk_payload: true },
+    agent_memory_observations: { vectors: ['default'], on_disk_payload: true },
+    document_knowledge_768: { vectors: ['default'], on_disk_payload: true },
     external_programming_docs_768: { vectors: ['default'], on_disk_payload: true },
     feature_maps: { vectors: ['summary'], on_disk_payload: true },
   },

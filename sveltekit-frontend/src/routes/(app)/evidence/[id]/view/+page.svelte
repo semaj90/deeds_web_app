@@ -6,7 +6,7 @@
 
 	const item = $derived(data.item);
 	const downloadUrl = $derived(item ? `/api/evidence/${item.id}/download` : null);
-	// fileUrl may be a backend storage URL (minio://, s3://, seaweed://) the browser cannot fetch.
+	// fileUrl may be a backend storage URL (seaweed://, s3://, or legacy object URL) the browser cannot fetch.
 	// Only use it directly when it's already HTTP(S); otherwise fall back to the proxying API.
 	const viewerUrl = $derived(
 		item?.fileUrl && /^https?:\/\//i.test(item.fileUrl) ? item.fileUrl : downloadUrl

@@ -1,0 +1,248 @@
+{
+  "generatedAt": "2026-05-25T00:00:00Z",
+  "summary": {
+    "total_sql_files_found": 208,
+    "documented_sidecars_count": 16,
+    "journaled_migrations_count": 29,
+    "manual_sql_files_count": 93,
+    "archived_files_count": 44,
+    "destructive_files_detected": "many (see destructive_files list)"
+  },
+  "documented_sidecars": [
+    {
+      "file": "0013_codeintel_indexes.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname LIKE '%trgm%' LIMIT 5;\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/0013_codeintel_indexes.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/0013_codeintel_indexes.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "0016_codeintel_schema.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('codebase_chunk_index','ast_node_cache');\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/0016_codeintel_schema.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/0016_codeintel_schema.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "0016_courtroom_3d_animation.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('courtroom_models','courtroom_animations');\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/0016_courtroom_3d_animation.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/0016_courtroom_3d_animation.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "0018_output_meta_manifold4.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='research_summaries' AND column_name='manifold4';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/0018_output_meta_manifold4.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/0018_output_meta_manifold4.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "0019_llm_context_cache.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='llm_context_cache';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/0019_llm_context_cache.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/0019_llm_context_cache.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "20260516_pgvector_repair.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "classification": "destructive_risk",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name, data_type FROM information_schema.columns WHERE table_name='legal_documents' AND column_name='content_embedding';\"",
+      "safe_apply": "# REVIEW REQUIRED: manual operator apply only. See next_steps_recommendations.operator_checks",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260516_pgvector_repair.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "20260516_hnsw_indexes.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexdef LIKE '%hnsw%';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260516_hnsw_indexes.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260516_hnsw_indexes.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "20260516_production_reconciliation.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "classification": "destructive_risk",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT data_type FROM information_schema.columns WHERE table_name='users' AND column_name='id';\"",
+      "safe_apply": "# REVIEW REQUIRED: identity/PK migration. Prepare exports + rollback plan before applying.",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260516_production_reconciliation.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "20260517_llm_synthesis_events.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-17",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='llm_synthesis_events';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260517_llm_synthesis_events.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260517_llm_synthesis_events.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "20260518_tool_traces.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-18",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='tool_traces' AND column_name IN ('status','error');\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260518_tool_traces.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260518_tool_traces.sql'; ROLLBACK;\""
+    },
+    {
+      "file": "20260506_code_retrieval_chunks.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-21",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT proname FROM pg_proc WHERE proname='search_code_hybrid_pg';\""
+    },
+    {
+      "file": "20260521_summary_cards.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec 94823593eb8e_legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT proname FROM pg_proc WHERE proname='search_code_hybrid_pg';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260506_code_retrieval_chunks.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260506_code_retrieval_chunks.sql'; ROLLBACK;\""
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='summary_cards';\""
+    },
+    {
+      "file": "20260523_citation_annotation_flow.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='summary_cards';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260521_summary_cards.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260521_summary_cards.sql'; ROLLBACK;\""
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('saved_citation_annotations','evidence_board_edges');\""
+    },
+    {
+      "file": "20260524_synthesis_cache_layer.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "antigravity",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('saved_citation_annotations','evidence_board_edges');\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260523_citation_annotation_flow.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260523_citation_annotation_flow.sql'; ROLLBACK;\""
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='synthesis_logs' AND column_name='cache_layer_used';\""
+    },
+    {
+      "file": "20260525_agent_memory_observations.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='synthesis_logs' AND column_name='cache_layer_used';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260524_synthesis_cache_layer.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260524_synthesis_cache_layer.sql'; ROLLBACK;\""
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_memory_observations';\""
+    },
+    {
+      "file": "20260525_agent_memory_observations_embedding.sql",
+      "status": "manual_sidecar",
+      "appliedBy": "operator",
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_memory_observations';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260525_agent_memory_observations.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260525_agent_memory_observations.sql'; ROLLBACK;\""
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='agent_memory_observations' AND column_name='embedding';\""
+    }
+  ],
+  "journaled_migrations": [
+    { "idx": 0, "tag": "0000_puzzling_mongu", "filename": "0000_puzzling_mongu.sql" },
+    { "idx": 1, "tag": "0001_dry_dragon_man", "filename": "0001_dry_dragon_man.sql" },
+    { "idx": 2, "tag": "0002_calm_human_cannonball", "filename": "0002_calm_human_cannonball.sql" },
+      "classification": "additive_safe",
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='agent_memory_observations' AND column_name='embedding';\"",
+      "safe_apply": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/20260525_agent_memory_observations_embedding.sql",
+      "safe_dry_run": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/20260525_agent_memory_observations_embedding.sql'; ROLLBACK;\""
+    { "idx": 4, "tag": "0004_strong_mindworm", "filename": "0004_strong_mindworm.sql" },
+    { "idx": 5, "tag": "0005_dapper_mad_thinker", "filename": "0005_dapper_mad_thinker.sql" },
+  "operatorApplyTemplates": {
+    "psql_apply_local": "psql \"$DATABASE_URL\" -f sveltekit-frontend/drizzle/manual/<file>.sql",
+    "psql_dry_run_local": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/<file>.sql'; ROLLBACK;\"",
+    "docker_exec_apply": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -f /work/sveltekit-frontend/drizzle/manual/<file>.sql",
+    "docker_exec_dry": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -v ON_ERROR_STOP=1 -c \"BEGIN; \i '/work/sveltekit-frontend/drizzle/manual/<file>.sql'; ROLLBACK;\""
+  },
+    { "idx": 6, "tag": "0006_sleepy_young_avengers", "filename": "0006_sleepy_young_avengers.sql" },
+    { "idx": 7, "tag": "0007_magical_donald_blake", "filename": "0007_magical_donald_blake.sql" },
+    { "idx": 8, "tag": "0008_black_tigra", "filename": "0008_black_tigra.sql" },
+    { "idx": 9, "tag": "0009_wakeful_shen", "filename": "0009_wakeful_shen.sql" },
+    { "idx": 10, "tag": "0010_nifty_sumo", "filename": "0010_nifty_sumo.sql" },
+    { "idx": 11, "tag": "0011_search_analytics", "filename": "0011_search_analytics.sql" },
+    { "idx": 12, "tag": "0012_qlora_column_addendum", "filename": "0012_qlora_column_addendum.sql" },
+    { "idx": 13, "tag": "0013_research_summaries", "filename": "0013_research_summaries.sql" },
+    { "idx": 14, "tag": "0014_user_research_tasks", "filename": "0014_user_research_tasks.sql" },
+    { "idx": 15, "tag": "0015_context_timeline", "filename": "0015_context_timeline.sql" },
+    { "idx": 16, "tag": "0016_redundant_rage", "filename": "0016_redundant_rage.sql" },
+    { "idx": 17, "tag": "0017_cooing_leopardon", "filename": "0017_cooing_leopardon.sql" },
+    { "idx": 18, "tag": "0018_open_luminals", "filename": "0018_open_luminals.sql" },
+    { "idx": 19, "tag": "0019_lively_quicksilver", "filename": "0019_lively_quicksilver.sql" },
+    { "idx": 20, "tag": "0020_dusty_malice", "filename": "0020_dusty_malice.sql" },
+    { "idx": 21, "tag": "0021_flat_carlie_cooper", "filename": "0021_flat_carlie_cooper.sql" },
+    { "idx": 22, "tag": "0022_purple_jimmy_woo", "filename": "0022_purple_jimmy_woo.sql" },
+    { "idx": 23, "tag": "0023_exotic_wrecker", "filename": "0023_exotic_wrecker.sql" },
+    { "idx": 24, "tag": "0024_nebulous_mongoose", "filename": "0024_nebulous_mongoose.sql" },
+    { "idx": 25, "tag": "0025_yellow_tony_stark", "filename": "0025_yellow_tony_stark.sql" },
+    { "idx": 26, "tag": "0026_flowery_cerebro", "filename": "0026_flowery_cerebro.sql" },
+    { "idx": 27, "tag": "0027_flawless_texas_twister", "filename": "0027_flawless_texas_twister.sql" },
+    { "idx": 28, "tag": "0028_yummy_doctor_strange", "filename": "0028_yummy_doctor_strange.sql" }
+  ],
+  "manual_untracked": [
+    "drizzle/manual/2026-04-12_chat_document_attachments.sql",
+    "drizzle/manual/0018_ace_observability_canonicalize.sql",
+    "drizzle/manual/2026-05-11_schema_finalization.sql",
+    "drizzle/manual/2026-05-11_rg_atlas_tables.sql",
+    "drizzle/manual/20260310_bootstrap_all_tables.sql",
+    "drizzle/manual/20260510_evidence_columns.sql",
+    "drizzle/manual/20260510_file_summaries.sql",
+    "drizzle/manual/20260510_users_columns.sql",
+    "drizzle/manual/20260510_admin_ai_chat_sessions_columns.sql",
+    "drizzle/manual/20260513_topology_tables.sql",
+    "(full manual file list present in the repo under drizzle/manual/)"
+  ],
+  "destructive_files": [
+    "drizzle/0003_powerful_nebula.sql",
+    "drizzle/0001_dry_dragon_man.sql",
+    "drizzle/0016_redundant_rage.sql",
+    "drizzle/0023_exotic_wrecker.sql",
+    "drizzle/archived/0001_add_evidence_schema.sql",
+    "drizzle/archived/0001_abandoned_satana.sql",
+    "drizzle/archived/0006_fat_tattoo.sql",
+    "drizzle/archived/* (many archived files contain DROP/ALTER operations)"
+  ],
+  "next_steps_recommendations": {
+    "high_level": [
+      "Do NOT run any migration automation until operator review of destructive files.",
+      "Validate documented sidecars using their provided validation commands (run on operator host).",
+      "For manual sidecars that are additive-only (CREATE IF NOT EXISTS, CONCURRENT INDEX), run a psql dry-run in transaction then apply after review.",
+      "For any file in 'destructive_files', open a PR and attach a rollback plan + data export; operator must approve before applying."
+    ],
+    "safe_apply_command_template_local": "psql \"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" -f sveltekit-frontend/drizzle/manual/<file>.sql",
+    "safe_dry_run_template_local": "psql \"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" -v ON_ERROR_STOP=1 -c \"BEGIN; \i 'sveltekit-frontend/drizzle/manual/<file>.sql'; ROLLBACK;\"",
+    "operator_checks": [
+      "Run the sidecar's validationCommand from this report (where provided).",
+      "Dump affected tables (pg_dump --data-only --table=...) before any ALTER/TYPE changes.",
+      "If changing identity columns or types (integer <-> uuid), prepare a backfill/mapping plan and test on staging first."
+    ]
+  }
+}

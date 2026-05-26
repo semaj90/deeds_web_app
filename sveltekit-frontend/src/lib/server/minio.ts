@@ -1,3 +1,13 @@
+/**
+ * Legacy MinIO-compatible S3 adapter.
+ *
+ * New SeaweedFS-first code should prefer:
+ * - `$lib/server/seaweed-client.js`
+ * - `$lib/server/seaweed-service.js`
+ *
+ * This module stays as a compatibility shim because SeaweedFS exposes an S3
+ * gateway and the existing client shape still works.
+ */
 import { Client } from 'minio';
 import { ENV } from '$lib/server/env.server.js';
 

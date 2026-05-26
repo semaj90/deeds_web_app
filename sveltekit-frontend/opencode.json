@@ -178,6 +178,12 @@
       "agent": "atlas-context",
       "subtask": false,
       "template": "Run deterministic graph recovery. Do not delegate. Do not inspect hidden agents. Do not use the task tool. Apply OpenCode patches, patch graph export fallback roots, run graph exports, run DuckDB smoke, and write memory/agent-runs/latest-recovery.json."
+    },
+    "redis8-eval-smoke": {
+      "description": "Smoke the isolated Redis 8 eval lane without touching the Redis 7 app stack",
+      "agent": "atlas-context",
+      "subtask": false,
+      "prompt": "Run npm run smoke:redis8-eval and report Redis 8, Agent Memory API :8010, and MCP :9010 health only. Do not modify the main request path or the Redis 7 app stack."
     }
   },
   "mcp": {
@@ -190,19 +196,19 @@
     "turbovec": {
       "type": "remote",
       "url": "http://127.0.0.1:8791/mcp",
-      "enabled": true,
+      "enabled": false,
       "timeout": 30000
     },
     "engram": {
       "type": "remote",
       "url": "http://127.0.0.1:8792/mcp",
-      "enabled": true,
+      "enabled": false,
       "timeout": 60000
     },
     "langextract-remote": {
       "type": "remote",
       "url": "http://127.0.0.1:8793/mcp",
-      "enabled": true,
+      "enabled": false,
       "timeout": 60000
     },
     "gemma4-offload": {

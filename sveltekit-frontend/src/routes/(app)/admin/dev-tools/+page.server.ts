@@ -161,7 +161,7 @@ export const load: PageServerLoad = async ({ url }) => {
 				checkServiceHealth('Ollama', `${getOllamaUrl()}/api/tags`),
 				checkServiceHealth('Qdrant', getQdrantUrl()),
 				checkServiceHealth('Neo4j', `${url.origin}/api/health/neo4j`),
-				checkServiceHealth('MinIO', `http://${getMinioConfig().endpoint}/minio/health/live`)
+				checkServiceHealth('SeaweedFS S3', `http://${getMinioConfig().endpoint}/minio/health/live`)
 			]),
 			getQdrantCollections(signal),
 			getIndexingStatus(signal),

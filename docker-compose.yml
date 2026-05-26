@@ -7,7 +7,8 @@
 #   - Node.js      → port 5173 (npm run dev)
 #
 # DOCKER (all data services):
-#   Default:       postgres, redis, qdrant, minio, rabbitmq    (~6GB)
+#   Default:       postgres, redis, qdrant, rabbitmq    (~6GB)
+#   SeaweedFS:     add the seaweedfs profile for canonical object storage
 #   --profile full: + couchdb, neo4j, nats, go-search, go-embed (~8GB)
 #   --profile gpu:  + tensorrt-llm (stop Ollama first!)        (~16GB)
 #
@@ -167,6 +168,9 @@ services:
       options:
         max-size: "20m"
         max-file: "3"
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
     ports:
       - "6333:6333"
       - "6334:6334"
@@ -174,16 +178,15 @@ services:
       - qdrant_data:/qdrant/storage
     networks:
       - legal-ai-network
-    environment:
-      - QDRANT__SERVICE__HTTP_PORT=6333
-      - QDRANT__SERVICE__GRPC_PORT=6334
     healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/6333' 2>/dev/null || exit 1"]
+      # Check both HTTP and gRPC ports are accepting TCP connections
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/6333 && echo > /dev/tcp/localhost/6334'"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # MinIO — evidence file storage (S3-compatible)
+  # Legacy MinIO-compatible evidence file storage (S3-compatible adapter only)
+  # SeaweedFS is the canonical object-store backend in this repo.
   minio:
     image: minio/minio:latest
     container_name: legal-ai-minio
@@ -219,14 +222,14 @@ services:
       retries: 3
 
   # ═══════════════════════════════════════════════════════════════════
-  # SEAWEEDFS PROFILE — MIT/Apache drop-in replacement for MinIO
+  # SEAWEEDFS PROFILE — MIT/Apache object-store backend
   # Usage: docker compose --profile seaweedfs up -d
   # Then set in .env:
   #   SEAWEED_ENDPOINT=127.0.0.1
   #   SEAWEED_S3_PORT=8333
   #   SEAWEED_ACCESS_KEY=minio
   #   SEAWEED_SECRET_KEY=minio123
-  # No code changes needed — minio.ts uses S3-compatible API transparently.
+  # No call-site changes needed — the existing S3-compatible adapter can target SeaweedFS.
   # ═══════════════════════════════════════════════════════════════════
 
   # SeaweedFS Master — cluster metadata + volume assignment
@@ -320,8 +323,8 @@ services:
     networks:
       - legal-ai-network
 
-  # SeaweedFS S3 — S3-compatible API gateway (port 8333)
-  # minio.ts connects to this transparently when SEAWEED_* env vars are set.
+  # SeaweedFS S3 — canonical S3-compatible API gateway (port 8333)
+  # Existing S3-compatible client code connects here when SEAWEED_* env vars are set.
   seaweedfs-s3:
     image: chrislusf/seaweedfs:latest
     container_name: legal-ai-seaweed-s3
@@ -760,16 +763,16 @@ services:
       CLICKHOUSE_CLUSTER_ENABLED: "false"
       LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
       LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
-      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
-      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
-      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: ${SEAWEED_ACCESS_KEY:-admin}
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${SEAWEED_SECRET_KEY:-admin}
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://seaweedfs-s3:8333
       LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
       LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
       LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
       LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
-      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
-      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
-      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: ${SEAWEED_ACCESS_KEY:-admin}
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${SEAWEED_SECRET_KEY:-admin}
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://seaweedfs-s3:8333
       LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
       LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
       LANGFUSE_USE_AZURE_BLOB: "false"
@@ -817,7 +820,7 @@ services:
       LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-3941aba7500ce9fabbe0c513ad6c3a58
       LANGFUSE_INIT_USER_EMAIL: admin@deeds-legal.ai
       LANGFUSE_INIT_USER_NAME: Admin
-      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_ADMIN_PASSWORD:-admin123}
+      LANGFUSE_INIT_USER_PASSWORD: admin123
     networks:
       - legal-ai-network
     healthcheck:

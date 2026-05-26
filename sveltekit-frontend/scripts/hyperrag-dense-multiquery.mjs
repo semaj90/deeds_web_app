@@ -53,6 +53,8 @@ const TURBOVEC_SIDECAR  = process.env.TURBOVEC_SIDECAR  ?? 'http://127.0.0.1:879
 const BITFROST_URL      = process.env.BITFROST_URL      ?? process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090';
 const EMBED_MODEL       = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const BITFROST_MODEL     = process.env.BITFROST_MODEL    ?? 'gemma4-rotorquant:latest';
+const AUTHORITY_SNAPSHOT_PATH = process.env.AUTHORITY_SNAPSHOT_PATH
+  ?? path.join(ROOT, 'logs', 'authority', 'latest.json');
 
 const CODEBASE_COL  = 'codebase_chunks_768';
 const GLYPH_COL     = 'glyph_atlas';
@@ -68,6 +70,48 @@ const c = {
   d: s => `\x1b[2m${s}\x1b[0m`,
   cy: s => `\x1b[36m${s}\x1b[0m`,
 };
+
+function normalizeAuthorityPath(raw) {
+  if (!raw) return null;
+  let value = String(raw).trim().replace(/\\/g, '/');
+  if (!value) return null;
+  const repoPrefix = 'sveltekit-frontend/';
+  if (value.startsWith(repoPrefix)) value = value.slice(repoPrefix.length);
+  if (value.startsWith('./')) value = value.slice(2);
+  return value.replace(/^\/+/u, '');
+}
+
+async function loadAuthoritySnapshot() {
+  try {
+    if (!fs.existsSync(AUTHORITY_SNAPSHOT_PATH)) return null;
+    const raw = await fs.promises.readFile(AUTHORITY_SNAPSHOT_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    const rows = Array.isArray(parsed?.rows) ? parsed.rows : [];
+    const byRef = new Map();
+    for (const row of rows) {
+      const key = normalizeAuthorityPath(row?.filePath ?? row?.sourceRef ?? row?.rel ?? row?.path);
+      if (!key) continue;
+      byRef.set(key, row);
+    }
+    return {
+      generatedAt: parsed?.generatedAt ?? null,
+      limit: parsed?.limit ?? null,
+      sourceCounts: parsed?.sources ?? null,
+      byRef,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function authorityForPayload(payload, snapshot) {
+  if (!snapshot) return null;
+  const ref = normalizeAuthorityPath(
+    payload?.filePath ?? payload?.relativePath ?? payload?.path ?? payload?.source_ref ?? payload?.sourceRef,
+  );
+  if (!ref) return null;
+  return snapshot.byRef.get(ref) ?? null;
+}
 
 // ── Ensure log dir ────────────────────────────────────────────────────────────
 if (!DRY_RUN) {
@@ -252,6 +296,7 @@ if (LANES.includes('wide') || allResults.length < 3) {
 // ── Step 5: Reciprocal Rank Fusion + PageRank boost ───────────────────────────
 log(`\n${c.b('Step 5')} — RRF merge + PageRank boost`);
 
+const authoritySnapshot = await loadAuthoritySnapshot();
 const scoreMap = new Map(); // id → merged score
 const payloadMap = new Map(); // id → payload
 const laneMap = new Map(); // id → [lanes]
@@ -262,7 +307,8 @@ for (const pt of allResults) {
   // RRF: 1/(k + rank) — using score as proxy for rank inverse
   const rrfScore = pt.score ?? 0;
   // PageRank boost from Karpathy signals
-  const pageRank = pt.payload?.pageRank ?? pt.payload?.authority_score ?? 0;
+  const authority = authorityForPayload(pt.payload, authoritySnapshot);
+  const pageRank = pt.payload?.pageRank ?? pt.payload?.authority_score ?? authority?.pagerank ?? 0;
   const boosted = rrfScore + pageRank * 0.15 + (turbovecIdSet.has(id) ? 0.1 : 0);
   scoreMap.set(id, Math.max(existing, boosted) + (scoreMap.has(id) ? 0.05 : 0)); // cross-lane bonus
   if (!payloadMap.has(id)) payloadMap.set(id, pt.payload ?? {});
@@ -280,6 +326,7 @@ const ranked = [...scoreMap.entries()]
     lanes: laneMap.get(id) ?? [],
     payload: payloadMap.get(id) ?? {},
     prefilterHit: turbovecIdSet.has(id),
+    authoritySnapshot: authorityForPayload(payloadMap.get(id) ?? {}, authoritySnapshot),
   }));
 
 log(`  ${c.g('✓')} Merged ${allResults.length} → ${ranked.length} unique ranked results`);
@@ -338,9 +385,15 @@ const contextPacket = {
     dir: r.payload?.dir ?? r.payload?.directoryPath,
     summary: (r.payload?.summary ?? r.payload?.content ?? '').slice(0, 300),
     wikiNote: r.payload?._wikiNote?.summary?.slice(0, 150),
-    pageRank: r.payload?.pageRank ?? r.payload?.authority_score,
+    pageRank: r.authoritySnapshot?.pagerank ?? r.payload?.pageRank ?? r.payload?.authority_score,
     gpuCluster: r.payload?.gpuCluster,
     topoClass: r.payload?.topoClass ?? r.payload?.topo_class,
+    authorityCombined: r.authoritySnapshot?.combinedScore ?? null,
+    graphAuthority: r.authoritySnapshot?.graphAuthority ?? null,
+    aceAuthority: r.authoritySnapshot?.aceAuthority ?? null,
+    topology: r.authoritySnapshot?.topology ?? null,
+    redisHot: r.authoritySnapshot?.redisHot ?? null,
+    authoritySnapshot: r.authoritySnapshot,
   })),
 };
 
@@ -443,4 +496,4 @@ await redis.quit().catch(() => {});
 log(`\n${c.g('✓')} hyperrag-dense-multiquery complete`);
 log(`  Results: ${ranked.length} | Wiki-enriched: ${wikiHits} | Cluster: ${activeClusterFilter ?? 'none'}`);
 log(`  → Feed to Bitfrost: cat logs/hyperrag-stream/latest.min.json`);
-log(`  → Start TurboVec sidecar: C:/Users/james/AppData/Local/Programs/Python/Python311/python.exe scripts/turbovec-sidecar.py`);
+log(`  → Start TurboVec sidecar: npm run atlas:hyperrag:sidecar`);

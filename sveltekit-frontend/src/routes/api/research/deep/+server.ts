@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { executeDeepResearch } from '$lib/server/ai/hermes/deep-research-dag.js';
+import { recordContextCacheAccess } from '$lib/server/cache/ace-context-cache-metrics.js';
 
 const bodySchema = z.object({
   query: z.string().min(3).max(4_000),
@@ -31,6 +32,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       caseId: parsed.data.caseId,
       parentTaskId: parsed.data.parentTaskId,
     });
+
+    // Emit non-blocking telemetry when returning a context packet to clients
+    try {
+      const { getRedis } = await import('$lib/server/redis.js');
+      const redis = getRedis();
+      const packet = result.contextPacket as any;
+      if (packet) {
+        void recordContextCacheAccess(redis, {
+          cacheKey: packet.cacheKey ?? packet.contextId ?? 'research:context',
+          cacheSource: 'no-cache',
+          contextCacheHit: true,
+          packId: packet.id ?? undefined,
+          query: parsed.data.query,
+          intent: 'deep-research',
+          mode: 'research-deep',
+          model: 'ace-context-pack',
+        }).catch(() => {});
+      }
+    } catch {
+      // best-effort, do not block response
+    }
 
     return json({
       plan: result.plan,

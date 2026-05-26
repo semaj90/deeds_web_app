@@ -12,6 +12,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { acePromptPreflightTool } from '$lib/server/ai/ace-prompt-preflight-tool.js';
 import { callGemma4WithTools, type Gemma4Tool, type Gemma4ToolCallResult } from './gemma4-codeintel.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -290,6 +291,7 @@ const webSearch: Gemma4Tool = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const ACE_TOOLS: Gemma4Tool[] = [
+  acePromptPreflightTool,
   searchCodebase,
   getClusterSummary,
   lookupResearchSummary,

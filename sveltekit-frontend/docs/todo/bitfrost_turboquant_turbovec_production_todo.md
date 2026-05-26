@@ -47,6 +47,27 @@ It is **not** the right runtime for image/video/VLM work when speculative decodi
 
 Use Ollama or a separate non-draft VLM server for image/video analysis.
 
+Later backlog item:
+
+- keep ACE/Redis as the compact memory layer
+- feed TurboQuant curated context packets instead of giant prompt dumps
+- enforce this as the default 64k behavior for:
+  - ACE context-pack synthesis
+  - Gemma4 text generation
+  - FeatureMap summaries
+  - Karpathy wiki summaries
+  - Hermes text planning
+  - Claude Code / local agent handoff briefs
+
+Memory tuning now in place:
+
+- [x] shared Node heap wrapper added: `scripts/with-node-memory.mjs`
+- [x] memory-heavy scripts use the wrapper on the main dev/check/build lanes
+- [x] VS Code TypeScript server memory aligned to 12 GB
+- [x] copy-paste memory commands documented in `docs/startup.md`
+- [x] `npm run check` now includes the WebGPU/PageRank smoke (`scripts/smoke-compute-worker-gpu.mjs`) so Karpathy/ACE/Redis/BitFrost/KAG multi-hop errors surface in the main check path
+- [x] PageRank/WebGPU smoke now writes `logs/webgpu-pagerank/latest.json` for multi-hop error review instead of only printing to console
+
 Launcher/model discovery note:
 
 - The launcher now resolves the actual repo-local runtime paths when older fallbacks are missing:
@@ -84,6 +105,10 @@ Retrieval / storage lane note:
 - Qdrant stays split by protocol:
   - REST `:6333` for HTTP health and direct collection inspection
   - gRPC `:6334` for retrieval-service integration
+- Qdrant uses the image-supported env vars in `docker-compose.yml`:
+  - `QDRANT__SERVICE__HTTP_PORT=6333`
+  - `QDRANT__SERVICE__GRPC_PORT=6334`
+  - do not replace them with `--grpc-address` CLI flags for this image
 - Bifrost vector-store health checks currently expect the gRPC lane on `:6334`; switching that field to `:6333` breaks Bifrost startup in the live container.
 - DuckDB is offline-only reconciliation over exported artifacts. It does not power the online request path.
 - The `duckdb\smoke-duckdb.ps1` wrapper delegates to `scripts\duckdb\smoke-duckdb.ps1`, which reads `memory/exports/graph-refresh-manifest.json`, `cluster-cards.jsonl`, and `pathway-cards.jsonl`.
@@ -95,7 +120,8 @@ Retrieval / storage lane note:
 - The canonical startup ladder is WSL2/Docker-aware:
   - Bifrost is a Docker/WSL2 lane for custom plugin/runtime work
   - TurboQuant, VS Code task orchestration, and SvelteKit dev remain Windows-native lanes
-  - the startup orchestrator now writes `.tmp/ace-startup-status.json` as the compact rollup
+  - the startup orchestrator now writes `.tmp/ace-startup-status.json` as the compact rollup and the folder-open health check is degraded-safe
+  - topology-search is soft-gated and reports yellow when `:8101` is absent
 - ACE backend identity now includes `kvQuant` and `draftModel` in addition to `modelName`, `modelQuant`, `backend`, `tokenizerHash`, `systemPromptHash`, `toolDefinitionsHash`, `repoGitSha`, `corpusHash`, `ragBundleHash`, and `graphSnapshotHash`.
 
 ### 1.2 Truth table — 2026-05-24
@@ -307,7 +333,23 @@ Naming transition note:
 
 - `MINIO_*` remains the legacy compatibility name in older code and docs
 - `SEAWEED_*` is the canonical new runtime naming in docs/env going forward
-- keep the existing MinIO-compatible SDK path until the SeaweedFS backend is fully normalized
+- keep the existing S3-compatible adapter path, but treat SeaweedFS as the canonical backend
+- [x] SeaweedFS alias modules now exist for the object-store surface
+- [x] visible admin/evidence labels now say SeaweedFS instead of MinIO
+- [ ] migrate remaining imports off MinIO-labeled entrypoints where practical
+- [x] add canonical `/seaweed/{bucket}/{key}` proxy while keeping `/minio/{bucket}/{key}` as a legacy alias
+- [ ] track remaining compatibility baggage explicitly:
+  - `minio_path`
+  - `minioUrl`
+  - legacy `minio` health alias
+  - legacy shim modules and comments
+  - do not rename these without a migration plan; they are contract names, not string cleanup
+- [ ] plan a compatibility migration for the remaining MinIO contract names
+  - `minio_path`
+  - `minioUrl`
+  - legacy `minio` health alias
+  - legacy shim modules and comments
+  - define the database / API / UI rename boundary before changing any contract field
 
 ### 2.5 TurboVec / ACE storage contract
 
@@ -831,16 +873,16 @@ Package script:
 
 Ensure cache key includes:
 
-- [ ] modelName
-- [ ] modelQuant
-- [ ] backend
-- [ ] tokenizerHash
-- [ ] systemPromptHash
-- [ ] toolDefinitionsHash
-- [ ] repoGitSha
-- [ ] corpusHash
-- [ ] ragBundleHash
-- [ ] graphSnapshotHash
+- [x] modelName
+- [x] modelQuant
+- [x] backend
+- [x] tokenizerHash
+- [x] systemPromptHash
+- [x] toolDefinitionsHash
+- [x] repoGitSha
+- [x] corpusHash
+- [x] ragBundleHash
+- [x] graphSnapshotHash
 
 Ensure `openai-facade.ts` passes:
 
@@ -870,12 +912,12 @@ Redis ace:ctx:{cacheKey}
   → miss
 ```
 
-- [ ] Redis hit wins
-- [ ] Redis down falls back to Postgres
-- [ ] Postgres down falls back to local JSON
-- [ ] corrupt local JSON returns miss
-- [ ] toolPolicy survives roundtrip
-- [ ] no retrieval fails because cache failed
+- [x] Redis hit wins
+- [x] Redis down falls back to Postgres
+- [x] Postgres down falls back to local JSON
+- [x] corrupt local JSON returns miss
+- [x] toolPolicy survives roundtrip
+- [x] no retrieval fails because cache failed
 
 ---
 
@@ -887,14 +929,14 @@ Create:
 .cache/ace/context-packs/
 ```
 
-- [ ] Write compact JSON context packs by cacheKey
-- [ ] Add cache size limit, e.g. 2–5 GB
-- [ ] Add LRU cleanup script:
+- [x] Write compact JSON context packs by cacheKey
+- [x] Add cache size limit, e.g. 2–5 GB
+- [x] Add LRU cleanup script:
   - `scripts/cache/prune-ace-context-packs.mjs`
-- [ ] Add package script:
+- [x] Add package script:
   - `cache:ace:prune`
-- [ ] Store lastUsedAt
-- [ ] Store estimated token savings
+- [x] Store lastUsedAt
+- [x] Store estimated token savings
 
 ---
 
@@ -908,11 +950,17 @@ ace:ctx:hits:{cacheKey}
 ace:ctx:meta:{cacheKey}
 ```
 
-- [ ] TTL 6h–48h depending on repo SHA freshness
-- [ ] increment hits on reuse
-- [ ] store lastUsedAt
-- [ ] store cacheSource
-- [ ] store promptTokensSavedEstimate
+Status:
+- [x] `ace:ctx:{cacheKey}` hot pointer exists
+- [x] Postgres audit row exists via `llm_context_cache`
+- [x] local snapshot exists under `.cache/ace/context-packs/`
+- [x] `lastUsedAt` is persisted in the audit row
+- [x] `ace:ctx:hits:{cacheKey}` counter
+- [x] `ace:ctx:meta:{cacheKey}` metadata key
+- [x] increment hits on reuse
+- [x] store cacheSource
+- [x] store promptTokensSavedEstimate
+- [x] TTL 6h–48h depending on repo SHA freshness
 
 ---
 
@@ -920,15 +968,21 @@ ace:ctx:meta:{cacheKey}
 
 Emit:
 
-- [ ] contextCacheHit
-- [ ] cacheSource: `redis|postgres|local-json|miss`
-- [ ] reusedChunkCount
-- [ ] skippedRetrievalLanes
-- [ ] promptTokensSavedEstimate
-- [ ] timeSavedMsEstimate
-- [ ] repoGitSha
-- [ ] ragBundleHash
-- [ ] graphSnapshotHash
+Status:
+- [x] contextCacheHit
+- [x] cacheSource: `redis|postgres|local-json|miss`
+- [x] reusedChunkCount
+- [x] skippedRetrievalLanes
+- [x] promptTokensSavedEstimate
+- [x] timeSavedMsEstimate
+- [x] repoGitSha
+- [x] ragBundleHash
+- [x] graphSnapshotHash
+
+Current note:
+- The cache code now writes hot keys, local logs, `ace_retrieval_runs.metadata`, and Langfuse traces for context-pack access.
+- `npm run ace:context-pack:metrics:smoke` now validates the Redis hot-key updates and the local log append path.
+- The remaining metrics work is live transport validation when Langfuse credentials are enabled.
 
 Write to:
 
@@ -944,13 +998,14 @@ logs/ace-context-cache/latest.json
 
 Benchmark:
 
-- [ ] no cache
-- [ ] Redis cache hit
-- [ ] Postgres cache hit
-- [ ] local JSON cache hit
-- [ ] changed repo SHA miss
-- [ ] changed system prompt miss
-- [ ] changed tool definitions miss
+- [x] no cache
+- [x] Redis cache hit
+- [x] Postgres cache hit
+- [x] local JSON cache hit
+- [x] changed repo SHA miss
+- [x] changed system prompt miss
+- [x] changed tool definitions miss
+- [x] `turbo:bench:cache-matrix`
 
 Record:
 
@@ -962,32 +1017,38 @@ completion_tokens
 cache_source
 ```
 
+Writes:
+
+```text
+logs/turboquant/bench-cache-matrix-latest.json
+```
+
 ---
 
 ### Phase 8 — Speculative decoding rules
 
-- [ ] keep draft model on for text-only synthesis
-- [ ] disable draft model for VLM/mmproj
-- [ ] record `draftModel=true` in cache metadata
-- [ ] if outputs look unstable, smoke with draft off
-- [ ] do not use draft for strict JSON-critical tests until validated
+- [x] keep draft model on for text-only synthesis
+- [x] disable draft model for VLM/mmproj
+- [x] record `draftModel=true` in cache metadata
+- [x] if outputs look unstable, smoke with draft off
+- [x] do not use draft for strict JSON-critical tests until validated
 
 ---
 
 ### Phase 9 — KV quant rules
 
-- [ ] keep `kv=q8_0/q8_0` initially
-- [ ] do not go lower until retrieval quality smoke passes
-- [ ] record KV mode in logs
-- [ ] compare q8_0 vs f16 if quality seems off
+- [x] keep `kv=q8_0/q8_0` initially
+- [x] do not go lower until retrieval quality smoke passes
+- [x] record KV mode in logs
+- [x] compare q8_0 vs f16 if quality seems off
 - [ ] do not implement 1-bit KV in app code yet
 
 ---
 
 ### Phase 10 — FlashAttention decision gate
 
-- [ ] check if current TurboQuant/llama-server binary supports optimized attention flag
-- [ ] if supported, test one smoke with it enabled
+- [x] check if current TurboQuant/llama-server launcher path uses optimized attention flag
+- [x] if supported, test one smoke with it enabled
 - [ ] if model crashes or quality shifts, leave off
 - [ ] do not compile separate FlashAttention
 - [ ] do not add Triton just for FlashAttention
@@ -1091,15 +1152,37 @@ Experimental lane only. Do not block retrieval, and do not move into this work u
   - `qdrant_hit -> graph_expand`
   - `graph_expand -> turbovec_rerank`
   - `turbovec_rerank -> gemma4_response`
-- [ ] Prototype CUDA/RNN reranker as experimental lane only
-- [ ] Add flag: `ENABLE_CUDA_RANKER=false`
-- [ ] Do not block retrieval on CUDA
-- [ ] Do not send raw prompts to CUDA lane; send IDs/scores only
+- [x] Publish `ace:autoencoder:weights` and `ace:autoencoder:meta` to Redis
+- [x] Run `npm run ae:centroids` and write `gpu:autoencoder:centroids_64`
+- [x] `graphify:cluster-summaries:v1:fast` now consumes the SOM centroids
+- [x] `karpathy:gpu` wrapper is callable again
+- [x] Prototype CUDA/RNN reranker as experimental lane only
+- [x] Add flag: `ENABLE_CUDA_RANKER=false`
+- [x] Add smoke: `ace:cuda-reranker:smoke`
+- [x] Do not block retrieval on CUDA
+- [x] Do not send raw prompts to CUDA lane; send IDs/scores only
 
 ---
 
 ### Phase 13 — Graph Synthesis + Feature MapReduce
 
+- [x] Add degraded intent synthesis record path:
+  - `src/lib/server/ace/intent-synthesis.ts`
+  - writes `intent_synthesis`
+  - degraded mode uses `autoencoder_weights_pending`
+  - does not block on `ace:autoencoder:weights`
+- [x] Add smoke:
+  - `npm run ace:intent-synthesis:smoke`
+  - confirms degraded write + round-trip
+- [x] Add Postgres-first GRPO-lite reward loop:
+  - `src/lib/server/ace/intent-synthesis-reward.ts`
+  - writes `intent_synthesis_rewards`
+  - caches hot summaries in Redis `ace:reward:*`
+  - degraded mode uses `karpathy_encoded_pending`
+  - does not block on `gpu:karpathy:encoded`
+- [x] Add smoke:
+  - `npm run ace:intent-reward:smoke`
+  - confirms Postgres write + Redis hot-cache write + degraded fallback
 - [ ] Build feature graph from:
   - paths
   - imports
@@ -1111,6 +1194,11 @@ Experimental lane only. Do not block retrieval, and do not move into this work u
   - NATS subjects
   - OpenCode tools
   - package scripts
+- [x] PageRank authority rebuild now prefers the CUDA bridge when the graph fits, accepts env-driven refresh/write flags, caches `couchdb:pagerank_scores` behind a graph hash, and skips Neo4j→CouchDB republish on cache hit
+- [x] Authority snapshot now consolidates `couchdb:pagerank_scores`, `ace:authority:top`, and `gpu:karpathy:scores` into `logs/authority/latest.json` for multi-hop analysis
+- [x] ACE fusion now reads the authority snapshot as a fallback signal when candidates do not already carry PageRank or authority fields
+- [x] HyperRAG dense multi-query now hydrates the consolidated authority snapshot so Karpathy / ACE / Redis / BitFrost / KAG results share one fallback authority source
+- [x] `graphify:cluster-summaries` now points at the real SOM summary script, and the Redis centroid layer is now populated by `npm run ae:centroids`
 - [ ] Add MapReduce summaries:
   - chunk summary
   - file summary
@@ -1273,11 +1361,11 @@ Triton / TensorRT / vLLM / SGLang
 
 ## 16. Direct Execution Order
 
-1. Finish `resolveContextCacheSources()`.
-2. Finish `tests/unit/llm-context-cache.test.ts`.
-3. Add NanoFlow/BitFrost README note.
-4. Add TurboQuant health smoke.
-5. Add NVMe context-pack prune script.
-6. Add token-savings metrics.
-7. Benchmark cache hit vs miss.
+1. [x] `resolveContextCacheSources()` is implemented.
+2. [x] `llm-context-cache.test.ts` covers the fallback order and toolPolicy roundtrip.
+3. [x] Add NanoFlow/BitFrost README note.
+4. [x] Add TurboQuant health smoke.
+5. [x] Add NVMe context-pack prune script.
+6. [x] Add token-savings metrics.
+7. [x] Benchmark cache hit vs miss.
 8. Only then consider attention/KV/runtime alternatives.

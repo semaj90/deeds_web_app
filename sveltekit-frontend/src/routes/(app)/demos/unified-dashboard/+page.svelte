@@ -43,7 +43,7 @@
 		{ name: 'Redis Cache', status: 'healthy', latency: '<1ms' },
 		{ name: 'Ollama LLM', status: 'healthy', latency: '45ms' },
 		{ name: 'RabbitMQ', status: 'healthy', latency: '3ms' },
-		{ name: 'MinIO Storage', status: 'warning', latency: '120ms' },
+		{ name: 'SeaweedFS Storage', status: 'warning', latency: '120ms' },
 	];
 
 	function getPriorityClass(p: string) {

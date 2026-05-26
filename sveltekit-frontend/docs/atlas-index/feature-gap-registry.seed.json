@@ -1,0 +1,126 @@
+[
+  {
+    "featureId": "ace-context-pack-cache",
+    "title": "ACE Context Pack Cache",
+    "ownerFiles": [
+      "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts"
+    ],
+    "storageLane": ["Redis", "Postgres", "SeaweedFS/NVMe"],
+    "retrievalLane": ["ACE", "Qdrant"],
+    "status": "implemented",
+    "nextAction": "attach more feature cards and timing traces"
+  },
+  {
+    "featureId": "claude-mem-opencode-bridge",
+    "title": "Claude-Mem OpenCode Observation Bridge",
+    "ownerFiles": [
+      "sveltekit-frontend/src/routes/api/memory/claude-mem/+server.ts",
+      "scripts/opencode/post-memory.mjs",
+      "scripts/memory/import-claude-mem-observations.mjs"
+    ],
+    "storageLane": ["Postgres", "Qdrant", "Redis"],
+    "retrievalLane": ["ACE", "Engram"],
+    "status": "implemented",
+    "nextAction": "make OpenCode automatically call post-memory.mjs"
+  },
+  {
+    "featureId": "hyperrag-turbovec",
+    "title": "HyperRAG TurboVec Retrieval",
+    "ownerFiles": [
+      "sveltekit-frontend/scripts/hyperrag-dense-multiquery.mjs",
+      "sveltekit-frontend/scripts/atlas/hyperrag-dense-multiquery.mjs",
+      "sveltekit-frontend/scripts/atlas/rotorquant-turbovec-sidecar.mjs"
+    ],
+    "storageLane": ["Redis", "Qdrant", "logs"],
+    "retrievalLane": ["TurboVec", "Qdrant", "ACE"],
+    "status": "implemented",
+    "nextAction": "ensure sidecar 8792/8793 health in startup rollup"
+  },
+  {
+    "featureId": "karpathy-authority",
+    "title": "Karpathy / PageRank Authority Lane",
+    "ownerFiles": [
+      "sveltekit-frontend/scripts/run-pagerank.ts",
+      "sveltekit-frontend/src/lib/server/graph/karpathy-authority.ts",
+      "sveltekit-frontend/scripts/karpathy-gpu-enrich.mjs"
+    ],
+    "storageLane": ["Redis", "logs", "Postgres"],
+    "retrievalLane": ["ACE", "HyperRAG"],
+    "status": "implemented",
+    "nextAction": "attach authority to all feature cards"
+  },
+  {
+    "featureId": "autoencoder-som-clusters",
+    "title": "Autoencoder 64D SOM Cluster Lane",
+    "ownerFiles": [
+      "sveltekit-frontend/scripts/train-autoencoder.mjs",
+      "sveltekit-frontend/scripts/ae-encode-to-redis.mjs",
+      "sveltekit-frontend/scripts/autoencoder-centroids.mjs",
+      "sveltekit-frontend/scripts/graphify-som-cluster-summaries.mjs"
+    ],
+    "storageLane": ["Redis", "Postgres"],
+    "retrievalLane": ["TurboVec", "HyperRAG"],
+    "status": "partial",
+    "nextAction": "finish full encoded64 population and cluster summary validation"
+  },
+  {
+    "featureId": "redis8-eval",
+    "title": "Redis 8 Vector Sets / Streams Eval Lane",
+    "ownerFiles": [
+      "docker-compose.redis8-eval.yml",
+      "scripts/vector/smoke-redis8-qdrant.ps1",
+      "monitor-claude-mem-poll.mjs"
+    ],
+    "storageLane": ["Redis 8 eval"],
+    "retrievalLane": ["experimental"],
+    "status": "partial",
+    "nextAction": "smoke VADD/VSIM and Streams with auth-correct REDIS8_URL"
+  },
+  {
+    "featureId": "zod-api-contracts",
+    "title": "Zod API Validation Contracts",
+    "ownerFiles": [
+      "sveltekit-frontend/src/lib/server/utils/validateRequest.ts",
+      "sveltekit-frontend/src/routes/api/**/+server.ts"
+    ],
+    "storageLane": ["SvelteKit API"],
+    "retrievalLane": ["audit"],
+    "status": "partial",
+    "nextAction": "patch high-risk request.json routes one by one"
+  },
+  {
+    "featureId": "markdown-ingestion",
+    "title": "Markdown Feature Card Ingestion",
+    "ownerFiles": [
+      "sveltekit-frontend/scripts/atlas/ingest-markdown-cards.mjs"
+    ],
+    "storageLane": ["Postgres", "Qdrant", "Redis", "CouchDB optional"],
+    "retrievalLane": ["ACE", "Engram"],
+    "status": "partial",
+    "nextAction": "wire JSONL output to embeddings, Qdrant, Postgres, Redis"
+  },
+  {
+    "featureId": "intent-synthesis-rewards",
+    "title": "Intent Synthesis + Reward Loop",
+    "ownerFiles": [
+      "sveltekit-frontend/src/lib/server/ace/intent-synthesis.ts",
+      "sveltekit-frontend/src/lib/server/ace/intent-synthesis-reward.ts"
+    ],
+    "storageLane": ["Postgres", "Redis"],
+    "retrievalLane": ["ACE"],
+    "status": "implemented",
+    "nextAction": "connect reward scores to feature ranking"
+  },
+  {
+    "featureId": "bifrost-semantic-cache",
+    "title": "Bifrost Semantic Cache Gateway",
+    "ownerFiles": [
+      "docker/bifrost/config.json",
+      "sveltekit-frontend/src/lib/server/bifrost/client.ts"
+    ],
+    "storageLane": ["Qdrant", "Bifrost"],
+    "retrievalLane": ["semantic-cache"],
+    "status": "implemented",
+    "nextAction": "keep TurboQuant separate until provider support exists"
+  }
+]

@@ -77,6 +77,18 @@ export interface RetrievalTrace {
   graphAuthority?: boolean | null;
 }
 
+export interface TimingTrace {
+  redisMs: number;
+  qdrantMs: number;
+  postgresMs: number;
+  graphMs: number;
+  bifrostMs: number;
+  turboquantMs: number;
+  totalMs: number;
+  selectedLane: 'redis' | 'turboquant' | 'bifrost';
+  fallbackReason: string | null;
+}
+
 export interface OpenAIChatCompletionResponse {
   id: string;
   object: 'chat.completion';
@@ -86,6 +98,8 @@ export interface OpenAIChatCompletionResponse {
   usage: OpenAIChatCompletionUsage;
   /** Retrieval + HMM trace — machine-inspectable by smoke tests */
   retrievalTrace?: RetrievalTrace;
+  /** Timing trace for ACE lane routing and backend selection */
+  timingTrace?: TimingTrace;
   /** Custom field — context sources used for this completion (transparency) */
   yorha?: {
     aceUsed: boolean;
@@ -121,11 +135,22 @@ export interface OpenAIChatCompletionResponse {
     runtimeAvailable?: boolean;
     turboQuantEnabled?: boolean;
     rotorQuantKv?: boolean;
+    draftModel?: boolean;
     // HMM ACE analyzer result (surfaced for full-loop smoke / TRACE proof)
     hmm?: AceHmmMeta;
     mcpCompactSearchHitCount?: number;
     mcpCompactSearchCacheHit?: boolean;
     mcpCompactSearchMs?: number;
+    contextPackKey?: string;
+    contextPacketVersion?: string;
+    sourceRefs?: string[];
+    chunkIds?: string[];
+    modelName?: string;
+    backend?: string;
+    kvQuant?: string;
+    selectedLane?: 'redis' | 'turboquant' | 'bifrost';
+    fallbackReason?: string | null;
+    timingTrace?: TimingTrace;
   };
 }
 

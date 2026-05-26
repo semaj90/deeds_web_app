@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  redis8-eval:
+    image: redis:8
+    container_name: redis8-eval
+    ports:
+      - "6380:6379"
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --save
+      - "60"
+      - "1000"
+    volumes:
+      - redis8-eval-data:/data
+
+  # Optional RedisInsight UI for evaluation
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: redisinsight-eval
+    ports:
+      - "8010:8001"
+    depends_on:
+      - redis8-eval
+
+  # Optional placeholder for Redis Agent Memory Server eval (REST/MCP)
+  # Uncomment and set image/tag when you want to evaluate the Agent Memory Server.
+  # redis-agent-memory-server-eval:
+  #   image: yourorg/redis-agent-memory-server:latest
+  #   container_name: redis-agent-memory-server-eval
+  #   ports:
+  #     - "9010:9010"
+  #   depends_on:
+  #     - redis8-eval
+
+volumes:
+  redis8-eval-data:

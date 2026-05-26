@@ -12,7 +12,7 @@ import type { RequestHandler } from './$types';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import { glob } from 'glob';
-import { ensureBucket, putObject } from '$lib/server/minio-client.js';
+import { ensureSeaweedBucket as ensureBucket, putSeaweedObject as putObject } from '$lib/server/seaweed-client.js';
 import path from 'path';
 import postgres from 'postgres';
 
@@ -40,7 +40,7 @@ const CONFIG = {
 
 // Helpers
 
-// MinIO client consolidated into $lib/server/minio-client.ts
+// SeaweedFS adapter consolidated into $lib/server/seaweed-client.ts
 
 async function generateEmbedding(text: string): Promise<number[]> {
   try {

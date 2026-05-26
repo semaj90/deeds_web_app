@@ -12,7 +12,7 @@ export const GET: RequestHandler = async () => {
   return new Response(null, { status: 200 });
 };
 
-// A light wrapper that accepts multipart form uploads and stores the file in MinIO under 'evidence' bucket.
+// A light wrapper that accepts multipart form uploads and stores the file in SeaweedFS under the 'evidence' bucket.
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const form = await request.formData();
@@ -29,18 +29,19 @@ export const POST: RequestHandler = async ({ request }) => {
     const objectName = `${id}_${file.name}`;
 
     try {
-      const { minio } = await import('$lib/server/minio/client.js');
+      const { getSeaweedClient } = await import('$lib/server/seaweed-client.js');
+      const seaweed = getSeaweedClient();
       const BUCKET = 'evidence';
-      const exists = await minio.bucketExists(BUCKET).catch(() => false);
-      if (!exists) await minio.makeBucket(BUCKET, 'us-east-1');
-      await minio.putObject(BUCKET, objectName, buffer, buffer.length, {
+      const exists = await seaweed.bucketExists(BUCKET).catch(() => false);
+      if (!exists) await seaweed.makeBucket(BUCKET, 'us-east-1');
+      await seaweed.putObject(BUCKET, objectName, buffer, buffer.length, {
         'x-amz-meta-case-id': caseId,
         'x-amz-meta-original-name': file.name,
         'Content-Type': file.type || 'application/octet-stream',
       });
     } catch (minioErr) {
       console.warn(
-        '[evidence] MinIO upload failed, continuing without storage:',
+        '[evidence] SeaweedFS upload failed, continuing without storage:',
         (minioErr as Error).message
       );
     }

@@ -1,14 +1,15 @@
 /**
  * POST /api/evidence/[id]/vlm-analyze
  * Runs VLM (Vision Language Model) analysis on an existing evidence file.
- * Fetches the file from MinIO, passes to 3-tier VLM pipeline (Triton → TurboQuant → Ollama).
+ * Fetches the file from SeaweedFS-compatible object storage, then passes to
+ * the 3-tier VLM pipeline (Triton → TurboQuant → Ollama).
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
-import { getFile } from '$lib/server/minio-client.js';
+import { getSeaweedFile as getFile } from '$lib/server/seaweed-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';

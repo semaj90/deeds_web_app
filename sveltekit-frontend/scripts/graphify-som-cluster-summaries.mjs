@@ -199,7 +199,7 @@ async function main() {
   // Load centroid metadata
   const meta = await redis.hgetall(REDIS_META_HASH);
   if (!meta?.trainedAt) {
-    console.error('[error] No centroid metadata in Redis — run ae:centroids first');
+    console.error('[error] No centroid metadata in Redis — publish ace:autoencoder:weights first (npm run ae:train:js), then run ae:centroids');
     process.exit(1);
   }
   const trainedAt = meta.trainedAt;

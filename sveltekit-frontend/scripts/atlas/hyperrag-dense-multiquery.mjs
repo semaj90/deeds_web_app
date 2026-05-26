@@ -16,14 +16,20 @@
  *   EMBED_MODEL       default embeddinggemma:latest
  *   QDRANT_URL        default http://localhost:6333
  *   REDIS_URL         default redis://127.0.0.1:6379
- *   TURBOVEC_URL      default http://127.0.0.1:8099
+ *   TURBOVEC_URL      default http://127.0.0.1:8792
  *   COLLECTION        default codebase_chunks_768
  *   SVELTEKIT_URL     default http://localhost:5173
  */
 
 import Redis from 'ioredis';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // ── Config ─────────────────────────────────────────────────────────────────────
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..', '..');
 const argv = process.argv.slice(2);
 const argGet = (flag) => { const i = argv.indexOf(flag); return i >= 0 ? argv[i + 1] : null; };
 
@@ -39,8 +45,10 @@ const EMBED_MODEL  = process.env.EMBED_MODEL     ?? 'embeddinggemma:latest';
 const SVELTEKIT    = process.env.SVELTEKIT_URL   ?? 'http://localhost:5173';
 const QDRANT_URL   = process.env.QDRANT_URL      ?? 'http://localhost:6333';
 const REDIS_URL    = process.env.REDIS_URL       ?? 'redis://127.0.0.1:6379';
-const TURBOVEC_URL = process.env.TURBOVEC_URL    ?? 'http://127.0.0.1:8099';
+const TURBOVEC_URL = process.env.TURBOVEC_URL    ?? 'http://127.0.0.1:8792';
 const COLLECTION   = process.env.COLLECTION      ?? 'codebase_chunks_768';
+const AUTHORITY_SNAPSHOT_PATH = process.env.AUTHORITY_SNAPSHOT_PATH
+  ?? path.join(ROOT, 'logs', 'authority', 'latest.json');
 const RRF_K        = 60;  // Reciprocal Rank Fusion constant
 
 if (!QUERY) {
@@ -147,6 +155,46 @@ function sourceRef(payload) {
   return payload?.path ?? payload?.source_ref ?? payload?.relativePath ?? null;
 }
 
+function normalizeAuthorityPath(raw) {
+  if (!raw) return null;
+  let value = String(raw).trim().replace(/\\/g, '/');
+  if (!value) return null;
+  const repoPrefix = 'sveltekit-frontend/';
+  if (value.startsWith(repoPrefix)) value = value.slice(repoPrefix.length);
+  if (value.startsWith('./')) value = value.slice(2);
+  return value.replace(/^\/+/u, '');
+}
+
+async function loadAuthoritySnapshot() {
+  try {
+    if (!existsSync(AUTHORITY_SNAPSHOT_PATH)) return null;
+    const raw = await readFile(AUTHORITY_SNAPSHOT_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    const rows = Array.isArray(parsed?.rows) ? parsed.rows : [];
+    const byRef = new Map();
+    for (const row of rows) {
+      const key = normalizeAuthorityPath(row?.filePath ?? row?.sourceRef ?? row?.rel ?? row?.path);
+      if (!key) continue;
+      byRef.set(key, row);
+    }
+    return {
+      generatedAt: parsed?.generatedAt ?? null,
+      limit: parsed?.limit ?? null,
+      sourceCounts: parsed?.sources ?? null,
+      byRef,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function authorityForRef(ref, snapshot) {
+  if (!snapshot || !ref) return null;
+  const key = normalizeAuthorityPath(ref);
+  if (!key) return null;
+  return snapshot.byRef.get(key) ?? null;
+}
+
 // ── Step 3: Qdrant dense search ────────────────────────────────────────────────
 async function qdrantSearch(vector, { filter, limit, label }) {
   const body = {
@@ -194,7 +242,18 @@ function rrfMerge(resultSets) {
 
 // ── Step 5: Karpathy blend enrichment ─────────────────────────────────────────
 async function enrichWithKarpathy(hits) {
-  if (!redisReady) return hits;
+  const authoritySnapshot = await loadAuthoritySnapshot();
+  if (!redisReady) {
+    return hits.map(h => {
+      const ref = sourceRef(h.payload);
+      const authority = authorityForRef(ref, authoritySnapshot);
+      return {
+        ...h,
+        karpathy: authority ?? null,
+        authoritySnapshot: authority ?? null,
+      };
+    });
+  }
 
   // Batch HGET for paths from payload
   const refs = hits.map(h => sourceRef(h.payload)).filter(Boolean);
@@ -215,7 +274,12 @@ async function enrichWithKarpathy(hits) {
   return hits.map(h => {
     const ref = sourceRef(h.payload);
     const karpathy = karpathyMap.get(ref);
-    return { ...h, karpathy: karpathy ?? null };
+    const authority = authorityForRef(ref, authoritySnapshot);
+    return {
+      ...h,
+      karpathy: karpathy ?? authority ?? null,
+      authoritySnapshot: authority ?? null,
+    };
   });
 }
 
@@ -294,10 +358,17 @@ const output = {
     rrfScore: parseFloat(h.rrf.toFixed(6)),
     qdrantScore: parseFloat(h.qdrantScore.toFixed(4)),
     karpathyBlend: h.karpathy?.blend ?? null,
+    authorityCombined: h.authoritySnapshot?.combinedScore ?? null,
+    pagerank: h.authoritySnapshot?.pagerank ?? null,
+    graphAuthority: h.authoritySnapshot?.graphAuthority ?? null,
+    aceAuthority: h.authoritySnapshot?.aceAuthority ?? null,
+    topology: h.authoritySnapshot?.topology ?? null,
+    redisHot: h.authoritySnapshot?.redisHot ?? null,
     source_ref: sourceRef(h.payload),
     cluster: h.payload?.som_cluster ?? h.payload?.cluster_id ?? null,
     text: (h.payload?.content ?? h.payload?.text)?.slice(0, 240) ?? null,
     tags: h.payload?.qdrant_tags ?? h.payload?.tags ?? [],
+    authoritySnapshot: h.authoritySnapshot ?? null,
   })),
 };
 
