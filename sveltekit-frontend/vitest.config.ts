@@ -16,6 +16,7 @@ export default defineConfig({
       'tests/ace-policy.spec.ts',
       'tests/code-llm-index.spec.ts',
       'tests/openai-facade.spec.ts',
+      'tests/intent-ranker.spec.ts',
       'tests/gemma4-tool-controller.spec.ts',
       'tests/llama-tool-definitions.spec.ts',
       'tests/agents-md-relations.spec.ts',
@@ -140,6 +141,7 @@ export default defineConfig({
       'tests/intent/regex-intent.spec.ts',
       // Intent-router chain mapping + executeChain partial-results contract (Phase B)
       'tests/intent/intent-router.spec.ts',
+      'tests/intent/rank-intent.spec.ts',
       // /api/ai/intent-dispatch route — G26 baseline (Phase B)
       'tests/routes/intent-dispatch.spec.ts',
       // Service Worker offline timeline-client (Phase D)
@@ -196,6 +198,8 @@ export default defineConfig({
       'tests/qdrant-rerank-feedback.spec.ts',
       // operator-gated ops.* tools (propose_patch, run_targeted_test, record_fix_attempt, run_quality_gate)
       'tests/mcp-operator-tools.spec.ts',
+      // OpenCode MCP config + docs regression guard
+      'tests/opencode-mcp-config.spec.ts',
       // AGENTS.md ingest + Qdrant topology payload backfill
       'tests/agents-md-ingest.spec.ts',
       'tests/qdrant-topology-payloads.spec.ts',
@@ -206,6 +210,9 @@ export default defineConfig({
       'tests/hypergraph-traversal.spec.ts',
       'tests/engram-dym.spec.ts',
       'tests/engram-graph-rerank.spec.ts',
+      'tests/engram-recall.spec.ts',
+      'tests/engram-registry.spec.ts',
+      'tests/engram-registry-db.integration.spec.ts',
       'tests/quaternion-manifold.spec.ts',
       'tests/ace-rerank-spine.spec.ts',
       'tests/tool-ranker.spec.ts',

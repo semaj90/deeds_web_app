@@ -141,7 +141,7 @@ const valid = rows.filter(r => r.content !== null); // Type: Row[] with content:
 
 ```typescript
 const config = {
-  model: 'gemma4-legal-vlm:latest',
+  model: 'gemma4-rotorquant:latest',
   temperature: 0.2,
 } satisfies OllamaOptions; // validates without widening type
 ```
@@ -234,7 +234,7 @@ the way matrix multiply is. Tensor cores excel at dense matmul — they're the w
 **What your RTX 3060 Ti does in this stack** (not tsgo):
 - `tensorrt_bridge.node` — LibTorch CUDA k-means, PageRank, cosine similarity
 - `embeddinggemma:latest` — Ollama GPU inference
-- `gemma4-legal-vlm:latest` — TurboQuant KV-compressed inference at :8090
+- `gemma4-rotorquant:latest` — TurboQuant KV-compressed inference at :8090
 
 ---
 
@@ -332,7 +332,7 @@ tsgo (Go, CPU-parallel)            ← TypeScript compilation only
 tensorrt_bridge.node (CUDA)        ← GPU k-means, PageRank, cosine sim
   └─ RTX 3060 Ti, CUDA 12.1
 
-embeddinggemma / gemma4-legal-vlm  ← Ollama GPU inference
+embeddinggemma / gemma4-rotorquant:latest  ← Ollama GPU inference
   └─ RTX 3060 Ti, 8GB VRAM
 
 gRPC services (Go)                 ← Embedding, retrieval microservices

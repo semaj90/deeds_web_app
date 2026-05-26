@@ -31,11 +31,58 @@
 
     # QUIC health check (HTTP fallback)
     handle /quic-health {
-        reverse_proxy http://localhost:8101/health
+        rewrite * /health
+        reverse_proxy http://localhost:8101
     }
 
-    # Include auto-generated WebSocket routes from ws-orchestrator
-    import ../../Caddyfile.ws
+    # TRACE MCP over Streamable HTTP / JSON-RPC
+    handle /mcp* {
+        reverse_proxy http://localhost:8788 {
+            flush_interval -1
+        }
+    }
+
+    # Optional direct llama-server lane
+    handle_path /llama/* {
+        reverse_proxy http://localhost:8090 {
+            flush_interval -1
+        }
+    }
+
+    # SSE / streaming API routes (disable buffering)
+    handle /api/sse/* {
+        reverse_proxy localhost:5174 {
+            flush_interval -1
+        }
+    }
+
+    handle /api/ai/* {
+        reverse_proxy localhost:5174 {
+            flush_interval -1
+        }
+    }
+
+    handle /api/*/stream* {
+        reverse_proxy localhost:5174 {
+            flush_interval -1
+        }
+    }
+
+    handle /api/synthesis/* {
+        reverse_proxy localhost:5174 {
+            flush_interval -1
+        }
+    }
+
+    handle /api/detective/* {
+        reverse_proxy localhost:5174 {
+            flush_interval -1
+        }
+    }
+
+    # Auto-generated WebSocket routes from ws-orchestrator are optional.
+    # Keep this disabled unless the generated Caddyfile.ws exists.
+    # import Caddyfile.ws
 
     # Reverse proxy to Vite dev server
     reverse_proxy localhost:5174 {

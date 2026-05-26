@@ -29,7 +29,7 @@ User Query
     ├─► Bifrost Gateway (semantic cache, Go :3040, disabled by default)
     │       └── Redis-backed semantic similarity cache (28x speedup)
     │
-    ├─► Ollama gemma4-legal:latest (RTX 3060 Ti, Flash Attention, Q8_0 KV)
+    ├─► Ollama gemma4-rotorquant:latest (RTX 3060 Ti, Flash Attention, Q8_0 KV)
     │       └── Structured output via GBNF grammar
     │
     ├─► ACE Self-Evaluation (async via RabbitMQ → Redis → /api/synthesis/evaluation/[id])
@@ -58,6 +58,40 @@ User Query
 | **Unsloth/GRPO** | LoRA fine-tuning + RL alignment | **IN PROGRESS** — 4 notebooks + merge-and-export.sh pipeline | Gemma4_E4B_Legal_GRPO.ipynb ready, needs Colab A100 run |
 | **Neo4j** | Graph DB for KAG/entity relationships | Active in ACE, optional Docker | Profile:full required |
 | **LibTorch CUDA** | N-API addon (similarity, clustering, embedding) | Verified (6 functions, RTX 3060 Ti) — added getCudaMemory, batchCosineSimilarity, graphSimilarityHalf | Only /api/gpu/compute |
+| **JSONB Legal Metadata** | Drizzle-backed JSONB tables + generated columns | Active (legal_documents_jsonb / cases_jsonb / evidence_jsonb) | Needs codebase labels + unified validation |
+
+## Production Boundary
+
+- PostgreSQL = durable legal metadata and Drizzle truth.
+- SeaweedFS = raw PDFs, OCR, and Docling JSON.
+- Qdrant = semantic chunk search plus payload filters.
+- Redis/Bifrost = hot LegalCards and semantic cache.
+- ACE = compact packet builder and LegalCard injector.
+- WebGPU/WebGL = frontend topology visualization and experimental prefilter only.
+- CUDA/LibTorch = backend batch math only.
+- Karpathy centroid cache = feature-labeling and traversal hints, not source of truth.
+
+### Guardrails
+
+- WebGPU/WebGL shader search is visualization and experimental prefiltering, not the authoritative retrieval lane.
+- Qdrant plus Redis remain the production retrieval path.
+- ACE injects LegalCards, not raw court PDFs or giant graph buffers.
+
+### Validation Block
+
+```bash
+python scripts/fetch_court_datasets.py --source cal --limit 10
+python scripts/ingest_court_opinions.py --source cal --limit 10
+
+npm run legal:cards:build
+npm run legal:bifrost:warm
+npm run smoke:graphify
+npm run db:studio
+```
+
+### Finish-Line Rule
+
+The system is production-ready when a California opinion can be fetched, stored in SeaweedFS, parsed, chunked, embedded, tagged in Qdrant, linked in Postgres/GraphRAG, compressed into LegalCards, injected by ACE, and analyzed by Gemma4 with source refs.
 
 ---
 
@@ -102,7 +136,7 @@ User Query
 **Current state**: Archived notebook (`phase77-unsloth-finetuning.ipynb`), conversion scripts in `deeds_labs/`.
 
 **What needs to happen**:
-1. **Fine-tune gemma4-legal with legal corpus** via Unsloth 4-bit QLoRA
+1. **Fine-tune gemma4-rotorquant:latest with legal corpus** via Unsloth 4-bit QLoRA
 2. **Merge LoRA adapters** back into base model weights
 3. **Export to GGUF** for Ollama consumption
 4. **Validate** legal domain accuracy vs base model
@@ -125,7 +159,7 @@ legal_corpus (PostgreSQL + Qdrant chunks)
     │     └── llama.cpp convert-hf-to-gguf.py
     │
     └─► Create Ollama Modelfile + push
-          └── ollama create gemma4-legal-finetuned -f Modelfile
+          └── ollama create gemma4-rotorquant:latest-finetuned -f Modelfile
 ```
 
 **Dependencies**: Unsloth (pip), CUDA 13.0, 8GB+ VRAM, ~2-4 hours training
@@ -282,6 +316,29 @@ Also fixed defensive iteration (`evidenceIds ?? []`) in `graph-context.ts` and `
 
 ---
 
+### P7: JSONB Metadata Enhancements — Codebase Mapping + Faceted Labels
+
+**Current state**: `jsonb-legal-schema.ts` and the JSONB migration files already define legal documents, cases, evidence, and relationship metadata with generated columns plus GIN indexes.
+
+**What to implement**:
+1. Treat the JSONB schema files as the canonical metadata layer for codebase mapping.
+2. Extract stable labels from `documentType`, `practiceArea`, `caseNumber`, `evidenceType`, `admissibility`, `chainOfCustody`, and `aiMetadata`.
+3. Propagate those labels into compact cards, Redis hot keys, and Qdrant payload annotations.
+4. Keep Postgres JSONB as the source of truth; Redis, Qdrant, and ACE only hold derived traversal hints.
+
+**Files to anchor**:
+- `src/lib/server/db/jsonb-legal-schema.ts`
+- `src/lib/server/db/jsonb-migrations.sql`
+- `src/lib/server/db/migrations/012_gin_jsonb_indexes.sql`
+- `src/lib/server/db/schema-postgres.ts`
+
+**Validation**:
+- `npm run db:studio`
+- `npx drizzle-kit generate --name=jsonb-mapping-audit`
+- `rg "metadata->>|relationship_metadata|chainOfCustody|aiMetadata" src/lib/server/db/`
+
+---
+
 ## CHR97 NES Glyph Architecture
 
 **Current state**: Internal binary cache format for tensor results.
@@ -333,7 +390,7 @@ CHR97 Binary Format:
 
 **Recommended next**:
 1. **P1**: Run Gemma4_E4B_Legal_GRPO.ipynb on Colab A100 (3-5 hours, ~$10)
-2. **P1**: Deploy resulting GGUF to Ollama: `ollama create gemma4-legal:latest -f Modelfile`
+2. **P1**: Deploy resulting GGUF to Ollama: `ollama create gemma4-rotorquant:latest -f Modelfile`
 3. **P2**: Runtime-test VLM pipeline with live Ollama (evidence upload + /api/vision/analyze)
 4. **P6**: Pull Triton TRT-LLM Docker image for Gemma 4 (needs ~8GB C: drive); build INT4 engine
 5. Watch TurboQuant for Ollama (~Q3 2026) — free 6x KV cache memory savings

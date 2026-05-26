@@ -15,7 +15,7 @@ Fixed **4 critical evidence pipeline bugs** that prevented PDF uploads from bein
 
 **Total Impact**:
 - **PDFs now searchable**: Text extraction works for both digital + scanned PDFs
-- **Entity extraction 5× faster**: gemma3:270m (4.5s) vs gemma4-legal (25s)
+- **Entity extraction 5× faster**: gemma3:270m (4.5s) vs gemma4-rotorquant:latest (25s)
 - **API responses cleaner**: Removed redundant field duplication
 - **GPU analysis accessible**: Evidence properly linked to users
 
@@ -217,7 +217,7 @@ Entity extraction returned 0 entities from uploaded documents.
 
 **Secondary**: Slow LLM performance
 
-Entity extraction used `gemma4-legal:latest` (11.8B params, 25s avg latency) which:
+Entity extraction used `gemma4-rotorquant:latest` (11.8B params, 25s avg latency) which:
 - Caused timeouts on 90s limit for long documents
 - Blocked processing pipeline (evidence indexing delayed)
 
@@ -229,10 +229,10 @@ Entity extraction used `gemma4-legal:latest` (11.8B params, 25s avg latency) whi
 
 ```typescript
 // Before
-const MODEL = 'gemma4-legal:latest';
+const MODEL = 'gemma4-rotorquant:latest';
 
 // After
-// Use gemma3:270m (fast, 4.5s avg) instead of gemma4-legal (slow, 25s avg)
+// Use gemma3:270m (fast, 4.5s avg) instead of gemma4-rotorquant:latest (slow, 25s avg)
 // Entity extraction benefits from speed over complexity
 const MODEL = 'gemma3:270m';
 ```
@@ -241,7 +241,7 @@ const MODEL = 'gemma3:270m';
 
 **2-Tier Fallback System**:
 
-1. **Tier 1 (LLM)**: Ollama gemma4-legal (now gemma3:270m) with GBNF-constrained structured output
+1. **Tier 1 (LLM)**: Ollama gemma4-rotorquant:latest (now gemma3:270m) with GBNF-constrained structured output
    - Extracts: PERSON, ORG, LOCATION, DATE, LAW, CASE, COURT, STATUTE, MONEY, EMAIL, PHONE
    - Quality: Best (semantic understanding)
    - Latency: 4.5s (was 25s)
@@ -477,9 +477,9 @@ curl http://localhost:5173/api/evidence/<evidence-id>/gpu-analysis
 2. **Encrypted PDFs**: PDF→image conversion will fail
    - **Workaround**: Returns `pdf-conversion-failed` error gracefully
 
-3. **Entity Extraction**: gemma3:270m less accurate than gemma4-legal for complex entities
+3. **Entity Extraction**: gemma3:270m less accurate than gemma4-rotorquant:latest for complex entities
    - **Mitigation**: Regex fallback ensures basic entities (EMAIL, PHONE, DATE) always extracted
-   - **Alternative**: Set `MODEL = 'gemma4-legal:latest'` for quality over speed
+   - **Alternative**: Set `MODEL = 'gemma4-rotorquant:latest'` for quality over speed
 
 4. **GPU Analysis**: Only works for evidence with `case_id` assignment
    - **Expected**: GPU analysis requires case context for similarity computation

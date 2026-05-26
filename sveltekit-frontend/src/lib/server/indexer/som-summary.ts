@@ -125,7 +125,7 @@ Focus on structural patterns and data-flow, not individual files.`;
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model:       'gemma4-legal-vlm:latest',
+            model:       'gemma4-rotorquant:latest',
             messages:    [{ role: 'user', content: prompt }],
             temperature: 0.2,
             max_tokens:  180,
@@ -144,7 +144,7 @@ Focus on structural patterns and data-flow, not individual files.`;
         const r = await fetch(`${ollamaUrl}/api/generate`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ model: 'gemma4-legal-vlm:latest', prompt, stream: false, options: { temperature: 0.2, num_predict: 180 } }),
+          body:    JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, options: { temperature: 0.2, num_predict: 180 } }),
           signal:  AbortSignal.timeout(60_000),
         });
         if (r.ok) {

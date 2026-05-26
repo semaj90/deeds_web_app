@@ -135,7 +135,7 @@ async function callGemma4(userPrompt: string): Promise<{ text: string; pt: numbe
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model:       'gemma4-legal',
+      model:       'gemma4-rotorquant:latest',
       messages:    [{ role: 'system', content: SYSTEM }, { role: 'user', content: userPrompt }],
       max_tokens:  1024,
       temperature: 0.2,

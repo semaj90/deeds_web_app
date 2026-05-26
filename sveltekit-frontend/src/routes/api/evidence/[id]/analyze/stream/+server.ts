@@ -15,7 +15,7 @@
  * SSE event shape (mirrors /api/chat/stream for client reuse):
  *   data: {"type":"start","evidenceId":"...","timestamp":"..."}
  *   data: {"type":"token","content":"..."}    (repeated)
- *   data: {"type":"done","durationMs":1234,"model":"gemma4-legal:latest","auditId":"..."}
+ *   data: {"type":"done","durationMs":1234,"model":"gemma4-rotorquant:latest","auditId":"..."}
  *   data: {"type":"error","error":"..."}      (terminal on failure)
  *
  * Auth: requires locals.user (DEV_BYPASS_AUTH honored upstream).
@@ -31,7 +31,7 @@ import { eq } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 
-const MODEL = 'gemma4-legal:latest';
+const MODEL = 'gemma4-rotorquant:latest';
 const MAX_CONTEXT_CHARS = 8_000; // cap extractedText to keep the prompt bounded
 
 function buildAnalysisPrompt(item: {

@@ -101,7 +101,7 @@ if (content) {
 
 | Domain | Queries | Model | Estimated Time | Actual Behavior |
 |--------|---------|-------|----------------|-----------------|
-| evidence-analysis | 20 | gemma4-legal | ~8 min | Took 20-25 min ⚠️ |
+| evidence-analysis | 20 | gemma4-rotorquant:latest | ~8 min | Took 20-25 min ⚠️ |
 | evidence | 20 | gemma3:270m | ~2 min | Completed successfully |
 | contracts | 20 | gemma3:270m | ~2 min | In progress |
 
@@ -110,7 +110,7 @@ if (content) {
 | Model | Avg Latency | Queries/Min | Use Case |
 |-------|-------------|-------------|----------|
 | gemma3:270m | 561ms | 100+ | Cache warm-up ✅ |
-| gemma4-legal | 25-34s | 2-3 | Complex analysis only |
+| gemma4-rotorquant:latest | 25-34s | 2-3 | Complex analysis only |
 
 **Recommendation**: Always use `--model gemma3:270m` for warm-up to get 40-60× faster processing
 
@@ -168,7 +168,7 @@ curl -X POST http://localhost:5173/api/cache/warm-up \
 
 ### 1. Model Selection is Critical
 - **gemma3:270m**: 561ms avg → 100+ queries/min → ✅ FAST
-- **gemma4-legal**: 25-34s avg → 2-3 queries/min → ❌ TOO SLOW for warm-up
+- **gemma4-rotorquant:latest**: 25-34s avg → 2-3 queries/min → ❌ TOO SLOW for warm-up
 
 **Always specify `--model gemma3:270m` for warm-up!**
 
@@ -203,7 +203,7 @@ With batch size 3 and slow model, first keys appear after ~5-10 minutes, not ins
 ### Short Term
 1. **Change default model to gemma3:270m** in API endpoint (line 39)
    ```typescript
-   model: z.string().optional().default('gemma3:270m'), // Was: gemma4-legal:latest
+   model: z.string().optional().default('gemma3:270m'), // Was: gemma4-rotorquant:latest
    ```
 
 2. **Add progress tracking**

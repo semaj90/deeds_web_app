@@ -256,7 +256,7 @@ const schemaAccessMap = groupBy(
 
 ## Phase E: TurboQuant + MLA Math for Production Config (P2, reference)
 
-### Current VRAM budget (RTX 3060 Ti, gemma4-legal-vlm 5.3GB Q4_K_M)
+### Current VRAM budget (RTX 3060 Ti, gemma4-rotorquant:latest 5.3GB Q4_K_M)
 
 ```
 Model weights (Q4_K_M):   5.3 GB
@@ -278,7 +278,7 @@ TOTAL estimated:          ~6.1 GB  (1.9 GB headroom on 8 GB)
 
 **Recommended command** (asymmetric, Flash Attention required):
 ```bash
-llama-server.exe -m <gemma4-legal-vlm.gguf> --mmproj <mmproj-BF16.gguf> \
+llama-server.exe -m <gemma4-rotorquant:latest.gguf> --mmproj <mmproj-BF16.gguf> \
   -ctk turbo3 -ctv turbo4 -fa on -ngl 99 --port 8090 -c 4096
 ```
 

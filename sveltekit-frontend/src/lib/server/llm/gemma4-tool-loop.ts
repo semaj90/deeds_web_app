@@ -27,6 +27,16 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { logToolTrace, type ToolTraceStatus } from '$lib/server/observability/tool-trace.js';
 
+const RUNTIME_CONTEXT_SIZE = Number(
+  process.env.LLM_CONTEXT_SIZE ??
+    process.env.TURBO_CTX_SIZE ??
+    process.env.LLAMA_CTX_SIZE ??
+    process.env.TURBO_CTX ??
+    process.env.LLAMA_SERVER_CTX ??
+    process.env.OLLAMA_CONTEXT_LENGTH ??
+    65536
+);
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
 // ═══════════════════════════════════════════════════════════════════════════
@@ -97,7 +107,7 @@ export type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 
 /** Configuration for callGemma4WithTools */
 export interface Gemma4ToolLoopOpts {
-  /** Ollama model name (default: ENV.GEMMA4_MODEL / gemma4-legal-vlm:latest) */
+  /** Ollama model name (default: ENV.GEMMA4_MODEL / gemma4-rotorquant:latest) */
   model?: string;
   /** Temperature (default: 0.1 for tool precision) */
   temperature?: number;
@@ -229,15 +239,10 @@ export async function callGemma4WithTools(
       options: {
         temperature: opts.temperature ?? 0.1,
         num_predict: opts.maxTokens ?? 4096,
-        num_ctx: 32768,
-        repeat_penalty: 1.05,
+        num_ctx: RUNTIME_CONTEXT_SIZE,
       },
+      ...(opts.responseSchema ? { format: opts.responseSchema } : {}),
     };
-
-    // Structured output: attach JSON schema to `format`
-    if (opts.responseSchema) {
-      ollamaBody.format = opts.responseSchema;
-    }
 
     console.log(
       `[gemma4-tool-loop] Iteration ${i + 1}/${maxIter} — ` +
@@ -417,6 +422,8 @@ export async function callGemma4WithTools(
     options: {
       temperature: opts.temperature ?? 0.1,
       num_predict: opts.maxTokens ?? 4096,
+      num_ctx: RUNTIME_CONTEXT_SIZE,
+      repeat_penalty: 1.05,
     },
     ...(opts.responseSchema ? { format: opts.responseSchema } : {}),
   };

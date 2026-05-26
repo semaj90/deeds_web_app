@@ -4,7 +4,7 @@
  * GRPO-style multi-pass face reranker for POI identity matching.
  *
  * Pass 1 — embedding cosine similarity (768-dim face vectors from pgvector)
- * Pass 2 — VLM visual reasoning (gemma4-legal-vlm / gemma3 via Ollama):
+ * Pass 2 — VLM visual reasoning (gemma4-rotorquant:latest / gemma3 via Ollama):
  *           "Do these photos show the same person?"  → confidence 0–100
  * Pass 3 — GRPO reward: 0.35 * pass1 + 0.65 * pass2  (preference-weighted)
  *
@@ -64,7 +64,7 @@ async function vlmFaceScore(
   candName: string
 ): Promise<{ confidence: number; reasoning: string }> {
   const OLLAMA_BASE = ENV.OLLAMA_BASE_URL.replace(/\/$/, '');
-  const model = ENV.OLLAMA_VLM_MODEL ?? ENV.GEMMA4_MODEL ?? 'gemma4-legal-vlm:latest';
+  const model = ENV.OLLAMA_VLM_MODEL ?? ENV.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest';
 
   const prompt =
     `You are a forensic facial recognition assistant. ` +

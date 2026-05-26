@@ -19,11 +19,14 @@ import {
   getExactMatchCache,
   setExactMatchCache,
 } from '$lib/server/cache/redis-exact-match.js';
+import { TTL } from '$lib/server/cache-keys.js';
 
 export interface CachedStreamOptions {
   model?: string;
   temperature?: number;
   maxTokens?: number;
+  /** Redis TTL in seconds for the stored replayable completion */
+  ttlSeconds?: number;
   /** Chunk size for simulated streaming (chars per chunk) */
   chunkSize?: number;
   /** Delay between chunks in ms (simulates typing speed) */
@@ -45,11 +48,7 @@ export async function getCachedStreamResponse(
   messages: Array<{ role: string; content: string }>,
   options: CachedStreamOptions = {}
 ): Promise<string | null> {
-  const {
-    model = 'gemma4-legal:latest',
-    temperature = 0.7,
-    maxTokens = 2048,
-  } = options;
+  const { model = 'gemma4-rotorquant:latest', temperature = 0.7, maxTokens = 2048 } = options;
 
   const cacheKey = generateCacheKey({
     model,
@@ -77,9 +76,10 @@ export async function storeCachedStreamResponse(
   options: CachedStreamOptions = {}
 ): Promise<void> {
   const {
-    model = 'gemma4-legal:latest',
+    model = 'gemma4-rotorquant:latest',
     temperature = 0.7,
     maxTokens = 2048,
+    ttlSeconds = TTL.ACE_PROMPT,
   } = options;
 
   const cacheKey = generateCacheKey({
@@ -89,15 +89,19 @@ export async function storeCachedStreamResponse(
     maxTokens,
   });
 
-  await setExactMatchCache(cacheKey, {
-    content: response,
-    model,
-    backend: 'ollama',
-  }).catch(err => {
+  await setExactMatchCache(
+    cacheKey,
+    {
+      content: response,
+      model,
+      backend: 'ollama',
+    },
+    ttlSeconds
+  ).catch((err) => {
     console.error('[cached-stream] Failed to store response:', err);
   });
 
-  console.log(`[cached-stream] Stored ${response.length} chars in L1 Redis`);
+  console.log(`[cached-stream] Stored ${response.length} chars in L1 Redis (ttl=${ttlSeconds}s)`);
 }
 
 /**

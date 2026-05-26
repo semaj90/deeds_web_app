@@ -29,14 +29,14 @@ const DEFAULT_MODEL_DIRS = [
   'C:\\Users\\james\\Desktop\\models',
   'C:\\Users\\james\\Desktop\\llama-server-cuda\\models',
   'C:\\Users\\james\\Videos\\deeds-web-app\\models',
-  // Ollama blob cache — gemma4-legal merged GRPO LoRA
+  // Ollama blob cache — gemma4-rotorquant:latest merged GRPO LoRA
   path.join(
     process.env.USERPROFILE ?? 'C:\\Users\\james',
     '.ollama', 'blobs'
   ),
 ].filter(Boolean);
 
-// Known gemma4-legal blob hash (fallback for USERPROFILE/.ollama/blobs)
+// Known gemma4-rotorquant:latest blob hash (fallback for USERPROFILE/.ollama/blobs)
 const KNOWN_BLOB =
   process.env.GEMMA4_GGUF_PATH ??
   path.join(
@@ -105,6 +105,16 @@ function findGemmaGguf() {
   candidates.sort((a, b) => a.priority - b.priority);
   return candidates[0]?.file ?? null;
 }
+
+const RUNTIME_CONTEXT_SIZE = Number(
+  process.env.LLM_CONTEXT_SIZE ??
+    process.env.TURBO_CTX_SIZE ??
+    process.env.LLAMA_CTX_SIZE ??
+    process.env.TURBO_CTX ??
+    process.env.LLAMA_SERVER_CTX ??
+    process.env.OLLAMA_CONTEXT_LENGTH ??
+    65536
+);
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
@@ -183,17 +193,25 @@ export async function ensureInference({
   const child = spawn(
     llamaExe,
     [
-      '-m', modelPath,
-      '-ngl', '99',
-      '-c', '32768',
-      '--flash-attn', 'on',
-      '-ctk', kvCache,
-      '-ctv', kvCache,
-      '--host', '127.0.0.1',
-      '--port', '8090',
+      '-m',
+      modelPath,
+      '-ngl',
+      '99',
+      '-c',
+      String(RUNTIME_CONTEXT_SIZE),
+      '--flash-attn',
+      'on',
+      '-ctk',
+      kvCache,
+      '-ctv',
+      kvCache,
+      '--host',
+      '127.0.0.1',
+      '--port',
+      '8090',
       '--log-disable',
     ],
-    { detached: true, stdio: 'ignore', windowsHide: true },
+    { detached: true, stdio: 'ignore', windowsHide: true }
   );
   child.unref();
 

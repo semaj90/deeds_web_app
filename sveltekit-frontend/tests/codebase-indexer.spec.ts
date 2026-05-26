@@ -33,10 +33,10 @@ const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
   ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
   VLM_MODELS: {
-    vision: 'gemma4-legal-vlm:latest',
+    vision: 'gemma4-rotorquant:latest',
     embedding: 'embeddinggemma:latest',
-    legal: 'gemma4-legal-vlm:latest',
-    gemma4: 'gemma4-legal-vlm:latest',
+    legal: 'gemma4-rotorquant:latest',
+    gemma4: 'gemma4-rotorquant:latest',
   },
 }));
 

@@ -44,6 +44,10 @@ function loadServiceClient(protoPath: string, packagePath: string[], serviceName
     enums: String,
     defaults: true,
     oneofs: true,
+    includeDirs: [
+      resolve(process.cwd(), '../proto'),
+      resolve(process.cwd(), '../proto/active')
+    ],
   });
 
   const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as Record<string, any>;

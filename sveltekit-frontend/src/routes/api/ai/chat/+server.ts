@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     return json({
       response: result.text || '',
-      model: result.model || 'gemma4-legal:latest',
+      model: result.model || 'gemma4-rotorquant:latest',
       backend: result.backend,
       performance: { latencyMs: result.latencyMs },
     });

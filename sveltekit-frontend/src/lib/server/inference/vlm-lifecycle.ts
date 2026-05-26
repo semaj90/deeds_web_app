@@ -1,6 +1,6 @@
 /**
  * VLM Lifecycle Manager
- * 
+ *
  * Manages the transitions between Text-only and Vision modes to prevent VRAM OOM.
  * Uses Redis to synchronize state across multiple server processes and ensures
  * only one transition happens at a time via a distributed lock.
@@ -188,18 +188,33 @@ function stopTurboQuant(pid: number): boolean {
  */
 function restartTurboQuant(modelPath: string, mmprojPath?: string): void {
   try {
-    const ctx  = process.env.TURBO_CTX   ?? '16384';
-    const ngl  = process.env.TURBO_NGL   ?? '99';
-    const kvK  = process.env.TURBO_KV_K  ?? 'q8_0';
-    const kvV  = process.env.TURBO_KV_V  ?? 'q8_0';
+    const ctx = String(
+      process.env.LLM_CONTEXT_SIZE ??
+        process.env.TURBO_CTX_SIZE ??
+        process.env.LLAMA_CTX_SIZE ??
+        process.env.TURBO_CTX ??
+        process.env.LLAMA_SERVER_CTX ??
+        process.env.OLLAMA_CONTEXT_LENGTH ??
+        '65536'
+    );
+    const ngl = process.env.TURBO_NGL ?? '99';
+    const kvK = process.env.TURBO_KV_K ?? 'q8_0';
+    const kvV = process.env.TURBO_KV_V ?? 'q8_0';
     const args = [
-      '-m', modelPath,
-      '--port', '8090',
-      '-ngl', ngl,
-      '--flash-attn', 'on',
-      '-ctk', kvK,
-      '-ctv', kvV,
-      '-c', ctx,
+      '-m',
+      modelPath,
+      '--port',
+      '8090',
+      '-ngl',
+      ngl,
+      '--flash-attn',
+      'on',
+      '-ctk',
+      kvK,
+      '-ctv',
+      kvV,
+      '-c',
+      ctx,
     ];
     if (mmprojPath) {
       args.push('--mmproj', mmprojPath);
@@ -241,7 +256,7 @@ async function waitForTurboQuant(port: number, maxSeconds: number): Promise<bool
   const url = `${protocol}//${hostname}:${port}/health`;
   const startTime = Date.now();
   const timeoutMs = maxSeconds * 1000;
-  
+
   while (Date.now() - startTime < timeoutMs) {
     try {
       const res = await fetch(url, { signal: AbortSignal.timeout(1000) });
@@ -254,6 +269,6 @@ async function waitForTurboQuant(port: number, maxSeconds: number): Promise<bool
     }
     await new Promise(r => setTimeout(r, 500));
   }
-  
+
   throw new Error(`[vlm-lifecycle] Timeout waiting for TurboQuant on port ${port} to start`);
 }

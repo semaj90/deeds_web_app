@@ -10,7 +10,7 @@
  */
 
 const BIFROST_URL = 'http://127.0.0.1:3040';
-const TEST_MODEL = 'ollama-local/gemma4-legal:latest';
+const TEST_MODEL = 'ollama-local/gemma4-rotorquant:latest';
 
 const queries = {
 	cold: 'List the four elements of negligence under tort law.',

@@ -72,6 +72,23 @@ export function topKClusters(
 		}
 	}
 
+	if (n > 0) {
+		// Apply softmax probability fix over the cosine similarities:
+		// dist^2 = 2 * (1 - similarity)
+		// logit = -dist^2 / tau
+		// tau = 0.5
+		const tau = 0.5;
+		const logits = results.map(r => -2 * (1 - r.score) / tau);
+		const maxLogit = Math.max(...logits);
+		const exps = logits.map(logit => Math.exp(logit - maxLogit));
+		const sumExps = exps.reduce((a, b) => a + b, 0);
+		const probs = exps.map(exp => exp / (sumExps || 1e-10));
+
+		for (let i = 0; i < n; i++) {
+			results[i].score = probs[i];
+		}
+	}
+
 	results.sort((a, b) => b.score - a.score);
 	return results.slice(0, topK);
 }

@@ -146,6 +146,9 @@ export function parsedRuneToGlyphRecord(
     section?:    GlyphSection;
     kind?:       GlyphKind;
     caseId?:     string;
+    cartridge_kind?: string | null;
+    glyph_kind?: string | null;
+    cluster_key?: string | null;
   } = {}
 ): GlyphRecord {
   const sourceId = opts.sourceId ?? String(rune.id);
@@ -194,6 +197,9 @@ export function parsedRuneToGlyphRecord(
     caseId:        opts.caseId ?? null,
     kind:          opts.kind ?? 'chunk',
     schemaVersion: 1,
+    cartridge_kind: opts.cartridge_kind ?? null,
+    glyph_kind: opts.glyph_kind ?? null,
+    cluster_key: opts.cluster_key ?? null,
     semantic,
     vector,
     topology,
@@ -251,6 +257,9 @@ export function glyphRecordToDbRow(g: GlyphRecord): GlyphRecordDbRow {
       sourceId:  g.sourceId,
       caseId:    g.caseId,
       kind:      g.kind,
+      cartridge_kind: g.cartridge_kind ?? null,
+      glyph_kind: g.glyph_kind ?? null,
+      cluster_key: g.cluster_key ?? null,
       semantic: {
         ...g.semantic,
       },
@@ -338,6 +347,9 @@ export function dbRowToGlyphRecord(row: GlyphRecordDbRow): GlyphRecord {
     caseId:        row.caseId,
     kind:          row.kind as GlyphKind,
     schemaVersion: row.schemaVersion,
+    cartridge_kind: (rec['cartridge_kind'] as string | null) ?? null,
+    glyph_kind: (rec['glyph_kind'] as string | null) ?? null,
+    cluster_key: (rec['cluster_key'] as string | null) ?? null,
 
     semantic: {
       summary:       row.summary,

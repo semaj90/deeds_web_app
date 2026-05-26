@@ -25,7 +25,7 @@
 ## ✅ Task 2: Evidence AI Analysis Optimization (COMPLETE)
 
 ### Performance Results
-- **Model Switch**: gemma4-legal (30s timeout) → gemma3:270m (4.1s)
+- **Model Switch**: gemma4-rotorquant:latest (30s timeout) → gemma3:270m (4.1s)
 - **Cold Request**: 30,000ms timeout → 4,125ms (**7.3× faster**)
 - **Cached Request**: 261ms (**15× speedup**)
 - **Success Rate**: 0% → 100%
@@ -33,7 +33,7 @@
 ### Implementation
 - File: `src/routes/api/evidence/ai/analyze/+server.ts` (149 lines)
 - Added: L1 Redis cache integration
-- Added: `useComplexModel: boolean` flag for gemma4-legal
+- Added: `useComplexModel: boolean` flag for gemma4-rotorquant:latest
 - Response: Added `cached` and `inferenceTime` fields
 
 **Status**: ✅ **PRODUCTION READY**
@@ -183,14 +183,14 @@ Average Latency: 5ms (L1), 2-5s (L2)
 
 ### Option B: Batch Processing Endpoint (1-2 hours)
 1. Create `/api/codebase/batch-analyze` endpoint
-2. Use RabbitMQ queue for gemma4-legal long-running tasks
+2. Use RabbitMQ queue for gemma4-rotorquant:latest long-running tasks
 3. Add job status polling endpoint
 4. Test with large codebase summarization
 
 ### Option C: Cache Monitoring Dashboard (2-3 hours)
 1. Integrate evidence AI metrics into `/cache-monitor`
 2. Add real-time latency charts
-3. Add model usage breakdown (gemma3:270m vs gemma4-legal)
+3. Add model usage breakdown (gemma3:270m vs gemma4-rotorquant:latest)
 4. Add cache invalidation controls
 
 ---
@@ -214,7 +214,7 @@ Average Latency: 5ms (L1), 2-5s (L2)
 ```
 ✅ SvelteKit Dev Server: Running on port 5173
 ✅ Redis: Connected, 99.15% hit rate
-✅ Ollama: GPU active (gemma3:270m + gemma4-legal)
+✅ Ollama: GPU active (gemma3:270m + gemma4-rotorquant:latest)
 ✅ PostgreSQL: Connected, 17 evidence records
 ⚠️  Evidence Pipeline: Text extraction issues
 ⚠️  Qdrant: 0 search results (indexing needed)

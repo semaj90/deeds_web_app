@@ -40,9 +40,10 @@
  *   node scripts/build-atlas-index.mjs --no-redis   # skip Redis cache
  */
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rename, unlink, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
 import pg from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -64,6 +65,55 @@ const pool      = new pg.Pool({
   idleTimeoutMillis: 10000,
 });
 pool.on('error', () => {}); // suppress pool errors — main query will catch
+
+const RETRYABLE_FS_CODES = new Set(['EBUSY', 'EPERM', 'EACCES', 'UNKNOWN']);
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function writeTempFileWithRetry(filePath, content, encoding = 'utf8', retries = 8) {
+  const tempCandidates = [
+    `${filePath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    resolve(tmpdir(), `deeds-atlas-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}.tmp`),
+  ];
+
+  let lastError;
+  for (const tempPath of tempCandidates) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        await writeFile(tempPath, content, encoding);
+        return tempPath;
+      } catch (err) {
+        lastError = err;
+        const shouldRetry = RETRYABLE_FS_CODES.has(err?.code) && attempt < retries;
+        if (!shouldRetry) break;
+        await sleep(40 * (attempt + 1));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+async function atomicWriteFile(filePath, content, encoding = 'utf8', retries = 8) {
+  const tempPath = await writeTempFileWithRetry(filePath, content, encoding, retries);
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      await unlink(filePath).catch((err) => {
+        if (err?.code !== 'ENOENT') throw err;
+      });
+      await rename(tempPath, filePath);
+      return;
+    } catch (err) {
+      const shouldRetry = RETRYABLE_FS_CODES.has(err?.code) && attempt < retries;
+      if (!shouldRetry) {
+        await unlink(tempPath).catch(() => {});
+        throw err;
+      }
+      await sleep(40 * (attempt + 1));
+    }
+  }
+}
 
 console.log(`\n[atlas-index] ${DRY_RUN ? 'DRY-RUN' : 'BUILD'}  hits-window=${HOURS}h`);
 
@@ -262,8 +312,8 @@ await mkdir(outDir, { recursive: true });
 const fullJson = JSON.stringify(atlas, null, 2);
 const minJson  = JSON.stringify(atlas);
 
-await writeFile(fullPath, fullJson, 'utf8');
-await writeFile(minPath,  minJson,  'utf8');
+await atomicWriteFile(fullPath, fullJson);
+await atomicWriteFile(minPath, minJson);
 const fullKB = (fullJson.length / 1024).toFixed(1);
 const minKB  = (minJson.length  / 1024).toFixed(1);
 const ratio  = ((minJson.length / fullJson.length) * 100).toFixed(0);
@@ -494,10 +544,10 @@ for (const d of dirCards.slice(0, 25)) {
 }
 
 if (!DRY_RUN) {
-  await writeFile(resolve(memoryAtlasDir, 'codebase-atlas.dirs.json'), dirsJson, 'utf8');
-  await writeFile(resolve(memoryAtlasDir, 'codebase-atlas.top.json'),  topJson,  'utf8');
-  await writeFile(resolve(memoryAtlasDir, 'codebase-atlas.latest.md'), mdLines.join('\n'), 'utf8');
-  await writeFile(resolve(memoryAtlasDir, 'codebase-atlas.min.json'),  minJson,  'utf8');
+  await atomicWriteFile(resolve(memoryAtlasDir, 'codebase-atlas.dirs.json'), dirsJson);
+  await atomicWriteFile(resolve(memoryAtlasDir, 'codebase-atlas.top.json'), topJson);
+  await atomicWriteFile(resolve(memoryAtlasDir, 'codebase-atlas.latest.md'), mdLines.join('\n'));
+  await atomicWriteFile(resolve(memoryAtlasDir, 'codebase-atlas.min.json'), minJson);
 
   console.log(`\n  ✓ wrote memory/atlas/codebase-atlas.dirs.json   (${(dirsJson.length / 1024).toFixed(1)} KB)`);
   console.log(`  ✓ wrote memory/atlas/codebase-atlas.top.json    (${(topJson.length / 1024).toFixed(1)} KB)`);

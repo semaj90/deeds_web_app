@@ -156,7 +156,7 @@ async function synthesizeField(
 
     const response = await bifrostChat(
       [{ role: 'user', content: userMsg }],
-      'gemma4-legal-vlm:latest',
+      'gemma4-rotorquant:latest',
       { temperature: 0.2, maxTokens }
     );
     return (typeof response === 'string' ? response : String(response ?? '')).trim();

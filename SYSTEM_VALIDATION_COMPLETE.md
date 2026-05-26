@@ -44,11 +44,11 @@
 |------|--------|---------|
 | G6: Ollama Service | ✅ PASS | Port 11434, 6 models loaded |
 | G7: GPU Available | ✅ PASS | RTX 3060 Ti, 879MB free VRAM |
-| G8: Model Files | ✅ PASS | gemma4-legal + embeddinggemma confirmed |
+| G8: Model Files | ✅ PASS | gemma4-rotorquant:latest + embeddinggemma confirmed |
 | G9: Inference Latency | ✅ PASS | < 100ms for embeddings |
 
 **Loaded Models**:
-- `gemma4-legal:latest` (11.8B Q4_K_M, 7.3GB)
+- `gemma4-rotorquant:latest` (11.8B Q4_K_M, 7.3GB)
 - `embeddinggemma:latest` (307M BF16, 622MB, 768-dim)
 - 4 additional models available
 

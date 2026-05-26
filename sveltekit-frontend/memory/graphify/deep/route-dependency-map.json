@@ -2047,8 +2047,8 @@
   },
   "sveltekit-frontend/src/routes/api/ace/summarize/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/acp/execute/+server.ts": {
@@ -2353,8 +2353,8 @@
   },
   "sveltekit-frontend/src/routes/api/agents/chat/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/ai/agent/+server.ts": {
@@ -3157,8 +3157,8 @@
   },
   "sveltekit-frontend/src/routes/api/cases/[id]/similar/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/cases/[id]/timeline/+server.ts": {
@@ -3239,6 +3239,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/citations/annotations/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/citations/collections/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -3288,6 +3294,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/citations/[citationId]/tags/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/clusters/cards/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -3391,8 +3403,8 @@
   },
   "sveltekit-frontend/src/routes/api/code-intel/search/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/code-intel/smoke/health/+server.ts": {
@@ -4475,6 +4487,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/graphify/stream/+server.ts": {
+    "zone": "shared",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/health/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -4629,6 +4647,12 @@
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ingestion/stream/+server.ts": {
+    "zone": "shared",
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/internal/error-brain/runs/+server.ts": {
@@ -5285,6 +5309,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/rabbitmq/health/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/rabbitmq/publish/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -5323,8 +5353,8 @@
   },
   "sveltekit-frontend/src/routes/api/rag/search/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/rag/search-fused/+server.ts": {
@@ -5395,8 +5425,8 @@
   },
   "sveltekit-frontend/src/routes/api/reconstruction/scene-intent/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/reports/+server.ts": {
@@ -5489,7 +5519,19 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/research/ldr-status/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/research/search/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/research/topological-encyclopedia/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -5641,8 +5683,8 @@
   },
   "sveltekit-frontend/src/routes/api/sse/chat/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/sse/[id]/+server.ts": {
@@ -5719,8 +5761,8 @@
   },
   "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/synthesis/prompt-feedback/+server.ts": {
@@ -5965,8 +6007,8 @@
   },
   "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/chat/messages/+server.ts": {
@@ -6013,14 +6055,14 @@
   },
   "sveltekit-frontend/src/routes/api/v1/models/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/query/+server.ts": {
     "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/redis/cache/+server.ts": {

@@ -11,10 +11,10 @@
 ## Final Results
 | Run | Mode | Requested Model | avg TTFT (ms) | avg total (ms) | avg tok/s | status |
 |---|---|---|---|---|---|---|
-| baseline-text | text | `gemma4-legal.gguf` | 203 | 6202 | 68.8 | ok |
-| candidate-text | text | `gemma4-legal-iq4xs.gguf` | 131 | 6302 | 69.2 | ok |
-| baseline-vlm | vlm | `gemma4-legal.gguf` | 117 | 6102 | 71.9 | ok |
-| candidate-vlm | vlm | `gemma4-legal-iq4xs.gguf` | 113 | 5593 | 72.4 | ok |
+| baseline-text | text | `gemma4-rotorquant:latest.gguf` | 203 | 6202 | 68.8 | ok |
+| candidate-text | text | `gemma4-rotorquant:latest-iq4xs.gguf` | 131 | 6302 | 69.2 | ok |
+| baseline-vlm | vlm | `gemma4-rotorquant:latest.gguf` | 117 | 6102 | 71.9 | ok |
+| candidate-vlm | vlm | `gemma4-rotorquant:latest-iq4xs.gguf` | 113 | 5593 | 72.4 | ok |
 
 ## What this proves
 - `--auto-compare` is now fully automated.
@@ -30,7 +30,7 @@
 ## Notes
 - This run does not yet include drafter/MTP/turbo KV.
 - The next phase is model selection validation, then performance optimization.
-- Verify the server model load path if you need additional confidence that `gemma4-legal-iq4xs.gguf` is being used by the backend.
+- Verify the server model load path if you need additional confidence that `gemma4-rotorquant:latest-iq4xs.gguf` is being used by the backend.
 
 ## Raw output files
 - `sveltekit-frontend/logs/turboquant/bench-run-1779155255466-2026-05-19T01-48-06-577Z.json`
@@ -39,7 +39,7 @@
 - `sveltekit-frontend/logs/turboquant/bench-run-1779155255466-2026-05-19T01-49-36-599Z.json`
 
 ## Next steps
-1. Confirm `gemma4-legal-iq4xs.gguf` is loaded and address any model selection aliasing.
+1. Confirm `gemma4-rotorquant:latest-iq4xs.gguf` is loaded and address any model selection aliasing.
 2. Re-run `npm run turbo:bench:auto -- --port 8080 --n 5` with confirmed candidate model availability.
 3. If validated, test `--model-draft` and `--mtp-head` next.
 4. Then enable turbo KV for the next speed jump.

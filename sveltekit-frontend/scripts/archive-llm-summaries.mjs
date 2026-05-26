@@ -52,10 +52,66 @@ const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const TTL_SEC   = 30 * 24 * 3600;  // 30 days — matches hypergraph archive
 
 const SOURCES = [
-  { id: 'codebase-todo',   path: resolve(ROOT, 'next_steps/active/codebase-todo-recommendations.md') },
-  { id: 'karpathy-gpu',    path: resolve(ROOT, 'next_steps/active/karpathy-gpu-recommendations.md') },
-  { id: 'agent-timeline',  path: resolve(REPO, 'sveltekit-frontend/docs/agent_timeline_synthesis.md') },
-  { id: 'atlas-latest',    path: resolve(ROOT, 'memory/atlas/codebase-atlas.latest.md') },
+  {
+    id: 'codebase-todo',
+    path: resolve(ROOT, 'next_steps/active/codebase-todo-recommendations.md'),
+  },
+  { id: 'karpathy-gpu', path: resolve(ROOT, 'next_steps/active/karpathy-gpu-recommendations.md') },
+  {
+    id: 'agent-timeline',
+    path: resolve(REPO, 'sveltekit-frontend/docs/agent_timeline_synthesis.md'),
+  },
+  { id: 'atlas-latest', path: resolve(ROOT, 'memory/atlas/codebase-atlas.latest.md') },
+  {
+    id: 'gpu-analysis',
+    path: resolve(REPO, 'sveltekit-frontend/docs/graph/batch-gpu-analysis-report.json'),
+  },
+  { id: 'codebase-map', path: resolve(REPO, 'sveltekit-frontend/docs/graph/codebase-map.md') },
+  {
+    id: 'page-rank-top100',
+    path: resolve(REPO, 'sveltekit-frontend/docs/graph/codebase-pagerank-top100.json'),
+  },
+  {
+    id: 'page-rank-top100-md',
+    path: resolve(REPO, 'sveltekit-frontend/docs/graph/codebase-pagerank-top100.md'),
+  },
+  { id: 'summary-cards-jsonl', path: resolve(ROOT, 'memory/cards/codebase-summary-cards.jsonl') },
+  {
+    id: 'summary-cards-top100',
+    path: resolve(ROOT, 'memory/cards/top-100-codebase-summary-cards.json'),
+  },
+  {
+    id: 'summary-cards-top100-toon',
+    path: resolve(ROOT, 'memory/cards/top-100-codebase-summary-cards.toon'),
+  },
+  {
+    id: 'summary-cards-top100-md',
+    path: resolve(ROOT, 'docs/reports/top-100-codebase-summary-cards.md'),
+  },
+  {
+    id: 'summary-cards-lane-report',
+    path: resolve(ROOT, 'docs/reports/summary-card-lane-report.json'),
+  },
+  {
+    id: 'summary-cards-neo4j-report',
+    path: resolve(ROOT, 'docs/reports/neo4j-summary-card-report.json'),
+  },
+  {
+    id: 'summary-cards-couchdb-report',
+    path: resolve(ROOT, 'docs/reports/couchdb-summary-card-snapshot.json'),
+  },
+  {
+    id: 'summary-cards-duckdb-report',
+    path: resolve(ROOT, 'docs/reports/duckdb-summary-card-report.json'),
+  },
+  {
+    id: 'summary-cards-error-list',
+    path: resolve(ROOT, 'docs/reports/summary-card-error-list.json'),
+  },
+  {
+    id: 'summary-cards-error-queue',
+    path: resolve(ROOT, 'memory/cards/summary-card-error-research.jsonl'),
+  },
 ];
 
 async function fileEntry(id, path) {
@@ -240,3 +296,4 @@ main().catch(err => {
   console.error('✗ archive-llm-summaries failed:', err.message);
   process.exit(1);
 });
+

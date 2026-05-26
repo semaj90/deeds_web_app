@@ -2,7 +2,7 @@
  * AI Token Usage Tracker — fire-and-forget persistence of LLM token counts.
  *
  * Usage:
- *   trackTokenUsage({ endpoint: '/api/chat', model: 'gemma4-legal:latest',
+ *   trackTokenUsage({ endpoint: '/api/chat', model: 'gemma4-rotorquant:latest',
  *     promptTokens: 150, completionTokens: 287, durationMs: 1200 });
  *
  * All writes are non-blocking and non-fatal (errors logged, never thrown).

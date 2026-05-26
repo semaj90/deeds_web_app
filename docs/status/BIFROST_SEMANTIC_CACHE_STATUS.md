@@ -19,7 +19,7 @@
 - **Cache has 0 points** — no responses being stored in Qdrant
 - **No cache hits observed** — all queries go through to Ollama (no <200ms hits)
 - **No embedding logs** — semantic cache plugin not logging embed/store operations
-- **VRAM constraint** — gemma4-legal:latest (7.3GB) fails to load with only 1.1GB free VRAM
+- **VRAM constraint** — gemma4-rotorquant:latest (7.3GB) fails to load with only 1.1GB free VRAM
 
 ---
 
@@ -73,7 +73,7 @@
 
 ## Test Results
 
-### Test 1: gemma4-legal:latest (FAILED — VRAM)
+### Test 1: gemma4-rotorquant:latest (FAILED — VRAM)
 ```
 VRAM: 6879 MB used, 1146 MB free (need ~7.3 GB total)
 Error: "model failed to load, this may be due to resource limitations"

@@ -8,6 +8,9 @@ const mocks = vi.hoisted(() => ({
   assembleACEContext: vi.fn(),
   buildACEPromptCached: vi.fn(),
   bifrostChat: vi.fn(),
+  generateCacheKey: vi.fn(),
+  getExactMatchCache: vi.fn(),
+  setExactMatchCache: vi.fn(),
   turboQuantChat: vi.fn(),
   runGemma4Agent: vi.fn(),
   recordRagAnswer: vi.fn(),
@@ -15,6 +18,11 @@ const mocks = vi.hoisted(() => ({
   isCodingPrompt: vi.fn(),
   classifyQuerySection: vi.fn(),
   callTraceMcp: vi.fn(),
+  runTurbovecPreIngestion: vi.fn(),
+}));
+
+vi.mock('$lib/server/ai/turbovec-ingest-sidecar.js', () => ({
+  runTurbovecPreIngestion: mocks.runTurbovecPreIngestion,
 }));
 
 vi.mock('$lib/server/ace/context-assembler.js', () => ({
@@ -22,10 +30,25 @@ vi.mock('$lib/server/ace/context-assembler.js', () => ({
   buildACEPromptCached:  mocks.buildACEPromptCached,
 }));
 
+vi.mock('$lib/server/cache/redis-exact-match.js', () => ({
+  generateCacheKey: mocks.generateCacheKey,
+  getExactMatchCache: mocks.getExactMatchCache,
+  setExactMatchCache: mocks.setExactMatchCache,
+}));
+
+vi.mock('$lib/server/ai/inference-configs.js', () => ({
+  resolveRuntimeConfig: () => ({
+    profile: 'atomicbot-turboquant',
+    runtimeAvailable: true,
+    turboQuant: true,
+    rotorQuantKv: false,
+  }),
+}));
+
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat:    mocks.bifrostChat,
   turboQuantChat: mocks.turboQuantChat,
-  VLM_MODELS:     { legal: 'gemma4-legal-vlm:latest', tool: 'gemma4-legal-vlm:latest' },
+  VLM_MODELS:     { legal: 'gemma4-rotorquant:latest', tool: 'gemma4-rotorquant:latest' },
 }));
 
 vi.mock('$lib/server/ai/gemma4-agent.js', () => ({
@@ -54,17 +77,25 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.assembleACEContext.mockReset();
     mocks.buildACEPromptCached.mockReset();
     mocks.bifrostChat.mockReset();
+    mocks.generateCacheKey.mockReset();
+    mocks.getExactMatchCache.mockReset();
+    mocks.setExactMatchCache.mockReset();
     mocks.turboQuantChat.mockReset();
     mocks.runGemma4Agent.mockReset();
+    mocks.runTurbovecPreIngestion.mockReset();
     mocks.recordRagAnswer.mockResolvedValue(undefined);
     mocks.buildDevContextPlan.mockResolvedValue(undefined);
     // Default: non-coding prompts; tests that want coding override this
     mocks.isCodingPrompt.mockReturnValue(false);
-    // Default: TurboQuant throws so bifrostChat is used (existing test expectations)
+    mocks.generateCacheKey.mockReturnValue('ace:llm:exact:mock');
+    mocks.getExactMatchCache.mockResolvedValue(null);
+    mocks.setExactMatchCache.mockResolvedValue(undefined);
     mocks.turboQuantChat.mockRejectedValue(new Error('TurboQuant unavailable'));
     mocks.callTraceMcp.mockResolvedValue({ ok: false, ms: 0, data: null, error: 'stub' });
     // Default: HMM returns a real classification so the data path is exercised
     mocks.classifyQuerySection.mockReturnValue({ section: 'FACTS', confidence: 0.82 });
+    mocks.bifrostChat.mockResolvedValue('Default response');
+    mocks.runTurbovecPreIngestion.mockResolvedValue('=== TURBOVEC PRE-INGEST SCAN ===\nNo direct task references found for terms.\n================================\n');
   });
 
   it('extracts last user message as query, earlier messages as history', async () => {
@@ -100,7 +131,16 @@ describe('openai-facade — runChatCompletion', () => {
     expect(res.choices).toHaveLength(1);
     expect(res.choices[0].message.content).toBe('Test response');
     expect(res.choices[0].finish_reason).toBe('stop');
-    expect(res.model).toBe('gemma4-legal-vlm:latest'); // mapped from yorha-legal
+    expect(res.model).toBe('gemma4-rotorquant:latest'); // mapped from yorha-legal
+    expect(mocks.setExactMatchCache).toHaveBeenCalledWith(
+      expect.stringMatching(/^ace:completion:/),
+      expect.objectContaining({
+        content: 'Test response',
+        model: 'gemma4-rotorquant:latest',
+        backend: 'openai-facade',
+      }),
+      86400
+    );
 
     // ACE called with the LAST user message as query
     expect(mocks.assembleACEContext).toHaveBeenCalledWith(
@@ -112,6 +152,84 @@ describe('openai-facade — runChatCompletion', () => {
     expect(messages[0].role).toBe('system');
     expect(messages[0].content).toContain('Be concise.'); // system preamble preserved
     expect(messages[messages.length - 1]).toEqual({ role: 'user', content: 'what is hearsay?' });
+  });
+
+  it('returns a 24-hour prompt-cache hit before generation', async () => {
+    mocks.assembleACEContext.mockResolvedValue({
+      ragChunks: [{}],
+      kbChunks: [],
+      caseChunks: [],
+      chatHistory: [],
+      agentsMd: null,
+      codeLlmHit: null,
+    });
+    mocks.buildACEPromptCached.mockResolvedValue({
+      systemPrompt: 'You are YorHA.',
+      contextWindow: '...chunks...',
+    });
+    mocks.getExactMatchCache.mockResolvedValueOnce({
+      content: 'Cached prompt answer',
+      model: 'gemma4-rotorquant:latest',
+      backend: 'openai-facade',
+      cachedAt: new Date().toISOString(),
+    });
+
+    const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+    const res = await runChatCompletion({
+      model: 'yorha-legal',
+      messages: [{ role: 'user', content: 'what is hearsay?' }],
+      temperature: 0.3,
+      raw: false,
+      stream: false,
+    });
+
+    expect(res.choices[0].message.content).toBe('Cached prompt answer');
+    expect(res.yorha?.cacheHit).toBe('prompt-cache');
+    expect(mocks.bifrostChat).not.toHaveBeenCalled();
+    expect(mocks.turboQuantChat).not.toHaveBeenCalled();
+    expect(mocks.setExactMatchCache).not.toHaveBeenCalled();
+  });
+
+  it('includes dynamic history and KV context in the prompt-cache key', async () => {
+    mocks.assembleACEContext.mockResolvedValue({
+      ragChunks: [],
+      kbChunks: [],
+      caseChunks: [],
+      chatHistory: [],
+      agentsMd: null,
+      codeLlmHit: null,
+    });
+    mocks.buildACEPromptCached.mockResolvedValue({
+      systemPrompt: 'You are YorHA.',
+      contextWindow: '...chunks...',
+    });
+    mocks.bifrostChat.mockResolvedValue('Answer A');
+
+    const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+    await runChatCompletion({
+      model: 'yorha-legal',
+      messages: [{ role: 'user', content: 'what is hearsay?' }],
+      temperature: 0.3,
+      raw: false,
+      stream: false,
+    });
+
+    const firstKey = mocks.getExactMatchCache.mock.calls[0]?.[0] as string;
+
+    await runChatCompletion({
+      model: 'yorha-legal',
+      messages: [
+        { role: 'user', content: 'what is hearsay?' },
+        { role: 'assistant', content: 'Sure.' },
+        { role: 'user', content: 'what is hearsay?' },
+      ],
+      temperature: 0.3,
+      raw: false,
+      stream: false,
+    });
+
+    const secondKey = mocks.getExactMatchCache.mock.calls[1]?.[0] as string;
+    expect(firstKey).not.toBe(secondKey);
   });
 
   it('routes raw:true requests directly to bifrostChat (skips ACE)', async () => {
@@ -193,6 +311,120 @@ describe('openai-facade — runChatCompletion', () => {
     expect(res.yorha?.mcpCompactSearchMs).toBe(12);
   });
 
+  it('bakes normalized routing labels into the prompt-cache key', async () => {
+    mocks.assembleACEContext.mockResolvedValueOnce({
+      ragChunks: [],
+      kbChunks: [],
+      caseChunks: [],
+      chatHistory: [],
+      agentsMd: null,
+      codeLlmHit: null,
+      clusterContext: [
+        {
+          clusterId: 12,
+          clusterKey: 'cluster:gpu:12',
+          centroidLabel: 'gpu:12',
+          topoClass: 'api-route',
+          topoLabel: 'api-route',
+          hotnessBucket: 'hot',
+          featureFamily: 'api-route',
+          topTags: ['api', 'routes'],
+          chunkCount: 3,
+          topFiles: ['src/routes/api/foo.ts'],
+          synthesisSuggestion: 'API hot cluster',
+          summaryLens: 'api-route · hot',
+        },
+      ],
+      codebaseContext: [
+        {
+          filePath: 'src/routes/api/foo.ts',
+          content: 'export const GET = () => new Response();',
+          score: 0.91,
+          tags: ['api'],
+          gpuCluster: 12,
+          clusterKey: 'cluster:gpu:12',
+          centroidLabel: 'gpu:12',
+          topologyLabel: 'api-route',
+          hotnessBucket: 'hot',
+          featureFamily: 'api-route',
+          topoClass: 'api-route',
+        },
+      ],
+    });
+    mocks.buildACEPromptCached.mockResolvedValue({
+      systemPrompt: 'You are YorHA.',
+      contextWindow: '...chunks...',
+    });
+    mocks.bifrostChat.mockResolvedValue('First response');
+
+    const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+    await runChatCompletion({
+      model: 'yorha-legal',
+      messages: [{ role: 'user', content: 'what is hearsay?' }],
+      temperature: 0.3,
+      raw: false,
+      stream: false,
+    });
+
+    const firstKey = mocks.getExactMatchCache.mock.calls.at(-1)?.[0] as string;
+
+    mocks.assembleACEContext.mockResolvedValueOnce({
+      ragChunks: [],
+      kbChunks: [],
+      caseChunks: [],
+      chatHistory: [],
+      agentsMd: null,
+      codeLlmHit: null,
+      clusterContext: [
+        {
+          clusterId: 99,
+          clusterKey: 'cluster:gpu:99',
+          centroidLabel: 'gpu:99',
+          topoClass: 'evidence',
+          topoLabel: 'evidence',
+          hotnessBucket: 'cool',
+          featureFamily: 'evidence',
+          topTags: ['evidence'],
+          chunkCount: 1,
+          topFiles: ['src/routes/api/evidence.ts'],
+          synthesisSuggestion: 'Evidence cluster',
+          summaryLens: 'evidence · cool',
+        },
+      ],
+      codebaseContext: [
+        {
+          filePath: 'src/routes/api/evidence.ts',
+          content: 'export const GET = () => new Response();',
+          score: 0.67,
+          tags: ['evidence'],
+          gpuCluster: 99,
+          clusterKey: 'cluster:gpu:99',
+          centroidLabel: 'gpu:99',
+          topologyLabel: 'evidence',
+          hotnessBucket: 'cool',
+          featureFamily: 'evidence',
+          topoClass: 'evidence',
+        },
+      ],
+    });
+    mocks.buildACEPromptCached.mockResolvedValue({
+      systemPrompt: 'You are YorHA.',
+      contextWindow: '...chunks...',
+    });
+    mocks.bifrostChat.mockResolvedValue('Second response');
+
+    await runChatCompletion({
+      model: 'yorha-legal',
+      messages: [{ role: 'user', content: 'what is hearsay?' }],
+      temperature: 0.3,
+      raw: false,
+      stream: false,
+    });
+
+    const secondKey = mocks.getExactMatchCache.mock.calls.at(-1)?.[0] as string;
+    expect(firstKey).not.toBe(secondKey);
+  });
+
   it('reports yorha.cacheHit=prior-answer when codeLlmHit is present', async () => {
     mocks.assembleACEContext.mockResolvedValue({
       ragChunks: [], kbChunks: [], caseChunks: [], chatHistory: [],
@@ -204,7 +436,7 @@ describe('openai-facade — runChatCompletion', () => {
 
     const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
     const res = await runChatCompletion({
-      model:    'gemma4-legal',
+      model:    'gemma4-rotorquant:latest',
       messages: [{ role: 'user', content: 'q' }],
       file_path: 'src/foo.ts',
       raw:      false,
@@ -341,6 +573,12 @@ describe('openai-facade — POST /api/v1/chat/completions handler', () => {
     mocks.assembleACEContext.mockReset();
     mocks.buildACEPromptCached.mockReset();
     mocks.bifrostChat.mockReset();
+    mocks.generateCacheKey.mockReset();
+    mocks.generateCacheKey.mockReturnValue('ace:llm:exact:mock');
+    mocks.getExactMatchCache.mockReset();
+    mocks.getExactMatchCache.mockResolvedValue(null);
+    mocks.setExactMatchCache.mockReset();
+    mocks.setExactMatchCache.mockResolvedValue(undefined);
     mocks.turboQuantChat.mockReset();
     mocks.runGemma4Agent.mockReset();
     mocks.recordRagAnswer.mockResolvedValue(undefined);

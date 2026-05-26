@@ -7,7 +7,7 @@ export declare function __unpin(ptr: number): void;
 export declare function __collect(): void;
 export declare const __rtti_base: number;
 /**
- * src/wasm/vector-operations/cosineSimilarity
+ * sveltekit-frontend/src/wasm/vector-operations/cosineSimilarity
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -15,7 +15,7 @@ export declare const __rtti_base: number;
  */
 export declare function cosineSimilarity(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/euclideanDistance
+ * sveltekit-frontend/src/wasm/vector-operations/euclideanDistance
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -23,7 +23,7 @@ export declare function cosineSimilarity(aPtr: number, bPtr: number, length: num
  */
 export declare function euclideanDistance(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/dotProduct
+ * sveltekit-frontend/src/wasm/vector-operations/dotProduct
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -31,7 +31,7 @@ export declare function euclideanDistance(aPtr: number, bPtr: number, length: nu
  */
 export declare function dotProduct(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/manhattanDistance
+ * sveltekit-frontend/src/wasm/vector-operations/manhattanDistance
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -39,19 +39,19 @@ export declare function dotProduct(aPtr: number, bPtr: number, length: number): 
  */
 export declare function manhattanDistance(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/normalize
+ * sveltekit-frontend/src/wasm/vector-operations/normalize
  * @param vectorPtr `usize`
  * @param length `i32`
  */
 export declare function normalize(vectorPtr: number, length: number): void;
 /**
- * src/wasm/vector-operations/zScoreNormalize
+ * sveltekit-frontend/src/wasm/vector-operations/zScoreNormalize
  * @param vectorPtr `usize`
  * @param length `i32`
  */
 export declare function zScoreNormalize(vectorPtr: number, length: number): void;
 /**
- * src/wasm/vector-operations/computeBatchSimilarity
+ * sveltekit-frontend/src/wasm/vector-operations/computeBatchSimilarity
  * @param queryPtr `usize`
  * @param vectorsPtr `usize`
  * @param resultsPtr `usize`
@@ -61,14 +61,14 @@ export declare function zScoreNormalize(vectorPtr: number, length: number): void
  */
 export declare function computeBatchSimilarity(queryPtr: number, vectorsPtr: number, resultsPtr: number, vectorDim: number, vectorCount: number, algorithm: number): void;
 /**
- * src/wasm/vector-operations/batchNormalizeVectors
+ * sveltekit-frontend/src/wasm/vector-operations/batchNormalizeVectors
  * @param vectorsPtr `usize`
  * @param numVectors `i32`
  * @param vectorLength `i32`
  */
 export declare function batchNormalizeVectors(vectorsPtr: number, numVectors: number, vectorLength: number): void;
 /**
- * src/wasm/vector-operations/hashEmbedding
+ * sveltekit-frontend/src/wasm/vector-operations/hashEmbedding
  * @param textPtr `usize`
  * @param textLen `i32`
  * @param embeddingPtr `usize`
@@ -76,18 +76,18 @@ export declare function batchNormalizeVectors(vectorsPtr: number, numVectors: nu
  */
 export declare function hashEmbedding(textPtr: number, textLen: number, embeddingPtr: number, embeddingDim: number): void;
 /**
- * src/wasm/vector-operations/allocateVectorMemory
+ * sveltekit-frontend/src/wasm/vector-operations/allocateVectorMemory
  * @param length `i32`
  * @returns `usize`
  */
 export declare function allocateVectorMemory(length: number): number;
 /**
- * src/wasm/vector-operations/freeVectorMemory
+ * sveltekit-frontend/src/wasm/vector-operations/freeVectorMemory
  * @param ptr `usize`
  */
 export declare function freeVectorMemory(ptr: number): void;
 /**
- * src/wasm/vector-operations/dotProductSIMD
+ * sveltekit-frontend/src/wasm/vector-operations/dotProductSIMD
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -95,7 +95,7 @@ export declare function freeVectorMemory(ptr: number): void;
  */
 export declare function dotProductSIMD(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/cosineSimilaritySIMD
+ * sveltekit-frontend/src/wasm/vector-operations/cosineSimilaritySIMD
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -103,20 +103,20 @@ export declare function dotProductSIMD(aPtr: number, bPtr: number, length: numbe
  */
 export declare function cosineSimilaritySIMD(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/prepareVectorForServer
+ * sveltekit-frontend/src/wasm/vector-operations/prepareVectorForServer
  * @param vectorPtr `usize`
  * @param length `i32`
  */
 export declare function prepareVectorForServer(vectorPtr: number, length: number): void;
 /**
- * src/wasm/vector-operations/processServerResponse
+ * sveltekit-frontend/src/wasm/vector-operations/processServerResponse
  * @param responsePtr `usize`
  * @param resultPtr `usize`
  * @param length `i32`
  */
 export declare function processServerResponse(responsePtr: number, resultPtr: number, length: number): void;
 /**
- * src/wasm/vector-operations/hybridCosineSimilarity
+ * sveltekit-frontend/src/wasm/vector-operations/hybridCosineSimilarity
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `usize`
@@ -125,7 +125,7 @@ export declare function processServerResponse(responsePtr: number, resultPtr: nu
  */
 export declare function hybridCosineSimilarity(aPtr: number, bPtr: number, length: number, useServer: boolean): number;
 /**
- * src/wasm/vector-operations/batchVectorChunking
+ * sveltekit-frontend/src/wasm/vector-operations/batchVectorChunking
  * @param vectorsPtr `usize`
  * @param numVectors `i32`
  * @param vectorLength `i32`
@@ -135,7 +135,7 @@ export declare function hybridCosineSimilarity(aPtr: number, bPtr: number, lengt
  */
 export declare function batchVectorChunking(vectorsPtr: number, numVectors: number, vectorLength: number, chunkSize: number, resultsPtr: number): number;
 /**
- * src/wasm/vector-operations/prepareTensorForCUDA
+ * sveltekit-frontend/src/wasm/vector-operations/prepareTensorForCUDA
  * @param tensorPtr `usize`
  * @param dimensions `~lib/array/Array<i32>`
  * @param dimCount `i32`
@@ -143,7 +143,7 @@ export declare function batchVectorChunking(vectorsPtr: number, numVectors: numb
  */
 export declare function prepareTensorForCUDA(tensorPtr: number, dimensions: Array<number>, dimCount: number, outputPtr: number): void;
 /**
- * src/wasm/vector-operations/optimizedEmbeddingTransfer
+ * sveltekit-frontend/src/wasm/vector-operations/optimizedEmbeddingTransfer
  * @param embeddingPtr `usize`
  * @param length `i32`
  * @param compressionLevel `i32`
@@ -151,7 +151,7 @@ export declare function prepareTensorForCUDA(tensorPtr: number, dimensions: Arra
  */
 export declare function optimizedEmbeddingTransfer(embeddingPtr: number, length: number, compressionLevel: number): number;
 /**
- * src/wasm/vector-operations/shouldUseServer
+ * sveltekit-frontend/src/wasm/vector-operations/shouldUseServer
  * @param operationType `i32`
  * @param dataSize `i32`
  * @param complexityScore `i32`
@@ -159,7 +159,7 @@ export declare function optimizedEmbeddingTransfer(embeddingPtr: number, length:
  */
 export declare function shouldUseServer(operationType: number, dataSize: number, complexityScore: number): boolean;
 /**
- * src/wasm/vector-operations/cosineSimJS
+ * sveltekit-frontend/src/wasm/vector-operations/cosineSimJS
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -167,7 +167,7 @@ export declare function shouldUseServer(operationType: number, dataSize: number,
  */
 export declare function cosineSimJS(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/dotProductJS
+ * sveltekit-frontend/src/wasm/vector-operations/dotProductJS
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -175,7 +175,7 @@ export declare function cosineSimJS(aPtr: number, bPtr: number, length: number):
  */
 export declare function dotProductJS(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/cosineSimSIMDJS
+ * sveltekit-frontend/src/wasm/vector-operations/cosineSimSIMDJS
  * @param aPtr `usize`
  * @param bPtr `usize`
  * @param length `i32`
@@ -183,12 +183,12 @@ export declare function dotProductJS(aPtr: number, bPtr: number, length: number)
  */
 export declare function cosineSimSIMDJS(aPtr: number, bPtr: number, length: number): number;
 /**
- * src/wasm/vector-operations/getMemoryStats
+ * sveltekit-frontend/src/wasm/vector-operations/getMemoryStats
  * @returns `i32`
  */
 export declare function getMemoryStats(): number;
 /**
- * src/wasm/vector-operations/benchmarkOperation
+ * sveltekit-frontend/src/wasm/vector-operations/benchmarkOperation
  * @param operation `i32`
  * @param dataSize `i32`
  * @returns `i32`

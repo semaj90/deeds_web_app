@@ -52,7 +52,7 @@ The event logging and prompt-feedback infrastructure exists. The loop back into 
 ### P1-B `rag_query_log` → QLoRA distillation pipeline closure
 - **Problem:** `POST /api/analytics/qlora-dataset` distills high-quality interactions (rerank ≥ 0.80, self-eval ≥ 0.80) into `qlora_examples` with Alpaca format export. No scheduled trigger runs it.
 - **Change:** Add a RabbitMQ consumer on a new `qlora.distill` queue (or a cron-style idle task) that calls the distillation endpoint nightly when `rag_query_log` has ≥ 50 new qualifying rows
-- **Downstream:** `GET /api/analytics/qlora-dataset?export=jsonl` → feed to Colab QLoRA training notebook → updated `gemma4-legal` checkpoint
+- **Downstream:** `GET /api/analytics/qlora-dataset?export=jsonl` → feed to Colab QLoRA training notebook → updated `gemma4-rotorquant:latest` checkpoint
 - **Effort:** 2 hrs
 
 ### P1-C `chunk_hit_log` → retrieval quality signal
@@ -129,7 +129,7 @@ The full self-improvement loop: inference → log → distill → train → depl
 - See P1-B above.
 
 ### P4-B Training quality gate before checkpoint swap
-- **Problem:** When a new QLoRA checkpoint is produced, there's no automated quality gate before it replaces `gemma4-legal` in Ollama.
+- **Problem:** When a new QLoRA checkpoint is produced, there's no automated quality gate before it replaces `gemma4-rotorquant:latest` in Ollama.
 - **Change:** Add a `POST /api/admin/model/validate-checkpoint` endpoint that:
   1. Loads the new checkpoint into a temporary Ollama tag
   2. Runs 10 golden test prompts from `qlora_examples` (the highest-scoring ones)

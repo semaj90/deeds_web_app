@@ -46,7 +46,8 @@ const WARN_THRESHOLD = parseInt(flagValue('--threshold-warn') ?? '70', 10);
 
 // Stable marker for human-edit detection
 const HEADER_MARKER = '<!-- LLMS-GEN v1 · do not edit below this line -->';
-const STAMP = `${HEADER_MARKER}\n<!-- generated: ${new Date().toISOString()} · llms.md spec · regen: npm run llms:write -->`;
+const STAMP_TEMPLATE =
+  '<!-- generated: {timestamp} · agents.md spec · regen: npm run agents:write -->';
 
 const WORKSPACE_EXTENSIONS = new Set(['.ts', '.svelte', '.js', '.mjs', '.cjs', '.json', '.md', '.go', '.cpp', '.cc', '.h', '.hpp', '.rs', '.proto', '.sql']);
 const WORKSPACE_EXCLUDE_DIRS = new Set(['node_modules', '.svelte-kit', 'build', 'dist', '.git', '__mocks__', '__tests__', 'deeds_labs', '.venv', '.svelte-error-fixes-backup', 'archive']);
@@ -120,20 +121,48 @@ ${rows.map(r => `| \`${r.name}\` | ${r.llms} | ${r.note} |`).join('\n')}
 `;
 }
 
-// ── Render per-directory LLMS.md ─────────────────────────────────────────────
-function renderDirLLMS(dirRel, dirFiles, kagDoc) {
+function buildStamp(existingContent) {
+  if (typeof existingContent === 'string') {
+    const markerIdx = existingContent.indexOf(HEADER_MARKER);
+    if (markerIdx !== -1) {
+      const after = existingContent.slice(markerIdx + HEADER_MARKER.length);
+      const match = after.match(/^\r?\n(<!-- generated:[^\r\n]* -->)/m);
+      if (match) {
+        return `${HEADER_MARKER}\n${match[1]}`;
+      }
+    }
+  }
+
+  return `${HEADER_MARKER}\n${STAMP_TEMPLATE.replace('{timestamp}', new Date().toISOString())}`;
+}
+
+function preserveExistingPrefix(existing, content) {
+  if (typeof existing !== 'string') return content;
+  const genIdx = existing.indexOf(HEADER_MARKER);
+  if (genIdx <= 0) return content;
+  const prefix = existing.slice(0, genIdx).trim();
+  if (!prefix) return content;
+  const h1Line = content.split('\n')[0];
+  const rest = content.slice(h1Line.length).trim();
+  return `${h1Line}\n\n${prefix}\n\n${rest}`;
+}
+
+function renderDirLLMS(dirRel, dirFiles, kagDoc, stamp) {
   const m = {
     fileCount: dirFiles.length,
-    apiCount: dirFiles.filter(f => f.routeHandlers?.length > 0).length,
+    apiCount: dirFiles.filter((f) => f.routeHandlers?.length > 0).length,
   };
-  
+
   const purpose = kagDoc?.purpose ?? `Directory: ${dirRel}`;
   const summary = kagDoc?.summary ?? `${m.fileCount} file(s), ${m.apiCount} handler(s)`;
-  const fileList = dirFiles.slice(0, 10).map(f => `- \`${path.basename(f.rel)}\``).join('\n');
+  const fileList = dirFiles
+    .slice(0, 10)
+    .map((f) => `- \`${path.basename(f.rel)}\``)
+    .join('\n');
 
   return `# LLMS.md — \`${dirRel}\`
 
-${STAMP}
+${stamp}
 
 > ${purpose}
 
@@ -160,10 +189,10 @@ Run \`npm run llms:write\` to regenerate.
 }
 
 // ── Render root LLMS.md ──────────────────────────────────────────────────────
-function renderRootLLMS() {
+function renderRootLLMS(stamp) {
   return `# LLMS.md — Deeds Web App
 
-${STAMP}
+${stamp}
 
 > Legal-AI platform: SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > See [\`CLAUDE.md\`](./CLAUDE.md) for the canonical dev guide.
@@ -186,10 +215,12 @@ Run \`npm run llms:write\` to regenerate.
 }
 
 // ── Write loop ───────────────────────────────────────────────────────────────
-const root = renderRootLLMS();
 const tasks = [];
 
-tasks.push({ path: path.join(REPO_ROOT, 'LLMS.md'), content: root });
+tasks.push({
+  path: path.join(REPO_ROOT, 'LLMS.md'),
+  render: (existing) => renderRootLLMS(buildStamp(existing)),
+});
 
 if (!ROOT_ONLY) {
   for (const [dirRel, dirFiles] of dirMap.entries()) {
@@ -197,8 +228,10 @@ if (!ROOT_ONLY) {
     if (FILTER && !dirRel.includes(FILTER)) continue;
 
     const kagDoc = await rget(`wiki:note:dir:${dirRel.replace(/[^a-z0-9]/gi, '_')}`);
-    const md = renderDirLLMS(dirRel, dirFiles, kagDoc);
-    tasks.push({ path: path.join(REPO_ROOT, dirRel, 'LLMS.md'), content: md });
+    tasks.push({
+      path: path.join(REPO_ROOT, dirRel, 'LLMS.md'),
+      render: (existing) => renderDirLLMS(dirRel, dirFiles, kagDoc, buildStamp(existing)),
+    });
   }
 }
 
@@ -208,27 +241,21 @@ if (DRY_RUN) {
   tasks.slice(0, 5).forEach(t => console.log(`[dry] ${t.path}`));
 } else {
   for (const t of tasks) {
-    // Hierarchical / Caveman preservation logic
-    if (existsSync(t.path)) {
-      const existing = readFileSync(t.path, 'utf8');
-      if (!existing.includes(HEADER_MARKER)) {
-        console.log(`  ⏸  ${path.relative(REPO_ROOT, t.path)}  (preserved)`);
-        continue;
-      }
-      
-      // Preserve everything ABOVE the marker
-      const genIdx = existing.indexOf(HEADER_MARKER);
-      if (genIdx > 0) {
-        const prefix = existing.slice(0, genIdx).trim();
-        if (prefix) {
-          const h1Line = t.content.split('\n')[0];
-          const rest = t.content.slice(h1Line.length).trim();
-          t.content = `${h1Line}\n\n${prefix}\n\n${rest}`;
-        }
-      }
+    const existing = existsSync(t.path) ? readFileSync(t.path, 'utf8') : null;
+
+    if (existing && !existing.includes(HEADER_MARKER)) {
+      console.log(`  ⏸  ${path.relative(REPO_ROOT, t.path)}  (preserved)`);
+      continue;
     }
-    
+
+    const draftContent = preserveExistingPrefix(existing, t.render(existing));
+    if (existing === draftContent) {
+      continue;
+    }
+
+    const finalContent = preserveExistingPrefix(existing, t.render(null));
     mkdirSync(path.dirname(t.path), { recursive: true });
-    writeFileSync(t.path, t.content, 'utf8');
+    writeFileSync(t.path, finalContent, 'utf8');
   }
 }
+

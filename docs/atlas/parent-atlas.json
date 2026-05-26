@@ -1,0 +1,53 @@
+{
+  "repoName": "deeds-web-app",
+  "generatedAt": "2026-05-23T03:51:04.010Z",
+  "summary": "YoRHa Legal Evidence AI Registry parent map. System consists of 4209 features in 6 clusters. Overall tasks: 108/246 complete (43.9%).",
+  "stats": {
+    "totalFeatures": 4209,
+    "implementedFeatures": 4176,
+    "partialFeatures": 7,
+    "missingFeatures": 26,
+    "blockedFeatures": 0,
+    "totalTasks": 246,
+    "completedTasks": 108,
+    "pendingTasks": 138
+  },
+  "clusters": [
+    {
+      "clusterId": "5",
+      "clusterName": "documentation",
+      "status": "partial",
+      "featuresCount": 1317
+    },
+    {
+      "clusterId": "6",
+      "clusterName": "general",
+      "status": "partial",
+      "featuresCount": 2301
+    },
+    {
+      "clusterId": "2",
+      "clusterName": "frontend_routes",
+      "status": "implemented",
+      "featuresCount": 335
+    },
+    {
+      "clusterId": "3",
+      "clusterName": "native_simd",
+      "status": "implemented",
+      "featuresCount": 18
+    },
+    {
+      "clusterId": "1",
+      "clusterName": "database_schema",
+      "status": "implemented",
+      "featuresCount": 23
+    },
+    {
+      "clusterId": "4",
+      "clusterName": "backend_services",
+      "status": "implemented",
+      "featuresCount": 215
+    }
+  ]
+}

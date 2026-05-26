@@ -1,0 +1,239 @@
+{
+  "skill_name": "codebase_mapper",
+  "version": "1.1.0",
+  "status": "active",
+  "owner": "platform/agentic",
+  "purpose": "Map cross-layer relationships across code and documentation, then surface architecture, data-flow, reliability, and coverage gaps with evidence-backed recommendations.",
+  "description": "Trace end-to-end flows from routes, tools, and services into schemas, storage, indexing, and memory; map markdown and text artifacts to live features; and flag missing imports, unresolved methods, persistence gaps, indexing/storage gaps, memory lifecycle risks, optimization candidates, and stale documentation.",
+  "doc_sources": {
+    "primary": [
+      "sveltekit-frontend/**/*.md",
+      "sveltekit-frontend/**/*.txt",
+      "sveltekit-frontend/next_steps/**/*.md",
+      "sveltekit-frontend/docs/**/*.md",
+      "sveltekit-frontend/docs/**/*.txt",
+      "sveltekit-frontend/memory/**/*.md"
+    ],
+    "secondary": [
+      "sveltekit-frontend/src/**/*.ts",
+      "sveltekit-frontend/src/**/*.js",
+      "sveltekit-frontend/scripts/**/*.mjs",
+      "sveltekit-frontend/scripts/**/*.ps1"
+    ]
+  },
+  "entrypoints": [
+    {
+      "name": "map_feature_flow",
+      "summary": "Trace a target feature or data flow from route/UI/tool entrypoint through services to schema, storage, indexing, and cache layers."
+    },
+    {
+      "name": "map_docs_to_features",
+      "summary": "Map markdown and text artifacts to major features, then flag drift, missing coverage, and stale claims."
+    },
+    {
+      "name": "detect_gap_clusters",
+      "summary": "Detect high-risk clusters: unresolved symbols, unwired paths, DB write gaps, leak patterns, indexing blind spots, and stale doc clusters."
+    },
+    {
+      "name": "inventory_feature_surface",
+      "summary": "Inventory routes, services, schemas, tools, and docs for a named area and emit a normalized feature map."
+    }
+  ],
+  "inputs": {
+    "workspace_root": {
+      "type": "string",
+      "required": true,
+      "description": "Absolute path to repository root."
+    },
+    "scope": {
+      "type": "object",
+      "required": false,
+      "properties": {
+        "include_paths": {
+          "type": "array",
+          "items": "string",
+          "default": [
+            "sveltekit-frontend/src/**",
+            "sveltekit-frontend/scripts/**",
+            "sveltekit-frontend/docs/**/*.md",
+            "sveltekit-frontend/docs/**/*.txt",
+            "sveltekit-frontend/next_steps/**/*.md",
+            "sveltekit-frontend/memory/**/*.md"
+          ]
+        },
+        "exclude_paths": {
+          "type": "array",
+          "items": "string",
+          "default": [
+            "**/node_modules/**",
+            "**/.svelte-kit/**",
+            "**/dist/**",
+            "**/build/**",
+            "**/scripts/phase104-backups/**",
+            "**/scripts/api-cleanup/reports/**",
+            "**/backups/**"
+          ]
+        }
+      }
+    },
+    "targets": {
+      "type": "object",
+      "required": false,
+      "properties": {
+        "routes": { "type": "array", "items": "string" },
+        "services": { "type": "array", "items": "string" },
+        "schemas": { "type": "array", "items": "string" },
+        "features": { "type": "array", "items": "string" },
+        "docs": { "type": "array", "items": "string" }
+      }
+    },
+    "analysis_flags": {
+      "type": "object",
+      "required": false,
+      "properties": {
+        "trace_import_graph": { "type": "boolean", "default": true },
+        "trace_method_calls": { "type": "boolean", "default": true },
+        "trace_db_writes": { "type": "boolean", "default": true },
+        "trace_indexing_storage": { "type": "boolean", "default": true },
+        "detect_memory_leaks": { "type": "boolean", "default": true },
+        "map_docs": { "type": "boolean", "default": true },
+        "emit_gap_report": { "type": "boolean", "default": true },
+        "emit_recommendations": { "type": "boolean", "default": true }
+      }
+    }
+  },
+  "analysis_modes": [
+    "feature_mapping",
+    "doc_feature_alignment",
+    "dependency_audit",
+    "data_flow_tracing",
+    "persistence_verification",
+    "indexing_storage_audit",
+    "memory_lifecycle_review",
+    "optimization_gap_scanning"
+  ],
+  "analysis_dimensions": [
+    "imports",
+    "methods_functions",
+    "data_flow",
+    "db_calls",
+    "indexing_storage",
+    "memory_lifecycle",
+    "doc_feature_alignment",
+    "performance_optimization",
+    "stale_doc_coverage",
+    "recommendation_quality"
+  ],
+  "detection_rules": [
+    {
+      "id": "missing_import_chain",
+      "severity": "high",
+      "description": "Referenced symbol cannot be resolved through the import graph."
+    },
+    {
+      "id": "unwired_route_flow",
+      "severity": "high",
+      "description": "Route exists but has no practical trigger path from UI/lifecycle/tool flow."
+    },
+    {
+      "id": "db_write_without_confirmed_persist",
+      "severity": "high",
+      "description": "Create/update path does not verify persistence success or writeback continuity."
+    },
+    {
+      "id": "indexing_storage_gap",
+      "severity": "high",
+      "description": "Retrieval/indexing feature lacks full ingest/update/writeback continuity."
+    },
+    {
+      "id": "potential_memory_leak_pattern",
+      "severity": "medium",
+      "description": "Long-lived listener/interval/stream lacks cleanup/disposal safeguards."
+    },
+    {
+      "id": "stale_or_unmapped_docs",
+      "severity": "medium",
+      "description": "Docs mention features with no active implementation mapping or vice versa."
+    },
+    {
+      "id": "optimization_gap_candidate",
+      "severity": "low",
+      "description": "Repeated hot path or heavy allocation suggests a focused optimization opportunity."
+    }
+  ],
+  "outputs": {
+    "graph": {
+      "nodes": ["file", "symbol", "route", "service", "schema", "doc", "feature", "finding"],
+      "edges": ["imports", "calls", "reads", "writes", "indexes", "documents", "depends_on", "maps_to"]
+    },
+    "flow_maps": [
+      {
+        "name": "feature_flow",
+        "from": "entrypoint",
+        "to": "schema_or_storage",
+        "hops": "ordered list of files and symbols"
+      },
+      {
+        "name": "doc_feature_alignment",
+        "from": "doc_artifact",
+        "to": "feature_surface",
+        "hops": "ordered list of docs, code surfaces, and evidence references"
+      }
+    ],
+    "gap_report": {
+      "severity_buckets": ["high", "medium", "low"],
+      "summary_fields": ["total_findings", "risk_clusters", "quick_wins", "doc_drift_count"],
+      "finding_fields": ["id", "severity", "path", "symbol", "evidence", "suggested_fix", "confidence"]
+    },
+    "recommendations": {
+      "required_fields": ["path", "action", "reason", "priority"],
+      "action_types": ["wire", "persist", "index", "document", "refactor", "test", "measure"]
+    },
+    "coverage": {
+      "doc_to_feature_coverage": "number",
+      "feature_to_doc_coverage": "number",
+      "route_to_persistence_coverage": "number",
+      "doc_drift_coverage": "number"
+    }
+  },
+  "knowledge_graph_integration_contract": {
+    "entity_types": [
+      "Feature",
+      "Route",
+      "Service",
+      "Schema",
+      "Function",
+      "DocArtifact",
+      "DocSection",
+      "RiskFinding",
+      "GapCluster",
+      "OptimizationCandidate"
+    ],
+    "relation_types": [
+      "IMPLEMENTS",
+      "CALLS",
+      "DEPENDS_ON",
+      "READS_FROM",
+      "WRITES_TO",
+      "INDEXES_IN",
+      "DOCUMENTED_BY",
+      "HAS_GAP",
+      "MITIGATED_BY",
+      "MAPS_TO"
+    ],
+    "upsert_keys": [
+      "workspace_root",
+      "normalized_path",
+      "symbol_name",
+      "feature_name",
+      "finding_fingerprint",
+      "doc_fingerprint"
+    ]
+  },
+  "execution_notes": {
+    "preferred_search": "ripgrep",
+    "safety": "read-first analysis; no destructive actions",
+    "confidence_policy": "emit uncertainty when flow resolution is partial",
+    "todo_policy": "reuse the active TODO generator instead of creating parallel roadmap docs"
+  }
+}

@@ -163,7 +163,7 @@ export async function bifrostChat(messages, model, options) {
 #### **Tier B: Inference Layer** (4 gates)
 - G6: Ollama service (model list)
 - G7: GPU availability (nvidia-smi)
-- G8: Required models exist (gemma4-legal, embeddinggemma)
+- G8: Required models exist (gemma4-rotorquant:latest, embeddinggemma)
 - G9: Inference latency baseline (<60s acceptable)
 
 #### **Tier C: Message Queue** (3 gates)
@@ -193,7 +193,7 @@ bash scripts/audit/backend-infrastructure-audit.sh
 **Created**:
 
 1. **test-redis-exact-match-cache.sh** — Original 3-tier test (deprecated due to Bifrost port issue)
-2. **test-redis-bifrost-cache.sh** — Updated test with correct model name (gemma4-legal)
+2. **test-redis-bifrost-cache.sh** — Updated test with correct model name (gemma4-rotorquant:latest)
 3. **demo-redis-cache.sh** — Demonstration script showing architecture + stats
 4. **test-cache-performance.sh** — Full cache demo via API endpoint
 5. **test-redis-l1-cache.sh** — Simplified L1 cache test
@@ -330,12 +330,12 @@ SAVINGS:         $1,800/month 💰
 
 1. **Dual-layer is NOT redundant** — L1 handles exact duplicates (20-30%), L2 handles semantic variants (70%), combined = 90%+ hit rate
 2. **Redis connection pooling works correctly** — round-robin across 10 connections, all talking to same server
-3. **Bifrost forwarding issue** — model name mismatch (`gemma3-legal` vs `gemma4-legal`) caused 404s
+3. **Bifrost forwarding issue** — model name mismatch (`gemma3-legal` vs `gemma4-rotorquant:latest`) caused 404s
 4. **Cache key determinism matters** — same params must generate same key, default values must match
 
 ### Performance Benchmarking
 
-1. **CPU vs GPU baseline** — GPU only 22% faster for gemma4-legal 7.5B (25s vs 33s), much smaller gap than expected
+1. **CPU vs GPU baseline** — GPU only 22% faster for gemma4-rotorquant:latest 7.5B (25s vs 33s), much smaller gap than expected
 2. **num_gpu=0 option works** — Forces CPU-only inference for baseline measurement
 3. **Throughput is multiplicative** — 5ms cache hit = 12,000 QPM vs 1-2 QPM without cache
 4. **Real-world speedup exceeds theoretical** — 6,542× measured vs 17,500× theoretical (due to realistic CPU baseline)

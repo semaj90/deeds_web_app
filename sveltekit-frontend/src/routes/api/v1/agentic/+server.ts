@@ -76,7 +76,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-legal:latest',
+					model: 'gemma4-rotorquant:latest',
 					prompt: `Given this error: "${query.slice(0, 2000)}", suggest fixes. Return JSON: { "suggestions": [{ "suggestion": "...", "successRate": 0.0-1.0, "similarError": "...", "relevance": 0.0-1.0 }] }`,
 					stream: false,
 					options: { temperature: 0.4 }

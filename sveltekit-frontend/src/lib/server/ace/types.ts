@@ -112,11 +112,17 @@ export interface RerankBreakdown {
   sameAgentsDir?: number;
   /** Boost from manifold4 quaternion similarity to top candidate (≤0.06 cap) */
   quaternion?: number;
+  /** Boost from relation graph connectivity */
+  relationBoost?: number;
   /** Final composite score (semantic + all boosts) */
   final: number;
 }
 
 export interface ACEContext {
+  selectedRelationCards?: string | null;
+  selectedClusterSummaries?: string | null;
+  cacheTrace?: string | null;
+  topRuntimeDependencies?: string | null;
   /** User behavioral profile from analytics */
   userProfile: ACEUserProfile | null;
   /** Case context string (from DB load) */
@@ -202,6 +208,11 @@ export interface ACEContext {
     lineEnd?: number;
     tags?: string[];
     gpuCluster?: number | null;
+    clusterKey?: string | null;
+    centroidLabel?: string | null;
+    topologyLabel?: string | null;
+    hotnessBucket?: string | null;
+    featureFamily?: string | null;
     pageRankScore?: number | null;
     routeType?: string | null;
     hasAuthGuard?: boolean | null;
@@ -341,6 +352,7 @@ export interface ACEContext {
 export interface ClusterContextPacket {
   clusterId: number;
   clusterKey?: string;
+  centroidLabel?: string;
   topoClass: string;
   topoClasses?: string[];
   topTags: string[];
@@ -350,6 +362,8 @@ export interface ClusterContextPacket {
   summary?: string;
   purpose?: string;
   riskLevel?: string;
+  hotnessBucket?: string;
+  featureFamily?: string;
   protocols?: string[];
   communityId?: string | null;
   graphAuthorityScore?: number | null;

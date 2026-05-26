@@ -2,7 +2,7 @@
 /**
  * smoke-graphify.mjs
  *
- * 5-pillar Graphify/Karpathy stack health check. Each pillar can be present
+ * 7-pillar Graphify/Karpathy stack health check. Each pillar can be present
  * or absent; absence is reported but doesn't fail the smoke unless --strict.
  *
  * Pillars:
@@ -13,6 +13,8 @@
  *   5. ACE fallback path  — context-assembler.ts FAST_AST_SCORE_CAP ≤ 0.07
  *   6. Hypergraph topology — tmp/hypergraph-centroids.json + Redis hypergraph:v1:*
  *                            + Qdrant som_cluster payload coverage
+ *   7. Autoencoder health  — ace:autoencoder:weights + gpu:autoencoder:centroids_64_meta
+ *                            + gpu:karpathy:encoded HLEN coverage
  *
  * Usage:
  *   node scripts/tests/smoke-graphify.mjs
@@ -85,7 +87,7 @@ function redisCmd(args) {
   });
 }
 
-console.log(c.bold('\n=== Graphify/Karpathy stack smoke (6 pillars + D33) ===\n'));
+console.log(c.bold('\n=== Graphify/Karpathy stack smoke (7 pillars + D33) ===\n'));
 
 // ── Pillar 1: Fast AST graph ────────────────────────────────────────────────
 
@@ -236,6 +238,31 @@ if (!existsSync(centroidsPath)) {
         miss('  └─ Qdrant som_cluster coverage', `Qdrant unreachable: ${e.message}`);
       }
     }
+  }
+}
+
+// ── Pillar 7: Autoencoder health ────────────────────────────────────────────
+
+if (NO_REDIS) {
+  miss('Pillar 7 — Autoencoder health', '--no-redis');
+} else {
+  const weightsPresent = Number((await redisCmd(['EXISTS', 'ace:autoencoder:weights'])) ?? 0) > 0;
+  const weightsTrainedAt = await redisCmd(['HGET', 'ace:autoencoder:meta', 'trainedAt']);
+  const centroidsPresent = Number((await redisCmd(['EXISTS', 'gpu:autoencoder:centroids_64_meta'])) ?? 0);
+  const encodedCount = Number((await redisCmd(['HLEN', 'gpu:karpathy:encoded'])) ?? 0);
+
+  if (weightsPresent && weightsTrainedAt && centroidsPresent > 0 && encodedCount > 0) {
+    ok(
+      'Pillar 7 — Autoencoder health',
+      `trainedAt=${weightsTrainedAt}, centroids=${centroidsPresent}, encoded=${encodedCount}`
+    );
+  } else if (weightsPresent || weightsTrainedAt) {
+    miss(
+      'Pillar 7 — Autoencoder health',
+      `weights present but centroids=${centroidsPresent}, encoded=${encodedCount} — run npm run graphify:autoencoder:train`
+    );
+  } else {
+    miss('Pillar 7 — Autoencoder health', 'xavier placeholder — run npm run graphify:autoencoder:train');
   }
 }
 

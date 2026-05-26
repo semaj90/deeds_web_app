@@ -80,3 +80,4 @@ node scripts/validate/full-system.mjs --gate=G30
 - [docs/architecture/claude-code-agent-os.md](../../../sveltekit-frontend/docs/architecture/claude-code-agent-os.md)
 - [docs/architecture/gemma4-to-claude-code-handoff.md](../../../sveltekit-frontend/docs/architecture/gemma4-to-claude-code-handoff.md)
 - [docs/architecture/drizzle-inspection-mcp.md](../../../sveltekit-frontend/docs/architecture/drizzle-inspection-mcp.md)
+- [metadata-context-analysis](../metadata-context-analysis/SKILL.md)

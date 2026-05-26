@@ -171,7 +171,7 @@ npm run turbo:start:text:detached     # text-only (3.4GB VRAM)
 ## Known issues / future work
 
 ### Not blocking
-1. `karpathy-tag.mjs` returns 0 tags on dry-run — `gemma4-legal-fast:latest` may not match the prompt's expected JSON shape. Separate from the Graphify pipeline.
+1. `karpathy-tag.mjs` returns 0 tags on dry-run — `gemma4-rotorquant:latest-fast:latest` may not match the prompt's expected JSON shape. Separate from the Graphify pipeline.
 2. The two `generate-route-test-stubs.mjs` files (one in `scripts/`, one in `scripts/tests/`) solve similar problems differently — consolidate later.
 3. Lint diagnostics flag `process`/`fetch`/`AbortSignal` in `smoke-graphify.mjs` — false positives, those are Node.js 18+ globals.
 

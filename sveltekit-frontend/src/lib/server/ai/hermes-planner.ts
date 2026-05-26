@@ -1,7 +1,7 @@
 /**
  * Hermes Planner — structured tool-call router / dispatcher brain.
  *
- * Hermes (gemma4-hermes-64k via gateway :8642) handles:
+ * Hermes (gemma4-rotorquant:latest via gateway :8642) handles:
  *   - Choosing which retrieval tools to call
  *   - Returning strict JSON plans (Zod-validated)
  *   - Routing ACE queries to the right store
@@ -65,26 +65,62 @@ export type GapRepairPlan = z.infer<typeof GapRepairPlanSchema>;
 
 const TOOL_POLICY: Record<string, string[]> = {
   search: [
-    'deep_research', 'source_summarize', 'citation_builder', 'web_fallback', 'compare_sources',
-    'qdrant_search', 'cluster_summary_lenses', 'topological_graph_filter', 'multi_collection_fusion',
-    'search_related_wiki_cards', 'trend_analysis', 'fact_check_claims', 'summarize_statutory_framework'
+    'deep_research',
+    'source_summarize',
+    'citation_builder',
+    'web_fallback',
+    'compare_sources',
+    'qdrant_search',
+    'cluster_summary_lenses',
+    'topological_graph_filter',
+    'multi_collection_fusion',
+    'search_related_wiki_cards',
+    'trend_analysis',
+    'fact_check_claims',
+    'summarize_statutory_framework',
+    'som_topology_stats',
+    'language_distribution',
   ],
   debug: [
-    'search_codebase', 'trace_imports', 'stack_health_report', 'redis_cache_lookup',
-    'gpu_vram_audit', 'client_side_error_log_audit', 'measure_cold_start_latency',
-    'monitor_worker_thread_pool_saturation', 'verify_simdjson_hotpath_dispatch',
-    'audit_api_route_auth_guards', 'check_redis_memory_fragmentation'
+    'search_codebase',
+    'trace_imports',
+    'stack_health_report',
+    'redis_cache_lookup',
+    'gpu_vram_audit',
+    'client_side_error_log_audit',
+    'measure_cold_start_latency',
+    'monitor_worker_thread_pool_saturation',
+    'verify_simdjson_hotpath_dispatch',
+    'audit_api_route_auth_guards',
+    'check_redis_memory_fragmentation',
   ],
   repair: [
-    'auto_fix_lint_errors', 'repair_broken_wiki_links', 'database_index_rebuild',
-    'reconcile_missing_vector_payloads', 'self_heal_broken_dependencies',
-    'fix_orphaned_file_metadata', 'reset_hung_background_tasks', 'vram_fragmentation_defrag'
+    'auto_fix_lint_errors',
+    'repair_broken_wiki_links',
+    'database_index_rebuild',
+    'reconcile_missing_vector_payloads',
+    'self_heal_broken_dependencies',
+    'fix_orphaned_file_metadata',
+    'reset_hung_background_tasks',
+    'vram_fragmentation_defrag',
   ],
   analyze: [
-    'opinion_summarizer', 'issue_spotter', 'case_intake', 'prior_case_crossref',
-    'elements_checker', 'precedent_search', 'discovery_gap_analysis',
-    'admissibility_checker', 'settlement_value_estimator', 'cross_jurisdictional_analysis',
-    'detect_legal_bias', 'identify_influence_nodes', 'semantic_overlap_map'
+    'opinion_summarizer',
+    'issue_spotter',
+    'case_intake',
+    'prior_case_crossref',
+    'elements_checker',
+    'precedent_search',
+    'discovery_gap_analysis',
+    'admissibility_checker',
+    'settlement_value_estimator',
+    'cross_jurisdictional_analysis',
+    'detect_legal_bias',
+    'identify_influence_nodes',
+    'semantic_overlap_map',
+    'attention_rank_files',
+    'som_topology_stats',
+    'playbook_lookup_by_language',
   ],
 };
 
@@ -132,7 +168,12 @@ Core Skill Families to choose from:
 - Repair (auto_fix_lint_errors, self_heal_dependencies, json_repair, etc.)
 - Legal/Case (case_intake, issue_spotter, precedent_search, legal_bias_detection, etc.)
 - Simulation (mock_trial, prosecutor_argument, outcome_probability_matrix, etc.)
-- GPU/Acceleration (gpu_vram_audit, autonomous_model_tier_selection, rerank_batch, etc.)
+- GPU/Acceleration:
+    - attention_rank_files(query, topN): Fetch top-200 Karpathy-scored files → embed query → attentionScoreGPU via libtorch → return topN ranked by attention
+    - som_topology_stats(): Return SOM grid dims, centroid count, scored file count from Redis
+    - language_distribution(): Return language tag distribution from Qdrant cluster tags (ts, svelte, py, go, rs, sql, etc.)
+    - playbook_lookup_by_language(language, symptom?): CouchDB karpathy_wiki playbooks filtered by language + top-50 karpathy files
+    - (also: gpu_vram_audit, autonomous_model_tier_selection, rerank_batch, benchmark_quantization_performance, etc.)
 - UI/Diagnostics (route_smoke_test, stack_health_report, accessibility_audit, etc.)
 - SystemAudit (audit_api_route_auth_guards, check_redis_fragmentation, qdrant_integrity_check, etc.)
 
@@ -174,7 +215,7 @@ async function callHermesJsonMode(
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'gemma4-hermes-64k',
+        model: 'gemma4-rotorquant:latest',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage },

@@ -33,13 +33,23 @@ const JSON_ONLY   = process.argv.includes('--json');
 
 function log(...args) { if (!QUIET && !JSON_ONLY) console.log(...args); }
 
+async function readRedisJsonLike(redis, key) {
+  const keyType = await redis.type(key).catch(() => 'none');
+  if (keyType === 'string') return redis.get(key).catch(() => null);
+  if (keyType === 'hash') {
+    const hash = await redis.hGetAll(key).catch(() => null);
+    return hash ? JSON.stringify(hash) : null;
+  }
+  return null;
+}
+
 // ── Redis checks ─────────────────────────────────────────────────────────────
 
 async function redisStats(redis) {
   const wikiKeys  = await redis.keys('wiki:note:dir:*');
   let withSummary = 0;
   for (const k of wikiKeys) {
-    const raw = await redis.get(k);
+    const raw = await readRedisJsonLike(redis, k);
     if (!raw) continue;
     try {
       const note = JSON.parse(raw);
@@ -49,22 +59,41 @@ async function redisStats(redis) {
 
   const bowChunkKeys   = await redis.keys('texture:bow:chunk:*');
   const bowClusterKeys = await redis.keys('texture:bow:cluster:*');
-  
-  const manifoldRaw    = await redis.get('cluster:kmeans:k20:manifold4:all');
+
+  const manifoldRaw = await readRedisJsonLike(redis, 'cluster:kmeans:k20:manifold4:all');
   const manifoldCount  = manifoldRaw ? JSON.parse(manifoldRaw).length : 0;
   // Check for various SOM grid key formats
   const somWeights     = (await redis.exists('som:weights')) || (await redis.exists('cluster:kmeans:k20:som:grid'));
+  const autoencoderWeightsType = await redis.type('ace:autoencoder:weights');
+  const autoencoderMetaType = await redis.type('ace:autoencoder:meta');
+  const autoencoderEncodedType = await redis.type('gpu:karpathy:encoded');
+  const autoencoderWeightsTrainedAt =
+    autoencoderMetaType === 'hash' ? await redis.hGet('ace:autoencoder:meta', 'trainedAt') : null;
+  const autoencoderCentroidsPresent = (await redis.exists('gpu:autoencoder:centroids_64_meta')) > 0;
+  const autoencoderEncodedCount =
+    autoencoderEncodedType === 'hash' ? await redis.hLen('gpu:karpathy:encoded') : 0;
 
   return {
-    wikiNoteCount:       wikiKeys.length,
-    gemma4SummaryCount:  withSummary,
-    gemma4Coverage:      wikiKeys.length > 0
-      ? Math.round((withSummary / wikiKeys.length) * 100)
-      : 0,
-    bowChunkTiles:       bowChunkKeys.length,
-    bowClusterTiles:     bowClusterKeys.length,
+    wikiNoteCount: wikiKeys.length,
+    gemma4SummaryCount: withSummary,
+    gemma4Coverage: wikiKeys.length > 0 ? Math.round((withSummary / wikiKeys.length) * 100) : 0,
+    bowChunkTiles: bowChunkKeys.length,
+    bowClusterTiles: bowClusterKeys.length,
     manifoldClusterCount: manifoldCount,
-    somWeightsPresent:    somWeights > 0,
+    somWeightsPresent: somWeights > 0,
+    autoencoderWeightsType,
+    autoencoderMetaType,
+    autoencoderEncodedType,
+    autoencoderWeightsTrainedAt,
+    autoencoderCentroidsPresent,
+    autoencoderEncodedCount,
+    autoencoderReady:
+      autoencoderWeightsType === 'hash' &&
+      autoencoderMetaType === 'hash' &&
+      autoencoderEncodedType === 'hash' &&
+      Boolean(autoencoderWeightsTrainedAt) &&
+      autoencoderCentroidsPresent &&
+      autoencoderEncodedCount > 0,
   };
 }
 
@@ -124,17 +153,18 @@ function agentsMdCount() {
 // ── ACE smoke (lightweight, non-blocking) ────────────────────────────────────
 
 async function aceSmokeResult(redis, qdrantInfo) {
-  const wikiOk  = qdrantInfo.glyphCount > 0;
-  const glyphOk = qdrantInfo.qdrantReachable;
-
   // Quick Redis sanity
   let wikiKeys = [];
-  try { wikiKeys = await redis.keys('wiki:note:dir:*'); } catch { /* */ }
+  try {
+    wikiKeys = await redis.keys('wiki:note:dir:*');
+  } catch {
+    /* */
+  }
 
   return {
     wikiNotesPresent: wikiKeys.length > 0,
     glyphAtlasPresent: qdrantInfo.glyphCount > 0,
-    httpProbesSkipped: true,  // requires running dev server
+    httpProbesSkipped: true, // requires running dev server
   };
 }
 
@@ -159,6 +189,10 @@ function formatMd(h) {
   const wikiStatus  = h.wikiNoteCount > 0 ? '✅' : '❌';
   const graphStatus = h.graphNodeCount > 0 ? '✅' : '⚠️';
   const agentsStatus= h.agentsMdCount > 0 ? '✅' : '⚠️';
+  const autoencoderStatus = h.autoencoderReady ? '✅' : '⚠️';
+  const autoencoderDetail = h.autoencoderReady
+    ? `trainedAt=${h.autoencoderWeightsTrainedAt}, centroids=${h.autoencoderCentroidsPresent ? 'yes' : 'no'}, encoded=${h.autoencoderEncodedCount}`
+    : `weightsType=${h.autoencoderWeightsType ?? 'unknown'}, encodedType=${h.autoencoderEncodedType ?? 'unknown'}, centroids=${h.autoencoderCentroidsPresent ? 'yes' : 'no'}`;
 
   return `# Graphify Health Report
 
@@ -178,6 +212,7 @@ function formatMd(h) {
 | AGENTS.md mirrors | ${h.agentsMdCount} | ${agentsStatus} |
 | Manifold clusters | ${h.manifoldClusterCount} | ${h.manifoldClusterCount > 0 ? '✅' : '⚠️'} |
 | SOM Weights | ${h.somWeightsPresent ? '✅' : '❌'} | ${h.somWeightsPresent ? '✅' : '❌'} |
+| Autoencoder weights | ${autoencoderDetail} | ${autoencoderStatus} |
 
 ## Graphify Tiers
 
@@ -192,6 +227,7 @@ function formatMd(h) {
 ## Recommendations
 
 ${h.gemma4Coverage < 80 ? `- ⚠️  Run \`npm run graphify:batch-gpu-analysis\` — only ${coveragePct} of wiki notes have Gemma4 summaries\n` : ''}${h.bowChunkTiles === 0 ? `- ⚠️  Run \`npm run graphify:bow-tiles:fast\` — no BoW tiles in Redis\n` : ''}${h.glyphCount === 0 ? `- ⚠️  Run \`npm run graphify:batch-gpu-analysis\` — glyph_atlas is empty\n` : ''}${h.agentsMdCount === 0 ? `- ⚠️  Run \`npm run graphify:agents-md\` — no AGENTS.md mirrors found\n` : ''}${h.gemma4Coverage >= 80 && h.bowChunkTiles > 100 && h.glyphCount > 0 ? `- ✅ All tiers healthy — no action needed\n` : ''}
+${h.autoencoderReady ? '' : `- ⚠️  Run \`npm run graphify:autoencoder:train\` — autoencoder is still on Xavier placeholder weights\n`}
 ## Raw JSON
 
 See \`docs/graph/graphify-health.json\` for machine-readable data.
@@ -212,11 +248,23 @@ try {
 log('Collecting graphify health metrics…');
 
 const [rStats, qStats] = await Promise.all([
-  redis ? redisStats(redis) : Promise.resolve({
-    wikiNoteCount: 0, gemma4SummaryCount: 0, gemma4Coverage: 0,
-    bowChunkTiles: 0, bowClusterTiles: 0,
-    manifoldClusterCount: 0, somWeightsPresent: false,
-  }),
+  redis
+    ? redisStats(redis)
+    : Promise.resolve({
+        wikiNoteCount: 0,
+        gemma4SummaryCount: 0,
+        gemma4Coverage: 0,
+        bowChunkTiles: 0,
+        bowClusterTiles: 0,
+        manifoldClusterCount: 0,
+        somWeightsPresent: false,
+        autoencoderWeightsType: 'none',
+        autoencoderEncodedType: 'none',
+        autoencoderWeightsTrainedAt: null,
+        autoencoderCentroidsPresent: false,
+        autoencoderEncodedCount: 0,
+        autoencoderReady: false,
+      }),
   qdrantStats(),
 ]);
 
@@ -228,30 +276,36 @@ const ts7     = ts7Check();
 if (redis) await redis.quit().catch(() => {});
 
 const health = {
-  generatedAt:          new Date().toISOString(),
+  generatedAt: new Date().toISOString(),
   // Redis
-  wikiNoteCount:        rStats.wikiNoteCount,
-  gemma4SummaryCount:   rStats.gemma4SummaryCount,
-  gemma4Coverage:       rStats.gemma4Coverage,
-  bowChunkTiles:        rStats.bowChunkTiles,
-  bowClusterTiles:      rStats.bowClusterTiles,
+  wikiNoteCount: rStats.wikiNoteCount,
+  gemma4SummaryCount: rStats.gemma4SummaryCount,
+  gemma4Coverage: rStats.gemma4Coverage,
+  bowChunkTiles: rStats.bowChunkTiles,
+  bowClusterTiles: rStats.bowClusterTiles,
   manifoldClusterCount: rStats.manifoldClusterCount,
-  somWeightsPresent:    rStats.somWeightsPresent,
+  somWeightsPresent: rStats.somWeightsPresent,
+  autoencoderWeightsType: rStats.autoencoderWeightsType,
+  autoencoderEncodedType: rStats.autoencoderEncodedType,
+  autoencoderWeightsTrainedAt: rStats.autoencoderWeightsTrainedAt,
+  autoencoderCentroidsPresent: rStats.autoencoderCentroidsPresent,
+  autoencoderEncodedCount: rStats.autoencoderEncodedCount,
+  autoencoderReady: rStats.autoencoderReady,
   // Qdrant
-  glyphCount:           qStats.glyphCount,
-  qdrantReachable:      qStats.qdrantReachable,
+  glyphCount: qStats.glyphCount,
+  qdrantReachable: qStats.qdrantReachable,
   // Filesystem
-  graphNodeCount:       gStats.nodeCount,
-  graphEdgeCount:       gStats.edgeCount,
-  graphLastModified:    gStats.lastModified,
-  agentsMdCount:        aCount,
+  graphNodeCount: gStats.nodeCount,
+  graphEdgeCount: gStats.edgeCount,
+  graphLastModified: gStats.lastModified,
+  agentsMdCount: aCount,
   // ACE smoke
-  aceSmokeWikiOk:       smoke.wikiNotesPresent,
-  aceSmokeGlyphOk:      smoke.glyphAtlasPresent,
-  aceSmokeHttpSkipped:  smoke.httpProbesSkipped,
+  aceSmokeWikiOk: smoke.wikiNotesPresent,
+  aceSmokeGlyphOk: smoke.glyphAtlasPresent,
+  aceSmokeHttpSkipped: smoke.httpProbesSkipped,
   // ts7
-  ts7Available:         ts7.available,
-  ts7Note:              ts7.note,
+  ts7Available: ts7.available,
+  ts7Note: ts7.note,
 };
 
 if (JSON_ONLY) {

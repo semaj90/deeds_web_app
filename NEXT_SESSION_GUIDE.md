@@ -24,15 +24,15 @@
 ### Step 1: Start llama-server
 
 ```bash
-# Find gemma4-legal GGUF file
+# Find gemma4-rotorquant:latest GGUF file
 ls ~/.ollama/models/blobs/ | grep sha256
 
 # Copy to workspace (largest file, ~7GB)
-cp ~/.ollama/models/blobs/sha256-XXXXX ./gemma4-legal.gguf
+cp ~/.ollama/models/blobs/sha256-XXXXX ./gemma4-rotorquant:latest.gguf
 
 # Start llama-server on port 8090
 llama-server \
-  -m ./gemma4-legal.gguf \
+  -m ./gemma4-rotorquant:latest.gguf \
   --port 8090 \
   -ngl 99 \
   --flash-attn \
@@ -167,7 +167,7 @@ node scripts/tests/redis-load-test.mjs --duration=60 --concurrency=10
 3. Expected time: 30-45 minutes
 4. Output: TensorRT engine (~3GB)
 
-**Result**: gemma4-legal 3-5× faster (34s → 5-10s)
+**Result**: gemma4-rotorquant:latest 3-5× faster (34s → 5-10s)
 
 ### 2. Redis Direct Benchmark
 
@@ -225,7 +225,7 @@ const MAX_FAILURES_BEFORE_SKIP = 3;
 
 ```bash
 # Start TurboQuant
-llama-server -m gemma4-legal.gguf --port 8090 -ngl 99 --flash-attn
+llama-server -m gemma4-rotorquant:latest.gguf --port 8090 -ngl 99 --flash-attn
 
 # Check health
 curl localhost:8090/health

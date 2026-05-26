@@ -15,6 +15,7 @@ const OUTPUT_REPORT = join(OUT_DIR, 'graph_file_cards.report.json');
 const OUTPUT_INVALID = join(OUT_DIR, 'graph_file_cards.invalid.jsonl');
 
 const TAG_BOOSTS = new Set(['auth', 'db', 'qdrant', 'redis', 'llm', 'ace', 'mcp', 'zod', 'evidence', 'reconstruction', 'cache']);
+const CARD_TYPES = new Set(['graph', 'route', 'glyph', 'cartridge', 'feature']);
 
 function parseArgs(argv) {
   const args = { input: null };
@@ -73,6 +74,19 @@ function toPosixPath(value) {
 
 function cleanList(values, limit = 12) {
   return [...new Set((Array.isArray(values) ? values : []).map((value) => String(value).trim()).filter(Boolean))].slice(0, limit);
+}
+
+function normalizeText(value) {
+  return String(value ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function truncateText(value, limit = 240) {
+  const text = normalizeText(value);
+  if (!text) return '';
+  if (text.length <= limit) return text;
+  return `${text.slice(0, Math.max(0, limit - 3)).trimEnd()}...`;
 }
 
 function fileHash(payload) {
@@ -161,6 +175,27 @@ function inferTags(record, sourcePath, kind, zone) {
   return [...new Set([...baseTags, ...extras])].slice(0, 12);
 }
 
+function inferCardType(record, sourcePath, kind, tags) {
+  const explicit = normalizeText(record?.card_type).toLowerCase();
+  if (CARD_TYPES.has(explicit)) return explicit;
+
+  if (normalizeText(record?.feature_key)) return 'feature';
+  if (normalizeText(record?.cartridge_kind)) return 'cartridge';
+  if (normalizeText(record?.glyph_kind)) return 'glyph';
+
+  const source = sourcePath.toLowerCase();
+  const tagSet = new Set(tags.map((tag) => tag.toLowerCase()));
+
+  if (kind === 'route' || source.includes('/routes/') || source.includes('/api/')) return 'route';
+  if (source.includes('/glyph/') || source.includes('glyph') || tagSet.has('glyph')) return 'glyph';
+  if (source.includes('/cartridge/') || source.includes('cartridge') || tagSet.has('cartridge'))
+    return 'cartridge';
+  if (source.includes('/feature/') || source.includes('feature') || tagSet.has('feature'))
+    return 'feature';
+
+  return 'graph';
+}
+
 function inferFanIn(record) {
   const value = record?.fanIn ?? record?.fan_in ?? record?.directFanIn ?? 0;
   return Number.isFinite(Number(value)) ? Number(value) : 0;
@@ -206,25 +241,55 @@ function collectNeighbors(record, sourcePath) {
   return [...new Set(candidates.map((item) => normalizeNeighborSpec(item, sourcePath)).filter(Boolean))].slice(0, 8);
 }
 
+function computeGapSignal(
+  record,
+  summary,
+  compactSummary,
+  tags,
+  fanIn,
+  fanOut,
+  exports,
+  neighbors
+) {
+  let gapScore = 0;
+
+  if (!compactSummary && !summary) gapScore += 0.3;
+  if (neighbors.length === 0) gapScore += 0.2;
+  if (fanIn === 0 && fanOut === 0) gapScore += 0.2;
+  if (tags.length <= 2) gapScore += 0.1;
+  if (
+    exports.length === 0 &&
+    (record?.isRoute || (Array.isArray(record?.routeHandlers) && record.routeHandlers.length > 0))
+  )
+    gapScore += 0.1;
+  if (record?.hasPairedTest === false) gapScore += 0.1;
+
+  return Math.max(0, Math.min(1, Number(gapScore.toFixed(3))));
+}
+
 function buildSearchText(card) {
-  const summary = card.summary ? `summary=${card.summary}` : '';
+  const summary = card.compact_summary ? `summary=${card.compact_summary}` : '';
   return [
     card.title,
+    card.card_type,
     card.kind,
     card.domain,
     card.zone,
     `tags=${card.tags.join(' ')}`,
     `exports=${card.exports.join(' ')}`,
     `deg ${card.fan_in}/${card.fan_out}`,
+    `gap ${card.gap_signal.toFixed(3)}`,
     `risk ${card.risk_score.toFixed(3)}`,
     summary,
-  ].filter(Boolean).join(' | ');
+  ]
+    .filter(Boolean)
+    .join(' | ');
 }
 
 function buildContextText(card) {
   const lines = [
     `NODE ${card.title}`,
-    `domain=${card.domain} kind=${card.kind} zone=${card.zone} risk=${card.risk_score.toFixed(3)} lines=${card.line_count}`,
+    `domain=${card.domain} card_type=${card.card_type} kind=${card.kind} zone=${card.zone} risk=${card.risk_score.toFixed(3)} gap=${card.gap_signal.toFixed(3)} lines=${card.line_count}`,
     `source_id=${card.source_id}`,
     `source_hash=${card.source_hash}`,
     `tags=${card.tags.join(',') || 'none'}`,
@@ -234,7 +299,7 @@ function buildContextText(card) {
     `neighbors=${card.graph_neighbors.slice(0, 8).join(', ') || 'none'}`,
   ];
 
-  if (card.summary) lines.push(`summary=${card.summary}`);
+  if (card.compact_summary) lines.push(`summary=${card.compact_summary}`);
   return lines.join('\n');
 }
 
@@ -317,6 +382,7 @@ function minifyRankCard(card) {
     card_id: card.card_id,
     source_id: card.source_id,
     source_path: card.source_path,
+    card_type: card.card_type,
     score: card.rank_score,
     risk_score: card.risk_score,
     line_count: card.line_count,
@@ -324,38 +390,70 @@ function minifyRankCard(card) {
     fan_out: card.fan_out,
     tag_boost: card.rank_metrics.tag_boost,
     summary_presence: card.rank_metrics.summary_presence,
+    gap_signal: card.rank_metrics.gap_signal,
     kind: card.kind,
     zone: card.zone,
     tags: card.tags,
     exports: card.exports,
     graph_neighbors: card.graph_neighbors,
+    compact_summary: card.compact_summary,
   };
 }
 
 function scoreCards(cards) {
   const maxLineCount = Math.max(1, ...cards.map((card) => card.line_count || 0));
+  const maxFanIn = Math.max(1, ...cards.map((card) => card.fan_in || 0));
+  const maxFanOut = Math.max(1, ...cards.map((card) => card.fan_out || 0));
   const maxDegree = Math.max(1, ...cards.map((card) => (card.fan_in || 0) + (card.fan_out || 0)));
 
   return cards
     .map((card) => {
       const normalizedLineCount = Math.min(1, (card.line_count || 0) / maxLineCount);
+      const normalizedFanIn = Math.min(1, (card.fan_in || 0) / maxFanIn);
+      const normalizedFanOut = Math.min(1, (card.fan_out || 0) / maxFanOut);
       const normalizedDegree = Math.min(1, ((card.fan_in || 0) + (card.fan_out || 0)) / maxDegree);
       const boostedTagCount = card.tags.filter((tag) => TAG_BOOSTS.has(tag.toLowerCase())).length;
       const tagBoost = Math.min(1, boostedTagCount / 4);
-      const summaryPresence = card.summary ? 1 : 0;
-      const rankScore = Number((0.35 * card.risk_score + 0.20 * normalizedLineCount + 0.20 * normalizedDegree + 0.15 * tagBoost + 0.10 * summaryPresence).toFixed(4));
+      const compactSummary =
+        typeof card.compact_summary === 'string' ? card.compact_summary.trim() : '';
+      const summaryPresence = compactSummary ? 1 : card.summary ? 1 : 0;
+      const gapSignal = Number(
+        (typeof card.gap_signal === 'number' ? card.gap_signal : 0).toFixed(4)
+      );
+      const rankScore = Number(
+        (
+          0.26 * card.risk_score +
+          0.26 * normalizedFanIn +
+          0.12 * normalizedLineCount +
+          0.16 * tagBoost +
+          0.08 * summaryPresence +
+          0.1 * gapSignal +
+          0.02 * normalizedFanOut
+        ).toFixed(4)
+      );
       return {
         ...card,
+        compact_summary: compactSummary,
         rank_score: rankScore,
         rank_metrics: {
           normalized_line_count: Number(normalizedLineCount.toFixed(4)),
+          normalized_fan_in: Number(normalizedFanIn.toFixed(4)),
+          normalized_fan_out: Number(normalizedFanOut.toFixed(4)),
           normalized_degree: Number(normalizedDegree.toFixed(4)),
           tag_boost: Number(tagBoost.toFixed(4)),
           summary_presence: summaryPresence,
+          gap_signal: gapSignal,
         },
       };
     })
-    .sort((left, right) => right.rank_score - left.rank_score || right.risk_score - left.risk_score || left.source_path.localeCompare(right.source_path));
+    .sort(
+      (left, right) =>
+        right.rank_score - left.rank_score ||
+        right.rank_metrics.gap_signal - left.rank_metrics.gap_signal ||
+        right.fan_in - left.fan_in ||
+        right.risk_score - left.risk_score ||
+        left.source_path.localeCompare(right.source_path)
+    );
 }
 
 async function main() {
@@ -386,6 +484,7 @@ async function main() {
     const kind = inferKind(record, sourcePath);
     const zone = inferZone(record, sourcePath);
     const tags = inferTags(record, sourcePath, kind, zone);
+    const cardType = inferCardType(record, sourcePath, kind, tags);
     const exports = cleanList(record?.exports, 12);
     const neighbors = collectNeighbors(record, sourcePath);
     const lineCount = inferLineCount(record);
@@ -394,9 +493,34 @@ async function main() {
     const hash = deriveHash(record, sourcePath);
     const riskScore = computeRiskScore(record, sourcePath, kind, zone, tags, fanIn, fanOut, lineCount);
     const summary = typeof record?.summary === 'string' ? record.summary.trim() : '';
+    const compactSummary = truncateText(
+      normalizeText(record?.compact_summary ?? summary) ||
+        [
+          sourcePath ? sourcePath.split('/').slice(-2).join('/') : 'codebase-node',
+          `${cardType}/${kind}/${zone}`,
+          lineCount > 0 ? `${lineCount} lines` : '',
+          fanIn || fanOut ? `deg ${fanIn}/${fanOut}` : '',
+          tags.length > 0 ? `tags ${tags.slice(0, 4).join(', ')}` : '',
+          `risk ${riskScore.toFixed(3)}`,
+        ]
+          .filter(Boolean)
+          .join(' | '),
+      240
+    );
     const title = sourcePath || record?.summary?.trim?.() || 'codebase-node';
     const sourceId = sourcePath || title;
-    const confidence = summary && tags.length > 0 ? 'high' : summary ? 'medium' : 'low';
+    const confidence =
+      compactSummary && tags.length > 0 ? 'high' : compactSummary ? 'medium' : 'low';
+    const gapSignal = computeGapSignal(
+      record,
+      summary,
+      compactSummary,
+      tags,
+      fanIn,
+      fanOut,
+      exports,
+      neighbors
+    );
 
     const card = {
       card_id: `card:codebase:${sourceId}:${hash}`,
@@ -405,9 +529,11 @@ async function main() {
       source_path: sourcePath || undefined,
       source_hash: hash,
       title,
+      card_type: cardType,
       kind,
       tags,
       summary,
+      compact_summary: compactSummary,
       search_text: '',
       context_text: '',
       citations: [],
@@ -422,6 +548,7 @@ async function main() {
       line_count: lineCount,
       fan_in: fanIn,
       fan_out: fanOut,
+      gap_signal: gapSignal,
       exports,
       risk_score: riskScore,
       has_auth: !!record?.hasAuth,

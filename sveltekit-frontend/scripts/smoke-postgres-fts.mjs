@@ -83,6 +83,12 @@ async function main() {
       return n > 0 ? `${n} rows` : false;
     });
 
+    await check('Embedding non-null count', async () => {
+      const { rows } = await client.query('SELECT COUNT(*)::int AS n FROM code_retrieval_chunks WHERE embedding IS NOT NULL');
+      const n = rows[0].n;
+      return `${n} embedded rows`;
+    });
+
     await check('GIN FTS index exists (crc_fts_gin)', async () => {
       const { rows } = await client.query(
         `SELECT indexname FROM pg_indexes WHERE tablename='code_retrieval_chunks' AND indexname='crc_fts_gin'`
@@ -107,6 +113,19 @@ async function main() {
         `SELECT proname FROM pg_proc WHERE proname='search_code_hybrid_pg'`
       );
       return rows.length > 0 ? 'found' : false;
+    });
+
+    await check('search_code_hybrid_pg returns result', async () => {
+      const { rows: embRows } = await client.query(
+        `SELECT embedding FROM code_retrieval_chunks WHERE embedding IS NOT NULL LIMIT 1`
+      );
+      const embedding = embRows[0]?.embedding;
+      if (!embedding) return 'skipped (no embedding rows yet)';
+      const { rows } = await client.query(
+        'SELECT * FROM search_code_hybrid_pg($1, $2::vector(768), $3, $4)',
+        [args.query, embedding, 5, null]
+      );
+      return rows.length > 0 ? `${rows.length} results, top hybrid=${Number(rows[0].hybrid_score).toFixed(4)}` : false;
     });
 
   } finally {

@@ -8,7 +8,7 @@
 
 ## Background: What We Have Today
 
-### Current gemma4-legal:latest (TEXT-ONLY)
+### Current gemma4-rotorquant:latest (TEXT-ONLY)
 
 | Property | Value |
 |----------|-------|
@@ -16,7 +16,7 @@
 | Training | GRPO (1,000 prompts, 250 steps, 7 reward signals) |
 | Adapter | 588 language_model tensors (140 MB LoRA) |
 | Merged GGUF | Q4_K_M, 5.0 GB, **text-only** |
-| Ollama tag | `gemma4-legal:latest` |
+| Ollama tag | `gemma4-rotorquant:latest` |
 | VRAM | ~5.3 GB loaded |
 | Context | 8192 (Modelfile) / 131K max (architecture) |
 
@@ -90,11 +90,11 @@ Output
 
 **Timeline**: Now
 **Effort**: Already done (model pulled, env wired)
-**How it works**: Ollama's `gemma4:e4b-it-q4_K_M` (9.6 GB) includes the full multimodal model. Use it for vision tasks, use `gemma4-legal:latest` for text-only legal tasks.
+**How it works**: Ollama's `gemma4:e4b-it-q4_K_M` (9.6 GB) includes the full multimodal model. Use it for vision tasks, use `gemma4-rotorquant:latest` for text-only legal tasks.
 
 **Current wiring**:
 - `env.server.ts` → `GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M'`
-- `vlm-evidence-analyzer.ts` → falls back to `ENV.GEMMA4_MODEL ?? 'gemma4-legal:latest'`
+- `vlm-evidence-analyzer.ts` → falls back to `ENV.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest'`
 - `persons-of-interest/photos` → uses `ENV.GEMMA4_MODEL` for VLM
 
 **Limitation**: The base `gemma4:e4b` is NOT fine-tuned for legal domain — it's the generic instruction-tuned model. Legal-specific vision tasks (evidence photos, scanned documents) won't have the legal formatting/citation training.
@@ -122,7 +122,7 @@ Output
 **Status**: COMPLETE
 
 ```
-Text queries → gemma4-legal:latest (5.3 GB, GRPO-trained)
+Text queries → gemma4-rotorquant:latest (5.3 GB, GRPO-trained)
 Vision queries → gemma4:e4b-it-q4_K_M (9.6 GB, base multimodal)
 Embeddings → embeddinggemma:latest (621 MB, always loaded)
 ```
@@ -203,13 +203,13 @@ This produces a clean 588-tensor adapter without needing surgery. Vision/audio t
 ```
 Evidence Input (text / image / audio / video)
     │
-    ├─ Text → gemma4-legal:latest (Ollama, GRPO-trained)
+    ├─ Text → gemma4-rotorquant:latest (Ollama, GRPO-trained)
     │   └─ SSE chat, synthesis, summarization, entity extraction, ACE
     │
     ├─ Image → Triton Ensemble (TRT-LLM)
     │   ├─ SigLIP vision encoder (ONNX/TRT)
     │   ├─ Multimodal projector (ONNX/TRT)
-    │   └─ gemma4-legal text LLM (TRT engine, GRPO-trained)
+    │   └─ gemma4-rotorquant:latest text LLM (TRT engine, GRPO-trained)
     │   └─ Fallback: gemma4:e4b (Ollama, base multimodal)
     │
     ├─ Audio → Whisper (Docling service, port 8085)
@@ -236,7 +236,7 @@ Evidence Input (text / image / audio / video)
 |------|--------|-------|
 | `scripts/unsloth-training/Gemma4_E4B_Legal_GRPO.ipynb` | Add TRT-LLM build cells (Section 18) | 2 |
 | `scripts/unsloth-training/Gemma3_12B_INT4_Quantize_and_Export.ipynb` | Update for Gemma 4 SigLIP export | 3 |
-| `docker/triton/model_repository/` | Add gemma4-legal TRT engine config | 2 |
+| `docker/triton/model_repository/` | Add gemma4-rotorquant:latest TRT engine config | 2 |
 | `docker/triton/model_repository/siglip_vision/` | SigLIP ONNX model + config.pbtxt | 3 |
 | `docker/triton/model_repository/mm_projector/` | Projector ONNX + config.pbtxt | 3 |
 | `src/lib/server/analysis/vlm-evidence-analyzer.ts` | Update Triton model names for Gemma 4 | 3 |
@@ -250,13 +250,13 @@ Evidence Input (text / image / audio / video)
 
 | Model | Size | Purpose | Status | Location |
 |-------|------|---------|--------|----------|
-| `gemma4-legal:latest` | 5.3 GB | Text LLM (GRPO-trained) | **ACTIVE** | Ollama |
+| `gemma4-rotorquant:latest` | 5.3 GB | Text LLM (GRPO-trained) | **ACTIVE** | Ollama |
 | `gemma4:e4b-it-q4_K_M` | 9.6 GB | Base multimodal VLM | **ACTIVE** | Ollama |
 | `embeddinggemma:latest` | 621 MB | 768-dim embeddings | **ACTIVE** | Ollama |
 | `gemma3:270m` | 291 MB | Client-side lightweight | **ACTIVE** | Ollama |
 | Merged BF16 safetensors | 16.1 GB | TRT-LLM source | On Colab (ephemeral) | Re-export needed |
 | LoRA adapter (588 tensors) | 140 MB | HuggingFace upload | `Semaj90/gemma4-e4b-legal-grpo` | HuggingFace |
-| Q4_K_M GGUF | 5.0 GB | Ollama source | `Downloads/gemma4-legal-ollama/` | Local |
+| Q4_K_M GGUF | 5.0 GB | Ollama source | `Downloads/gemma4-rotorquant:latest-ollama/` | Local |
 
 ---
 

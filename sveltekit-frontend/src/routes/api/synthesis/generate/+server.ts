@@ -129,7 +129,7 @@ interface SynthesisResponse {
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
-const MODEL = 'gemma4-legal:latest';
+const MODEL = 'gemma4-rotorquant:latest';
 const QUALITY_THRESHOLD = 0.6;
 
 // ── User Analytics + Predictive Pre-fetch ─────────────────────────────
@@ -463,7 +463,7 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
                     fullResponse += evt.token;
                     sendEvent('synthesis_chunk', { text: evt.token });
                   } else if (evt.status === 'running') {
-                    sendEvent('synthesis_started', { model: 'gemma4-legal:latest', maxTokens });
+                    sendEvent('synthesis_started', { model: 'gemma4-rotorquant:latest', maxTokens });
                   }
                   break;
                 case 'cache':
@@ -480,7 +480,7 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
                     citations: evt.citations ?? [],
                     evaluation: null,
                     confidence: evt.confidence ?? 0.5,
-                    model: 'gemma4-legal:latest',
+                    model: 'gemma4-rotorquant:latest',
                     tokensUsed: Math.ceil(fullResponse.length / 4),
                     timing: { contextMs: 0, generateMs: 0, evalMs: 0, totalMs: 0 },
                     cached: evt.cache !== 'L3-langgraph',

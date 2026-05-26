@@ -40,7 +40,10 @@ const require = createRequire(import.meta.url);
 if (!process.env.ESBUILD_BINARY_PATH) {
   const esbuildPackage = require.resolve('esbuild/package.json');
   const binName = process.platform === 'win32' ? 'esbuild.exe' : 'esbuild';
-  process.env.ESBUILD_BINARY_PATH = path.join(path.dirname(esbuildPackage), 'bin', binName);
+  const binPath = path.join(path.dirname(esbuildPackage), 'bin', binName);
+  if (fs.existsSync(binPath)) {
+    process.env.ESBUILD_BINARY_PATH = binPath;
+  }
 }
 
 const generatedDir = path.resolve(__dirname, '.svelte-kit/generated');

@@ -308,10 +308,10 @@ export interface SynthesisResult {
  *
  *   'none'   → return context as-is (CLI/raw output, no LLM call)
  *   'hermes' → try HERMES_API_URL dedicated server first (:8642 opt-in),
- *              fallback to bifrostChat gemma4-legal. Same quality either way;
+ *              fallback to bifrostChat gemma4-rotorquant:latest. Same quality either way;
  *              the dedicated server provides better concurrency when available.
  *              Use model=yorha-hermes on the OpenAI v1 facade to land here.
- *   'gemma4' → bifrostChat gemma4-legal directly (L1 → Bifrost L2 → L3)
+ *   'gemma4' → bifrostChat gemma4-rotorquant:latest directly (L1 → Bifrost L2 → L3)
  *
  * All LLM paths check Redis first (hermes:synth:* TTL 300s) and write on miss.
  */
@@ -355,7 +355,7 @@ ${context}`;
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           signal: AbortSignal.timeout(30_000),
-          body: JSON.stringify({ model: 'gemma4-legal', messages, temperature: 0.2, max_tokens: 512 }),
+          body: JSON.stringify({ model: 'gemma4-rotorquant:latest', messages, temperature: 0.2, max_tokens: 512 }),
         });
         if (res.ok) {
           const data = (await res.json()) as { choices: Array<{ message: { content: string } }> };
@@ -368,13 +368,13 @@ ${context}`;
       }
     }
 
-    // Fallback: bifrostChat gemma4-legal (L1 → Bifrost L2 → TurboQuant/Ollama L3)
+    // Fallback: bifrostChat gemma4-rotorquant:latest (L1 → Bifrost L2 → TurboQuant/Ollama L3)
     const { bifrostChat } = await import('$lib/server/ollama.js');
-    answer = await bifrostChat(messages, 'gemma4-legal', { temperature: 0.2, maxTokens: 512 });
+    answer = await bifrostChat(messages, 'gemma4-rotorquant:latest', { temperature: 0.2, maxTokens: 512 });
   } else {
     // composer === 'gemma4' — direct bifrostChat path
     const { bifrostChat } = await import('$lib/server/ollama.js');
-    answer = await bifrostChat(messages, 'gemma4-legal', { temperature: 0.2, maxTokens: 512 });
+    answer = await bifrostChat(messages, 'gemma4-rotorquant:latest', { temperature: 0.2, maxTokens: 512 });
   }
 
   await writeSynthCache(cacheKey, answer);

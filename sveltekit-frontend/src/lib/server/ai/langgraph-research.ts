@@ -204,7 +204,7 @@ async function redisSet(key: string, value: unknown, ttl: number): Promise<void>
 
 const QDRANT_URL  = ENV.QDRANT_URL;
 const COLLECTION  = 'codebase_chunks_768';
-const CHAT_MODEL  = ENV.OLLAMA_CHAT_MODEL;   // gemma4-legal-vlm (unified)
+const CHAT_MODEL  = ENV.OLLAMA_CHAT_MODEL;   // gemma4-rotorquant:latest (unified)
 
 // ── Neo4j topology expansion ─────────────────────────────────────────────────
 

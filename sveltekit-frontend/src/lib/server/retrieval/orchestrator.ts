@@ -176,7 +176,7 @@ async function correctiveRetrieval(
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				prompt: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${query}"`,
 				stream: false,
 				keep_alive: '2m',

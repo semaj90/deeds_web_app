@@ -221,7 +221,7 @@ Store result in Bifrost L2 for future hits ✅
 │    ↓ fallback                                            │
 │  LiteRT Sidecar (30-40s) ← CPU :8070 ✅                  │
 │    ↓ fallback                                            │
-│  Ollama (25-30s) ← gemma4-legal ✅                       │
+│  Ollama (25-30s) ← gemma4-rotorquant:latest ✅                       │
 └──────────────────────────────────────────────────────────┘
 ```
 

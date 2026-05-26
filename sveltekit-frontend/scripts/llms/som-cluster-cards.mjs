@@ -53,7 +53,7 @@ const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
 const COUCHDB_PASS = process.env.COUCHDB_PASSWORD ?? 'deeds123';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
-const LLM_MODEL = process.env.GEMMA4_MODEL ?? 'gemma4-legal-vlm:latest';
+const LLM_MODEL = process.env.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest';
 
 const NVME_DIR = resolve(ROOT, 'memory/agents-dag');
 const REDIS_TTL = 3600; // 1h hot cache

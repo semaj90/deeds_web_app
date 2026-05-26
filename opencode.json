@@ -1,72 +1,97 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "turboquant/gemma4-tq",
-  "small_model": "ollama/gemma4-hermes-64k",
+  "model": "gemma4-local/gemma4-local",
+  "small_model": "gemma4-local/gemma4-local",
+  "default_agent": "antigravity",
+  "shell": "pwsh.exe",
   "provider": {
-    "turboquant": {
+    "gemma4-local": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "TurboQuant llama-server :8090",
+      "name": "Gemma4 Local",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
         "apiKey": "local"
       },
       "models": {
-        "gemma4-tq": {
-          "name": "Gemma4 IQ4_XS via TurboQuant (59.8 tok/s, legal+LoRA merged)",
-          "limit": {
-            "context": 32768,
-            "output": 2048
-          }
+        "gemma4-local": {
+          "name": "Gemma4 Local"
         }
       }
     },
-    "ollama": {
+    "turboquant": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama local :11434",
+      "name": "Local llama-server :8090",
       "options": {
-        "baseURL": "http://127.0.0.1:11434/v1",
-        "apiKey": "ollama"
+        "baseURL": "http://127.0.0.1:8090/v1",
+        "apiKey": "local"
       },
       "models": {
-        "gemma4-hermes-64k": {
-          "name": "Gemma4 Hermes 64k — legal+vision merged, 64K ctx (blob d9c7875f)",
+        "gemma4-iq4xs": {
+          "name": "Gemma4 Legal 64K",
           "limit": {
             "context": 65536,
             "output": 4096
           }
         },
-        "gemma4-legal": {
-          "name": "Gemma4 Legal — text-only, 8K ctx (blob a79de882)",
+        "gemma4-tq": {
+          "name": "Gemma4 TurboQuant 64K",
           "limit": {
-            "context": 8192,
-            "output": 2048
+            "context": 65536,
+            "output": 4096
           }
         }
       }
     },
     "yorha": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "YorHA OpenAI facade :5173 (ACE/KAG pipeline)",
+      "name": "YorHA OpenAI facade :5173",
       "options": {
         "baseURL": "http://127.0.0.1:5173/api/v1",
         "apiKey": "local"
       },
       "models": {
         "yorha-hermes": {
-          "name": "Hermes via ACE facade → HERMES_API_URL → gemma4-hermes-64k:latest",
+          "name": "YorHA ACE Hermes 64K",
           "limit": {
             "context": 65536,
             "output": 4096
           }
         },
         "yorha-legal": {
-          "name": "Legal via ACE facade → bifrostChat → gemma4-legal:latest",
+          "name": "YorHA ACE Legal 64K",
           "limit": {
-            "context": 32768,
-            "output": 2048
+            "context": 65536,
+            "output": 4096
           }
         }
       }
+    }
+  },
+  "permission": {
+    "read": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "lsp": "allow",
+    "todowrite": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "bash": {
+      "npm run tools:check:structural": "allow",
+      "npm run index:*": "allow",
+      "npm run graphify:dependency:audit": "allow",
+      "npm --prefix * run index:*": "allow",
+      "npm --prefix * run graphify:dependency:audit": "allow",
+      "node scripts/index/*": "allow",
+      "rg *": "allow",
+      "ast-grep *": "allow",
+      "sg *": "allow",
+      "jq *": "allow",
+      "git status": "allow",
+      "git diff *": "allow",
+      "rm *": "deny",
+      "del *": "deny",
+      "Remove-Item *": "deny",
+      "*": "ask"
     }
   },
   "mcp": {
@@ -74,22 +99,43 @@
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp",
       "enabled": true,
-      "timeout": 20000
+      "timeout": 60000
+    },
+    "turbovec": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8791/mcp",
+      "enabled": true,
+      "timeout": 30000
+    },
+    "engram": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8792/mcp",
+      "enabled": true,
+      "timeout": 60000
+    },
+    "langextract": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8793/mcp",
+      "enabled": true,
+      "timeout": 60000
     },
     "gemma4-offload": {
       "type": "local",
-      "command": ["node", "sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
+      "command": "node",
+      "args": [
+        "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"
+      ],
       "enabled": true,
-      "timeout": 15000
+      "timeout": 30000
     }
   },
   "agent": {
-    "trace-audit": {
-      "description": "Read-only audit agent backed by TRACE MCP — starts with atlas.compact_context and only expands if needed",
-      "model": "turboquant/gemma4-tq",
+    "antigravity": {
+      "description": "Minimal MCP-first Gemma4 agent for VS Code/OpenCode.",
+      "model": "gemma4-local/gemma4-local",
       "temperature": 0,
-      "steps": 8,
-      "prompt": "Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "steps": 10,
+      "prompt": "Use MCP tools first, but call only what is needed for the current question. Default tool order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Only use gemma4-offload for runtime/model checks. Keep engram, turbovec, and langextract opt-in unless explicitly requested. Do not edit files without approval.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -97,65 +143,26 @@
         "glob": "allow",
         "grep": "allow",
         "lsp": "allow",
+        "todowrite": "allow",
         "atlas_*": "allow",
         "atlas.*": "allow",
         "context_*": "allow",
         "context.*": "allow",
-        "wiki_*": "allow",
-        "wiki.*": "allow",
-        "graph_*": "allow",
-        "graph.*": "allow",
-        "kag_*": "allow",
-        "kag.*": "allow",
         "trace_*": "allow",
         "trace.*": "allow",
-        "search_*": "allow",
-        "search.*": "allow",
-        "edit": "deny",
-        "bash": "deny",
-        "webfetch": "deny",
-        "websearch": "deny"
-      }
-    },
-    "audit-hermes": {
-      "description": "Hermes 64K direct — legal+vision, 64K ctx, same weights as VLM (blob d9c7875f), direct to Ollama (no ACE enrichment)",
-      "model": "ollama/gemma4-hermes-64k",
-      "temperature": 0,
-      "steps": 8,
-      "prompt": "Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
-      "permission": {
-        "*": "deny",
-        "read": "allow",
-        "list": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "lsp": "allow",
-        "atlas_*": "allow",
-        "atlas.*": "allow",
-        "context_*": "allow",
-        "context.*": "allow",
-        "wiki_*": "allow",
-        "wiki.*": "allow",
+        "ace_*": "allow",
+        "ace.*": "allow",
         "graph_*": "allow",
         "graph.*": "allow",
-        "kag_*": "allow",
-        "kag.*": "allow",
-        "trace_*": "allow",
-        "trace.*": "allow",
-        "search_*": "allow",
-        "search.*": "allow",
-        "edit": "deny",
-        "bash": "deny",
-        "webfetch": "deny",
-        "websearch": "deny"
+        "edit": "deny"
       }
     },
     "hermes-ace": {
-      "description": "Hermes via YorHA ACE facade — full ACE/KAG context enrichment + HERMES_API_URL → gemma4-hermes-64k:latest. Requires SvelteKit dev server on :5173.",
-      "model": "yorha/yorha-hermes",
+      "description": "Hermes-ACE local agent using ACE context, MCP tools, and local Gemma4 64K.",
+      "model": "gemma4-local/gemma4-local",
       "temperature": 0,
-      "steps": 8,
-      "prompt": "Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "steps": 12,
+      "prompt": "Use MCP tools in this priority order: trace.kag_search or trace.atlas_query, turbovec for cosine ranking and chunk-id scoring, engram for memory, and langextract for citation and entity extraction. Always include chunk_ids and cluster_labels in synthesis context. Do not edit files without explicit approval. Do not mutate live Postgres schema.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -163,6 +170,47 @@
         "glob": "allow",
         "grep": "allow",
         "lsp": "allow",
+        "todowrite": "allow",
+        "mcp_*": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "wiki_*": "allow",
+        "wiki.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "kag_*": "allow",
+        "kag.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "turbovec_*": "allow",
+        "turbovec.*": "allow",
+        "langextract_*": "allow",
+        "langextract.*": "allow",
+        "engram_*": "allow",
+        "engram.*": "allow",
+        "edit": "deny",
+        "webfetch": "allow",
+        "websearch": "allow"
+      }
+    },
+    "trace-audit": {
+      "description": "Read-only TRACE audit agent with compact context tools.",
+      "model": "gemma4-local/gemma4-local",
+      "temperature": 0,
+      "steps": 8,
+      "prompt": "Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval. Prefer cached compressed cards over raw file expansion. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
         "atlas_*": "allow",
         "atlas.*": "allow",
         "context_*": "allow",
@@ -178,24 +226,31 @@
         "search_*": "allow",
         "search.*": "allow",
         "edit": "deny",
-        "bash": "deny",
-        "webfetch": "deny",
-        "websearch": "deny"
+        "webfetch": "allow",
+        "websearch": "allow"
       }
     },
     "audit": {
-      "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor (no MCP, local files only)",
-      "model": "turboquant/gemma4-tq",
+      "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor.",
+      "model": "gemma4-local/gemma4-local",
+      "temperature": 0,
+      "steps": 8,
       "prompt": "You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
-      "tools": {
-        "write": false,
-        "edit": false
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "edit": "deny"
       }
     }
   },
-  "default_agent": "trace-audit",
   "instructions": [
     ".github/instructions/opencode-context-prefetch.instructions.md",
+    "sveltekit-frontend/docs/architecture/cline-opencode-system-prompt.md",
     "AGENTS.md",
     ".claude/skills/trace-mcp-tooling/SKILL.md",
     "sveltekit-frontend/docs/architecture/gemma4-to-claude-code-handoff.md"

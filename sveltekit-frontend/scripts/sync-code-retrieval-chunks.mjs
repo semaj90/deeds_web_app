@@ -26,12 +26,14 @@ const { values: args } = parseArgs({
     batch:   { type: 'string',  default: '100' },
     quiet:   { type: 'boolean', default: false },
   },
+  allowPositionals: true,
 });
 
-const DRY_RUN    = args['dry-run'];
-const HARD_LIMIT = parseInt(args.limit, 10) || 0;
-const BATCH_SIZE = parseInt(args.batch, 10) || 100;
-const QUIET      = args.quiet;
+const positionals = Array.isArray(args._) ? args._ : [];
+const DRY_RUN = args['dry-run'];
+const HARD_LIMIT = parseInt(args.limit || positionals[0] || '0', 10) || 0;
+const BATCH_SIZE = parseInt(args.batch || positionals[1] || '100', 10) || 100;
+const QUIET = args.quiet;
 
 const PG_URL     = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const QDRANT_URL = process.env.QDRANT_URL   ?? 'http://localhost:6333';
@@ -49,7 +51,7 @@ async function* scrollQdrant(collection, batchSize = 100) {
     const body = {
       limit: batchSize,
       with_payload: true,
-      with_vector: false,
+      with_vector: ['content'],
     };
     if (offset !== null) body.offset = offset;
 
@@ -73,45 +75,20 @@ async function* scrollQdrant(collection, batchSize = 100) {
   }
 }
 
+function toPgVector(value) {
+  if (!Array.isArray(value)) return null;
+  if (value.length !== 768) return null;
+  return `[${value.map((item) => Number(item)).join(',')}]`;
+}
+
 // ── Postgres upsert ───────────────────────────────────────────────────────────
 
-const UPSERT_SQL = `
-INSERT INTO code_retrieval_chunks (
-  stable_key, qdrant_id, file_path, symbol_name, symbol_kind, language,
-  content, tags, error_terms, tool_terms,
-  topo_byte, topo_hex, topo_class,
-  manifold4_x, manifold4_y, manifold4_z, manifold4_w,
-  graph_authority_score, metadata
-) VALUES (
-  $1, $2, $3, $4, $5, $6,
-  $7, $8, $9, $10,
-  $11, $12, $13,
-  $14, $15, $16, $17,
-  $18, $19
-)
-ON CONFLICT (stable_key) DO UPDATE SET
-  qdrant_id              = EXCLUDED.qdrant_id,
-  file_path              = EXCLUDED.file_path,
-  symbol_name            = EXCLUDED.symbol_name,
-  symbol_kind            = EXCLUDED.symbol_kind,
-  language               = EXCLUDED.language,
-  content                = EXCLUDED.content,
-  tags                   = EXCLUDED.tags,
-  error_terms            = EXCLUDED.error_terms,
-  tool_terms             = EXCLUDED.tool_terms,
-  topo_byte              = EXCLUDED.topo_byte,
-  topo_hex               = EXCLUDED.topo_hex,
-  topo_class             = EXCLUDED.topo_class,
-  manifold4_x            = EXCLUDED.manifold4_x,
-  manifold4_y            = EXCLUDED.manifold4_y,
-  manifold4_z            = EXCLUDED.manifold4_z,
-  manifold4_w            = EXCLUDED.manifold4_w,
-  graph_authority_score  = EXCLUDED.graph_authority_score,
-  metadata               = EXCLUDED.metadata,
-  updated_at             = now()
-`;
-
 async function upsertBatch(client, points) {
+  if (points.length === 0) return;
+  const valueBlocks = [];
+  const queryParams = [];
+  let paramIndex = 1;
+
   for (const p of points) {
     const pl = p.payload ?? {};
     const manifold4 = Array.isArray(pl.manifold4) ? pl.manifold4 : [];
@@ -122,14 +99,6 @@ async function upsertBatch(client, points) {
       pl.stable_key ?? pl.chunk_id ??
       (relPath ? `file:${relPath}${sym ? `:${sym}` : ''}` : `qdrant:${p.id}`)
     );
-
-    // Actual Qdrant payload field names (from codebase_chunks_768 schema):
-    //   path / relativePath  → file_path
-    //   symbol               → symbol_name
-    //   kind                 → symbol_kind
-    //   tags                 → tags (array)
-    //   graphAuthorityScore  → graph_authority_score
-    //   manifold4            → [x, y, z, w] array
 
     const filePath   = String(pl.file_path ?? pl.path ?? pl.relativePath ?? '');
     const symbolName = pl.symbol ?? pl.symbol_name ?? null;
@@ -147,28 +116,72 @@ async function upsertBatch(client, points) {
       .filter(t => /error|err|fail|exception|warn/i.test(String(t)))
       .join(' ');
 
-    await client.query(UPSERT_SQL, [
-      stableKey,                                             // $1  stable_key
-      `qdrant:${p.id}`,                                      // $2  qdrant_id
-      filePath,                                              // $3  file_path
-      symbolName ? String(symbolName) : null,                // $4  symbol_name
-      symbolKind ? String(symbolKind) : null,                // $5  symbol_kind
-      langFromExt ? String(langFromExt) : null,              // $6  language
-      String(pl.content ?? pl.text ?? pl.chunk_text ?? ''),  // $7  content
-      tagsStr,                                               // $8  tags
-      errorTerms,                                            // $9  error_terms
-      '',                                                    // $10 tool_terms
-      pl.topo_byte  != null ? Number(pl.topo_byte)  : null,  // $11 topo_byte
-      pl.topo_hex   ? String(pl.topo_hex)   : null,          // $12 topo_hex
-      pl.topo_class ? String(pl.topo_class) : null,          // $13 topo_class
-      manifold4[0]  != null ? Number(manifold4[0])  : null,  // $14 manifold4_x
-      manifold4[1]  != null ? Number(manifold4[1])  : null,  // $15 manifold4_y
-      manifold4[2]  != null ? Number(manifold4[2])  : null,  // $16 manifold4_z
-      manifold4[3]  != null ? Number(manifold4[3])  : null,  // $17 manifold4_w
-      Number(pl.graphAuthorityScore ?? pl.graph_authority_score ?? 0), // $18
-      JSON.stringify(pl),                                    // $19 metadata
-    ]);
+    const contentVec = p.vector?.content ?? p.vector?.default ?? (Array.isArray(p.vector) ? p.vector : null);
+    const embeddingStr = toPgVector(contentVec);
+
+    const rowParams = [
+      stableKey,                                             // stable_key
+      `qdrant:${p.id}`,                                      // qdrant_id
+      filePath,                                              // file_path
+      symbolName ? String(symbolName) : null,                // symbol_name
+      symbolKind ? String(symbolKind) : null,                // symbol_kind
+      langFromExt ? String(langFromExt) : null,              // language
+      String(pl.content ?? pl.text ?? pl.chunk_text ?? ''),  // content
+      tagsStr,                                               // tags
+      errorTerms,                                            // error_terms
+      '',                                                    // tool_terms
+      pl.topo_byte  != null ? Number(pl.topo_byte)  : null,  // topo_byte
+      pl.topo_hex   ? String(pl.topo_hex)   : null,          // topo_hex
+      pl.topo_class ? String(pl.topo_class) : null,          // topo_class
+      manifold4[0]  != null ? Number(manifold4[0])  : null,  // manifold4_x
+      manifold4[1]  != null ? Number(manifold4[1])  : null,  // manifold4_y
+      manifold4[2]  != null ? Number(manifold4[2])  : null,  // manifold4_z
+      manifold4[3]  != null ? Number(manifold4[3])  : null,  // manifold4_w
+      Number(pl.graphAuthorityScore ?? pl.graph_authority_score ?? 0), // graph_authority_score
+      JSON.stringify(pl),                                    // metadata
+      embeddingStr,                                          // embedding
+    ];
+
+    const placeholders = [];
+    for (let i = 0; i < rowParams.length; i++) {
+      placeholders.push(`$${paramIndex++}`);
+    }
+    valueBlocks.push(`(${placeholders.join(', ')})`);
+    queryParams.push(...rowParams);
   }
+
+  const sql = `
+    INSERT INTO code_retrieval_chunks (
+      stable_key, qdrant_id, file_path, symbol_name, symbol_kind, language,
+      content, tags, error_terms, tool_terms,
+      topo_byte, topo_hex, topo_class,
+      manifold4_x, manifold4_y, manifold4_z, manifold4_w,
+      graph_authority_score, metadata, embedding
+    ) VALUES ${valueBlocks.join(', ')}
+    ON CONFLICT (stable_key) DO UPDATE SET
+      qdrant_id              = EXCLUDED.qdrant_id,
+      file_path              = EXCLUDED.file_path,
+      symbol_name            = EXCLUDED.symbol_name,
+      symbol_kind            = EXCLUDED.symbol_kind,
+      language               = EXCLUDED.language,
+      content                = EXCLUDED.content,
+      tags                   = EXCLUDED.tags,
+      error_terms            = EXCLUDED.error_terms,
+      tool_terms             = EXCLUDED.tool_terms,
+      topo_byte              = EXCLUDED.topo_byte,
+      topo_hex               = EXCLUDED.topo_hex,
+      topo_class             = EXCLUDED.topo_class,
+      manifold4_x            = EXCLUDED.manifold4_x,
+      manifold4_y            = EXCLUDED.manifold4_y,
+      manifold4_z            = EXCLUDED.manifold4_z,
+      manifold4_w            = EXCLUDED.manifold4_w,
+      graph_authority_score  = EXCLUDED.graph_authority_score,
+      metadata               = EXCLUDED.metadata,
+      embedding              = EXCLUDED.embedding,
+      updated_at             = now()
+  `;
+
+  await client.query(sql, queryParams);
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────

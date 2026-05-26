@@ -1,5 +1,68 @@
 # AGENTS.md — `sveltekit-frontend/docs/atlas-index`
 
+## Manual Verification Note (2026-05-22)
+
+Read-only retrieval chain coverage is split across route-test files:
+
+- `tests/routes/auto/api/chat/stream.cache-hit.test.ts` (cache-path and stream error shape)
+- `tests/routes/auto/api/chat/stream.retrieval-chain.test.ts` (chain order and fallback contract)
+- `tests/routes/auto/api/chat/stream.test-harness.ts` (shared mock wiring, default setup, and fixture builders)
+
+OpenCode retrieval lane:
+
+- Command: `.opencode/command/rg-atlas.md`
+- Command: `.opencode/command/mcp-trace.md`
+- Command: `.opencode/command/mcp-turbovec.md`
+- Command: `.opencode/command/mcp-engram.md`
+- Command: `.opencode/command/mcp-langextract.md`
+- Agent: `.opencode/agents/rg-atlas.md`
+- Agent: `.opencode/agents/mcp-toolchain.md`
+- Agent: `.opencode/agents/trace-mcp-tooling.md`
+- Agent: `.opencode/agents/metadata-context-analysis.md`
+- Skill: `.opencode/skills/rg-atlas/SKILL.md`
+- Skill: `.opencode/skills/mcp-toolchain/SKILL.md`
+- Skill: `.opencode/skills/trace-mcp-tooling/SKILL.md`
+- Skill: `.opencode/skills/metadata-context-analysis/SKILL.md`
+
+Lane order:
+
+- `rg` for exact recall.
+- LangExtract for compact structure.
+- SourceRefs first, synthesis second.
+- No file edits in this lane.
+
+Retrieval-chain assertion coverage includes:
+
+- SSE retrieval stages emitted in-order:
+  `sourceRef_exact_match -> graph.expand_neighborhood -> turbovec.rank_chunks -> engram.chat_memory_recent`
+- `callTraceMcp` invocation order exactly:
+  `graph.expand_neighborhood, turbovec.rank_chunks, engram.chat_memory_recent`
+- Fallback behavior when chain ranking returns no refs:
+  emits rerank breakdown with source `toon.rerankFeaturesWithBreakdown`
+
+Refactor guardrail:
+
+- Vitest does not allow directly exporting a `vi.hoisted(...)` variable.
+- In `stream.test-harness.ts`, keep the hoisted binding private and export a normal alias.
+
+Validation run:
+
+- Command:
+  `npm run test:run -- tests/routes/auto/api/chat/stream.cache-hit.test.ts tests/routes/auto/api/chat/stream.retrieval-chain.test.ts`
+- Result:
+  `2 files passed, 5 tests passed`
+
+Sidecar smoke run:
+
+- Command:
+  `npm run smoke:mcp:opencode-sidecars`
+- Result:
+  `ok: true`
+- Notes:
+  `turbovec-sidecar`, `engram-embed`, and `langextract` all reported healthy.
+  The run also logged a TCP connect warning on `127.0.0.1:8791`, but the smoke still finished green.
+  Treat this warning as non-fatal for the smoke gate unless `ok` flips to `false` or a required sidecar reports unhealthy.
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
 <!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->
 

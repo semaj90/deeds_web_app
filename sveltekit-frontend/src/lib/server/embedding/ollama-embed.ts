@@ -31,8 +31,9 @@ export async function tryEmbedOllama(
   }
 ): Promise<OllamaEmbedResult | null> {
   const model = assertEmbeddingModel(opts?.model ?? 'embeddinggemma:latest');
-  const baseUrl = (opts?.baseUrl ?? ENV.OLLAMA_BASE_URL).replace(/\/$/, '');
-  const url = `${baseUrl}/api/embeddings`;
+  const baseUrl = (opts?.baseUrl ?? ENV.OLLAMA_BASE_URL).replace(/\/+$/, '');
+  const simpleModelName = model.split(':')[0];
+  const urlCandidates = [`${baseUrl}/api/embed`, `${baseUrl}/api/embeddings`];
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), opts?.timeoutMs ?? 2000);
@@ -40,22 +41,40 @@ export async function tryEmbedOllama(
 
   try {
     return await traceEmbedding(text, model, async () => {
-      const res = await ollamaFetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt: text }),
-        signal,
-      });
+      for (const url of urlCandidates) {
+        try {
+          const body = url.endsWith('/api/embed')
+            ? JSON.stringify({ text, model: simpleModelName })
+            : JSON.stringify({ model, prompt: text });
 
-      if (!res.ok) return null;
+          const res = await ollamaFetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+            signal,
+          });
 
-      const data = (await res.json()) as OllamaEmbedResponse;
-      if (!data?.embedding || !Array.isArray(data.embedding)) return null;
+          if (!res.ok) continue;
 
-      return {
-        model: data.model ?? model,
-        embedding: data.embedding,
-      };
+          const data = (await res.json()) as OllamaEmbedResponse;
+          const embedding = Array.isArray(data.embedding)
+            ? data.embedding
+            : Array.isArray((data as any).embeddings?.[0])
+              ? (data as any).embeddings[0]
+              : null;
+
+          if (!embedding) continue;
+
+          return {
+            model: data.model ?? model,
+            embedding,
+          };
+        } catch {
+          continue;
+        }
+      }
+
+      return null;
     });
   } catch (err) {
     return null;

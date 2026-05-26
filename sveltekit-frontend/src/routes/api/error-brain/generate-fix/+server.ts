@@ -87,7 +87,7 @@ Respond in JSON format:
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				prompt,
 				format: fixResponseJsonSchema,
 				stream: false,
@@ -121,7 +121,7 @@ Respond in JSON format:
 		trackTokenUsage({
 			userId: locals.user?.id,
 			endpoint: '/api/error-brain/generate-fix',
-			model: 'gemma4-legal:latest',
+			model: 'gemma4-rotorquant:latest',
 			promptTokens:     data.prompt_eval_count ?? 0,
 			completionTokens: data.eval_count ?? 0,
 			durationMs:       durationMs ?? undefined,
@@ -142,7 +142,7 @@ Respond in JSON format:
 				filePath,
 				errorMessage,
 				sourcesUsed: sources.length,
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				generatedAt: new Date().toISOString(),
 				tokenCount: data.eval_count ?? null,
 				durationMs,
@@ -154,7 +154,7 @@ Respond in JSON format:
 			success: false,
 			error: 'Fix generation failed — Ollama unavailable',
 			fix: null,
-			metadata: { filePath, errorMessage, model: 'gemma4-legal:latest' },
+			metadata: { filePath, errorMessage, model: 'gemma4-rotorquant:latest' },
 		}, { status: 503 });
 	}
 };

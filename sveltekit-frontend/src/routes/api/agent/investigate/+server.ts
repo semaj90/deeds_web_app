@@ -194,7 +194,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	return json({
     name: 'Autonomous Investigation Agent',
     architecture: 'LangGraph StateGraph + Supervisor Routing',
-    model: 'gemma4-legal:latest',
+    model: 'gemma4-rotorquant:latest',
     toolCount: 32,
     modes: {
       supervisor: {

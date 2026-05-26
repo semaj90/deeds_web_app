@@ -283,6 +283,7 @@ export type ResearchState = {
   answer?: string;
   obsidianPath?: string | null;
   redisKeys?: string[];
+  topologyContext?: unknown;
 
   error?: string;
 };
@@ -347,6 +348,7 @@ type ResearchContextPacket = {
   skillResults: Record<string, any>;
   pipelineGaps: string[];
   promptSummary: string;
+  topologyContext: unknown;
 };
 
 function fnv1a8(s: string): string {
@@ -440,6 +442,13 @@ function formatContextPacketForSynthesis(packet: ResearchContextPacket): string 
     lines.push(`- runtime: ${packet.cudaPrefilter.runtime}`);
     lines.push(`- kv cache: ${packet.cudaPrefilter.kvCache.k}/${packet.cudaPrefilter.kvCache.v}`);
   }
+  
+  if (Array.isArray(packet.topologyContext) && packet.topologyContext.length > 0) {
+    lines.push('', '## Topological Context');
+    for (const topo of packet.topologyContext.slice(0, 5)) {
+      lines.push(`- ${topo.clusterId}: ${topo.summary}`);
+    }
+  }
 
   if (packet.pipelineGaps.length > 0) {
     lines.push('', '## Pipeline Gaps', `- ${packet.pipelineGaps.join(', ')}`);
@@ -524,6 +533,7 @@ function buildContextPacket(state: ResearchState): ResearchContextPacket {
     skillResults: state.skillResults ?? {},
     pipelineGaps,
     promptSummary: '',
+    topologyContext: state.topologyContext ?? [],
   } satisfies ResearchContextPacket);
 
   return {
@@ -546,6 +556,7 @@ function buildContextPacket(state: ResearchState): ResearchContextPacket {
     skillResults: state.skillResults ?? {},
     pipelineGaps,
     promptSummary,
+    topologyContext: state.topologyContext ?? [],
   };
 }
 
@@ -578,6 +589,29 @@ async function runtimeTruthNode(state: ResearchState) {
   return { runtime };
 }
 
+async function redisTopologyNode(state: ResearchState) {
+  const topologyContext: any[] = [];
+  try {
+    const { default: Redis } = await import('ioredis');
+    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', { lazyConnect: true, maxRetriesPerRequest: 1 });
+    await redis.connect();
+    
+    // Fetch some hot cluster summaries to inject into context
+    const keys = await redis.keys('summary:cluster:*');
+    if (keys.length > 0) {
+      const vals = await redis.mget(keys.slice(0, 5));
+      for (const val of vals) {
+        if (val) topologyContext.push(JSON.parse(val));
+      }
+    }
+    await redis.quit();
+    await logNode(state.runId, 'redisTopology', 'retrieval', { query: state.query }, { clustersFound: topologyContext.length });
+  } catch (e) {
+    console.warn('[DAG] Failed to fetch topology context from Redis:', e);
+  }
+  return { topologyContext };
+}
+
 async function qdrantNode(state: ResearchState) {
   if (!state.plan || !shouldRunStage('qdrant', state.plan)) {
     return { qdrantHits: [] };
@@ -586,7 +620,7 @@ async function qdrantNode(state: ResearchState) {
   const research = await runConcurrentResearch(state.query, {
     domains: undefined,
     limitPerWorker: 6,
-    timeoutMs: 30_000,
+    timeoutMs: 120_000,
   });
 
   const qdrantHits = research.workerFindings.flatMap((w) =>
@@ -828,28 +862,31 @@ export function buildResearchDag() {
       answer: null,
       obsidianPath: null,
       redisKeys: null,
+      topologyContext: null,
       error: null,
     },
   });
 
-  graph.addNode('plan', hermesPlanNode);
-  graph.addNode('runtime', runtimeTruthNode);
+  graph.addNode('planner', hermesPlanNode);
+  graph.addNode('runtimeCheck', runtimeTruthNode);
+  graph.addNode('redisTopology', redisTopologyNode);
   graph.addNode('qdrant', qdrantNode);
   graph.addNode('couchdb', couchNode);
   graph.addNode('neo4j', neo4jNode);
   graph.addNode('deepImport', deepImportNode);
   graph.addNode('clusters', clusterLensNode);
-  graph    .addNode('cudaPrefilter', cudaTopologyPrefilterNode)
+  graph    .addNode('cudaTopologyPrefilter', cudaTopologyPrefilterNode)
     .addNode('skillExecution', skillExecutionNode)
     .addNode('pack', contextPackerNode);
   graph.addNode('compose', gemmaComposerNode);
   graph.addNode('persist', persistResultNode);
 
   const workflow = graph as any;
-  workflow.addEdge(START, 'plan');
-  workflow.addEdge('plan', 'runtime');
-  workflow.addEdge('runtime', 'qdrant');
-  workflow.addEdge('runtime', 'cudaPrefilter');
+  workflow.addEdge(START, 'planner');
+  workflow.addEdge('planner', 'runtimeCheck');
+  workflow.addEdge('runtimeCheck', 'redisTopology');
+  workflow.addEdge('redisTopology', 'qdrant');
+  workflow.addEdge('redisTopology', 'cudaTopologyPrefilter');
   workflow.addEdge('qdrant', 'couchdb');
   workflow.addEdge('qdrant', 'neo4j');
   workflow.addEdge('qdrant', 'deepImport');
@@ -858,8 +895,8 @@ export function buildResearchDag() {
   workflow.addEdge('couchdb', 'pack');
   workflow.addEdge('neo4j', 'pack');
   workflow    .addEdge('deepImport', 'clusters')
-    .addEdge('clusters', 'cudaPrefilter')
-    .addEdge('cudaPrefilter', 'skillExecution')
+    .addEdge('clusters', 'cudaTopologyPrefilter')
+    .addEdge('cudaTopologyPrefilter', 'skillExecution')
     .addEdge('skillExecution', 'pack')
     .addEdge('pack', 'compose');
   workflow.addEdge('compose', 'persist');

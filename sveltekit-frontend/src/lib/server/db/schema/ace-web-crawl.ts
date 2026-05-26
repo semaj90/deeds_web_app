@@ -32,7 +32,7 @@ export const aiChatSessions = pgTable('ai_chat_sessions', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	userId: integer('user_id'),
 	jobId: uuid('job_id'), // Link to web_crawl_jobs or other job types
-	model: varchar('model', { length: 100 }).notNull().default('gemma4-legal:latest'),
+	model: varchar('model', { length: 100 }).notNull().default('gemma4-rotorquant:latest'),
 	systemPrompt: text('system_prompt'),
 	messages: jsonb('messages').default([]), // Chat history
 	contextVectors: jsonb('context_vectors'), // Embedded context for RAG

@@ -12,7 +12,7 @@
 
 - [x] **L1 Redis Cache**: 2ms hits, 1,436× speedup
 - [x] **L2 Bifrost Semantic Cache**: 7 cached responses, operational
-- [x] **L3 Ollama Optimized**: gemma4-legal-fast 2.8s (10.7× speedup)
+- [x] **L3 Ollama Optimized**: gemma4-rotorquant:latest-fast 2.8s (10.7× speedup)
 - [x] **Infrastructure**: 11/11 critical services healthy
 - [x] **GPU**: RTX 3060 Ti operational (2.8GB/8GB)
 - [x] **Load Testing**: 100% success rate (72/72 requests)
@@ -65,7 +65,7 @@ bifrostChat() function
 │  L3: Ollama GPU Inference               │
 │  Service: Windows native                │
 │  Port: 11434                            │
-│  Model: gemma4-legal-fast               │
+│  Model: gemma4-rotorquant:latest-fast               │
 │  Performance: 2.8s                      │
 │  Hit Rate: 5-10%                        │
 └─────────────────────────────────────────┘
@@ -102,7 +102,7 @@ REDIS_DB=0
 
 # Ollama L3 Inference
 OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=gemma4-legal-fast          # Optimized model (2.8s)
+OLLAMA_MODEL=gemma4-rotorquant:latest-fast          # Optimized model (2.8s)
 OLLAMA_TIMEOUT_MS=300000
 
 # Model Keep-Alive (VRAM management)
@@ -169,8 +169,8 @@ services:
         "name": "ollama-key",
         "value": "http://host.docker.internal:11434",
         "models": [
-          "gemma4-legal-fast:latest",
-          "gemma4-legal:latest",
+          "gemma4-rotorquant:latest-fast:latest",
+          "gemma4-rotorquant:latest",
           "embeddinggemma:latest",
           "gemma3:270m"
         ]
@@ -199,7 +199,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 
 # Check Ollama
 curl http://localhost:11434/api/tags
-# Expected: JSON response with gemma4-legal-fast model
+# Expected: JSON response with gemma4-rotorquant:latest-fast model
 
 # Check GPU
 nvidia-smi --query-gpu=name,memory.used,utilization.gpu --format=csv,noheader
@@ -236,7 +236,7 @@ npm run dev
 # Monitor console logs for cache hits:
 # - [bifrost] L1 EXACT-MATCH HIT
 # - [bifrost] L2 SEMANTIC HIT
-# - [ollama-diag] endpoint=/api/chat model=gemma4-legal-fast
+# - [ollama-diag] endpoint=/api/chat model=gemma4-rotorquant:latest-fast
 ```
 
 **Option B: Production Mode (PM2)**
@@ -264,7 +264,7 @@ curl -X POST http://localhost:5173/api/test/redis-write
 # Test cache endpoint (run twice to verify L1 hit)
 curl -X POST http://localhost:5173/api/test/ollama-cached \
   -H "Content-Type: application/json" \
-  -d '{"query":"What is hearsay?","model":"gemma4-legal-fast"}'
+  -d '{"query":"What is hearsay?","model":"gemma4-rotorquant:latest-fast"}'
 
 # Run 1: Should take 2-3s (cold)
 # Run 2: Should take <100ms (L1 cache hit)
@@ -323,7 +323,7 @@ curl http://localhost:6333/collections/llm_response_cache
 **Monitor inference latency:**
 ```bash
 # Dev server console will show:
-# [ollama-diag] endpoint=/api/chat model=gemma4-legal-fast duration_ms=2800
+# [ollama-diag] endpoint=/api/chat model=gemma4-rotorquant:latest-fast duration_ms=2800
 # [bifrost] L1 EXACT-MATCH HIT — instant return
 # [bifrost] L2 SEMANTIC HIT similarity=0.89
 ```
@@ -417,7 +417,7 @@ docker exec deeds-redis-prod redis-cli ping
 node -e "
 const crypto = require('crypto');
 const key = crypto.createHash('sha256')
-  .update(JSON.stringify({model:'gemma4-legal-fast',messages:[{role:'user',content:'test'}]}))
+  .update(JSON.stringify({model:'gemma4-rotorquant:latest-fast',messages:[{role:'user',content:'test'}]}))
   .digest('hex');
 console.log('llm:' + key);
 "
@@ -462,8 +462,8 @@ curl http://localhost:6333/collections/llm_response_cache
 **Debug:**
 ```bash
 # Check if correct model is loaded
-curl http://localhost:11434/api/tags | grep gemma4-legal-fast
-# Expected: gemma4-legal-fast:latest appears
+curl http://localhost:11434/api/tags | grep gemma4-rotorquant:latest-fast
+# Expected: gemma4-rotorquant:latest-fast:latest appears
 
 # Check GPU is being used
 nvidia-smi
@@ -471,12 +471,12 @@ nvidia-smi
 
 # Test direct Ollama performance
 time curl -X POST http://localhost:11434/api/chat \
-  -d '{"model":"gemma4-legal-fast","messages":[{"role":"user","content":"Hello"}],"stream":false}'
+  -d '{"model":"gemma4-rotorquant:latest-fast","messages":[{"role":"user","content":"Hello"}],"stream":false}'
 # Expected: <3s total
 ```
 
 **Fix:**
-1. Verify `gemma4-legal-fast` model exists: `ollama list`
+1. Verify `gemma4-rotorquant:latest-fast` model exists: `ollama list`
 2. If missing, create it (see Session Summary for Modelfile)
 3. Check GPU driver: `nvidia-smi` (should show driver 580.88+)
 4. Restart Ollama service
@@ -623,7 +623,7 @@ npm run dev
 ### Long-Term (Optional Enhancements)
 
 1. **TensorRT INT4 Integration** (if need >5K QPM)
-   - Convert gemma4-legal to TensorRT INT4
+   - Convert gemma4-rotorquant:latest to TensorRT INT4
    - Target: 0.8-1.4s inference (vs 2.8s current)
    - Expected: 3-5× additional speedup
 

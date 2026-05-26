@@ -38,9 +38,9 @@ nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv,noheader
 
 ### 4. Check Ollama Model
 ```bash
-curl -s http://localhost:11434/api/tags | grep gemma4-legal-fast
+curl -s http://localhost:11434/api/tags | grep gemma4-rotorquant:latest-fast
 ```
-**Expected**: `"name":"gemma4-legal-fast:latest"` appears
+**Expected**: `"name":"gemma4-rotorquant:latest-fast:latest"` appears
 
 ---
 

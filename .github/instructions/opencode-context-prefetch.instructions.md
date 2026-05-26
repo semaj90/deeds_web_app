@@ -36,7 +36,9 @@ description: "OpenCode context prefetch policy for Karpathy/NES/Chrom retrieval.
   - Qdrant Hybrid Query API → dense + sparse candidate retrieval
   - FlagEmbedding / BGE reranker → top 40 candidates → final top 3–5
   - LangExtract → legal/entity/citation grounding
-  - ACE packet → compact prompt for model execution
+  - ACE prompt bundle → compiled system prompt cache for the current day
+  - OpenAI prompt/completion cache → 24h replay keyed by stable prefix + user intent + day bucket
+  - OpenAI route surface → `sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts`, `sveltekit-frontend/src/lib/server/ai/openai-facade.ts`, `sveltekit-frontend/src/lib/server/ai/cached-stream.ts`
 - Best immediate docs to read first:
   1. Qdrant Hybrid Queries
   2. RedisVL SemanticCache

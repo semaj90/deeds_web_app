@@ -1,8 +1,29 @@
 {
   "$schema": "vscode://schemas/tasks",
   "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "rgSearchQuery",
+      "type": "promptString",
+      "description": "Enter the ripgrep query (regex or literal) to search for",
+      "default": ""
+    }
+  ],
   // TODO: split VS Code tasks into grouped include files or generate tasks from scripts.
   "tasks": [
+    {
+      "label": "🤖 LangGraph NATS Worker",
+      "type": "shell",
+      "command": "npx tsx scripts/agent-worker.ts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": []
+    },
     {
       "label": "Dev Server",
       "type": "shell",
@@ -95,7 +116,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Start TurboQuant llama-server (gemma4-legal-vlm + mmproj VLM on :8090), Go retrieval gRPC (:50053), and the GPU-optimized frontend dev server (:5173)"
+      "detail": "Start TurboQuant llama-server (gemma4-rotorquant:latest + mmproj VLM on :8090), Go retrieval gRPC (:50053), and the GPU-optimized frontend dev server (:5173)"
     },
     {
       "label": "TurboQuant llama-server (VLM)",
@@ -114,7 +135,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Spawn TurboQuant llama-server.exe as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache and adds mmproj automatically if present."
+      "detail": "Spawn TurboQuant llama-server.exe as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache, 64K ctx, and adds mmproj automatically if present."
     },
     {
       "label": "MCP TRACE Server (detached)",
@@ -248,6 +269,96 @@
         "clear": true
       },
       "detail": "Run Phase 18 messy query router evaluation with a custom query prompt."
+    },
+    {
+      "label": "Search Repo Docs with rg",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (-not \"${input:rgSearchQuery}\") { Write-Error 'Query required'; exit 1 }; rg -n --glob '!node_modules' \"${input:rgSearchQuery}\" docs ."
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Prompt for a ripgrep query and search repo docs plus root files for matching references."
+    },
+    {
+      "label": "Search SvelteKit App Docs with rg",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (-not \"${input:rgSearchQuery}\") { Write-Error 'Query required'; exit 1 }; rg -n --glob '!node_modules' \"${input:rgSearchQuery}\" sveltekit-frontend/docs sveltekit-frontend/src"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Prompt for a ripgrep query and search the SvelteKit app docs + source files."
+    },
+    {
+      "label": "📚 Docs: Refresh Programming Hub (web+rg)",
+      "type": "shell",
+      "command": "npm run docs:programming:refresh",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Fetch latest docs (Bifrost, Firecrawl, Redis, WebGPU, CUDA, cuVS, Go, Drizzle, UnoCSS, Bits UI, shadcn-svelte) and merge with repo rg mappings."
+    },
+    {
+      "label": "✅ KAG: Phase 0/1/8 Gate (JSON)",
+      "type": "shell",
+      "command": "npm run kag:phase-gate",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Runs checklist Phase 0/1/8 health + memory + Bifrost boundary checks and writes docs/reports/kag-phase-gate-latest.json."
     },
     {
       "label": "ACE Cache Index Refresh",
@@ -1187,7 +1298,7 @@
     {
       "label": "🩺 Startup: Service Health Check",
       "type": "shell",
-      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"$services = @(@{Name='Redis'; Kind='redis'}, @{Name='Qdrant'; Url='http://127.0.0.1:6333/collections'}, @{Name='Ollama'; Url='http://127.0.0.1:11434/api/tags'}, @{Name='Postgres'; Kind='postgres'}, @{Name='Go Retrieval'; Url='http://127.0.0.1:8100/health'}, @{Name='Go Search'; Url='http://127.0.0.1:8096/health'}, @{Name='Bifrost'; Url='http://127.0.0.1:3040/health'}, @{Name='TurboQuant'; Url='http://127.0.0.1:8090/health'}, @{Name='MCP Server'; Url='http://127.0.0.1:8788/health'}); Write-Host '── Startup Health Check ──'; foreach ($s in $services) { try { if ($s.Kind -eq 'redis') { redis-cli PING | Out-Null; Write-Host '✅ Redis' } elseif ($s.Kind -eq 'postgres') { docker ps --format '{{.Names}}' | Select-String -Pattern 'postgres' | Out-Null; Write-Host '✅ Postgres container' } else { Invoke-WebRequest -Uri $s.Url -TimeoutSec 2 | Out-Null; Write-Host ('✅ ' + $s.Name) } } catch { Write-Host ('❌ ' + $s.Name) } }; Write-Host '── done ──'\"",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"$services = @(@{Name='Redis'; Kind='redis'}, @{Name='Qdrant'; Url='http://127.0.0.1:6333/collections'}, @{Name='Ollama'; Url='http://127.0.0.1:11434/api/tags'}, @{Name='Postgres'; Kind='postgres'}, @{Name='Go Retrieval'; Url='http://127.0.0.1:8100/health'}, @{Name='Go Search'; Url='http://127.0.0.1:8096/health'}, @{Name='Bifrost'; Url='http://127.0.0.1:3040/health'}, @{Name='TurboQuant'; Url='http://127.0.0.1:8090/health'}, @{Name='MCP Server'; Url='http://127.0.0.1:8788/health'}, @{Name='RabbitMQ API'; Kind='http-json'; Url='http://127.0.0.1:5173/api/rabbitmq/health'; ExpectConnected=$true}); $pass=0; $fail=0; Write-Host '── Startup Health Check ──'; foreach ($s in $services) { try { if ($s.Kind -eq 'redis') { redis-cli PING | Out-Null; Write-Host '✅ Redis'; $pass++ } elseif ($s.Kind -eq 'postgres') { docker ps --format '{{.Names}}' | Select-String -Pattern 'postgres' | Out-Null; Write-Host '✅ Postgres container'; $pass++ } elseif ($s.Kind -eq 'http-json') { $resp = Invoke-RestMethod -Uri $s.Url -TimeoutSec 2; if ($s.ExpectConnected -and -not $resp.connected) { throw 'connected=false' }; Write-Host ('✅ ' + $s.Name + ' (connected=' + [string]$resp.connected + ')'); $pass++ } else { Invoke-WebRequest -Uri $s.Url -TimeoutSec 2 | Out-Null; Write-Host ('✅ ' + $s.Name); $pass++ } } catch { Write-Host ('❌ ' + $s.Name); $fail++ } }; Write-Host ('── summary: PASS=' + $pass + ' FAIL=' + $fail + ' ──')\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -1364,6 +1475,44 @@
       "detail": "Only refresh GPU authority blend for files in Redis ace:rank:dirty_files (set by ace-incremental-startup). Skip silently if no dirty files."
     },
     {
+      "label": "🌲 XGBoost: Score Clusters (graph features)",
+      "type": "shell",
+      "command": "npm run xgboost:hotness:score",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Compute cluster hotness with graph features (clusterPageRank from couchdb:pagerank_scores + hyperedgeCount from hg:edge:idx). Writes ace:cluster:hot sorted set (1h TTL) and exports models/xgboost-hotness/features.json. Requires graphify:full run first to populate Redis graph keys."
+    },
+    {
+      "label": "🌲 XGBoost: Feature Matrix (dry run, no Redis write)",
+      "type": "shell",
+      "command": "npm run xgboost:features:graph",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Compute and export cluster feature matrix (models/xgboost-hotness/features.json) including PageRank + hyperedge graph features. Skips Redis ace:cluster:hot writes — safe to run for inspection."
+    },
+    {
       "label": "🔍🧠 RG-Atlas: Smoke Check (DB tables + API)",
       "type": "shell",
       "command": "npm run smoke:rg-atlas",
@@ -1437,6 +1586,30 @@
         "instanceLimit": 1
       },
       "isBackground": true,
+      "dependsOn": "🧪 Startup: OpenCode Sidecars Smoke (detached)",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Aggregates chunk_hit_log (last 24h) into Redis ace:rank:demand hash so contextForFile() rank includes a real-time agent-query feedback signal. Read-only Postgres → atomic Redis HSET replace, 1h TTL self-evicts stale data. Fires after sidecar + atlas smoke gates so data and sidecar regressions are caught before re-seeding. 5-min cooldown debounces rapid VS Code restarts."
+    },
+    {
+      "label": "🧪 Startup: OpenCode Sidecars Smoke (detached)",
+      "type": "shell",
+      "command": "$stamp = 'logs/task-output/.opencode-sidecar-smoke-last-run'; $cooldownSec = 900; $portsReady = (Test-NetConnection 127.0.0.1 -Port 8791 -InformationLevel Quiet) -and (Test-NetConnection 127.0.0.1 -Port 8792 -InformationLevel Quiet) -and (Test-NetConnection 127.0.0.1 -Port 8793 -InformationLevel Quiet); if (-not $portsReady) { Write-Host '🧪 sidecar smoke skipped — one or more sidecar ports are down (:8791/:8792/:8793)'; exit 0 } elseif ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🧪 sidecar smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run smoke:mcp:opencode-sidecars 2>&1 | Tee-Object -FilePath logs/task-output/smoke-opencode-sidecars-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🧪 sidecar smoke green' } else { Write-Host '🧪 sidecar smoke FAILED — sidecar MCP regression detected' } }",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": true,
       "dependsOn": "🩺 Startup: Atlas Smoke Gate (16 probes, detached)",
       "problemMatcher": [],
       "presentation": {
@@ -1447,7 +1620,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Aggregates chunk_hit_log (last 24h) into Redis ace:rank:demand hash so contextForFile() rank includes a real-time agent-query feedback signal. Read-only Postgres → atomic Redis HSET replace, 1h TTL self-evicts stale data. Fires after the atlas smoke gate so any data inconsistency is caught before re-seeding. 5-min cooldown debounces rapid VS Code restarts."
+      "detail": "Runs smoke:mcp:opencode-sidecars in startup chain after atlas smoke. Skips cleanly when sidecar ports are not running, otherwise validates TurboVec/Engram/LangExtract tool surfaces and engram memory write/read path. 15-min cooldown stamp: logs/task-output/.opencode-sidecar-smoke-last-run."
     },
     {
       "label": "🩺 Atlas Smoke: Manual Run (force, foreground)",
@@ -1624,7 +1797,7 @@
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {
-          "OLLAMA_MODEL": "gemma4-legal:latest"
+          "OLLAMA_MODEL": "gemma4-rotorquant:latest"
         }
       },
       "group": "build",
@@ -2028,7 +2201,7 @@
     {
       "label": "🗄️ Local: Open DB Studio",
       "type": "shell",
-      "command": "npm run db:studio",
+      "command": "npm run drizzle:studio",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -2544,7 +2717,7 @@
     {
       "label": "🤖 Ollama: Pull All Models (GPU)",
       "type": "shell",
-      "command": "ollama pull gemma4-legal:latest && ollama pull embeddinggemma:latest && ollama list",
+      "command": "ollama pull gemma4-rotorquant:latest && ollama pull embeddinggemma:latest && ollama list",
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -2568,7 +2741,7 @@
     {
       "label": "🤖 Ollama: Test Generate (Gemma4 Legal)",
       "type": "shell",
-      "command": "curl -s -X POST http://127.0.0.1:11434/api/generate -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"gemma4-legal:latest\\\",\\\"prompt\\\":\\\"Summarize the key legal elements of a breach of contract claim in 3 bullet points.\\\",\\\"stream\\\":false,\\\"options\\\":{\\\"num_gpu\\\":30}}\" | jq '{model: .model, response: .response[:200], eval_count: .eval_count, eval_duration_ms: (.eval_duration / 1000000 | round)}'",
+      "command": "curl -s -X POST http://127.0.0.1:11434/api/generate -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"gemma4-rotorquant:latest\\\",\\\"prompt\\\":\\\"Summarize the key legal elements of a breach of contract claim in 3 bullet points.\\\",\\\"stream\\\":false,\\\"options\\\":{\\\"num_gpu\\\":30}}\" | jq '{model: .model, response: .response[:200], eval_count: .eval_count, eval_duration_ms: (.eval_duration / 1000000 | round)}'",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -2640,7 +2813,7 @@
     {
       "label": "⚡ TurboQuant: Test Inference (hearsay query)",
       "type": "shell",
-      "command": "curl -s -X POST http://localhost:8090/v1/chat/completions -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"gemma4-legal\\\",\\\"messages\\\":[{\\\"role\\\":\\\"user\\\",\\\"content\\\":\\\"What is hearsay evidence? Answer in 2 sentences.\\\"}],\\\"max_tokens\\\":120,\\\"temperature\\\":0.3}\" | python -m json.tool",
+      "command": "curl -s -X POST http://localhost:8090/v1/chat/completions -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"gemma4-rotorquant:latest\\\",\\\"messages\\\":[{\\\"role\\\":\\\"user\\\",\\\"content\\\":\\\"What is hearsay evidence? Answer in 2 sentences.\\\"}],\\\"max_tokens\\\":120,\\\"temperature\\\":0.3}\" | python -m json.tool",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -3873,7 +4046,7 @@
           "DATABASE_URL": "postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db",
           "REDIS_URL": "redis://localhost:6379",
           "OLLAMA_URL": "http://localhost:11434",
-          "CODEINTEL_DEFAULT_MODEL": "gemma4-legal-fast:latest",
+          "CODEINTEL_DEFAULT_MODEL": "gemma4-rotorquant:latest-fast:latest",
           "OLLAMA_EMBED_MODEL": "embeddinggemma:latest"
         }
       },
@@ -4221,6 +4394,38 @@
       "detail": "L2 Bifrost semantic cache health + Qdrant collection stats"
     },
     {
+      "label": "🩺 Observability: Async Inference Log + CouchDB/RabbitMQ Audit",
+      "type": "shell",
+      "command": "npm run audit:inference-observability",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Verifies async inference logging design (buffer + non-blocking flush + _bulk_docs) and checks CouchDB/RabbitMQ runtime reachability."
+    },
+    {
+      "label": "🧠 HMM Loop: redis_logger_stubs → 🩺 Observability Audit",
+      "type": "shell",
+      "command": "npm run audit:hmm-error-loop:full",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Runs HMM error-agentic workflow loop checks (DAG + runtime wiring + redis logger stubs) and then executes the async inference observability audit."
+    },
+    {
       "label": "📊 Cache: Full Stack Stats (L1 + L2 + Qdrant Collections)",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"Write-Host '=== L1: Redis Exact-Match ===' -ForegroundColor Cyan; try { $l1 = Invoke-RestMethod http://localhost:5173/api/cache/exact-match/stats -TimeoutSec 5; Write-Host \\\"  Hits: $($l1.hits)  Misses: $($l1.misses)  Keys: $($l1.size)\\\" -ForegroundColor Green } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== L2: Bifrost Semantic ===' -ForegroundColor Cyan; try { $l2 = Invoke-RestMethod http://localhost:3040/health -TimeoutSec 5; Write-Host \\\"  Status: $($l2.status)\\\" -ForegroundColor Green } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== Qdrant Collections ===' -ForegroundColor Cyan; try { $q = Invoke-RestMethod http://localhost:6333/collections -TimeoutSec 5; $q.result.collections | ForEach-Object { Write-Host \\\"  $($_.name)\\\" -ForegroundColor Yellow } } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== Redis Memory ===' -ForegroundColor Cyan; try { redis-cli INFO memory 2>$null | Select-String 'used_memory_human' | ForEach-Object { Write-Host \\\"  $($_.Line)\\\" -ForegroundColor Green } } catch { Write-Host '  Unavailable' -ForegroundColor Red }\"",
@@ -4462,7 +4667,7 @@
     {
       "label": "⚡ TurboQuant: Test Inference",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$body = @{model='gemma4-legal';messages=@(@{role='user';content='What is hearsay evidence? (2 sentences)'});max_tokens=150;temperature=0.3} | ConvertTo-Json -Depth 5; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:8090/v1/chat/completions' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 60; $sw.Stop(); Write-Host \\\"TurboQuant: $($sw.ElapsedMilliseconds)ms\\\" -ForegroundColor Cyan; $r.choices[0].message.content | Write-Host\"",
+      "command": "pwsh -NoProfile -Command \"$body = @{model='gemma4-rotorquant:latest';messages=@(@{role='user';content='What is hearsay evidence? (2 sentences)'});max_tokens=150;temperature=0.3} | ConvertTo-Json -Depth 5; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:8090/v1/chat/completions' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 60; $sw.Stop(); Write-Host \\\"TurboQuant: $($sw.ElapsedMilliseconds)ms\\\" -ForegroundColor Cyan; $r.choices[0].message.content | Write-Host\"",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -4555,7 +4760,7 @@
     {
       "label": "🧠 LangGraph: Test Synthesis Query",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$body = @{model='gemma4-legal';messages=@(@{role='user';content='Summarize hearsay exceptions under FRE 803.'});temperature=0.3;max_tokens=400;use_ace=$true;use_web_search=$false;use_rg_search=$false} | ConvertTo-Json -Depth 5; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:8091/synthesize' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 120; $sw.Stop(); Write-Host \\\"LangGraph: $($sw.ElapsedMilliseconds)ms | cache=$($r.cache_tier) | conf=$($r.confidence)\\\" -ForegroundColor Cyan; $r.response | Write-Host\"",
+      "command": "pwsh -NoProfile -Command \"$body = @{model='gemma4-rotorquant:latest';messages=@(@{role='user';content='Summarize hearsay exceptions under FRE 803.'});temperature=0.3;max_tokens=400;use_ace=$true;use_web_search=$false;use_rg_search=$false} | ConvertTo-Json -Depth 5; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:8091/synthesize' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 120; $sw.Stop(); Write-Host \\\"LangGraph: $($sw.ElapsedMilliseconds)ms | cache=$($r.cache_tier) | conf=$($r.confidence)\\\" -ForegroundColor Cyan; $r.response | Write-Host\"",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -5356,7 +5561,7 @@
     {
       "label": "🔑 LangChain: Warm L1 Redis Cache (exact-match top queries)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"Write-Host '[L1 Cache] Warming Redis exact-match cache...' -ForegroundColor Cyan; $queries = @('What is hearsay evidence?','Explain chain of custody','Define prima facie case','What are Miranda rights?','Explain burden of proof'); foreach ($q in $queries) { $body = @{messages=@(@{role='user';content=$q});model='gemma4-legal'} | ConvertTo-Json -Depth 5; try { $null = Invoke-RestMethod 'http://localhost:5173/api/sse/chat' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 30 } catch {} Write-Host \\\"  Warmed: $($q.Substring(0,[Math]::Min(40,$q.Length)))...\\\" -ForegroundColor Yellow }; Write-Host '✅ L1 cache warm complete' -ForegroundColor Green\"",
+      "command": "pwsh -NoProfile -Command \"Write-Host '[L1 Cache] Warming Redis exact-match cache...' -ForegroundColor Cyan; $queries = @('What is hearsay evidence?','Explain chain of custody','Define prima facie case','What are Miranda rights?','Explain burden of proof'); foreach ($q in $queries) { $body = @{messages=@(@{role='user';content=$q});model='gemma4-rotorquant:latest'} | ConvertTo-Json -Depth 5; try { $null = Invoke-RestMethod 'http://localhost:5173/api/sse/chat' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 30 } catch {} Write-Host \\\"  Warmed: $($q.Substring(0,[Math]::Min(40,$q.Length)))...\\\" -ForegroundColor Yellow }; Write-Host '✅ L1 cache warm complete' -ForegroundColor Green\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -6739,10 +6944,10 @@
     {
       "label": "⚡ TurboQuant: Start VLM (text + vision, :8090)",
       "type": "shell",
-      "command": "C:/Users/james/Desktop/llama-server-cuda/llama-server.exe -m C:/Users/james/.ollama/blobs/sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7 --mmproj C:/Users/james/Downloads/gemma4-mmproj/mmproj-BF16.gguf --host 0.0.0.0 --port 8090 -ngl 99 --ctx-size 8192 --threads 6",
+      "command": "C:/Users/james/Desktop/llama-server-cuda/llama-server.exe -m C:/Users/james/.ollama/blobs/sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7 --mmproj C:/Users/james/Downloads/gemma4-mmproj/mmproj-BF16.gguf --host 0.0.0.0 --port 8090 -ngl 99 --ctx-size 65536 --flash-attn --threads 6",
       "isBackground": true,
       "group": "build",
-      "detail": "Launch TurboQuant llama-server with mmproj for unified text+vision inference (gemma4-legal-vlm Q4_K_M + SigLIP projector, ~6GB VRAM)",
+      "detail": "Launch TurboQuant llama-server with mmproj for unified text+vision inference (gemma4-rotorquant:latest Q4_K_M + SigLIP projector, ~6GB VRAM)",
       "problemMatcher": {
         "owner": "llama-server",
         "pattern": {
@@ -7190,7 +7395,7 @@
     {
       "label": "⚡ TurboQuant: Test Tool Calling (/api/chat)",
       "type": "shell",
-      "command": "node -e \"const body={model:'gemma4-legal-fast:latest',stream:false,options:{temperature:0.1,num_predict:300},messages:[{role:'user',content:'Which file handles RabbitMQ? Call search_codebase.'}],tools:[{type:'function',function:{name:'search_codebase',description:'Search codebase',parameters:{type:'object',properties:{query:{type:'string'}},required:['query']}}}]};fetch('http://localhost:11434/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(90000)}).then(r=>r.json()).then(d=>console.log('tool_calls:',JSON.stringify(d.message.tool_calls,null,2)))\"",
+      "command": "node -e \"const body={model:'gemma4-rotorquant:latest-fast:latest',stream:false,options:{temperature:0.1,num_predict:300},messages:[{role:'user',content:'Which file handles RabbitMQ? Call search_codebase.'}],tools:[{type:'function',function:{name:'search_codebase',description:'Search codebase',parameters:{type:'object',properties:{query:{type:'string'}},required:['query']}}}]};fetch('http://localhost:11434/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(90000)}).then(r=>r.json()).then(d=>console.log('tool_calls:',JSON.stringify(d.message.tool_calls,null,2)))\"",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -7871,13 +8076,13 @@
       "command": "& 'C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe'",
       "args": [
         "-m",
-        "C:\\Users\\james\\Downloads\\gemma4-legal-vlm-q4_k_m.gguf",
+        "C:\\Users\\james\\Downloads\\gemma4-rotorquant:latest-q4_k_m.gguf",
         "--host",
         "127.0.0.1",
         "--port",
         "8090",
         "--ctx-size",
-        "4096",
+        "65536",
         "--flash-attn",
         "on",
         "--ngl",
@@ -8569,7 +8774,7 @@
     {
       "label": "⚡ TurboQuant: Gemma4 Agentic Chat (compressed KV tokens)",
       "type": "shell",
-      "command": "node -e \"const q=process.env.TQ_QUERY||'Summarize the key legal principles around hearsay evidence and chain of custody'; fetch('http://localhost:8090/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gemma4-legal',messages:[{role:'system',content:'You are a legal AI assistant with access to case law and evidence rules.'},{role:'user',content:q}],max_tokens:512,temperature:0.3,stream:false})}).then(r=>r.json()).then(d=>{const m=d.choices?.[0]?.message?.content??JSON.stringify(d,null,2);console.log('\\n=== TurboQuant Agentic Response ===\\n');console.log(m);console.log('\\nTokens:',d.usage?.total_tokens??'?','Prompt:',d.usage?.prompt_tokens??'?','Completion:',d.usage?.completion_tokens??'?');}).catch(e=>console.error('TurboQuant not running on :8090 —',e.message))\"",
+      "command": "node -e \"const q=process.env.TQ_QUERY||'Summarize the key legal principles around hearsay evidence and chain of custody'; fetch('http://localhost:8090/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gemma4-rotorquant:latest',messages:[{role:'system',content:'You are a legal AI assistant with access to case law and evidence rules.'},{role:'user',content:q}],max_tokens:512,temperature:0.3,stream:false})}).then(r=>r.json()).then(d=>{const m=d.choices?.[0]?.message?.content??JSON.stringify(d,null,2);console.log('\\n=== TurboQuant Agentic Response ===\\n');console.log(m);console.log('\\nTokens:',d.usage?.total_tokens??'?','Prompt:',d.usage?.prompt_tokens??'?','Completion:',d.usage?.completion_tokens??'?');}).catch(e=>console.error('TurboQuant not running on :8090 —',e.message))\"",
       "options": {
         "cwd": "${workspaceFolder}",
         "env": {
@@ -8588,7 +8793,7 @@
     {
       "label": "⚡ TurboQuant: Gemma4 VLM Vision + Text (compressed KV)",
       "type": "shell",
-      "command": "node -e \"fetch('http://localhost:8090/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gemma4-legal-vlm',messages:[{role:'user',content:[{type:'text',text:'${input:vlmTextPrompt}'},{type:'image_url',image_url:{url:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}}]}],max_tokens:256,temperature:0.3})}).then(r=>r.json()).then(d=>console.log('VLM Response:',d.choices?.[0]?.message?.content??JSON.stringify(d,null,2))).catch(e=>console.error('TurboQuant VLM not running on :8090 (launch VLM variant first) —',e.message))\"",
+      "command": "node -e \"fetch('http://localhost:8090/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gemma4-rotorquant:latest',messages:[{role:'user',content:[{type:'text',text:'${input:vlmTextPrompt}'},{type:'image_url',image_url:{url:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}}]}],max_tokens:256,temperature:0.3})}).then(r=>r.json()).then(d=>console.log('VLM Response:',d.choices?.[0]?.message?.content??JSON.stringify(d,null,2))).catch(e=>console.error('TurboQuant VLM not running on :8090 (launch VLM variant first) —',e.message))\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -9427,7 +9632,7 @@
       "command": "npm run turbo:start:detached",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "build",
-      "detail": "Start llama-server.exe with gemma4-legal-vlm GGUF + mmproj on :8090 (q8_0 KV, flash-attn, ngl 99). Detached — returns when /health responds.",
+      "detail": "Start llama-server.exe with gemma4-rotorquant:latest GGUF + mmproj on :8090 (q8_0 KV, flash-attn, ngl 99). Detached — returns when /health responds.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     },
@@ -9435,7 +9640,7 @@
     {
       "label": "🦙 llama-server: Prompt Gemma4 — Directory Analysis",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$query = '${input:dirAnalysisQuery}'; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = 'You are a legal AI codebase analyst. Analyze the directory structure and return: (1) dominant purpose, (2) missing auth/validation gaps, (3) suggested refactor. Be concise.' }, @{ role = 'user'; content = $query }); max_tokens = 512; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $resp.choices[0].message.content\"",
+      "command": "pwsh -NoProfile -Command \"$query = '${input:dirAnalysisQuery}'; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = 'You are a legal AI codebase analyst. Analyze the directory structure and return: (1) dominant purpose, (2) missing auth/validation gaps, (3) suggested refactor. Be concise.' }, @{ role = 'user'; content = $query }); max_tokens = 512; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $resp.choices[0].message.content\"",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "test",
       "detail": "Prompt Gemma4 via llama-server :8090 for directory analysis. Uses system prompt + cache_prompt:true for KV reuse. Input: directory path or question.",
@@ -9446,7 +9651,7 @@
     {
       "label": "🦙 llama-server: Prompt Gemma4 — KAG Wiki Note (single dir)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$dir = '${input:targetDir}'; $fileList = Get-ChildItem -Path (Join-Path '${workspaceFolder}/sveltekit-frontend/src' $dir) -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 20 | ForEach-Object { $_.Name }; $files = $fileList -join ', '; $sys = 'You are a codebase knowledge-graph agent. Given a source directory and its files, produce a structured wiki note for the KAG system. Format: PURPOSE: <one sentence> | PATTERNS: <comma list> | GAPS: <auth/validation/test gaps> | TAGS: <tag list>'; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = $sys }, @{ role = 'user'; content = \\\"Directory: $dir\\nFiles: $files\\nProduce the KAG wiki note.\\\" }); max_tokens = 300; temperature = 0.15; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host \\\"\\n--- KAG note for $dir ---\\\"; $resp.choices[0].message.content\"",
+      "command": "pwsh -NoProfile -Command \"$dir = '${input:targetDir}'; $fileList = Get-ChildItem -Path (Join-Path '${workspaceFolder}/sveltekit-frontend/src' $dir) -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 20 | ForEach-Object { $_.Name }; $files = $fileList -join ', '; $sys = 'You are a codebase knowledge-graph agent. Given a source directory and its files, produce a structured wiki note for the KAG system. Format: PURPOSE: <one sentence> | PATTERNS: <comma list> | GAPS: <auth/validation/test gaps> | TAGS: <tag list>'; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = $sys }, @{ role = 'user'; content = \\\"Directory: $dir\\nFiles: $files\\nProduce the KAG wiki note.\\\" }); max_tokens = 300; temperature = 0.15; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host \\\"\\n--- KAG note for $dir ---\\\"; $resp.choices[0].message.content\"",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "test",
       "detail": "List up to 20 files in the target dir, then prompt Gemma4 via llama-server to generate a structured KAG wiki note (PURPOSE/PATTERNS/GAPS/TAGS). Input: relative path from src/ e.g. lib/server/cache",
@@ -9457,7 +9662,7 @@
     {
       "label": "🦙 llama-server: Audit + KAG Ingest + Gemma4 Summary (full pipeline)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"Write-Host '=== Step 1: Dir audit ===' -ForegroundColor Cyan; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --write-map; Write-Host '=== Step 2: KAG ingest (Qdrant SOM coords + Redis wiki notes) ===' -ForegroundColor Cyan; $ingest = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/codebase-index/summarize-dirs' -Method Post -Headers @{ 'x-dev-bypass-auth' = 'true'; 'Content-Type' = 'application/json' } -TimeoutSec 300; Write-Host (\\\"Ingested: $($ingest.directoriesFound) dirs, $($ingest.upserted) upserted, $($ingest.wikiNotesWritten) wiki notes\\\"); Write-Host '=== Step 3: Gemma4 meta-summary ===' -ForegroundColor Cyan; $sys = 'You are a legal AI platform architect. Summarize the codebase health in 5 bullet points covering: auth coverage, cache utilization, inference routing, SOM topology coverage, and top refactor priority.'; $ctx = \\\"Directories indexed: $($ingest.directoriesFound). Wiki notes written: $($ingest.wikiNotesWritten). Upserted community_reports: $($ingest.upserted).\\\"; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = $sys }, @{ role = 'user'; content = $ctx }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host '--- Gemma4 codebase health summary ---' -ForegroundColor Green; $resp.choices[0].message.content\"",
+      "command": "pwsh -NoProfile -Command \"Write-Host '=== Step 1: Dir audit ===' -ForegroundColor Cyan; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --write-map; Write-Host '=== Step 2: KAG ingest (Qdrant SOM coords + Redis wiki notes) ===' -ForegroundColor Cyan; $ingest = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/codebase-index/summarize-dirs' -Method Post -Headers @{ 'x-dev-bypass-auth' = 'true'; 'Content-Type' = 'application/json' } -TimeoutSec 300; Write-Host (\\\"Ingested: $($ingest.directoriesFound) dirs, $($ingest.upserted) upserted, $($ingest.wikiNotesWritten) wiki notes\\\"); Write-Host '=== Step 3: Gemma4 meta-summary ===' -ForegroundColor Cyan; $sys = 'You are a legal AI platform architect. Summarize the codebase health in 5 bullet points covering: auth coverage, cache utilization, inference routing, SOM topology coverage, and top refactor priority.'; $ctx = \\\"Directories indexed: $($ingest.directoriesFound). Wiki notes written: $($ingest.wikiNotesWritten). Upserted community_reports: $($ingest.upserted).\\\"; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = $sys }, @{ role = 'user'; content = $ctx }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host '--- Gemma4 codebase health summary ---' -ForegroundColor Green; $resp.choices[0].message.content\"",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "test",
       "detail": "Full pipeline: (1) deep-directory-audit lib/server → (2) POST /api/codebase-index/summarize-dirs (Qdrant SOM coords + Redis wiki notes + Postgres) → (3) Gemma4 meta-summary via llama-server :8090. Requires TurboQuant running.",
@@ -9468,7 +9673,7 @@
     {
       "label": "🦙 llama-server: Interactive Chat with Gemma4 (terminal REPL)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"Write-Host 'Gemma4 Chat via llama-server :8090 — type your query, empty line to quit' -ForegroundColor Green; $history = @(); while ($true) { $line = Read-Host 'You'; if ([string]::IsNullOrWhiteSpace($line)) { break }; $history += @{ role = 'user'; content = $line }; $msgs = @(@{ role = 'system'; content = 'You are a legal AI assistant with deep knowledge of SvelteKit, TypeScript, and legal document analysis.' }) + $history; $body = @{ model = 'gemma4-legal'; messages = $msgs; max_tokens = 512; temperature = 0.3; cache_prompt = $true } | ConvertTo-Json -Depth 6; try { $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $reply = $resp.choices[0].message.content; $history += @{ role = 'assistant'; content = $reply }; Write-Host ('Gemma4: ' + $reply) -ForegroundColor Yellow } catch { Write-Host ('Error: ' + $_.Exception.Message) -ForegroundColor Red } }\"",
+      "command": "pwsh -NoProfile -Command \"Write-Host 'Gemma4 Chat via llama-server :8090 — type your query, empty line to quit' -ForegroundColor Green; $history = @(); while ($true) { $line = Read-Host 'You'; if ([string]::IsNullOrWhiteSpace($line)) { break }; $history += @{ role = 'user'; content = $line }; $msgs = @(@{ role = 'system'; content = 'You are a legal AI assistant with deep knowledge of SvelteKit, TypeScript, and legal document analysis.' }) + $history; $body = @{ model = 'gemma4-rotorquant:latest'; messages = $msgs; max_tokens = 512; temperature = 0.3; cache_prompt = $true } | ConvertTo-Json -Depth 6; try { $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $reply = $resp.choices[0].message.content; $history += @{ role = 'assistant'; content = $reply }; Write-Host ('Gemma4: ' + $reply) -ForegroundColor Yellow } catch { Write-Host ('Error: ' + $_.Exception.Message) -ForegroundColor Red } }\"",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "test",
       "detail": "Interactive multi-turn chat with Gemma4 via llama-server :8090. Maintains conversation history. cache_prompt:true reuses system prompt KV across turns. Empty line exits.",
@@ -9479,7 +9684,7 @@
     {
       "label": "🦙 llama-server: Prompt Gemma4 — 4D SOM Topology Report",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"Write-Host 'Fetching SOM topology from Redis wiki notes...' -ForegroundColor Cyan; $keys = redis-cli KEYS 'wiki:note:dir:*' 2>$null; if (-not $keys) { Write-Host 'No wiki notes in Redis — run KAG ingest first' -ForegroundColor Red; exit 1 }; $sample = $keys | Select-Object -First 5 | ForEach-Object { $val = redis-cli GET $_ 2>$null; try { $doc = $val | ConvertFrom-Json; \\\"dir=$($doc.directoryPath) SOM=($($doc.somBmuRow),$($doc.somBmuCol)) cluster=$($doc.somCluster) score=$($doc.auditScore)\\\" } catch { $_ } }; $ctx = $sample -join \\\"`n\\\"; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = 'You are a codebase topology analyst. Given SOM grid positions and cluster assignments for source directories, identify: (1) which clusters group related infrastructure, (2) outlier directories (isolated SOM positions), (3) recommended directory merges or splits.' }, @{ role = 'user'; content = \\\"SOM topology sample (`n$ctx`n)`nAnalyze the topology and give recommendations.\\\" }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host '--- SOM Topology Analysis ---' -ForegroundColor Green; $resp.choices[0].message.content\"",
+      "command": "pwsh -NoProfile -Command \"Write-Host 'Fetching SOM topology from Redis wiki notes...' -ForegroundColor Cyan; $keys = redis-cli KEYS 'wiki:note:dir:*' 2>$null; if (-not $keys) { Write-Host 'No wiki notes in Redis — run KAG ingest first' -ForegroundColor Red; exit 1 }; $sample = $keys | Select-Object -First 5 | ForEach-Object { $val = redis-cli GET $_ 2>$null; try { $doc = $val | ConvertFrom-Json; \\\"dir=$($doc.directoryPath) SOM=($($doc.somBmuRow),$($doc.somBmuCol)) cluster=$($doc.somCluster) score=$($doc.auditScore)\\\" } catch { $_ } }; $ctx = $sample -join \\\"`n\\\"; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = 'You are a codebase topology analyst. Given SOM grid positions and cluster assignments for source directories, identify: (1) which clusters group related infrastructure, (2) outlier directories (isolated SOM positions), (3) recommended directory merges or splits.' }, @{ role = 'user'; content = \\\"SOM topology sample (`n$ctx`n)`nAnalyze the topology and give recommendations.\\\" }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host '--- SOM Topology Analysis ---' -ForegroundColor Green; $resp.choices[0].message.content\"",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "test",
       "detail": "Read a sample of Redis wiki notes, extract SOM grid positions (row, col, cluster), then prompt Gemma4 via llama-server to analyse the 4D topology and suggest structural improvements.",
@@ -9501,7 +9706,7 @@
     {
       "label": "🤫 Quiet: Prompt Gemma4 → log file",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/gemma4-prompt-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; $query = '${input:dirAnalysisQuery}'; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = 'You are a legal AI codebase analyst. Return concise, structured analysis.' }, @{ role = 'user'; content = $query }); max_tokens = 512; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $content = $resp.choices[0].message.content; Set-Content -Path $log -Value $content -Encoding UTF8; if ($content.Length -le 4000) { Write-Host $content } else { Write-Host ($content.Substring(0,4000)); Write-Host \\\"... truncated $($content.Length - 4000) chars\\\" -ForegroundColor Yellow }; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full response: $log ($($content.Length) chars)\\\" -ForegroundColor Green\"",
+      "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/gemma4-prompt-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; $query = '${input:dirAnalysisQuery}'; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = 'You are a legal AI codebase analyst. Return concise, structured analysis.' }, @{ role = 'user'; content = $query }); max_tokens = 512; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $content = $resp.choices[0].message.content; Set-Content -Path $log -Value $content -Encoding UTF8; if ($content.Length -le 4000) { Write-Host $content } else { Write-Host ($content.Substring(0,4000)); Write-Host \\\"... truncated $($content.Length - 4000) chars\\\" -ForegroundColor Yellow }; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full response: $log ($($content.Length) chars)\\\" -ForegroundColor Green\"",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "test",
       "detail": "Prompt Gemma4 via llama-server :8090, write full response to logs/gemma4-prompt-<timestamp>.log, show first 4000 chars inline. Safe for VS Code chat — caps inline output.",
@@ -9512,7 +9717,7 @@
     {
       "label": "🤫 Quiet: Full pipeline (audit + KAG + Gemma4) → log file",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/full-pipeline-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; '=== Step 1: Dir audit (lib/server) ===' | Out-File $log; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --write-map *>>&1 $log; '=== Step 2: KAG ingest ===' | Add-Content $log; try { $ingest = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/codebase-index/summarize-dirs' -Method Post -Headers @{ 'x-dev-bypass-auth' = 'true' } -TimeoutSec 300; \\\"Ingested: $($ingest.directoriesFound) dirs, $($ingest.upserted) upserted\\\" | Add-Content $log } catch { \\\"KAG ingest skipped (dev server not running): $_\\\" | Add-Content $log }; '=== Step 3: Gemma4 summary ===' | Add-Content $log; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = 'Codebase health analyst. 5 bullets: auth, cache, inference, topology, top refactor priority.' }, @{ role = 'user'; content = 'Summarize codebase production readiness.' }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $r.choices[0].message.content | Add-Content $log } catch { \\\"Gemma4 unreachable: $_\\\" | Add-Content $log }; Get-Content $log | Select-Object -Last 60; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full pipeline log: $log\\\" -ForegroundColor Green; Write-Host \\\"Size: $([math]::Round((Get-Item $log).Length/1KB,1)) KB\\\" -ForegroundColor Green\"",
+      "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/full-pipeline-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; '=== Step 1: Dir audit (lib/server) ===' | Out-File $log; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --write-map *>>&1 $log; '=== Step 2: KAG ingest ===' | Add-Content $log; try { $ingest = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/codebase-index/summarize-dirs' -Method Post -Headers @{ 'x-dev-bypass-auth' = 'true' } -TimeoutSec 300; \\\"Ingested: $($ingest.directoriesFound) dirs, $($ingest.upserted) upserted\\\" | Add-Content $log } catch { \\\"KAG ingest skipped (dev server not running): $_\\\" | Add-Content $log }; '=== Step 3: Gemma4 summary ===' | Add-Content $log; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = 'Codebase health analyst. 5 bullets: auth, cache, inference, topology, top refactor priority.' }, @{ role = 'user'; content = 'Summarize codebase production readiness.' }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $r.choices[0].message.content | Add-Content $log } catch { \\\"Gemma4 unreachable: $_\\\" | Add-Content $log }; Get-Content $log | Select-Object -Last 60; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full pipeline log: $log\\\" -ForegroundColor Green; Write-Host \\\"Size: $([math]::Round((Get-Item $log).Length/1KB,1)) KB\\\" -ForegroundColor Green\"",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "test",
       "detail": "Full 3-step pipeline (audit → KAG ingest → Gemma4) → all output to logs/full-pipeline-<timestamp>.log → show last 60 lines. KAG step gracefully skips if dev server not running.",
@@ -9935,6 +10140,22 @@
     },
 
     {
+      "label": "📖 Open Codebase Strategy Guide",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"code docs/DEVELOPER_STRATEGY_GUIDE.md\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Open docs/DEVELOPER_STRATEGY_GUIDE.md — consolidated codebase strategy guide for architecture, workflows, and operator conventions.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "🤖 Agent: Batch Error Fix — Dry Run (list hotspots)",
       "type": "shell",
       "command": "node scripts/agentic-batch-fix.mjs ${input:batchTopN} --dry-run",
@@ -10216,10 +10437,11 @@
     {
       "label": "🦉 Hermes: Dashboard (web UI :9119)",
       "type": "shell",
-      "command": "bash",
+      "command": "pwsh",
       "args": [
-        "-c",
-        "mkdir -p '${workspaceFolder}/logs/hermes' && hermes dashboard 2>&1 | tee '${workspaceFolder}/logs/hermes/dashboard.log'"
+        "-NoProfile",
+        "-Command",
+        "$logDir = Join-Path '${workspaceFolder}' 'logs/hermes'; New-Item -ItemType Directory -Force -Path $logDir | Out-Null; hermes dashboard 2>&1 | Tee-Object -FilePath (Join-Path $logDir 'dashboard.log')"
       ],
       "isBackground": true,
       "group": "build",
@@ -10256,25 +10478,25 @@
       "command": "hermes model",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "build",
-      "detail": "Switch Hermes's active LLM. Use to pick gemma4-hermes-64k (64K-context derivative of gemma4-legal-vlm).",
+      "detail": "Switch Hermes's active LLM. Use to pick gemma4-rotorquant:latest (64K-context derivative of gemma4-rotorquant:latest).",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     },
     {
       "label": "🦉 Hermes: Build 64K Modelfile (one-time)",
       "type": "shell",
-      "command": "$dir = \"$env:TEMP\\hermes-modelfile\"; New-Item -ItemType Directory -Path $dir -Force | Out-Null; $mf = Join-Path $dir 'Modelfile.gemma4-hermes-64k'; @\"\nFROM gemma4-legal-vlm:latest\nPARAMETER num_ctx 65536\n\"@ | Out-File -Encoding ascii -FilePath $mf; ollama create gemma4-hermes-64k -f $mf; ollama list | Select-String gemma4-hermes-64k",
+      "command": "$dir = \"$env:TEMP\\hermes-modelfile\"; New-Item -ItemType Directory -Path $dir -Force | Out-Null; $mf = Join-Path $dir 'Modelfile.gemma4-rotorquant:latest'; @\"\nFROM gemma4-rotorquant:latest\nPARAMETER num_ctx 65536\n\"@ | Out-File -Encoding ascii -FilePath $mf; ollama create gemma4-rotorquant:latest -f $mf; ollama list | Select-String gemma4-rotorquant:latest",
       "group": "build",
-      "detail": "One-time setup: derive a 64K-context Ollama model from gemma4-legal-vlm:latest. Hermes Agent requires ≥64K context. ~30s, ~5.3GB (metadata-only derive, no re-quantize).",
+      "detail": "One-time setup: derive a 64K-context Ollama model from gemma4-rotorquant:latest. Hermes Agent requires ≥64K context. ~30s, ~5.3GB (metadata-only derive, no re-quantize).",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     },
     {
       "label": "🤖 Ollama: Verify Hermes Model Ready",
       "type": "shell",
-      "command": "Write-Host '=== Ollama /api/tags ==='; (Invoke-RestMethod -Uri http://127.0.0.1:11434/api/tags).models | Where-Object { $_.name -match 'gemma4-hermes-64k|gemma4-legal-vlm' } | Select-Object name, size, modified_at | Format-Table; Write-Host '=== num_ctx check (gemma4-hermes-64k) ==='; $b = @{ name = 'gemma4-hermes-64k' } | ConvertTo-Json; (Invoke-RestMethod -Uri http://127.0.0.1:11434/api/show -Method Post -Body $b -ContentType 'application/json').parameters",
+      "command": "Write-Host '=== Ollama /api/tags ==='; (Invoke-RestMethod -Uri http://127.0.0.1:11434/api/tags).models | Where-Object { $_.name -match 'gemma4-rotorquant:latest|gemma4-rotorquant:latest' } | Select-Object name, size, modified_at | Format-Table; Write-Host '=== num_ctx check (gemma4-rotorquant:latest) ==='; $b = @{ name = 'gemma4-rotorquant:latest' } | ConvertTo-Json; (Invoke-RestMethod -Uri http://127.0.0.1:11434/api/show -Method Post -Body $b -ContentType 'application/json').parameters",
       "group": "test",
-      "detail": "Read-only health check: confirms gemma4-hermes-64k exists in Ollama AND its num_ctx parameter is 65536. Run this before launching Hermes if you're unsure of the setup state.",
+      "detail": "Read-only health check: confirms gemma4-rotorquant:latest exists in Ollama AND its num_ctx parameter is 65536. Run this before launching Hermes if you're unsure of the setup state.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     },
@@ -10289,14 +10511,15 @@
     {
       "label": "🦉 Hermes: Gateway run (HTTP API :8642)",
       "type": "shell",
-      "command": "bash",
+      "command": "pwsh",
       "args": [
-        "-c",
-        "mkdir -p '${workspaceFolder}/logs/hermes' && hermes gateway run 2>&1 | tee '${workspaceFolder}/logs/hermes/gateway.log'"
+        "-NoProfile",
+        "-Command",
+        "$logDir = Join-Path '${workspaceFolder}' 'logs/hermes'; New-Item -ItemType Directory -Force -Path $logDir | Out-Null; hermes gateway run 2>&1 | Tee-Object -FilePath (Join-Path $logDir 'gateway.log')"
       ],
       "isBackground": true,
       "group": "build",
-      "detail": "Starts the Hermes messaging gateway — HTTP API at :8642. Routes workspace → Ollama :11434/v1 (gemma4-hermes-64k). Sessions, memory, and TRACE MCP :8788 tools unlock automatically. Logs to logs/hermes/gateway.log. API_SERVER_ENABLED=true lives in AppData/Local/hermes/.env (NOT ~/.hermes/.env). Use --replace to restart a running instance.",
+      "detail": "Starts the Hermes messaging gateway — HTTP API at :8642. Routes workspace → Ollama :11434/v1 (gemma4-rotorquant:latest). Sessions, memory, and TRACE MCP :8788 tools unlock automatically. Logs to logs/hermes/gateway.log. API_SERVER_ENABLED=true lives in AppData/Local/hermes/.env (NOT ~/.hermes/.env). Use --replace to restart a running instance.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": {
         "pattern": { "regexp": "^.*(ERROR|error|Error).*$", "message": 0 },
@@ -10306,10 +10529,11 @@
     {
       "label": "🦉 Hermes: Workspace dev (:3001)",
       "type": "shell",
-      "command": "bash",
+      "command": "pwsh",
       "args": [
-        "-c",
-        "cd '${userHome}/Downloads/Hermes-Ollama/hermes-workspace' && mkdir -p '${workspaceFolder}/logs/hermes' && pnpm install 2>&1 | tee -a '${workspaceFolder}/logs/hermes/workspace-install.log' && node_modules/.bin/vite dev --port 3001 2>&1 | tee '${workspaceFolder}/logs/hermes/workspace-dev.log'"
+        "-NoProfile",
+        "-Command",
+        "$workspaceDir = Join-Path '${userHome}' 'Downloads/Hermes-Ollama/hermes-workspace'; Set-Location $workspaceDir; $logDir = Join-Path '${workspaceFolder}' 'logs/hermes'; New-Item -ItemType Directory -Force -Path $logDir | Out-Null; pnpm install 2>&1 | Tee-Object -Append -FilePath (Join-Path $logDir 'workspace-install.log'); if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npx vite dev --port 3001 2>&1 | Tee-Object -FilePath (Join-Path $logDir 'workspace-dev.log')"
       ],
       "isBackground": true,
       "group": "build",

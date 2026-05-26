@@ -18,7 +18,7 @@ import { ENV } from '$lib/server/env.server.js';
 let _langfuse: any = null;
 let _langfuseCtorPromise: Promise<any> | null = null;
 
-async function getLangfuse() {
+export async function getLangfuse() {
   if (_langfuse) return _langfuse;
   if (!ENV.LANGFUSE_ENABLED || !ENV.LANGFUSE_PUBLIC_KEY || !ENV.LANGFUSE_SECRET_KEY) {
     return null;
@@ -72,12 +72,12 @@ export async function traceLLM<T>(
 	const trace = langfuse.trace({
     name,
     metadata,
-    tags: [(metadata.backend as string) ?? 'llm', (metadata.model as string) ?? 'gemma4-legal'],
+    tags: [(metadata.backend as string) ?? 'llm', (metadata.model as string) ?? 'gemma4-rotorquant:latest'],
   });
 
 	const generation = trace.generation({
 		name: `${name}-generation`,
-		model: (metadata.model as string) ?? 'gemma4-legal:latest',
+		model: (metadata.model as string) ?? 'gemma4-rotorquant:latest',
 		input: metadata.prompt ?? metadata.messages ?? undefined,
 		metadata,
 	});
@@ -558,6 +558,39 @@ export async function flushLangfuse(): Promise<void> {
 }
 
 /**
+ * Trace a custom span for observability (e.g. relation_scan, dynamic_import_detection).
+ */
+export async function traceSpan<T>(
+	name: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = await getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name,
+		metadata,
+		tags: ['custom-span', name],
+	});
+
+	const span = trace.span({
+		name,
+		input: JSON.stringify(metadata).slice(0, 500),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		span.end({ output: `ok (${Date.now() - start}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
  * Shut down the Langfuse client.
  */
 export async function shutdownLangfuse(): Promise<void> {
@@ -570,3 +603,4 @@ export async function shutdownLangfuse(): Promise<void> {
 		}
 	}
 }
+

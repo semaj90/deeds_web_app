@@ -11,7 +11,7 @@ import { getChatModelKeepAlive, bifrostChat, ollamaFetch } from '$lib/server/oll
 
 const DEFAULT_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_MODEL =
-  process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma4-legal:latest';
+  process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
 
 // Canonical model parameters — mirrors gemma3Q4_K_M/Modelfile PARAMETER values.
 // All TS callers previously missed num_ctx and repeat_penalty, letting Ollama
@@ -29,7 +29,13 @@ const GEMMA4_DEFAULTS = {
   temperature: 0.1,
   top_k: 20,
   top_p: 0.8,
-  num_ctx: 32768, // Gemma 4 supports 131K; 32K is practical for 8GB VRAM with Q8_0 KV
+  num_ctx: Number(
+    process.env.LLM_CONTEXT_SIZE ??
+      process.env.OLLAMA_CONTEXT_LENGTH ??
+      process.env.TURBO_CTX_SIZE ??
+      process.env.LLAMA_CTX_SIZE ??
+      65536
+  ),
   repeat_penalty: 1.05,
   num_predict: 4096, // Gemma 4 can handle longer completions
 } as const;

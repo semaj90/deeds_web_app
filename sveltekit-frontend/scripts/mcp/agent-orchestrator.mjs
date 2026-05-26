@@ -232,7 +232,7 @@ class AgentOrchestrator {
      */
     async _callOllama(messages) {
         try {
-            const model = process.env.OLLAMA_MODEL || 'gemma4-legal:latest';
+            const model = process.env.OLLAMA_MODEL || 'gemma4-rotorquant:latest';
             const response = await fetch(`${this.ollamaUrl}/api/chat`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

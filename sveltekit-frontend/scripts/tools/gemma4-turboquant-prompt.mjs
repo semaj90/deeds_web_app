@@ -36,7 +36,7 @@ try {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-legal',
+      model: 'gemma4-rotorquant:latest',
       messages: [
         { role: 'system', content: sys },
         { role: 'user', content: q },

@@ -70,7 +70,7 @@
 | Priority | Task | Details | Effort |
 |----------|------|---------|--------|
 | P1 | VLM re-attachment (Option B) | Modify GRPO notebook to preserve vision tower during merge | 2 hr |
-| P2 | Deploy `gemma4-legal-vlm:latest` | GGUF export + llama.cpp multimodal projector | 1 hr |
+| P2 | Deploy `gemma4-rotorquant:latest` | GGUF export + llama.cpp multimodal projector | 1 hr |
 
 ### Future Sprint (P3+ Deferred)
 
@@ -83,7 +83,7 @@
 | ~~Python FastAPI audio microservice~~ | ~~Gemma4 E4B HF Transformers for audio ASR~~ | ~~Superseded by whisper enrichment pipeline~~ ✅ |
 | simdjson integration | Low priority — gRPC already eliminates 90% JSON overhead | Deferred |
 | ~~LangChain ReAct agent improvements~~ | ~~`synthesizeAnswer()` canned responses need LLM synthesis~~ | ~~Deferred~~ |
-| **AutoGen/CrewAI evaluation** | **Decision: KEEP LangChain 1.0.4 + LangGraph 1.2.7.** Production-ready with 32 FastMCP tools, supervisor routing (4-8 subagents), SSE streaming, Ollama gemma4-legal. AutoGen = planning docs only (never wired). CrewAI = 61-line Python demo (isolated). No unique capability gap. Adding AutoGen would require Python sidecar + IPC overhead for zero gain.** | **Resolved — Keep current stack** ✅ |
+| **AutoGen/CrewAI evaluation** | **Decision: KEEP LangChain 1.0.4 + LangGraph 1.2.7.** Production-ready with 32 FastMCP tools, supervisor routing (4-8 subagents), SSE streaming, Ollama gemma4-rotorquant:latest. AutoGen = planning docs only (never wired). CrewAI = 61-line Python demo (isolated). No unique capability gap. Adding AutoGen would require Python sidecar + IPC overhead for zero gain.** | **Resolved — Keep current stack** ✅ |
 | **YOLO vs VLM decision** | **YOLO (`yolo.ts`) handles object detection (bboxes, regions, layout). VLM (`vlm-evidence-analyzer.ts`) handles semantic understanding (summaries, key findings, tags). Both run in evidence pipeline: YOLO Stage 6a → VLM Stage 6b. KEEP BOTH — complementary, not redundant. CLIP not needed (embeddinggemma handles cross-modal search).** | **Evaluated** ✅ |
 | Deeds Labs archival | `deeds_labs/` → separate `semaj90/deeds-labs` private repo (17K+ files) | Manual git task |
 | Setup wizard onboarding | First-run UX wizard for new users | Future sprint |

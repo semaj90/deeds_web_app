@@ -1,6 +1,6 @@
 /**
  * POST /api/statutes/[id]/summary
- * Generates an AI summary of a statute using Ollama gemma4-legal.
+ * Generates an AI summary of a statute using Ollama gemma4-rotorquant:latest.
  * Caches results in Redis (24h TTL).
  */
 import { json } from '@sveltejs/kit';
@@ -13,7 +13,7 @@ import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { redis } from '$lib/server/redis.js';
 import { isUuid } from '$lib/server/validation.js';
 const CACHE_TTL = 86400; // 24 hours
-const LLM_MODEL = 'gemma4-legal:latest';
+const LLM_MODEL = 'gemma4-rotorquant:latest';
 
 export const POST: RequestHandler = async ({ params, locals }) => {
   if (!locals.user) {

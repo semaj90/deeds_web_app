@@ -39,7 +39,7 @@ import path from 'node:path';
 
 const TURBOQUANT_URL   = ENV.TURBOQUANT_BASE_URL;
 const OLLAMA_URL       = ENV.OLLAMA_BASE_URL;
-const CHAT_MODEL       = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
+const CHAT_MODEL       = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-rotorquant:latest';
 const NEO4J_URL        = ENV.NEO4J_URI;
 const NEO4J_USER       = ENV.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS       = ENV.NEO4J_PASSWORD;

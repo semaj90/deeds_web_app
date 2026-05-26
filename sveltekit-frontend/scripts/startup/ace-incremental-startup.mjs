@@ -225,8 +225,10 @@ async function runIncrementalLane(redis) {
     }
     log.changedFiles = changed;
 
-    const relevant = changed.filter(f =>
-      /^(sveltekit-frontend\/)?(src|scripts|docs|memory|next_steps|drizzle|package\.json|CLAUDE\.md|AGENTS\.md|LLMS\.md)/.test(f)
+    const relevant = changed.filter((f) =>
+      /^(sveltekit-frontend\/)?(src|scripts|docs|memory|next_steps|drizzle|package\.json|CLAUDE\.md|AGENTS\.md|LLMS\.md)/.test(
+        f
+      )
     );
     log.relevantCount = relevant.length;
     log.changeClass = classifyChanges(relevant);
@@ -236,7 +238,9 @@ async function runIncrementalLane(redis) {
     if (!hasChanges) {
       log.status = 'skipped';
       log.reason = 'no relevant changed files';
-      console.log('[startup] incremental: no relevant changes — skipping indexing, running health checks');
+      console.log(
+        '[startup] incremental: no relevant changes — skipping indexing, running health checks'
+      );
     }
 
     // ── Indexing loop — only when files changed ───────────────────────────────
@@ -251,10 +255,13 @@ async function runIncrementalLane(redis) {
       // up to ~30s when many files changed. The llms:pipeline below depends
       // on fresh code_relations data, so this MUST run first.
       runStep('codebase index resume', 'index:codebase:fast:resume', {
-        required: false, timeout: 180_000,
+        required: false,
+        timeout: 180_000,
       });
 
-      console.log('[startup] llms pipeline split out of startup lane — run npm run llms:pipeline:dry or npm run llms:pipeline:safe separately');
+      console.log(
+        '[startup] llms pipeline split out of startup lane — run npm run llms:pipeline:dry or npm run llms:pipeline:safe separately'
+      );
 
       runStep('topology validate', 'topology:validate', { required: false, timeout: 120_000 });
       runStep('graph synthesize', 'graph:synthesize', { required: false, timeout: 240_000 });
@@ -311,7 +318,9 @@ async function runIncrementalLane(redis) {
     const tvAge = tvStampRaw ? (Date.now() - new Date(tvStampRaw).getTime()) / 60_000 : Infinity;
     let tvHealthy = false;
     try {
-      const tvProbe = await fetch('http://127.0.0.1:8099/health', { signal: AbortSignal.timeout(1500) });
+      const tvProbe = await fetch('http://127.0.0.1:8099/health', {
+        signal: AbortSignal.timeout(1500),
+      });
       tvHealthy = tvProbe.ok;
     } catch {}
 
@@ -327,7 +336,9 @@ async function runIncrementalLane(redis) {
       });
       tvChild.unref();
       log.turbovecSidecar = { status: 'spawned', pid: tvChild.pid };
-      console.log(`[startup] TurboVec sidecar spawned pid=${tvChild.pid} → logs/task-output/pipeline-test/turbovec-sidecar.{out,err}.log`);
+      console.log(
+        `[startup] TurboVec sidecar spawned pid=${tvChild.pid} → logs/task-output/pipeline-test/turbovec-sidecar.{out,err}.log`
+      );
       await redis.set(tvCooldownKey, new Date().toISOString(), 'EX', 3600).catch(() => {});
     } else if (tvHealthy) {
       log.turbovecSidecar = { status: 'already-up' };
@@ -340,6 +351,13 @@ async function runIncrementalLane(redis) {
       .map(([k, v]) => `${k}:${v}`)
       .join(' ');
     console.log(`[startup] services → ${svcSummary}`);
+
+    // Warm the native LibTorch N-API bridge so first ACE/topology GPU calls
+    // do not pay addon load + kernel JIT overhead on user-facing requests.
+    runStep('N-API LibTorch bridge warmup', 'startup:napi-bridge:warm', {
+      required: false,
+      timeout: 90_000,
+    });
 
     // smoke:atlas — final regression gate. Runs the 16-check atlas-context
     // smoke: contextForFile shape + provenance, hypergraph.search returns

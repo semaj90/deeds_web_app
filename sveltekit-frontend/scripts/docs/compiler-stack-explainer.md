@@ -201,7 +201,7 @@ Client Request → /api/ai/agent or /api/sse/chat
   ├─[CPU sidecar]──────────────────────→ LiteRT-LM :8070 (MTP speculative)
   │                                                        ↓
   └─────────────────────────────────────→ Ollama :11434 (final fallback)
-                                           gemma4-legal Q4_K_M + Q8_0 KV
+                                           gemma4-rotorquant:latest Q4_K_M + Q8_0 KV
 ```
 
 ---

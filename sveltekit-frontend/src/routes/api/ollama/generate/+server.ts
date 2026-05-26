@@ -5,17 +5,17 @@ import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 const generateSchema = z.object({
-	model: z.string().max(100).default('gemma4-legal'),
-	prompt: z.string().min(1).max(100000),
-	stream: z.boolean().default(true),
-	options: z
-		.object({
-			temperature: z.number().min(0).max(2).optional(),
-			num_ctx: z.number().min(512).max(32768).optional(),
-			top_p: z.number().min(0).max(1).optional(),
-			top_k: z.number().min(1).max(200).optional()
-		})
-		.optional()
+  model: z.string().max(100).default('gemma4-rotorquant:latest'),
+  prompt: z.string().min(1).max(100000),
+  stream: z.boolean().default(true),
+  options: z
+    .object({
+      temperature: z.number().min(0).max(2).optional(),
+      num_ctx: z.number().min(512).max(65536).optional(),
+      top_p: z.number().min(0).max(1).optional(),
+      top_k: z.number().min(1).max(200).optional(),
+    })
+    .optional(),
 });
 
 /** POST /api/ollama/generate — Proxy to Ollama /api/generate with streaming support */

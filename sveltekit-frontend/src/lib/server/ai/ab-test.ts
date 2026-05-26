@@ -13,7 +13,7 @@
  *
  * Usage:
  *   const variant = await getVariant('legal-model-test', userId);
- *   // variant.model → 'gemma4-legal-vlm:latest' or 'gemma3:270m'
+ *   // variant.model → 'gemma4-rotorquant:latest' or 'gemma3:270m'
  *   await recordImpression('legal-model-test', variant.variantId);
  *   // ... run inference ...
  *   await recordWin('legal-model-test', variant.variantId, { durationMs, feedbackScore });
@@ -76,10 +76,10 @@ const EXPERIMENTS: Map<string, AbExperiment> = new Map([
     'legal-model-test',
     {
       experimentId: 'legal-model-test',
-      description: 'Compare gemma4-legal-vlm (full) vs gemma3:270m (fast) for legal Q&A',
+      description: 'Compare gemma4-rotorquant:latest (full) vs gemma3:270m (fast) for legal Q&A',
       active: true,
       variants: [
-        { variantId: 'control', label: 'Legal VLM (full)', model: 'gemma4-legal-vlm:latest', pct: 70 },
+        { variantId: 'control', label: 'Legal VLM (full)', model: 'gemma4-rotorquant:latest', pct: 70 },
         { variantId: 'fast',    label: 'Gemma3 270M (fast)', model: 'gemma3:270m', pct: 30 },
       ],
     },
@@ -91,8 +91,8 @@ const EXPERIMENTS: Map<string, AbExperiment> = new Map([
       description: 'TurboQuant (:8090) vs Ollama (:11434) latency comparison',
       active: true,
       variants: [
-        { variantId: 'turboquant', label: 'TurboQuant', model: 'gemma4-legal-vlm:latest', pct: 50, backendHint: 'turboquant' },
-        { variantId: 'ollama',     label: 'Ollama',     model: 'gemma4-legal-vlm:latest', pct: 50, backendHint: 'ollama' },
+        { variantId: 'turboquant', label: 'TurboQuant', model: 'gemma4-rotorquant:latest', pct: 50, backendHint: 'turboquant' },
+        { variantId: 'ollama',     label: 'Ollama',     model: 'gemma4-rotorquant:latest', pct: 50, backendHint: 'ollama' },
       ],
     },
   ],

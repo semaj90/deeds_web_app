@@ -7,7 +7,7 @@
  *
  * Usage:
  *   node scripts/atlas/append-llm-synthesis-jsonl.mjs --dry-run
- *   node scripts/atlas/append-llm-synthesis-jsonl.mjs --runId synth_abc --query "test" --profile code_debug --model gemma4-legal
+ *   node scripts/atlas/append-llm-synthesis-jsonl.mjs --runId synth_abc --query "test" --profile code_debug --model gemma4-rotorquant:latest
  */
 
 import { appendFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -81,7 +81,7 @@ const params = {
   sourceRefs: arg('sourceRefs') ? JSON.parse(arg('sourceRefs')) : [],
   cacheKeys: arg('cacheKeys') ? JSON.parse(arg('cacheKeys')) : {},
   trustTier: arg('trustTier') ?? 'local_code_plus_official_docs',
-  model: arg('model') ?? 'gemma4-legal',
+  model: arg('model') ?? 'gemma4-rotorquant:latest',
   validation: arg('validation') ? JSON.parse(arg('validation')) : {},
 };
 

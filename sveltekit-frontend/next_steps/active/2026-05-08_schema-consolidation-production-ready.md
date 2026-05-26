@@ -21,7 +21,7 @@ VS Code folderOpen
 | Layer | State | Verification |
 |-------|-------|--------------|
 | TRACE MCP `:8788` | 34 tools live, all reachable | `node scripts/smoke-trace-mcp-tools.mjs` |
-| TurboQuant `:8090` | gemma4-legal-vlm chat-only (q8_0 KV) | `curl localhost:8090/health` |
+| TurboQuant `:8090` | gemma4-rotorquant:latest chat-only (q8_0 KV) | `curl localhost:8090/health` |
 | Postgres proxy `:5434` | 36,069 cluster_members rows, agents_md_relations applied | `npm run smoke:agents` |
 | Qdrant `:6333` | codebase_chunks_768 with cluster_key payload (gpu:N namespaced) | smoke |
 | Redis `:6379` | gpu:karpathy:*, ace:*, agents:dir:*, taxonomy:* hot keys | `redis-cli KEYS 'gpu:*'` |

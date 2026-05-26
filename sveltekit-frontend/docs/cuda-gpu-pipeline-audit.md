@@ -74,7 +74,7 @@
 
 | Component | VRAM | Notes |
 |-----------|------|-------|
-| Ollama gemma4-legal-vlm | ~5.4 GB | Q4_K_M, primary model |
+| Ollama gemma4-rotorquant:latest | ~5.4 GB | Q4_K_M, primary model |
 | Ollama embeddinggemma | ~0.6 GB | BF16, 768-dim output |
 | CUDA context + cuDNN | ~0.3 GB | Driver + caching allocator |
 | **Total steady** | **~6.3 GB** | **Leaves ~1.7 GB for ops** |
@@ -168,7 +168,7 @@ flowchart TD
 
     subgraph "Stage 6 — LLM Summarize"
         J --> M["Per-cluster file lists"]
-        M --> N["gemma4-legal-vlm<br/>Q4_K_M · purpose/patterns/warnings"]
+        M --> N["gemma4-rotorquant:latest<br/>Q4_K_M · purpose/patterns/warnings"]
         N --> O["cluster_summaries<br/>+ summary_embedding[768]"]
     end
 
@@ -233,7 +233,7 @@ flowchart TD
 - `loadCentroidsFromDB()` warms Redis from Postgres on restart
 
 #### Stage 6 — LLM Summarization
-**Model**: gemma4-legal-vlm · Q4_K_M · ~5.4 GB VRAM
+**Model**: gemma4-rotorquant:latest · Q4_K_M · ~5.4 GB VRAM
 
 Per cluster, the LLM generates:
 - `purpose` — what the cluster does

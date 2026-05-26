@@ -112,7 +112,7 @@ User Query
 │ L3: Ollama GPU Inference                │
 │ • Latency: 4.5s avg (gemma3:270m)       │
 │ • Hit Rate: N/A (fallback)              │
-│ • Model: gemma3:270m or gemma4-legal    │
+│ • Model: gemma3:270m or gemma4-rotorquant:latest    │
 │ • Implementation: ollama.ts             │
 └──────┬──────────────────────────────────┘
        │ Response
@@ -156,7 +156,7 @@ http://localhost:5173/cache-monitor
 # Wait ~2 minutes (20 queries × ~5s avg)
 
 # Expected: ✅ Success! 20/20 queries cached
-# Note: gemma4-legal takes ~8 min (20 × ~22s avg)
+# Note: gemma4-rotorquant:latest takes ~8 min (20 × ~22s avg)
 ```
 
 ### **Step 3: Test Cache Integration**
@@ -418,7 +418,7 @@ curl -X POST http://localhost:5173/api/cache/warm-up \
 
 **Fixes**:
 1. Check Ollama is running: `curl http://localhost:11434/api/tags`
-2. Check model exists: `ollama list | grep gemma4-legal`
+2. Check model exists: `ollama list | grep gemma4-rotorquant:latest`
 3. Test endpoint directly: `curl -X POST http://localhost:5173/api/cache/warm-up -d '{"dryRun":true}'`
 4. Check dev server logs for specific error
 

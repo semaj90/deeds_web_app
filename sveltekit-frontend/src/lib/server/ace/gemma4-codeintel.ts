@@ -14,6 +14,7 @@ import { ENV } from '$lib/server/env.server.js';
 import crypto from 'node:crypto';
 import type { AceCodeIntelContext } from './codeintel-datastore.js';
 import {
+  assertDirectOllamaAllowed,
   bifrostChat,
   getChatModelKeepAlive,
   getOllamaRequestTimeoutMs,
@@ -21,6 +22,16 @@ import {
 } from '../ollama.js';
 import * as Hypergraph from '../ai/hypergraph-store.js';
 import { retrievalClient } from '../grpc/retrieval-client.js';
+
+const RUNTIME_CONTEXT_SIZE = Number(
+  process.env.LLM_CONTEXT_SIZE ??
+    process.env.TURBO_CTX_SIZE ??
+    process.env.LLAMA_CTX_SIZE ??
+    process.env.TURBO_CTX ??
+    process.env.LLAMA_SERVER_CTX ??
+    process.env.OLLAMA_CONTEXT_LENGTH ??
+    65536
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -266,6 +277,11 @@ export async function callGemma4WithAceContext(
     const assistantStartedAt = Date.now();
     const content = formatField
       ? await (async () => {
+          assertDirectOllamaAllowed(
+            'ace/gemma4-codeintel',
+            'json-schema',
+            'Structured JSON schema format is required for this lane.'
+          );
           const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -281,7 +297,7 @@ export async function callGemma4WithAceContext(
               options: {
                 temperature,
                 num_predict: maxTokens,
-                num_ctx: 32768,
+                num_ctx: RUNTIME_CONTEXT_SIZE,
                 repeat_penalty: 1.05,
               },
             }),
@@ -550,6 +566,11 @@ export async function callGemma4WithTools(
 
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      assertDirectOllamaAllowed(
+        'ace/gemma4-codeintel',
+        'tool-calls',
+        'Native tool-calling loop requires direct /api/chat tools payload.'
+      );
       const assistantStartedAt = Date.now();
       const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
         method: 'POST',
@@ -563,7 +584,7 @@ export async function callGemma4WithTools(
           options: {
             temperature,
             num_predict: maxTokens,
-            num_ctx: 32768,
+            num_ctx: RUNTIME_CONTEXT_SIZE,
             repeat_penalty: 1.05,
           },
         }),

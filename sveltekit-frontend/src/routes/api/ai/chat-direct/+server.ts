@@ -13,7 +13,7 @@ const directChatSchema = z
   .object({
     message: z.string().max(10000).optional(),
     prompt: z.string().max(10000).optional(),
-    // Default to gemma3:270m (fast, 4.5s avg) — use gemma4-legal for complex analysis
+    // Default to gemma3:270m (fast, 4.5s avg) — use gemma4-rotorquant:latest for complex analysis
     model: z.string().optional().default('gemma3:270m'),
     temperature: z.number().min(0).max(2).optional().default(0.7),
     history: z.array(chatMessageSchema).max(50).optional().default([]),

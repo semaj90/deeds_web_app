@@ -74,7 +74,7 @@ describe('src/routes/api/v1/chat/completions/+server.ts', () => {
         id: 'chatcmpl-test',
         object: 'chat.completion',
         created: 1,
-        model: 'gemma4-legal-vlm:latest',
+        model: 'gemma4-rotorquant:latest',
         choices: [
           {
             index: 0,

@@ -90,8 +90,8 @@ The semantic cache plugin uses a different code path that successfully connects 
         "name": "ollama-key",
         "value": "http://host.docker.internal:11434",
         "models": [
-          "gemma4-legal:latest",
-          "gemma4-legal-fast",
+          "gemma4-rotorquant:latest",
+          "gemma4-rotorquant:latest-fast",
           "embeddinggemma:latest",
           "gemma3:latest",
           "nomic-embed-text:latest",

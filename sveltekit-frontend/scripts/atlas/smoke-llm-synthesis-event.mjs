@@ -52,7 +52,7 @@ async function runSmoke() {
     sourceRefs: ['src/lib/server/db/schema-postgres.ts'],
     cacheKeys: { exactHit: 'false', semanticHit: 'false' },
     trustTier: 'local_code_plus_official_docs',
-    model: 'gemma4-legal',
+    model: 'gemma4-rotorquant:latest',
     validation: { testsPassed: true },
     createdAt: now,
     datasetTimestamp: now,

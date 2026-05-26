@@ -63,7 +63,7 @@ async function captionImage(buffer, fileName) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal-vlm',
+          model: 'gemma4-rotorquant:latest',
           messages: [{
             role: 'user',
             content: [
@@ -83,7 +83,7 @@ async function captionImage(buffer, fileName) {
       const tagsMatch = text.match(/\{"tags"\s*:\s*(\[[\s\S]*?\])\}/);
       const tags = tagsMatch ? JSON.parse(tagsMatch[1]) : extractTagsFromText(text);
       const summary = text.replace(/\{"tags"[\s\S]*?\}/g, '').trim().slice(0, 500);
-      return { summary, suggestedTags: tags.slice(0, 15), model: `${label}/gemma4-legal-vlm`, cached: false };
+      return { summary, suggestedTags: tags.slice(0, 15), model: `${label}/gemma4-rotorquant:latest`, cached: false };
     } catch { /* try next */ }
   }
 
@@ -93,7 +93,7 @@ async function captionImage(buffer, fileName) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-vlm',
+        model: 'gemma4-rotorquant:latest',
         prompt: 'Describe this image for legal evidence cataloguing. List key objects, people, text visible, and 5-10 tags.',
         images: [b64],
         stream: false,
@@ -103,7 +103,7 @@ async function captionImage(buffer, fileName) {
     if (res.ok) {
       const data = await res.json();
       const text = data?.response ?? '';
-      return { summary: text.slice(0, 500), suggestedTags: extractTagsFromText(text).slice(0, 15), model: 'ollama/gemma4-legal-vlm', cached: false };
+      return { summary: text.slice(0, 500), suggestedTags: extractTagsFromText(text).slice(0, 15), model: 'ollama/gemma4-rotorquant:latest', cached: false };
     }
   } catch { /* fall through */ }
 

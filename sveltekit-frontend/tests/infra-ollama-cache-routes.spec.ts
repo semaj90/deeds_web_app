@@ -48,7 +48,7 @@ const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-legal:latest',
+	getChatModel: () => 'gemma4-rotorquant:latest',
 	getEmbedModel: () => 'embeddinggemma:latest',
   ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
 }));
@@ -474,13 +474,13 @@ describe('/api/ollama/pull (GET/POST)', () => {
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.service).toBe('ollama');
-    expect(data.model).toBe('gemma4-legal');
+    expect(data.model).toBe('gemma4-rotorquant:latest');
     expect(data.url).toBe('http://ollama.test');
   });
 
   // POST
   it('POST returns 401 when unauthenticated', async () => {
-    const res = await POST({ request: mkRequest({ model: 'gemma4-legal' }), locals: anonLocals });
+    const res = await POST({ request: mkRequest({ model: 'gemma4-rotorquant:latest' }), locals: anonLocals });
     expect(res.status).toBe(401);
   });
 
@@ -495,7 +495,7 @@ describe('/api/ollama/pull (GET/POST)', () => {
   });
 
   it('POST pulls model successfully', async () => {
-    const res = await POST({ request: mkRequest({ model: 'gemma4-legal' }), locals: authedLocals });
+    const res = await POST({ request: mkRequest({ model: 'gemma4-rotorquant:latest' }), locals: authedLocals });
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.ok).toBe(true);
@@ -530,7 +530,7 @@ describe('/api/ollama/pull (GET/POST)', () => {
       })
     );
 
-    const res = await POST({ request: mkRequest({ model: 'gemma4-legal' }), locals: authedLocals });
+    const res = await POST({ request: mkRequest({ model: 'gemma4-rotorquant:latest' }), locals: authedLocals });
     const data = await res.json();
     expect(res.status).toBe(500);
     expect(data.ok).toBe(false);
@@ -569,7 +569,7 @@ describe('/api/ollama/generate (POST)', () => {
       body: null,
       json: async () => ({
         response: 'Legal analysis complete.',
-        model: 'gemma4-legal:latest',
+        model: 'gemma4-rotorquant:latest',
         done: true,
       }),
     });
@@ -604,17 +604,17 @@ describe('/api/ollama/generate (POST)', () => {
     mockOllamaFetch.mockResolvedValueOnce({
       ok: true,
       body: null,
-      json: async () => ({ response: 'done', model: 'gemma4-legal:latest' }),
+      json: async () => ({ response: 'done', model: 'gemma4-rotorquant:latest' }),
     });
 
     await POST({
-      request: mkRequest({ prompt: 'test', model: 'gemma4-legal', stream: false }),
+      request: mkRequest({ prompt: 'test', model: 'gemma4-rotorquant:latest', stream: false }),
       locals: authedLocals,
     });
 
     expect(mockOllamaFetch).toHaveBeenCalledOnce();
     const callBody = JSON.parse((mockOllamaFetch.mock.calls[0] as any[])[1].body);
-    expect(callBody.model).toBe('gemma4-legal:latest');
+    expect(callBody.model).toBe('gemma4-rotorquant:latest');
   });
 
   it('returns 503 when Ollama fails', async () => {
@@ -841,7 +841,7 @@ describe('/api/case-theory (POST)', () => {
 		expect(res.status).toBe(200);
 		expect(data.success).toBe(true);
 		expect(data.plan.masterTheory).toBeTruthy();
-		expect(data.metadata.model).toBe('gemma4-legal:latest');
+		expect(data.metadata.model).toBe('gemma4-rotorquant:latest');
 	});
 
 	it('returns 422 when LLM returns non-JSON', async () => {

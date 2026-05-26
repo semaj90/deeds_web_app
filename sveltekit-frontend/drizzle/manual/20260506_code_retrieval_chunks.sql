@@ -91,7 +91,7 @@ DECLARE
   v_tsq tsquery;
 BEGIN
   -- 'simple' dictionary preserves camelCase tokens, dots, and path segments
-  v_tsq := websearch_to_tsquery('simple', p_query);
+  v_tsq := websearch_to_tsquery('english', p_query);
 
   RETURN QUERY
   SELECT
@@ -121,6 +121,13 @@ $$;
 
 -- ── SQL function: hybrid FTS + pgvector rerank ────────────────────────────────
 
+DROP FUNCTION IF EXISTS search_code_hybrid_pg(
+  TEXT,
+  vector(768),
+  INT,
+  TEXT
+);
+
 CREATE OR REPLACE FUNCTION search_code_hybrid_pg(
   p_query        TEXT,
   p_embedding    vector(768),
@@ -128,89 +135,84 @@ CREATE OR REPLACE FUNCTION search_code_hybrid_pg(
   p_topo_class   TEXT DEFAULT NULL
 )
 RETURNS TABLE (
-  stable_key            TEXT,
-  file_path             TEXT,
-  symbol_name           TEXT,
-  symbol_kind           TEXT,
-  language              TEXT,
-  content               TEXT,
-  tags                  TEXT,
-  topo_class            TEXT,
-  graph_authority_score DOUBLE PRECISION,
-  lexical_score         FLOAT4,
-  semantic_score        FLOAT4,
-  hybrid_score          FLOAT4,
-  headline              TEXT
+  stable_key   TEXT,
+  path         TEXT,
+  symbol       TEXT,
+  content      TEXT,
+  summary      TEXT,
+  lex_rank     BIGINT,
+  sem_rank     BIGINT,
+  hybrid_score DOUBLE PRECISION
 )
 LANGUAGE plpgsql STABLE PARALLEL SAFE
 AS $$
 DECLARE
   v_tsq tsquery;
 BEGIN
-  v_tsq := websearch_to_tsquery('simple', p_query);
+  v_tsq := websearch_to_tsquery('english', p_query);
 
-  -- CTE: lexical candidates (FTS, weight A/B/C from generated column)
   RETURN QUERY
   WITH lex AS (
     SELECT
       c.stable_key,
-      c.file_path,
-      c.symbol_name,
-      c.symbol_kind,
-      c.language,
-      c.content,
-      c.tags,
-      c.topo_class,
-      c.graph_authority_score,
-      c.embedding,
-      c.search_vector,
-      ts_rank_cd(c.search_vector, v_tsq, 32)::FLOAT4 AS lscore
-    FROM code_retrieval_chunks c
-    WHERE
-      c.search_vector @@ v_tsq
-      AND (p_topo_class IS NULL OR c.topo_class = p_topo_class)
-    ORDER BY lscore DESC
-    LIMIT p_limit * 4
+      ROW_NUMBER() OVER (
+        ORDER BY
+          c.fts_rank DESC,
+          c.graph_authority_score DESC NULLS LAST,
+          c.updated_at DESC
+      ) AS lex_rank
+    FROM (
+      SELECT
+        c_inner.stable_key,
+        ts_rank_cd(c_inner.search_vector, v_tsq, 32)::FLOAT4 AS fts_rank,
+        c_inner.graph_authority_score,
+        c_inner.updated_at
+      FROM code_retrieval_chunks c_inner
+      WHERE c_inner.search_vector @@ v_tsq
+        AND (p_topo_class IS NULL OR c_inner.topo_class = p_topo_class)
+      ORDER BY fts_rank DESC
+      LIMIT 200
+    ) c
   ),
   sem AS (
-    -- pgvector ANN rerank over lexical candidates (avoids full-table scan)
     SELECT
-      l.stable_key,
-      l.file_path,
-      l.symbol_name,
-      l.symbol_kind,
-      l.language,
-      l.content,
-      l.tags,
-      l.topo_class,
-      l.graph_authority_score,
-      l.lscore,
-      (1 - (l.embedding <=> p_embedding))::FLOAT4    AS sscore,
-      ts_headline('simple', l.content, v_tsq,
-        'MaxFragments=2, MaxWords=30, MinWords=10, StartSel=<b>, StopSel=</b>'
-      )                                               AS headline
+      c.stable_key,
+      ROW_NUMBER() OVER (
+        ORDER BY c.emb_rank DESC, c.updated_at DESC
+      ) AS sem_rank
+    FROM (
+      SELECT
+        c_inner.stable_key,
+        (1 - (c_inner.embedding <=> p_embedding))::FLOAT4 AS emb_rank,
+        c_inner.updated_at
+      FROM code_retrieval_chunks c_inner
+      WHERE c_inner.embedding IS NOT NULL
+        AND (p_topo_class IS NULL OR c_inner.topo_class = p_topo_class)
+      ORDER BY c_inner.embedding <=> p_embedding ASC
+      LIMIT 200
+    ) c
+  ),
+  fused AS (
+    SELECT
+      coalesce(l.stable_key, s.stable_key) AS stable_key,
+      l.lex_rank,
+      s.sem_rank,
+      (coalesce(1.0 / (60.0 + l.lex_rank), 0.0) + coalesce(1.0 / (60.0 + s.sem_rank), 0.0))::FLOAT4 AS hybrid_score
     FROM lex l
-    WHERE l.embedding IS NOT NULL
+    FULL OUTER JOIN sem s ON l.stable_key = s.stable_key
   )
   SELECT
-    s.stable_key,
-    s.file_path,
-    s.symbol_name,
-    s.symbol_kind,
-    s.language,
-    s.content,
-    s.tags,
-    s.topo_class,
-    s.graph_authority_score,
-    s.lscore,
-    s.sscore,
-    -- Weighted fusion: 0.35 lexical + 0.35 semantic + 0.20 authority (scaled) + 0.10 boost floor
-    (0.35 * s.lscore + 0.35 * s.sscore
-      + 0.20 * LEAST(s.graph_authority_score::FLOAT4 / 10.0, 1.0)
-      + 0.10)::FLOAT4                                AS hybrid_score,
-    s.headline
-  FROM sem s
-  ORDER BY hybrid_score DESC
+    c.stable_key,
+    c.file_path AS path,
+    c.symbol_name AS symbol,
+    c.content,
+    left(coalesce(c.content, ''), 280) AS summary,
+    f.lex_rank,
+    f.sem_rank,
+    f.hybrid_score::double precision AS hybrid_score
+  FROM fused f
+  JOIN code_retrieval_chunks c ON f.stable_key = c.stable_key
+  ORDER BY f.hybrid_score DESC
   LIMIT p_limit;
 END;
 $$;

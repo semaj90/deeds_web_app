@@ -1,0 +1,2009 @@
+{
+  "collection": "codebase_chunks_768",
+  "generatedAt": "2026-05-19T17:24:56.770Z",
+  "dryRun": false,
+  "clusterCount": 18,
+  "scannedPoints": 2604,
+  "topTagsLimit": 12,
+  "topLanguagesLimit": 8,
+  "clusters": [
+    {
+      "clusterId": 18,
+      "clusterLabel": "cluster:gpu:18",
+      "qdrantFacetCount": 456,
+      "pointCount": 456,
+      "uniqueRawTags": 34,
+      "uniqueDerivedTags": 35,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 212
+        },
+        {
+          "name": "vector",
+          "count": 146
+        },
+        {
+          "name": "types",
+          "count": 105
+        },
+        {
+          "name": "redis",
+          "count": 100
+        },
+        {
+          "name": "auth",
+          "count": 83
+        },
+        {
+          "name": "typescript",
+          "count": 58
+        },
+        {
+          "name": "ts",
+          "count": 58
+        },
+        {
+          "name": "server",
+          "count": 27
+        },
+        {
+          "name": "legal",
+          "count": 21
+        },
+        {
+          "name": "rag-pipeline",
+          "count": 20
+        },
+        {
+          "name": "server-module",
+          "count": 17
+        },
+        {
+          "name": "rabbitmq",
+          "count": 13
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 456
+        },
+        {
+          "name": "embedding",
+          "count": 212
+        },
+        {
+          "name": "vector",
+          "count": 146
+        },
+        {
+          "name": "types",
+          "count": 105
+        },
+        {
+          "name": "redis",
+          "count": 100
+        },
+        {
+          "name": "auth",
+          "count": 83
+        },
+        {
+          "name": "typescript",
+          "count": 58
+        },
+        {
+          "name": "ts",
+          "count": 58
+        },
+        {
+          "name": "server",
+          "count": 27
+        },
+        {
+          "name": "legal",
+          "count": 21
+        },
+        {
+          "name": "rag-pipeline",
+          "count": 20
+        },
+        {
+          "name": "server-module",
+          "count": 17
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 456
+        }
+      ]
+    },
+    {
+      "clusterId": 19,
+      "clusterLabel": "cluster:gpu:19",
+      "qdrantFacetCount": 274,
+      "pointCount": 274,
+      "uniqueRawTags": 31,
+      "uniqueDerivedTags": 32,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 146
+        },
+        {
+          "name": "vector",
+          "count": 86
+        },
+        {
+          "name": "auth",
+          "count": 56
+        },
+        {
+          "name": "redis",
+          "count": 54
+        },
+        {
+          "name": "typescript",
+          "count": 44
+        },
+        {
+          "name": "ts",
+          "count": 44
+        },
+        {
+          "name": "types",
+          "count": 37
+        },
+        {
+          "name": "server",
+          "count": 23
+        },
+        {
+          "name": "server-module",
+          "count": 12
+        },
+        {
+          "name": "type",
+          "count": 10
+        },
+        {
+          "name": "api-route",
+          "count": 7
+        },
+        {
+          "name": "rabbitmq",
+          "count": 7
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 274
+        },
+        {
+          "name": "embedding",
+          "count": 146
+        },
+        {
+          "name": "vector",
+          "count": 86
+        },
+        {
+          "name": "auth",
+          "count": 56
+        },
+        {
+          "name": "redis",
+          "count": 54
+        },
+        {
+          "name": "typescript",
+          "count": 44
+        },
+        {
+          "name": "ts",
+          "count": 44
+        },
+        {
+          "name": "types",
+          "count": 37
+        },
+        {
+          "name": "server",
+          "count": 23
+        },
+        {
+          "name": "server-module",
+          "count": 12
+        },
+        {
+          "name": "type",
+          "count": 10
+        },
+        {
+          "name": "api-route",
+          "count": 7
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 274
+        }
+      ]
+    },
+    {
+      "clusterId": 11,
+      "clusterLabel": "cluster:gpu:11",
+      "qdrantFacetCount": 266,
+      "pointCount": 266,
+      "uniqueRawTags": 28,
+      "uniqueDerivedTags": 29,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 134
+        },
+        {
+          "name": "redis",
+          "count": 66
+        },
+        {
+          "name": "types",
+          "count": 64
+        },
+        {
+          "name": "vector",
+          "count": 61
+        },
+        {
+          "name": "auth",
+          "count": 57
+        },
+        {
+          "name": "config",
+          "count": 37
+        },
+        {
+          "name": "rabbitmq",
+          "count": 30
+        },
+        {
+          "name": "analytics",
+          "count": 18
+        },
+        {
+          "name": "queue",
+          "count": 18
+        },
+        {
+          "name": "cache",
+          "count": 14
+        },
+        {
+          "name": "ui-component",
+          "count": 13
+        },
+        {
+          "name": "typescript",
+          "count": 11
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 266
+        },
+        {
+          "name": "embedding",
+          "count": 134
+        },
+        {
+          "name": "redis",
+          "count": 66
+        },
+        {
+          "name": "types",
+          "count": 64
+        },
+        {
+          "name": "vector",
+          "count": 61
+        },
+        {
+          "name": "auth",
+          "count": 57
+        },
+        {
+          "name": "config",
+          "count": 37
+        },
+        {
+          "name": "rabbitmq",
+          "count": 30
+        },
+        {
+          "name": "analytics",
+          "count": 18
+        },
+        {
+          "name": "queue",
+          "count": 18
+        },
+        {
+          "name": "cache",
+          "count": 14
+        },
+        {
+          "name": "ui-component",
+          "count": 13
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 266
+        }
+      ]
+    },
+    {
+      "clusterId": 9,
+      "clusterLabel": "cluster:gpu:9",
+      "qdrantFacetCount": 235,
+      "pointCount": 235,
+      "uniqueRawTags": 31,
+      "uniqueDerivedTags": 33,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "server-module",
+          "count": 82
+        },
+        {
+          "name": "api-route",
+          "count": 79
+        },
+        {
+          "name": "redis",
+          "count": 49
+        },
+        {
+          "name": "auth",
+          "count": 46
+        },
+        {
+          "name": "embedding",
+          "count": 43
+        },
+        {
+          "name": "vector",
+          "count": 42
+        },
+        {
+          "name": "cache",
+          "count": 34
+        },
+        {
+          "name": "page-component",
+          "count": 28
+        },
+        {
+          "name": "config",
+          "count": 27
+        },
+        {
+          "name": "typescript",
+          "count": 18
+        },
+        {
+          "name": "ts",
+          "count": 18
+        },
+        {
+          "name": "sse",
+          "count": 16
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 206
+        },
+        {
+          "name": "server-module",
+          "count": 82
+        },
+        {
+          "name": "api-route",
+          "count": 79
+        },
+        {
+          "name": "redis",
+          "count": 49
+        },
+        {
+          "name": "auth",
+          "count": 46
+        },
+        {
+          "name": "embedding",
+          "count": 43
+        },
+        {
+          "name": "vector",
+          "count": 42
+        },
+        {
+          "name": "cache",
+          "count": 34
+        },
+        {
+          "name": "lang:javascript",
+          "count": 29
+        },
+        {
+          "name": "page-component",
+          "count": 28
+        },
+        {
+          "name": "config",
+          "count": 27
+        },
+        {
+          "name": "typescript",
+          "count": 18
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 206
+        },
+        {
+          "name": "javascript",
+          "count": 29
+        }
+      ]
+    },
+    {
+      "clusterId": 6,
+      "clusterLabel": "cluster:gpu:6",
+      "qdrantFacetCount": 234,
+      "pointCount": 234,
+      "uniqueRawTags": 26,
+      "uniqueDerivedTags": 28,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 139
+        },
+        {
+          "name": "vector",
+          "count": 129
+        },
+        {
+          "name": "redis",
+          "count": 84
+        },
+        {
+          "name": "auth",
+          "count": 40
+        },
+        {
+          "name": "api-route",
+          "count": 34
+        },
+        {
+          "name": "rabbitmq",
+          "count": 30
+        },
+        {
+          "name": "typescript",
+          "count": 22
+        },
+        {
+          "name": "ts",
+          "count": 22
+        },
+        {
+          "name": "server",
+          "count": 21
+        },
+        {
+          "name": "rag-pipeline",
+          "count": 17
+        },
+        {
+          "name": "server-module",
+          "count": 12
+        },
+        {
+          "name": "vector-search",
+          "count": 11
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 233
+        },
+        {
+          "name": "embedding",
+          "count": 139
+        },
+        {
+          "name": "vector",
+          "count": 129
+        },
+        {
+          "name": "redis",
+          "count": 84
+        },
+        {
+          "name": "auth",
+          "count": 40
+        },
+        {
+          "name": "api-route",
+          "count": 34
+        },
+        {
+          "name": "rabbitmq",
+          "count": 30
+        },
+        {
+          "name": "typescript",
+          "count": 22
+        },
+        {
+          "name": "ts",
+          "count": 22
+        },
+        {
+          "name": "server",
+          "count": 21
+        },
+        {
+          "name": "rag-pipeline",
+          "count": 17
+        },
+        {
+          "name": "server-module",
+          "count": 12
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 233
+        },
+        {
+          "name": "javascript",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "clusterId": 15,
+      "clusterLabel": "cluster:gpu:15",
+      "qdrantFacetCount": 228,
+      "pointCount": 228,
+      "uniqueRawTags": 27,
+      "uniqueDerivedTags": 29,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 109
+        },
+        {
+          "name": "redis",
+          "count": 96
+        },
+        {
+          "name": "vector",
+          "count": 62
+        },
+        {
+          "name": "rabbitmq",
+          "count": 48
+        },
+        {
+          "name": "api-route",
+          "count": 40
+        },
+        {
+          "name": "auth",
+          "count": 33
+        },
+        {
+          "name": "cache",
+          "count": 30
+        },
+        {
+          "name": "typescript",
+          "count": 27
+        },
+        {
+          "name": "ts",
+          "count": 27
+        },
+        {
+          "name": "server",
+          "count": 25
+        },
+        {
+          "name": "server-module",
+          "count": 22
+        },
+        {
+          "name": "queue",
+          "count": 16
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 218
+        },
+        {
+          "name": "embedding",
+          "count": 109
+        },
+        {
+          "name": "redis",
+          "count": 96
+        },
+        {
+          "name": "vector",
+          "count": 62
+        },
+        {
+          "name": "rabbitmq",
+          "count": 48
+        },
+        {
+          "name": "api-route",
+          "count": 40
+        },
+        {
+          "name": "auth",
+          "count": 33
+        },
+        {
+          "name": "cache",
+          "count": 30
+        },
+        {
+          "name": "typescript",
+          "count": 27
+        },
+        {
+          "name": "ts",
+          "count": 27
+        },
+        {
+          "name": "server",
+          "count": 25
+        },
+        {
+          "name": "server-module",
+          "count": 22
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 218
+        },
+        {
+          "name": "javascript",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "clusterId": 17,
+      "clusterLabel": "cluster:gpu:17",
+      "qdrantFacetCount": 211,
+      "pointCount": 211,
+      "uniqueRawTags": 32,
+      "uniqueDerivedTags": 34,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "server-module",
+          "count": 95
+        },
+        {
+          "name": "embedding",
+          "count": 60
+        },
+        {
+          "name": "config",
+          "count": 55
+        },
+        {
+          "name": "redis",
+          "count": 52
+        },
+        {
+          "name": "cache",
+          "count": 42
+        },
+        {
+          "name": "vector",
+          "count": 36
+        },
+        {
+          "name": "auth",
+          "count": 33
+        },
+        {
+          "name": "api-route",
+          "count": 32
+        },
+        {
+          "name": "worker",
+          "count": 27
+        },
+        {
+          "name": "sse",
+          "count": 25
+        },
+        {
+          "name": "types",
+          "count": 23
+        },
+        {
+          "name": "typescript",
+          "count": 16
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 162
+        },
+        {
+          "name": "server-module",
+          "count": 95
+        },
+        {
+          "name": "embedding",
+          "count": 60
+        },
+        {
+          "name": "config",
+          "count": 55
+        },
+        {
+          "name": "redis",
+          "count": 52
+        },
+        {
+          "name": "lang:javascript",
+          "count": 49
+        },
+        {
+          "name": "cache",
+          "count": 42
+        },
+        {
+          "name": "vector",
+          "count": 36
+        },
+        {
+          "name": "auth",
+          "count": 33
+        },
+        {
+          "name": "api-route",
+          "count": 32
+        },
+        {
+          "name": "worker",
+          "count": 27
+        },
+        {
+          "name": "sse",
+          "count": 25
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 162
+        },
+        {
+          "name": "javascript",
+          "count": 49
+        }
+      ]
+    },
+    {
+      "clusterId": 12,
+      "clusterLabel": "cluster:gpu:12",
+      "qdrantFacetCount": 161,
+      "pointCount": 161,
+      "uniqueRawTags": 28,
+      "uniqueDerivedTags": 30,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "typescript",
+          "count": 68
+        },
+        {
+          "name": "ts",
+          "count": 68
+        },
+        {
+          "name": "server",
+          "count": 34
+        },
+        {
+          "name": "auth",
+          "count": 24
+        },
+        {
+          "name": "embedding",
+          "count": 23
+        },
+        {
+          "name": "vector",
+          "count": 19
+        },
+        {
+          "name": "server-module",
+          "count": 17
+        },
+        {
+          "name": "function",
+          "count": 15
+        },
+        {
+          "name": "legal",
+          "count": 14
+        },
+        {
+          "name": "utility",
+          "count": 13
+        },
+        {
+          "name": "page-component",
+          "count": 13
+        },
+        {
+          "name": "redis",
+          "count": 8
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 158
+        },
+        {
+          "name": "typescript",
+          "count": 68
+        },
+        {
+          "name": "ts",
+          "count": 68
+        },
+        {
+          "name": "server",
+          "count": 34
+        },
+        {
+          "name": "auth",
+          "count": 24
+        },
+        {
+          "name": "embedding",
+          "count": 23
+        },
+        {
+          "name": "vector",
+          "count": 19
+        },
+        {
+          "name": "server-module",
+          "count": 17
+        },
+        {
+          "name": "function",
+          "count": 15
+        },
+        {
+          "name": "legal",
+          "count": 14
+        },
+        {
+          "name": "utility",
+          "count": 13
+        },
+        {
+          "name": "page-component",
+          "count": 13
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 158
+        },
+        {
+          "name": "javascript",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "clusterId": 16,
+      "clusterLabel": "cluster:gpu:16",
+      "qdrantFacetCount": 133,
+      "pointCount": 133,
+      "uniqueRawTags": 29,
+      "uniqueDerivedTags": 31,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 51
+        },
+        {
+          "name": "types",
+          "count": 41
+        },
+        {
+          "name": "auth",
+          "count": 32
+        },
+        {
+          "name": "redis",
+          "count": 22
+        },
+        {
+          "name": "vector",
+          "count": 21
+        },
+        {
+          "name": "config",
+          "count": 20
+        },
+        {
+          "name": "server-module",
+          "count": 17
+        },
+        {
+          "name": "ui-component",
+          "count": 8
+        },
+        {
+          "name": "rabbitmq",
+          "count": 8
+        },
+        {
+          "name": "javascript",
+          "count": 8
+        },
+        {
+          "name": "js",
+          "count": 8
+        },
+        {
+          "name": "page-component",
+          "count": 6
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 112
+        },
+        {
+          "name": "embedding",
+          "count": 51
+        },
+        {
+          "name": "types",
+          "count": 41
+        },
+        {
+          "name": "auth",
+          "count": 32
+        },
+        {
+          "name": "redis",
+          "count": 22
+        },
+        {
+          "name": "vector",
+          "count": 21
+        },
+        {
+          "name": "lang:javascript",
+          "count": 21
+        },
+        {
+          "name": "config",
+          "count": 20
+        },
+        {
+          "name": "server-module",
+          "count": 17
+        },
+        {
+          "name": "ui-component",
+          "count": 8
+        },
+        {
+          "name": "rabbitmq",
+          "count": 8
+        },
+        {
+          "name": "javascript",
+          "count": 8
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 112
+        },
+        {
+          "name": "javascript",
+          "count": 21
+        }
+      ]
+    },
+    {
+      "clusterId": 14,
+      "clusterLabel": "cluster:gpu:14",
+      "qdrantFacetCount": 117,
+      "pointCount": 117,
+      "uniqueRawTags": 26,
+      "uniqueDerivedTags": 28,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 71
+        },
+        {
+          "name": "redis",
+          "count": 24
+        },
+        {
+          "name": "typescript",
+          "count": 21
+        },
+        {
+          "name": "ts",
+          "count": 21
+        },
+        {
+          "name": "vector",
+          "count": 16
+        },
+        {
+          "name": "sse",
+          "count": 8
+        },
+        {
+          "name": "server-module",
+          "count": 7
+        },
+        {
+          "name": "page-component",
+          "count": 7
+        },
+        {
+          "name": "ml-inference",
+          "count": 7
+        },
+        {
+          "name": "utility",
+          "count": 7
+        },
+        {
+          "name": "server",
+          "count": 7
+        },
+        {
+          "name": "api-route",
+          "count": 6
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 109
+        },
+        {
+          "name": "embedding",
+          "count": 71
+        },
+        {
+          "name": "redis",
+          "count": 24
+        },
+        {
+          "name": "typescript",
+          "count": 21
+        },
+        {
+          "name": "ts",
+          "count": 21
+        },
+        {
+          "name": "vector",
+          "count": 16
+        },
+        {
+          "name": "sse",
+          "count": 8
+        },
+        {
+          "name": "server-module",
+          "count": 7
+        },
+        {
+          "name": "page-component",
+          "count": 7
+        },
+        {
+          "name": "ml-inference",
+          "count": 7
+        },
+        {
+          "name": "utility",
+          "count": 7
+        },
+        {
+          "name": "server",
+          "count": 7
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 109
+        },
+        {
+          "name": "javascript",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "clusterId": 4,
+      "clusterLabel": "cluster:gpu:4",
+      "qdrantFacetCount": 110,
+      "pointCount": 110,
+      "uniqueRawTags": 26,
+      "uniqueDerivedTags": 28,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "server-module",
+          "count": 48
+        },
+        {
+          "name": "types",
+          "count": 42
+        },
+        {
+          "name": "auth",
+          "count": 23
+        },
+        {
+          "name": "embedding",
+          "count": 21
+        },
+        {
+          "name": "api-route",
+          "count": 20
+        },
+        {
+          "name": "page-component",
+          "count": 19
+        },
+        {
+          "name": "config",
+          "count": 16
+        },
+        {
+          "name": "ui-component",
+          "count": 15
+        },
+        {
+          "name": "utility",
+          "count": 14
+        },
+        {
+          "name": "vector",
+          "count": 13
+        },
+        {
+          "name": "redis",
+          "count": 13
+        },
+        {
+          "name": "cache",
+          "count": 10
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 93
+        },
+        {
+          "name": "server-module",
+          "count": 48
+        },
+        {
+          "name": "types",
+          "count": 42
+        },
+        {
+          "name": "auth",
+          "count": 23
+        },
+        {
+          "name": "embedding",
+          "count": 21
+        },
+        {
+          "name": "api-route",
+          "count": 20
+        },
+        {
+          "name": "page-component",
+          "count": 19
+        },
+        {
+          "name": "lang:javascript",
+          "count": 17
+        },
+        {
+          "name": "config",
+          "count": 16
+        },
+        {
+          "name": "ui-component",
+          "count": 15
+        },
+        {
+          "name": "utility",
+          "count": 14
+        },
+        {
+          "name": "vector",
+          "count": 13
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 93
+        },
+        {
+          "name": "javascript",
+          "count": 17
+        }
+      ]
+    },
+    {
+      "clusterId": 2,
+      "clusterLabel": "cluster:gpu:2",
+      "qdrantFacetCount": 104,
+      "pointCount": 104,
+      "uniqueRawTags": 20,
+      "uniqueDerivedTags": 22,
+      "uniqueLanguages": 2,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 82
+        },
+        {
+          "name": "vector",
+          "count": 34
+        },
+        {
+          "name": "redis",
+          "count": 25
+        },
+        {
+          "name": "auth",
+          "count": 18
+        },
+        {
+          "name": "api-route",
+          "count": 15
+        },
+        {
+          "name": "server-module",
+          "count": 13
+        },
+        {
+          "name": "typescript",
+          "count": 8
+        },
+        {
+          "name": "ts",
+          "count": 8
+        },
+        {
+          "name": "sse",
+          "count": 7
+        },
+        {
+          "name": "server",
+          "count": 7
+        },
+        {
+          "name": "rabbitmq",
+          "count": 5
+        },
+        {
+          "name": "ml-inference",
+          "count": 4
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 103
+        },
+        {
+          "name": "embedding",
+          "count": 82
+        },
+        {
+          "name": "vector",
+          "count": 34
+        },
+        {
+          "name": "redis",
+          "count": 25
+        },
+        {
+          "name": "auth",
+          "count": 18
+        },
+        {
+          "name": "api-route",
+          "count": 15
+        },
+        {
+          "name": "server-module",
+          "count": 13
+        },
+        {
+          "name": "typescript",
+          "count": 8
+        },
+        {
+          "name": "ts",
+          "count": 8
+        },
+        {
+          "name": "sse",
+          "count": 7
+        },
+        {
+          "name": "server",
+          "count": 7
+        },
+        {
+          "name": "rabbitmq",
+          "count": 5
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 103
+        },
+        {
+          "name": "javascript",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "clusterId": 0,
+      "clusterLabel": "cluster:gpu:0",
+      "qdrantFacetCount": 57,
+      "pointCount": 57,
+      "uniqueRawTags": 16,
+      "uniqueDerivedTags": 17,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "vector",
+          "count": 38
+        },
+        {
+          "name": "types",
+          "count": 28
+        },
+        {
+          "name": "embedding",
+          "count": 25
+        },
+        {
+          "name": "redis",
+          "count": 22
+        },
+        {
+          "name": "server-module",
+          "count": 11
+        },
+        {
+          "name": "utility",
+          "count": 6
+        },
+        {
+          "name": "api-route",
+          "count": 5
+        },
+        {
+          "name": "database",
+          "count": 5
+        },
+        {
+          "name": "config",
+          "count": 5
+        },
+        {
+          "name": "cache",
+          "count": 4
+        },
+        {
+          "name": "vector-search",
+          "count": 3
+        },
+        {
+          "name": "auth",
+          "count": 2
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 57
+        },
+        {
+          "name": "vector",
+          "count": 38
+        },
+        {
+          "name": "types",
+          "count": 28
+        },
+        {
+          "name": "embedding",
+          "count": 25
+        },
+        {
+          "name": "redis",
+          "count": 22
+        },
+        {
+          "name": "server-module",
+          "count": 11
+        },
+        {
+          "name": "utility",
+          "count": 6
+        },
+        {
+          "name": "api-route",
+          "count": 5
+        },
+        {
+          "name": "database",
+          "count": 5
+        },
+        {
+          "name": "config",
+          "count": 5
+        },
+        {
+          "name": "cache",
+          "count": 4
+        },
+        {
+          "name": "vector-search",
+          "count": 3
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 57
+        }
+      ]
+    },
+    {
+      "clusterId": 5,
+      "clusterLabel": "cluster:gpu:5",
+      "qdrantFacetCount": 6,
+      "pointCount": 6,
+      "uniqueRawTags": 6,
+      "uniqueDerivedTags": 7,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "page-component",
+          "count": 4
+        },
+        {
+          "name": "ui-component",
+          "count": 4
+        },
+        {
+          "name": "server-module",
+          "count": 2
+        },
+        {
+          "name": "sse",
+          "count": 2
+        },
+        {
+          "name": "auth",
+          "count": 2
+        },
+        {
+          "name": "api-route",
+          "count": 1
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 6
+        },
+        {
+          "name": "page-component",
+          "count": 4
+        },
+        {
+          "name": "ui-component",
+          "count": 4
+        },
+        {
+          "name": "server-module",
+          "count": 2
+        },
+        {
+          "name": "sse",
+          "count": 2
+        },
+        {
+          "name": "auth",
+          "count": 2
+        },
+        {
+          "name": "api-route",
+          "count": 1
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "clusterId": 7,
+      "clusterLabel": "cluster:gpu:7",
+      "qdrantFacetCount": 6,
+      "pointCount": 6,
+      "uniqueRawTags": 11,
+      "uniqueDerivedTags": 12,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "embedding",
+          "count": 3
+        },
+        {
+          "name": "server-module",
+          "count": 2
+        },
+        {
+          "name": "api-route",
+          "count": 2
+        },
+        {
+          "name": "vector",
+          "count": 2
+        },
+        {
+          "name": "redis",
+          "count": 2
+        },
+        {
+          "name": "types",
+          "count": 1
+        },
+        {
+          "name": "rag-pipeline",
+          "count": 1
+        },
+        {
+          "name": "rabbitmq",
+          "count": 1
+        },
+        {
+          "name": "auth",
+          "count": 1
+        },
+        {
+          "name": "ui-component",
+          "count": 1
+        },
+        {
+          "name": "page-component",
+          "count": 1
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 6
+        },
+        {
+          "name": "embedding",
+          "count": 3
+        },
+        {
+          "name": "server-module",
+          "count": 2
+        },
+        {
+          "name": "api-route",
+          "count": 2
+        },
+        {
+          "name": "vector",
+          "count": 2
+        },
+        {
+          "name": "redis",
+          "count": 2
+        },
+        {
+          "name": "types",
+          "count": 1
+        },
+        {
+          "name": "rag-pipeline",
+          "count": 1
+        },
+        {
+          "name": "rabbitmq",
+          "count": 1
+        },
+        {
+          "name": "auth",
+          "count": 1
+        },
+        {
+          "name": "ui-component",
+          "count": 1
+        },
+        {
+          "name": "page-component",
+          "count": 1
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "clusterId": 1,
+      "clusterLabel": "cluster:gpu:1",
+      "qdrantFacetCount": 3,
+      "pointCount": 3,
+      "uniqueRawTags": 5,
+      "uniqueDerivedTags": 6,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "auth",
+          "count": 2
+        },
+        {
+          "name": "vector",
+          "count": 1
+        },
+        {
+          "name": "redis",
+          "count": 1
+        },
+        {
+          "name": "rabbitmq",
+          "count": 1
+        },
+        {
+          "name": "embedding",
+          "count": 1
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 3
+        },
+        {
+          "name": "auth",
+          "count": 2
+        },
+        {
+          "name": "vector",
+          "count": 1
+        },
+        {
+          "name": "redis",
+          "count": 1
+        },
+        {
+          "name": "rabbitmq",
+          "count": 1
+        },
+        {
+          "name": "embedding",
+          "count": 1
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "clusterId": 8,
+      "clusterLabel": "cluster:gpu:8",
+      "qdrantFacetCount": 2,
+      "pointCount": 2,
+      "uniqueRawTags": 4,
+      "uniqueDerivedTags": 5,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "api-route",
+          "count": 1
+        },
+        {
+          "name": "analytics",
+          "count": 1
+        },
+        {
+          "name": "server-module",
+          "count": 1
+        },
+        {
+          "name": "embedding",
+          "count": 1
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "lang:typescript",
+          "count": 2
+        },
+        {
+          "name": "api-route",
+          "count": 1
+        },
+        {
+          "name": "analytics",
+          "count": 1
+        },
+        {
+          "name": "server-module",
+          "count": 1
+        },
+        {
+          "name": "embedding",
+          "count": 1
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "clusterId": 13,
+      "clusterLabel": "cluster:gpu:13",
+      "qdrantFacetCount": 1,
+      "pointCount": 1,
+      "uniqueRawTags": 4,
+      "uniqueDerivedTags": 5,
+      "uniqueLanguages": 1,
+      "topRawTags": [
+        {
+          "name": "redis",
+          "count": 1
+        },
+        {
+          "name": "database",
+          "count": 1
+        },
+        {
+          "name": "types",
+          "count": 1
+        },
+        {
+          "name": "graph-db",
+          "count": 1
+        }
+      ],
+      "topDerivedTags": [
+        {
+          "name": "redis",
+          "count": 1
+        },
+        {
+          "name": "database",
+          "count": 1
+        },
+        {
+          "name": "types",
+          "count": 1
+        },
+        {
+          "name": "graph-db",
+          "count": 1
+        },
+        {
+          "name": "lang:typescript",
+          "count": 1
+        }
+      ],
+      "topLanguages": [
+        {
+          "name": "typescript",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "global": {
+    "rawTags": [
+      {
+        "name": "embedding",
+        "count": 1121
+      },
+      {
+        "name": "vector",
+        "count": 706
+      },
+      {
+        "name": "redis",
+        "count": 619
+      },
+      {
+        "name": "auth",
+        "count": 456
+      },
+      {
+        "name": "types",
+        "count": 367
+      },
+      {
+        "name": "server-module",
+        "count": 365
+      },
+      {
+        "name": "typescript",
+        "count": 300
+      },
+      {
+        "name": "ts",
+        "count": 300
+      },
+      {
+        "name": "api-route",
+        "count": 261
+      },
+      {
+        "name": "rabbitmq",
+        "count": 175
+      },
+      {
+        "name": "config",
+        "count": 168
+      },
+      {
+        "name": "cache",
+        "count": 165
+      }
+    ],
+    "derivedTags": [
+      {
+        "name": "lang:typescript",
+        "count": 2465
+      },
+      {
+        "name": "embedding",
+        "count": 1121
+      },
+      {
+        "name": "vector",
+        "count": 706
+      },
+      {
+        "name": "redis",
+        "count": 619
+      },
+      {
+        "name": "auth",
+        "count": 456
+      },
+      {
+        "name": "types",
+        "count": 367
+      },
+      {
+        "name": "server-module",
+        "count": 365
+      },
+      {
+        "name": "typescript",
+        "count": 300
+      },
+      {
+        "name": "ts",
+        "count": 300
+      },
+      {
+        "name": "api-route",
+        "count": 261
+      },
+      {
+        "name": "rabbitmq",
+        "count": 175
+      },
+      {
+        "name": "config",
+        "count": 168
+      }
+    ],
+    "languages": [
+      {
+        "name": "typescript",
+        "count": 2465
+      },
+      {
+        "name": "javascript",
+        "count": 134
+      }
+    ]
+  }
+}

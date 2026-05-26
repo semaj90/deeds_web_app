@@ -21,6 +21,7 @@ import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-ca
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { logEmbedIndex } from './ast-ingest-logger.js';
 import { topoByteFromPath, classifyPath } from '$lib/server/tensor/topology-byte-mapper.js';
+import { normalizeLabels } from '$lib/server/labels/normalize-labels.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const INITIAL_BATCH = 24; // starting batch size; runWithAdaptiveBatch halves on OOM
@@ -56,33 +57,22 @@ function isValidEmbedding(value: unknown): value is number[] {
 }
 
 /**
- * Generate a 768-dim embedding via Ollama embeddinggemma.
+ * Generate a 768-dim embedding via the 4-tier embedding fallback chain.
+ * Uses embedding-client.ts (gRPC→QUIC→HTTP batch→HTTP seq) which always
+ * targets Ollama :11434 — NOT ollamaFetch which may route to llama-server :8090.
  * Redis-cached by content hash to avoid re-embedding identical text.
  */
 async function embed(text: string): Promise<number[]> {
   const prompt = text.trim() || text;
-  const cached = await getCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL).catch(() => null);
-  if (isValidEmbedding(cached)) {
-    return cached;
-  }
 
-  const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: [prompt], keep_alive: '24h' }),
-    signal: AbortSignal.timeout(30_000),
-  });
+  // Use the canonical 4-tier embedding client (avoids TurboQuant :8090 routing)
+  const result = await generateEmbeddings([prompt]);
+  const embedding = result.vectors[0];
 
-  if (!res.ok) {
-    throw new Error(`Embedding failed (${res.status}): ${await res.text()}`);
-  }
-
-  const data = (await res.json()) as { embeddings: number[][] };
-  const embedding = data.embeddings?.[0];
   if (!isValidEmbedding(embedding)) {
-    throw new Error('Embedding response returned an invalid vector');
+    throw new Error('Embedding response returned an invalid vector (dim mismatch or empty)');
   }
-  setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, embedding).catch(() => {});
+
   return embedding;
 }
 
@@ -114,7 +104,18 @@ async function ensureCollection(): Promise<void> {
   }
 
   // Create payload indexes for filtered search
-  const indexes = ['kind', 'httpMethod', 'routeId', 'tags'];
+  const indexes = [
+    'kind',
+    'httpMethod',
+    'routeId',
+    'tags',
+    'topo_class',
+    'cluster_key',
+    'centroid_label',
+    'topology_label',
+    'hotness_bucket',
+    'feature_family',
+  ];
   for (const field of indexes) {
     await fetch(`${qdrantUrl}/collections/${QDRANT_COLLECTION}/index`, {
       method: 'PUT',
@@ -311,6 +312,13 @@ export async function searchCodebase(
         tags: r.payload.tags as string[],
         lineStart: r.payload.lineStart as number,
         lineEnd: r.payload.lineEnd as number,
+        topo_class: r.payload.topo_class as string | undefined,
+        cluster_key: r.payload.cluster_key as string | undefined,
+        centroid_label: r.payload.centroid_label as string | undefined,
+        topology_label: r.payload.topology_label as string | undefined,
+        hotness_bucket: r.payload.hotness_bucket as string | undefined,
+        feature_family: r.payload.feature_family as string | undefined,
+        label_json: r.payload.label_json as Record<string, unknown> | undefined,
         neo4j_gpuCluster: r.payload.neo4j_gpuCluster as number | undefined,
         gpu_cluster: r.payload.gpu_cluster as number | undefined,
         som_cluster: r.payload.som_cluster as number | undefined,
@@ -409,10 +417,7 @@ export async function indexChunks(
       for (let i = 0; i < batch.length; i++) {
         const contentEmb = vectors[i * 2];
         const signatureEmb = vectors[i * 2 + 1];
-        if (
-          !isValidEmbedding(contentEmb) ||
-          !isValidEmbedding(signatureEmb)
-        ) {
+        if (!isValidEmbedding(contentEmb) || !isValidEmbedding(signatureEmb)) {
           failed++;
           continue;
         }
@@ -422,17 +427,52 @@ export async function indexChunks(
           vectors: { content: contentEmb, signature: signatureEmb },
           payload: (() => {
             const meta = batch[i].metadata ?? {};
-            const topoClass = classifyPath((meta as Record<string, unknown>).relativePath as string ?? '');
-            const somCluster = (meta as Record<string, unknown>).som_cluster ?? (meta as Record<string, unknown>).somCluster;
+            const topoClass = classifyPath(
+              ((meta as Record<string, unknown>).relativePath as string) ?? ''
+            );
+            const somCluster =
+              (meta as Record<string, unknown>).som_cluster ??
+              (meta as Record<string, unknown>).somCluster;
             const clusterKey = somCluster != null ? `${topoClass}:${somCluster}` : topoClass;
+            const labels = normalizeLabels({
+              jsonb: meta,
+              centroid: {
+                label: `gpu:${somCluster ?? topoClass}`,
+                topology: String(topoClass),
+                clusterKey: String(clusterKey),
+              },
+              karpathy: {
+                blend:
+                  typeof (meta as Record<string, unknown>).karpathyBlend === 'number'
+                    ? Number((meta as Record<string, unknown>).karpathyBlend)
+                    : typeof (meta as Record<string, unknown>).graphAuthorityScore === 'number'
+                      ? Number((meta as Record<string, unknown>).graphAuthorityScore)
+                      : undefined,
+                score:
+                  typeof (meta as Record<string, unknown>).graphAuthorityScore === 'number'
+                    ? Number((meta as Record<string, unknown>).graphAuthorityScore)
+                    : undefined,
+                bucket:
+                  typeof (meta as Record<string, unknown>).hotness_bucket === 'string'
+                    ? String((meta as Record<string, unknown>).hotness_bucket)
+                    : undefined,
+              },
+            });
             return {
               content: batch[i].content.slice(0, 4_000),
               signature: batch[i].signature,
               chunk_id: batch[i].id,
               ...meta,
-              topo_byte:   topoByteFromPath((meta as Record<string, unknown>).relativePath as string ?? ''),
-              topo_class:  topoClass,
-              cluster_key: clusterKey,
+              topo_byte: topoByteFromPath(
+                ((meta as Record<string, unknown>).relativePath as string) ?? ''
+              ),
+              topo_class: labels.topology_label ?? topoClass,
+              cluster_key: labels.cluster_key ?? clusterKey,
+              centroid_label: labels.centroid_label,
+              topology_label: labels.topology_label,
+              hotness_bucket: labels.hotness_bucket,
+              feature_family: labels.feature_family,
+              label_json: labels.tags,
             };
           })(),
         });

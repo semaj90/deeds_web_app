@@ -16,13 +16,13 @@
 # You should have saved checkpoint to one of these:
 
 # Option A: Google Drive
-checkpoint_path = "/content/drive/MyDrive/models/gemma4-legal-grpo-checkpoint"
+checkpoint_path = "/content/drive/MyDrive/models/gemma4-rotorquant:latest-grpo-checkpoint"
 
 # Option B: Hugging Face Hub
-checkpoint_path = "your-username/gemma4-legal-2b-grpo"
+checkpoint_path = "your-username/gemma4-rotorquant:latest-2b-grpo"
 
 # Option C: Local Colab storage (if still running)
-checkpoint_path = "./gemma4-legal-grpo-final"
+checkpoint_path = "./gemma4-rotorquant:latest-grpo-final"
 ```
 
 **Action**: Open your GRPO training notebook and verify checkpoint path exists.
@@ -44,7 +44,7 @@ checkpoint_path = "./gemma4-legal-grpo-final"
 
 # Cell 2: Load checkpoint (~3 min)
 # Update checkpoint_path to YOUR path
-checkpoint_path = "/content/drive/MyDrive/models/gemma4-legal-grpo-checkpoint"
+checkpoint_path = "/content/drive/MyDrive/models/gemma4-rotorquant:latest-grpo-checkpoint"
 model, tokenizer = FastLanguageModel.from_pretrained(checkpoint_path, ...)
 
 # Cell 3: Test LoRA adapter (~30s)
@@ -54,22 +54,22 @@ model, tokenizer = FastLanguageModel.from_pretrained(checkpoint_path, ...)
 model = model.merge_and_unload()
 
 # Cell 5: Save merged model (~2 min)
-model.save_pretrained("./gemma4-legal-2b-merged")
+model.save_pretrained("./gemma4-rotorquant:latest-2b-merged")
 
 # Cell 6: Export GGUF (~10 min per quantization)
 # This creates 4 GGUF files, watch for Q4_K_M specifically
-model.save_pretrained_gguf("gemma4-legal-2b", tokenizer, quantization_method="q4_k_m")
+model.save_pretrained_gguf("gemma4-rotorquant:latest-2b", tokenizer, quantization_method="q4_k_m")
 
 # Cell 7: Generate Modelfile (~5s)
-# Creates Modelfile.gemma4-legal-2b
+# Creates Modelfile.gemma4-rotorquant:latest-2b
 
 # Cell 8: Show deployment commands
 # Copy these for Phase 2
 ```
 
 **Expected Output Files**:
-- ✅ `gemma4-legal-2b-q4_k_m.gguf` (~1.2GB) ⭐ **DOWNLOAD THIS**
-- ✅ `Modelfile.gemma4-legal-2b` ⭐ **DOWNLOAD THIS**
+- ✅ `gemma4-rotorquant:latest-2b-q4_k_m.gguf` (~1.2GB) ⭐ **DOWNLOAD THIS**
+- ✅ `Modelfile.gemma4-rotorquant:latest-2b` ⭐ **DOWNLOAD THIS**
 - ✅ `DEPLOYMENT_INSTRUCTIONS.txt`
 - ✅ `MODEL_CARD.md`
 - ⚪ Other quantizations (optional): f16, q8_0, q4_k_s
@@ -82,17 +82,17 @@ model.save_pretrained_gguf("gemma4-legal-2b", tokenizer, quantization_method="q4
 from google.colab import files
 
 # Download GGUF file
-files.download('gemma4-legal-2b-q4_k_m.gguf')  # ~1.2GB, may take 5-10 min
+files.download('gemma4-rotorquant:latest-2b-q4_k_m.gguf')  # ~1.2GB, may take 5-10 min
 
 # Download Modelfile
-files.download('Modelfile.gemma4-legal-2b')
+files.download('Modelfile.gemma4-rotorquant:latest-2b')
 ```
 
 **Save to**:
 ```
 C:\Users\james\Videos\deeds-web-app\models\
-├── gemma4-legal-2b-q4_k_m.gguf
-└── Modelfile.gemma4-legal-2b
+├── gemma4-rotorquant:latest-2b-q4_k_m.gguf
+└── Modelfile.gemma4-rotorquant:latest-2b
 ```
 
 ---
@@ -107,7 +107,7 @@ C:\Users\james\Videos\deeds-web-app\models\
 cd C:\Users\james\Videos\deeds-web-app\models
 
 # Create Ollama model from GGUF + Modelfile
-ollama create gemma4-legal-2b -f Modelfile.gemma4-legal-2b
+ollama create gemma4-rotorquant:latest-2b -f Modelfile.gemma4-rotorquant:latest-2b
 
 # Expected output:
 # transferring model data
@@ -122,7 +122,7 @@ ollama create gemma4-legal-2b -f Modelfile.gemma4-legal-2b
 **Test inference**:
 ```bash
 # Quick test
-ollama run gemma4-legal-2b "What is hearsay evidence?"
+ollama run gemma4-rotorquant:latest-2b "What is hearsay evidence?"
 
 # Expected: ~2-5s response with legal definition
 ```
@@ -133,8 +133,8 @@ ollama list
 
 # Should show:
 # NAME                  ID              SIZE      MODIFIED
-# gemma4-legal-2b      abc123def456    1.2 GB    2 minutes ago
-# gemma4-legal:latest  ...             11.8 GB   ...
+# gemma4-rotorquant:latest-2b      abc123def456    1.2 GB    2 minutes ago
+# gemma4-rotorquant:latest  ...             11.8 GB   ...
 # gemma3:270m          ...             418 MB    ...
 ```
 
@@ -151,14 +151,14 @@ cd C:\Users\james\Videos\deeds-web-app
 # Test with new 2B model
 node scripts/cache-warmup.mjs \
   --domain evidence \
-  --model gemma4-legal-2b \
+  --model gemma4-rotorquant:latest-2b \
   --batch-size 5 \
   --delay 500
 
 # Expected:
 # ✅ Warm-up started! Processing 20 queries...
 # Total queries: 20
-# Est. duration: ~2 minutes (vs 8 min with gemma4-legal)
+# Est. duration: ~2 minutes (vs 8 min with gemma4-rotorquant:latest)
 ```
 
 **Monitor cache growth**:
@@ -176,8 +176,8 @@ watch -n 2 'curl -s http://localhost:5173/api/cache/exact-match/stats'
 # Use the direct test script
 node scripts/tests/test-cache-warmup-direct.mjs
 
-# Manually edit to use gemma4-legal-2b:
-# Change line 9: const MODEL = 'gemma4-legal-2b';
+# Manually edit to use gemma4-rotorquant:latest-2b:
+# Change line 9: const MODEL = 'gemma4-rotorquant:latest-2b';
 
 # Expected results:
 # Avg latency: 2000-5000ms (vs 561ms for 270m, 25000ms for 11.8B)
@@ -191,7 +191,7 @@ node scripts/tests/test-cache-warmup-direct.mjs
 // File: src/routes/api/cache/warm-up/+server.ts
 // Line 39:
 
-model: z.string().optional().default('gemma4-legal-2b'), // Was: gemma4-legal:latest
+model: z.string().optional().default('gemma4-rotorquant:latest-2b'), // Was: gemma4-rotorquant:latest
 ```
 
 **Option B: Update warm-up script default**:
@@ -199,7 +199,7 @@ model: z.string().optional().default('gemma4-legal-2b'), // Was: gemma4-legal:la
 // File: scripts/cache-warmup.mjs
 // Line 113:
 
-const model = values.model || 'gemma4-legal-2b'; // Was: gemma4-legal:latest
+const model = values.model || 'gemma4-rotorquant:latest-2b'; // Was: gemma4-rotorquant:latest
 ```
 
 ---
@@ -215,8 +215,8 @@ const model = values.model || 'gemma4-legal-2b'; // Was: gemma4-legal:latest
 // Add new tier
 const MODEL_TIERS = {
   fast: 'gemma3:270m',           // 560ms - cache warm-up
-  balanced: 'gemma4-legal-2b',   // 2-5s  - production Q&A ✨ NEW
-  deep: 'gemma4-legal:latest',   // 25s   - complex analysis
+  balanced: 'gemma4-rotorquant:latest-2b',   // 2-5s  - production Q&A ✨ NEW
+  deep: 'gemma4-rotorquant:latest',   // 25s   - complex analysis
 };
 
 // Update routing logic
@@ -253,7 +253,7 @@ export async function selectModel(
 // Around line 50, replace hardcoded model:
 
 // Before:
-const model = 'gemma4-legal:latest';
+const model = 'gemma4-rotorquant:latest';
 
 // After:
 import { selectModel } from '$lib/server/ai/inference-router.js';
@@ -269,10 +269,10 @@ const model = await selectModel(
 // Around line 30:
 
 // Before:
-const model = 'gemma4-legal:latest';
+const model = 'gemma4-rotorquant:latest';
 
 // After:
-const model = request.model || 'gemma4-legal-2b';  // Default to 2B
+const model = request.model || 'gemma4-rotorquant:latest-2b';  // Default to 2B
 ```
 
 ---
@@ -285,13 +285,13 @@ const model = request.model || 'gemma4-legal-2b';  // Default to 2B
 ```bash
 # Warm up all 6 domains (120 queries)
 node scripts/cache-warmup.mjs \
-  --model gemma4-legal-2b \
+  --model gemma4-rotorquant:latest-2b \
   --batch-size 5 \
   --delay 500
 
 # Expected:
 # Total queries: 120
-# Est. duration: ~10 minutes (vs 45 min with gemma4-legal)
+# Est. duration: ~10 minutes (vs 45 min with gemma4-rotorquant:latest)
 ```
 
 **Monitor**:
@@ -329,7 +329,7 @@ for (const q of queries) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       messages: [{ role: 'user', content: q }],
-      model: 'gemma4-legal-2b'
+      model: 'gemma4-rotorquant:latest-2b'
     }),
   });
   const data = await res.json();
@@ -353,7 +353,7 @@ node test-2b-quality.mjs
 ```bash
 # Use the load testing script from earlier sessions
 node scripts/tests/load-test-cache.mjs \
-  --model gemma4-legal-2b \
+  --model gemma4-rotorquant:latest-2b \
   --requests 50 \
   --concurrency 5
 
@@ -377,8 +377,8 @@ node scripts/tests/load-test-cache.mjs \
 | Tier | Model | Size | Latency | Use Case |
 |------|-------|------|---------|----------|
 | Fast | gemma3:270m | 418MB | 560ms | Cache warm-up |
-| Balanced | gemma4-legal-2b | 1.2GB | 2-5s | Production Q&A ⭐ |
-| Deep | gemma4-legal:latest | 11.8GB | 25s | Complex analysis |
+| Balanced | gemma4-rotorquant:latest-2b | 1.2GB | 2-5s | Production Q&A ⭐ |
+| Deep | gemma4-rotorquant:latest | 11.8GB | 25s | Complex analysis |
 
 ## When to Use Each Tier
 
@@ -391,8 +391,8 @@ node scripts/tests/load-test-cache.mjs \
 
 **Optimized for production**:
 ```dockerfile
-# Modelfile.gemma4-legal-2b-prod
-FROM ./gemma4-legal-2b-q4_k_m.gguf
+# Modelfile.gemma4-rotorquant:latest-2b-prod
+FROM ./gemma4-rotorquant:latest-2b-q4_k_m.gguf
 
 TEMPLATE """<start_of_turn>user
 {{ .Prompt }}<end_of_turn>
@@ -419,11 +419,11 @@ SYSTEM """You are a legal AI assistant. Provide accurate, concise answers citing
 ```bash
 git add -A
 git commit -m "$(cat <<'EOF'
-feat: Integrate gemma4-legal-2b (GRPO-optimized 2B model)
+feat: Integrate gemma4-rotorquant:latest-2b (GRPO-optimized 2B model)
 
 ## New Model Added
-- gemma4-legal-2b-q4_k_m.gguf (1.2GB quantized)
-- Modelfile.gemma4-legal-2b (Ollama config)
+- gemma4-rotorquant:latest-2b-q4_k_m.gguf (1.2GB quantized)
+- Modelfile.gemma4-rotorquant:latest-2b (Ollama config)
 - Export notebook: Gemma4_Legal_2B_Export_and_Quantize.ipynb
 
 ## Performance
@@ -433,7 +433,7 @@ feat: Integrate gemma4-legal-2b (GRPO-optimized 2B model)
 
 ## Integration Points
 - Inference router: 3-tier model selection (fast/balanced/deep)
-- Cache warm-up: Default changed to gemma4-legal-2b
+- Cache warm-up: Default changed to gemma4-rotorquant:latest-2b
 - SSE chat: Auto-selects tier based on query complexity
 
 ## Validation Results
@@ -507,11 +507,11 @@ git push origin main
 **Solution**: Re-download GGUF file, ensure no corruption
 ```bash
 # Check file size
-ls -lh gemma4-legal-2b-q4_k_m.gguf
+ls -lh gemma4-rotorquant:latest-2b-q4_k_m.gguf
 # Should be ~1.2GB (1,200,000,000 bytes)
 
 # Verify GGUF magic bytes
-xxd gemma4-legal-2b-q4_k_m.gguf | head -1
+xxd gemma4-rotorquant:latest-2b-q4_k_m.gguf | head -1
 # Should show: 47 47 55 46 (GGUF header)
 ```
 
@@ -525,11 +525,11 @@ xxd gemma4-legal-2b-q4_k_m.gguf | head -1
 **Solution**:
 ```bash
 # Check Ollama GPU usage
-ollama run gemma4-legal-2b "test" &
+ollama run gemma4-rotorquant:latest-2b "test" &
 nvidia-smi  # Should show ollama process using GPU
 
 # Verify model quantization
-ollama show gemma4-legal-2b
+ollama show gemma4-rotorquant:latest-2b
 # Should show: quantization_level: q4_k_m
 ```
 
@@ -547,7 +547,7 @@ ollama show gemma4-legal-2b
 quantization_method="q8_0"  # Better quality, 2× larger
 
 # Test with lower temperature
-ollama run gemma4-legal-2b --temperature 0.1 "query"
+ollama run gemma4-rotorquant:latest-2b --temperature 0.1 "query"
 ```
 
 ---
@@ -580,13 +580,13 @@ ollama run gemma4-legal-2b --temperature 0.1 "query"
 # Phase 1-2 (Colab):
 # 1. Upload export notebook to Colab
 # 2. Run all cells
-# 3. Download gemma4-legal-2b-q4_k_m.gguf
+# 3. Download gemma4-rotorquant:latest-2b-q4_k_m.gguf
 
 # Phase 2-6 (Local):
 cd C:\Users\james\Videos\deeds-web-app\models
-ollama create gemma4-legal-2b -f Modelfile.gemma4-legal-2b
+ollama create gemma4-rotorquant:latest-2b -f Modelfile.gemma4-rotorquant:latest-2b
 cd ..
-node scripts/cache-warmup.mjs --model gemma4-legal-2b --domain evidence
+node scripts/cache-warmup.mjs --model gemma4-rotorquant:latest-2b --domain evidence
 ```
 
 ---

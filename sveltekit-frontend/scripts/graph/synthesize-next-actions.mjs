@@ -310,7 +310,7 @@ async function callLLM(prompt) {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:       'gemma4-legal-vlm',
+        model:       'gemma4-rotorquant:latest',
         messages:    [{ role: 'user', content: prompt }],
         stream:      false,
         temperature: 0.3,
@@ -334,7 +334,7 @@ async function callLLM(prompt) {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:    'gemma4-legal:latest',
+        model:    'gemma4-rotorquant:latest',
         messages: [{ role: 'user', content: prompt }],
         stream:   false,
         options:  { temperature: 0.1, num_predict: 512 },

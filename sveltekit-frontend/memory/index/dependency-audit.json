@@ -1,0 +1,1574 @@
+{
+  "generated_at": "2026-05-20T23:16:00.952Z",
+  "generated_by": "scripts/index/dependency-audit.mjs",
+  "hotspots": [
+    {
+      "dynamic_imports": 80,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\ace\\context-assembler.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/ace-hit-tagger.js",
+        "$lib/server/ace/codeintel-datastore.js",
+        "$lib/server/ai/langgraph-client.js",
+        "$lib/server/analytics/ldr-ace-bridge.js",
+        "$lib/server/cache-keys.js",
+        "$lib/server/cache/code-llm-index.js",
+        "$lib/server/cartridge/chr97-builder.js",
+        "$lib/server/db/client",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/db/schema/search-analytics.js",
+        "$lib/server/graph/community-graph.js",
+        "$lib/server/graph/neo4j-gds.js"
+      ],
+      "stable_id": "32e2617051f877ed",
+      "static_imports": 0,
+      "total_imports": 80
+    },
+    {
+      "dynamic_imports": 66,
+      "dynamic_ratio": 1,
+      "file": "src\\mcp\\server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ai/langgraph-research.js",
+        "$lib/server/analytics/codebase-research.js",
+        "$lib/server/analytics/deep-research.js",
+        "$lib/server/analytics/mapreduce-matrix-analysis.js",
+        "$lib/server/analytics/research-cache.js",
+        "$lib/server/analytics/unified-research-query.js",
+        "$lib/server/analytics/web-research-crawler.js",
+        "$lib/server/cache/code-llm-index.js",
+        "$lib/server/grpc/tool-router-client.js",
+        "$lib/server/llm-synthesis/log-event.js",
+        "$lib/server/retrieval/topology-search-client.js",
+        "../lib/server/ace/ace-wiki.js"
+      ],
+      "stable_id": "c37cdf56fbf9ab67",
+      "static_imports": 0,
+      "total_imports": 66
+    },
+    {
+      "dynamic_imports": 66,
+      "dynamic_ratio": 1,
+      "file": "src\\mcp\\trace-mcp-server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/graph/evidence-graph-service.js",
+        "../lib/server/ace/error-fingerprint.js",
+        "../lib/server/ace/multi-lane-retrieval.js",
+        "../lib/server/ai/context-compression.js",
+        "../lib/server/analysis/vlm-evidence-analyzer.js",
+        "../lib/server/atlas/context-for-file.js",
+        "../lib/server/db/schema-postgres.js",
+        "../lib/server/fixer/fixer-memory.js",
+        "../lib/server/gpu/gpu-pipeline.js",
+        "../lib/server/gpu/simdjson-bridge.js",
+        "../lib/server/hypergraph/hypergraph-search.js",
+        "../lib/server/retrieval/web-search.js"
+      ],
+      "stable_id": "c092d308e9e0832e",
+      "static_imports": 0,
+      "total_imports": 66
+    },
+    {
+      "dynamic_imports": 62,
+      "dynamic_ratio": 1,
+      "file": "tests\\codebase-indexer.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/codebase-index/+server.js",
+        "../src/routes/api/codebase-index/cluster-detect/+server.js",
+        "../src/routes/api/codebase-index/graph-sync/+server.js",
+        "../src/routes/api/codebase-index/ingest-errors/+server.js",
+        "../src/routes/api/codebase-index/kag-notebook/+server.js",
+        "../src/routes/api/codebase-index/reindex/+server.js",
+        "../src/routes/api/codebase-index/search/+server.js",
+        "../src/routes/api/codebase-index/stats/+server.js",
+        "util"
+      ],
+      "stable_id": "6327a8c2e6dc4391",
+      "static_imports": 0,
+      "total_imports": 62
+    },
+    {
+      "dynamic_imports": 55,
+      "dynamic_ratio": 1,
+      "file": "tests\\ai-routes-comprehensive.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "../src/routes/api/ai/analyze-evidence/+server.js",
+        "../src/routes/api/ai/ask/+server.js",
+        "../src/routes/api/ai/case-prediction/+server.js",
+        "../src/routes/api/ai/case-scoring/+server.js",
+        "../src/routes/api/ai/context/+server.js",
+        "../src/routes/api/ai/contextual-chat/+server.js",
+        "../src/routes/api/ai/cross-exam/+server.js",
+        "../src/routes/api/ai/generate-image/+server.js",
+        "../src/routes/api/ai/judge/+server.js",
+        "../src/routes/api/ai/legal-research/+server.js",
+        "../src/routes/api/ai/memo-skeleton/+server.js"
+      ],
+      "stable_id": "f9983d01779b2817",
+      "static_imports": 0,
+      "total_imports": 55
+    },
+    {
+      "dynamic_imports": 54,
+      "dynamic_ratio": 1,
+      "file": "tests\\cache-recommendations-ml-sys-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/cache/+server.js",
+        "../src/routes/api/cache/invalidate/+server.js",
+        "../src/routes/api/cache/llm/clean/+server.js",
+        "../src/routes/api/cache/llm/stats/+server.js",
+        "../src/routes/api/cache/metrics/+server.js",
+        "../src/routes/api/cache/recent-queries/+server.js",
+        "../src/routes/api/cache/set/+server.js",
+        "../src/routes/api/docs/+server.js",
+        "../src/routes/api/ml/cluster-status/+server.js",
+        "../src/routes/api/recommendations/+server.js",
+        "../src/routes/api/recommendations/metrics/+server.js",
+        "../src/routes/api/recommendations/track/+server.js"
+      ],
+      "stable_id": "b07fe3d986b11751",
+      "static_imports": 0,
+      "total_imports": 54
+    },
+    {
+      "dynamic_imports": 54,
+      "dynamic_ratio": 1,
+      "file": "tests\\vision-gpu-tools-topology-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "$lib/server/inference/gpu-arbiter.js",
+        "../src/routes/api/analyze-file/+server.js",
+        "../src/routes/api/analyze-tag/+server.js",
+        "../src/routes/api/glyph/generate/+server.js",
+        "../src/routes/api/gpu/compute/+server.js",
+        "../src/routes/api/gpu/lease/+server.js",
+        "../src/routes/api/gpu/queue/+server.js",
+        "../src/routes/api/tools/execute/+server.js",
+        "../src/routes/api/topology/+server.js",
+        "../src/routes/api/vector-search/+server.js",
+        "../src/routes/api/whisper/transcribe/+server.js"
+      ],
+      "stable_id": "4712098eb20a6229",
+      "static_imports": 0,
+      "total_imports": 54
+    },
+    {
+      "dynamic_imports": 48,
+      "dynamic_ratio": 1,
+      "file": "tests\\yorha-v1-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/v1/ai/cache-result/+server.js",
+        "../src/routes/api/v1/ai/generate-layout/+server.js",
+        "../src/routes/api/v1/ai/summary-cache/+server.js",
+        "../src/routes/api/v1/chat/messages/+server.js",
+        "../src/routes/api/v1/chat/search/+server.js",
+        "../src/routes/api/v1/chat/sessions/+server.js",
+        "../src/routes/api/v1/evidence/advanced-analysis/+server.js",
+        "../src/routes/api/v1/evidence/analyze/+server.js",
+        "../src/routes/api/v1/evidence/canvas/+server.js",
+        "../src/routes/api/v1/redis/cache/+server.js",
+        "../src/routes/api/yorha/analytics/+server.js",
+        "../src/routes/api/yorha/cases/+server.js"
+      ],
+      "stable_id": "52798a0b6bdbc470",
+      "static_imports": 0,
+      "total_imports": 48
+    },
+    {
+      "dynamic_imports": 45,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\ai\\hermes\\tools\\registry.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/cluster-tags-cache.js",
+        "$lib/server/ace/token-aware-packer.js",
+        "$lib/server/agent/tools/web-search.js",
+        "$lib/server/ai/whisper.js",
+        "$lib/server/analysis/media-processing.js",
+        "$lib/server/gpu/libtorch-bridge.js",
+        "$lib/server/graph/neo4j-jsonl-exporter.js",
+        "$lib/server/grpc/embedding-client.js",
+        "$lib/server/indexer/dual-embedder.js",
+        "$lib/server/indexer/karpathy-wiki.js",
+        "$lib/server/neo4j-driver.js",
+        "$lib/server/ollama.js"
+      ],
+      "stable_id": "a0a1123a334dcbfa",
+      "static_imports": 0,
+      "total_imports": 45
+    },
+    {
+      "dynamic_imports": 45,
+      "dynamic_ratio": 1,
+      "file": "tests\\ai-canon-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/ai/ask/+server.js",
+        "../src/routes/api/ai/case-prediction/+server.js",
+        "../src/routes/api/ai/case-scoring/+server.js",
+        "../src/routes/api/ai/context/+server.js",
+        "../src/routes/api/ai/feedback/+server.js",
+        "../src/routes/api/ai/judge/+server.js",
+        "../src/routes/api/ai/models/+server.js",
+        "../src/routes/api/ai/personas/+server.js",
+        "../src/routes/api/ai/stats/+server.js",
+        "../src/routes/api/ai/suggestions/+server.js",
+        "../src/routes/api/canon/+server.js",
+        "../src/routes/api/canon/ingest/+server.js"
+      ],
+      "stable_id": "6502cf2a991f53b4",
+      "static_imports": 0,
+      "total_imports": 45
+    },
+    {
+      "dynamic_imports": 43,
+      "dynamic_ratio": 1,
+      "file": "tests\\contextual-knowledge-web-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "../src/routes/api/contextual/chat/+server.js",
+        "../src/routes/api/contextual/predictions/+server.js",
+        "../src/routes/api/contextual/state/+server.js",
+        "../src/routes/api/contextual/stats/+server.js",
+        "../src/routes/api/knowledge/search/+server.js",
+        "../src/routes/api/knowledge/stats/+server.js",
+        "../src/routes/api/precedents/search/+server.js",
+        "../src/routes/api/web/crawl/+server.js",
+        "../src/routes/api/web/search/+server.js",
+        "../src/routes/api/websearch/+server.js"
+      ],
+      "stable_id": "93c1f65e517eccac",
+      "static_imports": 0,
+      "total_imports": 43
+    },
+    {
+      "dynamic_imports": 42,
+      "dynamic_ratio": 1,
+      "file": "tests\\graph-detective-search-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "../src/routes/api/detective/analyze/+server.js",
+        "../src/routes/api/detective/connections/+server.js",
+        "../src/routes/api/graph/connections/+server.js",
+        "../src/routes/api/graph/recommendations/+server.js",
+        "../src/routes/api/graph/relationships/+server.js",
+        "../src/routes/api/graph/sync/+server.js",
+        "../src/routes/api/graph/timeline/+server.js",
+        "../src/routes/api/search/cases/+server.js",
+        "../src/routes/api/search/citations/+server.js",
+        "../src/routes/api/search/filters/+server.js",
+        "../src/routes/api/search/laws/+server.js"
+      ],
+      "stable_id": "0ce070aa91001dcb",
+      "static_imports": 0,
+      "total_imports": 42
+    },
+    {
+      "dynamic_imports": 41,
+      "dynamic_ratio": 1,
+      "file": "tests\\docs-sync-cartridge-system-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/cartridge/invalidate/+server.js",
+        "../src/routes/api/cartridge/stats/+server.js",
+        "../src/routes/api/chat/replay/+server.js",
+        "../src/routes/api/document/[docId]/+server.js",
+        "../src/routes/api/documents/[id]/+server.js",
+        "../src/routes/api/documents/[id]/auto-save/+server.js",
+        "../src/routes/api/summarize/analyze/+server.js",
+        "../src/routes/api/summarize/synthesize/+server.js",
+        "../src/routes/api/sync/documents/+server.js",
+        "../src/routes/api/system/phase13/+server.js"
+      ],
+      "stable_id": "517754ef4f5c5de2",
+      "static_imports": 0,
+      "total_imports": 41
+    },
+    {
+      "dynamic_imports": 40,
+      "dynamic_ratio": 1,
+      "file": "tests\\cases-sub-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/cases/[id]/canvas/+server.js",
+        "../src/routes/api/cases/[id]/chat/+server.js",
+        "../src/routes/api/cases/[id]/citations/+server.js",
+        "../src/routes/api/cases/[id]/connections/+server.js",
+        "../src/routes/api/cases/[id]/key-points/+server.js",
+        "../src/routes/api/cases/[id]/overview/+server.js",
+        "../src/routes/api/cases/[id]/persons/+server.js",
+        "../src/routes/api/cases/[id]/reasoning-chain/+server.js",
+        "../src/routes/api/cases/[id]/similar/+server.js",
+        "../src/routes/api/cases/[id]/timeline/+server.js"
+      ],
+      "stable_id": "69c28008e4dde3fc",
+      "static_imports": 0,
+      "total_imports": 40
+    },
+    {
+      "dynamic_imports": 38,
+      "dynamic_ratio": 1,
+      "file": "tests\\retrieval-path-wiring.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/context-assembler.js",
+        "$lib/server/cache-keys.js",
+        "$lib/server/cache/dag-cache.js",
+        "$lib/server/config/vector-config.js",
+        "$lib/server/observability/inference-log.js",
+        "$lib/server/retrieval/authority-chain.js",
+        "$lib/server/retrieval/graph-context.js"
+      ],
+      "stable_id": "fa6c8f1114a77b96",
+      "static_imports": 0,
+      "total_imports": 38
+    },
+    {
+      "dynamic_imports": 35,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\queue\\rabbitmq-manager-fixed.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/cache-keys.js",
+        "$lib/server/types/retrieval.js",
+        "../ace/context-assembler.js",
+        "../ace/self-prompt.js",
+        "../analysis/entity-extraction.js",
+        "../analysis/evidence-analysis-pipeline.js",
+        "../analysis/forensics.js",
+        "../analysis/media-processing.js",
+        "../cartridge/glyph-tile-engine.js",
+        "../db/client.js",
+        "../db/schema-postgres.js",
+        "../env.server.js"
+      ],
+      "stable_id": "dd6b7002a61c5a47",
+      "static_imports": 0,
+      "total_imports": 35
+    },
+    {
+      "dynamic_imports": 35,
+      "dynamic_ratio": 1,
+      "file": "tests\\hmm-ace-flow.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/hmm-wiki-logger.js",
+        "$lib/server/analysis/hmm-ace-analyzer.js"
+      ],
+      "stable_id": "d795d430b0d4fdf6",
+      "static_imports": 0,
+      "total_imports": 35
+    },
+    {
+      "dynamic_imports": 33,
+      "dynamic_ratio": 1,
+      "file": "tests\\reports-embed-chat-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ai/token-tracker.js",
+        "$lib/server/cache/invalidation.js",
+        "$lib/server/db/client",
+        "$lib/server/middleware/rate-limiter.js",
+        "$lib/server/reports/audit",
+        "../src/routes/api/chat/+server",
+        "../src/routes/api/embed/+server",
+        "../src/routes/api/persons-of-interest/relationships/+server",
+        "../src/routes/api/reports/+server",
+        "../src/routes/api/reports/save/+server",
+        "../src/routes/api/summarize/+server"
+      ],
+      "stable_id": "251c766b1780ccc2",
+      "static_imports": 0,
+      "total_imports": 33
+    },
+    {
+      "dynamic_imports": 29,
+      "dynamic_ratio": 1,
+      "file": "tests\\poi-citations-conversations-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/cache.js",
+        "$lib/server/db/client",
+        "../src/routes/api/citations/+server",
+        "../src/routes/api/conversations/[id]/+server",
+        "../src/routes/api/persons-of-interest/+server",
+        "../src/routes/api/persons-of-interest/[id]/+server"
+      ],
+      "stable_id": "ef0c6d7348291ae0",
+      "static_imports": 0,
+      "total_imports": 29
+    },
+    {
+      "dynamic_imports": 28,
+      "dynamic_ratio": 1,
+      "file": "src\\routes\\api\\evidence\\upload\\+server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/auto-tagger.js",
+        "$lib/server/analysis/evidence-analysis-pipeline.js",
+        "$lib/server/analysis/granite-docling.js",
+        "$lib/server/analysis/media-processing.js",
+        "$lib/server/analysis/vlm-evidence-analyzer.js",
+        "$lib/server/audit/evidence-audit.js",
+        "$lib/server/docling.js",
+        "$lib/server/graph/pg-neo4j-sync.js",
+        "$lib/server/png-embed-extractor.js",
+        "$lib/server/queue/dispatch-inline.js",
+        "$lib/server/services/langextract-service.js",
+        "crypto"
+      ],
+      "stable_id": "f7f71383175dfc07",
+      "static_imports": 0,
+      "total_imports": 28
+    },
+    {
+      "dynamic_imports": 28,
+      "dynamic_ratio": 1,
+      "file": "tests\\engram-graph-rerank.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/graph-reranker.js",
+        "../src/routes/api/graph/fetch-rerank/+server.js"
+      ],
+      "stable_id": "a5d4d5790001c842",
+      "static_imports": 0,
+      "total_imports": 28
+    },
+    {
+      "dynamic_imports": 28,
+      "dynamic_ratio": 1,
+      "file": "tests\\unit\\chat-memory.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/chat-memory.js"
+      ],
+      "stable_id": "b30b10ae59bff78f",
+      "static_imports": 0,
+      "total_imports": 28
+    },
+    {
+      "dynamic_imports": 25,
+      "dynamic_ratio": 1,
+      "file": "tests\\library-upload-ingest.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/library/documents/+server.js",
+        "../src/routes/api/library/ingest-codebase-docs/+server.js",
+        "../src/routes/api/library/ingest-dev-docs/+server.js",
+        "../src/routes/api/library/ingest/[jobId]/+server.js",
+        "../src/routes/api/library/search/+server.js",
+        "../src/routes/api/library/upload/+server.js",
+        "fs"
+      ],
+      "stable_id": "1d4667a6fc551b76",
+      "static_imports": 0,
+      "total_imports": 25
+    },
+    {
+      "dynamic_imports": 24,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\cache\\__tests__\\cache.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/cache/cache-service.svelte",
+        "$lib/cache/indexdb-cache.svelte",
+        "$lib/cache/loki-cache.svelte",
+        "$lib/cache/offline-fetch"
+      ],
+      "stable_id": "70620e2c371aecc4",
+      "static_imports": 0,
+      "total_imports": 24
+    },
+    {
+      "dynamic_imports": 21,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\ai\\contextual-tools.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/context-assembler.js",
+        "$lib/server/agent/tools/web-search.js",
+        "$lib/server/analytics/minified-research-cache.js",
+        "$lib/server/analytics/web-research-crawler.js",
+        "$lib/server/db/client",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/env.server.js",
+        "$lib/server/gpu/simdjson-bridge.js",
+        "$lib/server/grpc/embedding-client.js",
+        "$lib/server/ollama.js",
+        "$lib/server/retrieval/authority-chain.js",
+        "$lib/server/retrieval/graph-context.js"
+      ],
+      "stable_id": "4647dbc2d9cbdfa9",
+      "static_imports": 0,
+      "total_imports": 21
+    },
+    {
+      "dynamic_imports": 21,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\queue\\queue-worker.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/chat-memory.js",
+        "$lib/server/analysis/entity-extraction.js",
+        "$lib/server/analysis/forensics.js",
+        "$lib/server/analysis/granite-docling.js",
+        "$lib/server/grpc/embedding-client.js",
+        "$lib/server/indexer/ast-chunker.js",
+        "$lib/server/indexer/dual-embedder.js",
+        "$lib/server/ml/user-history.js",
+        "$lib/server/redis.js",
+        "$lib/server/vector/qdrant-manager.js",
+        "../retrieval/web-ingest.js",
+        "./dispatch-inline.js"
+      ],
+      "stable_id": "41d9ccaa823216cd",
+      "static_imports": 0,
+      "total_imports": 21
+    },
+    {
+      "dynamic_imports": 20,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\analytics\\web-research-crawler.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/analytics/minified-research-cache.js",
+        "$lib/server/analytics/research-graph-rl.js",
+        "$lib/server/analytics/research-summaries-db.js",
+        "$lib/server/db/client",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/gpu/libtorch-bridge.js",
+        "$lib/server/gpu/simdjson-bridge.js",
+        "$lib/server/grpc/embedding-client.js",
+        "$lib/server/inference/turbo-prefix-cache.js",
+        "$lib/server/vector/qdrant-manager.js",
+        "drizzle-orm"
+      ],
+      "stable_id": "e6060a2ea1021ef3",
+      "static_imports": 0,
+      "total_imports": 20
+    },
+    {
+      "dynamic_imports": 19,
+      "dynamic_ratio": 1,
+      "file": "src\\hooks.server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ai/model-loader.js",
+        "$lib/server/analysis/worker.js",
+        "$lib/server/cache/dag-cache.js",
+        "$lib/server/cache/report-template-cache.js",
+        "$lib/server/connections/connection-pool.js",
+        "$lib/server/db/client",
+        "$lib/server/engagement/idle-reengagement.js",
+        "$lib/server/gpu/background-analyzer.js",
+        "$lib/server/observability/inference-log.js",
+        "$lib/server/observability/langfuse.js",
+        "$lib/server/queue/queue-worker.js",
+        "$lib/server/queue/rabbitmq-xstate-integration.js"
+      ],
+      "stable_id": "07cbe1d4e896ae5b",
+      "static_imports": 0,
+      "total_imports": 19
+    },
+    {
+      "dynamic_imports": 19,
+      "dynamic_ratio": 1,
+      "file": "tests\\ace-pipeline-wiring.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/context-assembler.js",
+        "$lib/server/ace/types.js",
+        "../src/routes/api/synthesis/evaluation/[id]/+server.js",
+        "zod"
+      ],
+      "stable_id": "33ee9fac66ce7a23",
+      "static_imports": 0,
+      "total_imports": 19
+    },
+    {
+      "dynamic_imports": 19,
+      "dynamic_ratio": 1,
+      "file": "tests\\hypergraph-traversal.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/lib/server/hypergraph/hypergraph-traversal.js"
+      ],
+      "stable_id": "d79b51a40b49c426",
+      "static_imports": 0,
+      "total_imports": 19
+    },
+    {
+      "dynamic_imports": 18,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\wiki\\wiki-gap-analyzer.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "node:fs/promises"
+      ],
+      "stable_id": "5bbb24c7d76007c3",
+      "static_imports": 0,
+      "total_imports": 18
+    },
+    {
+      "dynamic_imports": 18,
+      "dynamic_ratio": 1,
+      "file": "tests\\analytics-tags-nlp-prefs-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "$lib/server/ollama.js",
+        "$lib/services/couchdb-client.js",
+        "../src/routes/api/analytics/events/+server",
+        "../src/routes/api/analytics/patterns/+server",
+        "../src/routes/api/analytics/search/+server",
+        "../src/routes/api/analytics/summary/+server",
+        "../src/routes/api/analytics/token-usage/+server",
+        "../src/routes/api/nlp/classify/+server",
+        "../src/routes/api/nlp/sentiment/+server",
+        "../src/routes/api/onboarding/+server",
+        "../src/routes/api/ping/+server"
+      ],
+      "stable_id": "e75b47edaed12ee3",
+      "static_imports": 0,
+      "total_imports": 18
+    },
+    {
+      "dynamic_imports": 17,
+      "dynamic_ratio": 1,
+      "file": "src\\mcp\\tools\\legal-skills.tool.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/integrations/obsidian-client.js",
+        "$lib/server/neo4j-driver.js",
+        "$lib/server/redis.js",
+        "amqplib",
+        "pg"
+      ],
+      "stable_id": "b4abfbbe66c1a439",
+      "static_imports": 0,
+      "total_imports": 17
+    },
+    {
+      "dynamic_imports": 17,
+      "dynamic_ratio": 1,
+      "file": "tests\\sse-chat-attachment-metadata.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/sse/chat/+server.js"
+      ],
+      "stable_id": "f42392018331760c",
+      "static_imports": 0,
+      "total_imports": 17
+    },
+    {
+      "dynamic_imports": 16,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\ai\\gemma4-agent.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/graph/community-graph.js",
+        "$lib/server/graph/graph-intel.js",
+        "$lib/server/indexer/synthesis-memory-archiver.js",
+        "$lib/server/redis.js",
+        "$lib/server/vector/qdrant-manager.js",
+        "./information-gain-validator.js",
+        "./kv-context-controller.js",
+        "./trace-reranker.js",
+        "node:crypto"
+      ],
+      "stable_id": "6b7b4642149557ce",
+      "static_imports": 0,
+      "total_imports": 16
+    },
+    {
+      "dynamic_imports": 16,
+      "dynamic_ratio": 1,
+      "file": "src\\routes\\api\\codebase-index\\orchestrate\\+server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/cache/invalidation.js",
+        "$lib/server/db/client",
+        "$lib/server/graph/codebase-neo4j-sync.js",
+        "$lib/server/graph/community-graph.js",
+        "$lib/server/graph/couchdb-pagerank.js",
+        "$lib/server/graph/hypergraph-4d.js",
+        "$lib/server/graph/som-topology-pipeline.js",
+        "$lib/server/indexer/directory-summarizer.js",
+        "$lib/server/indexer/karpathy-wiki.js",
+        "$lib/server/indexer/web-search-indexer.js",
+        "$lib/server/redis.js",
+        "$lib/server/search/postgres-fts.js"
+      ],
+      "stable_id": "1aaf39a7ae680afb",
+      "static_imports": 0,
+      "total_imports": 16
+    },
+    {
+      "dynamic_imports": 16,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\get-degraded-shape-pass-a.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/middleware/cache-headers.js",
+        "../../src/routes/api/ai/stats/+server.js",
+        "../../src/routes/api/cache/exact-match/stats/+server.js",
+        "../../src/routes/api/cache/stats/+server.js",
+        "../../src/routes/api/cases/+server.js",
+        "../../src/routes/api/citations/+server.js",
+        "../../src/routes/api/infrastructure/status/+server.js",
+        "../../src/routes/api/yorha/analytics/+server.js",
+        "zod"
+      ],
+      "stable_id": "f5824b8d6dcbaa37",
+      "static_imports": 0,
+      "total_imports": 16
+    },
+    {
+      "dynamic_imports": 14,
+      "dynamic_ratio": 1,
+      "file": "tests\\errors-feedback-fictional-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "../src/routes/api/engagement/heartbeat/+server",
+        "../src/routes/api/engagement/scan/+server",
+        "../src/routes/api/errors/client-report/+server",
+        "../src/routes/api/errors/route-errors/+server",
+        "../src/routes/api/errors/summary/+server",
+        "../src/routes/api/feedback/+server",
+        "../src/routes/api/fictional-cases/+server",
+        "../src/routes/api/fictional-cases/[id]/+server",
+        "../src/routes/api/knowledge/stats/+server"
+      ],
+      "stable_id": "9cd83789baf94db4",
+      "static_imports": 0,
+      "total_imports": 14
+    },
+    {
+      "dynamic_imports": 14,
+      "dynamic_ratio": 1,
+      "file": "tests\\openai-facade.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ai/openai-facade.js",
+        "../src/routes/api/v1/chat/completions/+server.js"
+      ],
+      "stable_id": "2e01af159eadafce",
+      "static_imports": 0,
+      "total_imports": 14
+    },
+    {
+      "dynamic_imports": 14,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\chat-memory-settings.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../../src/routes/api/chat/memory/settings/+server.js"
+      ],
+      "stable_id": "1717522a38d18275",
+      "static_imports": 0,
+      "total_imports": 14
+    },
+    {
+      "dynamic_imports": 13,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\glyph-diffusion-service.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "$lib/server/storage/minio-service.js",
+        "drizzle-orm"
+      ],
+      "stable_id": "3fcbfee6b3795c8e",
+      "static_imports": 0,
+      "total_imports": 13
+    },
+    {
+      "dynamic_imports": 13,
+      "dynamic_ratio": 1,
+      "file": "tests\\autoencoder-encoded64.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/gpu/autoencoder-weights.js",
+        "$lib/server/gpu/encode-768-to-64.js"
+      ],
+      "stable_id": "9bd82f20dada317b",
+      "static_imports": 0,
+      "total_imports": 13
+    },
+    {
+      "dynamic_imports": 13,
+      "dynamic_ratio": 1,
+      "file": "tests\\compiled-knowledge-modules.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/types.js",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/glyph-prompt-cache.js",
+        "$lib/server/graph/ingestion-buffer-builder.js",
+        "$lib/server/mcp-bridge.js",
+        "$lib/server/retrieval/web-ingest.js",
+        "$lib/server/types/index.js",
+        "$lib/server/types/ingestion-buffer.js",
+        "fs",
+        "path"
+      ],
+      "stable_id": "81210dc47276d0fb",
+      "static_imports": 0,
+      "total_imports": 13
+    },
+    {
+      "dynamic_imports": 13,
+      "dynamic_ratio": 1,
+      "file": "tests\\gemma4-dev-context-loop.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ai/dev-context-planner.js"
+      ],
+      "stable_id": "8a4fee3b329cc255",
+      "static_imports": 0,
+      "total_imports": 13
+    },
+    {
+      "dynamic_imports": 13,
+      "dynamic_ratio": 1,
+      "file": "tests\\infra-ollama-cache-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "$lib/server/redis.js",
+        "../src/routes/api/cache/stats/+server",
+        "../src/routes/api/case-theory/+server",
+        "../src/routes/api/consolidation/status/+server",
+        "../src/routes/api/dashboard/stats/+server",
+        "../src/routes/api/db/health/+server",
+        "../src/routes/api/infrastructure/status/+server",
+        "../src/routes/api/ollama/generate/+server",
+        "../src/routes/api/ollama/pull/+server",
+        "../src/routes/api/vector-search/+server"
+      ],
+      "stable_id": "05b06de11d909a12",
+      "static_imports": 0,
+      "total_imports": 13
+    },
+    {
+      "dynamic_imports": 13,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\cases-canvas.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../../src/routes/api/cases/[id]/canvas/+server.js"
+      ],
+      "stable_id": "713c43bc7c788985",
+      "static_imports": 0,
+      "total_imports": 13
+    },
+    {
+      "dynamic_imports": 13,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\chat-memory-search.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../../src/routes/api/chat/memory/search/+server.js"
+      ],
+      "stable_id": "45ce6947bb537313",
+      "static_imports": 0,
+      "total_imports": 13
+    },
+    {
+      "dynamic_imports": 13,
+      "dynamic_ratio": 1,
+      "file": "tests\\sse-chat-glossary-metadata.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/sse/chat/+server.js"
+      ],
+      "stable_id": "352720ac0eeb4b2c",
+      "static_imports": 0,
+      "total_imports": 13
+    },
+    {
+      "dynamic_imports": 12,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\analysis\\evidence-analysis-pipeline.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/analysis/holistic-synthesizer.js",
+        "$lib/server/cache.js",
+        "$lib/server/db/client",
+        "$lib/server/env.server.js",
+        "$lib/server/grpc/embedding-client.js",
+        "$lib/server/neo4j-driver.js",
+        "$lib/server/ollama.js",
+        "$lib/server/redis.js",
+        "$lib/server/yolo.js"
+      ],
+      "stable_id": "d5c530a246596be8",
+      "static_imports": 0,
+      "total_imports": 12
+    },
+    {
+      "dynamic_imports": 12,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\grpc\\embedding-client.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../redis.js",
+        "../vector/qdrant-manager.js",
+        "@grpc/grpc-js",
+        "@grpc/proto-loader",
+        "crypto",
+        "nats",
+        "path"
+      ],
+      "stable_id": "eba9bb27a2f8d6ca",
+      "static_imports": 0,
+      "total_imports": 12
+    },
+    {
+      "dynamic_imports": 12,
+      "dynamic_ratio": 1,
+      "file": "src\\routes\\api\\rag\\search\\+server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/context-assembler.js",
+        "$lib/server/db/client",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/grpc/embedding-client.js",
+        "$lib/server/retrieval/document-dag.js",
+        "$lib/server/retrieval/graph-context.js",
+        "$lib/server/retrieval/qlora-boost.js",
+        "$lib/server/retrieval/rrf-fuse.js",
+        "$lib/server/retrieval/sparse-bm25.js",
+        "pg"
+      ],
+      "stable_id": "2b1474dd17097536",
+      "static_imports": 0,
+      "total_imports": 12
+    },
+    {
+      "dynamic_imports": 12,
+      "dynamic_ratio": 1,
+      "file": "src\\routes\\api\\sse\\chat\\+server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/user-analytics-context.js",
+        "$lib/server/ai/contextual-tools.js",
+        "$lib/server/cache.js",
+        "$lib/server/cache/redis-exact-match.js",
+        "$lib/server/db/schema",
+        "$lib/server/graph/hypergraph-4d.js",
+        "$lib/server/inference/turbo-prefix-cache.js",
+        "$lib/server/queue/dispatch-inline.js"
+      ],
+      "stable_id": "7abf8cfd6a2d3f02",
+      "static_imports": 0,
+      "total_imports": 12
+    },
+    {
+      "dynamic_imports": 12,
+      "dynamic_ratio": 1,
+      "file": "tests\\code-intel-dashboard.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ai/code-intel-service.js"
+      ],
+      "stable_id": "907a930ef27cbed5",
+      "static_imports": 0,
+      "total_imports": 12
+    },
+    {
+      "dynamic_imports": 11,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\queue\\dispatch-inline.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../ace/self-prompt.js",
+        "../ace/types.js",
+        "../pipeline/error-embedding-pipeline.js",
+        "../redis.js",
+        "./queue-worker.js",
+        "./rabbitmq-manager-fixed.js"
+      ],
+      "stable_id": "e6aa5d54a682b4ba",
+      "static_imports": 0,
+      "total_imports": 11
+    },
+    {
+      "dynamic_imports": 11,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\utils\\dynamic-imports.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/ai/client-cache.js",
+        "$lib/cache/loki-cache.svelte.js",
+        "$lib/components/LegalAnalysisDialog.svelte",
+        "$lib/components/ai/QLoRAMonitoringDashboard.svelte",
+        "$lib/components/canvas/FabricCanvas.svelte",
+        "$lib/components/detective/DetectiveBoard.svelte",
+        "$lib/components/detective/EvidenceCard.svelte",
+        "$lib/components/evidence/WebGPUTextureStreamingDemo.svelte",
+        "$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte",
+        "$lib/utils/fuse-import.js",
+        "$lib/workers/embedding-worker-enhanced.js"
+      ],
+      "stable_id": "7a53523e3328acb8",
+      "static_imports": 0,
+      "total_imports": 11
+    },
+    {
+      "dynamic_imports": 11,
+      "dynamic_ratio": 1,
+      "file": "tests\\ace-rerank-spine.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/context-assembler.js",
+        "$lib/server/ai/graph-reranker.js",
+        "$lib/server/analytics/search-analytics.js",
+        "$lib/server/redis.js",
+        "../src/routes/api/graph/fetch-rerank/+server.js"
+      ],
+      "stable_id": "521d61b012685d77",
+      "static_imports": 0,
+      "total_imports": 11
+    },
+    {
+      "dynamic_imports": 11,
+      "dynamic_ratio": 1,
+      "file": "tests\\autoencoder-projection-smoke.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/lib/server/gpu/autoencoder-bridge.js",
+        "../src/lib/server/gpu/libtorch-bridge.js"
+      ],
+      "stable_id": "5636f3b90e27ca58",
+      "static_imports": 0,
+      "total_imports": 11
+    },
+    {
+      "dynamic_imports": 11,
+      "dynamic_ratio": 1,
+      "file": "tests\\e2e\\e2b-client-inference.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "/src/lib/ai/client-cache.ts",
+        "/src/lib/ai/client-llm-synthesis.ts",
+        "/src/lib/ai/client-router.ts",
+        "/src/lib/ai/gemma4-e2b-client.ts"
+      ],
+      "stable_id": "322c7a38ce717bc3",
+      "static_imports": 0,
+      "total_imports": 11
+    },
+    {
+      "dynamic_imports": 11,
+      "dynamic_ratio": 1,
+      "file": "tests\\hypergraph-search.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/lib/server/hypergraph/hypergraph-search.js"
+      ],
+      "stable_id": "f2620c6aac3a3084",
+      "static_imports": 0,
+      "total_imports": 11
+    },
+    {
+      "dynamic_imports": 11,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\chat-memory-backfill.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/streaming/sse-utils.js",
+        "../../src/routes/api/chat/memory/backfill/+server.js"
+      ],
+      "stable_id": "ad768ad31ff1be7f",
+      "static_imports": 0,
+      "total_imports": 11
+    },
+    {
+      "dynamic_imports": 10,
+      "dynamic_ratio": 1,
+      "file": "src\\routes\\api\\health\\capabilities\\+server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/redis.js",
+        "$lib/server/vector/qdrant-health.js",
+        "@qdrant/js-client-rest",
+        "drizzle-orm"
+      ],
+      "stable_id": "91759006b0ff149e",
+      "static_imports": 0,
+      "total_imports": 10
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "scripts\\diagnose\\probe-tools-list-by-module.mjs",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../../src/mcp/admin_tools.ts",
+        "../../src/mcp/bifrost_tools.ts",
+        "../../src/mcp/codebase_tools.ts",
+        "../../src/mcp/db-inspection-tools.ts",
+        "../../src/mcp/new_tools.ts",
+        "../../src/mcp/research_tools.ts",
+        "../../src/mcp/skill_tools.ts",
+        "../../src/mcp/topology_mgmt_tools.ts",
+        "@modelcontextprotocol/sdk/server/zod-compat.js"
+      ],
+      "stable_id": "c8b2aeafb3ea0338",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\ai\\code-intel-service.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/schema.js",
+        "../grpc/embedding-client.js",
+        "../neo4j-driver.js",
+        "../vector/qdrant-manager.js",
+        "node:child_process",
+        "node:fs"
+      ],
+      "stable_id": "8e4dafc89c9a1198",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\rate-limit\\redis-rate-limit.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "./redis-rate-limit.js"
+      ],
+      "stable_id": "79170797b03cde50",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\services\\knowledge-search\\ACPToolRegistry.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/cache/topo-candidate-cache.js",
+        "$lib/server/retrieval/hyperrag-fusion-service.js",
+        "$lib/server/services/error-analysis",
+        "$lib/server/services/langextract-service"
+      ],
+      "stable_id": "20c70cc7a74e4974",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "tests\\error-brain-routes.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/error-brain/diagnose/+server.ts",
+        "../src/routes/api/error-brain/diagnosis-history/+server.ts",
+        "../src/routes/api/error-brain/diagnosis-history/backfill/+server.ts",
+        "../src/routes/api/error-brain/diagnosis-history/similar/+server.ts",
+        "../src/routes/api/error-brain/generate-fix/+server.ts",
+        "../src/routes/api/error-brain/search/+server.ts"
+      ],
+      "stable_id": "653d4e78483b85be",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "tests\\rg-atlas.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "$lib/server/ollama-cached.js",
+        "$lib/server/rg-atlas/cosine-blend.js",
+        "$lib/server/rg-atlas/multi-query.js",
+        "$lib/server/rg-atlas/persist.js"
+      ],
+      "stable_id": "dc752aa65cbe4485",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\all-routes-page-server.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../../src/routes/(app)/admin/all-routes/+page.server.js",
+        "../../src/routes/(app)/all-routes/+page.server.js",
+        "node:fs/promises"
+      ],
+      "stable_id": "7d3e14291c5b91c0",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\codebase-index-enrich-qdrant.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../../src/routes/api/codebase-index/enrich-qdrant/+server.js"
+      ],
+      "stable_id": "4d3443b1a19c3c1e",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\codebase-index-export-bundle.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../../src/routes/api/codebase-index/export/bundle/+server.js"
+      ],
+      "stable_id": "29545a337142341c",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "tests\\routes\\phase109-tag-chunks.test.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../../src/routes/api/phase109/tag-chunks/+server.js"
+      ],
+      "stable_id": "cdbde60eb1a13cc4",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 9,
+      "dynamic_ratio": 1,
+      "file": "tests\\tensor-analysis-enqueue.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/tensor/tensor-analysis-cache.js"
+      ],
+      "stable_id": "988d8ae7a8e9206c",
+      "static_imports": 0,
+      "total_imports": 9
+    },
+    {
+      "dynamic_imports": 8,
+      "dynamic_ratio": 1,
+      "file": "scripts\\graphify-svg-architecture.mjs",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/lib/server/db/client.js",
+        "../src/lib/server/db/schema/embedded-summaries.js",
+        "../src/lib/server/db/schema/graph-mappings.js",
+        "../src/lib/server/env.server.js",
+        "../src/lib/server/grpc/embedding-client.js",
+        "../src/lib/server/redis.js",
+        "../src/lib/server/types/graph-mapping.js",
+        "../src/lib/server/utils/simdjson-bridge.js"
+      ],
+      "stable_id": "2e19ec8b417f1e1c",
+      "static_imports": 0,
+      "total_imports": 8
+    },
+    {
+      "dynamic_imports": 8,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\analytics\\minified-research-cache.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/db/client",
+        "$lib/server/db/schema-postgres.js",
+        "$lib/server/grpc/graph-ml-client.js",
+        "$lib/server/vector/qdrant-manager.js",
+        "drizzle-orm"
+      ],
+      "stable_id": "9fffdae3a983d682",
+      "static_imports": 0,
+      "total_imports": 8
+    },
+    {
+      "dynamic_imports": 8,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\graph\\hypergraph-4d.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/connections/connection-pool.js",
+        "$lib/server/env.server.js",
+        "$lib/server/gpu/simdjson-bridge.js",
+        "$lib/server/redis.js"
+      ],
+      "stable_id": "25ac68d3db6bb25a",
+      "static_imports": 0,
+      "total_imports": 8
+    },
+    {
+      "dynamic_imports": 8,
+      "dynamic_ratio": 1,
+      "file": "src\\lib\\server\\grpc\\retrieval-client.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/cache/code-llm-index.js",
+        "@grpc/grpc-js",
+        "@grpc/proto-loader",
+        "path"
+      ],
+      "stable_id": "6667a5e4b63f2e46",
+      "static_imports": 0,
+      "total_imports": 8
+    },
+    {
+      "dynamic_imports": 8,
+      "dynamic_ratio": 1,
+      "file": "src\\routes\\api\\v1\\agentic\\tool-loop\\+server.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ace/error-kag-writer.js",
+        "$lib/server/env.server.js",
+        "$lib/server/ollama.js",
+        "$lib/server/retrieval/codebase-context.js",
+        "fs/promises",
+        "path"
+      ],
+      "stable_id": "091ab90783944ea5",
+      "static_imports": 0,
+      "total_imports": 8
+    },
+    {
+      "dynamic_imports": 8,
+      "dynamic_ratio": 1,
+      "file": "tests\\ace-ingest-route.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/routes/api/ace/ingest/+server.js"
+      ],
+      "stable_id": "c97b4cc96e798cf4",
+      "static_imports": 0,
+      "total_imports": 8
+    },
+    {
+      "dynamic_imports": 8,
+      "dynamic_ratio": 1,
+      "file": "tests\\codebase-index-rabbitmq-channel.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "../src/lib/server/queue/rabbitmq-manager-fixed.js"
+      ],
+      "stable_id": "ef5c66d99b9088e2",
+      "static_imports": 0,
+      "total_imports": 8
+    },
+    {
+      "dynamic_imports": 8,
+      "dynamic_ratio": 1,
+      "file": "tests\\gemma4-tool-controller.spec.ts",
+      "parser_modes": [
+        "ast-grep"
+      ],
+      "sample_targets": [
+        "$lib/server/ai/gemma4-tool-controller.js"
+      ],
+      "stable_id": "278c43a9343f070a",
+      "static_imports": 0,
+      "total_imports": 8
+    }
+  ],
+  "interpretation": {
+    "note": "Use this report alongside graphify topology and smoke gates for production readiness decisions.",
+    "static_vs_dynamic": "Dynamic imports detected; validate lazy-loading paths and runtime guards before production rollout."
+  },
+  "strict_mode": {
+    "enabled": true,
+    "thresholds": {
+      "min_dynamic_import_rows": 10,
+      "min_files_with_imports": 100,
+      "min_static_import_rows": 100
+    },
+    "violations": []
+  },
+  "totals": {
+    "dynamic_import_rows": 3844,
+    "files_with_imports": 5308,
+    "lexical_stub_signals": 7229,
+    "static_import_rows": 12602
+  }
+}

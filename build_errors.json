@@ -1,0 +1,134 @@
+[
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\optional",
+    "line": 82,
+    "column": 17,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to 'int', possible loss of data",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../libtorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\optional(82,17): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xutility",
+    "line": 406,
+    "column": 61,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../libtorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xutility(406,61): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory",
+    "line": 700,
+    "column": 82,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to '_Ty', possible loss of data\n             with\n             [\n             _Ty=unsigned int\n             ]",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../libtorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267: 'initializing': conversion from 'size_t' to '_Ty', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         with [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         [ [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:             _Ty=unsigned int [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         ] [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xutility",
+    "line": 406,
+    "column": 61,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to 'int', possible loss of data",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../libtorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xutility(406,61): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory",
+    "line": 700,
+    "column": 82,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to '_Ty', possible loss of data\n             with\n             [\n             _Ty=int\n             ]",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../libtorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267: 'initializing': conversion from 'size_t' to '_Ty', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         with [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         [ [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:             _Ty=int [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         ] [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility",
+    "line": 263,
+    "column": 16,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to '_Ty1', possible loss of data\n             with\n             [\n             _Ty1=int\n             ]\n             'initializing': conversion from 'size_t' to '_Ty2', possible loss of data\n             with\n             [\n             _Ty2=int\n             ]",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../libtorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267: 'initializing': conversion from 'size_t' to '_Ty1', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267:         with [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267:         [ [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267:             _Ty1=int [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267:         ] [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267:         with [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267:         [ [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267:             _Ty2=int [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267:         ] [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\optional",
+    "line": 82,
+    "column": 17,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to 'int', possible loss of data",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../pytorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\optional(82,17): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xutility",
+    "line": 406,
+    "column": 61,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../pytorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xutility(406,61): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory",
+    "line": 700,
+    "column": 82,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to '_Ty', possible loss of data\n             with\n             [\n             _Ty=unsigned int\n             ]",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../pytorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267: 'initializing': conversion from 'size_t' to '_Ty', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         with [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         [ [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:             _Ty=unsigned int [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         ] [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xutility",
+    "line": 406,
+    "column": 61,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to 'int', possible loss of data",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../pytorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xutility(406,61): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory",
+    "line": 700,
+    "column": 82,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to '_Ty', possible loss of data\n             with\n             [\n             _Ty=int\n             ]",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../pytorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267: 'initializing': conversion from 'size_t' to '_Ty', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         with [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         [ [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:             _Ty=int [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\xmemory(700,82): warning C4267:         ] [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  },
+  {
+    "file": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility",
+    "line": 263,
+    "column": 16,
+    "severity": "warning",
+    "code": "C4267",
+    "message": "'initializing': conversion from 'size_t' to '_Ty1', possible loss of data\n             with\n             [\n             _Ty1=int\n             ]\n             'initializing': conversion from 'size_t' to '_Ty2', possible loss of data\n             with\n             [\n             _Ty2=int\n             ]",
+    "project": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj",
+    "compiledSource": "../pytorch_graph.cc",
+    "raw": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267: 'initializing': conversion from 'size_t' to '_Ty1', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267:         with [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267:         [ [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267:             _Ty1=int [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,16): warning C4267:         ] [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267:         with [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267:         [ [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267:             _Ty2=int [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]\nC:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\utility(263,54): warning C4267:         ] [C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\tensorrt_bridge.vcxproj]"
+  }
+]

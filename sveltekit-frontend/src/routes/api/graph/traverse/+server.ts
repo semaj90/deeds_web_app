@@ -254,7 +254,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
             recordKagAnswer(`cluster:${clId}`, gemma4Summary!, {
               glyphClusterId: clId,
               tokensUsed:     Math.ceil(gemma4Summary!.length / 4),
-              model:          'gemma4-legal-vlm:latest',
+              model:          'gemma4-rotorquant:latest',
             })
           )
           .catch(() => null);

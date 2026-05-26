@@ -7,6 +7,8 @@
  * Usage: node scripts/eval-retrieval-harness.mjs [--verbose]
  */
 
+import pg from 'pg';
+
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
 const VOCAB_SIZE = 2_000_000;
@@ -93,17 +95,22 @@ async function embed(text) {
 
 // ── Search modes ──
 async function searchSparseOnly(collection, query, limit) {
-	const sparse = generateSparseVector(query);
-	const res = await qdrantFetch(`/collections/${collection}/points/query`, {
-		method: 'POST',
-		body: JSON.stringify({
-			prefetch: [{ query: sparse, using: 'bm25', limit }],
-			query: { fusion: 'rrf' },
-			limit,
-			with_payload: true,
-		}),
-	});
-	return res.result?.points ?? [];
+	try {
+		const sparse = generateSparseVector(query);
+		const res = await qdrantFetch(`/collections/${collection}/points/query`, {
+			method: 'POST',
+			body: JSON.stringify({
+				prefetch: [{ query: sparse, using: 'bm25', limit }],
+				query: { fusion: 'rrf' },
+				limit,
+				with_payload: true,
+			}),
+		});
+		return res.result?.points ?? [];
+	} catch (err) {
+		if (verbose) console.warn(`      ⚠️ searchSparseOnly failed/skipped for collection ${collection}: ${err.message}`);
+		return [];
+	}
 }
 
 async function searchDenseOnly(collection, query, limit) {
@@ -121,23 +128,114 @@ async function searchDenseOnly(collection, query, limit) {
 }
 
 async function searchHybrid(collection, query, limit) {
-	const [denseVec, sparse] = await Promise.all([
-		embed(query),
-		Promise.resolve(generateSparseVector(query)),
-	]);
-	const res = await qdrantFetch(`/collections/${collection}/points/query`, {
-		method: 'POST',
-		body: JSON.stringify({
-			prefetch: [
-				{ query: denseVec, using: 'content', limit: limit * 2 },
-				{ query: sparse, using: 'bm25', limit: limit * 2 },
-			],
-			query: { fusion: 'rrf' },
-			limit,
-			with_payload: true,
-		}),
-	});
-	return res.result?.points ?? [];
+	try {
+		const [denseVec, sparse] = await Promise.all([
+			embed(query),
+			Promise.resolve(generateSparseVector(query)),
+		]);
+		const res = await qdrantFetch(`/collections/${collection}/points/query`, {
+			method: 'POST',
+			body: JSON.stringify({
+				prefetch: [
+					{ query: denseVec, using: 'content', limit: limit * 2 },
+					{ query: sparse, using: 'bm25', limit: limit * 2 },
+				],
+				query: { fusion: 'rrf' },
+				limit,
+				with_payload: true,
+			}),
+		});
+		return res.result?.points ?? [];
+	} catch (err) {
+		if (verbose) console.warn(`      ⚠️ searchHybrid failed/skipped for collection ${collection}: ${err.message}`);
+		return [];
+	}
+}
+
+// ── PostgreSQL Evaluation Query Legs ──
+const PG_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+let pgPool = null;
+
+function getPgPool() {
+	if (!pgPool) {
+		pgPool = new pg.Pool({ connectionString: PG_URL, max: 2 });
+	}
+	return pgPool;
+}
+
+// PostgreSQL BM25 query leg (Timescale pg_textsearch operator)
+async function searchPostgresBM25(queryText, limit) {
+	const pool = getPgPool();
+	try {
+		const res = await pool.query(
+			`SELECT stable_key, file_path, content,
+              (content <@> $1) AS neg_score
+       FROM code_retrieval_chunks
+       ORDER BY neg_score ASC
+       LIMIT $2`,
+			[queryText, limit]
+		);
+		return res.rows.map(row => ({
+			id: row.stable_key,
+			payload: {
+				chunk_id: row.stable_key,
+				file_path: row.file_path,
+				content: row.content
+			},
+			score: -parseFloat(row.neg_score) // Invert negative score to represent higher as better
+		}));
+	} catch (err) {
+		if (verbose) console.warn(`      ⚠️ searchPostgresBM25 skipped/failed (pg_textsearch extension may not be active): ${err.message}`);
+		return [];
+	}
+}
+
+// PostgreSQL Lexical query leg (Standard tsvector/ts_rank_cd FTS)
+async function searchPostgresLexical(queryText, limit) {
+	const pool = getPgPool();
+	try {
+		const res = await pool.query(
+			`SELECT * FROM search_code_lexical($1, $2)`,
+			[queryText, limit]
+		);
+		return res.rows.map(row => ({
+			id: row.stable_key,
+			payload: {
+				chunk_id: row.stable_key,
+				file_path: row.file_path,
+				content: row.content
+			},
+			score: parseFloat(row.lexical_score)
+		}));
+	} catch (err) {
+		if (verbose) console.warn(`      ⚠️ searchPostgresLexical skipped/failed: ${err.message}`);
+		return [];
+	}
+}
+
+// PostgreSQL Hybrid query leg (FTS + pgvector similarity with RRF)
+async function searchPostgresHybrid(queryText, limit) {
+	const pool = getPgPool();
+	try {
+		const denseVec = await embed(queryText);
+		const embStr = `[${denseVec.join(',')}]`;
+		const res = await pool.query(
+			`SELECT * FROM search_code_hybrid_pg($1, $2::vector(768), $3)`,
+			[queryText, embStr, limit]
+		);
+		return res.rows.map(row => ({
+			id: row.stable_key,
+			payload: {
+				chunk_id: row.stable_key,
+				file_path: row.path,
+				content: row.content
+			},
+			score: parseFloat(row.hybrid_score)
+		}));
+	} catch (err) {
+		if (verbose) console.warn(`      ⚠️ searchPostgresHybrid skipped/failed: ${err.message}`);
+		return [];
+	}
 }
 
 // ── Metrics ──
@@ -164,8 +262,8 @@ function mrr(results, expected) {
 }
 
 function getResultId(r) {
-	// Canon collection uses chunk_id payload, fictional uses category
-	return r.payload?.chunk_id || r.payload?.case_uuid || String(r.id);
+	// Canon/Codebase collections use chunk_id / stable_key, fictional uses category
+	return r.payload?.chunk_id || r.payload?.stable_key || r.payload?.case_uuid || String(r.id);
 }
 
 // ── Labeled Query Sets ──
@@ -289,6 +387,47 @@ const FICTIONAL_QUERIES = [
 	},
 ];
 
+const CODEBASE_QUERIES = [
+	{
+		query: 'pgRows helper function node-postgres rows',
+		expectedChunkIds: [
+			'card:src/lib/server/db/client.ts:57308d155f1f7ae9'
+		],
+		label: 'pgRows Helper',
+	},
+	{
+		query: 'closeConnections database pool graceful shutdown',
+		expectedChunkIds: [
+			'file:src/lib/server/db/client.ts:closeConnections',
+			'card:src/lib/server/db/client.ts:c6985fca826a1768',
+			'card:src/lib/server/db/client.ts:f68bea68635df768',
+			'qdrant:fd971c55-cb50-74a7-68a0-7ea7ec5ca618'
+		],
+		label: 'Pool Closing',
+	},
+	{
+		query: 'seaweed S3Client bucket connection putFileToSeaweed',
+		expectedChunkIds: [
+			'card:src/lib/server/storage/seaweed.ts:296c3527530c5f97',
+			'card:src/lib/server/storage/seaweed.ts:aaa2bc1446c60a07'
+		],
+		label: 'SeaweedFS Client',
+	},
+	{
+		query: 'libtorch batchCosineSimilarity CUDA gemm dot product gpu-worker',
+		expectedChunkIds: [
+			'qdrant:420130d0-6ca6-5e20-30cb-6adaf844193c',
+			'card:src/lib/server/gpu/libtorch-bridge.ts:eaf844c3e9cdf55f',
+			'qdrant:20ecb1bd-b7b3-bdcd-f38b-518317e75941',
+			'card:src/lib/server/gpu/libtorch-bridge.ts:bdb0a3d1c07ebe43',
+			'card:src/lib/server/gpu/libtorch-bridge.ts:5fe28abb7f6323dc',
+			'qdrant:210a767d-1948-bcdd-3257-4ef9a1b146f1',
+			'card:src/lib/server/retrieval/gpu-reranker.ts:f57aa90fc360310c'
+		],
+		label: 'LibTorch GPU Bridge',
+	}
+];
+
 async function evalCanonQueries() {
 	console.log('\n═══════════════════════════════════════════════════════════════');
 	console.log('  LEGAL CANON CHUNKS — Retrieval Evaluation');
@@ -380,28 +519,93 @@ async function evalFictionalQueries() {
 	return results;
 }
 
+async function evalCodebaseQueries() {
+	console.log('\n\n═══════════════════════════════════════════════════════════════');
+	console.log('  CODEBASE CHUNKS — Retrieval Evaluation');
+	console.log('═══════════════════════════════════════════════════════════════\n');
+
+	const K = 5;
+	const results = {
+		sparse: [],
+		dense: [],
+		hybrid: [],
+		pg_bm25: [],
+		pg_lexical: [],
+		pg_hybrid: []
+	};
+
+	for (const q of CODEBASE_QUERIES) {
+		const expected = new Set(q.expectedChunkIds);
+
+		if (verbose) console.log(`\n  Query: "${q.query}" (${q.label})`);
+		if (verbose) console.log(`  Expected: ${q.expectedChunkIds.length} chunks`);
+
+		// Run all 6 modes
+		const [sparseHits, denseHits, hybridHits, pgBm25Hits, pgLexicalHits, pgHybridHits] = await Promise.all([
+			searchSparseOnly('codebase_chunks_768', q.query, K),
+			searchDenseOnly('codebase_chunks_768', q.query, K),
+			searchHybrid('codebase_chunks_768', q.query, K),
+			searchPostgresBM25(q.query, K),
+			searchPostgresLexical(q.query, K),
+			searchPostgresHybrid(q.query, K)
+		]);
+
+		for (const [mode, hits] of [
+			['sparse', sparseHits],
+			['dense', denseHits],
+			['hybrid', hybridHits],
+			['pg_bm25', pgBm25Hits],
+			['pg_lexical', pgLexicalHits],
+			['pg_hybrid', pgHybridHits]
+		]) {
+			const p = precisionAtK(hits, expected, K);
+			const r = recallAtK(hits, expected, K);
+			const m = mrr(hits, expected);
+			results[mode].push({ label: q.label, precision: p, recall: r, mrr: m });
+
+			if (verbose) {
+				console.log(`    ${mode.padEnd(12)}: P@${K}=${p.toFixed(3)} R@${K}=${r.toFixed(3)} MRR=${m.toFixed(3)}`);
+				for (const h of hits.slice(0, 3)) {
+					const id = getResultId(h);
+					const match = expected.has(id) ? '+' : ' ';
+					console.log(`      [${match}] ${String(h.score?.toFixed(3) || 'N/A').padEnd(6)} ${id}`);
+				}
+			}
+		}
+
+		process.stdout.write('.');
+	}
+
+	return results;
+}
+
 function printSummary(label, results) {
 	console.log(`\n\n  ${label}`);
-	console.log('  ┌──────────┬──────────┬──────────┬──────────┐');
-	console.log('  │ Mode     │ Avg P@5  │ Avg R@5  │ Avg MRR  │');
-	console.log('  ├──────────┼──────────┼──────────┼──────────┤');
+	console.log('  ┌──────────────┬──────────┬──────────┬──────────┐');
+	console.log('  │ Mode         │ Avg P@5  │ Avg R@5  │ Avg MRR  │');
+	console.log('  ├──────────────┼──────────┼──────────┼──────────┤');
 
-	for (const mode of ['sparse', 'dense', 'hybrid']) {
+	for (const mode of Object.keys(results)) {
 		const data = results[mode];
+		if (!data || data.length === 0) continue;
 		const avgP = data.reduce((s, d) => s + d.precision, 0) / data.length;
 		const avgR = data.reduce((s, d) => s + d.recall, 0) / data.length;
 		const avgM = data.reduce((s, d) => s + d.mrr, 0) / data.length;
-		const highlight = mode === 'hybrid' ? ' *' : '  ';
-		console.log(`  │ ${mode.padEnd(8)} │ ${avgP.toFixed(4).padStart(8)} │ ${avgR.toFixed(4).padStart(8)} │ ${avgM.toFixed(4).padStart(8)} │${highlight}`);
+		const highlight = (mode === 'hybrid' || mode === 'pg_hybrid') ? ' *' : '  ';
+		console.log(`  │ ${mode.padEnd(12)} │ ${avgP.toFixed(4).padStart(8)} │ ${avgR.toFixed(4).padStart(8)} │ ${avgM.toFixed(4).padStart(8)} │${highlight}`);
 	}
 
-	console.log('  └──────────┴──────────┴──────────┴──────────┘');
+	console.log('  └──────────────┴──────────┴──────────┴──────────┘');
 
-	// Per-query breakdown for hybrid
-	console.log('\n  Hybrid per-query breakdown:');
-	for (const d of results.hybrid) {
-		const bar = '█'.repeat(Math.round(d.mrr * 10));
-		console.log(`    ${d.label.padEnd(26)} P=${d.precision.toFixed(2)} R=${d.recall.toFixed(2)} MRR=${d.mrr.toFixed(2)} ${bar}`);
+	// Per-query breakdown for hybrid and pg_hybrid if present
+	for (const targetMode of ['hybrid', 'pg_hybrid']) {
+		if (results[targetMode] && results[targetMode].length > 0) {
+			console.log(`\n  ${targetMode} per-query breakdown:`);
+			for (const d of results[targetMode]) {
+				const bar = '█'.repeat(Math.round(d.mrr * 10));
+				console.log(`    ${d.label.padEnd(26)} P=${d.precision.toFixed(2)} R=${d.recall.toFixed(2)} MRR=${d.mrr.toFixed(2)} ${bar}`);
+			}
+		}
 	}
 }
 
@@ -410,11 +614,13 @@ async function main() {
 	console.log('║   Retrieval Eval Harness — Hybrid Search      ║');
 	console.log('║   Collections: legal_canon_chunks              ║');
 	console.log('║                fictional_case_chunks            ║');
+	console.log('║                codebase_chunks_768            ║');
 	console.log('║   Modes: sparse (BM42) | dense (768d) | hybrid ║');
+	console.log('║          pg_bm25 | pg_lexical | pg_hybrid     ║');
 	console.log('╚═══════════════════════════════════════════════╝');
 
 	// Verify collections exist
-	for (const col of ['legal_canon_chunks', 'fictional_case_chunks']) {
+	for (const col of ['legal_canon_chunks', 'fictional_case_chunks', 'codebase_chunks_768']) {
 		try {
 			const info = await qdrantFetch(`/collections/${col}`);
 			console.log(`\n  ${col}: ${info.result?.points_count} points`);
@@ -428,6 +634,7 @@ async function main() {
 
 	const canonResults = await evalCanonQueries();
 	const fictionalResults = await evalFictionalQueries();
+	const codebaseResults = await evalCodebaseQueries();
 
 	const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
 
@@ -437,8 +644,9 @@ async function main() {
 
 	printSummary('Canon Chunks (12 labeled queries)', canonResults);
 	printSummary('Fictional Cases (7 labeled queries)', fictionalResults);
+	printSummary('Codebase Chunks (4 labeled queries)', codebaseResults);
 
-	// Compute winner
+	// Compute winners
 	const canonHybridMRR = canonResults.hybrid.reduce((s, d) => s + d.mrr, 0) / canonResults.hybrid.length;
 	const canonSparseMRR = canonResults.sparse.reduce((s, d) => s + d.mrr, 0) / canonResults.sparse.length;
 	const canonDenseMRR = canonResults.dense.reduce((s, d) => s + d.mrr, 0) / canonResults.dense.length;
@@ -453,9 +661,26 @@ async function main() {
 	console.log('  Fictional Winner:', ficHybridMRR >= ficSparseMRR && ficHybridMRR >= ficDenseMRR
 		? 'HYBRID (RRF fusion)' : ficDenseMRR > ficSparseMRR ? 'DENSE' : 'SPARSE');
 
+	const cbModes = Object.keys(codebaseResults);
+	let bestCbMode = '';
+	let bestCbMRR = -1;
+	for (const mode of cbModes) {
+		const m = codebaseResults[mode].reduce((s, d) => s + d.mrr, 0) / codebaseResults[mode].length;
+		if (m > bestCbMRR) {
+			bestCbMRR = m;
+			bestCbMode = mode;
+		}
+	}
+	console.log(`  Codebase Winner: ${bestCbMode.toUpperCase()} (MRR=${bestCbMRR.toFixed(4)})`);
+
+	if (pgPool) {
+		await pgPool.end();
+		console.log('\n  Postgres connection pool closed.');
+	}
+
 	console.log(`\n  Total eval time: ${elapsed}s`);
-	console.log('  Queries: 12 canon + 7 fictional = 19 total');
-	console.log('  Search calls: 19 × 3 modes = 57 total\n');
+	console.log('  Queries: 12 canon + 7 fictional + 4 codebase = 23 total');
+	console.log('  Search calls: 19 × 3 modes + 4 × 6 modes = 81 total\n');
 }
 
 main().catch((err) => {

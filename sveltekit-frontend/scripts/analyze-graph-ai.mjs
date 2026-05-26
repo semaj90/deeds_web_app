@@ -77,7 +77,7 @@ async function askGemma4(systemPrompt, userPrompt, maxTokens = 512) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-legal',
+      model: 'gemma4-rotorquant:latest',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user',   content: userPrompt },

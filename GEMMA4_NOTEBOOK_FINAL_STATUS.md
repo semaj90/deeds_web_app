@@ -258,7 +258,7 @@ from optimum.onnxruntime import ORTModelForCausalLM
 from optimum.onnxruntime.configuration import AutoQuantizationConfig
 from pathlib import Path
 
-onnx_output_dir = "./gemma4-legal-2b-onnx"
+onnx_output_dir = "./gemma4-rotorquant:latest-2b-onnx"
 os.makedirs(onnx_output_dir, exist_ok=True)
 
 try:
@@ -286,7 +286,7 @@ try:
 
     client_config = {
         "model_type": "onnx",
-        "model_id": "gemma4-legal-2b",
+        "model_id": "gemma4-rotorquant:latest-2b",
         "quantization": "int4",
         "size_mb": round(total_size_mb, 1),
         "context_length": 8192,

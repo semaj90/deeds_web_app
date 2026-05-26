@@ -27,7 +27,7 @@ NULL.
 
 ### 1. VRAM coordination (Gemma4 VLM ↔ TurboQuant)
 The RTX 3060 Ti has 8 GB. TurboQuant llama-server holds it; Ollama can't
-load gemma4-legal-vlm in parallel.
+load gemma4-rotorquant:latest in parallel.
 
 **Options** (in order of disruption):
 - **a)** Add a `caption-screenshots-via-turbo.mjs` that hits TurboQuant's

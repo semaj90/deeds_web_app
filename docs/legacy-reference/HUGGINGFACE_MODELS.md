@@ -26,7 +26,7 @@ Clone [TheTom/turboquant_plus](https://github.com/TheTom/turboquant_plus), build
 ```bash
 git clone https://github.com/TheTom/turboquant_plus
 cd turboquant_plus && cmake -B build -DGGML_CUDA=ON && cmake --build build -j
-./build/bin/llama-server -m gemma4-legal.gguf -ctk turbo3 -ctv turbo3 --port 8090
+./build/bin/llama-server -m gemma4-rotorquant:latest.gguf -ctk turbo3 -ctv turbo3 --port 8090
 ```
 
 ### Track 2: LiteRT-LM (E2B model)

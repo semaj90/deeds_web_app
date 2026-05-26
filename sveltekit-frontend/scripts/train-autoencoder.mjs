@@ -65,7 +65,7 @@ const require = createRequire(import.meta.url);
 let addon = null;
 try {
   addon = require(ADDON_PATH);
-  console.log('[ae-train] tensorrt_bridge.node loaded, CUDA:', addon.isCudaAvailable?.() ?? 'unknown');
+  console.log('[ae-train] tensorrt_bridge.node loaded, CUDA:', addon.checkCudaAvailable?.() ?? 'unknown');
 } catch (e) {
   console.warn('[ae-train] N-API addon not available:', e.message);
   console.warn('[ae-train] Falling back to CPU JS training (much slower)');
@@ -256,7 +256,7 @@ try {
   }
 
   // If N-API addon available, use GPU for GEMM (matmul replacement)
-  const useGpu = addon && addon.isCudaAvailable?.();
+  const useGpu = addon && addon.checkCudaAvailable?.() > 0;
   console.log(`[ae-train] GPU training: ${useGpu ? 'YES (cuBLAS)' : 'NO (CPU fallback)'}`);
   console.log(`[ae-train] Training ${EPOCHS} epochs, batch=${BATCH}, lr=${LR}\n`);
 

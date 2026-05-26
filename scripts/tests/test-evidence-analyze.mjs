@@ -2,7 +2,7 @@
  * Test Evidence Analysis GPU Pipeline
  *
  * Tests the /api/codebase-index/evidence-analyze endpoint which:
- * - Runs evidence analysis queries through gemma4-legal
+ * - Runs evidence analysis queries through gemma4-rotorquant:latest
  * - Tracks cache hit rates and latency
  * - Stores results in CouchDB evidence_analysis database
  *
@@ -104,7 +104,7 @@ async function main() {
 	const response = await post('/api/codebase-index/evidence-analyze', {
 		domain,
 		batchSize: 5,
-		model: 'gemma3:270m', // Fast model (4.5s avg) — use gemma4-legal:latest for complex analysis
+		model: 'gemma3:270m', // Fast model (4.5s avg) — use gemma4-rotorquant:latest for complex analysis
 	});
 
 	if (!response) {

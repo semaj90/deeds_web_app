@@ -25,7 +25,7 @@ const FIX_PATTERNS = {
     severity: 'medium',
     description: 'SQL migrations present on disk but missing in the drizzle/meta journal, or manual sidecar SQL without manifest registration.',
     pattern: 'Unjournaled numbered SQL migration files found on disk.',
-    fixSummary: 'If it is an intentional sidecar migration, document it in sveltekit-frontend/drizzle/sidecar-migrations.json with reason, appliedAt, and validationCommand. If it is stale, clean it up.',
+    fixSummary: 'If it is an intentional sidecar migration, document it in sveltekit-frontend/drizzle/sidecar-migrations.json with reason, appliedAt, and validationCommand. If it is not intentional, journal or regenerate it instead of archiving it.',
     command: 'node scripts/atlas/audit-drizzle-meta-hygiene.mjs'
   },
   schema_mismatch: {

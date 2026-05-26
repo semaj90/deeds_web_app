@@ -3,7 +3,7 @@
  * karpathy-tag-parallel.mjs — Parallel LLM semantic tagging for codebase chunks.
  *
  * Scrolls codebase_chunks_768 filtering for content-bearing points,
- * classifies each via Ollama gemma4-legal-vlm, writes tags to Qdrant + Postgres.
+ * classifies each via Ollama gemma4-rotorquant:latest, writes tags to Qdrant + Postgres.
  *
  * Concurrency: 4 parallel Ollama requests (configurable via --concurrency).
  * Speed: ~4x faster than sequential SSE endpoint (~60 chunks/min).
@@ -17,7 +17,7 @@ const { Pool } = pg;
 
 const QDRANT_URL   = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL   = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
-const MODEL        = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
+const MODEL        = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-rotorquant:latest';
 const COLLECTION   = 'codebase_chunks_768';
 const PG_URL       = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const CONCURRENCY  = parseInt(process.argv.find(a => a.startsWith('--concurrency='))?.split('=')[1] ?? '4');

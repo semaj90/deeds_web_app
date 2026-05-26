@@ -23,7 +23,7 @@
 - [x] **ChatSession queryHash verified** — metadata type includes `queryHash`
 - [x] **Analytics pipeline verified** — context-timeline API, 12 search-analytics exports, drizzle/0015_context_timeline.sql all present
 - [x] **LangGraph pipeline test script** — `test-langgraph-pipeline.mjs` with 4-phase test (preflight, endpoints, deep analysis, JSON+MD reports)
-- [x] **Fix VLM model defaults** — env.server.ts + ollama.ts pointed to nonexistent `gemma4-legal-vlm:latest`. Fixed: CHAT_MODEL→`gemma4-legal:latest`, VLM_MODEL→`gemma4:e4b-it-q4_K_M` (stock multimodal base). User sets `OLLAMA_VLM_MODEL=gemma4-legal-vlm:latest` in `.env` after VLM merge.
+- [x] **Fix VLM model defaults** — env.server.ts + ollama.ts pointed to nonexistent `gemma4-rotorquant:latest`. Fixed: CHAT_MODEL→`gemma4-rotorquant:latest`, VLM_MODEL→`gemma4:e4b-it-q4_K_M` (stock multimodal base). User sets `OLLAMA_VLM_MODEL=gemma4-rotorquant:latest` in `.env` after VLM merge.
 - [x] **Chat feedback loop verified (P1+P5)** — queryHash already wired end-to-end: shortHash in ChatSession.svelte.ts, metadata preserved through SSE streaming, rateFeedback reads from metadata, FeedbackButtons in both ChatMessage.svelte and ContextualEvidenceChatModal.svelte.
 
 ---
@@ -56,8 +56,8 @@
 ### VLM Deployment — UNBLOCKED (upstream PEFT fix merged Apr 2026)
 - [ ] Run Colab VLM re-attachment notebook — `pip install --upgrade unsloth` first (PR #4807 merged, ClippableLinear fixed)
 - [ ] Clean PEFT merge now possible: vision+audio towers intact, no surgical tensor stripping
-- [ ] Export: `gemma4-legal-vlm-Q4_K_M.gguf` + `gemma4-legal-vlm-mmproj-BF16.gguf`
-- [ ] Deploy: `ollama create gemma4-legal-vlm:latest -f Modelfile` + update `.env OLLAMA_VLM_MODEL`
+- [ ] Export: `gemma4-rotorquant:latest-Q4_K_M.gguf` + `gemma4-rotorquant:latest-mmproj-BF16.gguf`
+- [ ] Deploy: `ollama create gemma4-rotorquant:latest -f Modelfile` + update `.env OLLAMA_VLM_MODEL`
 - [ ] Disk cleanup (~119 GB recoverable: WSL crash dumps, Claude CLI cache, duplicate GGUFs)
 
 ### deeds_labs Archival

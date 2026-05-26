@@ -22,6 +22,7 @@ const ROOT = join(__dirname, '..');
 const DEEP_DIR = join(ROOT, 'memory/graphify/deep');
 const INGEST_PENDING   = join(ROOT, 'memory/ingest/pending');
 const INGEST_PROCESSED = join(ROOT, 'memory/ingest/processed');
+const MIN_HOTSPOT_FANIN = Number(process.env.GRAPHIFY_DEEP_SMOKE_MIN_FANIN ?? '50');
 
 let passed = 0;
 let failed = 0;
@@ -145,11 +146,13 @@ gate('G7 - ACE ingest JSONL present (pending/ OR processed/)', () => {
 // G8 - top hotspot has directFanIn >= 50
 // Measured max across this 32k-file graph is ~77 (tests/helpers/env-ports.ts).
 // 50 is a realistic floor that flags a genuinely empty or broken graph.
-gate('G8 - top hotspot node has directFanIn >= 50', () => {
+gate(`G8 - top hotspot node has directFanIn >= ${MIN_HOTSPOT_FANIN}`, () => {
   if (!graph) return 'graph not loaded';
   const top = [...graph.nodes].sort((a, b) => b.directFanIn - a.directFanIn)[0];
   if (!top) return 'no nodes found';
-  if (top.directFanIn < 50) return `top hotspot ${top.rel} has fanIn=${top.directFanIn} (expected >= 50)`;
+  if (top.directFanIn < MIN_HOTSPOT_FANIN) {
+    return `top hotspot ${top.rel} has fanIn=${top.directFanIn} (expected >= ${MIN_HOTSPOT_FANIN})`;
+  }
   return true;
 });
 

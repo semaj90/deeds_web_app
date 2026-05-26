@@ -90,6 +90,42 @@
       "appliedAt": "2026-05-18",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='tool_traces' AND column_name IN ('status','error');\""
+    },
+    {
+      "file": "20260506_code_retrieval_chunks.sql",
+      "status": "manual_sidecar",
+      "reason": "Defines code_retrieval_chunks table with FTS indexes, pgvector HNSW index, and search_code_hybrid_pg RRF function.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-21",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec 94823593eb8e_legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT proname FROM pg_proc WHERE proname='search_code_hybrid_pg';\""
+    },
+    {
+      "file": "20260521_summary_cards.sql",
+      "status": "manual_sidecar",
+      "reason": "Defines canonical summary_cards table for normalized codebase summary cards, top-N retrieval cards, and TOON packet rollups.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-21",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='summary_cards';\""
+    },
+    {
+      "file": "20260523_citation_annotation_flow.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds saved_citation_annotations and evidence_board_edges to support citation -> annotation -> graph edge -> Redis packet flow.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-22",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('saved_citation_annotations','evidence_board_edges');\""
+    },
+    {
+      "file": "20260524_synthesis_cache_layer.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds cache_layer_used column to synthesis_logs to support fast analytics filters on cache hitting.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='synthesis_logs' AND column_name='cache_layer_used';\""
     }
   ]
 }

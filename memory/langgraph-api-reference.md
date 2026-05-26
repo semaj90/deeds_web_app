@@ -282,7 +282,7 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 
-const model = new ChatOllama({ model: "gemma4-legal:latest" });
+const model = new ChatOllama({ model: "gemma4-rotorquant:latest" });
 
 const searchTool = tool(
   async ({ query }) => `Results for: ${query}`,

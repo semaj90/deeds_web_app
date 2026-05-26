@@ -84,36 +84,49 @@ export async function searchSemanticCache(
 	threshold = REDIS_SEMANTIC_THRESHOLD,
 ): Promise<SemanticHit | null> {
 	try {
-		await ensureSemanticIndex(redis);
+    await ensureSemanticIndex(redis);
 
-		const vecBytes = embeddingToBytes(embedding);
-		// KNN 1 with model filter — returns the single best candidate
-		const query = `(@model:{${model.replace(/[^a-zA-Z0-9_-]/g, '_')}}|*)=>[KNN 1 @vec $vec AS __score]`;
+    const vecBytes = embeddingToBytes(embedding);
+    // KNN 1 over the semantic cache index.
+    // Model gating is handled by similarity threshold and upstream prompt hash checks.
+    const query = `*=>[KNN 1 @vec $vec AS __score]`;
 
-		const raw = await (redis as any).call(
-			'FT.SEARCH', INDEX_NAME,
-			query,
-			'PARAMS', '2', 'vec', vecBytes,
-			'RETURN', '2', 'response', '__score',
-			'SORTBY', '__score', 'ASC',   // ASC = closest first (cosine distance 0..2)
-			'LIMIT', '0', '1',
-			'DIALECT', '2',
-		) as unknown[];
+    const raw = (await (redis as any).call(
+      'FT.SEARCH',
+      INDEX_NAME,
+      query,
+      'PARAMS',
+      '2',
+      'vec',
+      vecBytes,
+      'RETURN',
+      '2',
+      'response',
+      '__score',
+      'SORTBY',
+      '__score',
+      'ASC', // ASC = closest first (cosine distance 0..2)
+      'LIMIT',
+      '0',
+      '1',
+      'DIALECT',
+      '2'
+    )) as unknown[];
 
-		const count = Number(raw[0]);
-		if (count === 0) return null;
+    const count = Number(raw[0]);
+    if (count === 0) return null;
 
-		// raw: [count, key, [field, value, ...], ...]
-		const fields = raw[2] as string[];
-		const idx    = (f: string) => fields.indexOf(f);
-		const resp   = fields[idx('response') + 1];
-		// RediSearch returns cosine *distance* (0 = identical, 2 = opposite)
-		const dist   = parseFloat(fields[idx('__score') + 1] ?? '2');
-		const score  = 1 - dist / 2; // convert to similarity 0-1
+    // raw: [count, key, [field, value, ...], ...]
+    const fields = raw[2] as string[];
+    const idx = (f: string) => fields.indexOf(f);
+    const resp = fields[idx('response') + 1];
+    // RediSearch returns cosine *distance* (0 = identical, 2 = opposite)
+    const dist = parseFloat(fields[idx('__score') + 1] ?? '2');
+    const score = 1 - dist / 2; // convert to similarity 0-1
 
-		if (!resp || score < threshold) return null;
-		return { response: resp, score };
-	} catch (err: unknown) {
+    if (!resp || score < threshold) return null;
+    return { response: resp, score };
+  } catch (err: unknown) {
 		// RediSearch unavailable — degrade silently to Qdrant L2
 		const msg = String((err as Error)?.message ?? err);
 		if (!msg.includes('Unknown Index name')) {

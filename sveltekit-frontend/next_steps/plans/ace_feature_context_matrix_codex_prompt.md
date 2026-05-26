@@ -527,7 +527,7 @@ Example:
 ```json
 {
   "cacheKey": "llmctx_abc",
-  "model": "gemma4-legal-vlm",
+  "model": "gemma4-rotorquant:latest",
   "promptTokens": 3400,
   "chunkIds": ["chunk_error_001"],
   "featureKeys": ["workers.kmeans"],

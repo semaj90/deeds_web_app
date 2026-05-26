@@ -122,7 +122,7 @@ const TURBOQUANT_KV_CACHE_CARD: Omit<WikiCard, 'gaps' | 'updatedAt'> = {
 		'algorithm: randomly rotate vectors, quantize coordinates with scalar codebooks, then add a ' +
 		'1-bit QJL residual for unbiased inner-product estimation. ' +
 		'For the RTX 3060 Ti (8GB) stack, turbo3 KV quantization alone is sufficient: ' +
-		'llama-server -m gemma4-legal-vlm.gguf --mmproj mmproj-BF16.gguf -ctk turbo3 -ctv turbo4 -fa on -ngl 99 -c 4096 ' +
+		'llama-server -m gemma4-rotorquant:latest.gguf --mmproj mmproj-BF16.gguf -ctk turbo3 -ctv turbo4 -fa on -ngl 99 -c 4096 ' +
 		'yields ~5.7GB total (5.3GB model + 192MB KV) leaving 2.3GB free for batching. ' +
 		'MLA-style latent compression is not needed for this GPU budget. ' +
 		'TurboQuant flags in llama-server must be verified via --help before use — flag names are build-specific.',

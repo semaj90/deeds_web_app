@@ -135,7 +135,7 @@ Each observability function logs structured metadata:
 **traceLLM(name, metadata, callback)**
 ```typescript
 {
-  model: "gemma4-legal:latest",
+  model: "gemma4-rotorquant:latest",
   backend: "bifrost",
   promptTokens: 1523,
   completionTokens: 312,
@@ -151,7 +151,7 @@ Each observability function logs structured metadata:
 ```cmd
 cd C:\Users\james\Desktop\llama-server-cuda
 llama-server.exe ^
-  -m "C:\Users\james\Downloads\gemma4-legal-vlm-q4_k_m.gguf" ^
+  -m "C:\Users\james\Downloads\gemma4-rotorquant:latest-q4_k_m.gguf" ^
   --mmproj "C:\Users\james\Downloads\gemma4-mmproj\mmproj-BF16.gguf" ^
   --port 8090 ^
   --cache-type-k turbo3 ^

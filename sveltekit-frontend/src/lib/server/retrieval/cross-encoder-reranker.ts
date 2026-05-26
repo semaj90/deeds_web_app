@@ -72,10 +72,10 @@ const REDIS_PREFIX = 'rr';
 const REDIS_LIST_PREFIX = 'rr:list';
 
 /** Model short tag embedded in list cache key (avoids cross-model collisions) */
-const MODEL_TAG = 'g4l'; // gemma4-legal
+const MODEL_TAG = 'g4l'; // gemma4-rotorquant:latest
 
 /** Model used for reranking — fine-tuned legal Gemma4 */
-const RERANK_MODEL = VLM_MODELS.legal; // 'gemma4-legal:latest'
+const RERANK_MODEL = VLM_MODELS.legal; // 'gemma4-rotorquant:latest'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

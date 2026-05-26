@@ -8,15 +8,14 @@ import { z } from 'zod';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
-const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
-const CASE_PRIORITY = ['low', 'medium', 'high', 'critical', 'urgent'] as const;
+import { insertCaseSchema } from '$lib/server/db/zod-schemas.js';
 
-const caseUpdateSchema = z.object({
-  title: z.string().min(1).max(500).optional(),
-  description: z.string().max(10000).optional(),
-  status: z.enum(CASE_STATUS).optional(),
-  priority: z.enum(CASE_PRIORITY).optional(),
-});
+const caseUpdateSchema = insertCaseSchema.pick({
+  title: true,
+  description: true,
+  status: true,
+  priority: true,
+}).partial();
 
 const isUuid = (s: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);

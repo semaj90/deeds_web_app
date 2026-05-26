@@ -92,7 +92,7 @@ export interface OpenAIChatCompletionResponse {
     contextChunks: number;
     agentsMd: boolean;
     codeLlmHit: boolean;
-    cacheHit: 'none' | 'LLMS.md' | 'prior-answer' | 'bifrost';
+    cacheHit: 'none' | 'LLMS.md' | 'prior-answer' | 'prompt-cache' | 'bifrost';
     durationMs: number;
     // Tool loop metadata (Step 5 — Gemma4 MCP tool controller)
     toolsUsed?: string[];

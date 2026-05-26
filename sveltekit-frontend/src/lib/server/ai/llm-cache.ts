@@ -22,7 +22,7 @@ const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const CACHE_HIT_THRESHOLD = 0.88;
 
 // Model version — included in cache key so cache auto-invalidates when model changes
-// Bump this when deploying a new fine-tuned model (e.g. gemma4-legal → gemma4-legal)
+// Bump this when deploying a new fine-tuned model (e.g. gemma4-rotorquant:latest → gemma4-rotorquant:latest)
 const CACHE_MODEL_VERSION = 'v2';
 
 // Tiered TTL by query type (seconds)
@@ -86,7 +86,7 @@ export async function lookupCachedResponse(params: {
 	context: string;
 	model?: string;
 }): Promise<CacheLookupResult> {
-	const { query, queryEmbedding: providedEmbedding, context, model = 'gemma4-legal:latest' } = params;
+	const { query, queryEmbedding: providedEmbedding, context, model = 'gemma4-rotorquant:latest' } = params;
 
 	try {
 		// Generate query embedding if not provided

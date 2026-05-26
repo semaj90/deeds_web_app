@@ -16,7 +16,7 @@
     },
     "model": {
       "type": "string",
-      "examples": ["gemma4-legal:latest", "embeddinggemma:latest"]
+      "examples": ["gemma4-rotorquant:latest", "embeddinggemma:latest"]
     },
     "task_type": {
       "type": "string",

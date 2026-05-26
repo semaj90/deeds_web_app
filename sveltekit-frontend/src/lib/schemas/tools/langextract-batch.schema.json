@@ -54,7 +54,7 @@
     "options": {
       "type": "object",
       "properties": {
-        "model": { "type": "string", "default": "gemma4-legal:latest" },
+        "model": { "type": "string", "default": "gemma4-rotorquant:latest" },
         "temperature": { "type": "number", "minimum": 0, "maximum": 2, "default": 0.1 },
         "timeout_ms": { "type": "integer", "minimum": 1000, "maximum": 300000, "default": 30000 }
       },

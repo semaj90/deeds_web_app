@@ -58,7 +58,7 @@ vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-legal:latest',
+	getChatModel: () => 'gemma4-rotorquant:latest',
 	getEmbedModel: () => 'embeddinggemma:latest',
 	callOllamaChat: mockCallOllamaChat,
 	ollamaFetch: mockOllamaFetch,
@@ -259,7 +259,7 @@ describe('POST /api/error-brain/generate-fix', () => {
 		expect(body.fix).toBeDefined();
 		expect(body.fix.fixedCode).toBeTruthy();
 		expect(body.metadata).toBeDefined();
-		expect(body.metadata.model).toBe('gemma4-legal:latest');
+		expect(body.metadata.model).toBe('gemma4-rotorquant:latest');
 	});
 
 	it('handles Ollama failure gracefully', async () => {

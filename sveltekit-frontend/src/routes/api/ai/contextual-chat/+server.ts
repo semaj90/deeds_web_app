@@ -96,7 +96,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			suggestions: result.suggestions,
 			citations: result.citations,
 			latencyMs: result.latencyMs,
-			model: 'gemma4-legal:latest',
+			model: 'gemma4-rotorquant:latest',
 			intent: {
 				label: intent.label,
 				confidence: intent.confidence,

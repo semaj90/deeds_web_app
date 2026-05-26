@@ -136,7 +136,7 @@ SvelteKit 2 route / API handler
 
 ## Notes: model and modalities
 
-- Merged legal model: `gemma4-legal-iq4xs-direct.gguf`.
+- Merged legal model: `gemma4-rotorquant:latest-iq4xs-direct.gguf`.
 - LoRA merged: yes.
 - Multimodal / VLM: `capabilities: ["completion", "multimodal"]` means the server can accept multimodal inputs.
 - True VLM still requires a vision encoder plus projector in the model/export.

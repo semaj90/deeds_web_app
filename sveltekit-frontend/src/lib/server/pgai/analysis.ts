@@ -6,7 +6,7 @@ export async function runCustomAnalysis(content: string, prompt: string): Promis
         method: "POST",
         headers: { "Content-Type": "application/json" },
 	body: JSON.stringify({
-	model: "gemma4-legal:latest",
+	model: "gemma4-rotorquant:latest",
             prompt: `${prompt}\n\nDocument content:\n${content.substring(0, 4000)}`,
             options: {
 	temperature: 0.2, num_predict: 2000 }

@@ -1,7 +1,7 @@
 /**
  * Holistic Document Synthesizer — Gemma-4 TurboQuant GraphRAG Pipeline.
  *
- * Uses the massive 256K context window of Gemma-4 to analyze entire documents
+ * Uses Gemma-4's large context window to analyze entire documents
  * and extract structural relationships (triples) for the knowledge graph.
  */
 
@@ -9,6 +9,16 @@ import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
+
+const RUNTIME_CONTEXT_SIZE = Number(
+  process.env.LLM_CONTEXT_SIZE ??
+    process.env.TURBO_CTX_SIZE ??
+    process.env.LLAMA_CTX_SIZE ??
+    process.env.LLAMA_SERVER_CTX ??
+    process.env.OLLAMA_CONTEXT_LENGTH ??
+    '65536'
+);
+
 
 const MODEL = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4:e4b-it-q4_K_M';
 const TURBOQUANT_BASE_URL = ENV.TURBOQUANT_BASE_URL;
@@ -49,7 +59,7 @@ export async function synthesizeHolisticDocument(text: string): Promise<Holistic
   // Use a large slice for holistic understanding (up to 100K chars ~ 25K-30K tokens)
   const input = text.length > 100_000 ? text.slice(0, 100_000) : text;
 
-  const prompt = `Perform a holistic analysis of this legal document. 
+  const prompt = `Perform a holistic analysis of this legal document.
 1. Provide a comprehensive global summary.
 2. Identify the most critical entities (People, Organizations, Locations, Legal Concepts).
 3. Extract key relationships (Subject-Predicate-Object triples) that define the "who, what, where, and why" of this document.
@@ -68,14 +78,14 @@ ${input}`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal',
+          model: 'gemma4-rotorquant:latest',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.1,
           max_tokens: 4096,
           // TurboQuant specific options for KV compression
           options: {
-            num_ctx: 131072,
-            kv_cache_type: 'turbo3' 
+            num_ctx: RUNTIME_CONTEXT_SIZE,
+            kv_cache_type: 'turbo3'
           }
         }),
         signal: AbortSignal.timeout(180_000), // 3 min timeout for long-context synthesis
@@ -91,7 +101,7 @@ ${input}`;
             prompt,
             stream: false,
             format: synthesisJsonSchema,
-            options: { num_ctx: 32768, temperature: 0.1 }
+            options: { num_ctx: RUNTIME_CONTEXT_SIZE, temperature: 0.1 }
           }),
           signal: AbortSignal.timeout(180_000),
         });

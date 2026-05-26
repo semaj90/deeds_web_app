@@ -790,7 +790,7 @@ Analyze and respond in JSON format:
     const result = await generateCompletion({
       prompt: userPrompt,
       systemPrompt,
-      model: 'gemma4-legal:latest',
+      model: 'gemma4-rotorquant:latest',
       temperature: 0.3,
       maxTokens: 1024
     });

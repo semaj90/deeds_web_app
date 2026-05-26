@@ -16,17 +16,17 @@ Successfully optimized the Deeds Web App caching infrastructure with **3 model o
 
 **1. `/api/evidence/ai/analyze`**
 - Default: `gemma3:270m` (455ms avg)
-- Optional: `useComplexModel: true` → gemma4-legal (25s avg)
+- Optional: `useComplexModel: true` → gemma4-rotorquant:latest (25s avg)
 - Cache: L1 Redis (5ms hits)
 - **Impact**: 6-50× faster depending on cache state
 
 **2. `/api/codebase-index/evidence-analyze`**
-- Default: `gemma3:270m` (was gemma4-legal)
+- Default: `gemma3:270m` (was gemma4-rotorquant:latest)
 - Use case: Background cache warm-up jobs
 - **Impact**: 6× faster warm-up cycles
 
 **3. `/api/ai/chat-direct`**
-- Default: `gemma3:270m` (was gemma4-legal)
+- Default: `gemma3:270m` (was gemma4-rotorquant:latest)
 - Added: L1 Redis caching ✨ NEW
 - Cache hits: **5ms average**
 - Cache misses: **455ms average**
@@ -37,7 +37,7 @@ Successfully optimized the Deeds Web App caching infrastructure with **3 model o
 | Model | Avg Latency | Use Case |
 |-------|-------------|----------|
 | **gemma3:270m** | 455ms | Real-time queries, cache warm-up |
-| **gemma4-legal** | 25,000ms | Complex analysis, codebase summarization |
+| **gemma4-rotorquant:latest** | 25,000ms | Complex analysis, codebase summarization |
 | **Redis L1 cached** | 5ms | Repeat queries (91× faster!) |
 
 ---
@@ -120,21 +120,21 @@ setExactMatchCache(cacheKey, { content: responseText, model, backend: 'ollama' }
 
 | Scenario | Before | After | Improvement |
 |----------|--------|-------|-------------|
-| Cold request (gemma4-legal) | 30s timeout | 455ms (gemma3:270m) | **66× faster** |
+| Cold request (gemma4-rotorquant:latest) | 30s timeout | 455ms (gemma3:270m) | **66× faster** |
 | Cached request | N/A | 261ms | **N/A** |
 
 ### Chat Direct Endpoint
 
 | Scenario | Before | After | Improvement |
 |----------|--------|-------|-------------|
-| First query | 22s (gemma4-legal) | 455ms (gemma3:270m) | **48× faster** |
+| First query | 22s (gemma4-rotorquant:latest) | 455ms (gemma3:270m) | **48× faster** |
 | Repeat query | 22s | **5ms** (L1 Redis) | **4,400× faster!** |
 
 ### Cache Warm-Up
 
 | Scenario | Before | After | Improvement |
 |----------|--------|-------|-------------|
-| 120 queries (all domain) | 50 min (gemma4-legal) | **9 min** (gemma3:270m) | **5.6× faster** |
+| 120 queries (all domain) | 50 min (gemma4-rotorquant:latest) | **9 min** (gemma3:270m) | **5.6× faster** |
 
 ---
 
@@ -237,7 +237,7 @@ Common legal queries now cached in Redis L1:
 - **Reduced GPU usage** (cache hits = no GPU)
 
 ### System Throughput
-- **Baseline**: 1-2 QPM (gemma4-legal)
+- **Baseline**: 1-2 QPM (gemma4-rotorquant:latest)
 - **With gemma3:270m**: 120-150 QPM
 - **With L1 cache**: 12,000 QPM (theoretical max)
 

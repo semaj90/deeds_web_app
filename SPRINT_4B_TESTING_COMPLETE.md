@@ -178,7 +178,7 @@ breach of contract claim under UCC § 2-601...
 - ✅ Whisper base model (multi-lingual, 99 languages)
 - ✅ CUDA acceleration (3s GPU) + CPU fallback (9s)
 - ✅ LangExtract entity extraction (PERSON, DATE, MONEY, CITATION, STATUTE)
-- ✅ ACE analysis (Ollama gemma4-legal: summary, claims, contradictions, tags)
+- ✅ ACE analysis (Ollama gemma4-rotorquant:latest: summary, claims, contradictions, tags)
 - ✅ Qdrant indexing (embeddinggemma 768-dim vectors)
 - ✅ Evidence metadata update (JSONB: transcription, entities, aceAnalysis)
 
@@ -225,7 +225,7 @@ breach of contract claim under UCC § 2-601...
 - **Upload**: ~200ms (larger files)
 - **Whisper transcription**: ~3s GPU (60s audio) | ~9s CPU
 - **LangExtract entities**: ~200ms
-- **ACE analysis**: ~2s (Ollama gemma4-legal)
+- **ACE analysis**: ~2s (Ollama gemma4-rotorquant:latest)
 - **Qdrant indexing**: ~500ms
 - **Total pipeline**: **6-9 seconds GPU** | **15-18 seconds CPU**
 
@@ -311,7 +311,7 @@ breach of contract claim under UCC § 2-601...
 - [ ] Redis 7+ (status tracking)
 - [ ] RabbitMQ 3.13+ (async queues)
 - [ ] Qdrant 1.15.4+ (vector search)
-- [ ] Ollama with models: embeddinggemma, gemma4-legal
+- [ ] Ollama with models: embeddinggemma, gemma4-rotorquant:latest
 - [ ] LangExtract service (port 8095)
 
 ### Database Migrations

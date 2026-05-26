@@ -492,8 +492,8 @@ rg --json "export (function|const|class) $SYMBOL" src/ --type ts \
 ### 6.8 TurboQuant MLA Latent as 64-dim Encoder (FUTURE)
 
 **Gap**: The `TURBO_EMBEDDINGS_ENABLED` path in karpathy-gpu-enrich.mjs is dormant. TurboQuant llama-server (`:8090`) started without `--embeddings` flag (would OOM on 8GB GPU).  
-**When ready**: Restart TurboQuant with `--embeddings` on a dedicated smaller model (not gemma4-legal-vlm). The Gemma4 SWA `head_dim=256` MLA latent compressed to 64-dim would replace Xavier/PCA entirely with semantically richer projections.  
-**Constraint**: gemma4-legal-vlm (5.3GB) + q8_0 KV uses ~5.8GB VRAM; no headroom for `--embeddings` on 8GB.
+**When ready**: Restart TurboQuant with `--embeddings` on a dedicated smaller model (not gemma4-rotorquant:latest). The Gemma4 SWA `head_dim=256` MLA latent compressed to 64-dim would replace Xavier/PCA entirely with semantically richer projections.  
+**Constraint**: gemma4-rotorquant:latest (5.3GB) + q8_0 KV uses ~5.8GB VRAM; no headroom for `--embeddings` on 8GB.
 
 ### 6.9 Topo-Byte Cache TTL Tuning (LOW)
 
@@ -1041,7 +1041,7 @@ Stage 4 — PageRank on derived graph
 
 Stage 5 — Chunk summarization (LiteRT / TurboQuant)
   LiteRT gemma3:270m (CPU, fast, no GPU swap)         # per-chunk 1-sentence summaries
-  TurboQuant gemma4-legal-vlm :8090 (GPU, KV q8_0)   # cluster-level synthesis
+  TurboQuant gemma4-rotorquant:latest :8090 (GPU, KV q8_0)   # cluster-level synthesis
     └── Bifrost semantic cache for repeated prompts
   → wiki:note:dir:* Redis (24h TTL) + CouchDB glyph_topology
 
@@ -1112,7 +1112,7 @@ User query (text)
   ├─ 8. ACE context pack — context-assembler   ← TrustMeta T1-T5 fence
   │       T4/T5 → sanitizer.ts injection check
   │
-  ├─ 9. TurboQuant LLM — llama-server :8090    ← gemma4-legal-vlm, -ctk q8_0 -ctv q8_0
+  ├─ 9. TurboQuant LLM — llama-server :8090    ← gemma4-rotorquant:latest, -ctk q8_0 -ctv q8_0
   │       Bifrost L2 semantic cache :3040       ← cosine ≥0.8 on previous responses
   │       Redis exact-match L1 cache            ← SHA-256 of prompt+model
   │
@@ -1168,7 +1168,7 @@ LLM inference (TurboQuant :8090 / LiteRT / ONNX)
   │       traceId:      "chunk_id:{qdrant_point_id}",
   │       name:         "synthesis | rerank | embed | grpo_step",
   │       startTime:    ISO8601,
-  │       model:        "gemma4-legal-vlm",
+  │       model:        "gemma4-rotorquant:latest",
   │       input:        [{ role, content }],
   │       output:       { text, tokens_used, latency_ms },
   │       metadata: {
@@ -1190,7 +1190,7 @@ LLM inference (TurboQuant :8090 / LiteRT / ONNX)
 ```bash
 node scripts/export-langfuse-jsonl.mjs --date 2026-05-10 --output logs/langfuse/2026-05-10.jsonl
 # Each line:
-# {"timestamp":"2026-05-10T02:44:57Z","chunk_id":"abc123","model":"gemma4-legal-vlm",
+# {"timestamp":"2026-05-10T02:44:57Z","chunk_id":"abc123","model":"gemma4-rotorquant:latest",
 #  "latency_ms":1247,"grpo_reward":0.87,"grpo_thinking":"...","tokens":342,"trust_tier":"T2"}
 ```
 
@@ -1336,7 +1336,7 @@ tmux send-keys -t finetune \
 
 **GRPO thinking → RLM memory** (stored as T2 trust synthesis chunks):
 ```jsonl
-{"timestamp":"2026-05-10T03:12:00Z","chunk_id":"grpo:step:4291","thinking":"FRE 801(d)(2)...","reward":0.87,"adapter":"legal-v2","model":"gemma4-legal-vlm","round":3}
+{"timestamp":"2026-05-10T03:12:00Z","chunk_id":"grpo:step:4291","thinking":"FRE 801(d)(2)...","reward":0.87,"adapter":"legal-v2","model":"gemma4-rotorquant:latest","round":3}
 ```
 `ingest-grpo-log.mjs` embeds thinking text → upserts into `synthesis_memory_768` → available as L5 lane next session.
 
