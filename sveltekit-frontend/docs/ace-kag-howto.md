@@ -59,7 +59,7 @@ Refresh the JSON anytime with `npm run graphify:daily`, then reload the viewer.
 │                    wiki:note:dir:{docId}        (24h TTL)            │
 │                                                                      │
 │  llama-server.exe :8090   (TurboQuant launch profile)                │
-│   model: gemma4-legal-vlm GGUF + mmproj                              │
+│   model: gemma4-rotorquant:latest GGUF + mmproj                              │
 │   flags: -ngl 99 --flash-attn on -ctk q8_0 -ctv q8_0                 │
 │        │                                                             │
 │        ▼                                                             │

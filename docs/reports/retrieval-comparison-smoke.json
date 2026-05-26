@@ -1,0 +1,27 @@
+{
+  "query": "smoke",
+  "legacyResult": {
+    "source": "legacy_embeddings",
+    "items": [
+      {
+        "id": "1",
+        "summary": "Simulated legacy summary",
+        "dominantTags": [
+          "test"
+        ]
+      }
+    ]
+  },
+  "graphResult": {
+    "source": "hypergraph",
+    "items": [
+      {
+        "id": "1",
+        "cluster_summary": "Simulated graph cluster summary",
+        "edges": 5
+      }
+    ]
+  },
+  "deltaScore": 0.12,
+  "status": "comparison_complete"
+}

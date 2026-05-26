@@ -29,7 +29,7 @@ total_keys:         162        (mostly Langfuse queue keys)
 ### Key Distribution
 - **Langfuse (Bull queues)**: 161 keys (~99%)
 - **Application cache**: 1 key (~1%)
-  - `model-price-tiers:deeds-observability:gemma4-legal%3Alatest`
+  - `model-price-tiers:deeds-observability:gemma4-rotorquant:latest%3Alatest`
 
 ---
 
@@ -248,7 +248,7 @@ docker exec deeds-redis-prod redis-cli INFO > redis-info-$(date +%Y%m%d-%H%M%S).
 docker exec deeds-redis-prod redis-cli --scan --pattern "llm:cache:*" --count 100
 
 # Get key TTLs
-docker exec deeds-redis-prod redis-cli TTL "model-price-tiers:deeds-observability:gemma4-legal%3Alatest"
+docker exec deeds-redis-prod redis-cli TTL "model-price-tiers:deeds-observability:gemma4-rotorquant:latest%3Alatest"
 
 # Check memory usage of largest keys
 docker exec deeds-redis-prod redis-cli --bigkeys

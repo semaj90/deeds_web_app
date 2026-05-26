@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-05-23T03:51:06.517Z",
+  "runtime": {
+    "bridge": {
+      "loaded": true,
+      "bridgePath": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\Release\\tensorrt_bridge.node",
+      "avx2SimdJson": true,
+      "cuda": false,
+      "bridgeError": "Cannot find module 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\simd-bridge\\cpp\\build\\Release\\tensorrt_bridge.node'\nRequire stack:\n- C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\scripts\\lib\\avx2-simdjson-bridge.mjs"
+    }
+  },
+  "errorCount": 0,
+  "errors": []
+}

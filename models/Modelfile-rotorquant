@@ -1,0 +1,5 @@
+FROM c:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf
+
+PARAMETER temperature 0.1
+PARAMETER num_ctx 65536
+PARAMETER num_predict 4096

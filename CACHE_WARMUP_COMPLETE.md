@@ -169,7 +169,7 @@ Prevents rate limiting:
 
 ### Model Selection
 
-- **`gemma4-legal:latest`** (default): 11.8B params, high quality, ~8-10s/query
+- **`gemma4-rotorquant:latest`** (default): 11.8B params, high quality, ~8-10s/query
 - **`gemma3:270m`**: 268M params, fast, ~2-4s/query (lower quality)
 
 ---

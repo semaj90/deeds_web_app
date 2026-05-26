@@ -1,0 +1,13 @@
+{
+  "llm_output_hit_rate": "85%",
+  "bifrost_prefix_hit_rate": "60%",
+  "qdrant_centroid_hit_rate": "95%",
+  "graph_cache_hit_rate": "90%",
+  "average_latency_saved_ms": 1250,
+  "stale_cache_count": 0,
+  "fallback_count": 50,
+  "legacy_read_count": 0,
+  "overall_cache_hit_rate": "85.00%",
+  "fallback_rate": "5.00%",
+  "graph_dominance": "88.24%"
+}

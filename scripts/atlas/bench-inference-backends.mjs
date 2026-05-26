@@ -122,7 +122,7 @@ async function benchOllama(maxTokens) {
   
   const vramBefore = getVramUsed();
   const t0 = Date.now();
-  const model = 'gemma4-legal:latest';
+  const model = 'gemma4-rotorquant:latest';
   
   const res = await fetch(`${url}/api/chat`, {
     method: 'POST',
@@ -286,7 +286,7 @@ This report audits and evaluates local inference performance between **TurboQuan
 ---
 
 ## 🧠 Environmental Context
-* **Base Model**: \`models/gemma4-legal-iq4xs-direct.gguf\` (~5.09 GB)
+* **Base Model**: \`models/gemma4-rotorquant:latest-iq4xs-direct.gguf\` (~5.09 GB)
 * **Vision Plugin**: \`models/mmproj-F16.gguf\` (~990 MB) (loaded only when VLM mode is toggled)
 * **VLM Mode**: \`${VLM_MODE ? 'ENABLED' : 'DISABLED'}\`
 

@@ -24,14 +24,14 @@ tags: ["file","ext/ts","cluster/32","t/ts","t/src","t/lib"]
 
 # `src/lib/server/analysis/summarizer.ts`
 ## For future Claude
-> Legal document summarization via Ollama (gemma4-legal).
+> Legal document summarization via Ollama (gemma4-rotorquant:latest).
 cluster:: [[Clusters/cluster-32]]
 pagerank:: 0.000000
 blend:: 0.000000
 lines:: 48
 ## Summary
 
-Legal document summarization via Ollama (gemma4-legal).
+Legal document summarization via Ollama (gemma4-rotorquant:latest).
 
 ## Backlinks (Dataview)
 ```dataviewjs

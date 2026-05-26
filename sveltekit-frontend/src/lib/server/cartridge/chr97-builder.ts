@@ -48,6 +48,9 @@ export interface CartridgeMetadata {
 	embeddingDim: number;
 	collections: string[];
 	sources: string[];
+	cartridge_kind?: string | null;
+	glyph_kind?: string | null;
+	cluster_key?: string | null;
 }
 
 export interface ParsedRune {

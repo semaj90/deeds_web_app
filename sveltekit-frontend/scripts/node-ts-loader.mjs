@@ -1,10 +1,18 @@
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import ts from 'typescript';
+
+const LOADER_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export async function resolve(specifier, context, nextResolve) {
   if (specifier.startsWith('$lib/')) {
-    const candidate = path.resolve('src/lib', `${specifier.slice('$lib/'.length).replace(/\.js$/, '')}.ts`);
+    const candidate = path.resolve(
+      LOADER_ROOT,
+      'src/lib',
+      `${specifier.slice('$lib/'.length).replace(/\.js$/, '')}.ts`
+    );
     if (existsSync(candidate)) {
       return { url: pathToFileURL(candidate).href, shortCircuit: true };
     }
@@ -27,4 +35,32 @@ export async function resolve(specifier, context, nextResolve) {
   }
 
   return nextResolve(specifier, context);
+}
+
+export async function load(url, context, nextLoad) {
+  if (!url.startsWith('file:') || !url.endsWith('.ts')) {
+    return nextLoad(url, context);
+  }
+
+  const filename = fileURLToPath(url);
+  const source = await readFile(filename, 'utf8');
+  const output = ts.transpileModule(source, {
+    fileName: filename,
+    compilerOptions: {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      esModuleInterop: true,
+      allowSyntheticDefaultImports: true,
+      resolveJsonModule: true,
+      sourceMap: false,
+      inlineSourceMap: false,
+    },
+  });
+
+  return {
+    format: 'module',
+    source: output.outputText,
+    shortCircuit: true,
+  };
 }

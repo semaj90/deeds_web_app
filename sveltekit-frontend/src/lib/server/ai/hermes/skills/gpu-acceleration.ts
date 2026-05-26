@@ -1,6 +1,12 @@
 import type { SkillRecipe } from './registry.js';
 
 export const GPU_ACCELERATION_SKILLS: Record<string, SkillRecipe> = {
+  attention_rank_files: {
+    id: 'attention_rank_files',
+    family: 'GPUPerformance',
+    description: 'Rank files by GPU attention score relative to a query using libtorch',
+    tools: [{ name: 'attention_rank_files' }]
+  },
   gpu_vram_audit: {
     id: 'gpu_vram_audit',
     family: 'GPUPerformance',

@@ -150,10 +150,18 @@ async function kagRecall(states) {
         try { recalls[state] = JSON.parse(raw); } catch { recalls[state] = [raw]; }
       }
     }
-    await redis.disconnect().catch(() => {});
+    try {
+      redis.disconnect();
+    } catch {
+      // best-effort cleanup
+    }
     return recalls;
   } catch {
-    await redis?.disconnect().catch(() => {});
+    try {
+      redis?.disconnect();
+    } catch {
+      // best-effort cleanup
+    }
     return {};
   }
 }
@@ -256,6 +264,9 @@ async function main() {
     seen.add(f.findingId);
     return true;
   });
+
+  // Informational findings do not participate in the error-fix DAG.
+  findings = findings.filter(f => (f.severity ?? 'medium') !== 'info');
 
   // Classify into HMM states
   const stateFindings = classifyFindings(findings);

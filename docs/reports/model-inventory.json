@@ -45,7 +45,7 @@
   ],
   "manifestStatus": [
     {
-      "id": "gemma4-legal-vlm",
+      "id": "gemma4-rotorquant:latest",
       "runtime": "llama-server",
       "filename": "(env-resolved)",
       "pathEnv": "TURBO_MODEL_PATH",
@@ -5596,36 +5596,36 @@
       "category": "desktop_staging"
     },
     {
-      "name": "gemma4-legal-f16-test.gguf",
-      "path": "C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-f16-test.gguf",
+      "name": "gemma4-rotorquant:latest-f16-test.gguf",
+      "path": "C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-f16-test.gguf",
       "ext": ".gguf",
       "sizeMB": 67.6,
       "category": "desktop_staging"
     },
     {
-      "name": "gemma4-legal-f16.gguf",
-      "path": "C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-f16.gguf",
+      "name": "gemma4-rotorquant:latest-f16.gguf",
+      "path": "C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-f16.gguf",
       "ext": ".gguf",
       "sizeMB": 67.6,
       "category": "desktop_staging"
     },
     {
-      "name": "gemma4-legal-iq4xs-direct.gguf",
-      "path": "C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-iq4xs-direct.gguf",
+      "name": "gemma4-rotorquant:latest-iq4xs-direct.gguf",
+      "path": "C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-iq4xs-direct.gguf",
       "ext": ".gguf",
       "sizeMB": 4855.57,
       "category": "desktop_staging"
     },
     {
-      "name": "gemma4-legal-iq4xs.gguf",
-      "path": "C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-iq4xs.gguf",
+      "name": "gemma4-rotorquant:latest-iq4xs.gguf",
+      "path": "C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-iq4xs.gguf",
       "ext": ".gguf",
       "sizeMB": 4855.57,
       "category": "desktop_staging"
     },
     {
-      "name": "gemma4-legal-merged-q4km.gguf",
-      "path": "C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-merged-q4km.gguf",
+      "name": "gemma4-rotorquant:latest-merged-q4km.gguf",
+      "path": "C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-merged-q4km.gguf",
       "ext": ".gguf",
       "sizeMB": 5088.13,
       "category": "desktop_staging"
@@ -7634,63 +7634,63 @@
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Downloads/gemma4-legal-adapters/adapter_model.safetensors",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 21.79,
       "category": "downloads_staging"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Downloads/gemma4-legal-adapters/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 21.79,
       "category": "downloads_staging"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Downloads/gemma4-legal-adapters (1)/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters (1)/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 21.79,
       "category": "downloads_staging"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Downloads/gemma4-legal-adapters (2)/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters (2)/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 21.79,
       "category": "downloads_staging"
     },
     {
-      "name": "gemma4-legal-adapters.zip",
-      "path": "C:/Users/james/Downloads/gemma4-legal-adapters.zip",
+      "name": "gemma4-rotorquant:latest-adapters.zip",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters.zip",
       "ext": ".zip",
       "sizeMB": 14.29,
       "category": "downloads_staging"
     },
     {
-      "name": "gemma4-legal-e4b-adapter.zip",
-      "path": "C:/Users/james/Downloads/gemma4-legal-e4b-adapter.zip",
+      "name": "gemma4-rotorquant:latest-e4b-adapter.zip",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-e4b-adapter.zip",
       "ext": ".zip",
       "sizeMB": 5.29,
       "category": "downloads_staging"
     },
     {
-      "name": "gemma4-legal-e4b.zip",
-      "path": "C:/Users/james/Downloads/gemma4-legal-e4b.zip",
+      "name": "gemma4-rotorquant:latest-e4b.zip",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-e4b.zip",
       "ext": ".zip",
       "sizeMB": 139.55,
       "category": "downloads_staging"
     },
     {
-      "name": "gemma4-legal-vlm-merged-20260411T044652Z-3-004.zip",
-      "path": "C:/Users/james/Downloads/gemma4-legal-vlm-merged-20260411T044652Z-3-004.zip",
+      "name": "gemma4-rotorquant:latest-merged-20260411T044652Z-3-004.zip",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-merged-20260411T044652Z-3-004.zip",
       "ext": ".zip",
       "sizeMB": 5.3,
       "category": "downloads_staging"
     },
     {
-      "name": "gemma4-legal-vlm-q4_k_m.gguf",
-      "path": "C:/Users/james/Downloads/gemma4-legal-vlm-q4_k_m.gguf",
+      "name": "gemma4-rotorquant:latest-q4_k_m.gguf",
+      "path": "C:/Users/james/Downloads/gemma4-rotorquant:latest-q4_k_m.gguf",
       "ext": ".gguf",
       "sizeMB": 5088.13,
       "category": "downloads_staging"
@@ -7759,15 +7759,15 @@
       "category": "downloads_staging"
     },
     {
-      "name": "gemma4-hermes-64k-latest-64k-latest-64k.Modelfile",
-      "path": "C:/Users/james/Downloads/Hermes-Ollama/ollama-modelfiles/gemma4-hermes-64k-latest-64k-latest-64k.Modelfile",
+      "name": "gemma4-rotorquant:latest-latest-64k-latest-64k.Modelfile",
+      "path": "C:/Users/james/Downloads/Hermes-Ollama/ollama-modelfiles/gemma4-rotorquant:latest-latest-64k-latest-64k.Modelfile",
       "ext": ".modelfile",
       "sizeMB": 0,
       "category": "downloads_staging"
     },
     {
-      "name": "gemma4-hermes-64k-latest-64k.Modelfile",
-      "path": "C:/Users/james/Downloads/Hermes-Ollama/ollama-modelfiles/gemma4-hermes-64k-latest-64k.Modelfile",
+      "name": "gemma4-rotorquant:latest-latest-64k.Modelfile",
+      "path": "C:/Users/james/Downloads/Hermes-Ollama/ollama-modelfiles/gemma4-rotorquant:latest-latest-64k.Modelfile",
       "ext": ".modelfile",
       "sizeMB": 0,
       "category": "downloads_staging"
@@ -9684,22 +9684,22 @@
       "category": "repo_models"
     },
     {
-      "name": "gemma4-legal.gguf",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-legal.gguf",
+      "name": "gemma4-rotorquant:latest.gguf",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-rotorquant:latest.gguf",
       "ext": ".gguf",
       "sizeMB": 5088.12,
       "category": "vendor_canonical"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-grpo/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 161.88,
       "category": "vendor_canonical"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-text/adapter_model.safetensors",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-text/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 140.08,
       "category": "vendor_canonical"
@@ -9712,22 +9712,22 @@
       "category": "vendor_canonical"
     },
     {
-      "name": "gemma4-legal.gguf",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-legal.gguf",
+      "name": "gemma4-rotorquant:latest.gguf",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-rotorquant:latest.gguf",
       "ext": ".gguf",
       "sizeMB": 5088.12,
       "category": "vendor_canonical"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-grpo/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 161.88,
       "category": "vendor_canonical"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-text/adapter_model.safetensors",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-text/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 140.08,
       "category": "vendor_canonical"
@@ -9740,22 +9740,22 @@
       "category": "vendor_canonical"
     },
     {
-      "name": "gemma4-legal.gguf",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-legal.gguf",
+      "name": "gemma4-rotorquant:latest.gguf",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-rotorquant:latest.gguf",
       "ext": ".gguf",
       "sizeMB": 5088.12,
       "category": "vendor_canonical"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-grpo/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 161.88,
       "category": "vendor_canonical"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-text/adapter_model.safetensors",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-text/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 140.08,
       "category": "vendor_canonical"
@@ -9768,22 +9768,22 @@
       "category": "vendor_canonical"
     },
     {
-      "name": "gemma4-legal.gguf",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-legal.gguf",
+      "name": "gemma4-rotorquant:latest.gguf",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-rotorquant:latest.gguf",
       "ext": ".gguf",
       "sizeMB": 5088.12,
       "category": "vendor_canonical"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-grpo/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 161.88,
       "category": "vendor_canonical"
     },
     {
       "name": "adapter_model.safetensors",
-      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-text/adapter_model.safetensors",
+      "path": "C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-text/adapter_model.safetensors",
       "ext": ".safetensors",
       "sizeMB": 140.08,
       "category": "vendor_canonical"

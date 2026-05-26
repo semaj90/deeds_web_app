@@ -10,6 +10,7 @@ export type RoutingExplanation = {
   profile: string;
   lexicalClusters: string[];
   topologyClusters: string[];
+  hotClusters: string[];
   profileClusters: string[];
   taskClusters: string[];
   finalClusters: string[];
@@ -18,6 +19,54 @@ export type RoutingExplanation = {
   fallbacks: string[];
   redisCards: string[];
   taskDistillate?: string;
+  subgraphSeedEnvelope?: {
+    version: string;
+    contract: {
+      query: string | null;
+      filePath: string | null;
+      route: string | null;
+      symbol: string | null;
+    };
+    caps: {
+      maxSeeds: number;
+      maxNeighbors: number;
+      maxHops: 1 | 2;
+    };
+    labels: {
+      centroid_label: string | null;
+      topology_label: string | null;
+      cluster_key: string | null;
+      hotness_bucket: string;
+      feature_family: string;
+      tags: Record<string, string | number | boolean | null | string[]>;
+    };
+    primaryFileTargets: string[];
+    seeds: Array<{
+      kind: string;
+      key: string;
+      score: number;
+      label: string;
+      reasons: string[];
+      stableKey?: string;
+      filePath?: string;
+      route?: string;
+      symbol?: string;
+      clusterId?: number;
+    }>;
+    neighborhood: Array<{
+      kind: string;
+      key: string;
+      score: number;
+      label: string;
+      reasons: string[];
+      stableKey?: string;
+      filePath?: string;
+      route?: string;
+      symbol?: string;
+      clusterId?: number;
+      pagerank?: number | null;
+    }>;
+  };
   engram?: {
     enabled: boolean;
     didYouMean?: string;
@@ -32,6 +81,7 @@ export class RoutingExplanationBuilder {
     profile: 'general',
     lexicalClusters: [],
     topologyClusters: [],
+    hotClusters: [],
     profileClusters: [],
     taskClusters: [],
     finalClusters: [],
@@ -53,6 +103,11 @@ export class RoutingExplanationBuilder {
 
   public setTopologyClusters(ids: number[]) {
     this.explanation.topologyClusters = ids.map(String);
+    return this;
+  }
+
+  public setHotClusters(ids: number[]) {
+    this.explanation.hotClusters = [...new Set(ids)].map(String);
     return this;
   }
 
@@ -84,6 +139,13 @@ export class RoutingExplanationBuilder {
 
   public addRedisCard(id: number) {
     this.explanation.redisCards.push(`ace:cluster:${id}`);
+    return this;
+  }
+
+  public setSubgraphSeedEnvelope(
+    envelope: RoutingExplanation['subgraphSeedEnvelope']
+  ) {
+    this.explanation.subgraphSeedEnvelope = envelope;
     return this;
   }
 

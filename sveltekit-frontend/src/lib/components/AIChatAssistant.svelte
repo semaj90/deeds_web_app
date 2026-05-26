@@ -1,12 +1,14 @@
 <script lang="ts">
- let { caseId, initialContext }: { caseId: string; initialContext: string } = $props();
+  import { chat } from '$lib/ai/unified-generation.js';
+
+  let { caseId, initialContext }: { caseId: string; initialContext: string } = $props();
 
 	let messages = $state<{ sender: 'user' | 'ai', text: string }[]>([]);
 
 	$effect(() => {
 		messages = [{
 			sender: 'ai',
-			text: `Hello! I'm your AI Legal Assistant for Case ID: ${caseId}. How can I help you today?`
+			text: `Hello! I'm your AI Legal Assistant. How can I help you analyze this context?`
 		}];
 	});
  let currentInput = $state('');
@@ -20,12 +22,25 @@
  currentInput = '';
  isThinking = true;
 
- // Simulate AI response
- await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
+ try {
+  const history = messages.slice(0, -1).map(m => ({
+  role: m.sender === 'ai' ? 'assistant' : 'user',
+  content: m.text
+  }));
 
- const aiResponse = `Acknowledged: "${userMessage}". Based on the context of Case ID ${ caseId } and your request, I am generating a detailed analysis.`;
- messages = [...messages, { sender: 'ai', text: aiResponse }];
- isThinking = false;
+  // Prepend initial context invisibly to the first interaction
+  const prompt = history.length === 1 
+  ? `Context for analysis: ${initialContext}\n\nUser Question: ${userMessage}`
+  : userMessage;
+
+  const aiResponse = await chat(prompt, { history });
+  messages = [...messages, { sender: 'ai', text: aiResponse }];
+ } catch (error) {
+  messages = [...messages, { sender: 'ai', text: 'Error generating response. Please try again.' }];
+  console.error('Chat error:', error);
+ } finally {
+  isThinking = false;
+ }
  }
 </script>
 

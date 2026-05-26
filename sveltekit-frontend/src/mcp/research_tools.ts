@@ -56,7 +56,7 @@ export function registerResearchTools(server: McpServer) {
    * Returns answer + confidence + cache tier + trace_id.
    *
    * The synth container is already running (docker compose --profile gpu) and
-   * auto-discovers Ollama models including gemma4-hermes-64k:latest.
+   * auto-discovers Ollama models including gemma4-rotorquant:latest.
    */
   server.registerTool(
     'research.synthesize',

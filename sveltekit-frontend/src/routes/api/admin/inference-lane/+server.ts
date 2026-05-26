@@ -24,7 +24,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			ctxMax: mainSlot?.n_ctx ?? 4096,
 			strategy: 'RotorQuant Q8_0',
 			flashAttn: true,
-			model: props.default_generation_settings?.model || 'gemma4-legal'
+			model: props.default_generation_settings?.model || 'gemma4-rotorquant:latest'
 		});
 	} catch (err) {
 		console.error('[Inference Lane API] Error:', err);

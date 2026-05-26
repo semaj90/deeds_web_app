@@ -96,7 +96,7 @@ async function runOllamaResearch(
       { role: 'system', content: system },
       { role: 'user', content: selfPrompt },
     ],
-    'gemma4-legal:latest',
+    'gemma4-rotorquant:latest',
     { temperature: 0.3, maxTokens: 1536, timeoutMs: 120_000 }
   );
 

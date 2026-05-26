@@ -65,7 +65,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// 2. Generate recommendations via Ollama
 		const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-		const MODEL = 'gemma4-legal:latest';
+		const MODEL = 'gemma4-rotorquant:latest';
 
 		const prompt = `You are a legal case analyst. Based on the query and evidence context below, provide investigation recommendations.
 

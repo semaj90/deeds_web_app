@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-19T02:31:44.583Z",
+  "generatedAt": "2026-05-22T16:22:51.722Z",
   "queries": [
     {
       "query": "why does the evidence upload modal reject files when qdrant is healthy and the Redis cache shows old gpu:karpathy:scores values",
@@ -52,6 +52,98 @@
           0.1
         ]
       },
+      "perSubquery": [
+        {
+          "subquery": "why does the evidence upload modal reject files when qdrant is healthy",
+          "parse": {
+            "files": [],
+            "ports": [],
+            "services": [
+              "qdrant"
+            ],
+            "errors": [],
+            "commands": [],
+            "concepts": []
+          },
+          "signal": {
+            "semantic": 0.9,
+            "lexical": 0.3,
+            "graph": 0.25,
+            "trust": 0.1,
+            "total": 0.48333333333333334,
+            "messy": false
+          },
+          "routing": {
+            "laneWeights": {
+              "chr97": 0.361,
+              "hyperrag": 0.225,
+              "graphrag": 0.227,
+              "mcp": 0.187
+            },
+            "dispatch": [
+              "chr97"
+            ],
+            "raw": [
+              0.9475,
+              0.4750000000000001,
+              0.48500000000000004,
+              0.28750000000000003
+            ],
+            "vector": [
+              0.9,
+              0.3,
+              0.25,
+              0.1
+            ]
+          }
+        },
+        {
+          "subquery": "the Redis cache shows old gpu:karpathy:scores values",
+          "parse": {
+            "files": [],
+            "ports": [],
+            "services": [
+              "Redis"
+            ],
+            "errors": [],
+            "commands": [],
+            "concepts": [
+              "cache"
+            ]
+          },
+          "signal": {
+            "semantic": 0.4,
+            "lexical": 0.9,
+            "graph": 0.25,
+            "trust": 0.1,
+            "total": 0.5166666666666667,
+            "messy": false
+          },
+          "routing": {
+            "laneWeights": {
+              "chr97": 0.278,
+              "hyperrag": 0.315,
+              "graphrag": 0.222,
+              "mcp": 0.186
+            },
+            "dispatch": [
+              "hyperrag"
+            ],
+            "raw": [
+              0.7325,
+              0.8550000000000001,
+              0.505,
+              0.3275
+            ],
+            "vector": [
+              0.4,
+              0.9,
+              0.25,
+              0.1
+            ]
+          }
+        }
+      ],
       "chr97": {
         "path": "CHR97 fast path",
         "selected": false,
@@ -70,12 +162,274 @@
           "graphrag": 0.202,
           "mcp": 0.161
         },
-        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 is not confident enough"
+        "stores": [
+          "qdrant",
+          "postgres",
+          "neo4j",
+          "redis-bitfrost"
+        ],
+        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 confidence <= 0.7"
       },
       "toolPlan": [
         {
           "tool": "mcp:service-inspector",
           "reason": "query references runtime services/protocols"
+        }
+      ],
+      "boundary": {
+        "mcp": {
+          "role": "tool permissions + execution guardrail",
+          "proposedTools": [
+            "mcp:service-inspector"
+          ],
+          "requireAllowlistValidation": true,
+          "allowlistedCommands": [
+            "docker",
+            "npm",
+            "git",
+            "redis-cli",
+            "psql",
+            "qdrant"
+          ]
+        },
+        "grpc": {
+          "role": "fast internal compute services",
+          "calls": [
+            {
+              "service": "embeddings",
+              "purpose": "query + subquery vectorization"
+            },
+            {
+              "service": "rerank",
+              "purpose": "cross-lane reranking"
+            },
+            {
+              "service": "vector-ops",
+              "purpose": "fast similarity / merge operations"
+            }
+          ]
+        }
+      },
+      "langGraphWorkflow": {
+        "name": "messy-query-orchestrator",
+        "stages": [
+          {
+            "stage": "parse",
+            "status": "ok",
+            "output": {
+              "entities": {
+                "files": [],
+                "ports": [],
+                "services": [
+                  "qdrant",
+                  "Redis"
+                ],
+                "errors": [],
+                "commands": [],
+                "concepts": [
+                  "cache"
+                ]
+              },
+              "subqueryCount": 2
+            }
+          },
+          {
+            "stage": "route",
+            "status": "ok",
+            "output": {
+              "perSubquery": [
+                {
+                  "subquery": "why does the evidence upload modal reject files when qdrant is healthy",
+                  "parse": {
+                    "files": [],
+                    "ports": [],
+                    "services": [
+                      "qdrant"
+                    ],
+                    "errors": [],
+                    "commands": [],
+                    "concepts": []
+                  },
+                  "signal": {
+                    "semantic": 0.9,
+                    "lexical": 0.3,
+                    "graph": 0.25,
+                    "trust": 0.1,
+                    "total": 0.48333333333333334,
+                    "messy": false
+                  },
+                  "routing": {
+                    "laneWeights": {
+                      "chr97": 0.361,
+                      "hyperrag": 0.225,
+                      "graphrag": 0.227,
+                      "mcp": 0.187
+                    },
+                    "dispatch": [
+                      "chr97"
+                    ],
+                    "raw": [
+                      0.9475,
+                      0.4750000000000001,
+                      0.48500000000000004,
+                      0.28750000000000003
+                    ],
+                    "vector": [
+                      0.9,
+                      0.3,
+                      0.25,
+                      0.1
+                    ]
+                  }
+                },
+                {
+                  "subquery": "the Redis cache shows old gpu:karpathy:scores values",
+                  "parse": {
+                    "files": [],
+                    "ports": [],
+                    "services": [
+                      "Redis"
+                    ],
+                    "errors": [],
+                    "commands": [],
+                    "concepts": [
+                      "cache"
+                    ]
+                  },
+                  "signal": {
+                    "semantic": 0.4,
+                    "lexical": 0.9,
+                    "graph": 0.25,
+                    "trust": 0.1,
+                    "total": 0.5166666666666667,
+                    "messy": false
+                  },
+                  "routing": {
+                    "laneWeights": {
+                      "chr97": 0.278,
+                      "hyperrag": 0.315,
+                      "graphrag": 0.222,
+                      "mcp": 0.186
+                    },
+                    "dispatch": [
+                      "hyperrag"
+                    ],
+                    "raw": [
+                      0.7325,
+                      0.8550000000000001,
+                      0.505,
+                      0.3275
+                    ],
+                    "vector": [
+                      0.4,
+                      0.9,
+                      0.25,
+                      0.1
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "stage": "retrieve",
+            "status": "fallback",
+            "output": {
+              "path": "HyperRAG fallback",
+              "lanes": [
+                "hyperrag"
+              ],
+              "gating": {
+                "chr97": 0.351,
+                "hyperrag": 0.286,
+                "graphrag": 0.202,
+                "mcp": 0.161
+              },
+              "stores": [
+                "qdrant",
+                "postgres",
+                "neo4j",
+                "redis-bitfrost"
+              ],
+              "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 confidence <= 0.7"
+            }
+          },
+          {
+            "stage": "tool-plan",
+            "status": "ok",
+            "output": [
+              {
+                "tool": "mcp:service-inspector",
+                "reason": "query references runtime services/protocols"
+              }
+            ]
+          },
+          {
+            "stage": "validate",
+            "status": "ok",
+            "output": {
+              "guardrail": "Hermes allowlist required for actions",
+              "hasActionRequest": false
+            }
+          },
+          {
+            "stage": "synthesize",
+            "status": "ok",
+            "output": {
+              "model": "gemma4-rotorquant:latest",
+              "includeSourceRefs": true,
+              "packetMergeStrategy": "merge lane packets + synthesis log"
+            }
+          }
+        ],
+        "summary": {
+          "query": "why does the evidence upload modal reject files when qdrant is healthy and the Redis cache shows old gpu:karpathy:scores values",
+          "strategy": "HyperRAG fallback"
+        }
+      },
+      "acePacket": {
+        "packetId": "ace-77687920646f",
+        "sourceRefs": [],
+        "synthesisLog": {
+          "query": "why does the evidence upload modal reject files when qdrant is healthy and the Redis cache shows old gpu:karpathy:scores values",
+          "subqueries": [
+            "why does the evidence upload modal reject files when qdrant is healthy",
+            "the Redis cache shows old gpu:karpathy:scores values"
+          ],
+          "lanes": [
+            {
+              "subquery": "why does the evidence upload modal reject files when qdrant is healthy",
+              "dispatch": [
+                "chr97"
+              ]
+            },
+            {
+              "subquery": "the Redis cache shows old gpu:karpathy:scores values",
+              "dispatch": [
+                "hyperrag"
+              ]
+            }
+          ]
+        }
+      },
+      "relevantDocs": [
+        {
+          "title": "Parent Atlas Karpathy Pipeline",
+          "path": "docs/architecture/parent-atlas-karpathy-pipeline.md",
+          "reason": "CHR97, Atlas, and retrieval-stage architecture context",
+          "score": 7.05
+        },
+        {
+          "title": "Karpathy LLM Wiki",
+          "path": "docs/codebase_atlas/karpathy_llmwiki.md",
+          "reason": "Higher-level codebase atlas and synthesis reference",
+          "score": 5.05
+        },
+        {
+          "title": "Repo SvelteKit Route Atlas",
+          "path": "docs/graph/repo-sveltekit-route-atlas.md",
+          "reason": "Route-level surface map for app/API retrieval grounding",
+          "score": 4.35
         }
       ]
     },
@@ -128,6 +482,96 @@
           0.1
         ]
       },
+      "perSubquery": [
+        {
+          "subquery": "find dependency path between src/lib/server/ace/context-assembler.ts",
+          "parse": {
+            "files": [
+              "src/lib/server/ace/context-assembler.ts"
+            ],
+            "ports": [],
+            "services": [],
+            "errors": [],
+            "commands": [],
+            "concepts": []
+          },
+          "signal": {
+            "semantic": 0.4,
+            "lexical": 0.9,
+            "graph": 0.85,
+            "trust": 0.1,
+            "total": 0.7166666666666667,
+            "messy": false
+          },
+          "routing": {
+            "laneWeights": {
+              "chr97": 0.258,
+              "hyperrag": 0.266,
+              "graphrag": 0.303,
+              "mcp": 0.172
+            },
+            "dispatch": [
+              "graphrag"
+            ],
+            "raw": [
+              0.8825000000000001,
+              0.915,
+              1.045,
+              0.47750000000000004
+            ],
+            "vector": [
+              0.4,
+              0.9,
+              0.85,
+              0.1
+            ]
+          }
+        },
+        {
+          "subquery": "qdrant cluster prefilter code",
+          "parse": {
+            "files": [],
+            "ports": [],
+            "services": [
+              "qdrant"
+            ],
+            "errors": [],
+            "commands": [],
+            "concepts": []
+          },
+          "signal": {
+            "semantic": 0.4,
+            "lexical": 0.3,
+            "graph": 0.85,
+            "trust": 0.1,
+            "total": 0.5166666666666666,
+            "messy": false
+          },
+          "routing": {
+            "laneWeights": {
+              "chr97": 0.261,
+              "hyperrag": 0.206,
+              "graphrag": 0.336,
+              "mcp": 0.196
+            },
+            "dispatch": [
+              "graphrag"
+            ],
+            "raw": [
+              0.6725,
+              0.43500000000000005,
+              0.925,
+              0.3875
+            ],
+            "vector": [
+              0.4,
+              0.3,
+              0.85,
+              0.1
+            ]
+          }
+        }
+      ],
       "chr97": {
         "path": "CHR97 fast path",
         "selected": false,
@@ -146,7 +590,13 @@
           "graphrag": 0.303,
           "mcp": 0.172
         },
-        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 is not confident enough"
+        "stores": [
+          "qdrant",
+          "postgres",
+          "neo4j",
+          "redis-bitfrost"
+        ],
+        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 confidence <= 0.7"
       },
       "toolPlan": [
         {
@@ -156,6 +606,266 @@
         {
           "tool": "mcp:codebase-file-lens",
           "reason": "query includes repo-relative files"
+        }
+      ],
+      "boundary": {
+        "mcp": {
+          "role": "tool permissions + execution guardrail",
+          "proposedTools": [
+            "mcp:service-inspector",
+            "mcp:codebase-file-lens"
+          ],
+          "requireAllowlistValidation": true,
+          "allowlistedCommands": [
+            "docker",
+            "npm",
+            "git",
+            "redis-cli",
+            "psql",
+            "qdrant"
+          ]
+        },
+        "grpc": {
+          "role": "fast internal compute services",
+          "calls": [
+            {
+              "service": "embeddings",
+              "purpose": "query + subquery vectorization"
+            },
+            {
+              "service": "rerank",
+              "purpose": "cross-lane reranking"
+            },
+            {
+              "service": "vector-ops",
+              "purpose": "fast similarity / merge operations"
+            }
+          ]
+        }
+      },
+      "langGraphWorkflow": {
+        "name": "messy-query-orchestrator",
+        "stages": [
+          {
+            "stage": "parse",
+            "status": "ok",
+            "output": {
+              "entities": {
+                "files": [
+                  "src/lib/server/ace/context-assembler.ts"
+                ],
+                "ports": [],
+                "services": [
+                  "qdrant"
+                ],
+                "errors": [],
+                "commands": [],
+                "concepts": []
+              },
+              "subqueryCount": 2
+            }
+          },
+          {
+            "stage": "route",
+            "status": "ok",
+            "output": {
+              "perSubquery": [
+                {
+                  "subquery": "find dependency path between src/lib/server/ace/context-assembler.ts",
+                  "parse": {
+                    "files": [
+                      "src/lib/server/ace/context-assembler.ts"
+                    ],
+                    "ports": [],
+                    "services": [],
+                    "errors": [],
+                    "commands": [],
+                    "concepts": []
+                  },
+                  "signal": {
+                    "semantic": 0.4,
+                    "lexical": 0.9,
+                    "graph": 0.85,
+                    "trust": 0.1,
+                    "total": 0.7166666666666667,
+                    "messy": false
+                  },
+                  "routing": {
+                    "laneWeights": {
+                      "chr97": 0.258,
+                      "hyperrag": 0.266,
+                      "graphrag": 0.303,
+                      "mcp": 0.172
+                    },
+                    "dispatch": [
+                      "graphrag"
+                    ],
+                    "raw": [
+                      0.8825000000000001,
+                      0.915,
+                      1.045,
+                      0.47750000000000004
+                    ],
+                    "vector": [
+                      0.4,
+                      0.9,
+                      0.85,
+                      0.1
+                    ]
+                  }
+                },
+                {
+                  "subquery": "qdrant cluster prefilter code",
+                  "parse": {
+                    "files": [],
+                    "ports": [],
+                    "services": [
+                      "qdrant"
+                    ],
+                    "errors": [],
+                    "commands": [],
+                    "concepts": []
+                  },
+                  "signal": {
+                    "semantic": 0.4,
+                    "lexical": 0.3,
+                    "graph": 0.85,
+                    "trust": 0.1,
+                    "total": 0.5166666666666666,
+                    "messy": false
+                  },
+                  "routing": {
+                    "laneWeights": {
+                      "chr97": 0.261,
+                      "hyperrag": 0.206,
+                      "graphrag": 0.336,
+                      "mcp": 0.196
+                    },
+                    "dispatch": [
+                      "graphrag"
+                    ],
+                    "raw": [
+                      0.6725,
+                      0.43500000000000005,
+                      0.925,
+                      0.3875
+                    ],
+                    "vector": [
+                      0.4,
+                      0.3,
+                      0.85,
+                      0.1
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "stage": "retrieve",
+            "status": "fallback",
+            "output": {
+              "path": "HyperRAG fallback",
+              "lanes": [
+                "graphrag"
+              ],
+              "gating": {
+                "chr97": 0.258,
+                "hyperrag": 0.266,
+                "graphrag": 0.303,
+                "mcp": 0.172
+              },
+              "stores": [
+                "qdrant",
+                "postgres",
+                "neo4j",
+                "redis-bitfrost"
+              ],
+              "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 confidence <= 0.7"
+            }
+          },
+          {
+            "stage": "tool-plan",
+            "status": "ok",
+            "output": [
+              {
+                "tool": "mcp:service-inspector",
+                "reason": "query references runtime services/protocols"
+              },
+              {
+                "tool": "mcp:codebase-file-lens",
+                "reason": "query includes repo-relative files"
+              }
+            ]
+          },
+          {
+            "stage": "validate",
+            "status": "ok",
+            "output": {
+              "guardrail": "Hermes allowlist required for actions",
+              "hasActionRequest": false
+            }
+          },
+          {
+            "stage": "synthesize",
+            "status": "ok",
+            "output": {
+              "model": "gemma4-rotorquant:latest",
+              "includeSourceRefs": true,
+              "packetMergeStrategy": "merge lane packets + synthesis log"
+            }
+          }
+        ],
+        "summary": {
+          "query": "find dependency path between src/lib/server/ace/context-assembler.ts and qdrant cluster prefilter code",
+          "strategy": "HyperRAG fallback"
+        }
+      },
+      "acePacket": {
+        "packetId": "ace-66696e642064",
+        "sourceRefs": [
+          "src/lib/server/ace/context-assembler.ts"
+        ],
+        "synthesisLog": {
+          "query": "find dependency path between src/lib/server/ace/context-assembler.ts and qdrant cluster prefilter code",
+          "subqueries": [
+            "find dependency path between src/lib/server/ace/context-assembler.ts",
+            "qdrant cluster prefilter code"
+          ],
+          "lanes": [
+            {
+              "subquery": "find dependency path between src/lib/server/ace/context-assembler.ts",
+              "dispatch": [
+                "graphrag"
+              ]
+            },
+            {
+              "subquery": "qdrant cluster prefilter code",
+              "dispatch": [
+                "graphrag"
+              ]
+            }
+          ]
+        }
+      },
+      "relevantDocs": [
+        {
+          "title": "Neo4j GraphRAG Parent Atlas",
+          "path": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+          "reason": "GraphRAG and topology-backed fallback behavior",
+          "score": 5.9
+        },
+        {
+          "title": "Repo SvelteKit Route Atlas",
+          "path": "docs/graph/repo-sveltekit-route-atlas.md",
+          "reason": "Route-level surface map for app/API retrieval grounding",
+          "score": 1.5
+        },
+        {
+          "title": "Karpathy LLM Wiki",
+          "path": "docs/codebase_atlas/karpathy_llmwiki.md",
+          "reason": "Higher-level codebase atlas and synthesis reference",
+          "score": 1.5
         }
       ]
     },
@@ -213,6 +923,60 @@
           0.1
         ]
       },
+      "perSubquery": [
+        {
+          "subquery": "check if Neo4j graph retrieval can explain failure of hermes tool output for TurboQuant router",
+          "parse": {
+            "files": [],
+            "ports": [],
+            "services": [
+              "Neo4j",
+              "hermes",
+              "TurboQuant"
+            ],
+            "errors": [
+              "failure"
+            ],
+            "commands": [],
+            "concepts": [
+              "retrieval",
+              "tool",
+              "router"
+            ]
+          },
+          "signal": {
+            "semantic": 0.9,
+            "lexical": 0.9,
+            "graph": 0.85,
+            "trust": 0.1,
+            "total": 0.8833333333333333,
+            "messy": false
+          },
+          "routing": {
+            "laneWeights": {
+              "chr97": 0.327,
+              "hyperrag": 0.244,
+              "graphrag": 0.278,
+              "mcp": 0.15
+            },
+            "dispatch": [
+              "chr97"
+            ],
+            "raw": [
+              1.3074999999999999,
+              1.0150000000000001,
+              1.145,
+              0.5275
+            ],
+            "vector": [
+              0.9,
+              0.9,
+              0.85,
+              0.1
+            ]
+          }
+        }
+      ],
       "chr97": {
         "path": "CHR97 fast path",
         "selected": false,
@@ -229,7 +993,13 @@
           "graphrag": 0.278,
           "mcp": 0.15
         },
-        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 is not confident enough"
+        "stores": [
+          "qdrant",
+          "postgres",
+          "neo4j",
+          "redis-bitfrost"
+        ],
+        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 confidence <= 0.7"
       },
       "toolPlan": [
         {
@@ -247,6 +1017,233 @@
         {
           "tool": "mcp:service-inspector",
           "reason": "query references runtime services/protocols"
+        }
+      ],
+      "boundary": {
+        "mcp": {
+          "role": "tool permissions + execution guardrail",
+          "proposedTools": [
+            "mcp:command-checker",
+            "mcp:service-inspector"
+          ],
+          "requireAllowlistValidation": true,
+          "allowlistedCommands": [
+            "docker",
+            "npm",
+            "git",
+            "redis-cli",
+            "psql",
+            "qdrant"
+          ]
+        },
+        "grpc": {
+          "role": "fast internal compute services",
+          "calls": [
+            {
+              "service": "embeddings",
+              "purpose": "query + subquery vectorization"
+            },
+            {
+              "service": "rerank",
+              "purpose": "cross-lane reranking"
+            },
+            {
+              "service": "vector-ops",
+              "purpose": "fast similarity / merge operations"
+            }
+          ]
+        }
+      },
+      "langGraphWorkflow": {
+        "name": "messy-query-orchestrator",
+        "stages": [
+          {
+            "stage": "parse",
+            "status": "ok",
+            "output": {
+              "entities": {
+                "files": [],
+                "ports": [],
+                "services": [
+                  "Neo4j",
+                  "hermes",
+                  "TurboQuant"
+                ],
+                "errors": [
+                  "failure"
+                ],
+                "commands": [],
+                "concepts": [
+                  "retrieval",
+                  "tool",
+                  "router"
+                ]
+              },
+              "subqueryCount": 1
+            }
+          },
+          {
+            "stage": "route",
+            "status": "ok",
+            "output": {
+              "perSubquery": [
+                {
+                  "subquery": "check if Neo4j graph retrieval can explain failure of hermes tool output for TurboQuant router",
+                  "parse": {
+                    "files": [],
+                    "ports": [],
+                    "services": [
+                      "Neo4j",
+                      "hermes",
+                      "TurboQuant"
+                    ],
+                    "errors": [
+                      "failure"
+                    ],
+                    "commands": [],
+                    "concepts": [
+                      "retrieval",
+                      "tool",
+                      "router"
+                    ]
+                  },
+                  "signal": {
+                    "semantic": 0.9,
+                    "lexical": 0.9,
+                    "graph": 0.85,
+                    "trust": 0.1,
+                    "total": 0.8833333333333333,
+                    "messy": false
+                  },
+                  "routing": {
+                    "laneWeights": {
+                      "chr97": 0.327,
+                      "hyperrag": 0.244,
+                      "graphrag": 0.278,
+                      "mcp": 0.15
+                    },
+                    "dispatch": [
+                      "chr97"
+                    ],
+                    "raw": [
+                      1.3074999999999999,
+                      1.0150000000000001,
+                      1.145,
+                      0.5275
+                    ],
+                    "vector": [
+                      0.9,
+                      0.9,
+                      0.85,
+                      0.1
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "stage": "retrieve",
+            "status": "fallback",
+            "output": {
+              "path": "HyperRAG fallback",
+              "lanes": [],
+              "gating": {
+                "chr97": 0.327,
+                "hyperrag": 0.244,
+                "graphrag": 0.278,
+                "mcp": 0.15
+              },
+              "stores": [
+                "qdrant",
+                "postgres",
+                "neo4j",
+                "redis-bitfrost"
+              ],
+              "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 confidence <= 0.7"
+            }
+          },
+          {
+            "stage": "tool-plan",
+            "status": "ok",
+            "output": [
+              {
+                "tool": "mcp:command-checker",
+                "reason": "query asks for action or execution",
+                "allowlist": [
+                  "docker",
+                  "npm",
+                  "git",
+                  "redis",
+                  "qdrant",
+                  "psql"
+                ]
+              },
+              {
+                "tool": "mcp:service-inspector",
+                "reason": "query references runtime services/protocols"
+              }
+            ]
+          },
+          {
+            "stage": "validate",
+            "status": "ok",
+            "output": {
+              "guardrail": "Hermes allowlist required for actions",
+              "hasActionRequest": true
+            }
+          },
+          {
+            "stage": "synthesize",
+            "status": "ok",
+            "output": {
+              "model": "gemma4-rotorquant:latest",
+              "includeSourceRefs": true,
+              "packetMergeStrategy": "merge lane packets + synthesis log"
+            }
+          }
+        ],
+        "summary": {
+          "query": "check if Neo4j graph retrieval can explain failure of hermes tool output for TurboQuant router",
+          "strategy": "HyperRAG fallback"
+        }
+      },
+      "acePacket": {
+        "packetId": "ace-636865636b20",
+        "sourceRefs": [],
+        "synthesisLog": {
+          "query": "check if Neo4j graph retrieval can explain failure of hermes tool output for TurboQuant router",
+          "subqueries": [
+            "check if Neo4j graph retrieval can explain failure of hermes tool output for TurboQuant router"
+          ],
+          "lanes": [
+            {
+              "subquery": "check if Neo4j graph retrieval can explain failure of hermes tool output for TurboQuant router",
+              "dispatch": [
+                "chr97"
+              ]
+            }
+          ]
+        }
+      },
+      "relevantDocs": [
+        {
+          "title": "Parent Atlas Karpathy Pipeline",
+          "path": "docs/architecture/parent-atlas-karpathy-pipeline.md",
+          "reason": "CHR97, Atlas, and retrieval-stage architecture context",
+          "score": 5.2
+        },
+        {
+          "title": "Legal AI Parent Atlas Product Integration",
+          "path": "docs/architecture/legal-ai-parent-atlas-product-integration.md",
+          "reason": "How retrieval and synthesis connect to product-facing flows",
+          "score": 3.5
+        },
+        {
+          "title": "Karpathy LLM Wiki",
+          "path": "docs/codebase_atlas/karpathy_llmwiki.md",
+          "reason": "Higher-level codebase atlas and synthesis reference",
+          "score": 2.2
         }
       ]
     },
@@ -300,6 +1297,96 @@
           0.1
         ]
       },
+      "perSubquery": [
+        {
+          "subquery": "run a safe grep for old postgres migrations",
+          "parse": {
+            "files": [],
+            "ports": [],
+            "services": [
+              "postgres"
+            ],
+            "errors": [],
+            "commands": [],
+            "concepts": []
+          },
+          "signal": {
+            "semantic": 0.4,
+            "lexical": 0.9,
+            "graph": 0.25,
+            "trust": 0.1,
+            "total": 0.5166666666666667,
+            "messy": false
+          },
+          "routing": {
+            "laneWeights": {
+              "chr97": 0.278,
+              "hyperrag": 0.315,
+              "graphrag": 0.222,
+              "mcp": 0.186
+            },
+            "dispatch": [
+              "hyperrag"
+            ],
+            "raw": [
+              0.7325,
+              0.8550000000000001,
+              0.505,
+              0.3275
+            ],
+            "vector": [
+              0.4,
+              0.9,
+              0.25,
+              0.1
+            ]
+          }
+        },
+        {
+          "subquery": "explain why user_id mismatch happens in drift cases",
+          "parse": {
+            "files": [],
+            "ports": [],
+            "services": [],
+            "errors": [
+              "mismatch"
+            ],
+            "commands": [],
+            "concepts": []
+          },
+          "signal": {
+            "semantic": 0.9,
+            "lexical": 0.3,
+            "graph": 0.25,
+            "trust": 0.1,
+            "total": 0.48333333333333334,
+            "messy": false
+          },
+          "routing": {
+            "laneWeights": {
+              "chr97": 0.361,
+              "hyperrag": 0.225,
+              "graphrag": 0.227,
+              "mcp": 0.187
+            },
+            "dispatch": [
+              "chr97"
+            ],
+            "raw": [
+              0.9475,
+              0.4750000000000001,
+              0.48500000000000004,
+              0.28750000000000003
+            ],
+            "vector": [
+              0.9,
+              0.3,
+              0.25,
+              0.1
+            ]
+          }
+        }
+      ],
       "chr97": {
         "path": "CHR97 fast path",
         "selected": false,
@@ -318,7 +1405,13 @@
           "graphrag": 0.202,
           "mcp": 0.161
         },
-        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 is not confident enough"
+        "stores": [
+          "qdrant",
+          "postgres",
+          "neo4j",
+          "redis-bitfrost"
+        ],
+        "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 confidence <= 0.7"
       },
       "toolPlan": [
         {
@@ -337,9 +1430,420 @@
           "tool": "mcp:service-inspector",
           "reason": "query references runtime services/protocols"
         }
+      ],
+      "boundary": {
+        "mcp": {
+          "role": "tool permissions + execution guardrail",
+          "proposedTools": [
+            "mcp:command-checker",
+            "mcp:service-inspector"
+          ],
+          "requireAllowlistValidation": true,
+          "allowlistedCommands": [
+            "docker",
+            "npm",
+            "git",
+            "redis-cli",
+            "psql",
+            "qdrant"
+          ]
+        },
+        "grpc": {
+          "role": "fast internal compute services",
+          "calls": [
+            {
+              "service": "embeddings",
+              "purpose": "query + subquery vectorization"
+            },
+            {
+              "service": "rerank",
+              "purpose": "cross-lane reranking"
+            },
+            {
+              "service": "vector-ops",
+              "purpose": "fast similarity / merge operations"
+            }
+          ]
+        }
+      },
+      "langGraphWorkflow": {
+        "name": "messy-query-orchestrator",
+        "stages": [
+          {
+            "stage": "parse",
+            "status": "ok",
+            "output": {
+              "entities": {
+                "files": [],
+                "ports": [],
+                "services": [
+                  "postgres"
+                ],
+                "errors": [
+                  "mismatch"
+                ],
+                "commands": [],
+                "concepts": []
+              },
+              "subqueryCount": 2
+            }
+          },
+          {
+            "stage": "route",
+            "status": "ok",
+            "output": {
+              "perSubquery": [
+                {
+                  "subquery": "run a safe grep for old postgres migrations",
+                  "parse": {
+                    "files": [],
+                    "ports": [],
+                    "services": [
+                      "postgres"
+                    ],
+                    "errors": [],
+                    "commands": [],
+                    "concepts": []
+                  },
+                  "signal": {
+                    "semantic": 0.4,
+                    "lexical": 0.9,
+                    "graph": 0.25,
+                    "trust": 0.1,
+                    "total": 0.5166666666666667,
+                    "messy": false
+                  },
+                  "routing": {
+                    "laneWeights": {
+                      "chr97": 0.278,
+                      "hyperrag": 0.315,
+                      "graphrag": 0.222,
+                      "mcp": 0.186
+                    },
+                    "dispatch": [
+                      "hyperrag"
+                    ],
+                    "raw": [
+                      0.7325,
+                      0.8550000000000001,
+                      0.505,
+                      0.3275
+                    ],
+                    "vector": [
+                      0.4,
+                      0.9,
+                      0.25,
+                      0.1
+                    ]
+                  }
+                },
+                {
+                  "subquery": "explain why user_id mismatch happens in drift cases",
+                  "parse": {
+                    "files": [],
+                    "ports": [],
+                    "services": [],
+                    "errors": [
+                      "mismatch"
+                    ],
+                    "commands": [],
+                    "concepts": []
+                  },
+                  "signal": {
+                    "semantic": 0.9,
+                    "lexical": 0.3,
+                    "graph": 0.25,
+                    "trust": 0.1,
+                    "total": 0.48333333333333334,
+                    "messy": false
+                  },
+                  "routing": {
+                    "laneWeights": {
+                      "chr97": 0.361,
+                      "hyperrag": 0.225,
+                      "graphrag": 0.227,
+                      "mcp": 0.187
+                    },
+                    "dispatch": [
+                      "chr97"
+                    ],
+                    "raw": [
+                      0.9475,
+                      0.4750000000000001,
+                      0.48500000000000004,
+                      0.28750000000000003
+                    ],
+                    "vector": [
+                      0.9,
+                      0.3,
+                      0.25,
+                      0.1
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "stage": "retrieve",
+            "status": "fallback",
+            "output": {
+              "path": "HyperRAG fallback",
+              "lanes": [
+                "hyperrag"
+              ],
+              "gating": {
+                "chr97": 0.351,
+                "hyperrag": 0.286,
+                "graphrag": 0.202,
+                "mcp": 0.161
+              },
+              "stores": [
+                "qdrant",
+                "postgres",
+                "neo4j",
+                "redis-bitfrost"
+              ],
+              "note": "seed HyperRAG with cartridge-proximate chunks if CHR97 confidence <= 0.7"
+            }
+          },
+          {
+            "stage": "tool-plan",
+            "status": "ok",
+            "output": [
+              {
+                "tool": "mcp:command-checker",
+                "reason": "query asks for action or execution",
+                "allowlist": [
+                  "docker",
+                  "npm",
+                  "git",
+                  "redis",
+                  "qdrant",
+                  "psql"
+                ]
+              },
+              {
+                "tool": "mcp:service-inspector",
+                "reason": "query references runtime services/protocols"
+              }
+            ]
+          },
+          {
+            "stage": "validate",
+            "status": "ok",
+            "output": {
+              "guardrail": "Hermes allowlist required for actions",
+              "hasActionRequest": true
+            }
+          },
+          {
+            "stage": "synthesize",
+            "status": "ok",
+            "output": {
+              "model": "gemma4-rotorquant:latest",
+              "includeSourceRefs": true,
+              "packetMergeStrategy": "merge lane packets + synthesis log"
+            }
+          }
+        ],
+        "summary": {
+          "query": "run a safe grep for old postgres migrations and explain why user_id mismatch happens in drift cases",
+          "strategy": "HyperRAG fallback"
+        }
+      },
+      "acePacket": {
+        "packetId": "ace-72756e206120",
+        "sourceRefs": [],
+        "synthesisLog": {
+          "query": "run a safe grep for old postgres migrations and explain why user_id mismatch happens in drift cases",
+          "subqueries": [
+            "run a safe grep for old postgres migrations",
+            "explain why user_id mismatch happens in drift cases"
+          ],
+          "lanes": [
+            {
+              "subquery": "run a safe grep for old postgres migrations",
+              "dispatch": [
+                "hyperrag"
+              ]
+            },
+            {
+              "subquery": "explain why user_id mismatch happens in drift cases",
+              "dispatch": [
+                "chr97"
+              ]
+            }
+          ]
+        }
+      },
+      "relevantDocs": [
+        {
+          "title": "Parent Atlas Karpathy Pipeline",
+          "path": "docs/architecture/parent-atlas-karpathy-pipeline.md",
+          "reason": "CHR97, Atlas, and retrieval-stage architecture context",
+          "score": 6.05
+        },
+        {
+          "title": "Legal AI Parent Atlas Product Integration",
+          "path": "docs/architecture/legal-ai-parent-atlas-product-integration.md",
+          "reason": "How retrieval and synthesis connect to product-facing flows",
+          "score": 4.05
+        },
+        {
+          "title": "Karpathy LLM Wiki",
+          "path": "docs/codebase_atlas/karpathy_llmwiki.md",
+          "reason": "Higher-level codebase atlas and synthesis reference",
+          "score": 4.05
+        }
       ]
     }
   ],
   "sampleKarpathy": [],
-  "summary": {}
+  "documentationRefs": [
+    {
+      "title": "Parent Atlas Karpathy Pipeline",
+      "path": "docs/architecture/parent-atlas-karpathy-pipeline.md",
+      "reason": "CHR97, Atlas, and retrieval-stage architecture context",
+      "tags": [
+        "chr97",
+        "atlas",
+        "retrieval",
+        "pipeline",
+        "cache"
+      ],
+      "lanes": [
+        "chr97",
+        "hyperrag"
+      ]
+    },
+    {
+      "title": "Neo4j GraphRAG Parent Atlas",
+      "path": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "reason": "GraphRAG and topology-backed fallback behavior",
+      "tags": [
+        "neo4j",
+        "graphrag",
+        "graph",
+        "topology",
+        "fallback"
+      ],
+      "lanes": [
+        "graphrag",
+        "hyperrag"
+      ]
+    },
+    {
+      "title": "Legal AI Parent Atlas Product Integration",
+      "path": "docs/architecture/legal-ai-parent-atlas-product-integration.md",
+      "reason": "How retrieval and synthesis connect to product-facing flows",
+      "tags": [
+        "product",
+        "integration",
+        "retrieval",
+        "synthesis",
+        "router"
+      ],
+      "lanes": [
+        "hyperrag",
+        "chr97"
+      ]
+    },
+    {
+      "title": "TRACE KAG Web Development Guide",
+      "path": "docs/architecture/trace-kag-web-development-guide.md",
+      "reason": "Router/tool boundaries and TRACE/KAG implementation rules",
+      "tags": [
+        "trace",
+        "kag",
+        "router",
+        "tools",
+        "mcp"
+      ],
+      "lanes": [
+        "mcp",
+        "hyperrag"
+      ]
+    },
+    {
+      "title": "TRACE Runtime Split",
+      "path": "docs/architecture/trace-runtime-split.md",
+      "reason": "Gemma4, MCP, and raw infra boundary guidance",
+      "tags": [
+        "trace",
+        "runtime",
+        "gemma4",
+        "mcp",
+        "infra"
+      ],
+      "lanes": [
+        "mcp"
+      ]
+    },
+    {
+      "title": "Repo SvelteKit Route Atlas",
+      "path": "docs/graph/repo-sveltekit-route-atlas.md",
+      "reason": "Route-level surface map for app/API retrieval grounding",
+      "tags": [
+        "routes",
+        "api",
+        "sveltekit",
+        "surface",
+        "path"
+      ],
+      "lanes": [
+        "chr97",
+        "hyperrag"
+      ]
+    },
+    {
+      "title": "Karpathy LLM Wiki",
+      "path": "docs/codebase_atlas/karpathy_llmwiki.md",
+      "reason": "Higher-level codebase atlas and synthesis reference",
+      "tags": [
+        "karpathy",
+        "wiki",
+        "atlas",
+        "synthesis",
+        "codebase"
+      ],
+      "lanes": [
+        "chr97",
+        "hyperrag",
+        "graphrag"
+      ]
+    },
+    {
+      "title": "LangGraph API Reference",
+      "path": "memory/langgraph-api-reference.md",
+      "reason": "LangGraph StateGraph, supervisor, and node orchestration reference for workflow design",
+      "tags": [
+        "langgraph",
+        "stategraph",
+        "workflow",
+        "supervisor",
+        "parallel"
+      ],
+      "lanes": [
+        "hyperrag",
+        "mcp"
+      ]
+    }
+  ],
+  "summary": {
+    "totalQueries": 4,
+    "chr97FastPathCount": 0,
+    "fallbackCount": 4,
+    "avgSubqueries": 1.75,
+    "calibration": {
+      "currentThreshold": 0.7,
+      "targetFastRate": 0.3,
+      "currentFastRate": 0,
+      "suggestedThreshold": 0.351,
+      "projectedFastRateAtSuggested": 0.5,
+      "minConfidence": 0.258,
+      "maxConfidence": 0.351,
+      "medianConfidence": 0.351
+    }
+  }
 }

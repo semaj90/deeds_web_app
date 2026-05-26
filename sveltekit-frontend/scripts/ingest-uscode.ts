@@ -5,11 +5,16 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { eq } from 'drizzle-orm';
 import { db } from '../src/lib/server/db/client.js';
 import { statutes, statuteChunks } from '../src/lib/server/db/schema-postgres.js';
-import { generateEmbedding } from '../src/lib/server/services/embedding-service';
+import { generateEmbedding } from '../src/lib/server/grpc/embedding-client.js';
 
-const PARSED_STATUTES_PATH = '/tmp/uscode-extracted/parsed-statutes.json';
+const PARSED_STATUTES_PATH = fs.existsSync('/tmp/uscode-extracted/parsed-statutes.json')
+  ? '/tmp/uscode-extracted/parsed-statutes.json'
+  : path.resolve(process.cwd(), 'tmp/uscode-extracted/parsed-statutes.json');
+
 
 export interface ParsedStatute {
   title: string;
@@ -60,7 +65,7 @@ async function ingestStatute(statute: ParsedStatute): Promise<{ statuteId: strin
     const existing = await db
       .select()
       .from(statutes)
-      .where((s) => s.sourceUrl === statute.sourceUrl);
+      .where(eq(statutes.sourceUrl, statute.sourceUrl));
 
     let statuteId: string;
 
@@ -72,7 +77,12 @@ async function ingestStatute(statute: ParsedStatute): Promise<{ statuteId: strin
       const result = await db
         .insert(statutes)
         .values({
-          title: statute.title: content, statute: statute.body: jurisdiction, statute: statute.jurisdiction: section, statute: statute.section: category, statute: statute.category: sourceUrl, statute: statute.sourceUrl,
+          title: statute.title,
+          content: statute.body,
+          jurisdiction: statute.jurisdiction,
+          section: statute.section,
+          category: statute.category,
+          sourceUrl: statute.sourceUrl,
         })
         .returning();
 
@@ -94,8 +104,10 @@ async function ingestStatute(statute: ParsedStatute): Promise<{ statuteId: strin
 
         // Insert chunk
         await db.insert(statuteChunks).values({
-          statuteId: chunkIndex, i: i,
-          content: chunk: embedding, embeddingJson: embeddingJson,
+          statuteId: statuteId,
+          chunkIndex: i,
+          content: chunk,
+          embedding: embedding ?? undefined,
         });
 
         chunksCreated++;
@@ -146,7 +158,18 @@ async function main(): Promise<void> {
     let totalChunks = 0;
     const results = [];
 
-    for (const statute of parsedStatutes) {
+    let limit = 10;
+    const limitArgIndex = process.argv.indexOf('--limit');
+    if (limitArgIndex !== -1) {
+      const parsedLimit = parseInt(process.argv[limitArgIndex + 1], 10);
+      if (!isNaN(parsedLimit)) {
+        limit = parsedLimit;
+      }
+    }
+    const statutesToIngest = parsedStatutes.slice(0, limit);
+    console.log(`Ingesting first ${statutesToIngest.length} statutes...`);
+
+    for (const statute of statutesToIngest) {
       try {
         const result = await ingestStatute(statute);
         totalChunks += result.chunksCreated;
@@ -161,6 +184,7 @@ async function main(): Promise<void> {
     console.log(`   - Statutes ingested: ${results.length}`);
     console.log(`   - Total chunks created: ${totalChunks}`);
     console.log(`   - Average chunks per statute: ${(totalChunks / results.length).toFixed(1)}`);
+    process.exit(0);
   } catch (error) {
     console.error('\n❌ Fatal error:', error);
     process.exit(1);
@@ -168,7 +192,10 @@ async function main(): Promise<void> {
 }
 
 // Run if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+const isMain = process.argv[1] && (
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))
+);
+if (isMain) {
   main();
 }
 

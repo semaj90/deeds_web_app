@@ -102,7 +102,7 @@ import { bifrostChat } from '$lib/server/ollama.js';
 // L0 → L2 → L3 fallback happens automatically
 const response = await bifrostChat(
   [{ role: 'user', content: 'What is hearsay evidence?' }],
-  'gemma4-legal',
+  'gemma4-rotorquant:latest',
   { temperature: 0.3, maxTokens: 200 }
 );
 ```

@@ -28,79 +28,79 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres';
-import { inferIntent } from '$lib/intent/regex-intent';
+import { rankIntent } from '$lib/intent/regex-intent';
 import { routeIntent, executeChain } from '$lib/server/ai/intent-router';
 
 const bodySchema = z.object({
-	text:         z.string().min(1).max(4000),
-	sessionId:    z.string().min(1).max(120).optional(),
-	caseId:       z.string().uuid().optional(),
-	filePath:     z.string().max(512).optional(),
-	parentTaskId: z.string().uuid().optional(),
-	runId:        z.string().max(64).optional(),
+  text: z.string().min(1).max(4000),
+  sessionId: z.string().min(1).max(120).optional(),
+  caseId: z.string().uuid().optional(),
+  filePath: z.string().max(512).optional(),
+  parentTaskId: z.string().uuid().optional(),
+  runId: z.string().max(64).optional(),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user) {
-		return json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-	}
+  if (!locals.user) {
+    return json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  }
 
-	let parsed;
-	try {
-		const raw = await request.json();
-		parsed = bodySchema.safeParse(raw);
-	} catch {
-		return json({ ok: false, error: 'Invalid JSON body' }, { status: 400 });
-	}
-	if (!parsed.success) {
-		return json(
-			{ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
-			{ status: 400 }
-		);
-	}
+  let parsed;
+  try {
+    const raw = await request.json();
+    parsed = bodySchema.safeParse(raw);
+  } catch {
+    return json({ ok: false, error: 'Invalid JSON body' }, { status: 400 });
+  }
+  if (!parsed.success) {
+    return json(
+      { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+      { status: 400 }
+    );
+  }
 
-	const { text, sessionId, caseId, filePath, parentTaskId, runId } = parsed.data;
-	const userId = Number(locals.user.id) || 0;
-	const ctx = { userId, sessionId: sessionId ?? '', caseId, filePath, parentTaskId, runId };
+  const { text, sessionId, caseId, filePath, parentTaskId, runId } = parsed.data;
+  const userId = Number(locals.user.id) || 0;
+  const ctx = { userId, sessionId: sessionId ?? '', caseId, filePath, parentTaskId, runId };
 
-	// Defense-in-depth: re-run inferIntent on the server. The client may have
-	// hinted intent but the server's classification is source of truth.
-	const intent    = inferIntent(text);
-	const decision  = routeIntent(intent, text, ctx);
-	const execution = await executeChain(decision, ctx, { parentTaskId, runId });
+  // Defense-in-depth: re-run rankIntent on the server. The client may have
+  // hinted intent but the server's classification is source of truth.
+  const intent = rankIntent(text);
+  const decision = routeIntent(intent, text, ctx);
+  const execution = await executeChain(decision, ctx, { parentTaskId, runId });
 
-	// Fire-and-forget context_timeline write. Don't await — UX latency matters.
-	db.insert(contextTimeline)
-		.values({
-			userId:    userId > 0 ? userId : undefined,
-			sessionId: sessionId ?? '',
-			eventType: 'chat.intent',
-			pipeline:  'ace',
-			payload:   {
-				label:      decision.intent.label,
-				confidence: decision.intent.confidence,
-				keywords:   decision.intent.keywords,
-				alternates: decision.intent.alternates,
-				fallback:   decision.fallback,
-				reason:     decision.reason,
-				chain:      decision.chain.map((s) => s.tool),
-				trace:      execution.trace,
-				route:      filePath ?? null,
-				parentTaskId,
-				runId,
-			},
-		})
-		.catch((err: unknown) => {
-			console.error('[intent-dispatch] context_timeline write failed:', err);
-		});
+  // Fire-and-forget context_timeline write. Don't await — UX latency matters.
+  db.insert(contextTimeline)
+    .values({
+      userId: userId > 0 ? userId : undefined,
+      sessionId: sessionId ?? '',
+      eventType: 'chat.intent',
+      pipeline: 'ace',
+      payload: {
+        label: decision.intent.label,
+        confidence: decision.intent.confidence,
+        keywords: decision.intent.keywords,
+        alternates: decision.intent.alternates,
+        fallback: decision.fallback,
+        reason: decision.reason,
+        chain: decision.chain.map((s) => s.tool),
+        trace: execution.trace,
+        route: filePath ?? null,
+        parentTaskId,
+        runId,
+      },
+    })
+    .catch((err: unknown) => {
+      console.error('[intent-dispatch] context_timeline write failed:', err);
+    });
 
-	return json({
-		ok:       true,
-		intent:   decision.intent,
-		chain:    decision.chain.map((s) => s.tool),
-		fallback: decision.fallback,
-		reason:   decision.reason,
-		result:   execution.result,
-		trace:    execution.trace,
-	});
+  return json({
+    ok: true,
+    intent: decision.intent,
+    chain: decision.chain.map((s) => s.tool),
+    fallback: decision.fallback,
+    reason: decision.reason,
+    result: execution.result,
+    trace: execution.trace,
+  });
 };

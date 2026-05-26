@@ -72,6 +72,7 @@ export const VECTOR_CONFIG = {
     summary_lenses: 'summary_lenses_768',
     synthesis_memory: 'synthesis_memory_768',
     programming_docs: 'external_programming_docs_768',
+    feature_maps: 'feature_maps',
   },
 
   /** Per-collection vector schema (vector name → used by health checks + init) */
@@ -90,7 +91,10 @@ export const VECTOR_CONFIG = {
     poi_profiles: { vectors: ['embedding'] },
     legal_canon_chunks: { vectors: ['content'], on_disk_payload: true },
     fictional_case_chunks: { vectors: ['content'], on_disk_payload: true },
-    codebase_chunks_768: { vectors: ['content', 'signature', 'error'], on_disk_payload: true },
+    codebase_chunks_768: {
+      vectors: ['content', 'signature', 'error', 'encoded_64'],
+      on_disk_payload: true,
+    },
     error_embeddings: { vectors: ['error'], on_disk_payload: true },
     diagnosis_embeddings: { vectors: ['diagnosis'], on_disk_payload: true },
     knowledge_base: { vectors: ['default'] },
@@ -102,6 +106,7 @@ export const VECTOR_CONFIG = {
     summary_lenses_768: { vectors: ['summary'], on_disk_payload: true },
     synthesis_memory_768: { vectors: ['synthesis'], on_disk_payload: true },
     external_programming_docs_768: { vectors: ['default'], on_disk_payload: true },
+    feature_maps: { vectors: ['summary'], on_disk_payload: true },
   },
 
   /** Qdrant HNSW config applied to all collections */

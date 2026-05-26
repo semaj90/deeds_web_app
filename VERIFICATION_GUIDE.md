@@ -396,7 +396,7 @@ docker run -d \
 **TurboQuant** (large context, VRAM-constrained):
 ```bash
 llama-server \
-  -m /models/gemma4-legal-Q4_K_M.gguf \
+  -m /models/gemma4-rotorquant:latest-Q4_K_M.gguf \
   --mmproj /models/mmproj-gemma4-BF16.gguf \
   -ctk q8_0 -ctv q8_0 \
   --port 8090 \

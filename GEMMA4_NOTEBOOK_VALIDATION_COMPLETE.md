@@ -259,10 +259,10 @@ This makes it easy for AI models (like Claude or GPT) to:
 - [ ] Cell 22: ZIP file downloads successfully
 
 **After Execution**:
-- [ ] Download gemma4-legal-2b-deployment.zip
+- [ ] Download gemma4-rotorquant:latest-2b-deployment.zip
 - [ ] Extract and verify files:
-  - [ ] gemma4-legal-2b-q4_k_m.gguf (~1.2GB)
-  - [ ] Modelfile.gemma4-legal-2b
+  - [ ] gemma4-rotorquant:latest-2b-q4_k_m.gguf (~1.2GB)
+  - [ ] Modelfile.gemma4-rotorquant:latest-2b
   - [ ] onnx/ folder (if ONNX worked)
   - [ ] CLIENT_INTEGRATION_GUIDE.md
   - [ ] DEPLOYMENT_INSTRUCTIONS.txt
@@ -274,10 +274,10 @@ This makes it easy for AI models (like Claude or GPT) to:
 ### Server Deployment (GGUF)
 ```bash
 # Import to Ollama
-ollama create gemma4-legal-2b -f Modelfile.gemma4-legal-2b
+ollama create gemma4-rotorquant:latest-2b -f Modelfile.gemma4-rotorquant:latest-2b
 
 # Test
-ollama run gemma4-legal-2b "What is hearsay evidence?"
+ollama run gemma4-rotorquant:latest-2b "What is hearsay evidence?"
 
 # Expected: 2-5s inference on RTX 3060 Ti
 ```
@@ -286,7 +286,7 @@ ollama run gemma4-legal-2b "What is hearsay evidence?"
 ```typescript
 // WebGPU/WASM fallback for browser
 const session = await InferenceSession.create(
-  '/models/gemma4-legal-2b-onnx/model.onnx',
+  '/models/gemma4-rotorquant:latest-2b-onnx/model.onnx',
   { executionProviders: ['webgpu', 'wasm'] }
 );
 

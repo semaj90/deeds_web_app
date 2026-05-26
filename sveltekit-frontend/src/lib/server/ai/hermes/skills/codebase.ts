@@ -1,6 +1,12 @@
 import type { SkillRecipe } from './registry.js';
 
 export const CODEBASE_SKILLS: Record<string, SkillRecipe> = {
+  language_distribution: {
+    id: 'language_distribution',
+    family: 'Codebase',
+    description: 'Get language tag distribution across Qdrant-tagged clusters',
+    tools: [{ name: 'language_distribution' }]
+  },
   search_codebase: {
     id: 'search_codebase',
     family: 'Codebase',

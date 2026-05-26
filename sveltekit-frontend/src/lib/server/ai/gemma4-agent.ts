@@ -2,7 +2,7 @@
  * Gemma4 Tool-Calling Agent
  *
  * Runs an agentic loop against Ollama's native tool-calling API
- * (gemma4-legal-vlm:latest — unified legal+VLM for tool-calling + agentic tasks).
+ * (gemma4-rotorquant:latest — unified legal+VLM for tool-calling + agentic tasks).
  *
  * Loop:
  *   1. Send messages + tool definitions to /api/chat
@@ -837,7 +837,7 @@ async function callTraceMcp(
   try {
     const res = await fetch(`${TRACE_MCP_URL}/mcp`, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
       body:    JSON.stringify({
         jsonrpc: '2.0',
         id:      1,
@@ -1263,10 +1263,17 @@ async function dispatchTool(
 
     // ── TRACE MCP graph tools — proxy to :8788 ─────────────────────────────
     if (name === 'graph_expand' || name === 'graph.expand_neighborhood') {
+      const sourceRefs = Array.isArray(args.sourceRefs)
+        ? args.sourceRefs.map((ref) => String(ref)).filter(Boolean)
+        : [];
       const stableKey = String(args.stableKey ?? '');
-      const depth     = Math.min(Math.max(Number(args.depth ?? 2), 1), 3);
-      const limit     = Math.min(Number(args.limit ?? 30), 80);
-      const data = await callTraceMcp('graph.expand_neighborhood', { stableKey, depth, limit });
+      const maxHops = Math.min(Math.max(Number(args.maxHops ?? args.depth ?? 2), 1), 2);
+      const limit = Math.min(Number(args.limit ?? 30), 80);
+      const payload =
+        sourceRefs.length > 0
+          ? { sourceRefs, maxHops, limit }
+          : { stableKey, depth: maxHops, limit };
+      const data = await callTraceMcp('graph.expand_neighborhood', payload);
       return { tool: name, result: data };
     }
 

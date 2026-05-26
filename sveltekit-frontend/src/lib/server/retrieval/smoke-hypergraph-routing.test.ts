@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { HyperRagFusionService } from '$lib/server/retrieval/hyperrag-fusion-service.js';
+import type { HyperRagFusionService } from '$lib/server/retrieval/hyperrag-fusion-service.js';
 
 const QUERIES = [
   "ACE context cache Redis",
@@ -11,10 +11,14 @@ const QUERIES = [
   "Drizzle schema database"
 ];
 
-describe('Atlas: Hypergraph Routing Smoke Test', () => {
+const RUN_EXTERNAL_SMOKE = process.env.RUN_HYPERRAG_SMOKE === 'true';
+const RUN_SYNTHESIS = process.env.RUN_HYPERRAG_SYNTHESIZE === 'true';
+
+describe.skipIf(!RUN_EXTERNAL_SMOKE)('Atlas: Hypergraph Routing Smoke Test', () => {
   let service: HyperRagFusionService;
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    const { HyperRagFusionService } = await import('$lib/server/retrieval/hyperrag-fusion-service.js');
     service = HyperRagFusionService.getInstance();
   });
 
@@ -26,7 +30,7 @@ describe('Atlas: Hypergraph Routing Smoke Test', () => {
       mode: 'codebase',
       useTopologyRouting: true,
       topK: 5,
-      synthesize: true
+      synthesize: RUN_SYNTHESIS
     });
 
     console.log(`✅ Hits: ${result.hits.length}`);

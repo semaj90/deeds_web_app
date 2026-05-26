@@ -26,12 +26,16 @@
  *   gpu:karpathy:*    — GPU rank/scoring metadata
  */
 
-import { createHash } from 'crypto';
+import { createHash } from 'node:crypto';
 
 // ── Hashing ────────────────────────────────────────────────────────────────
 
-function hashStr(input: string): string {
-	return createHash('sha256').update(input).digest('hex').slice(0, 16);
+function hashStr16(input: string): string {
+  return createHash('sha256').update(input).digest('hex').slice(0, 16);
+}
+
+export function hashStr(input: string): string {
+  return createHash('sha256').update(input).digest('hex');
 }
 
 // ── TTL Constants (seconds) ───────────────────────────────────────────────
@@ -63,6 +67,8 @@ export const TTL = {
   CENTROID: 6 * 60 * 60, // 6 hours
   /** ACE codebase hit cache: boosted chunks from last Qdrant+topology pass */
   ACE_CODE: 15 * 60, // 15 min — short enough to reflect new indexing
+  /** OpenAI-compatible prompt cache: compiled ACE prompt + response replay */
+  ACE_PROMPT: 24 * 60 * 60, // 24 hours — stable within a day bucket
   /** ACE topological KAG prompt block: compact Redis KV prompt injection */
   ACE_TOPO_KAG_PROMPT: 10 * 60, // 10 min — tied to hot retrieval context
   /** ACE token budget stats per (topoClass, clusterId): rolling window */
@@ -86,10 +92,10 @@ export const retrievalKey = {
    * Stores: chunk IDs, graph edge IDs, rerank scores, cluster IDs, source refs
    */
   forQuery: (caseId: string, query: string, caseVersion: number) =>
-    `case:${caseId}:query:${hashStr(query)}:retrieval:v${caseVersion}`,
+    `case:${caseId}:query:${hashStr16(query)}:retrieval:v${caseVersion}`,
 
   /** Global (no case scope): query:{queryHash}:retrieval */
-  global: (query: string) => `query:${hashStr(query)}:retrieval`,
+  global: (query: string) => `query:${hashStr16(query)}:retrieval`,
 };
 
 // ── Synthesis Cache Keys ──────────────────────────────────────────────────
@@ -105,17 +111,17 @@ export const synthesisKey = {
     model: string,
     promptVersion: string,
     caseVersion: number
-  ) => `case:${caseId}:query:${hashStr(query)}:llm:${model}:${promptVersion}:v${caseVersion}`,
+  ) => `case:${caseId}:query:${hashStr16(query)}:llm:${model}:${promptVersion}:v${caseVersion}`,
 
   /** Global (no case scope): query:{queryHash}:llm:{model} */
-  global: (query: string, model: string) => `query:${hashStr(query)}:llm:${model}`,
+  global: (query: string, model: string) => `query:${hashStr16(query)}:llm:${model}`,
 
   /**
    * bifrost:kb:llm_synthesis:v1:{kbSnapshotHash}:{karpathyRev}:{queryHash}
    * Ensures cartridge reorder invalidates synthesis cache correctly.
    */
   bifrostKb: (kbSnapshotHash: string, karpathyRev: string, query: string) =>
-    `bifrost:kb:llm_synthesis:v1:${kbSnapshotHash}:${karpathyRev}:${hashStr(query)}`,
+    `bifrost:kb:llm_synthesis:v1:${kbSnapshotHash}:${karpathyRev}:${hashStr16(query)}`,
 };
 
 // ── Client/UI Cache Keys ──────────────────────────────────────────────────
@@ -152,7 +158,7 @@ export const evidenceKey = {
 
 export const graphKey = {
   /** graph:{caseId}:neighbors:{nodeHash} — KAG neighborhood */
-  neighbors: (caseId: string, nodeId: string) => `graph:${caseId}:neighbors:${hashStr(nodeId)}`,
+  neighbors: (caseId: string, nodeId: string) => `graph:${caseId}:neighbors:${hashStr16(nodeId)}`,
 
   /** graph:{caseId}:edges — all edges for a case */
   edges: (caseId: string) => `graph:${caseId}:edges`,
@@ -162,7 +168,7 @@ export const graphKey = {
 
 export const embeddingKey = {
   /** embed:{model}:{textHash} — vector cache by content */
-  vector: (model: string, text: string) => `embed:${model}:${hashStr(text)}`,
+  vector: (model: string, text: string) => `embed:${model}:${hashStr16(text)}`,
 };
 
 // ── Job Status Keys ───────────────────────────────────────────────────────
@@ -262,7 +268,7 @@ export const aceCodeKey = {
    * Keyed by query + topo class (routing dimension) + agentsMd directory scope.
    */
   forQuery: (query: string, topoClass: number, resolvedDir?: string): string =>
-    `ace:code:${hashStr(query)}:${topoClass}:${hashStr(resolvedDir ?? 'root')}`,
+    `ace:code:${hashStr16(query)}:${topoClass}:${hashStr16(resolvedDir ?? 'root')}`,
 };
 
 export const aceTopologicalKagKey = {
@@ -272,7 +278,7 @@ export const aceTopologicalKagKey = {
    * codebase hits, SOM/BMU, graph authority, AGENTS scope, and multi-lane hints.
    */
   forPrompt: (query: string, scope: string): string =>
-    `ace:topo:kag:${hashStr(query)}:${hashStr(scope)}`,
+    `ace:topo:kag:${hashStr16(query)}:${hashStr16(scope)}`,
 };
 
 // ── ACE Token Budget Keys ─────────────────────────────────────────────────────
@@ -287,14 +293,16 @@ export const aceTokenBudgetKey = {
   forCluster: (topoClass: number, clusterId: number): string =>
     `ace:token:budget:${topoClass}:${clusterId}`,
   /** Fallback when cluster is unknown — keyed by topoClass only. */
-  forClass: (topoClass: number): string =>
-    `ace:token:budget:${topoClass}:unknown`,
+  forClass: (topoClass: number): string => `ace:token:budget:${topoClass}:unknown`,
 };
 
 // ── LLM Cache Key Utilities ───────────────────────────────────────────────
 
 /** Prefix used by the Redis L1 exact-match cache — single source of truth. */
 export const LLM_EXACT_CACHE_PREFIX = 'ace:llm:exact:';
+
+/** Prefix for OpenAI-compatible prompt/completion cache entries. */
+export const OPENAI_PROMPT_CACHE_PREFIX = 'ace:prompt:completion:';
 
 /**
  * Generate a deterministic L1 Redis cache key from LLM request parameters.
@@ -316,6 +324,64 @@ export function generateCacheKey(params: {
   };
   const hash = createHash('sha256').update(JSON.stringify(normalized)).digest('hex').slice(0, 16);
   return `${LLM_EXACT_CACHE_PREFIX}${hash}`;
+}
+
+/**
+ * Generate a day-bucketed prompt cache key for the OpenAI-compatible route.
+ * The stable prefix is the assembled system prompt; the user intent is the
+ * query text. The day bucket keeps the cache bounded to a 24h replay window.
+ */
+export function generatePromptCacheKey(params: {
+  model: string;
+  stablePrefix: string;
+  userIntent: string;
+  dayBucket?: string;
+  routingSignature?: string;
+  dynamicContextSignature?: string;
+}): string {
+  const normalized = {
+    model: params.model,
+    stablePrefix: params.stablePrefix,
+    userIntent: params.userIntent,
+    dayBucket: params.dayBucket ?? new Date().toISOString().slice(0, 10),
+    routingSignature: params.routingSignature ?? '',
+    dynamicContextSignature: params.dynamicContextSignature ?? '',
+  };
+  const hash = createHash('sha256').update(JSON.stringify(normalized)).digest('hex').slice(0, 16);
+  return `${OPENAI_PROMPT_CACHE_PREFIX}${hash}`;
+}
+
+/**
+ * Build the ACE completion cache key from a packet key and exact user query hash.
+ * The same ACE packet can be reused for multiple questions, so the final answer
+ * cache must include the user query hash to avoid returning a stale response.
+ */
+export function buildAcePacketCacheKey(input: {
+  model: string;
+  stablePrefixHash: string;
+  userIntent?: string;
+  routingSignature?: string;
+  dynamicContextSignature?: string;
+  dayBucket?: string;
+}) {
+  const raw = [
+    input.model,
+    input.stablePrefixHash,
+    input.userIntent ?? 'unknown',
+    input.routingSignature ?? 'none',
+    input.dynamicContextSignature ?? 'none',
+    input.dayBucket ?? new Date().toISOString().slice(0, 10),
+  ].join('|');
+
+  return `ace:packet:${hashStr(raw)}`;
+}
+
+/**
+ * The completion cache key must include the user query hash so the packet
+ * can be reused across different queries while final answers remain distinct.
+ */
+export function buildAceCompletionCacheKey(packetKey: string, userQueryHash: string) {
+  return packetKey.replace('ace:packet:', 'ace:completion:') + `:${userQueryHash}`;
 }
 
 /**
@@ -357,3 +423,4 @@ export async function getCaseVersion(caseId: string): Promise<number> {
 		return 0;
 	}
 }
+

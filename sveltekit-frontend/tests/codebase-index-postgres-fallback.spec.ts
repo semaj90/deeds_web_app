@@ -35,11 +35,11 @@ vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat: (...args: unknown[]) => mockBifrostChat(...args),
   ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
   VLM_MODELS: {
-    legal: 'gemma4-legal:latest',
-    vision: 'gemma4-legal-vlm:latest',
+    legal: 'gemma4-rotorquant:latest',
+    vision: 'gemma4-rotorquant:latest',
     embedding: 'embeddinggemma:latest',
-    gemma4: 'gemma4-legal:latest',
-    tool: 'gemma4-legal:latest',
+    gemma4: 'gemma4-rotorquant:latest',
+    tool: 'gemma4-rotorquant:latest',
   },
 }));
 

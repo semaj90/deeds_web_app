@@ -51,8 +51,8 @@ export interface RoutingDecision {
 // ─── Model constants ─────────────────────────────────────────────────────────
 
 export const MODELS = {
-  LEGAL_VLM:   'gemma4-legal-vlm:latest',   // unified text+vision, production
-  LEGAL_TEXT:  'gemma4-legal:latest',        // text-only fallback
+  LEGAL_VLM:   'gemma4-rotorquant:latest',   // unified text+vision, production
+  LEGAL_TEXT:  'gemma4-rotorquant:latest',        // text-only fallback
   FAST:        'gemma3:270m',                // sub-2s for simple queries
   EMBED:       'embeddinggemma:latest',
 } as const;

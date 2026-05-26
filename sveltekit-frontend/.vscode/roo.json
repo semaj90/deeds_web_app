@@ -28,7 +28,7 @@
       "topK": 20,
       "repeatPenalty": 1.05,
       "numPredict": 4096,
-      "numCtx": 32768
+      "numCtx": 65536
     }
   },
 

@@ -40,7 +40,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Generate cache key (deterministic)
     const cacheKey = generateCacheKey({
-      model: 'gemma4-legal',
+      model: 'gemma4-rotorquant:latest',
       messages: [{ role: 'user', content: query }],
       temperature: 0.3,
       maxTokens: 200,
@@ -65,7 +65,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gemma4-legal',
+            model: 'gemma4-rotorquant:latest',
             messages: [{ role: 'user', content: query }],
             stream: false,
             options: { num_predict: 200, temperature: 0.3 },
@@ -78,7 +78,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Store in L1 cache for next run
         await setExactMatchCache(cacheKey, {
           content: response,
-          model: 'gemma4-legal',
+          model: 'gemma4-rotorquant:latest',
           backend: 'ollama-direct',
         });
       }

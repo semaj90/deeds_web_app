@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-05-23T03:51:06.517Z",
+  "relations": {
+    "File_to_SummaryCard": 13874,
+    "SummaryCard_to_Symbol": 19544,
+    "SummaryCard_to_Route": 19653,
+    "SummaryCard_to_Table": 5578,
+    "SummaryCard_to_Feature": 142395
+  },
+  "cypherHint": "MERGE (c:SummaryCard {id:$id})-[:HAS_LABEL]->(:Feature {name:$label}) ..."
+}

@@ -110,7 +110,7 @@ After extract-code-relations, also write memory/runs/<run_id>/relationship_map.j
 > into a single latent vector of dim 512, then applies standard KV quant on top.
 > Gemma4 does NOT implement MLA natively — but turbo3 alone achieves comparable savings.
 
-**Recommended for dev** (gemma4-legal-vlm, 4K context):
+**Recommended for dev** (gemma4-rotorquant:latest, 4K context):
 ```bash
 llama-server.exe -m <gguf> -ctk turbo3 -ctv turbo4 -fa on -ngl 99 -c 4096
 ```

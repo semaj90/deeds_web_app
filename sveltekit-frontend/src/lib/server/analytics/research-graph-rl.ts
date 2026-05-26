@@ -552,7 +552,7 @@ async function nodeGenerate(state: ResearchRlStateType): Promise<Partial<Researc
 				{ role: 'system', content: 'You are a legal research assistant. Synthesize the context below to answer the query.' },
 				{ role: 'user',   content: `Context:\n${contextText}\n\nQuery: ${state.query}` },
 			],
-			'gemma4-legal',
+			'gemma4-rotorquant:latest',
 			{ temperature: 0.3, maxTokens: 400 },
 		);
 

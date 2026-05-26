@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "dryRun": false,
+  "applied": true,
+  "current": {
+    "name": "ollama",
+    "keys": [],
+    "network_config": {
+      "base_url": "http://host.docker.internal:11434",
+      "default_request_timeout_in_seconds": 120,
+      "max_retries": 1,
+      "retry_backoff_initial": 5000,
+      "retry_backoff_max": 10000
+    },
+    "concurrency_and_buffer_size": {
+      "concurrency": 1000,
+      "buffer_size": 5000
+    },
+    "proxy_config": null,
+    "send_back_raw_request": false,
+    "send_back_raw_response": false,
+    "store_raw_request_response": false,
+    "provider_status": "active",
+    "status": "unknown"
+  },
+  "desired": {
+    "provider": "ollama",
+    "base_url": "http://host.docker.internal:11434",
+    "network_config": {
+      "default_request_timeout_in_seconds": 120,
+      "max_retries": 1,
+      "retry_backoff_initial": 5000,
+      "retry_backoff_max": 10000
+    }
+  },
+  "reason": "Bifrost ollama provider updated successfully",
+  "providerUrl": "http://127.0.0.1:3040"
+}

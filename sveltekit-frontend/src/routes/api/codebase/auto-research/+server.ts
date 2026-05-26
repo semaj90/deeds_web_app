@@ -39,7 +39,7 @@ const researchSchema = z.object({
 
 const COLLECTION = 'codebase_chunks_768';
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
-const LLM_MODEL = 'gemma4-legal:latest';
+const LLM_MODEL = 'gemma4-rotorquant:latest';
 const ROOT = resolve(process.cwd());
 
 // Cooldown: don't re-research the same query within 15 minutes

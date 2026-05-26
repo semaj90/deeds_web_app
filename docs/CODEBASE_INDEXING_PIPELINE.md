@@ -23,7 +23,7 @@ flowchart TB
   end
 
   subgraph Summarize["Summarize / Tag"]
-    S6[6. summarize<br/>TurboQuant :8090<br/>gemma4-legal-vlm<br/>cache_prompt:true]
+    S6[6. summarize<br/>TurboQuant :8090<br/>gemma4-rotorquant:latest<br/>cache_prompt:true]
     S7[7. tag<br/>Karpathy semantic_tags]
   end
 
@@ -117,8 +117,8 @@ reuses it across all 20 cluster summaries, saving ~18s per run on an 8GB GPU.
 
 | Port | Service | Model | VRAM |
 |---|---|---|---|
-| `8090` | llama-server.exe (TurboQuant) | `gemma4-legal-vlm.gguf` + `mmproj-BF16.gguf` | 5.8 GB |
-| `11434` | Ollama (fallback) | `gemma4-legal-vlm:latest` | legacy swappable lane |
+| `8090` | llama-server.exe (TurboQuant) | `gemma4-rotorquant:latest.gguf` + `mmproj-BF16.gguf` | 5.8 GB |
+| `11434` | Ollama (fallback) | `gemma4-rotorquant:latest` | legacy swappable lane |
 
 Start TurboQuant via VS Code task: **⚡ TurboQuant: Start (vision + text, :8090)**
 
@@ -217,7 +217,7 @@ but `wikiNotes`/`tileAtlas`/`cacheStats` (different backends) still return.
 ### Gemma4 → embeddinggemma Summary Path
 
 Stage 6 (`summarize`) writes:
-1. **Text summary** → Postgres `cluster_summaries.summary` (gemma4-legal-vlm via Ollama/TurboQuant)
+1. **Text summary** → Postgres `cluster_summaries.summary` (gemma4-rotorquant:latest via Ollama/TurboQuant)
 2. **768-dim embedding** → Postgres `cluster_summaries.summary_embedding` halfvec (embeddinggemma)
 3. **Qdrant mirror** → `codebase_chunks_768` payload `summary_embedding` vector (named-vector mode)
 4. **Minified** → Int8 quantized via `minified-research-cache.ts` (serves L1/L2/L3 cache tiers)

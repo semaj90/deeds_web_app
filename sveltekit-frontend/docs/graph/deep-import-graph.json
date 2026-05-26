@@ -44127,7 +44127,7 @@
         "lib",
         "server"
       ],
-      "summary": "Legal document summarization via Ollama (gemma4-legal).",
+      "summary": "Legal document summarization via Ollama (gemma4-rotorquant:latest).",
       "imports": [
         "$lib/server/env.server.js",
         "$lib/server/observability/langfuse.js",
@@ -135888,7 +135888,7 @@
         "auth",
         "zod"
       ],
-      "summary": "POST /api/pgai/analyze — Custom analysis via Ollama gemma4-legal",
+      "summary": "POST /api/pgai/analyze — Custom analysis via Ollama gemma4-rotorquant:latest",
       "imports": [
         "./$types",
         "@sveltejs/kit",

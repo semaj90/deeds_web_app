@@ -432,6 +432,30 @@ Before a feature ships, every box must be checked:
 - [ ] **G37 `mcp:tool-surface-clean`** passes — no cross-file MCP tool name collisions, no ungated handler aliases
 - [ ] **G38 `mcp:stateless-transport-per-request`** passes — `StreamableHTTPServerTransport({ sessionIdGenerator: undefined })` is constructed *inside* the HTTP request handler, never as a module-scope singleton (would silent-500 every call after the first)
 
+## 24. KAGINTEL Local Subagents + LangGraph Boundary
+
+Use LangGraph only for the HMM/error workflow loop and local subagent orchestration, not as the full app framework.
+
+Implemented baseline modules:
+
+- `src/lib/server/ai/workflow-loop.ts` — plain TypeScript classify → repair → smoke → log loop.
+- `src/lib/server/ai/workflow-loop-langgraph.ts` — `StateGraph` wrapper around the same loop stages.
+- `src/lib/server/ai/workflow-loop.test.ts` — focused tests for both plain loop and LangGraph adapter.
+- `src/lib/server/ai/subagents/directory-analyzer.ts` — directory analyzer subagent over TOON/JSON cards.
+- `scripts/atlas/ingest-autoresearch-jsonl.mjs` — sanitized autoresearch JSONL ingestion lane.
+
+Run commands:
+
+- `npm run workflow:loop:test`
+- `npm run autoresearch:ingest -- --input <path-to-jsonl> [--dry-run]`
+
+Implementation constraints:
+
+- TypeScript routes/services remain the app boundary and source of truth.
+- Vercel AI SDK stays at UI/runtime boundary only (streaming/tool ergonomics), not orchestration core.
+- Service worker is offline UI artifact cache only (no inference, tool execution, or secrets).
+- A2A is deferred until agents are independently deployable services.
+
 ## Final rule
 
 ```

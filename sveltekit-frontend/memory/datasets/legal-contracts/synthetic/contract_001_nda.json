@@ -1,0 +1,6 @@
+{
+  "sourceRef": "memory/datasets/legal-contracts/synthetic/contract_001_nda.json",
+  "title": "Synthetic Non-Disclosure Agreement",
+  "content": "This Non-Disclosure Agreement is entered into by Alice Smith (Email: alice@example.com, Phone: 555-0199) and Bob Corp. The Confidential Information includes trade secrets. Neither party shall offer legal advice based on this document.",
+  "type": "NDA"
+}

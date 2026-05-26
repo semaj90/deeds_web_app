@@ -1,0 +1,65 @@
+{
+  "kind": "trace-full-loop-smoke-report",
+  "generated_at": "2026-05-20T04:06:02Z",
+  "source": {
+    "log_file": "sveltekit-frontend/logs/trace-full-loop/latest.json",
+    "command": "npm run smoke:trace:full",
+    "exit_code": 0
+  },
+  "startup_health": {
+    "command": "npm run startup:health:json",
+    "ok": true,
+    "exit_code": 0,
+    "report_file": "docs/reports/startup-health-trace-report.json"
+  },
+  "summary": {
+    "endpoint": "http://localhost:5173/api/v1/chat/completions",
+    "prompt_count": 5,
+    "pass_count": 0,
+    "warning_count": 3,
+    "error_count": 4,
+    "status": "failed"
+  },
+  "failures": [
+    {
+      "id": "graph-analyze-retrieval",
+      "duration_ms": 41465,
+      "status": 200,
+      "error": "missing_choices_content"
+    },
+    {
+      "id": "topology-near-ace",
+      "duration_ms": 90022,
+      "status": null,
+      "error": "fetch_error:The operation was aborted due to timeout"
+    },
+    {
+      "id": "hmm-integration-history",
+      "duration_ms": 90013,
+      "status": null,
+      "error": "fetch_error:The operation was aborted due to timeout"
+    },
+    {
+      "id": "code-intel-plan",
+      "duration_ms": 51735,
+      "status": 200,
+      "error": "missing_choices_content"
+    }
+  ],
+  "warnings": [
+    {
+      "id": "routes-test-priority",
+      "issues": [
+        "missing_memory_gain_score",
+        "missing_memory_decision",
+        "agents_md_miss_with_filepath"
+      ]
+    }
+  ],
+  "recommended_next_actions": [
+    "Investigate missing_choices_content on graph-analyze-retrieval and code-intel-plan response shaping path.",
+    "Increase timeout budget or optimize topology-near-ace and hmm-integration-history retrieval path to avoid 90s abort.",
+    "Add assertions in smoke-trace-full-loop.mjs so non-zero warning/error totals fail process exit code.",
+    "Re-run npm run smoke:trace:full after fixes and compare against this report."
+  ]
+}

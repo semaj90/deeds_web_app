@@ -1,0 +1,216 @@
+# Codebase Semantic Index Report
+
+- Generated: 2026-05-22T01:27:23.219Z
+- Workspace: C:\Users\james\Videos\deeds-web-app\sveltekit-frontend
+- Mode: report
+- Checklist files scanned: 5722
+- Open checklist items: 2166
+
+## Open Checklist Items
+
+- .agent/workflows/agentic-error-fixing.md:128 - Errors reduced from 71k to <5k
+- .agent/workflows/agentic-error-fixing.md:129 - Dev server starts without 500 errors
+- .agent/workflows/agentic-error-fixing.md:130 - All routes load without compilation errors
+- .agent/workflows/agentic-error-fixing.md:131 - Svelte 5 components render correctly
+- .agent/workflows/error-fixing-strategy.md:102 - Error count < 10,000 (Phase 91)
+- .agent/workflows/error-fixing-strategy.md:103 - Error count < 1,000 (Phase 92)
+- .agent/workflows/error-fixing-strategy.md:104 - `npm run dev` starts without crashes
+- .agent/workflows/error-fixing-strategy.md:105 - No blocking TypeScript errors in core routes
+- .github/gemini.md:919 - **Install Ollama** (if not already installed)
+- .github/gemini.md:925 - **Verify Embedding Dimension**
+- .github/gemini.md:931 - **Install Qdrant**
+- .github/gemini.md:937 - **Generate Embeddings**
+- .github/gemini.md:942 - **Upload to Qdrant**
+- .github/gemini.md:947 - **Create Knowledge Base**
+- .github/gemini.md:952 - **Test Semantic Search**
+- CACHE_MONITOR_INTEGRATION.md:365 - Redis `maxmemory` limit set (2GB recommended)
+- CACHE_MONITOR_INTEGRATION.md:366 - Eviction policy configured (`allkeys-lru`)
+- CACHE_MONITOR_INTEGRATION.md:367 - Cache warm-up script deployed
+- CACHE_MONITOR_INTEGRATION.md:368 - Grafana/Prometheus scraping configured
+- CACHE_MONITOR_INTEGRATION.md:369 - Alert thresholds set (hit rate <40%)
+- docs/agents_master_stack_checklist.build.md:15 - Pin Node and lockfile versions.
+- docs/agents_master_stack_checklist.build.md:16 - Keep Dockerfile system deps explicit for Python images.
+- docs/agents_master_stack_checklist.build.md:17 - Cache large Python wheels.
+- docs/agents_master_stack_checklist.build.md:18 - Move optional ML workloads into sidecars when possible.
+- docs/agents_master_stack_checklist.build.md:19 - Keep `prod-only` packages out of dev images unless a smoke needs them.
+- docs/agents_master_stack_checklist.dev.md:16 - Keep `npm run dev` and `npm run dev:full` working.
+- docs/agents_master_stack_checklist.dev.md:17 - Keep `svelte-check`, `vitest`, `eslint`, and `prettier` runnable locally.
+- docs/agents_master_stack_checklist.dev.md:18 - Document local service endpoints for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
+- docs/agents_master_stack_checklist.dev.md:19 - Keep dev bypasses isolated from production code paths.
+- docs/agents_master_stack_checklist.dev.md:20 - Include `dev-only` packages in local installs.
+- docs/agents_master_stack_checklist.md:77 - Pin Node version and keep `package-lock.json` or workspace lockfile committed.
+- docs/agents_master_stack_checklist.md:78 - Keep Dockerfile system deps explicit for Python images (`git`, `curl`, `ffmpeg`, OpenCV libs).
+- docs/agents_master_stack_checklist.md:79 - Cache large Python wheels and avoid rebuilding heavy ML layers when app code changes.
+- docs/agents_master_stack_checklist.md:80 - Split optional ML services from the core app image when they are not required at runtime.
+- docs/agents_master_stack_checklist.md:81 - Keep `prod-only` packages out of dev images unless a smoke truly needs them.
+- docs/agents_master_stack_checklist.md:86 - Precompress production assets where the deploy target supports it.
+- docs/agents_master_stack_checklist.md:87 - Remove duplicate runtime copies across Node, Python, and addon images.
+- docs/agents_master_stack_checklist.md:88 - Keep optional integrations out of the primary bundle unless they are always used.
+- docs/agents_master_stack_checklist.md:89 - Prefer runtime sidecars for large model workloads instead of bundling them into the UI image.
+- docs/agents_master_stack_checklist.md:90 - Reuse base layers for `prod-only` ML packages so wheel downloads are not repeated across builds.
+- docs/agents_master_stack_checklist.md:95 - `npm run dev` and `npm run dev:full` should start cleanly.
+- docs/agents_master_stack_checklist.md:96 - `svelte-check`, `vitest`, `eslint`, and `prettier` must remain runnable from the app workspace.
+- docs/agents_master_stack_checklist.md:97 - Local services should be documented for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
+- docs/agents_master_stack_checklist.md:98 - Any dev bypasses must be explicit and isolated from production code paths.
+- docs/agents_master_stack_checklist.md:99 - Keep `dev-only` packages available in local installs even when prod images omit them.
+- docs/agents_master_stack_checklist.md:104 - Keep unit tests under the repo's configured Vitest include paths.
+- docs/agents_master_stack_checklist.md:105 - Cover API contract behavior for auth, validation, and degraded response shapes.
+- docs/agents_master_stack_checklist.md:106 - Add image/build smokes for Python services that install heavy dependencies.
+- docs/agents_master_stack_checklist.md:107 - Keep one smoke for each critical external service integration.
+- docs/agents_master_stack_checklist.md:108 - Validate that `optional` packages fail gracefully when sidecars are absent.
+- docs/agents_master_stack_checklist.md:113 - Pin runtime versions for the app, Python services, and native addons.
+- docs/agents_master_stack_checklist.md:114 - Document required environment variables for every external service.
+- docs/agents_master_stack_checklist.md:115 - Keep optional integrations fail-open or behind a feature boundary.
+- docs/agents_master_stack_checklist.md:116 - Ensure prod images do not ship dev-only tooling or extra build caches.
+- docs/agents_master_stack_checklist.md:117 - Ship only `required` and `prod-only` packages in production images; exclude `dev-only` packages.
+- docs/agents_master_stack_checklist.prod.md:17 - Pin runtime versions for app, Python services, and native addons.
+- docs/agents_master_stack_checklist.prod.md:18 - Document required env vars for every external service.
+- docs/agents_master_stack_checklist.prod.md:19 - Keep optional integrations behind a feature boundary or fail-open path.
+- docs/agents_master_stack_checklist.prod.md:20 - Exclude `dev-only` packages from production images.
+- docs/agents_master_stack_checklist.prod.md:21 - Reuse base layers for heavy ML packages.
+- docs/agents_master_stack_checklist.test.md:15 - Keep tests under the configured Vitest include paths.
+- docs/agents_master_stack_checklist.test.md:16 - Cover auth, validation, and degraded response shapes.
+- docs/agents_master_stack_checklist.test.md:17 - Add image/build smokes for Python service containers.
+- docs/agents_master_stack_checklist.test.md:18 - Keep one smoke for each critical external integration.
+- docs/agents_master_stack_checklist.test.md:19 - Validate that optional sidecar packages fail gracefully when missing.
+- docs/agents_recommendations.md:55 - **2026-05-10** feat(mcp): research.synthesize → legal-ai-langgraph:8091 (89th tool) — dirs: `src/mcp`
+- docs/agents_recommendations.md:56 - **2026-05-10** feat(sw): Phase D offline analytics queue (CACHE_VERSION v1.6.0) — dirs: `src/lib/client`, `src/lib/server/ai`
+- docs/agents_recommendations.md:57 - **2026-05-10** feat(evidence): SSE /api/evidence/[id]/analyze/stream — Phase 3 Item 6 — dirs: `src/routes/api/evidence/[id]/analyze/stream`
+- docs/agents_recommendations.md:58 - **2026-05-10** feat(intent): Phase C demo page at /intent-chat — dirs: `src/routes/(dev)/intent-chat`
+- docs/agents_recommendations.md:59 - **2026-05-10** feat(sw+intent): Phase C SW telemetry + contextual-chat store + dispatch tests — dirs: `src/lib/stores`, `src/routes/api/admin/telemetry/batch`
+- docs/agents_recommendations.md:60 - **2026-05-10** feat(intent): Phase B intent-router + /api/ai/intent-dispatch route — dirs: `src/lib/server/ai`, `src/lib/server/mcp`
+- docs/agents_recommendations.md:61 - **2026-05-10** feat(rag): RAG_RRF_ENABLED canary in /api/rag/search for legal queries — dirs: `src/lib/server`, `src/routes/api/rag/search`
+- docs/agents_recommendations.md:62 - **2026-05-10** feat(intent): Phase A regex intent classifier — pure module + 31 tests — dirs: `src/lib/intent`
+- docs/agents_recommendations.md:63 - **2026-05-10** feat(retrieval): wire RRF into new /api/rag/search-fused endpoint — dirs: `src/routes/api/rag/search-fused`
+- docs/agents_recommendations.md:64 - **2026-05-10** feat(retrieval): Phase 1 sparse+dense lane — tsvector + RRF + BM25 — dirs: `src/lib/server/retrieval`
+- docs/agents_recommendations.md:65 - **2026-05-10** feat(speculative): wire gemma3:270m as draft model for llama-server speculative decoding — dirs: root
+- docs/agents_recommendations.md:66 - **2026-05-10** feat(agent): wire Langfuse tracing + Redis pattern recall into agentic-error-fix — dirs: root
+- docs/agents_recommendations.md:67 - **2026-05-10** feat(ace): QueryRouter4x4 dispatch + web_search L10 lane + smoke 10/10 — dirs: `src/lib/server/ace`, `src/lib/server/routing`
+- docs/agents_recommendations.md:68 - **2026-05-10** feat(mcp+image): image.enrich_tags MCP tool + batch enrichment script (78 tools) — dirs: `src/mcp`
+- docs/agents_recommendations.md:69 - **2026-05-10** feat(mcp): image search tools — 4 new TRACE MCP tools (77 total) — dirs: `src/mcp`
+- docs/agents_recommendations.md:70 - **2026-05-09** feat(evidence+synth): image search UI + GRPO synthesis loop scripts — dirs: `src/lib/components/evidence`, `src/lib/server/vector`
+- docs/agents_recommendations.md:71 - **2026-05-09** feat(karpathy): GPU batch stream log, AGENTS.md T1 patch, lane atlas, ACE hit-rate — dirs: root
+- docs/agents_recommendations.md:72 - **2026-05-09** feat(hyperrag): HyperRAG Feature Atlas + Trust-Tier system (§1-§13 blueprint) — dirs: `src/lib/server/ace`, `src/lib/server/db`
+- docs/agents_recommendations.md:73 - **2026-05-09** feat(session): browser-context lane, admin AI chat, external research agent, mcp:tail-errors, smoke suite — dirs: `src/lib/components/admin`, `src/lib/server/admin`
+- docs/agents_recommendations.md:74 - **2026-05-09** feat(mcp): un-gate canonical tools, fix ioredis cold-starts, expand multi-lane, wire prior-fix recall — dirs: `src/lib/server/ace`, `src/mcp`
+- docs/agents_recommendations.md:75 - **2026-05-09** feat(claude-code): Phase D — PreToolUse deny + PostToolUse audit hooks — dirs: root
+- docs/agents_recommendations.md:76 - **2026-05-09** feat(synth): Phase C — Gemma4 ⇄ MCP synthesis loop CLI — dirs: root
+- docs/agents_recommendations.md:77 - **2026-05-09** feat(mcp): Phase B — read-only db.* inspection tools + G33 gate — dirs: `src/mcp`
+- docs/agents_recommendations.md:78 - **2026-05-09** feat(mcp): adopted MCP servers (enabled:false) + smoke probe + plan amendments — dirs: root
+- docs/agents_recommendations.md:79 - **2026-05-09** feat(mcp): gemma4-offload stdio MCP + G29/G30/G31 validator gates — dirs: root
+- docs/architecture/trace-kag-web-development-guide.md:421 - Auth guard exists on every protected route (`locals.user` check)
+- docs/architecture/trace-kag-web-development-guide.md:422 - Zod validation exists for every JSON input
+- docs/architecture/trace-kag-web-development-guide.md:423 - Degraded/offline behavior exists (no hard 500s on optional-service failure)
+- docs/architecture/trace-kag-web-development-guide.md:424 - Audit log exists for every write (`evidenceAuditLog`, `context_timeline`, etc.)
+- docs/architecture/trace-kag-web-development-guide.md:425 - Source hashes / provenance exist for every piece of generated memory
+- docs/architecture/trace-kag-web-development-guide.md:426 - No raw infra access from Gemma4 — MCP tools only
+- docs/architecture/trace-kag-web-development-guide.md:427 - No GPU work on the Node main thread — RabbitMQ + sidecar
+- docs/architecture/trace-kag-web-development-guide.md:428 - No ambiguous ports (single source of truth in `env.server.ts`, no localhost literals)
+- docs/architecture/trace-kag-web-development-guide.md:429 - Smoke test exists and passes (`scripts/smoke/` or equivalent)
+- docs/architecture/trace-kag-web-development-guide.md:430 - G-gate coverage in `scripts/validate/full-system.mjs` if the feature crosses tier boundaries
+- docs/architecture/trace-kag-web-development-guide.md:431 - **G34 `mcp:zod-record-two-arg`** passes — MCP tool schemas use `z.record(z.string(), z.any())`, never the Zod 3 single-arg form (would crash `tools/list`)
+- docs/architecture/trace-kag-web-development-guide.md:432 - **G37 `mcp:tool-surface-clean`** passes — no cross-file MCP tool name collisions, no ungated handler aliases
+- docs/architecture/trace-kag-web-development-guide.md:433 - **G38 `mcp:stateless-transport-per-request`** passes — `StreamableHTTPServerTransport({ sessionIdGenerator: undefined })` is constructed *inside* the HTTP request handler, never as a module-scope singleton (would silent-500 every call after the first)
+- docs/CLAUDE_VERIFY_TRACE.md:162 - `npm run trace:start` works
+- docs/CLAUDE_VERIFY_TRACE.md:163 - SvelteKit :5173 healthy
+- docs/CLAUDE_VERIFY_TRACE.md:164 - llama-server :8090 healthy
+- docs/CLAUDE_VERIFY_TRACE.md:165 - topology-search :8101 healthy
+- docs/CLAUDE_VERIFY_TRACE.md:166 - TRACE MCP :8788 healthy
+- docs/CLAUDE_VERIFY_TRACE.md:169 - `trace.kag_search` returns hits
+- docs/CLAUDE_VERIFY_TRACE.md:170 - `topology.search_near` returns hits
+- docs/CLAUDE_VERIFY_TRACE.md:171 - `graph.expand_neighborhood` returns nodes
+- docs/CLAUDE_VERIFY_TRACE.md:172 - `graph.pagerank_top` returns data or known-empty reason
+- docs/CLAUDE_VERIFY_TRACE.md:175 - compute-worker GPU path smoke passes
+- docs/CLAUDE_VERIFY_TRACE.md:176 - CPU fallback works
+- docs/CLAUDE_VERIFY_TRACE.md:177 - graphify smoke passes
+- docs/CLAUDE_VERIFY_TRACE.md:178 - audit-parity strict passes
+- docs/CLAUDE_VERIFY_TRACE.md:181 - CouchDB reachable
+- docs/CLAUDE_VERIFY_TRACE.md:182 - Redis `wiki:note:*` keys present
+- docs/CLAUDE_VERIFY_TRACE.md:183 - Obsidian watcher status ok
+- docs/CLAUDE_VERIFY_TRACE.md:186 - `svelte-check` clean
+- docs/CLAUDE_VERIFY_TRACE.md:187 - `tsgo` clean
+- docs/CLAUDE_VERIFY_TRACE.md:188 - tests pass
+- docs/CLAUDE_VERIFY_TRACE.md:189 - deep audit gates pass
+- docs/graph/recommendations.md:55 - **R3-hotspots**: 30 files each depended on by >50 files transitively
+- docs/handoffs/2026-05-11_hermes-handoff-p1-4-drizzle-drift.md:164 - N tables classified `unknown` (listed below)
+- docs/handoffs/2026-05-11_hermes-handoff-p1-4-drizzle-drift.md:165 - Identity-strategy decision blocks 24 tables (listed below)
+- docs/hermes-agent-roadmap.md:307 - Add `AUTOENCODER_WEIGHTS_TRAINED` to HMM (done this session)
+- docs/hermes-agent-roadmap.md:308 - Create `npm run graphify:autoencoder:train` script wrapper
+- docs/hermes-agent-roadmap.md:309 - Add `media.download` + `media.transcribe` RabbitMQ queues to queue manager
+- docs/LLMS.md:31 - Keep docs entries short and machine-parseable.
+- docs/LLMS.md:32 - Preserve `name / title / description / env` fields in every new planning note.
+- docs/LLMS.md:33 - Record static and dynamic import paths when a note depends on code behavior.
+- docs/LLMS.md:34 - Keep this directory visible to `npm run index:codebase:fast && npm run agents:write`.
+- docs/reports/karpathy_cartridge_synthesis_audit.md:109 - Conduct full integration soak tests (`npm run atlas:parents:soak`) to benchmark average latency under high parallel load.
+- docs/reports/parents_atlas_dashboard_report.md:74 - Connect the dashboard actions to trigger WSL2 terminal execution commands.
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:520 - Confirm TurboQuant endpoint: `http://127.0.0.1:8080/v1`
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:521 - Confirm text-only mode when speculative decoding is enabled
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:522 - Confirm VLM is separate through Ollama or another non-draft server
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:523 - Record current launch command: `npm run turbo:start:detached`
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:524 - Record current KV mode: `q8_0/q8_0`
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:525 - Record draft model path
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:526 - Record model quant type: RotorQuant / GGUF
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:540 - `GET /v1/models`
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:541 - `POST /v1/chat/completions`
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:542 - response contains `turboquant-ok`
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:543 - records latencyMs
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:544 - records prompt/completion tokens if available
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:545 - writes `logs/turboquant/health-latest.json`
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:563 - modelName
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:564 - modelQuant
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:565 - backend
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:566 - tokenizerHash
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:567 - systemPromptHash
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:568 - toolDefinitionsHash
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:569 - repoGitSha
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:570 - corpusHash
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:571 - ragBundleHash
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:572 - graphSnapshotHash
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:602 - Redis hit wins
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:603 - Redis down falls back to Postgres
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:604 - Postgres down falls back to local JSON
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:605 - corrupt local JSON returns miss
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:606 - toolPolicy survives roundtrip
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:607 - no retrieval fails because cache failed
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:619 - Write compact JSON context packs by cacheKey
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:620 - Add cache size limit, e.g. 2–5 GB
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:621 - Add LRU cleanup script:
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:623 - Add package script:
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:625 - Store lastUsedAt
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:626 - Store estimated token savings
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:640 - TTL 6h–48h depending on repo SHA freshness
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:641 - increment hits on reuse
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:642 - store lastUsedAt
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:643 - store cacheSource
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:644 - store promptTokensSavedEstimate
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:652 - contextCacheHit
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:653 - cacheSource: `redis|postgres|local-json|miss`
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:654 - reusedChunkCount
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:655 - skippedRetrievalLanes
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:656 - promptTokensSavedEstimate
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:657 - timeSavedMsEstimate
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:658 - repoGitSha
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:659 - ragBundleHash
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:660 - graphSnapshotHash
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:676 - no cache
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:677 - Redis cache hit
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:678 - Postgres cache hit
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:679 - local JSON cache hit
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:680 - changed repo SHA miss
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:681 - changed system prompt miss
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:682 - changed tool definitions miss
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:698 - keep draft model on for text-only synthesis
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:699 - disable draft model for VLM/mmproj
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:700 - record `draftModel=true` in cache metadata
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:701 - if outputs look unstable, smoke with draft off
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:702 - do not use draft for strict JSON-critical tests until validated
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:708 - keep `kv=q8_0/q8_0` initially
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:709 - do not go lower until retrieval quality smoke passes
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:710 - record KV mode in logs
+- docs/todo/bitfrost_turboquant_turbovec_production_todo.md:711 - compare q8_0 vs f16 if quality seems off
+
+## Suggested Next Tasks
+
+- Regenerate the active daily TODO from the open checklist items.
+- Keep semantic indexing observation-first until the smoke/report lane is stable.
+- Preserve the OpenCode JSON packet contract: goal, context, files, constraints, mcp, plan.

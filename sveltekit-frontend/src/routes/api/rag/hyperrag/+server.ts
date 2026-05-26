@@ -122,7 +122,7 @@ async function synthesizeSummary(packet: Record<string, unknown>) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: ENV.TURBOQUANT_URL ? 'gemma4-legal:latest' : ENV.OLLAMA_CHAT_MODEL,
+        model: ENV.TURBOQUANT_URL ? 'gemma4-rotorquant:latest' : ENV.OLLAMA_CHAT_MODEL,
         temperature: 0.2,
         stream: false,
         messages: [

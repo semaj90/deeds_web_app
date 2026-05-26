@@ -166,25 +166,45 @@ export function invalidateLangExtractResolution(): void {
  *   - AND the service responds to /health
  */
 export async function langextractFetch(path: string, init?: RequestInit): Promise<Response | null> {
-  // Native-TS path — covers /extract POST. Other paths (e.g. /health) fall
-  // through to legacy network fetch since the native module doesn't expose them.
-  if (ENV.LANGEXTRACT_NATIVE === 'true' && path === '/extract' && init?.method === 'POST') {
-    try {
-      const body = init.body ? JSON.parse(String(init.body)) : {};
-      const text   = body.text ?? body.content ?? '';
-      const docId  = body.doc_id ?? body.document_id ?? `inline-${Date.now()}`;
-      const docType = (body.document_type ?? 'case') as 'statute' | 'case';
-      const { extractDocumentNative } = await import('$lib/server/langextract/native.js');
-      const out = extractDocumentNative(text, docId, docType);
-      // Return an OK Response shaped like the Python /extract output so callers
-      // that JSON.parse the body get the same fields they always did.
-      return new Response(JSON.stringify(out), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json', 'x-langextract-source': 'native-ts' },
-      });
-    } catch (err) {
-      console.warn('[langextract-native] short-circuit failed, falling through to Python:', (err as Error).message);
-      // Continue to network fallback below
+  // Native-TS path — covers /extract POST and /health GET.
+  if (ENV.LANGEXTRACT_NATIVE === 'true') {
+    if (path === '/extract' && init?.method === 'POST') {
+      try {
+        const body = init.body ? JSON.parse(String(init.body)) : {};
+        const text = body.text ?? body.content ?? '';
+        const docId = body.doc_id ?? body.document_id ?? `inline-${Date.now()}`;
+        const docType = (body.document_type ?? 'case') as 'statute' | 'case';
+        const { extractDocumentNative } = await import('$lib/server/langextract/native.js');
+        const out = extractDocumentNative(text, docId, docType);
+        return new Response(JSON.stringify(out), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'x-langextract-source': 'native-ts' },
+        });
+      } catch (err) {
+        console.warn(
+          '[langextract-native] short-circuit failed, falling through to Python:',
+          (err as Error).message
+        );
+        // Continue to network fallback below
+      }
+    }
+
+    if (path === '/health') {
+      return new Response(
+        JSON.stringify({
+          enabled: true,
+          healthy: true,
+          services: { native: true },
+          version: 'native-ts',
+          latencyMs: 0,
+          source: 'native-ts',
+          resolvedUrl: 'native-ts',
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'x-langextract-source': 'native-ts' },
+        }
+      );
     }
   }
 
@@ -211,6 +231,37 @@ export async function extractDocument(
     language?: string;
   }
 ): Promise<LangExtractResponse | null> {
+  if (ENV.LANGEXTRACT_NATIVE === 'true') {
+    try {
+      const { extractDocumentNative } = await import('$lib/server/langextract/native.js');
+      const out = extractDocumentNative(
+        content,
+        `inline-${Date.now()}`,
+        (options?.documentType as 'statute' | 'case') ?? 'case'
+      );
+      return {
+        document_id: out.doc_id,
+        structure: { sections: out.sections },
+        entities: out.entities.map((e) => ({
+          text: e.text,
+          label: e.type.toUpperCase(),
+          start: e.start,
+          end: e.end,
+          confidence: e.confidence,
+          metadata: e.metadata,
+        })),
+        metadata: (out.metadata ?? {}) as unknown as Record<string, unknown>,
+        processing_time: 0,
+      };
+    } catch (err) {
+      console.warn(
+        '[langextract-native] extractDocument native fallback failed:',
+        (err as Error).message
+      );
+      // Fall through to the Python service if configured.
+    }
+  }
+
   if (!ENV.LANGEXTRACT_ENABLED) return null;
 
   const healthy = await checkHealth();

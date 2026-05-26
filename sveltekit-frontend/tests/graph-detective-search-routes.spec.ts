@@ -77,7 +77,7 @@ const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
         didYouMean: ['alternative query'],
         predictiveSignals: ['signal 1'],
       }),
-      model: 'gemma4-legal:latest',
+      model: 'gemma4-rotorquant:latest',
     }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
   );
@@ -85,7 +85,7 @@ const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-legal:latest',
+	getChatModel: () => 'gemma4-rotorquant:latest',
 	getEmbedModel: () => 'embeddinggemma:latest',
   ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));

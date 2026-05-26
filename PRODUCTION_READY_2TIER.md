@@ -30,7 +30,7 @@ After comprehensive testing across multiple sessions, the **2-tier cache system 
 - Run 2 (cached): **2ms** → Redis L1 hit (**157× speedup**)
 - Run 3 (cached): **2ms** → Redis L1 hit
 
-**Session 4 Results** (gemma4-legal-fast):
+**Session 4 Results** (gemma4-rotorquant:latest-fast):
 - Run 1 (cold): 2,872ms → Direct Ollama
 - Run 2 (cached): **2ms** → Redis L1 hit (**1,436× speedup**)
 - Run 3 (cached): **6ms** → Redis L1 hit (**479× speedup**)
@@ -68,7 +68,7 @@ After comprehensive testing across multiple sessions, the **2-tier cache system 
 │  • Port: 11434                           │
 │  • Latency: 315ms-3s (model dependent)   │  ✅ VALIDATED
 │  • Model: gemma3:270m (fast)             │
-│  •        gemma4-legal-fast (production) │
+│  •        gemma4-rotorquant:latest-fast (production) │
 │  • GPU: RTX 3060 Ti (2.8GB/8GB)          │
 └──────────────────────────────────────────┘
 ```
@@ -150,7 +150,7 @@ const response = await ollamaCachedChat(
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userMessage }
   ],
-  'gemma4-legal-fast',
+  'gemma4-rotorquant:latest-fast',
   { temperature: 0.3, maxTokens: 2048 }
 );
 ```
@@ -244,7 +244,7 @@ Returns:
 | Metric | Value | Notes |
 |--------|-------|-------|
 | Cached queries | ~20,000 QPM | Redis L1 (60ms avg with network) |
-| Cold queries | ~1,286 QPM | Ollama gemma4-legal-fast |
+| Cold queries | ~1,286 QPM | Ollama gemma4-rotorquant:latest-fast |
 | **Combined** | **5,000-10,000 QPM** | At 70-90% cache hit rate |
 
 ### Resource Usage
@@ -289,7 +289,7 @@ nvidia-smi
 
 # Test Ollama directly
 time curl -X POST http://localhost:11434/api/generate \
-  -d '{"model":"gemma4-legal-fast","prompt":"Hello","stream":false}'
+  -d '{"model":"gemma4-rotorquant:latest-fast","prompt":"Hello","stream":false}'
 # Expected: <4s total
 ```
 
@@ -406,7 +406,7 @@ LiteRT L0 (500ms, browser) → Redis L1 (3ms) → Ollama L2 (3.2s)
 **Performance**:
 - 157-1,436× speedup on cache hits
 - 2-5ms cached responses
-- 3.2s cold inference (gemma4-legal-fast)
+- 3.2s cold inference (gemma4-rotorquant:latest-fast)
 - 70-90% cache hit rate
 
 **Reliability**:

@@ -298,6 +298,16 @@ export async function runGemma4ToolLoop(input: RunToolLoopInput): Promise<ToolLo
       }
       seenCallHashes.add(hash);
 
+      // Phase 7: Preflight Failure Prevention Guard
+      const { preflight } = await import('./preflight.js');
+      const guard = await preflight(JSON.stringify(args));
+      if (guard.prevent) {
+        finalAnswer = `⚠️ Known failure detected: ${guard.reason}\nSuggestion: ${guard.suggestion}`;
+        stuckTool = name;
+        toolMessages.push(buildToolResultMessage({ name, arguments: args }, finalAnswer));
+        break;
+      }
+
       const t0 = Date.now();
       const { result, fromServer } = await dispatchToolCall(name, args);
       const durationMs = Date.now() - t0;

@@ -44,6 +44,7 @@ import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/aut
 import { SYSTEM_YORHA_LEGAL } from '$lib/ai/prompts.js';
 import { sortByBestScore, assignRanks } from '$lib/server/types/retrieval.js';
 import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js';
+import { normalizeLabels } from '$lib/server/labels/normalize-labels.js';
 import {
   traceGraph,
   traceCache,
@@ -52,7 +53,7 @@ import {
   traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
 
-const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 32768);
+const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 65536);
 const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
 const ACE_PACKET_TOKEN_CAP = Number(process.env.ACE_PACKET_TOKEN_CAP ?? '3500');
 const MCP_RESULT_TOKEN_CAP = Number(process.env.MCP_RESULT_TOKEN_CAP ?? '800');
@@ -117,6 +118,7 @@ import {
   toUnitQuaternion,
   manifold4ToQuaternion,
 } from '$lib/server/search/quaternion-manifold.js';
+import type { HotCluster } from './hot-cluster-reader.js';
 import {
   getTopoCandidates,
   setTopoCandidates,
@@ -248,6 +250,32 @@ function buildClusterContext(
       const suggestion = artifact
         ? `Cluster ${clusterKey} (${artifact.fileCount} files). Domains: ${topoClasses.slice(0, 3).join(', ')}. Tags: ${enrichedTags.slice(0, 4).join(', ')}.`
         : `Cluster ${clusterId} (${hint}): focus on ${topTags.slice(0, 3).join(', ')} patterns.`;
+      const labels = normalizeLabels({
+        jsonb: {
+          cluster_key: clusterKey,
+          centroid_label: `gpu:${clusterId}`,
+          topology_label: artifact?.topoClasses?.[0] ?? topoClass,
+          feature_family: artifact?.topoClasses?.[0] ?? topoClass,
+          summary: artifact?.summary ?? suggestion,
+          purpose: artifact?.purpose,
+          risk_level: artifact?.risk_level,
+          top_tags: enrichedTags,
+          top_files: topFiles.length ? topFiles : artifactTopFiles,
+        },
+        centroid: {
+          label: `gpu:${clusterId}`,
+          topology: artifact?.topoClasses?.[0] ?? topoClass,
+          clusterKey,
+        },
+        karpathy: {
+          blend: Math.min(1, count / 4),
+          score:
+            typeof artifact?.fileCount === 'number' && artifact.fileCount > 0
+              ? Math.min(1, count / artifact.fileCount)
+              : undefined,
+          bucket: artifact?.risk_level ?? undefined,
+        },
+      });
       return {
         clusterId,
         clusterKey,
@@ -261,8 +289,19 @@ function buildClusterContext(
         graphAuthorityScore: null,
         summary: artifact?.summary,
         purpose: artifact?.purpose,
-        riskLevel: artifact?.risk_level,
+        riskLevel:
+          artifact?.risk_level ??
+          (labels.hotness_bucket === 'hot'
+            ? 'high'
+            : labels.hotness_bucket === 'warm'
+              ? 'medium'
+              : 'low'),
         protocols: artifact?.mitigation_protocols,
+        centroidLabel: labels.centroid_label ?? `gpu:${clusterId}`,
+        hotnessBucket: labels.hotness_bucket,
+        featureFamily: labels.feature_family,
+        summaryLens: `${labels.feature_family} · ${labels.hotness_bucket}`,
+        topoLabel: labels.topology_label ?? topoClass,
       };
     });
 }
@@ -419,10 +458,10 @@ async function fetchWebResearchRows(
   }
 }
 
-// ctx-size aware retrieval limit: 3 at 16k, 5 at 32k, 8 at 64k
-// Effective context = model ctx - (MCP outputs + chat history + query) — stay conservative at 16k
-function getAdaptiveTopK(): number {
-  const ctx = TURBO_CTX_SIZE;
+// ctx-size aware retrieval limit: 3 at smaller windows, 5 at 32k, 8 at 64k
+// Effective context = model ctx - (MCP outputs + chat history + query) — keep the 64k default conservative
+export function getAdaptiveTopK(contextSize: number = TURBO_CTX_SIZE): number {
+  const ctx = Number.isFinite(contextSize) ? contextSize : TURBO_CTX_SIZE;
   if (ctx >= 49152) return 8;
   if (ctx >= 32768) return 5;
   return 3;
@@ -1262,6 +1301,10 @@ export async function assembleACEContext(opts: {
             }
 
             const fastContext: ACEContext = {
+              selectedRelationCards: '',
+              selectedClusterSummaries: '',
+              cacheTrace: '',
+              topRuntimeDependencies: '',
               userProfile: userId
                 ? await fetchUserAnalyticsContext(userId, query, caseId).catch(() => null)
                 : null,
@@ -1567,6 +1610,14 @@ export async function assembleACEContext(opts: {
       const allRag = ragChunks.map(toUnified);
       await applyQloraBoost(allRag).catch(() => {});
 
+      // Fetch graph relation summaries (selectedRelationCards, selectedClusterSummaries, cacheTrace, topRuntimeDependencies)
+      const graphRelationSummaries = await fetchGraphRelationSummaries(query, codebaseContext ?? []).catch(() => ({
+        selectedRelationCards: '',
+        selectedClusterSummaries: '',
+        cacheTrace: '',
+        topRuntimeDependencies: ''
+      }));
+
       // ── Multi-lane parallel retrieval (allSettled — degradation-safe) ──────
       const { pool: pgPool } = await import('$lib/server/db/client');
       const multiLaneOutput: MultiLaneOutput | null = await runRetrievalLanes({
@@ -1589,6 +1640,10 @@ export async function assembleACEContext(opts: {
       };
 
       const baseContext: ACEContext = {
+        selectedRelationCards: graphRelationSummaries.selectedRelationCards,
+        selectedClusterSummaries: graphRelationSummaries.selectedClusterSummaries,
+        cacheTrace: graphRelationSummaries.cacheTrace,
+        topRuntimeDependencies: graphRelationSummaries.topRuntimeDependencies,
         userProfile,
         caseContext,
         glossaryMatches,
@@ -2194,6 +2249,65 @@ export async function assembleACEContext(opts: {
           .join('\n');
       }
 
+      // ─── LangGraph deep synthesis injection ───────────────────────────────
+      // When LANGGRAPH_ENABLED=true and budget tier is 'large', 'web_augmented',
+      // or 'authority_heavy', call the LangGraph DAG service (HMM-adapted):
+      //   web_search + rg_search -> retrieve_rag -> retrieve_kag -> tag_chunks
+      //   -> assemble_ace -> merge -> synthesize -> self_eval
+      // Result is prepended as a T2-trust block in webSearchContext.
+      // Falls back silently -- in-process pipeline handles the gap.
+      if (
+        (policyDecision.budget.tier === 'large' ||
+          policyDecision.budget.tier === 'web_augmented' ||
+          policyDecision.budget.tier === 'authority_heavy') &&
+        (baseContext.webSearchContext?.length ?? 0) < 24_000
+      ) {
+        try {
+          const { isLangGraphAvailable, langGraphSynthesize } = await import(
+            '$lib/server/ai/langgraph-client.js'
+          );
+          if (await isLangGraphAvailable()) {
+            const lgResult = await langGraphSynthesize(
+              {
+                query,
+                case_id: opts.caseId ?? null,
+                temperature: 0.1,
+                max_tokens: 1200,
+                skip_cache: false,
+              },
+              45_000
+            );
+            if (lgResult?.answer) {
+              const lgCitations = (lgResult.citations ?? [])
+                .slice(0, 6)
+                .map((c) => `  [${c.index}] ${c.title} (score: ${c.score.toFixed(3)})\n${c.text.slice(0, 300)}`)
+                .join('\n\n');
+
+              const lgBlock = [
+                '\n\n-- LangGraph Synthesis [T2-trust | HMM-adapted] --',
+                `Confidence: ${(lgResult.confidence * 100).toFixed(1)}% | ` +
+                `RAG hits: ${lgResult.rag_hits} | KAG neighbors: ${lgResult.kag_neighbors} | ` +
+                `Web results: ${lgResult.web_results} | Cache: ${lgResult.cache}`,
+                '',
+                lgResult.answer,
+                lgCitations ? `\nSources:\n${lgCitations}` : '',
+              ]
+                .filter(Boolean)
+                .join('\n');
+
+              baseContext.webSearchContext = [baseContext.webSearchContext ?? '', lgBlock]
+                .filter(Boolean)
+                .join('\n');
+            }
+          }
+        } catch (lgErr) {
+          console.warn(
+            '[ACE langgraph] synthesis skipped:',
+            (lgErr as Error)?.message ?? lgErr
+          );
+        }
+      }
+
       const finalContext = {
         ...baseContext,
         policyDecision,
@@ -2230,12 +2344,14 @@ export async function assembleACEContext(opts: {
           id: c.id,
           score: c.score,
           rerankScore: c.rerankScore ?? c.finalScore ?? null,
+          gpuCluster: c.gpuCluster ?? c.somCluster ?? null,
           somCluster: c.somCluster ?? null,
         })),
         ...finalContext.caseChunks.map((c) => ({
           id: c.id,
           score: c.score,
           rerankScore: c.rerankScore ?? c.finalScore ?? null,
+          gpuCluster: c.gpuCluster ?? c.somCluster ?? null,
           somCluster: c.somCluster ?? null,
         })),
       ];
@@ -2246,6 +2362,7 @@ export async function assembleACEContext(opts: {
             id: c.id,
             score: c.score,
             rerankScore: c.rerankScore ?? null,
+            gpuCluster: c.gpuCluster ?? c.somCluster ?? null,
             somCluster: c.somCluster ?? null,
           })),
           query,
@@ -2258,7 +2375,7 @@ export async function assembleACEContext(opts: {
           codebaseContext.map((c) => ({
             id: c.filePath,
             relativePath: c.filePath,
-            gpuCluster: c.gpuCluster ?? null,
+            gpuCluster: c.gpuCluster ?? c.somCluster ?? null,
             somCluster: c.somCluster ?? null,
             score: c.score,
             rerankScore: c.rerankBreakdown?.final,
@@ -2787,6 +2904,33 @@ export async function fetchCachedACEChunks(
  * Changes when any meaningful input changes (new chunks, neighbors, history, etc.).
  */
 function computeContextFingerprint(context: ACEContext, query: string): string {
+  const codebaseLabelSignature = (context.codebaseContext ?? [])
+    .slice(0, 3)
+    .map((c) =>
+      [
+        c.filePath ?? '',
+        c.clusterKey ?? '',
+        c.centroidLabel ?? '',
+        c.topologyLabel ?? c.topoClass ?? '',
+        c.hotnessBucket ?? '',
+        c.featureFamily ?? '',
+      ].join(':')
+    )
+    .join('|');
+
+  const clusterLabelSignature = (context.clusterContext ?? [])
+    .slice(0, 3)
+    .map((c) =>
+      [
+        c.clusterKey ?? '',
+        c.centroidLabel ?? '',
+        c.topoLabel ?? '',
+        c.hotnessBucket ?? '',
+        c.featureFamily ?? '',
+      ].join(':')
+    )
+    .join('|');
+
   const parts = [
     query.slice(0, 80),
     context.caseContext?.slice(0, 40) ?? '',
@@ -2801,6 +2945,8 @@ function computeContextFingerprint(context: ACEContext, query: string): string {
     String(context.evidenceConnections?.length ?? 0),
     String(context.glossaryMatches?.length ?? 0),
     context.persona ?? 'neutral',
+    codebaseLabelSignature,
+    clusterLabelSignature,
   ];
   // Fast non-crypto hash (FNV-1a 32-bit)
   let h = 0x811c9dc5;
@@ -2875,7 +3021,7 @@ function buildACEContextWeightsBlock(
 
 /**
  * Build ACE prompt with Redis caching (Stage 4 — ace_context_bundle).
- * Returns cached prompt if context fingerprint hasn't changed (2min TTL).
+ * Returns cached prompt if context fingerprint hasn't changed (24h TTL).
  * Falls through to sync buildACEPrompt() on cache miss.
  */
 export async function buildACEPromptCached(
@@ -2960,8 +3106,8 @@ export async function buildACEPromptCached(
     }
   }
 
-  // Cache assembled prompt (2 min — invalidated when any input tier changes)
-  setCachedACEBundle(cacheKey, prompt, 120).catch(() => {});
+  // Cache assembled prompt (24h — invalidated when any input tier changes)
+  setCachedACEBundle(cacheKey, prompt, TTL.ACE_PROMPT).catch(() => {});
   return prompt;
 }
 
@@ -3215,6 +3361,20 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     confidenceFactors.userAnalytics = 0.5;
   }
 
+  // 14. Graph Relation Summaries (selectedRelationCards, selectedClusterSummaries, cacheTrace, topRuntimeDependencies)
+  if (context.selectedRelationCards) {
+    lines.push(`\n## Relation Cards (Graph Neighbors)\n${context.selectedRelationCards}`);
+  }
+  if (context.selectedClusterSummaries) {
+    lines.push(`\n## Domain Cluster Summaries\n${context.selectedClusterSummaries}`);
+  }
+  if (context.topRuntimeDependencies) {
+    lines.push(`\n## Runtime Dependencies\n${context.topRuntimeDependencies}`);
+  }
+  if (context.cacheTrace) {
+    lines.push(`\n## Recent Cache Trace Logs\n${context.cacheTrace}`);
+  }
+
   // 13b. Token-aware compressed ACE packet (inject packed context when enabled)
   if (context.aceContextPacket?.contextMarkdown) {
     lines.push(`\n## Token-Aware ACE Context\n${context.aceContextPacket.contextMarkdown}`);
@@ -3231,7 +3391,16 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
           const loc = c.lineStart ? `:${c.lineStart}${c.lineEnd ? `-${c.lineEnd}` : ''}` : '';
           const meta = [
             c.routeType ? `type:${c.routeType}` : '',
-            c.gpuCluster != null ? `cluster:${c.gpuCluster}` : '',
+            c.clusterKey
+              ? `cluster:${c.clusterKey}`
+              : c.gpuCluster != null
+                ? `cluster:${c.gpuCluster}`
+                : '',
+            c.topoClass ? `topo:${c.topoClass}` : '',
+            c.topologyLabel ? `topology:${c.topologyLabel}` : '',
+            c.centroidLabel ? `centroid:${c.centroidLabel}` : '',
+            c.hotnessBucket ? `hot:${c.hotnessBucket}` : '',
+            c.featureFamily ? `family:${c.featureFamily}` : '',
             c.pageRankScore != null ? `rank:${c.pageRankScore.toFixed(2)}` : '',
             c.hasAuthGuard ? 'auth-guarded' : '',
           ]
@@ -3267,13 +3436,21 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
         .map((c) => {
           const tags = c.topTags?.length ? `Tags: ${c.topTags.slice(0, 6).join(', ')}` : '';
           const files = c.topFiles?.length ? `Files: ${c.topFiles.slice(0, 3).join(', ')}` : '';
+          const labels = [
+            c.centroidLabel ? `centroid:${c.centroidLabel}` : '',
+            c.topoLabel ? `topology:${c.topoLabel}` : '',
+            c.hotnessBucket ? `hot:${c.hotnessBucket}` : '',
+            c.featureFamily ? `family:${c.featureFamily}` : '',
+          ]
+            .filter(Boolean)
+            .join(' ');
           const synthesized = c.summary
             ? `\n  Summary: ${c.summary}${c.purpose ? ` (Purpose: ${c.purpose})` : ''}`
             : '';
           const audit = c.riskLevel
             ? `\n  Audit: Risk=${c.riskLevel.toUpperCase()}${c.protocols?.length ? ` Protocols: ${c.protocols.join(', ')}` : ''}`
             : '';
-          return `**${c.clusterKey}** (${c.topoClass ?? c.topoLabel ?? 'unknown'}): ${c.summaryLens ?? ''}${synthesized}${audit}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
+          return `**${c.clusterKey}** (${c.topoClass ?? c.topoLabel ?? 'unknown'}${labels ? ` | ${labels}` : ''}): ${c.summaryLens ?? ''}${synthesized}${audit}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
         })
         .join('\n');
       lines.push(`\n## Codebase Clusters\n${clusterLines}`);
@@ -4397,6 +4574,24 @@ export interface CodebaseFetchStats {
   karpathy?: {
     bowClusterBiasUsed: boolean;
     bowClusterScores: Array<{ clusterId: number; score: number }>;
+    hotClusterScores?: Array<{
+      clusterId: number;
+      hotness: number;
+      source: HotCluster['source'];
+      fileCount: number;
+      scalarSeed: number;
+      metadataSummary: string;
+    }>;
+    mergedClusterScores?: Array<{
+      clusterId: number;
+      score: number;
+      fromHot: boolean;
+      hotness?: number;
+      source?: HotCluster['source'];
+      fileCount?: number;
+      scalarSeed?: number;
+      metadataSummary?: string;
+    }>;
   };
 }
 
@@ -4604,28 +4799,57 @@ export async function fetchCodebaseContext(
       /* non-fatal — continue without cluster pre-filter */
     }
 
-    // ── Stage 2B: BoW cluster pre-scoring (term-space, no embedding needed) ────
+    // ── Stage 2B: BoW cluster pre-scoring + hot-cluster blend ────────────────
     // Scores all cluster BoW tiles against query terms in a single Promise.all.
-    // Top-2 clusters are added as Qdrant `should` conditions: when `must` clauses
-    // are also present (topo or centroid), `should` acts as a scoring boost only
-    // (Qdrant semantics) — does not restrict the ANN sweep.
-    // Threshold 0.05 filters noise (tile has no term overlap with query).
+    // Merges with XGBoost hotness scores from `ace:cluster:hot` (TTL 1h, written
+    // by xgboost-hotness-score.mjs).  Hot clusters with hotness ≥ 0.6 override
+    // their BoW score via a 50/50 blend.  Falls back to pure BoW when the key is
+    // absent (first run or Redis restart).
+    // Qdrant `should` semantics: boosts scores of matching docs without restricting.
     let bowClusterShould: Array<{ key: string; match: { value: number } }> = [];
     let _topBowClusterId: number | undefined;
     try {
       const bowQueryTerms = tokenizeBowQuery(query);
       if (bowQueryTerms.size > 0) {
-        const ranked = await scoreClustersForQuery(bowQueryTerms);
+        const { getRedis } = await import('$lib/server/redis.js');
+        const { readHotClusters } = await import('./hot-cluster-reader.js');
+        const { mergeClusterCandidates } = await import('./merge-cluster-candidates.js');
+        const [ranked, hotClusters] = await Promise.all([
+          scoreClustersForQuery(bowQueryTerms),
+          readHotClusters(getRedis(), 10, { preferHotSet: true }),
+        ]);
+        const merged = mergeClusterCandidates(ranked, hotClusters, {
+          hotThreshold: 0.6,
+          maxShould: 4,
+          hotWeight: 0.5,
+        });
         if (statsOut) {
           statsOut.karpathy = {
             bowClusterBiasUsed: ranked.length > 0,
             bowClusterScores: ranked.slice(0, 5),
+            hotClusterScores: hotClusters.slice(0, 5).map((cluster) => ({
+              clusterId: cluster.clusterId,
+              hotness: cluster.hotness,
+              source: cluster.source,
+              fileCount: cluster.fileCount,
+              scalarSeed: cluster.scalarSeed,
+              metadataSummary: cluster.metadataSummary,
+            })),
+            mergedClusterScores: merged.slice(0, 5).map((cluster) => ({
+              clusterId: cluster.clusterId,
+              score: cluster.score,
+              fromHot: cluster.fromHot,
+              hotness: cluster.hotness,
+              source: cluster.source,
+              fileCount: cluster.fileCount,
+              scalarSeed: cluster.scalarSeed,
+              metadataSummary: cluster.metadataSummary,
+            })),
           };
         }
-        if (ranked.length > 0) _topBowClusterId = ranked[0].clusterId;
-        bowClusterShould = ranked
-          .slice(0, 2)
-          .filter((c) => c.score >= 0.05)
+        if (merged.length > 0) _topBowClusterId = merged[0].clusterId;
+        bowClusterShould = merged
+          .filter((c) => c.score >= 0.03)
           .map((c) => ({ key: 'neo4j_gpuCluster', match: { value: c.clusterId } }));
       }
     } catch {
@@ -4653,15 +4877,40 @@ export async function fetchCodebaseContext(
       }
     }
 
+    // ── Stage 2D: GraphRAG neighbor expansion ──────────────────────────────
+    // Reads ace:cluster:graphrag:neighbors:* (written by graphify:graphrag-recommend)
+    // and adds the top-2 structural neighbors of the winning BoW cluster as extra
+    // `should` boost entries. Non-breaking: silently skips when key absent.
+    let graphragNeighborShould: Array<{ key: string; match: { value: number } }> = [];
+    if (_topBowClusterId != null && process.env.ACE_CLUSTER_FILTER_ENABLED !== 'false') {
+      try {
+        const { getRedis } = await import('$lib/server/redis.js');
+        const neighbors = await getRedis().zrevrange(
+          `ace:cluster:graphrag:neighbors:cluster:gpu:${_topBowClusterId}`,
+          0,
+          1 // top-2 neighbors only (Jaccard-ranked, avoids over-expansion)
+        );
+        for (const n of neighbors) {
+          const id = parseInt(n.replace('cluster:gpu:', ''), 10);
+          if (!isNaN(id) && id !== _topBowClusterId) {
+            graphragNeighborShould.push({ key: 'neo4j_gpuCluster', match: { value: id } });
+          }
+        }
+      } catch {
+        /* non-fatal */
+      }
+    }
+
     // Merge: topo (must) + encoded-cluster (must) + centroid cluster (must) +
-    //        BoW clusters (should) + Karpathy member boost (should).
+    //        BoW clusters (should) + Karpathy member boost (should) +
+    //        GraphRAG structural neighbors (should, damped top-2).
     // Qdrant: `should` boosts scores of matching docs without restricting the set.
     const mustClauses: unknown[] = [
       ...(topoFilter ? (topoFilter.must as unknown[]) : []),
       ...(encodedClusterFilter ? (encodedClusterFilter.must as unknown[]) : []),
       ...(clusterFilter ? (clusterFilter.must as unknown[]) : []),
     ];
-    const allShould = [...bowClusterShould, ...karpathyMemberShould];
+    const allShould = [...bowClusterShould, ...karpathyMemberShould, ...graphragNeighborShould];
     const combinedFilter: Record<string, unknown> | undefined =
       mustClauses.length > 0 || allShould.length > 0
         ? {
@@ -4767,6 +5016,7 @@ export async function fetchCodebaseContext(
       lineEnd: typeof r.chunk.lineEnd === 'number' ? r.chunk.lineEnd : undefined,
       tags: Array.isArray(r.chunk.tags) ? (r.chunk.tags as string[]) : undefined,
       gpuCluster: r.chunk.neo4j_gpuCluster != null ? Number(r.chunk.neo4j_gpuCluster) : null,
+      clusterKey: r.chunk.cluster_key != null ? String(r.chunk.cluster_key) : null,
       pageRankScore:
         r.chunk.neo4j_pageRankScore != null ? Number(r.chunk.neo4j_pageRankScore) : null,
       routeType: r.chunk.neo4j_routeType != null ? String(r.chunk.neo4j_routeType) : null,
@@ -4774,6 +5024,10 @@ export async function fetchCodebaseContext(
       somCluster: r.chunk.som_cluster != null ? Number(r.chunk.som_cluster) : null,
       somBmuRow: r.chunk.som_bmu_row != null ? Number(r.chunk.som_bmu_row) : null,
       somBmuCol: r.chunk.som_bmu_col != null ? Number(r.chunk.som_bmu_col) : null,
+      centroidLabel: r.chunk.centroid_label != null ? String(r.chunk.centroid_label) : null,
+      topologyLabel: r.chunk.topology_label != null ? String(r.chunk.topology_label) : null,
+      hotnessBucket: r.chunk.hotness_bucket != null ? String(r.chunk.hotness_bucket) : null,
+      featureFamily: r.chunk.feature_family != null ? String(r.chunk.feature_family) : null,
       // Pre-computed by nightly GDS job; avoids Neo4j RTT per ACE call
       graphAuthorityScore:
         r.chunk.graph_authority_score != null ? Number(r.chunk.graph_authority_score) : null,
@@ -5084,9 +5338,22 @@ async function applyKarpathyBoost(
   if (!candidates || candidates.length === 0) return candidates;
 
   let redisScores: Record<string, string> = {};
+  let edgeResults: any[] | null = null;
   try {
     const r = getRedis();
     redisScores = await r.hgetall('gpu:karpathy:scores').catch(() => ({}));
+    const pipeline = r.pipeline();
+    for (const c of candidates) {
+      if (c.filePath) {
+        const normalizedPath = c.filePath.replaceAll('\\', '/');
+        pipeline.get(`graph:edges:file:${normalizedPath}`);
+        pipeline.get(`graph:edges:file:sveltekit-frontend/${normalizedPath}`);
+      } else {
+        pipeline.get('dummy-nonexistent-key');
+        pipeline.get('dummy-nonexistent-key');
+      }
+    }
+    edgeResults = await pipeline.exec().catch(() => null);
   } catch {}
 
   // Normalise the LLMS.md resolved dir for fast prefix-match checks.
@@ -5156,7 +5423,7 @@ async function applyKarpathyBoost(
   const queryTerms = tokenizeBowQuery(query);
 
   // Step 3–6: apply boosts and build breakdown
-  const boosted = candidates.map((c) => {
+  const boosted = candidates.map((c, i) => {
     const semantic = c.score;
     let qdrantTagBoost = 0;
     let clusterBoost = 0;
@@ -5287,6 +5554,25 @@ async function applyKarpathyBoost(
 
     // §7 HyperRAG trust multiplier — codebase_chunks_768 are T3 (verified code).
     // When Qdrant payload carries `trust_tier`, use it; else default to T3 (0.95).
+    let relationScore = 0;
+    if (edgeResults && i < candidates.length) {
+      const res1 = edgeResults[2 * i];
+      const res2 = edgeResults[2 * i + 1];
+      const rawEdges1 = res1 && Array.isArray(res1) ? res1[1] : null;
+      const rawEdges2 = res2 && Array.isArray(res2) ? res2[1] : null;
+      const rawEdges = rawEdges1 || rawEdges2;
+      if (rawEdges && typeof rawEdges === 'string') {
+        try {
+          const edges = JSON.parse(rawEdges);
+          if (Array.isArray(edges)) {
+            const sumConfidence = edges.reduce((sum, edge) => sum + (typeof edge.confidence === 'number' ? edge.confidence : 1.0), 0);
+            relationScore = Math.min(sumConfidence, 5.0);
+          }
+        } catch {}
+      }
+    }
+    const relationBoost = relationScore * 0.05;
+
     const rawFinal =
       semantic +
       qdrantTagBoost +
@@ -5296,7 +5582,8 @@ async function applyKarpathyBoost(
       pagerankBoost +
       pairedTestBoost +
       sameAgentsDirBoost +
-      quaternionBoost;
+      quaternionBoost +
+      relationBoost;
     const chunkTrustTier = (c as Record<string, unknown>).trust_tier as string | undefined;
     const trustMultiplier =
       chunkTrustTier === 'T1'
@@ -5319,6 +5606,7 @@ async function applyKarpathyBoost(
       pairedTest: pairedTestBoost,
       sameAgentsDir: sameAgentsDirBoost,
       quaternion: quaternionBoost,
+      relationBoost,
       final,
     };
 
@@ -5377,8 +5665,8 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
     const qdrant = new QdrantManager();
     const embedding = await embedText(query);
 
-    const results = await qdrant.client.search('feature_maps', {
-      vector: embedding,
+    const results = await qdrant.client.search(qdrant.collections.feature_maps, {
+      vector: { name: 'summary', vector: embedding },
       limit: 1,
       with_payload: true,
     });
@@ -5418,7 +5706,147 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
       };
     }
   } catch (err) {
+    const error = err as {
+      message?: string;
+      status?: number;
+      statusText?: string;
+      data?: { status?: { error?: string } };
+    };
+    const message = [
+      error.message,
+      error.statusText,
+      error.data?.status?.error,
+      typeof err === 'string' ? err : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+    if (
+      error.status === 404 ||
+      message.includes('Not Found') ||
+      message.includes("doesn't exist")
+    ) {
+      return null;
+    }
     console.warn('[ACE] FeatureContextPacket fetch failed:', err);
   }
   return null;
+}
+
+
+async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]) {
+  const result = {
+    selectedRelationCards: '',
+    selectedClusterSummaries: '',
+    cacheTrace: '',
+    topRuntimeDependencies: ''
+  };
+
+  try {
+    const redis = getRedis();
+    const ping = await redis.ping().catch(() => null);
+    if (ping) {
+      // 1. Cache Trace: obs:cache-trace:recent (Lrange first 5)
+      const traces = await redis.lrange('obs:cache-trace:recent', 0, 4).catch(() => []);
+      if (traces.length > 0) {
+        result.cacheTrace = traces
+          .map(t => {
+            try {
+              const parsed = JSON.parse(t);
+              return `- [${parsed.timestamp}] Action: ${parsed.action} | Nodes: ${parsed.nodeCount} | Edges: ${parsed.edgeCount}`;
+            } catch {
+              return `- ${t}`;
+            }
+          })
+          .join('\n');
+      }
+
+      // 2. Selected Cluster Summaries
+      const domains = ['bifrost', 'ace', 'kag', 'engram', 'redis', 'qdrant', 'postgres', 'neo4j', 'duckdb', 'mcp', 'langgraph', 'gpu', 'sveltekit'];
+      const queryLower = query.toLowerCase();
+      const matchedDomains = domains.filter(d => 
+        queryLower.includes(d) || 
+        codebaseContext?.some(c => c.filePath.toLowerCase().includes(d))
+      );
+      const domainsToFetch = matchedDomains.length > 0 ? matchedDomains.slice(0, 3) : ['ace', 'kag', 'bifrost'];
+      
+      const clusterSummariesList: string[] = [];
+      for (const dom of domainsToFetch) {
+        const raw = await redis.get(`summary:cluster:${dom}`).catch(() => null);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            clusterSummariesList.push(`### Cluster: ${parsed.clusterId} (${parsed.nodeCount} nodes)\nSummary: ${parsed.summary}\nNodes: ${parsed.representativeNodes.join(', ')}`);
+          } catch {}
+        }
+      }
+      if (clusterSummariesList.length > 0) {
+        result.selectedClusterSummaries = clusterSummariesList.join('\n\n');
+      }
+
+      // 3. Selected Relation Cards
+      const topFiles = codebaseContext?.slice(0, 3).map(c => `file:${c.filePath.replaceAll('\\', '/')}`) || [];
+      const relationCardsList: string[] = [];
+      const runtimeDepsList: string[] = [];
+
+      for (const fileNode of topFiles) {
+        const rawNeigh = await redis.get(`summary:edge-neighborhood:${fileNode}`).catch(() => null);
+        if (rawNeigh) {
+          try {
+            const parsed = JSON.parse(rawNeigh);
+            relationCardsList.push(`- **${parsed.nodeId}** connections: ${parsed.connections.join(', ')}\n  *Summary*: ${parsed.summary}`);
+          } catch {}
+        }
+
+        const rawEdges = await redis.get(`graph:edges:${fileNode}`).catch(() => null);
+        if (rawEdges) {
+          try {
+            const edges = JSON.parse(rawEdges);
+            if (Array.isArray(edges)) {
+              for (const edge of edges) {
+                if (edge.relation_type === 'imports_dynamic' || edge.topologyClass === 'dynamic_import_island') {
+                  runtimeDepsList.push(`- **${edge.from}** dynamic import -> **${edge.to}** (confidence: ${edge.confidence})`);
+                }
+              }
+            }
+          } catch {}
+        }
+      }
+
+      if (relationCardsList.length > 0) {
+        result.selectedRelationCards = relationCardsList.join('\n');
+      }
+      if (runtimeDepsList.length > 0) {
+        result.topRuntimeDependencies = runtimeDepsList.slice(0, 5).join('\n');
+      }
+    }
+  } catch (err) {
+    console.warn('[ACE] Failed to fetch graph relation summaries from Redis:', err);
+  }
+
+  // File fallback if Redis returned empty (or was offline)
+  try {
+    const { readFileSync, existsSync } = await import('node:fs');
+    let topoPath = resolve(process.cwd(), 'memory/graph/topology-ontology-clusters.json');
+    if (!existsSync(topoPath)) {
+      topoPath = resolve(process.cwd(), '../memory/graph/topology-ontology-clusters.json');
+    }
+    if (existsSync(topoPath)) {
+      const topoData = JSON.parse(readFileSync(topoPath, 'utf-8'));
+      if (!result.selectedClusterSummaries && topoData.domainClusters) {
+        const fallbackClustersList: string[] = [];
+        for (const [clusterId, val] of Object.entries(topoData.domainClusters) as [string, any][]) {
+          fallbackClustersList.push(`### Cluster: ${clusterId} (${val.nodes.length} nodes)\nNodes: ${val.nodes.slice(0, 5).join(', ')}`);
+        }
+        result.selectedClusterSummaries = fallbackClustersList.slice(0, 3).join('\n\n');
+      }
+      if (!result.topRuntimeDependencies && topoData.dynamicIslands) {
+        result.topRuntimeDependencies = topoData.dynamicIslands
+          .slice(0, 5)
+          .map(node => `- Dynamic import island node: ${node}`)
+          .join('\n');
+      }
+    }
+  } catch {}
+
+  return result;
 }

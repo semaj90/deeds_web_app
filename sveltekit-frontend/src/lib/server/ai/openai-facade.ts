@@ -2,8 +2,9 @@
  * OpenAI-compatible facade for the YorHA agent stack.
  *
  * Routes OpenAI-shape requests through the full ACE/KAG/RAG context-assembler
- * + code-llm-index PRIOR ANSWER cache + bifrostChat (Bifrost L2 → TurboQuant
- * → Ollama cascade) before returning an OpenAI-shaped response.
+ * + code-llm-index PRIOR ANSWER cache + 24h prompt cache + bifrostChat
+ * (Bifrost L2 → TurboQuant → Ollama cascade) before returning an
+ * OpenAI-shaped response.
  *
  * This is what makes OpenWebUI (or any OpenAI-compat client) talk to your
  * full agent brain instead of raw llama-server.
@@ -24,6 +25,18 @@ import type {
 } from './openai-types.js';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import type { ACEContext } from '$lib/server/ace/types.js';
+import {
+  hashStr,
+  buildAcePacketCacheKey,
+  buildAceCompletionCacheKey,
+} from '$lib/server/cache-keys.js';
+import { getExactMatchCache, setExactMatchCache } from '$lib/server/cache/redis-exact-match.js';
+import { rankIntent, logIntentEvalEvent } from '$lib/server/ai/intent-ranker.js';
+import {
+  labelsSignature,
+  normalizeLabels,
+  orchestrateLabels,
+} from '$lib/server/labels/normalize-labels.js';
 import { turboQuantChat, bifrostChat } from '$lib/server/ollama.js';
 import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
@@ -45,6 +58,19 @@ const OPENAI_RESERVED_COMPLETION_TOKENS = Number(
 );
 const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
 const ACE_PACKET_TOKEN_CAP = Number(process.env.ACE_PACKET_TOKEN_CAP ?? '3500');
+const RUNTIME_CONTEXT_SIZE = Math.max(
+  65536,
+  ...[
+    process.env.LLM_CONTEXT_SIZE,
+    process.env.TURBO_CTX_SIZE,
+    process.env.LLAMA_CTX_SIZE,
+    process.env.TURBO_CTX,
+    process.env.LLAMA_SERVER_CTX,
+    process.env.OLLAMA_CONTEXT_LENGTH,
+  ]
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value) && value > 0)
+);
 
 export class BudgetExceededError extends Error {
   constructor(message: string) {
@@ -68,12 +94,12 @@ interface RunOpts {
 function resolveInternalModel(requested: string): string {
   // Drop any trailing `:latest` to normalise comparisons
   const m = requested.toLowerCase().replace(/:latest$/, '');
-  if (m === 'yorha-hermes' || m === 'gemma4-hermes-64k') return 'gemma4-hermes-64k:latest';
+  if (m === 'yorha-hermes' || m === 'gemma4-rotorquant:latest') return 'gemma4-rotorquant:latest';
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
-    return 'gemma4-legal-vlm:latest';
+    return 'gemma4-rotorquant:latest';
   }
   if (m === 'gemma4-agent' || m === 'gemma4-raw' || m.startsWith('gemma4')) {
-    return 'gemma4-legal-vlm:latest';
+    return 'gemma4-rotorquant:latest';
   }
   if (m.startsWith('gemma3')) return 'gemma3-legal:latest';
   if (m.startsWith('gemma270') || m.startsWith('gemma3:270')) return 'gemma3:270m';
@@ -119,6 +145,57 @@ function splitMessages(messages: ReadonlyArray<OpenAIMessage>): {
     if (last.role === 'user') query = last.content ?? '';
   }
   return { query, history, systemPreamble };
+}
+
+function deriveRoutingLabels(context: ACEContext) {
+  const primaryCluster = context.clusterContext?.[0];
+  const primaryChunk = context.codebaseContext?.[0];
+
+  return normalizeLabels({
+    jsonb: {
+      cluster_key: primaryCluster?.clusterKey ?? primaryChunk?.clusterKey ?? undefined,
+      centroid_label: primaryCluster?.centroidLabel ?? primaryChunk?.centroidLabel ?? undefined,
+      topology_label:
+        primaryCluster?.topoLabel ??
+        primaryCluster?.topoClass ??
+        primaryChunk?.topologyLabel ??
+        primaryChunk?.topoClass ??
+        undefined,
+      hotness_bucket: primaryCluster?.hotnessBucket ?? primaryChunk?.hotnessBucket ?? undefined,
+      feature_family: primaryCluster?.featureFamily ?? primaryChunk?.featureFamily ?? undefined,
+      summary:
+        primaryCluster?.summary ??
+        primaryCluster?.summaryLens ??
+        primaryCluster?.synthesisSuggestion ??
+        undefined,
+      purpose: primaryCluster?.purpose ?? undefined,
+      risk_level: primaryCluster?.riskLevel ?? undefined,
+    },
+    centroid: {
+      label:
+        primaryCluster?.centroidLabel ??
+        primaryChunk?.centroidLabel ??
+        primaryChunk?.stableKey ??
+        primaryChunk?.filePath ??
+        null,
+      topology:
+        primaryCluster?.topoLabel ??
+        primaryCluster?.topoClass ??
+        primaryChunk?.topologyLabel ??
+        primaryChunk?.topoClass ??
+        null,
+      clusterKey: primaryCluster?.clusterKey ?? primaryChunk?.clusterKey ?? null,
+    },
+    karpathy: {
+      bucket: primaryCluster?.hotnessBucket ?? primaryChunk?.hotnessBucket ?? null,
+      blend:
+        primaryChunk?.karpathyBlend ??
+        primaryChunk?.clusterPagerank ??
+        primaryChunk?.graphAuthorityScore ??
+        null,
+      score: primaryChunk?.graphAuthorityScore ?? null,
+    },
+  });
 }
 
 function trimHistoryForBudget(
@@ -183,7 +260,7 @@ async function runHermesChat(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-hermes-64k:latest',
+      model: 'gemma4-rotorquant:latest',
       messages,
       max_tokens: maxTokens,
       temperature: temperature ?? 0.2,
@@ -202,6 +279,43 @@ async function runHermesChat(
 
 function clampRequestedMaxTokens(requested: number | undefined): number {
   return Math.min(requested ?? OPENAI_DEFAULT_MAX_TOKENS, 4096, OPENAI_MAX_OUTPUT_TOKENS);
+}
+
+function extractAssistantText(result: unknown): string {
+  if (typeof result === 'string') return result;
+  if (!result || typeof result !== 'object') return '';
+
+  const rec = result as Record<string, unknown>;
+
+  const direct = rec.content;
+  if (typeof direct === 'string') return direct;
+
+  const message = rec.message;
+  if (message && typeof message === 'object') {
+    const msg = message as Record<string, unknown>;
+    if (typeof msg.content === 'string') return msg.content;
+  }
+
+  const choices = rec.choices;
+  if (Array.isArray(choices) && choices.length > 0) {
+    const first = choices[0];
+    if (first && typeof first === 'object') {
+      const choice = first as Record<string, unknown>;
+      const choiceMessage = choice.message;
+      if (choiceMessage && typeof choiceMessage === 'object') {
+        const msg = choiceMessage as Record<string, unknown>;
+        if (typeof msg.content === 'string') return msg.content;
+      }
+      if (typeof choice.content === 'string') return choice.content;
+      const delta = choice.delta;
+      if (delta && typeof delta === 'object') {
+        const d = delta as Record<string, unknown>;
+        if (typeof d.content === 'string') return d.content;
+      }
+    }
+  }
+
+  return '';
 }
 
 function determineInferenceLane(
@@ -228,8 +342,8 @@ function determineInferenceLane(
 
 /**
  * Run an OpenAI chat completion through the full agent stack.
- * Returns an OpenAI-shaped response. stream:true is rejected at the route
- * level for v1 — implement separately when bifrostChat streaming is wired.
+ * Returns an OpenAI-shaped response. stream:true is handled by the SSE route
+ * wrapper, which replays the cached or freshly generated completion chunks.
  */
 export async function runChatCompletion(
   req: OpenAIChatCompletionRequest,
@@ -257,16 +371,14 @@ export async function runChatCompletion(
     }));
 
     const rawContextSize =
-      internalModel === 'gemma4-hermes-64k:latest'
-        ? 65536
-        : Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 32768);
+      internalModel === 'gemma4-rotorquant:latest' ? 65536 : RUNTIME_CONTEXT_SIZE;
     const requestedMaxTokens = clampRequestedMaxTokens(req.max_tokens);
     const rawInputTokens = countTokens(mappedMsgs.map((m) => m.content).join('\n'));
     const rawInferenceLane: InferenceLane =
-      internalModel === 'gemma4-hermes-64k:latest'
+      internalModel === 'gemma4-rotorquant:latest'
         ? 'hermes'
         : determineInferenceLane(rawInputTokens, 0, requestedMaxTokens, false, canUseTurboQuantNow);
-    const rawModel = rawInferenceLane === 'hermes' ? 'gemma4-hermes-64k:latest' : internalModel;
+    const rawModel = rawInferenceLane === 'hermes' ? 'gemma4-rotorquant:latest' : internalModel;
 
     const runtimeLog = {
       stage: 'raw_openai_passthrough_budget_check',
@@ -312,21 +424,22 @@ export async function runChatCompletion(
           temperature: req.temperature,
           maxTokens: requestedMaxTokens,
         });
-        text = typeof result === 'string' ? result : (result as { content: string }).content;
+        text = extractAssistantText(result);
       } catch {
         const result = await bifrostChat(mappedMsgs, internalModel, {
           temperature: req.temperature,
           maxTokens: requestedMaxTokens,
         });
-        text = typeof result === 'string' ? result : (result as { content: string }).content;
+        text = extractAssistantText(result);
       }
     } else {
       const result = await bifrostChat(mappedMsgs, internalModel, {
         temperature: req.temperature,
         maxTokens: requestedMaxTokens,
       });
-      text = typeof result === 'string' ? result : (result as { content: string }).content;
+      text = extractAssistantText(result);
     }
+    text = text.trim() || '[No assistant content returned by model]';
     return wrapResponse({
       content: text,
       model: rawModel,
@@ -429,7 +542,7 @@ export async function runChatCompletion(
   }
 
   // ── ACE path: full retrieval + prompt assembly ──
-  // 20s guard: embeddinggemma won't load when VRAM is occupied by gemma4-legal-vlm.
+  // 20s guard: embeddinggemma won't load when VRAM is occupied by gemma4-rotorquant:latest.
   // On timeout we fall through with an empty context — bifrostChat still fires.
   const ACE_TIMEOUT_MS = 20_000;
   const aceStats: Record<string, any> = {};
@@ -616,9 +729,23 @@ export async function runChatCompletion(
     });
   }
 
+  let turbovecSidecar = '';
+  try {
+    const { runTurbovecPreIngestion } = await import('$lib/server/ai/turbovec-ingest-sidecar.js');
+    turbovecSidecar = await runTurbovecPreIngestion(query, {
+      userId: opts.userId?.toString(),
+      filePath: req.file_path,
+    });
+  } catch (err) {
+    console.warn('[TurboVec sidecar] failed:', err);
+  }
+
   let sysFull = systemPreamble
     ? `${systemPreamble}\n\n${prompt.systemPrompt}`
     : prompt.systemPrompt;
+  if (turbovecSidecar) {
+    sysFull = `${sysFull}\n\n${turbovecSidecar}`;
+  }
   let kvPacketTaskId: string | undefined;
   let stablePrefixHash: string | undefined;
   let kvContextBlock = '';
@@ -643,6 +770,9 @@ export async function runChatCompletion(
     sysFull = systemPreamble
       ? `${stablePrefix}\n\n${systemPreamble}\n\n${prompt.systemPrompt}`
       : `${stablePrefix}\n\n${prompt.systemPrompt}`;
+    if (turbovecSidecar) {
+      sysFull = `${sysFull}\n\n${turbovecSidecar}`;
+    }
 
     // Compressed TOC block injected before the user query
     kvContextBlock = kv.formatKvPacketForPrompt(packet);
@@ -671,7 +801,7 @@ export async function runChatCompletion(
   }
 
   let inputTokens = countTokens(messages.map((m) => m.content ?? '').join('\n'));
-  const maxContextSize = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 32768);
+  const maxContextSize = RUNTIME_CONTEXT_SIZE;
   let availableContextTokens = maxContextSize - inputTokens;
 
   if (inputTokens > OPENAI_HARD_INPUT_CAP) {
@@ -701,7 +831,7 @@ export async function runChatCompletion(
   const hasSpecializedRetrieval =
     hasTools || isCodingQuery || Boolean(req.file_path || req.case_id);
   const inferenceLane: InferenceLane =
-    internalModel === 'gemma4-hermes-64k:latest'
+    internalModel === 'gemma4-rotorquant:latest'
       ? 'hermes'
       : determineInferenceLane(
           inputTokens,
@@ -710,9 +840,170 @@ export async function runChatCompletion(
           hasSpecializedRetrieval,
           canUseTurboQuantNow
         );
-  const finalModelUsed = inferenceLane === 'hermes' ? 'gemma4-hermes-64k:latest' : internalModel;
-
+  const finalModelUsed = inferenceLane === 'hermes' ? 'gemma4-rotorquant:latest' : internalModel;
   let budgetGuardTriggered = false;
+  const hmmResult = (() => {
+    try {
+      return classifyQuerySection(query);
+    } catch {
+      return null;
+    }
+  })();
+  const topK = aceStats.top_k != null ? aceStats.top_k : maxContextSize >= 24576 ? 5 : 3;
+  const routingLabels = deriveRoutingLabels(aceCtx);
+
+  // ── Sink Write (fire-and-forget): propagate structural labels to Redis / Qdrant / JSONL / ClusterCard
+  // Does not block inference — errors are swallowed after console.warn.
+  {
+    const primaryCluster = aceCtx.clusterContext?.[0];
+    const primaryChunk = aceCtx.codebaseContext?.[0];
+    const labelFileKey =
+      ((primaryChunk as Record<string, unknown> | undefined)?.['filePath'] as string) ||
+      ((primaryChunk as Record<string, unknown> | undefined)?.['stableKey'] as string) ||
+      req.file_path ||
+      qHash;
+    const labelClusterId =
+      primaryCluster?.clusterKey ||
+      ((primaryChunk as Record<string, unknown> | undefined)?.['clusterKey'] as string) ||
+      undefined;
+    const labelQdrantPointId = (primaryChunk as Record<string, unknown> | undefined)?.[
+      'pointId'
+    ] as string | number | undefined;
+    orchestrateLabels(
+      {
+        jsonb: routingLabels.tags as Record<string, unknown>,
+        centroid: {
+          label: routingLabels.centroid_label,
+          topology: routingLabels.topology_label,
+          clusterKey: routingLabels.cluster_key,
+        },
+        karpathy: {
+          bucket: routingLabels.hotness_bucket,
+        },
+      },
+      {
+        redisKey: labelFileKey,
+        clusterId: labelClusterId,
+        jsonl: {
+          recordId: qHash,
+          query,
+          model: finalModelUsed,
+          latencyMs: Date.now() - startMs,
+        },
+        // Qdrant setPayload requires a real point id, not a file path/stable key.
+        ...(labelQdrantPointId != null
+          ? { qdrant: { collection: 'codebase_chunks_768', pointId: labelQdrantPointId } }
+          : {}),
+      }
+    ).catch(() => {
+      /* fire-and-forget */
+    });
+  }
+  const promptContextSignature = createHash('sha256')
+    .update(`${kvContextBlock}\n${history.map((m) => `${m.role}:${m.content ?? ''}`).join('\n')}`)
+    .digest('hex')
+    .slice(0, 16);
+
+  if (!stablePrefixHash) {
+    stablePrefixHash = hashStr(sysFull);
+  }
+  const userQueryHash = hashStr(query);
+
+  const packetKey = buildAcePacketCacheKey({
+    model: finalModelUsed,
+    stablePrefixHash,
+    userIntent: query,
+    routingSignature: labelsSignature(routingLabels),
+    dynamicContextSignature: promptContextSignature,
+  });
+
+  const completionKey = buildAceCompletionCacheKey(packetKey, userQueryHash);
+  const cachedPrompt = await getExactMatchCache(completionKey);
+
+  const intentRankerDecision = await rankIntent({
+    query,
+    model: finalModelUsed,
+    userId: opts.userId,
+    history,
+    completionKey,
+    packetKey,
+    exactCacheEntry: cachedPrompt,
+    exactCacheChecked: true,
+    caseId: req.case_id,
+    filePath: req.file_path,
+  });
+
+  void logIntentEvalEvent({
+    userId: opts.userId,
+    sessionId: undefined,
+    model: finalModelUsed,
+    queryHash: intentRankerDecision.queryHash,
+    decision: intentRankerDecision.decision,
+    confidence: intentRankerDecision.confidence,
+    rankedCandidates: intentRankerDecision.rankedCandidates,
+    rankingLoss: intentRankerDecision.rankingLoss,
+    intentLabel: intentRankerDecision.intentLabel,
+    intentConfidence: intentRankerDecision.intentConfidence,
+    cacheKeys: intentRankerDecision.cacheKeys,
+    featureInputs: intentRankerDecision.selectedFeatureInputs,
+    didYouMean: intentRankerDecision.didYouMean,
+    durationMs: Date.now() - startMs,
+    queryPreview: query,
+  });
+
+  if (cachedPrompt) {
+    return wrapResponse({
+      content: cachedPrompt.content,
+      model: finalModelUsed,
+      durationMs: Date.now() - startMs,
+      inferenceLane,
+      runtimeProfile: runtime.profile,
+      runtimeAvailable: runtime.runtimeAvailable,
+      turboQuantEnabled: runtime.turboQuant,
+      rotorQuantKv: runtime.rotorQuantKv,
+      ace: {
+        used: true,
+        chunks:
+          (aceCtx.ragChunks?.length ?? 0) +
+          (aceCtx.kbChunks?.length ?? 0) +
+          (aceCtx.caseChunks?.length ?? 0),
+        agentsMd: !!aceCtx.agentsMd?.markdown,
+        codeLlmHit: !!aceCtx.codeLlmHit?.llmOutput,
+        cacheHit: 'prompt-cache',
+        acePacketTokens,
+        inputTokens,
+        maxContextSize,
+        availableContextTokens,
+        budgetGuardTriggered,
+        topoHit: !!aceStats.topo_hit,
+        packetHit: !!aceStats.packet_hit,
+        topK,
+      },
+      hmm: hmmResult
+        ? {
+            hmmAnalyzerUsed: true,
+            intent: hmmResult.section,
+            confidence: hmmResult.confidence,
+            state: 'context_sufficient',
+            signals: ['ace_retrieval', 'qdrant', ...(aceCtx.agentsMd ? ['LLMS.md'] : [])],
+          }
+        : undefined,
+      topoPrefilter: aceStats.topoPrefilter ?? null,
+      toolLoop: {
+        toolsUsed: [],
+        toolRounds: 0,
+        toolResultChars: 0,
+        priorAnswerKey: aceCtx.codeLlmHit ? `query:${qHash}` : undefined,
+        mcpPort: 8788,
+        kvPacketTaskId,
+        stablePrefixHash,
+      },
+      mcpCompactSearchHitCount: mcpCompactSearch?.hits.length ?? 0,
+      mcpCompactSearchCacheHit: mcpCompactSearch?.cacheHit,
+      mcpCompactSearchMs: mcpCompactSearch?.elapsedMs,
+    });
+  }
+
   const runtimeLog = {
     stage: 'llm_request_budget_check',
     model: finalModelUsed,
@@ -820,7 +1111,6 @@ export async function runChatCompletion(
     (aceCtx.ragChunks?.length ?? 0) +
     (aceCtx.kbChunks?.length ?? 0) +
     (aceCtx.caseChunks?.length ?? 0);
-  const topK = aceStats.top_k != null ? aceStats.top_k : maxContextSize >= 24576 ? 5 : 3;
 
   console.log({
     stage: 'llm_request',
@@ -849,13 +1139,13 @@ export async function runChatCompletion(
           temperature: req.temperature,
           maxTokens: requestedMaxTokens,
         });
-        text = typeof result === 'string' ? result : (result as { content: string }).content;
+        text = extractAssistantText(result);
       } else {
         const result = await bifrostChat(messages, internalModel, {
           temperature: req.temperature,
           maxTokens: requestedMaxTokens,
         });
-        text = typeof result === 'string' ? result : (result as { content: string }).content;
+        text = extractAssistantText(result);
       }
     }
   } else if (canUseTurboQuantNow) {
@@ -864,21 +1154,52 @@ export async function runChatCompletion(
         temperature: req.temperature,
         maxTokens: requestedMaxTokens,
       });
-      text = typeof result === 'string' ? result : (result as { content: string }).content;
+      text = extractAssistantText(result);
     } catch {
       const result = await bifrostChat(messages, internalModel, {
         temperature: req.temperature,
         maxTokens: requestedMaxTokens,
       });
-      text = typeof result === 'string' ? result : (result as { content: string }).content;
+      text = extractAssistantText(result);
     }
   } else {
     const result = await bifrostChat(messages, internalModel, {
       temperature: req.temperature,
       maxTokens: requestedMaxTokens,
     });
-    text = typeof result === 'string' ? result : (result as { content: string }).content;
+    text = extractAssistantText(result);
   }
+
+  text = text.trim() || '[No assistant content returned by model]';
+
+  void Promise.all([
+    setExactMatchCache(
+      packetKey,
+      {
+        content: sysFull,
+        model: finalModelUsed,
+        backend: 'openai-facade-packet',
+        promptTokens: inputTokens,
+        completionTokens: 0,
+        cachedPromptTokens: acePacketTokens,
+      },
+      86400 // 24h
+    ),
+    setExactMatchCache(
+      completionKey,
+      {
+        content: text,
+        model: finalModelUsed,
+        backend: 'openai-facade',
+        promptTokens: inputTokens,
+        completionTokens: countTokens(text),
+        cachedPromptTokens: acePacketTokens,
+        somCluster: aceCtx.ragChunks?.[0]?.somCluster,
+        gpuCluster: aceCtx.ragChunks?.[0]?.gpuCluster,
+      },
+      86400 // 24h
+    ),
+  ]).catch(() => {});
 
   // Fire-and-forget: store answer so run-2 gets a prior-answer cache hit
   import('$lib/server/cache/code-llm-index.js')
@@ -927,13 +1248,54 @@ export async function runChatCompletion(
     priorAnswerKey = hcaKey;
   }
 
-  const hmmResult = (() => {
-    try {
-      return classifyQuerySection(query);
-    } catch {
-      return null;
+  // Log the LLM Synthesis event durably
+  try {
+    const { logLlmSynthesisEvent } = await import('$lib/server/llm-synthesis/log-event.js');
+    const cleanAcePacket: Record<string, any> = {
+      systemPrompt: sysFull,
+      aceStats: {
+        topo_hit: aceStats.topo_hit,
+        packet_hit: aceStats.packet_hit,
+        topoPrefilter: aceStats.topoPrefilter ?? null,
+      },
+      topK,
+      mcpCompactSearchHitCount: mcpCompactSearch?.hits.length ?? 0,
+      mcpCompactSearchCacheHit: mcpCompactSearch?.cacheHit ?? false,
+      mcpCompactSearchMs: mcpCompactSearch?.elapsedMs ?? 0,
+    };
+
+    // Strict security scrubbing of forbidden fields in telemetry
+    let serialized = JSON.stringify(cleanAcePacket);
+    for (const key of ['hiddenThoughts', 'chainOfThought', 'kv_cache', 'tensor', 'cudaPointer']) {
+      serialized = serialized.replace(new RegExp(key, 'gi'), 'cleaned_param');
     }
-  })();
+    const safeAcePacket = JSON.parse(serialized);
+
+    const sourceRefs = (aceCtx.ragChunks ?? []).map((c) => ({
+      name: c.filePath ? (c.filePath.split('/').pop()?.split('\\').pop() ?? 'unknown') : 'unknown',
+      path: c.filePath ?? 'unknown',
+      score: c.score ?? 0,
+    }));
+
+    await logLlmSynthesisEvent({
+      runId: `run-${qHash}-${Date.now()}`,
+      sessionId: opts.userId?.toString() ?? 'session-default',
+      userId: typeof opts.userId === 'number' ? opts.userId : undefined,
+      query,
+      profile: runtime.profile || 'openai-facade',
+      acePacket: safeAcePacket,
+      toolCalls: [],
+      sourceRefs,
+      cacheKeys: {
+        exact: completionKey,
+        packet: packetKey,
+        hca: priorAnswerKey ?? '',
+      },
+      model: finalModelUsed,
+    });
+  } catch (err) {
+    console.warn('[LLM Synthesis Log] failed to record event:', err);
+  }
 
   return wrapResponse({
     content: text,
@@ -978,6 +1340,9 @@ export async function runChatCompletion(
       kvPacketTaskId,
       stablePrefixHash,
     },
+    mcpCompactSearchHitCount: mcpCompactSearch?.hits.length ?? 0,
+    mcpCompactSearchCacheHit: mcpCompactSearch?.cacheHit,
+    mcpCompactSearchMs: mcpCompactSearch?.elapsedMs,
   });
 }
 
@@ -1026,10 +1391,12 @@ function wrapResponse(args: {
   mcpCompactSearchCacheHit?: boolean;
   mcpCompactSearchMs?: number;
 }): OpenAIChatCompletionResponse {
+  const assistantContent = args.content.trim() || '[No assistant content returned by model]';
+
   // Token counts: rough estimate (chars/4). Real counts only available when
   // bifrostChat returns them, which it does for direct Ollama but not always
   // for cached Bifrost hits.
-  const completionTokens = Math.ceil(args.content.length / 4);
+  const completionTokens = Math.ceil(assistantContent.length / 4);
 
   return {
     id: `chatcmpl-yorha-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -1045,7 +1412,7 @@ function wrapResponse(args: {
     choices: [
       {
         index: 0,
-        message: { role: 'assistant', content: args.content },
+        message: { role: 'assistant', content: assistantContent },
         finish_reason: 'stop',
       },
     ],
@@ -1095,12 +1462,12 @@ function wrapResponse(args: {
 // ── Models list ────────────────────────────────────────────────────────────
 
 export const ADVERTISED_MODELS = [
-  { id: 'gemma4-agent',   owned_by: 'local' },  // → gemma4-legal-vlm (ACE/KAG/RAG brain)
-  { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-legal-vlm (direct, no ACE)
-  { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-legal-vlm (alias)
+  { id: 'gemma4-agent',   owned_by: 'local' },  // → gemma4-rotorquant:latest (ACE/KAG/RAG brain)
+  { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-rotorquant:latest (direct, no ACE)
+  { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-rotorquant:latest (alias)
   { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
-  { id: 'yorha-hermes',   owned_by: 'yorha' },   // → hermes composer (HERMES_API_URL → bifrostChat gemma4-legal)
-  { id: 'gemma4-legal',   owned_by: 'yorha' },   // → gemma4-legal-vlm explicit
+  { id: 'yorha-hermes',   owned_by: 'yorha' },   // → hermes composer (HERMES_API_URL → bifrostChat gemma4-rotorquant:latest)
+  { id: 'gemma4-rotorquant:latest',   owned_by: 'yorha' },   // → gemma4-rotorquant:latest explicit
   { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },
 ] as const;

@@ -18,7 +18,7 @@ async function testRedisDirect() {
 
 	// Generate cache key
 	const cacheKey = generateCacheKey({
-		model: 'gemma4-legal:latest',
+		model: 'gemma4-rotorquant:latest',
 		messages: testMessages,
 		temperature: 0.7,
 		maxTokens: 2048
@@ -35,7 +35,7 @@ async function testRedisDirect() {
 	console.log('\n2️⃣ Test Cache Storage');
 	await setExactMatchCache(cacheKey, {
 		content: 'Hearsay is an out-of-court statement...',
-		model: 'gemma4-legal:latest',
+		model: 'gemma4-rotorquant:latest',
 		backend: 'test'
 	});
 	console.log('   ✓ Storage command sent');

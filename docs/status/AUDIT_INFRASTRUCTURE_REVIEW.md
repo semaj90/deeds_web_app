@@ -35,7 +35,7 @@ Neo4j Graph → LibTorch CUDA Tensors → Qdrant Vectors
 ### Docker Services
 
 - **CUDA**: RTX 3060 Ti (8192 MiB VRAM, driver 580.88)
-- **Ollama**: gemma4-legal (11.8B Q4_K_M), embeddinggemma (768-dim)
+- **Ollama**: gemma4-rotorquant:latest (11.8B Q4_K_M), embeddinggemma (768-dim)
 - **Triton**: TensorRT-LLM backend (optional)
 - **Qdrant**: INT8 quantized, 72 collections
 - **Neo4j**: Case graph, evidence relationships
@@ -359,7 +359,7 @@ pwsh scripts/audit-9layer-imports.ps1 -OrphanScan | findstr "Orphan candidates"
 - [x] CUDA addon compiles (LibTorch 2.9.0)
 - [x] Qdrant collections quantized (72/72)
 - [x] Neo4j graph seeded (12 connections)
-- [x] Ollama models loaded (gemma4-legal + embeddinggemma)
+- [x] Ollama models loaded (gemma4-rotorquant:latest + embeddinggemma)
 - [ ] Slash command skill registered (optional)
 - [ ] Unified JSON report schema (future)
 - [ ] Auto-fix integration (future)

@@ -174,7 +174,7 @@ POST /api/analytics/qlora-dataset (distillation trigger)
   ↓
 GET /api/analytics/qlora-dataset?export=jsonl
   → feed to Colab QLoRA training notebook
-  → updated gemma4-legal checkpoint
+  → updated gemma4-rotorquant:latest checkpoint
 ```
 
 P1-B (scheduled distillation trigger) will automate the nightly step.

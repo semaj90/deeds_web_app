@@ -60,7 +60,7 @@ explicit in the popup footer when local-mode is on.
 
 ```
 Operator's RTX 3060 Ti (8 GB VRAM)
-  └─ TurboQuant llama-server :8090 (gemma4-legal-vlm Q4_K_M, 5.3 GB)
+  └─ TurboQuant llama-server :8090 (gemma4-rotorquant:latest Q4_K_M, 5.3 GB)
         ↑
         │   /v1/chat/completions (HTTP, server-side)
         │

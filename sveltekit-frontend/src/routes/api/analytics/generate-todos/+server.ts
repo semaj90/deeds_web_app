@@ -278,7 +278,7 @@ Generate 5-10 todos ordered by estimated impact descending.`;
   }> = [];
 
   try {
-    const raw = await bifrostChat([{ role: 'user', content: prompt }], 'gemma4-legal:latest', {
+    const raw = await bifrostChat([{ role: 'user', content: prompt }], 'gemma4-rotorquant:latest', {
       temperature: 0.1,
       maxTokens: 1500,
       cacheKey: `generate-todos-${days}d`,
@@ -342,7 +342,7 @@ Generate 5-10 todos ordered by estimated impact descending.`;
             t.reason.slice(0, 1000),
             t.suggested_action.slice(0, 500),
             t.estimated_impact,
-            JSON.stringify({ userId, days, generatedBy: 'gemma4-legal' }),
+            JSON.stringify({ userId, days, generatedBy: 'gemma4-rotorquant:latest' }),
           ]
         );
         inserted++;

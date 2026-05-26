@@ -48,7 +48,7 @@ const CONFIG = {
   },
   models: {
     embedding: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
-    chat: process.env.OLLAMA_MODEL || 'gemma4-legal:latest',
+    chat: process.env.OLLAMA_MODEL || 'gemma4-rotorquant:latest',
   },
   timeouts: {
     default: 30000,
@@ -447,7 +447,7 @@ const handlers: Record<string, HandlerFn> = {
     if (options?.dryRun) {
       return planResult([
         { action: 'lookup', target: 'RAGRetriever', detail: 'Find similar past errors + fixes' },
-        { action: 'generate', target: 'Ollama', detail: 'Generate fix code via gemma4-legal' },
+        { action: 'generate', target: 'Ollama', detail: 'Generate fix code via gemma4-rotorquant:latest' },
         { action: 'validate', target: 'FixSynthesizer', detail: 'Check syntax and AST validity' }
       ], startTime);
     }
@@ -786,7 +786,7 @@ export const TOOLS: Record<string, ACPTool> = {
       type: 'object',
       properties: {
         prompt: { type: 'string' },
-        model: { type: 'string', description: 'Ollama model name (default: gemma4-legal:latest)' }
+        model: { type: 'string', description: 'Ollama model name (default: gemma4-rotorquant:latest)' }
       },
       required: ['prompt']
     },

@@ -4,7 +4,7 @@ path: "sveltekit-frontend/memory/kb/notecards/graph_file_cards.rank.json"
 aliases: ["graph_file_cards.rank.json","sveltekit-frontend/memory/kb/notecards/graph_file_cards.rank.json"]
 clusterId: -1
 ext: ".json"
-lineCount: 191239
+lineCount: 1218263
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/memory/kb/notecards/graph_file_cards.rank.json"
-last_updated_by_llm: "2026-05-18T18:20:08.357Z"
+last_updated_by_llm: "2026-05-23T02:58:14.645Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/json","t/json"]
 > JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 191239
+lines:: 1218263
 ## Summary
 
 JSON data file

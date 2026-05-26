@@ -35,7 +35,7 @@ const OLLAMA     = process.env.OLLAMA_BASE_URL   ?? 'http://127.0.0.1:11434';
 const QDRANT_URL = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
 const REDIS_URL  = process.env.REDIS_URL         ?? 'redis://127.0.0.1:6379';
 const COLLECTION = 'codebase_chunks_768';
-const LLM_MODEL  = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
+const LLM_MODEL  = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-rotorquant:latest';
 const EMBED_MODEL= 'embeddinggemma:latest';
 
 const WIKI_NOTE_TTL = 24 * 3600;

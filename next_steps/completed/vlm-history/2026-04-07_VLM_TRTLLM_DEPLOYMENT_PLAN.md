@@ -25,7 +25,7 @@ Dual deployment pipeline for the GRPO fine-tuned Gemma 4 E4B legal model:
 
 | File | Size | Purpose |
 |------|------|---------|
-| `gemma4-legal-text-only-adapter/adapter_model.safetensors` | 146 MB | Text-only LoRA adapter (588 language tensors, vision/audio stripped) |
+| `gemma4-rotorquant:latest-text-only-adapter/adapter_model.safetensors` | 146 MB | Text-only LoRA adapter (588 language tensors, vision/audio stripped) |
 | `gemma4-e4b-legal-final-gguf (1)/model.safetensors` | 9.62 GB | Full merged model — input for TRT-LLM engine build |
 | `gemma4-e4b-legal-final-gguf (1)/config.json` | — | Gemma4ForConditionalGeneration architecture config |
 
@@ -34,9 +34,9 @@ Dual deployment pipeline for the GRPO fine-tuned Gemma 4 E4B legal model:
 | File | Size | Why Safe |
 |------|------|----------|
 | `gemma4-e4b-legal-ollama/gemma4-e4b-legal.Q4_K_M.gguf` | 4.97 GB | Duplicate GGUF (text-only, superseded by VLM) |
-| `gemma4-legal-ollama/gemma4-e4b-legal.Q4_K_M.gguf` | 4.97 GB | Older duplicate |
+| `gemma4-rotorquant:latest-ollama/gemma4-e4b-legal.Q4_K_M.gguf` | 4.97 GB | Older duplicate |
 | `gemma4-e4b-legal-ollama.zip` | 5.0 GB | Unpacked above |
-| `gemma4-legal-adapters/` (1), (2) copies | ~0.04 GB | Duplicate adapter dirs |
+| `gemma4-rotorquant:latest-adapters/` (1), (2) copies | ~0.04 GB | Duplicate adapter dirs |
 
 ---
 
@@ -51,10 +51,10 @@ Dual deployment pipeline for the GRPO fine-tuned Gemma 4 E4B legal model:
   → Apply language-only LoRA
   → merge_and_unload() — vision/audio towers inherited from base
   → Export two-file multimodal GGUF:
-      gemma4-legal-vlm-Q4_K_M.gguf (~5 GB, language)
-      gemma4-legal-vlm-mmproj-BF16.gguf (~1.5 GB, vision projector)
+      gemma4-rotorquant:latest-Q4_K_M.gguf (~5 GB, language)
+      gemma4-rotorquant:latest-mmproj-BF16.gguf (~1.5 GB, vision projector)
   → Download from Google Drive
-  → ollama create gemma4-legal-vlm:latest -f Modelfile
+  → ollama create gemma4-rotorquant:latest -f Modelfile
 ```
 
 ### Architecture Preservation
@@ -74,7 +74,7 @@ The notebook re-applies the 146MB LoRA to the FULL base model instead, preservin
 
 `scripts/unsloth-training/Gemma4_E4B_Legal_VLM_Reattach.ipynb`
 
-**Cell 3**: Set `USE_LOCAL_ADAPTER = True`, upload `gemma4-legal-text-only-adapter/` (146MB)
+**Cell 3**: Set `USE_LOCAL_ADAPTER = True`, upload `gemma4-rotorquant:latest-text-only-adapter/` (146MB)
 **Cell 8**: Load full multimodal base + apply language LoRA
 **Cell 10**: Pre-merge vision inference test
 **Cell 12**: Dequantize NF4 → BF16, merge, save all tensors
@@ -84,14 +84,14 @@ The notebook re-applies the 146MB LoRA to the FULL base model instead, preservin
 ### Local Deployment
 
 ```bash
-cd trt_artifacts/gemma4-legal-vlm/
-ollama create gemma4-legal-vlm:latest -f Modelfile
-ollama run gemma4-legal-vlm:latest
+cd trt_artifacts/gemma4-rotorquant:latest/
+ollama create gemma4-rotorquant:latest -f Modelfile
+ollama run gemma4-rotorquant:latest
 ```
 
 Update `sveltekit-frontend/.env`:
 ```
-OLLAMA_VLM_MODEL=gemma4-legal-vlm:latest
+OLLAMA_VLM_MODEL=gemma4-rotorquant:latest
 ```
 
 ---
@@ -116,7 +116,7 @@ FP8 variants (W4A8, FP8) are Hopper/Blackwell only.
 ```bash
 # Step 1: Convert safetensors → TRT-LLM checkpoint (W4A16 AWQ)
 python TensorRT-LLM/examples/models/core/gemma/convert_checkpoint.py \
-  --model_dir ./gemma4-legal-vlm-merged \
+  --model_dir ./gemma4-rotorquant:latest-merged \
   --output_dir ./trt_checkpoint \
   --dtype float16 \
   --use_weight_only \
@@ -166,7 +166,7 @@ TurboQuant is **KV cache compression at runtime** — complementary to weight qu
 **Recommended**: Use vLLM + TurboQuant for max KV cache savings on RTX 3060 Ti:
 ```bash
 pip install turboquant-vllm
-vllm serve gemma4-legal-vlm --kv-cache-dtype turboquant35 --enable-turboquant
+vllm serve gemma4-rotorquant:latest --kv-cache-dtype turboquant35 --enable-turboquant
 ```
 
 ---
@@ -217,7 +217,7 @@ Remove-Item "$env:LOCALAPPDATA\Temp\DiagOutputDir" -Recurse -Force
 # Duplicate GGUFs in Downloads (~10 GB)
 # Review these manually first:
 # - gemma4-e4b-legal-ollama.zip (5 GB, unpacked already)
-# - gemma4-legal-ollama/ (5 GB, older version)
+# - gemma4-rotorquant:latest-ollama/ (5 GB, older version)
 ```
 
 ---
@@ -302,14 +302,14 @@ Redis is already the Bifrost for server-side caching. Monitor via `GET /api/infr
 
 ### Phase 1: VLM Re-Attachment (Ollama GGUF)
 - [ ] Open `Gemma4_E4B_Legal_VLM_Reattach.ipynb` on Colab (G4 GPU runtime)
-- [ ] Upload `gemma4-legal-text-only-adapter/` from Downloads (146 MB)
+- [ ] Upload `gemma4-rotorquant:latest-text-only-adapter/` from Downloads (146 MB)
 - [ ] Set `USE_LOCAL_ADAPTER = True` in Cell 3
 - [ ] Run all cells (1 → 10)
 - [ ] Download GGUF artifacts from Google Drive (~6.5 GB total)
-- [ ] Place in `trt_artifacts/gemma4-legal-vlm/`
-- [ ] Run `ollama create gemma4-legal-vlm:latest -f Modelfile`
-- [ ] Test VLM: `ollama run gemma4-legal-vlm:latest "Describe this image" --images test.jpg`
-- [ ] Update `.env`: `OLLAMA_VLM_MODEL=gemma4-legal-vlm:latest`
+- [ ] Place in `trt_artifacts/gemma4-rotorquant:latest/`
+- [ ] Run `ollama create gemma4-rotorquant:latest -f Modelfile`
+- [ ] Test VLM: `ollama run gemma4-rotorquant:latest "Describe this image" --images test.jpg`
+- [ ] Update `.env`: `OLLAMA_VLM_MODEL=gemma4-rotorquant:latest`
 - [ ] Verify VLM endpoint: `POST /api/ai/tensorrt` with image payload
 
 ### Phase 2: Fix ClickHouse Crashes + Disk Cleanup

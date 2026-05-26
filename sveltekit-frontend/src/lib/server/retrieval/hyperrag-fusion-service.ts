@@ -20,6 +20,7 @@ import { HypergraphRoutingService } from '$lib/server/retrieval/hypergraph-routi
 import { QueryProfileRouter, getClusterAlias } from '$lib/server/retrieval/query-profile-router.js';
 import { RoutingExplanationBuilder, type RoutingExplanation } from '$lib/server/retrieval/routing-explanation.js';
 import { getRouteClusterPriors } from '$lib/server/atlas/route-feature-map.js';
+import { buildSubgraphV1SeedNeighborhood } from '$lib/server/retrieval/subgraph-seed-neighborhood.js';
 import { ContextPacketBudgeter, DEFAULT_BUDGET, type ContextBudget } from '$lib/server/ace/context-packet-budgeter.js';
 import { logAceRun } from '$lib/server/retrieval/ace-retrieval-logger.js';
 import { ColdStorageRetrievalService } from '$lib/server/retrieval/cold-storage-retrieval-service.js';
@@ -189,6 +190,16 @@ export class HyperRagFusionService {
     const profile = QueryProfileRouter.route(query);
     explanation.setProfile(profile);
 
+    const seedEnvelope = await buildSubgraphV1SeedNeighborhood({
+      query,
+      maxSeeds: 6,
+      maxNeighbors: Math.max(8, Math.min(24, effectiveTopK * 2)),
+      maxHops: 1,
+    }).catch(() => null);
+    if (seedEnvelope) {
+      explanation.setSubgraphSeedEnvelope(seedEnvelope);
+    }
+
     // Lane -1: Engram Query Memory (Local Redis Bigram/SOM hints)
     const engramHint = await engramAdapter.getRoutingHints(query).catch(() => null);
     if (engramHint) {
@@ -241,6 +252,9 @@ export class HyperRagFusionService {
     if (routing?.clusterIds.length) {
       provenance.topologyRouting = true;
       explanation.setTopologyClusters(routing.clusterIds);
+      if (routing.hotClusterIds?.length) {
+        explanation.setHotClusters(routing.hotClusterIds);
+      }
     }
     if (taskDistillate) {
       explanation.addTaskDistillate(taskDistillate.task_key);
@@ -253,6 +267,7 @@ export class HyperRagFusionService {
     const allClusterIds = new Set<number>([
       ...(lexicalClusterIds || []),
       ...(routing?.clusterIds || []),
+      ...(routing?.hotClusterIds || []),
       ...(consolidatedPriors || []),
       ...(taskDistillate?.clusters?.map((c: string) => parseInt(c, 10)) || []),
     ]);

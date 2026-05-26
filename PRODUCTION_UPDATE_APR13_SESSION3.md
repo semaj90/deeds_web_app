@@ -126,7 +126,7 @@ Track:
 
 ## Future: Re-Enable Bifrost with TRT-LLM
 
-**When**: After converting gemma4-legal to TensorRT
+**When**: After converting gemma4-rotorquant:latest to TensorRT
 
 **Why it will work**:
 - TensorRT runs in Docker (container-to-container networking)
@@ -162,7 +162,7 @@ Redis L1 (3ms) → Bifrost L2 (2-5s) → TRT-LLM L3 (2-3s)
 
 ### Priority 3: Optional Enhancements
 - [ ] Debug 3-tier integration (fix cache writes)
-- [ ] Convert gemma4-legal to TensorRT INT4
+- [ ] Convert gemma4-rotorquant:latest to TensorRT INT4
 - [ ] Re-enable Bifrost with Docker backend
 
 ---
@@ -224,7 +224,7 @@ Redis L1 (3ms) → Bifrost L2 (2-5s) → TRT-LLM L3 (2-3s)
        │
        └─→ L2: Direct Ollama (3.2s)
            └─ Windows native (GPU)
-           └─ gemma3:270m or gemma4-legal-fast
+           └─ gemma3:270m or gemma4-rotorquant:latest-fast
            └─ Fallback for cache misses
 ```
 

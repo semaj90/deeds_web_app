@@ -98,7 +98,7 @@ vi.mock('$lib/server/observability/langfuse.js', () => ({
 vi.mock('$lib/server/env.server.js', () => ({
 	ENV: {
 		OLLAMA_BASE_URL: 'http://localhost:11434',
-		OLLAMA_CHAT_MODEL: 'gemma4-legal',
+		OLLAMA_CHAT_MODEL: 'gemma4-rotorquant:latest',
 		QDRANT_URL: 'http://localhost:6333',
 	},
 }));

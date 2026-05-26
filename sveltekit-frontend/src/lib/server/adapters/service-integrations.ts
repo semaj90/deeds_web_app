@@ -2,7 +2,7 @@
  * Server-Side Service Integration Adapters
  *
  * Production-ready helpers for:
- * - Ollama embeddings & chat (gemma4-legal:latest, embeddinggemma:latest)
+ * - Ollama embeddings & chat (gemma4-rotorquant:latest, embeddinggemma:latest)
  * - Redis caching (IORedis)
  * - Qdrant vector indexing (@qdrant/js-client-rest)
  * - PostgreSQL + pgvector (pg + drizzle-orm)
@@ -77,7 +77,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
 		ollamaConfig: {
 			baseUrl: ENV.OLLAMA_BASE_URL,
 			embeddingModel: privateEnv.EMBEDDING_MODEL || 'embeddinggemma:latest',
-			chatModel: privateEnv.CHAT_MODEL || 'gemma4-legal:latest',
+			chatModel: privateEnv.CHAT_MODEL || 'gemma4-rotorquant:latest',
 			gpuLayers: parseInt(privateEnv.OLLAMA_GPU_LAYERS || '30', 10),
 			timeout: 60000
 		},

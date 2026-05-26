@@ -1,0 +1,9 @@
+{
+  "artifact": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\index\\lexical-hits.jsonl",
+  "count": 47011,
+  "generated_by": "scripts/index/lexical-rg.mjs",
+  "lane": "rg",
+  "scanners": [
+    "rg"
+  ]
+}

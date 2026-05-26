@@ -492,16 +492,48 @@
     "sveltekit-frontend/scripts/backup-consolidation/tests/comparison-engine.test.mjs",
     "sveltekit-frontend/scripts/backup-consolidation/tests/pattern-matching.test.mjs"
   ],
+  "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.ts": [
+    "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.spec.ts",
+    "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts"
+  ],
   "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts": [
     "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.ts": [
+    "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.ts": [
+    "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.ts": [
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/tests/agents-regen-writers.spec.ts"
   ],
+  "sveltekit-frontend/src/lib/server/ai/engram-registry.ts": [
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts": [
+    "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop-langgraph.ts": [
+    "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts": [
+    "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts",
+    "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts",
+    "sveltekit-frontend/tests/opencode-skill.spec.ts"
+  ],
   "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.ts": [
     "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts": [
+    "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts"
+  ],
+  "sveltekit-frontend/scripts/cards/master-feature-cards.mjs": [
+    "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/evidence/docling-structure.ts": [
     "sveltekit-frontend/src/lib/server/evidence/docling-structure.test.ts"
@@ -522,12 +554,33 @@
   "sveltekit-frontend/src/lib/server/indexer/legal-chunker.ts": [
     "sveltekit-frontend/src/lib/server/indexer/legal-chunker.test.ts"
   ],
+  "sveltekit-frontend/src/lib/server/labels/feature-label-registry.ts": [
+    "sveltekit-frontend/src/lib/server/labels/feature-label-registry.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/llm/token-budget.ts": [
+    "sveltekit-frontend/src/lib/server/llm/token-budget.spec.ts"
+  ],
   "sveltekit-frontend/src/lib/server/models/model-registry.ts": [
     "sveltekit-frontend/src/lib/server/models/model-registry.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts": [
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/context-buffer.ts": [
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts": [
     "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
@@ -543,6 +596,24 @@
   "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.ts": [
     "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.test.ts",
     "sveltekit-frontend/tests/unit/routing-explanation.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/clusters/cards/+server.ts": [
+    "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
+    "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/types/retrieval.ts": [
+    "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.ts": [
     "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.test.ts"
@@ -580,6 +651,31 @@
   "sveltekit-frontend/tests/accessibility/accessibility-tester.ts": [
     "sveltekit-frontend/tests/accessibility/accessibility.test.ts"
   ],
+  "src/lib/server/ace/context-assembler.ts": [
+    "sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    "sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    "sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    "sveltekit-frontend/tests/ace-context-glossary.spec.ts",
+    "sveltekit-frontend/tests/ace-context-glossary.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-rerank-spine.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/retrieval-path-wiring.spec.ts",
+    "sveltekit-frontend/tests/retrieval-path-wiring.spec.ts"
+  ],
   "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts": [
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
@@ -590,11 +686,6 @@
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ace/ingest.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/synthesis/evaluation/[id]/+server.ts": [
-    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
-    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
-    "sveltekit-frontend/tests/routes/auto/api/synthesis/evaluation/__id.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ace/status/+server.ts": [
     "sveltekit-frontend/tests/ace-status-route.spec.ts",
@@ -697,6 +788,7 @@
     "sveltekit-frontend/tests/e2e/chat-inference-routing.spec.ts",
     "sveltekit-frontend/tests/e2e/chat-rag-sse.spec.ts",
     "sveltekit-frontend/tests/e2e/chat.spec.ts",
+    "sveltekit-frontend/tests/e2e/contract-network.spec.ts",
     "sveltekit-frontend/tests/e2e/demo-seed.spec.ts",
     "sveltekit-frontend/tests/e2e/evidence-analyze-stream.spec.ts",
     "sveltekit-frontend/tests/e2e/evidence-case-scoping.spec.ts",
@@ -951,16 +1043,6 @@
   ],
   "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts": [
     "sveltekit-frontend/tests/codebase-index-postgres-fallback.spec.ts"
-  ],
-  "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts": [
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
-    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase-index/+server.ts": [
     "sveltekit-frontend/tests/codebase-indexer.spec.ts",
@@ -1252,6 +1334,13 @@
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/case-theory.test.ts"
   ],
+  "sveltekit-frontend/src/lib/server/ai/intent-ranker.ts": [
+    "sveltekit-frontend/tests/intent-ranker.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts": [
+    "sveltekit-frontend/tests/intent-ranker.spec.ts",
+    "sveltekit-frontend/tests/unit/local-engram-memory-adapter.test.ts"
+  ],
   "sveltekit-frontend/src/lib/server/indexer/karpathy-hook.ts": [
     "sveltekit-frontend/tests/karpathy-hook-stability.spec.ts",
     "sveltekit-frontend/tests/karpathy-hook.spec.ts"
@@ -1297,11 +1386,23 @@
     "sveltekit-frontend/tests/multi-lane-retrieval.spec.ts",
     "sveltekit-frontend/tests/multi-lane-rrf-and-rerank.spec.ts"
   ],
-  "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": [
+  "src/lib/server/ai/openai-facade.ts": [
     "sveltekit-frontend/tests/openai-facade.spec.ts",
     "sveltekit-frontend/tests/openai-facade.spec.ts",
-    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
-    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts"
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ai/opencode-skill.ts": [
+    "sveltekit-frontend/tests/opencode-skill.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/kb/search-logic.ts": [
+    "sveltekit-frontend/tests/opencode-skill.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/persons-of-interest/+server.ts": [
     "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
@@ -1349,7 +1450,7 @@
     "sveltekit-frontend/tests/routes/all-routes-page-server.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ai/context/compact-search/+server.ts": [
-    "sveltekit-frontend/tests/routes/api/ai/context-compact-search.spec.ts"
+    "sveltekit-frontend/tests/routes/api/ai/context-compact-search.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ai/contextual-chat/+server.ts": [
     "sveltekit-frontend/tests/routes/api/ai/contextual-chat.spec.ts"
@@ -1911,7 +2012,16 @@
   "sveltekit-frontend/src/routes/api/chat/replay/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/chat/replay.test.ts"
   ],
+  "sveltekit-frontend/tests/routes/auto/api/chat/stream.test-harness.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/chat/stream/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.test.ts"
   ],
@@ -1927,6 +2037,10 @@
   "sveltekit-frontend/src/routes/api/chrrom/push/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/chrrom/push.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chrrom/push.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/citations/annotations/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/citations/annotations.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/citations/annotations.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/citations/collections/[collectionId]/citations/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/citations/collections/__collectionId/citations.test.ts",
@@ -3023,6 +3137,9 @@
   "sveltekit-frontend/src/routes/api/research/search/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/research/search.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/research/topological-encyclopedia/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/research/topological-encyclopedia.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/route-operations/log/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/route-operations/log.test.ts"
   ],
@@ -3152,6 +3269,9 @@
   "sveltekit-frontend/src/routes/api/sync/documents/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/sync/documents.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/synthesis/evaluation/[id]/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/synthesis/evaluation/__id.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/synthesis/generate.test.ts"
   ],
@@ -3269,6 +3389,10 @@
   ],
   "sveltekit-frontend/src/routes/api/v1/ai/summary-cache/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/v1/ai/summary-cache.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/v1/chat/messages/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/v1/chat/messages.test.ts"
@@ -3430,9 +3554,6 @@
   ],
   "sveltekit-frontend/src/lib/server/ace/context-packet-budgeter.ts": [
     "sveltekit-frontend/tests/unit/context-packet-budgeter.test.ts"
-  ],
-  "sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts": [
-    "sveltekit-frontend/tests/unit/local-engram-memory-adapter.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/engram-memory.ts": [
     "sveltekit-frontend/tests/unit/local-engram-memory-adapter.test.ts"

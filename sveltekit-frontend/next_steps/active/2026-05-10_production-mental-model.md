@@ -47,7 +47,7 @@ Production-readiness isn't one bar — it's 7 bars, one per orthogonal lane. A l
 
 **Production bar**: cold-prompt → first token ≤ 5s; cache hit ≤ 50ms; no OOM at 16K context with VLM.
 
-- ✅ Gemma 4 VLM merged (`gemma4-legal-vlm:latest`, 5.3 GB, mmproj fused)
+- ✅ Gemma 4 VLM merged (`gemma4-rotorquant:latest`, 5.3 GB, mmproj fused)
 - ✅ TurboQuant binary path env-flagged (`LLAMA_SERVER_PATH`, `TURBO_PROFILE` stock / turboquant / turboquant-safe)
 - ✅ KV cache `q8_0/q8_0` stable on stock binary; `q8_0/turbo3` if test1111 fork present
 - ✅ Bifrost L2 semantic cache live on :3040

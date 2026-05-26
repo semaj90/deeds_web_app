@@ -13,7 +13,7 @@ Our orchestration follows a multi-lane retrieval and synthesis strategy (TRACE: 
 
 ### Lane 2: GEMMA4 Offload (Diagnostic & Reasoning)
 *   **Purpose**: Cheap local reasoning, classification, and intent inference.
-*   **Strategy**: Uses lightweight models (`gemma3:270m`, `gemma4-legal-fast`) to perform "Phase D" diagnostic hooks, keeping the primary LLM context clean and token-efficient.
+*   **Strategy**: Uses lightweight models (`gemma3:270m`, `gemma4-rotorquant:latest-fast`) to perform "Phase D" diagnostic hooks, keeping the primary LLM context clean and token-efficient.
 *   **Tooling**: `gemma4-offload` MCP server.
 
 ### Lane 3: Deep Research (Hypergraph & Web)

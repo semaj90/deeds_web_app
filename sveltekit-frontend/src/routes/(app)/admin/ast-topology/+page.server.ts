@@ -61,7 +61,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
     recentActivity,
     config: {
 	qdrantUrl: getQdrantUrl(),
-      ollamaModels: ['embeddinggemma:latest', 'gemma4-legal:latest']
+      ollamaModels: ['embeddinggemma:latest', 'gemma4-rotorquant:latest']
     }
   };
 };

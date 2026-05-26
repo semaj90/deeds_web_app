@@ -105,7 +105,7 @@ async function enrichTranscription(
 				const summaryResp = await ollamaFetch('/api/generate', {
 					method: 'POST',
 					body: JSON.stringify({
-						model: 'gemma4-legal:latest',
+						model: 'gemma4-rotorquant:latest',
 						prompt: `Summarize this audio transcription in the context of the legal case. Identify key facts, dates, names, and legal relevance.\n\nTranscription:\n${text.slice(0, 6000)}\n\nRelated evidence:\n${contextSnippets.slice(0, 3000)}\n\nProvide a concise 2-3 paragraph summary:`,
 						stream: false,
 						options: { temperature: 0.2, num_predict: 512 },

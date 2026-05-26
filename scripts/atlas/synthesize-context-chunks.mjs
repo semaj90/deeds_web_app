@@ -53,7 +53,7 @@ const VERBOSE    = argv.includes('--verbose');
 
 const INPUT_PATH = inputI >= 0 ? argv[inputI + 1] : null;
 const OUT_PATH   = outI   >= 0 ? argv[outI + 1]   : null;
-const MODEL      = modelI >= 0 ? argv[modelI + 1] : 'gemma4-legal-vlm:latest';
+const MODEL      = modelI >= 0 ? argv[modelI + 1] : 'gemma4-rotorquant:latest';
 
 const TURBO_URL  = process.env.TURBO_URL  ?? 'http://localhost:8090';
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';

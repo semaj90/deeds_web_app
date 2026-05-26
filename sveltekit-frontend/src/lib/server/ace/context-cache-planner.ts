@@ -218,7 +218,7 @@ export function buildAceContextPlannerState(input: {
   const state = {
     query: input.query.trim(),
     queryHash: generateContextHash(input.query.trim()),
-    modelName: input.modelName ?? 'gemma4-legal:latest',
+    modelName: input.modelName ?? 'gemma4-rotorquant:latest',
     modelQuant: input.modelQuant ?? 'iq4_xs',
     backend: input.backend ?? 'openai-facade',
     tokenizerHash: input.tokenizerHash ?? 'embeddinggemma:latest:768',

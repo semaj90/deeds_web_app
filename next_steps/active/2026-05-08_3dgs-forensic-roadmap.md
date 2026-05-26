@@ -94,7 +94,7 @@ research note proposes. Gap analysis:
 2. **Original media is read-only.** Processed copies only.
 
 3. **Model versions are auditable.** Every `caption` row needs
-   `metadata.model = 'gemma4-legal-vlm:latest@<digest>'` so a future
+   `metadata.model = 'gemma4-rotorquant:latest@<digest>'` so a future
    review can prove which model produced the description.
 
 ## Pipeline shape (when activated)
@@ -139,7 +139,7 @@ Verified for the existing GPU pipeline (LibTorch + Karpathy GPU enrich):
 - **Karpathy GPU pipeline footprint**: ~196 KB (autoencoder weights) +
   6 KB (encoded buffer for 24 vectors) — negligible
 - **Embeddinggemma loaded**: 1,108 MB
-- **TurboQuant gemma4-legal-vlm**: ~5,300 MB (loaded on demand, exclusive)
+- **TurboQuant gemma4-rotorquant:latest**: ~5,300 MB (loaded on demand, exclusive)
 
 3DGS budget on this card: maybe 200–400 photos at 1024px FP16 with
 aggressive Gaussian pruning. Larger scenes need RTX 4080+ or batch

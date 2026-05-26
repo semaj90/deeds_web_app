@@ -1,5 +1,5 @@
 /**
- * Legal document summarization via Ollama (gemma4-legal).
+ * Legal document summarization via Ollama (gemma4-rotorquant:latest).
  * Generates a concise summary for each uploaded evidence document.
  * Ported from evidence-service/src/services/summarizer.ts
  */

@@ -19,7 +19,7 @@ python gemma4_setup.py
 
 **Time:** 60-90 minutes
 **Space:** 20GB free minimum
-**Result:** `gemma4-legal:e4b` model ready in Ollama
+**Result:** `gemma4-rotorquant:latest:e4b` model ready in Ollama
 
 ---
 
@@ -68,7 +68,7 @@ Fully automated pipeline:
 ### Test the Model
 
 ```bash
-ollama run gemma4-legal:e4b "What is hearsay evidence?"
+ollama run gemma4-rotorquant:latest:e4b "What is hearsay evidence?"
 ```
 
 ### Use in Code
@@ -78,7 +78,7 @@ import { bifrostChat } from '$lib/server/ollama.js';
 
 const response = await bifrostChat(
   [{ role: 'user', content: 'Analyze this contract...' }],
-  'gemma4-legal:e4b',
+  'gemma4-rotorquant:latest:e4b',
   { temperature: 0.3 }
 );
 ```
@@ -199,7 +199,7 @@ After successful import to Ollama:
 
 ```powershell
 # Delete merged model (saves ~15GB)
-Remove-Item -Recurse gemma4-legal-merged-full
+Remove-Item -Recurse gemma4-rotorquant:latest-merged-full
 
 # Delete llama.cpp (saves ~500MB)
 Remove-Item -Recurse llama.cpp
@@ -232,9 +232,9 @@ Part of Legal AI Platform project.
 | `setup.bat` | Start setup (double-click) |
 | `.\setup.ps1` | PowerShell launcher |
 | `python gemma4_setup.py` | Python directly |
-| `ollama run gemma4-legal:e4b` | Test model |
+| `ollama run gemma4-rotorquant:latest:e4b` | Test model |
 | `ollama list` | List installed models |
-| `ollama rm gemma4-legal:e4b` | Remove model |
+| `ollama rm gemma4-rotorquant:latest:e4b` | Remove model |
 | `type gemma4_setup.log` | View logs |
 
 ---

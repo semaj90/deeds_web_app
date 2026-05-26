@@ -125,7 +125,7 @@ export const CONTEXTUAL_TOOLS = [
     function: {
       name: 'crawl_web_research',
       description:
-        'Trigger a live web search crawl on a research query, summarise top results with gemma4-legal, ' +
+        'Trigger a live web search crawl on a research query, summarise top results with gemma4-rotorquant:latest, ' +
         'and index them in the glyph cache. Use when the user wants fresh web research on a legal topic, ' +
         'case law updates, or news relevant to their case. Results are also persisted for future searches.',
       parameters: {
@@ -151,7 +151,7 @@ export const CONTEXTUAL_TOOLS = [
       name: 'crawl_legal_corpus',
       description:
         'Search the local legal corpus (Legal Canon, Court Opinions, Context Documents) using vector similarity, ' +
-        'then summarise top chunks with gemma4-legal. Use for offline legal research across authoritative ' +
+        'then summarise top chunks with gemma4-rotorquant:latest. Use for offline legal research across authoritative ' +
         'primary sources plus nearby contextual local documents from the indexed Qdrant collections.',
       parameters: {
         type: 'object',
@@ -201,7 +201,7 @@ export const CONTEXTUAL_TOOLS = [
       description:
         'Identify or match a person of interest by face using gemma4 VLM multi-pass GRPO reranking. ' +
         'Pass 1: 768-dim face embedding cosine similarity (fast, ~5ms). ' +
-        'Pass 2: gemma4-legal-vlm visual reasoning — "same person?" → confidence 0-100. ' +
+        'Pass 2: gemma4-rotorquant:latest visual reasoning — "same person?" → confidence 0-100. ' +
         'Pass 3: GRPO reward fusion — 0.25 × embedding + 0.75 × VLM confidence. ' +
         'Use when the user asks "who is this person?", "find matching faces", or needs POI identity matching. ' +
         'Returns ranked candidates with per-pass scores and VLM reasoning snippets.',
@@ -910,7 +910,7 @@ export async function executeContextualTool(
         // Pass 2: VLM reasoning on top-5
         if (passes >= 2 && refPhoto?.thumbnailUrl) {
           const OLLAMA = env.OLLAMA_BASE_URL.replace(/\/$/, '');
-          const model = env.OLLAMA_VLM_MODEL ?? env.GEMMA4_MODEL ?? 'gemma4-legal-vlm:latest';
+          const model = env.OLLAMA_VLM_MODEL ?? env.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest';
 
           async function fetchB64(url: string): Promise<string | null> {
             try {

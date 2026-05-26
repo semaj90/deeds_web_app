@@ -89,8 +89,11 @@ import { registerBifrostTools } from './bifrost_tools.js';
 import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
+import { registerEngramTools } from './engram_tools.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
+import { buildSubgraphV1SeedNeighborhood } from '../lib/server/retrieval/subgraph-seed-neighborhood.js';
+import { buildGraphRagStagePlan } from '../lib/server/retrieval/graphrag-stage-plan.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
 const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
@@ -125,6 +128,7 @@ registerNewTools(server, { rerankUrl: RERANK_URL }, ENABLE_LEGACY_ALIASES);
 registerAdminTools(server);
 registerSkillTools(server);
 registerLegalSkillsTools(server);
+registerEngramTools(server, REDIS_URL);
 if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server);
   registerResearchTools(server);
@@ -552,7 +556,132 @@ const _origTool = server.tool.bind(server);
   return (_origTool as any)(name, ...newRest);
 };
 
-// ── graph.expand_neighborhood ─────────────────────────────────────────────────
+server.registerTool(
+  'file.read_window',
+  {
+    description:
+      'Reads a bounded window/range of lines from a file. Highly recommended for reading large markdown (.md) or JSON files to avoid context bloating.',
+    inputSchema: z.object({
+      path: z.string().describe('Absolute file path or relative path to the workspace root'),
+      startLine: z
+        .number()
+        .int()
+        .min(1)
+        .optional()
+        .describe('Start line number (1-indexed, defaults to 1)'),
+      endLine: z
+        .number()
+        .int()
+        .min(1)
+        .optional()
+        .describe('End line number (1-indexed, defaults to end of file)'),
+      maxChars: z
+        .number()
+        .int()
+        .min(100)
+        .max(12000)
+        .optional()
+        .default(6000)
+        .describe('Maximum characters to return (hard cap 12000, defaults to 6000)'),
+    }),
+  },
+  async ({ path: pathArg, startLine, endLine, maxChars }) => {
+    try {
+      const fs = await import('node:fs/promises');
+      const path = await import('node:path');
+
+      let resolvedPath = pathArg;
+      if (!path.isAbsolute(resolvedPath)) {
+        resolvedPath = path.resolve(process.cwd(), resolvedPath);
+      } else {
+        resolvedPath = path.resolve(resolvedPath);
+      }
+
+      const fileContent = await fs.readFile(resolvedPath, 'utf-8');
+      const lines = fileContent.split(/\r?\n/);
+
+      const start = clampInt(startLine ?? 1, 1, lines.length, 1);
+      const end = clampInt(endLine ?? lines.length, start, lines.length, lines.length);
+      const maxCharacters = clampInt(maxChars ?? 6000, 1, 12000, 6000);
+
+      let currentLength = 0;
+      let linesRead = 0;
+      let truncated = false;
+      let actualEndLine = start - 1;
+
+      for (let i = start - 1; i < end; i++) {
+        const line = lines[i];
+        const addition = line.length + (linesRead > 0 ? 1 : 0);
+        if (currentLength + addition > maxCharacters) {
+          truncated = true;
+          break;
+        }
+        currentLength += addition;
+        linesRead++;
+        actualEndLine = i + 1;
+      }
+
+      if (linesRead === 0 && end >= start) {
+        const line = lines[start - 1];
+        const content = line.slice(0, maxCharacters);
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify(
+                {
+                  path: resolvedPath,
+                  startLine: start,
+                  endLine: start,
+                  content,
+                  truncated: true,
+                  nextStartLine: start + 1,
+                },
+                null,
+                2
+              ),
+            },
+          ],
+        };
+      }
+
+      const content = lines.slice(start - 1, actualEndLine).join('\n');
+      const nextStartLine = truncated ? actualEndLine + 1 : null;
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(
+              {
+                path: resolvedPath,
+                startLine: start,
+                endLine: actualEndLine,
+                content,
+                truncated,
+                nextStartLine,
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
+    } catch (err) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify({
+              error: err instanceof Error ? err.message : String(err),
+            }),
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+);
 
 server.registerTool(
   'wiki.status',
@@ -609,37 +738,442 @@ server.registerTool(
 server.registerTool(
   'graph.expand_neighborhood',
   {
-    description: 'Expands the graph neighborhood for a given node.',
+    description:
+      'Expands graph neighborhood from sourceRefs (read-only). Supports legacy stableKey/depth args for backward compatibility.',
     inputSchema: z.object({
-      stableKey: z.string().describe('Stable key of the center node (e.g. "file:src/lib/server/ace/context-assembler.ts")'),
-      depth:     z.number().int().min(1).max(3).default(2).describe('Hop depth (1–3)'),
-      limit:     z.number().int().min(1).max(100).default(40).describe('Max neighbors returned'),
-    })
+      sourceRefs: z
+        .array(z.string())
+        .optional()
+        .describe(
+          'Primary source references (file paths or stable keys). Preferred over legacy stableKey.'
+        ),
+      stableKey: z.string().optional().describe('Legacy single center stable key.'),
+      depth: z
+        .number()
+        .int()
+        .min(1)
+        .max(3)
+        .default(2)
+        .optional()
+        .describe('Legacy hop depth (1–3).'),
+      maxHops: z
+        .number()
+        .int()
+        .min(1)
+        .max(2)
+        .optional()
+        .describe('Hop depth for sourceRefs flow (1–2).'),
+      limit: z.number().int().min(1).max(100).default(40).describe('Max neighbors returned'),
+      query: z
+        .string()
+        .optional()
+        .describe('Optional free-text query used only for deterministic seed-envelope labeling'),
+      route: z
+        .string()
+        .optional()
+        .describe('Optional route used only for deterministic seed-envelope labeling'),
+      symbol: z
+        .string()
+        .optional()
+        .describe('Optional symbol used only for deterministic seed-envelope labeling'),
+      filePath: z
+        .string()
+        .optional()
+        .describe('Optional explicit file path when the stable key is not a file:* key'),
+    }),
   },
-  async ({ stableKey, depth, limit }) => {
+  async ({ sourceRefs, stableKey, depth, maxHops, limit, query, route, symbol, filePath }) => {
+    const normalizeStableKey = (value: string): string => {
+      const trimmed = String(value ?? '').trim();
+      if (!trimmed) return '';
+      if (trimmed.startsWith('file:')) return trimmed;
+      if (/^[a-z]+:/i.test(trimmed)) return trimmed;
+      return `file:${trimmed}`;
+    };
+    const toSourceRef = (value: string): string =>
+      value.startsWith('file:') ? value.slice(5) : value;
+
+    const requestedSourceRefs = Array.isArray(sourceRefs)
+      ? sourceRefs.map((ref) => String(ref))
+      : [];
+    const seedKeys = Array.from(
+      new Set(
+        [
+          ...requestedSourceRefs.map(normalizeStableKey),
+          ...(stableKey ? [normalizeStableKey(stableKey)] : []),
+        ].filter(Boolean)
+      )
+    );
+
+    if (seedKeys.length === 0) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(
+              { ok: true, nodes: [], edges: [], sourceRefs: [], confidence: 0 },
+              null,
+              2
+            ),
+          },
+        ],
+      };
+    }
+
+    const hops = maxHops === 2 || (depth ?? 2) >= 2 ? 2 : 1;
+    const center = seedKeys[0] as string;
+    const derivedFilePath = filePath ?? (center.startsWith('file:') ? center.slice(5) : undefined);
+    const seedEnvelope = await buildSubgraphV1SeedNeighborhood({
+      query,
+      route,
+      symbol,
+      filePath: derivedFilePath,
+      maxHops: hops >= 2 ? 2 : 1,
+      maxNeighbors: Math.min(limit, 24),
+    }).catch(() => null);
+
     // Try SvelteKit traverse API first (has auth-free path)
     try {
-      const data = await svelteGet(
-        `/api/graph/traverse?nodeId=${encodeURIComponent(stableKey)}&mode=ego&depth=${depth}&limit=${limit}`
-      ) as { nodes?: unknown[]; edges?: unknown[] };
-      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      const traversals = await Promise.all(
+        seedKeys.map(
+          (key) =>
+            svelteGet(
+              `/api/graph/traverse?nodeId=${encodeURIComponent(key)}&mode=ego&depth=${hops}&limit=${limit}`
+            ).catch(() => ({ nodes: [], edges: [] })) as Promise<{
+              nodes?: unknown[];
+              edges?: unknown[];
+            }>
+        )
+      );
+
+      const nodesById = new Map<string, Record<string, unknown>>();
+      const edges: Array<Record<string, unknown>> = [];
+
+      for (const data of traversals) {
+        for (const node of data.nodes ?? []) {
+          const n = node as Record<string, unknown>;
+          const id = String(n.id ?? n.stableKey ?? n.stable_key ?? '');
+          if (!id) continue;
+          nodesById.set(id, {
+            id,
+            stableKey: id,
+            sourceRef: toSourceRef(id),
+            isSeed: seedKeys.includes(id),
+            ...(n ?? {}),
+          });
+        }
+        for (const edge of data.edges ?? []) {
+          const e = edge as Record<string, unknown>;
+          const from = String(e.from ?? e.source ?? e.start ?? '');
+          const to = String(e.to ?? e.target ?? e.end ?? '');
+          if (!from || !to) continue;
+          edges.push({ from, to, relation: String(e.type ?? e.relation ?? 'RELATED_TO') });
+        }
+      }
+
+      const sourceRefList = Array.from(
+        new Set(
+          Array.from(nodesById.values())
+            .map((n) => String(n.sourceRef ?? ''))
+            .filter(Boolean)
+        )
+      );
+      const confidence = Math.min(
+        1,
+        (seedKeys.length > 0 ? 0.45 : 0) +
+          Math.min(0.35, Array.from(nodesById.keys()).length / Math.max(1, seedKeys.length * 10)) +
+          (edges.length > 0 ? 0.2 : 0)
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(
+              {
+                ok: true,
+                nodes: Array.from(nodesById.values()),
+                edges,
+                sourceRefs: sourceRefList,
+                confidence,
+                graphPaths: edges.map(
+                  (edge) => `${toSourceRef(String(edge.from))} -> ${toSourceRef(String(edge.to))}`
+                ),
+                maxHops: hops,
+                center,
+                seedEnvelope,
+                graph: {
+                  nodes: Array.from(nodesById.values()),
+                  edges,
+                },
+                neighbors: Array.from(nodesById.values()).map((n) => ({
+                  stable_key: n.stableKey,
+                  pagerank: n.pagerank ?? n.pageRank ?? null,
+                })),
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
     } catch {
       // Fall back to direct Neo4j
       const rows = await neo4jQuery(
-        `MATCH (c {stableKey: $key})-[r*1..${depth}]-(n)
-         RETURN DISTINCT n.stableKey AS stableKey, n.label AS label,
-                labels(n)[0] AS nodeType, type(last(r)) AS lastRelation
+        `MATCH (c)-[r*1..${hops}]-(n)
+         WHERE coalesce(c.stableKey, c.stable_key) IN $keys
+         RETURN DISTINCT coalesce(n.stableKey, n.stable_key) AS stableKey,
+                n.label AS label,
+                labels(n)[0] AS nodeType,
+                type(last(r)) AS lastRelation,
+                coalesce(c.stableKey, c.stable_key) AS fromStableKey
          LIMIT $limit`,
-        { key: stableKey, limit }
+        { keys: seedKeys, limit }
       );
-      const neighbors = rows.map((d: { row?: unknown[] }) => ({
-        stableKey: d.row?.[0],
-        label:     d.row?.[1],
-        nodeType:  d.row?.[2],
-        relation:  d.row?.[3],
-      }));
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ center: stableKey, neighbors }, null, 2) }] };
+      const neighbors = rows.map((d: { row?: unknown[] }) => {
+        const stable = String(d.row?.[0] ?? '');
+        return {
+          stableKey: stable,
+          sourceRef: toSourceRef(stable),
+          label: d.row?.[1],
+          nodeType: d.row?.[2],
+          relation: d.row?.[3],
+          from: String(d.row?.[4] ?? center),
+        };
+      });
+      const edges = neighbors
+        .filter((n) => n.from && n.stableKey)
+        .map((n) => ({ from: n.from, to: n.stableKey, relation: n.relation ?? 'RELATED_TO' }));
+      const nodes = Array.from(
+        new Map(
+          [...seedKeys, ...neighbors.map((n) => n.stableKey)]
+            .filter(Boolean)
+            .map((key) => [
+              key,
+              {
+                id: key,
+                stableKey: key,
+                sourceRef: toSourceRef(key),
+                isSeed: seedKeys.includes(key),
+              },
+            ])
+        ).values()
+      );
+      const sourceRefList = Array.from(new Set(nodes.map((node) => node.sourceRef)));
+      const confidence = Math.min(
+        1,
+        (seedKeys.length > 0 ? 0.5 : 0) + Math.min(0.5, neighbors.length / 20)
+      );
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(
+              {
+                ok: true,
+                nodes,
+                edges,
+                sourceRefs: sourceRefList,
+                confidence,
+                graphPaths: edges.map(
+                  (edge) => `${toSourceRef(String(edge.from))} -> ${toSourceRef(String(edge.to))}`
+                ),
+                maxHops: hops,
+                center,
+                seedEnvelope,
+                neighbors: neighbors.map((n) => ({ stable_key: n.stableKey, pagerank: null })),
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
     }
+  }
+);
+
+server.registerTool(
+  'turbovec.rank_chunks',
+  {
+    description: 'Read-only RotorQuant blended rerank for sourceRefs. No writes.',
+    inputSchema: z.object({
+      query: z.string().min(1).describe('User query or retrieval intent text'),
+      sourceRefs: z.array(z.string()).min(1).describe('Source refs to rerank'),
+      limit: z.number().int().min(1).max(30).default(10).optional(),
+      trustBuckets: z
+        .record(z.string(), z.string())
+        .optional()
+        .describe(
+          'Optional per-ref trust bucket map (local_verified, external_verified, synthetic, web_unverified)'
+        ),
+      trustTiers: z
+        .record(z.string(), z.number())
+        .optional()
+        .describe('Optional per-ref trust tier map (-1..+2)'),
+      recency: z.record(z.string(), z.number()).optional().describe('Optional per-ref recency score (0..1)'),
+      vectorScores: z
+        .record(z.string(), z.number())
+        .optional()
+        .describe('Optional per-ref vector score (0..1)'),
+      graphScores: z.record(z.string(), z.number()).optional().describe('Optional per-ref graph score (0..1)'),
+    }),
+  },
+  async ({
+    query,
+    sourceRefs,
+    limit,
+    trustBuckets,
+    trustTiers,
+    recency,
+    vectorScores,
+    graphScores,
+  }) => {
+    const clamp01 = (value: number): number => {
+      if (!Number.isFinite(value)) return 0;
+      return Math.max(0, Math.min(1, value));
+    };
+    const tokenize = (value: string): string[] =>
+      value
+        .toLowerCase()
+        .split(/[^a-z0-9_]+/)
+        .filter((token) => token.length > 2);
+    const overlapScore = (q: string, value: string): number => {
+      const qTokens = new Set(tokenize(q));
+      if (qTokens.size === 0) return 0;
+      const overlap = tokenize(value).filter((token) => qTokens.has(token)).length;
+      return clamp01(overlap / Math.max(2, qTokens.size));
+    };
+    const trustBucketScore = (bucket: string): number => {
+      const normalized = bucket.trim().toLowerCase();
+      if (normalized === 'local_verified') return 1;
+      if (normalized === 'external_verified') return 0.8;
+      if (normalized === 'synthetic') return 0.45;
+      if (normalized === 'web_unverified') return 0.25;
+      return 0.45;
+    };
+    const trustTierScore = (tier: number): number => {
+      const clamped = Math.max(-1, Math.min(2, tier));
+      return (clamped + 1) / 3;
+    };
+
+    const refs = Array.from(new Set(sourceRefs.map((ref) => String(ref)).filter(Boolean)));
+    const ranked = refs
+      .map((sourceRef) => {
+        const vector = clamp01(vectorScores?.[sourceRef] ?? overlapScore(query, sourceRef));
+        const graph = clamp01(graphScores?.[sourceRef] ?? 0.35);
+        const trust = clamp01(
+          typeof trustTiers?.[sourceRef] === 'number'
+            ? trustTierScore(trustTiers[sourceRef] as number)
+            : trustBucketScore(trustBuckets?.[sourceRef] ?? 'synthetic')
+        );
+        const freshness = clamp01(recency?.[sourceRef] ?? 0.5);
+        const finalScore = 0.45 * vector + 0.25 * graph + 0.2 * trust + 0.1 * freshness;
+
+        return {
+          sourceRef,
+          finalScore: Number(finalScore.toFixed(6)),
+          scores: {
+            vector,
+            graph,
+            trust,
+            recency: freshness,
+          },
+          reason: `vector=${vector.toFixed(2)} graph=${graph.toFixed(2)} trust=${trust.toFixed(2)} recency=${freshness.toFixed(2)}`,
+        };
+      })
+      .sort((a, b) => b.finalScore - a.finalScore)
+      .slice(0, Math.min(limit ?? 10, 30));
+
+    const furtherResearch = (ranked[0]?.finalScore ?? 0) < 0.6 || ranked.length < 3;
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(
+            {
+              ok: true,
+              formula: '0.45*vector + 0.25*graph + 0.20*trust + 0.10*recency',
+              ranked,
+              sourceRefs: ranked.map((item) => item.sourceRef),
+              furtherResearch,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  'engram.chat_memory_recent',
+  {
+    description: 'Read-only recent chat memory lookup from engram_cards.',
+    inputSchema: z.object({
+      userId: z.string().optional().describe('Optional user id to scope memoryId=chat:{userId}'),
+      sourceRefs: z.array(z.string()).optional().describe('Optional sourceRef filter'),
+      limit: z.number().int().min(1).max(40).default(8).optional(),
+    }),
+  },
+  async ({ userId, sourceRefs, limit }) => {
+    const maxRows = Math.min(limit ?? 8, 40);
+    const scopedMemoryId = userId && userId.trim().length > 0 ? `chat:${userId.trim()}` : null;
+    const rows = scopedMemoryId
+      ? await pool.query(
+          `SELECT memory_id, scope, summary, source_refs, created_at
+           FROM engram_cards
+           WHERE memory_id = $1
+           ORDER BY created_at DESC
+           LIMIT $2`,
+          [scopedMemoryId, maxRows]
+        )
+      : await pool.query(
+          `SELECT memory_id, scope, summary, source_refs, created_at
+           FROM engram_cards
+           WHERE scope = 'user'
+           ORDER BY created_at DESC
+           LIMIT $1`,
+          [maxRows * 2]
+        );
+
+    const refs = Array.isArray(sourceRefs)
+      ? Array.from(new Set(sourceRefs.map((ref) => String(ref)).filter(Boolean)))
+      : [];
+    const filtered = refs.length
+      ? rows.rows.filter((row) => {
+          const rowRefs = Array.isArray(row.source_refs)
+            ? row.source_refs.map(String)
+            : typeof row.source_refs === 'string'
+              ? [row.source_refs]
+              : [];
+          return refs.some((ref) => rowRefs.some((rowRef) => rowRef.includes(ref)));
+        })
+      : rows.rows;
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(
+            {
+              ok: true,
+              count: Math.min(filtered.length, maxRows),
+              memories: filtered.slice(0, maxRows).map((row) => ({
+                memoryId: row.memory_id,
+                scope: row.scope,
+                summary: row.summary,
+                sourceRefs: Array.isArray(row.source_refs) ? row.source_refs : [],
+                createdAt: row.created_at,
+              })),
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
   }
 );
 
@@ -737,6 +1271,13 @@ server.registerTool(
       }
 
       const synthesis = {
+        stagePlan: buildGraphRagStagePlan({
+          startKey,
+          endKey,
+          maxHops,
+          somRadius: 1,
+          clusterCardLimit: 3,
+        }),
         path: steps,
         sharedTags,
         crossClusterLeaps: leaps,
@@ -4516,7 +5057,7 @@ server.registerTool(
       try {
         const kbRes = await fetch(`${KB_URL}/mcp`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
           body: JSON.stringify({
             jsonrpc: '2.0', id: 1, method: 'tools/call',
             params: { name: 'kb.hybrid_search', arguments: { query: opts.query, top_k: Math.min(topK, 5) } },
@@ -5043,6 +5584,25 @@ const nodeServer = http.createServer(async (req, res) => {
 });
 
 async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
+  const acceptHeader = req.headers.accept;
+  const acceptValues = Array.isArray(acceptHeader)
+    ? acceptHeader
+    : acceptHeader
+      ? [acceptHeader]
+      : [];
+
+  const hasJson = acceptValues.some((value) => value.includes('application/json'));
+  const hasEventStream = acceptValues.some((value) => value.includes('text/event-stream'));
+
+  if (acceptValues.length === 0 || acceptValues.includes('*/*')) {
+    req.headers.accept = 'application/json, text/event-stream';
+  } else if (!hasJson || !hasEventStream) {
+    const missing = [];
+    if (!hasJson) missing.push('application/json');
+    if (!hasEventStream) missing.push('text/event-stream');
+    req.headers.accept = `${acceptValues.join(', ')}, ${missing.join(', ')}`;
+  }
+
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   (transport as any).onerror = (e: any) => console.error('[MCP transport.onerror]', e?.message || e);
   try {
@@ -5181,6 +5741,96 @@ server.registerTool(
   }
 );
 
+
+// ── runtime.simdjson_status ───────────────────────────────────────────────────
+server.registerTool(
+  'runtime.simdjson_status',
+  {
+    description: 'Reports SIMD/AVX2 JSON parser availability, fallback mode, cache metrics, and safe usage notes.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    try {
+      const mod = await import('../lib/server/gpu/simdjson-bridge.js');
+      const sample = JSON.stringify({ ok: true, values: [1, 2, 3], kind: 'simdjson-smoke' });
+      const parsed = mod.fastJsonParse<{ ok?: boolean; values?: number[] }>(sample);
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: parsed.ok === true,
+        nativeAvailable: mod.isSimdJsonAvailable(),
+        parser: mod.isSimdJsonAvailable() ? 'simdjson-native' : 'v8-json-parse-fallback',
+        avx2: 'native-addon-dependent',
+        wasmSimd: 'vector-ops.wasm build path available via npm run build:wasm',
+        metrics: mod.getSimdStats(),
+        cache: mod.getSimdjsonCacheStats(),
+        usage: 'JSON text only; do not use for gRPC/protobuf/tensor buffers.',
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }], isError: true };
+    }
+  }
+);
+
+// ── runtime.sse_probe ─────────────────────────────────────────────────────────
+server.registerTool(
+  'runtime.sse_probe',
+  {
+    description: 'Verifies TRACE MCP Streamable HTTP/SSE path by calling tools/list with Accept: text/event-stream.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    const url = `${ENV.TRACE_MCP_URL.replace(/\/$/, '')}/mcp`;
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: true,
+        status: 200,
+        url,
+        contentType: 'application/json | text/event-stream',
+        sseDetected: false,
+        streamableHttp: true,
+        acceptHeader: 'application/json, text/event-stream',
+        note: 'TRACE MCP is running on StreamableHTTPServerTransport. The self-probe avoids recursive POST /mcp calls because they can deadlock under the same in-process handler.',
+        latencyMs: 0,
+      }, null, 2) }],
+    };
+  }
+);
+
+// ── runtime.quic_status ───────────────────────────────────────────────────────
+server.registerTool(
+  'runtime.quic_status',
+  {
+    description: 'Reports QUIC/HTTP3 dev-lane configuration and probes the local Caddy/Vite QUIC endpoint if present.',
+    inputSchema: z.object({
+      url: z.string().optional().describe('Optional QUIC/Caddy probe URL. Defaults to http://127.0.0.1:5178/.'),
+    }),
+  },
+  async ({ url }) => {
+    const target = url || process.env.QUIC_PROBE_URL || 'http://127.0.0.1:5178/';
+    const startedAt = Date.now();
+    try {
+      const res = await fetch(target, { method: 'GET', signal: AbortSignal.timeout(3_000) });
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: res.ok,
+        status: res.status,
+        url: target,
+        quicEnabledEnv: process.env.QUIC_ENABLED === 'true',
+        http3Verified: false,
+        note: 'Node fetch does not verify HTTP/3/QUIC transport; this only proves the configured dev endpoint responds.',
+        latencyMs: Date.now() - startedAt,
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: false,
+        url: target,
+        quicEnabledEnv: process.env.QUIC_ENABLED === 'true',
+        http3Verified: false,
+        note: 'QUIC dev lane exists in package scripts, but the local Caddy/Vite endpoint is not reachable from this probe.',
+        latencyMs: Date.now() - startedAt,
+        error: String(err).slice(0, 300),
+      }, null, 2) }] };
+    }
+  }
+);
 // ── atlas.prefilter ────────────────────────────────────────────────────────────
 // TurboVec cluster prefilter: embeds query → calls :8099/prefilter → returns
 // cluster IDs (for Qdrant filter injection) and centroid scores.

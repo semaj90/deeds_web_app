@@ -245,7 +245,7 @@ Store in Bifrost L2 for future hits
 │    ↓ fallback                                          │
 │  LiteRT-LM Sidecar (:8070) — 30-40s                    │
 │    ↓ fallback                                          │
-│  Ollama (gemma4-legal) — 25-30s                        │
+│  Ollama (gemma4-rotorquant:latest) — 25-30s                        │
 └────────────────────────────────────────────────────────┘
 ```
 

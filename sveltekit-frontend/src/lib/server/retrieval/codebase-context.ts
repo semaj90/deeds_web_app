@@ -689,7 +689,7 @@ export async function loadCodebaseContext(query: string): Promise<{
     import('$lib/server/retrieval/ace-retrieval-logger').then(({ logAceRun }) => {
         logAceRun({
             query,
-            model: 'gemma4-legal',
+            model: 'gemma4-rotorquant:latest',
             mode: 'multi-vector-rerank',
             metadata: {
                 recallMs: recall.recallMs,

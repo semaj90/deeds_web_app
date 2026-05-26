@@ -142,7 +142,7 @@ CREATE INDEX evidence_entities_text_label_idx ON evidence_entities(entity_text, 
 5. Dual storage (pgvector + Qdrant)
 6a. Entity extraction (LLM + regex) ← NEW BATCH STORAGE HERE
 6b. Forensic pattern detection
-7. Summarization (Ollama gemma4-legal)
+7. Summarization (Ollama gemma4-rotorquant:latest)
 8. Metadata persistence (JSONB + protobuf)
 9. GPU background analysis (similarity + clustering)
 ```

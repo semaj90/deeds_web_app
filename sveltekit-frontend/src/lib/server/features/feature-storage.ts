@@ -6,13 +6,15 @@ import { sql } from 'drizzle-orm';
 import type { FeatureCompileResult, FeatureMap } from './feature-map.types.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { productionLogger } from '$lib/server/production-logger.js';
-import { prepareStoreWrites } from './feature-map-store.js';
+import { buildFeatureSummaryEmbedding, prepareStoreWrites } from './feature-map-store.js';
 import { traceGraph } from '$lib/server/observability/langfuse.js';
 
 let enhancedGraphMappingsReady: Promise<void> | null = null;
 
 async function ensureEnhancedGraphMappingsTable(): Promise<void> {
-  enhancedGraphMappingsReady ??= db.execute(sql`
+  enhancedGraphMappingsReady ??= db
+    .execute(
+      sql`
     CREATE TABLE IF NOT EXISTS enhanced_graph_mappings (
       id text PRIMARY KEY,
       kind text NOT NULL,
@@ -28,7 +30,9 @@ async function ensureEnhancedGraphMappingsTable(): Promise<void> {
       created_at timestamptz NOT NULL DEFAULT now(),
       updated_at timestamptz NOT NULL DEFAULT now()
     )
-  `).then(() => undefined);
+  `
+    )
+    .then(() => undefined);
 
   await enhancedGraphMappingsReady;
 }
@@ -48,7 +52,8 @@ export async function persistFeatureCompileResult(result: FeatureCompileResult):
     },
     async () => {
       const settled = await Promise.allSettled([
-        db.insert(enhancedGraphMappings)
+        db
+          .insert(enhancedGraphMappings)
           .values(writes.postgresJsonb.row as any)
           .onConflictDoUpdate({
             target: enhancedGraphMappings.id,
@@ -64,10 +69,24 @@ export async function persistFeatureCompileResult(result: FeatureCompileResult):
         })(),
         (async () => {
           try {
-            const { collection, id, vector, payload } = writes.qdrantFeatureSummaryPoint;
-            await qdrant.client.upsert(collection, { points: [{ id, vector: { summary: vector }, payload }] });
+            const { collection, id, payload } = writes.qdrantFeatureSummaryPoint;
+            const summaryEmbedding = await buildFeatureSummaryEmbedding(result.featureMap);
+            await qdrant.client.upsert(collection, {
+              points: [
+                {
+                  id,
+                  vector: { summary: summaryEmbedding },
+                  payload: {
+                    ...payload,
+                    encoded64: writes.qdrantFeatureSummaryPoint.vector,
+                  },
+                },
+              ],
+            });
           } catch (err) {
-            productionLogger.error(`[feature-storage] Qdrant upsert failed: ${(err as Error).message}`);
+            productionLogger.error(
+              `[feature-storage] Qdrant upsert failed: ${(err as Error).message}`
+            );
           }
         })(),
       ]);

@@ -1,0 +1,107 @@
+# Codebase Semantic Index Tasks
+
+- Generated: 2026-05-22T01:27:23.220Z
+- Open items: 2166
+
+## Priority Tasks
+
+- [ ] .agent/workflows/agentic-error-fixing.md:128 - Errors reduced from 71k to <5k
+- [ ] .agent/workflows/agentic-error-fixing.md:129 - Dev server starts without 500 errors
+- [ ] .agent/workflows/agentic-error-fixing.md:130 - All routes load without compilation errors
+- [ ] .agent/workflows/agentic-error-fixing.md:131 - Svelte 5 components render correctly
+- [ ] .agent/workflows/error-fixing-strategy.md:102 - Error count < 10,000 (Phase 91)
+- [ ] .agent/workflows/error-fixing-strategy.md:103 - Error count < 1,000 (Phase 92)
+- [ ] .agent/workflows/error-fixing-strategy.md:104 - `npm run dev` starts without crashes
+- [ ] .agent/workflows/error-fixing-strategy.md:105 - No blocking TypeScript errors in core routes
+- [ ] .github/gemini.md:919 - **Install Ollama** (if not already installed)
+- [ ] .github/gemini.md:925 - **Verify Embedding Dimension**
+- [ ] .github/gemini.md:931 - **Install Qdrant**
+- [ ] .github/gemini.md:937 - **Generate Embeddings**
+- [ ] .github/gemini.md:942 - **Upload to Qdrant**
+- [ ] .github/gemini.md:947 - **Create Knowledge Base**
+- [ ] .github/gemini.md:952 - **Test Semantic Search**
+- [ ] CACHE_MONITOR_INTEGRATION.md:365 - Redis `maxmemory` limit set (2GB recommended)
+- [ ] CACHE_MONITOR_INTEGRATION.md:366 - Eviction policy configured (`allkeys-lru`)
+- [ ] CACHE_MONITOR_INTEGRATION.md:367 - Cache warm-up script deployed
+- [ ] CACHE_MONITOR_INTEGRATION.md:368 - Grafana/Prometheus scraping configured
+- [ ] CACHE_MONITOR_INTEGRATION.md:369 - Alert thresholds set (hit rate <40%)
+- [ ] docs/agents_master_stack_checklist.build.md:15 - Pin Node and lockfile versions.
+- [ ] docs/agents_master_stack_checklist.build.md:16 - Keep Dockerfile system deps explicit for Python images.
+- [ ] docs/agents_master_stack_checklist.build.md:17 - Cache large Python wheels.
+- [ ] docs/agents_master_stack_checklist.build.md:18 - Move optional ML workloads into sidecars when possible.
+- [ ] docs/agents_master_stack_checklist.build.md:19 - Keep `prod-only` packages out of dev images unless a smoke needs them.
+- [ ] docs/agents_master_stack_checklist.dev.md:16 - Keep `npm run dev` and `npm run dev:full` working.
+- [ ] docs/agents_master_stack_checklist.dev.md:17 - Keep `svelte-check`, `vitest`, `eslint`, and `prettier` runnable locally.
+- [ ] docs/agents_master_stack_checklist.dev.md:18 - Document local service endpoints for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
+- [ ] docs/agents_master_stack_checklist.dev.md:19 - Keep dev bypasses isolated from production code paths.
+- [ ] docs/agents_master_stack_checklist.dev.md:20 - Include `dev-only` packages in local installs.
+- [ ] docs/agents_master_stack_checklist.md:77 - Pin Node version and keep `package-lock.json` or workspace lockfile committed.
+- [ ] docs/agents_master_stack_checklist.md:78 - Keep Dockerfile system deps explicit for Python images (`git`, `curl`, `ffmpeg`, OpenCV libs).
+- [ ] docs/agents_master_stack_checklist.md:79 - Cache large Python wheels and avoid rebuilding heavy ML layers when app code changes.
+- [ ] docs/agents_master_stack_checklist.md:80 - Split optional ML services from the core app image when they are not required at runtime.
+- [ ] docs/agents_master_stack_checklist.md:81 - Keep `prod-only` packages out of dev images unless a smoke truly needs them.
+- [ ] docs/agents_master_stack_checklist.md:86 - Precompress production assets where the deploy target supports it.
+- [ ] docs/agents_master_stack_checklist.md:87 - Remove duplicate runtime copies across Node, Python, and addon images.
+- [ ] docs/agents_master_stack_checklist.md:88 - Keep optional integrations out of the primary bundle unless they are always used.
+- [ ] docs/agents_master_stack_checklist.md:89 - Prefer runtime sidecars for large model workloads instead of bundling them into the UI image.
+- [ ] docs/agents_master_stack_checklist.md:90 - Reuse base layers for `prod-only` ML packages so wheel downloads are not repeated across builds.
+- [ ] docs/agents_master_stack_checklist.md:95 - `npm run dev` and `npm run dev:full` should start cleanly.
+- [ ] docs/agents_master_stack_checklist.md:96 - `svelte-check`, `vitest`, `eslint`, and `prettier` must remain runnable from the app workspace.
+- [ ] docs/agents_master_stack_checklist.md:97 - Local services should be documented for Postgres, Redis, Qdrant, SeaweedFS S3, and Ollama.
+- [ ] docs/agents_master_stack_checklist.md:98 - Any dev bypasses must be explicit and isolated from production code paths.
+- [ ] docs/agents_master_stack_checklist.md:99 - Keep `dev-only` packages available in local installs even when prod images omit them.
+- [ ] docs/agents_master_stack_checklist.md:104 - Keep unit tests under the repo's configured Vitest include paths.
+- [ ] docs/agents_master_stack_checklist.md:105 - Cover API contract behavior for auth, validation, and degraded response shapes.
+- [ ] docs/agents_master_stack_checklist.md:106 - Add image/build smokes for Python services that install heavy dependencies.
+- [ ] docs/agents_master_stack_checklist.md:107 - Keep one smoke for each critical external service integration.
+- [ ] docs/agents_master_stack_checklist.md:108 - Validate that `optional` packages fail gracefully when sidecars are absent.
+- [ ] docs/agents_master_stack_checklist.md:113 - Pin runtime versions for the app, Python services, and native addons.
+- [ ] docs/agents_master_stack_checklist.md:114 - Document required environment variables for every external service.
+- [ ] docs/agents_master_stack_checklist.md:115 - Keep optional integrations fail-open or behind a feature boundary.
+- [ ] docs/agents_master_stack_checklist.md:116 - Ensure prod images do not ship dev-only tooling or extra build caches.
+- [ ] docs/agents_master_stack_checklist.md:117 - Ship only `required` and `prod-only` packages in production images; exclude `dev-only` packages.
+- [ ] docs/agents_master_stack_checklist.prod.md:17 - Pin runtime versions for app, Python services, and native addons.
+- [ ] docs/agents_master_stack_checklist.prod.md:18 - Document required env vars for every external service.
+- [ ] docs/agents_master_stack_checklist.prod.md:19 - Keep optional integrations behind a feature boundary or fail-open path.
+- [ ] docs/agents_master_stack_checklist.prod.md:20 - Exclude `dev-only` packages from production images.
+- [ ] docs/agents_master_stack_checklist.prod.md:21 - Reuse base layers for heavy ML packages.
+- [ ] docs/agents_master_stack_checklist.test.md:15 - Keep tests under the configured Vitest include paths.
+- [ ] docs/agents_master_stack_checklist.test.md:16 - Cover auth, validation, and degraded response shapes.
+- [ ] docs/agents_master_stack_checklist.test.md:17 - Add image/build smokes for Python service containers.
+- [ ] docs/agents_master_stack_checklist.test.md:18 - Keep one smoke for each critical external integration.
+- [ ] docs/agents_master_stack_checklist.test.md:19 - Validate that optional sidecar packages fail gracefully when missing.
+- [ ] docs/agents_recommendations.md:55 - **2026-05-10** feat(mcp): research.synthesize → legal-ai-langgraph:8091 (89th tool) — dirs: `src/mcp`
+- [ ] docs/agents_recommendations.md:56 - **2026-05-10** feat(sw): Phase D offline analytics queue (CACHE_VERSION v1.6.0) — dirs: `src/lib/client`, `src/lib/server/ai`
+- [ ] docs/agents_recommendations.md:57 - **2026-05-10** feat(evidence): SSE /api/evidence/[id]/analyze/stream — Phase 3 Item 6 — dirs: `src/routes/api/evidence/[id]/analyze/stream`
+- [ ] docs/agents_recommendations.md:58 - **2026-05-10** feat(intent): Phase C demo page at /intent-chat — dirs: `src/routes/(dev)/intent-chat`
+- [ ] docs/agents_recommendations.md:59 - **2026-05-10** feat(sw+intent): Phase C SW telemetry + contextual-chat store + dispatch tests — dirs: `src/lib/stores`, `src/routes/api/admin/telemetry/batch`
+- [ ] docs/agents_recommendations.md:60 - **2026-05-10** feat(intent): Phase B intent-router + /api/ai/intent-dispatch route — dirs: `src/lib/server/ai`, `src/lib/server/mcp`
+- [ ] docs/agents_recommendations.md:61 - **2026-05-10** feat(rag): RAG_RRF_ENABLED canary in /api/rag/search for legal queries — dirs: `src/lib/server`, `src/routes/api/rag/search`
+- [ ] docs/agents_recommendations.md:62 - **2026-05-10** feat(intent): Phase A regex intent classifier — pure module + 31 tests — dirs: `src/lib/intent`
+- [ ] docs/agents_recommendations.md:63 - **2026-05-10** feat(retrieval): wire RRF into new /api/rag/search-fused endpoint — dirs: `src/routes/api/rag/search-fused`
+- [ ] docs/agents_recommendations.md:64 - **2026-05-10** feat(retrieval): Phase 1 sparse+dense lane — tsvector + RRF + BM25 — dirs: `src/lib/server/retrieval`
+- [ ] docs/agents_recommendations.md:65 - **2026-05-10** feat(speculative): wire gemma3:270m as draft model for llama-server speculative decoding — dirs: root
+- [ ] docs/agents_recommendations.md:66 - **2026-05-10** feat(agent): wire Langfuse tracing + Redis pattern recall into agentic-error-fix — dirs: root
+- [ ] docs/agents_recommendations.md:67 - **2026-05-10** feat(ace): QueryRouter4x4 dispatch + web_search L10 lane + smoke 10/10 — dirs: `src/lib/server/ace`, `src/lib/server/routing`
+- [ ] docs/agents_recommendations.md:68 - **2026-05-10** feat(mcp+image): image.enrich_tags MCP tool + batch enrichment script (78 tools) — dirs: `src/mcp`
+- [ ] docs/agents_recommendations.md:69 - **2026-05-10** feat(mcp): image search tools — 4 new TRACE MCP tools (77 total) — dirs: `src/mcp`
+- [ ] docs/agents_recommendations.md:70 - **2026-05-09** feat(evidence+synth): image search UI + GRPO synthesis loop scripts — dirs: `src/lib/components/evidence`, `src/lib/server/vector`
+- [ ] docs/agents_recommendations.md:71 - **2026-05-09** feat(karpathy): GPU batch stream log, AGENTS.md T1 patch, lane atlas, ACE hit-rate — dirs: root
+- [ ] docs/agents_recommendations.md:72 - **2026-05-09** feat(hyperrag): HyperRAG Feature Atlas + Trust-Tier system (§1-§13 blueprint) — dirs: `src/lib/server/ace`, `src/lib/server/db`
+- [ ] docs/agents_recommendations.md:73 - **2026-05-09** feat(session): browser-context lane, admin AI chat, external research agent, mcp:tail-errors, smoke suite — dirs: `src/lib/components/admin`, `src/lib/server/admin`
+- [ ] docs/agents_recommendations.md:74 - **2026-05-09** feat(mcp): un-gate canonical tools, fix ioredis cold-starts, expand multi-lane, wire prior-fix recall — dirs: `src/lib/server/ace`, `src/mcp`
+- [ ] docs/agents_recommendations.md:75 - **2026-05-09** feat(claude-code): Phase D — PreToolUse deny + PostToolUse audit hooks — dirs: root
+- [ ] docs/agents_recommendations.md:76 - **2026-05-09** feat(synth): Phase C — Gemma4 ⇄ MCP synthesis loop CLI — dirs: root
+- [ ] docs/agents_recommendations.md:77 - **2026-05-09** feat(mcp): Phase B — read-only db.* inspection tools + G33 gate — dirs: `src/mcp`
+- [ ] docs/agents_recommendations.md:78 - **2026-05-09** feat(mcp): adopted MCP servers (enabled:false) + smoke probe + plan amendments — dirs: root
+- [ ] docs/agents_recommendations.md:79 - **2026-05-09** feat(mcp): gemma4-offload stdio MCP + G29/G30/G31 validator gates — dirs: root
+- [ ] docs/architecture/trace-kag-web-development-guide.md:421 - Auth guard exists on every protected route (`locals.user` check)
+- [ ] docs/architecture/trace-kag-web-development-guide.md:422 - Zod validation exists for every JSON input
+- [ ] docs/architecture/trace-kag-web-development-guide.md:423 - Degraded/offline behavior exists (no hard 500s on optional-service failure)
+- [ ] docs/architecture/trace-kag-web-development-guide.md:424 - Audit log exists for every write (`evidenceAuditLog`, `context_timeline`, etc.)
+- [ ] docs/architecture/trace-kag-web-development-guide.md:425 - Source hashes / provenance exist for every piece of generated memory
+- [ ] docs/architecture/trace-kag-web-development-guide.md:426 - No raw infra access from Gemma4 — MCP tools only
+- [ ] docs/architecture/trace-kag-web-development-guide.md:427 - No GPU work on the Node main thread — RabbitMQ + sidecar
+- [ ] docs/architecture/trace-kag-web-development-guide.md:428 - No ambiguous ports (single source of truth in `env.server.ts`, no localhost literals)
+- [ ] docs/architecture/trace-kag-web-development-guide.md:429 - Smoke test exists and passes (`scripts/smoke/` or equivalent)
+- [ ] docs/architecture/trace-kag-web-development-guide.md:430 - G-gate coverage in `scripts/validate/full-system.mjs` if the feature crosses tier boundaries

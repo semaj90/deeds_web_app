@@ -108,6 +108,12 @@ describe('HyperRagFusionService', () => {
     expect(result.graphPaths).toHaveLength(1);
     expect(result.routingExplanation).toEqual(expect.objectContaining({ profile: 'general' }));
     expect(result.routingExplanation?.redisCards).toEqual(expect.arrayContaining(['ace:cluster:7']));
+    expect(result.routingExplanation?.subgraphSeedEnvelope).toEqual(
+      expect.objectContaining({
+        version: 'subgraph_v1_seed_neighborhood',
+        contract: expect.objectContaining({ query: 'graph retrieval' }),
+      }),
+    );
   });
 
   it('fails open when TurboVec, Neo4j, Redis, and ACE lanes are unavailable', async () => {

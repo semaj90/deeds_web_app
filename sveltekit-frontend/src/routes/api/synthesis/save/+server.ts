@@ -7,7 +7,7 @@ import { synthesisRuns } from '$lib/server/db/schema-postgres.js';
 const saveSchema = z.object({
 	query: z.string().min(1).max(8000),
 	answer: z.string().min(1),
-	model: z.string().default('gemma4-legal:latest'),
+	model: z.string().default('gemma4-rotorquant:latest'),
 	cacheHit: z.string().optional(),
 	latencyMs: z.number().int().optional(),
 	confidence: z.number().min(0).max(1).optional(),

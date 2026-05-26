@@ -10,7 +10,7 @@
  *   {
  *     "batchSize": 5,          // Queries per batch (default: 5)
  *     "delayMs": 1000,         // Delay between batches (default: 1000ms)
- *     "model": "gemma4-legal", // LLM model to use
+ *     "model": "gemma4-rotorquant:latest", // LLM model to use
  *     "domain": "evidence",    // Specific domain (evidence, civil-procedure, torts, contracts, criminal)
  *     "dryRun": false          // If true, only log queries without calling LLM
  *   }
@@ -22,7 +22,7 @@
  *     "config": {
  *       "batchSize": 5,
  *       "delayMs": 1000,
- *       "model": "gemma4-legal:latest",
+ *       "model": "gemma4-rotorquant:latest",
  *       "domain": "evidence",
  *       "totalQueries": 20
  *     }
@@ -37,7 +37,7 @@ import { warmUpCache, warmUpDomain } from '$lib/server/cache/warm-up.js';
 const WarmUpSchema = z.object({
 	batchSize: z.number().int().positive().optional().default(5),
 	delayMs: z.number().int().nonnegative().optional().default(1000),
-	model: z.string().optional().default('gemma4-legal:latest'),
+	model: z.string().optional().default('gemma4-rotorquant:latest'),
 	domain: z
 		.enum(['evidence', 'civil-procedure', 'torts', 'contracts', 'criminal', 'evidence-analysis'])
 		.optional(),

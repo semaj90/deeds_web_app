@@ -313,7 +313,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             ...((row.entity_cases as string[]) ?? []),
           ]),
           tier, // quality_tier
-          process.env.OLLAMA_MODEL ?? 'gemma4-legal',
+          process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest',
           datasetSplit, // dataset_split — frozen on first insert
         ]
       );

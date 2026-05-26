@@ -1,8 +1,8 @@
 {
   "base_model": "unsloth/gemma-4-E4B-it",
   "adapter": "Semaj90/gemma4-e4b-legal-grpo",
-  "output_dir": "./gemma4-legal-merged-full",
-  "gguf_output": "gemma4-legal-e4b-q4_k_m.gguf",
+  "output_dir": "./gemma4-rotorquant:latest-merged-full",
+  "gguf_output": "gemma4-rotorquant:latest-e4b-q4_k_m.gguf",
   "quantization": "q4_k_m",
   "min_disk_space_gb": 20,
   "cuda_required": false

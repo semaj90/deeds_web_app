@@ -91,7 +91,7 @@ Map the inference stack by directory, dependency, and merge boundary so the libr
 | Obsidian export | `/api/codebase-index/export/obsidian` | writes note files |
 | Colab export | `/api/graph/colab-export` | notebook handoff |
 | Cluster summarizer | `scripts/summarize-clusters-pg.ts` | TurboQuant-first, Ollama fallback |
-| Stage 6 summary model | `TurboQuant :8090` | `cache_prompt:true`, `gemma4-legal-vlm` |
+| Stage 6 summary model | `TurboQuant :8090` | `cache_prompt:true`, `gemma4-rotorquant:latest` |
 
 ## Directory map
 

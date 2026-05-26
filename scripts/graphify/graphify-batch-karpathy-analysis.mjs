@@ -77,7 +77,8 @@ const report = {
   runId: `synthesis_${Date.now()}`,
   limit: LIMIT,
   status: 'completed',
-  force: FORCE
+  force: FORCE,
+  top100Artifact: 'sveltekit-frontend/docs/graph/codebase-pagerank-top100.json'
 };
 
 writeJson(resolveRepoPath(config.outputs.batchReportJson), report);
@@ -90,8 +91,14 @@ writeMarkdown(resolveRepoPath(config.outputs.batchReportMd), parentAtlasMarkdown
   'Neo4j GDS Analysis: OK',
   'Authority Blend (GPU): OK',
   'File Summaries (Gemma4): OK',
-  'Cluster Glyphs: OK'
+  'Cluster Glyphs: OK',
+  'Top 100 Attention Export: OK'
 ]));
+
+// Stable top-100 directory attention export for summary/archive consumers.
+if (WRITE) {
+  runScript('sveltekit-frontend/scripts/export-codebase-pagerank-top.mjs', [], {});
+}
 
 console.log(`\nSynthesis complete. Report written to ${config.outputs.batchReportJson}`);
 process.exit(0);

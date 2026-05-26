@@ -53,7 +53,7 @@ export const LangExtractBatchRequestSchema = z.object({
     relations: z.array(z.enum(['imports', 'extends', 'depends_on', 'deprecated_by', 'introduced_in', 'exports', 'implements']))
   }),
   options: z.object({
-	model: z.string().default('gemma4-legal:latest'),
+	model: z.string().default('gemma4-rotorquant:latest'),
     temperature: z.number().min(0).max(2).default(0.1),
     timeout_ms: z.number().min(1000).max(300000).default(30000)
   }).optional()
@@ -76,7 +76,7 @@ export const ClusterTagRequestSchema = z.object({
   }).optional(),
   tag_config: z.object({
 	generate_summaries: z.boolean().default(true),
-    model: z.string().default('gemma4-legal:latest'),
+    model: z.string().default('gemma4-rotorquant:latest'),
     update_qdrant: z.boolean().default(true)
   }).optional()
 });

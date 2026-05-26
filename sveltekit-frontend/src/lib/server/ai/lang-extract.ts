@@ -347,3 +347,53 @@ export async function extractCodeFix(
 		}
 	);
 }
+
+/** Pre-built schema for user query feature extraction */
+export const QueryFeaturesSchema = z.object({
+	entities: z.array(z.string()),
+	errorLabels: z.array(z.string()),
+	candidateIntents: z.array(z.string()),
+	candidateFeatureFamilies: z.array(z.string()),
+	candidateTools: z.array(z.string()),
+});
+
+export type QueryFeatures = z.infer<typeof QueryFeaturesSchema>;
+
+/**
+ * Extract structured feature components from a user query before routing.
+ */
+export async function extractQueryFeatures(query: string, model?: string): Promise<QueryFeatures> {
+	const result = await extractStructured(
+		QueryFeaturesSchema,
+		[
+			'Analyze the user query and extract key features to guide routing.',
+			'Identify any specific entities (e.g. database keys, table names, file paths, variables).',
+			'Identify any error labels or system error symptoms mentioned.',
+			'Predict candidate intent categories (e.g., query, fix, analyze, debug).',
+			'Predict candidate feature families (e.g., db-constraints, opencode-tools, qdrant-gaps, legal-research).',
+			'List any candidate tools or systems that might be involved.',
+		].join('\n'),
+		query,
+		{
+			model,
+			cacheKey: `langextract:query-features:${query.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 60)}`,
+			entityTags: ['intent-routing', 'query-features'],
+			temperature: 0,
+			maxTokens: 300,
+		}
+	);
+
+	if (result.valid && result.data) {
+		return result.data;
+	}
+
+	// Fallback in case of parse/validation failure
+	return {
+		entities: [],
+		errorLabels: [],
+		candidateIntents: [],
+		candidateFeatureFamilies: [],
+		candidateTools: [],
+	};
+}
+

@@ -1270,22 +1270,17 @@
     "authority": {
       "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.6611,
-      "avgPr": 3.4286,
-      "totalBlend": 6.6444,
-      "clusterAuthorityScore": 3.8638,
-      "scoredFiles": 4,
+      "avgBlend": 1.9208,
+      "avgPr": 4.0503,
+      "totalBlend": 5.7625,
+      "clusterAuthorityScore": 4.0503,
+      "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
           "karpathyBlend": 1.9208428102629216
-        },
-        {
-          "filePath": "src/lib/server/db/schema-phase89-preserved.ts",
-          "pageRank": 1.5636766166671263,
-          "karpathyBlend": 0.8819054049893633
         }
       ],
       "topBlendFiles": [
@@ -1293,15 +1288,10 @@
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
           "karpathyBlend": 1.9208428102629216
-        },
-        {
-          "filePath": "src/lib/server/db/schema-phase89-preserved.ts",
-          "pageRank": 1.5636766166671263,
-          "karpathyBlend": 0.8819054049893633
         }
       ]
     },
-    "clusterBlend": 1.8429
+    "clusterBlend": 1.9208
   },
   {
     "id": 88,
@@ -1472,11 +1462,11 @@
     "authority": {
       "maxBlend": 1.9208,
       "maxPr": 4.0503,
-      "avgBlend": 1.4967,
-      "avgPr": 3.0259,
-      "totalBlend": 10.4769,
-      "clusterAuthorityScore": 3.743,
-      "scoredFiles": 7,
+      "avgBlend": 1.7363,
+      "avgPr": 3.6072,
+      "totalBlend": 8.6815,
+      "clusterAuthorityScore": 3.9173,
+      "scoredFiles": 5,
       "totalFiles": 8,
       "topPrFiles": [
         {
@@ -1486,13 +1476,8 @@
         },
         {
           "filePath": "src/lib/server/db/relations.ts",
-          "pageRank": 1.8346582262300366,
+          "pageRank": 1.8346582262300364,
           "karpathyBlend": 0.9981295339312428
-        },
-        {
-          "filePath": "src/lib/server/db/schema/legal-relations.ts",
-          "pageRank": 1.5728262441344403,
-          "karpathyBlend": 0.8976928229744212
         }
       ],
       "topBlendFiles": [
@@ -1503,17 +1488,12 @@
         },
         {
           "filePath": "src/lib/server/db/relations.ts",
-          "pageRank": 1.8346582262300366,
+          "pageRank": 1.8346582262300364,
           "karpathyBlend": 0.9981295339312428
-        },
-        {
-          "filePath": "src/lib/server/db/schema/legal-relations.ts",
-          "pageRank": 1.5728262441344403,
-          "karpathyBlend": 0.8976928229744212
         }
       ]
     },
-    "clusterBlend": 1.7936
+    "clusterBlend": 1.8655
   },
   {
     "id": 53,
@@ -1702,12 +1682,12 @@
         },
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
-          "pageRank": 1.7821034441546986,
-          "karpathyBlend": 0.9696920496763416
+          "pageRank": 1.7821034441546988,
+          "karpathyBlend": 0.9696920496763418
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
-          "pageRank": 1.7597118175744617,
+          "pageRank": 1.759711817574462,
           "karpathyBlend": 0.9660065201549021
         }
       ],
@@ -1719,12 +1699,12 @@
         },
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
-          "pageRank": 1.7821034441546986,
-          "karpathyBlend": 0.9696920496763416
+          "pageRank": 1.7821034441546988,
+          "karpathyBlend": 0.9696920496763418
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
-          "pageRank": 1.7597118175744617,
+          "pageRank": 1.759711817574462,
           "karpathyBlend": 0.9660065201549021
         }
       ]
@@ -1908,38 +1888,38 @@
     "authority": {
       "maxBlend": 1.3294,
       "maxPr": 2.7145,
-      "avgBlend": 1.1843,
+      "avgBlend": 1.1858,
       "avgPr": 2.3562,
-      "totalBlend": 3.5529,
+      "totalBlend": 3.5574,
       "clusterAuthorityScore": 2.607,
       "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/config/env.server.ts",
-          "pageRank": 2.7145393537960745,
-          "karpathyBlend": 1.3294009141046603
+          "pageRank": 2.7145393537960754,
+          "karpathyBlend": 1.3294009141046608
         },
         {
           "filePath": "src/lib/server/minio.ts",
           "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.8941135632154192
+          "karpathyBlend": 0.8985495793745494
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/config/env.server.ts",
-          "pageRank": 2.7145393537960745,
-          "karpathyBlend": 1.3294009141046603
+          "pageRank": 2.7145393537960754,
+          "karpathyBlend": 1.3294009141046608
         },
         {
           "filePath": "src/lib/server/minio.ts",
           "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.8941135632154192
+          "karpathyBlend": 0.8985495793745494
         }
       ]
     },
-    "clusterBlend": 1.2859
+    "clusterBlend": 1.2863
   },
   {
     "id": 59,
@@ -2272,40 +2252,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.0016,
+      "maxBlend": 1.0184,
       "maxPr": 1.8989,
-      "avgBlend": 0.9538,
-      "avgPr": 1.7833,
-      "totalBlend": 4.7689,
-      "clusterAuthorityScore": 1.8642,
-      "scoredFiles": 5,
+      "avgBlend": 1.0184,
+      "avgPr": 1.8989,
+      "totalBlend": 3.0551,
+      "clusterAuthorityScore": 1.8989,
+      "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
-          "pageRank": 1.8989401144504943,
-          "karpathyBlend": 1.0016486897507326
-        },
-        {
-          "filePath": "src/lib/server/cache/pdf-export-cache.ts",
-          "pageRank": 1.6097200311485362,
-          "karpathyBlend": 0.8819559300652065
+          "pageRank": 1.8989401144504947,
+          "karpathyBlend": 1.0183531635847747
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
-          "pageRank": 1.8989401144504943,
-          "karpathyBlend": 1.0016486897507326
-        },
-        {
-          "filePath": "src/lib/server/cache/pdf-export-cache.ts",
-          "pageRank": 1.6097200311485362,
-          "karpathyBlend": 0.8819559300652065
+          "pageRank": 1.8989401144504947,
+          "karpathyBlend": 1.0183531635847747
         }
       ]
     },
-    "clusterBlend": 0.9873
+    "clusterBlend": 1.0184
   },
   {
     "id": 90,
@@ -2485,15 +2455,15 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/server/lucia.ts",
-          "pageRank": 1.7783166924245377,
-          "karpathyBlend": 0.9552279602550586
+          "pageRank": 1.7783166924245375,
+          "karpathyBlend": 0.9552279602550585
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/lucia.ts",
-          "pageRank": 1.7783166924245377,
-          "karpathyBlend": 0.9552279602550586
+          "pageRank": 1.7783166924245375,
+          "karpathyBlend": 0.9552279602550585
         }
       ]
     },
@@ -2678,30 +2648,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.947,
+      "maxBlend": 0.9545,
       "maxPr": 1.7873,
-      "avgBlend": 0.947,
+      "avgBlend": 0.9545,
       "avgPr": 1.7873,
-      "totalBlend": 0.947,
+      "totalBlend": 0.9545,
       "clusterAuthorityScore": 1.7873,
       "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.9469606041482612
+          "pageRank": 1.7872801029204415,
+          "karpathyBlend": 0.9544773403457018
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.9469606041482612
+          "pageRank": 1.7872801029204415,
+          "karpathyBlend": 0.9544773403457018
         }
       ]
     },
-    "clusterBlend": 0.947
+    "clusterBlend": 0.9545
   },
   {
     "id": 57,
@@ -2882,40 +2852,40 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.947,
+      "maxBlend": 0.9545,
       "maxPr": 1.7873,
-      "avgBlend": 0.9406,
+      "avgBlend": 0.9443,
       "avgPr": 1.7536,
-      "totalBlend": 1.8812,
+      "totalBlend": 1.8887,
       "clusterAuthorityScore": 1.7772,
       "scoredFiles": 2,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.9469606041482612
+          "pageRank": 1.7872801029204415,
+          "karpathyBlend": 0.9544773403457018
         },
         {
           "filePath": "src/lib/server/retrieval/context-buffer.ts",
-          "pageRank": 1.719915480779479,
-          "karpathyBlend": 0.9341958051762649
+          "pageRank": 1.7199154807794785,
+          "karpathyBlend": 0.9341958051762647
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204417,
-          "karpathyBlend": 0.9469606041482612
+          "pageRank": 1.7872801029204415,
+          "karpathyBlend": 0.9544773403457018
         },
         {
           "filePath": "src/lib/server/retrieval/context-buffer.ts",
-          "pageRank": 1.719915480779479,
-          "karpathyBlend": 0.9341958051762649
+          "pageRank": 1.7199154807794785,
+          "karpathyBlend": 0.9341958051762647
         }
       ]
     },
-    "clusterBlend": 0.945
+    "clusterBlend": 0.9514
   },
   {
     "id": 25,
@@ -3099,15 +3069,15 @@
       "topPrFiles": [
         {
           "filePath": "src/routes/api/cache/metrics/+server.ts",
-          "pageRank": 1.6815871693927562,
-          "karpathyBlend": 0.9282421567209731
+          "pageRank": 1.681587169392756,
+          "karpathyBlend": 0.9282421567209729
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/routes/api/cache/metrics/+server.ts",
-          "pageRank": 1.6815871693927562,
-          "karpathyBlend": 0.9282421567209731
+          "pageRank": 1.681587169392756,
+          "karpathyBlend": 0.9282421567209729
         }
       ]
     },
@@ -3275,15 +3245,15 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.6751651851381948,
-          "karpathyBlend": 0.9104999428035832
+          "pageRank": 1.675165185138195,
+          "karpathyBlend": 0.9104999428035834
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.6751651851381948,
-          "karpathyBlend": 0.9104999428035832
+          "pageRank": 1.675165185138195,
+          "karpathyBlend": 0.9104999428035834
         }
       ]
     },
@@ -3471,15 +3441,15 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.6751651851381948,
-          "karpathyBlend": 0.9104999428035832
+          "pageRank": 1.675165185138195,
+          "karpathyBlend": 0.9104999428035834
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.6751651851381948,
-          "karpathyBlend": 0.9104999428035832
+          "pageRank": 1.675165185138195,
+          "karpathyBlend": 0.9104999428035834
         }
       ]
     },
@@ -3590,14 +3560,14 @@
       "topPrFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.6746478680990662,
+          "pageRank": 1.674647868099066,
           "karpathyBlend": 0.8906088616221666
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.6746478680990662,
+          "pageRank": 1.674647868099066,
           "karpathyBlend": 0.8906088616221666
         }
       ]
@@ -3789,332 +3759,28 @@
     "authority": {
       "maxBlend": 0.8906,
       "maxPr": 1.6746,
-      "avgBlend": 0.8769,
-      "avgPr": 1.6464,
-      "totalBlend": 1.7537,
-      "clusterAuthorityScore": 1.6662,
-      "scoredFiles": 2,
+      "avgBlend": 0.8906,
+      "avgPr": 1.6746,
+      "totalBlend": 0.8906,
+      "clusterAuthorityScore": 1.6746,
+      "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.6746478680990662,
+          "pageRank": 1.674647868099066,
           "karpathyBlend": 0.8906088616221666
-        },
-        {
-          "filePath": "src/lib/webgpu/wire-telemetry.ts",
-          "pageRank": 1.6181393953058547,
-          "karpathyBlend": 0.8631309901247453
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.6746478680990662,
+          "pageRank": 1.674647868099066,
           "karpathyBlend": 0.8906088616221666
-        },
-        {
-          "filePath": "src/lib/webgpu/wire-telemetry.ts",
-          "pageRank": 1.6181393953058547,
-          "karpathyBlend": 0.8631309901247453
         }
       ]
     },
-    "clusterBlend": 0.8865
-  },
-  {
-    "id": 46,
-    "size": 2,
-    "sampledFor": 2,
-    "inferredTopic": "type chunks in `src/lib/server/types` (tag: ai)",
-    "topKinds": [
-      {
-        "kind": "type",
-        "count": 2
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "ai",
-        "count": 1
-      },
-      {
-        "tag": "vector",
-        "count": 1
-      },
-      {
-        "tag": "redis",
-        "count": 1
-      },
-      {
-        "tag": "embedding",
-        "count": 1
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "SynthesisResponse",
-        "count": 1
-      },
-      {
-        "symbol": "LangGraphSynthesizeResponse",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server/types",
-        "count": 1
-      },
-      {
-        "dir": "src/lib/server/ai",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/types/synthesis.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/ai/langgraph-client.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/types/synthesis.ts",
-        "kind": "type",
-        "symbol": "SynthesisResponse",
-        "lineStart": 28,
-        "lineEnd": 36
-      },
-      {
-        "path": "src/lib/server/ai/langgraph-client.ts",
-        "kind": "type",
-        "symbol": "LangGraphSynthesizeResponse",
-        "lineStart": 32,
-        "lineEnd": 48
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.8801,
-      "maxPr": 1.5968,
-      "avgBlend": 0.8801,
-      "avgPr": 1.5968,
-      "totalBlend": 0.8801,
-      "clusterAuthorityScore": 1.5968,
-      "scoredFiles": 1,
-      "totalFiles": 2,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/ai/langgraph-client.ts",
-          "pageRank": 1.5968087879198707,
-          "karpathyBlend": 0.8801285314801472
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/ai/langgraph-client.ts",
-          "pageRank": 1.5968087879198707,
-          "karpathyBlend": 0.8801285314801472
-        }
-      ]
-    },
-    "clusterBlend": 0.8801
-  },
-  {
-    "id": 60,
-    "size": 406,
-    "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/server/analytics` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "function",
-        "count": 5
-      },
-      {
-        "kind": "table-def",
-        "count": 3
-      },
-      {
-        "kind": "type",
-        "count": 1
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 8
-      },
-      {
-        "tag": "redis",
-        "count": 6
-      },
-      {
-        "tag": "vector",
-        "count": 5
-      },
-      {
-        "tag": "database",
-        "count": 4
-      },
-      {
-        "tag": "schema",
-        "count": 3
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "recordChunkHits",
-        "count": 1
-      },
-      {
-        "symbol": "chunk_hit_log",
-        "count": 1
-      },
-      {
-        "symbol": "recordQueryLog",
-        "count": 1
-      },
-      {
-        "symbol": "ace_chunks",
-        "count": 1
-      },
-      {
-        "symbol": "getChunkQualitySignals",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server/analytics",
-        "count": 4
-      },
-      {
-        "dir": "src/lib/server/db/schema",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/db/schema",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "count": 4
-      },
-      {
-        "path": "src/lib/server/db/schema/search-analytics.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/db/schema/ace-web.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/indexer/karpathy-wiki.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/pipeline-v2.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "kind": "function",
-        "symbol": "recordChunkHits",
-        "lineStart": 113,
-        "lineEnd": 153
-      },
-      {
-        "path": "src/lib/server/db/schema/search-analytics.ts",
-        "kind": "table-def",
-        "symbol": "chunk_hit_log",
-        "lineStart": 40,
-        "lineEnd": 56
-      },
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "kind": "function",
-        "symbol": "recordQueryLog",
-        "lineStart": 159,
-        "lineEnd": 193
-      },
-      {
-        "path": "src/lib/db/schema/ace-web.ts",
-        "kind": "table-def",
-        "symbol": "ace_chunks",
-        "lineStart": 58,
-        "lineEnd": 92
-      },
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "kind": "function",
-        "symbol": "getChunkQualitySignals",
-        "lineStart": 289,
-        "lineEnd": 332
-      },
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "kind": "function",
-        "symbol": "getClusterHeatMap",
-        "lineStart": 257,
-        "lineEnd": 280
-      },
-      {
-        "path": "src/lib/server/db/schema/search-analytics.ts",
-        "kind": "table-def",
-        "symbol": "rag_query_log",
-        "lineStart": 88,
-        "lineEnd": 113
-      },
-      {
-        "path": "src/lib/server/indexer/karpathy-wiki.ts",
-        "kind": "function",
-        "symbol": "generateClusterNote",
-        "lineStart": 204,
-        "lineEnd": 320
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.8753,
-      "maxPr": 1.6162,
-      "avgBlend": 0.8753,
-      "avgPr": 1.6162,
-      "totalBlend": 0.8753,
-      "clusterAuthorityScore": 1.6162,
-      "scoredFiles": 1,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/db/schema/ace-web.ts",
-          "pageRank": 1.6161655316884023,
-          "karpathyBlend": 0.8753176058816773
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/db/schema/ace-web.ts",
-          "pageRank": 1.6161655316884023,
-          "karpathyBlend": 0.8753176058816773
-        }
-      ]
-    },
-    "clusterBlend": 0.8753
+    "clusterBlend": 0.8906
   },
   {
     "id": 92,
@@ -4287,30 +3953,300 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.8543,
+      "maxBlend": 0.8541,
       "maxPr": 1.6043,
-      "avgBlend": 0.8543,
+      "avgBlend": 0.8541,
       "avgPr": 1.6043,
-      "totalBlend": 0.8543,
+      "totalBlend": 0.8541,
       "clusterAuthorityScore": 1.6043,
       "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.6042923723218951,
-          "karpathyBlend": 0.8542998612215914
+          "pageRank": 1.6042923723218958,
+          "karpathyBlend": 0.8541377293518897
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.6042923723218951,
-          "karpathyBlend": 0.8542998612215914
+          "pageRank": 1.6042923723218958,
+          "karpathyBlend": 0.8541377293518897
         }
       ]
     },
-    "clusterBlend": 0.8543
+    "clusterBlend": 0.8541
+  },
+  {
+    "id": 46,
+    "size": 2,
+    "sampledFor": 2,
+    "inferredTopic": "type chunks in `src/lib/server/types` (tag: ai)",
+    "topKinds": [
+      {
+        "kind": "type",
+        "count": 2
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "ai",
+        "count": 1
+      },
+      {
+        "tag": "vector",
+        "count": 1
+      },
+      {
+        "tag": "redis",
+        "count": 1
+      },
+      {
+        "tag": "embedding",
+        "count": 1
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "SynthesisResponse",
+        "count": 1
+      },
+      {
+        "symbol": "LangGraphSynthesizeResponse",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server/types",
+        "count": 1
+      },
+      {
+        "dir": "src/lib/server/ai",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/types/synthesis.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/ai/langgraph-client.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/types/synthesis.ts",
+        "kind": "type",
+        "symbol": "SynthesisResponse",
+        "lineStart": 28,
+        "lineEnd": 36
+      },
+      {
+        "path": "src/lib/server/ai/langgraph-client.ts",
+        "kind": "type",
+        "symbol": "LangGraphSynthesizeResponse",
+        "lineStart": 32,
+        "lineEnd": 48
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
+      "totalFiles": 2,
+      "topPrFiles": [],
+      "topBlendFiles": []
+    },
+    "clusterBlend": 0
+  },
+  {
+    "id": 60,
+    "size": 406,
+    "sampledFor": 16,
+    "inferredTopic": "function chunks in `src/lib/server/analytics` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "function",
+        "count": 5
+      },
+      {
+        "kind": "table-def",
+        "count": 3
+      },
+      {
+        "kind": "type",
+        "count": 1
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 8
+      },
+      {
+        "tag": "redis",
+        "count": 6
+      },
+      {
+        "tag": "vector",
+        "count": 5
+      },
+      {
+        "tag": "database",
+        "count": 4
+      },
+      {
+        "tag": "schema",
+        "count": 3
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "recordChunkHits",
+        "count": 1
+      },
+      {
+        "symbol": "chunk_hit_log",
+        "count": 1
+      },
+      {
+        "symbol": "recordQueryLog",
+        "count": 1
+      },
+      {
+        "symbol": "ace_chunks",
+        "count": 1
+      },
+      {
+        "symbol": "getChunkQualitySignals",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server/analytics",
+        "count": 4
+      },
+      {
+        "dir": "src/lib/server/db/schema",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/db/schema",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/analytics/search-analytics.ts",
+        "count": 4
+      },
+      {
+        "path": "src/lib/server/db/schema/search-analytics.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/db/schema/ace-web.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/indexer/karpathy-wiki.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/pipeline-v2.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/analytics/search-analytics.ts",
+        "kind": "function",
+        "symbol": "recordChunkHits",
+        "lineStart": 113,
+        "lineEnd": 153
+      },
+      {
+        "path": "src/lib/server/db/schema/search-analytics.ts",
+        "kind": "table-def",
+        "symbol": "chunk_hit_log",
+        "lineStart": 40,
+        "lineEnd": 56
+      },
+      {
+        "path": "src/lib/server/analytics/search-analytics.ts",
+        "kind": "function",
+        "symbol": "recordQueryLog",
+        "lineStart": 159,
+        "lineEnd": 193
+      },
+      {
+        "path": "src/lib/db/schema/ace-web.ts",
+        "kind": "table-def",
+        "symbol": "ace_chunks",
+        "lineStart": 58,
+        "lineEnd": 92
+      },
+      {
+        "path": "src/lib/server/analytics/search-analytics.ts",
+        "kind": "function",
+        "symbol": "getChunkQualitySignals",
+        "lineStart": 289,
+        "lineEnd": 332
+      },
+      {
+        "path": "src/lib/server/analytics/search-analytics.ts",
+        "kind": "function",
+        "symbol": "getClusterHeatMap",
+        "lineStart": 257,
+        "lineEnd": 280
+      },
+      {
+        "path": "src/lib/server/db/schema/search-analytics.ts",
+        "kind": "table-def",
+        "symbol": "rag_query_log",
+        "lineStart": 88,
+        "lineEnd": 113
+      },
+      {
+        "path": "src/lib/server/indexer/karpathy-wiki.ts",
+        "kind": "function",
+        "symbol": "generateClusterNote",
+        "lineStart": 204,
+        "lineEnd": 320
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
+      "totalFiles": 8,
+      "topPrFiles": [],
+      "topBlendFiles": []
+    },
+    "clusterBlend": 0
   },
   {
     "id": 14,

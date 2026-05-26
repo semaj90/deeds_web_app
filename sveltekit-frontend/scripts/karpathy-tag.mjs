@@ -13,7 +13,7 @@
  *   DATABASE_URL   (default postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db)
  *   QDRANT_URL     (default http://localhost:6333)
  *   OLLAMA_URL     (default http://localhost:11434)
- *   OLLAMA_MODEL   (default gemma4-legal-fast:latest)
+ *   OLLAMA_MODEL   (default gemma4-rotorquant:latest-fast:latest)
  *   CONCURRENCY    (default 4 — parallel LLM slots)
  */
 
@@ -23,7 +23,7 @@ const { Pool } = pg;
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://localhost:6333';
 const OLLAMA_URL   = process.env.OLLAMA_URL   ?? 'http://localhost:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-legal-fast:latest';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest-fast:latest';
 const COLLECTION   = 'codebase_chunks_768';
 const CONCURRENCY  = parseInt(process.env.CONCURRENCY ?? '4', 10);
 
@@ -176,7 +176,7 @@ async function callTurbo(prompt) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-legal',
+      model: 'gemma4-rotorquant:latest',
       messages: [
         { role: 'system', content: sysPrompt },
         { role: 'user',   content: prompt },
@@ -291,7 +291,7 @@ async function main() {
   const total = await getTotalCount();
   const cap = LIMIT > 0 ? Math.min(LIMIT, total) : total;
   const transport = USE_TURBO
-    ? `turbo→${TURBO_URL} (gemma4-legal, strict-JSON)`
+    ? `turbo→${TURBO_URL} (gemma4-rotorquant:latest, strict-JSON)`
     : `ollama→${OLLAMA_URL} (${OLLAMA_MODEL})`;
   console.log(`Karpathy tag: ${cap} chunks  ${transport}  concurrency=${CONCURRENCY}  dry=${DRY_RUN}`);
   console.log(`Vocabulary: ${ATOMS.length} atoms`);

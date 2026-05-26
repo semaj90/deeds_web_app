@@ -356,7 +356,7 @@ async function summarizeEdge(memberPaths: string[], _centroid: number[], cluster
     const res = await fetch(`${OLLAMA_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'gemma4-legal-vlm:latest', prompt, stream: false, cache_prompt: true }),
+      body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, cache_prompt: true }),
       signal: AbortSignal.timeout(30_000),
     });
     if (res.ok) {

@@ -176,13 +176,13 @@ curl -X POST http://localhost:11434/api/chat \
 
 **Expected**: ~2-3s (GPU)
 
-**Test gemma4-legal** (full model):
+**Test gemma4-rotorquant:latest** (full model):
 
 ```bash
 curl -X POST http://localhost:11434/api/chat \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gemma4-legal:latest",
+    "model": "gemma4-rotorquant:latest",
     "messages": [{"role": "user", "content": "Hello in 3 words"}],
     "stream": false
   }'

@@ -242,7 +242,7 @@ async function main() {
   // ── Agent call ─────────────────────────────────────────────────────────────
   const generation = trace?.generation({
     name: 'agent-call',
-    model: 'gemma4-legal',
+    model: 'gemma4-rotorquant:latest',
     input: { prompt: prompt.slice(0, 2000) },
     metadata: { agentUrl, preferredBackend, errorHash, memoryHitUsed: !!memoryHit },
   });

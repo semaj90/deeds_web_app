@@ -72,7 +72,7 @@ config = AgentConfig(
     tools=("search_database", "get_weather", "create_alert", "query_logs"),
 )
 ```
-**Our implementation**: `AutonomousAgent` class (`autonomous-agent.ts`), 14 LangChain DynamicStructuredTools, `gemma4-legal:latest` LLM.
+**Our implementation**: `AutonomousAgent` class (`autonomous-agent.ts`), 14 LangChain DynamicStructuredTools, `gemma4-rotorquant:latest` LLM.
 **Status**: ✅ LangChain ReAct agent is ACTIVE (re-audit Apr 7: `createReactAgent` imported and used, NOT commented out).
 **Bonus**: LangGraph `SupervisorAgent` with 5 domain-specific subagents also wired at `/api/agent/investigate`.
 
@@ -188,7 +188,7 @@ Before pushing to GitHub, run and capture:
 ### What to include in the PR description
 ```
 Stack: SvelteKit 5 + Gemma4 E4B (9.6 GB, Text+Image) + EmbeddingGemma + Granite-Docling 258M
-Models installed: gemma4:e4b-it-q4_K_M, gemma4-legal:latest, embeddinggemma:latest, ibm/granite-docling:258m
+Models installed: gemma4:e4b-it-q4_K_M, gemma4-rotorquant:latest, embeddinggemma:latest, ibm/granite-docling:258m
 Differentiators over community repos:
   - Qdrant GPU vector search + pgvector dual-store (community uses in-memory)
   - Granite-Docling 258M structured PDF parsing (unique — 0 community repos)

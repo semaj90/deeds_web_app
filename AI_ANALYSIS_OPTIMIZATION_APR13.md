@@ -11,7 +11,7 @@
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| **Model** | gemma4-legal (11.8B) | gemma3:270m (268M) | 6× faster |
+| **Model** | gemma4-rotorquant:latest (11.8B) | gemma3:270m (268M) | 6× faster |
 | **Cold Request** | 30,000ms (timeout) | 4,125ms (3.6s inference) | **7.3× faster** ✅ |
 | **Warm Request (cache)** | N/A | 261ms | **15× speedup** ✅ |
 | **Success Rate** | 0% (timeout) | 100% | **FIXED** ✅ |
@@ -67,7 +67,7 @@
 
 ---
 
-### Test 3: Complex Model Option (gemma4-legal)
+### Test 3: Complex Model Option (gemma4-rotorquant:latest)
 
 **Request**: Codebase analysis with `useComplexModel: true`
 
@@ -75,7 +75,7 @@
 
 **Result**: ⚠️ TIMEOUT (expected)
 
-**Note**: gemma4-legal still times out at 30s for complex tasks. Recommendation: Use for batch jobs only, not real-time API.
+**Note**: gemma4-rotorquant:latest still times out at 30s for complex tasks. Recommendation: Use for batch jobs only, not real-time API.
 
 ---
 
@@ -89,7 +89,7 @@
 
 1. **Model Selection** (Line 40):
    ```typescript
-   const model = useComplexModel ? 'gemma4-legal:latest' : 'gemma3:270m';
+   const model = useComplexModel ? 'gemma4-rotorquant:latest' : 'gemma3:270m';
    ```
 
 2. **L1 Redis Cache Integration** (Lines 42-66):
@@ -135,7 +135,7 @@ curl -X POST http://localhost:5173/api/evidence/ai/analyze \
 
 ---
 
-### Complex Analysis (gemma4-legal for batch jobs)
+### Complex Analysis (gemma4-rotorquant:latest for batch jobs)
 
 ```bash
 curl -X POST http://localhost:5173/api/evidence/ai/analyze \
@@ -199,7 +199,7 @@ generateCacheKey({
 
 ---
 
-### ⚠️ Use gemma4-legal for Batch Jobs Only
+### ⚠️ Use gemma4-rotorquant:latest for Batch Jobs Only
 
 **Suitable for**:
 - Codebase summarization
@@ -251,7 +251,7 @@ Add to cache monitoring dashboard:
 - Evidence AI analysis requests/hour
 - Cache hit rate
 - Average inference time
-- Model usage breakdown (270m vs gemma4-legal)
+- Model usage breakdown (270m vs gemma4-rotorquant:latest)
 
 ---
 
@@ -280,7 +280,7 @@ curl -X POST http://localhost:5173/api/evidence/ai/analyze \
 **Status**: ✅ **PRODUCTION READY**
 
 The Evidence AI analysis endpoint is now optimized and production-ready with:
-- **7.3× faster** cold requests (gemma3:270m vs gemma4-legal)
+- **7.3× faster** cold requests (gemma3:270m vs gemma4-rotorquant:latest)
 - **15× faster** cached requests (L1 Redis)
 - **100% success rate** (no more timeouts)
 - **Dual model support** (fast for real-time, complex for batch)

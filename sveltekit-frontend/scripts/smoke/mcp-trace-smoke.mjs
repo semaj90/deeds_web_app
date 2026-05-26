@@ -35,6 +35,8 @@ const REQUIRED_TOOLS = [
   'context.get_compressed_card',
   'search.hybrid',
   'kag.ingest_error',
+  'runtime.simdjson_status',
+  'runtime.sse_probe',
 ];
 
 const c = {
@@ -151,6 +153,32 @@ await gate('T6', 'graph.expand_neighborhood returns neighbors', async () => {
   return `${text.length} chars`;
 });
 
+
+// 7. runtime.simdjson_status
+await gate('T7', 'runtime.simdjson_status reports parser', async () => {
+  const data = await mcpCall('tools/call', {
+    name: 'runtime.simdjson_status',
+    arguments: {},
+  });
+  const content = data?.result?.content ?? data?.content ?? [];
+  const text = Array.isArray(content) ? content.map(c => c.text ?? '').join('') : String(content);
+  const parsed = JSON.parse(text);
+  if (!parsed || parsed.ok !== true) throw new Error('simdjson status not ok');
+  return `${parsed.parser}`;
+});
+
+// 8. runtime.sse_probe
+await gate('T8', 'runtime.sse_probe verifies streamable HTTP', async () => {
+  const data = await mcpCall('tools/call', {
+    name: 'runtime.sse_probe',
+    arguments: {},
+  });
+  const content = data?.result?.content ?? data?.content ?? [];
+  const text = Array.isArray(content) ? content.map(c => c.text ?? '').join('') : String(content);
+  const parsed = JSON.parse(text);
+  if (!parsed || parsed.ok !== true || parsed.streamableHttp !== true) throw new Error('SSE/streamable HTTP probe not ok');
+  return `sse=${parsed.sseDetected} streamable=${parsed.streamableHttp} status=${parsed.status}`;
+});
 // ── Summary ──────────────────────────────────────────────────────────────────
 
 const pass = results.filter(r => r.status === 'PASS').length;
@@ -166,3 +194,6 @@ if (fail === 0 && warn === 0) {
 console.log('');
 
 if (STRICT && fail > 0) process.exit(1);
+
+
+

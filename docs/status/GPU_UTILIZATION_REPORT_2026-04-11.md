@@ -105,7 +105,7 @@ $ curl http://localhost:8090/props
 
 ### Text-Only Mode (Current)
 ```
-llama-server (gemma4-legal Q4_K_M)
+llama-server (gemma4-rotorquant:latest Q4_K_M)
 ├─ Model weights: 3.4 GB
 ├─ KV cache (q4_0, 4096 ctx): ~400 MB
 └─ CUDA overhead: ~200 MB

@@ -1,0 +1,108 @@
+{
+  "ok": true,
+  "strict": false,
+  "timestamp": "2026-05-21T03:59:41.5334103Z",
+  "output_file": "docs/reports/startup-health-trace-report.json",
+  "neo4j_credential_source": {
+    "user": ".env",
+    "password": ".env"
+  },
+  "checks": {
+    "trace-health": {
+      "ok": true,
+      "required": true,
+      "result": {
+        "status": 200
+      }
+    },
+    "trace-mcp-initialize": {
+      "ok": true,
+      "required": true,
+      "result": {
+        "hasResult": true,
+        "status": 200
+      }
+    },
+    "trace-engram-redis-health": {
+      "ok": true,
+      "required": false,
+      "result": {
+        "status": 200,
+        "result": {
+          "ok": true,
+          "pong": "PONG"
+        }
+      }
+    },
+    "neo4j-auth-tx-commit": {
+      "ok": true,
+      "required": true,
+      "result": {
+        "password_source": ".env",
+        "status": 200,
+        "user_source": ".env",
+        "authenticated": true,
+        "uri": "http://127.0.0.1:7474/db/neo4j/tx/commit"
+      }
+    },
+    "redis": {
+      "ok": true,
+      "required": false,
+      "result": {
+        "port": 6379,
+        "connected": true,
+        "host": "127.0.0.1"
+      }
+    },
+    "qdrant": {
+      "ok": true,
+      "required": false,
+      "result": {
+        "status": 200
+      }
+    },
+    "bifrost": {
+      "ok": true,
+      "required": false,
+      "result": {
+        "status": 200
+      }
+    },
+    "llama-server-health": {
+      "ok": true,
+      "required": false,
+      "result": {
+        "status": 200
+      }
+    },
+    "llama-server-props": {
+      "ok": true,
+      "required": false,
+      "result": {
+        "raw_type": "System.Management.Automation.PSCustomObject"
+      }
+    },
+    "rg-version": {
+      "ok": true,
+      "required": true,
+      "result": {
+        "version": "ripgrep 14.1.0 (rev e50df40a19)"
+      }
+    },
+    "ast-grep-version": {
+      "ok": true,
+      "required": false,
+      "result": {
+        "version": "ast-grep 0.42.3"
+      }
+    },
+    "dotenv-resolution": {
+      "ok": true,
+      "required": true,
+      "result": {
+        "node": "ok"
+      }
+    }
+  },
+  "errors": []
+}

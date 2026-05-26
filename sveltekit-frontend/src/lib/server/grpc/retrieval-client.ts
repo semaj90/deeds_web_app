@@ -673,7 +673,7 @@ export async function getClusterSummaryViaGrpc(
         await recordKagAnswer(`cluster:${clusterType}:${clusterId}`, mapped.summary, {
           glyphClusterId: clusterId,
           tokensUsed:     Math.ceil(mapped.summary.length / 4),
-          model:          'gemma4-legal-vlm:latest',
+          model:          'gemma4-rotorquant:latest',
         });
       } catch { /* non-fatal */ }
     })();

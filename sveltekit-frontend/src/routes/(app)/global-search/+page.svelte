@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
+	import AIChatAssistant from '$lib/components/AIChatAssistant.svelte';
 	import { analytics } from '$lib/stores/analytics.svelte';
 	import RAGSearchComponent from '$lib/components/RAGSearchComponent.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
@@ -20,10 +21,11 @@
 		jurisdictions: string[];
 		categories: string[];
 		types: string[];
+		metadataLabels: string[];
 	}
 
-	let caseFacets = $state<FilterFacets>({ jurisdictions: [], categories: [], types: [] });
-	let lawFacets = $state<FilterFacets>({ jurisdictions: [], categories: [], types: [] });
+	let caseFacets = $state<FilterFacets>({ jurisdictions: [], categories: [], types: [], metadataLabels: [] });
+	let lawFacets = $state<FilterFacets>({ jurisdictions: [], categories: [], types: [], metadataLabels: [] });
 	let facetsLoaded = $state(false);
 
 	let showRAGAssistant = $state(false);
@@ -148,6 +150,12 @@
 	let selectedBundle = $state<EvidenceBundle | null>(null);
 	let searchError = $state<string | null>(null);
 	let totalFound = $state(0);
+
+	let activeAnalysisContext = $state<{ caseId: string; text: string } | null>(null);
+
+	function startAnalysis(caseId: string, text: string) {
+		activeAnalysisContext = { caseId, text };
+	}
 
 	let searchFilters = $state({
 		cases: true,
@@ -561,6 +569,14 @@
 							<option value={typ}>{typ}</option>
 						{/each}
 					</select>
+					{#if caseFacets.metadataLabels.length}
+						<h3>JSONB LABELS</h3>
+						<div class="entity-list">
+							{#each caseFacets.metadataLabels as label}
+								<span class="entity-tag">{label}</span>
+							{/each}
+						</div>
+					{/if}
 				</div>
 			{:else if searchMode === 'law'}
 				<div class="filter-section">
@@ -577,6 +593,14 @@
 							<option value={cat}>{cat}</option>
 						{/each}
 					</select>
+					{#if lawFacets.metadataLabels.length}
+						<h3>JSONB LABELS</h3>
+						<div class="entity-list">
+							{#each lawFacets.metadataLabels as label}
+								<span class="entity-tag">{label}</span>
+							{/each}
+						</div>
+					{/if}
 				</div>
 			{:else if searchMode === 'evidence'}
 				<div class="filter-section">
@@ -827,16 +851,17 @@
 							</div>
 						</div>
 						<p class="bundle-preview">{hit.snippet}</p>
-						{#if hit.jurisdiction || hit.corpusType}
-							<div class="bundle-meta">
-								{#if hit.jurisdiction}
-									<span class="meta-tag source">{hit.jurisdiction}</span>
-								{/if}
-								{#if hit.corpusType}
-									<span class="meta-tag section">{hit.corpusType}</span>
-								{/if}
-							</div>
-						{/if}
+						<div class="bundle-meta">
+							{#if hit.jurisdiction}
+								<span class="meta-tag source">{hit.jurisdiction}</span>
+							{/if}
+							{#if hit.corpusType}
+								<span class="meta-tag section">{hit.corpusType}</span>
+							{/if}
+							<button class="analysis-btn" type="button" onclick={(e) => { e.stopPropagation(); e.preventDefault(); startAnalysis(hit.title, hit.snippet); }}>
+								✨ Gemma4 Analysis
+							</button>
+						</div>
 					</a>
 				{/each}
 
@@ -861,19 +886,20 @@
 								</div>
 							</div>
 							<p class="bundle-preview">{hit.snippet ?? (hit.chunk_text ?? '').slice(0, 250)}</p>
-							{#if (hit.jurisdictionCode ?? hit.jurisdiction_code) || (hit.corpusType ?? hit.corpus_type)}
-								<div class="bundle-meta">
-									{#if hit.jurisdictionCode ?? hit.jurisdiction_code}
-										<span class="meta-tag source">{hit.jurisdictionCode ?? hit.jurisdiction_code}</span>
-									{/if}
-									{#if hit.corpusType ?? hit.corpus_type}
-										<span class="meta-tag section">{hit.corpusType ?? hit.corpus_type}</span>
-									{/if}
-									{#if hit.citation ?? hit.citation_label}
-										<span class="meta-tag citation">{hit.citation ?? hit.citation_label}</span>
-									{/if}
-								</div>
-							{/if}
+							<div class="bundle-meta">
+								{#if hit.jurisdictionCode ?? hit.jurisdiction_code}
+									<span class="meta-tag source">{hit.jurisdictionCode ?? hit.jurisdiction_code}</span>
+								{/if}
+								{#if hit.corpusType ?? hit.corpus_type}
+									<span class="meta-tag section">{hit.corpusType ?? hit.corpus_type}</span>
+								{/if}
+								{#if hit.citation ?? hit.citation_label}
+									<span class="meta-tag citation">{hit.citation ?? hit.citation_label}</span>
+								{/if}
+								<button class="analysis-btn" type="button" onclick={(e) => { e.stopPropagation(); e.preventDefault(); startAnalysis(hit.title ?? hit.document_title ?? 'Legal Document', hit.snippet ?? hit.chunk_text); }}>
+									✨ Gemma4 Analysis
+								</button>
+							</div>
 						</a>
 					{/each}
 				{/if}
@@ -899,7 +925,6 @@
 							<p class="hit-heading-label">{hit.node_heading}</p>
 						{/if}
 						<p class="bundle-preview">{hit.snippet ?? (hit.chunk_text ?? '').slice(0, 250)}</p>
-						{#if hit.jurisdictionCode ?? hit.jurisdiction_code ?? hit.corpusType ?? hit.corpus_type}
 							<div class="bundle-meta">
 								{#if hit.jurisdictionCode ?? hit.jurisdiction_code}
 									<span class="meta-tag source">{hit.jurisdictionCode ?? hit.jurisdiction_code}</span>
@@ -910,8 +935,10 @@
 								{#if hit.citation ?? hit.citation_label}
 									<span class="meta-tag citation">{hit.citation ?? hit.citation_label}</span>
 								{/if}
+								<button class="analysis-btn" type="button" onclick={(e) => { e.stopPropagation(); e.preventDefault(); startAnalysis(hit.title ?? hit.document_title ?? 'Legal Document', hit.snippet ?? hit.chunk_text); }}>
+									✨ Gemma4 Analysis
+								</button>
 							</div>
-						{/if}
 					</a>
 				{/each}
 
@@ -941,25 +968,26 @@
 							</div>
 						</div>
 						<p class="bundle-preview">{hit.snippet}</p>
-						{#if hit.metadata}
-							<div class="bundle-meta">
-								{#if hit.metadata.type}
-									<span class="meta-tag source">{hit.metadata.type}</span>
-								{/if}
-								{#if hit.metadata.status}
-									<span class="meta-tag section">{hit.metadata.status}</span>
-								{/if}
-								{#if hit.metadata.role}
-									<span class="meta-tag entity">{hit.metadata.role}</span>
-								{/if}
-							</div>
-						{/if}
+						<div class="bundle-meta">
+							{#if hit.metadata?.type}
+								<span class="meta-tag source">{hit.metadata.type}</span>
+							{/if}
+							{#if hit.metadata?.status}
+								<span class="meta-tag section">{hit.metadata.status}</span>
+							{/if}
+							{#if hit.metadata?.role}
+								<span class="meta-tag entity">{hit.metadata.role}</span>
+							{/if}
+							<button class="analysis-btn" type="button" onclick={(e) => { e.stopPropagation(); e.preventDefault(); startAnalysis(hit.title, hit.snippet); }}>
+								✨ Gemma4 Analysis
+							</button>
+						</div>
 					</a>
 				{/each}
 
 			{:else if searchMode === 'cases' && caseResults.length > 0}
 				{#each caseResults as result, i}
-					<button
+					<div
 						class="result-card"
 						onclick={() => {
 							trackClick({
@@ -968,7 +996,8 @@
 								searchContext: searchQuery,
 							});
 						}}
-						type="button"
+						role="button"
+						tabindex="0"
 					>
 						<div class="bundle-header">
 							<div class="bundle-rank">#{i + 1}</div>
@@ -994,14 +1023,17 @@
 							{#if result.metadata?.crimeClassifications?.length > 0}
 								<span class="meta-tag confidence">{result.metadata.crimeClassifications.join(', ')}</span>
 							{/if}
+							<button class="analysis-btn" type="button" onclick={(e) => { e.stopPropagation(); e.preventDefault(); startAnalysis(result.title, result.text); }}>
+								✨ Gemma4 Analysis
+							</button>
 						</div>
-					</button>
+					</div>
 				{/each}
 			{:else if searchMode === 'evidence' && evidenceBundles.length > 0}
 				<!-- Evidence Bundles (RAG+KAG+DAG) -->
 				{#each evidenceBundles as bundle, i}
 					{@const conf = getConfidenceFromScore(bundle.hit.score)}
-					<button
+					<div
 						class="bundle-card"
 						class:selected={selectedBundle === bundle}
 						onclick={() => {
@@ -1015,7 +1047,8 @@
 							searchContext: searchQuery
 						});
 					}}
-						type="button"
+						role="button"
+						tabindex="0"
 					>
 						<div class="bundle-header">
 							<div class="bundle-rank">#{i + 1}</div>
@@ -1040,6 +1073,9 @@
 							{#if bundle.graphNeighbors.length > 0}
 								<span class="meta-tag graph">{bundle.graphNeighbors.length} graph links</span>
 							{/if}
+							<button class="analysis-btn" type="button" onclick={(e) => { e.stopPropagation(); e.preventDefault(); startAnalysis(bundle.heading || bundle.documentContext?.fileName || 'Evidence Bundle', bundle.hit.content); }}>
+								✨ Gemma4 Analysis
+							</button>
 						</div>
 						{#if bundle.hit.rerank}
 							<div class="rerank-bar">
@@ -1058,7 +1094,7 @@
 								</div>
 							{/if}
 						{/if}
-					</button>
+					</div>
 				{/each}
 			{:else if searchMode === 'evidence' && evidenceResults.length > 0}
 				<!-- Flat evidence results (no bundles) -->
@@ -1078,7 +1114,7 @@
 				<!-- RAG results -->
 				{#each ragResults as result, i}
 					{@const conf = getConfidenceFromScore(result.score)}
-					<button
+					<div
 						class="result-card"
 						class:selected={selectedResult === result}
 						onclick={() => {
@@ -1092,7 +1128,8 @@
 							searchContext: searchQuery
 						});
 					}}
-						type="button"
+						role="button"
+						tabindex="0"
 					>
 						<div class="bundle-header">
 							<div class="bundle-rank">#{i + 1}</div>
@@ -1113,6 +1150,9 @@
 							{#if result.related_entities?.length > 0}
 								<span class="meta-tag entity">{result.related_entities.length} entities</span>
 							{/if}
+							<button class="analysis-btn" type="button" onclick={(e) => { e.stopPropagation(); e.preventDefault(); startAnalysis(result.source_title, result.snippet || result.text); }}>
+								✨ Gemma4 Analysis
+							</button>
 						</div>
 						{#if scoringMethod !== "vector_only" && result.vector_score !== undefined}
 							<div class="score-breakdown">
@@ -1129,7 +1169,7 @@
 								</div>
 							</div>
 						{/if}
-					</button>
+					</div>
 				{/each}
 			{:else if searchMode === 'statutes' && statuteResults.length > 0}
 				<StatuteResultsList
@@ -1506,6 +1546,16 @@
 			showContextConfirm = false;
 		}}
 	/>
+{/if}
+{#if activeAnalysisContext}
+	<div class="analysis-modal-backdrop" onclick={() => activeAnalysisContext = null}>
+		<div class="analysis-modal" onclick={(e) => e.stopPropagation()}>
+			<div class="modal-header">
+				<button class="close-btn" onclick={() => activeAnalysisContext = null}>&times;</button>
+			</div>
+			<AIChatAssistant caseId={activeAnalysisContext.caseId} initialContext={activeAnalysisContext.text} />
+		</div>
+	</div>
 {/if}
 
 <style>
@@ -2388,5 +2438,63 @@
 		color: #8a7a5a;
 		width: 2ch;
 		text-align: right;
+	}
+
+	.analysis-modal-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		background: rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(8px);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 1000;
+	}
+	.analysis-modal {
+		background: #111;
+		border: 1px solid #333;
+		border-radius: 12px;
+		width: 90%;
+		max-width: 600px;
+		box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+		padding: 10px;
+		display: flex;
+		flex-direction: column;
+	}
+	.analysis-modal .modal-header {
+		display: flex;
+		justify-content: flex-end;
+		padding: 5px;
+	}
+	.analysis-modal .close-btn {
+		background: none;
+		border: none;
+		font-size: 24px;
+		cursor: pointer;
+		color: #888;
+	}
+	.analysis-modal .close-btn:hover {
+		color: #fff;
+	}
+	.analysis-btn {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+		border: none;
+		border-radius: 4px;
+		padding: 4px 8px;
+		font-size: 11px;
+		font-weight: 600;
+		cursor: pointer;
+		margin-left: 10px;
+		transition: opacity 0.2s;
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+	}
+	.analysis-btn:hover {
+		opacity: 0.9;
 	}
 </style>

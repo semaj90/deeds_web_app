@@ -7,12 +7,12 @@ import { ENV } from '$lib/server/env.server.js';
 
 /**
  * Ollama Configuration for High-Performance AI Assistant
- * Using local gemma4-legal:latest model with legal-bert fallback
+ * Using local gemma4-rotorquant:latest model with legal-bert fallback
  */
 // Model configurations aligned with the blueprint architecture
 export const MODELS: Record<string, ModelConfig> = {
-  'gemma4-legal:latest': {
-    name: 'gemma4-legal:latest',
+  'gemma4-rotorquant:latest': {
+    name: 'gemma4-rotorquant:latest',
     type: 'local',
     capabilities: ['text-generation', 'embeddings', 'legal-analysis'],
     contextWindow: 8192,
@@ -50,10 +50,10 @@ export const MODELS: Record<string, ModelConfig> = {
 // Fallback chain configuration - llama3.2 removed
 export const FALLBACK_CHAIN = {
 	'legal-analysis': [
-		'gemma4-legal:latest', // Only gemma4-legal
+		'gemma4-rotorquant:latest', // Only gemma4-rotorquant:latest
 	],
 	'text-generation': [
-		'gemma4-legal:latest', // Only gemma4-legal
+		'gemma4-rotorquant:latest', // Only gemma4-rotorquant:latest
 	],
 	embeddings: [
 		'embeddinggemma', // Primary Google's EmbeddingGemma
@@ -63,12 +63,12 @@ export const FALLBACK_CHAIN = {
 
 export const OLLAMA_CONFIG: OllamaConfig = {
   baseUrl: ENV.OLLAMA_BASE_URL,
-  defaultModel: 'gemma4-legal:latest',
+  defaultModel: 'gemma4-rotorquant:latest',
 	embeddingModel: 'embeddinggemma',
-	fallbackModel: 'gemma4-legal:latest',
+	fallbackModel: 'gemma4-rotorquant:latest',
 	fallbackModels: {
-	legal: 'gemma4-legal:latest',
-		general: 'gemma4-legal:latest'
+	legal: 'gemma4-rotorquant:latest',
+		general: 'gemma4-rotorquant:latest'
 	},
 	timeout: 60000, // 60 seconds for complex legal analysis
 	maxRetries: 3,

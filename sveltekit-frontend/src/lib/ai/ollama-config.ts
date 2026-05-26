@@ -35,13 +35,13 @@ export function getOllamaEndpoint(): string {
 export function getOllamaModel(): string {
     // Return default or env configured model
     if (typeof process !== 'undefined' && process.env) {
-        return process.env.OLLAMA_MODEL || 'gemma4-legal:latest';
+        return process.env.OLLAMA_MODEL || 'gemma4-rotorquant:latest';
     }
     try {
         // @ts-ignore
-        return import.meta.env?.VITE_OLLAMA_MODEL || 'gemma4-legal:latest';
+        return import.meta.env?.VITE_OLLAMA_MODEL || 'gemma4-rotorquant:latest';
     } catch {
-        return 'gemma4-legal:latest';
+        return 'gemma4-rotorquant:latest';
     }
 }
 

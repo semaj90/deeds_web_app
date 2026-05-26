@@ -482,7 +482,7 @@ Track cache performance by model:
 
 ```typescript
 cacheStats: {
-  'gemma4-legal:latest': { hits: 120, misses: 15, hitRate: 88.9% },
+  'gemma4-rotorquant:latest': { hits: 120, misses: 15, hitRate: 88.9% },
   'gemma3:270m': { hits: 80, misses: 40, hitRate: 66.7% },
 }
 ```

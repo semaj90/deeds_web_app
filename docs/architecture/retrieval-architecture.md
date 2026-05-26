@@ -199,3 +199,6 @@ That is the retrieval stack the MCP surface should expose.
 Use `sveltekit-frontend/next_steps/active/2026-05-08_knowledge-graph-retrieval-feature-tracker.md`
 for the implementation timeline, owner files, feature todos, and production
 recommendation inputs for graph datastore retrieval.
+
+See also: [Qdrant search contract](qdrant-search-contract.md) for the Query API,
+hybrid prefetch/fusion, grouping, and cluster-topic retrieval notes.

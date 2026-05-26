@@ -35,7 +35,7 @@ single ranked recommendation document.
 | AGENTS.md rule density | Postgres `agent_context_files.rules` JSONB | `npm run agents:pipeline:safe` | filter |
 | Engram bigram (query-conditioned) | Redis `ace:engram:bigram:<hash>` (1h TTL) | implicit on retrieval | bias |
 | Cluster summary lenses | MCP `clusters.get_summary_lenses` | live `:8788` | context |
-| Gemma4 rerank | Ollama `gemma4-legal-vlm:latest` | live `:11434` | final |
+| Gemma4 rerank | Ollama `gemma4-rotorquant:latest` | live `:11434` | final |
 
 The fused score is computed by `scripts/skills/codebase-todo-aggregator.mjs`:
 

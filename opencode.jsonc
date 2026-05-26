@@ -1,0 +1,69 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "shell": "pwsh",
+  "provider": {
+    "bifrost-local": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Bifrost Gemma4 Local",
+      "options": {
+        "baseURL": "http://127.0.0.1:8090/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-legal.gguf": {
+          "name": "Gemma4 Legal"
+        }
+      }
+    }
+  },
+  "model": "bifrost-local/gemma4-legal.gguf",
+  "permission": {
+    "bash": "ask",
+    "edit": "ask",
+    "write": "ask",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "skill": "allow",
+    "trace_*": "allow",
+    "turbovec_*": "allow",
+    "engram_*": "allow",
+    "langextract_*": "allow"
+  },
+  "mcp": {
+    "trace": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8788/mcp",
+      "enabled": true
+    },
+    "turbovec": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8791/mcp",
+      "enabled": true
+    },
+    "engram": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8792/mcp",
+      "enabled": true
+    },
+    "langextract": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8793/mcp",
+      "enabled": true
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    ".opencode/command/*.md",
+    "docs/ai-os/*.md"
+  ],
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**",
+      ".svelte-kit/**",
+      "memory/**",
+      "tmp/**"
+    ]
+  }
+}

@@ -72,12 +72,12 @@ NARRATIVE:
 ${narrative}
 `;
 
- const data = await traceLLM('gemma-intake', { model: 'gemma4-legal', prompt: narrative.slice(0, 500) }, async (gen) => {
+ const data = await traceLLM('gemma-intake', { model: 'gemma4-rotorquant:latest', prompt: narrative.slice(0, 500) }, async (gen) => {
 	const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: 'gemma4-legal',
+			model: 'gemma4-rotorquant:latest',
 			prompt,
 			stream: false,
 		}),

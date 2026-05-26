@@ -118,9 +118,9 @@ trace-subagent-orchestrator.ts: replace runAndPersistStub("llm_synthesis") with 
 > into a single latent vector of dim 512, then applies standard KV quant on top.
 > Gemma4 does NOT implement MLA natively — turbo3 alone is sufficient for 8GB GPU.
 
-**Verified dev command** (gemma4-legal-vlm + VLM, asymmetric, Flash Attention required):
+**Verified dev command** (gemma4-rotorquant:latest + VLM, asymmetric, Flash Attention required):
 ```bash
-llama-server.exe -m gemma4-legal-vlm.gguf --mmproj mmproj-BF16.gguf -ctk turbo3 -ctv turbo4 -fa on -ngl 99 --port 8090 -c 4096
+llama-server.exe -m gemma4-rotorquant:latest.gguf --mmproj mmproj-BF16.gguf -ctk turbo3 -ctv turbo4 -fa on -ngl 99 --port 8090 -c 4096
 ```
 VRAM estimate: 5.3GB model + 192MB KV + 200MB overhead ≈ **5.7GB** → 2.3GB free for batch
 

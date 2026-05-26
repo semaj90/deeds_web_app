@@ -10,7 +10,7 @@
 | Model | Size | Modality |
 |-------|------|----------|
 | `gemma4:e4b-it-q4_K_M` | **9.6 GB** | Text + Image ✅ (vision working) |
-| `gemma4-legal:latest` | **5.3 GB** | Text only (vision stripped at GGUF export) |
+| `gemma4-rotorquant:latest` | **5.3 GB** | Text only (vision stripped at GGUF export) |
 | `embeddinggemma:latest` | 621 MB | Embeddings |
 | `ibm/granite-docling:258m` | 521 MB | Doc parsing |
 | `gemma3:270m` | 291 MB | Text tiny |
@@ -25,7 +25,7 @@
 - **No `ollama pull` or code fix needed for VLM**
 
 ### Whisper — FULLY IMPLEMENTED (re-audit April 7)
-- Previously was sending audio filename/size as text to `gemma4-legal` (silent failure)
+- Previously was sending audio filename/size as text to `gemma4-rotorquant:latest` (silent failure)
 - **NOW FULLY WORKING**: `nodejs-whisper` v0.2.9 installed, CUDA acceleration, multilingual (99 languages)
 - Route: `/api/whisper/transcribe` — 25MB limit, audio type/ext validation, auth guard, Langfuse tracing
 - Features: language detect, translate to English, word-level timestamps, JSON segment output
@@ -66,30 +66,30 @@
 **Gemma3 4GB wins only if**: VRAM is critically tight (e.g., sharing with embedding model).
 At 8GB RTX 3060 Ti: `gemma4:e4b` = 5GB VRAM + `embeddinggemma` = ~1.5GB = 6.5GB total ✅ fits.
 
-### Current Problem: gemma4-legal is Text-Only
+### Current Problem: gemma4-rotorquant:latest is Text-Only
 
-The GRPO training pipeline in `Gemma4_E4B_Legal_GRPO.ipynb` **strips vision/audio towers** before fine-tuning (cells 17a-17e). The deployed `gemma4-legal:latest` is therefore text-only.
+The GRPO training pipeline in `Gemma4_E4B_Legal_GRPO.ipynb` **strips vision/audio towers** before fine-tuning (cells 17a-17e). The deployed `gemma4-rotorquant:latest` is therefore text-only.
 
-The VLM fallback in `vlm-evidence-analyzer.ts` sends images to `gemma4-legal` → **silently fails** (model ignores image base64, returns text-only response).
+The VLM fallback in `vlm-evidence-analyzer.ts` sends images to `gemma4-rotorquant:latest` → **silently fails** (model ignores image base64, returns text-only response).
 
 ---
 
 ## 🗺️ VLM Re-attachment Plan
 
 ### Option A: Separate Vision Model (recommended, fastest)
-Use `gemma4:e4b` directly for vision queries, keep `gemma4-legal:latest` for text/legal reasoning.
+Use `gemma4:e4b` directly for vision queries, keep `gemma4-rotorquant:latest` for text/legal reasoning.
 
 ```
 Vision pipeline:
   /api/vision/analyze → vlm-evidence-analyzer.ts
     → Triton VLM ensemble (when available)
-    → Ollama: gemma4:e4b + images[] (fallback)  ← change from gemma4-legal
+    → Ollama: gemma4:e4b + images[] (fallback)  ← change from gemma4-rotorquant:latest
 
 Text/legal pipeline:
-  /api/sse/chat → gemma4-legal:latest (unchanged)
+  /api/sse/chat → gemma4-rotorquant:latest (unchanged)
 ```
 
-**Change required**: `vlm-evidence-analyzer.ts` line ~60 — change `TRITON_VLM_MODEL` fallback from `gemma4-legal` to `gemma4:e4b` for the Ollama multimodal path.
+**Change required**: `vlm-evidence-analyzer.ts` line ~60 — change `TRITON_VLM_MODEL` fallback from `gemma4-rotorquant:latest` to `gemma4:e4b` for the Ollama multimodal path.
 
 ### Option B: Full Vision Tower Re-attachment (Colab, ~2hr)
 In `Gemma4_E4B_Legal_GRPO.ipynb` Section 17 — skip cell 17a's "strips vision/audio" step:
@@ -137,7 +137,7 @@ Scoring: 100% = fully wired + verified working in production | 0% = not implemen
 | 14 | RAG pipeline | **88%** | WIRED | 8 endpoints. -12% KAG graph pre-filter has UUID vs file_path mixing issue (known) |
 | 13 | Semantic search | **85%** | WIRED | 8-domain adapters, `/api/search` fan-out. -15% Fuse.js local index not pre-populated on cold start |
 | 15 | KAG (graph neighbor) | **80%** | WIRED | Graph neighbor pre-filtering in SSE chat. -20% Neo4j sync limited, falls through to PG JSON |
-| 1 | MP3/Audio transcribe | **75%** | WIRED | `/api/whisper/transcribe` accepts MP3/WAV/OGG. -25% uses `gemma4-legal` (text-only!) for "transcription", falls back to placeholder text |
+| 1 | MP3/Audio transcribe | **75%** | WIRED | `/api/whisper/transcribe` accepts MP3/WAV/OGG. -25% uses `gemma4-rotorquant:latest` (text-only!) for "transcription", falls back to placeholder text |
 
 ### 🔧 Tier 3: Partial / Limited (50-69%)
 
@@ -150,7 +150,7 @@ Scoring: 100% = fully wired + verified working in production | 0% = not implemen
 
 | Issue | Impact | Affected Components |
 |-------|--------|---------------------|
-| `gemma4-legal` is text-only | VLM falls back to text-only → wrong/empty image analysis | #1, #2, #3 |
+| `gemma4-rotorquant:latest` is text-only | VLM falls back to text-only → wrong/empty image analysis | #1, #2, #3 |
 | TRT-LLM not installed | Bifrost always uses Ollama fallback, no GPU acceleration via TRT | #9 |
 | Neo4j not synced in docker-compose | KAG uses PG JSON only (weaker graph traversal) | #10, #15 |
 | `/api/whisper/transcribe` sends audio to text model | Audio "transcription" returns placeholder text | #1 |
@@ -161,11 +161,11 @@ Scoring: 100% = fully wired + verified working in production | 0% = not implemen
 
 ### 🔴 P0 — Fix Silent Failures (this week)
 
-- [ ] **Fix VLM analyzer Ollama fallback** (`vlm-evidence-analyzer.ts`): change fallback model from `gemma4-legal` to `gemma4:e4b` for image analysis. Requires `ollama pull gemma4:e4b` on the server.
+- [ ] **Fix VLM analyzer Ollama fallback** (`vlm-evidence-analyzer.ts`): change fallback model from `gemma4-rotorquant:latest` to `gemma4:e4b` for image analysis. Requires `ollama pull gemma4:e4b` on the server.
   - File: `sveltekit-frontend/src/lib/server/analysis/vlm-evidence-analyzer.ts` ~line 60
   - ENV var: add `OLLAMA_VLM_MODEL=gemma4:e4b` to distinguish from text model
 
-- [ ] **Fix `/api/whisper/transcribe`**: it currently sends audio as base64 to `gemma4-legal` (text-only) which cannot decode audio. Options:
+- [ ] **Fix `/api/whisper/transcribe`**: it currently sends audio as base64 to `gemma4-rotorquant:latest` (text-only) which cannot decode audio. Options:
   - A) Install `whisper.cpp` or `openai-whisper` Python alongside Ollama
   - B) Use Ollama's `whisper` model: `ollama pull whisper` (separate ASR model)
   - C) Upgrade to Gemma4 E4B with audio encoder (Option C above, Python microservice)
@@ -173,11 +173,11 @@ Scoring: 100% = fully wired + verified working in production | 0% = not implemen
 
 ### 🟡 P1 — VLM Re-attachment (next sprint)
 
-- [ ] **Run Colab VLM re-attachment** (Option B, ~2hr): modify `Gemma4_E4B_Legal_GRPO.ipynb` Section 17 to preserve vision tower during adapter merge. Export as multimodal GGUF + llama.cpp projector. Deploy as `gemma4-legal-vlm:latest` in Ollama.
+- [ ] **Run Colab VLM re-attachment** (Option B, ~2hr): modify `Gemma4_E4B_Legal_GRPO.ipynb` Section 17 to preserve vision tower during adapter merge. Export as multimodal GGUF + llama.cpp projector. Deploy as `gemma4-rotorquant:latest` in Ollama.
   - Prerequisite: verify llama.cpp Gemma4 multimodal GGUF support (`llama.cpp` main branch April 2026)
   - Notebook changes: skip tower stripping in cell 17a, add vision projector export step
 
-- [ ] **Wire vision model name into VLM analyzer**: After Colab run, switch `OLLAMA_VLM_MODEL=gemma4-legal-vlm:latest` for legal-domain-aware image analysis
+- [ ] **Wire vision model name into VLM analyzer**: After Colab run, switch `OLLAMA_VLM_MODEL=gemma4-rotorquant:latest` for legal-domain-aware image analysis
 
 ### 🟡 P2 — Neo4j Activation
 
@@ -222,8 +222,8 @@ Scoring: 100% = fully wired + verified working in production | 0% = not implemen
 
 | Task | File | Change |
 |------|------|--------|
-| VLM fix | `src/lib/server/analysis/vlm-evidence-analyzer.ts` | Change Ollama fallback model from `gemma4-legal` to env-driven `OLLAMA_VLM_MODEL` |
-| Whisper fix | `src/routes/api/whisper/transcribe/+server.ts` | Use `whisper:latest` model (not `gemma4-legal`) |
+| VLM fix | `src/lib/server/analysis/vlm-evidence-analyzer.ts` | Change Ollama fallback model from `gemma4-rotorquant:latest` to env-driven `OLLAMA_VLM_MODEL` |
+| Whisper fix | `src/routes/api/whisper/transcribe/+server.ts` | Use `whisper:latest` model (not `gemma4-rotorquant:latest`) |
 | Vision resize | `src/lib/server/image/resize-for-vlm.ts` | Update `GEMMA3_VLM_SIZE` constant for Gemma4's variable resolution (70-1120 token budgets) |
 | VLM route | `src/routes/api/vision/analyze/+server.ts` | Remove `GEMMA3_VLM_SIZE` reference, use dynamic budget |
 | Env | `.env.example` | Add `OLLAMA_VLM_MODEL=gemma4:e4b` |

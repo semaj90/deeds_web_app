@@ -21,7 +21,7 @@ Gemma 4 VLM consists of two separate files in the `llama.cpp` stack:
       - *Result:* A folder of Safetensors (e.g., `merged-legal-vlm-f16/`).
 - [ ] **Export to GGUF (Text only):** Run the `convert_hf_to_gguf.py` script.
       - **Crucial:** You only need to export the *language model* part here.
-      - *Result:* `gemma4-legal-f16.gguf` (~8.5GB).
+      - *Result:* `gemma4-rotorquant:latest-f16.gguf` (~8.5GB).
 - [ ] **Download to PC:** Move the `.gguf` file to your local machine.
 
 ---
@@ -32,12 +32,12 @@ Gemma 4 VLM consists of two separate files in the `llama.cpp` stack:
 - [ ] **Prepare Tools:** Ensure `llama-quantize.exe` is available (usually in your `llama-server-cuda` folder).
 - [ ] **Quantize to RotorQuant:** Run the local conversion script:
       ```powershell
-      .\scripts\turboquant\quantize-legal.ps1 -SourcePath "C:\Downloads\gemma4-legal-f16.gguf" -OutputPath "C:\models\gemma4-legal-iq4xs.gguf"
+      .\scripts\turboquant\quantize-legal.ps1 -SourcePath "C:\Downloads\gemma4-rotorquant:latest-f16.gguf" -OutputPath "C:\models\gemma4-rotorquant:latest-iq4xs.gguf"
       ```
 - [ ] **Verify MMPROJ:** Ensure you have the vision tower sidecar (e.g., `mmproj-BF16.gguf`). You don't need to re-quantize this.
 - [ ] **Configure `.env`:**
       ```env
-      ROTORQUANT_MODEL_PATH=C:\models\gemma4-legal-iq4xs.gguf
+      ROTORQUANT_MODEL_PATH=C:\models\gemma4-rotorquant:latest-iq4xs.gguf
       TURBO_MMPROJ_PATH=C:\models\mmproj-BF16.gguf
       ```
 - [ ] **Launch:**
@@ -63,8 +63,8 @@ Gemma 4 VLM consists of two separate files in the `llama.cpp` stack:
 For maximum legal precision, generate an `imatrix` locally before the final quantization step:
 ```powershell
 # 1. Generate imatrix from legal corpus (takes ~20 mins)
-.\llama-imatrix.exe -m gemma4-legal-f16.gguf -f legal-corpus.txt -o legal.imatrix
+.\llama-imatrix.exe -m gemma4-rotorquant:latest-f16.gguf -f legal-corpus.txt -o legal.imatrix
 
 # 2. Quantize using the matrix
-.\llama-quantize.exe --imatrix legal.imatrix gemma4-legal-f16.gguf gemma4-legal-iq4xs.gguf IQ4_XS
+.\llama-quantize.exe --imatrix legal.imatrix gemma4-rotorquant:latest-f16.gguf gemma4-rotorquant:latest-iq4xs.gguf IQ4_XS
 ```

@@ -173,7 +173,7 @@ describe('getFixRecommendations()', () => {
     expect(result.recommendations.length).toBeGreaterThan(0);
     expect(result.diagnostics.degraded).toBe(false);
     expect(result.diagnostics.clusterHit).toBe(3);
-    expect(result.diagnostics.modelUsed).toBe('gemma4-legal-fast:latest');
+    expect(result.diagnostics.modelUsed).toBe('gemma4-rotorquant:latest-fast:latest');
   });
 
   it('falls back to heuristics when Gemma4 is unavailable (503)', async () => {

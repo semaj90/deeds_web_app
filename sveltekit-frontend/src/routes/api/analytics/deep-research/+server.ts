@@ -28,6 +28,8 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { generateDeepResearch, invalidateDeepResearchCache } from '$lib/server/analytics/deep-research.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
+import { startLdrResearch, searchLdrHistory } from '$lib/server/analytics/ldr-client.js';
 
 // ── Schemas ────────────────────────────────────────────────────────────────
 
@@ -80,6 +82,39 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const { selfPrompt, pipelineHint, caseId } = parsed.data;
 	const start = Date.now();
 
+	const ldrEnabled = (ENV as any).LDR_ENABLED !== false;
+
+	if (ldrEnabled) {
+		try {
+			// 1. Check history/cache
+			const cached = await searchLdrHistory(selfPrompt);
+			if (cached && cached.summary && cached.summary.length > 50) {
+				return json({
+					answer: cached.summary,
+					pipeline: pipelineHint ?? 'ace',
+					durationMs: Date.now() - start,
+					cached: true,
+					provider: 'ldr',
+					sources: cached.sources,
+				});
+			}
+
+			// 2. Start a new task
+			const ref = await startLdrResearch(selfPrompt, { maxIterations: 3 });
+			if (ref) {
+				return json({
+					status: 'running',
+					taskId: ref.taskId,
+					queryHash: ref.queryHash,
+					pipeline: pipelineHint ?? 'ace',
+					provider: 'ldr',
+				});
+			}
+		} catch (err) {
+			console.warn('[deep-research API] LDR path failed, falling back to local Gemma4:', err);
+		}
+	}
+
 	try {
 		// Build system prompt based on pipeline hint
 		const systemPrompts: Record<string, string> = {
@@ -100,7 +135,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				{ role: 'system', content: system + caseContext },
 				{ role: 'user', content: selfPrompt },
 			],
-			'gemma4-legal:latest',
+			'gemma4-rotorquant:latest',
 			{
 				temperature: 0.3,
 				maxTokens: 1536,
@@ -113,6 +148,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			pipeline: pipelineHint ?? 'ace',
 			durationMs: Date.now() - start,
 			cached: false,
+			provider: 'gemma4-rotorquant:latest',
 		});
 	} catch (err) {
 		return json({

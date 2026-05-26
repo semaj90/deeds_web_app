@@ -25,7 +25,7 @@ const qloraConfigSchema = z.object({
 });
 
 const qloraSubmitSchema = z.object({
-	model: z.string().max(200).optional().default('gemma4-legal:latest'),
+	model: z.string().max(200).optional().default('gemma4-rotorquant:latest'),
 	dataset: z.string().max(200).optional().default('legal-qa-pairs'),
 	config: qloraConfigSchema.optional().default({})
 });

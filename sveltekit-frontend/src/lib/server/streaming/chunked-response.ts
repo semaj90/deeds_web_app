@@ -3,7 +3,7 @@
  * Optimizes LLM responses with incremental delivery via SSE
  *
  * Integrates with:
- * - Ollama (gemma4-legal:latest)
+ * - Ollama (gemma4-rotorquant:latest)
  * - RAG pipeline (Qdrant vector search)
  * - RabbitMQ background jobs
  */
@@ -137,7 +137,7 @@ export function createSSEStream(
  */
 export async function* streamOllamaResponse(
 	prompt: string,
-	model: string = 'gemma4-legal:latest'
+	model: string = 'gemma4-rotorquant:latest'
 ): AsyncGenerator<StreamChunk> {
 	try {
 		const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {

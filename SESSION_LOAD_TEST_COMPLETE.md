@@ -147,14 +147,14 @@ p99 Latency:       711ms
 Total Requests:    70
 Successful:        70 (100.0%) ✅
 Failed:            0
-Average Latency:   2.14s (vs 34.3s with gemma4-legal)
+Average Latency:   2.14s (vs 34.3s with gemma4-rotorquant:latest)
 p50:               2.23s
 p99:               4.46s
 QPM:               140
 ```
 
 **Analysis**:
-- **13.2× faster** than gemma4-legal
+- **13.2× faster** than gemma4-rotorquant:latest
 - **100% success rate** (stable, no timeouts)
 - **QPM limited by latency**: 140 QPM actual vs 12,000 target
 - **To achieve 12K QPM**: Would need ~400 concurrent workers or <500ms latency
@@ -171,7 +171,7 @@ QPM:               140
 
 | Model | Size | Latency | Max QPM (single GPU) | Load Test Ready? |
 |-------|------|---------|----------------------|------------------|
-| gemma4-legal | 11.8B Q4_K_M | 34.3s | ~7 | ❌ Too slow |
+| gemma4-rotorquant:latest | 11.8B Q4_K_M | 34.3s | ~7 | ❌ Too slow |
 | gemma3:270m | 268M Q8_0 | 2.6s | ~280 | ✅ Viable |
 | embeddinggemma | 307M BF16 | 0.5s | ~1,200 | ✅ Fast |
 
@@ -253,12 +253,12 @@ Max Capacity:      ~280 QPM (8-10 workers)
 Success Rate:      100% (70/70 requests)
 ```
 
-### Ollama L3 (gemma4-legal)
+### Ollama L3 (gemma4-rotorquant:latest)
 
 **Status**: ⚠️ NEEDS OPTIMIZATION
 
 ```
-Model:             gemma4-legal (11.8B Q4_K_M)
+Model:             gemma4-rotorquant:latest (11.8B Q4_K_M)
 Latency:           34.3s avg (cold)
 Throughput:        ~7 QPM max
 Success Rate:      0% (all timeout in load test)
@@ -329,7 +329,7 @@ Optimization:      TensorRT-LLM needed (3-5× speedup expected)
 - **Verification**: Settings persist across restarts
 
 ### Blocker 2: Ollama Performance ✅ RESOLVED
-- **Issue**: gemma4-legal >35s per request
+- **Issue**: gemma4-rotorquant:latest >35s per request
 - **Fix**: Switch to gemma3:270m (13× faster)
 - **Result**: 100% success rate, 2.14s latency
 
@@ -351,7 +351,7 @@ Optimization:      TensorRT-LLM needed (3-5× speedup expected)
 4. Validate 90%+ combined hit rate target
 
 **Option B: Production Model Optimization**
-1. Convert gemma4-legal to TensorRT INT4 format
+1. Convert gemma4-rotorquant:latest to TensorRT INT4 format
 2. Expected: 34s → 7-10s (3-5× speedup)
 3. Deploy on TensorRT-LLM server (:8099)
 4. Re-run load tests with production model
@@ -365,7 +365,7 @@ Optimization:      TensorRT-LLM needed (3-5× speedup expected)
 
 2. **Optimize Ollama configuration**:
    ```bash
-   FROM gemma4-legal:latest
+   FROM gemma4-rotorquant:latest
    PARAMETER num_ctx 2048       # Reduce from 8192
    PARAMETER num_gpu 50
    PARAMETER num_thread 8
@@ -386,7 +386,7 @@ Optimization:      TensorRT-LLM needed (3-5× speedup expected)
 
 2. **Hybrid model strategy**:
    - Simple queries → gemma3:270m (~2s, 90% traffic)
-   - Complex queries → gemma4-legal TRT (~8s, 10% traffic)
+   - Complex queries → gemma4-rotorquant:latest TRT (~8s, 10% traffic)
    - Cache hit rate → 90%+ (L1 + L2)
    - Effective latency → <2s p50
 
@@ -448,7 +448,7 @@ Optimization:      TensorRT-LLM needed (3-5× speedup expected)
 - gemma3:270m achieves 100% success rate
 
 **Production Model**: ⚠️ **OPTIMIZATION NEEDED**
-- gemma4-legal too slow without TensorRT
+- gemma4-rotorquant:latest too slow without TensorRT
 - TensorRT conversion expected to resolve
 - Alternative: Hybrid model strategy
 

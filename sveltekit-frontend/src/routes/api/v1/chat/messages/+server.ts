@@ -2,14 +2,12 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
-import { chatMessages, chatMetadata } from '$lib/server/db/schema.js';
+import { chatMessages, chatMetadata, insertChatMessageSchema } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import { recordChatMessageForRecall } from '$lib/server/ace/chat-memory.js';
 
-const createMessageSchema = z.object({
-	sessionId: z.string().min(1),
+const createMessageSchema = insertChatMessageSchema.extend({
 	role: z.enum(['user', 'assistant', 'system']),
-	content: z.string().max(100000),
 	synthesizedInput: z.string().nullable().optional(),
 	legalAnalysis: z.string().nullable().optional(),
 	ragResults: z.string().nullable().optional(),

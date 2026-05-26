@@ -161,7 +161,7 @@ Merges the adapter with the base model:
 
 Saves the merged model:
 - Format: HuggingFace SafeTensors
-- Location: `./gemma4-legal-merged-full/`
+- Location: `./gemma4-rotorquant:latest-merged-full/`
 - Size: ~15GB
 
 This directory contains:
@@ -176,12 +176,12 @@ Two-phase conversion:
 
 **Phase 1: HuggingFace → FP16 GGUF** (~10-20 min)
 - Uses `llama.cpp/convert_hf_to_gguf.py`
-- Output: `gemma4-legal-e4b-fp16.gguf` (~8GB)
+- Output: `gemma4-rotorquant:latest-e4b-fp16.gguf` (~8GB)
 
 **Phase 2: FP16 → Q4_K_M Quantization** (~10-20 min)
 - Uses `llama.cpp/llama-quantize`
 - Quantization: Q4_K_M (4-bit with K-means optimization)
-- Output: `gemma4-legal-e4b-q4_k_m.gguf` (~2.5GB)
+- Output: `gemma4-rotorquant:latest-e4b-q4_k_m.gguf` (~2.5GB)
 - Cleanup: FP16 file auto-deleted
 
 **First-time setup:** If `llama.cpp` not built yet, adds ~10-20 minutes for CMake build.
@@ -202,19 +202,19 @@ Creates `Modelfile` with:
 
 Runs:
 ```bash
-ollama create gemma4-legal:e4b -f Modelfile
+ollama create gemma4-rotorquant:latest:e4b -f Modelfile
 ```
 
 This:
 - Copies GGUF to Ollama's model store
-- Registers the model with tag `gemma4-legal:e4b`
+- Registers the model with tag `gemma4-rotorquant:latest:e4b`
 - Makes it available for `ollama run`
 
 ### Step 9: Validation Test (~30 seconds)
 
 Tests the model with:
 ```bash
-ollama run gemma4-legal:e4b "What is hearsay evidence?"
+ollama run gemma4-rotorquant:latest:e4b "What is hearsay evidence?"
 ```
 
 Verifies:
@@ -232,8 +232,8 @@ Edit `config.json` to customize:
 {
   "base_model": "unsloth/gemma-4-E4B-it",
   "adapter": "Semaj90/gemma4-e4b-legal-grpo",
-  "output_dir": "./gemma4-legal-merged-full",
-  "gguf_output": "gemma4-legal-e4b-q4_k_m.gguf",
+  "output_dir": "./gemma4-rotorquant:latest-merged-full",
+  "gguf_output": "gemma4-rotorquant:latest-e4b-q4_k_m.gguf",
   "quantization": "q4_k_m",
   "min_disk_space_gb": 20,
   "cuda_required": false
@@ -368,7 +368,7 @@ cmake --build . --config Release
 **Model loading too slow:**
 - Wait 1-2 minutes and try again:
   ```bash
-  ollama run gemma4-legal:e4b "test"
+  ollama run gemma4-rotorquant:latest:e4b "test"
   ```
 
 **Ollama service not running:**
@@ -383,7 +383,7 @@ ollama serve
 ollama list
 
 # If missing, re-import
-ollama create gemma4-legal:e4b -f Modelfile
+ollama create gemma4-rotorquant:latest:e4b -f Modelfile
 ```
 
 ### Script Hangs or Crashes
@@ -413,21 +413,21 @@ python gemma4_setup.py
 
 ```bash
 # Basic test
-ollama run gemma4-legal:e4b "What is hearsay evidence?"
+ollama run gemma4-rotorquant:latest:e4b "What is hearsay evidence?"
 
 # Interactive mode
-ollama run gemma4-legal:e4b
+ollama run gemma4-rotorquant:latest:e4b
 
 # With parameters
-ollama run gemma4-legal:e4b --temperature 0.2 --num-ctx 4096
+ollama run gemma4-rotorquant:latest:e4b --temperature 0.2 --num-ctx 4096
 ```
 
 ### Use in SvelteKit App
 
 Update `CLAUDE.md`:
 ```typescript
-// Change LLM model from gemma3-legal to gemma4-legal:e4b
-OLLAMA_MODEL=gemma4-legal:e4b
+// Change LLM model from gemma3-legal to gemma4-rotorquant:latest:e4b
+OLLAMA_MODEL=gemma4-rotorquant:latest:e4b
 ```
 
 Test in chat:
@@ -436,7 +436,7 @@ import { bifrostChat } from '$lib/server/ollama.js';
 
 const response = await bifrostChat(
   [{ role: 'user', content: 'Analyze this contract...' }],
-  'gemma4-legal:e4b',
+  'gemma4-rotorquant:latest:e4b',
   { temperature: 0.3, maxTokens: 2000 }
 );
 ```
@@ -447,7 +447,7 @@ const response = await bifrostChat(
 
 ```powershell
 # Delete merged model (saves ~15GB)
-Remove-Item -Recurse gemma4-legal-merged-full
+Remove-Item -Recurse gemma4-rotorquant:latest-merged-full
 
 # Delete llama.cpp (saves ~500MB)
 Remove-Item -Recurse llama.cpp
@@ -459,7 +459,7 @@ Remove-Item -Recurse llama.cpp
 
 ```bash
 # Remove from Ollama
-ollama rm gemma4-legal:e4b
+ollama rm gemma4-rotorquant:latest:e4b
 
 # Delete all files
 cd ..
@@ -498,8 +498,8 @@ Remove-Item -Recurse models
 | `SETUP_GUIDE.md` | This file |
 | `Modelfile` | Generated Ollama model definition |
 | `gemma4_setup.log` | Detailed execution log |
-| `gemma4-legal-e4b-q4_k_m.gguf` | Final GGUF model (~2.5GB) |
-| `gemma4-legal-merged-full/` | Intermediate merged model (~15GB, optional) |
+| `gemma4-rotorquant:latest-e4b-q4_k_m.gguf` | Final GGUF model (~2.5GB) |
+| `gemma4-rotorquant:latest-merged-full/` | Intermediate merged model (~15GB, optional) |
 | `llama.cpp/` | GGUF conversion tools (~500MB, optional) |
 
 ---

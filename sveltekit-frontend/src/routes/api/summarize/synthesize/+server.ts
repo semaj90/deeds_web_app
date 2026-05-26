@@ -37,7 +37,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal:latest',
+				model: 'gemma4-rotorquant:latest',
 				prompt: `Synthesize insights from the following legal document sections and key findings.
 
 ${sectionText.slice(0, 15000)}

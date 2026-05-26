@@ -192,6 +192,9 @@ export class QdrantManager {
       { collection: this.collections.codebase_chunks, field: 'updated_at', schema: 'integer' },
       { collection: this.collections.codebase_chunks, field: 'cluster_key', schema: 'keyword' },
       { collection: this.collections.codebase_chunks, field: 'topo_class', schema: 'keyword' },
+      { collection: this.collections.feature_maps, field: 'featureId', schema: 'keyword' },
+      { collection: this.collections.feature_maps, field: 'kind', schema: 'keyword' },
+      { collection: this.collections.feature_maps, field: 'status', schema: 'keyword' },
       // evidence_items: add cluster + tag indexes for cross-case similarity
       { collection: this.collections.evidence, field: 'cluster_id', schema: 'keyword' },
       { collection: this.collections.evidence, field: 'tags', schema: 'keyword' },
@@ -810,7 +813,7 @@ export class QdrantManager {
     const startTime = Date.now();
 
     // Parallel search across all requested collections
-    const searchPromises = collections.map(col => 
+    const searchPromises = collections.map(col =>
       this.hybridSearch({
         query: params.query,
         queryEmbedding: params.queryEmbedding,
@@ -823,7 +826,7 @@ export class QdrantManager {
     );
 
     const allResults = await Promise.all(searchPromises);
-    
+
     // RRF Fusion Logic: score = sum(1 / (60 + rank))
     const fusedResultsMap = new Map<string, { id: string | number; score: number; payload: any; collection: string }>();
     const RRF_CONSTANT = 60;
@@ -833,7 +836,7 @@ export class QdrantManager {
       res.results.forEach((hit: any, rank: number) => {
         const key = `${collectionName}:${hit.id}`;
         const rrfScore = 1 / (RRF_CONSTANT + rank + 1);
-        
+
         if (fusedResultsMap.has(key)) {
           fusedResultsMap.get(key)!.score += rrfScore;
         } else {
@@ -915,16 +918,16 @@ export class QdrantManager {
   }) {
     const { collection, k, vectorName = 'content', batchSize = 1000 } = params;
     const startTime = Date.now();
-    
+
     const { kmeansWithCentroids } = await import('../gpu/pytorch-graph.js');
-    
+
     // 1. Scroll all points to get embeddings
     const embeddings: number[][] = [];
     const ids: (string | number)[] = [];
     let nextOffset: string | number | null | undefined = null;
-    
+
     console.log(`[qdrant] Starting cluster scroll for ${collection}...`);
-    
+
     do {
       const scrollResult: any = await this.client.scroll(collection, {
         limit: batchSize,
@@ -932,7 +935,7 @@ export class QdrantManager {
         with_vector: [vectorName],
         with_payload: false
       });
-      
+
       for (const point of scrollResult.points) {
         const vec = point.vector?.[vectorName] || point.vector;
         if (vec && Array.isArray(vec)) {
@@ -940,33 +943,33 @@ export class QdrantManager {
           ids.push(point.id);
         }
       }
-      
+
       nextOffset = scrollResult.next_page_offset;
     } while (nextOffset);
-    
+
     const n = embeddings.length;
     if (n === 0) return { status: 'empty', count: 0 };
     const dim = embeddings[0].length;
-    
+
     console.log(`[qdrant] Scrolled ${n} points. Running k-means (k=${k})...`);
-    
+
     // 2. Flatten for GPU k-means
     const flat = new Float32Array(n * dim);
     for (let i = 0; i < n; i++) {
       flat.set(embeddings[i], i * dim);
     }
-    
+
     // 3. Run k-means
     const { assignments, centroids, source } = kmeansWithCentroids(flat, n, dim, k);
-    
+
     console.log(`[qdrant] k-means complete (${source}). Writing back assignments...`);
-    
+
     // 4. Write back assignments in batches
     const updateBatches = this.chunkArray(ids.map((id, i) => ({
       id,
       payload: { cluster_id: assignments[i] }
     })), batchSize);
-    
+
     for (const batch of updateBatches) {
       await this.client.setPayload(collection, {
         payload: { cluster_id: 0 }, // placeholder to define key if missing
@@ -983,7 +986,7 @@ export class QdrantManager {
         if (!byCluster.has(c)) byCluster.set(c, []);
         byCluster.get(c)!.push(item.id);
       }
-      
+
       for (const [clusterId, points] of byCluster.entries()) {
         await this.client.setPayload(collection, {
           payload: { cluster_id: clusterId },
@@ -991,7 +994,7 @@ export class QdrantManager {
         });
       }
     }
-    
+
     return {
       status: 'success',
       count: n,

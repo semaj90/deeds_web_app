@@ -57,7 +57,7 @@
 | Model | Avg Latency | Queries/Min | Best For |
 |-------|-------------|-------------|----------|
 | **gemma3:270m** | 455ms | 120-150 | Real-time queries, cache warm-up |
-| **gemma4-legal** | 25,000ms | 2-3 | Complex analysis, codebase summarization |
+| **gemma4-rotorquant:latest** | 25,000ms | 2-3 | Complex analysis, codebase summarization |
 | **Redis L1 (hit)** | 5ms | 12,000 | Repeat queries |
 | **Bifrost L2 (hit)** | 2,500ms | 24 | Semantic variants |
 
@@ -87,12 +87,12 @@
 
 **Endpoints Updated** (3):
 1. `/api/evidence/ai/analyze` - Default: gemma3:270m, Optional: `useComplexModel: true`
-2. `/api/codebase-index/evidence-analyze` - Default: gemma3:270m (was gemma4-legal)
+2. `/api/codebase-index/evidence-analyze` - Default: gemma3:270m (was gemma4-rotorquant:latest)
 3. `/api/ai/chat-direct` - Default: gemma3:270m + L1 Redis cache ✨ NEW
 
 **Impact**:
-- 50-66× faster than gemma4-legal
-- 100% success rate (vs 0% with gemma4-legal timeouts)
+- 50-66× faster than gemma4-rotorquant:latest
+- 100% success rate (vs 0% with gemma4-rotorquant:latest timeouts)
 - Dual-model support (fast vs complex)
 
 ### 3. Cache Warm-Up CLI
@@ -153,7 +153,7 @@ http://localhost:5173/cache-monitor
 - Models: 7 loaded
 - GPU: RTX 3060 Ti (1146MB free)
 - gemma3:270m: 455ms avg
-- gemma4-legal: 25s avg
+- gemma4-rotorquant:latest: 25s avg
 
 ### 6. Backend Infrastructure (17 Gates)
 
@@ -294,7 +294,7 @@ http://localhost:5173/cache-monitor
 ✅ SvelteKit Dev Server: Running on port 5173
 ✅ Redis L1 Cache: 177 keys, 5ms hits, 34.1% hit rate
 ✅ Bifrost L2 Cache: Port 3040, 2-5s semantic search
-✅ Ollama GPU: 7 models, gemma3:270m (455ms), gemma4-legal (25s)
+✅ Ollama GPU: 7 models, gemma3:270m (455ms), gemma4-rotorquant:latest (25s)
 ✅ Qdrant: 20 collections, v1.15.4, INT8 quantized
 ✅ RabbitMQ: 21 queues, all consumers active
 ✅ PostgreSQL: Connected, 17 evidence records

@@ -1,6 +1,12 @@
 import type { SkillRecipe } from './registry.js';
 
 export const RESEARCH_SKILLS: Record<string, SkillRecipe> = {
+  playbook_lookup_by_language: {
+    id: 'playbook_lookup_by_language',
+    family: 'Research',
+    description: 'Retrieve legal/compliance playbooks for a specific language intersecting with top codebase files',
+    tools: [{ name: 'playbook_lookup_by_language' }]
+  },
   deep_research: {
     id: 'deep_research',
     family: 'Research',

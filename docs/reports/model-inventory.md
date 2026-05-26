@@ -12,7 +12,7 @@ _Generated: 2026-05-16T19:21:44.800Z_  |  Status: **WARN**
 ## Manifest Status
 | Model ID | Runtime | Filename | Discovered | Size |
 |----------|---------|----------|------------|------|
-| `gemma4-legal-vlm` | llama-server | `(env-resolved)` | ✓ | 0.04 MB |
+| `gemma4-rotorquant:latest` | llama-server | `(env-resolved)` | ✓ | 0.04 MB |
 | `gemma4-mmproj` | llama-server | `mmproj-BF16.gguf` | ✓ | 0 MB |
 | `embeddinggemma-768d` | ollama | `(env-resolved)` | ✓ | 0.04 MB |
 | `gemma3-270m-onnx` | onnx-runtime-web | `(env-resolved)` | ✓ | 0.04 MB |
@@ -807,11 +807,11 @@ _Generated: 2026-05-16T19:21:44.800Z_  |  Status: **WARN**
 | `[Gemma_2]control_vectors.ipynb` | 0.24 | desktop_staging | `C:/Users/james/Desktop/gemma-cookbook-main/gemma-cookbook-main/Workshops/[Gemma_2]control_vectors.ipynb` |
 | `gemma3-legal-finetune.ipynb` | 0.03 | desktop_staging | `C:/Users/james/Desktop/gemma3-legal-finetune.ipynb` |
 | `Gemma3_12B_Merge_and_TRT_Export.ipynb` | 0.02 | desktop_staging | `C:/Users/james/Desktop/Gemma3_12B_Merge_and_TRT_Export.ipynb` |
-| `gemma4-legal-f16-test.gguf` | 67.6 | desktop_staging | `C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-f16-test.gguf` |
-| `gemma4-legal-f16.gguf` | 67.6 | desktop_staging | `C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-f16.gguf` |
-| `gemma4-legal-iq4xs-direct.gguf` | 4855.57 | desktop_staging | `C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-iq4xs-direct.gguf` |
-| `gemma4-legal-iq4xs.gguf` | 4855.57 | desktop_staging | `C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-iq4xs.gguf` |
-| `gemma4-legal-merged-q4km.gguf` | 5088.13 | desktop_staging | `C:/Users/james/Desktop/gemma4-legal-iq4xs/gemma4-legal-merged-q4km.gguf` |
+| `gemma4-rotorquant:latest-f16-test.gguf` | 67.6 | desktop_staging | `C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-f16-test.gguf` |
+| `gemma4-rotorquant:latest-f16.gguf` | 67.6 | desktop_staging | `C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-f16.gguf` |
+| `gemma4-rotorquant:latest-iq4xs-direct.gguf` | 4855.57 | desktop_staging | `C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-iq4xs-direct.gguf` |
+| `gemma4-rotorquant:latest-iq4xs.gguf` | 4855.57 | desktop_staging | `C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-iq4xs.gguf` |
+| `gemma4-rotorquant:latest-merged-q4km.gguf` | 5088.13 | desktop_staging | `C:/Users/james/Desktop/gemma4-rotorquant:latest-iq4xs/gemma4-rotorquant:latest-merged-q4km.gguf` |
 | `Gemma4_E4B_Legal_GRPO.ipynb` | 0.04 | desktop_staging | `C:/Users/james/Desktop/Gemma4_E4B_Legal_GRPO.ipynb` |
 | `gemma3_qlora_train_win_env.py` | 0 | desktop_staging | `C:/Users/james/Desktop/googledrive4_8_25/gemma3_qlora_train_win_env.py` |
 | `hf_to_gguf_gemma.py` | 0 | desktop_staging | `C:/Users/james/Desktop/googledrive4_8_25/hf_to_gguf_gemma.py` |
@@ -1098,15 +1098,15 @@ _Generated: 2026-05-16T19:21:44.800Z_  |  Status: **WARN**
 | `Gemma3_LibTorch_Vision_PPO.zip` | 0 | downloads_staging | `C:/Users/james/Downloads/Gemma3_LibTorch_Vision_PPO.zip` |
 | `gemma4-audio-capabilities.md` | 0.05 | downloads_staging | `C:/Users/james/Downloads/gemma4-audio-capabilities.md` |
 | `gemma4-e4b-legal-final-gguf.zip` | 0 | downloads_staging | `C:/Users/james/Downloads/gemma4-e4b-legal-final-gguf.zip` |
-| `adapter_model.safetensors` | 21.79 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-adapters/adapter_model.safetensors` |
-| `adapter_model.safetensors` | 21.79 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-adapters/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors` |
-| `adapter_model.safetensors` | 21.79 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-adapters (1)/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors` |
-| `adapter_model.safetensors` | 21.79 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-adapters (2)/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors` |
-| `gemma4-legal-adapters.zip` | 14.29 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-adapters.zip` |
-| `gemma4-legal-e4b-adapter.zip` | 5.29 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-e4b-adapter.zip` |
-| `gemma4-legal-e4b.zip` | 139.55 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-e4b.zip` |
-| `gemma4-legal-vlm-merged-20260411T044652Z-3-004.zip` | 5.3 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-vlm-merged-20260411T044652Z-3-004.zip` |
-| `gemma4-legal-vlm-q4_k_m.gguf` | 5088.13 | downloads_staging | `C:/Users/james/Downloads/gemma4-legal-vlm-q4_k_m.gguf` |
+| `adapter_model.safetensors` | 21.79 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters/adapter_model.safetensors` |
+| `adapter_model.safetensors` | 21.79 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors` |
+| `adapter_model.safetensors` | 21.79 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters (1)/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors` |
+| `adapter_model.safetensors` | 21.79 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters (2)/gemma4-e4b-legal-grpo-lora/adapter_model.safetensors` |
+| `gemma4-rotorquant:latest-adapters.zip` | 14.29 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-adapters.zip` |
+| `gemma4-rotorquant:latest-e4b-adapter.zip` | 5.29 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-e4b-adapter.zip` |
+| `gemma4-rotorquant:latest-e4b.zip` | 139.55 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-e4b.zip` |
+| `gemma4-rotorquant:latest-merged-20260411T044652Z-3-004.zip` | 5.3 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-merged-20260411T044652Z-3-004.zip` |
+| `gemma4-rotorquant:latest-q4_k_m.gguf` | 5088.13 | downloads_staging | `C:/Users/james/Downloads/gemma4-rotorquant:latest-q4_k_m.gguf` |
 | `mmproj-BF16.gguf.metadata` | 0 | downloads_staging | `C:/Users/james/Downloads/gemma4-mmproj/.cache/huggingface/download/mmproj-BF16.gguf.metadata` |
 | `Gemma4_E4B_Legal_VLM_Reattach_A100_Merge (1).ipynb` | 0.01 | downloads_staging | `C:/Users/james/Downloads/Gemma4_E4B_Legal_VLM_Reattach_A100_Merge (1).ipynb` |
 | `Gemma4_E4B_Legal_VLM_Reattach_A100_Merge (2).ipynb` | 0.01 | downloads_staging | `C:/Users/james/Downloads/Gemma4_E4B_Legal_VLM_Reattach_A100_Merge (2).ipynb` |
@@ -1116,8 +1116,8 @@ _Generated: 2026-05-16T19:21:44.800Z_  |  Status: **WARN**
 | `ollama.png` | 0.01 | downloads_staging | `C:/Users/james/Downloads/Hermes-Ollama/hermes-workspace/public/providers/ollama.png` |
 | `clipboard.ts` | 0 | downloads_staging | `C:/Users/james/Downloads/Hermes-Ollama/hermes-workspace/src/lib/clipboard.ts` |
 | `hermes-world-embed.tsx` | 0 | downloads_staging | `C:/Users/james/Downloads/Hermes-Ollama/hermes-workspace/src/screens/playground/hermes-world-embed.tsx` |
-| `gemma4-hermes-64k-latest-64k-latest-64k.Modelfile` | 0 | downloads_staging | `C:/Users/james/Downloads/Hermes-Ollama/ollama-modelfiles/gemma4-hermes-64k-latest-64k-latest-64k.Modelfile` |
-| `gemma4-hermes-64k-latest-64k.Modelfile` | 0 | downloads_staging | `C:/Users/james/Downloads/Hermes-Ollama/ollama-modelfiles/gemma4-hermes-64k-latest-64k.Modelfile` |
+| `gemma4-rotorquant:latest-latest-64k-latest-64k.Modelfile` | 0 | downloads_staging | `C:/Users/james/Downloads/Hermes-Ollama/ollama-modelfiles/gemma4-rotorquant:latest-latest-64k-latest-64k.Modelfile` |
+| `gemma4-rotorquant:latest-latest-64k.Modelfile` | 0 | downloads_staging | `C:/Users/james/Downloads/Hermes-Ollama/ollama-modelfiles/gemma4-rotorquant:latest-latest-64k.Modelfile` |
 | `How to build an Agent with Gemma 4 (LangGraph + Ollama).mkv` | 36.31 | downloads_staging | `C:/Users/james/Downloads/How to build an Agent with Gemma 4 (LangGraph + Ollama).mkv` |
 | `Investigating Gemma 3 TensorRT-LLM Config vs Weights Mismatch.pdf` | 0.05 | downloads_staging | `C:/Users/james/Downloads/Investigating Gemma 3 TensorRT-LLM Config vs Weights Mismatch.pdf` |
 | `langchain-turboquant-master.zip` | 0.05 | downloads_staging | `C:/Users/james/Downloads/langchain-turboquant-master.zip` |
@@ -1391,19 +1391,19 @@ _Generated: 2026-05-16T19:21:44.800Z_  |  Status: **WARN**
 | `gemma3_client_quantized.onnx` | 417.22 | repo_models | `C:/Users/james/Videos/deeds-web-app/models/gemma3-client-onnx/gemma3_client_quantized.onnx` |
 | `model.safetensors` | 511.38 | repo_models | `C:/Users/james/Videos/deeds-web-app/models/gemma3_270m/model.safetensors` |
 | `gemma4_setup.py` | 0.02 | repo_models | `C:/Users/james/Videos/deeds-web-app/models/gemma4_setup.py` |
-| `gemma4-legal.gguf` | 5088.12 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-legal.gguf` |
-| `adapter_model.safetensors` | 161.88 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors` |
-| `adapter_model.safetensors` | 140.08 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-text/adapter_model.safetensors` |
+| `gemma4-rotorquant:latest.gguf` | 5088.12 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-rotorquant:latest.gguf` |
+| `adapter_model.safetensors` | 161.88 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-grpo/adapter_model.safetensors` |
+| `adapter_model.safetensors` | 140.08 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-text/adapter_model.safetensors` |
 | `mmproj-gemma4.gguf` | 945.62 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/mmproj-gemma4.gguf` |
-| `gemma4-legal.gguf` | 5088.12 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-legal.gguf` |
-| `adapter_model.safetensors` | 161.88 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors` |
-| `adapter_model.safetensors` | 140.08 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-text/adapter_model.safetensors` |
+| `gemma4-rotorquant:latest.gguf` | 5088.12 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-rotorquant:latest.gguf` |
+| `adapter_model.safetensors` | 161.88 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-grpo/adapter_model.safetensors` |
+| `adapter_model.safetensors` | 140.08 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-text/adapter_model.safetensors` |
 | `mmproj-gemma4.gguf` | 945.62 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/mmproj-gemma4.gguf` |
-| `gemma4-legal.gguf` | 5088.12 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-legal.gguf` |
-| `adapter_model.safetensors` | 161.88 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors` |
-| `adapter_model.safetensors` | 140.08 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-text/adapter_model.safetensors` |
+| `gemma4-rotorquant:latest.gguf` | 5088.12 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-rotorquant:latest.gguf` |
+| `adapter_model.safetensors` | 161.88 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-grpo/adapter_model.safetensors` |
+| `adapter_model.safetensors` | 140.08 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-text/adapter_model.safetensors` |
 | `mmproj-gemma4.gguf` | 945.62 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/mmproj-gemma4.gguf` |
-| `gemma4-legal.gguf` | 5088.12 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-legal.gguf` |
-| `adapter_model.safetensors` | 161.88 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-grpo/adapter_model.safetensors` |
-| `adapter_model.safetensors` | 140.08 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-legal-text/adapter_model.safetensors` |
+| `gemma4-rotorquant:latest.gguf` | 5088.12 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/gemma4-rotorquant:latest.gguf` |
+| `adapter_model.safetensors` | 161.88 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-grpo/adapter_model.safetensors` |
+| `adapter_model.safetensors` | 140.08 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/lora/gemma4-rotorquant:latest-text/adapter_model.safetensors` |
 | `mmproj-gemma4.gguf` | 945.62 | vendor_canonical | `C:/Users/james/Videos/deeds-web-app/vendor/models/mmproj-gemma4.gguf` |

@@ -132,7 +132,7 @@ vi.mock('$lib/server/ai/token-tracker.js', () => ({
     promptTokens: 30000,
     completionTokens: 20000,
     requestCount: 200,
-    byModel: { 'gemma4-legal': { tokens: 50000, requests: 200 } },
+    byModel: { 'gemma4-rotorquant:latest': { tokens: 50000, requests: 200 } },
   })),
 }));
 
@@ -195,7 +195,7 @@ vi.mock('$lib/server/ace/tag-sync.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-legal:latest',
+	getChatModel: () => 'gemma4-rotorquant:latest',
 	getEmbedModel: () => 'embeddinggemma:latest',
   ollamaFetch: vi.fn(async () => ({
     ok: true,

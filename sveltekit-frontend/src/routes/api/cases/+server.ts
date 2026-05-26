@@ -8,21 +8,22 @@ import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
+import { insertCaseSchema } from '$lib/server/db/zod-schemas.js';
 
 const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
 const CASE_PRIORITY = ['low', 'medium', 'high', 'critical', 'urgent'] as const;
 
 const caseCreateSchema = z.object({
-	title: z.string().min(1, 'Title is required').max(500),
+	title: insertCaseSchema.shape.title,
 	description: z.string().min(1, 'Description is required').max(10000),
-	status: z.enum(CASE_STATUS).optional(),
-	priority: z.enum(CASE_PRIORITY).optional()
+	status: insertCaseSchema.shape.status,
+	priority: insertCaseSchema.shape.priority
 });
 
 const caseBulkSchema = z.object({
 	ids: z.array(z.string().uuid()).min(1, 'Select at least one case'),
-	status: z.enum(CASE_STATUS).optional(),
-	priority: z.enum(CASE_PRIORITY).optional()
+	status: insertCaseSchema.shape.status,
+	priority: insertCaseSchema.shape.priority
 });
 
 const caseListQuerySchema = z.object({
