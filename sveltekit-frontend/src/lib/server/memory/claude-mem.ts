@@ -1,16 +1,16 @@
-// Lightweight server-side wrapper for claude-mem-opencode
-// Provides a singleton instance and safe helpers to initialize/use the worker
 import type {
   ClaudeMemIntegration as ClaudeMemIntegrationType,
+} from 'claude-mem-opencode/dist/integration/index.js';
+import type {
   WorkerClient as WorkerClientType,
-} from 'claude-mem-opencode';
+} from 'claude-mem-opencode/dist/integration/worker-client.js';
 
 let integration: ClaudeMemIntegrationType | null = null;
 
 export async function initClaudeMem(workerUrl?: string) {
   if (integration) return integration;
   try {
-    const mod = await import('claude-mem-opencode');
+    const mod = await import('claude-mem-opencode/dist/integration/index.js');
     // prefer provided workerUrl, otherwise library default
     const instance: ClaudeMemIntegrationType = new mod.ClaudeMemIntegration(workerUrl);
     await instance.initialize();
