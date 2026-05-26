@@ -236,6 +236,8 @@ async function _runEnrichment(job: EnrichJob, batchSize: number): Promise<void> 
     const preIndexDefs = [
       { field_name: 'file_path', field_schema: { type: 'keyword', lookup: true } },
       { field_name: 'relativePath', field_schema: { type: 'keyword', lookup: true } },
+      { field_name: 'sourceRefs', field_schema: { type: 'keyword', lookup: true } },
+      { field_name: 'source_refs', field_schema: { type: 'keyword', lookup: true } },
       { field_name: 'extension', field_schema: { type: 'keyword', lookup: true } },
       { field_name: 'kind', field_schema: { type: 'keyword', lookup: true } },
       { field_name: 'domain', field_schema: { type: 'keyword', lookup: true } },
@@ -486,7 +488,29 @@ function buildChunkRestorePayload(
   const tags = normalizeTags(row.tags, row.semantic_tags);
   if (tags.length > 0) payload.tags = tags;
 
+  const sourceRefs = buildChunkSourceRefs(row);
+  if (sourceRefs.length > 0) {
+    payload.sourceRefs = sourceRefs;
+    payload.source_refs = sourceRefs;
+  }
+
   return payload;
+}
+
+function buildChunkSourceRefs(row: ChunkRestoreRow): string[] {
+  const relativePath = String(row.relative_path ?? '').trim();
+  if (!relativePath) return [];
+
+  const start = Number.isFinite(row.line_start as number) ? Number(row.line_start) : null;
+  const end = Number.isFinite(row.line_end as number) ? Number(row.line_end) : null;
+
+  if (start !== null && end !== null && end >= start) {
+    return [`${relativePath}#L${start}-L${end}`];
+  }
+  if (start !== null) {
+    return [`${relativePath}#L${start}`];
+  }
+  return [relativePath];
 }
 
 function normalizeTags(tagsValue: unknown, semanticTags: string[] | null): string[] {

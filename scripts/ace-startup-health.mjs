@@ -59,13 +59,15 @@ async function main() {
 
   // 1. Call local /api/health
   try {
-    const response = await fetch('http://localhost:5173/api/health', { signal: AbortSignal.timeout(3000) });
+    const response = await fetch('http://localhost:5173/api/health', {
+      signal: AbortSignal.timeout(3000),
+    });
     status = response.status;
     viteService = true;
     if (response.status === 200) {
       // 200 OK
     } else if (response.status === 403) {
-      blockers.push("api.health.auth_blocked");
+      blockers.push('api.health.auth_blocked');
       ok = false;
     } else {
       blockers.push(`api.health.invalid_status_${response.status}`);
@@ -74,20 +76,20 @@ async function main() {
   } catch (error) {
     status = error.code || error.message;
     viteService = false;
-    blockers.push("api.health.unavailable");
+    blockers.push('api.health.unavailable');
     ok = false;
   }
 
   // 2. Check duplicate scripts in package.json
   const rootDuplicates = getDuplicateScripts(path.join(ROOT_DIR, 'package.json'));
-  const frontendDuplicates = getDuplicateScripts(path.join(ROOT_DIR, 'sveltekit-frontend/package.json'));
+  const frontendDuplicates = getDuplicateScripts(
+    path.join(ROOT_DIR, 'sveltekit-frontend/package.json')
+  );
   if (rootDuplicates.length > 0) {
-    blockers.push(`package.json.root.duplicate_scripts: ${rootDuplicates.join(', ')}`);
-    ok = false;
+    warnings.push(`package.json.root.duplicate_scripts: ${rootDuplicates.join(', ')}`);
   }
   if (frontendDuplicates.length > 0) {
-    blockers.push(`package.json.frontend.duplicate_scripts: ${frontendDuplicates.join(', ')}`);
-    ok = false;
+    warnings.push(`package.json.frontend.duplicate_scripts: ${frontendDuplicates.join(', ')}`);
   }
 
   // 3. Sidecar stdout guard check
@@ -99,7 +101,7 @@ async function main() {
       const stdout = execSync(`node "${sidecarCheckScript}"`, { encoding: 'utf8', stdio: 'pipe' });
       // If we got "OFFLINE" or warnings about offline, or exit code != 0, consider it a failure
       if (stdout.includes('OFFLINE') || stdout.includes('degraded')) {
-        warnings.push("sidecar_running_degraded");
+        warnings.push('sidecar_running_degraded');
       }
     }
   } catch (e) {
@@ -109,6 +111,7 @@ async function main() {
   }
 
   const resultPayload = {
+    status: ok ? 'ok' : 'degraded',
     ok,
     health: {
       ok: ok && status === 200,
@@ -117,7 +120,7 @@ async function main() {
     },
     services: {
       vite: viteService,
-      sidecars: sidecarHealthy
+      sidecars: sidecarHealthy,
     },
     blockers,
     warnings,

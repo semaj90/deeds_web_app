@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-05-26T23:38:57.138Z",
+  "root": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "counts": {
+    "cards": 1,
+    "schemaFiles": 84,
+    "tables": 310,
+    "domains": 7
+  },
+  "outputs": {
+    "cardsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\schema-indexer-contract-cards.jsonl",
+    "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\schema-indexer-contract-manifest.json",
+    "reportJsonPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\schema-indexer-contract-report.json",
+    "reportMdPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\schema-indexer-contract-report.md"
+  },
+  "inputs": {
+    "schemaDirs": [
+      "src/lib/server/db/schema",
+      "src/lib/server/db"
+    ],
+    "semanticIndexer": "scripts/codebase-semantic-indexer.mjs"
+  },
+  "note": "Standalone schema-indexer contract for MCP search and prompt-context engineering, independent from workspace-gap cards."
+}

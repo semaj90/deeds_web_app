@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-05-26T23:19:17.153Z",
+  "db": "feature_cards",
+  "designId": "_design/feature_cards",
+  "dryRun": false,
+  "warm": true,
+  "changed": false,
+  "views": [
+    "by_kind",
+    "by_feature_key",
+    "by_term",
+    "by_audit_status"
+  ],
+  "existingRev": "1-ed630f87c94fd7a779d36b1a2e665819",
+  "upserted": false,
+  "warmChecks": [
+    {
+      "path": "/_design/feature_cards/_view/by_kind?limit=1",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "path": "/_design/feature_cards/_view/by_feature_key?limit=1",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "path": "/_design/feature_cards/_view/by_term?limit=1",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "path": "/_design/feature_cards/_view/by_audit_status?reduce=true&group=true&limit=1",
+      "ok": true,
+      "status": 200
+    }
+  ]
+}

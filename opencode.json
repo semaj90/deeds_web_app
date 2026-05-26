@@ -67,6 +67,19 @@
       }
     }
   },
+  "skills": {
+    "paths": [
+      ".opencode/skills"
+    ]
+  },
+  "command": {
+    "workspace-bootstrap": {
+      "description": "Refresh ACE context, local health, and report artifacts before starting OpenCode work",
+      "agent": "antigravity",
+      "subtask": false,
+      "prompt": "Run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE context, daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, bash tools, and the next safe action. Do not edit files."
+    }
+  },
   "permission": {
     "read": "allow",
     "grep": "allow",

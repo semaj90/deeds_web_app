@@ -23,6 +23,8 @@ const DRY_RUN = process.argv.includes('--dry-run') || ANALYZE;
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
+const VERBOSE = process.argv.includes('--verbose') || process.argv.includes('-v');
+
 function ts(d = new Date()) {
   return d.toISOString().replace(/[:.]/g, '-').slice(0, 19);
 }
@@ -39,19 +41,52 @@ ensureDir(reportsDir);
 // Collect any existing svelte-check / tsc log snapshots from logs/
 const logsDir = path.join(ROOT, 'logs');
 ensureDir(logsDir);
-
 let totalIssues = 0;
 let highPriority = 0;
 let filesAnalyzed = 0;
-const files = [];
+let files = [];
 
-// If a prior svelte-check log exists, count error lines
-const svelteLog = path.join(logsDir, 'svelte-check.log');
-if (fs.existsSync(svelteLog)) {
+// Determine which log file to read: explicit --log-path, or common candidates in logs/
+let svelteLog = null;
+const explicitIndex = process.argv.indexOf('--log-path');
+if (explicitIndex !== -1 && process.argv.length > explicitIndex + 1) {
+  svelteLog = path.resolve(process.argv[explicitIndex + 1]);
+} else {
+  // preference: logs/svelte-check.log -> logs/svelte-check-errors.txt -> reports/svelte-check.log
+  const candidates = [
+    path.join(logsDir, 'svelte-check.log'),
+    path.join(logsDir, 'svelte-check-errors.txt'),
+    path.join(reportsDir, 'svelte-check.log'),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      svelteLog = p;
+      break;
+    }
+  }
+  if (!svelteLog) {
+    // scan logsDir for any file that mentions svelte and check or error
+    try {
+      const found = fs
+        .readdirSync(logsDir)
+        .filter((f) => /svelte/i.test(f) && /(check|error)/i.test(f));
+      if (found.length) svelteLog = path.join(logsDir, found[0]);
+    } catch (e) {
+      if (VERBOSE) console.log(`[batch-merger-fixer-v2] Failed scanning logs/: ${e.message}`);
+    }
+  }
+}
+
+if (VERBOSE) console.log(`[batch-merger-fixer-v2] Selected log path: ${svelteLog || '(none)'} `);
+
+if (svelteLog && fs.existsSync(svelteLog)) {
   const lines = fs.readFileSync(svelteLog, 'utf8').split('\n');
-  const errorLines = lines.filter(l => /Error\b|error TS/i.test(l));
+  if (VERBOSE) console.log(`[batch-merger-fixer-v2] Read ${lines.length} lines from ${svelteLog}`);
+  const errorLines = lines.filter((l) => /Error\b|error TS/i.test(l));
   totalIssues += errorLines.length;
-  highPriority += errorLines.filter(l => /TS2\d{3}|Cannot find|is not assignable/i.test(l)).length;
+  highPriority += errorLines.filter((l) =>
+    /TS2\d{3}|Cannot find|is not assignable/i.test(l)
+  ).length;
 
   // Summarise top offending files
   const fileHits = {};
@@ -62,6 +97,34 @@ if (fs.existsSync(svelteLog)) {
   for (const [filePath, count] of Object.entries(fileHits)) {
     files.push({ path: filePath, patterns: Array(count).fill('ts-error') });
     filesAnalyzed++;
+  }
+
+  if (VERBOSE) {
+    console.log(
+      `[batch-merger-fixer-v2] Detected ${errorLines.length} error lines across ${Object.keys(fileHits).length} files:`
+    );
+    for (const [f, c] of Object.entries(fileHits)) console.log(`  ${f}: ${c}`);
+    if (errorLines.length && errorLines.length < 50) {
+      console.log('[batch-merger-fixer-v2] Sample error lines:');
+      for (const l of errorLines.slice(0, 20)) console.log('  ' + l);
+    }
+  }
+} else {
+  if (VERBOSE) {
+    console.log(
+      `[batch-merger-fixer-v2] No svelte-check log found. Tried: ${svelteLog || '(none)'} `
+    );
+    try {
+      const all = fs.readdirSync(logsDir);
+      const found = all.filter((f) => /svelte/i.test(f) && /(check|error)/i.test(f));
+      console.log(
+        `[batch-merger-fixer-v2] Other files in logs/: ${found.length ? found.join(', ') : '(none)'} `
+      );
+      if (!found.length && all.length)
+        console.log(`[batch-merger-fixer-v2] All log files: ${all.join(', ')}`);
+    } catch (e) {
+      console.log(`[batch-merger-fixer-v2] Error listing logs/: ${e.message}`);
+    }
   }
 }
 

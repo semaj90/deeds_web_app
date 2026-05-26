@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-05-26T23:15:32.564Z",
+  "status": "pass",
+  "duckdb": {
+    "bin": "C:\\Users\\james\\AppData\\Local\\Programs\\DuckDB\\duckdb.exe",
+    "dbPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\feature-card.duckdb",
+    "exists": true
+  },
+  "source": {
+    "ndjsonPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\feature-card-duckdb-ready.ndjson",
+    "rows": 19
+  },
+  "database": {
+    "rows": 19,
+    "termsRows": 459,
+    "columns": [
+      "id",
+      "kind",
+      "labels",
+      "summary",
+      "sourceRefs",
+      "score_rank",
+      "score_authority",
+      "score_recency",
+      "payload"
+    ]
+  },
+  "expectedColumns": [
+    "id",
+    "kind",
+    "labels",
+    "summary",
+    "sourceRefs",
+    "score_rank",
+    "score_authority",
+    "score_recency",
+    "payload"
+  ],
+  "issues": []
+}

@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-05-26T06:01:46.407Z",
+  "generatedAt": "2026-05-26T23:23:06.572Z",
   "mode": "live",
   "root": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
   "inputStatus": {
     "docsAtlasFeatureRegistry": {
-      "present": false,
+      "present": true,
       "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas\\feature-registry.json"
     },
     "docsAtlasIndex": {
       "present": true,
       "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas-index\\codebase-atlas.min.json",
-      "generatedAt": "2026-05-25T07:04:22.335Z"
+      "generatedAt": "2026-05-26T21:17:10.716Z"
     },
     "authorityLatest": {
       "present": true,
@@ -27,7 +27,7 @@
     },
     "qdrantClusterTags": {
       "present": true,
-      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\runs\\2026-05-24T23-09-00\\qdrant_cluster_tags.json",
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\runs\\2026-05-26T17-32-26\\qdrant_cluster_tags.json",
       "clusterCount": 1289
     },
     "featureMapCards": {
@@ -38,7 +38,7 @@
   },
   "summary": {
     "implementedRows": 8,
-    "missingLiveAtlasContract": true,
+    "missingLiveAtlasContract": false,
     "missingLiveAtlasIndex": false,
     "missingAuthoritySnapshot": false
   },
@@ -62,9 +62,9 @@
         "graph",
         "lane:l0-l11",
         "fusion",
+        "cache:Redis hot cache",
         "cluster:20",
-        "cluster:23",
-        "cluster:25"
+        "cluster:23"
       ],
       "turbovecLabel": "retrieval",
       "smokeRefs": [
@@ -96,9 +96,9 @@
         "hot-lane",
         "qdrant",
         "redis",
-        "path:src/lib/server/ace",
-        "service:KarpathyBlendOrchestrator",
-        "status:active"
+        "cache:Redis hot cache",
+        "lang:TypeScript",
+        "module:src/lib/server/ace"
       ],
       "turbovecLabel": "graph",
       "smokeRefs": [
@@ -132,8 +132,8 @@
         "context-pack",
         "redis",
         "postgres",
-        "cluster:72",
-        "cluster:94"
+        "cache:Redis hot cache",
+        "cluster:72"
       ],
       "turbovecLabel": "cache",
       "smokeRefs": [
@@ -164,9 +164,9 @@
         "index",
         "semantic",
         "codebase",
-        "path:src/lib/server/atlas/master-feature-map.ts",
-        "service:MasterFeatureMap",
-        "status:active"
+        "cache:Redis atlas cache",
+        "cache:feature-map cache",
+        "fallback:CPU rerank fallback"
       ],
       "turbovecLabel": "database",
       "smokeRefs": [
@@ -193,11 +193,11 @@
         "feature-map",
         "labeling",
         "registry",
-        "path:src/lib/server/atlas/master-feature-map.ts",
-        "service:MasterFeatureMap",
-        "status:active",
-        "store:Postgres",
-        "src"
+        "cache:Redis atlas cache",
+        "cache:feature-map cache",
+        "fallback:CPU rerank fallback",
+        "fallback:Gemma4 Opencode",
+        "lang:JSON"
       ],
       "turbovecLabel": "general",
       "smokeRefs": [
@@ -229,9 +229,9 @@
         "topology",
         "redis",
         "qdrant",
-        "path:scripts/atlas/detect-manifold-drift.mjs",
-        "service:ManifoldDriftMonitor",
-        "status:active"
+        "cache:Redis hot cache",
+        "lang:JavaScript",
+        "lang:TypeScript"
       ],
       "turbovecLabel": "graph",
       "smokeRefs": [
@@ -265,10 +265,10 @@
         "cache-policy",
         "redis-hot",
         "postgres-first",
+        "cache:Redis hot cache",
         "cluster:72",
         "cluster:94",
-        "path:src/lib/server/ace",
-        "service:ContextPacketBudgeter"
+        "lang:TypeScript"
       ],
       "turbovecLabel": "cache",
       "smokeRefs": [
@@ -298,9 +298,9 @@
         "registry",
         "placeholder",
         "postgres",
-        "path:src/lib/server/atlas/master-feature-map.ts",
-        "service:MasterFeatureMap",
-        "status:active"
+        "cache:Redis atlas cache",
+        "cache:feature-map cache",
+        "fallback:CPU rerank fallback"
       ],
       "turbovecLabel": "database",
       "smokeRefs": [

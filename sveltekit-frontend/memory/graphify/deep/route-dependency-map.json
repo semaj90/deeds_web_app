@@ -1,4 +1,10 @@
 {
+  "src/routes/api/ace/ask/+server.ts": {
+    "zone": "route",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "src/routes/api/chat/stream/+server.ts": {
     "zone": "route",
     "directDeps": 1,
@@ -4703,6 +4709,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/internal/index-memory/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/investigate/suggest/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -4898,6 +4910,30 @@
   "sveltekit-frontend/src/routes/api/mcp/+server.ts": {
     "zone": "shared",
     "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/memory/agent-observation/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/memory/claude-mem/+server.ts": {
+    "zone": "shared",
+    "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/memory/claude-mem/import/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/memory/status/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -6304,5 +6340,11 @@
     "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 1
+  },
+  "sveltekit-frontend/src/routes/seaweed/[...path]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
   }
 }

@@ -1,0 +1,311 @@
+{
+  "generatedAt": "2026-05-26T23:22:22.485Z",
+  "runId": "stage-2c-500",
+  "inputs": {
+    "graphDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\graph",
+    "qdrantUrl": "http://localhost:6333",
+    "qdrantCollection": "codebase_chunks_768"
+  },
+  "phase3": {
+    "authorityAudit": {
+      "graphReportPresent": false,
+      "pagerankReportPresent": true,
+      "pagerankTop100": {
+        "present": true,
+        "count": 100,
+        "top": [
+          {
+            "rank": 1,
+            "directory": "`scripts/api-cleanup`",
+            "score": 45,
+            "files": 20,
+            "status": "⚠️"
+          },
+          {
+            "rank": 2,
+            "directory": "`scripts/api-cleanup/reports`",
+            "score": 45,
+            "files": 3,
+            "status": "⚠️"
+          },
+          {
+            "rank": 3,
+            "directory": "`scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z`",
+            "score": 45,
+            "files": 1324,
+            "status": "⚠️"
+          },
+          {
+            "rank": 4,
+            "directory": "`sveltekit-frontend/src/routes/.well-known`",
+            "score": 58,
+            "files": 4,
+            "status": "⚠️"
+          },
+          {
+            "rank": 5,
+            "directory": "`.venv/Lib/site-packages/torch`",
+            "score": 65,
+            "files": 3,
+            "status": "⚠️"
+          },
+          {
+            "rank": 6,
+            "directory": "`sveltekit-frontend/src/routes/minio`",
+            "score": 75,
+            "files": 1,
+            "status": "✅"
+          },
+          {
+            "rank": 7,
+            "directory": "`docker/langgraph-synthesis/.venv/Lib`",
+            "score": 75,
+            "files": 31,
+            "status": "✅"
+          },
+          {
+            "rank": 8,
+            "directory": "`sveltekit-frontend/src/lib/components`",
+            "score": 80,
+            "files": 617,
+            "status": "✅"
+          },
+          {
+            "rank": 9,
+            "directory": "`scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z`",
+            "score": 80,
+            "files": 3,
+            "status": "✅"
+          },
+          {
+            "rank": 10,
+            "directory": "`sveltekit-frontend/src/lib/workers`",
+            "score": 83,
+            "files": 8,
+            "status": "✅"
+          }
+        ]
+      },
+      "graphReportPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\graph\\repo-neo4j-graphrag-report.json",
+      "gap": "missing_repo_neo4j_graphrag_report"
+    },
+    "summaryVerification": {
+      "codebaseGraphPresent": true,
+      "graphNodeCount": null,
+      "graphEdgeCount": null,
+      "note": "graph report missing in this checkout"
+    },
+    "embeddingParity": {
+      "qdrantCollection": "codebase_chunks_768",
+      "qdrantUrl": "http://localhost:6333",
+      "sample": {
+        "ok": true,
+        "status": 200,
+        "total": 25,
+        "withSourceRefs": 0,
+        "coverage": 0,
+        "sample": [
+          {
+            "id": "8303",
+            "filePath": "src/lib/types/evidence.ts",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": 19
+          },
+          {
+            "id": "155706",
+            "filePath": "src/lib/server/retrieval/turbovec-prefilter.ts",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "174637",
+            "filePath": "src/lib/server/ai/contextual-tools.ts",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "188608",
+            "filePath": "src/lib/server/research/reddit-harvester.ts",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "194586",
+            "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "292522",
+            "filePath": "src/lib/components/monitoring/CacheMonitoringWidget.svelte",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "433670",
+            "filePath": "src/routes/(app)/demos/courtroom-sim/LLMS.md",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "436451",
+            "filePath": "src/lib/components/citations/CitationSaveForm.svelte",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "506499",
+            "filePath": "src/lib/types/svelte5-api-types.d.ts",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": 4
+          },
+          {
+            "id": "516801",
+            "filePath": "src/lib/components/cases/ContextualChatModal.svelte",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": 2
+          },
+          {
+            "id": "909958",
+            "filePath": "src/lib/server/retrieval/centroid-cache.ts",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "1005499",
+            "filePath": "src/lib/components/ai/LLMS.md",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          }
+        ],
+        "error": null
+      }
+    }
+  },
+  "phase4": {
+    "provenanceDisplay": {
+      "adminAtlasUiPresent": true,
+      "sourceRefsHookPresent": true,
+      "graphPathsHookPresent": false
+    },
+    "clusterVisualization": {
+      "clusterAliasesPresent": true,
+      "aliasCount": 17,
+      "sampleAliases": [
+        {
+          "clusterId": "20",
+          "alias": "webgpu_similarity",
+          "topic": "WebGPU similarity and GPU graph operations"
+        },
+        {
+          "clusterId": "23",
+          "alias": "gpu_topology",
+          "topic": "WebGPU manifold and GPU graph topology"
+        },
+        {
+          "clusterId": "25",
+          "alias": "redis_cache",
+          "topic": "cache services, Redis, ACE packets"
+        },
+        {
+          "clusterId": "32",
+          "alias": "langextract_services",
+          "topic": "LangExtract extraction services and tooling"
+        },
+        {
+          "clusterId": "47",
+          "alias": "legal_corpus_routes",
+          "topic": "legal corpus, statutes, citations"
+        },
+        {
+          "clusterId": "48",
+          "alias": "db_schema",
+          "topic": "Drizzle schema, database tables, migrations"
+        },
+        {
+          "clusterId": "55",
+          "alias": "db_schema",
+          "topic": "Drizzle schema, database tables, migrations"
+        },
+        {
+          "clusterId": "57",
+          "alias": "gpu_topology",
+          "topic": "WebGPU manifold and GPU graph topology"
+        },
+        {
+          "clusterId": "72",
+          "alias": "ace_context",
+          "topic": "ACE context assembly and retrieval policy"
+        },
+        {
+          "clusterId": "73",
+          "alias": "retrieval_graph",
+          "topic": "retrieval ranking, graph context, legal PageRank"
+        },
+        {
+          "clusterId": "80",
+          "alias": "gpu_topology",
+          "topic": "WebGPU manifold and GPU graph topology"
+        },
+        {
+          "clusterId": "82",
+          "alias": "grpc_mcp_tools",
+          "topic": "gRPC, MCP tool clients, internal tool routing"
+        }
+      ]
+    },
+    "directEdit": {
+      "trustTierHooksPresent": true,
+      "promotionHooksPresent": false,
+      "note": "Direct edit remains an implementation lane; current codebase has trust-tier plumbing but no operator UI edit surface in this pass."
+    },
+    "multiLaneRetrieval": {
+      "traceCommandSuggestHook": true,
+      "opencodeSkillPresent": true
+    }
+  },
+  "phase5": {
+    "featureRegistry": {
+      "featureRegistrySchemaPresent": true,
+      "featureRegistryMentions": true,
+      "masterFeatureMapPresent": true
+    },
+    "commandMapping": {
+      "commandSuggestHook": true,
+      "allowlistMentions": true
+    },
+    "syntheticEvidence": {
+      "atlasContextFusionPresent": true,
+      "codebaseEvidenceBuilderPresent": true
+    }
+  },
+  "recommendations": [
+    "Regenerate docs/graph/repo-neo4j-graphrag-report.json from the live Neo4j projection before treating Phase 3 as closed.",
+    "Phase 4 is partially wired in code; keep UI provenance and trust-tier editing behind the admin atlas surface.",
+    "Phase 5 should reconcile the feature registry against the code-based evidence before mapping commands or generating synthetic cards."
+  ]
+}

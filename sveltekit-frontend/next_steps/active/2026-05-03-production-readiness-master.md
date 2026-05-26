@@ -55,5 +55,8 @@ _No agent queries ran (Ollama offline or --skip-agent)_
 1. Fix all ❌ FAIL items above (blocking production)
 2. Address ⚠️ WARN items (hardcoded URLs, missing Zod, TODO density)
 3. Run directory consolidation plan (see `2026-05-03-directory-consolidation.md`)
-4. Run auth guard coverage plan (see `2026-05-03-auth-gaps.md`)
-5. Re-run this script after fixes — target: all PASS, 0 FAIL
+4. Run app-file label and dependency-chain mapping for `svelte-inspector` and `svelte-realtime` before the later graph-analysis pass
+5. Expand the feature cards into full JSON contracts with modules, imports, dependencies, languages, networking, offline lanes, cache, and inference fallbacks
+6. Add a feature-card semantics report so the card contract can be analyzed before DuckDB/CouchDB mirrors are available
+7. Run auth guard coverage plan (see `2026-05-03-auth-gaps.md`)
+8. Re-run this script after fixes — target: all PASS, 0 FAIL

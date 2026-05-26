@@ -1,4 +1,607 @@
 {
+  "claude-mem/openclaw/src/index.ts": [
+    "claude-mem/openclaw/src/index.test.ts"
+  ],
+  "claude-mem/src/adapters/claude-code/mapper.ts": [
+    "claude-mem/tests/adapters/claude-code-mapper.test.ts"
+  ],
+  "claude-mem/src/adapters/generic-rest/examples.ts": [
+    "claude-mem/tests/adapters/claude-code-mapper.test.ts"
+  ],
+  "claude-mem/src/services/worker/ClaudeProvider.ts": [
+    "claude-mem/tests/claude-provider-error-classifier.test.ts",
+    "claude-mem/tests/worker/provider-classifiers.test.ts"
+  ],
+  "claude-mem/src/services/worker/provider-errors.ts": [
+    "claude-mem/tests/claude-provider-error-classifier.test.ts",
+    "claude-mem/tests/worker/provider-classifiers.test.ts",
+    "claude-mem/tests/worker/provider-errors.test.ts"
+  ],
+  "claude-mem/src/utils/logger.ts": [
+    "claude-mem/tests/claude-provider-error-classifier.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-subagent-skip.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts",
+    "claude-mem/tests/cli/server-jobs.test.ts",
+    "claude-mem/tests/compat/sessions-observations-adapter.test.ts",
+    "claude-mem/tests/hooks/file-context.test.ts",
+    "claude-mem/tests/infrastructure/cleanup-v12_4_3.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/hook-execution-e2e.test.ts",
+    "claude-mem/tests/integration/worker-api-endpoints.test.ts",
+    "claude-mem/tests/server/error-handler.test.ts",
+    "claude-mem/tests/server/runtime/jobs-list-and-operator-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-mcp-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-session-routes.test.ts",
+    "claude-mem/tests/server/runtime/team-project-jobs-routes.test.ts",
+    "claude-mem/tests/server/server-beta-service.test.ts",
+    "claude-mem/tests/server/server.test.ts",
+    "claude-mem/tests/server/v1-routes.test.ts",
+    "claude-mem/tests/transcripts/watcher-start-at-end.test.ts",
+    "claude-mem/tests/utils/tag-stripping.test.ts",
+    "claude-mem/tests/worker/agents/response-processor.test.ts",
+    "claude-mem/tests/worker/http/routes/data-routes-coercion.test.ts",
+    "claude-mem/tests/worker/http/routes/memory-routes.test.ts",
+    "claude-mem/tests/worker/http/routes/search-routes-welcome-hint.test.ts"
+  ],
+  "claude-mem/src/cli/adapters/claude-code.ts": [
+    "claude-mem/tests/cli/adapters/claude-code-subagent.test.ts",
+    "claude-mem/tests/hook-lifecycle.test.ts",
+    "claude-mem/tests/hook-lifecycle.test.ts",
+    "claude-mem/tests/hook-lifecycle.test.ts",
+    "claude-mem/tests/hook-lifecycle.test.ts",
+    "claude-mem/tests/hook-lifecycle.test.ts"
+  ],
+  "claude-mem/src/cli/adapters/codex-file-context.ts": [
+    "claude-mem/tests/cli/adapters/codex-file-context.test.ts"
+  ],
+  "claude-mem/src/cli/handlers/summarize.ts": [
+    "claude-mem/tests/cli/handlers/summarize-subagent-skip.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-subagent-skip.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-subagent-skip.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-subagent-skip.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts",
+    "claude-mem/tests/cli/handlers/summarize-tag-stripping.test.ts"
+  ],
+  "claude-mem/src/npx-cli/commands/server-jobs.ts": [
+    "claude-mem/tests/cli/server-jobs.test.ts"
+  ],
+  "claude-mem/src/cli/stdin-reader.ts": [
+    "claude-mem/tests/cli/stdin-reader-framed.test.ts",
+    "claude-mem/tests/cli/stdin-reader.test.ts"
+  ],
+  "claude-mem/src/services/server/Server.ts": [
+    "claude-mem/tests/compat/sessions-observations-adapter.test.ts",
+    "claude-mem/tests/integration/hook-execution-e2e.test.ts",
+    "claude-mem/tests/integration/hook-execution-e2e.test.ts",
+    "claude-mem/tests/integration/worker-api-endpoints.test.ts",
+    "claude-mem/tests/integration/worker-api-endpoints.test.ts",
+    "claude-mem/tests/server/runtime/jobs-list-and-operator-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-mcp-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-session-routes.test.ts",
+    "claude-mem/tests/server/runtime/team-project-jobs-routes.test.ts",
+    "claude-mem/tests/server/server.test.ts",
+    "claude-mem/tests/server/server.test.ts",
+    "claude-mem/tests/server/v1-routes.test.ts"
+  ],
+  "claude-mem/src/server/routes/v1/ServerV1PostgresRoutes.ts": [
+    "claude-mem/tests/compat/sessions-observations-adapter.test.ts",
+    "claude-mem/tests/server/runtime/jobs-list-and-operator-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-mcp-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-session-routes.test.ts",
+    "claude-mem/tests/server/runtime/team-project-jobs-routes.test.ts"
+  ],
+  "claude-mem/src/server/compat/SessionsObservationsAdapter.ts": [
+    "claude-mem/tests/compat/sessions-observations-adapter.test.ts"
+  ],
+  "claude-mem/src/server/compat/SessionsSummarizeAdapter.ts": [
+    "claude-mem/tests/compat/sessions-observations-adapter.test.ts"
+  ],
+  "claude-mem/src/storage/postgres/index.ts": [
+    "claude-mem/tests/compat/sessions-observations-adapter.test.ts",
+    "claude-mem/tests/server/generation/process-generated-response.test.ts",
+    "claude-mem/tests/server/generation/provider-observation-generator.test.ts",
+    "claude-mem/tests/server/generation/scope-enforcement.test.ts",
+    "claude-mem/tests/server/runtime/jobs-list-and-operator-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-mcp-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-session-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-session-runtime.test.ts",
+    "claude-mem/tests/server/runtime/team-project-jobs-routes.test.ts",
+    "claude-mem/tests/server/server-beta-service.test.ts",
+    "claude-mem/tests/storage/postgres/postgres-storage.test.ts"
+  ],
+  "claude-mem/src/server/runtime/types.ts": [
+    "claude-mem/tests/compat/sessions-observations-adapter.test.ts",
+    "claude-mem/tests/server/runtime/jobs-list-and-operator-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-mcp-routes.test.ts",
+    "claude-mem/tests/server/runtime/server-session-routes.test.ts",
+    "claude-mem/tests/server/runtime/team-project-jobs-routes.test.ts",
+    "claude-mem/tests/server/server-beta-service.test.ts"
+  ],
+  "claude-mem/src/services/context/formatters/AgentFormatter.ts": [
+    "claude-mem/tests/context/formatters/agent-formatter.test.ts"
+  ],
+  "claude-mem/src/services/context/types.ts": [
+    "claude-mem/tests/context/formatters/agent-formatter.test.ts",
+    "claude-mem/tests/context/observation-compiler.test.ts",
+    "claude-mem/tests/context/token-calculator.test.ts",
+    "claude-mem/tests/context/token-calculator.test.ts"
+  ],
+  "claude-mem/src/services/context/index.ts": [
+    "claude-mem/tests/context/observation-compiler.test.ts",
+    "claude-mem/tests/context/token-calculator.test.ts"
+  ],
+  "claude-mem/src/utils/context-injection.ts": [
+    "claude-mem/tests/context-injection.test.ts",
+    "claude-mem/tests/mcp-integrations.test.ts"
+  ],
+  "claude-mem/src/utils/cursor-utils.ts": [
+    "claude-mem/tests/cursor-context-update.test.ts",
+    "claude-mem/tests/cursor-hooks-json-utils.test.ts",
+    "claude-mem/tests/cursor-mcp-config.test.ts",
+    "claude-mem/tests/cursor-registry.test.ts"
+  ],
+  "claude-mem/src/shared/EnvManager.ts": [
+    "claude-mem/tests/env-isolation.test.ts",
+    "claude-mem/tests/shared/oauth-token.test.ts"
+  ],
+  "claude-mem/src/shared/oauth-token.ts": [
+    "claude-mem/tests/env-isolation.test.ts",
+    "claude-mem/tests/shared/oauth-token.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/SessionStore.ts": [
+    "claude-mem/tests/fk-constraint-fix.test.ts",
+    "claude-mem/tests/services/sqlite/get-observations-by-ids-relevance.test.ts",
+    "claude-mem/tests/services/sqlite/PendingMessageStore.test.ts",
+    "claude-mem/tests/services/sqlite/session-store-mark-completed.test.ts",
+    "claude-mem/tests/services/worker/session-manager-queue.test.ts",
+    "claude-mem/tests/session_id_usage_validation.test.ts",
+    "claude-mem/tests/session_store.test.ts",
+    "claude-mem/tests/worker/SearchManager.timeline-anchor.test.ts"
+  ],
+  "claude-mem/src/shared/transcript-parser.ts": [
+    "claude-mem/tests/gemini-cli-compat.test.ts",
+    "claude-mem/tests/gemini-cli-compat.test.ts",
+    "claude-mem/tests/gemini-cli-compat.test.ts",
+    "claude-mem/tests/gemini-cli-compat.test.ts",
+    "claude-mem/tests/gemini-cli-compat.test.ts",
+    "claude-mem/tests/gemini-cli-compat.test.ts",
+    "claude-mem/tests/gemini-cli-compat.test.ts",
+    "claude-mem/tests/transcripts/cursor-extraction.test.ts"
+  ],
+  "claude-mem/src/services/worker/GeminiProvider.ts": [
+    "claude-mem/tests/gemini_provider.test.ts",
+    "claude-mem/tests/worker/provider-classifiers.test.ts"
+  ],
+  "claude-mem/src/services/worker/DatabaseManager.ts": [
+    "claude-mem/tests/gemini_provider.test.ts",
+    "claude-mem/tests/services/worker/session-manager-queue.test.ts",
+    "claude-mem/tests/worker/agents/response-processor.test.ts"
+  ],
+  "claude-mem/src/services/worker/SessionManager.ts": [
+    "claude-mem/tests/gemini_provider.test.ts",
+    "claude-mem/tests/services/worker/session-manager-queue.test.ts",
+    "claude-mem/tests/worker/agents/response-processor.test.ts"
+  ],
+  "claude-mem/src/services/domain/ModeManager.ts": [
+    "claude-mem/tests/gemini_provider.test.ts"
+  ],
+  "claude-mem/src/shared/SettingsDefaultsManager.ts": [
+    "claude-mem/tests/gemini_provider.test.ts",
+    "claude-mem/tests/shared/settings-defaults-manager.test.ts",
+    "claude-mem/tests/shared/welcome-hint-default.test.ts"
+  ],
+  "claude-mem/src/cli/hook-command.ts": [
+    "claude-mem/tests/hook-command.test.ts"
+  ],
+  "claude-mem/src/shared/hook-constants.ts": [
+    "claude-mem/tests/hook-constants.test.ts"
+  ],
+  "claude-mem/src/cli/handlers/index.ts": [
+    "claude-mem/tests/hook-lifecycle.test.ts",
+    "claude-mem/tests/hook-lifecycle.test.ts"
+  ],
+  "claude-mem/src/cli/adapters/index.ts": [
+    "claude-mem/tests/hook-lifecycle.test.ts",
+    "claude-mem/tests/hook-lifecycle.test.ts"
+  ],
+  "claude-mem/src/cli/adapters/codex.ts": [
+    "claude-mem/tests/hook-lifecycle.test.ts"
+  ],
+  "claude-mem/src/cli/handlers/file-context.ts": [
+    "claude-mem/tests/hooks/file-context.test.ts"
+  ],
+  "claude-mem/src/services/hooks/runtime-selector.ts": [
+    "claude-mem/tests/hooks/runtime-selector.test.ts"
+  ],
+  "claude-mem/src/services/hooks/server-beta-client.ts": [
+    "claude-mem/tests/hooks/server-beta-client.test.ts",
+    "claude-mem/tests/server/runtime/server-mcp-routes.test.ts"
+  ],
+  "claude-mem/src/services/infrastructure/CleanupV12_4_3.ts": [
+    "claude-mem/tests/infrastructure/cleanup-v12_4_3.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/Database.ts": [
+    "claude-mem/tests/infrastructure/cleanup-v12_4_3.test.ts",
+    "claude-mem/tests/services/queue/ObservationQueueEngine.contract.test.ts",
+    "claude-mem/tests/services/sqlite/observations/store-subagent-label.test.ts",
+    "claude-mem/tests/services/sqlite/PendingMessageStore.test.ts",
+    "claude-mem/tests/services/sqlite/schema-repair.test.ts",
+    "claude-mem/tests/services/worker/session-manager-queue.test.ts",
+    "claude-mem/tests/sqlite/data-integrity.test.ts",
+    "claude-mem/tests/sqlite/observations.test.ts",
+    "claude-mem/tests/sqlite/prompts.test.ts",
+    "claude-mem/tests/sqlite/sessions.test.ts",
+    "claude-mem/tests/sqlite/summaries.test.ts",
+    "claude-mem/tests/sqlite/transactions.test.ts",
+    "claude-mem/tests/zombie-prevention.test.ts"
+  ],
+  "claude-mem/src/shared/paths.ts": [
+    "claude-mem/tests/infrastructure/cleanup-v12_4_3.test.ts",
+    "claude-mem/tests/shared/oauth-token.test.ts",
+    "claude-mem/tests/shared/paths.test.ts"
+  ],
+  "claude-mem/src/services/infrastructure/index.ts": [
+    "claude-mem/tests/infrastructure/graceful-shutdown.test.ts",
+    "claude-mem/tests/infrastructure/health-monitor.test.ts",
+    "claude-mem/tests/infrastructure/process-manager.test.ts"
+  ],
+  "claude-mem/src/shared/plugin-state.ts": [
+    "claude-mem/tests/infrastructure/plugin-disabled-check.test.ts"
+  ],
+  "claude-mem/src/services/infrastructure/ProcessManager.ts": [
+    "claude-mem/tests/infrastructure/wmic-parsing.test.ts",
+    "claude-mem/tests/infrastructure/wmic-parsing.test.ts",
+    "claude-mem/tests/infrastructure/wmic-parsing.test.ts"
+  ],
+  "claude-mem/src/services/worker-service.ts": [
+    "claude-mem/tests/infrastructure/worker-json-status.test.ts"
+  ],
+  "claude-mem/src/npx-cli/commands/install.ts": [
+    "claude-mem/tests/install-disable-auto-memory.test.ts"
+  ],
+  "claude-mem/src/services/sync/ChromaSync.ts": [
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts",
+    "claude-mem/tests/integration/chroma-vector-sync.test.ts"
+  ],
+  "claude-mem/src/services/integrations/CodexCliInstaller.ts": [
+    "claude-mem/tests/integration/codex-cli-installer.test.ts"
+  ],
+  "claude-mem/src/utils/tag-stripping.ts": [
+    "claude-mem/tests/integration/hook-execution-e2e.test.ts",
+    "claude-mem/tests/integration/hook-execution-e2e.test.ts",
+    "claude-mem/tests/utils/tag-stripping.test.ts"
+  ],
+  "claude-mem/src/utils/json-utils.ts": [
+    "claude-mem/tests/json-utils.test.ts",
+    "claude-mem/tests/mcp-integrations.test.ts"
+  ],
+  "claude-mem/scripts/export-memories.ts": [
+    "claude-mem/tests/scripts/export-memories.test.ts",
+    "claude-mem/tests/scripts/export-memories.test.ts",
+    "claude-mem/tests/scripts/export-memories.test.ts",
+    "claude-mem/tests/scripts/export-memories.test.ts",
+    "claude-mem/tests/scripts/export-memories.test.ts",
+    "claude-mem/tests/scripts/export-memories.test.ts"
+  ],
+  "claude-mem/scripts/pr-babysit-status.ts": [
+    "claude-mem/tests/scripts/pr-babysit-status.test.ts",
+    "claude-mem/tests/scripts/pr-babysit-status.test.ts",
+    "claude-mem/tests/scripts/pr-babysit-status.test.ts"
+  ],
+  "claude-mem/src/sdk/parser.ts": [
+    "claude-mem/tests/sdk/parse-summary.test.ts",
+    "claude-mem/tests/sdk/parser.test.ts"
+  ],
+  "claude-mem/src/sdk/prompts.ts": [
+    "claude-mem/tests/sdk/prompts.test.ts",
+    "claude-mem/tests/worker/agents/response-processor.test.ts"
+  ],
+  "claude-mem/src/server/auth/api-key-service.ts": [
+    "claude-mem/tests/server/auth-api-key.test.ts",
+    "claude-mem/tests/server/v1-routes.test.ts"
+  ],
+  "claude-mem/src/server/middleware/auth.ts": [
+    "claude-mem/tests/server/auth-api-key.test.ts"
+  ],
+  "claude-mem/src/storage/sqlite/index.ts": [
+    "claude-mem/tests/server/auth-api-key.test.ts",
+    "claude-mem/tests/storage/sqlite/server-storage.test.ts"
+  ],
+  "claude-mem/src/services/server/ErrorHandler.ts": [
+    "claude-mem/tests/server/error-handler.test.ts"
+  ],
+  "claude-mem/src/server/generation/processGeneratedResponse.ts": [
+    "claude-mem/tests/server/generation/process-generated-response.test.ts",
+    "claude-mem/tests/server/runtime/server-session-runtime.test.ts"
+  ],
+  "claude-mem/src/server/generation/ProviderObservationGenerator.ts": [
+    "claude-mem/tests/server/generation/provider-observation-generator.test.ts",
+    "claude-mem/tests/server/generation/scope-enforcement.test.ts"
+  ],
+  "claude-mem/src/server/generation/providers/shared/types.ts": [
+    "claude-mem/tests/server/generation/provider-observation-generator.test.ts",
+    "claude-mem/tests/server/generation/providers.test.ts",
+    "claude-mem/tests/server/generation/scope-enforcement.test.ts"
+  ],
+  "claude-mem/src/server/jobs/types.ts": [
+    "claude-mem/tests/server/generation/provider-observation-generator.test.ts",
+    "claude-mem/tests/server/generation/scope-enforcement.test.ts",
+    "claude-mem/tests/server/generation/scope-enforcement.test.ts",
+    "claude-mem/tests/server/jobs/payload-schema.test.ts",
+    "claude-mem/tests/server/runtime/active-queue-manager.test.ts"
+  ],
+  "claude-mem/src/server/generation/providers/shared/error-classification.ts": [
+    "claude-mem/tests/server/generation/providers.test.ts"
+  ],
+  "claude-mem/src/server/generation/providers/ClaudeObservationProvider.ts": [
+    "claude-mem/tests/server/generation/providers.test.ts",
+    "claude-mem/tests/server/generation/providers.test.ts"
+  ],
+  "claude-mem/src/server/generation/providers/GeminiObservationProvider.ts": [
+    "claude-mem/tests/server/generation/providers.test.ts"
+  ],
+  "claude-mem/src/server/generation/providers/OpenRouterObservationProvider.ts": [
+    "claude-mem/tests/server/generation/providers.test.ts"
+  ],
+  "claude-mem/src/server/generation/providers/shared/prompt-builder.ts": [
+    "claude-mem/tests/server/generation/providers.test.ts"
+  ],
+  "claude-mem/src/server/jobs/job-id.ts": [
+    "claude-mem/tests/server/jobs/job-id.test.ts"
+  ],
+  "claude-mem/src/server/jobs/outbox.ts": [
+    "claude-mem/tests/server/jobs/outbox.test.ts"
+  ],
+  "claude-mem/src/server/jobs/ServerJobQueue.ts": [
+    "claude-mem/tests/server/jobs/outbox.test.ts",
+    "claude-mem/tests/server/jobs/server-job-queue.test.ts",
+    "claude-mem/tests/server/runtime/active-queue-manager.test.ts"
+  ],
+  "claude-mem/src/storage/postgres/generation-jobs.ts": [
+    "claude-mem/tests/server/jobs/outbox.test.ts"
+  ],
+  "claude-mem/src/server/middleware/request-id.ts": [
+    "claude-mem/tests/server/middleware/request-id.test.ts"
+  ],
+  "claude-mem/src/server/runtime/ActiveServerBetaQueueManager.ts": [
+    "claude-mem/tests/server/runtime/active-queue-manager.test.ts"
+  ],
+  "claude-mem/src/server/runtime/ServerSessionRuntimeRepository.ts": [
+    "claude-mem/tests/server/runtime/server-session-runtime.test.ts"
+  ],
+  "claude-mem/src/server/runtime/SessionGenerationPolicy.ts": [
+    "claude-mem/tests/server/runtime/server-session-runtime.test.ts"
+  ],
+  "claude-mem/src/server/runtime/ServerBetaService.ts": [
+    "claude-mem/tests/server/server-beta-service.test.ts"
+  ],
+  "claude-mem/src/server/routes/v1/ServerV1Routes.ts": [
+    "claude-mem/tests/server/v1-routes.test.ts"
+  ],
+  "claude-mem/src/services/worker/http/routes/LogsRoutes.ts": [
+    "claude-mem/tests/services/logs-routes-tail-read.test.ts"
+  ],
+  "claude-mem/src/server/queue/BullMqObservationQueueEngine.ts": [
+    "claude-mem/tests/services/queue/bullmq-observation-queue-engine.test.ts"
+  ],
+  "claude-mem/src/services/worker-types.ts": [
+    "claude-mem/tests/services/queue/bullmq-observation-queue-engine.test.ts",
+    "claude-mem/tests/services/sqlite/PendingMessageStore.test.ts",
+    "claude-mem/tests/services/worker/generator-exit-handler.test.ts",
+    "claude-mem/tests/worker/agents/response-processor.test.ts",
+    "claude-mem/tests/worker/agents/session-cleanup-helper.test.ts",
+    "claude-mem/tests/zombie-prevention.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/Sessions.ts": [
+    "claude-mem/tests/services/queue/ObservationQueueEngine.contract.test.ts",
+    "claude-mem/tests/services/sqlite/observations/store-subagent-label.test.ts",
+    "claude-mem/tests/services/sqlite/PendingMessageStore.test.ts",
+    "claude-mem/tests/sqlite/data-integrity.test.ts",
+    "claude-mem/tests/sqlite/observations.test.ts",
+    "claude-mem/tests/sqlite/prompts.test.ts",
+    "claude-mem/tests/sqlite/sessions.test.ts",
+    "claude-mem/tests/sqlite/summaries.test.ts",
+    "claude-mem/tests/sqlite/transactions.test.ts",
+    "claude-mem/tests/zombie-prevention.test.ts"
+  ],
+  "claude-mem/src/server/queue/ObservationQueueEngine.ts": [
+    "claude-mem/tests/services/queue/ObservationQueueEngine.contract.test.ts"
+  ],
+  "claude-mem/src/services/queue/SessionQueueProcessor.ts": [
+    "claude-mem/tests/services/queue/SessionQueueProcessor.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/PendingMessageStore.ts": [
+    "claude-mem/tests/services/queue/SessionQueueProcessor.test.ts",
+    "claude-mem/tests/services/sqlite/PendingMessageStore.test.ts",
+    "claude-mem/tests/sqlite/data-integrity.test.ts",
+    "claude-mem/tests/zombie-prevention.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/migrations/runner.ts": [
+    "claude-mem/tests/services/sqlite/migration-runner.test.ts",
+    "claude-mem/tests/services/sqlite/schema-repair.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/Observations.ts": [
+    "claude-mem/tests/services/sqlite/observations/store-subagent-label.test.ts",
+    "claude-mem/tests/sqlite/observations.test.ts",
+    "claude-mem/tests/sqlite/transactions.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/observations/types.ts": [
+    "claude-mem/tests/services/sqlite/observations/store-subagent-label.test.ts",
+    "claude-mem/tests/sqlite/data-integrity.test.ts",
+    "claude-mem/tests/sqlite/observations.test.ts",
+    "claude-mem/tests/sqlite/transactions.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/observations/files.ts": [
+    "claude-mem/tests/services/sqlite/parse-file-list.test.ts"
+  ],
+  "claude-mem/src/shared/path-utils.ts": [
+    "claude-mem/tests/services/sqlite/session-search-path-matching.test.ts"
+  ],
+  "claude-mem/src/services/sync/ChromaMcpManager.ts": [
+    "claude-mem/tests/services/sync/chroma-mcp-manager-singleton.test.ts",
+    "claude-mem/tests/services/sync/chroma-mcp-manager-ssl.test.ts"
+  ],
+  "claude-mem/src/services/worker/session/GeneratorExitHandler.ts": [
+    "claude-mem/tests/services/worker/generator-exit-handler.test.ts"
+  ],
+  "claude-mem/src/services/worker-spawner.ts": [
+    "claude-mem/tests/services/worker-spawner.test.ts"
+  ],
+  "claude-mem/src/npx-cli/install/setup-runtime.ts": [
+    "claude-mem/tests/setup-runtime.test.ts"
+  ],
+  "claude-mem/src/shared/timeline-formatting.ts": [
+    "claude-mem/tests/shared/timeline-formatting.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/observations/store.ts": [
+    "claude-mem/tests/sqlite/data-integrity.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/transactions.ts": [
+    "claude-mem/tests/sqlite/data-integrity.test.ts",
+    "claude-mem/tests/sqlite/transactions.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/Prompts.ts": [
+    "claude-mem/tests/sqlite/prompts.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/Summaries.ts": [
+    "claude-mem/tests/sqlite/summaries.test.ts",
+    "claude-mem/tests/sqlite/transactions.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/summaries/types.ts": [
+    "claude-mem/tests/sqlite/summaries.test.ts",
+    "claude-mem/tests/sqlite/transactions.test.ts"
+  ],
+  "claude-mem/src/storage/sqlite/serde.ts": [
+    "claude-mem/tests/storage/sqlite/server-storage.test.ts"
+  ],
+  "claude-mem/src/supervisor/env-sanitizer.ts": [
+    "claude-mem/tests/supervisor/env-sanitizer.test.ts"
+  ],
+  "claude-mem/src/supervisor/health-checker.ts": [
+    "claude-mem/tests/supervisor/health-checker.test.ts"
+  ],
+  "claude-mem/src/supervisor/index.ts": [
+    "claude-mem/tests/supervisor/index.test.ts"
+  ],
+  "claude-mem/src/supervisor/process-registry.ts": [
+    "claude-mem/tests/supervisor/process-registry.test.ts",
+    "claude-mem/tests/supervisor/shutdown.test.ts"
+  ],
+  "claude-mem/src/supervisor/shutdown.ts": [
+    "claude-mem/tests/supervisor/shutdown.test.ts"
+  ],
+  "claude-mem/src/services/transcripts/config.ts": [
+    "claude-mem/tests/transcripts/config.test.ts"
+  ],
+  "claude-mem/src/services/transcripts/types.ts": [
+    "claude-mem/tests/transcripts/config.test.ts",
+    "claude-mem/tests/transcripts/watcher-start-at-end.test.ts"
+  ],
+  "claude-mem/src/cli/adapters/cursor.ts": [
+    "claude-mem/tests/transcripts/cursor-extraction.test.ts"
+  ],
+  "claude-mem/src/cli/types.ts": [
+    "claude-mem/tests/transcripts/watcher-start-at-end.test.ts"
+  ],
+  "claude-mem/src/services/transcripts/watcher.ts": [
+    "claude-mem/tests/transcripts/watcher-start-at-end.test.ts"
+  ],
+  "claude-mem/src/utils/claude-md-utils.ts": [
+    "claude-mem/tests/utils/claude-md-utils.test.ts"
+  ],
+  "claude-mem/src/utils/project-filter.ts": [
+    "claude-mem/tests/utils/project-filter.test.ts"
+  ],
+  "claude-mem/src/utils/project-name.ts": [
+    "claude-mem/tests/utils/project-name-isolation.test.ts",
+    "claude-mem/tests/utils/project-name.test.ts"
+  ],
+  "claude-mem/src/services/worker/agents/FallbackErrorHandler.ts": [
+    "claude-mem/tests/worker/agents/fallback-error-handler.test.ts"
+  ],
+  "claude-mem/src/services/worker/agents/types.ts": [
+    "claude-mem/tests/worker/agents/fallback-error-handler.test.ts",
+    "claude-mem/tests/worker/agents/response-processor.test.ts",
+    "claude-mem/tests/worker/agents/session-cleanup-helper.test.ts"
+  ],
+  "claude-mem/src/services/worker/agents/ResponseProcessor.ts": [
+    "claude-mem/tests/worker/agents/response-processor.test.ts"
+  ],
+  "claude-mem/src/services/worker/agents/SessionCleanupHelper.ts": [
+    "claude-mem/tests/worker/agents/session-cleanup-helper.test.ts"
+  ],
+  "claude-mem/src/services/worker/http/routes/CorpusRoutes.ts": [
+    "claude-mem/tests/worker/http/routes/corpus-routes-coercion.test.ts"
+  ],
+  "claude-mem/src/services/worker/http/routes/DataRoutes.ts": [
+    "claude-mem/tests/worker/http/routes/data-routes-coercion.test.ts"
+  ],
+  "claude-mem/src/services/worker/http/routes/MemoryRoutes.ts": [
+    "claude-mem/tests/worker/http/routes/memory-routes.test.ts"
+  ],
+  "claude-mem/src/services/worker/http/routes/SearchRoutes.ts": [
+    "claude-mem/tests/worker/http/routes/search-routes-welcome-hint.test.ts"
+  ],
+  "claude-mem/src/services/worker/http/middleware.ts": [
+    "claude-mem/tests/worker/middleware/cors-restriction.test.ts"
+  ],
+  "claude-mem/src/services/worker/OpenRouterProvider.ts": [
+    "claude-mem/tests/worker/provider-classifiers.test.ts"
+  ],
+  "claude-mem/src/services/worker/RateLimitStore.ts": [
+    "claude-mem/tests/worker/rate-limit-store.test.ts"
+  ],
+  "claude-mem/src/services/worker/search/ResultFormatter.ts": [
+    "claude-mem/tests/worker/search/result-formatter.test.ts"
+  ],
+  "claude-mem/src/services/worker/search/types.ts": [
+    "claude-mem/tests/worker/search/result-formatter.test.ts",
+    "claude-mem/tests/worker/search/search-orchestrator.test.ts",
+    "claude-mem/tests/worker/search/strategies/chroma-search-strategy.test.ts",
+    "claude-mem/tests/worker/search/strategies/hybrid-search-strategy.test.ts",
+    "claude-mem/tests/worker/search/strategies/sqlite-search-strategy.test.ts"
+  ],
+  "claude-mem/src/services/worker/search/SearchOrchestrator.ts": [
+    "claude-mem/tests/worker/search/search-orchestrator.test.ts"
+  ],
+  "claude-mem/src/services/worker/search/strategies/ChromaSearchStrategy.ts": [
+    "claude-mem/tests/worker/search/strategies/chroma-search-strategy.test.ts"
+  ],
+  "claude-mem/src/services/worker/search/strategies/HybridSearchStrategy.ts": [
+    "claude-mem/tests/worker/search/strategies/hybrid-search-strategy.test.ts"
+  ],
+  "claude-mem/src/services/worker/search/strategies/SQLiteSearchStrategy.ts": [
+    "claude-mem/tests/worker/search/strategies/sqlite-search-strategy.test.ts"
+  ],
+  "claude-mem/src/services/sqlite/SessionSearch.ts": [
+    "claude-mem/tests/worker/SearchManager.timeline-anchor.test.ts"
+  ],
+  "claude-mem/src/services/worker/FormattingService.ts": [
+    "claude-mem/tests/worker/SearchManager.timeline-anchor.test.ts"
+  ],
+  "claude-mem/src/services/worker/TimelineService.ts": [
+    "claude-mem/tests/worker/SearchManager.timeline-anchor.test.ts"
+  ],
+  "claude-mem/src/services/worker/SearchManager.ts": [
+    "claude-mem/tests/worker/SearchManager.timeline-anchor.test.ts"
+  ],
+  "claude-mem/src/npx-cli/utils/paths.ts": [
+    "claude-mem/tests/write-json-file-atomic.test.ts"
+  ],
   "deeds_labs/api-legacy/api/error-brain/+server.ts": [
     "deeds_labs/api-legacy/api/error-brain/server.test.ts",
     "deeds_labs/api-legacy/api/error-brain/server.test.ts"
@@ -502,6 +1105,9 @@
   "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.ts": [
     "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.test.ts"
   ],
+  "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts": [
+    "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts"
+  ],
   "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.ts": [
     "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts"
   ],
@@ -515,6 +1121,9 @@
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/tests/agents-regen-writers.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ai/draft-model-policy.ts": [
+    "sveltekit-frontend/src/lib/server/ai/draft-model-policy.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/engram-registry.ts": [
     "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
@@ -531,6 +1140,9 @@
     "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts",
     "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts",
     "sveltekit-frontend/tests/opencode-skill.spec.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/ai/request-classifiers.ts": [
+    "sveltekit-frontend/src/lib/server/ai/request-classifiers.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.ts": [
     "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts"

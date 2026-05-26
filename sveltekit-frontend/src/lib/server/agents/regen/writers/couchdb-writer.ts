@@ -94,10 +94,16 @@ interface CouchCtx {
 }
 
 function buildCtx(opts: CouchWriteOptions): CouchCtx {
-	const baseUrl   = (opts.url      ?? DEFAULT_COUCHDB_URL).replace(/\/+$/, '');
+	const rawUrl    = opts.url      ?? DEFAULT_COUCHDB_URL;
+	const parsedUrl = (() => {
+		try { return new URL(rawUrl); } catch { return null; }
+	})();
+	const baseUrl   = parsedUrl
+		? parsedUrl.origin.replace(/\/+$/, '')
+		: rawUrl.replace(/\/+$/, '');
 	const db        = opts.database  ?? DEFAULT_COUCHDB_DB;
-	const user      = opts.user      ?? DEFAULT_COUCHDB_USER;
-	const password  = opts.password  ?? DEFAULT_COUCHDB_PASS;
+	const user      = opts.user      ?? parsedUrl?.username ?? DEFAULT_COUCHDB_USER;
+	const password  = opts.password  ?? parsedUrl?.password ?? DEFAULT_COUCHDB_PASS;
 	const fetcher   = opts.fetchImpl ?? fetch;
 	const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 	const auth      = 'Basic ' + Buffer.from(`${user}:${password}`).toString('base64');

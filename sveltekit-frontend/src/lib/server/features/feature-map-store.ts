@@ -1,11 +1,11 @@
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { generateSingleEmbedding } from '../grpc/embedding-client.js';
 import { db } from '../db/client.js';
 import { featureMaps, grpoMemorySticks } from '../db/schema/features.js';
 import { getRedis } from '../redis.js';
 import { QdrantManager } from '../vector/qdrant-manager.js';
 import { aceContextKey } from '../cache-keys.js';
+import { productionLogger } from '../production-logger.js';
 import {
   buildAceContextRegistryPacket,
   writeAceContextRegistry,
@@ -54,8 +54,25 @@ export async function buildFeatureSummaryEmbedding(featureMap: FeatureMap): Prom
     .trim();
 
   try {
-    return await generateSingleEmbedding(sourceText.slice(0, 4000) || featureMap.title);
-  } catch {
+    const ollamaUrl = process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
+    const model = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
+    const res = await fetch(`${ollamaUrl.replace(/\/$/, '')}/api/embed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        input: sourceText.slice(0, 4000) || featureMap.title,
+      }),
+    });
+    if (!res.ok) throw new Error(`Ollama embed HTTP ${res.status}`);
+    const data = (await res.json()) as { embeddings?: number[][]; embedding?: number[] };
+    const vector = Array.isArray(data.embeddings) ? data.embeddings[0] : data.embedding;
+    if (!Array.isArray(vector) || vector.length === 0) throw new Error('Empty embedding response');
+    return vector;
+  } catch (error) {
+    productionLogger.warn(
+      `[feature-storage] Embedding fallback for ${featureMap.featureId}: ${(error as Error).message}`
+    );
     return Array.from({ length: 768 }, () => 0);
   }
 }

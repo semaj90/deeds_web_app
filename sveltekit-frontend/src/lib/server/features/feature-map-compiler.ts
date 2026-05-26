@@ -110,10 +110,10 @@ export async function compileFeatureMap(input: FeatureMapCompileInput): Promise<
   let grpoUtility = 0;
   let pagerank = 0;
 
-  try {
-    if (dryRun) {
-      throw new Error('dryRun=true skipped Graph-ML enrichment');
-    }
+  if (dryRun) {
+    warnings.push('Graph-ML enrichment skipped in dry run');
+  } else {
+    try {
     const { scoreAttention, scoreGRPOReward, runPageRank } = await import('../grpc/graph-ml-client.js');
     const { scores: attnScores } = await scoreAttention(queryVec, DIM, queryVec, 1);
     attentionScore = attnScores[0] || 0;
@@ -128,6 +128,7 @@ export async function compileFeatureMap(input: FeatureMapCompileInput): Promise<
     pagerank = pagerankResult.scores[0] || 0;
   } catch (err) {
     warnings.push(`Graph-ML enrichment failed: ${(err as Error).message}`);
+  }
   }
 
   // 6. Glyph Generation
