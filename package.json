@@ -80,7 +80,7 @@
     "graphify:karpathy-batch": "node scripts/graphify/graphify-batch-karpathy-analysis.mjs",
     "graphify:karpathy-batch:test": "node scripts/graphify/graphify-batch-karpathy-analysis.mjs --limit=1",
     "graphify:karpathy-batch:write": "node scripts/graphify/graphify-batch-karpathy-analysis.mjs --write",
-    "graphify:batch-gpu-analysis": "node scripts/graphify/graphify-batch-gpu-analysis.mjs",
+    "graphify:batch-gpu-analysis": "npm run ace:startup-health && node scripts/graphify/graphify-batch-gpu-analysis.mjs",
     "smoke:graphify": "cd sveltekit-frontend && node scripts/tests/smoke-graphify.mjs",
     "graph:relations:build": "npx tsx scripts/graph/build-deep-relations-jsonl.mjs build",
     "graph:relations:inspect": "npx tsx scripts/graph/build-deep-relations-jsonl.mjs inspect",
@@ -92,8 +92,8 @@
     "neo4j:cards:write:fail-open": "cd sveltekit-frontend && npm run neo4j:cards:write:fail-open",
     "codebase:semantic-index": "node scripts/codebase-semantic-indexer.mjs",
     "graphify:health": "cd sveltekit-frontend && npm run graphify:health",
-    "atlas:build": "npm run atlas:root:index && npm run atlas:workspace && npm run atlas:language && npm run atlas:imports && npm run atlas:env && npm run atlas:routes && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:validate",
-    "atlas:root:full": "npm run atlas:root:index && npm run atlas:routes:import && npm run atlas:imports:static && npm run atlas:imports:dynamic && npm run atlas:env:map && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:engram:sync && npm run agents:write && npm run atlas:validate",
+    "atlas:build": "npm run ace:startup-health && npm run atlas:root:index && npm run atlas:workspace && npm run atlas:language && npm run atlas:imports && npm run atlas:env && npm run atlas:routes && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:validate",
+    "atlas:root:full": "npm run ace:startup-health && npm run atlas:root:index && npm run atlas:routes:import && npm run atlas:imports:static && npm run atlas:imports:dynamic && npm run atlas:env:map && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:engram:sync && npm run agents:write && npm run atlas:validate",
     "dev": "vite dev --host 0.0.0.0",
     "dev:agent": "powershell scripts/dev-agentic.ps1",
     "build": "npm run build:wasm && vite build",
@@ -172,7 +172,10 @@
     "atlas:rlm": "npx tsx scripts/atlas/rlm-condense-index.ts",
     "graph:exports": "node scripts/atlas/generate-graph-exports.mjs",
     "graph:exports:smoke": "npm run graph:exports && powershell -ExecutionPolicy Bypass -File duckdb\\smoke-duckdb.ps1",
-    "mcp-health": "node scripts/opencode/mcp-health.mjs"
+    "mcp-health": "node scripts/opencode/mcp-health.mjs",
+    "ace:startup-health": "node scripts/ace-startup-health.mjs",
+    "scanner:status": "node scripts/idle-scanner-status.mjs",
+    "startup:truth": "npm run ace:startup-health && npm run scanner:status"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
