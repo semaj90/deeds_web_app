@@ -16,9 +16,9 @@ const AceAskSchema = z.object({
 });
 
 export const POST = async ({ request, locals }) => {
-  const body = await safeValidateRequest(request, AceAskSchema, async (error) => {
+  const body = (await safeValidateRequest(request, AceAskSchema, async (error) => {
     throw new Error(JSON.stringify(error));
-  });
+  })) as any;
 
   const { query } = body;
   const scriptPath = path.join(process.cwd(), 'scripts', 'ace', 'ask-gemma4.mjs');

@@ -27,13 +27,14 @@ export const acePromptPreflightTool: Gemma4Tool = {
   parameters: ACE_PROMPT_PREFLIGHT_PARAMETERS,
   execute: async (args) => {
     const query = String(args.query ?? '');
-    return buildAcePromptPreflight({
+    const preflight = await buildAcePromptPreflight({
       query,
       intent: (args.intent as AcePromptPreflightInput['intent']) ?? 'find',
       tokenBudget: Number(args.tokenBudget ?? 3500),
       backend: (args.backend as AcePromptPreflightInput['backend']) ?? 'turboquant',
       modelName: 'gemma4-legal.gguf',
     });
+    return JSON.stringify(preflight);
   },
 };
 

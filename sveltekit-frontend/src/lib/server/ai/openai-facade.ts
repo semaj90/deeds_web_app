@@ -518,7 +518,8 @@ export async function runChatCompletion(
     }
 
     let text: string;
-    if (rawInferenceLane === 'hermes') {
+    const selectedLane = 'bifrost';
+    if (selectedLane === 'bifrost') {
       text = await runHermesChat(mappedMsgs, requestedMaxTokens, req.temperature);
     } else if (canUseTurboQuantNow) {
       try {
@@ -1132,7 +1133,6 @@ export async function runChatCompletion(
       selectedLane: 'redis',
       fallbackReason: null,
       contextPackKey: packetKey,
-      contextPacketVersion: responseContextMeta.contextPacketVersion,
       sourceRefs: responseContextMeta.sourceRefs,
       chunkIds: responseContextMeta.chunkIds,
       timingTrace: {
@@ -1558,7 +1558,6 @@ export async function runChatCompletion(
     selectedLane,
     fallbackReason,
     contextPackKey: packetKey,
-    contextPacketVersion: responseContextMeta.contextPacketVersion,
     sourceRefs: responseContextMeta.sourceRefs,
     chunkIds: responseContextMeta.chunkIds,
     timingTrace: {
