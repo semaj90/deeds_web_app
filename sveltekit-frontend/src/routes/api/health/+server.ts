@@ -62,11 +62,6 @@ async function probe(url: string, timeoutMs = 5000): Promise<CheckResult> {
 }
 
 export const GET: RequestHandler = async ({ url, locals }) => {
-  const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
-  if (!isTest && !locals?.user) {
-    return json({ status: 'ok', uptime: Math.round((Date.now() - startedAt) / 1000) });
-  }
-
   const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
   if (!parsed.success) {
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid service' }, { status: 400 });
