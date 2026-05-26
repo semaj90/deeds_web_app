@@ -66,7 +66,26 @@ async function main(){
   await fs.writeFile(outEmbeds, embedLines.map(l=>JSON.stringify(l)).join('\n') + '\n','utf8');
   await fs.writeFile(outQdrantPreview, qdrantLines.map(l=>JSON.stringify(l)).join('\n') + '\n','utf8');
 
-  console.log(JSON.stringify({ cards: cards.length, embed_preview: outEmbeds, qdrant_preview: outQdrantPreview, input: inputPath, liveMode: !!live, dim }, null, 2));
+  const result = { cards: cards.length, embed_preview: outEmbeds, qdrant_preview: outQdrantPreview, input: inputPath, liveMode: !!live, dim };
+
+  // Optionally emit MCP task descriptors that an offline GPU batch worker (PyTorch/XGBoost) can consume.
+  if (process.argv.includes('--emit-mcp-tasks')) {
+    const mcpTasksPath = path.resolve(cwd, arg('mcp-out', path.join(cwd, 'memory', 'knowledge', 'gpu-batch-tasks.json')));
+    const task = {
+      id: `gpu-batch:${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      inputPreview: outQdrantPreview,
+      required: { gpu: true, minVramGb: 6 },
+      command: `node scripts/knowledge/gpu-batch-worker.mjs --input "${outQdrantPreview}" --output "${path.join(cwd, 'memory', 'knowledge', `gpu-results-${Date.now()}.json`)}" --batch-size 128`,
+      note: 'This task is an offline GPU batch job. Schedule on Woodpecker/local GPU runner or submit to MCP agent for execution. The schema indexer remains read-only and separate from GPU analysis.',
+      metadata: { cards: cards.length, dim },
+    };
+    await fs.mkdir(path.dirname(mcpTasksPath), { recursive: true });
+    await fs.writeFile(mcpTasksPath, JSON.stringify([task], null, 2), 'utf8');
+    result.mcp_tasks = mcpTasksPath;
+  }
+
+  console.log(JSON.stringify(result, null, 2));
 }
 
 main().catch(e=>{ console.error(e); process.exitCode=2 });
