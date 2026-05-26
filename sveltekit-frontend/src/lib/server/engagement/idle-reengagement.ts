@@ -21,6 +21,8 @@ import type { NotificationPayload } from '$lib/server/notifications/push-service
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { TTL, userEngagementKey } from '$lib/server/cache-keys.js';
+import fs from 'node:fs';
+import path from 'node:path';
 
 // ── Configuration ─────────────────────────────────────────────────
 
@@ -244,9 +246,29 @@ export async function scanIdleUsers(): Promise<{
     return result;
   }
 
-  try {
+  const start = Date.now();
+  const timeoutMs = Number(process.env.IDLE_SCANNER_TIMEOUT_MS || 30000);
+  const checkedAt = new Date().toISOString();
+  const statusFile = '.tmp/idle-scanner-status.json';
+
+  const writeStatus = (payload: any) => {
+    try {
+      const resolvedPath = path.resolve(process.cwd(), statusFile);
+      fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
+      fs.writeFileSync(resolvedPath, JSON.stringify(payload, null, 2), 'utf8');
+
+      if (process.cwd().endsWith('sveltekit-frontend')) {
+        const rootPath = path.resolve(process.cwd(), '../', statusFile);
+        fs.mkdirSync(path.dirname(rootPath), { recursive: true });
+        fs.writeFileSync(rootPath, JSON.stringify(payload, null, 2), 'utf8');
+      }
+    } catch (e) {
+      console.warn('[Idle] Failed to write scanner status:', e);
+    }
+  };
+
+  const doScan = async () => {
     const redis: Redis = getRedis();
-    // Get all user activity keys from Redis
     const keys: string[] = [];
     let cursor = '0';
     do {
@@ -274,7 +296,6 @@ export async function scanIdleUsers(): Promise<{
         const lastActive = parseInt(lastActiveStr, 10);
         const idleDuration = now - lastActive;
 
-        // Find the highest applicable idle tier
         let applicableTier: (typeof IDLE_TIERS)[number] | null = null;
         for (const tier of [...IDLE_TIERS].reverse()) {
           if (idleDuration >= tier.thresholdMs) {
@@ -285,10 +306,8 @@ export async function scanIdleUsers(): Promise<{
 
         if (!applicableTier) continue;
 
-        // Check throttle
         if (await hasNotifiedToday(userId, applicableTier.name)) continue;
 
-        // Generate appropriate notification
         let payload: NotificationPayload;
         switch (applicableTier.name) {
           case 'gentle_nudge':
@@ -305,7 +324,6 @@ export async function scanIdleUsers(): Promise<{
             break;
         }
 
-        // Send via ntfy (always available, no subscription needed)
         await sendNotification(payload, {
           channels: ['ntfy'],
           userId,
@@ -322,13 +340,68 @@ export async function scanIdleUsers(): Promise<{
         console.warn(`[Idle] Error processing user ${userId.slice(0, 8)}:`, err);
       }
     }
+    return keys.length;
+  };
+
+  try {
+    const matchedFilesCount = await Promise.race([
+      doScan(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Command timed out')), timeoutMs)
+      ),
+    ]);
+
+    const durationMs = Date.now() - start;
+    writeStatus({
+      ok: true,
+      timedOut: false,
+      command: 'scanIdleUsers',
+      durationMs,
+      checkedAt,
+      matchedFiles: matchedFilesCount,
+      errorMessage: null,
+      smoke_or_report_output: statusFile,
+      canonical_status: 'ok',
+    });
   } catch (err: any) {
-    if (err.message?.includes('Connection is closed')) {
-      console.warn('[Idle] Redis connection closed, skipping scan');
+    const durationMs = Date.now() - start;
+    const isTimeout = err.message === 'Command timed out';
+
+    if (isTimeout) {
+      console.warn('[Idle] Scanner timeout warning:', err.message);
+      writeStatus({
+        ok: false,
+        timedOut: true,
+        command: 'scanIdleUsers',
+        durationMs,
+        checkedAt,
+        matchedFiles: null,
+        errorMessage: err.message,
+        smoke_or_report_output: statusFile,
+        canonical_status: 'partial',
+        risk_notes: 'scanner timeout / incomplete inventory',
+      });
     } else {
-      console.warn('[Idle] Scanner error:', err.message);
+      if (err.message?.includes('Connection is closed')) {
+        console.warn('[Idle] Redis connection closed, skipping scan');
+      } else {
+        console.warn('[Idle] Scanner error:', err.message);
+      }
+      result.errors++;
+
+      writeStatus({
+        ok: false,
+        timedOut: false,
+        command: 'scanIdleUsers',
+        durationMs,
+        checkedAt,
+        matchedFiles: null,
+        errorMessage: err.message,
+        smoke_or_report_output: statusFile,
+        canonical_status: 'failed',
+        risk_notes: err.message,
+      });
     }
-    result.errors++;
   }
 
   return result;
