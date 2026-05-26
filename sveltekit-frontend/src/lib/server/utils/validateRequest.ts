@@ -9,7 +9,7 @@ import { z, ZodError } from 'zod';
  * @returns A Promise that resolves with the validated data object if successful.
  * @throws An error object containing validation details if validation fails.
  */
-export async function validateRequest(request: Request, schema: z.ZodTypeAny): Promise<z.ZodInfer<z.ZodTypeAny>> {
+export async function validateRequest(request: Request, schema: z.ZodTypeAny): Promise<z.infer<z.ZodTypeAny>> {
 	try {
 		const body = await request.json();
 		const result = schema.safeParse(body);
@@ -43,7 +43,7 @@ export async function safeValidateRequest(
 	request: Request,
 	schema: z.ZodTypeAny,
 	errorHandler: (error: { status: number; message: string }) => Promise<void>
-): Promise<z.ZodInfer<z.ZodTypeAny>> {
+): Promise<z.infer<z.ZodTypeAny>> {
 	try {
 		const validatedData = await validateRequest(request, schema);
 		return validatedData;
