@@ -34,20 +34,52 @@ function walk(dir, extFilter){
   return files;
 }
 
-function grepFiles(regex, root){
+function grepFiles(regex, roots){
   const hits = new Set();
-  const files = walk(root);
-  for(const f of files){
-    try{
-      const txt = fs.readFileSync(f,'utf8');
-      if(regex.test(txt)) hits.add(path.relative(process.cwd(), f));
-    }catch(e){}
+  const rootList = Array.isArray(roots) ? roots : [roots];
+  for(const root of rootList){
+    const files = walk(path.resolve(root));
+    for(const f of files){
+      try{
+        const txt = fs.readFileSync(f,'utf8');
+        if(regex.test(txt)) hits.add(path.relative(process.cwd(), f));
+      }catch(e){}
+    }
   }
   return [...hits];
 }
 
+function collectDocs(root) {
+  const docs = [];
+  const roots = [
+    'docs',
+    'reports',
+    '.opencode',
+    'memory',
+    'sveltekit-frontend/docs',
+    'sveltekit-frontend/reports',
+    'sveltekit-frontend/memory'
+  ];
+  const exts = new Set(['.md', '.json', '.jsonl', '.txt']);
+
+  for (const relRoot of roots) {
+    const absRoot = path.join(root, relRoot);
+    if (!fs.existsSync(absRoot)) continue;
+    for (const rel of walk(absRoot, [...exts])) {
+      const relFromRoot = path.relative(root, rel);
+      if (!/(report|summary|analyzer|health|diff|ace|feature|atlas|graph|turbovec|qdrant|redis|knowledge|context|startup|memory)/i.test(relFromRoot)) {
+        continue;
+      }
+      docs.push(relFromRoot);
+    }
+  }
+
+  return [...new Set(docs)];
+}
+
 async function main(){
   const repoRoot = path.resolve(process.cwd());
+  const fastMode = process.argv.includes('--fast');
   const out = {
     featureId: 'env-module',
     generatedAt: new Date().toISOString(),
@@ -56,7 +88,11 @@ async function main(){
     runtimeServices: [],
     sourceRefs: [],
     packageScripts: {},
+    bashTools: [],
     mcpToolFiles: [],
+    docArtifacts: [],
+    reportArtifacts: [],
+    turbovecArtifacts: [],
     storageLane: [],
     retrievalLane: [],
     dynamicHealth: {},
@@ -75,6 +111,13 @@ async function main(){
     if(Object.keys(out.packageScripts).length) out.sourceRefs.push('package.json:scripts');
   }catch(e){}
 
+  const toolScriptNames = Object.entries(out.packageScripts)
+    .filter(([name]) => /(?:mcp|health|startup|ace|atlas|graph|codebase|feature|redis|turbovec|engram|langextract|opencode|trace|duckdb)/i.test(name))
+    .map(([name, command]) => `${name} => ${command}`)
+    .slice(0, 100);
+  out.bashTools = toolScriptNames;
+  if (toolScriptNames.length) out.sourceRefs.push('package.json:bashTools');
+
   // runtime matrix
   const runtime = readIfExists(path.join(repoRoot,'RUNTIME_MATRIX.md')) || readIfExists(path.join(repoRoot,'docs','RUNTIME_MATRIX.md'));
   if(runtime) {
@@ -87,11 +130,22 @@ async function main(){
   }
 
   // MCP related search
-  out.mcpToolFiles = grepFiles(/\bMCP\b|mcp\/server|TRACE_MCP_URL|FastMCP/i, repoRoot).slice(0,100);
+  const mcpSearchRoots = fastMode
+    ? ['.opencode', 'scripts', 'sveltekit-frontend/scripts', 'docs']
+    : [repoRoot];
+  out.mcpToolFiles = grepFiles(/\bMCP\b|mcp\/server|TRACE_MCP_URL|FastMCP/i, mcpSearchRoots).slice(0,100);
   out.sourceRefs.push(...out.mcpToolFiles.slice(0,10));
 
+  out.docArtifacts = collectDocs(repoRoot);
+  out.reportArtifacts = out.docArtifacts.filter((p) => /(report|summary|analyzer|health|diff)/i.test(p));
+  out.turbovecArtifacts = out.docArtifacts.filter((p) => /(turbovec|turboquant|embedding|qdrant)/i.test(p));
+  out.sourceRefs.push(...out.docArtifacts.slice(0, 20));
+
   // env/reference owners
-  const envRefFiles = grepFiles(/\b(OLLAMA|QDRANT|REDIS|POSTGRES|DATABASE_URL|SEAWEED|MINIO|TURBO|BIFROST)\b/i, repoRoot);
+  const envSearchRoots = fastMode
+    ? ['scripts', 'src', '.opencode', 'docs', 'sveltekit-frontend/scripts', 'sveltekit-frontend/src', 'sveltekit-frontend/docs']
+    : [repoRoot];
+  const envRefFiles = grepFiles(/\b(OLLAMA|QDRANT|REDIS|POSTGRES|DATABASE_URL|SEAWEED|MINIO|TURBO|BIFROST)\b/i, envSearchRoots);
   out.ownerFiles = envRefFiles.slice(0,500);
 
   // storage lane detection
@@ -116,10 +170,12 @@ async function main(){
   if(!out.envVars.length) out.missingPieces.push('.env not present or no env keys discovered');
   if(!out.ownerFiles.length) out.missingPieces.push('No files referencing runtime envs found');
   if(!out.mcpToolFiles.length) out.missingPieces.push('No MCP tool references discovered');
+  if(!out.docArtifacts.length) out.missingPieces.push('No startup doc/report artifacts discovered');
 
   out.nextSteps.push('Verify Redis/Qdrant/Postgres endpoints and credentials');
   out.nextSteps.push('Publish .opencode/ace-context.json to ace:opencode:context:<hash> in Redis if available');
   out.nextSteps.push('Add smoke probes for Ollama and Qdrant in scripts/opencode/probes');
+  out.nextSteps.push('Run npm run opencode:bootstrap to refresh startup truth and report artifacts');
 
   // write output file
   const outDir = path.join(repoRoot,'.opencode');

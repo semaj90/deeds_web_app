@@ -1,7 +1,7 @@
 # Codebase Semantic Index Tasks
 
-- Generated: 2026-05-26T02:40:41.296Z
-- Open items: 2225
+- Generated: 2026-05-26T23:04:46.012Z
+- Open items: 2224
 
 ## Priority Tasks
 

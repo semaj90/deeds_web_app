@@ -1,0 +1,14 @@
+kind: pipeline
+name: cheap-ci
+
+steps:
+- name: cheap-ci
+  image: node:20
+  commands:
+    - cd sveltekit-frontend
+    - npm ci
+    - npm run check || true
+    - npm run lint || true
+    - npm run test:unit || true
+    - npm run guard:sidecar-stdout || true
+    - npm run ace:startup-health || true

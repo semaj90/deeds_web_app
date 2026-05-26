@@ -1,10 +1,10 @@
 # Codebase Semantic Index Report
 
-- Generated: 2026-05-26T02:40:41.295Z
+- Generated: 2026-05-26T23:04:46.011Z
 - Workspace: C:\Users\james\Videos\deeds-web-app\sveltekit-frontend
 - Mode: report
-- Checklist files scanned: 5796
-- Open checklist items: 2225
+- Checklist files scanned: 5801
+- Open checklist items: 2224
 
 ## Open Checklist Items
 

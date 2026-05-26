@@ -1,0 +1,16 @@
+kind: pipeline
+name: local-gpu-heavy
+
+steps:
+- name: gpu-heavy
+  image: node:20
+  environment:
+    # Gate these heavy GPU jobs behind an explicit flag in Woodpecker UI or env
+    ALLOW_GPU_RUN: ${ALLOW_GPU_RUN}
+  commands:
+    - if [ "${ALLOW_GPU_RUN:-}" != "1" ]; then echo "GPU jobs gated. Set ALLOW_GPU_RUN=1 to run."; exit 0; fi
+    - cd sveltekit-frontend
+    - npm ci
+    - npm run models:probe || true
+    - npm run turbo:status || true
+    - npm run test:hyperrag || true

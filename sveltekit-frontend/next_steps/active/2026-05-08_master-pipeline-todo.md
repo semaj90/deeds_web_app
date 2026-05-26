@@ -108,6 +108,12 @@ Bullets above are Gemma4-generated; weight them as priors, not commands. Verify 
 ### P1.4 — `agents_md.shares_tags` + `agents_md.binding_chain` smoke coverage
 - Add the 2 new MCP tools to `scripts/smoke-atlas-context.mjs` so regressions surface.
 
+### P1.5 — App-file consolidation labels
+- **Lane labels**: `svelte-inspector` and `svelte-realtime`
+- **Goal**: keep feature labeling aligned with app-file family upgrades before the later graph-analysis pass.
+- **Fix**: thread the labels through the feature registry, route classification, and report output so consolidation candidates stay visible.
+- **Verify**: rerun `npm run audit:neo4j-missing-links -- --json` and confirm the new label buckets appear in the report.
+
 ---
 
 ## P2 — Coverage expansion
@@ -120,6 +126,103 @@ Bullets above are Gemma4-generated; weight them as priors, not commands. Verify 
 
 ### P2.3 — Feed `screenshot_artifacts.caption_embedding` into hypergraph
 - Treat each captioned screenshot as a hypergraph member with `member_kind='ui_screenshot'`. Lets `hypergraph.search?q="login form"` return UI evidence alongside code clusters.
+
+### P2.4 — Dependency chain mapping for app-file families
+- **Goal**: map static import chains, dynamic imports, and cross-route handoff paths for the app-file families before the proper graph-analysis pass.
+- **Inputs**: route atlas, import map, Neo4j projection, and the new `svelte-inspector` / `svelte-realtime` labels.
+- **Outcome**: a durable dependency-chain view that can drive future consolidation and upgrade work without waiting for the full graph rewrite.
+
+### P2.5 — Full-feature JSON cards
+- **Goal**: expand the feature card schema so each card carries modules, imports, dependencies, languages, networking, offline processing, cache, and inference fallback lanes.
+- **Why now**: the atlas needs one rich JSON contract that can be queried before DuckDB/CouchDB offline processing and later Gemma4/OpenCode inference are fully wired.
+- **Outcome**: a multi-query card shape that can feed semantics analysis now and carry cache-forward into the frontend app later.
+
+### P2.6 — Feature-card semantics report
+- **Goal**: run JSON analysis over the generated feature cards so lane coverage, offline fields, and multi-query matches are visible before the later storage backends land.
+- **Fix**: keep the semantics report read-only and derived from `memory/exports/feature-map-cards.jsonl`.
+- **Outcome**: a durable report artifact that can be used as the input contract for future DuckDB and CouchDB mirrors.
+
+### P2.7 — App-side feature-card semantic index
+- **Goal**: expose a read-only server module that can load and query the generated cards for later Gemma4/OpenCode inference.
+- **Fix**: keep the loader pointed at the generated JSONL/report artifacts and avoid adding a second durable store.
+- **Outcome**: a thin query layer the frontend app can reuse once the offline mirrors are ready.
+
+### P2.8 — Offline feature-card mirror
+- **Goal**: prepare opt-in CouchDB and DuckDB-ready artifacts from the generated feature cards.
+- **Fix**: keep the mirror downstream-only so Postgres remains authoritative and Redis remains the hot lane.
+- **Outcome**: an offline processing handoff that can be activated later without changing the request path.
+- **Status**: DuckDB export is now materialized to `docs/reports/feature-card.duckdb`; keep CouchDB opt-in only.
+
+### P2.9 — DuckDB feature-card smoke
+- **Goal**: validate the persisted feature-card DuckDB file and the local Windows DuckDB install with a direct query.
+- **Fix**: keep the smoke cheap and file-backed so it does not depend on the Postgres request path.
+- **Outcome**: a repeatable local check for `feature_cards` table presence and row count.
+
+### P2.10 — DuckDB feature-card inspect report
+- **Goal**: expose the persisted DuckDB mirror as a readable report with columns, counts, labels, and a preview slice.
+- **Fix**: keep the inspect path read-only and derived from `docs/reports/feature-card.duckdb`.
+- **Outcome**: a durable DuckDB analysis report the offline lane can reuse before CouchDB or Gemma4/OpenCode integration.
+
+### P2.11 — DuckDB feature-card validation
+- **Goal**: verify NDJSON export parity, DuckDB table shape, and row counts before downstream phases consume the mirror.
+- **Fix**: keep validation read-only and fail fast when the export and DB diverge.
+- **Outcome**: a single downstream gate that proves the offline mirror is coherent before any future CouchDB sync or assistant ingestion.
+
+### P2.12 — DuckDB normalized term table
+- **Goal**: materialize a second DuckDB table for labels/modules/imports/dependencies so downstream search and analysis can query normalized terms.
+- **Fix**: keep it derived from the feature-card JSON payload, not a second source of truth.
+- **Outcome**: a queryable term index inside DuckDB that supports richer downstream phases without needing cosine-only search.
+
+### P2.13 — CouchDB feature-card MapReduce views
+- **Goal**: install a feature-card design doc in CouchDB so the mirror can query feature kinds, feature keys, and normalized terms with MapReduce.
+- **Fix**: keep the design doc behind the same opt-in CouchDB gate as the doc writes.
+- **Outcome**: a durable CouchDB view layer that matches the feature-card contract and can warm itself after offline mirroring.
+
+### P3.1 — Post-synthesis quality review
+- **Goal**: verify Neo4j authority, summary drift, and Qdrant sourceRefs parity for the stage-2c-500 review run.
+- **Fix**: treat the missing `docs/graph/repo-neo4j-graphrag-report.json` as a blocking gap until the graph projection is refreshed.
+- **Fix**: backfill `codebase_chunks_768` payloads with chunk-level `sourceRefs` derived from `codebase_chunk_index` so atlas and ACE cards can consolidate indexed vs untracked evidence.
+- **Outcome**: a repeatable quality gate before the downstream UI and synthesis phases consume graph-derived evidence.
+
+### P4.1 — Admin copilot provenance display
+- **Goal**: show Qdrant sourceRefs and Neo4j graph paths in the admin search results and atlas panel.
+- **Fix**: keep provenance visible by default so operators can see where retrieval came from before editing trust or promoting content.
+- **Outcome**: provenance-aware search results that support operator review and trust tuning.
+
+### P4.2 — Cluster visualization and aliases
+- **Goal**: surface 4D manifold cluster aliases and graph-aware visual cues in the UI.
+- **Fix**: connect the cluster alias materialization to the admin panel instead of relying on report files only.
+- **Outcome**: a visible cluster topology layer for operators and synthesis review.
+
+### P4.3 — Direct edit trust tiers
+- **Goal**: allow operators to promote or demote synthesis trust tiers from the admin copilot surface.
+- **Fix**: keep edits constrained to the allowlisted trust-tier fields and preserve provenance metadata.
+- **Outcome**: an operator-driven trust control loop without loosening the existing retrieval policy.
+
+### P4.4 — Multi-lane retrieval
+- **Goal**: surface local and external documents together with explicit trust markers.
+- **Fix**: keep lane labels and trust tiers attached so synthesis can explain which evidence is local versus external.
+- **Outcome**: a hybrid retrieval surface that still distinguishes authoritative local evidence from fallback sources.
+
+### P4.5 — Action suggestions
+- **Goal**: integrate `trace.command_suggest` into the chat panel as an action suggestion lane.
+- **Fix**: keep suggestions grounded in allowlisted commands and the current feature registry.
+- **Outcome**: chat responses that can steer operators into the right commands without guessing.
+
+### P5.1 — Feature registry reconciliation
+- **Goal**: reconcile core architectural features with code-based evidence and the feature registry.
+- **Fix**: keep the feature registry as the contract and use code evidence to backfill gaps.
+- **Outcome**: a consistent registry that ties features to real files, imports, and dependencies.
+
+### P5.2 — Command mapping
+- **Goal**: bridge reconciled features to safe, allowlisted MCP commands.
+- **Fix**: keep the command map bounded to reviewable operations and preserve trust tiers.
+- **Outcome**: a feature-to-command atlas that can guide operator workflows safely.
+
+### P5.3 — Synthetic evidence cards
+- **Goal**: generate concept cards for undocumented local patterns after the reconciliation pass.
+- **Fix**: keep synthetic evidence clearly labeled and downstream-only until it is validated.
+- **Outcome**: a durable set of concept cards that can seed later synthesis and command mapping.
 
 ---
 

@@ -1,6 +1,6 @@
 # Directory Atlas Recommendations
 
-> Generated: 2026-05-25T07:04:22.335Z · 1167 directories · 8675 files
+> Generated: 2026-05-26T21:17:10.716Z · 1167 directories · 8674 files
 
 ## `src/lib/server/db`
 
@@ -94,33 +94,33 @@
 
 ## `src/lib/webgpu`
 
-- Rank: **0.341** · files=41 · hits=0 · dirty=0
+- Rank: **0.351** · files=41 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/webgpu/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0.4 avg=0.187, PageRank max=0, Karpathy blend=0.712
+- Authority max=0.4 avg=0.187, PageRank max=0, Karpathy blend=0.891
 - Topo classes: `graph-gpu-topology`
 - Clusters: `general`, `gpu:23`, `gpu:20`, `gpu:36`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/webgpu/init.ts`, `src/lib/webgpu/init.ts`, `src/lib/webgpu/compute-shader-engine.ts`
 
-## `src/lib/ai`
-
-- Rank: **0.338** · files=25 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/ai/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0.4 avg=0.161, PageRank max=0, Karpathy blend=0.662
-- Topo classes: `unclassified`
-- Clusters: `general`, `gpu:86`, `gpu:72`, `gpu:22`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/ai/model-ids.ts`, `src/lib/ai/model-ids.ts`, `src/lib/ai/base64-fp32-quantizer.ts`
-
 ## `src/lib`
 
-- Rank: **0.337** · files=17 · hits=0 · dirty=0
+- Rank: **0.348** · files=17 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/AGENTS.md` (parent: `agents:src/AGENTS.md`)
-- Authority max=0.4 avg=0.181, PageRank max=0, Karpathy blend=0.655
+- Authority max=0.4 avg=0.181, PageRank max=0, Karpathy blend=0.836
 - Topo classes: `unclassified`
 - Clusters: `general`, `gpu:57`, `gpu:20`, `gpu:9`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/types.ts`, `src/lib/env.server.ts`, `src/lib/polyfills.ts`
+
+## `src/lib/ai`
+
+- Rank: **0.348** · files=25 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/ai/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
+- Authority max=0.4 avg=0.161, PageRank max=0, Karpathy blend=0.845
+- Topo classes: `unclassified`
+- Clusters: `general`, `gpu:86`, `gpu:72`, `gpu:22`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/ai/model-ids.ts`, `src/lib/ai/model-ids.ts`, `src/lib/ai/base64-fp32-quantizer.ts`
 
 ## `src/routes/api/test/redis-direct`
 
@@ -131,6 +131,16 @@
 - Clusters: `general`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/routes/api/test/redis-direct/+server.ts`
+
+## `src/lib/db/schema`
+
+- Rank: **0.326** · files=10 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/db/schema/AGENTS.md` (parent: `agents:src/lib/db/AGENTS.md`)
+- Authority max=0.4 avg=0.28, PageRank max=0, Karpathy blend=0.89
+- Topo classes: `database-schema`
+- Clusters: `gpu:60`, `general`, `gpu:55`, `gpu:51`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/db/schema/cutlass.ts`, `src/lib/db/schema/ace-web.ts`, `src/lib/db/schema/ace-web.ts`
 
 ## `src/lib/server/graph`
 
@@ -151,16 +161,6 @@
 - Clusters: `general`, `gpu:59`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/server/observability/inference-log.ts`, `src/lib/server/observability/langfuse.ts`, `src/lib/server/observability/inference-log-views.ts`
-
-## `src/lib/db/schema`
-
-- Rank: **0.315** · files=10 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/db/schema/AGENTS.md` (parent: `agents:src/lib/db/AGENTS.md`)
-- Authority max=0.4 avg=0.28, PageRank max=0, Karpathy blend=0.7
-- Topo classes: `database-schema`
-- Clusters: `gpu:60`, `general`, `gpu:55`, `gpu:51`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/db/schema/cutlass.ts`, `src/lib/db/schema/ace-web.ts`, `src/lib/db/schema/ace-web.ts`
 
 ## `src/lib/server/ace`
 

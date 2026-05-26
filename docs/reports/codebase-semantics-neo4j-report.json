@@ -1,0 +1,6378 @@
+{
+  "generatedAt": "2026-05-26T22:53:26.741Z",
+  "repo": "deeds-web-app",
+  "source": {
+    "routeAtlas": "docs/graph/repo-sveltekit-route-atlas.json",
+    "importMap": "docs/graph/repo-import-map.json",
+    "neo4j": "live",
+    "seaweedfs": "handled by api/health, not mutated by this report"
+  },
+  "stats": {
+    "routes": 250,
+    "shipped": 195,
+    "failOpen": 55,
+    "unlabeled": 0,
+    "dynamicHeavy": 46,
+    "importTargets": 50
+  },
+  "byStatus": {
+    "SHIPPED": 195,
+    "PARTIAL": 55
+  },
+  "byLabel": {
+    "api-route": 172,
+    "svelte-realtime": 71,
+    "svelte-inspector": 4,
+    "ui-component": 3
+  },
+  "neo4j": {
+    "available": true,
+    "orphanCount": 3914,
+    "orphanPaths": [
+      "sveltekit-frontend/docs_readme/deeds_labs_archive/components/CaseOutcomePrediction.svelte",
+      "sveltekit-frontend/docs_readme/deeds_labs_archive/components/NESGraphRenderer.svelte",
+      "sveltekit-frontend/docs_readme/deeds_labs_archive/components/RouteInspectorDetectiveBoard.svelte",
+      "sveltekit-frontend/src/lib/client/ui/POIPhotoModal.svelte",
+      "sveltekit-frontend/src/lib/client/ui/POIPhotoUploader.svelte",
+      "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "sveltekit-frontend/src/lib/components/admin/PipelineProgress.svelte",
+      "sveltekit-frontend/src/lib/components/admin/RoutingExplanationPanel.svelte",
+      "sveltekit-frontend/src/lib/components/admin/SummarizeButton.svelte",
+      "sveltekit-frontend/src/lib/components/admin/TraceCopilotPanel.svelte",
+      "sveltekit-frontend/src/lib/components/agent/AutonomousInvestigator.svelte",
+      "sveltekit-frontend/src/lib/components/agentic/AgentChat.svelte",
+      "sveltekit-frontend/src/lib/components/agentic/AgenticController.svelte",
+      "sveltekit-frontend/src/lib/components/ai/ACEContextBubble.svelte",
+      "sveltekit-frontend/src/lib/components/ai/AIAssistantButton.svelte"
+    ],
+    "relationshipCount": 0,
+    "notes": []
+  },
+  "unlabeledRoutes": [],
+  "fallbackRoutes": [],
+  "dynamicHeavyRoutes": [
+    {
+      "routePath": "/",
+      "dynamicCount": 2,
+      "imports": 7
+    },
+    {
+      "routePath": "/",
+      "dynamicCount": 18,
+      "imports": 28
+    },
+    {
+      "routePath": "/",
+      "dynamicCount": 2,
+      "imports": 27
+    },
+    {
+      "routePath": "/.well-known/llms-full.txt",
+      "dynamicCount": 3,
+      "imports": 5
+    },
+    {
+      "routePath": "/.well-known/llms.txt",
+      "dynamicCount": 2,
+      "imports": 5
+    },
+    {
+      "routePath": "/(analysis)@",
+      "dynamicCount": 2,
+      "imports": 7
+    },
+    {
+      "routePath": "/admin",
+      "dynamicCount": 1,
+      "imports": 5
+    },
+    {
+      "routePath": "/admin/all-routes",
+      "dynamicCount": 1,
+      "imports": 21
+    },
+    {
+      "routePath": "/admin/cache",
+      "dynamicCount": 1,
+      "imports": 5
+    },
+    {
+      "routePath": "/admin/case-graph",
+      "dynamicCount": 2,
+      "imports": 3
+    },
+    {
+      "routePath": "/admin/codebase-viewer",
+      "dynamicCount": 2,
+      "imports": 14
+    },
+    {
+      "routePath": "/admin/dev-tools",
+      "dynamicCount": 1,
+      "imports": 19
+    },
+    {
+      "routePath": "/admin/document-search",
+      "dynamicCount": 4,
+      "imports": 12
+    },
+    {
+      "routePath": "/admin/gpu-evidence-graph",
+      "dynamicCount": 1,
+      "imports": 5
+    },
+    {
+      "routePath": "/api/ace/context",
+      "dynamicCount": 1,
+      "imports": 7
+    },
+    {
+      "routePath": "/api/ace/health",
+      "dynamicCount": 2,
+      "imports": 5
+    },
+    {
+      "routePath": "/api/ace/ingest",
+      "dynamicCount": 6,
+      "imports": 19
+    },
+    {
+      "routePath": "/api/admin/model/promote-weights",
+      "dynamicCount": 2,
+      "imports": 7
+    },
+    {
+      "routePath": "/api/admin/pipeline/events",
+      "dynamicCount": 3,
+      "imports": 8
+    },
+    {
+      "routePath": "/api/agents/chat",
+      "dynamicCount": 5,
+      "imports": 11
+    },
+    {
+      "routePath": "/api/ai/case-prediction",
+      "dynamicCount": 2,
+      "imports": 8
+    },
+    {
+      "routePath": "/api/ai/case-scoring",
+      "dynamicCount": 3,
+      "imports": 6
+    },
+    {
+      "routePath": "/api/ai/context",
+      "dynamicCount": 5,
+      "imports": 9
+    },
+    {
+      "routePath": "/api/ai/feedback",
+      "dynamicCount": 2,
+      "imports": 7
+    },
+    {
+      "routePath": "/api/ai/generate-image",
+      "dynamicCount": 2,
+      "imports": 5
+    },
+    {
+      "routePath": "/api/ai/stats",
+      "dynamicCount": 2,
+      "imports": 7
+    },
+    {
+      "routePath": "/api/ai/yorha/context-chat",
+      "dynamicCount": 2,
+      "imports": 7
+    },
+    {
+      "routePath": "/api/analytics/events",
+      "dynamicCount": 2,
+      "imports": 8
+    },
+    {
+      "routePath": "/api/analytics/mirror-health",
+      "dynamicCount": 2,
+      "imports": 4
+    },
+    {
+      "routePath": "/api/analytics/qlora-dataset",
+      "dynamicCount": 2,
+      "imports": 8
+    },
+    {
+      "routePath": "/api/analytics/research-summaries",
+      "dynamicCount": 1,
+      "imports": 8
+    },
+    {
+      "routePath": "/api/analytics/research-topics",
+      "dynamicCount": 1,
+      "imports": 8
+    },
+    {
+      "routePath": "/api/analytics/rl-signal",
+      "dynamicCount": 2,
+      "imports": 6
+    },
+    {
+      "routePath": "/api/analytics/search",
+      "dynamicCount": 1,
+      "imports": 4
+    },
+    {
+      "routePath": "/api/browser-context/snapshot",
+      "dynamicCount": 2,
+      "imports": 5
+    },
+    {
+      "routePath": "/api/cache/invalidate",
+      "dynamicCount": 1,
+      "imports": 6
+    },
+    {
+      "routePath": "/api/cache/set",
+      "dynamicCount": 1,
+      "imports": 4
+    },
+    {
+      "routePath": "/api/cache/stats",
+      "dynamicCount": 1,
+      "imports": 9
+    },
+    {
+      "routePath": "/api/canon/ingest",
+      "dynamicCount": 2,
+      "imports": 10
+    },
+    {
+      "routePath": "/api/canon/search",
+      "dynamicCount": 1,
+      "imports": 8
+    },
+    {
+      "routePath": "/api/cases",
+      "dynamicCount": 1,
+      "imports": 11
+    },
+    {
+      "routePath": "/api/cases/[id]/analyze/stream",
+      "dynamicCount": 4,
+      "imports": 9
+    },
+    {
+      "routePath": "/api/charges/add",
+      "dynamicCount": 1,
+      "imports": 5
+    },
+    {
+      "routePath": "/api/chat",
+      "dynamicCount": 1,
+      "imports": 8
+    },
+    {
+      "routePath": "/api/chat/migrate",
+      "dynamicCount": 2,
+      "imports": 7
+    },
+    {
+      "routePath": "/api/citations",
+      "dynamicCount": 1,
+      "imports": 9
+    }
+  ],
+  "consolidationCandidates": [
+    {
+      "key": "api-route:/api/admin",
+      "entries": [
+        "/api/admin/agent/fix",
+        "/api/admin/ai-chat",
+        "/api/admin/ai-chat/[sessionId]",
+        "/api/admin/ai-chat/sessions",
+        "/api/admin/ai-chat/subagent/launch",
+        "/api/admin/ai-chat/upload",
+        "/api/admin/audit",
+        "/api/admin/chat",
+        "/api/admin/citations/discover",
+        "/api/admin/diagnose",
+        "/api/admin/inference-lane",
+        "/api/admin/inference-stats",
+        "/api/admin/jobs",
+        "/api/admin/knowledge",
+        "/api/admin/legal-strategy",
+        "/api/admin/model/promote-weights",
+        "/api/admin/model/upload-weights",
+        "/api/admin/model/validate-checkpoint",
+        "/api/admin/observability",
+        "/api/admin/raptor-atlas",
+        "/api/admin/raptor/build",
+        "/api/admin/recommendations",
+        "/api/admin/repair",
+        "/api/admin/routes",
+        "/api/admin/seed-knowledge",
+        "/api/admin/topology/recompute",
+        "/api/admin/weights"
+      ]
+    },
+    {
+      "key": "api-route:/api/analytics",
+      "entries": [
+        "/api/analytics/codebase-research",
+        "/api/analytics/context-timeline",
+        "/api/analytics/deep-research",
+        "/api/analytics/events",
+        "/api/analytics/feedback",
+        "/api/analytics/focus",
+        "/api/analytics/health",
+        "/api/analytics/knowledge-triples",
+        "/api/analytics/mapreduce-matrix",
+        "/api/analytics/mirror-health",
+        "/api/analytics/panel-activity",
+        "/api/analytics/patterns",
+        "/api/analytics/prompt-leaderboard",
+        "/api/analytics/qlora-dataset",
+        "/api/analytics/research-graph",
+        "/api/analytics/research-index",
+        "/api/analytics/research-summaries",
+        "/api/analytics/research-summaries/[id]",
+        "/api/analytics/rl-signal",
+        "/api/analytics/search",
+        "/api/analytics/search-patterns",
+        "/api/analytics/similar-queries",
+        "/api/analytics/summary",
+        "/api/analytics/token-usage",
+        "/api/analytics/unified-research"
+      ]
+    },
+    {
+      "key": "api-route:/api/cases",
+      "entries": [
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/authorities",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/related",
+        "/api/cases/[id]/timeline",
+        "/api/cases/analytics",
+        "/api/cases/cluster"
+      ]
+    },
+    {
+      "key": "api-route:/api/ai",
+      "entries": [
+        "/api/ai/analyze-evidence",
+        "/api/ai/ask",
+        "/api/ai/case-prediction",
+        "/api/ai/chat",
+        "/api/ai/context",
+        "/api/ai/contextual-chat",
+        "/api/ai/feedback",
+        "/api/ai/generate-image",
+        "/api/ai/hermes-plan",
+        "/api/ai/intent-dispatch",
+        "/api/ai/legal-research",
+        "/api/ai/models",
+        "/api/ai/personas",
+        "/api/ai/summarize",
+        "/api/ai/tensorrt",
+        "/api/ai/tensorrt/vlm",
+        "/api/ai/vector-search",
+        "/api/ai/yorha/context-chat"
+      ]
+    },
+    {
+      "key": "svelte-realtime:/api/ai",
+      "entries": [
+        "/api/ai/agent",
+        "/api/ai/agent/batch",
+        "/api/ai/analyze/[scope]",
+        "/api/ai/case-scoring",
+        "/api/ai/chat-direct",
+        "/api/ai/chat/stream",
+        "/api/ai/cross-exam",
+        "/api/ai/generate-report/[scope]",
+        "/api/ai/hermes-run",
+        "/api/ai/judge",
+        "/api/ai/memo-skeleton",
+        "/api/ai/route-intent",
+        "/api/ai/stats",
+        "/api/ai/suggestions",
+        "/api/ai/tensorrt/stream"
+      ]
+    },
+    {
+      "key": "api-route:/api/auth",
+      "entries": [
+        "/api/auth/debug",
+        "/api/auth/demo-login",
+        "/api/auth/health",
+        "/api/auth/login",
+        "/api/auth/logout",
+        "/api/auth/me",
+        "/api/auth/profile",
+        "/api/auth/register",
+        "/api/auth/reset-password",
+        "/api/auth/session"
+      ]
+    },
+    {
+      "key": "api-route:/api/cache",
+      "entries": [
+        "/api/cache",
+        "/api/cache/bifrost/store",
+        "/api/cache/exact-match/stats",
+        "/api/cache/invalidate",
+        "/api/cache/llm/clean",
+        "/api/cache/llm/stats",
+        "/api/cache/nintendo",
+        "/api/cache/recent-queries",
+        "/api/cache/set",
+        "/api/cache/som"
+      ]
+    },
+    {
+      "key": "api-route:/api/ace",
+      "entries": [
+        "/api/ace/agent",
+        "/api/ace/context",
+        "/api/ace/error-kag",
+        "/api/ace/health",
+        "/api/ace/rank",
+        "/api/ace/recommendations",
+        "/api/ace/status"
+      ]
+    },
+    {
+      "key": "svelte-realtime:/api/admin",
+      "entries": [
+        "/api/admin/ai-chat/summarize-panel",
+        "/api/admin/cache-stats",
+        "/api/admin/pipeline/events",
+        "/api/admin/qlora",
+        "/api/admin/routes/stream",
+        "/api/admin/telemetry/batch"
+      ]
+    },
+    {
+      "key": "api-route:/api/cartridge",
+      "entries": [
+        "/api/cartridge/export",
+        "/api/cartridge/invalidate",
+        "/api/cartridge/search",
+        "/api/cartridge/stats",
+        "/api/cartridge/tile-atlas",
+        "/api/cartridge/timeline"
+      ]
+    },
+    {
+      "key": "svelte-realtime:/api/analytics",
+      "entries": [
+        "/api/analytics/file-activity",
+        "/api/analytics/generate-todos",
+        "/api/analytics/knowledge-triples/prune",
+        "/api/analytics/research-topics",
+        "/api/analytics/web-research"
+      ]
+    },
+    {
+      "key": "svelte-realtime:/api/cache",
+      "entries": [
+        "/api/cache/bifrost/check",
+        "/api/cache/metrics",
+        "/api/cache/stats",
+        "/api/cache/warm-up"
+      ]
+    },
+    {
+      "key": "api-route:/api/canon",
+      "entries": [
+        "/api/canon",
+        "/api/canon/chunks/[chunkId]",
+        "/api/canon/ingest",
+        "/api/canon/search"
+      ]
+    },
+    {
+      "key": "api-route:/api/chat",
+      "entries": [
+        "/api/chat",
+        "/api/chat/memory/search",
+        "/api/chat/memory/settings",
+        "/api/chat/migrate"
+      ]
+    },
+    {
+      "key": "api-route:/admin/phase78",
+      "entries": [
+        "/admin/phase78",
+        "/admin/phase78/monitor",
+        "/admin/phase78/patches"
+      ]
+    }
+  ],
+  "appConsolidationCandidates": [
+    {
+      "label": "api-route",
+      "entries": [
+        "/",
+        "/.well-known/llms-full.txt",
+        "/(analysis)@",
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/admin/api-testing/agentic-loop",
+        "/admin/api-testing/ast-topology",
+        "/admin/case-graph",
+        "/admin/codebase-graph",
+        "/admin/codebase-index/[fileId]",
+        "/admin/codebase-viewer",
+        "/admin/document-search",
+        "/admin/error-analysis",
+        "/admin/error-brain/runs",
+        "/admin/kag-notebook",
+        "/admin/library",
+        "/admin/phase78",
+        "/admin/phase78/monitor",
+        "/admin/phase78/patches",
+        "/admin/unified-indexing-studio",
+        "/ai-dashboard",
+        "/all-routes",
+        "/analytics",
+        "/api/ace/agent",
+        "/api/ace/context",
+        "/api/ace/error-kag",
+        "/api/ace/health",
+        "/api/ace/rank",
+        "/api/ace/recommendations",
+        "/api/ace/status",
+        "/api/acp/execute",
+        "/api/acp/tools",
+        "/api/admin/agent/fix",
+        "/api/admin/ai-chat",
+        "/api/admin/ai-chat/[sessionId]",
+        "/api/admin/ai-chat/sessions",
+        "/api/admin/ai-chat/subagent/launch",
+        "/api/admin/ai-chat/upload",
+        "/api/admin/audit",
+        "/api/admin/chat",
+        "/api/admin/citations/discover",
+        "/api/admin/diagnose",
+        "/api/admin/inference-lane",
+        "/api/admin/inference-stats",
+        "/api/admin/jobs",
+        "/api/admin/knowledge",
+        "/api/admin/legal-strategy",
+        "/api/admin/model/promote-weights",
+        "/api/admin/model/upload-weights",
+        "/api/admin/model/validate-checkpoint",
+        "/api/admin/observability",
+        "/api/admin/raptor-atlas",
+        "/api/admin/raptor/build",
+        "/api/admin/recommendations",
+        "/api/admin/repair",
+        "/api/admin/routes",
+        "/api/admin/seed-knowledge",
+        "/api/admin/topology/recompute",
+        "/api/admin/weights",
+        "/api/ai/analyze-evidence",
+        "/api/ai/ask",
+        "/api/ai/case-prediction",
+        "/api/ai/chat",
+        "/api/ai/context",
+        "/api/ai/contextual-chat",
+        "/api/ai/feedback",
+        "/api/ai/generate-image",
+        "/api/ai/hermes-plan",
+        "/api/ai/intent-dispatch",
+        "/api/ai/legal-research",
+        "/api/ai/models",
+        "/api/ai/personas",
+        "/api/ai/summarize",
+        "/api/ai/tensorrt",
+        "/api/ai/tensorrt/vlm",
+        "/api/ai/vector-search",
+        "/api/ai/yorha/context-chat",
+        "/api/analytics/codebase-research",
+        "/api/analytics/context-timeline",
+        "/api/analytics/deep-research",
+        "/api/analytics/events",
+        "/api/analytics/feedback",
+        "/api/analytics/focus",
+        "/api/analytics/health",
+        "/api/analytics/knowledge-triples",
+        "/api/analytics/mapreduce-matrix",
+        "/api/analytics/mirror-health",
+        "/api/analytics/panel-activity",
+        "/api/analytics/patterns",
+        "/api/analytics/prompt-leaderboard",
+        "/api/analytics/qlora-dataset",
+        "/api/analytics/research-graph",
+        "/api/analytics/research-index",
+        "/api/analytics/research-summaries",
+        "/api/analytics/research-summaries/[id]",
+        "/api/analytics/rl-signal",
+        "/api/analytics/search",
+        "/api/analytics/search-patterns",
+        "/api/analytics/similar-queries",
+        "/api/analytics/summary",
+        "/api/analytics/token-usage",
+        "/api/analytics/unified-research",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/audio/analysis/[evidenceId]",
+        "/api/audio/search",
+        "/api/audit/gpu",
+        "/api/audit/planner",
+        "/api/auth/debug",
+        "/api/auth/demo-login",
+        "/api/auth/health",
+        "/api/auth/login",
+        "/api/auth/logout",
+        "/api/auth/me",
+        "/api/auth/profile",
+        "/api/auth/register",
+        "/api/auth/reset-password",
+        "/api/auth/session",
+        "/api/browser-context/snapshot",
+        "/api/cache",
+        "/api/cache/bifrost/store",
+        "/api/cache/exact-match/stats",
+        "/api/cache/invalidate",
+        "/api/cache/llm/clean",
+        "/api/cache/llm/stats",
+        "/api/cache/nintendo",
+        "/api/cache/recent-queries",
+        "/api/cache/set",
+        "/api/cache/som",
+        "/api/canon",
+        "/api/canon/chunks/[chunkId]",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cartridge/export",
+        "/api/cartridge/invalidate",
+        "/api/cartridge/search",
+        "/api/cartridge/stats",
+        "/api/cartridge/tile-atlas",
+        "/api/cartridge/timeline",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/authorities",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/related",
+        "/api/cases/[id]/timeline",
+        "/api/cases/analytics",
+        "/api/cases/cluster",
+        "/api/charges/add",
+        "/api/chat",
+        "/api/chat/memory/search",
+        "/api/chat/memory/settings",
+        "/api/chat/migrate",
+        "/api/chrrom/precompute",
+        "/api/citations",
+        "/api/citations/[citationId]/tags"
+      ]
+    },
+    {
+      "label": "svelte-realtime",
+      "entries": [
+        "/",
+        "/.well-known/agent.json",
+        "/.well-known/llms.txt",
+        "/acp",
+        "/active-cases",
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/all-routes",
+        "/admin/api-testing/agentic-events",
+        "/admin/ast-topology",
+        "/admin/cache",
+        "/admin/codebase-index",
+        "/admin/component-analysis",
+        "/admin/dev-tools",
+        "/admin/error-brain",
+        "/admin/explorer",
+        "/admin/face-gallery",
+        "/admin/gpu-evidence-graph",
+        "/admin/knowledge-base",
+        "/admin/knowledge-search",
+        "/admin/phase78/routes/[routePath]",
+        "/admin/phase89",
+        "/admin/qlora-training",
+        "/admin/search-intelligence",
+        "/admin/topology",
+        "/analysis-center",
+        "/api/ace/ingest",
+        "/api/ace/summarize",
+        "/api/admin/ai-chat/summarize-panel",
+        "/api/admin/cache-stats",
+        "/api/admin/pipeline/events",
+        "/api/admin/qlora",
+        "/api/admin/routes/stream",
+        "/api/admin/telemetry/batch",
+        "/api/agent/investigate",
+        "/api/agents/chat",
+        "/api/ai/agent",
+        "/api/ai/agent/batch",
+        "/api/ai/analyze/[scope]",
+        "/api/ai/case-scoring",
+        "/api/ai/chat-direct",
+        "/api/ai/chat/stream",
+        "/api/ai/cross-exam",
+        "/api/ai/generate-report/[scope]",
+        "/api/ai/hermes-run",
+        "/api/ai/judge",
+        "/api/ai/memo-skeleton",
+        "/api/ai/route-intent",
+        "/api/ai/stats",
+        "/api/ai/suggestions",
+        "/api/ai/tensorrt/stream",
+        "/api/analysis/page-context",
+        "/api/analytics/file-activity",
+        "/api/analytics/generate-todos",
+        "/api/analytics/knowledge-triples/prune",
+        "/api/analytics/research-topics",
+        "/api/analytics/web-research",
+        "/api/audio/progress/[evidenceId]",
+        "/api/audio/upload",
+        "/api/cache/bifrost/check",
+        "/api/cache/metrics",
+        "/api/cache/stats",
+        "/api/cache/warm-up",
+        "/api/case-theory",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/similar",
+        "/api/chat/memory/backfill",
+        "/api/chat/replay",
+        "/api/chat/stream",
+        "/api/chrrom/events",
+        "/api/chrrom/push"
+      ]
+    },
+    {
+      "label": "svelte-inspector",
+      "entries": [
+        "/admin",
+        "/admin/ai-dashboard",
+        "/admin/chat-memory",
+        "/admin/memory-inspector"
+      ]
+    },
+    {
+      "label": "ui-component",
+      "entries": [
+        "/.well-known/appspecific/com.chrome.devtools.json",
+        "/admin/dev-tools/component-showcase",
+        "/admin/observability"
+      ]
+    }
+  ],
+  "dependencyChainTargets": [
+    {
+      "target": "./$types",
+      "routes": [
+        "/",
+        "/.well-known/agent.json",
+        "/.well-known/appspecific/com.chrome.devtools.json",
+        "/.well-known/llms-full.txt",
+        "/.well-known/llms.txt",
+        "/(analysis)@",
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/active-cases",
+        "/admin/ai-dashboard",
+        "/admin/all-routes",
+        "/admin/api-testing/agentic-events",
+        "/admin/api-testing/agentic-loop",
+        "/admin/api-testing/ast-topology",
+        "/admin/ast-topology",
+        "/admin/cache",
+        "/admin/chat-memory",
+        "/admin/codebase-index",
+        "/admin/codebase-index/[fileId]",
+        "/admin/codebase-viewer",
+        "/admin/component-analysis",
+        "/admin/dev-tools",
+        "/admin/document-search",
+        "/admin/error-analysis",
+        "/admin/error-brain",
+        "/admin/gpu-evidence-graph",
+        "/admin/kag-notebook",
+        "/admin/knowledge-base",
+        "/admin/knowledge-search",
+        "/admin/memory-inspector",
+        "/admin/phase89",
+        "/admin/qlora-training",
+        "/admin/search-intelligence",
+        "/admin/unified-indexing-studio",
+        "/analysis-center",
+        "/analytics",
+        "/api/ace/agent",
+        "/api/ace/context",
+        "/api/ace/error-kag",
+        "/api/ace/health",
+        "/api/ace/ingest",
+        "/api/ace/rank",
+        "/api/ace/recommendations",
+        "/api/ace/status",
+        "/api/ace/summarize",
+        "/api/admin/agent/fix",
+        "/api/admin/audit",
+        "/api/admin/cache-stats",
+        "/api/admin/chat",
+        "/api/admin/citations/discover",
+        "/api/admin/diagnose",
+        "/api/admin/inference-lane",
+        "/api/admin/inference-stats",
+        "/api/admin/jobs",
+        "/api/admin/knowledge",
+        "/api/admin/legal-strategy",
+        "/api/admin/model/promote-weights",
+        "/api/admin/model/validate-checkpoint",
+        "/api/admin/observability",
+        "/api/admin/pipeline/events",
+        "/api/admin/qlora",
+        "/api/admin/raptor-atlas",
+        "/api/admin/raptor/build",
+        "/api/admin/recommendations",
+        "/api/admin/repair",
+        "/api/admin/routes",
+        "/api/admin/routes/stream",
+        "/api/admin/seed-knowledge",
+        "/api/admin/telemetry/batch",
+        "/api/admin/weights",
+        "/api/agent/investigate",
+        "/api/agents/chat",
+        "/api/ai/agent",
+        "/api/ai/agent/batch",
+        "/api/ai/analyze-evidence",
+        "/api/ai/analyze/[scope]",
+        "/api/ai/ask",
+        "/api/ai/case-prediction",
+        "/api/ai/case-scoring",
+        "/api/ai/chat",
+        "/api/ai/chat-direct",
+        "/api/ai/chat/stream",
+        "/api/ai/context",
+        "/api/ai/contextual-chat",
+        "/api/ai/cross-exam",
+        "/api/ai/feedback",
+        "/api/ai/generate-image",
+        "/api/ai/generate-report/[scope]",
+        "/api/ai/hermes-plan",
+        "/api/ai/hermes-run",
+        "/api/ai/intent-dispatch",
+        "/api/ai/judge",
+        "/api/ai/legal-research",
+        "/api/ai/memo-skeleton",
+        "/api/ai/models",
+        "/api/ai/personas",
+        "/api/ai/route-intent",
+        "/api/ai/stats",
+        "/api/ai/suggestions",
+        "/api/ai/summarize",
+        "/api/ai/tensorrt",
+        "/api/ai/tensorrt/stream",
+        "/api/ai/vector-search",
+        "/api/ai/yorha/context-chat",
+        "/api/analysis/page-context",
+        "/api/analytics/codebase-research",
+        "/api/analytics/context-timeline",
+        "/api/analytics/deep-research",
+        "/api/analytics/events",
+        "/api/analytics/feedback",
+        "/api/analytics/generate-todos",
+        "/api/analytics/health",
+        "/api/analytics/knowledge-triples",
+        "/api/analytics/knowledge-triples/prune",
+        "/api/analytics/mapreduce-matrix",
+        "/api/analytics/mirror-health",
+        "/api/analytics/panel-activity",
+        "/api/analytics/patterns",
+        "/api/analytics/prompt-leaderboard",
+        "/api/analytics/qlora-dataset",
+        "/api/analytics/research-graph",
+        "/api/analytics/research-index",
+        "/api/analytics/research-summaries",
+        "/api/analytics/research-summaries/[id]",
+        "/api/analytics/research-topics",
+        "/api/analytics/rl-signal",
+        "/api/analytics/search",
+        "/api/analytics/search-patterns",
+        "/api/analytics/similar-queries",
+        "/api/analytics/summary",
+        "/api/analytics/token-usage",
+        "/api/analytics/unified-research",
+        "/api/analytics/web-research",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/audio/analysis/[evidenceId]",
+        "/api/audio/progress/[evidenceId]",
+        "/api/audio/search",
+        "/api/audio/upload",
+        "/api/audit/gpu",
+        "/api/audit/planner",
+        "/api/auth/demo-login",
+        "/api/auth/login",
+        "/api/auth/logout",
+        "/api/auth/me",
+        "/api/auth/profile",
+        "/api/auth/register",
+        "/api/auth/reset-password",
+        "/api/auth/session",
+        "/api/cache",
+        "/api/cache/bifrost/check",
+        "/api/cache/bifrost/store",
+        "/api/cache/exact-match/stats",
+        "/api/cache/invalidate",
+        "/api/cache/llm/clean",
+        "/api/cache/llm/stats",
+        "/api/cache/metrics",
+        "/api/cache/nintendo",
+        "/api/cache/recent-queries",
+        "/api/cache/set",
+        "/api/cache/som",
+        "/api/cache/stats",
+        "/api/cache/warm-up",
+        "/api/canon",
+        "/api/canon/chunks/[chunkId]",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cartridge/export",
+        "/api/cartridge/invalidate",
+        "/api/cartridge/search",
+        "/api/cartridge/stats",
+        "/api/cartridge/tile-atlas",
+        "/api/cartridge/timeline",
+        "/api/case-theory",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/authorities",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/related",
+        "/api/cases/[id]/similar",
+        "/api/cases/analytics",
+        "/api/cases/cluster",
+        "/api/charges/add",
+        "/api/chat",
+        "/api/chat/memory/backfill",
+        "/api/chat/memory/search",
+        "/api/chat/memory/settings",
+        "/api/chat/migrate",
+        "/api/chat/replay",
+        "/api/chat/stream",
+        "/api/chrrom/events",
+        "/api/chrrom/precompute",
+        "/api/chrrom/push",
+        "/api/citations",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 211
+    },
+    {
+      "target": "$lib/server/db/client",
+      "routes": [
+        "/",
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/active-cases",
+        "/admin/gpu-evidence-graph",
+        "/admin/phase89",
+        "/analysis-center",
+        "/api/ace/health",
+        "/api/ace/ingest",
+        "/api/admin/audit",
+        "/api/admin/chat",
+        "/api/admin/citations/discover",
+        "/api/admin/inference-stats",
+        "/api/admin/jobs",
+        "/api/admin/model/promote-weights",
+        "/api/admin/observability",
+        "/api/admin/qlora",
+        "/api/admin/raptor-atlas",
+        "/api/admin/raptor/build",
+        "/api/admin/recommendations",
+        "/api/admin/routes",
+        "/api/admin/routes/stream",
+        "/api/admin/seed-knowledge",
+        "/api/admin/telemetry/batch",
+        "/api/ai/case-prediction",
+        "/api/ai/case-scoring",
+        "/api/ai/context",
+        "/api/ai/contextual-chat",
+        "/api/ai/feedback",
+        "/api/ai/intent-dispatch",
+        "/api/ai/stats",
+        "/api/ai/yorha/context-chat",
+        "/api/analysis/page-context",
+        "/api/analytics/context-timeline",
+        "/api/analytics/events",
+        "/api/analytics/feedback",
+        "/api/analytics/generate-todos",
+        "/api/analytics/knowledge-triples",
+        "/api/analytics/knowledge-triples/prune",
+        "/api/analytics/mirror-health",
+        "/api/analytics/panel-activity",
+        "/api/analytics/qlora-dataset",
+        "/api/analytics/research-summaries",
+        "/api/analytics/research-summaries/[id]",
+        "/api/analytics/rl-signal",
+        "/api/analytics/search-patterns",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/audio/analysis/[evidenceId]",
+        "/api/audio/search",
+        "/api/audio/upload",
+        "/api/auth/demo-login",
+        "/api/auth/health",
+        "/api/auth/login",
+        "/api/auth/profile",
+        "/api/auth/register",
+        "/api/auth/reset-password",
+        "/api/canon",
+        "/api/canon/chunks/[chunkId]",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/authorities",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/similar",
+        "/api/cases/[id]/timeline",
+        "/api/cases/analytics",
+        "/api/charges/add",
+        "/api/chat/memory/backfill",
+        "/api/chat/memory/search",
+        "/api/chat/migrate",
+        "/api/chat/stream",
+        "/api/citations",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 92
+    },
+    {
+      "target": "$lib/server/env.server.js",
+      "routes": [
+        "/admin/document-search",
+        "/admin/phase89",
+        "/admin/unified-indexing-studio",
+        "/api/ace/context",
+        "/api/ace/health",
+        "/api/ace/ingest",
+        "/api/ace/summarize",
+        "/api/admin/agent/fix",
+        "/api/admin/ai-chat",
+        "/api/admin/ai-chat/[sessionId]",
+        "/api/admin/ai-chat/sessions",
+        "/api/admin/ai-chat/subagent/launch",
+        "/api/admin/ai-chat/summarize-panel",
+        "/api/admin/ai-chat/upload",
+        "/api/admin/chat",
+        "/api/admin/citations/discover",
+        "/api/admin/diagnose",
+        "/api/admin/inference-lane",
+        "/api/admin/inference-stats",
+        "/api/admin/jobs",
+        "/api/admin/knowledge",
+        "/api/admin/legal-strategy",
+        "/api/admin/model/promote-weights",
+        "/api/admin/model/upload-weights",
+        "/api/admin/observability",
+        "/api/admin/qlora",
+        "/api/admin/raptor-atlas",
+        "/api/admin/raptor/build",
+        "/api/admin/recommendations",
+        "/api/admin/repair",
+        "/api/admin/routes",
+        "/api/admin/seed-knowledge",
+        "/api/admin/topology/recompute",
+        "/api/agents/chat",
+        "/api/ai/agent",
+        "/api/ai/analyze-evidence",
+        "/api/ai/analyze/[scope]",
+        "/api/ai/ask",
+        "/api/ai/case-prediction",
+        "/api/ai/chat-direct",
+        "/api/ai/context",
+        "/api/ai/cross-exam",
+        "/api/ai/generate-image",
+        "/api/ai/generate-report/[scope]",
+        "/api/ai/judge",
+        "/api/ai/legal-research",
+        "/api/ai/memo-skeleton",
+        "/api/ai/models",
+        "/api/ai/route-intent",
+        "/api/ai/stats",
+        "/api/ai/summarize",
+        "/api/ai/tensorrt",
+        "/api/ai/tensorrt/stream",
+        "/api/ai/tensorrt/vlm",
+        "/api/ai/yorha/context-chat",
+        "/api/analytics/health",
+        "/api/analytics/research-topics",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/audio/search",
+        "/api/cache/bifrost/check",
+        "/api/cache/bifrost/store",
+        "/api/cache/stats",
+        "/api/cartridge/export",
+        "/api/cartridge/search",
+        "/api/cartridge/tile-atlas",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/similar",
+        "/api/cases/cluster",
+        "/api/chat",
+        "/api/chat/memory/backfill",
+        "/api/chat/memory/search"
+      ],
+      "count": 72
+    },
+    {
+      "target": "$lib/server/middleware/cache-headers.js",
+      "routes": [
+        "/api/ace/status",
+        "/api/acp/tools",
+        "/api/admin/audit",
+        "/api/admin/knowledge",
+        "/api/admin/routes",
+        "/api/ai/models",
+        "/api/ai/personas",
+        "/api/ai/stats",
+        "/api/ai/suggestions",
+        "/api/analytics/events",
+        "/api/analytics/patterns",
+        "/api/analytics/similar-queries",
+        "/api/analytics/summary",
+        "/api/analytics/token-usage",
+        "/api/audit/gpu",
+        "/api/audit/planner",
+        "/api/auth/me",
+        "/api/auth/session",
+        "/api/cache",
+        "/api/cache/exact-match/stats",
+        "/api/cache/metrics",
+        "/api/cache/stats",
+        "/api/canon",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/authorities",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/similar",
+        "/api/cases/[id]/timeline",
+        "/api/cases/analytics",
+        "/api/citations",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 44
+    },
+    {
+      "target": "$lib/server/db/schema-postgres.js",
+      "routes": [
+        "/admin/gpu-evidence-graph",
+        "/analysis-center",
+        "/api/ace/ingest",
+        "/api/admin/seed-knowledge",
+        "/api/ai/context",
+        "/api/ai/contextual-chat",
+        "/api/analysis/page-context",
+        "/api/analytics/context-timeline",
+        "/api/analytics/panel-activity",
+        "/api/analytics/research-summaries",
+        "/api/analytics/research-summaries/[id]",
+        "/api/analytics/rl-signal",
+        "/api/auth/profile",
+        "/api/canon",
+        "/api/canon/chunks/[chunkId]",
+        "/api/canon/ingest",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/similar",
+        "/api/cases/[id]/timeline",
+        "/api/cases/analytics",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 30
+    },
+    {
+      "target": "$lib/server/ollama.js",
+      "routes": [
+        "/admin/phase89",
+        "/api/ace/summarize",
+        "/api/admin/agent/fix",
+        "/api/admin/model/validate-checkpoint",
+        "/api/admin/qlora",
+        "/api/admin/seed-knowledge",
+        "/api/agents/chat",
+        "/api/ai/analyze-evidence",
+        "/api/ai/analyze/[scope]",
+        "/api/ai/ask",
+        "/api/ai/case-prediction",
+        "/api/ai/cross-exam",
+        "/api/ai/generate-image",
+        "/api/ai/generate-report/[scope]",
+        "/api/ai/judge",
+        "/api/ai/legal-research",
+        "/api/ai/memo-skeleton",
+        "/api/ai/route-intent",
+        "/api/ai/summarize",
+        "/api/ai/tensorrt/vlm",
+        "/api/ai/yorha/context-chat",
+        "/api/analytics/deep-research",
+        "/api/analytics/generate-todos",
+        "/api/analytics/health",
+        "/api/analytics/research-topics",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/similar",
+        "/api/chat"
+      ],
+      "count": 30
+    },
+    {
+      "target": "$lib/server/redis.js",
+      "routes": [
+        "/.well-known/llms-full.txt",
+        "/.well-known/llms.txt",
+        "/admin/unified-indexing-studio",
+        "/api/ace/health",
+        "/api/admin/cache-stats",
+        "/api/admin/model/validate-checkpoint",
+        "/api/admin/observability",
+        "/api/admin/pipeline/events",
+        "/api/admin/qlora",
+        "/api/admin/weights",
+        "/api/ai/agent",
+        "/api/analytics/focus",
+        "/api/analytics/health",
+        "/api/analytics/prompt-leaderboard",
+        "/api/analytics/research-graph",
+        "/api/analytics/research-topics",
+        "/api/analytics/web-research",
+        "/api/cache",
+        "/api/cache/invalidate",
+        "/api/cache/metrics",
+        "/api/cache/nintendo",
+        "/api/cache/recent-queries",
+        "/api/cache/set",
+        "/api/cache/som",
+        "/api/cache/stats",
+        "/api/cartridge/export",
+        "/api/chat/memory/settings",
+        "/api/chat/migrate"
+      ],
+      "count": 28
+    },
+    {
+      "target": "$lib/server/validation.js",
+      "routes": [
+        "/api/canon/chunks/[chunkId]",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/related",
+        "/api/cases/[id]/similar",
+        "/api/cases/[id]/timeline",
+        "/api/chat/stream",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 21
+    },
+    {
+      "target": "$lib/server/db/schema",
+      "routes": [
+        "/",
+        "/active-cases",
+        "/api/ai/case-prediction",
+        "/api/ai/case-scoring",
+        "/api/ai/feedback",
+        "/api/auth/demo-login",
+        "/api/auth/health",
+        "/api/auth/login",
+        "/api/auth/register",
+        "/api/cases/[id]",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/chat/migrate",
+        "/api/chat/stream"
+      ],
+      "count": 19
+    },
+    {
+      "target": "$lib/components/ui/Icon.svelte",
+      "routes": [
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/active-cases",
+        "/admin",
+        "/admin/ai-dashboard",
+        "/admin/all-routes",
+        "/admin/cache",
+        "/admin/case-graph",
+        "/admin/codebase-graph",
+        "/admin/dev-tools",
+        "/admin/dev-tools/component-showcase",
+        "/admin/face-gallery",
+        "/admin/library",
+        "/admin/observability",
+        "/admin/qlora-training",
+        "/admin/search-intelligence",
+        "/analysis-center",
+        "/analytics"
+      ],
+      "count": 19
+    },
+    {
+      "target": "./$types.js",
+      "routes": [
+        "/",
+        "/admin/knowledge-base",
+        "/admin/phase78",
+        "/admin/phase78/monitor",
+        "/admin/phase78/routes/[routePath]",
+        "/ai-dashboard",
+        "/all-routes",
+        "/analysis-center",
+        "/api/acp/execute",
+        "/api/acp/tools",
+        "/api/admin/ai-chat/summarize-panel",
+        "/api/analytics/focus",
+        "/api/auth/debug",
+        "/api/auth/health",
+        "/api/browser-context/snapshot",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/timeline"
+      ],
+      "count": 17
+    },
+    {
+      "target": "$lib/server/grpc/embedding-client.js",
+      "routes": [
+        "/admin/document-search",
+        "/api/ace/context",
+        "/api/ace/ingest",
+        "/api/ace/rank",
+        "/api/agents/chat",
+        "/api/ai/context",
+        "/api/analytics/similar-queries",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cases/[id]/similar"
+      ],
+      "count": 10
+    },
+    {
+      "target": "$lib/server/vector/qdrant-manager.js",
+      "routes": [
+        "/api/ace/ingest",
+        "/api/agents/chat",
+        "/api/analytics/mirror-health",
+        "/api/analytics/similar-queries",
+        "/api/cache/llm/stats",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cases/[id]/similar",
+        "/api/cases/cluster"
+      ],
+      "count": 9
+    },
+    {
+      "target": "$lib/components/ui/Button.svelte",
+      "routes": [
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/codebase-graph",
+        "/admin/error-analysis",
+        "/admin/error-brain",
+        "/admin/error-brain/runs",
+        "/admin/face-gallery",
+        "/admin/qlora-training"
+      ],
+      "count": 8
+    },
+    {
+      "target": "$lib/server/analytics/search-analytics.js",
+      "routes": [
+        "/api/agents/chat",
+        "/api/ai/agent",
+        "/api/ai/contextual-chat",
+        "/api/ai/legal-research",
+        "/api/analytics/search-patterns",
+        "/api/audio/search",
+        "/api/canon/search",
+        "/api/cartridge/search"
+      ],
+      "count": 8
+    },
+    {
+      "target": "$lib/config/env.server.js",
+      "routes": [
+        "/admin/api-testing/ast-topology",
+        "/admin/ast-topology",
+        "/admin/codebase-viewer",
+        "/admin/dev-tools",
+        "/admin/error-analysis",
+        "/analysis-center"
+      ],
+      "count": 6
+    },
+    {
+      "target": "$lib/server/db/schema-postgres",
+      "routes": [
+        "/api/admin/raptor/build",
+        "/api/ai/intent-dispatch",
+        "/api/audio/search",
+        "/api/audio/upload",
+        "/api/auth/reset-password",
+        "/api/cases/[id]/chat"
+      ],
+      "count": 6
+    },
+    {
+      "target": "$lib/server/lucia",
+      "routes": [
+        "/api/auth/demo-login",
+        "/api/auth/health",
+        "/api/auth/login",
+        "/api/auth/logout",
+        "/api/auth/register",
+        "/api/auth/session"
+      ],
+      "count": 6
+    },
+    {
+      "target": "$lib/stores/notifications.svelte",
+      "routes": [
+        "/",
+        "/admin/cache",
+        "/admin/dev-tools",
+        "/admin/explorer",
+        "/admin/phase78/patches"
+      ],
+      "count": 5
+    },
+    {
+      "target": "$lib/server/analytics/event-logger.js",
+      "routes": [
+        "/analytics",
+        "/api/admin/pipeline/events",
+        "/api/analytics/events",
+        "/api/analytics/patterns",
+        "/api/analytics/summary"
+      ],
+      "count": 5
+    },
+    {
+      "target": "$lib/server/inference/gpu-arbiter.js",
+      "routes": [
+        "/api/ai/tensorrt",
+        "/api/ai/tensorrt/stream",
+        "/api/ai/tensorrt/vlm",
+        "/api/chat",
+        "/api/chat/stream"
+      ],
+      "count": 5
+    },
+    {
+      "target": "$lib/server/auth-helpers.js",
+      "routes": [
+        "/api/case-theory",
+        "/api/cases",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/analytics",
+        "/api/cases/cluster"
+      ],
+      "count": 5
+    },
+    {
+      "target": "$lib/components/ui/card/Card.svelte",
+      "routes": [
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/error-brain",
+        "/admin/error-brain/runs"
+      ],
+      "count": 4
+    },
+    {
+      "target": "$lib/components/ui/card/CardContent.svelte",
+      "routes": [
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/error-brain",
+        "/admin/error-brain/runs"
+      ],
+      "count": 4
+    },
+    {
+      "target": "$lib/server/graph/pg-neo4j-sync.js",
+      "routes": [
+        "/api/ace/ingest",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/authorities"
+      ],
+      "count": 4
+    }
+  ],
+  "staticDependencyChains": [
+    {
+      "target": "./$types",
+      "routes": [
+        "/",
+        "/.well-known/agent.json",
+        "/.well-known/appspecific/com.chrome.devtools.json",
+        "/.well-known/llms-full.txt",
+        "/.well-known/llms.txt",
+        "/(analysis)@",
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/active-cases",
+        "/admin/ai-dashboard",
+        "/admin/all-routes",
+        "/admin/api-testing/agentic-events",
+        "/admin/api-testing/agentic-loop",
+        "/admin/api-testing/ast-topology",
+        "/admin/ast-topology",
+        "/admin/cache",
+        "/admin/chat-memory",
+        "/admin/codebase-index",
+        "/admin/codebase-index/[fileId]",
+        "/admin/codebase-viewer",
+        "/admin/component-analysis",
+        "/admin/dev-tools",
+        "/admin/document-search",
+        "/admin/error-analysis",
+        "/admin/error-brain",
+        "/admin/gpu-evidence-graph",
+        "/admin/kag-notebook",
+        "/admin/knowledge-base",
+        "/admin/knowledge-search",
+        "/admin/memory-inspector",
+        "/admin/phase89",
+        "/admin/qlora-training",
+        "/admin/search-intelligence",
+        "/admin/unified-indexing-studio",
+        "/analysis-center",
+        "/analytics",
+        "/api/ace/agent",
+        "/api/ace/context",
+        "/api/ace/error-kag",
+        "/api/ace/health",
+        "/api/ace/ingest",
+        "/api/ace/rank",
+        "/api/ace/recommendations",
+        "/api/ace/status",
+        "/api/ace/summarize",
+        "/api/admin/agent/fix",
+        "/api/admin/audit",
+        "/api/admin/cache-stats",
+        "/api/admin/chat",
+        "/api/admin/citations/discover",
+        "/api/admin/diagnose",
+        "/api/admin/inference-lane",
+        "/api/admin/inference-stats",
+        "/api/admin/jobs",
+        "/api/admin/knowledge",
+        "/api/admin/legal-strategy",
+        "/api/admin/model/promote-weights",
+        "/api/admin/model/validate-checkpoint",
+        "/api/admin/observability",
+        "/api/admin/pipeline/events",
+        "/api/admin/qlora",
+        "/api/admin/raptor-atlas",
+        "/api/admin/raptor/build",
+        "/api/admin/recommendations",
+        "/api/admin/repair",
+        "/api/admin/routes",
+        "/api/admin/routes/stream",
+        "/api/admin/seed-knowledge",
+        "/api/admin/telemetry/batch",
+        "/api/admin/weights",
+        "/api/agent/investigate",
+        "/api/agents/chat",
+        "/api/ai/agent",
+        "/api/ai/agent/batch",
+        "/api/ai/analyze-evidence",
+        "/api/ai/analyze/[scope]",
+        "/api/ai/ask",
+        "/api/ai/case-prediction",
+        "/api/ai/case-scoring",
+        "/api/ai/chat",
+        "/api/ai/chat-direct",
+        "/api/ai/chat/stream",
+        "/api/ai/context",
+        "/api/ai/contextual-chat",
+        "/api/ai/cross-exam",
+        "/api/ai/feedback",
+        "/api/ai/generate-image",
+        "/api/ai/generate-report/[scope]",
+        "/api/ai/hermes-plan",
+        "/api/ai/hermes-run",
+        "/api/ai/intent-dispatch",
+        "/api/ai/judge",
+        "/api/ai/legal-research",
+        "/api/ai/memo-skeleton",
+        "/api/ai/models",
+        "/api/ai/personas",
+        "/api/ai/route-intent",
+        "/api/ai/stats",
+        "/api/ai/suggestions",
+        "/api/ai/summarize",
+        "/api/ai/tensorrt",
+        "/api/ai/tensorrt/stream",
+        "/api/ai/vector-search",
+        "/api/ai/yorha/context-chat",
+        "/api/analysis/page-context",
+        "/api/analytics/codebase-research",
+        "/api/analytics/context-timeline",
+        "/api/analytics/deep-research",
+        "/api/analytics/events",
+        "/api/analytics/feedback",
+        "/api/analytics/generate-todos",
+        "/api/analytics/health",
+        "/api/analytics/knowledge-triples",
+        "/api/analytics/knowledge-triples/prune",
+        "/api/analytics/mapreduce-matrix",
+        "/api/analytics/mirror-health",
+        "/api/analytics/panel-activity",
+        "/api/analytics/patterns",
+        "/api/analytics/prompt-leaderboard",
+        "/api/analytics/qlora-dataset",
+        "/api/analytics/research-graph",
+        "/api/analytics/research-index",
+        "/api/analytics/research-summaries",
+        "/api/analytics/research-summaries/[id]",
+        "/api/analytics/research-topics",
+        "/api/analytics/rl-signal",
+        "/api/analytics/search",
+        "/api/analytics/search-patterns",
+        "/api/analytics/similar-queries",
+        "/api/analytics/summary",
+        "/api/analytics/token-usage",
+        "/api/analytics/unified-research",
+        "/api/analytics/web-research",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/audio/analysis/[evidenceId]",
+        "/api/audio/progress/[evidenceId]",
+        "/api/audio/search",
+        "/api/audio/upload",
+        "/api/audit/gpu",
+        "/api/audit/planner",
+        "/api/auth/demo-login",
+        "/api/auth/login",
+        "/api/auth/logout",
+        "/api/auth/me",
+        "/api/auth/profile",
+        "/api/auth/register",
+        "/api/auth/reset-password",
+        "/api/auth/session",
+        "/api/cache",
+        "/api/cache/bifrost/check",
+        "/api/cache/bifrost/store",
+        "/api/cache/exact-match/stats",
+        "/api/cache/invalidate",
+        "/api/cache/llm/clean",
+        "/api/cache/llm/stats",
+        "/api/cache/metrics",
+        "/api/cache/nintendo",
+        "/api/cache/recent-queries",
+        "/api/cache/set",
+        "/api/cache/som",
+        "/api/cache/stats",
+        "/api/cache/warm-up",
+        "/api/canon",
+        "/api/canon/chunks/[chunkId]",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cartridge/export",
+        "/api/cartridge/invalidate",
+        "/api/cartridge/search",
+        "/api/cartridge/stats",
+        "/api/cartridge/tile-atlas",
+        "/api/cartridge/timeline",
+        "/api/case-theory",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/authorities",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/related",
+        "/api/cases/[id]/similar",
+        "/api/cases/analytics",
+        "/api/cases/cluster",
+        "/api/charges/add",
+        "/api/chat",
+        "/api/chat/memory/backfill",
+        "/api/chat/memory/search",
+        "/api/chat/memory/settings",
+        "/api/chat/migrate",
+        "/api/chat/replay",
+        "/api/chat/stream",
+        "/api/chrrom/events",
+        "/api/chrrom/precompute",
+        "/api/chrrom/push",
+        "/api/citations",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 211,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/db/client",
+      "routes": [
+        "/",
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/active-cases",
+        "/admin/gpu-evidence-graph",
+        "/admin/phase89",
+        "/analysis-center",
+        "/api/ace/health",
+        "/api/ace/ingest",
+        "/api/admin/audit",
+        "/api/admin/chat",
+        "/api/admin/citations/discover",
+        "/api/admin/inference-stats",
+        "/api/admin/jobs",
+        "/api/admin/model/promote-weights",
+        "/api/admin/observability",
+        "/api/admin/qlora",
+        "/api/admin/raptor-atlas",
+        "/api/admin/raptor/build",
+        "/api/admin/recommendations",
+        "/api/admin/routes",
+        "/api/admin/routes/stream",
+        "/api/admin/seed-knowledge",
+        "/api/admin/telemetry/batch",
+        "/api/ai/case-prediction",
+        "/api/ai/case-scoring",
+        "/api/ai/context",
+        "/api/ai/contextual-chat",
+        "/api/ai/feedback",
+        "/api/ai/intent-dispatch",
+        "/api/ai/stats",
+        "/api/ai/yorha/context-chat",
+        "/api/analysis/page-context",
+        "/api/analytics/context-timeline",
+        "/api/analytics/events",
+        "/api/analytics/feedback",
+        "/api/analytics/generate-todos",
+        "/api/analytics/knowledge-triples",
+        "/api/analytics/knowledge-triples/prune",
+        "/api/analytics/mirror-health",
+        "/api/analytics/panel-activity",
+        "/api/analytics/qlora-dataset",
+        "/api/analytics/research-summaries",
+        "/api/analytics/research-summaries/[id]",
+        "/api/analytics/rl-signal",
+        "/api/analytics/search-patterns",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/audio/analysis/[evidenceId]",
+        "/api/audio/search",
+        "/api/audio/upload",
+        "/api/auth/demo-login",
+        "/api/auth/health",
+        "/api/auth/login",
+        "/api/auth/profile",
+        "/api/auth/register",
+        "/api/auth/reset-password",
+        "/api/canon",
+        "/api/canon/chunks/[chunkId]",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/authorities",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/similar",
+        "/api/cases/[id]/timeline",
+        "/api/cases/analytics",
+        "/api/charges/add",
+        "/api/chat/memory/backfill",
+        "/api/chat/memory/search",
+        "/api/chat/migrate",
+        "/api/chat/stream",
+        "/api/citations",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 92,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/env.server.js",
+      "routes": [
+        "/admin/document-search",
+        "/admin/phase89",
+        "/admin/unified-indexing-studio",
+        "/api/ace/context",
+        "/api/ace/health",
+        "/api/ace/ingest",
+        "/api/ace/summarize",
+        "/api/admin/agent/fix",
+        "/api/admin/ai-chat",
+        "/api/admin/ai-chat/[sessionId]",
+        "/api/admin/ai-chat/sessions",
+        "/api/admin/ai-chat/subagent/launch",
+        "/api/admin/ai-chat/summarize-panel",
+        "/api/admin/ai-chat/upload",
+        "/api/admin/chat",
+        "/api/admin/citations/discover",
+        "/api/admin/diagnose",
+        "/api/admin/inference-lane",
+        "/api/admin/inference-stats",
+        "/api/admin/jobs",
+        "/api/admin/knowledge",
+        "/api/admin/legal-strategy",
+        "/api/admin/model/promote-weights",
+        "/api/admin/model/upload-weights",
+        "/api/admin/observability",
+        "/api/admin/qlora",
+        "/api/admin/raptor-atlas",
+        "/api/admin/raptor/build",
+        "/api/admin/recommendations",
+        "/api/admin/repair",
+        "/api/admin/routes",
+        "/api/admin/seed-knowledge",
+        "/api/admin/topology/recompute",
+        "/api/agents/chat",
+        "/api/ai/agent",
+        "/api/ai/analyze-evidence",
+        "/api/ai/analyze/[scope]",
+        "/api/ai/ask",
+        "/api/ai/case-prediction",
+        "/api/ai/chat-direct",
+        "/api/ai/context",
+        "/api/ai/cross-exam",
+        "/api/ai/generate-image",
+        "/api/ai/generate-report/[scope]",
+        "/api/ai/judge",
+        "/api/ai/legal-research",
+        "/api/ai/memo-skeleton",
+        "/api/ai/models",
+        "/api/ai/route-intent",
+        "/api/ai/stats",
+        "/api/ai/summarize",
+        "/api/ai/tensorrt",
+        "/api/ai/tensorrt/stream",
+        "/api/ai/tensorrt/vlm",
+        "/api/ai/yorha/context-chat",
+        "/api/analytics/health",
+        "/api/analytics/research-topics",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/audio/search",
+        "/api/cache/bifrost/check",
+        "/api/cache/bifrost/store",
+        "/api/cache/stats",
+        "/api/cartridge/export",
+        "/api/cartridge/search",
+        "/api/cartridge/tile-atlas",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/similar",
+        "/api/cases/cluster",
+        "/api/chat",
+        "/api/chat/memory/backfill",
+        "/api/chat/memory/search"
+      ],
+      "count": 72,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/middleware/cache-headers.js",
+      "routes": [
+        "/api/ace/status",
+        "/api/acp/tools",
+        "/api/admin/audit",
+        "/api/admin/knowledge",
+        "/api/admin/routes",
+        "/api/ai/models",
+        "/api/ai/personas",
+        "/api/ai/stats",
+        "/api/ai/suggestions",
+        "/api/analytics/events",
+        "/api/analytics/patterns",
+        "/api/analytics/similar-queries",
+        "/api/analytics/summary",
+        "/api/analytics/token-usage",
+        "/api/audit/gpu",
+        "/api/audit/planner",
+        "/api/auth/me",
+        "/api/auth/session",
+        "/api/cache",
+        "/api/cache/exact-match/stats",
+        "/api/cache/metrics",
+        "/api/cache/stats",
+        "/api/canon",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/authorities",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/similar",
+        "/api/cases/[id]/timeline",
+        "/api/cases/analytics",
+        "/api/citations",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 44,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/db/schema-postgres.js",
+      "routes": [
+        "/admin/gpu-evidence-graph",
+        "/analysis-center",
+        "/api/ace/ingest",
+        "/api/admin/seed-knowledge",
+        "/api/ai/context",
+        "/api/ai/contextual-chat",
+        "/api/analysis/page-context",
+        "/api/analytics/context-timeline",
+        "/api/analytics/panel-activity",
+        "/api/analytics/research-summaries",
+        "/api/analytics/research-summaries/[id]",
+        "/api/analytics/rl-signal",
+        "/api/auth/profile",
+        "/api/canon",
+        "/api/canon/chunks/[chunkId]",
+        "/api/canon/ingest",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/similar",
+        "/api/cases/[id]/timeline",
+        "/api/cases/analytics",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 30,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/ollama.js",
+      "routes": [
+        "/admin/phase89",
+        "/api/ace/summarize",
+        "/api/admin/agent/fix",
+        "/api/admin/model/validate-checkpoint",
+        "/api/admin/qlora",
+        "/api/admin/seed-knowledge",
+        "/api/agents/chat",
+        "/api/ai/analyze-evidence",
+        "/api/ai/analyze/[scope]",
+        "/api/ai/ask",
+        "/api/ai/case-prediction",
+        "/api/ai/cross-exam",
+        "/api/ai/generate-image",
+        "/api/ai/generate-report/[scope]",
+        "/api/ai/judge",
+        "/api/ai/legal-research",
+        "/api/ai/memo-skeleton",
+        "/api/ai/route-intent",
+        "/api/ai/summarize",
+        "/api/ai/tensorrt/vlm",
+        "/api/ai/yorha/context-chat",
+        "/api/analytics/deep-research",
+        "/api/analytics/generate-todos",
+        "/api/analytics/health",
+        "/api/analytics/research-topics",
+        "/api/analyze-file",
+        "/api/analyze-tag",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/similar",
+        "/api/chat"
+      ],
+      "count": 30,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/redis.js",
+      "routes": [
+        "/.well-known/llms-full.txt",
+        "/.well-known/llms.txt",
+        "/admin/unified-indexing-studio",
+        "/api/ace/health",
+        "/api/admin/cache-stats",
+        "/api/admin/model/validate-checkpoint",
+        "/api/admin/observability",
+        "/api/admin/pipeline/events",
+        "/api/admin/qlora",
+        "/api/admin/weights",
+        "/api/ai/agent",
+        "/api/analytics/focus",
+        "/api/analytics/health",
+        "/api/analytics/prompt-leaderboard",
+        "/api/analytics/research-graph",
+        "/api/analytics/research-topics",
+        "/api/analytics/web-research",
+        "/api/cache",
+        "/api/cache/invalidate",
+        "/api/cache/metrics",
+        "/api/cache/nintendo",
+        "/api/cache/recent-queries",
+        "/api/cache/set",
+        "/api/cache/som",
+        "/api/cache/stats",
+        "/api/cartridge/export",
+        "/api/chat/memory/settings",
+        "/api/chat/migrate"
+      ],
+      "count": 28,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/validation.js",
+      "routes": [
+        "/api/canon/chunks/[chunkId]",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/chat",
+        "/api/cases/[id]/citations",
+        "/api/cases/[id]/evidence",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/key-points",
+        "/api/cases/[id]/laws",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/evidence",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/cases/[id]/overview",
+        "/api/cases/[id]/persons",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/[id]/related",
+        "/api/cases/[id]/similar",
+        "/api/cases/[id]/timeline",
+        "/api/chat/stream",
+        "/api/citations/[citationId]/tags"
+      ],
+      "count": 21,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/db/schema",
+      "routes": [
+        "/",
+        "/active-cases",
+        "/api/ai/case-prediction",
+        "/api/ai/case-scoring",
+        "/api/ai/feedback",
+        "/api/auth/demo-login",
+        "/api/auth/health",
+        "/api/auth/login",
+        "/api/auth/register",
+        "/api/cases/[id]",
+        "/api/cases/[id]/analyze/stream",
+        "/api/cases/[id]/canvas",
+        "/api/cases/[id]/export/pdf",
+        "/api/cases/[id]/notes",
+        "/api/cases/[id]/notes/[noteId]",
+        "/api/cases/[id]/notes/[noteId]/versions",
+        "/api/cases/[id]/notes/search",
+        "/api/chat/migrate",
+        "/api/chat/stream"
+      ],
+      "count": 19,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/components/ui/Icon.svelte",
+      "routes": [
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/active-cases",
+        "/admin",
+        "/admin/ai-dashboard",
+        "/admin/all-routes",
+        "/admin/cache",
+        "/admin/case-graph",
+        "/admin/codebase-graph",
+        "/admin/dev-tools",
+        "/admin/dev-tools/component-showcase",
+        "/admin/face-gallery",
+        "/admin/library",
+        "/admin/observability",
+        "/admin/qlora-training",
+        "/admin/search-intelligence",
+        "/analysis-center",
+        "/analytics"
+      ],
+      "count": 19,
+      "kind": "static"
+    },
+    {
+      "target": "./$types.js",
+      "routes": [
+        "/",
+        "/admin/knowledge-base",
+        "/admin/phase78",
+        "/admin/phase78/monitor",
+        "/admin/phase78/routes/[routePath]",
+        "/ai-dashboard",
+        "/all-routes",
+        "/analysis-center",
+        "/api/acp/execute",
+        "/api/acp/tools",
+        "/api/admin/ai-chat/summarize-panel",
+        "/api/analytics/focus",
+        "/api/auth/debug",
+        "/api/auth/health",
+        "/api/browser-context/snapshot",
+        "/api/cases/[id]/connections",
+        "/api/cases/[id]/timeline"
+      ],
+      "count": 17,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/grpc/embedding-client.js",
+      "routes": [
+        "/admin/document-search",
+        "/api/ace/context",
+        "/api/ace/ingest",
+        "/api/ace/rank",
+        "/api/agents/chat",
+        "/api/ai/context",
+        "/api/analytics/similar-queries",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cases/[id]/similar"
+      ],
+      "count": 10,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/vector/qdrant-manager.js",
+      "routes": [
+        "/api/ace/ingest",
+        "/api/agents/chat",
+        "/api/analytics/mirror-health",
+        "/api/analytics/similar-queries",
+        "/api/cache/llm/stats",
+        "/api/canon/ingest",
+        "/api/canon/search",
+        "/api/cases/[id]/similar",
+        "/api/cases/cluster"
+      ],
+      "count": 9,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/components/ui/Button.svelte",
+      "routes": [
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/codebase-graph",
+        "/admin/error-analysis",
+        "/admin/error-brain",
+        "/admin/error-brain/runs",
+        "/admin/face-gallery",
+        "/admin/qlora-training"
+      ],
+      "count": 8,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/analytics/search-analytics.js",
+      "routes": [
+        "/api/agents/chat",
+        "/api/ai/agent",
+        "/api/ai/contextual-chat",
+        "/api/ai/legal-research",
+        "/api/analytics/search-patterns",
+        "/api/audio/search",
+        "/api/canon/search",
+        "/api/cartridge/search"
+      ],
+      "count": 8,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/config/env.server.js",
+      "routes": [
+        "/admin/api-testing/ast-topology",
+        "/admin/ast-topology",
+        "/admin/codebase-viewer",
+        "/admin/dev-tools",
+        "/admin/error-analysis",
+        "/analysis-center"
+      ],
+      "count": 6,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/db/schema-postgres",
+      "routes": [
+        "/api/admin/raptor/build",
+        "/api/ai/intent-dispatch",
+        "/api/audio/search",
+        "/api/audio/upload",
+        "/api/auth/reset-password",
+        "/api/cases/[id]/chat"
+      ],
+      "count": 6,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/lucia",
+      "routes": [
+        "/api/auth/demo-login",
+        "/api/auth/health",
+        "/api/auth/login",
+        "/api/auth/logout",
+        "/api/auth/register",
+        "/api/auth/session"
+      ],
+      "count": 6,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/stores/notifications.svelte",
+      "routes": [
+        "/",
+        "/admin/cache",
+        "/admin/dev-tools",
+        "/admin/explorer",
+        "/admin/phase78/patches"
+      ],
+      "count": 5,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/analytics/event-logger.js",
+      "routes": [
+        "/analytics",
+        "/api/admin/pipeline/events",
+        "/api/analytics/events",
+        "/api/analytics/patterns",
+        "/api/analytics/summary"
+      ],
+      "count": 5,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/inference/gpu-arbiter.js",
+      "routes": [
+        "/api/ai/tensorrt",
+        "/api/ai/tensorrt/stream",
+        "/api/ai/tensorrt/vlm",
+        "/api/chat",
+        "/api/chat/stream"
+      ],
+      "count": 5,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/auth-helpers.js",
+      "routes": [
+        "/api/case-theory",
+        "/api/cases",
+        "/api/cases/[id]/reasoning-chain",
+        "/api/cases/analytics",
+        "/api/cases/cluster"
+      ],
+      "count": 5,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/components/ui/card/Card.svelte",
+      "routes": [
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/error-brain",
+        "/admin/error-brain/runs"
+      ],
+      "count": 4,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/components/ui/card/CardContent.svelte",
+      "routes": [
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/error-brain",
+        "/admin/error-brain/runs"
+      ],
+      "count": 4,
+      "kind": "static"
+    },
+    {
+      "target": "$lib/server/graph/pg-neo4j-sync.js",
+      "routes": [
+        "/api/ace/ingest",
+        "/api/cases",
+        "/api/cases/[id]",
+        "/api/cases/[id]/authorities"
+      ],
+      "count": 4,
+      "kind": "static"
+    }
+  ],
+  "dynamicDependencyChains": [
+    {
+      "target": "$lib/server/db/client",
+      "routes": [
+        "/api/ace/health",
+        "/api/admin/model/promote-weights",
+        "/api/ai/stats",
+        "/api/ai/yorha/context-chat",
+        "/api/analytics/events",
+        "/api/analytics/mirror-health",
+        "/api/analytics/rl-signal"
+      ],
+      "count": 7,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/server/redis.js",
+      "routes": [
+        "/.well-known/llms-full.txt",
+        "/.well-known/llms.txt",
+        "/api/ace/health",
+        "/api/admin/pipeline/events",
+        "/api/cache/set",
+        "/api/chat/migrate"
+      ],
+      "count": 6,
+      "kind": "dynamic"
+    },
+    {
+      "target": "drizzle-orm",
+      "routes": [
+        "/api/admin/model/promote-weights",
+        "/api/ai/case-prediction",
+        "/api/ai/case-scoring",
+        "/api/ai/feedback",
+        "/api/ai/stats",
+        "/api/ai/yorha/context-chat"
+      ],
+      "count": 6,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/server/vector/qdrant-manager.js",
+      "routes": [
+        "/api/agents/chat",
+        "/api/analytics/mirror-health",
+        "/api/canon/ingest",
+        "/api/canon/search"
+      ],
+      "count": 4,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/server/db/schema",
+      "routes": [
+        "/api/ai/case-prediction",
+        "/api/ai/case-scoring",
+        "/api/ai/feedback",
+        "/api/cases/[id]/analyze/stream"
+      ],
+      "count": 4,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/server/queue/dispatch-inline.js",
+      "routes": [
+        "/api/analytics/events",
+        "/api/analytics/search",
+        "/api/cases",
+        "/api/chat"
+      ],
+      "count": 4,
+      "kind": "dynamic"
+    },
+    {
+      "target": "@qdrant/js-client-rest",
+      "routes": [
+        "/admin/codebase-viewer",
+        "/admin/document-search",
+        "/api/ai/context"
+      ],
+      "count": 3,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/server/grpc/embedding-client.js",
+      "routes": [
+        "/admin/document-search",
+        "/api/agents/chat",
+        "/api/ai/context"
+      ],
+      "count": 3,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/server/env.server.js",
+      "routes": [
+        "/admin/document-search",
+        "/api/ai/context",
+        "/api/ai/generate-image"
+      ],
+      "count": 3,
+      "kind": "dynamic"
+    },
+    {
+      "target": "svelte",
+      "routes": [
+        "/",
+        "/(analysis)@"
+      ],
+      "count": 2,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/stores/auth-store.svelte",
+      "routes": [
+        "/",
+        "/(analysis)@"
+      ],
+      "count": 2,
+      "kind": "dynamic"
+    },
+    {
+      "target": "d3",
+      "routes": [
+        "/admin",
+        "/admin/case-graph"
+      ],
+      "count": 2,
+      "kind": "dynamic"
+    },
+    {
+      "target": "ioredis",
+      "routes": [
+        "/api/admin/pipeline/events",
+        "/api/browser-context/snapshot"
+      ],
+      "count": 2,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/server/db/schema-postgres.js",
+      "routes": [
+        "/api/ai/context",
+        "/api/analytics/rl-signal"
+      ],
+      "count": 2,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/server/graph/hypergraph-4d.js",
+      "routes": [
+        "/api/analytics/research-summaries",
+        "/api/citations"
+      ],
+      "count": 2,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/components/ui/AccessibilityPanel.svelte",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/components/ai/AIChatWidget.svelte",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/components/admin/ContextualAssistantModal.svelte",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/components/onboarding/SetupWizard.svelte",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/components/KeyboardShortcutsPanel.svelte",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/components/analysis/AnalysisPanel.svelte",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/components/research/ResearchTaskPanel.svelte",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/components/ui/AuthModal.svelte",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/webgpu/webgpu-init",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    },
+    {
+      "target": "$lib/webgpu/webgpu-cpu-fallback",
+      "routes": [
+        "/"
+      ],
+      "count": 1,
+      "kind": "dynamic"
+    }
+  ],
+  "routeRows": [
+    {
+      "routePath": "/",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 2,
+      "tests": 985,
+      "datastoreCount": 1,
+      "files": {
+        "layoutSvelte": "src/routes/(analysis)/+layout.svelte",
+        "layoutServerTs": "src/routes/(analysis)/+layout.server.ts"
+      }
+    },
+    {
+      "routePath": "/",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 28,
+      "dynamicImports": 18,
+      "tests": 985,
+      "datastoreCount": 1,
+      "files": {
+        "layoutSvelte": "src/routes/(app)/+layout.svelte",
+        "layoutServerTs": "src/routes/(app)/+layout.server.ts"
+      }
+    },
+    {
+      "routePath": "/",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 27,
+      "dynamicImports": 2,
+      "tests": 985,
+      "datastoreCount": 2,
+      "files": {
+        "pageSvelte": "src/routes/+page.svelte",
+        "pageServerTs": "src/routes/+page.server.ts",
+        "layoutSvelte": "src/routes/+layout.svelte",
+        "layoutTs": "src/routes/+layout.ts",
+        "layoutServerTs": "src/routes/+layout.server.ts",
+        "errorSvelte": "src/routes/+error.svelte"
+      }
+    },
+    {
+      "routePath": "/.well-known/agent.json",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/.well-known/agent.json/+server.ts"
+      }
+    },
+    {
+      "routePath": "/.well-known/appspecific/com.chrome.devtools.json",
+      "label": "ui-component",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts"
+      }
+    },
+    {
+      "routePath": "/.well-known/llms-full.txt",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 5,
+      "dynamicImports": 3,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/.well-known/llms-full.txt/+server.ts"
+      }
+    },
+    {
+      "routePath": "/.well-known/llms.txt",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 5,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 4,
+      "files": {
+        "serverTs": "src/routes/.well-known/llms.txt/+server.ts"
+      }
+    },
+    {
+      "routePath": "/(analysis)@",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 2,
+      "tests": 4,
+      "datastoreCount": 1,
+      "files": {
+        "layoutSvelte": "src/routes/(analysis)@/+layout.svelte",
+        "layoutServerTs": "src/routes/(analysis)@/+layout.server.ts"
+      }
+    },
+    {
+      "routePath": "/(analysis)@/audio-analysis/[evidenceId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
+        "pageServerTs": "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/(analysis)@/document-analysis/[evidenceId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
+        "pageServerTs": "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/(analysis)@/video-analysis/[evidenceId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte",
+        "pageServerTs": "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/acp",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 0,
+      "dynamicImports": 0,
+      "tests": 11,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/acp/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/active-cases",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 15,
+      "dynamicImports": 0,
+      "tests": 16,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/active-cases/+page.svelte",
+        "pageServerTs": "src/routes/(app)/active-cases/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin",
+      "label": "svelte-inspector",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 5,
+      "dynamicImports": 1,
+      "tests": 106,
+      "datastoreCount": 3,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/+page.svelte",
+        "layoutSvelte": "src/routes/(app)/admin/+layout.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/ai-dashboard",
+      "label": "svelte-inspector",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 13,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/ai-dashboard/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/ai-dashboard/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/ai-dashboard/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/ai-dashboard/lab",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 17,
+      "dynamicImports": 0,
+      "tests": 7,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/ai-dashboard/lab/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/ai-dashboard/lab/+page.ts"
+      }
+    },
+    {
+      "routePath": "/admin/ai-dashboard/operator",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 15,
+      "dynamicImports": 0,
+      "tests": 6,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/ai-dashboard/operator/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/ai-dashboard/operator/+page.ts"
+      }
+    },
+    {
+      "routePath": "/admin/all-routes",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 21,
+      "dynamicImports": 1,
+      "tests": 18,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/all-routes/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/all-routes/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/all-routes/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/api-testing/agentic-events",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/(app)/admin/api-testing/agentic-events/+server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/api-testing/agentic-loop",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/(app)/admin/api-testing/agentic-loop/+server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/api-testing/ast-topology",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/(app)/admin/api-testing/ast-topology/+server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/ast-topology",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 3,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/ast-topology/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/ast-topology/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/ast-topology/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/cache",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 1,
+      "tests": 15,
+      "datastoreCount": 3,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/cache/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/cache/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/cache/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/case-graph",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 3,
+      "dynamicImports": 2,
+      "tests": 6,
+      "datastoreCount": 2,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/case-graph/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/chat-memory",
+      "label": "svelte-inspector",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 3,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/chat-memory/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/chat-memory/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/codebase-graph",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 8,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/codebase-graph/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/codebase-index",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/codebase-index/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/codebase-index/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/codebase-index/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/codebase-index/[fileId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 1,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 2,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/codebase-index/[fileId]/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/codebase-index/[fileId]/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/codebase-viewer",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 14,
+      "dynamicImports": 2,
+      "tests": 14,
+      "datastoreCount": 2,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/codebase-viewer/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/codebase-viewer/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/codebase-viewer/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/component-analysis",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 1,
+      "dynamicImports": 0,
+      "tests": 8,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/component-analysis/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/component-analysis/+page.ts"
+      }
+    },
+    {
+      "routePath": "/admin/dev-tools",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 19,
+      "dynamicImports": 1,
+      "tests": 13,
+      "datastoreCount": 4,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/dev-tools/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/dev-tools/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/dev-tools/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/dev-tools/component-showcase",
+      "label": "ui-component",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 6,
+      "datastoreCount": 0,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/dev-tools/component-showcase/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts"
+      }
+    },
+    {
+      "routePath": "/admin/document-search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 12,
+      "dynamicImports": 4,
+      "tests": 10,
+      "datastoreCount": 2,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/document-search/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/document-search/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/error-analysis",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 12,
+      "datastoreCount": 2,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/error-analysis/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/error-analysis/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/error-brain",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 16,
+      "dynamicImports": 0,
+      "tests": 13,
+      "datastoreCount": 2,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/error-brain/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/error-brain/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/error-brain/+page.server.ts",
+        "layoutSvelte": "src/routes/(app)/admin/error-brain/+layout.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/error-brain/runs",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 7,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/error-brain/runs/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/explorer",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 1,
+      "dynamicImports": 0,
+      "tests": 8,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/explorer/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/face-gallery",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 6,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/face-gallery/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/gpu-evidence-graph",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 1,
+      "tests": 11,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/gpu-evidence-graph/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/gpu-evidence-graph/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/gpu-evidence-graph/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/kag-notebook",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 3,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/kag-notebook/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/kag-notebook/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/knowledge-base",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 4,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/knowledge-base/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/knowledge-base/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/knowledge-search",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 14,
+      "datastoreCount": 3,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/knowledge-search/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/knowledge-search/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/library",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 6,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/library/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/library/+page.ts"
+      }
+    },
+    {
+      "routePath": "/admin/memory-inspector",
+      "label": "svelte-inspector",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/memory-inspector/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/memory-inspector/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/observability",
+      "label": "ui-component",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 8,
+      "datastoreCount": 5,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/observability/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/phase78",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 5,
+      "datastoreCount": 0,
+      "files": {
+        "pageServerTs": "src/routes/(app)/admin/phase78/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/phase78/monitor",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 1,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/phase78/monitor/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/phase78/monitor/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/phase78/patches",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 1,
+      "dynamicImports": 0,
+      "tests": 6,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/phase78/patches/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/phase78/routes/[routePath]",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 0,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/phase78/routes/[routePath]/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/phase78/routes/[routePath]/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/phase89",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 12,
+      "datastoreCount": 3,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/phase89/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/phase89/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/qlora-training",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 10,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/qlora-training/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/qlora-training/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/search-intelligence",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 12,
+      "datastoreCount": 4,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/search-intelligence/+page.svelte",
+        "pageTs": "src/routes/(app)/admin/search-intelligence/+page.ts",
+        "pageServerTs": "src/routes/(app)/admin/search-intelligence/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/admin/topology",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": false,
+      "authRequired": false,
+      "staticImports": 0,
+      "dynamicImports": 0,
+      "tests": 9,
+      "datastoreCount": 1,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/topology/+page.svelte"
+      }
+    },
+    {
+      "routePath": "/admin/unified-indexing-studio",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 10,
+      "dynamicImports": 0,
+      "tests": 11,
+      "datastoreCount": 4,
+      "files": {
+        "pageSvelte": "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
+        "pageServerTs": "src/routes/(app)/admin/unified-indexing-studio/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/ai-dashboard",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 9,
+      "datastoreCount": 0,
+      "files": {
+        "pageServerTs": "src/routes/(app)/ai-dashboard/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/all-routes",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 16,
+      "datastoreCount": 0,
+      "files": {
+        "pageServerTs": "src/routes/(app)/all-routes/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/analysis-center",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 23,
+      "dynamicImports": 0,
+      "tests": 18,
+      "datastoreCount": 3,
+      "files": {
+        "pageSvelte": "src/routes/(app)/analysis-center/+page.svelte",
+        "pageTs": "src/routes/(app)/analysis-center/+page.ts",
+        "pageServerTs": "src/routes/(app)/analysis-center/+page.server.ts",
+        "layoutSvelte": "src/routes/(app)/analysis-center/+layout.svelte"
+      }
+    },
+    {
+      "routePath": "/analytics",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 61,
+      "datastoreCount": 2,
+      "files": {
+        "pageSvelte": "src/routes/(app)/analytics/+page.svelte",
+        "pageServerTs": "src/routes/(app)/analytics/+page.server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/agent",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ace/agent/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/context",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 1,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/ace/context/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/error-kag",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/ace/error-kag/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/health",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/ace/health/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/ingest",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 19,
+      "dynamicImports": 6,
+      "tests": 675,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/ace/ingest/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/rank",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 4,
+      "files": {
+        "serverTs": "src/routes/api/ace/rank/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/recommendations",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/ace/recommendations/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/status",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ace/status/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ace/summarize",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ace/summarize/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/acp/execute",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/acp/execute/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/acp/tools",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/acp/tools/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/agent/fix",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/admin/agent/fix/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/ai-chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/admin/ai-chat/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/ai-chat/[sessionId]",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/ai-chat/[sessionId]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/ai-chat/sessions",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/ai-chat/sessions/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/ai-chat/subagent/launch",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/ai-chat/subagent/launch/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/ai-chat/summarize-panel",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/admin/ai-chat/summarize-panel/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/ai-chat/upload",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/ai-chat/upload/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/audit",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/audit/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/cache-stats",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/admin/cache-stats/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/admin/chat/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/citations/discover",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/citations/discover/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/diagnose",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/diagnose/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/inference-lane",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/inference-lane/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/inference-stats",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/inference-stats/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/jobs",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/jobs/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/knowledge",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/admin/knowledge/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/legal-strategy",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/legal-strategy/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/model/promote-weights",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/model/promote-weights/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/model/upload-weights",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/model/upload-weights/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/model/validate-checkpoint",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/admin/model/validate-checkpoint/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/observability",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 5,
+      "files": {
+        "serverTs": "src/routes/api/admin/observability/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/pipeline/events",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 3,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/admin/pipeline/events/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/qlora",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/admin/qlora/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/raptor-atlas",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/raptor-atlas/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/raptor/build",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/raptor/build/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/recommendations",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/recommendations/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/repair",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/repair/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/routes",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/admin/routes/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/routes/stream",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/routes/stream/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/seed-knowledge",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 11,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/admin/seed-knowledge/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/telemetry/batch",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/admin/telemetry/batch/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/topology/recompute",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/admin/topology/recompute/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/admin/weights",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/admin/weights/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/agent/investigate",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/agent/investigate/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/agents/chat",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 11,
+      "dynamicImports": 5,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/agents/chat/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/agent",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/ai/agent/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/agent/batch",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/agent/batch/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/analyze-evidence",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/analyze-evidence/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/analyze/[scope]",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/analyze/[scope]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/ask",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/ask/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/case-prediction",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 2,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/case-prediction/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/case-scoring",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 3,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/case-scoring/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/chat/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/chat-direct",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/chat-direct/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/chat/stream",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/chat/stream/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/context",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 5,
+      "tests": 677,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/context/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/contextual-chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 676,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/contextual-chat/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/cross-exam",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/cross-exam/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/feedback",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 2,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/feedback/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/generate-image",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 2,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/generate-image/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/generate-report/[scope]",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/generate-report/[scope]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/hermes-plan",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/hermes-plan/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/hermes-run",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/ai/hermes-run/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/intent-dispatch",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/intent-dispatch/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/judge",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/judge/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/legal-research",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/legal-research/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/memo-skeleton",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/memo-skeleton/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/models",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/models/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/personas",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/personas/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/route-intent",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/route-intent/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/stats",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 2,
+      "tests": 676,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/stats/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/suggestions",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/suggestions/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/summarize",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/summarize/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/tensorrt",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/tensorrt/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/tensorrt/stream",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/tensorrt/stream/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/tensorrt/vlm",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/tensorrt/vlm/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/vector-search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/ai/vector-search/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/ai/yorha/context-chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/ai/yorha/context-chat/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analysis/page-context",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 10,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analysis/page-context/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/codebase-research",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/codebase-research/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/context-timeline",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analytics/context-timeline/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/deep-research",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/deep-research/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/events",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 2,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/events/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/feedback",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/feedback/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/file-activity",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/analytics/file-activity/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/focus",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analytics/focus/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/generate-todos",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/generate-todos/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/health",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/analytics/health/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/knowledge-triples",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/knowledge-triples/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/knowledge-triples/prune",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/knowledge-triples/prune/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/mapreduce-matrix",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analytics/mapreduce-matrix/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/mirror-health",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analytics/mirror-health/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/panel-activity",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analytics/panel-activity/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/patterns",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/patterns/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/prompt-leaderboard",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/prompt-leaderboard/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/qlora-dataset",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/analytics/qlora-dataset/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/research-graph",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/research-graph/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/research-index",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analytics/research-index/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/research-summaries",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 1,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/research-summaries/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/research-summaries/[id]",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/research-summaries/[id]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/research-topics",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 1,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/analytics/research-topics/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/rl-signal",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/rl-signal/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 1,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/search/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/search-patterns",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/search-patterns/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/similar-queries",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analytics/similar-queries/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/summary",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/summary/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/token-usage",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/analytics/token-usage/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/unified-research",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analytics/unified-research/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analytics/web-research",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analytics/web-research/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analyze-file",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 11,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/analyze-file/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/analyze-tag",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/analyze-tag/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/audio/analysis/[evidenceId]",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/audio/analysis/[evidenceId]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/audio/progress/[evidenceId]",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 2,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/audio/progress/[evidenceId]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/audio/search",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/audio/search/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/audio/upload",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 10,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/audio/upload/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/audit/gpu",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/audit/gpu/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/audit/planner",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/audit/planner/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/debug",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 1,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/debug/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/demo-login",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/demo-login/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/health",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/auth/health/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/login",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 678,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/login/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/logout",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 678,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/logout/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/me",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 684,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/me/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/profile",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/profile/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/register",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 679,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/register/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/reset-password",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/reset-password/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/auth/session",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": false,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/auth/session/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/browser-context/snapshot",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/browser-context/snapshot/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 677,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cache/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/bifrost/check",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/cache/bifrost/check/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/bifrost/store",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cache/bifrost/store/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/exact-match/stats",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cache/exact-match/stats/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/invalidate",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 1,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cache/invalidate/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/llm/clean",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cache/llm/clean/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/llm/stats",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cache/llm/stats/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/metrics",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/cache/metrics/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/nintendo",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cache/nintendo/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/recent-queries",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cache/recent-queries/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/set",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 1,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/cache/set/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/som",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cache/som/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/stats",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 1,
+      "tests": 675,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/cache/stats/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cache/warm-up",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cache/warm-up/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/canon",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/canon/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/canon/chunks/[chunkId]",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/canon/chunks/[chunkId]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/canon/ingest",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 10,
+      "dynamicImports": 2,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/canon/ingest/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/canon/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 1,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/canon/search/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cartridge/export",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 10,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/cartridge/export/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cartridge/invalidate",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cartridge/invalidate/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cartridge/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/cartridge/search/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cartridge/stats",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 3,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cartridge/stats/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cartridge/tile-atlas",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/cartridge/tile-atlas/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cartridge/timeline",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cartridge/timeline/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/case-theory",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/case-theory/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 11,
+      "dynamicImports": 1,
+      "tests": 698,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cases/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/analyze/stream",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 4,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/analyze/stream/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/authorities",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/authorities/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/canvas",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 10,
+      "dynamicImports": 0,
+      "tests": 675,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/canvas/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 10,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/chat/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/citations",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/citations/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/connections",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/connections/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/evidence",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/evidence/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/export/pdf",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/export/pdf/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/key-points",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/key-points/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/laws",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/laws/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/notes",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/notes/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/notes/[noteId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/notes/[noteId]/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/notes/[noteId]/evidence",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/notes/[noteId]/evidence/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/notes/[noteId]/versions",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/notes/[noteId]/versions/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/notes/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/notes/search/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/overview",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/overview/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/persons",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/persons/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/reasoning-chain",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/reasoning-chain/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/related",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/related/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/similar",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 16,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/similar/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/[id]/timeline",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/cases/[id]/timeline/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/analytics",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/cases/analytics/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/cases/cluster",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/cases/cluster/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/charges/add",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 1,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/charges/add/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 8,
+      "dynamicImports": 1,
+      "tests": 687,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/chat/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chat/memory/backfill",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/chat/memory/backfill/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chat/memory/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/chat/memory/search/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chat/memory/settings",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 3,
+      "files": {
+        "serverTs": "src/routes/api/chat/memory/settings/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chat/migrate",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 7,
+      "dynamicImports": 2,
+      "tests": 673,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/chat/migrate/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chat/replay",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 674,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/chat/replay/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chat/stream",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 11,
+      "dynamicImports": 0,
+      "tests": 678,
+      "datastoreCount": 1,
+      "files": {
+        "serverTs": "src/routes/api/chat/stream/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chrrom/events",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 6,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/chrrom/events/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chrrom/precompute",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 4,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/chrrom/precompute/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/chrrom/push",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 5,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/chrrom/push/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/citations",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 1,
+      "tests": 679,
+      "datastoreCount": 2,
+      "files": {
+        "serverTs": "src/routes/api/citations/+server.ts"
+      }
+    },
+    {
+      "routePath": "/api/citations/[citationId]/tags",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "serverOnly": true,
+      "authRequired": true,
+      "staticImports": 9,
+      "dynamicImports": 0,
+      "tests": 673,
+      "datastoreCount": 0,
+      "files": {
+        "serverTs": "src/routes/api/citations/[citationId]/tags/+server.ts"
+      }
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "title": "Project orphaned Neo4j nodes back into route/implementation edges",
+      "details": "3914 CodeArtifact nodes have no relationships. This usually means the Neo4j projection is missing import edges or a subset of files was skipped.",
+      "nextAction": "Rerun atlas:neo4j:ingest with a workspace limit, then inspect orphan paths before writing more labels.",
+      "sourceRefs": [
+        "sveltekit-frontend/docs_readme/deeds_labs_archive/components/CaseOutcomePrediction.svelte",
+        "sveltekit-frontend/docs_readme/deeds_labs_archive/components/NESGraphRenderer.svelte",
+        "sveltekit-frontend/docs_readme/deeds_labs_archive/components/RouteInspectorDetectiveBoard.svelte",
+        "sveltekit-frontend/src/lib/client/ui/POIPhotoModal.svelte",
+        "sveltekit-frontend/src/lib/client/ui/POIPhotoUploader.svelte",
+        "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+        "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+        "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+        "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+        "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte"
+      ]
+    },
+    {
+      "priority": "medium",
+      "title": "Review dynamic-import heavy routes for consolidation",
+      "details": "46 routes use dynamic imports in their route files. These are candidates for loader/util extraction or feature-folder consolidation.",
+      "nextAction": "Move repeated dynamic import logic into shared server helpers, then keep route files thin.",
+      "sourceRefs": [
+        "/",
+        "/.well-known/llms-full.txt",
+        "/.well-known/llms.txt",
+        "/(analysis)@",
+        "/admin",
+        "/admin/all-routes",
+        "/admin/cache",
+        "/admin/case-graph",
+        "/admin/codebase-viewer",
+        "/admin/dev-tools"
+      ]
+    },
+    {
+      "priority": "medium",
+      "title": "Consolidate app-file families under label-aware buckets",
+      "details": "4 label groups have multiple app files that can be treated as one dependency family for feature mapping.",
+      "nextAction": "Use the label registry to cluster related app files, then keep dependency chains stable as the graph matures.",
+      "sourceRefs": [
+        "/",
+        "/.well-known/llms-full.txt",
+        "/(analysis)@",
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/admin/api-testing/agentic-loop",
+        "/admin/api-testing/ast-topology",
+        "/admin/case-graph",
+        "/admin/codebase-graph"
+      ]
+    },
+    {
+      "priority": "medium",
+      "title": "Map static and dynamic dependency chains for label upgrades",
+      "details": "15 shared dependency targets show up across inspector/realtime or Svelte-heavy routes. These are the edges to pin before graph analysis is promoted from audit to enforcement.",
+      "nextAction": "Keep shared imports and dynamic loading paths centralized so feature-label upgrades do not fan out across multiple files.",
+      "sourceRefs": [
+        "/(analysis)@/audio-analysis/[evidenceId]",
+        "/(analysis)@/document-analysis/[evidenceId]",
+        "/(analysis)@/video-analysis/[evidenceId]",
+        "/active-cases",
+        "/admin",
+        "/admin/ai-dashboard",
+        "/admin/all-routes",
+        "/admin/cache",
+        "/admin/case-graph",
+        "/admin/codebase-graph",
+        "/admin/dev-tools",
+        "/admin/dev-tools/component-showcase",
+        "/admin/face-gallery",
+        "/admin/library",
+        "/admin/observability",
+        "/admin/qlora-training",
+        "/admin/search-intelligence",
+        "/analysis-center",
+        "/analytics",
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/codebase-graph",
+        "/admin/error-analysis",
+        "/admin/error-brain",
+        "/admin/error-brain/runs",
+        "/admin/face-gallery",
+        "/admin/qlora-training",
+        "/",
+        "/admin/cache",
+        "/admin/dev-tools",
+        "/admin/explorer",
+        "/admin/phase78/patches",
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/error-brain",
+        "/admin/error-brain/runs",
+        "/admin/ai-dashboard/lab",
+        "/admin/ai-dashboard/operator",
+        "/admin/error-brain",
+        "/admin/error-brain/runs",
+        "/",
+        "/(analysis)@",
+        "/",
+        "/(analysis)@",
+        "/",
+        "/",
+        "/"
+      ]
+    }
+  ]
+}

@@ -165,7 +165,13 @@
       "description": "Validate Windows workspace, sidecars, semantic indexing, and feature readiness",
       "agent": "workspace-ready",
       "subtask": true,
-      "prompt": "Use the Windows agentic recovery skill. Validate config, discover scripts, check sidecars, run codebase indexing, run graph exports, run smoke tests, and write memory/agent-runs/latest-workspace-ready.json. Use turn-based session handoffs for review, plan, research, and build flows."
+      "prompt": "Use the Windows agentic recovery skill. First run the repo-root bootstrap lane (`npm --prefix .. run opencode:bootstrap`) to refresh ACE context, daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Then validate config, discover scripts, check sidecars, run codebase indexing, run graph exports only if stale, and write memory/agent-runs/latest-workspace-ready.json. Use turn-based session handoffs for review, plan, research, and build flows."
+    },
+    "workspace-bootstrap": {
+      "description": "Refresh ACE context, local health, and report artifacts from the main repo",
+      "agent": "workspace-ready",
+      "subtask": false,
+      "prompt": "Run the repo-root bootstrap lane with `npm --prefix .. run opencode:bootstrap`. The bootstrap must first ensure Claude-Mem is launched detached when available, then refresh the local ACE context, the daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, bash tools, and the next safe action. Do not edit files."
     },
     "graph-export-recover": {
       "description": "Recover graph export artifacts without task delegation",

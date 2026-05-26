@@ -141,7 +141,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       latencyMs: 0,
       error: 'neo4j probe failed',
     })),
-    probeTcp(new URL(ENV.NATS_URL).hostname, parseInt(new URL(ENV.NATS_URL).port || '4222', 10), 'nats'),
+    probeTcp(
+      new URL(ENV.NATS_URL).hostname,
+      parseInt(new URL(ENV.NATS_URL).port || '4222', 10),
+      'nats'
+    ),
   ]);
 
   const checks = {
@@ -185,78 +189,81 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     goSearch,
   });
 
-  return json({
-    status: coreOk ? 'healthy' : 'degraded',
-    uptime: Math.round((Date.now() - startedAt) / 1000),
-    time: new Date().toISOString(),
-    checks,
-    tiers: {
-      core: {
-        services: ['ollama', 'qdrant', 'redis', 'postgres'],
-        allOk: coreOk,
-        definition: 'Live, required, request path depends on it',
-      },
-      data: {
-        services: ['seaweedfs', 'rabbitmq', 'langextract'],
-        allOk: seaweedfs.ok && rabbitmq.ok && langextract.ok,
-        definition: 'Live, supports storage/extraction/messaging',
-      },
-      inference: {
-        services: ['trtllm', 'triton', 'grpc'],
-        allOk: trtllm.ok || false,
-        note: 'GPU inference backends — fall back to Ollama when unavailable',
-        fallback: 'ollama',
-      },
-      future: {
-        services: ['neo4j', 'couchdb', 'nats', 'quic', 'goSearch'],
-        allOk: false,
-        definition: 'Optional, dormant, env-only, stubbed, or planned next',
-        items: {
-          neo4j: {
-            referenced: true,
-            containerRunning: neo4j.ok,
-            fallback: 'postgres graph tables',
-            want: true,
-          },
-          couchdb: { referenced: true, containerRunning: couchdb.ok, fallback: null, want: true },
-          nats: { referenced: false, containerRunning: nats.ok, fallback: null, want: false },
-          quic: {
-            referenced: true,
-            containerRunning: quicHealth.ok,
-            fallback: 'http',
-            want: false,
-          },
-          goSearch: {
-            referenced: false,
-            containerRunning: goSearch.ok,
-            fallback: null,
-            want: false,
+  return json(
+    {
+      status: coreOk ? 'healthy' : 'degraded',
+      uptime: Math.round((Date.now() - startedAt) / 1000),
+      time: new Date().toISOString(),
+      checks,
+      tiers: {
+        core: {
+          services: ['ollama', 'qdrant', 'redis', 'postgres'],
+          allOk: coreOk,
+          definition: 'Live, required, request path depends on it',
+        },
+        data: {
+          services: ['seaweedfs', 'rabbitmq', 'langextract'],
+          allOk: seaweedfs.ok && rabbitmq.ok && langextract.ok,
+          definition: 'Live, supports storage/extraction/messaging',
+        },
+        inference: {
+          services: ['trtllm', 'triton', 'grpc'],
+          allOk: trtllm.ok || false,
+          note: 'GPU inference backends — fall back to Ollama when unavailable',
+          fallback: 'ollama',
+        },
+        future: {
+          services: ['neo4j', 'couchdb', 'nats', 'quic', 'goSearch'],
+          allOk: false,
+          definition: 'Optional, dormant, env-only, stubbed, or planned next',
+          items: {
+            neo4j: {
+              referenced: true,
+              containerRunning: neo4j.ok,
+              fallback: 'postgres graph tables',
+              want: true,
+            },
+            couchdb: { referenced: true, containerRunning: couchdb.ok, fallback: null, want: true },
+            nats: { referenced: false, containerRunning: nats.ok, fallback: null, want: false },
+            quic: {
+              referenced: true,
+              containerRunning: quicHealth.ok,
+              fallback: 'http',
+              want: false,
+            },
+            goSearch: {
+              referenced: false,
+              containerRunning: goSearch.ok,
+              fallback: null,
+              want: false,
+            },
           },
         },
       },
-    },
-    breakers: {
-      ollama: ollamaBreaker.getStatus(),
-      qdrant: qdrantBreaker.getStatus(),
-      redis: redisBreaker.getStatus(),
-      recentEvents: breakerEventLog.slice(-5),
-    },
-    cache: cacheMetrics.snapshot(),
-    embedding: {
-      grpc,
-      quic: {
-        enabled: ENV.EMBEDDING_QUIC_ENABLED,
-        natsUrl: ENV.NATS_URL,
+      breakers: {
+        ollama: ollamaBreaker.getStatus(),
+        qdrant: qdrantBreaker.getStatus(),
+        redis: redisBreaker.getStatus(),
+        recentEvents: breakerEventLog.slice(-5),
       },
-      inFlight: getInFlightCount(),
+      cache: cacheMetrics.snapshot(),
+      embedding: {
+        grpc,
+        quic: {
+          enabled: ENV.EMBEDDING_QUIC_ENABLED,
+          natsUrl: ENV.NATS_URL,
+        },
+        inFlight: getInFlightCount(),
+      },
+      transport: {
+        tier1_grpc: { enabled: ENV.EMBEDDING_GRPC_ENABLED, url: ENV.EMBEDDING_GRPC_URL },
+        tier2_quic: { enabled: ENV.EMBEDDING_QUIC_ENABLED, url: ENV.NATS_URL },
+        tier3_http_batch: { enabled: true, url: `${ENV.OLLAMA_BASE_URL}/api/embed` },
+        tier4_http_seq: { enabled: true, url: `${ENV.OLLAMA_BASE_URL}/api/embeddings` },
+      },
     },
-    transport: {
-      tier1_grpc: { enabled: ENV.EMBEDDING_GRPC_ENABLED, url: ENV.EMBEDDING_GRPC_URL },
-      tier2_quic: { enabled: ENV.EMBEDDING_QUIC_ENABLED, url: ENV.NATS_URL },
-      tier3_http_batch: { enabled: true, url: `${ENV.OLLAMA_BASE_URL}/api/embed` },
-      tier4_http_seq: { enabled: true, url: `${ENV.OLLAMA_BASE_URL}/api/embeddings` },
-    },
-  }, { headers: cacheControl.short });
+    { headers: cacheControl.short }
+  );
 };
 
 /** Handle per-service health sub-endpoint */
@@ -268,7 +275,10 @@ async function handleServiceHealth(service: string) {
     }
     case 'redis': {
       const state = redisBreaker.getStatus();
-      return json({ service: 'redis', ok: state.state === 'CLOSED', state }, { headers: cacheControl.short });
+      return json(
+        { service: 'redis', ok: state.state === 'CLOSED', state },
+        { headers: cacheControl.short }
+      );
     }
     case 'qdrant': {
       const result = await probe(`${ENV.QDRANT_URL}`, 3000);
@@ -279,17 +289,23 @@ async function handleServiceHealth(service: string) {
         const { pool: pgPool } = await import('$lib/server/db/client');
         const start = performance.now();
         await pgPool.query('SELECT 1');
-        return json({
-          service: 'database',
-          ok: true,
-          latencyMs: Math.round(performance.now() - start),
-        }, { headers: cacheControl.short });
+        return json(
+          {
+            service: 'database',
+            ok: true,
+            latencyMs: Math.round(performance.now() - start),
+          },
+          { headers: cacheControl.short }
+        );
       } catch (err) {
-        return json({
-          service: 'database',
-          ok: false,
-          error: 'Service unreachable',
-        }, { headers: cacheControl.short });
+        return json(
+          {
+            service: 'database',
+            ok: false,
+            error: 'Service unreachable',
+          },
+          { headers: cacheControl.short }
+        );
       }
     }
     case 'quic': {
@@ -327,7 +343,11 @@ async function handleServiceHealth(service: string) {
       return json({ service: 'neo4j', ...result });
     }
     case 'nats': {
-      const result = await probeTcp(new URL(ENV.NATS_URL).hostname, parseInt(new URL(ENV.NATS_URL).port || '4222', 10), 'nats');
+      const result = await probeTcp(
+        new URL(ENV.NATS_URL).hostname,
+        parseInt(new URL(ENV.NATS_URL).port || '4222', 10),
+        'nats'
+      );
       return json({ service: 'nats', ...result });
     }
     default:

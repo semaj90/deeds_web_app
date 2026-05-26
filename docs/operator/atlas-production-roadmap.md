@@ -16,6 +16,8 @@ This document serves as the durable operator guide for scaling, validating, and 
 - [ ] **Feature Registry**: Reconcile core architectural features with code-based evidence.
 - [ ] **Command Mapping**: Bridge features to safe, allowlisted MCP commands.
 - [ ] **Synthetic Evidence**: Generate concept cards for undocumented local patterns.
+- [ ] **Feature Labeling**: Add app-file labels for `svelte-inspector` and `svelte-realtime` consolidation lanes and keep the feature registry aligned with file-family upgrades.
+- [ ] **Dependency Chains**: Map shared static and dynamic import chains for app-file family upgrades before the later graph analysis pass.
 
 ## Phase 6: Programming Docs Atlas (External Lane)
 ### Governance & Guardrails
@@ -43,6 +45,8 @@ This document serves as the durable operator guide for scaling, validating, and 
 1. **Validate Infrastructure**: `node scripts/atlas/validate-model-endpoints.mjs`.
 2. **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
 3. **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
+4. **Missing Links Audit**: Run `npm run audit:neo4j-missing-links` to surface orphaned graph nodes, unlabeled routes, and dynamic-import consolidation candidates.
+5. **Label Upgrade**: Run the semantics report after the label registry refresh so `svelte-inspector` and `svelte-realtime` rows are visible in the atlas outputs.
 
 ## Phase 9: Codex Implementation Prompt
 > "Implement the Programming Docs Atlas ingestion lane using Firecrawl-style scraping, llms.txt generation, Qdrant indexing, and Neo4j projection. Enforce trust tiers and sourceRefs requirements. Maintain strict isolation between codebase and external documentation vectors."

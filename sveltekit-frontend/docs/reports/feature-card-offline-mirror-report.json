@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-05-26T23:19:17.325Z",
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\exports\\feature-map-cards.jsonl",
+  "cards": 19,
+  "couchdb": {
+    "enabled": true,
+    "db": "feature_cards",
+    "wrote": 19,
+    "skipped": 0,
+    "failed": 0,
+    "conflicted": 0,
+    "designDoc": {
+      "enabled": true,
+      "changed": false,
+      "upserted": false,
+      "views": [
+        "by_kind",
+        "by_feature_key",
+        "by_term",
+        "by_audit_status"
+      ],
+      "warmChecks": [
+        {
+          "path": "/_design/feature_cards/_view/by_kind?limit=1",
+          "ok": true,
+          "status": 200
+        },
+        {
+          "path": "/_design/feature_cards/_view/by_feature_key?limit=1",
+          "ok": true,
+          "status": 200
+        },
+        {
+          "path": "/_design/feature_cards/_view/by_term?limit=1",
+          "ok": true,
+          "status": 200
+        },
+        {
+          "path": "/_design/feature_cards/_view/by_audit_status?reduce=true&group=true&limit=1",
+          "ok": true,
+          "status": 200
+        }
+      ]
+    }
+  },
+  "duckdb": {
+    "bin": "C:\\Users\\james\\AppData\\Local\\Programs\\DuckDB\\duckdb.exe",
+    "binCandidates": [
+      "C:\\Users\\james\\AppData\\Local\\Programs\\DuckDB\\duckdb.exe",
+      "duckdb"
+    ],
+    "dbPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\feature-card.duckdb",
+    "ok": true,
+    "status": 0,
+    "stdout": "┌─────────┐\r\n│ Success │\r\n│ boolean │\r\n└─────────┘\r\n  0 rows",
+    "stderr": "",
+    "rows": 19,
+    "prepared": true,
+    "liveWriteRequested": false
+  },
+  "note": "Offline mirror is opt-in and non-authoritative; Postgres remains the source of truth."
+}

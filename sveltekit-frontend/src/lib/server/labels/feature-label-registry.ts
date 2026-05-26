@@ -3,6 +3,8 @@ import { createHash } from 'node:crypto';
 export const FEATURE_LABEL_KEYS = [
   'api-route',
   'ui-component',
+  'svelte-inspector',
+  'svelte-realtime',
   'evidence',
   'graph',
   'database',
@@ -31,6 +33,16 @@ export const FEATURE_LABEL_REGISTRY: FeatureLabelDefinition[] = [
     key: 'ui-component',
     aliases: ['ui', 'component', 'page', 'view', 'svelte', 'screen'],
     description: 'User-facing UI components and pages',
+  },
+  {
+    key: 'svelte-inspector',
+    aliases: ['inspector', 'inspecter', 'route-inspector', 'memory-inspector', 'admin-inspector'],
+    description: 'Inspector surfaces, route lenses, and admin debugging panes',
+  },
+  {
+    key: 'svelte-realtime',
+    aliases: ['realtime', 'real-time', 'sse', 'live-update', 'streaming', 'progress-stream'],
+    description: 'Realtime SSE, streaming progress, and live update lanes',
   },
   {
     key: 'evidence',
@@ -109,6 +121,10 @@ export function normalizeFeatureLabel(value: string | null | undefined): Feature
   if (normalized.includes('route') || normalized.includes('api')) return 'api-route';
   if (normalized.includes('ui') || normalized.includes('component') || normalized.includes('page') || normalized.includes('view')) {
     return 'ui-component';
+  }
+  if (normalized.includes('inspector') || normalized.includes('inspecter')) return 'svelte-inspector';
+  if (normalized.includes('realtime') || normalized.includes('real-time') || normalized.includes('sse') || normalized.includes('stream')) {
+    return 'svelte-realtime';
   }
   if (normalized.includes('evidence') || normalized.includes('document') || normalized.includes('pdf') || normalized.includes('case')) {
     return 'evidence';

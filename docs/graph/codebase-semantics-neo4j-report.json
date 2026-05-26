@@ -1,0 +1,6425 @@
+{
+  "generatedAt": "2026-05-26T22:53:26.741Z",
+  "nodes": [
+    {
+      "id": "route:/",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 18,
+      "staticImports": 28
+    },
+    {
+      "id": "route:/",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 27
+    },
+    {
+      "id": "route:/.well-known/agent.json",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/.well-known/appspecific/com.chrome.devtools.json",
+      "label": "ui-component",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/.well-known/llms-full.txt",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 3,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/.well-known/llms.txt",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 2,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/(analysis)@",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/(analysis)@/audio-analysis/[evidenceId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/(analysis)@/document-analysis/[evidenceId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/(analysis)@/video-analysis/[evidenceId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/acp",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 0
+    },
+    {
+      "id": "route:/active-cases",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 15
+    },
+    {
+      "id": "route:/admin",
+      "label": "svelte-inspector",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/admin/ai-dashboard",
+      "label": "svelte-inspector",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/admin/ai-dashboard/lab",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 17
+    },
+    {
+      "id": "route:/admin/ai-dashboard/operator",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 15
+    },
+    {
+      "id": "route:/admin/all-routes",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 21
+    },
+    {
+      "id": "route:/admin/api-testing/agentic-events",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/admin/api-testing/agentic-loop",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/admin/api-testing/ast-topology",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/admin/ast-topology",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/admin/cache",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/admin/case-graph",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/admin/chat-memory",
+      "label": "svelte-inspector",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/admin/codebase-graph",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/admin/codebase-index",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/admin/codebase-index/[fileId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 1
+    },
+    {
+      "id": "route:/admin/codebase-viewer",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 14
+    },
+    {
+      "id": "route:/admin/component-analysis",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 1
+    },
+    {
+      "id": "route:/admin/dev-tools",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 19
+    },
+    {
+      "id": "route:/admin/dev-tools/component-showcase",
+      "label": "ui-component",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/admin/document-search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 4,
+      "staticImports": 12
+    },
+    {
+      "id": "route:/admin/error-analysis",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/admin/error-brain",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 16
+    },
+    {
+      "id": "route:/admin/error-brain/runs",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/admin/explorer",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 1
+    },
+    {
+      "id": "route:/admin/face-gallery",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/admin/gpu-evidence-graph",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/admin/kag-notebook",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/admin/knowledge-base",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/admin/knowledge-search",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/admin/library",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/admin/memory-inspector",
+      "label": "svelte-inspector",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/admin/observability",
+      "label": "ui-component",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/admin/phase78",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/admin/phase78/monitor",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 1
+    },
+    {
+      "id": "route:/admin/phase78/patches",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 1
+    },
+    {
+      "id": "route:/admin/phase78/routes/[routePath]",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/admin/phase89",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/admin/qlora-training",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/admin/search-intelligence",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/admin/topology",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 0
+    },
+    {
+      "id": "route:/admin/unified-indexing-studio",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 10
+    },
+    {
+      "id": "route:/ai-dashboard",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/all-routes",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/analysis-center",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 23
+    },
+    {
+      "id": "route:/analytics",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ace/agent",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/ace/context",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/ace/error-kag",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/ace/health",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 2,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ace/ingest",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 6,
+      "staticImports": 19
+    },
+    {
+      "id": "route:/api/ace/rank",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ace/recommendations",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ace/status",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ace/summarize",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/acp/execute",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/acp/tools",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/agent/fix",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/ai-chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/admin/ai-chat/[sessionId]",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/admin/ai-chat/sessions",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/admin/ai-chat/subagent/launch",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/admin/ai-chat/summarize-panel",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/ai-chat/upload",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/admin/audit",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/cache-stats",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/admin/citations/discover",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/admin/diagnose",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/inference-lane",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/admin/inference-stats",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/jobs",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/knowledge",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/legal-strategy",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/model/promote-weights",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/admin/model/upload-weights",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/admin/model/validate-checkpoint",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/admin/observability",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/admin/pipeline/events",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 3,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/admin/qlora",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/admin/raptor-atlas",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/admin/raptor/build",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/admin/recommendations",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/admin/repair",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/admin/routes",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/admin/routes/stream",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/admin/seed-knowledge",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 11
+    },
+    {
+      "id": "route:/api/admin/telemetry/batch",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/admin/topology/recompute",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/admin/weights",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/agent/investigate",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/agents/chat",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 5,
+      "staticImports": 11
+    },
+    {
+      "id": "route:/api/ai/agent",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/ai/agent/batch",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ai/analyze-evidence",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/analyze/[scope]",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ai/ask",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/case-prediction",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/ai/case-scoring",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 3,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ai/chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/chat-direct",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/chat/stream",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/context",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 5,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/ai/contextual-chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/ai/cross-exam",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/feedback",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/ai/generate-image",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/generate-report/[scope]",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ai/hermes-plan",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/hermes-run",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/ai/intent-dispatch",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/ai/judge",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/legal-research",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ai/memo-skeleton",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/models",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/personas",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/ai/route-intent",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/stats",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/ai/suggestions",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/ai/summarize",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/ai/tensorrt",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/ai/tensorrt/stream",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/ai/tensorrt/vlm",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/ai/vector-search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/ai/yorha/context-chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/analysis/page-context",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 10
+    },
+    {
+      "id": "route:/api/analytics/codebase-research",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/analytics/context-timeline",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/analytics/deep-research",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/events",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/analytics/feedback",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/file-activity",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/analytics/focus",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/generate-todos",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/analytics/health",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/analytics/knowledge-triples",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/knowledge-triples/prune",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/analytics/mapreduce-matrix",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/analytics/mirror-health",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 2,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/analytics/panel-activity",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/patterns",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/prompt-leaderboard",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/analytics/qlora-dataset",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/analytics/research-graph",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/research-index",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/analytics/research-summaries",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/analytics/research-summaries/[id]",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/research-topics",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/analytics/rl-signal",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/analytics/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/analytics/search-patterns",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/similar-queries",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/analytics/summary",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/token-usage",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/analytics/unified-research",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/analytics/web-research",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/analyze-file",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 11
+    },
+    {
+      "id": "route:/api/analyze-tag",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/audio/analysis/[evidenceId]",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/audio/progress/[evidenceId]",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 2
+    },
+    {
+      "id": "route:/api/audio/search",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/audio/upload",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 10
+    },
+    {
+      "id": "route:/api/audit/gpu",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/audit/planner",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/auth/debug",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 1
+    },
+    {
+      "id": "route:/api/auth/demo-login",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/auth/health",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/auth/login",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/auth/logout",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/auth/me",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/auth/profile",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/auth/register",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/auth/reset-password",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/auth/session",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/browser-context/snapshot",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 2,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/cache",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/cache/bifrost/check",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/cache/bifrost/store",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/cache/exact-match/stats",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/cache/invalidate",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/cache/llm/clean",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/cache/llm/stats",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/cache/metrics",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/cache/nintendo",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/cache/recent-queries",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/cache/set",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/cache/som",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/cache/stats",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 1,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/cache/warm-up",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/canon",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/canon/chunks/[chunkId]",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/canon/ingest",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 10
+    },
+    {
+      "id": "route:/api/canon/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/cartridge/export",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 10
+    },
+    {
+      "id": "route:/api/cartridge/invalidate",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/cartridge/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/cartridge/stats",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 3
+    },
+    {
+      "id": "route:/api/cartridge/tile-atlas",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/cartridge/timeline",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/case-theory",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/cases",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 11
+    },
+    {
+      "id": "route:/api/cases/[id]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/cases/[id]/analyze/stream",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 4,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/cases/[id]/authorities",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/cases/[id]/canvas",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 10
+    },
+    {
+      "id": "route:/api/cases/[id]/chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 10
+    },
+    {
+      "id": "route:/api/cases/[id]/citations",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/cases/[id]/connections",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/cases/[id]/evidence",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/cases/[id]/export/pdf",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/cases/[id]/key-points",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/cases/[id]/laws",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/cases/[id]/notes",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/cases/[id]/notes/[noteId]",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/cases/[id]/notes/[noteId]/evidence",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/cases/[id]/notes/[noteId]/versions",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/cases/[id]/notes/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/cases/[id]/overview",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/cases/[id]/persons",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/cases/[id]/reasoning-chain",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/cases/[id]/related",
+      "label": "api-route",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/cases/[id]/similar",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 16
+    },
+    {
+      "id": "route:/api/cases/[id]/timeline",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/cases/analytics",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/cases/cluster",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/charges/add",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/chat",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 8
+    },
+    {
+      "id": "route:/api/chat/memory/backfill",
+      "label": "svelte-realtime",
+      "status": "PARTIAL",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/chat/memory/search",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/chat/memory/settings",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/chat/migrate",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 2,
+      "staticImports": 7
+    },
+    {
+      "id": "route:/api/chat/replay",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/chat/stream",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 11
+    },
+    {
+      "id": "route:/api/chrrom/events",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 6
+    },
+    {
+      "id": "route:/api/chrrom/precompute",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 4
+    },
+    {
+      "id": "route:/api/chrrom/push",
+      "label": "svelte-realtime",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 5
+    },
+    {
+      "id": "route:/api/citations",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 1,
+      "staticImports": 9
+    },
+    {
+      "id": "route:/api/citations/[citationId]/tags",
+      "label": "api-route",
+      "status": "SHIPPED",
+      "dynamicImports": 0,
+      "staticImports": 9
+    },
+    {
+      "id": "import:./$types",
+      "label": "static-import-target",
+      "target": "./$types",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/db/client",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/db/client",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/server/env.server.js",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/env.server.js",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/server/middleware/cache-headers.js",
+      "label": "static-import-target",
+      "target": "$lib/server/middleware/cache-headers.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/db/schema-postgres.js",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/db/schema-postgres.js",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/server/ollama.js",
+      "label": "static-import-target",
+      "target": "$lib/server/ollama.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/redis.js",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/redis.js",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/server/validation.js",
+      "label": "static-import-target",
+      "target": "$lib/server/validation.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/db/schema",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/db/schema",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/ui/Icon.svelte",
+      "label": "static-import-target",
+      "target": "$lib/components/ui/Icon.svelte",
+      "kind": "static"
+    },
+    {
+      "id": "import:./$types.js",
+      "label": "static-import-target",
+      "target": "./$types.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/grpc/embedding-client.js",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/grpc/embedding-client.js",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/server/vector/qdrant-manager.js",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/vector/qdrant-manager.js",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/ui/Button.svelte",
+      "label": "static-import-target",
+      "target": "$lib/components/ui/Button.svelte",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/analytics/search-analytics.js",
+      "label": "static-import-target",
+      "target": "$lib/server/analytics/search-analytics.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/config/env.server.js",
+      "label": "static-import-target",
+      "target": "$lib/config/env.server.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/db/schema-postgres",
+      "label": "static-import-target",
+      "target": "$lib/server/db/schema-postgres",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/lucia",
+      "label": "static-import-target",
+      "target": "$lib/server/lucia",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/stores/notifications.svelte",
+      "label": "static-import-target",
+      "target": "$lib/stores/notifications.svelte",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/analytics/event-logger.js",
+      "label": "static-import-target",
+      "target": "$lib/server/analytics/event-logger.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/inference/gpu-arbiter.js",
+      "label": "static-import-target",
+      "target": "$lib/server/inference/gpu-arbiter.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/auth-helpers.js",
+      "label": "static-import-target",
+      "target": "$lib/server/auth-helpers.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/components/ui/card/Card.svelte",
+      "label": "static-import-target",
+      "target": "$lib/components/ui/card/Card.svelte",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/components/ui/card/CardContent.svelte",
+      "label": "static-import-target",
+      "target": "$lib/components/ui/card/CardContent.svelte",
+      "kind": "static"
+    },
+    {
+      "id": "import:$lib/server/graph/pg-neo4j-sync.js",
+      "label": "static-import-target",
+      "target": "$lib/server/graph/pg-neo4j-sync.js",
+      "kind": "static"
+    },
+    {
+      "id": "import:drizzle-orm",
+      "label": "dynamic-import-target",
+      "target": "drizzle-orm",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/server/queue/dispatch-inline.js",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/queue/dispatch-inline.js",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:@qdrant/js-client-rest",
+      "label": "dynamic-import-target",
+      "target": "@qdrant/js-client-rest",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:svelte",
+      "label": "dynamic-import-target",
+      "target": "svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/stores/auth-store.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/stores/auth-store.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:d3",
+      "label": "dynamic-import-target",
+      "target": "d3",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:ioredis",
+      "label": "dynamic-import-target",
+      "target": "ioredis",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/server/graph/hypergraph-4d.js",
+      "label": "dynamic-import-target",
+      "target": "$lib/server/graph/hypergraph-4d.js",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/ui/AccessibilityPanel.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/components/ui/AccessibilityPanel.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/ai/AIChatWidget.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/components/ai/AIChatWidget.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/admin/ContextualAssistantModal.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/components/admin/ContextualAssistantModal.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/onboarding/SetupWizard.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/components/onboarding/SetupWizard.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/KeyboardShortcutsPanel.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/components/KeyboardShortcutsPanel.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/analysis/AnalysisPanel.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/components/analysis/AnalysisPanel.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/research/ResearchTaskPanel.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/components/research/ResearchTaskPanel.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/components/ui/AuthModal.svelte",
+      "label": "dynamic-import-target",
+      "target": "$lib/components/ui/AuthModal.svelte",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/webgpu/webgpu-init",
+      "label": "dynamic-import-target",
+      "target": "$lib/webgpu/webgpu-init",
+      "kind": "dynamic"
+    },
+    {
+      "id": "import:$lib/webgpu/webgpu-cpu-fallback",
+      "label": "dynamic-import-target",
+      "target": "$lib/webgpu/webgpu-cpu-fallback",
+      "kind": "dynamic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/ai-chat",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/ai-chat/[sessionId]",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/ai-chat/sessions",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/ai-chat/subagent/launch",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/ai-chat/upload",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/audit",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/chat",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/citations/discover",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/diagnose",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/inference-lane",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/inference-stats",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/jobs",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/knowledge",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/legal-strategy",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/model/promote-weights",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/model/upload-weights",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/model/validate-checkpoint",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/observability",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/raptor-atlas",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/raptor/build",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/recommendations",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/repair",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/routes",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/seed-knowledge",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/topology/recompute",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "route:/api/admin/weights",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/context-timeline",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/deep-research",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/events",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/feedback",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/focus",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/health",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/knowledge-triples",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/mapreduce-matrix",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/mirror-health",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/panel-activity",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/patterns",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/prompt-leaderboard",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/qlora-dataset",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/research-graph",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/research-index",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/research-summaries",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/research-summaries/[id]",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/rl-signal",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/search",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/search-patterns",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/similar-queries",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/summary",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/token-usage",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "route:/api/analytics/unified-research",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/authorities",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/canvas",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/chat",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/citations",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/connections",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/evidence",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/export/pdf",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/key-points",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/laws",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/notes",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/notes/[noteId]",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/notes/[noteId]/evidence",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/notes/[noteId]/versions",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/notes/search",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/overview",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/persons",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/reasoning-chain",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/related",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/[id]/timeline",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/analytics",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "route:/api/cases/cluster",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/ask",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/case-prediction",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/chat",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/context",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/contextual-chat",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/feedback",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/generate-image",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/hermes-plan",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/intent-dispatch",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/legal-research",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/models",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/personas",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/summarize",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/tensorrt",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/tensorrt/vlm",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/vector-search",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "route:/api/ai/yorha/context-chat",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/agent/batch",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/analyze/[scope]",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/case-scoring",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/chat-direct",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/chat/stream",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/cross-exam",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/generate-report/[scope]",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/hermes-run",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/judge",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/memo-skeleton",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/route-intent",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/stats",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/suggestions",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "route:/api/ai/tensorrt/stream",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/demo-login",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/health",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/login",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/logout",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/me",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/profile",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/register",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/reset-password",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "route:/api/auth/session",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/bifrost/store",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/exact-match/stats",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/invalidate",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/llm/clean",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/llm/stats",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/nintendo",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/recent-queries",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/set",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "route:/api/cache/som",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ace/agent",
+      "to": "route:/api/ace/context",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ace/agent",
+      "to": "route:/api/ace/error-kag",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ace/agent",
+      "to": "route:/api/ace/health",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ace/agent",
+      "to": "route:/api/ace/rank",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ace/agent",
+      "to": "route:/api/ace/recommendations",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/ace/agent",
+      "to": "route:/api/ace/status",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/summarize-panel",
+      "to": "route:/api/admin/cache-stats",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/summarize-panel",
+      "to": "route:/api/admin/pipeline/events",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/summarize-panel",
+      "to": "route:/api/admin/qlora",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/summarize-panel",
+      "to": "route:/api/admin/routes/stream",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/summarize-panel",
+      "to": "route:/api/admin/telemetry/batch",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cartridge/export",
+      "to": "route:/api/cartridge/invalidate",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cartridge/export",
+      "to": "route:/api/cartridge/search",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cartridge/export",
+      "to": "route:/api/cartridge/stats",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cartridge/export",
+      "to": "route:/api/cartridge/tile-atlas",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cartridge/export",
+      "to": "route:/api/cartridge/timeline",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/file-activity",
+      "to": "route:/api/analytics/generate-todos",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/file-activity",
+      "to": "route:/api/analytics/knowledge-triples/prune",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/file-activity",
+      "to": "route:/api/analytics/research-topics",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/analytics/file-activity",
+      "to": "route:/api/analytics/web-research",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache/bifrost/check",
+      "to": "route:/api/cache/metrics",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache/bifrost/check",
+      "to": "route:/api/cache/stats",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/cache/bifrost/check",
+      "to": "route:/api/cache/warm-up",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/canon",
+      "to": "route:/api/canon/chunks/[chunkId]",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/canon",
+      "to": "route:/api/canon/ingest",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/canon",
+      "to": "route:/api/canon/search",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/chat",
+      "to": "route:/api/chat/memory/search",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/chat",
+      "to": "route:/api/chat/memory/settings",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/api/chat",
+      "to": "route:/api/chat/migrate",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/admin/phase78",
+      "to": "route:/admin/phase78/monitor",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/admin/phase78",
+      "to": "route:/admin/phase78/patches",
+      "type": "CONSOLIDATE_WITH"
+    },
+    {
+      "from": "route:/",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/.well-known/agent.json",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/.well-known/appspecific/com.chrome.devtools.json",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/.well-known/llms-full.txt",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/.well-known/llms.txt",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/audio-analysis/[evidenceId]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/document-analysis/[evidenceId]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/video-analysis/[evidenceId]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/active-cases",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ai-dashboard",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/all-routes",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/api-testing/agentic-events",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/api-testing/agentic-loop",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/api-testing/ast-topology",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ast-topology",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/cache",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/chat-memory",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/codebase-index",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/codebase-index/[fileId]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/codebase-viewer",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/component-analysis",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/dev-tools",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/document-search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-analysis",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-brain",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/gpu-evidence-graph",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/kag-notebook",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/knowledge-base",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/knowledge-search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/memory-inspector",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/phase89",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/qlora-training",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/search-intelligence",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/unified-indexing-studio",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analysis-center",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analytics",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/agent",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/context",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/error-kag",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/health",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/ingest",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/rank",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/recommendations",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/status",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/summarize",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/audit",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/cache-stats",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/chat",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/citations/discover",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/diagnose",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/inference-lane",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/inference-stats",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/jobs",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/knowledge",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/legal-strategy",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/promote-weights",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/validate-checkpoint",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/observability",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/pipeline/events",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/qlora",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/raptor-atlas",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/raptor/build",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/recommendations",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/repair",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/routes",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/routes/stream",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/seed-knowledge",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/telemetry/batch",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/weights",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agent/investigate",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agents/chat",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/agent/batch",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/analyze/[scope]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/ask",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-prediction",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-scoring",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/chat",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/chat-direct",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/chat/stream",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/contextual-chat",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/cross-exam",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/feedback",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/generate-image",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/generate-report/[scope]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/hermes-plan",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/hermes-run",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/intent-dispatch",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/judge",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/legal-research",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/memo-skeleton",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/models",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/personas",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/route-intent",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/stats",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/suggestions",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/summarize",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt/stream",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/vector-search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/yorha/context-chat",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analysis/page-context",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/codebase-research",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/context-timeline",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/deep-research",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/events",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/feedback",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/generate-todos",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/health",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/knowledge-triples",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/knowledge-triples/prune",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/mapreduce-matrix",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/mirror-health",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/panel-activity",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/patterns",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/prompt-leaderboard",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/qlora-dataset",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-graph",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-index",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-summaries",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-summaries/[id]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-topics",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/rl-signal",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/search-patterns",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/similar-queries",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/summary",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/token-usage",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/unified-research",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/web-research",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analyze-file",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analyze-tag",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/analysis/[evidenceId]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/progress/[evidenceId]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/upload",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audit/gpu",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audit/planner",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/demo-login",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/login",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/logout",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/me",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/profile",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/register",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/reset-password",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/session",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/bifrost/check",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/bifrost/store",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/exact-match/stats",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/invalidate",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/llm/clean",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/llm/stats",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/metrics",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/nintendo",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/recent-queries",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/set",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/som",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/stats",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/warm-up",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/chunks/[chunkId]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/ingest",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/export",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/invalidate",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/stats",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/tile-atlas",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/timeline",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/case-theory",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/analyze/stream",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/authorities",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/canvas",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/chat",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/citations",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/evidence",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/export/pdf",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/key-points",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/laws",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/evidence",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/versions",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/overview",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/persons",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/reasoning-chain",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/related",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/analytics",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/cluster",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/charges/add",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/memory/backfill",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/memory/search",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/memory/settings",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/migrate",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/replay",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/stream",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chrrom/events",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chrrom/precompute",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chrrom/push",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations/[citationId]/tags",
+      "to": "import:./$types",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/audio-analysis/[evidenceId]",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/document-analysis/[evidenceId]",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/video-analysis/[evidenceId]",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/active-cases",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/gpu-evidence-graph",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/phase89",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analysis-center",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/health",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/ingest",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/audit",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/chat",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/citations/discover",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/inference-stats",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/jobs",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/promote-weights",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/observability",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/qlora",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/raptor-atlas",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/raptor/build",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/recommendations",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/routes",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/routes/stream",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/seed-knowledge",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/telemetry/batch",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-prediction",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-scoring",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/contextual-chat",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/feedback",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/intent-dispatch",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/stats",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/yorha/context-chat",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analysis/page-context",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/context-timeline",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/events",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/feedback",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/generate-todos",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/knowledge-triples",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/knowledge-triples/prune",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/mirror-health",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/panel-activity",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/qlora-dataset",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-summaries",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-summaries/[id]",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/rl-signal",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/search-patterns",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analyze-file",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analyze-tag",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/analysis/[evidenceId]",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/search",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/upload",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/demo-login",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/health",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/login",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/profile",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/register",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/reset-password",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/chunks/[chunkId]",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/ingest",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/search",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/analyze/stream",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/authorities",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/canvas",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/chat",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/citations",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/connections",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/evidence",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/export/pdf",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/key-points",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/laws",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/evidence",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/versions",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/search",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/overview",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/persons",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/reasoning-chain",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/timeline",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/analytics",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/charges/add",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/memory/backfill",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/memory/search",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/migrate",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/stream",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations/[citationId]/tags",
+      "to": "import:$lib/server/db/client",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/document-search",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/phase89",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/unified-indexing-studio",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/context",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/health",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/ingest",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/summarize",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/ai-chat",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/[sessionId]",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/sessions",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/subagent/launch",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/summarize-panel",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/upload",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/chat",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/citations/discover",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/diagnose",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/inference-lane",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/inference-stats",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/jobs",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/knowledge",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/legal-strategy",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/promote-weights",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/upload-weights",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/observability",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/qlora",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/raptor-atlas",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/raptor/build",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/recommendations",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/repair",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/routes",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/seed-knowledge",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/topology/recompute",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agents/chat",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/analyze/[scope]",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/ask",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-prediction",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/chat-direct",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/cross-exam",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/generate-image",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/generate-report/[scope]",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/judge",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/legal-research",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/memo-skeleton",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/models",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/route-intent",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/stats",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/summarize",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt/stream",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt/vlm",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/yorha/context-chat",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/health",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-topics",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analyze-file",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analyze-tag",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/search",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/bifrost/check",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/bifrost/store",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/stats",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/export",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/search",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/tile-atlas",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/key-points",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/cluster",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/memory/backfill",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/memory/search",
+      "to": "import:$lib/server/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/status",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/acp/tools",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/audit",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/knowledge",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/routes",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/models",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/personas",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/stats",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/suggestions",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/events",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/patterns",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/similar-queries",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/summary",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/token-usage",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audit/gpu",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audit/planner",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/me",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/session",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/exact-match/stats",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/metrics",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/stats",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/authorities",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/canvas",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/chat",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/citations",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/connections",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/evidence",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/laws",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/evidence",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/versions",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/search",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/overview",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/persons",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/timeline",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/analytics",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations/[citationId]/tags",
+      "to": "import:$lib/server/middleware/cache-headers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/gpu-evidence-graph",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analysis-center",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/ingest",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/seed-knowledge",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/contextual-chat",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analysis/page-context",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/context-timeline",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/panel-activity",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-summaries",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-summaries/[id]",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/rl-signal",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/profile",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/chunks/[chunkId]",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/ingest",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/analyze/stream",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/canvas",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/chat",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/connections",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/evidence",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/key-points",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/evidence",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/overview",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/persons",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/reasoning-chain",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/timeline",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/analytics",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations/[citationId]/tags",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/phase89",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/summarize",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/agent/fix",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/validate-checkpoint",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/qlora",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/seed-knowledge",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agents/chat",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/analyze-evidence",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/analyze/[scope]",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/ask",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-prediction",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/cross-exam",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/generate-image",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/generate-report/[scope]",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/judge",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/legal-research",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/memo-skeleton",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/route-intent",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/summarize",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt/vlm",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/yorha/context-chat",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/deep-research",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/generate-todos",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/health",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-topics",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analyze-file",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analyze-tag",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/key-points",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat",
+      "to": "import:$lib/server/ollama.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/.well-known/llms-full.txt",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/.well-known/llms.txt",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/unified-indexing-studio",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/health",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/cache-stats",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/validate-checkpoint",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/observability",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/pipeline/events",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/qlora",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/weights",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/focus",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/health",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/prompt-leaderboard",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-graph",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-topics",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/web-research",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/invalidate",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/metrics",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/nintendo",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/recent-queries",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/set",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/som",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/stats",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/export",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/memory/settings",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/migrate",
+      "to": "import:$lib/server/redis.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/chunks/[chunkId]",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/analyze/stream",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/canvas",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/chat",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/citations",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/evidence",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/export/pdf",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/key-points",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/laws",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/evidence",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/versions",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/search",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/overview",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/persons",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/reasoning-chain",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/related",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/timeline",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/stream",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations/[citationId]/tags",
+      "to": "import:$lib/server/validation.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/active-cases",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-prediction",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-scoring",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/feedback",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/demo-login",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/health",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/login",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/register",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/analyze/stream",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/canvas",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/export/pdf",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/[noteId]/versions",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/notes/search",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/migrate",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/stream",
+      "to": "import:$lib/server/db/schema",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/audio-analysis/[evidenceId]",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/document-analysis/[evidenceId]",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@/video-analysis/[evidenceId]",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/active-cases",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ai-dashboard",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/all-routes",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/cache",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/case-graph",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/codebase-graph",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/dev-tools",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/dev-tools/component-showcase",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/face-gallery",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/library",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/observability",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/qlora-training",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/search-intelligence",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analysis-center",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analytics",
+      "to": "import:$lib/components/ui/Icon.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/knowledge-base",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/phase78",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/phase78/monitor",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/phase78/routes/[routePath]",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/ai-dashboard",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/all-routes",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analysis-center",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/acp/execute",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/acp/tools",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/ai-chat/summarize-panel",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/focus",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/debug",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/health",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/browser-context/snapshot",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/connections",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/timeline",
+      "to": "import:./$types.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/document-search",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/context",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/ingest",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/rank",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agents/chat",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/similar-queries",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/ingest",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/search",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/ingest",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agents/chat",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/mirror-health",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/similar-queries",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/llm/stats",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/ingest",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/search",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/similar",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/cluster",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ai-dashboard/lab",
+      "to": "import:$lib/components/ui/Button.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ai-dashboard/operator",
+      "to": "import:$lib/components/ui/Button.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/codebase-graph",
+      "to": "import:$lib/components/ui/Button.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-analysis",
+      "to": "import:$lib/components/ui/Button.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-brain",
+      "to": "import:$lib/components/ui/Button.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-brain/runs",
+      "to": "import:$lib/components/ui/Button.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/face-gallery",
+      "to": "import:$lib/components/ui/Button.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/qlora-training",
+      "to": "import:$lib/components/ui/Button.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agents/chat",
+      "to": "import:$lib/server/analytics/search-analytics.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/agent",
+      "to": "import:$lib/server/analytics/search-analytics.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/contextual-chat",
+      "to": "import:$lib/server/analytics/search-analytics.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/legal-research",
+      "to": "import:$lib/server/analytics/search-analytics.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/search-patterns",
+      "to": "import:$lib/server/analytics/search-analytics.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/search",
+      "to": "import:$lib/server/analytics/search-analytics.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/search",
+      "to": "import:$lib/server/analytics/search-analytics.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cartridge/search",
+      "to": "import:$lib/server/analytics/search-analytics.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/api-testing/ast-topology",
+      "to": "import:$lib/config/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ast-topology",
+      "to": "import:$lib/config/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/codebase-viewer",
+      "to": "import:$lib/config/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/dev-tools",
+      "to": "import:$lib/config/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-analysis",
+      "to": "import:$lib/config/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analysis-center",
+      "to": "import:$lib/config/env.server.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/raptor/build",
+      "to": "import:$lib/server/db/schema-postgres",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/intent-dispatch",
+      "to": "import:$lib/server/db/schema-postgres",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/search",
+      "to": "import:$lib/server/db/schema-postgres",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/audio/upload",
+      "to": "import:$lib/server/db/schema-postgres",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/reset-password",
+      "to": "import:$lib/server/db/schema-postgres",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/chat",
+      "to": "import:$lib/server/db/schema-postgres",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/demo-login",
+      "to": "import:$lib/server/lucia",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/health",
+      "to": "import:$lib/server/lucia",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/login",
+      "to": "import:$lib/server/lucia",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/logout",
+      "to": "import:$lib/server/lucia",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/register",
+      "to": "import:$lib/server/lucia",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/auth/session",
+      "to": "import:$lib/server/lucia",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/stores/notifications.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/cache",
+      "to": "import:$lib/stores/notifications.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/dev-tools",
+      "to": "import:$lib/stores/notifications.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/explorer",
+      "to": "import:$lib/stores/notifications.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/phase78/patches",
+      "to": "import:$lib/stores/notifications.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/analytics",
+      "to": "import:$lib/server/analytics/event-logger.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/pipeline/events",
+      "to": "import:$lib/server/analytics/event-logger.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/events",
+      "to": "import:$lib/server/analytics/event-logger.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/patterns",
+      "to": "import:$lib/server/analytics/event-logger.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/summary",
+      "to": "import:$lib/server/analytics/event-logger.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt",
+      "to": "import:$lib/server/inference/gpu-arbiter.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt/stream",
+      "to": "import:$lib/server/inference/gpu-arbiter.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/tensorrt/vlm",
+      "to": "import:$lib/server/inference/gpu-arbiter.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat",
+      "to": "import:$lib/server/inference/gpu-arbiter.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/stream",
+      "to": "import:$lib/server/inference/gpu-arbiter.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/case-theory",
+      "to": "import:$lib/server/auth-helpers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "import:$lib/server/auth-helpers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/reasoning-chain",
+      "to": "import:$lib/server/auth-helpers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/analytics",
+      "to": "import:$lib/server/auth-helpers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/cluster",
+      "to": "import:$lib/server/auth-helpers.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ai-dashboard/lab",
+      "to": "import:$lib/components/ui/card/Card.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ai-dashboard/operator",
+      "to": "import:$lib/components/ui/card/Card.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-brain",
+      "to": "import:$lib/components/ui/card/Card.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-brain/runs",
+      "to": "import:$lib/components/ui/card/Card.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ai-dashboard/lab",
+      "to": "import:$lib/components/ui/card/CardContent.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/ai-dashboard/operator",
+      "to": "import:$lib/components/ui/card/CardContent.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-brain",
+      "to": "import:$lib/components/ui/card/CardContent.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/error-brain/runs",
+      "to": "import:$lib/components/ui/card/CardContent.svelte",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/ingest",
+      "to": "import:$lib/server/graph/pg-neo4j-sync.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "import:$lib/server/graph/pg-neo4j-sync.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]",
+      "to": "import:$lib/server/graph/pg-neo4j-sync.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/authorities",
+      "to": "import:$lib/server/graph/pg-neo4j-sync.js",
+      "type": "STATIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/health",
+      "to": "import:$lib/server/db/client",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/promote-weights",
+      "to": "import:$lib/server/db/client",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/stats",
+      "to": "import:$lib/server/db/client",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/yorha/context-chat",
+      "to": "import:$lib/server/db/client",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/events",
+      "to": "import:$lib/server/db/client",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/mirror-health",
+      "to": "import:$lib/server/db/client",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/rl-signal",
+      "to": "import:$lib/server/db/client",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/.well-known/llms-full.txt",
+      "to": "import:$lib/server/redis.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/.well-known/llms.txt",
+      "to": "import:$lib/server/redis.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ace/health",
+      "to": "import:$lib/server/redis.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/pipeline/events",
+      "to": "import:$lib/server/redis.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cache/set",
+      "to": "import:$lib/server/redis.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat/migrate",
+      "to": "import:$lib/server/redis.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/model/promote-weights",
+      "to": "import:drizzle-orm",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-prediction",
+      "to": "import:drizzle-orm",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-scoring",
+      "to": "import:drizzle-orm",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/feedback",
+      "to": "import:drizzle-orm",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/stats",
+      "to": "import:drizzle-orm",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/yorha/context-chat",
+      "to": "import:drizzle-orm",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agents/chat",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/mirror-health",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/ingest",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/canon/search",
+      "to": "import:$lib/server/vector/qdrant-manager.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-prediction",
+      "to": "import:$lib/server/db/schema",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/case-scoring",
+      "to": "import:$lib/server/db/schema",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/feedback",
+      "to": "import:$lib/server/db/schema",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases/[id]/analyze/stream",
+      "to": "import:$lib/server/db/schema",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/events",
+      "to": "import:$lib/server/queue/dispatch-inline.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/search",
+      "to": "import:$lib/server/queue/dispatch-inline.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/cases",
+      "to": "import:$lib/server/queue/dispatch-inline.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/chat",
+      "to": "import:$lib/server/queue/dispatch-inline.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/codebase-viewer",
+      "to": "import:@qdrant/js-client-rest",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/document-search",
+      "to": "import:@qdrant/js-client-rest",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:@qdrant/js-client-rest",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/document-search",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/agents/chat",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:$lib/server/grpc/embedding-client.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/document-search",
+      "to": "import:$lib/server/env.server.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:$lib/server/env.server.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/generate-image",
+      "to": "import:$lib/server/env.server.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@",
+      "to": "import:svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/stores/auth-store.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/(analysis)@",
+      "to": "import:$lib/stores/auth-store.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin",
+      "to": "import:d3",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/admin/case-graph",
+      "to": "import:d3",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/admin/pipeline/events",
+      "to": "import:ioredis",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/browser-context/snapshot",
+      "to": "import:ioredis",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/ai/context",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/rl-signal",
+      "to": "import:$lib/server/db/schema-postgres.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/analytics/research-summaries",
+      "to": "import:$lib/server/graph/hypergraph-4d.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/api/citations",
+      "to": "import:$lib/server/graph/hypergraph-4d.js",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/components/ui/AccessibilityPanel.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/components/ai/AIChatWidget.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/components/admin/ContextualAssistantModal.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/components/onboarding/SetupWizard.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/components/KeyboardShortcutsPanel.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/components/analysis/AnalysisPanel.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/components/research/ResearchTaskPanel.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/components/ui/AuthModal.svelte",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/webgpu/webgpu-init",
+      "type": "DYNAMIC_IMPORTS"
+    },
+    {
+      "from": "route:/",
+      "to": "import:$lib/webgpu/webgpu-cpu-fallback",
+      "type": "DYNAMIC_IMPORTS"
+    }
+  ]
+}

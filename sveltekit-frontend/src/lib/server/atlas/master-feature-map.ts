@@ -18,6 +18,14 @@ export interface MasterFeatureEntry {
   intent: string;
   service: string;
   stores: string[];
+  modules?: string[];
+  imports?: string[];
+  dependencies?: string[];
+  languages?: string[];
+  networking?: string[];
+  offlineProcessing?: string[];
+  cache?: string[];
+  inferenceFallbacks?: string[];
   clusters: number[];
   status: 'active' | 'partial' | 'dry_run' | 'planned' | 'research_spike' | 'deprecated';
   params: Record<string, any>;
@@ -151,6 +159,14 @@ export const MASTER_FEATURE_MAP: Record<string, MasterFeatureEntry> = {
     intent: 'central registry for architectural intents and anchors',
     service: 'MasterFeatureMap',
     stores: ['Postgres'],
+    modules: ['src/lib/server/atlas', 'scripts/atlas', 'docs/atlas-index'],
+    imports: ['MASTER_FEATURE_MAP', 'route-feature-map', 'feature-label-registry'],
+    dependencies: ['route atlas', 'import map', 'feature cards', 'postgres registry'],
+    languages: ['TypeScript', 'JSON', 'Markdown'],
+    networking: ['Redis', 'Postgres', 'Qdrant'],
+    offlineProcessing: ['DuckDB', 'CouchDB'],
+    cache: ['Redis atlas cache', 'feature-map cache'],
+    inferenceFallbacks: ['Gemma4 Opencode', 'CPU rerank fallback'],
     clusters: [],
     status: 'active',
     params: { families: 11 },
@@ -167,6 +183,14 @@ export const MASTER_FEATURE_MAP: Record<string, MasterFeatureEntry> = {
     intent: 'dependency graph and topological sorting',
     service: 'DeepImportGraph',
     stores: ['Neo4j', 'Postgres'],
+    modules: ['src/lib/server/atlas', 'src/lib/server/retrieval', 'scripts/atlas'],
+    imports: ['STATIC_IMPORTS', 'DYNAMIC_IMPORTS', 'route-feature-map'],
+    dependencies: ['route atlas', 'import map', 'neo4j projection'],
+    languages: ['TypeScript', 'JSON'],
+    networking: ['Neo4j', 'Postgres'],
+    offlineProcessing: ['DuckDB', 'CouchDB'],
+    cache: ['Redis graph cache'],
+    inferenceFallbacks: ['CPU dependency analysis'],
     clusters: [],
     status: 'partial',
     params: { edgeTypes: ['STATIC_IMPORTS', 'DYNAMIC_IMPORTS'] },
@@ -183,6 +207,14 @@ export const MASTER_FEATURE_MAP: Record<string, MasterFeatureEntry> = {
     intent: 'mapping routes to services, envs, and sidecars',
     service: 'RouteFeatureMap',
     stores: ['Postgres'],
+    modules: ['src/lib/server/atlas', 'src/routes', 'src/lib/server/db'],
+    imports: ['route-feature-map', 'feature-label-registry', 'db schema'],
+    dependencies: ['route atlas', 'feature registry', 'env mapping'],
+    languages: ['TypeScript'],
+    networking: ['HTTP', 'SvelteKit endpoints'],
+    offlineProcessing: ['DuckDB'],
+    cache: ['Redis route cards'],
+    inferenceFallbacks: ['static route analysis'],
     clusters: [],
     status: 'active',
     params: { edges: ['USES_ENV', 'USES_STORE'] },

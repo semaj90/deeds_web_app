@@ -1,0 +1,296 @@
+{
+  "generatedAt": "2026-05-26T23:15:32.961Z",
+  "duckdb": {
+    "bin": "C:\\Users\\james\\AppData\\Local\\Programs\\DuckDB\\duckdb.exe",
+    "dbPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\feature-card.duckdb",
+    "exists": true
+  },
+  "table": {
+    "name": "feature_cards",
+    "exists": true
+  },
+  "termsTable": {
+    "name": "feature_card_terms",
+    "exists": true
+  },
+  "columns": [
+    {
+      "cid": 0,
+      "name": "id",
+      "type": "VARCHAR",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    },
+    {
+      "cid": 1,
+      "name": "kind",
+      "type": "VARCHAR",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    },
+    {
+      "cid": 2,
+      "name": "labels",
+      "type": "VARCHAR[]",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    },
+    {
+      "cid": 3,
+      "name": "summary",
+      "type": "VARCHAR",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    },
+    {
+      "cid": 4,
+      "name": "sourceRefs",
+      "type": "VARCHAR[]",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    },
+    {
+      "cid": 5,
+      "name": "score_rank",
+      "type": "BIGINT",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    },
+    {
+      "cid": 6,
+      "name": "score_authority",
+      "type": "DOUBLE",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    },
+    {
+      "cid": 7,
+      "name": "score_recency",
+      "type": "BIGINT",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    },
+    {
+      "cid": 8,
+      "name": "payload",
+      "type": "STRUCT(id VARCHAR, \"name\" VARCHAR, intent VARCHAR, service VARCHAR, stores VARCHAR[], modules VARCHAR[], imports VARCHAR[], dependencies VARCHAR[], languages VARCHAR[], networking VARCHAR[], offlineProcessing VARCHAR[], \"cache\" VARCHAR[], inferenceFallbacks VARCHAR[], clusters BIGINT[], status VARCHAR, params MAP(VARCHAR, JSON), pathMapping VARCHAR[], failOpen BOOLEAN)",
+      "notnull": false,
+      "dflt_value": null,
+      "pk": false
+    }
+  ],
+  "counts": {
+    "rows": 19,
+    "featureRows": 19
+  },
+  "termsCounts": [
+    {
+      "termType": "label",
+      "rows": 243
+    },
+    {
+      "termType": "import",
+      "rows": 62
+    },
+    {
+      "termType": "dependency",
+      "rows": 40
+    },
+    {
+      "termType": "module",
+      "rows": 33
+    },
+    {
+      "termType": "networking",
+      "rows": 32
+    },
+    {
+      "termType": "language",
+      "rows": 24
+    },
+    {
+      "termType": "cache",
+      "rows": 13
+    },
+    {
+      "termType": "fallback",
+      "rows": 7
+    },
+    {
+      "termType": "offline",
+      "rows": 5
+    }
+  ],
+  "labelCounts": [
+    {
+      "label": "feature-map",
+      "count": 19
+    },
+    {
+      "label": "lang:TypeScript",
+      "count": 19
+    },
+    {
+      "label": "status:active",
+      "count": 12
+    },
+    {
+      "label": "net:Postgres",
+      "count": 10
+    },
+    {
+      "label": "net:Redis",
+      "count": 10
+    },
+    {
+      "label": "store:Postgres",
+      "count": 10
+    },
+    {
+      "label": "cache:Redis hot cache",
+      "count": 9
+    },
+    {
+      "label": "store:Redis",
+      "count": 9
+    },
+    {
+      "label": "net:Qdrant",
+      "count": 6
+    },
+    {
+      "label": "store:Qdrant",
+      "count": 5
+    },
+    {
+      "label": "module:src/lib/server/atlas",
+      "count": 4
+    },
+    {
+      "label": "module:src/lib/server/retrieval",
+      "count": 4
+    },
+    {
+      "label": "net:Neo4j",
+      "count": 4
+    },
+    {
+      "label": "store:Neo4j",
+      "count": 4
+    },
+    {
+      "label": "cluster:72",
+      "count": 3
+    },
+    {
+      "label": "cluster:82",
+      "count": 3
+    },
+    {
+      "label": "module:scripts/atlas",
+      "count": 3
+    },
+    {
+      "label": "offline:DuckDB",
+      "count": 3
+    },
+    {
+      "label": "path:src/lib/server/retrieval",
+      "count": 3
+    },
+    {
+      "label": "status:planned",
+      "count": 3
+    }
+  ],
+  "preview": [
+    {
+      "id": "feature-map:gpu-compute-plane",
+      "kind": "feature",
+      "summary": "GPU Compute Plane Integration — resilient GPU-accelerated graph analysis and retrieval fallback coordination. Status active. Service GpuPipeline; stores Redis, Qdrant, Postgres; clusters none; modules src/lib/server/gpu…",
+      "score_rank": 95,
+      "score_authority": 0.55,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:hyperrag-fusion",
+      "kind": "feature",
+      "summary": "HyperRAG Retrieval (L0-L11) — multi-signal retrieval fusion (Lexical/Topology/Task/Graph). Status active. Service HyperRagFusionService; stores Qdrant, Redis, Neo4j, Postgres; clusters 72, 73, 94, 25, 32, 47, 92, 82, 20…",
+      "score_rank": 95,
+      "score_authority": 0.45,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:atlas-reconciliation",
+      "kind": "feature",
+      "summary": "Master Atlas Reconciliation — drift detection and automatic manifold repair. Status active. Service ManifoldDriftMonitor; stores Redis, Postgres, Qdrant; clusters none; modules scripts/atlas/detect-manifold-drift.mjs; i…",
+      "score_rank": 95,
+      "score_authority": 0.35000000000000003,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:ace-envelope",
+      "kind": "feature",
+      "summary": "ACE / BitFrost Context Cache — low-latency context assembly and budgeting. Status active. Service ContextPacketBudgeter; stores Redis, Postgres; clusters 72, 94; modules src/lib/server/ace; imports ContextPacketBudgeter…",
+      "score_rank": 95,
+      "score_authority": 0.25,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:hypergraph-4d",
+      "kind": "feature",
+      "summary": "Manifold4 / Hypergraph / Topological Routing — 4D manifold routing (som_x, som_y, semantic_z, activity_w). Status active. Service HypergraphRoutingService; stores Redis, Qdrant; clusters 72, 73; modules src/lib/server/r…",
+      "score_rank": 95,
+      "score_authority": 0.25,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:ingestion-layer",
+      "kind": "feature",
+      "summary": "Docling / LangExtract / OCR Ingestion — multimodal document and code ingestion pipeline. Status active. Service TopologyProcessor; stores Postgres, Qdrant; clusters 32, 92; modules src/lib/server/db/schema/topology.ts;…",
+      "score_rank": 95,
+      "score_authority": 0.25,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:legal-product",
+      "kind": "feature",
+      "summary": "Legal-AI Product Layer (KAG/DAG) — high-level legal reasoning and synthesis. Status active. Service Gemma4Synthesizer; stores Neo4j, Postgres; clusters 47; modules src/lib/server/ai, src/lib/server/kag; imports Gemma4Sy…",
+      "score_rank": 95,
+      "score_authority": 0.25,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:feature-atlas",
+      "kind": "feature",
+      "summary": "Feature Mapping Atlas — central registry for architectural intents and anchors. Status active. Service MasterFeatureMap; stores Postgres; clusters none; modules docs/atlas-index, scripts/atlas, src/lib/server/atlas; imp…",
+      "score_rank": 95,
+      "score_authority": 0.15000000000000002,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:karpathy-blend",
+      "kind": "feature",
+      "summary": "Karpathy / GPU Blend / Codebase Indexing — NanoFlow streaming context synthesis and autoencoding. Status active. Service KarpathyBlendOrchestrator; stores Redis; clusters none; modules src/lib/server/ace; imports Karpat…",
+      "score_rank": 95,
+      "score_authority": 0.15000000000000002,
+      "score_recency": 0
+    },
+    {
+      "id": "feature-map:route-map",
+      "kind": "feature",
+      "summary": "Route / Env / Sidecar Map — mapping routes to services, envs, and sidecars. Status active. Service RouteFeatureMap; stores Postgres; clusters none; modules src/lib/server/atlas, src/lib/server/atlas/route-feature-map.ts…",
+      "score_rank": 95,
+      "score_authority": 0.15000000000000002,
+      "score_recency": 0
+    }
+  ]
+}

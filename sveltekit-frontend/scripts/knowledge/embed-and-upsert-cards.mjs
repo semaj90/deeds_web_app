@@ -3,10 +3,24 @@ import fs from 'fs/promises';
 import path from 'path';
 import { createHash } from 'crypto';
 
-const cwd = process.cwd();
-const enrichedPath = path.join(cwd, 'memory','knowledge','document-knowledge-cards.langext.jsonl');
-const outEmbeds = path.join(cwd, 'memory','knowledge','document-knowledge-embeds.jsonl');
-const outQdrantPreview = path.join(cwd, 'memory','knowledge','document-knowledge-qdrant-preview.jsonl');
+function findRepoRoot(startDir) {
+  const current = path.resolve(startDir);
+  return path.basename(current).toLowerCase() === 'sveltekit-frontend'
+    ? path.dirname(current)
+    : current;
+}
+
+const cwd = findRepoRoot(process.cwd());
+
+function arg(name, fallback = '') {
+  const i = process.argv.indexOf(`--${name}`);
+  return i >= 0 ? process.argv[i + 1] : fallback;
+}
+
+const inputPath = path.resolve(cwd, arg('input', path.join(cwd, 'memory', 'knowledge', 'document-knowledge-cards.langext.jsonl')));
+const outEmbeds = path.resolve(cwd, arg('embeds-out', path.join(cwd, 'memory', 'knowledge', 'document-knowledge-embeds.jsonl')));
+const outQdrantPreview = path.resolve(cwd, arg('qdrant-preview-out', path.join(cwd, 'memory', 'knowledge', 'document-knowledge-qdrant-preview.jsonl')));
+const dim = Number(arg('dim', '768')) || 768;
 
 function parseLines(text){ return text.split(/\r?\n/).filter(Boolean).map(l=>{ try{return JSON.parse(l);}catch(e){return null} }).filter(Boolean); }
 
@@ -33,9 +47,8 @@ async function main(){
   if (live) console.warn('LIVE mode requested: this script will attempt external calls. Ensure env vars are set and you intend to run live.');
 
   let raw;
-  try{ raw = await fs.readFile(enrichedPath,'utf8'); }catch(e){ console.error('Enriched cards missing:', enrichedPath); process.exitCode=2; return }
+  try{ raw = await fs.readFile(inputPath,'utf8'); }catch(e){ console.error('Enriched cards missing:', inputPath); process.exitCode=2; return }
   const cards = parseLines(raw);
-  const dim = 768;
   const embedLines = [];
   const qdrantLines = [];
 
@@ -53,7 +66,7 @@ async function main(){
   await fs.writeFile(outEmbeds, embedLines.map(l=>JSON.stringify(l)).join('\n') + '\n','utf8');
   await fs.writeFile(outQdrantPreview, qdrantLines.map(l=>JSON.stringify(l)).join('\n') + '\n','utf8');
 
-  console.log(JSON.stringify({ cards: cards.length, embed_preview: outEmbeds, qdrant_preview: outQdrantPreview, liveMode: !!live }, null, 2));
+  console.log(JSON.stringify({ cards: cards.length, embed_preview: outEmbeds, qdrant_preview: outQdrantPreview, input: inputPath, liveMode: !!live, dim }, null, 2));
 }
 
 main().catch(e=>{ console.error(e); process.exitCode=2 });

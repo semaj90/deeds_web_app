@@ -1,27 +1,27 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-25T07:07:58.461Z
+> Generated: 2026-05-26T21:09:35.318Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 33800 |
-| Routes | 1067 |
+| Files | 34549 |
+| Routes | 1074 |
 | Components | 5341 |
-| API handlers | 5523 |
-| TODOs | 7700 |
-| Dirs | 1225 |
+| API handlers | 5528 |
+| TODOs | 7706 |
+| Dirs | 1354 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
-| G4 No auth | 11 |
-| G5 No Zod  | 1 |
-| G11 Localhost | 1475 |
+| G4 No auth | 16 |
+| G5 No Zod  | 3 |
+| G11 Localhost | 1495 |
 | G14 Svelte4 | 142 |
 | G15 SSR unsafe | 0 |
-| G16 No test | 75 |
-| G20 Cyclic | 1 |
+| G16 No test | 77 |
+| G20 Cyclic | 2 |
 
 ## Files with TODO/FIXME
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/proto/legal_api_pb.js` — 2370 marker(s)
