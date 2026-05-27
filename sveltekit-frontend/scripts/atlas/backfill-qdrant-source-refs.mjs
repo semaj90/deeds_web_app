@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { pool } from '../../src/lib/server/db/client.ts';
+import { Pool } from 'pg';
 
 const ROOT = resolve(process.cwd());
 const REPORTS_DIR = join(ROOT, 'docs', 'reports');
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
+const DATABASE_URL =
+  process.env.DATABASE_URL ??
+  process.env.POSTGRES_URL ??
+  'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has('--dry-run');
@@ -79,6 +83,10 @@ async function qdrantCoverageSample(sampleLimit = 25) {
 }
 
 async function main() {
+  if (!DATABASE_URL) {
+    throw new Error('DATABASE_URL or POSTGRES_URL is required');
+  }
+  const pool = new Pool({ connectionString: DATABASE_URL, max: 2 });
   const startedAt = new Date().toISOString();
   const before = await qdrantCoverageSample(limit);
 
@@ -127,60 +135,65 @@ async function main() {
       skipped = points.length;
     }
   } else {
-    const { rows } = await pool.query(
-      `SELECT DISTINCT relative_path
-       FROM codebase_chunk_index
-       WHERE relative_path IS NOT NULL
-         AND relative_path <> ''
-         AND relative_path <> '__unknown__'`
-    );
+    try {
+      const { rows } = await pool.query<{ relative_path: string }>(
+        `SELECT DISTINCT relative_path
+         FROM codebase_chunk_index
+         WHERE relative_path IS NOT NULL
+           AND relative_path <> ''
+           AND relative_path <> '__unknown__'
+         ORDER BY relative_path`
+      );
 
-    for (let i = 0; i < rows.length; i += batchSize) {
-      const batch = rows.slice(i, i + batchSize);
-      if (dryRun) {
-        attempted += batch.length;
-        skipped += batch.length;
-        continue;
-      }
+      for (let i = 0; i < rows.length; i += batchSize) {
+        const batch = rows.slice(i, i + batchSize);
+        if (dryRun) {
+          attempted += batch.length;
+          skipped += batch.length;
+          continue;
+        }
 
-      await Promise.all(
-        batch.map(async (row) => {
-          const sourceRefs = buildSourceRefs(row.relative_path);
-          attempted++;
-          if (sourceRefs.length === 0) {
-            skipped++;
-            return;
-          }
+        await Promise.all(
+          batch.map(async (row) => {
+            const sourceRefs = buildSourceRefs(row.relative_path);
+            attempted++;
+            if (sourceRefs.length === 0) {
+              skipped++;
+              return;
+            }
 
-          try {
-            const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                filter: {
-                  should: [
-                    { key: 'relativePath', match: { value: row.relative_path } },
-                    { key: 'file_path', match: { value: row.relative_path } },
-                  ],
-                  minimum_should_match: 1,
-                },
-                payload: {
-                  sourceRefs,
-                  source_refs: sourceRefs,
-                },
-              }),
-              signal: AbortSignal.timeout(15_000),
-            });
-            if (res.ok) {
-              updated++;
-            } else {
+            try {
+              const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  filter: {
+                    should: [
+                      { key: 'relativePath', match: { value: row.relative_path } },
+                      { key: 'file_path', match: { value: row.relative_path } },
+                    ],
+                    minimum_should_match: 1,
+                  },
+                  payload: {
+                    sourceRefs,
+                    source_refs: sourceRefs,
+                  },
+                }),
+                signal: AbortSignal.timeout(15_000),
+              });
+              if (res.ok) {
+                updated++;
+              } else {
+                skipped++;
+              }
+            } catch {
               skipped++;
             }
-          } catch {
-            skipped++;
-          }
-        })
-      );
+          })
+        );
+      }
+    } finally {
+      await pool.end().catch(() => {});
     }
   }
 

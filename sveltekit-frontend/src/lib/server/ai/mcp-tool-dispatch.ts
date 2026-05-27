@@ -9,6 +9,7 @@
  * ALL tools here are READ-ONLY — no writes to Qdrant, Neo4j, Redis, or Postgres.
  */
 
+import { join } from 'node:path';
 import { searchCodeLexical }       from '$lib/server/search/postgres-fts.js';
 import { searchQdrantCode }        from '$lib/server/search/qdrant-search.js';
 import { expandNeighbours }        from '$lib/server/search/neo4j-rerank.js';
@@ -617,6 +618,41 @@ export async function tool_kb_search_cards(args: {
   }
 }
 
+/** kb.search_schema_contract — retrieval over the standalone schema-indexer contract cards */
+export async function tool_kb_search_schema_contract(args: {
+  query: string;
+  limit?: number;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const cards = await searchNotecards({
+      query: args.query,
+      limit: Math.min(args.limit ?? 10, 20),
+      cardsPath: join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl'),
+    });
+    return ok(
+      'kb.search_schema_contract',
+      {
+        query: args.query,
+        count: cards.length,
+        cards: cards.map((hit) => ({
+          chunk_id: hit.card_id,
+          source_path: hit.source_path,
+          score: hit.score,
+          why: hit.why,
+          kind: hit.kind,
+          tags: hit.tags,
+          rank_score: hit.rank_score,
+          content: hit.context_text,
+        })),
+      },
+      Date.now() - t0
+    );
+  } catch (e) {
+    return err('kb.search_schema_contract', String(e), Date.now() - t0);
+  }
+}
+
 /** kb.get_card — fetch a single card by stable id or source path */
 export async function tool_kb_get_card(args: { chunk_id: string }): Promise<MCPToolResult> {
   const t0 = Date.now();
@@ -895,6 +931,8 @@ export const TOOL_DISPATCH: Record<
   'workspace.timeline': (a) =>
     tool_workspace_timeline(a as Parameters<typeof tool_workspace_timeline>[0]),
   'kb.search_cards': (a) => tool_kb_search_cards(a as Parameters<typeof tool_kb_search_cards>[0]),
+  'kb.search_schema_contract': (a) =>
+    tool_kb_search_schema_contract(a as Parameters<typeof tool_kb_search_schema_contract>[0]),
   'kb.get_card': (a) => tool_kb_get_card(a as Parameters<typeof tool_kb_get_card>[0]),
   'kb.expand_neighbors': (a) =>
     tool_kb_expand_neighbors(a as Parameters<typeof tool_kb_expand_neighbors>[0]),

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T23:22:22.485Z",
+  "generatedAt": "2026-05-26T23:44:12.659Z",
   "runId": "stage-2c-500",
   "inputs": {
     "graphDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\graph",
@@ -102,102 +102,102 @@
         "ok": true,
         "status": 200,
         "total": 25,
-        "withSourceRefs": 0,
-        "coverage": 0,
+        "withSourceRefs": 25,
+        "coverage": 1,
         "sample": [
           {
             "id": "8303",
             "filePath": "src/lib/types/evidence.ts",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": 19
           },
           {
             "id": "155706",
             "filePath": "src/lib/server/retrieval/turbovec-prefilter.ts",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
             "id": "174637",
             "filePath": "src/lib/server/ai/contextual-tools.ts",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
             "id": "188608",
             "filePath": "src/lib/server/research/reddit-harvester.ts",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
             "id": "194586",
             "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
             "id": "292522",
             "filePath": "src/lib/components/monitoring/CacheMonitoringWidget.svelte",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
             "id": "433670",
             "filePath": "src/routes/(app)/demos/courtroom-sim/LLMS.md",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
             "id": "436451",
             "filePath": "src/lib/components/citations/CitationSaveForm.svelte",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
             "id": "506499",
             "filePath": "src/lib/types/svelte5-api-types.d.ts",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": 4
           },
           {
             "id": "516801",
             "filePath": "src/lib/components/cases/ContextualChatModal.svelte",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": 2
           },
           {
             "id": "909958",
             "filePath": "src/lib/server/retrieval/centroid-cache.ts",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
             "id": "1005499",
             "filePath": "src/lib/components/ai/LLMS.md",
-            "sourceRefsCount": 0,
-            "hasSourceRefs": false,
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           }
@@ -210,7 +210,7 @@
     "provenanceDisplay": {
       "adminAtlasUiPresent": true,
       "sourceRefsHookPresent": true,
-      "graphPathsHookPresent": false
+      "graphPathsHookPresent": true
     },
     "clusterVisualization": {
       "clusterAliasesPresent": true,
@@ -280,7 +280,7 @@
     },
     "directEdit": {
       "trustTierHooksPresent": true,
-      "promotionHooksPresent": false,
+      "promotionHooksPresent": true,
       "note": "Direct edit remains an implementation lane; current codebase has trust-tier plumbing but no operator UI edit surface in this pass."
     },
     "multiLaneRetrieval": {

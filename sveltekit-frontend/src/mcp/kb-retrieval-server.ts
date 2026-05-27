@@ -9,6 +9,7 @@
  */
 
 import http from 'node:http';
+import { join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
@@ -20,6 +21,7 @@ import { ENV } from '../lib/server/env.server.js';
 const KB_MCP = new URL(ENV.KB_MCP_URL);
 const PORT = Number(KB_MCP.port || '8789');
 const HOST = KB_MCP.hostname;
+const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
 // ── MCP Server ────────────────────────────────────────────────────────────────
 
@@ -58,6 +60,47 @@ server.tool(
         })),
         elapsedMs: Date.now() - t0,
         retrieval_mode: 'sparse-lexical-rank',
+      };
+
+      return { content: [{ type: 'text' as const, text: JSON.stringify(out, null, 2) }] };
+    } catch (err: any) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: err.message }) }], isError: true };
+    }
+  }
+);
+
+// ── kb.search_schema_contract ───────────────────────────────────────────────
+
+server.tool(
+  'kb.search_schema_contract',
+  {
+    query: z.string().describe('Semantic query for the schema-indexer contract'),
+    limit: z.number().int().min(1).max(50).default(10).describe('Max cards returned'),
+  },
+  async ({ query, limit }) => {
+    const t0 = Date.now();
+    try {
+      const results = await searchNotecards({
+        query,
+        limit,
+        cardsPath: SCHEMA_INDEXER_CONTRACT_CARDS_PATH,
+      });
+
+      const out = {
+        query,
+        count: results.length,
+        retrieval_mode: 'schema-contract-lexical-rank',
+        cards: results.map((hit) => ({
+          chunk_id: hit.card_id,
+          source_path: hit.source_path,
+          score: hit.score,
+          why: hit.why,
+          kind: hit.kind,
+          tags: hit.tags,
+          rank_score: hit.rank_score,
+          content: hit.context_text,
+        })),
+        elapsedMs: Date.now() - t0,
       };
 
       return { content: [{ type: 'text' as const, text: JSON.stringify(out, null, 2) }] };

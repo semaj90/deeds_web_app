@@ -99,6 +99,7 @@
 	let routingSignals = $state<AtlasRoutingSignals | null>(null);
 	let chunks = $state<AtlasChunk[]>([]);
 	let sourceRefs = $state<string[]>([]);
+	let graphPaths = $state<string[]>([]);
 	let nodes = $state<AtlasNode[]>([]);
 	let edges = $state<AtlasEdge[]>([]);
 	let trace = $state<TraceStep[]>([]);
@@ -136,6 +137,7 @@
 			karpathyRev = res.karpathyRev ?? '';
 			chunks = res.chunks ?? [];
 			sourceRefs = res.sourceRefs ?? [];
+			graphPaths = res.graphPaths ?? [];
 			nodes = d.nodes ?? [];
 			edges = d.edges ?? [];
 			trace = d.trace ?? [];
@@ -890,6 +892,20 @@
 							<li class="text-[0.68rem] text-[#d1cdb8] truncate flex items-center gap-1.5" title={ref}>
 								<span class="w-1.5 h-1.5 bg-[#d1cdb8]/30"></span>
 								<span class="font-bold text-[#efede4]">{ref.split('/').pop()}</span>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
+
+			{#if graphPaths.length > 0}
+				<div class="p-4 border-b border-[#3f3e37]">
+					<p class="text-[0.68rem] text-[#a39f90] font-bold uppercase tracking-wider mb-2 border-b border-[#3f3e37] pb-1">// Graph Paths</p>
+					<ul class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+						{#each graphPaths as path (path)}
+							<li class="text-[0.68rem] text-[#d1cdb8] truncate flex items-center gap-1.5" title={path}>
+								<span class="w-1.5 h-1.5 bg-[#8c9f7a]/40"></span>
+								<span class="font-bold text-[#efede4]">{path}</span>
 							</li>
 						{/each}
 					</ul>

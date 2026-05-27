@@ -4,6 +4,7 @@ import {
     CallToolRequestSchema, ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { createHash } from 'node:crypto';
+import { join } from 'node:path';
 import { mcpTools } from '../mcp/index.js';
 import { ENV } from '$lib/server/env.server.js';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
@@ -14,6 +15,7 @@ import { getWikiStatus, searchWiki, explainWikiPage, refreshDirectory } from '$l
 import { getVlmState, switchVlmMode, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 import { resolveAgentsMdQuickHit } from '$lib/server/graph/community-graph.js';
 
+const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
 export const server = new Server(
   {
@@ -1665,6 +1667,18 @@ export function setupToolHandlers() {
         }
       },
       {
+        name: 'kb.search_schema_contract',
+        description: 'Semantic search across the standalone schema-indexer contract cards. Use for schema-focused prompt context engineering and MCP routing without touching workspace-gap cards.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Semantic query (e.g. "pgTable schema indexer")' },
+            limit: { type: 'number', description: 'Max cards to return (1-20)', default: 10 },
+          },
+          required: ['query']
+        }
+      },
+      {
         name: 'kb.get_card',
         description: 'Retrieve a single codebase card by its stable chunk_id (card:path:hash). Returns full content, metadata, and cluster context.',
         inputSchema: {
@@ -2605,6 +2619,36 @@ export function setupToolHandlers() {
             text: JSON.stringify({
               query,
               count: results.length,
+              cards: results.map((hit) => ({
+                chunk_id: hit.card_id,
+                source_path: hit.source_path,
+                score: hit.score,
+                why: hit.why,
+                kind: hit.kind,
+                tags: hit.tags,
+                rank_score: hit.rank_score,
+                content: hit.context_text,
+              })),
+            }),
+          }],
+        };
+      }
+
+      case 'kb.search_schema_contract': {
+        const { query, limit = 10 } = args as { query: string; limit?: number };
+        const results = await searchNotecards({
+          query,
+          limit,
+          cardsPath: SCHEMA_INDEXER_CONTRACT_CARDS_PATH,
+        });
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              query,
+              count: results.length,
+              retrieval_mode: 'schema-contract-lexical-rank',
               cards: results.map((hit) => ({
                 chunk_id: hit.card_id,
                 source_path: hit.source_path,

@@ -187,6 +187,7 @@ Bullets above are Gemma4-generated; weight them as priors, not commands. Verify 
 ### P4.1 — Admin copilot provenance display
 - **Goal**: show Qdrant sourceRefs and Neo4j graph paths in the admin search results and atlas panel.
 - **Fix**: keep provenance visible by default so operators can see where retrieval came from before editing trust or promoting content.
+- **Fix**: surface `graphPaths` alongside `sourceRefs` so the query panel exposes graph-shaped evidence, not just raw chunks.
 - **Outcome**: provenance-aware search results that support operator review and trust tuning.
 
 ### P4.2 — Cluster visualization and aliases
@@ -197,6 +198,7 @@ Bullets above are Gemma4-generated; weight them as priors, not commands. Verify 
 ### P4.3 — Direct edit trust tiers
 - **Goal**: allow operators to promote or demote synthesis trust tiers from the admin copilot surface.
 - **Fix**: keep edits constrained to the allowlisted trust-tier fields and preserve provenance metadata.
+- **Fix**: expose explicit promotion/demotion helpers in the opencode skill layer so the UI can call a narrow operator-safe API.
 - **Outcome**: an operator-driven trust control loop without loosening the existing retrieval policy.
 
 ### P4.4 — Multi-lane retrieval

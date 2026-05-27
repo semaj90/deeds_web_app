@@ -86,6 +86,11 @@ async function dispatchLocalDeepResearch(args: { featureKey?: string, sourceRefs
   });
 }
 
+export function adjustTrustTier(trustTier: number, action: 'promotion' | 'demotion') {
+  const delta = action === 'promotion' ? 1 : -1;
+  return Math.max(-1, Math.min(2, trustTier + delta));
+}
+
 export async function injectSummary(rawArgs: unknown) {
   const args = InjectSummaryArgsSchema.parse(rawArgs);
 

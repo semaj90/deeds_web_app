@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-26T23:40:17.458Z",
-  "startedAt": "2026-05-26T23:40:17.221Z",
+  "generatedAt": "2026-05-26T23:42:55.452Z",
+  "startedAt": "2026-05-26T23:42:55.186Z",
   "dryRun": false,
   "sampleQdrant": true,
   "sampleLimit": 25,
-  "qdrantUrl": "http://127.0.0.1:6333",
+  "qdrantUrl": "http://localhost:6333",
   "collection": "codebase_chunks_768",
   "attempted": 25,
   "updated": 25,
@@ -13,1272 +13,8 @@
     "ok": true,
     "status": 200,
     "total": 25,
-    "withSourceRefs": 0,
-    "coverage": 0,
-    "sample": [
-      {
-        "id": 8303,
-        "payload": {
-          "content": "export type UploadResponse = APIResponse<{\r\n fileId: string;\r\n\tpath: string;\r\n processingStarted: boolean;\r\n}>;",
-          "signature": "export UploadResponse [vector, redis, embedding]",
-          "path": "sveltekit-frontend/src/lib/types/evidence.ts",
-          "relativePath": "src/lib/types/evidence.ts",
-          "kind": "file",
-          "symbol": "UploadResponse",
-          "exports": [
-            "UploadResponse"
-          ],
-          "tags": [
-            "vector",
-            "redis",
-            "embedding"
-          ],
-          "lineStart": 177,
-          "lineEnd": 181,
-          "feature_key": "code.surface",
-          "neo4j_gpuCluster": 19,
-          "language": "typescript",
-          "som_bmu_row": 1,
-          "som_bmu_col": 12,
-          "cluster_id": 19,
-          "cluster_purpose": "Data Contract Definitions",
-          "cluster_summary_text": "This cluster defines the comprehensive data models and response types used across various backend services. It standardizes the structure for results coming from knowledge bases, web searches, document processing, and AI synthesis.",
-          "cluster_patterns": [
-            "Data Transfer Objects (DTOs)",
-            "Response Standardization",
-            "Type Safety Enforcement",
-            "Layered Architecture"
-          ],
-          "cluster_warnings": [
-            "The use of `Record<string, any>` (e.g., in `QueryResultRow` and `KBSearchResult`) sacrifices compile-time type safety for flexibility. Consumers must implement robust runtime validation to prevent unexpected data access.",
-            "The definitions imply complex multi-stage pipelines (e.g., search -> cache -> synthesis). Error handling and fallback mechanisms for external services (like MinIO or vector stores) must be rigorously implemented outside of these type definitions."
-          ],
-          "cluster_tags": [
-            "src/lib/types/source-validation.ts",
-            "src/lib/server/retrieval/web-search.ts",
-            "src/lib/server/docling.ts",
-            "src/lib/server/types/synthesis.ts",
-            "src/lib/types/evidence.ts"
-          ],
-          "pipeline_tags": [
-            "error:ts-general:-general-ts-error",
-            "error:ts1005:-token-syntax-corruptio",
-            "error:ts2339:-missing-property-on-ty",
-            "error:ts1005:-token-syntax-corruptio",
-            "error:ts2345:-type-assignability-mis",
-            "error:ts2300:-duplicate-declaration",
-            "error:ts-general:-general-ts-error",
-            "error:ts2322:-type-'",
-            "error:ts2305:-module-export-mismatch",
-            "error:ts7053:-unknown-object-propert"
-          ],
-          "pipeline_analyzed_at": "2026-04-25T03:58:41.317Z",
-          "topo_byte": 64,
-          "topo_hex": "0x40",
-          "topo_class": "unclassified",
-          "workspace": "sveltekit-frontend",
-          "graphAuthorityScore": 0,
-          "cluster_key": "unclassified:community-14112",
-          "agents_scope": "lib/types/AGENTS.md",
-          "grpo_reward": 0.29705882352941176,
-          "nes_risk_level": "low",
-          "nes_priority": 64,
-          "tsgo7_diags": 0,
-          "runId": "atlas-full-payload-sweep-004",
-          "communitySize": 0,
-          "pagerank": 0.15000000000000002,
-          "glyph_cluster": "unclassified:na",
-          "gpuCluster": 17,
-          "somRow": 3,
-          "somCol": 2,
-          "agents_card_id": "agents:dir:src-lib-types",
-          "agents_card_hash": "34bb87b6325e3cb4",
-          "dir_path": "src/lib/types",
-          "dir_summary": "shared library directory with 53 files, 0 API handlers, 1 Drizzle refs",
-          "feature_keys": [],
-          "qdrant_tags": [
-            "src",
-            "lib",
-            "types",
-            "zod",
-            "db-schema"
-          ],
-          "audit_status": "PARTIAL",
-          "agents_activity_score": 0,
-          "agents_indexed_at": "2026-05-11T16:58:26.039Z",
-          "authority_score": 0.7781802509562914,
-          "graph_centrality_version": "gds-pagerank-v1",
-          "repo": "deeds-web-app",
-          "activity_w": 0,
-          "route_refs": [],
-          "env_keys": [],
-          "communityId": "community:14112",
-          "manifold4": [
-            0.64111257,
-            0.7620649,
-            0.70939213,
-            0.31323695
-          ],
-          "som_cluster": 0,
-          "gpu_cluster": 0,
-          "encoded_at": "2026-05-19T19:59:18.876449+00:00",
-          "encoded_64": [
-            -0.05850469321012497,
-            -0.04684213921427727,
-            -0.03367035835981369,
-            -0.15981069207191467,
-            -0.14755496382713318,
-            0.18637508153915405,
-            -0.2630312442779541,
-            -0.16687381267547607,
-            0.04389220476150513,
-            0.05052529275417328,
-            -0.28717881441116333,
-            0.05331189185380936,
-            0.10236698389053343,
-            0.06208226829767227,
-            -0.025451811030507088,
-            -0.052316971123218536,
-            -0.08590535819530487,
-            0.011640317738056185,
-            0.02961602434515953,
-            0.05066872760653496,
-            0.06355640292167664,
-            0.05742549151182175,
-            -0.07111522555351257,
-            -0.15604689717292786,
-            -0.17360270023345947,
-            -0.1479066014289856,
-            0.1914053410291672,
-            -0.02153344824910164,
-            -0.021176734939217567,
-            -0.14115279912948608,
-            -0.03194214031100273,
-            -0.2418699711561203,
-            -0.01555955410003662,
-            -0.0919950008392334,
-            -0.05314012989401817,
-            0.024639436975121495,
-            0.030956650152802467,
-            -0.12074251472949982,
-            0.12852613627910614,
-            0.12346568703651428,
-            -0.08585666120052338,
-            0.0059923031367361546,
-            0.06204186752438545,
-            -0.08954286575317383,
-            -0.09236634522676468,
-            0.11467906832695007,
-            -0.10125644505023956,
-            0.08043117821216583,
-            0.15361668169498444,
-            0.124482661485672,
-            0.0157813411206007,
-            -0.15384867787361145,
-            -0.14089608192443848,
-            0.3328094780445099,
-            -0.17356209456920624,
-            0.14012448489665985,
-            -0.1819633990526199,
-            0.026908060535788536,
-            0.0769023671746254,
-            -0.11639871448278429,
-            -0.14206020534038544,
-            0.22493170201778412,
-            0.006378555204719305,
-            0.07301965355873108
-          ],
-          "manifold_64": [
-            -0.00044420050107873976,
-            0.253475546836853,
-            -0.06370552629232407,
-            0.11021269857883452,
-            0.17113541066646576,
-            0.07086046785116196,
-            0.07936732470989227,
-            0.020037272945046425,
-            0.054981935769319534,
-            -0.06147145852446556,
-            -0.17471107840538025,
-            0.28542646765708923,
-            -0.15129320323467255,
-            -0.08664578944444656,
-            -0.128042533993721,
-            0.23661042749881744,
-            -0.04101958125829697,
-            -0.011781963519752026,
-            -0.005100890062749386,
-            0.17201298475265503,
-            0.056459132581949234,
-            -0.22913198173046112,
-            0.07002530246973038,
-            0.12590140104293823,
-            -0.20404119789600372,
-            -0.03236047923564911,
-            -0.15591084957122803,
-            -0.0914873629808426,
-            -0.1182507872581482,
-            -0.08982689678668976,
-            0.10610370337963104,
-            0.02859680913388729,
-            0.09319401532411575,
-            0.101388119161129,
-            -0.035130128264427185,
-            0.15523451566696167,
-            -0.2715229392051697,
-            -0.06846484541893005,
-            -0.098303385078907,
-            -0.05948572978377342,
-            -0.10127294808626176,
-            0.04045542702078819,
-            -0.21107232570648193,
-            -0.1328425258398056,
-            0.0065147364512085915,
-            -0.0672759935259819,
-            0.14829295873641968,
-            -0.07937929779291153,
-            -0.14441411197185516,
-            -0.12435518205165864,
-            -0.1277414858341217,
-            0.014200406149029732,
-            -0.18356835842132568,
-            0.01100008189678192,
-            -0.048032570630311966,
-            -0.06983745843172073,
-            0.12367700785398485,
-            0.03425614908337593,
-            0.05070739611983299,
-            -0.07943154126405716,
-            -0.02399598993360996,
-            -0.06755229830741882,
-            0.09342476725578308,
-            -0.25234347581863403
-          ]
-        }
-      },
-      {
-        "id": 155706,
-        "payload": {
-          "chunk_id": "card:src/lib/server/retrieval/turbovec-prefilter.ts:5d6c1942c4fbcd0a",
-          "file_path": "src/lib/server/retrieval/turbovec-prefilter.ts",
-          "file_name": "turbovec-prefilter.ts",
-          "extension": ".ts",
-          "chunk_index": 2,
-          "total_chunks": 5,
-          "content": "      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({\n        vector: Array.from(embedding),\n        topClusters: opts.topClusters ?? 5,\n      }),\n      signal: AbortSignal.timeout(timeoutMs),\n    });\n    if (!res.ok) return EMPTY_PREFILTER;\n    const data = await res.json();\n    return {\n      clusterIds: data.clusterIds ?? [],\n      centroidScores: data.centroidScores ?? {},\n      backend: data.backend ?? 'js',\n      durationMs: Date.now() - t0,\n    };\n  } catch {\n    return { ...EMPTY_PREFILTER, durationMs: Date.now() - t0 };\n  }\n}\n\n/**\n * Call /search — returns ANN candidate point IDs for score-boosting (not hard filtering).\n * Times out after `opts.timeoutMs` (default 300ms). Returns empty result on failure.\n */\nexport async function turbovecSearch(",
-          "content_hash": "5d6c1942c4fbcd0a",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-26T17:41:15.599Z"
-        }
-      },
-      {
-        "id": 174637,
-        "payload": {
-          "chunk_id": "card:src/lib/server/ai/contextual-tools.ts:dd017c7c6ad55fbc",
-          "file_path": "src/lib/server/ai/contextual-tools.ts",
-          "file_name": "contextual-tools.ts",
-          "extension": ".ts",
-          "chunk_index": 49,
-          "total_chunks": 61,
-          "content": "          name: string;\r\n          pass1: number;\r\n          pass2: number;\r\n          grpo: number;\r\n          reasoning: string;\r\n        };\r\n        const matches: Match[] = candidates.map((c: { id: string; name: string | null }) => {\r\n          const photo = photoMap.get(c.id);\r\n          const p1 = refEmb && photo?.emb ? (cosine(refEmb, photo.emb) + 1) / 2 : 0;\r\n          return {\r\n            poiId: c.id,\r\n            name: c.name ?? 'Unknown',\r\n            pass1: p1,\r\n            pass2: 0,\r\n            grpo: 0,\r\n            reasoning: '',\r\n          };\r\n        });\r\n\r\n        matches.sort((a, b) => b.pass1 - a.pass1);\r\n\r\n        // Pass 2: VLM reasoning on top-5\r\n        if (passes >= 2 && refPhoto?.thumbnailUrl) {\r\n          const OLLAMA = env.OLLAMA_BASE_URL.replace(/\\/$/, '');\r",
-          "content_hash": "dd017c7c6ad55fbc",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T07:41:55.126Z",
-          "topo_byte": 128,
-          "topo_hex": "0x80",
-          "topo_class": "unclassified",
-          "manifold4": [
-            0.9376611,
-            0.3144611,
-            0.7501833,
-            0.2583998
-          ],
-          "graphAuthorityScore": 0,
-          "glyph_cluster": "unclassified:na"
-        }
-      },
-      {
-        "id": 188608,
-        "payload": {
-          "chunk_id": "card:src/lib/server/research/reddit-harvester.ts:19efad6c28a9852c",
-          "file_path": "src/lib/server/research/reddit-harvester.ts",
-          "file_name": "reddit-harvester.ts",
-          "extension": ".ts",
-          "chunk_index": 8,
-          "total_chunks": 9,
-          "content": "\r\n        return {\r\n          id: sha256Hex(`reddit_post:${d.id}:${body.slice(0, 200)}`),\r\n          source: 'reddit_post' as const,\r\n          url: redditUrl,\r\n          title: d.title,\r\n          body: body.slice(0, 5000),\r\n          subreddit: d.subreddit,\r\n          score: d.score,\r\n          fetched_at: new Date().toISOString(),\r\n        };\r\n      });\r\n\r\n    return { chunks, after: data?.data?.after ?? null };\r\n  } catch (err) {\r\n    console.error('[reddit-harvester] fetch error:', err);\r\n    return { chunks: [], after: null };\r\n  }\r\n}\r\n",
-          "content_hash": "19efad6c28a9852c",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T08:01:10.123Z"
-        }
-      },
-      {
-        "id": 194586,
-        "payload": {
-          "chunk_id": "card:src/lib/server/gpu/libtorch-bridge.ts:920ac4a0d0dc0438",
-          "file_path": "src/lib/server/gpu/libtorch-bridge.ts",
-          "file_name": "libtorch-bridge.ts",
-          "extension": ".ts",
-          "chunk_index": 26,
-          "total_chunks": 76,
-          "content": "\r\n  // CPU heap guard: n×n float matrix at 4 bytes each\r\n  const cpuBytes = n * n * 4;\r\n  if (!heapHasRoom(cpuBytes)) {\r\n    throw new RangeError(\r\n      `[libtorch-bridge] graphSimilarity: insufficient heap for ${n}×${n} CPU matrix ` +\r\n        `(need ~${(cpuBytes / 1e6).toFixed(0)} MB)`\r\n    );\r\n  }\r\n  return { matrix: cpuCosineSimilarity(embeddings), n, source: 'cpu' };\r\n}\r\n\r\n/**\r\n * K-means clustering.\r\n * GPU: libtorch CUDA K-means. CPU: 8× unrolled, Float32 centroid storage.\r\n */\r\nexport async function clusterEmbeddings(embeddings: number[][], k: number): Promise<ClusterResult> {\r\n  const n = embeddings.length;\r\n  const dim = embeddings[0]?.length ?? 0;\r\n\r\n  // P0: k > n would leave empty clusters with undefined centroids → NaN propagation\r",
-          "content_hash": "920ac4a0d0dc0438",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T07:53:08.773Z"
-        }
-      },
-      {
-        "id": 292522,
-        "payload": {
-          "chunk_id": "card:src/lib/components/monitoring/CacheMonitoringWidget.svelte:5166baf5051650d9",
-          "file_path": "src/lib/components/monitoring/CacheMonitoringWidget.svelte",
-          "file_name": "CacheMonitoringWidget.svelte",
-          "extension": ".svelte",
-          "chunk_index": 16,
-          "total_chunks": 19,
-          "content": "\t\t\t\t\t\t\t\t\t<span>{op.latencyMs.toFixed(1)}ms</span>\r\n\t\t\t\t\t\t\t\t{/if}\r\n\t\t\t\t\t\t\t\t<span>{timeAgo(op.timestamp)}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t{/each}\r\n\t\t\t\t</div>\r\n\t\t\t{/if}\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!-- Cache Info -->\r\n\t<div class=\"bg-panelSoft rounded p-3 border border-sand-5 space-y-1 text-xs\">\r\n\t\t<div class=\"flex justify-between\">\r\n\t\t\t<span class=\"text-sand-11\">Avg TTL:</span>\r\n\t\t\t<span class=\"font-medium\">{stats.avgTtlMinutes} minutes ({stats.rawTtlSeconds}s)</span>\r\n\t\t</div>\r\n\t\t{#if lastUpdate}\r\n\t\t\t<div class=\"flex justify-between\">\r\n\t\t\t\t<span class=\"text-sand-11\">Last Update:</span>\r\n\t\t\t\t<span class=\"font-medium\">{timeAgo(lastUpdate)}</span>\r\n\t\t\t</div>\r\n\t\t{/if}\r\n\t\t<div class=\"flex justify-between\">\r\n\t\t\t<span class=\"text-sand-11\">Poll Interval:</span>\r",
-          "content_hash": "5166baf5051650d9",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T07:24:39.633Z"
-        }
-      },
-      {
-        "id": 433670,
-        "payload": {
-          "chunk_id": "card:src/routes/(app)/demos/courtroom-sim/LLMS.md:43021311a769671f",
-          "file_path": "src/routes/(app)/demos/courtroom-sim/LLMS.md",
-          "file_name": "LLMS.md",
-          "extension": ".md",
-          "chunk_index": 0,
-          "total_chunks": 4,
-          "content": "# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\n\n# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\n\n# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\n\n# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\n\n# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n<!-- LLMS-ENRICH v1 · auto-generated by enrich-llms-md.mjs · do not edit manually -->\n\n## Enhanced Graph Context\n\n\n| File | Authority | Flags |\n|------|-----------|-------|\n| `+page.server.ts` | 0.000 | 0x205 |\n| `+page.ts` | 0.000 | 0x208 |\n| `+page.svelte` | 0.000 | 0x209 |",
-          "content_hash": "43021311a769671f",
-          "tags": [
-            "docs",
-            "route",
-            "utility",
-            "md"
-          ],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-22T02:23:01.275Z"
-        }
-      },
-      {
-        "id": 436451,
-        "payload": {
-          "chunk_id": "card:src/lib/components/citations/CitationSaveForm.svelte:9876dbe952c51405",
-          "file_path": "src/lib/components/citations/CitationSaveForm.svelte",
-          "file_name": "CitationSaveForm.svelte",
-          "extension": ".svelte",
-          "chunk_index": 7,
-          "total_chunks": 14,
-          "content": "\t\t>\r\n\t\t\t{showAdvanced ? '▼' : '▶'} Advanced Options\r\n\t\t</button>\r\n\r\n\t\t{#if showAdvanced}\r\n\t\t\t<div class=\"advanced-options\">\r\n\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t<label for=\"statute-code\">Statute Code</label>\r\n\t\t\t\t\t<input\r\n\t\t\t\t\t\tid=\"statute-code\"\r\n\t\t\t\t\t\ttype=\"text\"\r\n\t\t\t\t\t\tbind:value={formData.statuteCode}\r\n\t\t\t\t\t\tplaceholder=\"e.g., 42-1983\"\r\n\t\t\t\t\t\tdisabled={isLoading}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t<label for=\"statute-title\">Statute Title</label>\r\n\t\t\t\t\t<input\r\n\t\t\t\t\t\tid=\"statute-title\"\r\n\t\t\t\t\t\ttype=\"text\"\r\n\t\t\t\t\t\tbind:value={formData.statuteTitle}\r\n\t\t\t\t\t\tplaceholder=\"e.g., Civil action for deprivation of rights\"\r\n\t\t\t\t\t\tdisabled={isLoading}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t<label for=\"context-text\">Context Text</label>\r\n\t\t\t\t\t<textarea\r",
-          "content_hash": "9876dbe952c51405",
-          "tags": [
-            "svelte",
-            "component",
-            "utility"
-          ],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-24T16:55:34.253Z"
-        }
-      },
-      {
-        "id": 506499,
-        "payload": {
-          "content": "/**\r\n * Form state with Svelte 5\r\n */\r\nexport interface FormState<T = Record<string, unknown>> {\r\n  values: StateValue<T>;\r\n  errors: StateValue<Partial<Record<keyof T, string>>>;\r\n  touched: StateValue<Partial<Record<keyof T, boolean>>>;\r\n  isValid: DerivedValue<boolean>;\r\n  isSubmitting: StateValue<boolean>;\r\n  submit: () => Promise<void>;\r\n  reset: () => void;\r\n}",
-          "signature": "export FormState [auth]",
-          "path": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/types/svelte5-api-types.d.ts",
-          "relativePath": "src/lib/types/svelte5-api-types.d.ts",
-          "kind": "type",
-          "symbol": "FormState",
-          "exports": [
-            "FormState"
-          ],
-          "tags": [
-            "auth"
-          ],
-          "lineStart": 237,
-          "lineEnd": 245,
-          "gpu_cluster": 1,
-          "neo4j_gpuCluster": 4,
-          "som_cluster": 1,
-          "som_bmu_row": 1,
-          "som_bmu_col": 12,
-          "pipeline_tags": [
-            "error:ts-general:-general-ts-error",
-            "error:ts1005:-token-syntax-corruptio",
-            "error:ts2339:-missing-property-on-ty",
-            "error:ts1005:-token-syntax-corruptio",
-            "error:ts2345:-type-assignability-mis",
-            "error:ts2300:-duplicate-declaration",
-            "error:ts-general:-general-ts-error",
-            "error:ts2322:-type-'",
-            "error:ts2305:-module-export-mismatch",
-            "error:ts7053:-unknown-object-propert"
-          ],
-          "pipeline_analyzed_at": "2026-04-25T03:58:41.317Z",
-          "topo_byte": 64,
-          "topo_hex": "0x40",
-          "topo_class": "unclassified",
-          "manifold4": [
-            0.81064016,
-            0.72751534,
-            0.45122954,
-            0.59258264
-          ],
-          "graphAuthorityScore": 0,
-          "cluster_key": "unclassified:community-13804",
-          "agents_scope": "lib/types/AGENTS.md",
-          "glyph_cluster": "unclassified:na",
-          "gpuCluster": 17,
-          "somRow": 3,
-          "somCol": 2,
-          "agents_card_id": "agents:dir:src-lib-types",
-          "agents_card_hash": "34bb87b6325e3cb4",
-          "dir_path": "src/lib/types",
-          "dir_summary": "shared library directory with 53 files, 0 API handlers, 1 Drizzle refs",
-          "feature_keys": [],
-          "qdrant_tags": [
-            "src",
-            "lib",
-            "types",
-            "zod",
-            "db-schema"
-          ],
-          "audit_status": "PARTIAL",
-          "agents_activity_score": 0,
-          "agents_indexed_at": "2026-05-11T16:58:26.039Z",
-          "pagerank": 0.15000000000000002,
-          "authority_score": 0.7782200718683947,
-          "graph_centrality_version": "gds-pagerank-v1",
-          "communitySize": 0,
-          "communityId": "community:13804",
-          "encoded_at": "2026-05-19T19:59:18.876449+00:00",
-          "encoded_64": [
-            0.018332885578274727,
-            -0.1360969990491867,
-            0.017765207216143608,
-            0.19306661188602448,
-            -0.05068487301468849,
-            0.13385634124279022,
-            -0.2142740786075592,
-            -0.24151848256587985,
-            0.005920281168073416,
-            0.08302327990531921,
-            -0.11545207351446152,
-            0.19473928213119507,
-            0.00015977541625034064,
-            0.016497759148478508,
-            0.030747149139642715,
-            -0.03659048303961754,
-            0.11462464928627014,
-            -0.17046287655830383,
-            0.07993185520172119,
-            -0.06820614635944366,
-            -0.017388878390192986,
-            -0.022870462387800217,
-            -0.1673976182937622,
-            0.02706027217209339,
-            -0.1767188012599945,
-            0.08087057620286942,
-            -0.020242856815457344,
-            -0.09656848013401031,
-            -0.20495551824569705,
-            0.003060685470700264,
-            -0.07386017590761185,
-            0.04952529817819595,
-            -0.01833074167370796,
-            -0.029440704733133316,
-            -0.2791373133659363,
-            0.13516253232955933,
-            -0.14893914759159088,
-            -0.03470347821712494,
-            -0.0765753835439682,
-            0.10061770677566528,
-            -0.130828395485878,
-            0.11497358977794649,
-            0.21580645442008972,
-            -0.12294840812683104,
-            -0.03385091572999954,
-            -0.08069261908531189,
-            -0.06587670743465424,
-            0.12072381377220154,
-            0.06551019102334976,
-            0.02748885005712509,
-            0.14267650246620178,
-            0.07088430970907211,
-            -0.08097437024116516,
-            0.3138673007488251,
-            0.01831817999482155,
-            0.05543003603816032,
-            -0.20469531416893005,
-            0.06393680721521378,
-            0.21216735243797305,
-            -0.2837630808353424,
-            0.011693534441292286,
-            0.09049086272716522,
-            0.0600147470831871,
-            -0.010962706990540028
-          ],
-          "manifold_64": [
-            -0.015676388517022133,
-            -0.10012456029653548,
-            0.2019781470298767,
-            -0.10532976686954498,
-            0.1793835312128067,
-            -0.11999762803316116,
-            -0.13138964772224426,
-            -0.06611187756061554,
-            0.20782606303691864,
-            0.05534226447343826,
-            0.10054662078619005,
-            0.060242656618356705,
-            -0.18399155139923096,
-            -0.1788732260465622,
-            0.0015432775253430009,
-            0.1920505613088608,
-            -0.08612120896577835,
-            0.02237466350197792,
-            -0.10869580507278442,
-            0.23595157265663147,
-            0.10440155863761902,
-            -0.1458156853914261,
-            0.05632608383893967,
-            0.25551408529281616,
-            -0.0969444215297699,
-            -0.13901947438716888,
-            0.06695245951414108,
-            -0.05984349176287651,
-            -0.14302603900432587,
-            -0.08078230172395706,
-            -0.06629528105258942,
-            0.09834379702806471,
-            0.1614670753479004,
-            -0.03156014159321785,
-            0.0026561750564724207,
-            0.077253058552742,
-            -0.019581694155931473,
-            -0.14716604351997375,
-            0.02015644684433937,
-            0.22191110253334043,
-            -0.1076984405517578,
-            -0.10612551867961884,
-            -0.24374252557754517,
-            -0.038320332765579224,
-            -0.0011045167921110988,
-            -0.014479877427220345,
-            0.042265113443136215,
-            -0.0754116028547287,
-            -0.009258925914764404,
-            -0.0997883602976799,
-            -0.14510132372379303,
-            0.1797366589307785,
-            -0.1885654628276825,
-            -0.009054908528923988,
-            0.19683025777339935,
-            -0.05421743914484978,
-            -0.12401193380355836,
-            0.094455286860466,
-            -0.04223310947418213,
-            -0.13044176995754242,
-            -0.07744227349758148,
-            -0.24652421474456787,
-            -0.042298704385757446,
-            -0.06702515482902527
-          ]
-        }
-      },
-      {
-        "id": 516801,
-        "payload": {
-          "content": "<script lang=\"ts\">\r\n // Migrated to $effect\r\n\r\n interface Props {\r\n caseId: string;\r\n onClose?: () => void;\r\n initialMessage?: string;\r\n }\r\n\r\n let { caseId, onClose, initialMessage }: Props = $props();\r\n\r\n $effect(() => {\r\n if (initialMessage) { inputValue = initialMessage; }\r\n });\r\n\r\n interface Message {\r\n role: 'user' | 'assistant';\r\n content: string;\r\n citations?: Array<{ type: string, id: string;\r\n\ttext: string;\r\n }>;\r\n }\r\n\r\n let messages = $state<Message[]>([]);\r\n let inputValue = $state('');\r\n let isLoading = $state(false);\r\n let error = $state<string | null>(null);\r\n let messagesContainer = $state<HTMLDivElement | null>(null);\r\n\r\n $effect(() => {\r\n\r\n // Scroll to bottom when messages change\r\n if (messagesContainer) {\r\n messagesContainer.scrollTop = messagesContainer.scrollHeight;\r\n }\r\n\r\n});\r\n\r\n $effect(() => {\r\n // Auto-scroll to bottom when new messages arrive\r\n if (messagesContainer) {\r\n setTimeout(() => {\r\n messagesContainer!.scrollTop = messagesContainer!.scrollHeight;\r\n },\r\n\t0);\r\n }\r\n });\r\n\r\n async function sendMessage() {\r\n if (!inputValue.trim()) return;\r\n\r\n const userMessage = inputValue.trim();\r\n inputValue = '';\r\n error = null;\r\n\r\n // Add user message to chat\r\n messages = [...messages, { role: 'user', content: userMessage }];\r\n\r\n isLoading = true;\r\n\r\n try {\r\n\t\tconst response = await fetch('/api/ai/contextual-chat', {\r\n\t\t\tmethod: 'POST',\r\n\t\t\theaders: { 'Content-Type': 'application/json' },\r\n\tbody: JSON.stringify({\r\nmessage: userMessage,\r\n\t\t\t\tcaseId,\r\n\t\t\t\tmessages: messages.map((m) => ({\r\n\t\t\t\t\trole: m.role,\r\n\t\t\t\t\tcontent: m.content\r\n\t\t\t\t}))\r\n\t\t\t})\r\n\t\t});\r\n\r\n if (!response.ok) {\r\n const data = await response.json();\r\n throw new Error(data.error || 'Failed to get response');\r\n }\r\n\r\n const data = await response.json();\r\n\r\n // Add assistant message\r\n\t\tmessages = [\r\n\t\t\t...messages,\r\n\t\t\t{\r\n\t\t\t\trole: 'assistant',\r\n\t\t\t\tcontent: data.answer || data.response || 'No response',\r\n\t\t\t\tcitations: data.citations || []\r\n\t\t\t}\r\n\t\t];\r\n } catch (err) {\r\n error = err instanceof Error ? err.message : 'Failed to send message';\r\n } finally {\r\n isLoading = false;\r\n }\r\n }\r\n\r\n function handleKeydown(e: KeyboardEvent) {\r\n if (e.key === 'Enter' && !e.shiftKey) {\r\n e.preventDefault();\r\n sendMessage();\r\n }\r\n }\r\n</script>\r\n\r\n<div class=\"contextual-chat-modal\">\r\n <!-- Messages Container -->\r\n <div class=\"messages-container\" bind:this={messagesContainer}>\r\n {#if messages.length === 0}\r\n <div class=\"empty-state\">\r\n <p>🧠 AI Contextual Chat</p>\r\n <p class=\"subtitle\">Ask questions about this case. The AI will reference your notes, evidence, and case context.</p>\r\n </div>\r\n {/if}\r\n\r\n\t{#each messages as message (message)}\r\n\t<div class=\"message\" class:user={message.role === 'user'} class:assistant={message.role === 'assistant'}>\r\n <div class=\"message-content\">\r\n {message.content}\r\n </div>\r\n {#if message.citations && message.citations.length > 0}\r\n <div class=\"citations\">\r\n <p class=\"citations-label\">Citations:</p>\r\n <ul>\r\n {#each message.citations as citation (citation.id)}\r\n <li class=\"citation\">\r\n <span class=\"citation-type\">[{citation.type}]</span>\r\n <span class=\"citation-text\">{citation.text}</span>\r\n </li>\r\n {/each}\r\n </ul>\r\n </div>\r\n {/if}\r\n </div>\r\n {/each}\r\n\r\n {#if isLoading}\r\n <div class=\"message assistant\">\r\n <div class=\"message-content loading\">\r\n <span class=\"dot\"></span>\r\n <span class=\"dot\"></span>\r\n <span class=\"dot\"></span>\r\n </div>\r\n </div>\r\n {/if}\r\n\r\n {#if error}\r\n <div class=\"message error\">\r\n <div class=\"message-content\">\r\n ❌ {error}\r\n </div>\r\n </div>\r\n {/if}\r\n </div>\r\n\r\n <!-- Input Area -->\r\n <div class=\"input-area\">\r\n\t<textarea\r\n bind:value={inputValue}\r\n\tonkeydown={handleKeydown}\r\n placeholder=\"Ask a question about this case... (Shift+Enter for new line)\"\r\n disabled={isLoading}\r\n class=\"input-field\"\r\n ></textarea>\r\n <button\r\n onclick={sendMessage}\r\n disabled={isLoading || !inputValue.trim()}\r\n class=\"send-button\"\r\n >\r\n {isLoading ? '⏳' : '📤'} Send\r\n </button>\r\n </div>\r\n</div>\r\n\r\n<style>\r\n .contextual-chat-modal {\r\n display: flex;",
-          "signature": "ContextualChatModal.svelte",
-          "path": "sveltekit-frontend/src/lib/components/cases/ContextualChatModal.svelte",
-          "relativePath": "src/lib/components/cases/ContextualChatModal.svelte",
-          "kind": "component",
-          "symbol": "ContextualChatModal.svelte",
-          "exports": [],
-          "tags": [
-            "svelte",
-            "component",
-            "legal"
-          ],
-          "lineStart": 1,
-          "lineEnd": 410,
-          "language": "svelte",
-          "som_bmu_row": 11,
-          "som_bmu_col": 6,
-          "feature_key": "code.surface",
-          "topo_byte": 65,
-          "topo_hex": "0x41",
-          "topo_class": "legal-evidence",
-          "workspace": "sveltekit-frontend",
-          "graphAuthorityScore": 0,
-          "cluster_key": "unclassified:community-13809",
-          "agents_scope": "lib/components/cases/AGENTS.md",
-          "communityId": "community:13809",
-          "communitySize": 0,
-          "pagerank": 0.15000000000000002,
-          "glyph_cluster": "legal-evidence:na",
-          "gpuCluster": 4,
-          "somRow": 0,
-          "somCol": 4,
-          "agents_card_id": "agents:dir:src-lib-components-cases",
-          "agents_card_hash": "14b0d7438a521caf",
-          "dir_path": "src/lib/components/cases",
-          "dir_summary": "shared library directory with 11 files, 0 API handlers",
-          "feature_keys": [],
-          "qdrant_tags": [
-            "src",
-            "lib",
-            "components",
-            "component",
-            "zod"
-          ],
-          "audit_status": "PARTIAL",
-          "agents_activity_score": 0,
-          "agents_indexed_at": "2026-05-11T16:58:26.032Z",
-          "authority_score": 0.540087651903277,
-          "graph_centrality_version": "gds-pagerank-v1",
-          "repo": "deeds-web-app",
-          "activity_w": 0,
-          "route_refs": [],
-          "env_keys": [],
-          "runId": "atlas-full-payload-sweep-004",
-          "manifold4": [
-            0.9965016,
-            0.32041952,
-            0.90530574,
-            0.6149272
-          ],
-          "som_cluster": 2,
-          "gpu_cluster": 2,
-          "encoded_at": "2026-05-19T19:59:18.876449+00:00",
-          "encoded_64": [
-            -0.11869598925113678,
-            0.04302472621202469,
-            -0.04689034819602966,
-            -0.14112110435962677,
-            0.03814070671796799,
-            0.07740885764360428,
-            -0.07825721800327301,
-            0.0530894510447979,
-            0.12400883436203004,
-            -0.16149845719337463,
-            0.10880152136087418,
-            0.09016557782888412,
-            0.013914143666625025,
-            -0.1913433372974396,
-            0.06998346000909805,
-            -0.05577810853719711,
-            -0.12670274078845978,
-            -0.16669122874736786,
-            -0.1276698261499405,
-            0.13799314200878143,
-            -0.12828856706619263,
-            0.1532965898513794,
-            0.037864409387111664,
-            0.08835950493812561,
-            0.0723637267947197,
-            0.10456908494234084,
-            -0.04737976938486099,
-            -0.19053001701831815,
-            -0.056617625057697296,
-            -0.05824713408946991,
-            -0.1864012181758881,
-            -0.26783156394958496,
-            0.12643860280513763,
-            0.05813075229525566,
-            -0.04667717218399048,
-            0.2665458917617798,
-            -0.010424349457025528,
-            -0.1834834516048431,
-            0.06254708021879196,
-            0.07588139176368713,
-            -0.0537215881049633,
-            0.16477327048778534,
-            -0.009990609250962734,
-            0.03465333953499794,
-            0.23129300773143768,
-            0.008060896769165993,
-            0.04785844311118126,
-            -0.15212415158748627,
-            0.1300383359193802,
-            -0.27306824922561646,
-            -0.14203210175037384,
-            -0.021161265671253204,
-            -0.18202558159828183,
-            -0.06870676577091217,
-            -0.13685476779937744,
-            0.18447688221931455,
-            0.05052647367119789,
-            0.11047878116369247,
-            0.03441859409213066,
-            0.22763442993164065,
-            -0.0661051869392395,
-            -0.04313947632908821,
-            0.13482074439525604,
-            -0.04349809885025024
-          ],
-          "manifold_64": [
-            -0.11126185953617096,
-            -0.1601230502128601,
-            0.24123187363147736,
-            0.15365925431251526,
-            -0.20025771856307983,
-            -0.05629334971308708,
-            0.1106969639658928,
-            0.1405363380908966,
-            0.03203314170241356,
-            0.014160371385514736,
-            0.03905826434493065,
-            -0.0030245997477322817,
-            -0.3849571943283081,
-            -0.11960411071777344,
-            -0.16607491672039032,
-            0.027633901685476303,
-            0.1291808933019638,
-            0.06899003684520721,
-            0.09113483130931854,
-            -0.16510315239429474,
-            0.06494653970003128,
-            0.13046856224536896,
-            -0.08587057888507843,
-            -0.05939657613635063,
-            0.01454527210444212,
-            0.017871839925646782,
-            -0.08733626455068588,
-            0.17465804517269137,
-            0.06865650415420532,
-            0.10662008821964264,
-            -0.17234213650226593,
-            0.1379108726978302,
-            0.1212853193283081,
-            0.21557407081127167,
-            0.006887665018439293,
-            0.022830674424767498,
-            0.0008736634626984596,
-            0.054885607212781906,
-            -0.09544124454259872,
-            -0.037727631628513336,
-            0.08212793618440628,
-            0.2310768961906433,
-            -0.02228306233882904,
-            0.13886450231075287,
-            -0.0352214016020298,
-            -0.12845775485038757,
-            0.054258957505226135,
-            -0.27188703417778015,
-            0.07916395366191864,
-            0.06258492916822433,
-            -0.17917288839817047,
-            0.21908850967884064,
-            0.04316530376672745,
-            -0.10054030269384384,
-            0.014340258203446863,
-            -0.03407425060868263,
-            0.11685008555650712,
-            -0.006428588181734085,
-            0.0624244287610054,
-            0.0014196712290868163,
-            0.12158858776092528,
-            0.16687141358852386,
-            0.02924999408423901,
-            0.06439429521560669
-          ]
-        }
-      },
-      {
-        "id": 909958,
-        "payload": {
-          "chunk_id": "card:src/lib/server/retrieval/centroid-cache.ts:00bbae84258a1b98",
-          "file_path": "src/lib/server/retrieval/centroid-cache.ts",
-          "file_name": "centroid-cache.ts",
-          "extension": ".ts",
-          "chunk_index": 19,
-          "total_chunks": 29,
-          "content": "}\r\n\r\nexport interface DidYouMeanResult {\r\n  neighbors:           SomNeighbor[];\r\n  reconstructionError: number;\r\n  isNovel:             boolean; // true when error exceeds noveltyThreshold\r\n  errorSource:         'autoencoder-gpu' | 'autoencoder-cpu' | 'cosine-approx';\r\n}\r\n\r\n// ── Autoencoder weight loader ─────────────────────────────────────────────────\r\n\r\n/** Redis key written by the topology projection pipeline after autoencoder training. */\r\nconst DECODER_WEIGHTS_KEY = 'ace:autoencoder:decoder:weights';\r\n\r\ninterface StoredWeights {\r\n  W:         number[];\r\n  b:         number[];\r\n  hidden:    number;\r\n  outputDim: number;\r\n}\r\n\r\n/**\r\n * Load decoder weights from Redis.\r\n * Returns null when the autoencoder hasn't been trained / weights not yet cached.\r",
-          "content_hash": "00bbae84258a1b98",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T08:01:25.728Z"
-        }
-      },
-      {
-        "id": 1005499,
-        "payload": {
-          "chunk_id": "card:src/lib/components/ai/LLMS.md:33bfadbb28e8e426",
-          "file_path": "src/lib/components/ai/LLMS.md",
-          "file_name": "LLMS.md",
-          "extension": ".md",
-          "chunk_index": 1,
-          "total_chunks": 5,
-          "content": "| `TypewriterResponse.svelte` | 0.000 | 0x8 |\n| `QLoRAMonitoringDashboard.svelte` | 0.000 | 0x9 |\n| `ProactiveAIAssistant.svelte` | 0.000 | 0x9 |\n| `LocalImageGenerator.svelte` | 0.000 | 0x9 |\n| `LLMSelector.svelte` | 0.000 | 0x9 |\n| `LegalDocumentSummarizer.svelte` | 0.000 | 0x9 |\n| `EnhancedAIChatTest.svelte` | 0.000 | 0x9 |\n| `DocumentUploadSimulator.svelte` | 0.000 | 0x9 |\n## Audit Gates — Svelte 5 Components\n\n> Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-26\n> Run each check from the **sveltekit-frontend/** root.\n\n### Tier D — Security + Runtime\n\n**G20** SSR safety — browser globals behind onMount guard\n```bash\nrg \"window\\.|document\\.|localStorage|IndexedDB\" src/lib/MODULE --type svelte\n```\n\n### Tier E — Svelte 5 Rune Compliance\n",
-          "content_hash": "33bfadbb28e8e426",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-26T18:11:37.444Z"
-        }
-      },
-      {
-        "id": 1080785,
-        "payload": {
-          "chunk_id": "card:src/lib/components/admin/AdminMonitoringDashboard.svelte:b6cbebca14c0fbd1",
-          "file_path": "src/lib/components/admin/AdminMonitoringDashboard.svelte",
-          "file_name": "AdminMonitoringDashboard.svelte",
-          "extension": ".svelte",
-          "chunk_index": 22,
-          "total_chunks": 37,
-          "content": "        <div class=\"space-y-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin\">\r\n          {#if stats.timelineEvents}\r\n            {#each stats.timelineEvents as event}\r\n              <div class=\"p-2 rounded-lg bg-zinc-950/40 border border-zinc-800/30 text-[10px] flex items-center justify-between\">\r\n                <div class=\"flex flex-col gap-1\">\r\n                  <div class=\"flex items-center gap-2\">\r\n                    <span class=\"font-bold text-zinc-300 uppercase tracking-tighter\">{event.signal?.replace('_', ' ') ?? 'EVENT'}</span>\r\n                    <span class=\"px-1 py-0.5 rounded-[4px] text-[8px] bg-zinc-800 text-zinc-500 font-mono\">{event.pipeline}</span>\r\n                  </div>\r",
-          "content_hash": "b6cbebca14c0fbd1",
-          "tags": [
-            "svelte",
-            "component",
-            "utility"
-          ],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-24T16:35:15.624Z"
-        }
-      },
-      {
-        "id": 1103029,
-        "payload": {
-          "chunk_id": "card:src/lib/components/graph/GraphifyViewer.svelte:e5ca07ccec87ca3b",
-          "file_path": "src/lib/components/graph/GraphifyViewer.svelte",
-          "file_name": "GraphifyViewer.svelte",
-          "extension": ".svelte",
-          "chunk_index": 64,
-          "total_chunks": 81,
-          "content": "  .glyph-chips { display: flex; flex-wrap: wrap; gap: 4px; }\r\n  .glyph-chip {\r\n    padding: 1px 6px; border-radius: 3px; font-size: 0.68rem; white-space: nowrap;\r\n    border: 1px solid #234;\r\n  }\r\n  .glyph-chip.som   { background: #0a1a1a; color: #4a8; border-color: #1a3a2a; }\r\n  .glyph-chip.src   { background: #0a0a1a; color: #88f; border-color: #224; }\r\n  .glyph-chip.ace   { background: #0a0a0a; border-color: #333; }\r\n  .glyph-chip.ace-ok   { color: #4d4; border-color: #1a3a1a; background: #0a160a; }\r\n  .glyph-chip.ace-miss { color: #d84; border-color: #3a2a1a; background: #160f0a; }\r\n  .glyph-terms { display: flex; flex-wrap: wrap; gap: 3px; }\r\n  .glyph-term {\r\n    padding: 1px 5px; background: #111a11; border: 1px solid #1a2a1a;\r\n    border-radius: 3px; color: #6a6; font-size: 0.65rem;\r",
-          "content_hash": "e5ca07ccec87ca3b",
-          "tags": [
-            "svelte",
-            "graph",
-            "component",
-            "utility"
-          ],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-24T17:01:48.829Z"
-        }
-      },
-      {
-        "id": 1113622,
-        "payload": {
-          "chunk_id": "card:src/lib/server/gpu/AGENTS.md:b0445ca37860c122",
-          "file_path": "src/lib/server/gpu/AGENTS.md",
-          "file_name": "AGENTS.md",
-          "extension": ".md",
-          "chunk_index": 8,
-          "total_chunks": 9,
-          "content": "- `read_file({ filePath: \"src/lib/server/gpu/<file>\" })` — fetch any file's contents (sandboxed to src/)\n- `cluster_bag_lookup({ clusterId: 20 })` — BoW texture tile for cluster C20\n- `rag_search({ query: \"…\", collection: \"codebase_chunks_768\", filter: { gpuCluster: 20 } })` — semantic search scoped to this cluster\n\n## How to use this file\n\nAgents (Claude Code, Cursor, Codex, Aider) automatically pick up the nearest `AGENTS.md` when editing files in this tree. The root `AGENTS.md` provides repo-wide rules; this file overlays directory-specific signals from the Redis KAG cache.\n\nRun `npm run agents:write` to regenerate after `npm run index:codebase:fast`.\n",
-          "content_hash": "b0445ca37860c122",
-          "tags": [
-            "docs",
-            "server",
-            "gpu",
-            "utility",
-            "md"
-          ],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-10T03:58:29.746Z",
-          "topo_byte": 134,
-          "topo_hex": "0x86",
-          "topo_class": "graph-gpu-topology",
-          "manifold4": [
-            0.7154183,
-            0.10606798,
-            0.0472519,
-            0.18430334
-          ],
-          "graphAuthorityScore": 0,
-          "glyph_cluster": "graph-gpu-topology:na",
-          "gpu_cluster": 15,
-          "som_cluster": 4,
-          "som_bmu_col": 0,
-          "som_bmu_row": 3,
-          "agents_card_id": "agents:dir:src-lib-server-gpu",
-          "agents_card_hash": "39ea3302242bb264",
-          "dir_path": "src/lib/server/gpu",
-          "dir_summary": "server module directory with 17 files, 0 API handlers, 2 Drizzle refs",
-          "feature_keys": [],
-          "qdrant_tags": [
-            "src",
-            "lib",
-            "server",
-            "test",
-            "db-schema",
-            "zod"
-          ],
-          "audit_status": "PARTIAL",
-          "agents_activity_score": 0,
-          "agents_indexed_at": "2026-05-11T16:58:26.039Z",
-          "pagerank": 0.15000000000000002,
-          "authority_score": 0.5563936948452248,
-          "graph_centrality_version": "gds-pagerank-v1",
-          "communityId": "community:14286",
-          "communitySize": 0,
-          "cluster_key": "gpu:4",
-          "encoded_at": "2026-05-19T19:59:18.876449+00:00",
-          "encoded_64": [
-            -0.22034642100334167,
-            -0.053794994950294495,
-            -0.08167605847120285,
-            -0.02056518755853176,
-            0.21269148588180545,
-            -0.014325054362416267,
-            0.08198028057813644,
-            0.03359457850456238,
-            -0.08463311940431595,
-            0.023208215832710263,
-            0.14725516736507416,
-            -0.2316441833972931,
-            -0.13884493708610535,
-            0.17147770524024963,
-            0.03530305624008179,
-            -0.011603407561779022,
-            0.1838594228029251,
-            0.019492434337735176,
-            0.012354282662272452,
-            -0.054917216300964355,
-            0.11889859288930892,
-            0.1975598782300949,
-            0.24022693932056427,
-            -0.1039566844701767,
-            0.16064585745334625,
-            0.08026675134897232,
-            0.06988856941461563,
-            0.13398215174674988,
-            -0.16421829164028168,
-            -0.011854092590510843,
-            0.1878875494003296,
-            -0.040884412825107574,
-            -0.2575125992298126,
-            0.07839078456163406,
-            0.1055389791727066,
-            -0.10265862941741943,
-            -0.05204657465219498,
-            0.0588887520134449,
-            -0.09541517496109007,
-            0.0967053398489952,
-            0.11698652058839798,
-            0.11037709563970566,
-            -0.1319819539785385,
-            -0.19455486536026,
-            0.1111946851015091,
-            0.11664937436580658,
-            -0.043344877660274506,
-            0.1843777298927307,
-            -0.1733248084783554,
-            0.0025727238971740007,
-            -0.0030761270318180323,
-            -0.05812431126832962,
-            0.00015125780191738158,
-            0.2482813745737076,
-            0.03853330388665199,
-            -0.2863895297050476,
-            -0.035446491092443466,
-            0.03248511999845505,
-            -0.08264613151550293,
-            -0.015986712649464607,
-            -0.10053689032793044,
-            0.0928385928273201,
-            -0.0010817036963999271,
-            -0.09162507951259612
-          ],
-          "manifold_64": [
-            0.08056914061307907,
-            -0.0893155038356781,
-            -0.24246244132518768,
-            -0.054673776030540466,
-            -0.1517488956451416,
-            0.017403118312358856,
-            0.020193587988615036,
-            -0.17699939012527466,
-            0.03080745041370392,
-            0.11331240832805634,
-            -0.035550713539123535,
-            0.09742747247219086,
-            0.10869823396205902,
-            0.02971486561000347,
-            0.19456255435943604,
-            -0.044440798461437225,
-            0.09326865524053574,
-            -0.02999980002641678,
-            0.1749764084815979,
-            0.12996523082256317,
-            -0.10602156817913055,
-            0.10525527596473694,
-            -0.005059998016804457,
-            0.09518077224493028,
-            0.05789519473910332,
-            -0.03870297968387604,
-            0.02666938118636608,
-            0.09641056507825851,
-            0.19894881546497345,
-            -0.13399742543697357,
-            0.08570387959480286,
-            -0.05377683416008949,
-            -0.17930611968040466,
-            0.00974325928837061,
-            0.03779802843928337,
-            0.05019579455256462,
-            0.12333516776561736,
-            -0.04166678339242935,
-            -0.11338966339826584,
-            0.15245211124420166,
-            0.00007865967199904844,
-            -0.00785190798342228,
-            -0.03818010538816452,
-            -0.06330125033855438,
-            0.18515576422214508,
-            -0.06827150285243988,
-            0.2218859940767288,
-            0.02203056402504444,
-            -0.33020713925361633,
-            -0.13879339396953583,
-            0.026563357561826702,
-            -0.1046287715435028,
-            0.2005317658185959,
-            0.30075863003730774,
-            -0.049007683992385864,
-            0.17521274089813232,
-            -0.22624465823173523,
-            0.07277486473321915,
-            -0.02652057074010372,
-            -0.11127492040395735,
-            0.18562370538711548,
-            -0.1106850728392601,
-            -0.04911974817514419,
-            -0.12096887081861496
-          ]
-        }
-      },
-      {
-        "id": 1116368,
-        "payload": {
-          "chunk_id": "card:src/lib/server/retrieval/cluster-aware-reranker.ts:64239deea55589f4",
-          "file_path": "src/lib/server/retrieval/cluster-aware-reranker.ts",
-          "file_name": "cluster-aware-reranker.ts",
-          "extension": ".ts",
-          "chunk_index": 1,
-          "total_chunks": 7,
-          "content": " *   3. Re-sort descending by adjusted score.\r\n *   4. Optionally inject a 1-line cluster label (\"// cluster 7 — auth/session\")\r\n *      as the first chunk so the LLM has spatial context.\r\n *\r\n * BoW texture integration:\r\n *   When `bowTile` is supplied (from bag-cache.ts / getBowTextureForCluster),\r\n *   the top-5 terms are appended to each in-cluster chunk's content so the\r\n *   reranker's cross-encoder has richer lexical overlap with the query.\r\n *\r\n * Non-fatal — callers wrap in try/catch.\r\n */\r\n\r\nimport { getRedis } from '$lib/server/redis.js';\r\nimport type { BowTextureTile } from '$lib/server/langextract/bag-cache.js';\r\n\r\nexport interface RAGChunkLike {\r\n  content: string;\r\n  score: number;\r\n  source: string;\r\n  gpuCluster?: number;\r\n  somCluster?: number;\r\n}\r\n\r",
-          "content_hash": "64239deea55589f4",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T08:01:29.314Z"
-        }
-      },
-      {
-        "id": 1249835,
-        "payload": {
-          "chunk_id": "card:src/lib/webgpu/gaussian-splat-renderer.ts:125ba32751498585",
-          "file_path": "src/lib/webgpu/gaussian-splat-renderer.ts",
-          "file_name": "gaussian-splat-renderer.ts",
-          "extension": ".ts",
-          "chunk_index": 13,
-          "total_chunks": 20,
-          "content": "    // Stage 1: Preprocess\r\n    {\r\n      const pass = enc.beginComputePass({ label: 'preprocess' });\r\n      pass.setPipeline(this.preprocessPipeline);\r\n      pass.setBindGroup(0, this.preprocessBG);\r\n      pass.dispatchWorkgroups(Math.ceil(this.gaussianCount / 256));\r\n      pass.end();\r\n    }\r\n\r\n    // Stage 2: Bitonic sort (by (tile_id, depth))\r\n    {\r\n      const pass = enc.beginComputePass({ label: 'sort' });\r\n      pass.setPipeline(this.sortPipeline);\r\n      // Sort bind group re-uses sortKeyBuffer — created at pipeline init time\r\n      // (omitted here for brevity; in production wire sortBG separately)\r\n      pass.dispatchWorkgroups(Math.ceil(this.gaussianCount / 256));\r\n      pass.end();\r\n    }\r\n\r\n    // Stage 3: Rasterize\r\n    {\r",
-          "content_hash": "125ba32751498585",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T08:10:06.142Z"
-        }
-      },
-      {
-        "id": 1354889,
-        "payload": {
-          "chunk_id": "card:src/lib/components/legal/EvidenceReportSummary.svelte:3b3cdad63482a124",
-          "file_path": "src/lib/components/legal/EvidenceReportSummary.svelte",
-          "file_name": "EvidenceReportSummary.svelte",
-          "extension": ".svelte",
-          "chunk_index": 5,
-          "total_chunks": 26,
-          "content": "\r\n## Legal Implications\r\n- Charges: ${reportData.legalImplications.charges.join(', ')}\r\n- Precedents: ${reportData.legalImplications.precedents.join(', ')}\r\n- Challenge Points: ${reportData.legalImplications.challengePoints.join(', ')}\r\n\r\n## Attachments\r\n${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\\n')}\r\n`.trim();\r\n\r\n\t\tconst blob = new Blob([content], { type: 'text/markdown' });\r\n\t\tconst url = URL.createObjectURL(blob);\r\n\t\tconst a = document.createElement('a');\r\n\t\ta.href = url;\r\n\t\ta.download = `evidence-report-${evidenceId}-${new Date().toISOString().split('T')[0]}.md`;\r\n\t\tdocument.body.appendChild(a);\r\n\t\ta.click();\r\n\t\tdocument.body.removeChild(a);\r\n\t\tURL.revokeObjectURL(url);\r\n\t}\r\n</script>\r\n\r\n<div class=\"evidence-report-summary\">\r\n\t<!-- Report Header -->\r",
-          "content_hash": "3b3cdad63482a124",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T07:20:41.756Z"
-        }
-      },
-      {
-        "id": 1401737,
-        "payload": {
-          "chunk_id": "card:src/lib/db/schema/evidence.ts:93e380b034f56230",
-          "file_path": "src/lib/db/schema/evidence.ts",
-          "file_name": "evidence.ts",
-          "extension": ".ts",
-          "chunk_index": 4,
-          "total_chunks": 8,
-          "content": "\ttype: nodeTypeEnum('type').notNull(),\r\n\r\n\t// Position on graph\r\n\tposX: integer('pos_x').notNull(),\r\n\tposY: integer('pos_y').notNull(),\r\n\r\n\t// Reference to actual entity\r\n\tentityId: uuid('entity_id'), // ID of person, evidence, or location\r\n\r\n\tcreatedAt: timestamp('created_at').defaultNow().notNull(),\r\n});\r\n\r\nexport const graphEdges = pgTable('graph_edges', {\r\n\tid: uuid('id').primaryKey().defaultRandom(),\r\n\tcaseId: uuid('case_id').notNull(),\r\n\tfromNodeId: uuid('from_node_id')\r\n\t\t.notNull()\r\n\t\t.references(() => graphNodes.id, { onDelete: 'cascade' }),\r\n\ttoNodeId: uuid('to_node_id')\r\n\t\t.notNull()\r\n\t\t.references(() => graphNodes.id, { onDelete: 'cascade' }),\r\n\tlabel: text('label'),\r\n\tstrength: relationshipStrengthEnum('strength').default('medium'),\r",
-          "content_hash": "93e380b034f56230",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T07:36:15.111Z"
-        }
-      },
-      {
-        "id": 1409685,
-        "payload": {
-          "chunk_id": "card:src/routes/(app)/acp/+page.svelte:a0a903ab64cd72a6",
-          "file_path": "src/routes/(app)/acp/+page.svelte",
-          "file_name": "+page.svelte",
-          "extension": ".svelte",
-          "chunk_index": 17,
-          "total_chunks": 20,
-          "content": "\t.result-box {\r\n\t\tmargin-top: 1.5rem;\r\n\t\tbackground: rgba(0, 0, 0, 0.3);\r\n\t\tborder: 1px solid rgba(255, 255, 255, 0.1);\r\n\t\tborder-radius: 8px;\r\n\t\toverflow: hidden;\r\n\t}\r\n\r\n\t.result-box h3 { margin: 0;\r\n\t\tpadding: 0.75rem 1rem;\r\n\t\tbackground: rgba(255, 255, 255, 0.05);\r\n\t\tfont-size: 0.9rem;\r\n\t\tcolor: #888;\r\n\t}\r\n\r\n\t.result-meta { display: flex;\r\n\t\tgap: 1rem;\r\n\t\tpadding: 0.75rem 1rem;\r\n\t\tborder-bottom: 1px solid rgba(255, 255, 255, 0.05);\r\n\t}\r\n\r\n\t.success {\r\n\t\tcolor: #00ff88;\r\n\t}\r\n\r\n\t.failure {\r\n\t\tcolor: #ff6b6b;\r\n\t}\r\n\r\n\t.duration {\r\n\t\tcolor: #888;\r\n\t}\r\n\r\n\t.result-json { margin: 0;\r\n\t\tpadding: 1rem;\r\n\t\tfont-family: 'Fira Code', monospace;\r\n\t\tfont-size: 0.85rem;\r\n\t\toverflow-x: auto;\r\n\t\tmax-height: 400px;\r\n\t\toverflow-y: auto;\r\n\t}\r\n\r\n\t.placeholder {\r\n\t\tdisplay: flex;\r\n\t\tflex-direction: column;\r",
-          "content_hash": "a0a903ab64cd72a6",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T08:13:02.706Z"
-        }
-      },
-      {
-        "id": 1536417,
-        "payload": {
-          "chunk_id": "card:src/mcp/tools/legal-skills.tool.ts:ea3a710f17403889",
-          "file_path": "src/mcp/tools/legal-skills.tool.ts",
-          "file_name": "legal-skills.tool.ts",
-          "extension": ".ts",
-          "chunk_index": 47,
-          "total_chunks": 65,
-          "content": "          enqueuedAt: new Date().toISOString(),\r\n          source: 'mcp_legal_transcribe_video',\r\n          pipeline: ['yt-dlp', 'ffmpeg', 'whisper', 'embed', 'qdrant'],\r\n        })), { persistent: true, headers: { priority, jobId, source: 'mcp' } });\r\n\r\n        await ch.close();\r\n        await conn.close();\r\n\r\n        return {\r\n          content: [{\r\n            type: 'text',\r\n            text: JSON.stringify({\r\n              ok: true, jobId, status: 'queued', url, caseId,\r\n              message: `Video queued for yt-dlp + Whisper transcription. Poll Redis key hermes:job:${jobId} for progress.`,\r\n            }),\r\n          }],\r\n        };\r\n      } catch (err) {\r\n        return {\r\n          content: [{\r\n            type: 'text',\r\n            text: JSON.stringify({\r",
-          "content_hash": "ea3a710f17403889",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T08:11:33.682Z"
-        }
-      },
-      {
-        "id": 1604171,
-        "payload": {
-          "chunk_id": "card:src/lib/components/admin/ContextualAssistantModal.svelte:e7f05cffedf9f6b6",
-          "file_path": "src/lib/components/admin/ContextualAssistantModal.svelte",
-          "file_name": "ContextualAssistantModal.svelte",
-          "extension": ".svelte",
-          "chunk_index": 19,
-          "total_chunks": 23,
-          "content": "\r\n            <input\r\n              type=\"file\"\r\n              bind:this={fileInput}\r\n              class=\"hidden\"\r\n              onchange={handleFileUpload}\r\n              accept=\"image/*,.pdf,.doc,.docx,.txt\"\r\n            />\r\n\r\n            <button\r\n              type=\"button\"\r\n              class=\"absolute left-4 bottom-4 w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all\"\r\n              onclick={() => fileInput.click()}\r\n              disabled={isUploading || snapshot.matches('thinking')}\r\n            >\r\n              {#if isUploading}\r\n                <span class=\"i-carbon-loader animate-spin\"></span>\r\n              {:else}\r\n                <span class=\"i-carbon-add text-xl\"></span>\r\n              {/if}\r\n            </button>\r\n\r",
-          "content_hash": "e7f05cffedf9f6b6",
-          "tags": [
-            "svelte",
-            "component",
-            "utility"
-          ],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-24T16:35:24.452Z"
-        }
-      },
-      {
-        "id": 1612494,
-        "payload": {
-          "chunk_id": "card:src/lib/components/legal-ai/CaseDocumentWriter.svelte:077ff71f79fc0c51",
-          "file_path": "src/lib/components/legal-ai/CaseDocumentWriter.svelte",
-          "file_name": "CaseDocumentWriter.svelte",
-          "extension": ".svelte",
-          "chunk_index": 5,
-          "total_chunks": 11,
-          "content": "\t\t\t\t\tbind:value={noteTitle}\r\n\t\t\t\t\tplaceholder=\"Document title (optional)\"\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"cdw-editor-wrap\">\r\n\t\t\t<TipTapEditor\r\n\t\t\t\tbind:this={editorRef}\r\n\t\t\t\ttheme=\"legal\"\r\n\t\t\t\tplaceholder=\"Write your case document here...\"\r\n\t\t\t\tonUpdate={handleEditorUpdate}\r\n\t\t\t/>\r\n\t\t</div>\r\n\r\n\t\t{#if saveStatus !== 'idle'}\r\n\t\t\t<div class=\"cdw-status\" class:saved={saveStatus === 'saved'} class:error={saveStatus === 'error'}>\r\n\t\t\t\t{#if saveStatus === 'saving'}\r\n\t\t\t\t\tSaving...\r\n\t\t\t\t{:else if saveStatus === 'saved'}\r\n\t\t\t\t\t{saveMessage}\r\n\t\t\t\t{:else if saveStatus === 'error'}\r\n\t\t\t\t\t{saveMessage}\r\n\t\t\t\t{/if}\r\n\t\t\t</div>\r\n\t\t{/if}\r\n\r\n\t\t<div class=\"cdw-footer\">\r\n\t\t\t<span class=\"cdw-shortcut-hint\">Ctrl+Shift+D to toggle</span>\r\n\t\t\t{#if selectedCase}\r",
-          "content_hash": "077ff71f79fc0c51",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T07:22:33.808Z"
-        }
-      },
-      {
-        "id": 1631859,
-        "payload": {
-          "chunk_id": "card:src/lib/server/indexer/directory-summarizer.ts:a904b281caddde0d",
-          "file_path": "src/lib/server/indexer/directory-summarizer.ts",
-          "file_name": "directory-summarizer.ts",
-          "extension": ".ts",
-          "chunk_index": 12,
-          "total_chunks": 26,
-          "content": "           MERGE (d:DirectorySummary {path: $dir})\r\n           MERGE (c)-[r:HAS_DIRECTORY_SUMMARY]->(d)\r\n           ON CREATE SET r.createdAt = $now\r\n           ON MATCH  SET r.updatedAt = $now\r\n           SET r.somCluster = $somCluster,\r\n               r.somBmuRow  = $somBmuRow,\r\n               r.somBmuCol  = $somBmuCol,\r\n               d.somCluster = $somCluster,\r\n               d.somBmuRow  = $somBmuRow,\r\n               d.somBmuCol  = $somBmuCol`,\r\n          {\r\n            clusterId,\r\n            dir,\r\n            now: new Date().toISOString(),\r\n            somCluster: somCluster ?? null,\r\n            somBmuRow:  somBmuRow  ?? null,\r\n            somBmuCol:  somBmuCol  ?? null,\r\n          }\r\n        );\r\n        created++;\r\n      }\r\n    }\r\n  } finally {\r\n    await session.close();\r",
-          "content_hash": "a904b281caddde0d",
-          "tags": [],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-25T07:55:57.262Z"
-        }
-      },
-      {
-        "id": 1672448,
-        "payload": {
-          "chunk_id": "card:src/lib/components/analysis/KeyboardShortcutsHelp.svelte:74ec440c816a8ebd",
-          "file_path": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
-          "file_name": "KeyboardShortcutsHelp.svelte",
-          "extension": ".svelte",
-          "chunk_index": 6,
-          "total_chunks": 8,
-          "content": "\t\tmin-width: 80px;\r\n\t\tpadding: 0.375rem 0.75rem;\r\n\t\tbackground: var(--t-panel);\r\n\t\tborder: 1px solid var(--t-border);\r\n\t\tborder-radius: 0.375rem;\r\n\t\tfont-family: monospace;\r\n\t\tfont-size: 0.875rem;\r\n\t\tfont-weight: 600;\r\n\t\ttext-align: center;\r\n\t\tcolor: var(--t-accent);\r\n\t\tbox-shadow: 0 2px 0 var(--t-border);\r\n\t}\r\n\r\n\t.shortcut-desc {\r\n\t\tflex: 1;\r\n\t\tfont-size: 0.9375rem;\r\n\t\tcolor: var(--t-text-secondary);\r\n\t}\r\n\r\n\t.help-footer {\r\n\t\tmargin-top: 1.5rem;\r\n\t\tpadding-top: 1.5rem;\r\n\t\tborder-top: 1px solid var(--t-border);\r\n\t}\r\n\r\n\t.help-tip {\r\n\t\tdisplay: flex;\r\n\t\talign-items: center;\r\n\t\tgap: 0.75rem;\r\n\t\tfont-size: 0.875rem;\r\n\t\tcolor: var(--t-text-secondary);\r\n\t\tmargin: 0;\r\n\t}\r\n\r\n\t.help-tip kbd {\r\n\t\tpadding: 0.25rem 0.5rem;\r\n\t\tbackground: var(--t-panel);\r\n\t\tborder: 1px solid var(--t-border);\r",
-          "content_hash": "74ec440c816a8ebd",
-          "tags": [
-            "svelte",
-            "component",
-            "utility"
-          ],
-          "purpose": "",
-          "domain": "utility",
-          "complexity": "medium",
-          "indexed_at": "2026-05-24T16:53:09.557Z"
-        }
-      }
-    ]
-  },
-  "qdrantAfter": {
-    "ok": true,
-    "status": 200,
-    "total": 25,
-    "withSourceRefs": 5,
-    "coverage": 0.2,
+    "withSourceRefs": 25,
+    "coverage": 1,
     "sample": [
       {
         "id": 8303,
@@ -1576,7 +312,13 @@
             0.2583998
           ],
           "graphAuthorityScore": 0,
-          "glyph_cluster": "unclassified:na"
+          "glyph_cluster": "unclassified:na",
+          "sourceRefs": [
+            "src/lib/server/ai/contextual-tools.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/ai/contextual-tools.ts"
+          ]
         }
       },
       {
@@ -1594,7 +336,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T08:01:10.123Z"
+          "indexed_at": "2026-05-25T08:01:10.123Z",
+          "sourceRefs": [
+            "src/lib/server/research/reddit-harvester.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/research/reddit-harvester.ts"
+          ]
         }
       },
       {
@@ -1612,7 +360,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T07:53:08.773Z"
+          "indexed_at": "2026-05-25T07:53:08.773Z",
+          "sourceRefs": [
+            "src/lib/server/gpu/libtorch-bridge.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/gpu/libtorch-bridge.ts"
+          ]
         }
       },
       {
@@ -1630,7 +384,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T07:24:39.633Z"
+          "indexed_at": "2026-05-25T07:24:39.633Z",
+          "sourceRefs": [
+            "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
+          ]
         }
       },
       {
@@ -1893,6 +653,12 @@
             -0.24652421474456787,
             -0.042298704385757446,
             -0.06702515482902527
+          ],
+          "sourceRefs": [
+            "src/lib/types/svelte5-api-types.d.ts"
+          ],
+          "source_refs": [
+            "src/lib/types/svelte5-api-types.d.ts"
           ]
         }
       },
@@ -2093,6 +859,12 @@
             0.16687141358852386,
             0.02924999408423901,
             0.06439429521560669
+          ],
+          "sourceRefs": [
+            "src/lib/components/cases/ContextualChatModal.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/cases/ContextualChatModal.svelte"
           ]
         }
       },
@@ -2111,7 +883,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T08:01:25.728Z"
+          "indexed_at": "2026-05-25T08:01:25.728Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/centroid-cache.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/centroid-cache.ts"
+          ]
         }
       },
       {
@@ -2129,7 +907,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-26T18:11:37.444Z"
+          "indexed_at": "2026-05-26T18:11:37.444Z",
+          "sourceRefs": [
+            "src/lib/components/ai/LLMS.md"
+          ],
+          "source_refs": [
+            "src/lib/components/ai/LLMS.md"
+          ]
         }
       },
       {
@@ -2151,7 +935,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-24T16:35:15.624Z"
+          "indexed_at": "2026-05-24T16:35:15.624Z",
+          "sourceRefs": [
+            "src/lib/components/admin/AdminMonitoringDashboard.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/admin/AdminMonitoringDashboard.svelte"
+          ]
         }
       },
       {
@@ -2374,6 +1164,12 @@
             -0.1106850728392601,
             -0.04911974817514419,
             -0.12096887081861496
+          ],
+          "sourceRefs": [
+            "src/lib/server/gpu/AGENTS.md"
+          ],
+          "source_refs": [
+            "src/lib/server/gpu/AGENTS.md"
           ]
         }
       },
@@ -2392,7 +1188,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T08:01:29.314Z"
+          "indexed_at": "2026-05-25T08:01:29.314Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/cluster-aware-reranker.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/cluster-aware-reranker.ts"
+          ]
         }
       },
       {
@@ -2410,7 +1212,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T08:10:06.142Z"
+          "indexed_at": "2026-05-25T08:10:06.142Z",
+          "sourceRefs": [
+            "src/lib/webgpu/gaussian-splat-renderer.ts"
+          ],
+          "source_refs": [
+            "src/lib/webgpu/gaussian-splat-renderer.ts"
+          ]
         }
       },
       {
@@ -2428,7 +1236,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T07:20:41.756Z"
+          "indexed_at": "2026-05-25T07:20:41.756Z",
+          "sourceRefs": [
+            "src/lib/components/legal/EvidenceReportSummary.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/legal/EvidenceReportSummary.svelte"
+          ]
         }
       },
       {
@@ -2446,7 +1260,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T07:36:15.111Z"
+          "indexed_at": "2026-05-25T07:36:15.111Z",
+          "sourceRefs": [
+            "src/lib/db/schema/evidence.ts"
+          ],
+          "source_refs": [
+            "src/lib/db/schema/evidence.ts"
+          ]
         }
       },
       {
@@ -2464,7 +1284,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T08:13:02.706Z"
+          "indexed_at": "2026-05-25T08:13:02.706Z",
+          "sourceRefs": [
+            "src/routes/(app)/acp/+page.svelte"
+          ],
+          "source_refs": [
+            "src/routes/(app)/acp/+page.svelte"
+          ]
         }
       },
       {
@@ -2482,7 +1308,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T08:11:33.682Z"
+          "indexed_at": "2026-05-25T08:11:33.682Z",
+          "sourceRefs": [
+            "src/mcp/tools/legal-skills.tool.ts"
+          ],
+          "source_refs": [
+            "src/mcp/tools/legal-skills.tool.ts"
+          ]
         }
       },
       {
@@ -2504,7 +1336,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-24T16:35:24.452Z"
+          "indexed_at": "2026-05-24T16:35:24.452Z",
+          "sourceRefs": [
+            "src/lib/components/admin/ContextualAssistantModal.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/admin/ContextualAssistantModal.svelte"
+          ]
         }
       },
       {
@@ -2522,7 +1360,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T07:22:33.808Z"
+          "indexed_at": "2026-05-25T07:22:33.808Z",
+          "sourceRefs": [
+            "src/lib/components/legal-ai/CaseDocumentWriter.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/legal-ai/CaseDocumentWriter.svelte"
+          ]
         }
       },
       {
@@ -2540,7 +1384,13 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-25T07:55:57.262Z"
+          "indexed_at": "2026-05-25T07:55:57.262Z",
+          "sourceRefs": [
+            "src/lib/server/indexer/directory-summarizer.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/indexer/directory-summarizer.ts"
+          ]
         }
       },
       {
@@ -2562,7 +1412,1427 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-24T16:53:09.557Z"
+          "indexed_at": "2026-05-24T16:53:09.557Z",
+          "sourceRefs": [
+            "src/lib/components/analysis/KeyboardShortcutsHelp.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/analysis/KeyboardShortcutsHelp.svelte"
+          ]
+        }
+      }
+    ]
+  },
+  "qdrantAfter": {
+    "ok": true,
+    "status": 200,
+    "total": 25,
+    "withSourceRefs": 25,
+    "coverage": 1,
+    "sample": [
+      {
+        "id": 8303,
+        "payload": {
+          "content": "export type UploadResponse = APIResponse<{\r\n fileId: string;\r\n\tpath: string;\r\n processingStarted: boolean;\r\n}>;",
+          "signature": "export UploadResponse [vector, redis, embedding]",
+          "path": "sveltekit-frontend/src/lib/types/evidence.ts",
+          "relativePath": "src/lib/types/evidence.ts",
+          "kind": "file",
+          "symbol": "UploadResponse",
+          "exports": [
+            "UploadResponse"
+          ],
+          "tags": [
+            "vector",
+            "redis",
+            "embedding"
+          ],
+          "lineStart": 177,
+          "lineEnd": 181,
+          "feature_key": "code.surface",
+          "neo4j_gpuCluster": 19,
+          "language": "typescript",
+          "som_bmu_row": 1,
+          "som_bmu_col": 12,
+          "cluster_id": 19,
+          "cluster_purpose": "Data Contract Definitions",
+          "cluster_summary_text": "This cluster defines the comprehensive data models and response types used across various backend services. It standardizes the structure for results coming from knowledge bases, web searches, document processing, and AI synthesis.",
+          "cluster_patterns": [
+            "Data Transfer Objects (DTOs)",
+            "Response Standardization",
+            "Type Safety Enforcement",
+            "Layered Architecture"
+          ],
+          "cluster_warnings": [
+            "The use of `Record<string, any>` (e.g., in `QueryResultRow` and `KBSearchResult`) sacrifices compile-time type safety for flexibility. Consumers must implement robust runtime validation to prevent unexpected data access.",
+            "The definitions imply complex multi-stage pipelines (e.g., search -> cache -> synthesis). Error handling and fallback mechanisms for external services (like MinIO or vector stores) must be rigorously implemented outside of these type definitions."
+          ],
+          "cluster_tags": [
+            "src/lib/types/source-validation.ts",
+            "src/lib/server/retrieval/web-search.ts",
+            "src/lib/server/docling.ts",
+            "src/lib/server/types/synthesis.ts",
+            "src/lib/types/evidence.ts"
+          ],
+          "pipeline_tags": [
+            "error:ts-general:-general-ts-error",
+            "error:ts1005:-token-syntax-corruptio",
+            "error:ts2339:-missing-property-on-ty",
+            "error:ts1005:-token-syntax-corruptio",
+            "error:ts2345:-type-assignability-mis",
+            "error:ts2300:-duplicate-declaration",
+            "error:ts-general:-general-ts-error",
+            "error:ts2322:-type-'",
+            "error:ts2305:-module-export-mismatch",
+            "error:ts7053:-unknown-object-propert"
+          ],
+          "pipeline_analyzed_at": "2026-04-25T03:58:41.317Z",
+          "topo_byte": 64,
+          "topo_hex": "0x40",
+          "topo_class": "unclassified",
+          "workspace": "sveltekit-frontend",
+          "graphAuthorityScore": 0,
+          "cluster_key": "unclassified:community-14112",
+          "agents_scope": "lib/types/AGENTS.md",
+          "grpo_reward": 0.29705882352941176,
+          "nes_risk_level": "low",
+          "nes_priority": 64,
+          "tsgo7_diags": 0,
+          "runId": "atlas-full-payload-sweep-004",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "glyph_cluster": "unclassified:na",
+          "gpuCluster": 17,
+          "somRow": 3,
+          "somCol": 2,
+          "agents_card_id": "agents:dir:src-lib-types",
+          "agents_card_hash": "34bb87b6325e3cb4",
+          "dir_path": "src/lib/types",
+          "dir_summary": "shared library directory with 53 files, 0 API handlers, 1 Drizzle refs",
+          "feature_keys": [],
+          "qdrant_tags": [
+            "src",
+            "lib",
+            "types",
+            "zod",
+            "db-schema"
+          ],
+          "audit_status": "PARTIAL",
+          "agents_activity_score": 0,
+          "agents_indexed_at": "2026-05-11T16:58:26.039Z",
+          "authority_score": 0.7781802509562914,
+          "graph_centrality_version": "gds-pagerank-v1",
+          "repo": "deeds-web-app",
+          "activity_w": 0,
+          "route_refs": [],
+          "env_keys": [],
+          "communityId": "community:14112",
+          "manifold4": [
+            0.64111257,
+            0.7620649,
+            0.70939213,
+            0.31323695
+          ],
+          "som_cluster": 0,
+          "gpu_cluster": 0,
+          "encoded_at": "2026-05-19T19:59:18.876449+00:00",
+          "encoded_64": [
+            -0.05850469321012497,
+            -0.04684213921427727,
+            -0.03367035835981369,
+            -0.15981069207191467,
+            -0.14755496382713318,
+            0.18637508153915405,
+            -0.2630312442779541,
+            -0.16687381267547607,
+            0.04389220476150513,
+            0.05052529275417328,
+            -0.28717881441116333,
+            0.05331189185380936,
+            0.10236698389053343,
+            0.06208226829767227,
+            -0.025451811030507088,
+            -0.052316971123218536,
+            -0.08590535819530487,
+            0.011640317738056185,
+            0.02961602434515953,
+            0.05066872760653496,
+            0.06355640292167664,
+            0.05742549151182175,
+            -0.07111522555351257,
+            -0.15604689717292786,
+            -0.17360270023345947,
+            -0.1479066014289856,
+            0.1914053410291672,
+            -0.02153344824910164,
+            -0.021176734939217567,
+            -0.14115279912948608,
+            -0.03194214031100273,
+            -0.2418699711561203,
+            -0.01555955410003662,
+            -0.0919950008392334,
+            -0.05314012989401817,
+            0.024639436975121495,
+            0.030956650152802467,
+            -0.12074251472949982,
+            0.12852613627910614,
+            0.12346568703651428,
+            -0.08585666120052338,
+            0.0059923031367361546,
+            0.06204186752438545,
+            -0.08954286575317383,
+            -0.09236634522676468,
+            0.11467906832695007,
+            -0.10125644505023956,
+            0.08043117821216583,
+            0.15361668169498444,
+            0.124482661485672,
+            0.0157813411206007,
+            -0.15384867787361145,
+            -0.14089608192443848,
+            0.3328094780445099,
+            -0.17356209456920624,
+            0.14012448489665985,
+            -0.1819633990526199,
+            0.026908060535788536,
+            0.0769023671746254,
+            -0.11639871448278429,
+            -0.14206020534038544,
+            0.22493170201778412,
+            0.006378555204719305,
+            0.07301965355873108
+          ],
+          "manifold_64": [
+            -0.00044420050107873976,
+            0.253475546836853,
+            -0.06370552629232407,
+            0.11021269857883452,
+            0.17113541066646576,
+            0.07086046785116196,
+            0.07936732470989227,
+            0.020037272945046425,
+            0.054981935769319534,
+            -0.06147145852446556,
+            -0.17471107840538025,
+            0.28542646765708923,
+            -0.15129320323467255,
+            -0.08664578944444656,
+            -0.128042533993721,
+            0.23661042749881744,
+            -0.04101958125829697,
+            -0.011781963519752026,
+            -0.005100890062749386,
+            0.17201298475265503,
+            0.056459132581949234,
+            -0.22913198173046112,
+            0.07002530246973038,
+            0.12590140104293823,
+            -0.20404119789600372,
+            -0.03236047923564911,
+            -0.15591084957122803,
+            -0.0914873629808426,
+            -0.1182507872581482,
+            -0.08982689678668976,
+            0.10610370337963104,
+            0.02859680913388729,
+            0.09319401532411575,
+            0.101388119161129,
+            -0.035130128264427185,
+            0.15523451566696167,
+            -0.2715229392051697,
+            -0.06846484541893005,
+            -0.098303385078907,
+            -0.05948572978377342,
+            -0.10127294808626176,
+            0.04045542702078819,
+            -0.21107232570648193,
+            -0.1328425258398056,
+            0.0065147364512085915,
+            -0.0672759935259819,
+            0.14829295873641968,
+            -0.07937929779291153,
+            -0.14441411197185516,
+            -0.12435518205165864,
+            -0.1277414858341217,
+            0.014200406149029732,
+            -0.18356835842132568,
+            0.01100008189678192,
+            -0.048032570630311966,
+            -0.06983745843172073,
+            0.12367700785398485,
+            0.03425614908337593,
+            0.05070739611983299,
+            -0.07943154126405716,
+            -0.02399598993360996,
+            -0.06755229830741882,
+            0.09342476725578308,
+            -0.25234347581863403
+          ],
+          "sourceRefs": [
+            "src/lib/types/evidence.ts"
+          ],
+          "source_refs": [
+            "src/lib/types/evidence.ts"
+          ]
+        }
+      },
+      {
+        "id": 155706,
+        "payload": {
+          "chunk_id": "card:src/lib/server/retrieval/turbovec-prefilter.ts:5d6c1942c4fbcd0a",
+          "file_path": "src/lib/server/retrieval/turbovec-prefilter.ts",
+          "file_name": "turbovec-prefilter.ts",
+          "extension": ".ts",
+          "chunk_index": 2,
+          "total_chunks": 5,
+          "content": "      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({\n        vector: Array.from(embedding),\n        topClusters: opts.topClusters ?? 5,\n      }),\n      signal: AbortSignal.timeout(timeoutMs),\n    });\n    if (!res.ok) return EMPTY_PREFILTER;\n    const data = await res.json();\n    return {\n      clusterIds: data.clusterIds ?? [],\n      centroidScores: data.centroidScores ?? {},\n      backend: data.backend ?? 'js',\n      durationMs: Date.now() - t0,\n    };\n  } catch {\n    return { ...EMPTY_PREFILTER, durationMs: Date.now() - t0 };\n  }\n}\n\n/**\n * Call /search — returns ANN candidate point IDs for score-boosting (not hard filtering).\n * Times out after `opts.timeoutMs` (default 300ms). Returns empty result on failure.\n */\nexport async function turbovecSearch(",
+          "content_hash": "5d6c1942c4fbcd0a",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-26T17:41:15.599Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/turbovec-prefilter.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/turbovec-prefilter.ts"
+          ]
+        }
+      },
+      {
+        "id": 174637,
+        "payload": {
+          "chunk_id": "card:src/lib/server/ai/contextual-tools.ts:dd017c7c6ad55fbc",
+          "file_path": "src/lib/server/ai/contextual-tools.ts",
+          "file_name": "contextual-tools.ts",
+          "extension": ".ts",
+          "chunk_index": 49,
+          "total_chunks": 61,
+          "content": "          name: string;\r\n          pass1: number;\r\n          pass2: number;\r\n          grpo: number;\r\n          reasoning: string;\r\n        };\r\n        const matches: Match[] = candidates.map((c: { id: string; name: string | null }) => {\r\n          const photo = photoMap.get(c.id);\r\n          const p1 = refEmb && photo?.emb ? (cosine(refEmb, photo.emb) + 1) / 2 : 0;\r\n          return {\r\n            poiId: c.id,\r\n            name: c.name ?? 'Unknown',\r\n            pass1: p1,\r\n            pass2: 0,\r\n            grpo: 0,\r\n            reasoning: '',\r\n          };\r\n        });\r\n\r\n        matches.sort((a, b) => b.pass1 - a.pass1);\r\n\r\n        // Pass 2: VLM reasoning on top-5\r\n        if (passes >= 2 && refPhoto?.thumbnailUrl) {\r\n          const OLLAMA = env.OLLAMA_BASE_URL.replace(/\\/$/, '');\r",
+          "content_hash": "dd017c7c6ad55fbc",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T07:41:55.126Z",
+          "topo_byte": 128,
+          "topo_hex": "0x80",
+          "topo_class": "unclassified",
+          "manifold4": [
+            0.9376611,
+            0.3144611,
+            0.7501833,
+            0.2583998
+          ],
+          "graphAuthorityScore": 0,
+          "glyph_cluster": "unclassified:na",
+          "sourceRefs": [
+            "src/lib/server/ai/contextual-tools.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/ai/contextual-tools.ts"
+          ]
+        }
+      },
+      {
+        "id": 188608,
+        "payload": {
+          "chunk_id": "card:src/lib/server/research/reddit-harvester.ts:19efad6c28a9852c",
+          "file_path": "src/lib/server/research/reddit-harvester.ts",
+          "file_name": "reddit-harvester.ts",
+          "extension": ".ts",
+          "chunk_index": 8,
+          "total_chunks": 9,
+          "content": "\r\n        return {\r\n          id: sha256Hex(`reddit_post:${d.id}:${body.slice(0, 200)}`),\r\n          source: 'reddit_post' as const,\r\n          url: redditUrl,\r\n          title: d.title,\r\n          body: body.slice(0, 5000),\r\n          subreddit: d.subreddit,\r\n          score: d.score,\r\n          fetched_at: new Date().toISOString(),\r\n        };\r\n      });\r\n\r\n    return { chunks, after: data?.data?.after ?? null };\r\n  } catch (err) {\r\n    console.error('[reddit-harvester] fetch error:', err);\r\n    return { chunks: [], after: null };\r\n  }\r\n}\r\n",
+          "content_hash": "19efad6c28a9852c",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T08:01:10.123Z",
+          "sourceRefs": [
+            "src/lib/server/research/reddit-harvester.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/research/reddit-harvester.ts"
+          ]
+        }
+      },
+      {
+        "id": 194586,
+        "payload": {
+          "chunk_id": "card:src/lib/server/gpu/libtorch-bridge.ts:920ac4a0d0dc0438",
+          "file_path": "src/lib/server/gpu/libtorch-bridge.ts",
+          "file_name": "libtorch-bridge.ts",
+          "extension": ".ts",
+          "chunk_index": 26,
+          "total_chunks": 76,
+          "content": "\r\n  // CPU heap guard: n×n float matrix at 4 bytes each\r\n  const cpuBytes = n * n * 4;\r\n  if (!heapHasRoom(cpuBytes)) {\r\n    throw new RangeError(\r\n      `[libtorch-bridge] graphSimilarity: insufficient heap for ${n}×${n} CPU matrix ` +\r\n        `(need ~${(cpuBytes / 1e6).toFixed(0)} MB)`\r\n    );\r\n  }\r\n  return { matrix: cpuCosineSimilarity(embeddings), n, source: 'cpu' };\r\n}\r\n\r\n/**\r\n * K-means clustering.\r\n * GPU: libtorch CUDA K-means. CPU: 8× unrolled, Float32 centroid storage.\r\n */\r\nexport async function clusterEmbeddings(embeddings: number[][], k: number): Promise<ClusterResult> {\r\n  const n = embeddings.length;\r\n  const dim = embeddings[0]?.length ?? 0;\r\n\r\n  // P0: k > n would leave empty clusters with undefined centroids → NaN propagation\r",
+          "content_hash": "920ac4a0d0dc0438",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T07:53:08.773Z",
+          "sourceRefs": [
+            "src/lib/server/gpu/libtorch-bridge.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/gpu/libtorch-bridge.ts"
+          ]
+        }
+      },
+      {
+        "id": 292522,
+        "payload": {
+          "chunk_id": "card:src/lib/components/monitoring/CacheMonitoringWidget.svelte:5166baf5051650d9",
+          "file_path": "src/lib/components/monitoring/CacheMonitoringWidget.svelte",
+          "file_name": "CacheMonitoringWidget.svelte",
+          "extension": ".svelte",
+          "chunk_index": 16,
+          "total_chunks": 19,
+          "content": "\t\t\t\t\t\t\t\t\t<span>{op.latencyMs.toFixed(1)}ms</span>\r\n\t\t\t\t\t\t\t\t{/if}\r\n\t\t\t\t\t\t\t\t<span>{timeAgo(op.timestamp)}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t{/each}\r\n\t\t\t\t</div>\r\n\t\t\t{/if}\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!-- Cache Info -->\r\n\t<div class=\"bg-panelSoft rounded p-3 border border-sand-5 space-y-1 text-xs\">\r\n\t\t<div class=\"flex justify-between\">\r\n\t\t\t<span class=\"text-sand-11\">Avg TTL:</span>\r\n\t\t\t<span class=\"font-medium\">{stats.avgTtlMinutes} minutes ({stats.rawTtlSeconds}s)</span>\r\n\t\t</div>\r\n\t\t{#if lastUpdate}\r\n\t\t\t<div class=\"flex justify-between\">\r\n\t\t\t\t<span class=\"text-sand-11\">Last Update:</span>\r\n\t\t\t\t<span class=\"font-medium\">{timeAgo(lastUpdate)}</span>\r\n\t\t\t</div>\r\n\t\t{/if}\r\n\t\t<div class=\"flex justify-between\">\r\n\t\t\t<span class=\"text-sand-11\">Poll Interval:</span>\r",
+          "content_hash": "5166baf5051650d9",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T07:24:39.633Z",
+          "sourceRefs": [
+            "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
+          ]
+        }
+      },
+      {
+        "id": 433670,
+        "payload": {
+          "chunk_id": "card:src/routes/(app)/demos/courtroom-sim/LLMS.md:43021311a769671f",
+          "file_path": "src/routes/(app)/demos/courtroom-sim/LLMS.md",
+          "file_name": "LLMS.md",
+          "extension": ".md",
+          "chunk_index": 0,
+          "total_chunks": 4,
+          "content": "# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\n\n# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\n\n# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\n\n# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\n\n# LLMS.md — `sveltekit-frontend/src/routes/(app)/demos/courtroom-sim`\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\n\n\n\n\n\n\n\n\n\n\n\n\n<!-- LLMS-ENRICH v1 · auto-generated by enrich-llms-md.mjs · do not edit manually -->\n\n## Enhanced Graph Context\n\n\n| File | Authority | Flags |\n|------|-----------|-------|\n| `+page.server.ts` | 0.000 | 0x205 |\n| `+page.ts` | 0.000 | 0x208 |\n| `+page.svelte` | 0.000 | 0x209 |",
+          "content_hash": "43021311a769671f",
+          "tags": [
+            "docs",
+            "route",
+            "utility",
+            "md"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-22T02:23:01.275Z",
+          "sourceRefs": [
+            "src/routes/(app)/demos/courtroom-sim/LLMS.md"
+          ],
+          "source_refs": [
+            "src/routes/(app)/demos/courtroom-sim/LLMS.md"
+          ]
+        }
+      },
+      {
+        "id": 436451,
+        "payload": {
+          "chunk_id": "card:src/lib/components/citations/CitationSaveForm.svelte:9876dbe952c51405",
+          "file_path": "src/lib/components/citations/CitationSaveForm.svelte",
+          "file_name": "CitationSaveForm.svelte",
+          "extension": ".svelte",
+          "chunk_index": 7,
+          "total_chunks": 14,
+          "content": "\t\t>\r\n\t\t\t{showAdvanced ? '▼' : '▶'} Advanced Options\r\n\t\t</button>\r\n\r\n\t\t{#if showAdvanced}\r\n\t\t\t<div class=\"advanced-options\">\r\n\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t<label for=\"statute-code\">Statute Code</label>\r\n\t\t\t\t\t<input\r\n\t\t\t\t\t\tid=\"statute-code\"\r\n\t\t\t\t\t\ttype=\"text\"\r\n\t\t\t\t\t\tbind:value={formData.statuteCode}\r\n\t\t\t\t\t\tplaceholder=\"e.g., 42-1983\"\r\n\t\t\t\t\t\tdisabled={isLoading}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t<label for=\"statute-title\">Statute Title</label>\r\n\t\t\t\t\t<input\r\n\t\t\t\t\t\tid=\"statute-title\"\r\n\t\t\t\t\t\ttype=\"text\"\r\n\t\t\t\t\t\tbind:value={formData.statuteTitle}\r\n\t\t\t\t\t\tplaceholder=\"e.g., Civil action for deprivation of rights\"\r\n\t\t\t\t\t\tdisabled={isLoading}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t<label for=\"context-text\">Context Text</label>\r\n\t\t\t\t\t<textarea\r",
+          "content_hash": "9876dbe952c51405",
+          "tags": [
+            "svelte",
+            "component",
+            "utility"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-24T16:55:34.253Z",
+          "sourceRefs": [
+            "src/lib/components/citations/CitationSaveForm.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/citations/CitationSaveForm.svelte"
+          ]
+        }
+      },
+      {
+        "id": 506499,
+        "payload": {
+          "content": "/**\r\n * Form state with Svelte 5\r\n */\r\nexport interface FormState<T = Record<string, unknown>> {\r\n  values: StateValue<T>;\r\n  errors: StateValue<Partial<Record<keyof T, string>>>;\r\n  touched: StateValue<Partial<Record<keyof T, boolean>>>;\r\n  isValid: DerivedValue<boolean>;\r\n  isSubmitting: StateValue<boolean>;\r\n  submit: () => Promise<void>;\r\n  reset: () => void;\r\n}",
+          "signature": "export FormState [auth]",
+          "path": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/types/svelte5-api-types.d.ts",
+          "relativePath": "src/lib/types/svelte5-api-types.d.ts",
+          "kind": "type",
+          "symbol": "FormState",
+          "exports": [
+            "FormState"
+          ],
+          "tags": [
+            "auth"
+          ],
+          "lineStart": 237,
+          "lineEnd": 245,
+          "gpu_cluster": 1,
+          "neo4j_gpuCluster": 4,
+          "som_cluster": 1,
+          "som_bmu_row": 1,
+          "som_bmu_col": 12,
+          "pipeline_tags": [
+            "error:ts-general:-general-ts-error",
+            "error:ts1005:-token-syntax-corruptio",
+            "error:ts2339:-missing-property-on-ty",
+            "error:ts1005:-token-syntax-corruptio",
+            "error:ts2345:-type-assignability-mis",
+            "error:ts2300:-duplicate-declaration",
+            "error:ts-general:-general-ts-error",
+            "error:ts2322:-type-'",
+            "error:ts2305:-module-export-mismatch",
+            "error:ts7053:-unknown-object-propert"
+          ],
+          "pipeline_analyzed_at": "2026-04-25T03:58:41.317Z",
+          "topo_byte": 64,
+          "topo_hex": "0x40",
+          "topo_class": "unclassified",
+          "manifold4": [
+            0.81064016,
+            0.72751534,
+            0.45122954,
+            0.59258264
+          ],
+          "graphAuthorityScore": 0,
+          "cluster_key": "unclassified:community-13804",
+          "agents_scope": "lib/types/AGENTS.md",
+          "glyph_cluster": "unclassified:na",
+          "gpuCluster": 17,
+          "somRow": 3,
+          "somCol": 2,
+          "agents_card_id": "agents:dir:src-lib-types",
+          "agents_card_hash": "34bb87b6325e3cb4",
+          "dir_path": "src/lib/types",
+          "dir_summary": "shared library directory with 53 files, 0 API handlers, 1 Drizzle refs",
+          "feature_keys": [],
+          "qdrant_tags": [
+            "src",
+            "lib",
+            "types",
+            "zod",
+            "db-schema"
+          ],
+          "audit_status": "PARTIAL",
+          "agents_activity_score": 0,
+          "agents_indexed_at": "2026-05-11T16:58:26.039Z",
+          "pagerank": 0.15000000000000002,
+          "authority_score": 0.7782200718683947,
+          "graph_centrality_version": "gds-pagerank-v1",
+          "communitySize": 0,
+          "communityId": "community:13804",
+          "encoded_at": "2026-05-19T19:59:18.876449+00:00",
+          "encoded_64": [
+            0.018332885578274727,
+            -0.1360969990491867,
+            0.017765207216143608,
+            0.19306661188602448,
+            -0.05068487301468849,
+            0.13385634124279022,
+            -0.2142740786075592,
+            -0.24151848256587985,
+            0.005920281168073416,
+            0.08302327990531921,
+            -0.11545207351446152,
+            0.19473928213119507,
+            0.00015977541625034064,
+            0.016497759148478508,
+            0.030747149139642715,
+            -0.03659048303961754,
+            0.11462464928627014,
+            -0.17046287655830383,
+            0.07993185520172119,
+            -0.06820614635944366,
+            -0.017388878390192986,
+            -0.022870462387800217,
+            -0.1673976182937622,
+            0.02706027217209339,
+            -0.1767188012599945,
+            0.08087057620286942,
+            -0.020242856815457344,
+            -0.09656848013401031,
+            -0.20495551824569705,
+            0.003060685470700264,
+            -0.07386017590761185,
+            0.04952529817819595,
+            -0.01833074167370796,
+            -0.029440704733133316,
+            -0.2791373133659363,
+            0.13516253232955933,
+            -0.14893914759159088,
+            -0.03470347821712494,
+            -0.0765753835439682,
+            0.10061770677566528,
+            -0.130828395485878,
+            0.11497358977794649,
+            0.21580645442008972,
+            -0.12294840812683104,
+            -0.03385091572999954,
+            -0.08069261908531189,
+            -0.06587670743465424,
+            0.12072381377220154,
+            0.06551019102334976,
+            0.02748885005712509,
+            0.14267650246620178,
+            0.07088430970907211,
+            -0.08097437024116516,
+            0.3138673007488251,
+            0.01831817999482155,
+            0.05543003603816032,
+            -0.20469531416893005,
+            0.06393680721521378,
+            0.21216735243797305,
+            -0.2837630808353424,
+            0.011693534441292286,
+            0.09049086272716522,
+            0.0600147470831871,
+            -0.010962706990540028
+          ],
+          "manifold_64": [
+            -0.015676388517022133,
+            -0.10012456029653548,
+            0.2019781470298767,
+            -0.10532976686954498,
+            0.1793835312128067,
+            -0.11999762803316116,
+            -0.13138964772224426,
+            -0.06611187756061554,
+            0.20782606303691864,
+            0.05534226447343826,
+            0.10054662078619005,
+            0.060242656618356705,
+            -0.18399155139923096,
+            -0.1788732260465622,
+            0.0015432775253430009,
+            0.1920505613088608,
+            -0.08612120896577835,
+            0.02237466350197792,
+            -0.10869580507278442,
+            0.23595157265663147,
+            0.10440155863761902,
+            -0.1458156853914261,
+            0.05632608383893967,
+            0.25551408529281616,
+            -0.0969444215297699,
+            -0.13901947438716888,
+            0.06695245951414108,
+            -0.05984349176287651,
+            -0.14302603900432587,
+            -0.08078230172395706,
+            -0.06629528105258942,
+            0.09834379702806471,
+            0.1614670753479004,
+            -0.03156014159321785,
+            0.0026561750564724207,
+            0.077253058552742,
+            -0.019581694155931473,
+            -0.14716604351997375,
+            0.02015644684433937,
+            0.22191110253334043,
+            -0.1076984405517578,
+            -0.10612551867961884,
+            -0.24374252557754517,
+            -0.038320332765579224,
+            -0.0011045167921110988,
+            -0.014479877427220345,
+            0.042265113443136215,
+            -0.0754116028547287,
+            -0.009258925914764404,
+            -0.0997883602976799,
+            -0.14510132372379303,
+            0.1797366589307785,
+            -0.1885654628276825,
+            -0.009054908528923988,
+            0.19683025777339935,
+            -0.05421743914484978,
+            -0.12401193380355836,
+            0.094455286860466,
+            -0.04223310947418213,
+            -0.13044176995754242,
+            -0.07744227349758148,
+            -0.24652421474456787,
+            -0.042298704385757446,
+            -0.06702515482902527
+          ],
+          "sourceRefs": [
+            "src/lib/types/svelte5-api-types.d.ts"
+          ],
+          "source_refs": [
+            "src/lib/types/svelte5-api-types.d.ts"
+          ]
+        }
+      },
+      {
+        "id": 516801,
+        "payload": {
+          "content": "<script lang=\"ts\">\r\n // Migrated to $effect\r\n\r\n interface Props {\r\n caseId: string;\r\n onClose?: () => void;\r\n initialMessage?: string;\r\n }\r\n\r\n let { caseId, onClose, initialMessage }: Props = $props();\r\n\r\n $effect(() => {\r\n if (initialMessage) { inputValue = initialMessage; }\r\n });\r\n\r\n interface Message {\r\n role: 'user' | 'assistant';\r\n content: string;\r\n citations?: Array<{ type: string, id: string;\r\n\ttext: string;\r\n }>;\r\n }\r\n\r\n let messages = $state<Message[]>([]);\r\n let inputValue = $state('');\r\n let isLoading = $state(false);\r\n let error = $state<string | null>(null);\r\n let messagesContainer = $state<HTMLDivElement | null>(null);\r\n\r\n $effect(() => {\r\n\r\n // Scroll to bottom when messages change\r\n if (messagesContainer) {\r\n messagesContainer.scrollTop = messagesContainer.scrollHeight;\r\n }\r\n\r\n});\r\n\r\n $effect(() => {\r\n // Auto-scroll to bottom when new messages arrive\r\n if (messagesContainer) {\r\n setTimeout(() => {\r\n messagesContainer!.scrollTop = messagesContainer!.scrollHeight;\r\n },\r\n\t0);\r\n }\r\n });\r\n\r\n async function sendMessage() {\r\n if (!inputValue.trim()) return;\r\n\r\n const userMessage = inputValue.trim();\r\n inputValue = '';\r\n error = null;\r\n\r\n // Add user message to chat\r\n messages = [...messages, { role: 'user', content: userMessage }];\r\n\r\n isLoading = true;\r\n\r\n try {\r\n\t\tconst response = await fetch('/api/ai/contextual-chat', {\r\n\t\t\tmethod: 'POST',\r\n\t\t\theaders: { 'Content-Type': 'application/json' },\r\n\tbody: JSON.stringify({\r\nmessage: userMessage,\r\n\t\t\t\tcaseId,\r\n\t\t\t\tmessages: messages.map((m) => ({\r\n\t\t\t\t\trole: m.role,\r\n\t\t\t\t\tcontent: m.content\r\n\t\t\t\t}))\r\n\t\t\t})\r\n\t\t});\r\n\r\n if (!response.ok) {\r\n const data = await response.json();\r\n throw new Error(data.error || 'Failed to get response');\r\n }\r\n\r\n const data = await response.json();\r\n\r\n // Add assistant message\r\n\t\tmessages = [\r\n\t\t\t...messages,\r\n\t\t\t{\r\n\t\t\t\trole: 'assistant',\r\n\t\t\t\tcontent: data.answer || data.response || 'No response',\r\n\t\t\t\tcitations: data.citations || []\r\n\t\t\t}\r\n\t\t];\r\n } catch (err) {\r\n error = err instanceof Error ? err.message : 'Failed to send message';\r\n } finally {\r\n isLoading = false;\r\n }\r\n }\r\n\r\n function handleKeydown(e: KeyboardEvent) {\r\n if (e.key === 'Enter' && !e.shiftKey) {\r\n e.preventDefault();\r\n sendMessage();\r\n }\r\n }\r\n</script>\r\n\r\n<div class=\"contextual-chat-modal\">\r\n <!-- Messages Container -->\r\n <div class=\"messages-container\" bind:this={messagesContainer}>\r\n {#if messages.length === 0}\r\n <div class=\"empty-state\">\r\n <p>🧠 AI Contextual Chat</p>\r\n <p class=\"subtitle\">Ask questions about this case. The AI will reference your notes, evidence, and case context.</p>\r\n </div>\r\n {/if}\r\n\r\n\t{#each messages as message (message)}\r\n\t<div class=\"message\" class:user={message.role === 'user'} class:assistant={message.role === 'assistant'}>\r\n <div class=\"message-content\">\r\n {message.content}\r\n </div>\r\n {#if message.citations && message.citations.length > 0}\r\n <div class=\"citations\">\r\n <p class=\"citations-label\">Citations:</p>\r\n <ul>\r\n {#each message.citations as citation (citation.id)}\r\n <li class=\"citation\">\r\n <span class=\"citation-type\">[{citation.type}]</span>\r\n <span class=\"citation-text\">{citation.text}</span>\r\n </li>\r\n {/each}\r\n </ul>\r\n </div>\r\n {/if}\r\n </div>\r\n {/each}\r\n\r\n {#if isLoading}\r\n <div class=\"message assistant\">\r\n <div class=\"message-content loading\">\r\n <span class=\"dot\"></span>\r\n <span class=\"dot\"></span>\r\n <span class=\"dot\"></span>\r\n </div>\r\n </div>\r\n {/if}\r\n\r\n {#if error}\r\n <div class=\"message error\">\r\n <div class=\"message-content\">\r\n ❌ {error}\r\n </div>\r\n </div>\r\n {/if}\r\n </div>\r\n\r\n <!-- Input Area -->\r\n <div class=\"input-area\">\r\n\t<textarea\r\n bind:value={inputValue}\r\n\tonkeydown={handleKeydown}\r\n placeholder=\"Ask a question about this case... (Shift+Enter for new line)\"\r\n disabled={isLoading}\r\n class=\"input-field\"\r\n ></textarea>\r\n <button\r\n onclick={sendMessage}\r\n disabled={isLoading || !inputValue.trim()}\r\n class=\"send-button\"\r\n >\r\n {isLoading ? '⏳' : '📤'} Send\r\n </button>\r\n </div>\r\n</div>\r\n\r\n<style>\r\n .contextual-chat-modal {\r\n display: flex;",
+          "signature": "ContextualChatModal.svelte",
+          "path": "sveltekit-frontend/src/lib/components/cases/ContextualChatModal.svelte",
+          "relativePath": "src/lib/components/cases/ContextualChatModal.svelte",
+          "kind": "component",
+          "symbol": "ContextualChatModal.svelte",
+          "exports": [],
+          "tags": [
+            "svelte",
+            "component",
+            "legal"
+          ],
+          "lineStart": 1,
+          "lineEnd": 410,
+          "language": "svelte",
+          "som_bmu_row": 11,
+          "som_bmu_col": 6,
+          "feature_key": "code.surface",
+          "topo_byte": 65,
+          "topo_hex": "0x41",
+          "topo_class": "legal-evidence",
+          "workspace": "sveltekit-frontend",
+          "graphAuthorityScore": 0,
+          "cluster_key": "unclassified:community-13809",
+          "agents_scope": "lib/components/cases/AGENTS.md",
+          "communityId": "community:13809",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "glyph_cluster": "legal-evidence:na",
+          "gpuCluster": 4,
+          "somRow": 0,
+          "somCol": 4,
+          "agents_card_id": "agents:dir:src-lib-components-cases",
+          "agents_card_hash": "14b0d7438a521caf",
+          "dir_path": "src/lib/components/cases",
+          "dir_summary": "shared library directory with 11 files, 0 API handlers",
+          "feature_keys": [],
+          "qdrant_tags": [
+            "src",
+            "lib",
+            "components",
+            "component",
+            "zod"
+          ],
+          "audit_status": "PARTIAL",
+          "agents_activity_score": 0,
+          "agents_indexed_at": "2026-05-11T16:58:26.032Z",
+          "authority_score": 0.540087651903277,
+          "graph_centrality_version": "gds-pagerank-v1",
+          "repo": "deeds-web-app",
+          "activity_w": 0,
+          "route_refs": [],
+          "env_keys": [],
+          "runId": "atlas-full-payload-sweep-004",
+          "manifold4": [
+            0.9965016,
+            0.32041952,
+            0.90530574,
+            0.6149272
+          ],
+          "som_cluster": 2,
+          "gpu_cluster": 2,
+          "encoded_at": "2026-05-19T19:59:18.876449+00:00",
+          "encoded_64": [
+            -0.11869598925113678,
+            0.04302472621202469,
+            -0.04689034819602966,
+            -0.14112110435962677,
+            0.03814070671796799,
+            0.07740885764360428,
+            -0.07825721800327301,
+            0.0530894510447979,
+            0.12400883436203004,
+            -0.16149845719337463,
+            0.10880152136087418,
+            0.09016557782888412,
+            0.013914143666625025,
+            -0.1913433372974396,
+            0.06998346000909805,
+            -0.05577810853719711,
+            -0.12670274078845978,
+            -0.16669122874736786,
+            -0.1276698261499405,
+            0.13799314200878143,
+            -0.12828856706619263,
+            0.1532965898513794,
+            0.037864409387111664,
+            0.08835950493812561,
+            0.0723637267947197,
+            0.10456908494234084,
+            -0.04737976938486099,
+            -0.19053001701831815,
+            -0.056617625057697296,
+            -0.05824713408946991,
+            -0.1864012181758881,
+            -0.26783156394958496,
+            0.12643860280513763,
+            0.05813075229525566,
+            -0.04667717218399048,
+            0.2665458917617798,
+            -0.010424349457025528,
+            -0.1834834516048431,
+            0.06254708021879196,
+            0.07588139176368713,
+            -0.0537215881049633,
+            0.16477327048778534,
+            -0.009990609250962734,
+            0.03465333953499794,
+            0.23129300773143768,
+            0.008060896769165993,
+            0.04785844311118126,
+            -0.15212415158748627,
+            0.1300383359193802,
+            -0.27306824922561646,
+            -0.14203210175037384,
+            -0.021161265671253204,
+            -0.18202558159828183,
+            -0.06870676577091217,
+            -0.13685476779937744,
+            0.18447688221931455,
+            0.05052647367119789,
+            0.11047878116369247,
+            0.03441859409213066,
+            0.22763442993164065,
+            -0.0661051869392395,
+            -0.04313947632908821,
+            0.13482074439525604,
+            -0.04349809885025024
+          ],
+          "manifold_64": [
+            -0.11126185953617096,
+            -0.1601230502128601,
+            0.24123187363147736,
+            0.15365925431251526,
+            -0.20025771856307983,
+            -0.05629334971308708,
+            0.1106969639658928,
+            0.1405363380908966,
+            0.03203314170241356,
+            0.014160371385514736,
+            0.03905826434493065,
+            -0.0030245997477322817,
+            -0.3849571943283081,
+            -0.11960411071777344,
+            -0.16607491672039032,
+            0.027633901685476303,
+            0.1291808933019638,
+            0.06899003684520721,
+            0.09113483130931854,
+            -0.16510315239429474,
+            0.06494653970003128,
+            0.13046856224536896,
+            -0.08587057888507843,
+            -0.05939657613635063,
+            0.01454527210444212,
+            0.017871839925646782,
+            -0.08733626455068588,
+            0.17465804517269137,
+            0.06865650415420532,
+            0.10662008821964264,
+            -0.17234213650226593,
+            0.1379108726978302,
+            0.1212853193283081,
+            0.21557407081127167,
+            0.006887665018439293,
+            0.022830674424767498,
+            0.0008736634626984596,
+            0.054885607212781906,
+            -0.09544124454259872,
+            -0.037727631628513336,
+            0.08212793618440628,
+            0.2310768961906433,
+            -0.02228306233882904,
+            0.13886450231075287,
+            -0.0352214016020298,
+            -0.12845775485038757,
+            0.054258957505226135,
+            -0.27188703417778015,
+            0.07916395366191864,
+            0.06258492916822433,
+            -0.17917288839817047,
+            0.21908850967884064,
+            0.04316530376672745,
+            -0.10054030269384384,
+            0.014340258203446863,
+            -0.03407425060868263,
+            0.11685008555650712,
+            -0.006428588181734085,
+            0.0624244287610054,
+            0.0014196712290868163,
+            0.12158858776092528,
+            0.16687141358852386,
+            0.02924999408423901,
+            0.06439429521560669
+          ],
+          "sourceRefs": [
+            "src/lib/components/cases/ContextualChatModal.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/cases/ContextualChatModal.svelte"
+          ]
+        }
+      },
+      {
+        "id": 909958,
+        "payload": {
+          "chunk_id": "card:src/lib/server/retrieval/centroid-cache.ts:00bbae84258a1b98",
+          "file_path": "src/lib/server/retrieval/centroid-cache.ts",
+          "file_name": "centroid-cache.ts",
+          "extension": ".ts",
+          "chunk_index": 19,
+          "total_chunks": 29,
+          "content": "}\r\n\r\nexport interface DidYouMeanResult {\r\n  neighbors:           SomNeighbor[];\r\n  reconstructionError: number;\r\n  isNovel:             boolean; // true when error exceeds noveltyThreshold\r\n  errorSource:         'autoencoder-gpu' | 'autoencoder-cpu' | 'cosine-approx';\r\n}\r\n\r\n// ── Autoencoder weight loader ─────────────────────────────────────────────────\r\n\r\n/** Redis key written by the topology projection pipeline after autoencoder training. */\r\nconst DECODER_WEIGHTS_KEY = 'ace:autoencoder:decoder:weights';\r\n\r\ninterface StoredWeights {\r\n  W:         number[];\r\n  b:         number[];\r\n  hidden:    number;\r\n  outputDim: number;\r\n}\r\n\r\n/**\r\n * Load decoder weights from Redis.\r\n * Returns null when the autoencoder hasn't been trained / weights not yet cached.\r",
+          "content_hash": "00bbae84258a1b98",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T08:01:25.728Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/centroid-cache.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/centroid-cache.ts"
+          ]
+        }
+      },
+      {
+        "id": 1005499,
+        "payload": {
+          "chunk_id": "card:src/lib/components/ai/LLMS.md:33bfadbb28e8e426",
+          "file_path": "src/lib/components/ai/LLMS.md",
+          "file_name": "LLMS.md",
+          "extension": ".md",
+          "chunk_index": 1,
+          "total_chunks": 5,
+          "content": "| `TypewriterResponse.svelte` | 0.000 | 0x8 |\n| `QLoRAMonitoringDashboard.svelte` | 0.000 | 0x9 |\n| `ProactiveAIAssistant.svelte` | 0.000 | 0x9 |\n| `LocalImageGenerator.svelte` | 0.000 | 0x9 |\n| `LLMSelector.svelte` | 0.000 | 0x9 |\n| `LegalDocumentSummarizer.svelte` | 0.000 | 0x9 |\n| `EnhancedAIChatTest.svelte` | 0.000 | 0x9 |\n| `DocumentUploadSimulator.svelte` | 0.000 | 0x9 |\n## Audit Gates — Svelte 5 Components\n\n> Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-26\n> Run each check from the **sveltekit-frontend/** root.\n\n### Tier D — Security + Runtime\n\n**G20** SSR safety — browser globals behind onMount guard\n```bash\nrg \"window\\.|document\\.|localStorage|IndexedDB\" src/lib/MODULE --type svelte\n```\n\n### Tier E — Svelte 5 Rune Compliance\n",
+          "content_hash": "33bfadbb28e8e426",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-26T18:11:37.444Z",
+          "sourceRefs": [
+            "src/lib/components/ai/LLMS.md"
+          ],
+          "source_refs": [
+            "src/lib/components/ai/LLMS.md"
+          ]
+        }
+      },
+      {
+        "id": 1080785,
+        "payload": {
+          "chunk_id": "card:src/lib/components/admin/AdminMonitoringDashboard.svelte:b6cbebca14c0fbd1",
+          "file_path": "src/lib/components/admin/AdminMonitoringDashboard.svelte",
+          "file_name": "AdminMonitoringDashboard.svelte",
+          "extension": ".svelte",
+          "chunk_index": 22,
+          "total_chunks": 37,
+          "content": "        <div class=\"space-y-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin\">\r\n          {#if stats.timelineEvents}\r\n            {#each stats.timelineEvents as event}\r\n              <div class=\"p-2 rounded-lg bg-zinc-950/40 border border-zinc-800/30 text-[10px] flex items-center justify-between\">\r\n                <div class=\"flex flex-col gap-1\">\r\n                  <div class=\"flex items-center gap-2\">\r\n                    <span class=\"font-bold text-zinc-300 uppercase tracking-tighter\">{event.signal?.replace('_', ' ') ?? 'EVENT'}</span>\r\n                    <span class=\"px-1 py-0.5 rounded-[4px] text-[8px] bg-zinc-800 text-zinc-500 font-mono\">{event.pipeline}</span>\r\n                  </div>\r",
+          "content_hash": "b6cbebca14c0fbd1",
+          "tags": [
+            "svelte",
+            "component",
+            "utility"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-24T16:35:15.624Z",
+          "sourceRefs": [
+            "src/lib/components/admin/AdminMonitoringDashboard.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/admin/AdminMonitoringDashboard.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1103029,
+        "payload": {
+          "chunk_id": "card:src/lib/components/graph/GraphifyViewer.svelte:e5ca07ccec87ca3b",
+          "file_path": "src/lib/components/graph/GraphifyViewer.svelte",
+          "file_name": "GraphifyViewer.svelte",
+          "extension": ".svelte",
+          "chunk_index": 64,
+          "total_chunks": 81,
+          "content": "  .glyph-chips { display: flex; flex-wrap: wrap; gap: 4px; }\r\n  .glyph-chip {\r\n    padding: 1px 6px; border-radius: 3px; font-size: 0.68rem; white-space: nowrap;\r\n    border: 1px solid #234;\r\n  }\r\n  .glyph-chip.som   { background: #0a1a1a; color: #4a8; border-color: #1a3a2a; }\r\n  .glyph-chip.src   { background: #0a0a1a; color: #88f; border-color: #224; }\r\n  .glyph-chip.ace   { background: #0a0a0a; border-color: #333; }\r\n  .glyph-chip.ace-ok   { color: #4d4; border-color: #1a3a1a; background: #0a160a; }\r\n  .glyph-chip.ace-miss { color: #d84; border-color: #3a2a1a; background: #160f0a; }\r\n  .glyph-terms { display: flex; flex-wrap: wrap; gap: 3px; }\r\n  .glyph-term {\r\n    padding: 1px 5px; background: #111a11; border: 1px solid #1a2a1a;\r\n    border-radius: 3px; color: #6a6; font-size: 0.65rem;\r",
+          "content_hash": "e5ca07ccec87ca3b",
+          "tags": [
+            "svelte",
+            "graph",
+            "component",
+            "utility"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-24T17:01:48.829Z",
+          "sourceRefs": [
+            "src/lib/components/graph/GraphifyViewer.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/graph/GraphifyViewer.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1113622,
+        "payload": {
+          "chunk_id": "card:src/lib/server/gpu/AGENTS.md:b0445ca37860c122",
+          "file_path": "src/lib/server/gpu/AGENTS.md",
+          "file_name": "AGENTS.md",
+          "extension": ".md",
+          "chunk_index": 8,
+          "total_chunks": 9,
+          "content": "- `read_file({ filePath: \"src/lib/server/gpu/<file>\" })` — fetch any file's contents (sandboxed to src/)\n- `cluster_bag_lookup({ clusterId: 20 })` — BoW texture tile for cluster C20\n- `rag_search({ query: \"…\", collection: \"codebase_chunks_768\", filter: { gpuCluster: 20 } })` — semantic search scoped to this cluster\n\n## How to use this file\n\nAgents (Claude Code, Cursor, Codex, Aider) automatically pick up the nearest `AGENTS.md` when editing files in this tree. The root `AGENTS.md` provides repo-wide rules; this file overlays directory-specific signals from the Redis KAG cache.\n\nRun `npm run agents:write` to regenerate after `npm run index:codebase:fast`.\n",
+          "content_hash": "b0445ca37860c122",
+          "tags": [
+            "docs",
+            "server",
+            "gpu",
+            "utility",
+            "md"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-10T03:58:29.746Z",
+          "topo_byte": 134,
+          "topo_hex": "0x86",
+          "topo_class": "graph-gpu-topology",
+          "manifold4": [
+            0.7154183,
+            0.10606798,
+            0.0472519,
+            0.18430334
+          ],
+          "graphAuthorityScore": 0,
+          "glyph_cluster": "graph-gpu-topology:na",
+          "gpu_cluster": 15,
+          "som_cluster": 4,
+          "som_bmu_col": 0,
+          "som_bmu_row": 3,
+          "agents_card_id": "agents:dir:src-lib-server-gpu",
+          "agents_card_hash": "39ea3302242bb264",
+          "dir_path": "src/lib/server/gpu",
+          "dir_summary": "server module directory with 17 files, 0 API handlers, 2 Drizzle refs",
+          "feature_keys": [],
+          "qdrant_tags": [
+            "src",
+            "lib",
+            "server",
+            "test",
+            "db-schema",
+            "zod"
+          ],
+          "audit_status": "PARTIAL",
+          "agents_activity_score": 0,
+          "agents_indexed_at": "2026-05-11T16:58:26.039Z",
+          "pagerank": 0.15000000000000002,
+          "authority_score": 0.5563936948452248,
+          "graph_centrality_version": "gds-pagerank-v1",
+          "communityId": "community:14286",
+          "communitySize": 0,
+          "cluster_key": "gpu:4",
+          "encoded_at": "2026-05-19T19:59:18.876449+00:00",
+          "encoded_64": [
+            -0.22034642100334167,
+            -0.053794994950294495,
+            -0.08167605847120285,
+            -0.02056518755853176,
+            0.21269148588180545,
+            -0.014325054362416267,
+            0.08198028057813644,
+            0.03359457850456238,
+            -0.08463311940431595,
+            0.023208215832710263,
+            0.14725516736507416,
+            -0.2316441833972931,
+            -0.13884493708610535,
+            0.17147770524024963,
+            0.03530305624008179,
+            -0.011603407561779022,
+            0.1838594228029251,
+            0.019492434337735176,
+            0.012354282662272452,
+            -0.054917216300964355,
+            0.11889859288930892,
+            0.1975598782300949,
+            0.24022693932056427,
+            -0.1039566844701767,
+            0.16064585745334625,
+            0.08026675134897232,
+            0.06988856941461563,
+            0.13398215174674988,
+            -0.16421829164028168,
+            -0.011854092590510843,
+            0.1878875494003296,
+            -0.040884412825107574,
+            -0.2575125992298126,
+            0.07839078456163406,
+            0.1055389791727066,
+            -0.10265862941741943,
+            -0.05204657465219498,
+            0.0588887520134449,
+            -0.09541517496109007,
+            0.0967053398489952,
+            0.11698652058839798,
+            0.11037709563970566,
+            -0.1319819539785385,
+            -0.19455486536026,
+            0.1111946851015091,
+            0.11664937436580658,
+            -0.043344877660274506,
+            0.1843777298927307,
+            -0.1733248084783554,
+            0.0025727238971740007,
+            -0.0030761270318180323,
+            -0.05812431126832962,
+            0.00015125780191738158,
+            0.2482813745737076,
+            0.03853330388665199,
+            -0.2863895297050476,
+            -0.035446491092443466,
+            0.03248511999845505,
+            -0.08264613151550293,
+            -0.015986712649464607,
+            -0.10053689032793044,
+            0.0928385928273201,
+            -0.0010817036963999271,
+            -0.09162507951259612
+          ],
+          "manifold_64": [
+            0.08056914061307907,
+            -0.0893155038356781,
+            -0.24246244132518768,
+            -0.054673776030540466,
+            -0.1517488956451416,
+            0.017403118312358856,
+            0.020193587988615036,
+            -0.17699939012527466,
+            0.03080745041370392,
+            0.11331240832805634,
+            -0.035550713539123535,
+            0.09742747247219086,
+            0.10869823396205902,
+            0.02971486561000347,
+            0.19456255435943604,
+            -0.044440798461437225,
+            0.09326865524053574,
+            -0.02999980002641678,
+            0.1749764084815979,
+            0.12996523082256317,
+            -0.10602156817913055,
+            0.10525527596473694,
+            -0.005059998016804457,
+            0.09518077224493028,
+            0.05789519473910332,
+            -0.03870297968387604,
+            0.02666938118636608,
+            0.09641056507825851,
+            0.19894881546497345,
+            -0.13399742543697357,
+            0.08570387959480286,
+            -0.05377683416008949,
+            -0.17930611968040466,
+            0.00974325928837061,
+            0.03779802843928337,
+            0.05019579455256462,
+            0.12333516776561736,
+            -0.04166678339242935,
+            -0.11338966339826584,
+            0.15245211124420166,
+            0.00007865967199904844,
+            -0.00785190798342228,
+            -0.03818010538816452,
+            -0.06330125033855438,
+            0.18515576422214508,
+            -0.06827150285243988,
+            0.2218859940767288,
+            0.02203056402504444,
+            -0.33020713925361633,
+            -0.13879339396953583,
+            0.026563357561826702,
+            -0.1046287715435028,
+            0.2005317658185959,
+            0.30075863003730774,
+            -0.049007683992385864,
+            0.17521274089813232,
+            -0.22624465823173523,
+            0.07277486473321915,
+            -0.02652057074010372,
+            -0.11127492040395735,
+            0.18562370538711548,
+            -0.1106850728392601,
+            -0.04911974817514419,
+            -0.12096887081861496
+          ],
+          "sourceRefs": [
+            "src/lib/server/gpu/AGENTS.md"
+          ],
+          "source_refs": [
+            "src/lib/server/gpu/AGENTS.md"
+          ]
+        }
+      },
+      {
+        "id": 1116368,
+        "payload": {
+          "chunk_id": "card:src/lib/server/retrieval/cluster-aware-reranker.ts:64239deea55589f4",
+          "file_path": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+          "file_name": "cluster-aware-reranker.ts",
+          "extension": ".ts",
+          "chunk_index": 1,
+          "total_chunks": 7,
+          "content": " *   3. Re-sort descending by adjusted score.\r\n *   4. Optionally inject a 1-line cluster label (\"// cluster 7 — auth/session\")\r\n *      as the first chunk so the LLM has spatial context.\r\n *\r\n * BoW texture integration:\r\n *   When `bowTile` is supplied (from bag-cache.ts / getBowTextureForCluster),\r\n *   the top-5 terms are appended to each in-cluster chunk's content so the\r\n *   reranker's cross-encoder has richer lexical overlap with the query.\r\n *\r\n * Non-fatal — callers wrap in try/catch.\r\n */\r\n\r\nimport { getRedis } from '$lib/server/redis.js';\r\nimport type { BowTextureTile } from '$lib/server/langextract/bag-cache.js';\r\n\r\nexport interface RAGChunkLike {\r\n  content: string;\r\n  score: number;\r\n  source: string;\r\n  gpuCluster?: number;\r\n  somCluster?: number;\r\n}\r\n\r",
+          "content_hash": "64239deea55589f4",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T08:01:29.314Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/cluster-aware-reranker.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/cluster-aware-reranker.ts"
+          ]
+        }
+      },
+      {
+        "id": 1249835,
+        "payload": {
+          "chunk_id": "card:src/lib/webgpu/gaussian-splat-renderer.ts:125ba32751498585",
+          "file_path": "src/lib/webgpu/gaussian-splat-renderer.ts",
+          "file_name": "gaussian-splat-renderer.ts",
+          "extension": ".ts",
+          "chunk_index": 13,
+          "total_chunks": 20,
+          "content": "    // Stage 1: Preprocess\r\n    {\r\n      const pass = enc.beginComputePass({ label: 'preprocess' });\r\n      pass.setPipeline(this.preprocessPipeline);\r\n      pass.setBindGroup(0, this.preprocessBG);\r\n      pass.dispatchWorkgroups(Math.ceil(this.gaussianCount / 256));\r\n      pass.end();\r\n    }\r\n\r\n    // Stage 2: Bitonic sort (by (tile_id, depth))\r\n    {\r\n      const pass = enc.beginComputePass({ label: 'sort' });\r\n      pass.setPipeline(this.sortPipeline);\r\n      // Sort bind group re-uses sortKeyBuffer — created at pipeline init time\r\n      // (omitted here for brevity; in production wire sortBG separately)\r\n      pass.dispatchWorkgroups(Math.ceil(this.gaussianCount / 256));\r\n      pass.end();\r\n    }\r\n\r\n    // Stage 3: Rasterize\r\n    {\r",
+          "content_hash": "125ba32751498585",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T08:10:06.142Z",
+          "sourceRefs": [
+            "src/lib/webgpu/gaussian-splat-renderer.ts"
+          ],
+          "source_refs": [
+            "src/lib/webgpu/gaussian-splat-renderer.ts"
+          ]
+        }
+      },
+      {
+        "id": 1354889,
+        "payload": {
+          "chunk_id": "card:src/lib/components/legal/EvidenceReportSummary.svelte:3b3cdad63482a124",
+          "file_path": "src/lib/components/legal/EvidenceReportSummary.svelte",
+          "file_name": "EvidenceReportSummary.svelte",
+          "extension": ".svelte",
+          "chunk_index": 5,
+          "total_chunks": 26,
+          "content": "\r\n## Legal Implications\r\n- Charges: ${reportData.legalImplications.charges.join(', ')}\r\n- Precedents: ${reportData.legalImplications.precedents.join(', ')}\r\n- Challenge Points: ${reportData.legalImplications.challengePoints.join(', ')}\r\n\r\n## Attachments\r\n${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\\n')}\r\n`.trim();\r\n\r\n\t\tconst blob = new Blob([content], { type: 'text/markdown' });\r\n\t\tconst url = URL.createObjectURL(blob);\r\n\t\tconst a = document.createElement('a');\r\n\t\ta.href = url;\r\n\t\ta.download = `evidence-report-${evidenceId}-${new Date().toISOString().split('T')[0]}.md`;\r\n\t\tdocument.body.appendChild(a);\r\n\t\ta.click();\r\n\t\tdocument.body.removeChild(a);\r\n\t\tURL.revokeObjectURL(url);\r\n\t}\r\n</script>\r\n\r\n<div class=\"evidence-report-summary\">\r\n\t<!-- Report Header -->\r",
+          "content_hash": "3b3cdad63482a124",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T07:20:41.756Z",
+          "sourceRefs": [
+            "src/lib/components/legal/EvidenceReportSummary.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/legal/EvidenceReportSummary.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1401737,
+        "payload": {
+          "chunk_id": "card:src/lib/db/schema/evidence.ts:93e380b034f56230",
+          "file_path": "src/lib/db/schema/evidence.ts",
+          "file_name": "evidence.ts",
+          "extension": ".ts",
+          "chunk_index": 4,
+          "total_chunks": 8,
+          "content": "\ttype: nodeTypeEnum('type').notNull(),\r\n\r\n\t// Position on graph\r\n\tposX: integer('pos_x').notNull(),\r\n\tposY: integer('pos_y').notNull(),\r\n\r\n\t// Reference to actual entity\r\n\tentityId: uuid('entity_id'), // ID of person, evidence, or location\r\n\r\n\tcreatedAt: timestamp('created_at').defaultNow().notNull(),\r\n});\r\n\r\nexport const graphEdges = pgTable('graph_edges', {\r\n\tid: uuid('id').primaryKey().defaultRandom(),\r\n\tcaseId: uuid('case_id').notNull(),\r\n\tfromNodeId: uuid('from_node_id')\r\n\t\t.notNull()\r\n\t\t.references(() => graphNodes.id, { onDelete: 'cascade' }),\r\n\ttoNodeId: uuid('to_node_id')\r\n\t\t.notNull()\r\n\t\t.references(() => graphNodes.id, { onDelete: 'cascade' }),\r\n\tlabel: text('label'),\r\n\tstrength: relationshipStrengthEnum('strength').default('medium'),\r",
+          "content_hash": "93e380b034f56230",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T07:36:15.111Z",
+          "sourceRefs": [
+            "src/lib/db/schema/evidence.ts"
+          ],
+          "source_refs": [
+            "src/lib/db/schema/evidence.ts"
+          ]
+        }
+      },
+      {
+        "id": 1409685,
+        "payload": {
+          "chunk_id": "card:src/routes/(app)/acp/+page.svelte:a0a903ab64cd72a6",
+          "file_path": "src/routes/(app)/acp/+page.svelte",
+          "file_name": "+page.svelte",
+          "extension": ".svelte",
+          "chunk_index": 17,
+          "total_chunks": 20,
+          "content": "\t.result-box {\r\n\t\tmargin-top: 1.5rem;\r\n\t\tbackground: rgba(0, 0, 0, 0.3);\r\n\t\tborder: 1px solid rgba(255, 255, 255, 0.1);\r\n\t\tborder-radius: 8px;\r\n\t\toverflow: hidden;\r\n\t}\r\n\r\n\t.result-box h3 { margin: 0;\r\n\t\tpadding: 0.75rem 1rem;\r\n\t\tbackground: rgba(255, 255, 255, 0.05);\r\n\t\tfont-size: 0.9rem;\r\n\t\tcolor: #888;\r\n\t}\r\n\r\n\t.result-meta { display: flex;\r\n\t\tgap: 1rem;\r\n\t\tpadding: 0.75rem 1rem;\r\n\t\tborder-bottom: 1px solid rgba(255, 255, 255, 0.05);\r\n\t}\r\n\r\n\t.success {\r\n\t\tcolor: #00ff88;\r\n\t}\r\n\r\n\t.failure {\r\n\t\tcolor: #ff6b6b;\r\n\t}\r\n\r\n\t.duration {\r\n\t\tcolor: #888;\r\n\t}\r\n\r\n\t.result-json { margin: 0;\r\n\t\tpadding: 1rem;\r\n\t\tfont-family: 'Fira Code', monospace;\r\n\t\tfont-size: 0.85rem;\r\n\t\toverflow-x: auto;\r\n\t\tmax-height: 400px;\r\n\t\toverflow-y: auto;\r\n\t}\r\n\r\n\t.placeholder {\r\n\t\tdisplay: flex;\r\n\t\tflex-direction: column;\r",
+          "content_hash": "a0a903ab64cd72a6",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T08:13:02.706Z",
+          "sourceRefs": [
+            "src/routes/(app)/acp/+page.svelte"
+          ],
+          "source_refs": [
+            "src/routes/(app)/acp/+page.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1536417,
+        "payload": {
+          "chunk_id": "card:src/mcp/tools/legal-skills.tool.ts:ea3a710f17403889",
+          "file_path": "src/mcp/tools/legal-skills.tool.ts",
+          "file_name": "legal-skills.tool.ts",
+          "extension": ".ts",
+          "chunk_index": 47,
+          "total_chunks": 65,
+          "content": "          enqueuedAt: new Date().toISOString(),\r\n          source: 'mcp_legal_transcribe_video',\r\n          pipeline: ['yt-dlp', 'ffmpeg', 'whisper', 'embed', 'qdrant'],\r\n        })), { persistent: true, headers: { priority, jobId, source: 'mcp' } });\r\n\r\n        await ch.close();\r\n        await conn.close();\r\n\r\n        return {\r\n          content: [{\r\n            type: 'text',\r\n            text: JSON.stringify({\r\n              ok: true, jobId, status: 'queued', url, caseId,\r\n              message: `Video queued for yt-dlp + Whisper transcription. Poll Redis key hermes:job:${jobId} for progress.`,\r\n            }),\r\n          }],\r\n        };\r\n      } catch (err) {\r\n        return {\r\n          content: [{\r\n            type: 'text',\r\n            text: JSON.stringify({\r",
+          "content_hash": "ea3a710f17403889",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T08:11:33.682Z",
+          "sourceRefs": [
+            "src/mcp/tools/legal-skills.tool.ts"
+          ],
+          "source_refs": [
+            "src/mcp/tools/legal-skills.tool.ts"
+          ]
+        }
+      },
+      {
+        "id": 1604171,
+        "payload": {
+          "chunk_id": "card:src/lib/components/admin/ContextualAssistantModal.svelte:e7f05cffedf9f6b6",
+          "file_path": "src/lib/components/admin/ContextualAssistantModal.svelte",
+          "file_name": "ContextualAssistantModal.svelte",
+          "extension": ".svelte",
+          "chunk_index": 19,
+          "total_chunks": 23,
+          "content": "\r\n            <input\r\n              type=\"file\"\r\n              bind:this={fileInput}\r\n              class=\"hidden\"\r\n              onchange={handleFileUpload}\r\n              accept=\"image/*,.pdf,.doc,.docx,.txt\"\r\n            />\r\n\r\n            <button\r\n              type=\"button\"\r\n              class=\"absolute left-4 bottom-4 w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all\"\r\n              onclick={() => fileInput.click()}\r\n              disabled={isUploading || snapshot.matches('thinking')}\r\n            >\r\n              {#if isUploading}\r\n                <span class=\"i-carbon-loader animate-spin\"></span>\r\n              {:else}\r\n                <span class=\"i-carbon-add text-xl\"></span>\r\n              {/if}\r\n            </button>\r\n\r",
+          "content_hash": "e7f05cffedf9f6b6",
+          "tags": [
+            "svelte",
+            "component",
+            "utility"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-24T16:35:24.452Z",
+          "sourceRefs": [
+            "src/lib/components/admin/ContextualAssistantModal.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/admin/ContextualAssistantModal.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1612494,
+        "payload": {
+          "chunk_id": "card:src/lib/components/legal-ai/CaseDocumentWriter.svelte:077ff71f79fc0c51",
+          "file_path": "src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+          "file_name": "CaseDocumentWriter.svelte",
+          "extension": ".svelte",
+          "chunk_index": 5,
+          "total_chunks": 11,
+          "content": "\t\t\t\t\tbind:value={noteTitle}\r\n\t\t\t\t\tplaceholder=\"Document title (optional)\"\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"cdw-editor-wrap\">\r\n\t\t\t<TipTapEditor\r\n\t\t\t\tbind:this={editorRef}\r\n\t\t\t\ttheme=\"legal\"\r\n\t\t\t\tplaceholder=\"Write your case document here...\"\r\n\t\t\t\tonUpdate={handleEditorUpdate}\r\n\t\t\t/>\r\n\t\t</div>\r\n\r\n\t\t{#if saveStatus !== 'idle'}\r\n\t\t\t<div class=\"cdw-status\" class:saved={saveStatus === 'saved'} class:error={saveStatus === 'error'}>\r\n\t\t\t\t{#if saveStatus === 'saving'}\r\n\t\t\t\t\tSaving...\r\n\t\t\t\t{:else if saveStatus === 'saved'}\r\n\t\t\t\t\t{saveMessage}\r\n\t\t\t\t{:else if saveStatus === 'error'}\r\n\t\t\t\t\t{saveMessage}\r\n\t\t\t\t{/if}\r\n\t\t\t</div>\r\n\t\t{/if}\r\n\r\n\t\t<div class=\"cdw-footer\">\r\n\t\t\t<span class=\"cdw-shortcut-hint\">Ctrl+Shift+D to toggle</span>\r\n\t\t\t{#if selectedCase}\r",
+          "content_hash": "077ff71f79fc0c51",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T07:22:33.808Z",
+          "sourceRefs": [
+            "src/lib/components/legal-ai/CaseDocumentWriter.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/legal-ai/CaseDocumentWriter.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1631859,
+        "payload": {
+          "chunk_id": "card:src/lib/server/indexer/directory-summarizer.ts:a904b281caddde0d",
+          "file_path": "src/lib/server/indexer/directory-summarizer.ts",
+          "file_name": "directory-summarizer.ts",
+          "extension": ".ts",
+          "chunk_index": 12,
+          "total_chunks": 26,
+          "content": "           MERGE (d:DirectorySummary {path: $dir})\r\n           MERGE (c)-[r:HAS_DIRECTORY_SUMMARY]->(d)\r\n           ON CREATE SET r.createdAt = $now\r\n           ON MATCH  SET r.updatedAt = $now\r\n           SET r.somCluster = $somCluster,\r\n               r.somBmuRow  = $somBmuRow,\r\n               r.somBmuCol  = $somBmuCol,\r\n               d.somCluster = $somCluster,\r\n               d.somBmuRow  = $somBmuRow,\r\n               d.somBmuCol  = $somBmuCol`,\r\n          {\r\n            clusterId,\r\n            dir,\r\n            now: new Date().toISOString(),\r\n            somCluster: somCluster ?? null,\r\n            somBmuRow:  somBmuRow  ?? null,\r\n            somBmuCol:  somBmuCol  ?? null,\r\n          }\r\n        );\r\n        created++;\r\n      }\r\n    }\r\n  } finally {\r\n    await session.close();\r",
+          "content_hash": "a904b281caddde0d",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-25T07:55:57.262Z",
+          "sourceRefs": [
+            "src/lib/server/indexer/directory-summarizer.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/indexer/directory-summarizer.ts"
+          ]
+        }
+      },
+      {
+        "id": 1672448,
+        "payload": {
+          "chunk_id": "card:src/lib/components/analysis/KeyboardShortcutsHelp.svelte:74ec440c816a8ebd",
+          "file_path": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
+          "file_name": "KeyboardShortcutsHelp.svelte",
+          "extension": ".svelte",
+          "chunk_index": 6,
+          "total_chunks": 8,
+          "content": "\t\tmin-width: 80px;\r\n\t\tpadding: 0.375rem 0.75rem;\r\n\t\tbackground: var(--t-panel);\r\n\t\tborder: 1px solid var(--t-border);\r\n\t\tborder-radius: 0.375rem;\r\n\t\tfont-family: monospace;\r\n\t\tfont-size: 0.875rem;\r\n\t\tfont-weight: 600;\r\n\t\ttext-align: center;\r\n\t\tcolor: var(--t-accent);\r\n\t\tbox-shadow: 0 2px 0 var(--t-border);\r\n\t}\r\n\r\n\t.shortcut-desc {\r\n\t\tflex: 1;\r\n\t\tfont-size: 0.9375rem;\r\n\t\tcolor: var(--t-text-secondary);\r\n\t}\r\n\r\n\t.help-footer {\r\n\t\tmargin-top: 1.5rem;\r\n\t\tpadding-top: 1.5rem;\r\n\t\tborder-top: 1px solid var(--t-border);\r\n\t}\r\n\r\n\t.help-tip {\r\n\t\tdisplay: flex;\r\n\t\talign-items: center;\r\n\t\tgap: 0.75rem;\r\n\t\tfont-size: 0.875rem;\r\n\t\tcolor: var(--t-text-secondary);\r\n\t\tmargin: 0;\r\n\t}\r\n\r\n\t.help-tip kbd {\r\n\t\tpadding: 0.25rem 0.5rem;\r\n\t\tbackground: var(--t-panel);\r\n\t\tborder: 1px solid var(--t-border);\r",
+          "content_hash": "74ec440c816a8ebd",
+          "tags": [
+            "svelte",
+            "component",
+            "utility"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-24T16:53:09.557Z",
+          "sourceRefs": [
+            "src/lib/components/analysis/KeyboardShortcutsHelp.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/analysis/KeyboardShortcutsHelp.svelte"
+          ]
         }
       }
     ]

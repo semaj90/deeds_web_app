@@ -366,6 +366,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		.slice(0, 10);
 
 	const sourceRefs = [...new Set(allChunks.map(c => c.source_ref))];
+	const graphPaths = edges
+		.filter((edge) => edge.source && edge.target)
+		.map((edge) => `${edge.source} -> ${edge.target}${edge.label ? ` (${edge.label})` : ''}`);
 	const confidence = allChunks[0]?.score ?? 0;
 	const codebaseHitCount = blended.length;
 	const wikiHitCount = wikiChunks.length;
@@ -440,6 +443,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		karpathyRev: Object.keys(prMap).length > 0 ? 'loaded' : 'unknown',
 		chunks: allChunks,
 		sourceRefs,
+		graphPaths,
 	};
 
 	try { await redis.setex(cacheKey, CACHE_TTL, JSON.stringify(result)); } catch { /* offline */ }

@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-05-26T23:47:19.181Z",
+  "manifest": "memory/knowledge/index-gap-memory-manifest.json",
+  "cards": "memory/knowledge/index-gap-memory-cards.jsonl",
+  "cardsSizeBytes": 192636,
+  "manifestSummary": {
+    "cards": 99,
+    "featureGapRows": 8,
+    "workspaceGapCards": 90,
+    "overviewCards": 1,
+    "productionReady": 8,
+    "active": 66,
+    "candidatePrune": 25,
+    "archiveToDeedsLab": 0
+  }
+}

@@ -1,13 +1,13 @@
 # Stage 2C-500 Phase Review
 
-Generated: 2026-05-26T23:22:22.485Z
+Generated: 2026-05-26T23:44:12.659Z
 RunId: stage-2c-500
 
 ## Phase 3
 - Neo4j graph report present: no
 - Pagerank report present: yes
 - Qdrant sample points: 25
-- Qdrant sourceRefs coverage: 0
+- Qdrant sourceRefs coverage: 1
 
 ## Phase 4
 - Admin atlas UI present: yes
