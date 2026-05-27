@@ -200,7 +200,7 @@ async function main() {
       const vec = pt.vector?.content ?? (Array.isArray(pt.vector) ? pt.vector : null);
       if (!vec || vec.length !== CONTENT_DIM) { missing++; continue; }
 
-      toEncode.push({ fp, vec });
+      toEncode.push({ id: String(pt.id), vec });
     }
 
     if (toEncode.length === 0) continue;
@@ -219,7 +219,7 @@ async function main() {
         const csv = Array.from(latent.subarray(i * ENCODED_DIM, (i + 1) * ENCODED_DIM))
           .map(v => v.toFixed(4))
           .join(',');
-        pipeline.hset(REDIS_KEY, toEncode[i].fp, csv);
+        pipeline.hset(REDIS_KEY, toEncode[i].id, csv);
       }
       await pipeline.exec();
     }

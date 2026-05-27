@@ -161,7 +161,12 @@ async function ensureCollection(): Promise<void> {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      vectors: { size: VECTOR_DIM, distance: 'Cosine' },
+      vectors: {
+        content: { size: VECTOR_DIM, distance: 'Cosine' },
+        signature: { size: VECTOR_DIM, distance: 'Cosine' },
+        error: { size: VECTOR_DIM, distance: 'Cosine' },
+        encoded_64: { size: 64, distance: 'Cosine' },
+      },
       optimizers_config: { indexing_threshold: 20000 },
       quantization_config: { scalar: { type: 'int8', always_ram: true } },
     }),

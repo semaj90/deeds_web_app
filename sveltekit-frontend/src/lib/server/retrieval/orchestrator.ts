@@ -33,6 +33,7 @@ import {
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { ENV } from '$lib/server/env.server.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
+import { turbovecRerank } from '$lib/server/retrieval/turbovec-rerank.js';
 
 // Re-export ContextDoc so callers don't need graph-informed-retrieval import
 export type { ContextDoc };
@@ -335,6 +336,29 @@ export async function orchestrateRetrieval(req: RetrievalRequest): Promise<Retri
 		chunks = await searchLegalCollections(vector, topK, graphFilter);
 	}
 	timings.search = Math.round(performance.now() - t2);
+
+	// 3.5 TurboVec Rerank Blend
+	if (!req.skipRerank && chunks.length > 0) {
+		const t25 = performance.now();
+		const rerankResult = await turbovecRerank(vector, chunks, {
+			topK,
+			graphNeighbors: preRetrievalNeighbors,
+		});
+		chunks = rerankResult.chunks;
+		timings.turbovec = rerankResult.latencyMs;
+		
+		// Emit before/after top-N diff
+		if (rerankResult.diff.length > 0) {
+			logInference({
+				type: 'turbovec_rerank',
+				backend: 'js',
+				latencyMs: rerankResult.latencyMs,
+				cacheHit: false,
+				resultCount: chunks.length,
+				details: { diff: rerankResult.diff }
+			});
+		}
+	}
 
 	// 4. Corrective RAG (reformulate on low scores)
 	let reformulated = false;

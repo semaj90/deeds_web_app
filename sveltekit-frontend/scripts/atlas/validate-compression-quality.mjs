@@ -152,7 +152,7 @@ async function main() {
     if (vec.length !== ENCODED_DIM) continue;
     const norm = Math.sqrt(vec.reduce((s, v) => s + v * v, 0));
     if (norm < 0.01) { flatCount++; continue; }
-    encoded64.push({ fp: sampleKeys[i], vec });
+    encoded64.push({ id: sampleKeys[i], vec });
   }
 
   log(`  Loaded ${encoded64.length} valid 64d vectors (${flatCount} flat/zero skipped)`);
@@ -163,33 +163,30 @@ async function main() {
   log(`  64d pairwise variance (sample n=50): ${variance64.toFixed(6)}`);
 
   // ── 5. Fetch Qdrant 768d vectors aligned to Redis sample ─────────────────
-  // Query Qdrant by file_path filter using the Redis keys we already have —
-  // avoids scrolling blind and hoping early points have named content vectors.
-  const alignFps    = encoded64.slice(0, 50).map(e => e.fp);
-  log(`  Fetching Qdrant 768d for ${alignFps.length} Redis keys (filter by file_path)...`);
+  const alignIds    = encoded64.slice(0, 50).map(e => e.id);
+  log(`  Fetching Qdrant 768d for ${alignIds.length} Redis point IDs...`);
 
-  const filterRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
+  const filterRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      limit: alignFps.length,
+      ids: alignIds.map(id => Number.isInteger(Number(id)) ? Number(id) : id),
       with_payload: ['file_path'],
       with_vector: ['content'],
-      filter: { must: [{ key: 'file_path', match: { any: alignFps } }] },
     }),
   });
   const filterData   = filterRes.ok ? await filterRes.json() : null;
-  const qdrantPoints = filterData?.result?.points ?? [];
+  const qdrantPoints = filterData?.result ?? [];
 
   const aligned = [];
   for (const pt of qdrantPoints) {
     const fp     = pt.payload?.file_path;
-    if (!fp) continue;
+    const ptId   = String(pt.id);
     const vec768 = pt.vector?.content ?? (Array.isArray(pt.vector) ? pt.vector : null);
     if (!vec768 || vec768.length !== CONTENT_DIM) continue;
-    const enc = encoded64.find(e => e.fp === fp);
+    const enc = encoded64.find(e => e.id === ptId);
     if (!enc) continue;
-    aligned.push({ fp, vec768, vec64: enc.vec });
+    aligned.push({ fp: fp || `id_${ptId}`, vec768, vec64: enc.vec });
   }
   log(`  Aligned Qdrant↔Redis pairs: ${aligned.length}`);
 

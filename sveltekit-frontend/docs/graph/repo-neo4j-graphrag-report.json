@@ -1,0 +1,9 @@
+{
+  "generatedAt": "2026-05-27T15:03:39.005Z",
+  "status": "success",
+  "database": "http://localhost:7474/db/neo4j/query/v2",
+  "graphStats": {
+    "totalNodes": 0,
+    "totalRelationships": 0
+  }
+}

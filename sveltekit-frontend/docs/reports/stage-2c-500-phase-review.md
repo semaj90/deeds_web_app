@@ -1,10 +1,10 @@
 # Stage 2C-500 Phase Review
 
-Generated: 2026-05-26T23:44:12.659Z
+Generated: 2026-05-27T15:06:01.403Z
 RunId: stage-2c-500
 
 ## Phase 3
-- Neo4j graph report present: no
+- Neo4j graph report present: yes
 - Pagerank report present: yes
 - Qdrant sample points: 25
 - Qdrant sourceRefs coverage: 1
@@ -20,6 +20,6 @@ RunId: stage-2c-500
 - Synthetic evidence helper present: yes
 
 ## Recommendations
-- Regenerate docs/graph/repo-neo4j-graphrag-report.json from the live Neo4j projection before treating Phase 3 as closed.
+- Phase 3 graph report present; use the authority audit and Qdrant parity sections as the next review gate.
 - Phase 4 is partially wired in code; keep UI provenance and trust-tier editing behind the admin atlas surface.
 - Phase 5 should reconcile the feature registry against the code-based evidence before mapping commands or generating synthetic cards.

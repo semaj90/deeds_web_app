@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T23:44:12.659Z",
+  "generatedAt": "2026-05-27T15:06:01.403Z",
   "runId": "stage-2c-500",
   "inputs": {
     "graphDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\graph",
@@ -8,7 +8,7 @@
   },
   "phase3": {
     "authorityAudit": {
-      "graphReportPresent": false,
+      "graphReportPresent": true,
       "pagerankReportPresent": true,
       "pagerankTop100": {
         "present": true,
@@ -87,13 +87,13 @@
         ]
       },
       "graphReportPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\graph\\repo-neo4j-graphrag-report.json",
-      "gap": "missing_repo_neo4j_graphrag_report"
+      "gap": null
     },
     "summaryVerification": {
       "codebaseGraphPresent": true,
       "graphNodeCount": null,
       "graphEdgeCount": null,
-      "note": "graph report missing in this checkout"
+      "note": "graph report available"
     },
     "embeddingParity": {
       "qdrantCollection": "codebase_chunks_768",
@@ -304,7 +304,7 @@
     }
   },
   "recommendations": [
-    "Regenerate docs/graph/repo-neo4j-graphrag-report.json from the live Neo4j projection before treating Phase 3 as closed.",
+    "Phase 3 graph report present; use the authority audit and Qdrant parity sections as the next review gate.",
     "Phase 4 is partially wired in code; keep UI provenance and trust-tier editing behind the admin atlas surface.",
     "Phase 5 should reconcile the feature registry against the code-based evidence before mapping commands or generating synthetic cards."
   ]
