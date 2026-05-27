@@ -1,0 +1,60 @@
+{
+  "feature": "ace-context",
+  "sourceRefs": [
+    "scripts/opencode/get-ace-context.mjs",
+    ".opencode/ace-context.json",
+    "scripts\\opencode\\bootstrap-workspace.mjs",
+    "scripts\\opencode\\ensure-claude-mem-detached.mjs",
+    "scripts\\opencode\\find-feature.mjs",
+    "scripts\\opencode\\get-ace-context-patcher.mjs",
+    "scripts\\opencode\\get-ace-context.mjs",
+    "docs\\opencode\\TODO.md",
+    ".opencode\\ace-context.json",
+    ".opencode\\ace-patch-card.json",
+    ".opencode\\startup-context.json",
+    ".opencode\\skills\\graphrag-context-recovery.md",
+    ".opencode\\commands\\find-feature.md",
+    ".opencode\\command\\ace-context.md",
+    ".opencode\\command\\graphrag-recover.md",
+    "sveltekit-frontend\\docs\\documents-atlas-index.md",
+    "sveltekit-frontend\\docs\\startup.md",
+    "sveltekit-frontend\\docs\\todo\\bitfrost_turboquant_turbovec_production_todo.md",
+    "sveltekit-frontend\\docs\\todo\\codex_workstation_agentic_todos.md",
+    "sveltekit-frontend\\docs\\todo\\langextract_ace_kag_agentic_workflow_plan.md",
+    "sveltekit-frontend\\docs\\reports\\feature-gap-registry-live-latest.json",
+    "sveltekit-frontend\\docs\\reports\\feature-mapping-production-readiness.md",
+    "sveltekit-frontend\\docs\\obsidian-vault\\Files\\scripts__phase104-backups__src__lib__services__ace-web__ace-context-service.md",
+    "sveltekit-frontend\\docs\\obsidian-vault\\Files\\tests__ace-context-glossary.spec.md",
+    "sveltekit-frontend\\docs\\graph\\codebase-graph.json",
+    "sveltekit-frontend\\docs\\graph\\codebase-map.md",
+    "sveltekit-frontend\\docs\\graph\\deep-audit-ast.json",
+    "sveltekit-frontend\\docs\\graph\\deep-import-graph.json",
+    "sveltekit-frontend\\docs\\graph\\enhanced-hypergraph.json",
+    "sveltekit-frontend\\docs\\graph\\multihop-codebase-map.json",
+    "sveltekit-frontend\\docs\\graph\\nes-glyph-architecture.json",
+    "sveltekit-frontend\\docs\\graph\\sveltekit-route-gap-atlas.json",
+    "sveltekit-frontend\\docs\\graph\\sveltekit-route-map.json",
+    "sveltekit-frontend\\docs\\atlas-index\\feature-gap-registry.seed.json",
+    "sveltekit-frontend\\docs\\atlas\\feature-registry.json"
+  ],
+  "relatedScripts": [
+    "opencode:post-memory",
+    "opencode:bootstrap",
+    "opencode:redis8-eval",
+    "turbo:opencode",
+    "opencode:root",
+    "opencode:app",
+    "opencode:find-feature"
+  ],
+  "recommendedSubagent": "atlas-context",
+  "patchCard": {
+    "type": "gemma4_patch_card",
+    "target_file": "scripts/opencode/get-ace-context.mjs",
+    "problem": "Need feature map wiring for ace-context context.",
+    "acceptance": [
+      ".opencode/feature-map/ace-context.json exists",
+      "sourceRefs preserved",
+      "stdout compact"
+    ]
+  }
+}

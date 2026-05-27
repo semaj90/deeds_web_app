@@ -1,0 +1,10 @@
+{
+  "type": "gemma4_patch_card",
+  "target_file": "scripts/opencode/get-ace-context.mjs",
+  "problem": "Need feature map wiring for ace-context context.",
+  "acceptance": [
+    ".opencode/feature-map/ace-context.json exists",
+    "sourceRefs preserved",
+    "stdout compact"
+  ]
+}
