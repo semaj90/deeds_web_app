@@ -190,6 +190,7 @@
     "atlas:cartridge-seed:publish": "node scripts/atlas/atlas-to-cartridge-seed.mjs --publish",
     "atlas:lane-health": "node scripts/atlas/atlas-lane-health-loop.mjs",
     "opencode:find-feature": "node scripts/opencode/find-feature.mjs",
+    "opencode:smoke": "node scripts/opencode/smoke-validate.js",
     "health:vscode-performance": "node scripts/vscode-extension-performance-log.mjs",
     "health:vscode-performance:publish": "node scripts/vscode-extension-performance-log.mjs --publish"
   },
