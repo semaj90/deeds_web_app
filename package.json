@@ -234,7 +234,17 @@
     "ace:label-and-cache": "npm run graphify:feature-labels && npm run graphify:domain-topology && npm run ace:intent-cache && npm run ace:cache",
     "summary:nightly": "node scripts/opencode/nightly-summary.mjs",
     "ingest:label": "node scripts/ingest/label-features.mjs",
-    "ingest:label:dry": "node scripts/ingest/label-features.mjs --dry-run"
+    "ingest:label:dry": "node scripts/ingest/label-features.mjs --dry-run",
+    "turbovec:sidecar": "python scripts/ingest/turbovec-sidecar.py",
+    "embeds:stub": "node scripts/ingest/stub-missing-embeddings.mjs",
+    "embeds:stub:dry": "node scripts/ingest/stub-missing-embeddings.mjs --dry-run",
+    "ace:startup": "npm run embeds:stub && npm run recommendations:full",
+    "agent:prompt": "node scripts/agent/prompt-generator.mjs",
+    "agent:prompt:dry": "node scripts/agent/prompt-generator.mjs --dry-run",
+    "agent:search-memory": "node scripts/agent/turbovec-search-memory.mjs",
+    "agent:search-memory:stats": "node scripts/agent/turbovec-search-memory.mjs --stats",
+    "agent:search-memory:recall": "node scripts/agent/turbovec-search-memory.mjs --recall",
+    "summary:weekly": "node scripts/opencode/weekly-cold-archive.mjs"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

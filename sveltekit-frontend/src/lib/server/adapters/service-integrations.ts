@@ -34,6 +34,7 @@ import type {
 	ServiceEnvironment,
 	ServiceUrls
 } from '$lib/types/external-services';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 
 // ===== Environment Configuration Loader =====
 /**
@@ -41,343 +42,363 @@ import type {
  * Compatible with both Docker and native Windows services
  */
 export function loadServiceEnvironment(): ServiceEnvironment {
-	const databaseUrl = ENV.DATABASE_URL;
-	const dbUrl = new URL(databaseUrl.replace('postgres://', 'postgresql://'));
+  const databaseUrl = ENV.DATABASE_URL;
+  const dbUrl = new URL(databaseUrl.replace('postgres://', 'postgresql://'));
 
-	return {
-		// Database
-		databaseUrl,
-		postgresConfig: {
-			host: dbUrl.hostname,
-			port: parseInt(dbUrl.port || '5432', 10),
-			database: dbUrl.pathname.slice(1),
-			user: dbUrl.username,
-			password: dbUrl.password,
-			ssl: process.env.NODE_ENV === 'production',
-			max: 20,
-			idleTimeoutMillis: 30000
-		},
-		// Redis
-		redisConfig: {
-			url: ENV.REDIS_URL,
-			password: privateEnv.REDIS_PASSWORD || undefined,
-			host: new URL(ENV.REDIS_URL).hostname,
-			port: new URL(ENV.REDIS_URL).port ? parseInt(new URL(ENV.REDIS_URL).port, 10) : 6379,
-			db: 0,
-			maxRetriesPerRequest: 3,
-			enableReadyCheck: true
-		},
-		// Qdrant
-		qdrantConfig: {
-			host: new URL(ENV.QDRANT_URL).hostname,
-			port: new URL(ENV.QDRANT_URL).port ? parseInt(new URL(ENV.QDRANT_URL).port, 10) : 6333,
-			apiKey: privateEnv.QDRANT_API_KEY,
-			timeout: 30000
-		},
-		// Ollama
-		ollamaConfig: {
-			baseUrl: ENV.OLLAMA_BASE_URL,
-			embeddingModel: privateEnv.EMBEDDING_MODEL || 'embeddinggemma:latest',
-			chatModel: privateEnv.CHAT_MODEL || 'gemma4-rotorquant:latest',
-			gpuLayers: parseInt(privateEnv.OLLAMA_GPU_LAYERS || '30', 10),
-			timeout: 60000
-		},
-		// MinIO
-		minioConfig: {
-			endPoint: ENV.MINIO_ENDPOINT,
-			port: parseInt(ENV.MINIO_PORT, 10),
-			accessKey: ENV.MINIO_ACCESS_KEY,
-			secretKey: ENV.MINIO_SECRET_KEY,
-			useSSL: ENV.MINIO_USE_SSL === 'true',
-			region: 'us-east-1'
-		},
-		// Neo4j
-		neo4jConfig: {
-			uri: ENV.NEO4J_URI,
-			user: ENV.NEO4J_USER,
-			password: ENV.NEO4J_PASSWORD,
-			database: privateEnv.NEO4J_DATABASE || 'neo4j',
-			maxConnectionPoolSize: 50
-		},
-		// RabbitMQ
-		rabbitmqConfig: {
-			url: ENV.RABBITMQ_URL,
-			enabled: privateEnv.RABBITMQ_ENABLED !== 'false',
-			exchange: 'legal-ai-exchange',
-			queuePrefix: 'legal-ai',
-			heartbeat: 60
-		},
-		// Development
-		nodeEnv: (privateEnv.NODE_ENV || 'development') as 'development' | 'production' | 'test',
-		devBypassAuth: dev,
-		logLevel: (privateEnv.LOG_LEVEL || 'info') as 'error' | 'warn' | 'info' | 'debug'
-	};
+  return {
+    // Database
+    databaseUrl,
+    postgresConfig: {
+      host: dbUrl.hostname,
+      port: parseInt(dbUrl.port || '5432', 10),
+      database: dbUrl.pathname.slice(1),
+      user: dbUrl.username,
+      password: dbUrl.password,
+      ssl: process.env.NODE_ENV === 'production',
+      max: 20,
+      idleTimeoutMillis: 30000,
+    },
+    // Redis
+    redisConfig: {
+      url: ENV.REDIS_URL,
+      password: privateEnv.REDIS_PASSWORD || undefined,
+      host: new URL(ENV.REDIS_URL).hostname,
+      port: new URL(ENV.REDIS_URL).port ? parseInt(new URL(ENV.REDIS_URL).port, 10) : 6379,
+      db: 0,
+      maxRetriesPerRequest: 3,
+      enableReadyCheck: true,
+    },
+    // Qdrant
+    qdrantConfig: {
+      host: new URL(ENV.QDRANT_URL).hostname,
+      port: new URL(ENV.QDRANT_URL).port ? parseInt(new URL(ENV.QDRANT_URL).port, 10) : 6333,
+      apiKey: privateEnv.QDRANT_API_KEY,
+      timeout: 30000,
+    },
+    // Ollama
+    ollamaConfig: {
+      baseUrl: ENV.OLLAMA_BASE_URL,
+      embeddingModel: privateEnv.EMBEDDING_MODEL || 'embeddinggemma:latest',
+      chatModel: privateEnv.CHAT_MODEL || 'gemma4-rotorquant:latest',
+      gpuLayers: parseInt(privateEnv.OLLAMA_GPU_LAYERS || '30', 10),
+      timeout: 60000,
+    },
+    // MinIO
+    minioConfig: {
+      endPoint: ENV.MINIO_ENDPOINT,
+      port: parseInt(ENV.MINIO_PORT, 10),
+      accessKey: ENV.MINIO_ACCESS_KEY,
+      secretKey: ENV.MINIO_SECRET_KEY,
+      useSSL: ENV.MINIO_USE_SSL === 'true',
+      region: 'us-east-1',
+    },
+    // Neo4j
+    neo4jConfig: {
+      uri: ENV.NEO4J_URI,
+      user: ENV.NEO4J_USER,
+      password: ENV.NEO4J_PASSWORD,
+      database: privateEnv.NEO4J_DATABASE || 'neo4j',
+      maxConnectionPoolSize: 50,
+    },
+    // RabbitMQ
+    rabbitmqConfig: {
+      url: ENV.RABBITMQ_URL,
+      enabled: privateEnv.RABBITMQ_ENABLED !== 'false',
+      exchange: 'legal-ai-exchange',
+      queuePrefix: 'legal-ai',
+      heartbeat: 60,
+    },
+    // Development
+    nodeEnv: (privateEnv.NODE_ENV || 'development') as 'development' | 'production' | 'test',
+    devBypassAuth: dev,
+    logLevel: (privateEnv.LOG_LEVEL || 'info') as 'error' | 'warn' | 'info' | 'debug',
+  };
 }
 
 /**
  * Get all service URLs for health checks and debugging
  */
 export function getServiceUrls(env: ServiceEnvironment): ServiceUrls {
-	return {
-		// Core Infrastructure
-		postgres: 'postgresql://' + env.postgresConfig.host + ':' + env.postgresConfig.port + '/' + env.postgresConfig.database,
-		redis: env.redisConfig.url,
-		qdrant: 'http://' + env.qdrantConfig.host + ':' + env.qdrantConfig.port,
-		// AI Services
-		ollama: env.ollamaConfig.baseUrl,
-		ollamaEmbeddings: env.ollamaConfig.baseUrl + '/api/embeddings',
-		// Storage & Processing
-		minio: (env.minioConfig.useSSL ? 'https' : 'http') + '://' + env.minioConfig.endPoint + ':' + env.minioConfig.port,
-		minioConsole: (env.minioConfig.useSSL ? 'https' : 'http') + '://' + env.minioConfig.endPoint + ':' + (env.minioConfig.port + 1),
-		neo4j: env.neo4jConfig.uri,
-		neo4jHttp: env.neo4jConfig.uri.replace('bolt://', 'http://').replace(':7687', ':7474'),
-		rabbitmq: env.rabbitmqConfig.url,
-		rabbitmqManagement: env.rabbitmqConfig.url
-			.replace('amqp://', 'http://')
-			.replace(':5672', ':15672'),
-		// QUIC Microservices
-		quicGateway: privateEnv.QUIC_GATEWAY_URL ?? '',
-		quicVectorService: privateEnv.QUIC_VECTOR_SERVICE_URL ?? '',
-		quicSearchService: privateEnv.QUIC_SEARCH_SERVICE_URL ?? '',
-		// GPU Services
-		tensorRTApi: privateEnv.TENSORRT_API_URL ?? '',
-		tensorRTWs: privateEnv.TENSORRT_WS_URL ?? '',
-		cudaService: privateEnv.CUDA_SERVICE_URL ?? ''
-	};
+  return {
+    // Core Infrastructure
+    postgres:
+      'postgresql://' +
+      env.postgresConfig.host +
+      ':' +
+      env.postgresConfig.port +
+      '/' +
+      env.postgresConfig.database,
+    redis: env.redisConfig.url,
+    qdrant: 'http://' + env.qdrantConfig.host + ':' + env.qdrantConfig.port,
+    // AI Services
+    ollama: env.ollamaConfig.baseUrl,
+    ollamaEmbeddings: env.ollamaConfig.baseUrl + '/api/embeddings',
+    // Storage & Processing
+    minio:
+      (env.minioConfig.useSSL ? 'https' : 'http') +
+      '://' +
+      env.minioConfig.endPoint +
+      ':' +
+      env.minioConfig.port,
+    minioConsole:
+      (env.minioConfig.useSSL ? 'https' : 'http') +
+      '://' +
+      env.minioConfig.endPoint +
+      ':' +
+      (env.minioConfig.port + 1),
+    neo4j: env.neo4jConfig.uri,
+    neo4jHttp: env.neo4jConfig.uri.replace('bolt://', 'http://').replace(':7687', ':7474'),
+    rabbitmq: env.rabbitmqConfig.url,
+    rabbitmqManagement: env.rabbitmqConfig.url
+      .replace('amqp://', 'http://')
+      .replace(':5672', ':15672'),
+    // QUIC Microservices
+    quicGateway: privateEnv.QUIC_GATEWAY_URL ?? '',
+    quicVectorService: privateEnv.QUIC_VECTOR_SERVICE_URL ?? '',
+    quicSearchService: privateEnv.QUIC_SEARCH_SERVICE_URL ?? '',
+    // GPU Services
+    tensorRTApi: privateEnv.TENSORRT_API_URL ?? '',
+    tensorRTWs: privateEnv.TENSORRT_WS_URL ?? '',
+    cudaService: privateEnv.CUDA_SERVICE_URL ?? '',
+  };
 }
 
 // ===== Ollama Adapter =====
 export class OllamaAdapter implements OllamaClient {
-	constructor(private config: OllamaConfig) {}
+  constructor(private config: OllamaConfig) {}
 
-	async embed(text: string, opts?: { model?: string }): Promise<number[]> {
-		const model = opts?.model || this.config.embeddingModel;
-		const url = this.config.baseUrl + '/api/embeddings';
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: model, prompt: text }),
-			signal: AbortSignal.timeout(this.config.timeout || 60000)
-		});
+  async embed(text: string, opts?: { model?: string }): Promise<number[]> {
+    const model = opts?.model || this.config.embeddingModel;
+    const url = this.config.baseUrl + '/api/embeddings';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: model, prompt: text }),
+      signal: AbortSignal.timeout(this.config.timeout || 60000),
+    });
 
-		if (!response.ok) {
-			throw new Error('Ollama embed failed: ' + response.statusText);
-		}
+    if (!response.ok) {
+      throw new Error('Ollama embed failed: ' + response.statusText);
+    }
 
-		const data = await response.json();
-		return data.embedding;
-	}
+    const data = await response.json();
+    return data.embedding;
+  }
 
-	async generateText(
-		prompt: string,
-		opts?: { model?: string; maxTokens?: number }
-	): Promise<string> {
-		const model = opts?.model || this.config.chatModel;
-		const url = this.config.baseUrl + '/api/generate';
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: model,
-				prompt: prompt,
-				options: { num_predict: opts?.maxTokens || 512 }
-			}),
-			signal: AbortSignal.timeout(this.config.timeout || 60000)
-		});
+  async generateText(
+    prompt: string,
+    opts?: { model?: string; maxTokens?: number }
+  ): Promise<string> {
+    const model = opts?.model || this.config.chatModel;
+    const url = this.config.baseUrl + '/api/generate';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        prompt: prompt,
+        options: { num_predict: opts?.maxTokens || 512 },
+      }),
+      signal: AbortSignal.timeout(this.config.timeout || 60000),
+    });
 
-		if (!response.ok) {
-			throw new Error('Ollama generate failed: ' + response.statusText);
-		}
+    if (!response.ok) {
+      throw new Error('Ollama generate failed: ' + response.statusText);
+    }
 
-		const data = await response.json();
-		return data.response;
-	}
+    const data = await response.json();
+    return data.response;
+  }
 
-	async chat(
-		messages: Array<{ role: string; content: string }>,
-		opts?: { model?: string; stream?: boolean }
-	): Promise<string | AsyncIterable<string>> {
-		const model = opts?.model || this.config.chatModel;
-		const url = this.config.baseUrl + '/api/chat';
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: model,
-				messages: messages,
-				stream: opts?.stream || false
-			}),
-			signal: AbortSignal.timeout(this.config.timeout || 60000)
-		});
+  async chat(
+    messages: Array<{ role: string; content: string }>,
+    opts?: { model?: string; stream?: boolean }
+  ): Promise<string | AsyncIterable<string>> {
+    const model = opts?.model || this.config.chatModel;
+    const url = this.config.baseUrl + '/api/chat';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        messages: messages,
+        stream: opts?.stream || false,
+      }),
+      signal: AbortSignal.timeout(this.config.timeout || 60000),
+    });
 
-		if (!response.ok) {
-			throw new Error('Ollama chat failed: ' + response.statusText);
-		}
+    if (!response.ok) {
+      throw new Error('Ollama chat failed: ' + response.statusText);
+    }
 
-		if (opts?.stream) {
-			return (async function* () {
-				const reader = response.body?.getReader();
-				if (!reader) return;
-				const decoder = new TextDecoder();
-				while (true) {
-					const { done, value } = await reader.read();
-					if (done) break;
-					const chunk = decoder.decode(value);
-					const lines = chunk.split('\n').filter(function(line) { return line.trim(); });
-					for (const line of lines) {
-						try {
-							const json = JSON.parse(line);
-							if (json.message?.content) {
-								yield json.message.content;
-							}
-						} catch {}
-					}
-				}
-			})();
-		}
+    if (opts?.stream) {
+      return (async function* () {
+        const reader = response.body?.getReader();
+        if (!reader) return;
+        const decoder = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n').filter(function (line) {
+            return line.trim();
+          });
+          for (const line of lines) {
+            try {
+              const json = JSON.parse(line);
+              if (json.message?.content) {
+                yield json.message.content;
+              }
+            } catch {}
+          }
+        }
+      })();
+    }
 
-		const data = await response.json();
-		return data.message?.content || '';
-	}
+    const data = await response.json();
+    return data.message?.content || '';
+  }
 }
 
 // ===== Redis Adapter (IORedis) =====
 export class RedisAdapter implements RedisCacheService {
-	private client: any;
-	private connected = false;
+  private client: any;
+  private connected = false;
 
-	constructor(private config: RedisConfig) {}
+  constructor(private config: RedisConfig) {}
 
-	private async ensureConnected() {
-		if (this.connected) return;
-		const Redis = (await import('ioredis')).default;
-		this.client = new Redis(this.config.url, {
-			password: this.config.password,
-			maxRetriesPerRequest: this.config.maxRetriesPerRequest || 3,
-			enableReadyCheck: this.config.enableReadyCheck !== false,
-			lazyConnect: false
-		});
-		await this.client.connect();
-		this.connected = true;
-	}
+  private async ensureConnected() {
+    if (this.connected) return;
+    const Redis = (await import('ioredis')).default;
+    this.client = new Redis(this.config.url, {
+      password: this.config.password,
+      maxRetriesPerRequest: this.config.maxRetriesPerRequest || 3,
+      enableReadyCheck: this.config.enableReadyCheck !== false,
+      lazyConnect: false,
+    });
+    await this.client.connect();
+    this.connected = true;
+  }
 
-	async get(key: string): Promise<string | null> {
-		await this.ensureConnected();
-		return this.client.get(key);
-	}
+  async get(key: string): Promise<string | null> {
+    await this.ensureConnected();
+    return this.client.get(key);
+  }
 
-	async setex(key: string, seconds: number, value: string): Promise<'OK' | null> {
-		await this.ensureConnected();
-		return this.client.setex(key, seconds, value);
-	}
+  async setex(key: string, seconds: number, value: string): Promise<'OK' | null> {
+    await this.ensureConnected();
+    return this.client.setex(key, seconds, value);
+  }
 
-	async hset(key: string, data: Record<string, string>): Promise<number> {
-		await this.ensureConnected();
-		return this.client.hset(key, data);
-	}
+  async hset(key: string, data: Record<string, string>): Promise<number> {
+    await this.ensureConnected();
+    return this.client.hset(key, data);
+  }
 
-	async hget(key: string, field: string): Promise<string | null> {
-		await this.ensureConnected();
-		return this.client.hget(key, field);
-	}
+  async hget(key: string, field: string): Promise<string | null> {
+    await this.ensureConnected();
+    return this.client.hget(key, field);
+  }
 
-	async hgetall(key: string): Promise<Record<string, string>> {
-		await this.ensureConnected();
-		return this.client.hgetall(key);
-	}
+  async hgetall(key: string): Promise<Record<string, string>> {
+    await this.ensureConnected();
+    return this.client.hgetall(key);
+  }
 
-	async del(...keys: string[]): Promise<number> {
-		await this.ensureConnected();
-		return this.client.del(...keys);
-	}
+  async del(...keys: string[]): Promise<number> {
+    await this.ensureConnected();
+    return this.client.del(...keys);
+  }
 
-	async exists(key: string): Promise<boolean> {
-		await this.ensureConnected();
-		const result = await this.client.exists(key);
-		return result === 1;
-	}
+  async exists(key: string): Promise<boolean> {
+    await this.ensureConnected();
+    const result = await this.client.exists(key);
+    return result === 1;
+  }
 
-	async keys(pattern: string): Promise<string[]> {
-		await this.ensureConnected();
-		return this.client.keys(pattern);
-	}
+  async keys(pattern: string): Promise<string[]> {
+    await this.ensureConnected();
+    return this.client.keys(pattern);
+  }
 
-	async disconnect(): Promise<void> {
-		if (this.connected) {
-			await this.client.quit();
-			this.connected = false;
-		}
-	}
+  async disconnect(): Promise<void> {
+    if (this.connected) {
+      await this.client.quit();
+      this.connected = false;
+    }
+  }
 }
 
 // ===== Qdrant Adapter =====
 export class QdrantAdapter implements QdrantClient {
-	private client: any;
+  private client: any;
 
-	constructor(private config: QdrantConfig) {}
+  constructor(private config: QdrantConfig) {}
 
-	private async ensureClient() {
-		if (this.client) return;
-		const { QdrantClient: QdrantClientLib } = await import('@qdrant/js-client-rest');
-		this.client = new QdrantClientLib({
-			url: 'http://' + this.config.host + ':' + this.config.port,
-			apiKey: this.config.apiKey,
-			timeout: this.config.timeout || 30000
-		});
-	}
+  private async ensureClient() {
+    if (this.client) return;
+    const { QdrantClient: QdrantClientLib } = await import('@qdrant/js-client-rest');
+    this.client = new QdrantClientLib({
+      url: 'http://' + this.config.host + ':' + this.config.port,
+      apiKey: this.config.apiKey,
+      timeout: this.config.timeout || 30000,
+    });
+  }
 
-	async createCollection(name: string, vectorSize: number): Promise<void> {
-		await this.ensureClient();
-		await this.client.createCollection(name, {
-			vectors: { size: vectorSize, distance: 'Cosine' },
-			hnsw_config: VECTOR_CONFIG.QDRANT_HNSW,
-			quantization_config: VECTOR_CONFIG.QDRANT_QUANTIZATION
-		});
-	}
+  async createCollection(name: string, vectorSize: number): Promise<void> {
+    await this.ensureClient();
+    await this.client.createCollection(name, {
+      vectors: { size: vectorSize, distance: 'Cosine' },
+      hnsw_config: VECTOR_CONFIG.QDRANT_HNSW,
+      quantization_config: VECTOR_CONFIG.QDRANT_QUANTIZATION,
+    });
+  }
 
-	async indexCollection(name: string, vectors: QdrantVectorPayload[]): Promise<void> {
-		await this.ensureClient();
-		const points = vectors.map(function(v) {
-			return {
-				id: v.id,
-				vector: v.vector,
-				payload: v.payload || {}
-			};
-		});
-		await this.client.upsert(name, { points: points });
-	}
+  async indexCollection(name: string, vectors: QdrantVectorPayload[]): Promise<void> {
+    await this.ensureClient();
+    const points = vectors.map(function (v) {
+      return {
+        id: v.id,
+        vector: v.vector,
+        payload: v.payload || {},
+      };
+    });
+    // Use the centralized qdrant upsert wrapper to enforce dimension checks
+    await qdrant.upsert({ collection: name, points: points } as any);
+  }
 
-	async search(
-		collection: string,
-		vector: number[],
-		limit?: number
-	): Promise<QdrantSearchResult<any>[]> {
-		await this.ensureClient();
-		const results = await this.client.search(collection, {
-			vector: vector,
-			limit: limit || 10,
-			with_payload: true,
-			with_vector: false
-		});
-		return results.map(function(r: any) {
-			return {
-				id: r.id,
-				score: r.score,
-				payload: r.payload,
-				vector: r.vector
-			};
-		});
-	}
+  async search(
+    collection: string,
+    vector: number[],
+    limit?: number
+  ): Promise<QdrantSearchResult<any>[]> {
+    await this.ensureClient();
+    const results = await this.client.search(collection, {
+      vector: vector,
+      limit: limit || 10,
+      with_payload: true,
+      with_vector: false,
+    });
+    return results.map(function (r: any) {
+      return {
+        id: r.id,
+        score: r.score,
+        payload: r.payload,
+        vector: r.vector,
+      };
+    });
+  }
 
-	async upsert(collection: string, points: QdrantVectorPayload[]): Promise<void> {
-		await this.ensureClient();
-		await this.client.upsert(collection, { points: points });
-	}
+  async upsert(collection: string, points: QdrantVectorPayload[]): Promise<void> {
+    await this.ensureClient();
+    // Delegate to central qdrant wrapper to get validation, batching and cache invalidation
+    await qdrant.upsert({ collection, points } as any);
+  }
 
-	async deleteCollection(name: string): Promise<void> {
-		await this.ensureClient();
-		await this.client.deleteCollection(name);
-	}
+  async deleteCollection(name: string): Promise<void> {
+    await this.ensureClient();
+    await this.client.deleteCollection(name);
+  }
 }
 
 // ===== PostgreSQL + pgvector Adapter =====

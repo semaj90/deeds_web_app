@@ -526,7 +526,7 @@ async function persistPreparedIngest(
 
   emit?.('storing', 0.75);
   const points = buildPoints(prepared.chunks, allVectors, prepared.resolved, input.caseId, userId);
-  await qdrant.client.upsert(qdrant.collections.documents, { wait: true, points });
+  await qdrant.upsert({ collection: qdrant.collections.documents, wait: true, points } as any);
 
   emit?.('graph', 0.85);
   const graphNodeId = await createGraphNode(

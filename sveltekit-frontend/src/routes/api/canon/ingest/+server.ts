@@ -189,7 +189,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				.filter((p): p is NonNullable<typeof p> => p !== null);
 
 			if (points.length > 0) {
-				await qdrant.client.upsert(QDRANT_COLLECTION, { points });
+				await qdrant.upsert({ collection: QDRANT_COLLECTION, points } as any);
 				qdrantCount = points.length;
 			}
 		} catch (qdrantErr) {

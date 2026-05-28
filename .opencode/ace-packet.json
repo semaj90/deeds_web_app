@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-28T19:44:17.623Z",
+  "generatedAt": "2026-05-28T20:01:11.625Z",
   "query": "ACE context retrieval",
   "tokenBudget": 6000,
   "tokenEstimate": 5996,
@@ -67,8 +67,8 @@
     "31acb250ee62ba21": "claude_code_phases413.txt",
     "ebaa006fcfb12629": "claude-mem\\.claude\\commands\\anti-pattern-czar.md",
     "8af523d8fafb921d": "claude-mem\\.claude\\reports\\test-audit-2026-01-05.md",
-    "0871c6e841964ac0": "claude-mem\\plans\\03-worker-lifecycle.md",
     "dd7c7c15fa10da6a": "claude-mem\\plans\\2026-05-06-observation-queue-engine-deep-dive.md",
+    "0871c6e841964ac0": "claude-mem\\plans\\03-worker-lifecycle.md",
     "b20ff2e23ff58f82": "AUDIT_COMPILATION_PHASE_1.md",
     "b6673c841175e985": "docs\\security\\STACK_AUDIT_PORTS.md",
     "f7897aa34ebf6586": "cudagraphloops_59.txt",
@@ -107,7 +107,7 @@
       "id": "ef048099204c051a",
       "title": "password_reset_tokens.user_id: uuid → integer (0 rows in table — matches users.id)",
       "sourceRef": "claude.md",
-      "score": 0.8057,
+      "score": 0.8056,
       "signals": {
         "semantic": 0.488,
         "recency": 0.973,
@@ -141,7 +141,7 @@
       "id": "1a1c4d2f01240d7a",
       "title": "Sub-audits (can run independently)",
       "sourceRef": "AGENTS.md",
-      "score": 0.6963,
+      "score": 0.6962,
       "signals": {
         "semantic": 0.493,
         "recency": 0.973,
@@ -243,7 +243,7 @@
       "id": "17cff96e3627b85d",
       "title": "Docker service health check.\r \r VS Code tasks.json changes (last 3 days) — 4 commits touched it, adding:\r \r \"Dev Server ",
       "sourceRef": "423_whatdwedo.txt",
-      "score": 0.6874,
+      "score": 0.6873,
       "signals": {
         "semantic": 0.514,
         "recency": 0.973,
@@ -260,7 +260,7 @@
       "id": "72c355fb2ea7f4fe",
       "title": "Full Audit Results\r Search Pipeline: ALL WIRED\r Component\tVerdict\r Ripgrep\tWIRED — real rg binary spawn, MCP tool\r RAG\tW",
       "sourceRef": "320ragkagdag.txt",
-      "score": 0.6861,
+      "score": 0.686,
       "signals": {
         "semantic": 0.511,
         "recency": 0.973,
@@ -294,7 +294,7 @@
       "id": "7a02356b94cd64d0",
       "title": "yes continue and \r This error:\r archiveLargeFile is not defined\r means your Phase 6E archive path was designed but never",
       "sourceRef": "5_23_26_pt_6_todo.txt",
-      "score": 0.685,
+      "score": 0.6849,
       "signals": {
         "semantic": 0.516,
         "recency": 0.973,
@@ -345,7 +345,7 @@
       "id": "e9320c2ca649d795",
       "title": "Now I understand the full picture. The key format is {som_bmu_row_bucket}|{gpu_cluster}|{trust_tier}. At query time, we'",
       "sourceRef": "51726__.txt",
-      "score": 0.6832,
+      "score": 0.6831,
       "signals": {
         "semantic": 0.54,
         "recency": 0.973,
@@ -379,7 +379,7 @@
       "id": "b90b5703eaa40fc3",
       "title": "npm run atlas:parents:eval        # Re-runs evaluation against the 25-query E2E messy query suite\r Every command is vali",
       "sourceRef": "517_26_llmwikikarapathy.txt",
-      "score": 0.6826,
+      "score": 0.6825,
       "signals": {
         "semantic": 0.501,
         "recency": 0.973,
@@ -651,7 +651,7 @@
       "id": "624809cbde794161",
       "title": "The user is clarifying their intent:\r Three distinct issues:\r \r api-metadata-extractor.ts: Duplicate object keys (person",
       "sourceRef": "318_26.txt",
-      "score": 0.6342,
+      "score": 0.6341,
       "signals": {
         "semantic": 0.505,
         "recency": 0.973,
@@ -668,7 +668,7 @@
       "id": "dd90e81428be06af",
       "title": "we're trying to use 768 embedddinggemma and an autoencoder for cold warm storage bitfrost kmeans clustering qdrant centr",
       "sourceRef": "5_16_pt3_morning.txt",
-      "score": 0.6334,
+      "score": 0.6333,
       "signals": {
         "semantic": 0.503,
         "recency": 0.973,
@@ -685,7 +685,7 @@
       "id": "12cb47c829b24000",
       "title": "Phases",
       "sourceRef": "claude-mem\\plugin\\skills\\design-is\\SKILL.md",
-      "score": 0.6323,
+      "score": 0.6322,
       "signals": {
         "semantic": 0.489,
         "recency": 0.973,
@@ -702,7 +702,7 @@
       "id": "3c3984b88f74ee98",
       "title": "Recent Architecture Changes (May 3, 2026)",
       "sourceRef": "CODEBASE_MAP.md",
-      "score": 0.6318,
+      "score": 0.6317,
       "signals": {
         "semantic": 0.511,
         "recency": 0.973,
@@ -736,7 +736,7 @@
       "id": "2f1d8b8442785803",
       "title": "Loading svelte-check in workspace: c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend Getting Svelte diagnostics... ",
       "sourceRef": "analysis-errors.txt",
-      "score": 0.6297,
+      "score": 0.6296,
       "signals": {
         "semantic": 0.492,
         "recency": 0.973,
@@ -753,7 +753,7 @@
       "id": "2a57a761c4e886e6",
       "title": "Open Gates — Priority Order",
       "sourceRef": "docs\\opencode\\SUB-MASTER-FEATURE-TODO-2026-05-27.md",
-      "score": 0.6287,
+      "score": 0.6286,
       "signals": {
         "semantic": 0.522,
         "recency": 0.973,
@@ -787,7 +787,7 @@
       "id": "70502d7d98f7eca4",
       "title": "[ensure-mcp-server] TRACE MCP exited code=0 after 8500ms\r   stderr (tail):\r   [mcp] UNCAUGHT EXCEPTION: Error: Tool trac",
       "sourceRef": "514_26__.txt",
-      "score": 0.6273,
+      "score": 0.6272,
       "signals": {
         "semantic": 0.468,
         "recency": 0.973,
@@ -821,7 +821,7 @@
       "id": "d7b8c64d471d1d83",
       "title": "This path is used for direct error fixing and production wiring validation.  ### Canonical checks  - `check:typescript` ",
       "sourceRef": "docs\\error-analysis-architecture.md",
-      "score": 0.6217,
+      "score": 0.6216,
       "signals": {
         "semantic": 0.534,
         "recency": 0.973,
@@ -872,7 +872,7 @@
       "id": "dc6c1191f9f115e7",
       "title": "look this up, what is this?\r langextract is for text minio parsing? would be simd json avx2 parsing jsonb grpc redis cac",
       "sourceRef": "330_26.txt",
-      "score": 0.6193,
+      "score": 0.6192,
       "signals": {
         "semantic": 0.491,
         "recency": 0.973,
@@ -923,7 +923,7 @@
       "id": "7ef9abb53ce2c38d",
       "title": "Completed This Session\r Ctrl+K → GlobalCommandPalette — Already wired in root +layout.svelte (line 23-26). CodebaseSearc",
       "sourceRef": "319_26_nextsteps.txt",
-      "score": 0.6147,
+      "score": 0.6146,
       "signals": {
         "semantic": 0.507,
         "recency": 0.973,
@@ -957,7 +957,7 @@
       "id": "f296a38660515392",
       "title": "Phase 3 — Fix #2357 (CLAUDE_CODE_EFFORT_LEVEL leak + 400 retry classification)",
       "sourceRef": "claude-mem\\plans\\06-worker-env-isolation.md",
-      "score": 0.6141,
+      "score": 0.614,
       "signals": {
         "semantic": 0.512,
         "recency": 0.973,
@@ -974,7 +974,7 @@
       "id": "1c6e12bf180d50e3",
       "title": "Phase 1 critical fixes",
       "sourceRef": "AUDIT_COMPILATION_COMPLETE.md",
-      "score": 0.6138,
+      "score": 0.6137,
       "signals": {
         "semantic": 0.499,
         "recency": 0.973,
@@ -1008,7 +1008,7 @@
       "id": "1cfe33fbccfd5dbd",
       "title": "---\r name: \"Route Triage Engineer\"\r description: \"Use when triaging screenshot failures, broken routes, route-specific c",
       "sourceRef": ".github\\agents\\route-triage-engineer.agent.md",
-      "score": 0.6127,
+      "score": 0.6126,
       "signals": {
         "semantic": 0.48,
         "recency": 0.973,
@@ -1124,23 +1124,6 @@
       "charCount": 191
     },
     {
-      "id": "0871c6e841964ac0",
-      "title": "Phase 0 — Documentation Discovery & Allowed APIs",
-      "sourceRef": "claude-mem\\plans\\03-worker-lifecycle.md",
-      "score": 0.6043,
-      "signals": {
-        "semantic": 0.516,
-        "recency": 0.973,
-        "errorBoost": 0.592,
-        "todoBoost": 1,
-        "sourceRefConfidence": 0.5
-      },
-      "summary": "**Goal**: Anchor every implementation phase in real APIs that exist in the current codebase or in vetted libraries.  Prevent phantom-method invention.",
-      "selected": true,
-      "compressed": "### Phase 0 — Documentation Discovery & Allowed APIs\n**source**: `claude-mem\\plans\\03-worker-lifecycle.md`\n**Goal**: Anchor every implementation phase in real APIs that exist in the current codebase or in vetted libraries.  Prevent phantom-method invention.",
-      "charCount": 257
-    },
-    {
       "id": "dd7c7c15fa10da6a",
       "title": "BullMQ deep dive",
       "sourceRef": "claude-mem\\plans\\2026-05-06-observation-queue-engine-deep-dive.md",
@@ -1156,6 +1139,23 @@
       "selected": true,
       "compressed": "### BullMQ deep dive\n**source**: `claude-mem\\plans\\2026-05-06-observation-queue-engine-deep-dive.md`\n- GitHub: https://github. - NPM: https://www.",
       "charCount": 146
+    },
+    {
+      "id": "0871c6e841964ac0",
+      "title": "Phase 0 — Documentation Discovery & Allowed APIs",
+      "sourceRef": "claude-mem\\plans\\03-worker-lifecycle.md",
+      "score": 0.6043,
+      "signals": {
+        "semantic": 0.516,
+        "recency": 0.973,
+        "errorBoost": 0.592,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "**Goal**: Anchor every implementation phase in real APIs that exist in the current codebase or in vetted libraries.  Prevent phantom-method invention.",
+      "selected": true,
+      "compressed": "### Phase 0 — Documentation Discovery & Allowed APIs\n**source**: `claude-mem\\plans\\03-worker-lifecycle.md`\n**Goal**: Anchor every implementation phase in real APIs that exist in the current codebase or in vetted libraries.  Prevent phantom-method invention.",
+      "charCount": 257
     },
     {
       "id": "b20ff2e23ff58f82",
@@ -1195,7 +1195,7 @@
       "id": "f7897aa34ebf6586",
       "title": "$env:DRAFT_MODEL_PATH = 'C:\\path\\to\\gemma3-270m.gguf'\r npm run turbo:start        # Now launches with -md draft flag + -",
       "sourceRef": "cudagraphloops_59.txt",
-      "score": 0.6,
+      "score": 0.5999,
       "signals": {
         "semantic": 0.533,
         "recency": 0.973,
@@ -1297,7 +1297,7 @@
       "id": "3a640d5cf0938fe8",
       "title": "✅ COMPLETE (No Action Needed)",
       "sourceRef": "docs\\status\\NEXT_STEPS_AUDIT_2026-04-12.md",
-      "score": 0.5958,
+      "score": 0.5957,
       "signals": {
         "semantic": 0.513,
         "recency": 0.973,
@@ -1331,7 +1331,7 @@
       "id": "d0efad1e918a46c0",
       "title": "1\tanimations/gpu-animations.ts\t22\tSTUB\tNo\tNone\r 2\tcompat/lokijs.ts\t120\tGOOD\tNo\tLow — npm lokijs used directly\r 3\tconstan",
       "sourceRef": "3_16_26.txt",
-      "score": 0.595,
+      "score": 0.5949,
       "signals": {
         "semantic": 0.461,
         "recency": 0.973,
@@ -1399,7 +1399,7 @@
       "id": "101f3b896832662f",
       "title": "**Why next**: 110k stars, richest plugin ecosystem. OpenCode plugins are JS/TS modules auto-loaded from plugin directori",
       "sourceRef": "claude-mem\\.plan\\npx-distribution.md",
-      "score": 0.5925,
+      "score": 0.5924,
       "signals": {
         "semantic": 0.472,
         "recency": 0.973,

@@ -130,25 +130,26 @@ export async function embedErrorEvent(
 	const pointId = deterministicPointId(pointKey);
 
 	// 4. Upsert to Qdrant
-	await qdrant.client.upsert(COLLECTION, {
-		wait: false,
-		points: [
-			{
-				id: pointId,
-				vector: { error: embedding },
-				payload: {
-					routePath: input.routePath || '',
-					filePath: input.filePath || '',
-					clusterId: input.clusterId || clusterMatch.clusterId || '',
-					severity: input.severity || 'error',
-					tsCode: input.tsCode || '',
-					message: input.errorMessage.slice(0, 500),
-					stackTrace: (input.stackTrace || '').slice(0, 1000),
-					createdAt: new Date().toISOString(),
-				},
-			},
-		],
-	});
+	await qdrant.upsert({
+    collection: COLLECTION,
+    wait: false,
+    points: [
+      {
+        id: pointId,
+        vector: { error: embedding },
+        payload: {
+          routePath: input.routePath || '',
+          filePath: input.filePath || '',
+          clusterId: input.clusterId || clusterMatch.clusterId || '',
+          severity: input.severity || 'error',
+          tsCode: input.tsCode || '',
+          message: input.errorMessage.slice(0, 500),
+          stackTrace: (input.stackTrace || '').slice(0, 1000),
+          createdAt: new Date().toISOString(),
+        },
+      },
+    ],
+  } as any);
 
 	return {
 		pointId,

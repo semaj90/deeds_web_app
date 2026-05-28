@@ -5,10 +5,16 @@
       "description": "Recover graph export artifacts and validate DuckDB smoke",
       "agent": "atlas-context",
       "template": "Use the ACE recovery skill. Execute deterministic graph recovery only. Do not delegate. Discover files with rg --files -uu, patch fallback roots if needed, run npm run graph:exports, run DuckDB smoke, then write memory/agent-runs/latest-recovery.json."
+    },
+    "deep-research": {
+      "description": "Diagnose errors or research a topic: local rg → ACE Redis cache → ranking reports → SearXNG fallback",
+      "agent": "error-inference-research",
+      "template": "Use the error-inference-research skill. Follow the research order exactly: (1) classify the error or topic, (2) rg search in the local repo, (3) read ace:packet:latest from Redis (`node -e \"const Redis=require('ioredis');const r=new Redis();r.get('ace:packet:latest').then(v=>{if(v){const p=JSON.parse(v);console.log(p.totalCards,'cards,',p.tokenEstimate,'tokens,',p.query);p.cards?.slice(0,3).forEach(c=>console.log(' -',c.title));} r.disconnect();})\"`), (4) inspect .tmp/retrieval-ranking-report.json and .tmp/rerank-diff.json, (5) check docs/atlas and MASTER TODO, (6) run `node scripts/opencode/smoke-searxng.mjs` then query http://localhost:8889/search?q=QUERY&format=json only if local evidence is insufficient. Produce: likely_cause, evidence, patch_targets, safe_next_command, do_not_do."
     }
   },
   "instructions": [
     "AGENTS.md",
-    ".opencode/skills/ace-recovery/SKILL.md"
+    ".opencode/skills/ace-recovery/SKILL.md",
+    ".opencode/skills/error-inference-research.md"
   ]
 }

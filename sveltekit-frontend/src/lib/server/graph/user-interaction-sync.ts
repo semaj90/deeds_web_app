@@ -146,21 +146,22 @@ async function embedSearchQuery(
 		const { deterministicPointId } = await import('$lib/server/vector/qdrant-manager.js');
 		const pointId = deterministicPointId(`${userId}:${simpleHash(query)}`);
 
-		await qdrant.client.upsert('user_searches', {
-			wait: false,
-			points: [
-				{
-					id: pointId,
-					vector,
-					payload: {
-						userId,
-						query: query.slice(0, 1000),
-						eventType,
-						timestamp,
-					},
-				},
-			],
-		});
+		await qdrant.upsert({
+      collection: 'user_searches',
+      wait: false,
+      points: [
+        {
+          id: pointId,
+          vector,
+          payload: {
+            userId,
+            query: query.slice(0, 1000),
+            eventType,
+            timestamp,
+          },
+        },
+      ],
+    } as any);
 	} catch {
 		// Embedding or Qdrant unavailable — non-fatal
 	}

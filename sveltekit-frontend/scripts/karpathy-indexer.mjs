@@ -1,6 +1,6 @@
 /**
  * Karpathy Indexer Orchestrator
- * 
+ *
  * Scans the codebase, groups files by directory, and runs the Karpathy Hook
  * to populate durable memory across Qdrant, Neo4j, Postgres, and CouchDB.
  */
@@ -10,7 +10,7 @@ import crypto from 'crypto';
 import { processKarpathyHook } from '../src/lib/server/indexer/karpathy-hook.js';
 import { persistKarpathyHook } from '../src/lib/server/indexer/karpathy-persistence.js';
 import { getOllamaEmbedding } from '../src/lib/server/ollama.js';
-import { QdrantManager } from '../src/lib/server/vector/qdrant-manager.js';
+import { qdrant } from '../src/lib/server/vector/qdrant-manager.js';
 
 const REPO_ROOT = process.cwd();
 const BATCH_SIZE = 50; // Files per batch
@@ -37,7 +37,8 @@ async function runIndexer() {
 	console.log(`[indexer] Found ${allFiles.length} files to index.`);
 
 	const runId = crypto.randomUUID();
-	const qdrant = new QdrantManager();
+	// use singleton qdrant manager
+	// const qdrant = new QdrantManager();
 
 	// Process in batches
 	for (let i = 0; i < allFiles.length; i += BATCH_SIZE) {
@@ -77,14 +78,11 @@ async function runIndexer() {
 
 		// 4. Upsert to Qdrant (Bulk)
 		if (output.qdrantPayloads.length > 0) {
-			await qdrant.client.upsert(qdrant.collections.codebase_chunks, {
+			await qdrant.upsert({
+				collection: qdrant.collections.codebase_chunks,
 				wait: true,
-				points: output.qdrantPayloads.map(p => ({
-					id: p.id,
-					vector: p.vector,
-					payload: p.payload
-				}))
-			});
+				points: output.qdrantPayloads.map(p => ({ id: p.id, vector: p.vector, payload: p.payload }))
+			} as any);
 		}
 	}
 

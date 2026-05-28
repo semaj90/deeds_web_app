@@ -468,11 +468,11 @@ intent → feature_labels → ACE context chunks → tool signatures
 - Used for: attention head selection, personalized rerank boosts
 
 **Tasks**:
-- [ ] `scripts/agent/prompt-generator.mjs` — intent → structured Gemma4 system prompt
-- [ ] `scripts/agent/turbovec-search-memory.mjs` — user intent embedding cache with TTL
-- [ ] Wire SearXNG fallback (localhost:8889) into research chain
-- [ ] Gemma4 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search`
-- [ ] Add `agent:prompt` and `agent:search-memory` npm scripts
+- [x] `scripts/agent/prompt-generator.mjs` — intent → structured Gemma4 system prompt (2026-05-28)
+- [x] `scripts/agent/turbovec-search-memory.mjs` — user intent embedding cache with TTL (2026-05-28)
+- [x] Gemma4 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search` — embedded in prompt-generator.mjs
+- [x] Add `agent:prompt` and `agent:search-memory` npm scripts (2026-05-28)
+- [ ] Wire SearXNG fallback (localhost:8889) into research chain (Phase 20 / Unsloth lane)
 
 ---
 
@@ -495,9 +495,9 @@ changed files (git diff --name-only HEAD~1) → hot errors → hot sourceRefs
 ```
 
 **Tasks**:
-- [ ] `scripts/opencode/nightly-summary.mjs` — git diff + hot errors + hot sourceRefs → markdown
+- [x] `scripts/opencode/nightly-summary.mjs` — git diff + hot errors + hot sourceRefs → markdown (2026-05-28)
+- [x] Add `summary:nightly` and `summary:weekly` npm scripts (2026-05-28)
 - [ ] `scripts/opencode/weekly-cold-archive.mjs` — aggregate 7 nights → Postgres cold insert
-- [ ] Add `summary:nightly` and `summary:weekly` npm scripts
 - [ ] Wire nightly into startup heavy lane (`ace-incremental-startup.mjs`) with 24h cooldown
 
 ---

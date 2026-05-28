@@ -853,25 +853,28 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 					}
 
 					const pointKey = `diag:${routePath || ''}:${query.slice(0, 100)}`;
-					await qdrant.client.upsert(DIAG_COLLECTION, {
-						wait: false,
-						points: [{
-							id: deterministicPointId(pointKey),
-							vector: { diagnosis: diagEmbedding },
-							payload: {
-								routePath: routePath || '',
-								filePath: filePath || '',
-								mode,
-								rootCauseType: result.probableRootCauseType,
-								riskLevel: result.riskLevel,
-								diagnosis: result.diagnosis.slice(0, 500),
-								likelyFiles: result.likelyFiles ?? [],
-								fixSteps: (result.fixPlan ?? []).length,
-								feedbackAccurate: null,
-								createdAt: new Date().toISOString(),
-							},
-						}],
-					});
+					await qdrant.upsert({
+            collection: DIAG_COLLECTION,
+            wait: false,
+            points: [
+              {
+                id: deterministicPointId(pointKey),
+                vector: { diagnosis: diagEmbedding },
+                payload: {
+                  routePath: routePath || '',
+                  filePath: filePath || '',
+                  mode,
+                  rootCauseType: result.probableRootCauseType,
+                  riskLevel: result.riskLevel,
+                  diagnosis: result.diagnosis.slice(0, 500),
+                  likelyFiles: result.likelyFiles ?? [],
+                  fixSteps: (result.fixPlan ?? []).length,
+                  feedbackAccurate: null,
+                  createdAt: new Date().toISOString(),
+                },
+              },
+            ],
+          } as any);
 				} catch {
 					// Non-critical — diagnosis works without Qdrant indexing
 				}

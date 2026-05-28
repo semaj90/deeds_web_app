@@ -361,6 +361,28 @@
       "detail": "Runs checklist Phase 0/1/8 health + memory + Bifrost boundary checks and writes docs/reports/kag-phase-gate-latest.json."
     },
     {
+      "label": "ACE: TurboVec Sidecar :8791 (Python, detached)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8791 -ErrorAction SilentlyContinue; if ($p) { Write-Host '⚡ TurboVec sidecar already running on :8791' } else { Start-Process python -ArgumentList 'scripts/ingest/turbovec-sidecar.py' -WorkingDirectory '${workspaceFolder}' -WindowStyle Hidden; Start-Sleep 2; $h = Invoke-RestMethod http://127.0.0.1:8791/health -ErrorAction SilentlyContinue; if ($h.status -eq 'ok') { Write-Host '⚡ TurboVec sidecar started :8791 OK' } else { Write-Host '⚠️ TurboVec sidecar may not have started — check manually' } }\"",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": [],
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "echo": true, "reveal": "silent", "focus": false, "panel": "shared", "showReuseMessage": false, "clear": false },
+      "detail": "Start the TurboVec Python ANN sidecar on :8791 (detached, idempotent — skips if already running). Used by rerank-cards.mjs for 2-bit quantized vector search over ACE packet embeddings."
+    },
+    {
+      "label": "ACE: Stub + Rank + Rerank + Recommend (full pipeline)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$stamp = 'logs/task-output/.ace-startup-last-run'; $cooldownSec = 3600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('ACE pipeline skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (1h cooldown)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run ace:startup 2>&1 | Tee-Object logs/task-output/ace-startup-latest.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host 'ACE startup pipeline green' } else { Write-Host 'ACE startup pipeline FAILED — check logs/task-output/ace-startup-latest.log' } }\"",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": [],
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "echo": true, "reveal": "silent", "focus": false, "panel": "shared", "showReuseMessage": false, "clear": false },
+      "detail": "On folder open: stub missing embeddings → rank-cards → rerank-cards (TurboVec) → compress-cards → build-recommendations → feature-labeling → domain-topology → intent-cache → cache-ace-packet → materialize-tasks. 1h cooldown stamp. Logs to logs/task-output/ace-startup-latest.log."
+    },
+    {
       "label": "ACE Cache Index Refresh",
       "type": "shell",
       "command": "npm run ace:cache:index:refresh",
