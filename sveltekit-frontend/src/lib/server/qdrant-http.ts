@@ -4,6 +4,8 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { parseQdrantJsonResponse } from './utils/qdrant-parser.js';
+
 const QDRANT_URL = ENV.QDRANT_URL;
 const QDRANT_TIMEOUT = 10_000;
 
@@ -19,6 +21,11 @@ export type QdrantHit = {
   payload?: Record<string, any>;
 };
 
+function logTrace(trace: any) {
+  // log parser mode in debug/trace only
+  console.debug(`[QdrantParserTrace] parser=${trace.parser} bytes=${trace.responseBytes} op=${trace.qdrantOperation}`);
+}
+
 /**
  * Get all collections
  */
@@ -27,7 +34,10 @@ export async function getCollections(): Promise<string[]> {
     signal: AbortSignal.timeout(QDRANT_TIMEOUT),
   });
   if (!r.ok) throw new Error(`Qdrant getCollections failed: ${r.status}`);
-  const data = await r.json();
+  const data = await parseQdrantJsonResponse<any>(r, {
+    qdrantOperation: 'collection',
+    onTrace: logTrace
+  });
   return (data?.result?.collections ?? []).map((c: any) => c.name);
 }
 
@@ -39,7 +49,10 @@ export async function getCollection(name: string): Promise<any> {
     signal: AbortSignal.timeout(QDRANT_TIMEOUT),
   });
   if (!r.ok) throw new Error(`Qdrant getCollection failed: ${r.status} ${await r.text()}`);
-  const data = await r.json();
+  const data = await parseQdrantJsonResponse<any>(r, {
+    qdrantOperation: 'collection',
+    onTrace: logTrace
+  });
   return data?.result;
 }
 
@@ -74,7 +87,10 @@ export async function scrollPoints(opts: {
   });
 
   if (!r.ok) throw new Error(`Qdrant scroll failed: ${r.status} ${await r.text()}`);
-  const data = await r.json();
+  const data = await parseQdrantJsonResponse<any>(r, {
+    qdrantOperation: 'scroll',
+    onTrace: logTrace
+  });
 
   return {
     points: data?.result?.points ?? [],
@@ -110,7 +126,10 @@ export async function searchVector(opts: {
   });
 
   if (!r.ok) throw new Error(`Qdrant search failed: ${r.status} ${await r.text()}`);
-  const data = await r.json();
+  const data = await parseQdrantJsonResponse<any>(r, {
+    qdrantOperation: 'search',
+    onTrace: logTrace
+  });
   return data?.result ?? [];
 }
 
@@ -135,5 +154,8 @@ export async function upsertPoints(opts: {
   );
 
   if (!r.ok) throw new Error(`Qdrant upsert failed: ${r.status} ${await r.text()}`);
-  return await r.json();
+  return await parseQdrantJsonResponse<any>(r, {
+    qdrantOperation: 'upsert',
+    onTrace: logTrace
+  });
 }

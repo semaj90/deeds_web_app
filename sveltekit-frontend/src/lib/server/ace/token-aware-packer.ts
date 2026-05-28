@@ -401,56 +401,83 @@ export function packContext(input: PackerInput): RetrievalPacket {
   };
 }
 
+import type { CompressedMemoryPacket } from './types.js';
+
 /**
  * Serialize a RetrievalPacket into the compact prompt string injected before Gemma4.
+ * Uses minified CompressedMemoryPacket structure for optimal token efficiency.
  */
 export function serializePacket(packet: RetrievalPacket): string {
-  // Emit a compact, human-readable prompt block for Gemma4.
   const lines: string[] = [
     `# Retrieval context for: ${packet.query}`,
     `Budget: ${packet.tokenUsed}/${packet.budget.maxInputTokens - packet.budget.reservedOutputTokens} tokens used`,
     '',
+    '## Compressed Semantic Memory Packets',
   ];
 
+  // 1. Cluster Summaries
   if (packet.context.clusterSummaries.length) {
-    lines.push('## Cluster summaries');
     for (const s of packet.context.clusterSummaries) {
-      lines.push(`- Cluster ${s.clusterId} — ${s.label}: ${s.summary}`);
+      const packetObj: CompressedMemoryPacket = {
+        topic: s.label || `cluster_${s.clusterId}`,
+        summary: s.summary,
+        important_files: [],
+        dependencies: [],
+        known_good_patterns: [],
+        source_refs: [`cluster:gpu:${s.clusterId}`]
+      };
+      lines.push(JSON.stringify(packetObj));
     }
-    lines.push('');
   }
 
+  // 2. Direct Evidence
+  if (packet.context.directEvidence.length) {
+    for (const e of packet.context.directEvidence) {
+      // Find matches for keywords or patterns if possible, or extract a brief summary
+      const cleanText = e.text.replace(/\s+/g, ' ').slice(0, 200);
+      const packetObj: CompressedMemoryPacket = {
+        topic: e.id.split('/').pop()?.replace(/\.[^/.]+$/, "") || e.id,
+        summary: cleanText,
+        important_files: [e.id],
+        dependencies: [],
+        known_good_patterns: [],
+        source_refs: [e.id]
+      };
+      lines.push(JSON.stringify(packetObj));
+    }
+  }
+
+  // 3. Prior Cases
+  if (packet.context.priorCaseSummaries.length) {
+    for (const p of packet.context.priorCaseSummaries) {
+      const packetObj: CompressedMemoryPacket = {
+        topic: p.id,
+        summary: p.text.replace(/\s+/g, ' ').slice(0, 200),
+        important_files: [],
+        dependencies: [],
+        known_good_patterns: [],
+        source_refs: [p.id]
+      };
+      lines.push(JSON.stringify(packetObj));
+    }
+  }
+
+  // 4. Graph Triples
   if (packet.context.graphTriples.length) {
-    lines.push('## Graph relationships');
+    lines.push('');
+    lines.push('## Graph Relationships');
     for (const t of packet.context.graphTriples) {
       lines.push(`- [${t.triple[0]}] —${t.triple[1]}→ [${t.triple[2]}]`);
     }
-    lines.push('');
   }
 
+  // 5. Couch View Groups
   if (packet.context.couchViewGroups.length) {
-    lines.push('## Knowledge index groups');
+    lines.push('');
+    lines.push('## Knowledge Index Groups');
     for (const g of packet.context.couchViewGroups) {
       lines.push(`- ${g.view}[${g.key}]: ${g.count} documents`);
     }
-    lines.push('');
-  }
-
-  if (packet.context.directEvidence.length) {
-    lines.push('## Relevant code / evidence chunks');
-    for (const e of packet.context.directEvidence) {
-      lines.push(`### ${e.id} (score ${e.score.toFixed(3)})`);
-      lines.push(e.text);
-      lines.push('');
-    }
-  }
-
-  if (packet.context.priorCaseSummaries.length) {
-    lines.push('## Prior case context');
-    for (const p of packet.context.priorCaseSummaries) {
-      lines.push(`- ${p.id}: ${p.text}`);
-    }
-    lines.push('');
   }
 
   return lines.join('\n');

@@ -124,3 +124,42 @@ export const NODE_RADIUS: Record<AtlasNodeType, number> = {
 	feature: 16,
 	source: 14,
 };
+
+// ── Atlas Library card types (NES Library UI) ─────────────────────────────────
+
+export interface AtlasCardSummary {
+	id: string;
+	kind: 'rag' | 'cluster';
+	title: string;
+	summary: string;
+	featureLabel: string;
+	tags: string[];
+	createdAt: string;
+}
+
+export interface AtlasCardDetail {
+	id: string;
+	kind: 'rag' | 'cluster';
+	title?: string;
+	summary: string;
+	featureLabel: string;
+	tags?: string[];
+	topTags?: string[];
+	createdAt: string;
+	// rag fields
+	filePath?: string;
+	// cluster fields
+	clusterId?: number;
+	centroidLabel?: string;
+	topFiles?: unknown[];
+}
+
+export interface AtlasCardsResponse {
+	ok: boolean;
+	versionHash: string;
+	limit: number;
+	offset: number;
+	count: number;
+	cards: AtlasCardSummary[];
+	error?: string;
+}

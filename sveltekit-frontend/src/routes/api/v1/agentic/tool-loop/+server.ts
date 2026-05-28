@@ -22,6 +22,13 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+const safeJsonPost = (await import('$lib/server/utils/safe-json-post.js')).default as unknown as <
+  T,
+>(
+  url: string,
+  payload: unknown,
+  opts?: { timeoutMs?: number; maxResponseBytes?: number; fallback?: T }
+) => Promise<T | undefined>;
 import {
   callGemma4WithTools,
   makeWebSearchHandler,
@@ -40,7 +47,17 @@ import {
 const bodySchema = z.object({
   query: z.string().min(1).max(10_000),
   tools: z
-    .array(z.enum(['codebase_search', 'knowledge_search', 'read_file', 'fix_recommend', 'wiki_generate', 'web_search', 'error_summarize']))
+    .array(
+      z.enum([
+        'codebase_search',
+        'knowledge_search',
+        'read_file',
+        'fix_recommend',
+        'wiki_generate',
+        'web_search',
+        'error_summarize',
+      ])
+    )
     .optional(),
   systemPrompt: z.string().max(5_000).optional(),
   responseSchema: z.record(z.string(), z.unknown()).optional(),
@@ -90,43 +107,36 @@ async function handleKnowledgeSearch(args: Record<string, unknown>): Promise<unk
   const collection = String(args.collection ?? 'knowledge_base');
 
   try {
-    const { ollamaFetch } = await import('$lib/server/ollama.js');
     const { ENV } = await import('$lib/server/env.server.js');
 
-    // Generate query embedding
-    const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
-      signal: AbortSignal.timeout(15_000),
-    });
+    // Generate query embedding (use safeJsonPost to guard timeouts/large responses)
+    const embedData = await safeJsonPost<{ embedding: number[] }>(
+      `${ENV.OLLAMA_BASE_URL}/api/embeddings`,
+      { model: 'embeddinggemma:latest', prompt: query },
+      { timeoutMs: 15_000, maxResponseBytes: 200_000 }
+    );
 
-    if (!embedRes.ok) {
-      return { error: `Embedding failed: ${embedRes.status}`, results: [] };
+    if (!embedData || !Array.isArray(embedData.embedding)) {
+      return { error: `Embedding failed`, results: [] };
     }
 
-    const embedData = (await embedRes.json()) as { embedding: number[] };
-
-    // Search Qdrant
-    const qdrantRes = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    // Search Qdrant (use safeJsonPost to avoid unbounded response reads)
+    const qdrantData = await safeJsonPost<{
+      result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
+    }>(
+      `${ENV.QDRANT_URL}/collections/${collection}/points/search`,
+      {
         vector: embedData.embedding,
         limit,
         with_payload: true,
         score_threshold: 0.3,
-      }),
-      signal: AbortSignal.timeout(10_000),
-    });
+      },
+      { timeoutMs: 10_000, maxResponseBytes: 2_000_000 }
+    );
 
-    if (!qdrantRes.ok) {
-      return { error: `Qdrant search failed: ${qdrantRes.status}`, results: [] };
+    if (!qdrantData) {
+      return { error: `Qdrant search failed`, results: [] };
     }
-
-    const qdrantData = (await qdrantRes.json()) as {
-      result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
-    };
 
     return {
       results: qdrantData.result.map((r) => ({

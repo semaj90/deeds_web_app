@@ -1,6 +1,18 @@
 # Drizzle ↔ Postgres Contract Report
 
-Generated: 2026-05-26T03:03:54.941Z  |  Findings: 818
+Generated: 2026-05-28T01:36:02.324Z  |  Findings: 828
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
@@ -3692,12 +3704,6 @@ Generated: 2026-05-26T03:03:54.941Z  |  Findings: 818
 **File:** `sveltekit-frontend\src\lib\server\db\schema\evidence.ts`
 **Validate:** `npm run db:check`
 
-### live_db_schema_drift  (high)
-**Problem:** evidence.file_size: Drizzle says bigint, live DB says integer.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema\evidence.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
 ### missing_column  (medium)
 **Problem:** Column jurisdictions.created_at in Drizzle schema but absent from live DB.
 **Fix:** ALTER TABLE jurisdictions ADD COLUMN IF NOT EXISTS created_at ...
@@ -3734,11 +3740,59 @@ Generated: 2026-05-26T03:03:54.941Z  |  Findings: 818
 **File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
 **Validate:** `npm run db:check`
 
-### missing_table  (medium)
-**Problem:** Table "case_chunks" declared in Drizzle schema but absent from live DB — migration pending.
-**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+### live_db_schema_drift  (high)
+**Problem:** case_chunks.id: Drizzle says uuid, live DB says integer.
+**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
 **File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`, `npm run db:generate`
+**Validate:** `npm run db:check`, `npm run audit:contracts`
+
+### missing_column  (medium)
+**Problem:** Column case_chunks.chunk_index in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS chunk_index ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column case_chunks.section_type in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS section_type ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column case_chunks.section_subtype in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS section_subtype ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column case_chunks.text in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS text ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column case_chunks.embedding in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS embedding ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column case_chunks.token_start in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS token_start ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column case_chunks.token_end in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS token_end ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column case_chunks.created_at in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS created_at ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
+**Validate:** `npm run db:check`
 
 ### missing_column  (medium)
 **Problem:** Column library_document_versions.amendment_note in Drizzle schema but absent from live DB.
@@ -4263,12 +4317,6 @@ Generated: 2026-05-26T03:03:54.941Z  |  Findings: 818
 **Validate:** `npm run db:check`, `npm run db:generate`
 
 ### missing_table  (medium)
-**Problem:** Table "cluster_cards" declared in Drizzle schema but absent from live DB — migration pending.
-**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run db:generate`
-
-### missing_table  (medium)
 **Problem:** Table "context_buffers" declared in Drizzle schema but absent from live DB — migration pending.
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
 **File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
@@ -4320,6 +4368,12 @@ Generated: 2026-05-26T03:03:54.941Z  |  Findings: 818
 **Problem:** Table "prosecutor_reports" declared in Drizzle schema but absent from live DB — migration pending.
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
 **File:** `sveltekit-frontend\src\lib\server\db\schema-prosecutor.ts`
+**Validate:** `npm run db:check`, `npm run db:generate`
+
+### missing_table  (medium)
+**Problem:** Table "scenarios" declared in Drizzle schema but absent from live DB — migration pending.
+**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+**File:** `sveltekit-frontend\src\lib\server\db\schema-scenarios.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`
 
 ### missing_table  (medium)
@@ -4558,6 +4612,12 @@ Generated: 2026-05-26T03:03:54.941Z  |  Findings: 818
 
 ### migration_schema_drift  (low)
 **Problem:** Table "token_map_cards" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "public" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
 **Validate:** `npm run db:check`

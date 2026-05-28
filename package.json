@@ -195,6 +195,12 @@
     "atlas:lane-health": "node scripts/atlas/atlas-lane-health-loop.mjs",
     "opencode:find-feature": "node scripts/opencode/find-feature.mjs",
     "opencode:smoke": "node scripts/opencode/smoke-validate.js",
+    "start-with-smoke": "node scripts/start-with-smoke.mjs",
+    "start:dev:smoke": "npm run start-with-smoke -- dev",
+    "start:atlas:smoke": "npm run start-with-smoke -- atlas:build",
+    "start:graphify:smoke": "npm run start-with-smoke -- graphify:daily",
+    "start:karpathy:smoke": "npm run start-with-smoke -- graphify:karpathy-batch",
+    "start:all-lanes": "npm run start:dev:smoke && npm run start:atlas:smoke && npm run start:graphify:smoke",
     "health:vscode-performance": "node scripts/vscode-extension-performance-log.mjs",
     "health:vscode-performance:publish": "node scripts/vscode-extension-performance-log.mjs --publish"
   },

@@ -510,20 +510,25 @@ async function searchCollection(
   const searchStart = performance.now();
   try {
     const vectorPayload = buildVectorPayload(collection, vector);
+    const safeJsonPost = (await import('$lib/server/utils/safe-json-post.js'))
+      .default as unknown as <T>(
+      url: string,
+      payload: unknown,
+      opts?: { timeoutMs?: number; maxResponseBytes?: number; fallback?: T }
+    ) => Promise<T | undefined>;
 
-    const res = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const data = await safeJsonPost<{ result?: any[] }>(
+      `${QDRANT_URL}/collections/${collection}/points/search`,
+      {
         vector: vectorPayload,
         limit,
         with_payload: true,
         score_threshold: RAG_SCORE_THRESHOLD,
         ...(filter ? { filter } : {}),
-      }),
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!res.ok) {
+      },
+      { timeoutMs: 5_000, maxResponseBytes: 1_000_000 }
+    );
+    if (!data || !data.result) {
       logInference({
         type: 'vector_search',
         collection,
@@ -531,13 +536,10 @@ async function searchCollection(
         latencyMs: Math.round(performance.now() - searchStart),
         cacheHit: false,
         resultCount: 0,
-        error: `${res.status}`,
+        error: `no-data`,
       });
       return [];
     }
-    // GPU-accelerated JSON parsing via simdjson (5× faster for Qdrant responses)
-    const rawText = await res.text();
-    const data = fastJsonParse<{ result?: any[] }>(rawText);
     const results = (data.result ?? []).map((r: Record<string, unknown>) => ({
       ...r,
       _collection: collection,

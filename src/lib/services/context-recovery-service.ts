@@ -22,14 +22,14 @@ export async function recoverWhenLost(input: {
   // 2. Check Redis for cache hit
   const cacheKey = `lost-cache:${domCluster}:${hash(input.query)}`;
   const cacheHit = await redis.get(cacheKey);
-  if (cacheHit) {
-    console.log(\`Cache hit for query: \${input.query}\`);
-    return {
-      cache_hit: true,
-      dominant_cluster: domCluster,
-      results: JSON.parse(cacheHit) as any
-    };
-  }
+    if (cacheHit) {
+      console.log('Cache hit for query: ' + input.query);
+      return {
+        cache_hit: true,
+        dominant_cluster: domCluster,
+        results: JSON.parse(cacheHit) as any,
+      };
+    }
 
   // 3. Query Parent Atlas, Qdrant, and pg_trgm
   const atlasHits = await searchParentAtlas(input.query, domCluster);

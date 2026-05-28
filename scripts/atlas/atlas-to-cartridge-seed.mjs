@@ -180,14 +180,55 @@ if (codesbaseAtlas) {
   console.log('⏭️  codebase-atlas.json: not found, skipping');
 }
 
-console.log(`📦 Total seeds: ${seeds.length} (skipped ${skipped})`);
+console.log(`📦 Total accumulated seeds: ${seeds.length} (skipped ${skipped})`);
+
+// ── Leak Guard Filter ────────────────────────────────────────────────────────
+const BLOCKED_TERMS = [
+  'case_id', 'caseid', 'evidence_id', 'evidenceid', 'evidence_items',
+  'legal_documents', 'case_documents', 'runtime:evidence',
+  'source:case_cartridge', 'source:evidence_cartridge'
+];
+
+const finalSeeds = [];
+let blockedCount = 0;
+const blockedRuntimeEvidenceRefs = [];
+const falsePositiveFeatureTagsSet = new Set();
+
+for (const seed of seeds) {
+  let isBlocked = false;
+  const seedStr = JSON.stringify(seed);
+  for (const term of BLOCKED_TERMS) {
+    if (seedStr.toLowerCase().includes(term.toLowerCase())) {
+      isBlocked = true;
+      blockedRuntimeEvidenceRefs.push(`${seed.seed_id} (matched: ${term})`);
+      break;
+    }
+  }
+
+  if (isBlocked) {
+    blockedCount++;
+  } else {
+    finalSeeds.push(seed);
+    // Track whitelisted / allowed feature/source tags containing "evidence" or "legal"
+    for (const tag of seed.qdrant_tags || []) {
+      if (/evidence|legal|case/i.test(tag)) {
+        falsePositiveFeatureTagsSet.add(tag);
+      }
+    }
+  }
+}
+
+const false_positive_feature_tags = [...falsePositiveFeatureTagsSet];
+const seed_count = finalSeeds.length;
+
+console.log(`🛡️ Leak Guard: Blocked ${blockedCount} runtime-entity seeds. Saved ${seed_count} clean seeds.`);
 
 // ── Write outputs ──────────────────────────────────────────────────────────
 if (!DRY_RUN) {
   fs.mkdirSync(path.dirname(OUT_JSONL), { recursive: true });
   fs.mkdirSync(path.dirname(OUT_REPORT), { recursive: true });
 
-  const jsonl = seeds.map(s => JSON.stringify(s)).join('\n');
+  const jsonl = finalSeeds.map(s => JSON.stringify(s)).join('\n');
   fs.writeFileSync(OUT_JSONL, jsonl, 'utf8');
   console.log(`✅ wrote ${OUT_JSONL}`);
 
@@ -195,10 +236,21 @@ if (!DRY_RUN) {
     '# Atlas → CHR97 Cartridge Seed Report',
     '',
     `Generated: ${new Date().toISOString()}`,
-    `Total seeds: ${seeds.length}`,
-    `  - From feature-registry: ${featureCount}`,
-    `  - From codebase-atlas: ${seeds.length - featureCount}`,
-    `  - Skipped (no key): ${skipped}`,
+    `Total seeds (final): ${seed_count}`,
+    `Blocked seeds count: ${blockedCount}`,
+    `Skipped entries: ${skipped}`,
+    '',
+    '## Leak Guard Telemetry',
+    `- seed_count: ${seed_count}`,
+    `- blocked_count: ${blockedCount}`,
+    '',
+    '### False Positive Feature Tags',
+    `*Allowed feature tags containing codebase structural words:*`,
+    ...false_positive_feature_tags.map(t => `- \`${t}\``),
+    '',
+    '### Blocked Runtime Evidence Refs',
+    `*Entities matching active runtime patterns (blocked from context cartridge):*`,
+    ...blockedRuntimeEvidenceRefs.map(r => `- ${r}`),
     '',
     '## Guardrails',
     '- Seeds are READ-ONLY adapter output — regenerate freely',
@@ -211,7 +263,7 @@ if (!DRY_RUN) {
     `- Redis: NOT published (use --publish to enable)`,
     '',
     '## Sample Seeds',
-    ...seeds.slice(0, 5).map(s =>
+    ...finalSeeds.slice(0, 5).map(s =>
       `### ${s.feature_label}\n- seed_id: \`${s.seed_id}\`\n- sourceRef: \`${s.sourceRef}\`\n- keywords: ${s.hot_keywords.join(', ')}\n- redis_hint: \`${s.redis_hint_key}\`\n`
     ),
   ].join('\n');
@@ -219,7 +271,7 @@ if (!DRY_RUN) {
   fs.writeFileSync(OUT_REPORT, report, 'utf8');
   console.log(`✅ wrote ${OUT_REPORT}`);
 } else {
-  console.log(`🔎 dry-run: would write ${seeds.length} seeds to ${OUT_JSONL}`);
+  console.log(`🔎 dry-run: would write ${seed_count} seeds to ${OUT_JSONL}`);
 }
 
 // ── Optional Redis publish ─────────────────────────────────────────────────

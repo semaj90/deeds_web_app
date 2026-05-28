@@ -1,8 +1,13 @@
 import { ENV } from '$lib/server/env.server.js';
 const env: Record<string, string | undefined> = { ...process.env, ...ENV } as any;
 import type { PointStruct, SearchRequest, SearchResponse, UpsertPoints, UpsertResponse } from '$lib/types/qdrant';
+import { parseQdrantJsonResponse } from './utils/qdrant-parser.js';
 
 const QDRANT_COLLECTION_NAME = 'legal_documents';
+
+function logTrace(trace: any) {
+  console.debug(`[QdrantParserTrace] parser=${trace.parser} bytes=${trace.responseBytes} op=${trace.qdrantOperation}`);
+}
 
 /**
  * Upserts points (vectors and payloads) into a Qdrant collection.
@@ -25,7 +30,10 @@ export async function upsertVectors(points: PointStruct[]): Promise<UpsertRespon
             throw new Error(`Qdrant upsert error, ${response.status} - ${errorBody}`);
         }
 
-        return await response.json();
+        return await parseQdrantJsonResponse<UpsertResponse>(response, {
+            qdrantOperation: 'upsert',
+            onTrace: logTrace
+        });
     } catch (error) {
         console.error('Error upserting vectors to Qdrant: ', error);
         throw error;
@@ -53,12 +61,12 @@ export async function searchVectors(searchRequest: SearchRequest): Promise<Searc
             throw new Error(`Qdrant search error, ${response.status} - ${errorBody}`);
         }
 
-        return await response.json();
+        return await parseQdrantJsonResponse<SearchResponse>(response, {
+            qdrantOperation: 'search',
+            onTrace: logTrace
+        });
     } catch (error) {
         console.error('Error searching vectors in Qdrant: ', error);
         throw error;
     }
 }
-
-
-

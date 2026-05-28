@@ -1,6 +1,6 @@
 # Codebase Semantics and Neo4j Missing Links Report
 
-Generated: 2026-05-26T22:53:26.741Z
+Generated: 2026-05-28T02:17:30.103Z
 
 Routes: 250  |  Shipped: 195  |  Fail-open: 55  |  Unlabeled: 0  |  Dynamic-heavy: 46
 

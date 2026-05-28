@@ -6,22 +6,6 @@ export type JsonbLabelValue = string | number | boolean | null | string[];
 
 export type JsonbLabelRecord = Record<string, JsonbLabelValue>;
 
-export interface LabelNormalizationInput {
-  jsonb?: Record<string, unknown>;
-  centroid?: {
-    label?: string | number | null;
-    topology?: string | null;
-    clusterKey?: string | null;
-  };
-  karpathy?: {
-    bucket?: string | null;
-    hotness?: number | null;
-    blend?: number | null;
-    score?: number | null;
-    authority?: number | null;
-  };
-}
-
 export interface NormalizedLabels {
   centroid_label: string | null;
   topology_label: string | null;
@@ -207,16 +191,7 @@ export function normalizeLabels(input: LabelNormalizationInput): NormalizedLabel
   };
 }
 
-export function labelsSignature(labels: NormalizedLabels): string {
-  const canonical = {
-    centroid_label: labels.centroid_label,
-    topology_label: labels.topology_label,
-    cluster_key: labels.cluster_key,
-    hotness_bucket: labels.hotness_bucket,
-    feature_family: labels.feature_family,
-    tags: labels.tags,
-  };
-  // --- Sink Write Functions (Stubs for integration) ---
+// --- Sink Write Functions (Stubs for integration) ---
 
 /**
  * Writes the normalized labels to the Redis cache layer.
@@ -224,7 +199,7 @@ export function labelsSignature(labels: NormalizedLabels): string {
  * @param key The primary key for the cache entry.
  */
 export async function writeToRedisCache(labels: NormalizedLabels, key: string): Promise<void> {
-    console.log(\`[Redis] Setting label key \${key}...\`);
+  console.log('[Redis] Setting label key ' + key + '...');
     // TODO: Call redisClient.set(key, JSON.stringify(labels), 'EX', '24h');
     console.log('Redis write stub successful.');
 }
@@ -235,12 +210,8 @@ export async function writeToRedisCache(labels: NormalizedLabels, key: string): 
  * @param collectionName The target collection name (e.g., 'evidence_vectors').
  * @param vector The associated vector data (placeholder).
  */
-export async function writeToQdrant(
-    labels: NormalizedLabels,
-    collectionName: string,
-    vector: Float32Array // Assuming we generate a vector here
-): Promise<void> {
-    console.log(\`[Qdrant] Upserting label data to collection '\${collectionName}'...\`);
+export async function writeToQdrant(labels: NormalizedLabels, collectionName: string, vector: Float32Array): Promise<void> {
+  console.log('[Qdrant] Upserting label data to collection ' + collectionName + '...');
     // TODO: Call qdrantClient.upsert(collectionName, vector, labels)
     console.log('Qdrant write stub successful.');
 }
@@ -251,7 +222,7 @@ export async function writeToQdrant(
  * @param recordId A unique identifier for the record.
  */
 export async function writeToJsonlExport(labels: NormalizedLabels, recordId: string): Promise<void> {
-    console.log(\`[JSONL] Appending record \${recordId} to synthesis log...\`);
+  console.log('[JSONL] Appending record ' + recordId + ' to synthesis log...');
     // TODO: Call synthesisLogger.append(recordId, labels)
     console.log('JSONL write stub successful.');
 }
@@ -262,7 +233,7 @@ export async function writeToJsonlExport(labels: NormalizedLabels, recordId: str
  * @param recordId The ID of the cluster card/record being updated.
  */
 export async function updateClusterCard(labels: NormalizedLabels, recordId: string): Promise<void> {
-    console.log(\`[ClusterCard] Updating metadata for record \${recordId}...\`);
+  console.log('[ClusterCard] Updating metadata for record ' + recordId + '...');
     // TODO: Call databaseClient.update_cluster_card_metadata(recordId, labels)
     console.log('ClusterCard update stub successful.');
 }

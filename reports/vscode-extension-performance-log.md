@@ -1,7 +1,7 @@
 # VS Code Extension Performance Log
 
-**Generated:** 2026-05-27T22:40:05.208Z
-**Branch:** `main` | **Dirty files:** 657
+**Generated:** 2026-05-28T01:45:52.445Z
+**Branch:** `main` | **Dirty files:** 28
 **VS Code:** 1.121.0
 **Extensions installed:** 55
 
@@ -48,12 +48,12 @@
 | Folder | Size |
 |---|---|
 | `node_modules` | 1835 pkgs |
-| `.svelte-kit` | 2333 MB ⚠️ |
+| `.svelte-kit` | 0 MB |
 | `.vite` | — (not found) |
 | `dist` | — (not found) |
 | `build` | 2462 MB ⚠️ |
 | `.tmp` | 178 MB |
-| `logs` | 28 MB |
+| `logs` | 29 MB |
 | `coverage` | — (not found) |
 
 ---

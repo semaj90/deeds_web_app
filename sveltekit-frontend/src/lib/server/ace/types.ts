@@ -549,3 +549,13 @@ export const TILE_SCORE_WEIGHTS = {
   quaternion: 0.1,
   memory_gain: 0.05,
 } as const;
+
+export interface CompressedMemoryPacket {
+  topic: string;
+  summary: string;
+  important_files: string[];
+  dependencies: string[];
+  known_good_patterns: string[];
+  embedding_ref?: string;
+  source_refs: string[];
+}

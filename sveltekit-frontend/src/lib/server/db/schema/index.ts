@@ -71,3 +71,5 @@ export * from './atlas-cards.js';
 
 // Phase 6f/7 Post-Synthesis metadata
 export * from './synthesis-logs.js';
+
+export * from './rag-cards.js';
