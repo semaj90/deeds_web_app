@@ -1,0 +1,55 @@
+{
+  "created": "2026-05-28T00:57:15.917Z",
+  "cards": [
+    {
+      "id": "000678ef52ca67b0",
+      "title": "Your Mission",
+      "excerpt": "Your Mission\n\nHelp the user systematically fix error handling anti-patterns detected by the automated scanner."
+    },
+    {
+      "id": "00116e85cfe0456e",
+      "title": "Test from host",
+      "excerpt": "Test from host\n\nredis-cli -h 127.0.0.1 -p 6379 ping\r\n```\r\n\r\n### Bifrost Not Responding\r\n\r\n```bash"
+    },
+    {
+      "id": "0012bc7350ff2a70",
+      "title": "Snapshot",
+      "excerpt": "Snapshot\n\n- 13 file(s), 0 handler(s)\n- Audit score: _(no GPU audit)_\n- TODOs: 1"
+    },
+    {
+      "id": "001570455730d2d7",
+      "title": "rg \"fetch.*$MODULE\" src/ --type ts --type svelte",
+      "excerpt": "rg \"fetch.*$MODULE\" src/ --type ts --type svelte\n\n# G8: Event coupling (yorha: namespace, CustomEvent dispatch/listen)"
+    },
+    {
+      "id": "001f2d08e4459234",
+      "title": "Huge thanks to **Alexander Knigge** ([@AlexanderKnigge](https://x.com/AlexanderKnigge)) for contributing the Gemini provider implementation! This feature significantly expands claude-mem's flexibility and gives users more choice in their AI backend.\n\n---\n\n**Full Changelog**: https://github.com/thedotmack/claude-mem/compare/v8.1.0...v8.2.0",
+      "excerpt": "Huge thanks to **Alexander Knigge** ([@AlexanderKnigge](https://x.com/AlexanderKnigge)) for contributing the Gemini provider implementation! This feature significantly expands claude-mem's flexibility and gives users more choice in their AI backend.\n\n---\n\n**Full Changelog**: https://github.com/thedotmack/claude-mem/compare/v8.1.0...v8.2.0\n\n## [8.1.0] - 2025-12-25"
+    },
+    {
+      "id": "00262e5f02b7c99d",
+      "title": "Return:\r\n1. What route or route family failed\r\n2. What the actual root cause was\r\n3. What change fixed it\r\n4. What validation was run\r\n5. Any remaining route risks or harness caveats",
+      "excerpt": "Return:\r\n1. What route or route family failed\r\n2. What the actual root cause was\r\n3. What change fixed it\r\n4. What validation was run\r\n5. Any remaining route risks or harness caveats"
+    },
+    {
+      "id": "002add0263b8e6c8",
+      "title": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/ocr",
+      "excerpt": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/ocr\n\n## Snapshot"
+    },
+    {
+      "id": "002aee21948f778f",
+      "title": "The CrimeAnalysisService uses the Atlas to perform deep investigative reasoning. In \"Plan-Only Mode\", it generates a structured investigative plan before committing to a full synthesis.\n\n### Investigative Plan Structure:\n-   **Facts**: Verified evidence found in the corpus.\n-   **Allegations**: Claims made by parties in the case.\n-   **Inferences**: Logical deductions made by the AI based on facts (marked as \"AI Inference\").\n-   **Unknowns**: Gaps in the evidence that require further documentation.\n-   **SourceRefs**: Every fact and allegation MUST be pinned to a source document.",
+      "excerpt": "The CrimeAnalysisService uses the Atlas to perform deep investigative reasoning. In \"Plan-Only Mode\", it generates a structured investigative plan before committing to a full synthesis.\n\n### Investigative Plan Structure:\n-   **Facts**: Verified evidence found in the corpus.\n-   **Allegations**: Claims made by parties in the case.\n-   **Inferences**: Logical deductions made by the AI based on facts"
+    },
+    {
+      "id": "002e5c7880802f89",
+      "title": "- did not sample rows\n- did not modify anything\n```\n\nIf the requested table is on the forbidden allowlist (anything with\n`password`, `session_token`, `api_key`, `webhook_secret`, etc.), refuse\npolitely and explain why.",
+      "excerpt": "- did not sample rows\n- did not modify anything\n```\n\nIf the requested table is on the forbidden allowlist (anything with\n`password`, `session_token`, `api_key`, `webhook_secret`, etc.), refuse\npolitely and explain why."
+    },
+    {
+      "id": "002fbf452f355e62",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/internal/error-brain/status/[runId]/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/internal/error-brain/status/[runId]/+server.ts\" })`",
+      "excerpt": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/internal/error-brain/status/[runId]/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/internal/error-brain/status/[runId]/+server.ts\" })`\n\n## How to use this file"
+    }
+  ]
+}

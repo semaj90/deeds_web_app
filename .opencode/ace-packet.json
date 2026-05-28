@@ -1,0 +1,1405 @@
+{
+  "created_at": "2026-05-28T00:33:51.380Z",
+  "cards": [
+    {
+      "id": "000678ef52ca67b0",
+      "title": "Your Mission",
+      "text": "Your Mission\n\nHelp the user systematically fix error handling anti-patterns detected by the automated scanner.",
+      "source": "claude-mem\\.claude\\commands\\anti-pattern-czar.md",
+      "hasVector": true
+    },
+    {
+      "id": "00116e85cfe0456e",
+      "title": "Test from host",
+      "text": "Test from host\n\nredis-cli -h 127.0.0.1 -p 6379 ping\r\n```\r\n\r\n### Bifrost Not Responding\r\n\r\n```bash",
+      "source": "BACKEND_INFRASTRUCTURE_AUDIT.md",
+      "hasVector": true
+    },
+    {
+      "id": "0012bc7350ff2a70",
+      "title": "Snapshot",
+      "text": "Snapshot\n\n- 13 file(s), 0 handler(s)\n- Audit score: _(no GPU audit)_\n- TODOs: 1",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\layout\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "001570455730d2d7",
+      "title": "rg \"fetch.*$MODULE\" src/ --type ts --type svelte",
+      "text": "rg \"fetch.*$MODULE\" src/ --type ts --type svelte\n\n# G8: Event coupling (yorha: namespace, CustomEvent dispatch/listen)",
+      "source": "claude.md",
+      "hasVector": true
+    },
+    {
+      "id": "001f2d08e4459234",
+      "title": "Huge thanks to **Alexander Knigge** ([@AlexanderKnigge](https://x.com/AlexanderKnigge)) for contributing the Gemini provider implementation! This feature significantly expands claude-mem's flexibility and gives users more choice in their AI backend.\n\n---\n\n**Full Changelog**: https://github.com/thedotmack/claude-mem/compare/v8.1.0...v8.2.0",
+      "text": "Huge thanks to **Alexander Knigge** ([@AlexanderKnigge](https://x.com/AlexanderKnigge)) for contributing the Gemini provider implementation! This feature significantly expands claude-mem's flexibility and gives users more choice in their AI backend.\n\n---\n\n**Full Changelog**: https://github.com/thedotmack/claude-mem/compare/v8.1.0...v8.2.0\n\n## [8.1.0] - 2025-12-25",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "00262e5f02b7c99d",
+      "title": "Return:\r\n1. What route or route family failed\r\n2. What the actual root cause was\r\n3. What change fixed it\r\n4. What validation was run\r\n5. Any remaining route risks or harness caveats",
+      "text": "Return:\r\n1. What route or route family failed\r\n2. What the actual root cause was\r\n3. What change fixed it\r\n4. What validation was run\r\n5. Any remaining route risks or harness caveats",
+      "source": ".github\\agents\\route-triage-engineer.agent.md",
+      "hasVector": true
+    },
+    {
+      "id": "002add0263b8e6c8",
+      "title": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/ocr",
+      "text": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/ocr\n\n## Snapshot",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\ocr\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "002aee21948f778f",
+      "title": "The CrimeAnalysisService uses the Atlas to perform deep investigative reasoning. In \"Plan-Only Mode\", it generates a structured investigative plan before committing to a full synthesis.\n\n### Investigative Plan Structure:\n-   **Facts**: Verified evidence found in the corpus.\n-   **Allegations**: Claims made by parties in the case.\n-   **Inferences**: Logical deductions made by the AI based on facts (marked as \"AI Inference\").\n-   **Unknowns**: Gaps in the evidence that require further documentation.\n-   **SourceRefs**: Every fact and allegation MUST be pinned to a source document.",
+      "text": "The CrimeAnalysisService uses the Atlas to perform deep investigative reasoning. In \"Plan-Only Mode\", it generates a structured investigative plan before committing to a full synthesis.\n\n### Investigative Plan Structure:\n-   **Facts**: Verified evidence found in the corpus.\n-   **Allegations**: Claims made by parties in the case.\n-   **Inferences**: Logical deductions made by the AI based on facts (marked as \"AI Inference\").\n-   **Unknowns**: Gaps in the evidence that require further documentation.\n-   **SourceRefs**: Every fact and allegation MUST be pinned to a source document.\n\n## Implementation Status",
+      "source": "docs\\architecture\\legal-ai-parent-atlas-product-integration.md",
+      "hasVector": true
+    },
+    {
+      "id": "002e5c7880802f89",
+      "title": "- did not sample rows\n- did not modify anything\n```\n\nIf the requested table is on the forbidden allowlist (anything with\n`password`, `session_token`, `api_key`, `webhook_secret`, etc.), refuse\npolitely and explain why.",
+      "text": "- did not sample rows\n- did not modify anything\n```\n\nIf the requested table is on the forbidden allowlist (anything with\n`password`, `session_token`, `api_key`, `webhook_secret`, etc.), refuse\npolitely and explain why.",
+      "source": ".claude\\agents\\drizzle-inspector.md",
+      "hasVector": true
+    },
+    {
+      "id": "002fbf452f355e62",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/internal/error-brain/status/[runId]/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/internal/error-brain/status/[runId]/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/internal/error-brain/status/[runId]/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/internal/error-brain/status/[runId]/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\internal\\error-brain\\status\\[runId]\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "004b71ea087384b7",
+      "title": "CLI Usage",
+      "text": "CLI Usage\n\n```bash",
+      "source": "claude-mem\\scripts\\translate-readme\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "004cff5b333f1f92",
+      "title": "AGENTS.md — `deeds_labs/frontend/svelte4-archive/components/laws`",
+      "text": "AGENTS.md — `deeds_labs/frontend/svelte4-archive/components/laws`\n\n<!-- AGENTS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->\n\n> Directory: deeds_labs/frontend/svelte4-archive/components/laws",
+      "source": "deeds_labs\\frontend\\svelte4-archive\\components\\laws\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "004f8942bf2140ae",
+      "title": "Files (7)",
+      "text": "Files (7)\n\n- `AISummaryModal.svelte`\n- `EvidenceAnalysisModal.svelte`\n- `EvidenceCRUDModal.svelte`\n- `EvidenceModal.svelte`\n- `EvidenceUploadModal.svelte`\n- `EvidenceUploadModal_backup.svelte`\n- `EvidenceValidationModal.svelte`",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\modals\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0056213574662f41",
+      "title": "🚀 Quick Start",
+      "text": "🚀 Quick Start\n\n### Prerequisites\r\n- **Docker & Docker Compose** (v2.0+)\r\n- **NVIDIA GPU** with CUDA 12.0+ (optional but recommended)\r\n- **Node.js** 18+ and Python 3.9+\r\n- **16GB+ RAM** for full GPU processing\r\n\r\n### 1. Environment Setup\r\n```bash",
+      "source": "docs\\legacy-reference\\ingestion-phase66-README.md",
+      "hasVector": true
+    },
+    {
+      "id": "005b287a19bf51c2",
+      "title": "docker stop legal-ai-gpu",
+      "text": "docker stop legal-ai-gpu\n\n# Remove",
+      "source": "copilot.md",
+      "hasVector": true
+    },
+    {
+      "id": "006501fd958b9d97",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/audit/[resourceType]/[resourceId]/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/audit/[resourceType]/[resourceId]/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/audit/[resourceType]/[resourceId]/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/audit/[resourceType]/[resourceId]/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\audit\\[resourceType]\\[resourceId]\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "006535601f442f32",
+      "title": "See Also",
+      "text": "See Also\n\n- [Claude-Mem Documentation](https://docs.claude-mem.ai)\n- [Cursor Hooks Reference](../docs/context/cursor-hooks-reference.md)\n- [Claude-Mem Architecture](https://docs.claude-mem.ai/architecture/overview)",
+      "source": "claude-mem\\cursor-hooks\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "006f14c54a2cbd19",
+      "title": "rg \"buildGlyphTileAtlas|searchGlyphTiles|invalidateGlyphAtlas|publishGlyphRebuild\" src/ --type ts",
+      "text": "rg \"buildGlyphTileAtlas|searchGlyphTiles|invalidateGlyphAtlas|publishGlyphRebuild\" src/ --type ts\n\n# MUST return ≥2 hits — builder + at least one consumer/trigger",
+      "source": "claude.md",
+      "hasVector": true
+    },
+    {
+      "id": "008b374b79d2d44e",
+      "title": "- `read_file({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/templates/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/templates/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/templates/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/templates/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\ui\\templates\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "008c047432b8fdd4",
+      "title": "varargslist: vfpdef ['=' test ](',' vfpdef ['=' test])* ',' '/' [',' [\n                     ((vfpdef ['=' test] ',')* ('*' [vname] (',' vname ['=' test])*\n                            [',' ['**' vname [',']]] | '**' vname [','])\n                            | vfpdef ['=' test] (',' vfpdef ['=' test])* [','])\n                     ]] | ((vfpdef ['=' test] ',')*\n                     ('*' [vname] (',' vname ['=' test])*  [',' ['**' vname [',']]]| '**' vname [','])\n                     | vfpdef ['=' test] (',' vfpdef ['=' test])* [','])\n\nvname: NAME\nvfpdef: vname | '(' vfplist ')'\nvfplist: vfpdef (',' vfpdef)* [',']\n\nstmt: simple_stmt | compound_stmt\nsimple_stmt: small_stmt (';' small_stmt)* [';'] NEWLINE\nsmall_stmt: (expr_stmt | print_stmt  | del_stmt | pass_stmt | flow_stmt |\n             import_stmt | global_stmt | exec_stmt | assert_stmt)\nexpr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |\n                     ('=' (yield_expr|testlist_star_expr))*)\nannassign: ':' test ['=' test]\ntestlist_star_expr: (test|star_expr) (',' (test|star_expr))* [',']\naugassign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |\n            '<<=' | '>>=' | '**=' | '//=')",
+      "text": "varargslist: vfpdef ['=' test ](',' vfpdef ['=' test])* ',' '/' [',' [\n                     ((vfpdef ['=' test] ',')* ('*' [vname] (',' vname ['=' test])*\n                            [',' ['**' vname [',']]] | '**' vname [','])\n                            | vfpdef ['=' test] (',' vfpdef ['=' test])* [','])\n                     ]] | ((vfpdef ['=' test] ',')*\n                     ('*' [vname] (',' vname ['=' test])*  [',' ['**' vname [',']]]| '**' vname [','])\n                     | vfpdef ['=' test] (',' vfpdef ['=' test])* [','])\n\nvname: NAME\nvfpdef: vname | '(' vfplist ')'\nvfplist: vfpdef (',' vfpdef)* [',']\n\nstmt: simple_stmt | compound_stmt\nsimple_stmt: small_stmt (';' small_stmt)* [';'] NEWLINE\nsmall_stmt: (expr_stmt | print_stmt  | del_stmt | pass_stmt | flow_stmt |\n             impor",
+      "source": ".python311\\lib\\python3.11\\lib2to3\\Grammar.txt",
+      "hasVector": true
+    },
+    {
+      "id": "008d27b749e0742c",
+      "title": "- The pipeline command currently exits 0 even with warnings/errors.\r\n- This can mask regressions in automated runs.",
+      "text": "- The pipeline command currently exits 0 even with warnings/errors.\r\n- This can mask regressions in automated runs.\n\n## Next Actions",
+      "source": "docs\\reports\\trace-full-loop-smoke-report-2026-05-20.md",
+      "hasVector": true
+    },
+    {
+      "id": "00956a83446f98eb",
+      "title": "Complete 10-Layer Import Audit Checklist\r\nHere's what the standard 3-layer grep catches vs what it misses:\r\n\r\nCovered by Standard Audit (L1-L3)\r\nLayer\tPattern\tExample\r\nL1\tStatic ESM\tfrom '$lib/components/Foo.svelte'\r\nL2\tDynamic ESM\tawait import('$lib/components/Foo.svelte')\r\nL3\tCJS require\trequire('$lib/server/proto')\r\n4 Additional Layers That Can Cause False Orphans\r\nLayer\tPattern\tRisk\tFiles\tDetection Command\r\nL4\tVariable dynamic imports (@vite-ignore)\tCRITICAL\t4 files\trg \"@vite-ignore\" src/ or rg \"import\\([^'\\\"]\" src/\r\nL8\tDead barrel re-exports\tMODERATE\t24 index.ts barrels\tCheck if barrel itself is imported, not just contents\r\nL9\tEvent coupling (CustomEvent, addEventListener)\tHIGH\t88 files (192 events)\trg \"CustomEvent|addEventListener\" src/ + grep event names\r\nL5\tSvelteKit auto-discovery (+page.svelte etc.)\tLOW\t692 route files\tDon't flag route files as orphans\r\nKey Findings\r\nL4 — Variable-based dynamic imports (invisible to literal grep):\r\n\r\nlib/server/db/drizzle.ts — const cachePath = '$lib/server/cache/redis'; await import(cachePath)\r\nlib/server/analysis/granite-docling.ts — PDF rendering\r\nlib/server/json/fastjson.ts — JSON parser\r\nlib/components/yorha/_simulations/CanvasBoard.svelte — simulation engine\r\nL9 — Event coupling (the AnalysisPanel pattern):\r\n\r\nAnalysisPanel.svelte has 0 static imports in any .svelte file but is triggered via yorha:open-analysis event from root layout\r\n27 files use window.addEventListener for global event channels\r\nL8 — Barrel exports hiding dead code:\r\n\r\nshells/index.ts re-exports 3 components but the barrel itself has 0 consumers — entire chain is dead\r\nAlways check if the barrel itself is imported, not just its contents\r\nUpdated Audit Protocol (10-layer)",
+      "text": "Complete 10-Layer Import Audit Checklist\r\nHere's what the standard 3-layer grep catches vs what it misses:\r\n\r\nCovered by Standard Audit (L1-L3)\r\nLayer\tPattern\tExample\r\nL1\tStatic ESM\tfrom '$lib/components/Foo.svelte'\r\nL2\tDynamic ESM\tawait import('$lib/components/Foo.svelte')\r\nL3\tCJS require\trequire('$lib/server/proto')\r\n4 Additional Layers That Can Cause False Orphans\r\nLayer\tPattern\tRisk\tFiles\tDetection Command\r\nL4\tVariable dynamic imports (@vite-ignore)\tCRITICAL\t4 files\trg \"@vite-ignore\" src/ or rg \"import\\([^'\\\"]\" src/\r\nL8\tDead barrel re-exports\tMODERATE\t24 index.ts barrels\tCheck if barrel itself is imported, not just contents\r\nL9\tEvent coupling (CustomEvent, addEventListener)\tHIGH\t88 files (192 events)\trg \"CustomEvent|addEventListener\" src/ + grep event names\r\nL5\tSvelteKit auto-discovery",
+      "source": "4726_auditchecklist.txt",
+      "hasVector": true
+    },
+    {
+      "id": "009d83f27333771d",
+      "title": "Phase 4 — Audit + migrate every existing site",
+      "text": "Phase 4 — Audit + migrate every existing site\n\n**What to implement:** For each site in the Phase 0.1 catalogue, declare its rule (A/B/C/none) and reconcile the implementation with the canonical generator/helper from Phases 2–3.\n\n### 4.1 Site-by-site disposition\n\n| # | Site | Rule | Action |\n|---|---|---|---|\n| 1 | `plugin/hooks/hooks.json` | A | Generated by `scripts/build-hooks.js` calling `buildShellCommand` (Phase 2). |\n| 2 | `plugin/hooks/codex-hooks.json` | A | Same. |\n| 3 | `.mcp.json` | A | Same. |\n| 4 | `plugin/.mcp.json` | A | Same. Build asserts byte-parity with #3 (already exists at `scripts/build-hooks.js:392–396`). |\n| 5 | `plugin/scripts/version-check.js` | C | No change — already correctly implemented at lines 7–17. Document in `CLAUDE.md`. |\n| 6 | `plugin/scripts/bun-runner",
+      "source": "claude-mem\\plans\\02-spawn-contract-templating.md",
+      "hasVector": true
+    },
+    {
+      "id": "00a337a7c6c8fadc",
+      "title": "- Analyze the ENTIRE timeline chronologically -- do not skip early history\n- Look for narrative arcs: problem -> investigation -> solution\n- Identify turning points where the project's direction fundamentally changed\n- Note any observations about the development process itself (tooling, workflow, collaboration patterns)\n\nHere is the complete project timeline:\n\n[TIMELINE CONTENT GOES HERE]\n```\n\n### Step 5: Save the Report\n\nSave the agent's output as a markdown file. Default location:\n\n```\n./journey-into-PROJECT_NAME.md\n```\n\nOr if the user specified a different output path, use that instead.\n\n### Step 6: Report Completion\n\nTell the user:\n- Where the report was saved\n- The approximate token cost (input timeline + output report)\n- The date range covered\n- Number of observations analyzed",
+      "text": "- Analyze the ENTIRE timeline chronologically -- do not skip early history\n- Look for narrative arcs: problem -> investigation -> solution\n- Identify turning points where the project's direction fundamentally changed\n- Note any observations about the development process itself (tooling, workflow, collaboration patterns)\n\nHere is the complete project timeline:\n\n[TIMELINE CONTENT GOES HERE]\n```\n\n### Step 5: Save the Report\n\nSave the agent's output as a markdown file. Default location:\n\n```\n./journey-into-PROJECT_NAME.md\n```\n\nOr if the user specified a different output path, use that instead.\n\n### Step 6: Report Completion\n\nTell the user:\n- Where the report was saved\n- The approximate token cost (input timeline + output report)\n- The date range covered\n- Number of observations analyzed\n\n## Er",
+      "source": "claude-mem\\plugin\\skills\\timeline-report\\SKILL.md",
+      "hasVector": true
+    },
+    {
+      "id": "00a7f26545d7a728",
+      "title": "rg \"@vite-ignore\" src/\r\nrg \"import\\([^'\\\"]\" src/ --type ts --type svelte",
+      "text": "rg \"@vite-ignore\" src/\r\nrg \"import\\([^'\\\"]\" src/ --type ts --type svelte\n\n# L8: Barrel audit (NEW — dead re-export chains)",
+      "source": "4726_auditchecklist.txt",
+      "hasVector": true
+    },
+    {
+      "id": "00c2c6e692efd4a1",
+      "title": "Next target: Phase 10B TurboVec Rerank",
+      "text": "Next target: Phase 10B TurboVec Rerank\n\nBecause Phase 10A/10D are now stabilized and producing reliable lanes, the next gate is TurboVec rerank.\r\n\r\n### Phase 10B: TurboVec Rerank Gate\r\n\r\nGoal:\r\nUse TurboVec as a rerank lane after deterministic retrieval but before Bifrost synthesis.\r\n\r\nInputs:\r\n- Qdrant 768d top-N\r\n- AE 64d centroid IDs\r\n- Neo4j authority/topology scores\r\n- sourceRefs provenance\r\n- JSONB/card metadata\r\n- Karpathy GPU blend scores\r\n\r\nOutputs:\r\n- reranked top-N\r\n- score breakdown\r\n- sourceRef-preserving packet\r\n- fallback-safe ACE input\r\n\r\nRules:\r\n- TurboVec must not mutate canonical JSON graph.\r\n- TurboVec must not write Qdrant canonical payloads during rerank.\r\n- Failure falls back to existing Qdrant/GraphRAG order.\r\n- Trace output is observability-only.\r\n- Bifrost receive",
+      "source": "docs\\pipeline\\phase10_status.md",
+      "hasVector": true
+    },
+    {
+      "id": "00c681c077a81a5d",
+      "title": "Sources consulted:\n- `src/services/sqlite/SessionStore.ts:30-77` (constructor migration list)\n- `src/services/sqlite/SessionStore.ts:949-1100` (existing mirror methods + docstrings)\n- `src/services/sqlite/migrations/runner.ts:22-43` (canonical migration order)\n- `src/services/sqlite/migrations/runner.ts:1005-1153` (canonical v28 logic)\n- `src/services/sqlite/PendingMessageStore.ts:106-194` (consumer SQL using both columns)\n- `src/services/sqlite/schema.sql:121-156` (canonical fresh-DB schema — already has both columns + indexes)\n- `src/services/worker/DatabaseManager.ts:31-35` (worker uses SessionStore directly)\n- `plugin/scripts/worker-service.cjs` — confirmed bundled artifact has `.run(27,` and `.run(29,` but no `.run(28,` and no `rebuildPendingMessagesForSelfHealingClaim` symbol.\n\nAllowed APIs (verified to exist):\n- `this.db.query('PRAGMA table_info(pending_messages)').all() as TableColumnInfo[]` — used at SessionStore.ts:1024.\n- `this.db.run('ALTER TABLE pending_messages ADD COLUMN <col> <type>')` — used at SessionStore.ts:1029, 1032.\n- `this.db.run('CREATE INDEX IF NOT EXISTS …')` — used throughout.\n- `this.db.run('CREATE UNIQUE INDEX IF NOT EXISTS …')` — used at runner.ts:1134.\n- `this.db.prepare('INSERT OR IGNORE INTO schema_versions …').run(28, new Date().toISOString())` — same pattern as v27, v29 mirrors.\n- `TableColumnInfo` is already imported at SessionStore.ts top.\n\nAnti-patterns to avoid:\n- Do NOT trust `schema_versions.version = 28` alone — check `PRAGMA table_info` for column existence first (real-world DBs from issue #2139 already have v29 recorded with no v28 logic ever applied).\n- Do NOT do a full table rebuild in SessionStore — risky on populated DBs and unnecessary; use ALTER TABLE.\n- Do NOT add a new version number (e.g. v30). The migration is v28 — we are completing what was already specified, not creating new schema.\n- Do NOT modify `runner.ts` — its v28 is correct already; the bug is only that SessionStore doesn't mirror it.\n- Do NOT remove the duplicated migration system. That's a larger refactor (see observation 71512). For this fix, just complete the mirror.",
+      "text": "Sources consulted:\n- `src/services/sqlite/SessionStore.ts:30-77` (constructor migration list)\n- `src/services/sqlite/SessionStore.ts:949-1100` (existing mirror methods + docstrings)\n- `src/services/sqlite/migrations/runner.ts:22-43` (canonical migration order)\n- `src/services/sqlite/migrations/runner.ts:1005-1153` (canonical v28 logic)\n- `src/services/sqlite/PendingMessageStore.ts:106-194` (consumer SQL using both columns)\n- `src/services/sqlite/schema.sql:121-156` (canonical fresh-DB schema — already has both columns + indexes)\n- `src/services/worker/DatabaseManager.ts:31-35` (worker uses SessionStore directly)\n- `plugin/scripts/worker-service.cjs` — confirmed bundled artifact has `.run(27,` and `.run(29,` but no `.run(28,` and no `rebuildPendingMessagesForSelfHealingClaim` symbol.\n\nAllow",
+      "source": "claude-mem\\plans\\issue-2139-pending-messages-migration.md",
+      "hasVector": true
+    },
+    {
+      "id": "00cab26de4491175",
+      "title": "Event generation semantics",
+      "text": "Event generation semantics\n\n`POST /v1/events` accepts two query flags that control observation generation:\n\n- `generate=false` — write the event but do not enqueue a generation job.\n- `wait=true` — return the `generationJob` descriptor in the response, so\n  callers can poll `GET /v1/jobs/:id` for completion.\n\nWithout `wait=true`, the response includes the new event row and a best-\neffort `generationJob` field. With `wait=true`, the `generationJob` field is\nalways populated (or `null` only when generation was explicitly disabled).\nThe actual provider call happens in a separate BullMQ worker process\n(`claude-mem server worker start`); the HTTP path never blocks on a\nprovider response.",
+      "source": "claude-mem\\docs\\api.md",
+      "hasVector": true
+    },
+    {
+      "id": "00cadc920830512d",
+      "title": "### Rules\n\n- Each phase uses fresh subagents where noted (or when context is large/unclear)\n- Assign one clear objective per subagent and require evidence (commands run, outputs, files changed)\n- Do not advance to the next step until the assigned subagent reports completion and the orchestrator confirms it matches the plan\n\n### During Each Phase\n\nDeploy an \"Implementation\" subagent to:\n1. Execute the implementation as specified\n2. COPY patterns from documentation, don't invent\n3. Cite documentation sources in code comments when using unfamiliar APIs\n4. If an API seems missing, STOP and verify — don't assume it exists\n\n### After Each Phase\n\nDeploy subagents for each post-phase responsibility:\n1. **Run verification checklist** — Deploy a \"Verification\" subagent to prove the phase worked\n2. **Anti-pattern check** — Deploy an \"Anti-pattern\" subagent to grep for known bad patterns from the plan\n3. **Code quality review** — Deploy a \"Code Quality\" subagent to review changes\n4. **Commit only if verified** — Deploy a \"Commit\" subagent *only after* verification passes; otherwise, do not commit\n\n### Between Phases\n\nDeploy a \"Branch/Sync\" subagent to:\n- Push to working branch after each verified phase\n- Prepare the next phase handoff so the next phase's subagents start fresh but have plan context",
+      "text": "### Rules\n\n- Each phase uses fresh subagents where noted (or when context is large/unclear)\n- Assign one clear objective per subagent and require evidence (commands run, outputs, files changed)\n- Do not advance to the next step until the assigned subagent reports completion and the orchestrator confirms it matches the plan\n\n### During Each Phase\n\nDeploy an \"Implementation\" subagent to:\n1. Execute the implementation as specified\n2. COPY patterns from documentation, don't invent\n3. Cite documentation sources in code comments when using unfamiliar APIs\n4. If an API seems missing, STOP and verify — don't assume it exists\n\n### After Each Phase\n\nDeploy subagents for each post-phase responsibility:\n1. **Run verification checklist** — Deploy a \"Verification\" subagent to prove the phase worked\n2. *",
+      "source": "claude-mem\\plugin\\skills\\do\\SKILL.md",
+      "hasVector": true
+    },
+    {
+      "id": "00cd512fb4f9a7be",
+      "title": "Upload test document",
+      "text": "Upload test document\n\ncurl -X POST http://localhost:5173/api/evidence/upload \\\r\n  -F \"file=@test_contract.pdf\" \\\r\n  -F \"title=Test Contract\" \\\r\n  -F \"caseId=<valid-uuid>\"",
+      "source": "docs\\status\\BATCH_ENTITY_PIPELINE_COMPLETE.md",
+      "hasVector": true
+    },
+    {
+      "id": "00d6d263332b5312",
+      "title": "Test Results",
+      "text": "Test Results\n\n### Test 1: gemma4-rotorquant:latest (FAILED — VRAM)\r\n```\r\nVRAM: 6879 MB used, 1146 MB free (need ~7.3 GB total)\r\nError: \"model failed to load, this may be due to resource limitations\"\r\nRoot cause: TurboQuant (llama-server) holding 6.8 GB VRAM\r\n```\r\n\r\n### Test 2: gemma3:270m (SUCCESSFUL MODEL LOAD, NO CACHE)\r\n```\r\nCold query:  633ms\r\nHot query:   489ms (1.3x speedup) ❌ expected <200ms\r\nWarm query:  448ms (1.4x speedup) ❌ expected <200ms\r\n\r\nQdrant collection: BifrostSemanticCachePlugin\r\nPoints stored: 0  ← Cache not storing responses\r\n```\r\n\r\n---",
+      "source": "docs\\status\\BIFROST_SEMANTIC_CACHE_STATUS.md",
+      "hasVector": true
+    },
+    {
+      "id": "00d8acf7823fae83",
+      "title": "🎨 YoRHa Design System",
+      "text": "🎨 YoRHa Design System\n\n### Color Palette\r\n```typescript\r\nsand: '#d4c7a3' // Main background\r\nsandDark: '#b9aa86' // Sidebar, inputs\r\npanel: '#24211b' // Dark panels\r\npanelSoft: '#2f2a22' // Softer panels\r\naccent: '#4ade80' // Green (primary actions, connections)\r\ndanger: '#ef4444' // Red (suspects, high risk)\r\nwarning: '#facc15' // Yellow (medium risk, pending)\r\ninfo: '#38bdf8' // Blue (witnesses, info)\r\n```\r\n\r\n### Typography\r\n- **UI Font:** IBM Plex Sans\r\n- **Mono Font:** Fira Code\r\n- **Tracking:** Extra-wide letter spacing (0.12em - 0.3em)\r\n- **Case:** UPPERCASE for labels and headings\r\n\r\n### Component Patterns\r\n- **Buttons:** NES-style shadows (`0_2px_0_0_#000`)\r\n- **Pills:** Rounded, uppercase, tight padding\r\n- **Panels:** Dark with borders and drop shadows\r\n- **Grids:** Dotted radial",
+      "source": "deeds_labs\\archived-dead-code\\dead-lib-dirs\\ui\\README_COMPLETE.md",
+      "hasVector": true
+    },
+    {
+      "id": "00dcd72830a5244f",
+      "title": "AGENTS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/evidence`",
+      "text": "AGENTS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/evidence`\n\n<!-- AGENTS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/evidence",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\server\\evidence\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "00de915f0301dacb",
+      "title": "Agent:Web search: CUDA Graphs tensor cores + manifold 4D topological search 2026\r\nIN\r\nDo three focused web searches and return concise technical findings. Under 250 words total, bullets only.\r\n\r\n1. Search \"CUDA Graphs tensor cores RTX fixed-shape replay 2026\" — how capture/replay works, CPU overhead savings, relation to cuBLAS GEMM\r\n2. Search \"4D topological vector store SOM manifold coordinates ML pipeline\" — how manifold coordinates (SOM x/y + semantic z + reward w) are stored and searched efficiently\r\n3. Search \"LangExtract keyword extraction LLM output 2026\" — what LangExtract does for extracting structured keywords/entities from LLM output text\r\n\r\nReturn as 3 numbered bullet lists. Include source URLs.\r\nBash Check manifold4 implementation details in hypergraph-4d.ts\r\nIN\r\ngrep -n \"manifold4\\|som_x\\|som_y\\|semantic_z\\|grpo_w\\|writeManifold4\\|4D\\|captureAEGraph\\|CUDA_GRAPH\" \\\r\n  \"c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/graph/hypergraph-4d.ts\" 2>/dev/null | head -25\r\n\r\nOUT\r\n2: * 4D Hypergraph — GPU-backed legal knowledge hypergraph\r\n73:const HG_COORD_TTL    = 1 * 60 * 60; // 1h Redis TTL for 4D coords\r\n94:export interface HyperNode4D {\r\n272:  // When present, buildHypergraph4D skips the GPU SOM re-training step.\r\n638:// ── Postgres manifold4 write-back ──────────────────────────────────────────────\r\n641: * Write manifold4 = [som_x, som_y, semantic_z, grpo_w] back to research_summaries\r\n642: * in a single batch UPDATE. This makes 4D coordinates queryable directly in SQL —\r\n646:async function writeManifold4ToDB(nodes: HyperNode4D[]): Promise<void> {\r\n656:         SET    manifold4 = u.coords::real[]\r\n666:         SET    manifold4 = u.coords::double precision[]\r\n679:         SET    manifold4 = u.coords::real[]\r\n686:    console.error('[hypergraph-4d] Failed to write manifold4 to DB:', err);\r\n694:  nodes: HyperNode4D[],\r\n704:      // 1. Upsert File nodes with 4D coordinates + SomCell / Cluster nodes\r\n709:           SET   f.som_x      = $x,\r\n710:                 f.som_y      = $y,\r\n711:                 f.semantic_z = $z,\r\n713:                 f.manifold4X = $x,\r\n714:                 f.manifold4Y = $y,\r\n715:                 f.manifold4Z = $z,\r\n716:                 f.manifold4W = $w,\r\n777: * Mirror 4D coordinates into Qdrant `research_summaries` collection payloads.\r\n781: *   som_x        integer  — SOM BMU x-coordinate (0…SOM_GRID_W-1)\r\n782: *   som_y        integer  — SOM BMU y-coordinate (0…SOM_GRID_H-1)\r\n783: *   manifold4    float[]  — [som_x, som_y, semantic_z, grpo_w]\r\nWeb SearchLangExtract keyword extraction LLM output 2026\r\nOUT\r\nWeb search results for query: \"LangExtract keyword extraction LLM output 2026\"\r\n\r\nLinks: [{\"title\":\"GitHub - google/langextract: A Python library for extracting structured information from unstructured text using LLMs with precise source grounding and interactive visualization. · GitHub\",\"url\":\"https://github.com/google/langextract\"},{\"title\":\"Extracting Structured Data with LangExtract: A Deep Dive into LLM-Orchestrated Workflows | Towards Data Science\",\"url\":\"https://towardsdatascience.com/extracting-structured-data-with-langextract-a-deep-dive-into-llm-orchestrated-workflows/\"},{\"title\":\"langextract · PyPI\",\"url\":\"https://pypi.org/project/langextract/\"},{\"title\":\"Real-World Information Extraction with LangExtract: A Comprehensive Guide · Technical news about AI, coding and all\",\"url\":\"https://dasroot.net/posts/2026/03/real-world-information-extraction-langextract/\"},{\"title\":\"LLM-Powered Data Extraction: Structured Output Guide (2026)\",\"url\":\"https://dataresearchtools.com/llm-data-extraction/\"},{\"title\":\"LangExtract: Production LLM-Powered Information Extraction with Source Grounding | Gian Paolo Santopaolo\",\"url\":\"https://genmind.ch/posts/LangExtract-Production-LLM-Powered-Information-Extraction/\"},{\"title\":\"Google's 'langextract': LLM-Powered Structured Text Extraction | AIToolly\",\"url\":\"https://aitoolly.com/ai-news/article/2026-02-10-googles-new-python-library-langextract-leverages-llms-for-precise-structured-information-extraction\"},{\"title\":\"[Feature Request]: Integrate Google LangExtract for LLM-Powered Semantic Extraction in Ingestion Pipeline · Issue #13105 · infiniflow/ragflow\",\"url\":\"https://github.com/infiniflow/ragflow/issues/13105\"},{\"title\":\"Information Extraction with Local LLM | by Tomáš Repčík | ITNEXT\",\"url\":\"https://itnext.io/information-extraction-with-local-llm-94524c5a1fc6\"},{\"title\":\"LangExtract - Official LangExtract Python Library for Information Extraction\",\"url\":\"https://langextract.com/\"}]\r\n\r\nBased on the search results, here's what I found about LangExtract and keyword extraction with LLM output in 2026:",
+      "text": "Agent:Web search: CUDA Graphs tensor cores + manifold 4D topological search 2026\r\nIN\r\nDo three focused web searches and return concise technical findings. Under 250 words total, bullets only.\r\n\r\n1. Search \"CUDA Graphs tensor cores RTX fixed-shape replay 2026\" — how capture/replay works, CPU overhead savings, relation to cuBLAS GEMM\r\n2. Search \"4D topological vector store SOM manifold coordinates ML pipeline\" — how manifold coordinates (SOM x/y + semantic z + reward w) are stored and searched efficiently\r\n3. Search \"LangExtract keyword extraction LLM output 2026\" — what LangExtract does for extracting structured keywords/entities from LLM output text\r\n\r\nReturn as 3 numbered bullet lists. Include source URLs.\r\nBash Check manifold4 implementation details in hypergraph-4d.ts\r\nIN\r\ngrep -n \"mani",
+      "source": "59_26cudagraphdeepresearch.txt",
+      "hasVector": true
+    },
+    {
+      "id": "00e5d971c47c8ae9",
+      "title": "Example: Log a failure when running the Drizzle schema review",
+      "text": "Example: Log a failure when running the Drizzle schema review\n\nnpm run log-subagent -- --agent \"trace-audit\" --subagent \"drizzle-schema-review\" --task \"audit sidecar migrations\" --status \"blocked\" --reason \"missing scripts / asked user incorrectly\" --query \"feature:atlas\"\r\n```",
+      "source": ".opencode\\command\\log-subagent.md",
+      "hasVector": true
+    },
+    {
+      "id": "00e841b0b956f18e",
+      "title": "LLMS.md — `deeds_labs/api-legacy/api/bench/simd/metrics`",
+      "text": "LLMS.md — `deeds_labs/api-legacy/api/bench/simd/metrics`\n\n# LLMS.md — `deeds_labs/api-legacy/api/bench/simd/metrics`",
+      "source": "deeds_labs\\api-legacy\\api\\bench\\simd\\metrics\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "00f4245426617dab",
+      "title": "AGENTS.md — `deeds_labs/dead_code/contradictionEngine`",
+      "text": "AGENTS.md — `deeds_labs/dead_code/contradictionEngine`\n\n<!-- AGENTS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->\n\n> Directory: deeds_labs/dead_code/contradictionEngine",
+      "source": "deeds_labs\\dead_code\\contradictionEngine\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "00f9b72594f1e8c1",
+      "title": "- `archived-handlers.ts`\n- `archived-handlers.ts`",
+      "text": "- `archived-handlers.ts`\n- `archived-handlers.ts`\n\n## Agentic tool-calling — quick ACE hits",
+      "source": "deeds_labs\\api-legacy\\api\\rag\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "00ff4b115be2d0ba",
+      "title": "Magsimula ng bagong Claude Code session sa terminal at ilagay ang mga sumusunod na command:\n\n```\n/plugin marketplace add thedotmack/claude-mem\n\n/plugin install claude-mem\n```\n\nI-restart ang Claude Code. Awtomatikong lalabas sa mga bagong session ang konteksto mula sa mga nakaraang session.\n\n**Mga Pangunahing Tampok:**\n\n- 🧠 **Persistent Memory** - Nananatili ang konteksto sa pagitan ng mga session\n- 📊 **Progressive Disclosure** - Layered na pagkuha ng memory na may visibility ng token cost\n- 🔍 **Skill-Based Search** - I-query ang history ng proyekto gamit ang mem-search skill\n- 🖥️ **Web Viewer UI** - Real-time memory stream sa http://localhost:37777\n- 💻 **Claude Desktop Skill** - Maghanap sa memory mula sa Claude Desktop conversations\n- 🔒 **Privacy Control** - Gamitin ang `<private>` tags para hindi ma-store ang sensitibong nilalaman\n- ⚙️ **Context Configuration** - Mas pinong kontrol kung anong konteksto ang ini-inject\n- 🤖 **Automatic Operation** - Walang kailangang manual na intervention\n- 🔗 **Citations** - I-refer ang mga lumang obserbasyon gamit ang IDs (i-access sa http://localhost:37777/api/observation/{id} o tingnan lahat sa web viewer sa http://localhost:37777)\n- 🧪 **Beta Channel** - Subukan ang mga experimental feature tulad ng Endless Mode sa pamamagitan ng version switching\n\n---",
+      "text": "Magsimula ng bagong Claude Code session sa terminal at ilagay ang mga sumusunod na command:\n\n```\n/plugin marketplace add thedotmack/claude-mem\n\n/plugin install claude-mem\n```\n\nI-restart ang Claude Code. Awtomatikong lalabas sa mga bagong session ang konteksto mula sa mga nakaraang session.\n\n**Mga Pangunahing Tampok:**\n\n- 🧠 **Persistent Memory** - Nananatili ang konteksto sa pagitan ng mga session\n- 📊 **Progressive Disclosure** - Layered na pagkuha ng memory na may visibility ng token cost\n- 🔍 **Skill-Based Search** - I-query ang history ng proyekto gamit ang mem-search skill\n- 🖥️ **Web Viewer UI** - Real-time memory stream sa http://localhost:37777\n- 💻 **Claude Desktop Skill** - Maghanap sa memory mula sa Claude Desktop conversations\n- 🔒 **Privacy Control** - Gamitin ang `<private>` ",
+      "source": "claude-mem\\docs\\i18n\\README.tl.md",
+      "hasVector": true
+    },
+    {
+      "id": "010d0b2d9524ea21",
+      "title": "Snapshot",
+      "text": "Snapshot\n\n- 9 file(s), 0 handler(s)\n- Audit score: _(no GPU audit)_\n- 🟡 Svelte4: 1",
+      "source": ".svelte-error-fixes-backup\\sveltekit-frontend\\src\\lib\\components\\layout\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "01173cbc9ea61255",
+      "title": "Optimization Results",
+      "text": "Optimization Results\n\n### Performance Improvements\r\n\r\n| Metric | Before | After | Improvement |\r\n|--------|--------|-------|-------------|\r\n| **Model** | gemma4-rotorquant:latest (11.8B) | gemma3:270m (268M) | 6× faster |\r\n| **Cold Request** | 30,000ms (timeout) | 4,125ms (3.6s inference) | **7.3× faster** ✅ |\r\n| **Warm Request (cache)** | N/A | 261ms | **15× speedup** ✅ |\r\n| **Success Rate** | 0% (timeout) | 100% | **FIXED** ✅ |\r\n\r\n---",
+      "source": "AI_ANALYSIS_OPTIMIZATION_APR13.md",
+      "hasVector": true
+    },
+    {
+      "id": "0129e35b12f3d546",
+      "title": "Snapshot",
+      "text": "Snapshot\n\n- 3 file(s), 0 handler(s)\n- Audit score: _(no GPU audit)_\n- 🔴 SSR-unsafe: 1 · TODOs: 1",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\glyph\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "012bdcf41b358b39",
+      "title": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/api-legacy/api/documents/process/vision",
+      "text": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/api-legacy/api/documents/process/vision\n\n## Snapshot",
+      "source": "deeds_labs\\api-legacy\\api\\documents\\process\\vision\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "012eadc6ea32515f",
+      "title": "python ocr.py document.pdf -o result.json",
+      "text": "python ocr.py document.pdf -o result.json\n\n# 只处理指定页码",
+      "source": "deeds_labs\\community-refs\\gemma4-ocr\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "013d249936c805aa",
+      "title": "Files (2)",
+      "text": "Files (2)\n\n- `DEPRECATED.+server.ts`\n- `upload.ts`",
+      "source": "deeds_labs\\api-legacy\\api\\evidence\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "013f2ecd0be93182",
+      "title": "Snapshot",
+      "text": "Snapshot\n\n- 9 file(s), 0 handler(s)\n- Audit score: _(no GPU audit)_\n- 🟠 hardcoded localhost: 1 · TODOs: 1",
+      "source": ".svelte-error-fixes-backup\\sveltekit-frontend\\src\\lib\\components\\evidence\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "015d0d46e2512b31",
+      "title": "Copy-Item \"C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf\" `\r\n          \"C:\\Users\\james\\Videos\\deeds-web-app\\models\\mmproj-BF16.gguf\"",
+      "text": "Copy-Item \"C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf\" `\r\n          \"C:\\Users\\james\\Videos\\deeds-web-app\\models\\mmproj-BF16.gguf\"\n\n# 3. The inference server binary (was on Desktop)",
+      "source": "5_16_pt3_morning.txt",
+      "hasVector": true
+    },
+    {
+      "id": "015f759e91f3e398",
+      "title": "📈 Success Metrics",
+      "text": "📈 Success Metrics\n\n### Quantitative KPIs\r\n\r\n| Metric | Target | Measured | Pass/Fail |\r\n|--------|--------|----------|-----------|\r\n| Indexing throughput | ≥100 chunks/sec | _____ | ⬜ |\r\n| Search latency | <3s | _____ | ⬜ |\r\n| Vector search time | <100ms | _____ | ⬜ |\r\n| Search relevance (top 5) | ≥80% | _____ | ⬜ |\r\n| Worker completion rate | 100% | _____ | ⬜ |\r\n| Error rate | <1% | _____ | ⬜ |\r\n\r\n### Qualitative Assessment\r\n\r\n**User Experience** (1-5 scale):\r\n- [ ] Dashboard UI is intuitive and easy to navigate\r\n- [ ] Progress tracking provides clear feedback\r\n- [ ] Search results are relevant and useful\r\n- [ ] Error messages are helpful when issues occur\r\n- [ ] Overall system feels responsive and polished\r\n\r\n**Code Quality**:\r\n- [ ] Worker threads handle errors gracefully\r\n- [ ] No con",
+      "source": "docs\\status\\GPU_SEMANTIC_WIKI_TESTING_GUIDE.md",
+      "hasVector": true
+    },
+    {
+      "id": "015fdb847bd4b1fe",
+      "title": "Audit Gates",
+      "text": "Audit Gates\n\n| Gate | Status | Detail |\n|------|--------|--------|\n| G21-24 | ❌ FAIL | 2/31 files with Svelte 4 patterns |\n| G20 | ✅ PASS | clean ✅ |\n\n_Gates checked: G21-24, G20. Run `npm run index:codebase:fast && npm run agents:write` to refresh._",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\legal\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0172337b4ed348d6",
+      "title": "TS-106",
+      "text": "TS-106\n\n- **File**: `src/routes/api/atlas/audit/+server.ts`\r\n- **Error**: `TS2614: Module '\"$lib/server/agent-executor\"' has no exported member 'runAgentSkill'.`\r\n- **Reason**: This utility function is currently stubbed out or missing from `agent-executor.ts`.",
+      "source": "docs\\reports\\ts7-suppressed-errors.md",
+      "hasVector": true
+    },
+    {
+      "id": "01894a389e7eff90",
+      "title": "- **Documentação**: [docs/](docs/)\n- **Issues**: [GitHub Issues](https://github.com/thedotmack/claude-mem/issues)\n- **Repositório**: [github.com/thedotmack/claude-mem](https://github.com/thedotmack/claude-mem)\n- **Autor**: Alex Newman ([@thedotmack](https://github.com/thedotmack))\n\n---\n\n**Construído com Claude Agent SDK** | **Desenvolvido por Claude Code** | **Feito com TypeScript**",
+      "text": "- **Documentação**: [docs/](docs/)\n- **Issues**: [GitHub Issues](https://github.com/thedotmack/claude-mem/issues)\n- **Repositório**: [github.com/thedotmack/claude-mem](https://github.com/thedotmack/claude-mem)\n- **Autor**: Alex Newman ([@thedotmack](https://github.com/thedotmack))\n\n---\n\n**Construído com Claude Agent SDK** | **Desenvolvido por Claude Code** | **Feito com TypeScript**",
+      "source": "claude-mem\\docs\\i18n\\README.pt-br.md",
+      "hasVector": true
+    },
+    {
+      "id": "018ec061477a0264",
+      "title": "LLMS.md — `deeds_labs/api-legacy/api/contextual/chat`",
+      "text": "LLMS.md — `deeds_labs/api-legacy/api/contextual/chat`\n\n# LLMS.md — `deeds_labs/api-legacy/api/contextual/chat`",
+      "source": "deeds_labs\\api-legacy\\api\\contextual\\chat\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "018ee3a7166e2539",
+      "title": "### .code-workspace\n\nWorkspace-level exclusions are for:\n- Explorer noise reduction\n- search filtering\n- agent context hygiene\n- multi-root workspace cleanliness\n\nThey are **not** used for:\n- TypeScript compilation\n- Svelte compilation\n- Vite resolution rules\n- production build configuration\n\n### .vscode/settings.json\n\nRepo-local VS Code settings are used for:\n- frontend-specific editor behavior\n- excludes for search and indexing\n- Python interpreter path for local tooling\n- TypeScript SDK selection\n- task ergonomics\n\n### Exclusion Policy\n\nThe following directories should generally be excluded from workspace search/indexing unless debugging specifically requires them:\n\n- `node_modules`\n- `.svelte-kit`\n- `dist`\n- `build`\n- `coverage`\n- `.vite`\n- `.venv`\n- `__pycache__`\n- `.pytest_cache`\n- `.mypy_cache`\n- `.ruff_cache`\n- Go vendor directories\n- generated Docker/build outputs\n\n**Why:** These exclusions improve search quality, agent retrieval quality, indexing performance, signal-to-noise ratio for debugging, and context efficiency for AI-assisted workflows.\n\n---",
+      "text": "### .code-workspace\n\nWorkspace-level exclusions are for:\n- Explorer noise reduction\n- search filtering\n- agent context hygiene\n- multi-root workspace cleanliness\n\nThey are **not** used for:\n- TypeScript compilation\n- Svelte compilation\n- Vite resolution rules\n- production build configuration\n\n### .vscode/settings.json\n\nRepo-local VS Code settings are used for:\n- frontend-specific editor behavior\n- excludes for search and indexing\n- Python interpreter path for local tooling\n- TypeScript SDK selection\n- task ergonomics\n\n### Exclusion Policy\n\nThe following directories should generally be excluded from workspace search/indexing unless debugging specifically requires them:\n\n- `node_modules`\n- `.svelte-kit`\n- `dist`\n- `build`\n- `coverage`\n- `.vite`\n- `.venv`\n- `__pycache__`\n- `.pytest_cache`\n- `",
+      "source": "docs\\error-analysis-architecture.md",
+      "hasVector": true
+    },
+    {
+      "id": "0192524efece8a97",
+      "title": "Backend Infrastructure Audit — 17-Gate System",
+      "text": "Backend Infrastructure Audit — 17-Gate System\n\n**Purpose**: Verify backend services (Redis, Bifrost, Ollama, Docker, RabbitMQ, Codebase Intelligence) are running and configured correctly.\r\n\r\n**When to use**: Pre-deployment health checks, debugging cache/inference issues, post-update validation, verifying codebase indexing.\r\n\r\n**Complement to**: 20-Gate Code Audit (CLAUDE.md) — this audit checks RUNTIME infrastructure, not code.\r\n\r\n---",
+      "source": "BACKEND_INFRASTRUCTURE_AUDIT.md",
+      "hasVector": true
+    },
+    {
+      "id": "019a1a18c5a36961",
+      "title": "Svelte 5 Runes (REQUIRED — No Svelte 4 Patterns)",
+      "text": "Svelte 5 Runes (REQUIRED — No Svelte 4 Patterns)\n\n```typescript\r\n// State\r\nlet count = $state(0);\r\nlet user = $state({ name: '', email: '' });\r\n\r\n// Derived (simple expression)\r\nlet doubled = $derived(count * 2);\r\n\r\n// Derived (complex — use $derived.by for blocks)\r\nlet filtered = $derived.by(() => { /* complex logic */ return result; });\r\n\r\n// Effects\r\n$effect(() => { console.log(count); });\r\n\r\n// Props\r\nlet { value, onChange }: Props = $props();\r\n```\r\n\r\n**Svelte 4 → 5 mapping:**\r\n| Svelte 4 | Svelte 5 |\r\n|----------|----------|\r\n| `export let x` | `let { x } = $props()` |\r\n| `$: doubled = x * 2` | `let doubled = $derived(x * 2)` |\r\n| `$: { sideEffect() }` | `$effect(() => { sideEffect() })` |\r\n| `on:click={fn}` | `onclick={fn}` |\r\n| `<slot>` | `{#snippet children()}{/snippet}` + `{@rende",
+      "source": "claude.md",
+      "hasVector": true
+    },
+    {
+      "id": "01a390422666396a",
+      "title": "Purpose",
+      "text": "Purpose\n\nThese files document the **historical reasons** for disabling SSR and the **migration path** taken to re-enable it.",
+      "source": "deeds_labs\\frontend\\ssr-disable-archive\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "01a62b77dc3374be",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"scroll-area\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"dead-ui-components scroll-area\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/dead-ui-components/scroll-area/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\dead-ui-components\\scroll-area\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "01a862043c8c156e",
+      "title": "- table `cases`: 14 columns, 3 indexes, ~5,200 rows (estimate)\n- key columns: `id` uuid PK, `status` enum, `priority` enum, `metadata` jsonb\n- indexes: B-tree(`status`), B-tree(`created_at`), HNSW(`embedding`)\n- JSONB keys in `metadata`: `assigned_to`, `case_type`, `tags[]`",
+      "text": "- table `cases`: 14 columns, 3 indexes, ~5,200 rows (estimate)\n- key columns: `id` uuid PK, `status` enum, `priority` enum, `metadata` jsonb\n- indexes: B-tree(`status`), B-tree(`created_at`), HNSW(`embedding`)\n- JSONB keys in `metadata`: `assigned_to`, `case_type`, `tags[]`\n\n## What the Drizzle source shows",
+      "source": ".claude\\agents\\drizzle-inspector.md",
+      "hasVector": true
+    },
+    {
+      "id": "01c20b96e1e377a3",
+      "title": "📋 Checklists & Todo Lists",
+      "text": "📋 Checklists & Todo Lists\n\n### 📄 [to do \"the one real issue\"](file:///c:/Users/james/Videos/deeds-web-app/43_26-todo.txt)\r\n```json\r\n{\r\n  \"id\": \"b4339716\",\r\n  \"title\": \"to do \\\"the one real issue\\\"\",\r\n  \"path\": \"43_26-todo.txt\",\r\n  \"fileUrl\": \"file:///c:/Users/james/Videos/deeds-web-app/43_26-todo.txt\",\r\n  \"sizeBytes\": 15550,\r\n  \"lines\": 195,\r\n  \"modifiedAt\": \"2026-04-04T06:15:29.647Z\",\r\n  \"searchGroups\": [\r\n    \"db-drizzle-postgres\",\r\n    \"ml-inference-cuda\",\r\n    \"web-svelte-frontend\",\r\n    \"rag-vector-search\",\r\n    \"caching-redis\",\r\n    \"infra-devops\",\r\n    \"logs-timelines\"\r\n  ],\r\n  \"clusterTags\": [\r\n    \"pgvector\",\r\n    \"mcp\",\r\n    \"cuda\",\r\n    \"bifrost\",\r\n    \"qdrant\",\r\n    \"neo4j\",\r\n    \"redis\",\r\n    \"rabbitmq\",\r\n    \"docker\",\r\n    \"ace\"\r\n  ],\r\n  \"topoClass\": \"todo-list\",\r\n  \"summar",
+      "source": "docs\\documents-atlas-index.md",
+      "hasVector": true
+    },
+    {
+      "id": "01c469b5c1811b96",
+      "title": "This cache stores logical context packs, not raw model KV tensors.\r\n\r\nIt is safe because cache keys include:\r\n- model/backend/tokenizer identity\r\n- system prompt hash\r\n- tool definition hash\r\n- repo SHA\r\n- corpus hash\r\n- RAG bundle hash\r\n- graph snapshot hash\r\n\r\nA cache hit reuses:\r\n- summary\r\n- chunk IDs\r\n- graph paths\r\n- tool policy\r\n\r\nIt does not serialize llama-server KV cache, GPU tensors, native pointers, or hidden reasoning.\r\nwhat happened tot his it got deleted?\r\n│ L0: Redis (3-5ms)   │ ← Exact-match (SHA-256 hash of query)",
+      "text": "This cache stores logical context packs, not raw model KV tensors.\r\n\r\nIt is safe because cache keys include:\r\n- model/backend/tokenizer identity\r\n- system prompt hash\r\n- tool definition hash\r\n- repo SHA\r\n- corpus hash\r\n- RAG bundle hash\r\n- graph snapshot hash\r\n\r\nA cache hit reuses:\r\n- summary\r\n- chunk IDs\r\n- graph paths\r\n- tool policy\r\n\r\nIt does not serialize llama-server KV cache, GPU tensors, native pointers, or hidden reasoning.\r\nwhat happened tot his it got deleted?\r\n│ L0: Redis (3-5ms)   │ ← Exact-match (SHA-256 hash of query)",
+      "source": "5_13_pt2_todo.txt",
+      "hasVector": true
+    },
+    {
+      "id": "01c6a5605c27e5fc",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"evidence\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"api evidence\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/api-legacy/api/evidence/<file>\" })` — fetch any file's contents (sandboxed to src/)\n\nFor route handlers in this dir, also try:\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/evidence/+server.ts\" })` — runs svelte-check / tsc on a single file",
+      "source": "deeds_labs\\api-legacy\\api\\evidence\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "01cb823b12408bc0",
+      "title": "기여를 환영합니다! 다음 절차를 따라주세요:\n\n1. 저장소 포크\n2. 기능 브랜치 생성\n3. 테스트와 함께 변경 사항 작성\n4. 문서 업데이트\n5. Pull Request 제출\n\n기여 워크플로우는 [개발 가이드](https://docs.claude-mem.ai/development)를 참조하세요.\n\n---",
+      "text": "기여를 환영합니다! 다음 절차를 따라주세요:\n\n1. 저장소 포크\n2. 기능 브랜치 생성\n3. 테스트와 함께 변경 사항 작성\n4. 문서 업데이트\n5. Pull Request 제출\n\n기여 워크플로우는 [개발 가이드](https://docs.claude-mem.ai/development)를 참조하세요.\n\n---\n\n## License",
+      "source": "claude-mem\\docs\\i18n\\README.ko.md",
+      "hasVector": true
+    },
+    {
+      "id": "01d16f576344841f",
+      "title": "LLMS.md — `deeds_labs/api-legacy/api/yolo`",
+      "text": "LLMS.md — `deeds_labs/api-legacy/api/yolo`\n\n# LLMS.md — `deeds_labs/api-legacy/api/yolo`",
+      "source": "deeds_labs\\api-legacy\\api\\yolo\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "01e1657967e949c1",
+      "title": "Todos + Enhancements",
+      "text": "Todos + Enhancements\n\n- **[LOW]** [TODO] `AIChatMessage.svelte`: TODO\n\n_Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._",
+      "source": "deeds_labs\\frontend\\svelte4-archive\\components\\ai-chat\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "01e6b01a790663ca",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/trt-llm/stream/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/trt-llm/stream/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/trt-llm/stream/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/trt-llm/stream/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\trt-llm\\stream\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "01f0ae80c775d8da",
+      "title": "[12.4.1] - 2026-04-25",
+      "text": "[12.4.1] - 2026-04-25\n\n## perf(chroma): Cache backfill watermarks to skip per-restart Chroma scans",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "01f7d6e3e42cede9",
+      "title": "Discovery",
+      "text": "Discovery\n\nRun:\r\n\r\n```powershell\r\nrg --files -uu | rg \"sidecar-audit-validated.json|codebase-atlas|codebase-atlas.min|cluster-cards|pathway-cards|graph-refresh-manifest|document-knowledge|kag-notes|docstore|nes|ace|feature-map\"\r\n```\r\n\r\nThen:\r\n\r\n```powershell\r\nrg -n -uu \"ClusterCard|PathwayCard|FeatureMap|GlyphRecord|CHR97|sourceRefs|chunkIds|clusterTags|featureLabels|llm_context_cache|ace:ctx|semantic_path_synthesis\" sveltekit-frontend/src sveltekit-frontend/scripts sveltekit-frontend/docs sveltekit-frontend/memory\r\n```",
+      "source": ".opencode\\command\\knowledge-consolidate.md",
+      "hasVector": true
+    },
+    {
+      "id": "02017f5bee894a7b",
+      "title": "Top Failures (0-100)",
+      "text": "Top Failures (0-100)",
+      "source": ".tmp\\test-triage-debug\\20260520-190307\\summary.md",
+      "hasVector": true
+    },
+    {
+      "id": "020b6f5f39b7233c",
+      "title": "🎯 Usage Examples",
+      "text": "🎯 Usage Examples\n\n### Building a Case Detail Page\r\n\r\n```svelte\r\n<script>\r\n import Panel from '$lib/ui/Panel.svelte';\r\n import Button from '$lib/ui/Button.svelte';\r\n import StatusPill from '$lib/ui/StatusPill.svelte';\r\n</script>\r\n\r\n<div class=\"grid grid-cols-[2fr_1fr] gap-4\">\r\n <Panel>\r\n <div class=\"heading-sub mb-3\">Case Overview</div>\r\n <StatusPill risk=\"high\" status=\"active\" />\r\n <p class=\"mt-3 text-sm leading-relaxed\">\r\n Investigation into corporate espionage...\r\n </p>\r\n <Button variant=\"primary\" class=\"mt-4\">View Evidence</Button>\r\n </Panel>\r\n\r\n <Panel>\r\n <div class=\"heading-sub mb-3\">Related Cases</div>\r\n <!-- ... -->\r\n </Panel>\r\n</div>\r\n```\r\n\r\n### Evidence Board with Cards\r\n\r\n```svelte\r\n<div class=\"grid grid-cols-3 gap-3\">\r\n {#each evidenceItems as item}\r\n <Card clickable onclick={(",
+      "source": "deeds_labs\\archived-dead-code\\dead-lib-dirs\\ui\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "0212cb44df359a58",
+      "title": "LLMS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/accordion`",
+      "text": "LLMS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/accordion`\n\n# LLMS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/accordion`",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\ui\\accordion\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0214853329b1f651",
+      "title": "- `ollama.ts`\n- `ollama.ts`",
+      "text": "- `ollama.ts`\n- `ollama.ts`\n\n## Agentic tool-calling — quick ACE hits",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\server\\clients\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "021b14a2f39ec72e",
+      "title": "G51: Reward-aware synthesis linkage exists",
+      "text": "G51: Reward-aware synthesis linkage exists\n\n# MUST return ≥1 hit — search/retrieval/glyph pipeline can surface or persist GRPO reward scores",
+      "source": "416plan_locally.txt",
+      "hasVector": true
+    },
+    {
+      "id": "021ced9efb90d060",
+      "title": "Original IDLE todo, much of it now outdated:\n============================================\nTO DO:\n\n- improve debugger:\n    - manage breakpoints globally, allow bp deletion, tbreak, cbreak etc.\n    - real object browser\n    - help on how to use it (a simple help button will do wonders)\n    - performance?  (updates of large sets of locals are slow)\n    - better integration of \"debug module\"\n    - debugger should be global resource (attached to flist, not to shell)\n    - fix the stupid bug where you need to step twice\n    - display class name in stack viewer entries for methods\n    - suppress tracing through IDLE internals (e.g. print) DONE\n    - add a button to suppress through a specific module or class or method\n    - more object inspection to stack viewer, e.g. to view all array items\n- insert the initial current directory into sys.path DONE\n- default directory attribute for each window instead of only for windows\n  that have an associated filename\n- command expansion from keywords, module contents, other buffers, etc.\n- \"Recent documents\" menu item DONE\n- Filter region command\n- Optional horizontal scroll bar\n- more Emacsisms:\n    - ^K should cut to buffer\n    - M-[, M-] to move by paragraphs\n    - incremental search?\n- search should indicate wrap-around in some way\n- restructure state sensitive code to avoid testing flags all the time\n- persistent user state (e.g. window and cursor positions, bindings)\n- make backups when saving\n- check file mtimes at various points\n- Pluggable interface with RCS/CVS/Perforce/Clearcase\n- better help?\n- don't open second class browser on same module (nor second path browser)\n- unify class and path browsers\n- Need to define a standard way whereby one can determine one is running\n  inside IDLE (needed for Tk mainloop, also handy for $PYTHONSTARTUP)\n- Add more utility methods for use by extensions (a la get_selection)\n- Way to run command in totally separate interpreter (fork+os.system?) DONE\n- Way to find definition of fully-qualified name:\n  In other words, select \"UserDict.UserDict\", hit some magic key and\n  it loads up UserDict.py and finds the first def or class for UserDict.\n- need a way to force colorization on/off\n- need a way to force auto-indent on/off\n\nDetails:\n\n- ^O (on Unix -- open-line) should honor autoindent\n- after paste, show end of pasted text\n- on Windows, should turn short filename to long filename (not only in argv!)\n  (shouldn't this be done -- or undone -- by ntpath.normpath?)\n- new autoindent after colon even indents when the colon is in a comment!\n- sometimes forward slashes in pathname remain\n- sometimes star in window name remains in Windows menu\n- With unix bindings, ESC by itself is ignored\n- Sometimes for no apparent reason a selection from the cursor to the\n  end of the command buffer appears, which is hard to get rid of\n  because it stays when you are typing!\n- The Line/Col in the status bar can be wrong initially in PyShell DONE\n\nStructural problems:\n\n- too much knowledge in FileList about EditorWindow (for example)\n- should add some primitives for accessing the selection etc.\n  to repeat cumbersome code over and over\n\n======================================================================\n\nJeff Bauer suggests:\n\n- Open Module doesn't appear to handle hierarchical packages.\n- Class browser should also allow hierarchical packages.\n- Open and Open Module could benefit from a history, DONE\n  either command line style, or Microsoft recent-file\n  style.\n- Add a Smalltalk-style inspector  (i.e. Tkinspect)\n\nThe last suggestion is already a reality, but not yet\nintegrated into IDLE.  I use a module called inspector.py,\nthat used to be available from python.org(?)  It no longer\nappears to be in the contributed section, and the source\nhas no author attribution.\n\nIn any case, the code is useful for visually navigating\nan object's attributes, including its container hierarchy.\n\n    >>> from inspector import Tkinspect\n    >>> Tkinspect(None, myObject)\n\nTkinspect could probably be extended and refined to\nintegrate better into IDLE.\n\n======================================================================\n\nComparison to PTUI\n------------------\n\n+ PTUI's help is better (HTML!)\n\n+ PTUI can attach a shell to any module\n\n+ PTUI has some more I/O commands:\n  open multiple\n  append\n  examine (what's that?)\n\n======================================================================\n\nNotes after trying to run Grail\n-------------------------------\n\n- Grail does stuff to sys.path based on sys.argv[0]; you must set\nsys.argv[0] to something decent first (it is normally set to the path of\nthe idle script).\n\n- Grail must be exec'ed in __main__ because that's imported by some\nother parts of Grail.\n\n- Grail uses a module called History and so does idle :-(\n\n======================================================================\n\nRobin Friedrich's items:\n\nThings I'd like to see:\n    - I'd like support for shift-click extending the selection. There's a\n      bug now that it doesn't work the first time you try it.\n    - Printing is needed. How hard can that be on Windows? FIRST CUT DONE\n    - The python-mode trick of autoindenting a line with <tab> is neat and\n      very handy.\n    - (someday) a spellchecker for docstrings and comments.\n    - a pagedown/up command key which moves to next class/def statement (top\n      level)\n    - split window capability\n    - DnD text relocation/copying\n\nThings I don't want to see.\n    - line numbers...  will probably slow things down way too much.\n    - Please use another icon for the tree browser leaf. The small snake\n      isn't cutting it.\n\n----------------------------------------------------------------------\n\n- Customizable views (multi-window or multi-pane).  (Markus Gritsch)\n\n- Being able to double click (maybe double right click) on a callable\nobject in the editor which shows the source of the object, if\npossible.  (Gerrit Holl)\n\n- Hooks into the guts, like in Emacs.  (Mike Romberg)\n\n- Sharing the editor with a remote tutor.  (Martijn Faassen)\n\n- Multiple views on the same file.  (Tony J Ibbs)\n\n- Store breakpoints in a global (per-project) database (GvR); Dirk\nHeise adds: save some space-trimmed context and search around when\nreopening a file that might have been edited by someone else.\n\n- Capture menu events in extensions without changing the IDLE source.\n(Matthias Barmeier)\n\n- Use overlapping panels (a \"notebook\" in MFC terms I think) for info\nthat doesn't need to be accessible simultaneously (e.g. HTML source\nand output).  Use multi-pane windows for info that does need to be\nshown together (e.g. class browser and source).  (Albert Brandl)\n\n- A project should invisibly track all symbols, for instant search,\nreplace and cross-ref.  Projects should be allowed to span multiple\ndirectories, hosts, etc.  Project management files are placed in a\ndirectory you specify.  A global mapping between project names and\nproject directories should exist [not so sure --GvR].  (Tim Peters)\n\n- Merge attr-tips and auto-expand.  (Mark Hammond, Tim Peters)\n\n- Python Shell should behave more like a \"shell window\" as users know\nit -- i.e. you can only edit the current command, and the cursor can't\nescape from the command area.  (Albert Brandl)\n\n- Set X11 class to \"idle/Idle\", set icon and title to something\nbeginning with \"idle\" -- for window manangers.  (Randall Hopper)\n\n- Config files editable through a preferences dialog.  (me) DONE\n\n- Config files still editable outside the preferences dialog.\n(Randall Hopper) DONE\n\n- When you're editing a command in PyShell, and there are only blank\nlines below the cursor, hitting Return should ignore or delete those\nblank lines rather than deciding you're not on the last line.  (me)\n\n- Run command (F5 c.s.) should be more like Pythonwin's Run -- a\ndialog with options to give command line arguments, run the debugger,\netc.  (me)\n\n- Shouldn't be able to delete part of the prompt (or any text before\nit) in the PyShell.  (Martijn Faassen)   DONE\n\n- Emacs style auto-fill (also smart about comments and strings).\n(Jeremy Hylton)\n\n- Output of Run Script should go to a separate output window, not to\nthe shell window.  Output of separate runs should all go to the same\nwindow but clearly delimited.  (David Scherer) REJECT FIRST, LATTER DONE\n\n- GUI form designer to kick VB's butt.  (Robert Geiger) THAT'S NOT IDLE\n\n- Printing!  Possibly via generation of PDF files which the user must\nthen send to the printer separately.  (Dinu Gherman)  FIRST CUT",
+      "text": "Original IDLE todo, much of it now outdated:\n============================================\nTO DO:\n\n- improve debugger:\n    - manage breakpoints globally, allow bp deletion, tbreak, cbreak etc.\n    - real object browser\n    - help on how to use it (a simple help button will do wonders)\n    - performance?  (updates of large sets of locals are slow)\n    - better integration of \"debug module\"\n    - debugger should be global resource (attached to flist, not to shell)\n    - fix the stupid bug where you need to step twice\n    - display class name in stack viewer entries for methods\n    - suppress tracing through IDLE internals (e.g. print) DONE\n    - add a button to suppress through a specific module or class or method\n    - more object inspection to stack viewer, e.g. to view all array items\n- in",
+      "source": ".python311\\lib\\python3.11\\idlelib\\TODO.txt",
+      "hasVector": true
+    },
+    {
+      "id": "021f2c521a230f3a",
+      "title": "Repair Missing NPM Script",
+      "text": "Repair Missing NPM Script\n\nUse this command when an npm command fails with:\r\n\r\n- `npm error Missing script`\r\n- `Missing script: \"feature:atlas\"`\r\n- documented command exists but package.json alias is missing",
+      "source": ".opencode\\command\\repair-missing-npm-script.md",
+      "hasVector": true
+    },
+    {
+      "id": "023025f3514b11ff",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"legal\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"components legal\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/legal/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\legal\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "023116f7dd2d2791",
+      "title": "Everything stays in ~/.claude-mem on this machine.\n\nNothing leaves your machine except calls to whichever AI provider you configured for compression (Claude / OpenRouter / Gemini). The SQLite database, vector index, logs, and settings all live under that directory and are removed cleanly on `npx claude-mem uninstall`.",
+      "text": "Everything stays in ~/.claude-mem on this machine.\n\nNothing leaves your machine except calls to whichever AI provider you configured for compression (Claude / OpenRouter / Gemini). The SQLite database, vector index, logs, and settings all live under that directory and are removed cleanly on `npx claude-mem uninstall`.",
+      "source": "claude-mem\\src\\services\\worker\\onboarding-explainer.md",
+      "hasVector": true
+    },
+    {
+      "id": "0232b28b94b16a2e",
+      "title": "4. Multi-Lane Topological Search",
+      "text": "4. Multi-Lane Topological Search\n\nRetrieval routes through four distinct signal classifiers (Semantic, Lexical, Graph, and Trust Pressure):\r\n1.  **Semantic Lane**: Dense ANN lookup via Qdrant `/collections/codebase_chunks_768`.\r\n2.  **Lexical Lane**: RegEx-based index match using deep `rg` search matrix queries.\r\n3.  **Graph Lane**: Somatic cluster PageRank traversal in Neo4j on port `7687`.\r\n4.  **Trust Lane**: Evaluates prior synthesis feedback loop histories to adapt thresholds dynamically.",
+      "source": "data\\parents-atlas\\llm-wiki\\deeds-architecture.md",
+      "hasVector": true
+    },
+    {
+      "id": "0236a70ae076de62",
+      "title": "To update, restart Claude Code or run the plugin installer.",
+      "text": "To update, restart Claude Code or run the plugin installer.\n\n## [6.2.1] - 2025-11-23",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "023a357b64af438a",
+      "title": "**Position in build order**: After KB Step 6 (manifest hashes byte-stable), parallel with Step 7 (summarize). Operates on `memory/graph/codebase-graph.jsonl` rows that are already produced by `graphify:daily`.\r\n\r\n**Core rule**: Make notecards first → search notecards second → embed notecards third → only then synthesize with the LLM. Raw 10,000-line JSONL never reaches Gemma4 or Claude.\r\n\r\n### Why this lane exists\r\n\r\nThe `graph_node` rows from graphify already carry: file path, kind, zone, tags, hash, summary, line count, auth/Zod flags, exports, fan-in/out, risk score, neighbors. That's enough metadata to build **token-compressed retrieval cards** before any LLM token is spent. Today, ACE retrieval pulls full chunks; with notecards it can pull 80–120 token cards per file and only fetch full bodies for top-K survivors.\r\n\r\n### Notecard formats (3 sizes)\r\n\r\n| Card | Use | Example |\r\n|---|---|---|\r\n| **S-card** (single line, ~30 tokens) | Qdrant/Fuse/BM25 search | `src/hooks.server.ts \\| hooks/server \\| auth redis qdrant db llm \\| exp handle,handleError \\| risk .297 \\| deg 0/27` |\r\n| **M-card** (5–8 lines, ~80–120 tokens) | ACE context-pack | path + kind/zone/risk/lines + tags + exports + auth/zod flags + fan-in/out + top neighbors + summary |\r\n| **L-card** (1 paragraph, ~60–100 tokens) | LLM synthesis surface | \"[SERVER HOOK / HIGH FANOUT] src/hooks.server.ts handles SvelteKit server hooks. Touches auth, Redis, Qdrant, DB, LLM paths…\" |\r\n\r\nL-cards are generated **only after reranking** (top-20 max). S-cards and M-cards are generated for every node.\r\n\r\n### Card schema (canonical JSON)\r\n\r\n```json\r\n{\r\n  \"card_id\": \"card:src/hooks.server.ts:09dd0811f209\",\r\n  \"source_path\": \"src/hooks.server.ts\",\r\n  \"kind\": \"hooks\",\r\n  \"zone\": \"server\",\r\n  \"tags\": [\"auth\", \"redis\", \"qdrant\", \"db\", \"llm\"],\r\n  \"hash\": \"09dd0811f209\",\r\n  \"risk_score\": 0.297,\r\n  \"line_count\": 1021,\r\n  \"fan_in\": 0,\r\n  \"fan_out\": 27,\r\n  \"exports\": [\"handle\", \"handleError\"],\r\n  \"neighbors\": [\"src/lib/server/lucia.ts\", \"src/lib/server/production-logger.ts\", \"src/lib/server/db/client.ts\"],\r\n  \"search_text\": \"<S-card>\",\r\n  \"context_text\": \"<M-card>\",\r\n  \"status\": \"active\"\r\n}\r\n```\r\n\r\n### Ranking formula\r\n\r\n```\r\nscore =\r\n  0.35 * risk_score +\r\n  0.20 * normalized_line_count +\r\n  0.20 * normalized_degree +\r\n  0.15 * tag_boost +\r\n  0.10 * summary_presence\r\n```\r\n\r\n**Tag boost set**: `auth, db, qdrant, redis, llm, ace, mcp, zod, evidence, reconstruction, cache`\r\n\r\n### Retrieval blend (final, after notecards exist)\r\n\r\n```\r\nfinal_score =\r\n  0.30 dense (Qdrant/pgvector) +\r\n  0.25 sparse (BM25/rg/Fuse over search_text) +\r\n  0.20 hypergraph (cluster_context, shared_resource, agents_context, vault_link) +\r\n  0.10 risk_score +\r\n  0.10 freshness +\r\n  0.05 prior_success\r\n```\r\n\r\n### What the next session should build (this lane only)\r\n\r\n| # | Task | Effort |\r\n|---|---|---|\r\n| N1 | `scripts/kb/graph-jsonl-to-cards.mjs` — read `memory/graph/codebase-graph.jsonl`, emit `memory/kb/notecards/graph_file_cards.jsonl` (S+M cards, no L cards) | S |\r\n| N2 | `scripts/kb/rank-graph-cards.mjs` — compute the 5-term score, write `graph_file_cards.rank.json` (top-200 by score) | S |\r\n| N3 | `scripts/kb/validate-graph-cards.mjs` — JSON-parse + duplicate `card_id` + `source_path` exists + `search_text`/`context_text` non-empty; bad rows → `graph_file_cards.invalid.jsonl` | XS |\r\n| N4 | `memory/kb/notecards/README.md` — schema + tag boost set + ranking formula | XS |\r\n| N5 | npm scripts: `kb:graph-cards`, `kb:graph-cards:rank`, `kb:graph-cards:validate` | XS |\r\n| N6 | Verify card emission is **byte-stable** across two consecutive runs (same hash discipline as Phase 0B + preset emit) | XS |\r\n| N7 | **Pause before N7.** Do not wire MCP/Qdrant/Bitfrost integration until card schema + rank stability are proven. | — |\r\n| N8 | When ready: Fuse.js + BM25 sparse index over `search_text` (worker thread, local only) | S |\r\n| N9 | When ready: Qdrant embedding job for `context_text` (batched 32–128) + pgvector mirror for SQL filters | M |\r\n| N10 | When ready: MCP tools `kb.search_cards`, `kb.get_card`, `kb.expand_neighbors`, `kb.explain_retrieval` (return cards, never raw JSONL) | M |\r\n| N11 | When ready: Go/gRPC sidecar spike (`KBNotecardIndex` service: SearchCards, GetCards, ExpandNeighbors, RerankCards) — research only, benchmark vs Node | L |\r\n\r\n### Hard rules\r\n\r\n- ❌ **Do not call Gemma4, Qdrant, Postgres, Redis, or GPU during N1–N6.** This lane is local-file only until the schema is stable.\r\n- ❌ **Do not mutate the existing graph JSONL.** Cards are derivative; the source stays read-only.\r\n- ❌ **Do not add SurrealDB.** BSL 1.1 license + 5th-datastore overlap with Postgres/Qdrant/Neo4j/CouchDB/Redis. Research spike only, never integration.\r\n- ❌ **Do not return raw JSONL through MCP tools.** Tools return cards. The agent never sees a 10,000-line blob.\r\n- ❌ **Do not run CUDA Graphs on dynamic shapes.** Reserve for repeated embedding batches (128/256/512 tokens) and rerank pairs (16–64). Skip for JSON parsing, file I/O, small graph traversal.\r\n- ❌ **Do not cache parser outputs in Bitfrost.** Cache `summary(card_hash)`, `cluster_rollup(cluster_hash)`, `context_pack(query_hash + kb_snapshot_hash)`, `answer(semantic_query_hash + kb_snapshot_hash)`. Raw parses are deterministic and cheap.\r\n\r\n### LangGraph-style pipeline (resumable, every node writes a file)\r\n\r\n```\r\nload_jsonl\r\n  → parse_validate     (graph_file_cards.report.json + invalid.jsonl)\r\n  → build_cards        (graph_file_cards.jsonl)\r\n  → score_cards        (graph_file_cards.rank.json)\r\n  → sparse_index       (Fuse + BM25, local)\r\n  → embedding_jobs     (jsonl, deferred to N9)\r\n  → qdrant_upsert      (deferred to N9)\r\n  → hypergraph_join    (existing 4-lane edges, A/B/C/D)\r\n  → retrieve_context   (ACE pulls top-K cards)\r\n  → synthesize_answer  (Gemma4/Qwen sees only cards + L-cards)\r\n  → log_trace          (yorha.toolsUsed + retrieval audit)\r\n```\r\n\r\n### CPU vs GPU split\r\n\r\n| CPU (Node/Go) | GPU (LibTorch via N-API) | Gemma4 |\r\n|---|---|---|\r\n| rg / git diff / fd discovery | embedding batches (32–128) | changed-chunk summaries (KV-cache-friendly system prompt) |\r\n| markdown + JSONL parsing | dense vector similarity (rerank) | tag suggestions / classifier |\r\n| frontmatter + heading chunking | clustering / autoencoding | rollup synthesis (cluster → topic → daily) |\r\n| chunk_id / card_id generation | repeated dot-product batches | TODO extraction from changed text |\r\n| sha256 / hash manifests | CUDA Graphs **only for fixed shapes** | raw retrieval answer (top-K cards in) |\r\n\r\n### SurrealDB note (recorded for future audits)\r\n\r\nLicense is **BSL 1.1**, not MIT/Apache. Free for self-hosted production including commercial; restriction is no managed-DBaaS resale. Converts to Apache 2.0 four years after each release. Treat as research spike — adding a 5th live datastore overlapping Postgres+Qdrant+Neo4j+CouchDB has no clear gap to fill right now.",
+      "text": "**Position in build order**: After KB Step 6 (manifest hashes byte-stable), parallel with Step 7 (summarize). Operates on `memory/graph/codebase-graph.jsonl` rows that are already produced by `graphify:daily`.\r\n\r\n**Core rule**: Make notecards first → search notecards second → embed notecards third → only then synthesize with the LLM. Raw 10,000-line JSONL never reaches Gemma4 or Claude.\r\n\r\n### Why this lane exists\r\n\r\nThe `graph_node` rows from graphify already carry: file path, kind, zone, tags, hash, summary, line count, auth/Zod flags, exports, fan-in/out, risk score, neighbors. That's enough metadata to build **token-compressed retrieval cards** before any LLM token is spent. Today, ACE retrieval pulls full chunks; with notecards it can pull 80–120 token cards per file and only fetch fu",
+      "source": "58_26_next_steps_graphanalysis_ingestion_analysis.txt",
+      "hasVector": true
+    },
+    {
+      "id": "023ae7c3181a79ff",
+      "title": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/performance",
+      "text": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/performance\n\n## Snapshot",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\performance\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "023f71fd6a387629",
+      "title": "🔗 Frontend Integration",
+      "text": "🔗 Frontend Integration\n\n### Evidence Page with Backend\r\n\r\n**`routes/(yorha)/evidence/+page.ts`** - Load function:\r\n```typescript\r\nexport const load: PageLoad = async ({ fetch }) => {\r\n const res = await fetch(`/api/evidence/CASE-001`);\r\n const { items, connections } = await res.json();\r\n return { items, connections, caseId: 'CASE-001' };\r\n};\r\n```\r\n\r\n**`routes/(yorha)/evidence/+page.svelte`** - Component:\r\n```svelte\r\n<script>\r\n import EvidenceBoard from '$lib/ui/EvidenceBoard.svelte';\r\n export let data;\r\n\r\n async function savePositions(items) {\r\n await fetch(`/api/evidence/${data.caseId}`, {\r\n method: 'PATCH',\r\n body: JSON.stringify({ items }),\r\n });\r\n }\r\n</script>\r\n\r\n<EvidenceBoard\r\n items={data.items}\r\n connections={data.connections}\r\n onSave={savePositions}\r\n/>\r\n```\r\n\r\n---",
+      "source": "deeds_labs\\archived-dead-code\\dead-lib-dirs\\ui\\README_BACKEND_INTEGRATION.md",
+      "hasVector": true
+    },
+    {
+      "id": "024f8973c0da4e20",
+      "title": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/api-legacy/api/errors/stream",
+      "text": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/api-legacy/api/errors/stream\n\n## Snapshot",
+      "source": "deeds_labs\\api-legacy\\api\\errors\\stream\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02611fa6e5886c23",
+      "title": "[12.0.1] - 2026-04-08",
+      "text": "[12.0.1] - 2026-04-08\n\n## 🔴 Hotfix: MCP server crashed with `Cannot find module 'bun:sqlite'` under Node",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "026319be52caef60",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"core\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"stub-ui-subdirs core\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/frontend/svelte4-archive/components/stub-ui-subdirs/core/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\frontend\\svelte4-archive\\components\\stub-ui-subdirs\\core\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02660f795d104c53",
+      "title": "AGENTS.md — `deeds_labs/frontend/svelte4-archive/components/stub-ui-subdirs/modular`",
+      "text": "AGENTS.md — `deeds_labs/frontend/svelte4-archive/components/stub-ui-subdirs/modular`\n\n<!-- AGENTS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->\n\n> Directory: deeds_labs/frontend/svelte4-archive/components/stub-ui-subdirs/modular",
+      "source": "deeds_labs\\frontend\\svelte4-archive\\components\\stub-ui-subdirs\\modular\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "026f931d5ddb4e15",
+      "title": "- `read_file({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/card/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/card/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/card/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/card/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\ui\\card\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0270849ffd85b308",
+      "title": "LLMS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/textarea`",
+      "text": "LLMS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/textarea`\n\n# LLMS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/textarea`",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\ui\\textarea\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0276c4d0906fd014",
+      "title": "3. Concurrency Governance & Thread Locks",
+      "text": "3. Concurrency Governance & Thread Locks\n\n> [!CRITICAL]\n> **Strict No-Overlap Rule**: Concurrent invocations of high-overhead CUDA kernels or native tensor operations are strictly forbidden.\n\n1. **Javascript Queue Lock**: All native addon entrypoints mapped in [binding.cc](file:///c:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/binding.cc) (specifically PageRank, SOM training, KMeans, and Autoencoders) must be wrapped under an async queue mutex in Node.js.\n2. **Serialized Execution**: If a somatic centroid routing calculation is requested while an LLM synthesis generation is active, the somatic job must wait or fall back gracefully to CPU calculations.\n\n---",
+      "source": "docs\\architecture\\vram-hygiene-policy.md",
+      "hasVector": true
+    },
+    {
+      "id": "027b97529e921d16",
+      "title": "🔧 Integration Points",
+      "text": "🔧 Integration Points\n\n### VS Code Tasks (Already Exist)\r\n\r\n**Location**: [`.vscode/tasks.json`](.vscode/tasks.json)\r\n\r\n**GPU Audit Tasks** (lines 1830-1926):\r\n- 🔥 Audit: Full GPU Audit\r\n- 🔥 Audit: GPU Audit (Half-Precision)\r\n- 🔥 Audit: Latest Report (GET)\r\n- 🤖 Audit: Gemma Planner\r\n- 🧠 Graph: Analyze (PageRank + Communities)\r\n- 🔬 Codebase: GPU Analysis (K-Means/Duplicates)\r\n\r\n**Import Audit Tasks** (lines 1422-1484):\r\n- 🔍 Audit: Single Module (9-Layer)\r\n- 🔍 Audit: Orphan Scan (All Components)\r\n- 🔍 Audit: Full 10-Layer Scan\r\n\r\n### PowerShell Script (Foundation)\r\n\r\n**File**: [`scripts/audit-9layer-imports.ps1`](scripts/audit-9layer-imports.ps1) (219 lines)\r\n\r\nAll 10 layers implemented:\r\n- L1-L3: Standard imports (static/dynamic/require)\r\n- L4: @vite-ignore variable imports (CRITICA",
+      "source": "docs\\status\\AUDIT_IMPLEMENTATION_COMPLETE.md",
+      "hasVector": true
+    },
+    {
+      "id": "029772b692b7d3c4",
+      "title": "Claude-Mem tarjoaa **beta-kanavan** kokeellisilla ominaisuuksilla kuten **Endless Mode** (biomimeettinen muistiarkkitehtuuri pidennetyille istunnoille). Vaihda vakaan ja beta-version välillä web-katselukäyttöliittymästä osoitteessa http://localhost:37777 → Settings.\n\nKatso **[Beta-ominaisuuksien dokumentaatio](https://docs.claude-mem.ai/beta-features)** yksityiskohdista Endless Moden ja sen kokeilemisen osalta.\n\n---",
+      "text": "Claude-Mem tarjoaa **beta-kanavan** kokeellisilla ominaisuuksilla kuten **Endless Mode** (biomimeettinen muistiarkkitehtuuri pidennetyille istunnoille). Vaihda vakaan ja beta-version välillä web-katselukäyttöliittymästä osoitteessa http://localhost:37777 → Settings.\n\nKatso **[Beta-ominaisuuksien dokumentaatio](https://docs.claude-mem.ai/beta-features)** yksityiskohdista Endless Moden ja sen kokeilemisen osalta.\n\n---\n\n## Järjestelmävaatimukset",
+      "source": "claude-mem\\docs\\i18n\\README.fi.md",
+      "hasVector": true
+    },
+    {
+      "id": "029c081fcb7c687e",
+      "title": "Karpathy Synthesis Lane - Production",
+      "text": "Karpathy Synthesis Lane - Production\n\n- limit: 50\r\n- runId: synthesis_1779407314664\r\n- mode: WRITE\r\n- force: false",
+      "source": "docs\\graph\\batch-gpu-analysis-report.md",
+      "hasVector": true
+    },
+    {
+      "id": "029c99c656679142",
+      "title": "LLMS.md — `deeds_labs/frontend/features-archive/ai/services/types`",
+      "text": "LLMS.md — `deeds_labs/frontend/features-archive/ai/services/types`\n\n# LLMS.md — `deeds_labs/frontend/features-archive/ai/services/types`",
+      "source": "deeds_labs\\frontend\\features-archive\\ai\\services\\types\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02abca46b74f6b1a",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/search/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/search/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/search/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/search/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\search\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02b13f822614c604",
+      "title": "### Modified Files\r\n1. `scripts/cache-warmup.mjs`\r\n   - Line 131: Added 'evidence-analysis' to validDomains\r\n   - Lines 202-222: Fixed async response handling\r\n\r\n### New Files\r\n1. `CACHE_WARMUP_STATUS.md` (this file)\r\n\r\n### Previously Modified (Session Dependencies)\r\n1. `src/lib/server/cache/warm-up.ts` — Added evidence-analysis queries (user)\r\n2. `src/routes/api/cache/warm-up/+server.ts` — Added domain to Zod schema\r\n3. `src/lib/components/monitoring/CacheWarmUpSimple.svelte` — UI component\r\n4. `src/routes/(app)/cache-monitor/+page.svelte` — Integrated UI component\r\n\r\n---",
+      "text": "### Modified Files\r\n1. `scripts/cache-warmup.mjs`\r\n   - Line 131: Added 'evidence-analysis' to validDomains\r\n   - Lines 202-222: Fixed async response handling\r\n\r\n### New Files\r\n1. `CACHE_WARMUP_STATUS.md` (this file)\r\n\r\n### Previously Modified (Session Dependencies)\r\n1. `src/lib/server/cache/warm-up.ts` — Added evidence-analysis queries (user)\r\n2. `src/routes/api/cache/warm-up/+server.ts` — Added domain to Zod schema\r\n3. `src/lib/components/monitoring/CacheWarmUpSimple.svelte` — UI component\r\n4. `src/routes/(app)/cache-monitor/+page.svelte` — Integrated UI component\r\n\r\n---\n\n## 🎯 Next Actions",
+      "source": "CACHE_WARMUP_STATUS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02b25302bb18b930",
+      "title": "AGENTS.md — `deeds_labs/frontend/svelte4-archive/components/stub-archive/test-demo/demo`",
+      "text": "AGENTS.md — `deeds_labs/frontend/svelte4-archive/components/stub-archive/test-demo/demo`\n\n<!-- AGENTS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->\n\n> Directory: deeds_labs/frontend/svelte4-archive/components/stub-archive/test-demo/demo",
+      "source": "deeds_labs\\frontend\\svelte4-archive\\components\\stub-archive\\test-demo\\demo\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02b3dedbacb85f9b",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"archived-components\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"deeds_labs archived-components\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/archived-components/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\archived-components\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02bb250e49554089",
+      "title": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/metrics",
+      "text": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/metrics\n\n## Snapshot",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\metrics\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02bdad5e94d6af6b",
+      "title": "[3.9.12] - 2025-10-04",
+      "text": "[3.9.12] - 2025-10-04\n\n## What's New",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "02bf23f02b4eca0e",
+      "title": "ההגדרות מנוהלות ב-`~/.claude-mem/settings.json` (נוצר אוטומטית עם ברירות מחדל בהפעלה הראשונה). הגדר מודל AI, פורט worker, ספריית נתונים, רמת לוג, והגדרות הזרקת הקשר.\n\nראה **[מדריך הגדרות](https://docs.claude-mem.ai/configuration)** לכל ההגדרות הזמינות ודוגמאות.\n\n---",
+      "text": "ההגדרות מנוהלות ב-`~/.claude-mem/settings.json` (נוצר אוטומטית עם ברירות מחדל בהפעלה הראשונה). הגדר מודל AI, פורט worker, ספריית נתונים, רמת לוג, והגדרות הזרקת הקשר.\n\nראה **[מדריך הגדרות](https://docs.claude-mem.ai/configuration)** לכל ההגדרות הזמינות ודוגמאות.\n\n---\n\n## פיתוח",
+      "source": "claude-mem\\docs\\i18n\\README.he.md",
+      "hasVector": true
+    },
+    {
+      "id": "02c85f601b99752a",
+      "title": "Retrieval / Rerank Hints",
+      "text": "Retrieval / Rerank Hints\n\n> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.\n\n- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_\n- **Paired tests**: 5/24 files have paired tests",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\server\\db\\schema\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02cf69b0e9b24066",
+      "title": "设置在 `~/.claude-mem/settings.json` 中管理(首次运行时自动创建默认设置)。可配置 AI 模型、worker 端口、数据目录、日志级别和上下文注入设置。\n\n详见 **[配置指南](https://docs.claude-mem.ai/configuration)** 了解所有可用设置和示例。\n\n---",
+      "text": "设置在 `~/.claude-mem/settings.json` 中管理(首次运行时自动创建默认设置)。可配置 AI 模型、worker 端口、数据目录、日志级别和上下文注入设置。\n\n详见 **[配置指南](https://docs.claude-mem.ai/configuration)** 了解所有可用设置和示例。\n\n---\n\n## 开发",
+      "source": "claude-mem\\docs\\i18n\\README.zh.md",
+      "hasVector": true
+    },
+    {
+      "id": "02cfd0e189b724dc",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/audit/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/audit/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/audit/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/audit/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\audit\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02db9392f4e32836",
+      "title": "Granite-Docling-258M Integration Complete\r\nWhat was done:\r\nStep\tFile\tChange\r\nModel pull\tOllama\tibm/granite-docling:258m (521 MB) registered\r\nModel constant\tmodel-ids.ts:54\tSERVER_GRANITE_DOCLING_MODEL\r\nEnv config\tenv.server.ts:41-43\tGRANITE_DOCLING_MODEL + GRANITE_DOCLING_ENABLED (default: true)\r\nWrapper\tgranite-docling.ts\tNEW — analyzeImageWithGraniteDocling() + isGraniteDoclingAvailable() + DocTags parser\r\nEvidence upload\tupload/+server.ts\tGranite-Docling tried before Tesseract OCR for image files\r\nACE ingest\tace/ingest/+server.ts\tSame pattern — Granite-Docling before OCR for images\r\nDashboard\tAlready wired\tgranite_docling stage label in GrpcStatusAdapter.ts\r\nBuild\tvite build\tExit 0\r\nImage extraction priority chain (new):\r\n\r\nImage uploaded → Granite-Docling-258M (layout, tables, equations)\r\n                  ↓ fails/too short\r\n                Tesseract OCR (flat text)\r\n                  ↓ fails/too short\r\n                Gemma4 VLM (visual description)\r\nyes test it do we have resizement for gemma4 web search what the vision transformer is it liek siglip fetch the documents api for gemma4 and keep in directory under next_steps\r\n\r\nThe PDF→PNG→Granite-Docling pipeline works end-to-end (1.5s inference). The model hallucinated because the test PDF had no embedded fonts (blank rendering), but real scanned PDFs with embedded images will work perfectly.\r\nNow let me implement everything. First, the reference doc, then the PDF→image converter, then wire the full pipeline.\r\nUpdate Todos\r\nSave IBM Granite-Docling reference docs to next_steps\r\nAdd PDF→image conversion for Granite-Docling processing\r\nWire Granite-Docling output through full pipeline (LangExtract → RAG/KAG/DAG → semantic search)\r\nVerify vite build passes\r\nRead c:\\Users\\james\\Videos\\deeds-web-app\\next_steps\\active\\GRANITE_DOCLING_258M_INTEGRATION_2026-04-05.md\r\nGood, the next_steps doc already exists with good content. Let me update it with the IBM reference information and implementation status, then move to the PDF test with a real legal PDF.\r\nLet me first find a legal PDF to test with:\r\nGlobpattern: \"**/*.pdf\"\r\nFound 1 file\r\nand we'll need a pdf viewer that shows us all pdf images like adobe acrobat pdf viewer svelte 5 runes bits-ui newer components\r\nre's the full assessment of all remaining excluded orphan files:\r\nARCHIVE (4 files — dead, superseded)\r\nFile\tReason\r\ndb/index-unified.ts\tPhantom deps (connection-manager.js), superseded by client.ts\r\ndb/pgvector-service.ts\tWrong driver (postgres.js), redundant with Qdrant vector search\r\ndb/phase90-helpers.ts\t30 schema mismatches, zero consumers\r\ncomponents/ui/enhanced-bits.ts\tImports from phantom BitsDropdown/ dir\r\nREWRITE (1 directory — unique feature worth wiring)\r\nDir\tWhat\tEffort\r\nfeatures/evidence-command-center/\t5 clean Svelte 5 components — NES-style multi-pane evidence dashboard (board/graph/chat) with keyboard shortcuts\t~30 min to wire to a route\r\nKEEP EXCLUDED (already active via dynamic imports)\r\nItem\tConsumer\r\nwebgpu/**\tRoot layout (every page)\r\nworkers/queue-worker.ts\tDifferent from server/queue/queue-worker.ts — this one is the orphan\r\nLet me archive the 4 dead files and then wire the evidence-command-center.\r\nUpdate Todos:\r\nInvestigate remaining excluded files for fixability\r\nFix viable files and un-exclude them\r\nRun svelte-check + Playwright to verify\r\nCommit + push batch 4 un-excludes\r\nArchive 4 dead orphan files to deeds_labs\r\nWire evidence-command-center to a route\r\nRun svelte-check + Playwright final verification\r\nCommit + push\r\nBash Create archive directory for dead orphan files\r\nIN\r\nmkdir -p /c/Users/james/Videos/deeds-web-app/deeds_labs/dead-orphans-2026-04-06 && ls /c/Users/james/Videos/deeds-web-app/deeds_labs/dead-orphans-2026-04-06\r\nAll done. Here's the full results summary:\r\nUS Constitution — Full Granite-Docling Pipeline Complete\r\nExtraction Results (52 pages)\r\nMetric\tValue\r\nTotal pages\t52\r\nTotal blocks\t388 (avg 7.5/page)\r\nTotal chars\t69,930 (avg 1,345/page)\r\nTotal time\t137.4s (avg 2.64s/page)\r\nModel\tibm/granite-docling:258m\r\nBlock Type Distribution\r\nparagraph: 281 (72.4%)\r\nother: 48 (12.4%) — page footers, code elements\r\nheading: 47 (12.1%) — Articles, Amendments, sections\r\nequation: 7 (1.8%) — decorative elements\r\ntable: 4 (1.0%) — signers table, index\r\nlist: 1 (0.3%)\r\nStorage Pipeline\r\nService\tStatus\tDetails\r\nMinIO\tPDF + JSON stored\tlegal-library/uploads/raw/{id}.pdf (564 KB) + extraction JSON (137 KB)\r\nPostgreSQL\t46 nodes, 292 chunks\tlibrary_documents + legal_nodes (7 Articles, 27 Amendments, sections) + legal_chunks\r\nQdrant\t296 vectors\tlegal_documents collection, 768-dim embeddinggemma, tagged with page/type/jurisdiction\r\nRedis\tCached\tDocument metadata + per-page stats (1hr TTL)\r\nLibrary Viewing\r\nDocument ID: a683d98d-f853-412c-a51f-8f4d74eb2447\r\nLibrary URL: /library/a683d98d-f853-412c-a51f-8f4d74eb2447\r\nReader URL: /library/a683d98d-f853-412c-a51f-8f4d74eb2447/reader\r\nThe Constitution is now in your legal corpus — viewable in the library with PDF viewer, searchable via Qdrant vector search, and structured with all 7 Articles + 27 Amendments as individual nodes. Pages 49-50 had minimal content (page numbers only). The richest page was page 6 with 17 blocks and 2,352 chars.\r\ntake screenshot plapywright test of this",
+      "text": "Granite-Docling-258M Integration Complete\r\nWhat was done:\r\nStep\tFile\tChange\r\nModel pull\tOllama\tibm/granite-docling:258m (521 MB) registered\r\nModel constant\tmodel-ids.ts:54\tSERVER_GRANITE_DOCLING_MODEL\r\nEnv config\tenv.server.ts:41-43\tGRANITE_DOCLING_MODEL + GRANITE_DOCLING_ENABLED (default: true)\r\nWrapper\tgranite-docling.ts\tNEW — analyzeImageWithGraniteDocling() + isGraniteDoclingAvailable() + DocTags parser\r\nEvidence upload\tupload/+server.ts\tGranite-Docling tried before Tesseract OCR for image files\r\nACE ingest\tace/ingest/+server.ts\tSame pattern — Granite-Docling before OCR for images\r\nDashboard\tAlready wired\tgranite_docling stage label in GrpcStatusAdapter.ts\r\nBuild\tvite build\tExit 0\r\nImage extraction priority chain (new):\r\n\r\nImage uploaded → Granite-Docling-258M (layout, tables, equation",
+      "source": "4526_gran_ibm.txt",
+      "hasVector": true
+    },
+    {
+      "id": "02df2d195de7e47d",
+      "title": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/svelte4-archive",
+      "text": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/frontend/svelte4-archive\n\n## Snapshot",
+      "source": "deeds_labs\\frontend\\svelte4-archive\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "02e15aaa64e9547b",
+      "title": "Windows Installation",
+      "text": "Windows Installation\n\nWindows users get full support via PowerShell scripts. The installer automatically detects Windows and installs the appropriate scripts.\n\n### Enable Script Execution (if needed)\n\nPowerShell may require you to enable script execution:\n\n```powershell\nSet-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser\n```\n\n### Step-by-Step for Windows\n\n```powershell",
+      "source": "claude-mem\\cursor-hooks\\STANDALONE-SETUP.md",
+      "hasVector": true
+    },
+    {
+      "id": "02e1bdb43a4d9ec0",
+      "title": "---\nname: how-it-works\ndescription: Explain how claude-mem captures observations, when memory injection kicks in, and where data lives. Use when the user asks \"how does claude-mem work?\" or \"what is this thing doing?\".\n---",
+      "text": "---\nname: how-it-works\ndescription: Explain how claude-mem captures observations, when memory injection kicks in, and where data lives. Use when the user asks \"how does claude-mem work?\" or \"what is this thing doing?\".\n---\n\n# How claude-mem works",
+      "source": "claude-mem\\plugin\\skills\\how-it-works\\SKILL.md",
+      "hasVector": true
+    },
+    {
+      "id": "02f6e7fb7c0e7451",
+      "title": "| Need | Import |\n|------|--------|\n| `db` client | `import { db } from '$lib/server/db/client'` *(no `.js`)* |\n| Schema | `import { ... } from '$lib/server/db/schema-postgres.js'` *(yes `.js`)* |\n| pgvector column | `import { vector, halfvec, sparsevec } from 'drizzle-orm/pg-core'` (native) |\n| Distance fns | `import { cosineDistance, l2Distance } from 'drizzle-orm'` |\n\nDo **not** use `pgvector/drizzle-orm` (legacy experimental). Do **not**\nadd `.js` to `db/client` (breaks named export resolution despite the\ngeneral `.js` rule).",
+      "text": "| Need | Import |\n|------|--------|\n| `db` client | `import { db } from '$lib/server/db/client'` *(no `.js`)* |\n| Schema | `import { ... } from '$lib/server/db/schema-postgres.js'` *(yes `.js`)* |\n| pgvector column | `import { vector, halfvec, sparsevec } from 'drizzle-orm/pg-core'` (native) |\n| Distance fns | `import { cosineDistance, l2Distance } from 'drizzle-orm'` |\n\nDo **not** use `pgvector/drizzle-orm` (legacy experimental). Do **not**\nadd `.js` to `db/client` (breaks named export resolution despite the\ngeneral `.js` rule).\n\n## Manual SQL for index features Drizzle can't express",
+      "source": ".claude\\skills\\drizzle-schema-review\\SKILL.md",
+      "hasVector": true
+    },
+    {
+      "id": "0300dcfc4d23344d",
+      "title": "Populate Redis wiki notes first (uses TurboQuant/Ollama for AI summaries):",
+      "text": "Populate Redis wiki notes first (uses TurboQuant/Ollama for AI summaries):\n\nnode scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph\nnode scripts/tests/deep-directory-audit.mjs routes/api --direct --no-graph\nnode scripts/tests/deep-directory-audit.mjs lib --direct --no-graph --depth 3",
+      "source": "docs\\CODEBASE_DIRECTORY_MAP.md",
+      "hasVector": true
+    },
+    {
+      "id": "031db91771dd5a02",
+      "title": "Routes",
+      "text": "Routes\n\n- `/detective/vision` - Complete vision analysis interface\r\n- API endpoints expected:\r\n - `POST /api/vision/image/analyze`\r\n - `POST /api/vision/video/analyze`\r\n - `POST /api/vision/similarity/search`",
+      "source": "deeds_labs\\frontend\\svelte4-archive\\components\\vision\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "032019ce1bf0345c",
+      "title": "**Plugin is already fully built** at `openclaw/src/index.ts` (~1000 lines). Has event hooks, SSE observation feed, MEMORY.md sync, slash commands. Only wiring into the installer is needed.\n\n### What to implement\n\n1. **Wire OpenClaw into the npx installer**:\n   - Detect `~/.openclaw/` directory\n   - Copy pre-built plugin from `openclaw/dist/` (built in Phase 2) to OpenClaw plugins location\n   - Register in `~/.openclaw/openclaw.json` under `plugins.claude-mem`\n   - Configure worker port, project name, syncMemoryFile\n   - Optionally prompt for observation feed setup (channel type + target ID)\n\n2. **Add OpenClaw to IDE selection TUI** with hint about messaging channel support\n\n### Verification\n\n- `npx claude-mem install --ide openclaw` registers the plugin\n- OpenClaw gateway loads the plugin on restart\n- Observations are recorded from OpenClaw sessions\n- MEMORY.md syncs to agent workspaces\n\n### Anti-patterns\n\n- Do NOT rebuild the OpenClaw plugin from source at install time — it ships pre-built from Phase 2\n- Do NOT modify the plugin's event handling — it's battle-tested\n\n---",
+      "text": "**Plugin is already fully built** at `openclaw/src/index.ts` (~1000 lines). Has event hooks, SSE observation feed, MEMORY.md sync, slash commands. Only wiring into the installer is needed.\n\n### What to implement\n\n1. **Wire OpenClaw into the npx installer**:\n   - Detect `~/.openclaw/` directory\n   - Copy pre-built plugin from `openclaw/dist/` (built in Phase 2) to OpenClaw plugins location\n   - Register in `~/.openclaw/openclaw.json` under `plugins.claude-mem`\n   - Configure worker port, project name, syncMemoryFile\n   - Optionally prompt for observation feed setup (channel type + target ID)\n\n2. **Add OpenClaw to IDE selection TUI** with hint about messaging channel support\n\n### Verification\n\n- `npx claude-mem install --ide openclaw` registers the plugin\n- OpenClaw gateway loads the plugin ",
+      "source": "claude-mem\\.plan\\npx-distribution.md",
+      "hasVector": true
+    },
+    {
+      "id": "0324eb2e3143a773",
+      "title": "- **Obsidian Web Clipper** is a browser extension that converts web articles to markdown. Very useful for quickly getting sources into your raw collection.\r\n- **Download images locally.** In Obsidian Settings → Files and links, set \"Attachment folder path\" to a fixed directory (e.g. `raw/assets/`). Then in Settings → Hotkeys, search for \"Download\" to find \"Download attachments for current file\" and bind it to a hotkey (e.g. Ctrl+Shift+D). After clipping an article, hit the hotkey and all images get downloaded to local disk. This is optional but useful — it lets the LLM view and reference images directly instead of relying on URLs that may break. Note that LLMs can't natively read markdown with inline images in one pass — the workaround is to have the LLM read the text first, then view some or all of the referenced images separately to gain additional context. It's a bit clunky but works well enough.\r\n- **Obsidian's graph view** is the best way to see the shape of your wiki — what's connected to what, which pages are hubs, which are orphans.\r\n- **Marp** is a markdown-based slide deck format. Obsidian has a plugin for it. Useful for generating presentations directly from wiki content.\r\n- **Dataview** is an Obsidian plugin that runs queries over page frontmatter. If your LLM adds YAML frontmatter to wiki pages (tags, dates, source counts), Dataview can generate dynamic tables and lists.\r\n- The wiki is just a git repo of markdown files. You get version history, branching, and collaboration for free.",
+      "text": "- **Obsidian Web Clipper** is a browser extension that converts web articles to markdown. Very useful for quickly getting sources into your raw collection.\r\n- **Download images locally.** In Obsidian Settings → Files and links, set \"Attachment folder path\" to a fixed directory (e.g. `raw/assets/`). Then in Settings → Hotkeys, search for \"Download\" to find \"Download attachments for current file\" and bind it to a hotkey (e.g. Ctrl+Shift+D). After clipping an article, hit the hotkey and all images get downloaded to local disk. This is optional but useful — it lets the LLM view and reference images directly instead of relying on URLs that may break. Note that LLMs can't natively read markdown with inline images in one pass — the workaround is to have the LLM read the text first, then view some",
+      "source": "517_26_llmwikikarapathy.txt",
+      "hasVector": true
+    },
+    {
+      "id": "03351baa29fba5a5",
+      "title": ".\\scripts\\security\\monitor-claude-mem.ps1 -Loop -AutoKill\r\n```\r\n\r\nIf you want, I can:\r\n- run the firewall block on this machine now (I can execute the PowerShell command), or\r\n- add an example nginx proxy config and a small script to run it in WSL, or\r\n- search the repo/config for any references to claude-mem storage paths and surface them.",
+      "text": ".\\scripts\\security\\monitor-claude-mem.ps1 -Loop -AutoKill\r\n```\r\n\r\nIf you want, I can:\r\n- run the firewall block on this machine now (I can execute the PowerShell command), or\r\n- add an example nginx proxy config and a small script to run it in WSL, or\r\n- search the repo/config for any references to claude-mem storage paths and surface them.",
+      "source": "docs\\security\\CLAUDE_MEM.md",
+      "hasVector": true
+    },
+    {
+      "id": "034485c9b005446b",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"nes\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"ui nes\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/nes/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": ".svelte-error-fixes-backup\\sveltekit-frontend\\src\\lib\\components\\ui\\nes\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "035aa2a7fec2c54b",
+      "title": "Falls back to Ollama :11434 (legacy fallback lane) automatically if TurboQuant unhealthy",
+      "text": "Falls back to Ollama :11434 (legacy fallback lane) automatically if TurboQuant unhealthy\n\n```\r\n\r\n---",
+      "source": "docs\\CODEBASE_INDEXING_PIPELINE.md",
+      "hasVector": true
+    },
+    {
+      "id": "035c522ebbbcdd5d",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/v1/legal/session/create/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/v1/legal/session/create/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/v1/legal/session/create/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/v1/legal/session/create/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\v1\\legal\\session\\create\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0361210742dfdd6e",
+      "title": "Exclude large binary reports",
+      "text": "Exclude large binary reports\n\nrg -u \"pattern\" --iglob \"!docs/reports/rg_*.txt\"\n```",
+      "source": "docs\\devtools_rg.md",
+      "hasVector": true
+    },
+    {
+      "id": "037012482cc4474e",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/ai/summarize/cache/[key]/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/ai/summarize/cache/[key]/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/ai/summarize/cache/[key]/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/ai/summarize/cache/[key]/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\ai\\summarize\\cache\\[key]\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "037cb9a27af5e9cf",
+      "title": "Performance Impact",
+      "text": "Performance Impact\n\n### Size Comparison (Real Test Data)\r\n```\r\nJSON:     1,390 bytes\r\nProtobuf:   264 bytes\r\nSavings:   81.0% reduction\r\n```\r\n\r\n### Storage Impact\r\n- **Before**: 1.4 KB JSONB per evidence item\r\n- **After**: 0.3 KB protobuf + 1.4 KB JSONB (dual storage for compatibility)\r\n- **Future**: Can drop JSONB after migration → 81% storage savings\r\n\r\n### Speed Impact\r\n- **Serialization**: ~2ms (negligible in 2-5 second upload pipeline)\r\n- **Deserialization**: ~1ms\r\n- **Network**: 81% smaller → faster gRPC transfers\r\n\r\n---",
+      "source": "docs\\status\\VLM_PROTOBUF_INTEGRATION_STATUS.md",
+      "hasVector": true
+    },
+    {
+      "id": "037cc690ff5106e3",
+      "title": "Search, context, and instructions",
+      "text": "Search, context, and instructions\n\n| Legacy path                        | Native server-beta replacement | Adapter | Status                                |\n| ---------------------------------- | ------------------------------ | ------- | ------------------------------------- |\n| `GET  /api/search`                 | `POST /v1/search`              | _(none)_ | unsupported (legacy GET — see note 1) |\n| `GET  /api/timeline`               | _(none yet)_                   | _(none)_ | unsupported                           |\n| `GET  /api/decisions`              | _(none yet)_                   | _(none)_ | unsupported                           |\n| `GET  /api/changes`                | _(none yet)_                   | _(none)_ | unsupported                           |\n| `GET  /api/how-it-works`   ",
+      "source": "claude-mem\\docs\\server-beta-parity-map.md",
+      "hasVector": true
+    },
+    {
+      "id": "0389628fc25d5306",
+      "title": "- Postgres: source of truth.\n- Redis: cache and ephemeral coordination.\n- Qdrant: vector retrieval.\n- Neo4j: graph structure and traversal.\n- CouchDB: flexible document memory.\n- Sidecars: compute and media execution.",
+      "text": "- Postgres: source of truth.\n- Redis: cache and ephemeral coordination.\n- Qdrant: vector retrieval.\n- Neo4j: graph structure and traversal.\n- CouchDB: flexible document memory.\n- Sidecars: compute and media execution.\n\n## Non-Goals",
+      "source": "docs\\architecture\\subgraph-instruction-programming-kag-ace-topology.md",
+      "hasVector": true
+    },
+    {
+      "id": "0389b5452057662b",
+      "title": "Prevents `RangeError: Invalid string length` when running long-running audit/agent tasks that emit multi-MB markdown.\r\n\r\nHelper: `sveltekit-frontend/scripts/lib/bounded-output.mjs` — `writeBoundedOutput({label, text, root, maxChars, silent})` and `writeSummary({label, summaryLines, fullText})`. Default `MAX_STDOUT_CHARS=12_000`, env-overridable.\r\n\r\nScripts with `--quiet` / `--summary-only` flags:\r\n- `agentic-batch-fix.mjs` (parallel hotspot fix planner)\r\n- `generate-codebase-directory-map.mjs`\r\n- `tests/deep-directory-audit.mjs`\r\n\r\nVS Code task pattern: `mkdir -p logs/task-output && node X.mjs --quiet > logs/task-output/X-latest.log 2>&1 && tail -40 logs/task-output/X-latest.log`. `.gitignore` excludes `logs/task-output/` and `logs/*.log`.\r\n\r\nNPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `audit:dirs:map:{quiet,summary}`.\r\n\r\n---",
+      "text": "Prevents `RangeError: Invalid string length` when running long-running audit/agent tasks that emit multi-MB markdown.\r\n\r\nHelper: `sveltekit-frontend/scripts/lib/bounded-output.mjs` — `writeBoundedOutput({label, text, root, maxChars, silent})` and `writeSummary({label, summaryLines, fullText})`. Default `MAX_STDOUT_CHARS=12_000`, env-overridable.\r\n\r\nScripts with `--quiet` / `--summary-only` flags:\r\n- `agentic-batch-fix.mjs` (parallel hotspot fix planner)\r\n- `generate-codebase-directory-map.mjs`\r\n- `tests/deep-directory-audit.mjs`\r\n\r\nVS Code task pattern: `mkdir -p logs/task-output && node X.mjs --quiet > logs/task-output/X-latest.log 2>&1 && tail -40 logs/task-output/X-latest.log`. `.gitignore` excludes `logs/task-output/` and `logs/*.log`.\r\n\r\nNPM scripts: `agent:fix:batch:{quiet,summary}`,",
+      "source": "claude.md",
+      "hasVector": true
+    },
+    {
+      "id": "03949a93ee80ba1d",
+      "title": "---\nname: topology-medic\ndescription: Use proactively when the user asks about graph health, SOM/cluster state, PageRank freshness, ACE blend weights, or Karpathy authority scores. Inspects via TRACE MCP graph tools + Redis cache reads. Recommends reruns; never runs them itself.\ntools: mcp__trace__graph_pagerank_top, mcp__trace__graph_expand_neighborhood, mcp__trace__topology_search_4d, mcp__trace__kag_search, mcp__trace__context_build_kv_packet, Read, Glob, Grep\nmodel: inherit\n---\n\nYou diagnose the health of the codebase intelligence pipeline:\n4-pillar (Neo4j + CouchDB + LibTorch GPU + Qdrant) + ACE scoring +\nSOM topology + Karpathy authority blend.",
+      "text": "---\nname: topology-medic\ndescription: Use proactively when the user asks about graph health, SOM/cluster state, PageRank freshness, ACE blend weights, or Karpathy authority scores. Inspects via TRACE MCP graph tools + Redis cache reads. Recommends reruns; never runs them itself.\ntools: mcp__trace__graph_pagerank_top, mcp__trace__graph_expand_neighborhood, mcp__trace__topology_search_4d, mcp__trace__kag_search, mcp__trace__context_build_kv_packet, Read, Glob, Grep\nmodel: inherit\n---\n\nYou diagnose the health of the codebase intelligence pipeline:\n4-pillar (Neo4j + CouchDB + LibTorch GPU + Qdrant) + ACE scoring +\nSOM topology + Karpathy authority blend.\n\n## Your hard rules",
+      "source": ".claude\\agents\\topology-medic.md",
+      "hasVector": true
+    },
+    {
+      "id": "0397414aa7006adb",
+      "title": "CacheControl==0.13.1  # Make sure to update the license in pyproject.toml for this.\ncolorama==0.4.6\ndistlib==0.3.8\ndistro==1.8.0\nmsgpack==1.0.5\npackaging==21.3\nplatformdirs==3.8.1\npyparsing==3.1.0\npyproject-hooks==1.0.0\nrequests==2.31.0\n    certifi==2023.7.22\n    chardet==5.1.0\n    idna==3.4\n    urllib3==1.26.17\nrich==13.4.2\n    pygments==2.15.1\n    typing_extensions==4.7.1\nresolvelib==1.0.1\nsetuptools==68.0.0\nsix==1.16.0\ntenacity==8.2.2\ntomli==2.0.1\ntruststore==0.8.0\nwebencodings==0.5.1",
+      "text": "CacheControl==0.13.1  # Make sure to update the license in pyproject.toml for this.\ncolorama==0.4.6\ndistlib==0.3.8\ndistro==1.8.0\nmsgpack==1.0.5\npackaging==21.3\nplatformdirs==3.8.1\npyparsing==3.1.0\npyproject-hooks==1.0.0\nrequests==2.31.0\n    certifi==2023.7.22\n    chardet==5.1.0\n    idna==3.4\n    urllib3==1.26.17\nrich==13.4.2\n    pygments==2.15.1\n    typing_extensions==4.7.1\nresolvelib==1.0.1\nsetuptools==68.0.0\nsix==1.16.0\ntenacity==8.2.2\ntomli==2.0.1\ntruststore==0.8.0\nwebencodings==0.5.1",
+      "source": ".python311\\lib\\python3.11\\site-packages\\pip\\_vendor\\vendor.txt",
+      "hasVector": true
+    },
+    {
+      "id": "039ca9bf82d025c0",
+      "title": "Key Findings",
+      "text": "Key Findings\n\n### ✅ Cache Infrastructure Wired\r\n\r\n**Endpoints Using bifrostChat() → Redis L1 + Bifrost L2**:\r\n- `/api/test/cache-demo` ← Now uses gemma3:270m (2.6s)\r\n- `/api/rag/answer` ← RAG pipeline\r\n- `/api/error-brain/diagnose` ← Error analysis\r\n- `/api/codebase-index/analyze` ← Codebase intelligence\r\n\r\n**Configuration**:\r\n- `ENV.BIFROST_ENABLED=true` ✅\r\n- Bifrost: `http://localhost:3040/health` → `{\"status\":\"ok\"}` ✅\r\n\r\n### ⚠️ TurboQuant Missing (Would Give 2-3× Speedup)\r\n\r\n**Status**: Defined but not running on port 8090\r\n**Impact**: gemma4-rotorquant:latest stuck at 34.3s instead of ~11-15s\r\n**Fix**: Install turboquant_plus llama.cpp fork + start llama-server\r\n\r\n### ✅ 4-Pillar Codebase Intelligence System\r\n\r\n**Mapped by Explore Agent** (ad318f9):\r\n1. **Neo4j**: 3,140 CodebaseFile nod",
+      "source": "CACHE_VALIDATION_RESULTS.md",
+      "hasVector": true
+    },
+    {
+      "id": "039d069c35daff3f",
+      "title": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/api-legacy/api/internal/error-brain/knowledge",
+      "text": "<!-- LLMS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T17:39:23.555Z · llms.md spec · regen: npm run llms:write -->\n\n> Directory: deeds_labs/api-legacy/api/internal/error-brain/knowledge\n\n## Snapshot",
+      "source": "deeds_labs\\api-legacy\\api\\internal\\error-brain\\knowledge\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "03a346cecd4eb6b7",
+      "title": "Executive Decision",
+      "text": "Executive Decision\n\nServer beta must own its runtime end to end:\n\n```text\nREST/MCP/hooks -> Server beta HTTP/API layer -> BullMQ observation jobs -> provider generation -> server storage/search\n```\n\nThe worker remains the stable legacy runtime, but Server beta must not depend on `WorkerService`, worker HTTP routes, worker queue consumers, or worker process lifecycle to generate observations.\n\nServer beta should use BullMQ/Valkey as its canonical queue and Postgres as its canonical observation store. SQLite remains the legacy worker/local compatibility store only. Redis/Valkey is runtime infrastructure for jobs, retries, concurrency, and observability, not the source of truth for observations.",
+      "source": "claude-mem\\plans\\2026-05-07-server-beta-independent-bullmq-observation-runtime.md",
+      "hasVector": true
+    },
+    {
+      "id": "03a3f03f7314dd19",
+      "title": "Opret omfattende fejlrapporter med den automatiserede generator:\n\n```bash\ncd ~/.claude/plugins/marketplaces/thedotmack\nnpm run bug-report\n```",
+      "text": "Opret omfattende fejlrapporter med den automatiserede generator:\n\n```bash\ncd ~/.claude/plugins/marketplaces/thedotmack\nnpm run bug-report\n```\n\n## Bidrag",
+      "source": "claude-mem\\docs\\i18n\\README.da.md",
+      "hasVector": true
+    },
+    {
+      "id": "03a5f9488be47441",
+      "title": "multiple (test comp_for) arguments are blocked; keyword unpackings",
+      "text": "multiple (test comp_for) arguments are blocked; keyword unpackings\n\n# that precede iterable unpackings are blocked; etc.",
+      "source": ".python311\\lib\\python3.11\\lib2to3\\Grammar.txt",
+      "hasVector": true
+    },
+    {
+      "id": "03aad3579e2ed28c",
+      "title": "Snapshot",
+      "text": "Snapshot\n\n- 10 file(s), 0 handler(s)\n- Audit score: _(no GPU audit)_\n- 🟠 hardcoded localhost: 4",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\config\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "03b09f2d51609f2f",
+      "title": "Contents",
+      "text": "Contents\n\n| File | What it covers |\n|------|---------------|\n| [ARCHIVE_INDEX.md](ARCHIVE_INDEX.md) | Full index of all legacy-projects entries |\n| [ARCHIVE_MANIFEST.md](ARCHIVE_MANIFEST.md) | Manifest with status/disposition of each legacy project |\n| [ingestion-phase66-README.md](ingestion-phase66-README.md) | Enterprise GPU ingestion pipeline (PDF/DOCX/image, 11 Python workers, full Docker Compose) — now at [github.com/semaj90/deeds-ingestion-pipeline](https://github.com/semaj90/deeds-ingestion-pipeline) |\n| [granite-docling-worker-README.md](granite-docling-worker-README.md) | IBM Granite + Docling document parsing worker |\n| [ai-server-README.md](ai-server-README.md) | Legacy AI server (superseded by integrated Ollama + gRPC stack) |\n| [HUGGINGFACE_MODELS.md](HUGGINGFACE_MODELS.md) | ",
+      "source": "docs\\legacy-reference\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "03c70049866f88b0",
+      "title": "Summary",
+      "text": "Summary\n\n- cards: 99\r\n- embedded cards: 99\r\n- qdrant preview rows: 99\r\n- feature gap rows: 8\r\n- workspace gap cards: 90\r\n- tracked gaps: 39\r\n- untracked gaps: 51\r\n- production_ready: 8\r\n- active: 66\r\n- candidate_prune: 25\r\n- archive_to_deeds_lab: 0",
+      "source": "docs\\reports\\index-gap-memory-report.md",
+      "hasVector": true
+    },
+    {
+      "id": "03d373cd3e1f8ec5",
+      "title": "Startup Rule",
+      "text": "Startup Rule\n\nVS Code startup may run smokes and refreshes, but must not do heavy rebuilds unless stale.\r\n\r\nAllowed on startup:\r\n\r\n- service health\r\n- graphify:daily with cooldown\r\n- ACE context-pack smoke\r\n- top-N retrieval smoke\r\n- feature-map smoke\r\n- sidecar health\r\n\r\nNot allowed on every startup:\r\n\r\n- full graph rebuild\r\n- manual roadmap creation\r\n- large markdown consolidation\r\n- DuckDB promotion\r\n- schema migration",
+      "source": ".opencode\\skills\\graphrag-context-recovery.md",
+      "hasVector": true
+    },
+    {
+      "id": "03e0fbe1c46ea382",
+      "title": "sudo apt install poppler-utils  # Ubuntu",
+      "text": "sudo apt install poppler-utils  # Ubuntu\n\n# 2. 安装 Python 依赖",
+      "source": "deeds_labs\\community-refs\\gemma4-ocr\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "03e14cfaf790ed77",
+      "title": "📚 **[Переглянути повну документацію](https://docs.claude-mem.ai/)** - Переглянути на офіційному сайті\n\n### Початок роботи\n\n- **[Посібник з встановлення](https://docs.claude-mem.ai/installation)** - Швидкий старт і розширене встановлення\n- **[Посібник з використання](https://docs.claude-mem.ai/usage/getting-started)** - Як Claude-Mem працює автоматично\n- **[Інструменти пошуку](https://docs.claude-mem.ai/usage/search-tools)** - Запитуйте історію свого проєкту природною мовою\n- **[Бета-функції](https://docs.claude-mem.ai/beta-features)** - Спробуйте експериментальні функції, як-от режим Endless Mode\n\n### Найкращі практики\n\n- **[Інженерія контексту](https://docs.claude-mem.ai/context-engineering)** - Принципи оптимізації контексту AI-агента\n- **[Прогресивне розкриття](https://docs.claude-mem.ai/progressive-disclosure)** - Філософія стратегії підготовки контексту Claude-Mem\n\n### Архітектура\n\n- **[Огляд](https://docs.claude-mem.ai/architecture/overview)** - Компоненти системи та потік даних\n- **[Еволюція архітектури](https://docs.claude-mem.ai/architecture-evolution)** - Шлях від v3 до v5\n- **[Архітектура хуків](https://docs.claude-mem.ai/hooks-architecture)** - Як Claude-Mem використовує хуки життєвого циклу\n- **[Довідник хуків](https://docs.claude-mem.ai/architecture/hooks)** - Пояснення 7 скриптів хуків\n- **[Сервіс воркера](https://docs.claude-mem.ai/architecture/worker-service)** - HTTP API та управління Bun\n- **[База даних](https://docs.claude-mem.ai/architecture/database)** - Схема SQLite та пошук FTS5\n- **[Архітектура пошуку](https://docs.claude-mem.ai/architecture/search-architecture)** - Гібридний пошук з векторною базою даних Chroma\n\n### Конфігурація та розробка\n\n- **[Конфігурація](https://docs.claude-mem.ai/configuration)** - Змінні середовища та налаштування\n- **[Розробка](https://docs.claude-mem.ai/development)** - Збірка, тестування, внесок\n- **[Усунення несправностей](https://docs.claude-mem.ai/troubleshooting)** - Поширені проблеми та рішення\n\n---",
+      "text": "📚 **[Переглянути повну документацію](https://docs.claude-mem.ai/)** - Переглянути на офіційному сайті\n\n### Початок роботи\n\n- **[Посібник з встановлення](https://docs.claude-mem.ai/installation)** - Швидкий старт і розширене встановлення\n- **[Посібник з використання](https://docs.claude-mem.ai/usage/getting-started)** - Як Claude-Mem працює автоматично\n- **[Інструменти пошуку](https://docs.claude-mem.ai/usage/search-tools)** - Запитуйте історію свого проєкту природною мовою\n- **[Бета-функції](https://docs.claude-mem.ai/beta-features)** - Спробуйте експериментальні функції, як-от режим Endless Mode\n\n### Найкращі практики\n\n- **[Інженерія контексту](https://docs.claude-mem.ai/context-engineering)** - Принципи оптимізації контексту AI-агента\n- **[Прогресивне розкриття](https://docs.claude-mem.",
+      "source": "claude-mem\\docs\\i18n\\README.uk.md",
+      "hasVector": true
+    },
+    {
+      "id": "03e74a376a075bf3",
+      "title": "Audit Gates",
+      "text": "Audit Gates\n\n| Gate | Status | Detail |\n|------|--------|--------|\n| G21-24 | ✅ PASS | 4/4 clean ✅ |\n| G20 | ✅ PASS | clean ✅ |\n\n_Gates checked: G21-24, G20. Run `npm run index:codebase:fast && npm run agents:write` to refresh._",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\evidence-canvas\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "03ef83c8a052b0c0",
+      "title": "Part 3: XState v5 Machines Audit ✅ COMPLETE",
+      "text": "Part 3: XState v5 Machines Audit ✅ COMPLETE\n\n**Directory:** `src/lib/machines/`  \n**Total Files:** 11  \n**Status:** 6 ACTIVE, 3 ORPHANED, 1 ERROR, 1 STUB\n\n### Detailed Classification\n\n| Machine | Lines | Status | Issue | Priority |\n|---------|------:|--------|-------|----------|\n| **auth-machine.ts** | 398 | ✅ ACTIVE | None | P0 (production) |\n| **document-upload-machine.ts** | 331 | ✅ ACTIVE | None | P0 (production) |\n| **evidenceCustodyMachine.ts** | 364 | ⚠️ ERROR | Missing error target | P1 (critical) |\n| **uploadMachine.ts** | 73 | ✅ ACTIVE (stub) | By design (thin wrapper) | P2 (working) |\n| **gpu-process-machine.ts** | 344 | ⚠️ PARTIAL | Low UI integration | P2 (monitor) |\n| **retrieval-machine.ts** | 292 | ⚠️ MONITOR | CodebaseSearch only | P2 (monitor) |\n| **userTypingStateMachine",
+      "source": "AUDIT_COMPILATION_PHASE_1.md",
+      "hasVector": true
+    },
+    {
+      "id": "03fb1f6ad5cf910d",
+      "title": "Files (6)",
+      "text": "Files (6)\n\n- `AIAssistantChat.svelte`\n- `EnhancedEvidenceBoard.svelte`\n- `EvidenceProcessingWorkflow.svelte`\n- `LegalDocumentProcessor.svelte`\n- `OllamaAutoComplete.svelte`\n- `YoRHaCaseForm.svelte`",
+      "source": "deeds_labs\\frontend\\orphaned-components\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04019748644a4b52",
+      "title": "Usage",
+      "text": "Usage\n\n```bash\r\nnode scripts/ai-os/log-progress.mjs \"Your message here\"\r\n```",
+      "source": ".opencode\\command\\progress-log.md",
+      "hasVector": true
+    },
+    {
+      "id": "040ebac4853b857e",
+      "title": "Plan 06 — Worker Env Isolation",
+      "text": "Plan 06 — Worker Env Isolation\n\n> **Goal:** Stop host-side environment variables from contaminating the worker's Anthropic SDK subprocess. Two confirmed bugs anchor this plan: `ANTHROPIC_BASE_URL` leaks from the parent shell while `ANTHROPIC_AUTH_TOKEN` is blocked, breaking proxy/gateway auth (#2375); and `CLAUDE_CODE_EFFORT_LEVEL` propagates from host CLI settings into the SDK subprocess where it triggers a permanent HTTP 400 that the retry classifier mistakes for transient (#2357). Adjacent feature #2289 (`$TIER` alias syntax) is in scope where it shares the same env/model-resolution surface.\n>\n> **Net effect:**\n> - The OAuth-skip predicate requires a real credential (`ANTHROPIC_API_KEY` or `ANTHROPIC_AUTH_TOKEN`), not a bare `ANTHROPIC_BASE_URL`. Proxy/gateway users put credentials in `",
+      "source": "claude-mem\\plans\\06-worker-env-isolation.md",
+      "hasVector": true
+    },
+    {
+      "id": "0412233b68ea1040",
+      "title": "Rules",
+      "text": "Rules\n\n- Always `cd sveltekit-frontend` before running npm scripts — the scripts resolve paths relative to that directory.\n- Never delete files — all analysis is read-only unless the tier explicitly writes to `docs/graph/`.\n- If `codebase-graph.json` is older than 24h, automatically run `/graphify map` before `dir` analysis.\n- Respect bounded output: cap directory tables at 30 rows, file lists at 50 files.\n- If Ollama is not running and tier = `semantic`/`cluster`/`full`/`gpu`, warn before attempting and suggest `map` or `daily` instead.\n- For `batch` and `gpu` tiers, warn if CUDA is unavailable (check `isCudaAvailable()` via tensorrt_bridge.node).\n- `ace-smoke` requires the SvelteKit dev server on :5173. If not running, print the skip note and continue.\n- `ts7` runs `tsgo` (TypeScript 7 G",
+      "source": ".claude\\commands\\graphify.md",
+      "hasVector": true
+    },
+    {
+      "id": "0421c55eea4d6d01",
+      "title": "- **Node.js**: 18.0.0 বা উচ্চতর\n- **Claude Code**: প্লাগইন সাপোর্ট সহ সর্বশেষ সংস্করণ\n- **Bun**: JavaScript রানটাইম এবং প্রসেস ম্যানেজার (অনুপস্থিত থাকলে স্বয়ংক্রিয়ভাবে ইনস্টল হয়)\n- **uv**: ভেক্টর অনুসন্ধানের জন্য Python প্যাকেজ ম্যানেজার (অনুপস্থিত থাকলে স্বয়ংক্রিয়ভাবে ইনস্টল হয়)\n- **SQLite 3**: স্থায়ী স্টোরেজের জন্য (বান্ডল করা)\n\n---",
+      "text": "- **Node.js**: 18.0.0 বা উচ্চতর\n- **Claude Code**: প্লাগইন সাপোর্ট সহ সর্বশেষ সংস্করণ\n- **Bun**: JavaScript রানটাইম এবং প্রসেস ম্যানেজার (অনুপস্থিত থাকলে স্বয়ংক্রিয়ভাবে ইনস্টল হয়)\n- **uv**: ভেক্টর অনুসন্ধানের জন্য Python প্যাকেজ ম্যানেজার (অনুপস্থিত থাকলে স্বয়ংক্রিয়ভাবে ইনস্টল হয়)\n- **SQLite 3**: স্থায়ী স্টোরেজের জন্য (বান্ডল করা)\n\n---\n\n## কনফিগারেশন",
+      "source": "claude-mem\\docs\\i18n\\README.bn.md",
+      "hasVector": true
+    },
+    {
+      "id": "0429e0aeeeaa8b31",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"middleware\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"lib middleware\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/middleware/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\middleware\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0439f41a871f30bf",
+      "title": "#1908, #1953, #1916, #1913, #2048, #1957, #1956, #1874, #1867",
+      "text": "#1908, #1953, #1916, #1913, #2048, #1957, #1956, #1874, #1867\n\n## [12.3.1] - 2026-04-20",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "0440b16fc04889ab",
+      "title": "Drizzle Sidecar Migration Policy (Phase 6E)",
+      "text": "Drizzle Sidecar Migration Policy (Phase 6E)\n\n**Definition**: A sidecar migration is a numbered `.sql` file in `drizzle/` that is intentionally **not** in `drizzle/meta/_journal.json` because it:\n- Uses SQL syntax Drizzle Kit cannot express (GIN trgm, HNSW, enum-only, concurrent index)\n- Was applied manually at a point where regenerating the journal snapshot would break drift\n\n**Rules**:\n1. Every sidecar MUST be listed in `sveltekit-frontend/drizzle/sidecar-migrations.json` with a `reason`, `appliedAt` date, and `validationCommand`.\n2. Unlisted unjournaled numbered SQL files are **WARN/FAIL** in the contract audit (`unknown_unjournaled_sql`).\n3. Do NOT delete or auto-journal sidecars without operator review.\n4. Do NOT add vector HNSW indexes without first reviewing `docs/reports/pgvector-in",
+      "source": "AGENTS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0448d0e2225cd18b",
+      "title": "Vitest Triage Summary",
+      "text": "Vitest Triage Summary\n\n- generatedAt: 2026-05-21T02:03:18.631Z\n- totalFailures: 0\n- exitCode: 124",
+      "source": ".tmp\\test-triage-debug\\20260520-190307\\summary.md",
+      "hasVector": true
+    },
+    {
+      "id": "044acab38aa95f00",
+      "title": "AGENTS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/cache`",
+      "text": "AGENTS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/cache`\n\n<!-- AGENTS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/cache",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\cache\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04517a30c0c92331",
+      "title": "Todos + Enhancements",
+      "text": "Todos + Enhancements\n\n- **[LOW]** [TODO] `parallaxDynamic.js`: TODO\n- **[LOW]** [TODO] `parallaxDynamic.js`: TODO\n\n_Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\ui\\gaming\\n64\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04563ad7bc7bd3d0",
+      "title": "Test Artifacts (2)",
+      "text": "Test Artifacts (2)\n\n| Directory | What It Was | Why Archived |\r\n|-----------|-------------|--------------|\r\n| `test-reports/` | Old test report output | Current reports in `playwright-report/` |\r\n| `test-results/` | Old test result output | Current results from Playwright |",
+      "source": "docs\\legacy-reference\\ARCHIVE_INDEX.md",
+      "hasVector": true
+    },
+    {
+      "id": "04773c08dafa7f33",
+      "title": "Redis (Docker)",
+      "text": "Redis (Docker)\n\ndocker start deeds-redis-prod",
+      "source": "CACHE_SYSTEM_STATUS_APR13.md",
+      "hasVector": true
+    },
+    {
+      "id": "048699597e424ba8",
+      "title": "Files (13)",
+      "text": "Files (13)\n\n- `AdvancedEditor.svelte`\n- `CollaborativeEvidenceCanvas.svelte`\n- `EnhancedEvidenceCanvas.svelte`\n- `EnhancedLegalCanvas.svelte`\n- `EvidenceCanvas.svelte`\n- `EvidenceCanvasEditor.svelte`\n- `EvidenceNode.svelte`\n- `POINode.svelte`",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\canvas\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04b4ee5de7bdeaa7",
+      "title": "Bug Fixes",
+      "text": "Bug Fixes\n\n- **Auto-restart worker on version mismatch** (#484): When the plugin updates but the worker was already running on the old version, the worker now automatically restarts instead of failing with 400 errors.\n\n### Changes\n- `/api/version` endpoint now returns the built-in version (compiled at build time) instead of reading from disk\n- `worker-service start` command checks for version mismatch and auto-restarts if needed\n- Downgraded hook version mismatch warning to debug logging (now handled by auto-restart)\n\nThanks @yungweng for the detailed bug report!",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "04b8d3f6aad31e54",
+      "title": "- `read_file({ filePath: \"deeds_labs/frontend/features-archive/demos/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/frontend/features-archive/demos/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/frontend/features-archive/demos/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/frontend/features-archive/demos/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\frontend\\features-archive\\demos\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04c0ad5d7822d926",
+      "title": "python ocr.py ./my_pdfs/",
+      "text": "python ocr.py ./my_pdfs/\n\n# 指定文档类型（跳过自动检测，更快）",
+      "source": "deeds_labs\\community-refs\\gemma4-ocr\\README.md",
+      "hasVector": true
+    },
+    {
+      "id": "04c4d90bb8f8c7d1",
+      "title": "Critical constraints",
+      "text": "Critical constraints\n\n- Svelte 5 runes only: no `export let`, `$:`, `on:click`, or `<slot>`; use `$state`, `$derived`, `$props`, `onclick`, and snippets.\n- Bits UI uses namespace imports from `bits-ui`; prefer the `child` snippet pattern.\n- Drizzle server code should come from `$lib/server/db/client`, keep `.js` import extensions, and use migrate flows rather than `drizzle-kit push` on live data.\n- GET API routes should keep a stable JSON shape even on failure.\n- Zod-validate every `request.json()` payload.\n- Use `env.server.ts` for service URLs; do not hardcode `localhost` in app code.\n- **Engram Memory (Lane -1)**: Low-trust pre-routing hints. MUST NOT store hidden thoughts, raw tensors, or model cache.\n- **Port 8888**: Reserved for SeaweedFS Filer. Do NOT bind SearXNG to 8888; use port ",
+      "source": "AGENTS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04c6160442547efb",
+      "title": "Issue Blowout 2026 — 25 bugs across worker, hooks, security, and search",
+      "text": "Issue Blowout 2026 — 25 bugs across worker, hooks, security, and search\n\n### Security Hardening\n- Bearer token authentication for all worker API endpoints with auto-generated tokens\n- Path traversal protection on context write paths\n- Per-user worker port derivation (37700 + uid%100) to prevent cross-user data leakage\n- Rate limiting (300 req/min/IP) and reduced JSON body limit (50MB → 5MB)\n- Caller headers can no longer override the bearer auth token\n\n### Worker Stability\n- Time-windowed RestartGuard replaces flat counter — prevents stranding pending messages on long sessions\n- Idle session eviction prevents pool slot deadlock when all slots are full\n- MCP loopback self-check uses process.execPath instead of bare 'node'\n- Age-scoped failed message purge (1h retention) instead of clearing ",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "04d0d4b7cde00939",
+      "title": "AGENTS.md — `deeds_labs/frontend/svelte4-archive/components/stub-ui-subdirs/tooltip`",
+      "text": "AGENTS.md — `deeds_labs/frontend/svelte4-archive/components/stub-ui-subdirs/tooltip`\n\n<!-- AGENTS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->\n\n> Directory: deeds_labs/frontend/svelte4-archive/components/stub-ui-subdirs/tooltip",
+      "source": "deeds_labs\\frontend\\svelte4-archive\\components\\stub-ui-subdirs\\tooltip\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04d221fed2e1043f",
+      "title": "LLMS.md — `deeds_labs/api-legacy/api/v1/evidence`",
+      "text": "LLMS.md — `deeds_labs/api-legacy/api/v1/evidence`\n\n# LLMS.md — `deeds_labs/api-legacy/api/v1/evidence`",
+      "source": "deeds_labs\\api-legacy\\api\\v1\\evidence\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04d791ea740d5b0a",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"glyph\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"components glyph\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/glyph/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\glyph\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04db420d8ba99288",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"integrations\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"src-lib integrations\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/dead_code/src-lib/integrations/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\dead_code\\src-lib\\integrations\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "04e718be5af03b1d",
+      "title": "- Fixed SDK spawn failures and sharp native binary crashes\n- Added `plugin.json` to root `.claude-plugin` directory for proper plugin structure\n- Removed duplicate else block from merge artifact",
+      "text": "- Fixed SDK spawn failures and sharp native binary crashes\n- Added `plugin.json` to root `.claude-plugin` directory for proper plugin structure\n- Removed duplicate else block from merge artifact\n\n## Infrastructure",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "04eb24394995dd6a",
+      "title": "Simplicial neural networks (SNNs) are a generalization of graph neural networks to data that live on a class of topological spaces called simplicial complexes. These are natural multi-dimensional extensions of graphs that encode not only pairwise relationships but also higher-order interactions between vertices—allowing us to consider richer data, including vector fields and n-fold collaboration networks.",
+      "text": "Simplicial neural networks (SNNs) are a generalization of graph neural networks to data that live on a class of topological spaces called simplicial complexes. These are natural multi-dimensional extensions of graphs that encode not only pairwise relationships but also higher-order interactions between vertices—allowing us to consider richer data, including vector fields and n-fold collaboration networks.\n\n## What Are Simplicial Complexes?",
+      "source": "4_18_evaldeepresearch.txt",
+      "hasVector": true
+    },
+    {
+      "id": "04ee4ff3c992daec",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/laws/prefetch-context/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/laws/prefetch-context/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/laws/prefetch-context/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/laws/prefetch-context/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\laws\\prefetch-context\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0508f90968fbe9db",
+      "title": "Fix",
+      "text": "Fix\n\n- **Remove `save_observation` from MCP tool surface** — This tool was exposed as an MCP tool available to Claude, but it's an internal API-only feature. Removing it from the MCP server prevents unintended tool invocation and keeps the tool surface clean.",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "0509751baf2a0190",
+      "title": "Audit Gates",
+      "text": "Audit Gates\n\n| Gate | Status | Detail |\n|------|--------|--------|\n| G17 | ❌ FAIL | 1/7 files — use env.server.ts getters |\n\n_Gates checked: G17. Run `npm run index:codebase:fast && npm run agents:write` to refresh._",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\gpu\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05250dc8f40383f5",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/db-test/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/db-test/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/db-test/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/db-test/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\db-test\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "052d2ee3ad5c295e",
+      "title": "📚 **[Ver Documentação Completa](https://docs.claude-mem.ai/)** - Navegar no site oficial\n\n### Começando\n\n- **[Guia de Instalação](https://docs.claude-mem.ai/installation)** - Início rápido e instalação avançada\n- **[Guia de Uso](https://docs.claude-mem.ai/usage/getting-started)** - Como Claude-Mem funciona automaticamente\n- **[Ferramentas de Procura](https://docs.claude-mem.ai/usage/search-tools)** - Consulte seu histórico de projeto com linguagem natural\n- **[Recursos Beta](https://docs.claude-mem.ai/beta-features)** - Experimente recursos experimentais como o Endless Mode\n\n### Melhores Práticas\n\n- **[Engenharia de Contexto](https://docs.claude-mem.ai/context-engineering)** - Princípios de otimização de contexto para agentes de IA\n- **[Divulgação Progressiva](https://docs.claude-mem.ai/progressive-disclosure)** - Filosofia por trás da estratégia de preparação de contexto do Claude-Mem\n\n### Arquitetura\n\n- **[Visão Geral](https://docs.claude-mem.ai/architecture/overview)** - Componentes do sistema e fluxo de dados\n- **[Evolução da Arquitetura](https://docs.claude-mem.ai/architecture-evolution)** - A jornada da v3 à v5\n- **[Arquitetura de Hooks](https://docs.claude-mem.ai/hooks-architecture)** - Como Claude-Mem usa hooks de ciclo de vida\n- **[Referência de Hooks](https://docs.claude-mem.ai/architecture/hooks)** - 7 scripts de hook explicados\n- **[Serviço Worker](https://docs.claude-mem.ai/architecture/worker-service)** - API HTTP e gerenciamento do Bun\n- **[Banco de Dados](https://docs.claude-mem.ai/architecture/database)** - Schema SQLite e Procura FTS5\n- **[Arquitetura de Procura](https://docs.claude-mem.ai/architecture/search-architecture)** - Procura híbrida com banco de dados vetorial Chroma\n\n### Configuração e Desenvolvimento\n\n- **[Configuração](https://docs.claude-mem.ai/configuration)** - Variáveis de ambiente e configurações\n- **[Desenvolvimento](https://docs.claude-mem.ai/development)** - Build, testes e contribuição\n- **[Solução de Problemas](https://docs.claude-mem.ai/troubleshooting)** - Problemas comuns e soluções\n\n---",
+      "text": "📚 **[Ver Documentação Completa](https://docs.claude-mem.ai/)** - Navegar no site oficial\n\n### Começando\n\n- **[Guia de Instalação](https://docs.claude-mem.ai/installation)** - Início rápido e instalação avançada\n- **[Guia de Uso](https://docs.claude-mem.ai/usage/getting-started)** - Como Claude-Mem funciona automaticamente\n- **[Ferramentas de Procura](https://docs.claude-mem.ai/usage/search-tools)** - Consulte seu histórico de projeto com linguagem natural\n- **[Recursos Beta](https://docs.claude-mem.ai/beta-features)** - Experimente recursos experimentais como o Endless Mode\n\n### Melhores Práticas\n\n- **[Engenharia de Contexto](https://docs.claude-mem.ai/context-engineering)** - Princípios de otimização de contexto para agentes de IA\n- **[Divulgação Progressiva](https://docs.claude-mem.ai/p",
+      "source": "claude-mem\\docs\\i18n\\pt.md",
+      "hasVector": true
+    },
+    {
+      "id": "053cab5faf25f0f7",
+      "title": "GraphRAG Recover",
+      "text": "GraphRAG Recover\n\ndescription: Recover task context through file discovery, Qdrant semantic search, graph expansion, and ACE context packs without stuffing raw files into prompts.",
+      "source": ".opencode\\command\\graphrag-recover.md",
+      "hasVector": true
+    },
+    {
+      "id": "0544214fb38fcf9a",
+      "title": "🔧 Worker Lifecycle Hardening",
+      "text": "🔧 Worker Lifecycle Hardening\n\nThis patch release addresses critical bugs discovered during PR review of the self-spawn pattern introduced in 8.2.0. The worker daemon now handles edge cases robustly across both Unix and Windows platforms.\n\n### 🐛 Critical Bug Fixes\n\n#### Process Exit Detection Fixed\nThe `waitForProcessesExit` function was crashing when processes exited during monitoring. The `process.kill(pid, 0)` call throws when a process no longer exists, which was not being caught. Now wrapped in try/catch to correctly identify exited processes.\n\n#### Spawn PID Validation\nThe worker daemon now validates that `spawn()` actually returned a valid PID before writing to the PID file. Previously, spawn failures could leave invalid PID files that broke subsequent lifecycle operations.\n\n#### C",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "054729cd34017f3e",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/ace/web-crawl/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/ace/web-crawl/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/ace/web-crawl/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/ace/web-crawl/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\ace\\web-crawl\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0556d469083645d7",
+      "title": "BATCH FIX PROGRESS REPORT",
+      "text": "BATCH FIX PROGRESS REPORT\n\n## Current Status: ~452 errors, 51 warnings remaining (After latest fixes)",
+      "source": "deeds_labs\\docs\\reference\\batch-fix-progress\\BATCH_FIX_PROGRESS.md",
+      "hasVector": true
+    },
+    {
+      "id": "055de8d46baffa85",
+      "title": "LLMS.md — `deeds_labs/api-legacy/api/laws/prefetch-context`",
+      "text": "LLMS.md — `deeds_labs/api-legacy/api/laws/prefetch-context`\n\n# LLMS.md — `deeds_labs/api-legacy/api/laws/prefetch-context`",
+      "source": "deeds_labs\\api-legacy\\api\\laws\\prefetch-context\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "0566387d5eff8880",
+      "title": "Files (4)",
+      "text": "Files (4)\n\n- `llm-prompt-service.ts`\n- `som-webgpu-cache.ts`\n- `svelte-check-analyzer.ts`\n- `tool-invoker.ts`",
+      "source": "deeds_labs\\archived-dead-code\\dead-lib-dirs\\diagnostics\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05714f67afff10e9",
+      "title": "ACE Packet Integration Smoke Report",
+      "text": "ACE Packet Integration Smoke Report\n\n## Execution Summary",
+      "source": "docs\\reports\\ace-packet-smoke-report.md",
+      "hasVector": true
+    },
+    {
+      "id": "058cf870fc1acd74",
+      "title": "IMG_B64=$(base64 -w0 /c/Users/james/Videos/deeds-web-app/scripts/tests/screenshots/latest/evidence.png)\r\npython -c \"\r\nimport json\r\nb64 = open(0).read().strip()\r\npayload = {\r\n    'messages': [{\r\n        'role': 'user',\r\n        'content': [\r\n            {'type': 'image_url', 'image_url': {'url': f'data:image/png;base64,{b64}'}},\r\n            {'type': 'text', 'text': 'What is shown in this image? Brief 2-sentence description.'}\r\n        ]\r\n    }],\r\n    'max_tokens': 128,\r\n    'temperature': 0.2\r\n}\r\nwith open('/tmp/vlm_test.json', 'w') as f:\r\n    json.dump(payload, f)\r\nprint(f'Payload written: {len(json.dumps(payload))} bytes')\r\n\" <<< \"$IMG_B64\"\r\n\r\ncurl -s --max-time 120 http://127.0.0.1:8090/v1/chat/completions \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d @/tmp/vlm_test.json 2>&1 | python -m json.tool 2>/dev/null\r\nExit code 1\r\nPayload written: 471767 bytes\r\nBash Test VLM raw output\r\nIN",
+      "text": "IMG_B64=$(base64 -w0 /c/Users/james/Videos/deeds-web-app/scripts/tests/screenshots/latest/evidence.png)\r\npython -c \"\r\nimport json\r\nb64 = open(0).read().strip()\r\npayload = {\r\n    'messages': [{\r\n        'role': 'user',\r\n        'content': [\r\n            {'type': 'image_url', 'image_url': {'url': f'data:image/png;base64,{b64}'}},\r\n            {'type': 'text', 'text': 'What is shown in this image? Brief 2-sentence description.'}\r\n        ]\r\n    }],\r\n    'max_tokens': 128,\r\n    'temperature': 0.2\r\n}\r\nwith open('/tmp/vlm_test.json', 'w') as f:\r\n    json.dump(payload, f)\r\nprint(f'Payload written: {len(json.dumps(payload))} bytes')\r\n\" <<< \"$IMG_B64\"\r\n\r\ncurl -s --max-time 120 http://127.0.0.1:8090/v1/chat/completions \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d @/tmp/vlm_test.json 2>&1 | pytho",
+      "source": "419_26next_steps.txt",
+      "hasVector": true
+    },
+    {
+      "id": "05913a2dd06a77dd",
+      "title": "```\r\nUser Query\r\n   ↓\r\n┌─────────────────────┐\r\n│ L0: Redis (3-5ms)   │ ← Exact-match (SHA-256 hash of query)\r\n└──────┬──────────────┘\r\n       │ MISS (20-30%)\r\n       ↓\r\n┌─────────────────────┐\r\n│ L2: Qdrant (500ms)  │ ← Semantic similarity (vector search)\r\n└──────┬──────────────┘\r\n       │ MISS (10-5%)\r\n       ↓\r\n┌─────────────────────┐\r\n│ L3: Ollama (2.8s)   │ ← Cold GPU inference\r\n└─────────────────────┘\r\n       │\r\n       ↓\r\n    Response\r\n       │\r\n       ├──→ Store in L0 (for future exact hits)\r\n       └──→ Store in L2 (for semantic hits)\r\n```\r\n\r\n**Performance**:\r\n- **Combined Hit Rate**: 90-95%\r\n- **Cost Reduction**: 90%\r\n- **Throughput**: 12,000 QPM\r\n- **L0 Speedup**: 6,542× vs CPU, 5,079× vs GPU",
+      "text": "```\r\nUser Query\r\n   ↓\r\n┌─────────────────────┐\r\n│ L0: Redis (3-5ms)   │ ← Exact-match (SHA-256 hash of query)\r\n└──────┬──────────────┘\r\n       │ MISS (20-30%)\r\n       ↓\r\n┌─────────────────────┐\r\n│ L2: Qdrant (500ms)  │ ← Semantic similarity (vector search)\r\n└──────┬──────────────┘\r\n       │ MISS (10-5%)\r\n       ↓\r\n┌─────────────────────┐\r\n│ L3: Ollama (2.8s)   │ ← Cold GPU inference\r\n└─────────────────────┘\r\n       │\r\n       ↓\r\n    Response\r\n       │\r\n       ├──→ Store in L0 (for future exact hits)\r\n       └──→ Store in L2 (for semantic hits)\r\n```\r\n\r\n**Performance**:\r\n- **Combined Hit Rate**: 90-95%\r\n- **Cost Reduction**: 90%\r\n- **Throughput**: 12,000 QPM\r\n- **L0 Speedup**: 6,542× vs CPU, 5,079× vs GPU\n\n## Files",
+      "source": "5_13_pt2_todo.txt",
+      "hasVector": true
+    },
+    {
+      "id": "0599b10c08506da8",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"semantic\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"contradictionEngine semantic\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/contradictionEngine/semantic/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\server\\contradictionEngine\\semantic\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05a0fbf9f7cde6bb",
+      "title": "$ClusterScript = Join-Path $Frontend \"scripts\\start-trace-mcp-cluster.mjs\"\r\n$McpServer     = Join-Path $Frontend \"src\\mcp\\trace-mcp-server.ts\"\r\nif ((Test-Path $ClusterScript) -and (Test-Path $McpServer)) {\r\n  $workers = [Math]::Min([System.Environment]::ProcessorCount, 4)\r\n  Write-Host \"Starting TRACE MCP cluster on :8788 ($workers workers) ...\" -ForegroundColor Cyan\r\n  Start-Process -FilePath \"node.exe\" `\r\n    -ArgumentList @($ClusterScript, $workers) `\r\n    -WorkingDirectory $Frontend -WindowStyle Minimized\r\n  Start-Sleep -Milliseconds 2500\r\n} else {\r\n  Write-Host \"start-trace-mcp-cluster.mjs or trace-mcp-server.ts not found — skipping\" -ForegroundColor Yellow\r\n}",
+      "text": "$ClusterScript = Join-Path $Frontend \"scripts\\start-trace-mcp-cluster.mjs\"\r\n$McpServer     = Join-Path $Frontend \"src\\mcp\\trace-mcp-server.ts\"\r\nif ((Test-Path $ClusterScript) -and (Test-Path $McpServer)) {\r\n  $workers = [Math]::Min([System.Environment]::ProcessorCount, 4)\r\n  Write-Host \"Starting TRACE MCP cluster on :8788 ($workers workers) ...\" -ForegroundColor Cyan\r\n  Start-Process -FilePath \"node.exe\" `\r\n    -ArgumentList @($ClusterScript, $workers) `\r\n    -WorkingDirectory $Frontend -WindowStyle Minimized\r\n  Start-Sleep -Milliseconds 2500\r\n} else {\r\n  Write-Host \"start-trace-mcp-cluster.mjs or trace-mcp-server.ts not found — skipping\" -ForegroundColor Yellow\r\n}\n\n# ── 4. SvelteKit dev server :5173 ─────────────────────────────────────────────",
+      "source": "5_7_26.txt",
+      "hasVector": true
+    },
+    {
+      "id": "05ab0ae1637b9694",
+      "title": "**Stack Audit: Service Ports & Listener Mapping**\r\n\r\nPurpose\r\n- Inventory the local dev stack ports and provide a checklist for auditing listeners and transport drift.\r\n\r\nCommon services (dev environment)\r\n- SvelteKit dev server: `localhost:5173` (app + API routes)\r\n- Ollama (bifrost / embedding): `localhost:11434` or configured `OLLAMA_BASE_URL`\r\n- TurboQuant / llama-server HTTP: `localhost:8090` (TurboQuant chat/generate)\r\n- OpenCode sidecars (MCP sidecars): `localhost:8791`, `:8792`, `:8793` (turbovec, engram, langextract)\r\n- Qdrant: `localhost:6333`\r\n- Redis: `localhost:6379`\r\n- Postgres: `5432` (inside Docker container)\r\n- SeaweedFS S3 gateway: `8333` (if used)\r\n- SeaweedFS master: `9333` and filer `8382`\r\n- Hermes gateway: `:8642` (project-specific)\r\n- Hermes dashboard: `:9119`\r\n- Claude-Mem (insecure local memory): `localhost:37777` (unauthenticated by default)\r\n\r\nAudit checklist\r\n1. Enumerate listeners locally:\r\n\r\n```powershell",
+      "text": "**Stack Audit: Service Ports & Listener Mapping**\r\n\r\nPurpose\r\n- Inventory the local dev stack ports and provide a checklist for auditing listeners and transport drift.\r\n\r\nCommon services (dev environment)\r\n- SvelteKit dev server: `localhost:5173` (app + API routes)\r\n- Ollama (bifrost / embedding): `localhost:11434` or configured `OLLAMA_BASE_URL`\r\n- TurboQuant / llama-server HTTP: `localhost:8090` (TurboQuant chat/generate)\r\n- OpenCode sidecars (MCP sidecars): `localhost:8791`, `:8792`, `:8793` (turbovec, engram, langextract)\r\n- Qdrant: `localhost:6333`\r\n- Redis: `localhost:6379`\r\n- Postgres: `5432` (inside Docker container)\r\n- SeaweedFS S3 gateway: `8333` (if used)\r\n- SeaweedFS master: `9333` and filer `8382`\r\n- Hermes gateway: `:8642` (project-specific)\r\n- Hermes dashboard: `:9119`\r\n- Cl",
+      "source": "docs\\security\\STACK_AUDIT_PORTS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05b2f5ac9c1b7c79",
+      "title": "LLMS.md — `deeds_labs/api-legacy/api/ibm-vision`",
+      "text": "LLMS.md — `deeds_labs/api-legacy/api/ibm-vision`\n\n# LLMS.md — `deeds_labs/api-legacy/api/ibm-vision`",
+      "source": "deeds_labs\\api-legacy\\api\\ibm-vision\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05bb62e8302a684e",
+      "title": "- 4 file(s), 0 handler(s)\n- Files: 4",
+      "text": "- 4 file(s), 0 handler(s)\n- Files: 4\n\n## Top Files",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\caching\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05bcbb072f3dd81a",
+      "title": "curl -s --max-time 120 -X POST \"http://localhost:5173/api/codebase-index/index-stream?cluster=1&limit=2\" \\\r\n  -H \"Content-Type: application/json\" \\\r\nDoes LangGraph need tensorrt-llm? No.\r\nLangGraph calls Ollama (:11434) or TurboQuant (:8090) for LLM inference via HTTP. tensorrt-llm was a leftover dependency — the service doesn't do direct GPU inference itself.\r\nYour current inference cascade (inference-router.ts):\r\nPosition\tService\tPort\tWhat It Is\tStatus\r\n1\tTensorRT-LLM\t:8099\tNVIDIA TRT engine server\tNot running (needs engine build)\r\n2\tTriton\t:8000\tNVIDIA model server (TRT/ONNX/PyTorch)\tNot running (needs model repo)\r\n3\tBifrost\t:3040\tSemantic cache (Qdrant)\tRunning\r\n4\tTurboQuant\t:8090\tllama.cpp + turbo3 KV cache\tRunning\r\n5\tVLM Server\t:8085\tHF Transformers VLM\tNot running\r\n6\tLiteRT\t:8070\tGoogle LiteRT\tNot running\r\n7\tOllama\t:11434\tStandard GGUF inference\tRunning\r\nAlternatives to tensorrt-llm for faster inference:\r\nTurboQuant (already running) — 2x Ollama speed, turbo3 KV cache compression, same GGUF model\r\nvLLM — PagedAttention, continuous batching, popular for serving (Docker image available)\r\nExLlamaV2 — GPTQ/EXL2 quantized, excellent on consumer RTX GPUs\r\nSGLang — RadixAttention, prefix caching, 2-5x faster than vLLM for some workloads\r\nllama.cpp server (vanilla, without turbo3) — stable, well-tested\r\nFor your RTX 3060 Ti (8 GB VRAM): TurboQuant is the best fit — it's already running, uses the same legal fine-tuned GGUF, and the turbo3 KV cache cuts VRAM from 7.5 GB to 3.4 GB.\r\nNow let me fix the LangGraph build — just a PyJWT conflict with the system package.\r\nUse llama-server (TurboQuant) with --mmproj mmproj-BF16.gguf — this is what your CLAUDE.md describes as the working VLM path\r\nLet me check if the mmproj file exists locally.\r\nwe have llama.cpp built gpu? optimizations and turboquant? ood question. Here's the inference stack breakdown:No mmproj file found on disk. Here's the situation:\r\n\r\nYour Unsloth GRPO training produced a merged GGUF (gemma4-legal-vlm-Q4_K_M.gguf) which is the text/tool-calling model currently in Ollama. The vision tower was frozen during GRPO training (never modified), so the stock SigLIP mmproj is compatible with your legal fine-tune.\r\n\r\nTo get image analysis working, you need the gemma4-legal-vlm-mmproj-BF16.gguf file. Your notebook (§10) describes exporting it. Two ways to get it:\r\n\r\nRun §10 of the Colab notebook — it converts the mmproj from the merged HF checkpoint\r\nUse the stock Gemma 4 mmproj — since the vision tower was frozen during GRPO, the stock mmproj from the base gemma4:e4b-it works. You can extract it from the Ollama base model blob or download from HuggingFace\r\nOnce you have the mmproj file, either:\r\n\r\nOllama: Create a Modelfile with FROM gemma4-legal-vlm-Q4_K_M.gguf + projector reference\r\nTurboQuant: llama-server -m legal.gguf --mmproj mmproj-BF16.gguf --port 8090\r\nFor now, text/tool-calling works perfectly — let me continue the pipeline. svelte-check passed (0 errors, 0 warnings) with the L3 fallback. Let me run the index-stream pipeline to generate cluster summaries with gemma4-legal-vlm:latest.\r\n\r\nBash Test index-stream with L3 Ollama fallback (cluster 1, limit 2 chunks)\r\nIN",
+      "text": "curl -s --max-time 120 -X POST \"http://localhost:5173/api/codebase-index/index-stream?cluster=1&limit=2\" \\\r\n  -H \"Content-Type: application/json\" \\\r\nDoes LangGraph need tensorrt-llm? No.\r\nLangGraph calls Ollama (:11434) or TurboQuant (:8090) for LLM inference via HTTP. tensorrt-llm was a leftover dependency — the service doesn't do direct GPU inference itself.\r\nYour current inference cascade (inference-router.ts):\r\nPosition\tService\tPort\tWhat It Is\tStatus\r\n1\tTensorRT-LLM\t:8099\tNVIDIA TRT engine server\tNot running (needs engine build)\r\n2\tTriton\t:8000\tNVIDIA model server (TRT/ONNX/PyTorch)\tNot running (needs model repo)\r\n3\tBifrost\t:3040\tSemantic cache (Qdrant)\tRunning\r\n4\tTurboQuant\t:8090\tllama.cpp + turbo3 KV cache\tRunning\r\n5\tVLM Server\t:8085\tHF Transformers VLM\tNot running\r\n6\tLiteRT\t:8070\tGo",
+      "source": "419_26next_steps.txt",
+      "hasVector": true
+    },
+    {
+      "id": "05c43bf3349e47ee",
+      "title": "Files (3)",
+      "text": "Files (3)\n\n- `lib-ui-EvidenceCanvas-orphaned.svelte`\n- `lib-ui-EvidenceCard-412L-migration-errors.svelte`\n- `ui-EvidenceCard-41L-corrupted.svelte`",
+      "source": "deeds_labs\\frontend\\orphaned-components\\evidence-card-variants\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05cd8b714b55f3bb",
+      "title": "Files (4)",
+      "text": "Files (4)\n\n- `index.ts`\n- `Svelte5BitsDialog.svelte`\n- `Svelte5Button.svelte`\n- `Svelte5Card.svelte`",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\templates\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05d1b5a92a1ff72c",
+      "title": "AGENTS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/features/ai/services`",
+      "text": "AGENTS.md — `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/features/ai/services`\n\n<!-- AGENTS-GEN v1 · do not edit below this line -->\n<!-- generated: 2026-05-15T03:29:31.367Z · agents.md spec · regen: npm run agents:write -->\n\n> Directory: deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/features/ai/services",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\features\\ai\\services\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05d994fd4596e79f",
+      "title": "📋 Migration Steps",
+      "text": "📋 Migration Steps\n\n### Step 1: Run Drizzle Migration\r\n\r\n```powershell\r\ncd sveltekit-frontend",
+      "source": "deeds_labs\\archived-dead-code\\dead-lib-dirs\\ui\\README_BACKEND_INTEGRATION.md",
+      "hasVector": true
+    },
+    {
+      "id": "05e231e99ef3f457",
+      "title": "nvidia-smi -q\r\n```\r\n\r\n### Performance Metrics\r\n\r\n```bash",
+      "text": "nvidia-smi -q\r\n```\r\n\r\n### Performance Metrics\r\n\r\n```bash\n\n# Container resource usage",
+      "source": "copilot.md",
+      "hasVector": true
+    },
+    {
+      "id": "05e4b943b719a6d0",
+      "title": "Windows Platform Improvements",
+      "text": "Windows Platform Improvements\n\n- **ProcessManager**: Migrated daemon spawning from deprecated WMIC to PowerShell `Start-Process` with `-WindowStyle Hidden`\n- **ChromaSync**: Re-enabled vector search on Windows (was previously disabled entirely)\n- **Worker Service**: Added unified DB-ready gate middleware — all DB-dependent endpoints now wait for initialization instead of returning \"Database not initialized\" errors\n- **EnvManager**: Switched from fragile allowlist to simple blocklist for subprocess env vars (only strips `ANTHROPIC_API_KEY` per Issue #733)",
+      "source": "claude-mem\\CHANGELOG.md",
+      "hasVector": true
+    },
+    {
+      "id": "05e59657ea3db16b",
+      "title": "LLMS.md — `deeds_labs/api-legacy/api/v1/llm`",
+      "text": "LLMS.md — `deeds_labs/api-legacy/api/v1/llm`\n\n# LLMS.md — `deeds_labs/api-legacy/api/v1/llm`",
+      "source": "deeds_labs\\api-legacy\\api\\v1\\llm\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05f4961864314ada",
+      "title": "CouchDB MapReduce Ingestion — Parent Atlas Rollups",
+      "text": "CouchDB MapReduce Ingestion — Parent Atlas Rollups\n\n- documents: 6947\n- views: 11\n- stage: Ingestion\n- runId: run_1778913585232",
+      "source": "docs\\graph\\repo-couchdb-mapreduce-report.md",
+      "hasVector": true
+    },
+    {
+      "id": "05f5056aa6669196",
+      "title": "Agentic tool-calling — quick ACE hits",
+      "text": "Agentic tool-calling — quick ACE hits\n\nIn-process tools the Gemma4 agent can call to dig deeper into this directory:\n\n- `graph_search({ query: \"verify-drizzle\", topK: 8 })` — files in this dir with tags, TODOs, audit flags\n- `wiki_note_lookup({ query: \"dev-routes verify-drizzle\", limit: 5 })` — KAG narrative + audit score\n- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set\n- `read_file({ filePath: \"deeds_labs/archived-dead-code/dev-routes/verify-drizzle/<file>\" })` — fetch any file's contents (sandboxed to src/)",
+      "source": "deeds_labs\\archived-dead-code\\dev-routes\\verify-drizzle\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "05f9f5d9f767ea6d",
+      "title": "- `.kiro/` directory does NOT exist in workspace\r\n- Historical references exist in `copilot.md` to completed backup-consolidation spec\r\n- No active kiro specs for current features\r\n\r\n---",
+      "text": "- `.kiro/` directory does NOT exist in workspace\r\n- Historical references exist in `copilot.md` to completed backup-consolidation spec\r\n- No active kiro specs for current features\r\n\r\n---\n\n## 8. PRODUCTION LAUNCH PLAN (Critical Path)",
+      "source": "docs\\legacy-reference\\PRODUCTION_AUDIT_2026-03-15.md",
+      "hasVector": true
+    },
+    {
+      "id": "05fce994c47c773b",
+      "title": "```\r\n\r\n---\r\n\r\n#### **G17: GPU Simdjson Addon**\r\n```bash",
+      "text": "```\r\n\r\n---\r\n\r\n#### **G17: GPU Simdjson Addon**\r\n```bash\n\n# Check if native simdjson addon is loaded",
+      "source": "BACKEND_INFRASTRUCTURE_AUDIT.md",
+      "hasVector": true
+    },
+    {
+      "id": "0609237b0d9504f5",
+      "title": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/ace/llm-analyze/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/ace/llm-analyze/+server.ts\" })`",
+      "text": "- `read_file({ filePath: \"deeds_labs/api-legacy/api/ace/llm-analyze/<file>\" })`\n- `verify_fix({ filePath: \"deeds_labs/api-legacy/api/ace/llm-analyze/+server.ts\" })`\n\n## How to use this file",
+      "source": "deeds_labs\\api-legacy\\api\\ace\\llm-analyze\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "06173fb4ef93cc2c",
+      "title": "Output",
+      "text": "Output\n\nReturn:\r\n\r\n```txt\r\nstatus:\r\nfailure_type:\r\nfallback_used:\r\nconfirmed_paths:\r\ncommands_run:\r\nfiles_changed:\r\ntests_run:\r\nresult:\r\nnext_exact_command:\r\n\r\nThen trigger it with:\r\n\r\n```txt\r\n/ace-fallback-ladder continue graph export recovery\r\n\r\nFor the exact current state, the next command is still:\r\n\r\nrg --files -uu | rg \"codebase-graph.json|deep-import-graph.json|deep-import-edges.jsonl|codebase-map.md\"\r\n\r\nThen patch the generator to search fallback roots\r\n```",
+      "source": ".opencode\\command\\ace-fallback-ladder.md",
+      "hasVector": true
+    },
+    {
+      "id": "061c2d86d51f4b19",
+      "title": "Next Steps",
+      "text": "Next Steps\n\n1. Review this plan\n2. Approve Phase 1 scope\n3. Create feature branch: `feat/architectural-cleanup`\n4. Start with contract definitions\n\n**Estimated Total Time**: 3-4 weeks\n**Risk Level**: Medium (refactor of core systems)\n**Rollback Strategy**: Feature flags + canary deployment",
+      "source": "ARCHITECTURAL_CLEANUP_PLAN.md",
+      "hasVector": true
+    },
+    {
+      "id": "061ec4f440ad977a",
+      "title": "How It Works",
+      "text": "How It Works\n\n1. **Before each prompt**: Hooks initialize a session and ensure the worker is running\n2. **During agent work**: MCP tools, shell commands, and file edits are captured\n3. **When agent stops**: Summary is generated and context file is updated\n4. **Next session**: Fresh context is automatically injected via `.cursor/rules/`",
+      "source": "claude-mem\\cursor-hooks\\STANDALONE-SETUP.md",
+      "hasVector": true
+    },
+    {
+      "id": "061effad255ce2cf",
+      "title": "Files (4)",
+      "text": "Files (4)\n\n- `ChatMessage.svelte`\n- `LegalAIChat.svelte`\n- `nes-typewriter-stream.svelte`\n- `SSRQLorAChatInterface.svelte`",
+      "source": ".svelte-error-fixes-backup\\sveltekit-frontend\\src\\lib\\components\\chat\\LLMS.md",
+      "hasVector": true
+    },
+    {
+      "id": "06221c22dbb3b924",
+      "title": "Programming Docs Atlas Index",
+      "text": "Programming Docs Atlas Index\n\n> Consolidated documentation for local Gemma4/HyperRAG use.",
+      "source": "archive\\logs\\bfa7ac0f_llms.txt",
+      "hasVector": true
+    },
+    {
+      "id": "0629d0e5f60c1262",
+      "title": "Terms for Further Exploration",
+      "text": "Terms for Further Exploration\n\n### Codebase Intelligence\r\n- **Dependency graph visualization**\r\n- **Import analysis**, **Module coupling**\r\n- **Semantic code search**, **AST-based retrieval**\r\n- **Static analysis graph**, **Call graph**\r\n\r\n### Legal Knowledge\r\n- **Authority chain analysis**, **Citation network**\r\n- **Statute dependency graph**, **Case law precedent**\r\n- **Legal ontology mapping**, **Jurisdiction hierarchy**\r\n- **Multi-hop reasoning**, **Semantic legal search**\r\n\r\n### Evidence Analysis\r\n- **Forensic relationship graph**, **Entity co-occurrence**\r\n- **Temporal event graph**, **Document similarity network**\r\n- **Chain of custody**, **Evidence provenance**\r\n\r\n### Recommendations\r\n- **Knowledge graph completion**, **Missing link prediction**\r\n- **Orphan node detection**, **Low-",
+      "source": "ARCHITECTURE_SPEC.md",
+      "hasVector": true
+    },
+    {
+      "id": "06306d4392a3a488",
+      "title": "Files (5)",
+      "text": "Files (5)\n\n- `ClusterBadge.svelte`\n- `CodeEditor.svelte`\n- `ErrorPanel.svelte`\n- `index.ts`\n- `SuggestionList.svelte`",
+      "source": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\archives\\unused-2026-02-14\\lib\\components\\ast\\LLMS.md",
+      "hasVector": true
+    }
+  ]
+}

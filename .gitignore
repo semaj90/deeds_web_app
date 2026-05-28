@@ -323,6 +323,10 @@ sveltekit-frontend/backups/
 .opencode/**/*.trace.json
 .opencode/**/*.run.json
 
+# Bulk OpenCode artifacts to ignore (cards + embeddings)
+.opencode/cards/
+.opencode/embeddings/
+
 # Bulk generated cards/reports
 .tmp/
 logs/
@@ -394,6 +398,13 @@ FodyWeavers.xsd
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 .vscode/*.log
+
+# Local env files (examples preserved)
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.example.production
 .vscode/vite-errors.json
 .vscode/**/history/**
 

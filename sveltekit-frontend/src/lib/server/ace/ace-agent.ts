@@ -14,6 +14,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { acePromptPreflightTool } from '$lib/server/ai/ace-prompt-preflight-tool.js';
 import { callGemma4WithTools, type Gemma4Tool, type Gemma4ToolCallResult } from './gemma4-codeintel.js';
+import { parseQdrantResponse } from '$lib/server/qdrant/parse-qdrant-json.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tool definitions + executors
@@ -67,7 +68,7 @@ const searchCodebase: Gemma4Tool = {
         },
       );
       if (!qdrantResp.ok) throw new Error(`Qdrant HTTP ${qdrantResp.status}`);
-      const qdrantData = await qdrantResp.json() as { result?: Array<{ payload?: Record<string, unknown>; score: number }> };
+      const qdrantData = await parseQdrantResponse<{ result?: Array<{ payload?: Record<string, unknown>; score: number }> }>(qdrantResp, 'search');
 
       const hits = (qdrantData.result ?? []).map(r => {
         const p = r.payload ?? {};
@@ -113,7 +114,7 @@ const getClusterSummary: Gemma4Tool = {
         },
       );
       if (!qdrantResp.ok) throw new Error(`Qdrant HTTP ${qdrantResp.status}`);
-      const data = await qdrantResp.json() as { result?: { points: Array<{ payload?: Record<string, unknown> }> } };
+      const data = await parseQdrantResponse<{ result?: { points: Array<{ payload?: Record<string, unknown> }> } }>(qdrantResp, 'scroll');
       const point = data.result?.points?.[0];
       if (!point?.payload) return `No data found for cluster ${clusterId}`;
 
@@ -267,7 +268,7 @@ const webSearch: Gemma4Tool = {
             },
           );
           if (sResp.ok) {
-            const sData = await sResp.json() as { result?: Array<{ payload?: Record<string, unknown>; score: number }> };
+            const sData = await parseQdrantResponse<{ result?: Array<{ payload?: Record<string, unknown>; score: number }> }>(sResp, 'search');
             const hits = sData.result ?? [];
             if (hits.length) {
               return '[Stored research fallback]\n' + hits.map(h => {
