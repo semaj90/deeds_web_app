@@ -152,6 +152,22 @@ function agentsMdCount() {
 
 // ── ACE smoke (lightweight, non-blocking) ────────────────────────────────────
 
+// ── Atlas seed meta (A4 — Phase 11D) ────────────────────────────────────────
+
+function readSeedMeta() {
+  const metaPath = join(ROOT, '.tmp', 'atlas-cartridge-seed-meta.json');
+  if (!existsSync(metaPath)) {
+    return { seed_count: 0, seedGenerated: false, seedWarning: true, status: 'missing',
+             areaBreakdown: {}, clusterBreakdown: {}, warning: 'seed meta not found — run atlas:cartridge-seed' };
+  }
+  try {
+    return JSON.parse(readFileSync(metaPath, 'utf-8'));
+  } catch {
+    return { seed_count: 0, seedGenerated: false, seedWarning: true, status: 'parse_error',
+             areaBreakdown: {}, clusterBreakdown: {}, warning: 'Failed to parse atlas-cartridge-seed-meta.json' };
+  }
+}
+
 async function aceSmokeResult(redis, qdrantInfo) {
   // Quick Redis sanity
   let wikiKeys = [];
@@ -166,6 +182,26 @@ async function aceSmokeResult(redis, qdrantInfo) {
     glyphAtlasPresent: qdrantInfo.glyphCount > 0,
     httpProbesSkipped: true, // requires running dev server
   };
+}
+
+// ── Atlas cartridge-seed stats ───────────────────────────────────────────────
+
+function seedStats() {
+  const metaPath = join(ROOT, '.tmp', 'atlas-cartridge-seed-meta.json');
+  if (!existsSync(metaPath)) {
+    return { seedCount: 0, seedStatus: 'not_run', seedGeneratedAt: null, seedWarning: null };
+  }
+  try {
+    const meta = JSON.parse(readFileSync(metaPath, 'utf-8'));
+    return {
+      seedCount:       meta.seed_count      ?? 0,
+      seedStatus:      meta.status          ?? 'unknown',
+      seedGeneratedAt: meta.generatedAt     ?? null,
+      seedWarning:     meta.warning         ?? null,
+    };
+  } catch {
+    return { seedCount: 0, seedStatus: 'parse_error', seedGeneratedAt: null, seedWarning: 'Failed to parse seed meta JSON' };
+  }
 }
 
 // ── ts7 check ────────────────────────────────────────────────────────────────
@@ -190,6 +226,7 @@ function formatMd(h) {
   const graphStatus = h.graphNodeCount > 0 ? '✅' : '⚠️';
   const agentsStatus= h.agentsMdCount > 0 ? '✅' : '⚠️';
   const autoencoderStatus = h.autoencoderReady ? '✅' : '⚠️';
+  const seedStatus = h.seedStatus === 'ok' ? '✅' : h.seedStatus === 'not_run' ? '⚠️' : '❌';
   const autoencoderDetail = h.autoencoderReady
     ? `trainedAt=${h.autoencoderWeightsTrainedAt}, centroids=${h.autoencoderCentroidsPresent ? 'yes' : 'no'}, encoded=${h.autoencoderEncodedCount}`
     : `weightsType=${h.autoencoderWeightsType ?? 'unknown'}, encodedType=${h.autoencoderEncodedType ?? 'unknown'}, centroids=${h.autoencoderCentroidsPresent ? 'yes' : 'no'}`;
@@ -213,6 +250,9 @@ function formatMd(h) {
 | Manifold clusters | ${h.manifoldClusterCount} | ${h.manifoldClusterCount > 0 ? '✅' : '⚠️'} |
 | SOM Weights | ${h.somWeightsPresent ? '✅' : '❌'} | ${h.somWeightsPresent ? '✅' : '❌'} |
 | Autoencoder weights | ${autoencoderDetail} | ${autoencoderStatus} |
+| Atlas seed count | ${h.seedCount} | ${h.seedGenerated ? '\u2705' : h.seedWarning ? '\u26a0\ufe0f' : '\u274c'} |
+| Atlas seed status | ${h.seedStatus} | - |
+${Object.keys(h.seedAreaBreakdown ?? {}).length > 0 ? `| Seed area breakdown | ${Object.entries(h.seedAreaBreakdown).map(([k,v]) => `${k}:${v}`).join(', ')} | - |\n` : ''}
 
 ## Graphify Tiers
 
@@ -270,6 +310,7 @@ const [rStats, qStats] = await Promise.all([
 
 const gStats  = graphJsonStats();
 const aCount  = agentsMdCount();
+const sStats  = seedStats();
 const smoke   = redis ? await aceSmokeResult(redis, qStats) : { wikiNotesPresent: false, glyphAtlasPresent: false, httpProbesSkipped: true };
 const ts7     = ts7Check();
 
@@ -303,6 +344,11 @@ const health = {
   aceSmokeWikiOk: smoke.wikiNotesPresent,
   aceSmokeGlyphOk: smoke.glyphAtlasPresent,
   aceSmokeHttpSkipped: smoke.httpProbesSkipped,
+  // Atlas cartridge seed
+  seedCount:       sStats.seedCount,
+  seedStatus:      sStats.seedStatus,
+  seedGeneratedAt: sStats.seedGeneratedAt,
+  seedWarning:     sStats.seedWarning,
   // ts7
   ts7Available: ts7.available,
   ts7Note: ts7.note,
@@ -332,3 +378,5 @@ log(`  AGENTS.md files: ${health.agentsMdCount}`);
 log('');
 log(`  ✓ Wrote ${jsonPath}`);
 log(`  ✓ Wrote ${mdPath}`);
+log(`  Seed count:      ${health.seedCount} (${health.seedStatus})`);
+if (health.seedMsgWarning) log(`  Seed warning:    ${health.seedMsgWarning}`);

@@ -164,5 +164,64 @@ if (startup) {
 
 console.log('\n══════════════════════════════════════════════════════════\n');
 
+// ── Write output files ─────────────────────────────────────────────────────
+const tmpDir = path.join(ROOT, '.tmp');
+const reportsDir = path.join(ROOT, 'reports');
+fs.mkdirSync(tmpDir, { recursive: true });
+fs.mkdirSync(reportsDir, { recursive: true });
+
+const payload = {
+  generatedAt: new Date().toISOString(),
+  cuda,
+  atlasFiles: atlas,
+  seeds,
+  startup: startup ?? null,
+};
+
+fs.writeFileSync(
+  path.join(tmpDir, 'atlas-lane-health-loop.json'),
+  JSON.stringify(payload, null, 2)
+);
+
+const seedStatus = seeds.exists
+  ? `✅ ${seeds.lines} seeds, age ${seeds.ageMin}min${seeds.stale ? ' ⚠️ stale' : ''}`
+  : '❌ not generated';
+
+const atlasRows = Object.entries(atlas)
+  .map(([k, v]) => `| ${k} | ${v.exists ? `✅ ${v.sizeKb}KB` : '❌ missing'} |`)
+  .join('\n');
+
+const md = `# Atlas Lane Health — ${new Date().toISOString()}
+
+## C++ / CUDA Build (simd-bridge)
+| Check | Status |
+|-------|--------|
+| CMake configured | ${cuda.cmakeConfigured ? '✅ yes' : '❌ no'} |
+| Build dir exists | ${cuda.buildDirExists ? '✅ yes' : '❌ no'} |
+| .node addon built | ${cuda.nodeAddonExists ? '✅ yes' : '❌ no'} |
+| CUDA arch | ${cuda.cudaArch ?? '❓ not detected'} |
+| LibTorch detected | ${cuda.libtorchDetected ? '✅ yes' : '❌ no'} |
+| simdjson vendor | ${cuda.simdjsonVendorExists ? '✅ yes' : '❌ no'} |
+
+## Atlas Files
+| File | Status |
+|------|--------|
+${atlasRows}
+
+## Cartridge Seeds
+${seedStatus}
+
+Regen: \`node scripts/atlas/atlas-to-cartridge-seed.mjs\`
+
+## Startup Service Status
+${startup ? `\`\`\`json\n${JSON.stringify(startup, null, 2)}\n\`\`\`` : '⏭️ ace-startup-status.json not found'}
+`;
+
+fs.writeFileSync(path.join(reportsDir, 'atlas-lane-health-loop.md'), md);
+
+console.log(`Output written:`);
+console.log(`  .tmp/atlas-lane-health-loop.json`);
+console.log(`  reports/atlas-lane-health-loop.md\n`);
+
 // Exit 0 always — health loop is informational, not a gate
 process.exit(0);

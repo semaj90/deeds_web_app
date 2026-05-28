@@ -210,7 +210,7 @@ export async function ingestResearchChunks(
           }
 
           if (points.length) {
-            await qdrant.client.upsert(RESEARCH_COLLECTION, { wait: true, points });
+            await qdrant.upsert({ collection: RESEARCH_COLLECTION, wait: true, points } as any);
             ingested += points.length;
 
             // Fire-and-forget tag enrichment

@@ -395,3 +395,121 @@ Scenario cache entries stored as MessagePack in Redis (`ace:scenario:exact:*`) f
 - [ ] LangGraph `scenario_lookup` node: runs Tier 1+2 before `ace_retrieval` node
 - [ ] Export scenario set as portable SQLite for offline/air-gapped edge nodes
 - [ ] Modular deployment bundle: scenario SQLite + small ONNX embed model + Redis → single Docker image for Pi/embedded chatbot
+
+---
+
+## Infrastructure Already Complete (SESSION_2026-04-12 context — do not re-implement)
+
+These are done. Listed here so future sessions don't re-open them as gaps.
+
+| Feature | Status | Reference |
+|---|---|---|
+| 3-Tier Cache (L1 Redis 5ms, L2 Bifrost 2-5s, L3 Ollama 25s) | ✅ PRODUCTION READY | `redis-exact-match.ts`, `bifrostChat()`, port 3040 |
+| Langfuse observability (7 endpoints traced) | ✅ LIVE | error-brain, codebase-index, synthesis worker, 5 RabbitMQ queues |
+| RabbitMQ 7-queue architecture | ✅ LIVE | `rabbitmq-manager-fixed.ts`, `dispatch-inline` wired |
+| simdjson N-API addon (AVX2, 2-5× JSON speedup) | ✅ BUILT | `tensorrt_bridge.node` 349KB, sm_86 |
+| LibTorch CUDA bridge (100× batch cosine) | ✅ BUILT | `libtorch-bridge.ts`, all 6 GPU functions exported |
+| Phase AC — Atlas ↔ CHR97 cartridge bridge | ✅ COMPLETE | `atlas-cartridge-seeds.ts`, 4173 seeds generated |
+| KG phases 1-6 (Neo4j + CouchDB + PageRank) | ✅ COMPLETE | `run-pagerank.ts`, `run-hypergraph.ts`, 1016 nodes |
+| Karpathy GPU authority blend (0.4·PR+0.3·attn+0.3·authority) | ✅ WIRED | `gpu:karpathy:scores` Redis hash (24h TTL) |
+| OpenAI-compatible v1 facade | ✅ LIVE | `POST /api/v1/chat/completions`, `GET /api/v1/models` |
+| AGENTS.md relationship spine (3 Postgres tables) | ✅ COMPLETE | `agent_context_files`, `directory_context_bindings`, `ace_context_sources` |
+| SeaweedFS S3 gateway (MinIO deprecated) | ✅ LIVE | port 8333, `SEAWEED_S3_PORT` override in `env.server.ts` |
+| Dispatch-inline for RabbitMQ (8 queues) | ✅ PRODUCTION READY | `DISPATCH_INLINE_COMPLETE.md` |
+| Redis permanent prod config (2GB, LRU, RDB snapshots) | ✅ PERMANENT | `docker-compose.yml` both containers |
+| Codebase index (3140 files, 768d Qdrant) | ✅ INDEXED | `codebase_chunks_768` collection |
+| RL feedback loop (context_timeline + adaptFromAnalytics) | ✅ WIRED | 6 routes wired, dwell tracking live |
+| Route test stubs G16 (355 mutating routes) | ✅ GENERATED | `tests/routes/auto/`, `generate-route-test-stubs.mjs` |
+| SOM topology on Neo4j (HAS_SOM_POSITION edges) | ✅ WIRED | `directory-summarizer.ts`, `HAS_DIRECTORY_SUMMARY` |
+| Atlas lane health loop + output files | ✅ COMPLETE 2026-05-28 | `scripts/atlas/atlas-lane-health-loop.mjs` → `reports/atlas-lane-health-loop.md` |
+| VS Code extension performance log | ✅ COMPLETE 2026-05-27 | `scripts/vscode-extension-performance-log.mjs` |
+
+**What IS still open from SESSION context:**
+- Playwright test fixtures for Track C production gap remediation
+- `.env` audit for SeaweedFS + SEAWEED_* vars across all callers
+- Model/GGUF cleanup (old MinIO admin commands still referenced in docs)
+- `cases.user_id uuid → integer` migration (blocks case-seed in `tests/global-setup.ts`)
+
+---
+
+## Startup Audit Gate Failures (run: 2026-05-27T19-37-18)
+
+Source: `sveltekit-frontend/memory/runs/2026-05-27T19-37-18/audit_failures.json`  
+Gates failing: G17 (21), G18 (6), G19 (4), G25 (1) — total 32 violations
+
+### G17 — Hardcoded localhost (21 violations)
+
+All files below use `localhost` or `127.0.0.1` directly instead of `ENV.*` getters from `env.server.ts`.
+Fix: replace literals with the appropriate `ENV.OLLAMA_URL`, `ENV.REDIS_URL`, `ENV.QDRANT_URL`, etc.
+
+| File | Fix needed |
+|---|---|
+| `src/lib/server/cache/ace-packet-cache.ts` | Use `ENV.REDIS_URL` |
+| `src/lib/server/cache/cache-invalidation.ts` | Use `ENV.REDIS_URL` |
+| `src/lib/server/cache/semantic-cache.ts` | Use `ENV.REDIS_URL` or `ENV.BIFROST_URL` |
+| `src/lib/server/analytics/ldr-client.ts` | Use `ENV.*` for LDR endpoint |
+| `src/lib/server/features/feature-map-store.ts` | Use `ENV.*` |
+| `src/lib/server/ai/preflight.ts` | Use `ENV.OLLAMA_URL` / `ENV.LLAMA_SERVER_URL` |
+| `src/lib/server/langextract/mcp-langextract.ts` | Use `ENV.TRACE_MCP_URL` (`:8788`) |
+| `src/lib/server/observability/cache-logger.ts` | Use `ENV.LANGFUSE_URL` or `ENV.REDIS_URL` |
+| `src/lib/server/observability/synthesis-logger.ts` | Use `ENV.*` |
+| `src/lib/server/ai/opencode-skill.ts` | Use `ENV.*` |
+| `src/lib/server/ai/learning-loop.ts` | Use `ENV.*` |
+| `src/lib/server/ai/langgraph-dag.ts` | Use `ENV.*` |
+| `src/lib/server/ai/gemma4.ts` | Use `ENV.OLLAMA_URL` / `ENV.LLAMA_SERVER_URL` |
+| `src/lib/server/ai/hermes/deep-research-dag.ts` | Use `ENV.*` |
+| `src/lib/server/ai/execution-transition-memory.ts` | Use `ENV.*` |
+| `src/lib/server/ai/gemma4-intent-engine.ts` | Use `ENV.*` |
+| `src/lib/server/ai/agentic-diagnostic.ts` | Use `ENV.*` |
+| `src/lib/server/ai/agent-worker.ts` | Use `ENV.*` |
+| `src/lib/server/ai/auto-fix.ts` | Use `ENV.*` |
+| `src/lib/server/ai/ace-builder.ts` | Use `ENV.*` |
+| `src/lib/server/ai/accelerator-capabilities.ts` | Use `ENV.*` |
+
+**Batch fix approach**: `rg -l "localhost" sveltekit-frontend/src/lib/server/ --type ts | grep -v env.server` gives the full list. Replace with `ENV.*` from `src/lib/server/env.server.ts`. Run `rg "localhost" src/lib/server/ --type ts` to verify 0 hits outside `env.server.ts` after fix.
+
+### G18 — Missing auth guard (6 violations)
+
+All 6 routes must add `if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 })` at the top of each handler.
+
+| File | Handler type |
+|---|---|
+| `src/routes/api/ace/stream/+server.ts` | SSE stream — add auth before starting stream |
+| `src/routes/api/ace/packet/+server.ts` | GET/POST — add auth check |
+| `src/routes/api/chat/stream/+server.ts` | SSE stream — add auth before starting stream |
+| `src/routes/api/atlas/audit/+server.ts` | Currently 501 stub — add auth when implementing |
+| `src/routes/api/internal/index-memory/+server.ts` | Internal indexing — should be auth + admin-role check |
+| `src/routes/api/memory/status/+server.ts` | Status endpoint — add auth |
+
+### G19 — Missing Zod validation (4 violations)
+
+4 API routes accept POST/PATCH body without Zod schema validation. Audit gates found 4 hits but filenames are not in `audit_failures.json` — run to find them:
+
+```bash
+rg --type ts -l "export async function POST|export async function PATCH" sveltekit-frontend/src/routes/api/ \
+  | xargs grep -L "from.*zod\|z\.\|zodSchema\|superValidate"
+```
+
+Fix pattern for each:
+```typescript
+import { z } from 'zod';
+const schema = z.object({ /* fields */ });
+const parsed = schema.safeParse(await request.json());
+if (!parsed.success) return json({ error: 'Invalid input' }, { status: 400 });
+```
+
+### G25 — Rune call in plain `.ts` file (1 violation)
+
+| File | Issue | Fix |
+|---|---|---|
+| `src/lib/server/graph/codebase-scanner-v2.ts` | `$state` or `$derived` call in plain `.ts` (not `.svelte.ts`) | Rename to `.svelte.ts` OR replace rune with plain class/ref pattern |
+
+**Note**: Runes are inert in plain `.ts` — they compile but don't react. This is a silent correctness bug, not a crash.
+
+### Audit gate fix priority
+
+```
+G25 (1 file, easy rename) → G18 (6 auth guards, ~5 min each) → G19 (4 Zod schemas) → G17 (batch ENV.* substitution)
+```
+
+Run after fixing: `node sveltekit-frontend/scripts/run-audit-gates.mjs` (or equivalent) to verify gate counts drop to 0.

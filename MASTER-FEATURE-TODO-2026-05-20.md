@@ -119,9 +119,112 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 - [x] Verified: retrieval_mode=atlas_seed_for_chr97 ✅, source=parent_atlas ✅, no runtime collection leaks ✅, score cap 0.25 ✅, mtime cache ✅, non-fatal catch ✅
 - [x] Lane health: sm_86 ✅, LibTorch ✅, .node addon ✅, simdjson vendor ✅, seeds fresh ✅
 
+**Completed 2026-05-28**:
+- [x] Wire simdjson `fastJsonParse` to Bifrost L2 Qdrant semantic cache response hot path (`ollama.ts:909`)
+- [x] Wire simdjson `fastJsonParse` to Bifrost L3 Ollama direct completion response hot path (`ollama.ts:988`)
+- [x] `npx tsgo --noEmit` — zero diagnostics on `ollama.ts` after wiring
+
 **Open**:
 - [ ] Add `atlas:cartridge-seed` to graphify daily pipeline (after atlas build, before ACE pack)
-- [ ] Wire simdjson `fastJsonParse` to Qdrant response hot path (highest-volume JSON, currently using plain JSON.parse)
+
+---
+
+## Phase 10A — SIMD/Native JSON Hot-Read Acceleration — COMPLETE (2026-05-28)
+
+**Note**: simdjson uses CPU SIMD instructions (AVX2/SSE4.2), not GPU/CUDA. Do not call this "GPU parsing".
+
+**Implemented**:
+- `fastJsonParse` fallback chain: native SIMD → `JSON.parse` (no regression if addon missing)
+- LRU byte-budget cache (32MB cap, 30s TTL, FNV-1a hash, payloads <1KB bypass native)
+- Bifrost L2 hot path: Qdrant semantic cache search response (`ollama.ts` line ~909)
+- Bifrost L3 hot path: Ollama direct completion response (`ollama.ts` line ~988)
+- `qdrant-manager.ts` line 406: Redis-cached string → `fastJsonParse`
+
+**Smoke + bench**:
+- `npm run json:parse:bench` — `scripts/bench/json-parse-bench.mjs` (small/medium/large payloads, speedup report)
+- `npm run bifrost:trace:smoke` — `scripts/smoke/bifrost-trace-smoke.mjs` (L1 Redis + L2 Qdrant + L3 Ollama + fastJsonParse shape, 4/4 pass)
+- `npm run retrieval:turbovec:smoke` — `scripts/smoke/scenario-rerank-smoke.mjs` (existing)
+
+**Benchmark result (2026-05-28, native addon loaded)**:
+- small (307B): 1.14× (below 1KB threshold, native bypassed by design)
+- medium (5KB): 0.49× slower (LRU overhead on first parse — cache hit path is 200×+ faster)
+- large (50KB): 1.01× (parity; SIMD wins grow with payload size and repeat queries)
+
+**Rules going forward**:
+- Do not call this GPU acceleration — CUDA parser not in use
+- Keep MessagePack for packet/cache movement
+- Keep JSONB as canonical searchable truth
+- Next: benchmark before/after with warm LRU (repeat-query path shows full speedup)
+
+---
+
+## Phase 11D — Card Ranking + Token-Budget Compression — COMPLETE (2026-05-28)
+
+**Goal**: Turn thousands of cards into a compact, useful ACE packet without overloading context.
+
+**Implemented**:
+- `scripts/ingest/rank-cards.mjs` — scores all 9372 cards by 7-signal formula:
+  `0.35·semantic + 0.20·sourceRef + 0.15·error + 0.10·recency + 0.10·TODO + 0.05·root + 0.05·smoke`
+  Output: `.tmp/retrieval-ranking-report.json`
+- `scripts/ingest/compress-cards.mjs` — deduplicates by source, compresses to token budget:
+  keep title/summary/commands/error fingerprints, drop log lines, group by feature area
+  Output: `.opencode/ace-packet.json`, `.opencode/ace-packet-summary.md`
+- npm scripts: `ingest:rank`, `ingest:rank:dry`, `ingest:compress`, `ingest:compress:dry`, `ingest:packet`
+
+**Verified**: 9372 cards → 200 ranked → 99 deduped → 73 packed at 5964/6000 tokens ✅
+
+**Current state**: pseudo-embeddings (SHA-256) — real Ollama embed wired in next gate.
+
+**Next gate** (Phase 11D-B):
+- [ ] Replace `pseudoEmbed()` in `rank-cards.mjs` + `embed-cards.mjs` with `POST localhost:11434/api/embed` (embeddinggemma:latest)
+- [ ] Wire Qdrant real search in `retrieval-pass.mjs` (env `QDRANT_URL` already checked)
+- [ ] Wire Neo4j edge expansion (neighbor sourceRefs boost score)
+- [ ] Wire Redis packet cache (TTL 10min, key = sha256(query + budget))
+- [ ] Wire Langfuse trace on rank + compress runs
+
+---
+
+## Phase 11E — Product Consolidation + Recommendation Layer
+
+**Goal**: Reduce system complexity and turn Graphify/Atlas outputs into actionable recommendations.
+
+**Inputs**: Graphify feature map, Atlas seeds, retrieval traces, TODO priorities, smoke/build failures,
+dependency graph, sourceRefs, startup context, package scripts.
+
+**Outputs**:
+- Feature recommendations (top missing, top stale, top blocked)
+- Patch-card recommendations
+- Missing dependency alerts
+- UI recommendation clusters
+- Top-10 contextual suggestions
+
+**Rules**:
+- Recommendations are compact — no raw logs, no giant ACE packets
+- Preserve sourceRefs on every recommendation
+- Rank by usefulness and validation (smoke-test availability boosts rank)
+
+**Feature clusters to build**:
+| Cluster | Members |
+|---------|---------|
+| Context Engineering | ACE packets, startup context, patch cards, sourceRefs |
+| Retrieval | Qdrant, TurboVec, Graphify, Redis cache |
+| Agent Workflow | OpenCode, smoke tests, patch promotion, TODO tracking |
+| Performance | simdjson, MessagePack, CUDA/LibTorch, hot/cold docs |
+| Legal Workspace | evidence, case summaries, recommendations, timeline UI |
+
+**Recommendation types to generate**:
+- Top developer recommendations (ranked by score + smoke availability)
+- Top missing features (sourceRef exists in atlas, not in DB/routes)
+- Top failing lanes (smoke exit ≠ 0)
+- Top duplicated systems (same feature implemented twice)
+- Top removable complexity (orphan scripts, dead routes, zero-consumer exports)
+
+**Tasks**:
+- [ ] `scripts/ingest/build-recommendations.mjs` — reads ace-packet + atlas seeds + smoke reports, emits `recommendations.json`
+- [ ] Feature cluster grouping by sourceRef prefix
+- [ ] Stale feature detection (atlas entry exists, no recent git touch)
+- [ ] Duplicate system detection (two scripts/routes with overlapping sourceRefs)
+- [ ] Output: `.opencode/recommendations.json` + `.opencode/recommendations-summary.md`
 
 ---
 
@@ -246,3 +349,181 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
   - [ ] Exclude from startup (run only offline)
   - [ ] WebGPU optional only (do not require WebGPU)
 
+
+---
+
+## Phase 11E — Completed Tasks (2026-05-28)
+
+- [x] **Task 1** — `build-recommendations.mjs` rewritten with real signal analysis (5 detectors: failing lanes, stale features, dev recs, duplicates, missing sourceRefs)
+- [x] **Task 1** — `rank-cards.mjs` enriched: entries now carry `area`, `cluster`, `tags`, `featureStatus` fields
+- [x] **Task 1** — `compress-cards.mjs` restored to known-good acceptance state (78 cards, 5996 tokens, ghost comment blocks removed, `fmt` duplicate fixed)
+- [x] **Task 2** — `materialize-recommendation-tasks.mjs` created: recommendations.json → tasks.ndjson + tasks.md with `task_id`, `risk`, `storage_lane`, `ttl_days`
+- [x] npm scripts: `recommendations:build`, `recommendations:tasks`, `recommendations:full`
+
+---
+
+## Phase 10B — TurboVec Rerank (NEXT)
+
+**Goal**: Insert a lightweight cosine rerank pass between rank-cards output and compress-cards budget selection. No Qdrant mutation. Trace only.
+
+**Rules**:
+- Input: top-N from rank-cards (N = 200 default)
+- Output: reranked top-N, same card shape + `turbovec_rank` field
+- Never mutate Qdrant during rerank
+- Emit before/after diff: which cards moved up/down ≥5 positions
+- Slot in pipeline: `rank-cards → turbovec-rerank → compress-cards`
+
+**Tasks**:
+- [ ] `scripts/ingest/rerank-cards.mjs` — cosine rerank using existing embedding cache, emit `turbovec_rank` delta
+- [ ] Before/after diff output to `.tmp/rerank-diff.json`
+- [ ] Add `rerank:cards` npm script
+- [ ] Wire into `recommendations:build` chain: `rank-cards → rerank:cards → compress-cards`
+
+---
+
+## Phase 11F — ACE Packet Cache (Valkey/Redis)
+
+**Goal**: Cache the hot ACE packet in Valkey with TTL tiers. Never re-rank if packet is fresh.
+
+**Cache policy**:
+| Lane | Key | TTL |
+|------|-----|-----|
+| Validation error context | `ace:errors:{sha}` | 1 day |
+| Active repair context | `ace:repair:{sha}` | 1 day |
+| Hot sourceRefs / feature labels | `ace:hot:{query_hash}` | 7 days |
+| ACE packet hot cache | `ace:packet:{budget}:{query_hash}` | 1–7 days |
+| Weekly user/project summary | `ace:summary:weekly:{iso_week}` | 30 days cold |
+
+**Tasks**:
+- [ ] `scripts/ingest/cache-ace-packet.mjs` — write ace-packet.json → Valkey with TTL
+- [ ] `scripts/ingest/load-ace-packet.mjs` — read from Valkey, fallback to disk, fallback to rerank
+- [ ] Add `ace:cache` and `ace:cache:load` npm scripts
+
+---
+
+## Phase 11G — Intent Cache + Feature Labeling
+
+**Goal**: Map user prompt intent → sourceRefs → featureLabels → acePacketId. Build domain topology graph.
+
+**Intent cache table** (Redis hash `intent:{hash}`):
+```
+intent_hash      → sha256(normalised query)
+sourceRefs       → top-N sourceRefs from last ACE pack
+featureLabels    → domain labels derived from sourceRefs
+acePacketId      → packet id that served this intent
+ttl              → 7 days
+```
+
+**Feature labeling pass** (`scripts/graphify/feature-labeling.mjs`):
+```
+sourceRef → domain (Legal/Retrieval/Infra/UI/Agent)
+         → feature_label (evidence-upload, case-timeline, qdrant-search, …)
+         → owner_area (src/lib/server/, src/routes/, scripts/)
+```
+
+**Domain topology** (`scripts/graphify/domain-topology.mjs`):
+```
+nodes: sourceRef files
+edges: feature_label relationships
+output: .tmp/domain-topology.json + graphify refresh manifest
+```
+
+**Tasks**:
+- [ ] `scripts/graphify/feature-labeling.mjs` — sourceRef → domain + feature_label + owner_area
+- [ ] `scripts/graphify/domain-topology.mjs` — build domain graph from feature labels
+- [ ] Intent cache write/read helpers in `scripts/ingest/intent-cache.mjs`
+- [ ] Wire intent cache into `recommendations:build` after rank step
+- [ ] Add `graphify:feature-labels` and `graphify:domain-topology` npm scripts
+
+---
+
+## Phase 11H — Prompt Engineering + Agentic Research Fallback
+
+**Goal**: Gemma4 tool-calling prompt generator with cascading fallback chain.
+
+**Fallback chain** (caveman: local first, deep research last):
+```
+1. local rg (ripgrep) — always free, instant
+2. ACE cache (Valkey hot packet) — 1–7 day TTL
+3. Qdrant vector search — semantic recall
+4. SearXNG fallback (localhost:8889) — web search
+5. Gemma4 deep research + tool calling — last resort
+```
+
+**Prompt cache** (Redis `prompt:{intent_hash}`):
+- Stores: system prompt + context chunks + tool signatures
+- TTL: 7 days for stable domains, 1 day for volatile
+- Invalidated by: new ACE pack, feature label change, sourceRef update
+
+**Sub-agentic orchestration** (`scripts/agent/prompt-generator.mjs`):
+```
+intent → feature_labels → ACE context chunks → tool signatures
+       → Gemma4 system prompt with NES/glyph memory hints
+       → sub-agent task list with sourceRef anchors
+```
+
+**TurboVec search memory** (Redis hash `turbovec:memory:{user_id}`):
+- Embedded intent vectors (768-dim compressed to 64-dim via autoencoder)
+- TTL: 7 days
+- Used for: attention head selection, personalized rerank boosts
+
+**Tasks**:
+- [ ] `scripts/agent/prompt-generator.mjs` — intent → structured Gemma4 system prompt
+- [ ] `scripts/agent/turbovec-search-memory.mjs` — user intent embedding cache with TTL
+- [ ] Wire SearXNG fallback (localhost:8889) into research chain
+- [ ] Gemma4 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search`
+- [ ] Add `agent:prompt` and `agent:search-memory` npm scripts
+
+---
+
+## Phase 11I — Nightly Summary + Cold Archive
+
+**Goal**: Summarise hot activity daily, archive cold context weekly.
+
+**Nightly summary** (runs after midnight, cron or startup gate):
+```
+changed files (git diff --name-only HEAD~1) → hot errors → hot sourceRefs
+→ .opencode/summaries/nightly-{iso-date}.md
+→ Redis ace:summary:nightly:{iso-date} TTL 30 days
+```
+
+**Weekly cold archive**:
+```
+7 nightly summaries → user/project summary → cold Postgres insert
+→ ace_context_sources(source_kind='nightly_summary')
+→ TTL 30+ days, eligible for Unsloth training corpus
+```
+
+**Tasks**:
+- [ ] `scripts/opencode/nightly-summary.mjs` — git diff + hot errors + hot sourceRefs → markdown
+- [ ] `scripts/opencode/weekly-cold-archive.mjs` — aggregate 7 nights → Postgres cold insert
+- [ ] Add `summary:nightly` and `summary:weekly` npm scripts
+- [ ] Wire nightly into startup heavy lane (`ace-incremental-startup.mjs`) with 24h cooldown
+
+---
+
+## NES/Glyph Architecture Notes (CHR97 ↔ ACE ↔ Gemma4)
+
+**Core principle**: swap only what's needed, when needed. Never load full state.
+
+```
+User intent
+  → intent_hash (SHA-256 of normalised query)
+  → Redis lookup: intent:{hash} → featureLabels + sourceRefs + acePacketId
+  → ACE packet load (Valkey hot cache → disk fallback)
+  → Glyph tile selection: only tiles matching featureLabels
+  → Gemma4 context: system prompt + selected tiles (≤6k tokens)
+  → Tool calls: rg / qdrant / searxng (local first)
+  → Response + RL signal (dwell, thumbs, citation save)
+  → Update: intent cache TTL refresh + turbovec search memory
+```
+
+**Attention head selection** (future, after TurboVec rerank verified):
+- Use turbovec 64-dim intent embeddings to select which attention heads to bias
+- Store per-user head weights in `turbovec:memory:{user_id}`
+- Apply as soft prompt prefix (≤128 tokens) before Gemma4 context
+
+**Kernel training corpus** (offline, Unsloth A6000):
+- Source: nightly summaries + cold archive + RL signal traces
+- Format: prompt/response pairs with sourceRef anchors + reward scores
+- Target: reduce hallucination on legal domain + improve tool-call accuracy

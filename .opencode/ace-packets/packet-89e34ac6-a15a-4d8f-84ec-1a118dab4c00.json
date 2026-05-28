@@ -1,0 +1,52 @@
+{
+  "query": "",
+  "packet_id": "89e34ac6-a15a-4d8f-84ec-1a118dab4c00",
+  "cards": [
+    {
+      "card_id": "a408aa0d1a96447c",
+      "sourceRef": "a408aa0d1a96447c.json",
+      "summary": "DRY_RUN summary for prompt (Summarize the following document into a short JSON with keys: summary (one conci...)",
+      "score": 0,
+      "tags": [
+        "source:llm",
+        "project:opencode"
+      ]
+    },
+    {
+      "card_id": "93421846ddef648a",
+      "sourceRef": "93421846ddef648a.json",
+      "summary": "DRY_RUN summary for prompt (Summarize the following document into a short JSON with keys: summary (one conci...)",
+      "score": 0,
+      "tags": [
+        "source:llm",
+        "project:opencode"
+      ]
+    },
+    {
+      "card_id": "1b418cbfdabf788f",
+      "sourceRef": "1b418cbfdabf788f.json",
+      "summary": "DRY_RUN summary for prompt (Summarize the following document into a short JSON with keys: summary (one conci...)",
+      "score": 0,
+      "tags": [
+        "source:llm",
+        "project:opencode"
+      ]
+    }
+  ],
+  "clusters": [
+    "source:llm"
+  ],
+  "edges": [],
+  "top_tags": [
+    "source:llm",
+    "project:opencode"
+  ],
+  "sourceRefs": [
+    "a408aa0d1a96447c.json",
+    "93421846ddef648a.json",
+    "1b418cbfdabf788f.json"
+  ],
+  "compression_ratio": 1,
+  "estimated_tokens": 85,
+  "created_at": "2026-05-28T18:24:29.765Z"
+}

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs/promises';
 import { join } from 'path';
+import { createHash } from 'crypto';
 
 const CARDS_INDEX = '.opencode/cards/index.json';
 const CARDS_DIR = '.opencode/cards';
@@ -107,15 +108,28 @@ async function main(){
       if(!force){
         try{ await fs.access(outPath); console.log('Skipping existing summary for', cardMeta.id); continue; }catch(e){}
       }
-      try{
-        const resp = await callLLM(prompt, { dryRun });
-        const out = { id: cardMeta.id, summary: resp.summary ?? resp.text ?? resp.raw ?? String(resp), tags: resp.tags ?? [] };
-        await fs.writeFile(outPath, JSON.stringify(out, null, 2), 'utf8');
-        summariesOut.push({ card_id: cardMeta.id, sourceRef: card.file || null, summary: out.summary, keywords: out.tags || [], tags: ['source:llm','project:opencode'], file: cardMeta.file, mtime: 0 });
-        console.log('Wrote summary to', outPath);
-      }catch(e){
-        console.error('Failed to summarize', cardMeta.id, e.message);
-      }
+        try{
+                const resp = await callLLM(prompt, { dryRun });
+          const summaryText = String(resp.summary || resp.text || resp.raw || '').trim();
+          if (!summaryText) {
+            // record invalid summary
+            const invalidPath = join(CARDS_DIR, 'invalid-summaries.jsonl');
+            const invalidObj = { card_id: cardMeta.id, sourceRef: card.file || null, reason: 'empty_llm_summary' };
+            try{ await fs.appendFile(invalidPath, JSON.stringify(invalidObj)+'\n','utf8'); }catch(e){}
+            console.log('LLM produced empty summary for', cardMeta.id, '- recorded to invalid-summaries.jsonl');
+            continue;
+          }
+          const out = { id: cardMeta.id, summary: summaryText, tags: resp.tags ?? [] };
+          await fs.writeFile(outPath, JSON.stringify(out, null, 2), 'utf8');
+          // compute content hash
+          const h = createHash('sha256');
+          h.update(String(cardMeta.id)); h.update('\n'); h.update(String(card.file || '')); h.update('\n'); h.update(String(summaryText));
+          const content_hash = h.digest('hex');
+          summariesOut.push({ card_id: cardMeta.id, sourceRef: card.file || null, summary: summaryText, content_hash, keywords: out.tags || [], tags: ['source:llm','project:opencode'], file: cardMeta.file, mtime: 0 });
+          console.log('Wrote summary to', outPath);
+        }catch(e){
+          console.error('Failed to summarize', cardMeta.id, e.message);
+        }
     }
     // append to global summaries.jsonl
     if(summariesOut.length){

@@ -21,7 +21,7 @@ import { ENV } from '$lib/server/env.server.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const LDR_BASE_URL    = (ENV as unknown as Record<string, string>).LDR_BASE_URL ?? 'http://127.0.0.1:5000';
+const LDR_BASE_URL    = process.env.LDR_BASE_URL ?? 'http://127.0.0.1:5000';
 const LDR_ENABLED     = (ENV as unknown as Record<string, string>).LDR_ENABLED !== 'false';
 const TASK_TTL        = 24 * 60 * 60;  // 24h
 const RESULT_TTL      = 4  * 60 * 60;  // 4h

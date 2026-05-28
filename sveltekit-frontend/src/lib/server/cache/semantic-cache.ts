@@ -45,6 +45,7 @@ import { semanticCache } from '../db/schema/schema-semantic-cache.js';
 import { sql } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { getRedis } from '../redis.js';
+import { ENV } from '../env.server.js';
 import {
   searchSemanticCache as searchRedisSemanticCache,
   storeSemanticCache as storeRedisSemanticCache,
@@ -55,7 +56,7 @@ const KARPATHY_ENCODED_TTL_SECONDS = 24 * 60 * 60;
 // In a real scenario, this connects to Ollama embeddinggemma
 export async function generateEmbedding(text: string): Promise<number[]> {
   try {
-    const res = await fetch('http://127.0.0.1:11434/api/embeddings', {
+    const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),

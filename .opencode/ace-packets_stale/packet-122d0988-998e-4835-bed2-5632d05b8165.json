@@ -1,0 +1,378 @@
+{
+  "query": "",
+  "packet_id": "122d0988-998e-4835-bed2-5632d05b8165",
+  "cards": [
+    {
+      "sourceRef": "file:src/lib/components/ui/alert-dialog/index.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "components",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/components/ui/Card.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "components",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/components/ui/context-menu.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "components",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/components/ui/gaming/core/useGamingEvolution.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "components",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/components/ui/modal/index.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "components",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/components/ui/scrollarea/index.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "components",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/config/pgvector-gpu-config.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "config",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/server/auth-guard.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "server",
+        "auth",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/server/database-simple.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "server",
+        "db-schema",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/server/rabbitmq.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/shims/commonjs-shim.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "shims",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/shims/dns-browser-shim.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "shims",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/shims/fs-browser-shim.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "shims",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/shims/ioredis-browser-shim.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "shims",
+        "zod",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/shims/lokijs-browser-adapter.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "shims",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/shims/os-browser-shim.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "shims",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/shims/piper-expressions-shim.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "shims",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/shims/worker-threads-browser-shim.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "shims",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/utils/parallaxDynamic.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "utils",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/webgpu/unified-runtime-abstraction.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "webgpu",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/webgpu/webgpu-gemma-client.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "webgpu",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/workers/embedding-worker-enhanced.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "lib",
+        "workers",
+        "has-todo",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/mcp/zod-to-json-schema-bridge/index.js",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "js",
+        "src",
+        "mcp",
+        "zod-to-json-schema-bridge",
+        "zod",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    }
+  ],
+  "clusters": [
+    "js"
+  ],
+  "edges": [],
+  "top_tags": [
+    "js",
+    "src",
+    "source:atlas",
+    "type:graphify",
+    "project:atlas",
+    "lib",
+    "shims",
+    "components",
+    "server",
+    "zod"
+  ],
+  "sourceRefs": [
+    "file:src/lib/components/ui/alert-dialog/index.js",
+    "file:src/lib/components/ui/Card.js",
+    "file:src/lib/components/ui/context-menu.js",
+    "file:src/lib/components/ui/gaming/core/useGamingEvolution.js",
+    "file:src/lib/components/ui/modal/index.js",
+    "file:src/lib/components/ui/scrollarea/index.js",
+    "file:src/lib/config/pgvector-gpu-config.js",
+    "file:src/lib/server/auth-guard.js",
+    "file:src/lib/server/database-simple.js",
+    "file:src/lib/server/rabbitmq.js",
+    "file:src/lib/shims/commonjs-shim.js",
+    "file:src/lib/shims/dns-browser-shim.js",
+    "file:src/lib/shims/fs-browser-shim.js",
+    "file:src/lib/shims/ioredis-browser-shim.js",
+    "file:src/lib/shims/lokijs-browser-adapter.js",
+    "file:src/lib/shims/os-browser-shim.js",
+    "file:src/lib/shims/piper-expressions-shim.js",
+    "file:src/lib/shims/worker-threads-browser-shim.js",
+    "file:src/lib/utils/parallaxDynamic.js",
+    "file:src/lib/webgpu/unified-runtime-abstraction.js",
+    "file:src/lib/webgpu/webgpu-gemma-client.js",
+    "file:src/lib/workers/embedding-worker-enhanced.js",
+    "file:src/mcp/zod-to-json-schema-bridge/index.js"
+  ],
+  "compression_ratio": 1,
+  "estimated_tokens": 6,
+  "created_at": "2026-05-28T15:27:58.633Z"
+}

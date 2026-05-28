@@ -1,0 +1,383 @@
+{
+  "query": "",
+  "packet_id": "c5f73dd6-f235-4f76-ae84-8a2d88d42cbf",
+  "cards": [
+    {
+      "sourceRef": "ingest_hch7hgv",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_pcxikau",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_rb246b1",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_3ypdofy",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_7dfndk2",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_1nfowno",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_herm0l5",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_gwxt3ym",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_ejtfraj",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_rwu867f",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_yzi44dr",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_n55skpr",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_y4zk6kv",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_s4gqv2b",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_x06j68i",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_srv04gw",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_z8tqunt",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_cmydb2o",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_7cbj2z4",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_4osv7ac",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ingest_1eua523",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "context-assembler.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "multi-lane-retrieval.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "retrieval-lanes.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "cache-keys.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "ngram-retrieval.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "error-fingerprint.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "graph-expander.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "qdrant-manager.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "gemma4-agent.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "trace-subagent-orchestrator.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "synthesis-memory-archiver.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "dual-embedder.ts",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "source:atlas",
+        "type:ingest",
+        "project:atlas"
+      ]
+    }
+  ],
+  "clusters": [
+    "source:atlas"
+  ],
+  "edges": [],
+  "top_tags": [
+    "source:atlas",
+    "type:ingest",
+    "project:atlas"
+  ],
+  "sourceRefs": [
+    "ingest_hch7hgv",
+    "ingest_pcxikau",
+    "ingest_rb246b1",
+    "ingest_3ypdofy",
+    "ingest_7dfndk2",
+    "ingest_1nfowno",
+    "ingest_herm0l5",
+    "ingest_gwxt3ym",
+    "ingest_ejtfraj",
+    "ingest_rwu867f",
+    "ingest_yzi44dr",
+    "ingest_n55skpr",
+    "ingest_y4zk6kv",
+    "ingest_s4gqv2b",
+    "ingest_x06j68i",
+    "ingest_srv04gw",
+    "ingest_z8tqunt",
+    "ingest_cmydb2o",
+    "ingest_7cbj2z4",
+    "ingest_4osv7ac",
+    "ingest_1eua523",
+    "context-assembler.ts",
+    "multi-lane-retrieval.ts",
+    "retrieval-lanes.ts",
+    "cache-keys.ts",
+    "ngram-retrieval.ts",
+    "error-fingerprint.ts",
+    "graph-expander.ts",
+    "qdrant-manager.ts",
+    "gemma4-agent.ts",
+    "trace-subagent-orchestrator.ts",
+    "synthesis-memory-archiver.ts",
+    "dual-embedder.ts"
+  ],
+  "compression_ratio": 1,
+  "estimated_tokens": 8,
+  "created_at": "2026-05-28T15:27:58.635Z"
+}

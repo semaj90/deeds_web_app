@@ -1,5 +1,6 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { createHash } from 'crypto';
+import { promises as fs } from 'fs';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG, buildVectorPayload } from '$lib/server/config/vector-config.js';
@@ -45,6 +46,66 @@ export class QdrantManager {
 
   constructor(url = ENV.QDRANT_URL) {
     this.client = new QdrantClient({ url });
+    // Wrap client.upsert to enforce vector-dimension validation for any direct upsert calls
+    try {
+      const originalUpsert = (this.client as any).upsert?.bind(this.client);
+      if (originalUpsert) {
+        (this.client as any).upsert = async (collectionName: string, body: any) => {
+          try {
+            const points = body?.points ?? [];
+            const invalids: Array<{
+              id: string | number;
+              vectorName?: string;
+              found?: string | number;
+            }> = [];
+            for (const p of points) {
+              const v = p.vector;
+              if (Array.isArray(v)) {
+                if (v.length !== VECTOR_CONFIG.DIMENSIONS)
+                  invalids.push({ id: p.id, found: v.length });
+              } else if (v && typeof v === 'object') {
+                for (const [name, val] of Object.entries(v)) {
+                  if (Array.isArray(val) && (val as any).length !== VECTOR_CONFIG.DIMENSIONS) {
+                    invalids.push({ id: p.id, vectorName: name, found: (val as any).length });
+                  }
+                }
+              }
+            }
+
+            if (invalids.length > 0) {
+              try {
+                await fs.mkdir('.tmp', { recursive: true });
+                await fs.writeFile(
+                  '.tmp/qdrant-upsert-dim-report.json',
+                  JSON.stringify(
+                    {
+                      error: 'invalid_vector_dimensions',
+                      details: invalids,
+                      expected: VECTOR_CONFIG.DIMENSIONS,
+                      timestamp: new Date().toISOString(),
+                    },
+                    null,
+                    2
+                  )
+                );
+              } catch (e) {
+                console.error('Failed to write qdrant upsert dim report (wrapped upsert):', e);
+              }
+              throw new Error(
+                `Aborting Qdrant upsert: found ${invalids.length} points with invalid vector dimensions (expected ${VECTOR_CONFIG.DIMENSIONS}). See .tmp/qdrant-upsert-dim-report.json`
+              );
+            }
+
+            return await originalUpsert(collectionName, body);
+          } catch (err) {
+            throw err;
+          }
+        };
+      }
+    } catch (e) {
+      // Non-fatal: if wrapping fails, rely on explicit batchUpsert/storeDocument checks
+      console.warn('[qdrant] failed to wrap client.upsert for additional validation:', e);
+    }
   }
 
   private sparseSupportCacheKey(collectionName: string, sparseVectorName: string): string {
@@ -205,17 +266,41 @@ export class QdrantManager {
       // ── synthesis_memory — long-term agent memory ────────────────────
       { collection: this.collections.synthesis_memory, field: 'source', schema: 'keyword' },
       { collection: this.collections.synthesis_memory, field: 'tags', schema: 'keyword' },
-      { collection: this.collections.agent_memory_observations, field: 'source', schema: 'keyword' },
+      {
+        collection: this.collections.agent_memory_observations,
+        field: 'source',
+        schema: 'keyword',
+      },
       { collection: this.collections.agent_memory_observations, field: 'ide', schema: 'keyword' },
-      { collection: this.collections.agent_memory_observations, field: 'session_id', schema: 'keyword' },
-      { collection: this.collections.agent_memory_observations, field: 'observation_id', schema: 'keyword' },
-      { collection: this.collections.agent_memory_observations, field: 'project_path', schema: 'keyword' },
+      {
+        collection: this.collections.agent_memory_observations,
+        field: 'session_id',
+        schema: 'keyword',
+      },
+      {
+        collection: this.collections.agent_memory_observations,
+        field: 'observation_id',
+        schema: 'keyword',
+      },
+      {
+        collection: this.collections.agent_memory_observations,
+        field: 'project_path',
+        schema: 'keyword',
+      },
       { collection: this.collections.agent_memory_observations, field: 'tags', schema: 'keyword' },
-      { collection: this.collections.agent_memory_observations, field: 'source_refs', schema: 'keyword' },
+      {
+        collection: this.collections.agent_memory_observations,
+        field: 'source_refs',
+        schema: 'keyword',
+      },
       { collection: this.collections.document_knowledge, field: 'cardId', schema: 'keyword' },
       { collection: this.collections.document_knowledge, field: 'kind', schema: 'keyword' },
       { collection: this.collections.document_knowledge, field: 'status', schema: 'keyword' },
-      { collection: this.collections.document_knowledge, field: 'featureLabels', schema: 'keyword' },
+      {
+        collection: this.collections.document_knowledge,
+        field: 'featureLabels',
+        schema: 'keyword',
+      },
       { collection: this.collections.document_knowledge, field: 'sourceRefs', schema: 'keyword' },
       { collection: this.collections.document_knowledge, field: 'chunkIds', schema: 'keyword' },
       { collection: this.collections.document_knowledge, field: 'clusterTags', schema: 'keyword' },
@@ -618,6 +703,54 @@ export class QdrantManager {
   }) {
     const batchSize = params.batchSize ?? 100;
     const collectionName = this.collections[params.collection];
+    // Validate all vectors before performing any network upsert to avoid partial writes
+    const invalids: Array<{ id: string | number; vectorName?: string; found?: string | number }> =
+      [];
+    for (const p of params.points) {
+      const v = p.vector;
+      if (Array.isArray(v)) {
+        if (v.length !== VECTOR_CONFIG.DIMENSIONS) {
+          invalids.push({ id: p.id, found: v.length });
+        }
+      } else if (v && typeof v === 'object') {
+        // Named multi-vector or mapping
+        for (const [name, val] of Object.entries(v)) {
+          if (Array.isArray(val)) {
+            if (val.length !== VECTOR_CONFIG.DIMENSIONS) {
+              invalids.push({ id: p.id, vectorName: name, found: (val as any).length });
+            }
+          }
+          // sparse vectors may be objects with indices/values — skip sparse validation here
+        }
+      } else {
+        // no vector present — skip
+      }
+    }
+
+    if (invalids.length > 0) {
+      try {
+        await fs.mkdir('.tmp', { recursive: true });
+        await fs.writeFile(
+          '.tmp/qdrant-upsert-dim-report.json',
+          JSON.stringify(
+            {
+              error: 'invalid_vector_dimensions',
+              details: invalids,
+              expected: VECTOR_CONFIG.DIMENSIONS,
+              timestamp: new Date().toISOString(),
+            },
+            null,
+            2
+          )
+        );
+      } catch (e) {
+        console.error('Failed to write qdrant upsert dim report:', e);
+      }
+      throw new Error(
+        `Aborting Qdrant upsert: found ${invalids.length} points with invalid vector dimensions (expected ${VECTOR_CONFIG.DIMENSIONS}). See .tmp/qdrant-upsert-dim-report.json`
+      );
+    }
+
     const batches = this.chunkArray(params.points, batchSize);
     let totalUpserted = 0;
 
@@ -651,6 +784,119 @@ export class QdrantManager {
     return { totalUpserted };
   }
 
+  /**
+   * Canonical upsert wrapper — validates vectors, delegates to batchUpsert when
+   * the payload exceeds batchSize, and performs cache invalidation.
+   */
+  async upsert(params: {
+    collection: keyof typeof this.collections | string;
+    points: any[];
+    wait?: boolean;
+    batchSize?: number;
+  }) {
+    const batchSize = params.batchSize ?? 100;
+
+    // Resolve collection name (value) and attempt to preserve the original key
+    const resolvedCollectionName =
+      (this.collections as any)[params.collection as any] ?? params.collection;
+
+    // If caller passed a key (exists in collections), prefer that key when delegating
+    const collectionKey =
+      Object.keys(this.collections).find(
+        (k) => (this.collections as any)[k] === params.collection
+      ) ||
+      (Object.keys(this.collections).includes(params.collection as string)
+        ? params.collection
+        : null);
+
+    if (!Array.isArray(params.points) || params.points.length === 0) {
+      return { upserted: 0 };
+    }
+
+    // Delegate to batchUpsert when large
+    if (params.points.length > batchSize) {
+      try {
+        return await this.batchUpsert({
+          collection: (collectionKey as any) ?? (params.collection as any),
+          points: params.points,
+          batchSize,
+        } as any);
+      } catch (e) {
+        throw e;
+      }
+    }
+
+    // Validate vector dimensions (same rules as batchUpsert)
+    const invalids: Array<{ id: string | number; vectorName?: string; found?: string | number }> =
+      [];
+    for (const p of params.points) {
+      const v = p.vector;
+      if (Array.isArray(v)) {
+        if (v.length !== VECTOR_CONFIG.DIMENSIONS) invalids.push({ id: p.id, found: v.length });
+      } else if (v && typeof v === 'object') {
+        for (const [name, val] of Object.entries(v)) {
+          if (Array.isArray(val) && (val as any).length !== VECTOR_CONFIG.DIMENSIONS) {
+            invalids.push({ id: p.id, vectorName: name, found: (val as any).length });
+          }
+        }
+      }
+    }
+
+    if (invalids.length > 0) {
+      try {
+        await fs.mkdir('.tmp', { recursive: true });
+        await fs.writeFile(
+          '.tmp/qdrant-upsert-dim-report.json',
+          JSON.stringify(
+            {
+              error: 'invalid_vector_dimensions',
+              details: invalids,
+              expected: VECTOR_CONFIG.DIMENSIONS,
+              timestamp: new Date().toISOString(),
+            },
+            null,
+            2
+          )
+        );
+      } catch (e) {
+        console.error('Failed to write qdrant upsert dim report (upsert):', e);
+      }
+      throw new Error(
+        `Aborting Qdrant upsert: found ${invalids.length} points with invalid vector dimensions (expected ${VECTOR_CONFIG.DIMENSIONS}). See .tmp/qdrant-upsert-dim-report.json`
+      );
+    }
+
+    // Perform the upsert
+    try {
+      await this.client.upsert(resolvedCollectionName as string, {
+        wait: params.wait ?? false,
+        points: params.points,
+      });
+
+      // Invalidate cached searches for this collection after upsert
+      try {
+        const { getRedis } = await import('../redis.js');
+        const redis = getRedis();
+        if (redis) {
+          const pattern = `qdrant:search:*`;
+          const keys = await redis.keys(pattern);
+          if (keys.length > 0) {
+            const delPipeline = redis.pipeline();
+            for (const k of keys) delPipeline.del(k);
+            await delPipeline.exec();
+          }
+        }
+      } catch {
+        /* invalidation failure — non-fatal */
+      }
+
+      return { upserted: params.points.length };
+    } catch (error: any) {
+      console.error('[qdrant] upsert failed:', error);
+      throw error;
+    }
+  }
+
   async storeDocument(document: {
     id: string;
     title: string;
@@ -659,6 +905,54 @@ export class QdrantManager {
     summaryEmbedding?: number[];
     metadata: Record<string, unknown>;
   }) {
+    // Validate embedding dimensions
+    const invalids: Array<{ id: string; field: string; found: number }> = [];
+    if (
+      !Array.isArray(document.contentEmbedding) ||
+      document.contentEmbedding.length !== VECTOR_CONFIG.DIMENSIONS
+    ) {
+      invalids.push({
+        id: document.id,
+        field: 'contentEmbedding',
+        found: Array.isArray(document.contentEmbedding) ? document.contentEmbedding.length : 0,
+      });
+    }
+    if (
+      document.summaryEmbedding &&
+      (!Array.isArray(document.summaryEmbedding) ||
+        document.summaryEmbedding.length !== VECTOR_CONFIG.DIMENSIONS)
+    ) {
+      invalids.push({
+        id: document.id,
+        field: 'summaryEmbedding',
+        found: Array.isArray(document.summaryEmbedding) ? document.summaryEmbedding.length : 0,
+      });
+    }
+
+    if (invalids.length > 0) {
+      try {
+        await fs.mkdir('.tmp', { recursive: true });
+        await fs.writeFile(
+          '.tmp/qdrant-upsert-dim-report.json',
+          JSON.stringify(
+            {
+              error: 'invalid_document_embedding_dimensions',
+              details: invalids,
+              expected: VECTOR_CONFIG.DIMENSIONS,
+              timestamp: new Date().toISOString(),
+            },
+            null,
+            2
+          )
+        );
+      } catch (e) {
+        console.error('Failed to write qdrant upsert dim report:', e);
+      }
+      throw new Error(
+        `Aborting Qdrant document upsert: invalid embedding dimensions for document ${document.id}. See .tmp/qdrant-upsert-dim-report.json`
+      );
+    }
+
     const point: any = {
       id: document.id,
       vector: {
@@ -721,6 +1015,32 @@ export class QdrantManager {
         expires_at: Date.now() + 24 * 60 * 60 * 1000,
       },
     };
+    // Validate embedding dimension before upsert
+    if (!Array.isArray(embedding) || embedding.length !== VECTOR_CONFIG.DIMENSIONS) {
+      try {
+        await fs.mkdir('.tmp', { recursive: true });
+        await fs.writeFile(
+          '.tmp/qdrant-upsert-dim-report.json',
+          JSON.stringify(
+            {
+              error: 'invalid_cache_embedding_dimension',
+              key,
+              found: Array.isArray(embedding) ? embedding.length : typeof embedding,
+              expected: VECTOR_CONFIG.DIMENSIONS,
+              timestamp: new Date().toISOString(),
+            },
+            null,
+            2
+          )
+        );
+      } catch (e) {
+        console.error('Failed to write qdrant upsert dim report:', e);
+      }
+      throw new Error(
+        `Aborting Qdrant cacheEmbedding upsert: embedding for key ${key} must be ${VECTOR_CONFIG.DIMENSIONS} dimensions`
+      );
+    }
+
     try {
       await this.client.upsert(this.collections.embeddings_cache, { wait: false, points: [point] });
     } catch (e) {
@@ -828,13 +1148,13 @@ export class QdrantManager {
     const startTime = Date.now();
 
     // Parallel search across all requested collections
-    const searchPromises = collections.map(col =>
+    const searchPromises = collections.map((col) =>
       this.hybridSearch({
         query: params.query,
         queryEmbedding: params.queryEmbedding,
         collection: col,
-        limit: limit * 2 // Over-sample for better fusion
-      }).catch(err => {
+        limit: limit * 2, // Over-sample for better fusion
+      }).catch((err) => {
         console.error(`HyperSearch failed for ${col}:`, err);
         return { results: [], metadata: {} } as any;
       })
@@ -843,7 +1163,10 @@ export class QdrantManager {
     const allResults = await Promise.all(searchPromises);
 
     // RRF Fusion Logic: score = sum(1 / (60 + rank))
-    const fusedResultsMap = new Map<string, { id: string | number; score: number; payload: any; collection: string }>();
+    const fusedResultsMap = new Map<
+      string,
+      { id: string | number; score: number; payload: any; collection: string }
+    >();
     const RRF_CONSTANT = 60;
 
     allResults.forEach((res, colIdx) => {
@@ -859,7 +1182,7 @@ export class QdrantManager {
             id: hit.id,
             score: rrfScore,
             payload: { ...hit.payload, _collection: collectionName },
-            collection: collectionName
+            collection: collectionName,
           });
         }
       });
@@ -870,15 +1193,15 @@ export class QdrantManager {
       .slice(0, limit);
 
     return {
-      results: fusedResults.map(r => ({ id: r.id, score: r.score, payload: r.payload })),
+      results: fusedResults.map((r) => ({ id: r.id, score: r.score, payload: r.payload })),
       metadata: {
         query: params.query,
         collection: 'hyper-collection',
         responseTime: Date.now() - startTime,
         total_results: fusedResults.length,
         cached: false,
-        searchType: 'hyper-rrf-fusion'
-      }
+        searchType: 'hyper-rrf-fusion',
+      },
     };
   }
 
@@ -948,7 +1271,7 @@ export class QdrantManager {
         limit: batchSize,
         offset: nextOffset as any,
         with_vector: [vectorName],
-        with_payload: false
+        with_payload: false,
       });
 
       for (const point of scrollResult.points) {
@@ -980,15 +1303,18 @@ export class QdrantManager {
     console.log(`[qdrant] k-means complete (${source}). Writing back assignments...`);
 
     // 4. Write back assignments in batches
-    const updateBatches = this.chunkArray(ids.map((id, i) => ({
-      id,
-      payload: { cluster_id: assignments[i] }
-    })), batchSize);
+    const updateBatches = this.chunkArray(
+      ids.map((id, i) => ({
+        id,
+        payload: { cluster_id: assignments[i] },
+      })),
+      batchSize
+    );
 
     for (const batch of updateBatches) {
       await this.client.setPayload(collection, {
         payload: { cluster_id: 0 }, // placeholder to define key if missing
-        points: batch.map(p => p.id)
+        points: batch.map((p) => p.id),
       });
       // Actually set the specific cluster_id per point
       // Note: setPayload with points array sets the same payload for all.
@@ -1005,7 +1331,7 @@ export class QdrantManager {
       for (const [clusterId, points] of byCluster.entries()) {
         await this.client.setPayload(collection, {
           payload: { cluster_id: clusterId },
-          points
+          points,
         });
       }
     }
@@ -1015,7 +1341,7 @@ export class QdrantManager {
       count: n,
       clusters: k,
       durationMs: Date.now() - startTime,
-      source
+      source,
     };
   }
 

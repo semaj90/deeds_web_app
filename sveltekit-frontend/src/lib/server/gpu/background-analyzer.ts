@@ -33,135 +33,156 @@ export interface GpuAnalysisResult {
  * Non-fatal — logs warnings and returns partial results on error.
  */
 export async function analyzeEvidenceGpu(
-	evidenceId: string,
-	caseId: string
+  evidenceId: string,
+  caseId: string
 ): Promise<GpuAnalysisResult | null> {
-	const start = performance.now();
+  const start = performance.now();
 
-	try {
-		// 1. Fetch all evidence embeddings for this case from Qdrant
-		const casePoints = await qdrant.client.scroll(qdrant.collections.evidence, {
-			filter: { must: [{ key: 'case_id', match: { value: caseId } }] },
-			with_vector: true,
-			limit: 200,
-		});
+  try {
+    // 1. Fetch all evidence embeddings for this case from Qdrant
+    const casePoints = await qdrant.client.scroll(qdrant.collections.evidence, {
+      filter: { must: [{ key: 'case_id', match: { value: caseId } }] },
+      with_vector: true,
+      limit: 200,
+    });
 
-		const points = casePoints?.points ?? [];
-		if (points.length < 2) {
-			console.log(`[GPU Analyzer] Case ${caseId}: only ${points.length} evidence point(s), skipping GPU analysis`);
-			return null;
-		}
+    const points = casePoints?.points ?? [];
+    if (points.length < 2) {
+      console.log(
+        `[GPU Analyzer] Case ${caseId}: only ${points.length} evidence point(s), skipping GPU analysis`
+      );
+      return null;
+    }
 
-		// Extract embeddings and IDs
-		const embeddings: number[][] = [];
-		const pointIds: string[] = [];
-		for (const pt of points) {
-			const vec = (pt.vector as { content?: number[] })?.content ?? (pt.vector as number[]);
-			if (Array.isArray(vec) && vec.length === 768) {
-				embeddings.push(vec);
-				pointIds.push(String(pt.id));
-			}
-		}
+    // Extract embeddings and IDs
+    const embeddings: number[][] = [];
+    const pointIds: string[] = [];
+    for (const pt of points) {
+      const vec = (pt.vector as { content?: number[] })?.content ?? (pt.vector as number[]);
+      if (Array.isArray(vec) && vec.length === 768) {
+        embeddings.push(vec);
+        pointIds.push(String(pt.id));
+      }
+    }
 
-		if (embeddings.length < 2) {
-			console.log(`[GPU Analyzer] Case ${caseId}: insufficient valid embeddings (${embeddings.length})`);
-			return null;
-		}
+    if (embeddings.length < 2) {
+      console.log(
+        `[GPU Analyzer] Case ${caseId}: insufficient valid embeddings (${embeddings.length})`
+      );
+      return null;
+    }
 
-		const cudaStatus = isCudaAvailable() ? 'GPU' : 'CPU';
-		console.log(`[GPU Analyzer] Case ${caseId}: analyzing ${embeddings.length} evidence embeddings (${cudaStatus})`);
+    const cudaStatus = isCudaAvailable() ? 'GPU' : 'CPU';
+    console.log(
+      `[GPU Analyzer] Case ${caseId}: analyzing ${embeddings.length} evidence embeddings (${cudaStatus})`
+    );
 
-		// A. Graph similarity — find related evidence
-		const simResult = await graphSimilarity(embeddings);
-		const currentIdx = pointIds.indexOf(evidenceId);
-		const similarEvidence: Array<{ id: string; score: number }> = [];
+    // A. Graph similarity — find related evidence
+    const simResult = await graphSimilarity(embeddings);
+    const currentIdx = pointIds.indexOf(evidenceId);
+    const similarEvidence: Array<{ id: string; score: number }> = [];
 
-		if (currentIdx >= 0 && simResult.matrix) {
-			const row = simResult.matrix[currentIdx];
-			for (let j = 0; j < row.length; j++) {
-				if (j !== currentIdx && row[j] > 0.5) {
-					similarEvidence.push({ id: pointIds[j], score: row[j] });
-				}
-			}
-			similarEvidence.sort((a, b) => b.score - a.score);
-		}
+    if (currentIdx >= 0 && simResult.matrix) {
+      const row = simResult.matrix[currentIdx];
+      for (let j = 0; j < row.length; j++) {
+        if (j !== currentIdx && row[j] > 0.5) {
+          similarEvidence.push({ id: pointIds[j], score: row[j] });
+        }
+      }
+      similarEvidence.sort((a, b) => b.score - a.score);
+    }
 
-		// B. Cluster embeddings — auto-group into topic clusters
-		const k = Math.min(Math.max(2, Math.floor(embeddings.length / 3)), 10);
-		const clusterResult = await clusterEmbeddings(embeddings, k);
-		const clusterAssignment = currentIdx >= 0 ? clusterResult.assignments[currentIdx] : -1;
+    // B. Cluster embeddings — auto-group into topic clusters
+    const k = Math.min(Math.max(2, Math.floor(embeddings.length / 3)), 10);
+    const clusterResult = await clusterEmbeddings(embeddings, k);
+    const clusterAssignment = currentIdx >= 0 ? clusterResult.assignments[currentIdx] : -1;
 
-		// C. Compute aggregate case embedding (equal weights)
-		const weights = new Array(embeddings.length).fill(1.0 / embeddings.length);
-		const caseEmbResult = await computeCaseEmbedding(weights, embeddings);
+    // C. Compute aggregate case embedding (equal weights)
+    const weights = new Array(embeddings.length).fill(1.0 / embeddings.length);
+    const caseEmbResult = await computeCaseEmbedding(weights, embeddings);
 
-		// Store results in evidence.metadata.gpuAnalysis JSONB
-		const gpuAnalysis = {
-			similarEvidence: similarEvidence.slice(0, 10),
-			clusterAssignment,
-			clusterCount: k,
-			totalEvidenceInCase: embeddings.length,
-			source: simResult.source,
-			analyzedAt: new Date().toISOString(),
-		};
+    // Store results in evidence.metadata.gpuAnalysis JSONB
+    const gpuAnalysis = {
+      similarEvidence: similarEvidence.slice(0, 10),
+      clusterAssignment,
+      clusterCount: k,
+      totalEvidenceInCase: embeddings.length,
+      source: simResult.source,
+      analyzedAt: new Date().toISOString(),
+    };
 
-		try {
-			await db.execute(sql`
+    try {
+      await db.execute(sql`
 				UPDATE evidence SET metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
-					gpuAnalysis,
-				})}::jsonb
+          gpuAnalysis,
+        })}::jsonb
 				WHERE id = ${evidenceId}
 			`);
-		} catch (err) {
-			console.warn('[GPU Analyzer] Metadata update failed (non-fatal):', err);
-		}
+    } catch (err) {
+      console.warn('[GPU Analyzer] Metadata update failed (non-fatal):', err);
+    }
 
-		// Store case-level aggregate embedding in Qdrant (upsert)
-		if (caseEmbResult.embedding.length === 768) {
-			try {
-				await qdrant.client.upsert(qdrant.collections.cases, {
-					wait: false,
-					points: [{
-						id: caseId,
-						vector: { content: caseEmbResult.embedding },
-						payload: {
-							case_id: caseId,
-							type: 'case_aggregate',
-							evidence_count: embeddings.length,
-							source: caseEmbResult.source,
-							updated_at: new Date().toISOString(),
-						},
-					}],
-				});
-			} catch (err) {
-				console.warn('[GPU Analyzer] Case embedding upsert failed (non-fatal):', err);
-			}
-		}
+    // Store case-level aggregate embedding in Qdrant (upsert)
+    if (caseEmbResult.embedding.length === 768) {
+      try {
+        await qdrant.upsert({
+          collection: qdrant.collections.cases,
+          wait: false,
+          points: [
+            {
+              id: caseId,
+              vector: { content: caseEmbResult.embedding },
+              payload: {
+                case_id: caseId,
+                type: 'case_aggregate',
+                evidence_count: embeddings.length,
+                source: caseEmbResult.source,
+                updated_at: new Date().toISOString(),
+              },
+            },
+          ],
+        } as any);
+      } catch (err) {
+        console.warn('[GPU Analyzer] Case embedding upsert failed (non-fatal):', err);
+      }
+    }
 
-		const latencyMs = Math.round(performance.now() - start);
-		console.log(`[GPU Analyzer] Case ${caseId}: ${similarEvidence.length} similar, cluster=${clusterAssignment}/${k}, ${latencyMs}ms (${simResult.source})`);
+    const latencyMs = Math.round(performance.now() - start);
+    console.log(
+      `[GPU Analyzer] Case ${caseId}: ${similarEvidence.length} similar, cluster=${clusterAssignment}/${k}, ${latencyMs}ms (${simResult.source})`
+    );
 
-		// Audit log — GPU analysis completed
-		import('$lib/server/audit/evidence-audit.js').then(({ logEvidenceAction }) => {
-			logEvidenceAction(evidenceId, 'gpu_analyzed', {
-				changes: { source: simResult.source, similarCount: similarEvidence.length, clusterAssignment, clusterCount: k, latencyMs },
-			});
-		}).catch(() => { /* audit is non-critical */ });
+    // Audit log — GPU analysis completed
+    import('$lib/server/audit/evidence-audit.js')
+      .then(({ logEvidenceAction }) => {
+        logEvidenceAction(evidenceId, 'gpu_analyzed', {
+          changes: {
+            source: simResult.source,
+            similarCount: similarEvidence.length,
+            clusterAssignment,
+            clusterCount: k,
+            latencyMs,
+          },
+        });
+      })
+      .catch(() => {
+        /* audit is non-critical */
+      });
 
-		return {
-			evidenceId,
-			caseId,
-			source: simResult.source,
-			similarEvidence: similarEvidence.slice(0, 10),
-			clusterAssignment,
-			clusterCount: k,
-			caseEmbeddingUpdated: caseEmbResult.embedding.length === 768,
-			latencyMs,
-		};
-	} catch (err) {
-		console.error(`[GPU Analyzer] Failed for evidence ${evidenceId}:`, err);
-		return null;
-	}
+    return {
+      evidenceId,
+      caseId,
+      source: simResult.source,
+      similarEvidence: similarEvidence.slice(0, 10),
+      clusterAssignment,
+      clusterCount: k,
+      caseEmbeddingUpdated: caseEmbResult.embedding.length === 768,
+      latencyMs,
+    };
+  } catch (err) {
+    console.error(`[GPU Analyzer] Failed for evidence ${evidenceId}:`, err);
+    return null;
+  }
 }
 
 // ─── Batch Accumulator ────────────────────────────────────────────────
@@ -174,136 +195,136 @@ let batchTimer: ReturnType<typeof setTimeout> | null = null;
 const BATCH_DEBOUNCE_MS = 150;
 
 function drainBatch(): void {
-	batchTimer = null;
-	const snapshot = new Map(batchAccumulator);
-	batchAccumulator.clear();
+  batchTimer = null;
+  const snapshot = new Map(batchAccumulator);
+  batchAccumulator.clear();
 
-	for (const [caseId, evidenceIds] of snapshot) {
-		analyzeEvidenceBatchGpu(caseId, [...evidenceIds]).catch((err) => {
-			console.warn(`[GPU Batch] Case ${caseId} batch analysis failed:`, err);
-		});
-	}
+  for (const [caseId, evidenceIds] of snapshot) {
+    analyzeEvidenceBatchGpu(caseId, [...evidenceIds]).catch((err) => {
+      console.warn(`[GPU Batch] Case ${caseId} batch analysis failed:`, err);
+    });
+  }
 }
 
 /**
  * Batched GPU analysis — one Qdrant scroll + GPU pass for all queued evidence in a case.
  * Replaces per-evidence analyzeEvidenceGpu for bulk uploads.
  */
-async function analyzeEvidenceBatchGpu(
-	caseId: string,
-	evidenceIds: string[]
-): Promise<void> {
-	const start = performance.now();
+async function analyzeEvidenceBatchGpu(caseId: string, evidenceIds: string[]): Promise<void> {
+  const start = performance.now();
 
-	try {
-		// 1. Fetch all evidence embeddings for this case (once, shared across batch)
-		const casePoints = await qdrant.client.scroll(qdrant.collections.evidence, {
-			filter: { must: [{ key: 'case_id', match: { value: caseId } }] },
-			with_vector: true,
-			limit: 200,
-		});
+  try {
+    // 1. Fetch all evidence embeddings for this case (once, shared across batch)
+    const casePoints = await qdrant.client.scroll(qdrant.collections.evidence, {
+      filter: { must: [{ key: 'case_id', match: { value: caseId } }] },
+      with_vector: true,
+      limit: 200,
+    });
 
-		const points = casePoints?.points ?? [];
-		if (points.length < 2) return;
+    const points = casePoints?.points ?? [];
+    if (points.length < 2) return;
 
-		const embeddings: number[][] = [];
-		const pointIds: string[] = [];
-		for (const pt of points) {
-			const vec = (pt.vector as { content?: number[] })?.content ?? (pt.vector as number[]);
-			if (Array.isArray(vec) && vec.length === 768) {
-				embeddings.push(vec);
-				pointIds.push(String(pt.id));
-			}
-		}
-		if (embeddings.length < 2) return;
+    const embeddings: number[][] = [];
+    const pointIds: string[] = [];
+    for (const pt of points) {
+      const vec = (pt.vector as { content?: number[] })?.content ?? (pt.vector as number[]);
+      if (Array.isArray(vec) && vec.length === 768) {
+        embeddings.push(vec);
+        pointIds.push(String(pt.id));
+      }
+    }
+    if (embeddings.length < 2) return;
 
-		const cudaStatus = isCudaAvailable() ? 'GPU' : 'CPU';
-		console.log(
-			`[GPU Batch] Case ${caseId}: ${evidenceIds.length} items batched, ${embeddings.length} embeddings (${cudaStatus})`
-		);
+    const cudaStatus = isCudaAvailable() ? 'GPU' : 'CPU';
+    console.log(
+      `[GPU Batch] Case ${caseId}: ${evidenceIds.length} items batched, ${embeddings.length} embeddings (${cudaStatus})`
+    );
 
-		// 2. ONE GPU pass: similarity + clustering + case embedding
-		const simResult = await graphSimilarity(embeddings);
-		const k = Math.min(Math.max(2, Math.floor(embeddings.length / 3)), 10);
-		const clusterResult = await clusterEmbeddings(embeddings, k);
-		const weights = new Array(embeddings.length).fill(1.0 / embeddings.length);
-		const caseEmbResult = await computeCaseEmbedding(weights, embeddings);
+    // 2. ONE GPU pass: similarity + clustering + case embedding
+    const simResult = await graphSimilarity(embeddings);
+    const k = Math.min(Math.max(2, Math.floor(embeddings.length / 3)), 10);
+    const clusterResult = await clusterEmbeddings(embeddings, k);
+    const weights = new Array(embeddings.length).fill(1.0 / embeddings.length);
+    const caseEmbResult = await computeCaseEmbedding(weights, embeddings);
 
-		// 3. Distribute results to each queued evidence item
-		for (const evidenceId of evidenceIds) {
-			const currentIdx = pointIds.indexOf(evidenceId);
-			const similarEvidence: Array<{ id: string; score: number }> = [];
+    // 3. Distribute results to each queued evidence item
+    for (const evidenceId of evidenceIds) {
+      const currentIdx = pointIds.indexOf(evidenceId);
+      const similarEvidence: Array<{ id: string; score: number }> = [];
 
-			if (currentIdx >= 0 && simResult.matrix) {
-				const row = simResult.matrix[currentIdx];
-				for (let j = 0; j < row.length; j++) {
-					if (j !== currentIdx && row[j] > 0.5) {
-						similarEvidence.push({ id: pointIds[j], score: row[j] });
-					}
-				}
-				similarEvidence.sort((a, b) => b.score - a.score);
-			}
+      if (currentIdx >= 0 && simResult.matrix) {
+        const row = simResult.matrix[currentIdx];
+        for (let j = 0; j < row.length; j++) {
+          if (j !== currentIdx && row[j] > 0.5) {
+            similarEvidence.push({ id: pointIds[j], score: row[j] });
+          }
+        }
+        similarEvidence.sort((a, b) => b.score - a.score);
+      }
 
-			const clusterAssignment = currentIdx >= 0 ? clusterResult.assignments[currentIdx] : -1;
-			const gpuAnalysis = {
-				similarEvidence: similarEvidence.slice(0, 10),
-				clusterAssignment,
-				clusterCount: k,
-				totalEvidenceInCase: embeddings.length,
-				source: simResult.source,
-				analyzedAt: new Date().toISOString(),
-				batchSize: evidenceIds.length,
-			};
+      const clusterAssignment = currentIdx >= 0 ? clusterResult.assignments[currentIdx] : -1;
+      const gpuAnalysis = {
+        similarEvidence: similarEvidence.slice(0, 10),
+        clusterAssignment,
+        clusterCount: k,
+        totalEvidenceInCase: embeddings.length,
+        source: simResult.source,
+        analyzedAt: new Date().toISOString(),
+        batchSize: evidenceIds.length,
+      };
 
-			try {
-				await db.execute(sql`
+      try {
+        await db.execute(sql`
 					UPDATE evidence SET metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
-						gpuAnalysis,
-					})}::jsonb
+            gpuAnalysis,
+          })}::jsonb
 					WHERE id = ${evidenceId}
 				`);
-			} catch {}
-		}
+      } catch {}
+    }
 
-		// 4. Update case aggregate embedding (once per batch)
-		if (caseEmbResult.embedding.length === 768) {
-			try {
-				await qdrant.client.upsert(qdrant.collections.cases, {
-					wait: false,
-					points: [{
-						id: caseId,
-						vector: { content: caseEmbResult.embedding },
-						payload: {
-							case_id: caseId,
-							type: 'case_aggregate',
-							evidence_count: embeddings.length,
-							source: caseEmbResult.source,
-							updated_at: new Date().toISOString(),
-						},
-					}],
-				});
-			} catch {}
-		}
+    // 4. Update case aggregate embedding (once per batch)
+    if (caseEmbResult.embedding.length === 768) {
+      try {
+        await qdrant.upsert({
+          collection: qdrant.collections.cases,
+          wait: false,
+          points: [
+            {
+              id: caseId,
+              vector: { content: caseEmbResult.embedding },
+              payload: {
+                case_id: caseId,
+                type: 'case_aggregate',
+                evidence_count: embeddings.length,
+                source: caseEmbResult.source,
+                updated_at: new Date().toISOString(),
+              },
+            },
+          ],
+        } as any);
+      } catch {}
+    }
 
-		// 5. Cache GPU results for reuse by later queries/uploads (P2e)
-		cacheGpuAnalysis(caseId, {
-			clusterAssignments: clusterResult.assignments,
-			centroids: clusterResult.centroids,
-			clusterK: k,
-			caseEmbedding: caseEmbResult.embedding,
-			pointIds,
-			source: simResult.source,
-			cachedAt: new Date().toISOString(),
-			embeddingCount: embeddings.length,
-		} satisfies CachedGpuAnalysis).catch(() => {});
+    // 5. Cache GPU results for reuse by later queries/uploads (P2e)
+    cacheGpuAnalysis(caseId, {
+      clusterAssignments: clusterResult.assignments,
+      centroids: clusterResult.centroids,
+      clusterK: k,
+      caseEmbedding: caseEmbResult.embedding,
+      pointIds,
+      source: simResult.source,
+      cachedAt: new Date().toISOString(),
+      embeddingCount: embeddings.length,
+    } satisfies CachedGpuAnalysis).catch(() => {});
 
-		const latencyMs = Math.round(performance.now() - start);
-		console.log(
-			`[GPU Batch] Case ${caseId}: ${evidenceIds.length} items processed in ${latencyMs}ms (${simResult.source})`
-		);
-	} catch (err) {
-		console.error(`[GPU Batch] Failed for case ${caseId}:`, err);
-	}
+    const latencyMs = Math.round(performance.now() - start);
+    console.log(
+      `[GPU Batch] Case ${caseId}: ${evidenceIds.length} items processed in ${latencyMs}ms (${simResult.source})`
+    );
+  } catch (err) {
+    console.error(`[GPU Batch] Failed for case ${caseId}:`, err);
+  }
 }
 
 /**

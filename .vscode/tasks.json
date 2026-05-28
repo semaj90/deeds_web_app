@@ -14,7 +14,7 @@
     {
       "label": "🤖 LangGraph NATS Worker",
       "type": "shell",
-      "command": "npx tsx scripts/agent-worker.ts",
+      "command": "node scripts/startup/ensure-nats-langgraph.mjs",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },

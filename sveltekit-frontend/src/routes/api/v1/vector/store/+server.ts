@@ -29,28 +29,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const { embedding, text, documentId, metadata } = parsed.data;
 
-		const { QdrantClient } = await import('@qdrant/js-client-rest');
-		const { ENV } = await import('$lib/server/env.server.js');
-		const client = new QdrantClient({ url: ENV.QDRANT_URL });
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 
-		const { v4: uuid } = await import('uuid');
-		const pointId = uuid();
+    const { v4: uuid } = await import('uuid');
+    const pointId = uuid();
 
-		await client.upsert('legal_documents', {
-			wait: true,
-			points: [
-				{
-					id: pointId,
-					vector: embedding,
-					payload: {
-						text: text.slice(0, 10000),
-						documentId,
-						...metadata,
-						indexedAt: new Date().toISOString()
-					}
-				}
-			]
-		});
+    await qdrant.upsert({
+      collection: 'legal_documents',
+      wait: true,
+      points: [
+        {
+          id: pointId,
+          vector: embedding,
+          payload: {
+            text: text.slice(0, 10000),
+            documentId,
+            ...metadata,
+            indexedAt: new Date().toISOString(),
+          },
+        },
+      ],
+    } as any);
 
 		return json({ success: true, id: pointId });
 	} catch (err) {

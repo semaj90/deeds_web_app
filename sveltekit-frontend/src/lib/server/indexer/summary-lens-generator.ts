@@ -1,6 +1,6 @@
 import { bifrostChat } from '$lib/server/ollama.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
-import { QdrantManager, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
+import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import { db } from '$lib/server/db/client';
 import { embeddedSummaries } from '$lib/server/db/schema.js';
 
@@ -9,74 +9,84 @@ import { embeddedSummaries } from '$lib/server/db/schema.js';
  * for high-value codebase chunks, directories, or clusters.
  */
 export async function generateSummaryLenses(params: {
-	chunkId: string;
-	targetType: string; // 'file' | 'dir' | 'cluster' | 'chunk'
-	content: string;
-	lenses: string[]; // ['purpose', 'risk', 'api_surface', 'retrieval_role']
-	somBmuRow?: number;
-	somBmuCol?: number;
-	manifold4?: number[];
-	gpuCluster?: number;
+  chunkId: string;
+  targetType: string; // 'file' | 'dir' | 'cluster' | 'chunk'
+  content: string;
+  lenses: string[]; // ['purpose', 'risk', 'api_surface', 'retrieval_role']
+  somBmuRow?: number;
+  somBmuCol?: number;
+  manifold4?: number[];
+  gpuCluster?: number;
 }) {
-	const qdrant = new QdrantManager();
-	const results = [];
+  // reuse singleton qdrant instance
+  const results = [];
 
-	for (const lensType of params.lenses) {
-		try {
-			// 1. Generate lens text via Gemma4
-			const lensText = await generateLensText(params.content, lensType, params.targetType);
+  for (const lensType of params.lenses) {
+    try {
+      // 1. Generate lens text via Gemma4
+      const lensText = await generateLensText(params.content, lensType, params.targetType);
 
-			// 2. Generate embedding
-			const embedding = await generateSingleEmbedding(lensText);
+      // 2. Generate embedding
+      const embedding = await generateSingleEmbedding(lensText);
 
-			// 3. Store in Postgres (Audit record + Durable text)
-			await db.insert(embeddedSummaries).values({
-				chunkId: params.chunkId,
-				sourceType: params.targetType,
-				sourceHash: 'T2_SUMMARY', // Tier 2 summary marker
-				summaryType: lensType,
-				summaryText: lensText,
-				model: 'gemma4-rotorquant:latest',
-				embeddingModel: 'embeddinggemma',
-				qdrantCollection: 'summary_lenses_768',
-				somBmuRow: params.somBmuRow,
-				somBmuCol: params.somBmuCol,
-				manifold4: params.manifold4,
-				gpuCluster: params.gpuCluster,
-				updatedAt: new Date()
-			}).onConflictDoUpdate({
-				target: [embeddedSummaries.chunkId, embeddedSummaries.sourceHash, embeddedSummaries.summaryType],
-				set: { summaryText: lensText, updatedAt: new Date() }
-			});
+      // 3. Store in Postgres (Audit record + Durable text)
+      await db
+        .insert(embeddedSummaries)
+        .values({
+          chunkId: params.chunkId,
+          sourceType: params.targetType,
+          sourceHash: 'T2_SUMMARY', // Tier 2 summary marker
+          summaryType: lensType,
+          summaryText: lensText,
+          model: 'gemma4-rotorquant:latest',
+          embeddingModel: 'embeddinggemma',
+          qdrantCollection: 'summary_lenses_768',
+          somBmuRow: params.somBmuRow,
+          somBmuCol: params.somBmuCol,
+          manifold4: params.manifold4,
+          gpuCluster: params.gpuCluster,
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: [
+            embeddedSummaries.chunkId,
+            embeddedSummaries.sourceHash,
+            embeddedSummaries.summaryType,
+          ],
+          set: { summaryText: lensText, updatedAt: new Date() },
+        });
 
-			// 4. Store in Qdrant (Retrieval vector)
-			await qdrant.client.upsert(qdrant.collections.summary_lenses, {
-				wait: false,
-				points: [{
-					id: deterministicPointId(`${params.chunkId}:${lensType}`),
-					vector: { summary: embedding },
-					payload: {
-						chunk_id: params.chunkId,
-						lens_type: lensType,
-						text: lensText,
-						target_type: params.targetType,
-						som_bmu_row: params.somBmuRow,
-						som_bmu_col: params.somBmuCol,
-						manifold4: params.manifold4,
-						gpu_cluster: params.gpuCluster,
-						generated_at: new Date().toISOString()
-					}
-				}]
-			});
+      // 4. Store in Qdrant (Retrieval vector)
+      await qdrant.upsert({
+        collection: qdrant.collections.summary_lenses,
+        wait: false,
+        points: [
+          {
+            id: deterministicPointId(`${params.chunkId}:${lensType}`),
+            vector: { summary: embedding },
+            payload: {
+              chunk_id: params.chunkId,
+              lens_type: lensType,
+              text: lensText,
+              target_type: params.targetType,
+              som_bmu_row: params.somBmuRow,
+              som_bmu_col: params.somBmuCol,
+              manifold4: params.manifold4,
+              gpu_cluster: params.gpuCluster,
+              generated_at: new Date().toISOString(),
+            },
+          },
+        ],
+      } as any);
 
-			results.push({ lensType, success: true, summaryText: lensText });
-		} catch (error) {
-			console.error(`[summary-lens] Failed to generate ${lensType} for ${params.chunkId}:`, error);
-			results.push({ lensType, success: false, error: String(error) });
-		}
-	}
+      results.push({ lensType, success: true, summaryText: lensText });
+    } catch (error) {
+      console.error(`[summary-lens] Failed to generate ${lensType} for ${params.chunkId}:`, error);
+      results.push({ lensType, success: false, error: String(error) });
+    }
+  }
 
-	return results;
+  return results;
 }
 
 async function generateLensText(content: string, lensType: string, targetType: string): Promise<string> {

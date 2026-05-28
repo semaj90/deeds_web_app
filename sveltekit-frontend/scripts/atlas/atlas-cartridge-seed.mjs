@@ -27,7 +27,8 @@ import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { mkdirSync }                                             from 'node:fs';
 import { join, resolve }                                         from 'node:path';
 import { fileURLToPath }                                         from 'node:url';
-import { createClient }                                          from 'redis';
+// NOTE: redis is dynamically imported inside the --publish block only
+//       to avoid loading @redis/json on every run.
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT      = resolve(__dirname, '../..'); // sveltekit-frontend/
@@ -75,22 +76,87 @@ function loadLines(filePath) {
   }
 }
 
+// ── Feature-area classification ──────────────────────────────────────────────
+
+/** Heuristically derive a feature area from tags, title, and source path. */
+function deriveArea(tags, title, src) {
+  const haystack = [...tags, title, src].join(' ').toLowerCase();
+  if (/\b(qdrant|vector|embedding|semantic|similarity|hnsw|pgvector)\b/.test(haystack)) return 'retrieval';
+  if (/\b(redis|cache|bifrost|hot.key|ttl|pipeline)\b/.test(haystack))                 return 'caching';
+  if (/\b(drizzle|postgres|migration|schema|sql|db|orm)\b/.test(haystack))              return 'database';
+  if (/\b(ace|packet|compress|rank|dedup|seed|cartridge)\b/.test(haystack))             return 'context-engineering';
+  if (/\b(svelte|route|ui|page|component|form|modal)\b/.test(haystack))                 return 'frontend';
+  if (/\b(mcp|agent|llm|gemma|ollama|inference|tool.call)\b/.test(haystack))            return 'ai-agent';
+  if (/\b(docker|compose|service|health|port|startup)\b/.test(haystack))               return 'infrastructure';
+  if (/\b(graphify|graph|kag|dag|node|edge|topology)\b/.test(haystack))                 return 'knowledge-graph';
+  if (/\b(audit|contract|zod|validate|check|lint)\b/.test(haystack))                    return 'quality';
+  if (/\b(cuda|gpu|torch|simd|native|bridge)\b/.test(haystack))                         return 'gpu';
+  return 'general';
+}
+
+/** Derive a cluster label from area + dominant tags. */
+function deriveCluster(area, tags) {
+  const CLUSTER_MAP = {
+    'retrieval':            'Context Engineering',
+    'caching':              'Hot Cache Layer',
+    'database':             'Durable Storage',
+    'context-engineering':  'Context Engineering',
+    'frontend':             'UI / UX',
+    'ai-agent':             'AI Agent Runtime',
+    'infrastructure':       'DevOps & Services',
+    'knowledge-graph':      'Knowledge Graph',
+    'quality':              'Contract Audit',
+    'gpu':                  'GPU / Native Bridge',
+    'general':              'General',
+  };
+  return CLUSTER_MAP[area] ?? 'General';
+}
+
+/** Derive a featureStatus from score and tag signals. */
+function deriveFeatureStatus(score, tags) {
+  const t = tags.join(' ').toLowerCase();
+  if (/stale|deprecated|removed|legacy/.test(t)) return 'stale';
+  if (/experimental|wip|draft|todo/.test(t))      return 'experimental';
+  if (score > 0.7)                                 return 'active';
+  if (score > 0.3)                                 return 'partial';
+  return 'unknown';
+}
+
 function parseAtlasCard(raw) {
   try {
     const obj = typeof raw === 'string' ? JSON.parse(raw) : raw;
     // Normalise across different atlas card schemas
     const id      = obj.card_id   || obj.cardId    || obj.id    || `seed:${Date.now()}`;
+    const title   = obj.title     || obj.name       || '';
     const summary = obj.summary   || obj.description || '';
     const tags    = [
       ...(obj.hot_keywords   || []),
       ...(obj.clusterTags    || []),
       ...(obj.qdrant_tags    || []),
       ...(obj.featureLabels  || []),
+      ...(obj.tags           || []),
     ].slice(0, 20);
     const src     = obj.sourceRef || (obj.sourceRefs && obj.sourceRefs[0]) || '';
     const score   = typeof obj.hotness_score === 'number' ? obj.hotness_score :
                     typeof obj.pagerank       === 'number' ? obj.pagerank       : 0;
-    return { id, summary: String(summary).slice(0, 400), tags, src, score, ts: Date.now() };
+
+    // Phase 11D — feature-area classification
+    const area          = obj.area          || deriveArea(tags, title, src);
+    const cluster       = obj.cluster       || deriveCluster(area, tags);
+    const featureStatus = obj.featureStatus || deriveFeatureStatus(score, tags);
+
+    return {
+      id,
+      title:   String(title).slice(0, 120),
+      summary: String(summary).slice(0, 400),
+      tags,
+      src,
+      score,
+      area,
+      cluster,
+      featureStatus,
+      ts: Date.now(),
+    };
   } catch {
     return null;
   }
@@ -151,12 +217,24 @@ for (const card of rawCards) {
 
 log(`Selected ${seeds.length} seeds from ${rawCards.length} total cards (${MAX_SEEDS} cap)`);
 
+// Phase 11D — aggregate area/cluster breakdown for health reporting
+const areaBreakdown = {};
+const clusterBreakdown = {};
+for (const seed of seeds) {
+  areaBreakdown[seed.area]    = (areaBreakdown[seed.area]    ?? 0) + 1;
+  clusterBreakdown[seed.cluster] = (clusterBreakdown[seed.cluster] ?? 0) + 1;
+}
+
 const meta = {
-  seed_count:   seeds.length,
-  status:       seeds.length > 0 ? 'ok' : 'empty',
-  generatedAt:  new Date().toISOString(),
-  sources:      sources.map(s => s.replace(ROOT, '.')),
-  warning:      seeds.length === 0 ? 'No atlas cards found — run atlas:build first' : null,
+  seed_count:       seeds.length,
+  status:           seeds.length > 0 ? 'ok' : 'empty',
+  generatedAt:      new Date().toISOString(),
+  sources:          sources.map(s => s.replace(ROOT, '.')),
+  warning:          seeds.length === 0 ? 'No atlas cards found — run atlas:build first' : null,
+  areaBreakdown,
+  clusterBreakdown,
+  seedGenerated:    seeds.length > 0,
+  seedWarning:      seeds.length === 0,
 };
 
 if (DRY_RUN) {
@@ -203,6 +281,7 @@ if (seeds.length === 0) {
 
 let redis;
 try {
+  const { createClient } = await import('redis');
   redis = createClient({ url: REDIS_URL });
   await redis.connect();
 } catch (err) {

@@ -1,0 +1,100 @@
+{
+  "query": "",
+  "packet_id": "3c7d7ca2-e42d-45f3-82c2-590060813b4d",
+  "cards": [
+    {
+      "sourceRef": "file:src/lib/server/gpu/mapreduce-runner.mjs",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "mjs",
+        "src",
+        "lib",
+        "server",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/server/gpu/mapreduce-worker.mjs",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "mjs",
+        "src",
+        "lib",
+        "server",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/workers/ast-graph-worker.mjs",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "mjs",
+        "src",
+        "lib",
+        "workers",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/workers/compute-worker.mjs",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "mjs",
+        "src",
+        "lib",
+        "workers",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    },
+    {
+      "sourceRef": "file:src/lib/workers/gpu-worker.mjs",
+      "summary": "",
+      "score": 0,
+      "tags": [
+        "mjs",
+        "src",
+        "lib",
+        "workers",
+        "source:atlas",
+        "type:graphify",
+        "project:atlas"
+      ]
+    }
+  ],
+  "clusters": [
+    "mjs"
+  ],
+  "edges": [],
+  "top_tags": [
+    "mjs",
+    "src",
+    "lib",
+    "source:atlas",
+    "type:graphify",
+    "project:atlas",
+    "workers",
+    "server"
+  ],
+  "sourceRefs": [
+    "file:src/lib/server/gpu/mapreduce-runner.mjs",
+    "file:src/lib/server/gpu/mapreduce-worker.mjs",
+    "file:src/lib/workers/ast-graph-worker.mjs",
+    "file:src/lib/workers/compute-worker.mjs",
+    "file:src/lib/workers/gpu-worker.mjs"
+  ],
+  "compression_ratio": 1,
+  "estimated_tokens": 1,
+  "created_at": "2026-05-28T15:25:27.002Z"
+}

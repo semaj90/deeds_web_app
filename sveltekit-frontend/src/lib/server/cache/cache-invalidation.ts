@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 import { ENV } from '../env.server.js';
 
-const redis = new Redis(ENV.REDIS_URL || 'redis://127.0.0.1:6379');
+const redis = new Redis(ENV.REDIS_URL);
 
 /**
  * Compares old and new digests. If they differ, invalidates the specified Redis key patterns

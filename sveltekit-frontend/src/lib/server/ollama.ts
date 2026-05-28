@@ -906,9 +906,10 @@ export async function bifrostChat(
           t_qdrant = performance.now() - t0_qdrant;
 
           if (searchRes.ok) {
-            const searchData = (await searchRes.json()) as {
+            const searchText = await searchRes.text();
+            const searchData = fastJsonParse<{
               result?: Array<{ score: number; payload?: { response?: string } }>;
-            };
+            }>(searchText);
             const hit = searchData.result?.[0];
             if (hit && hit.score >= L2_SEMANTIC_THRESHOLD && hit.payload?.response) {
               try {
@@ -984,7 +985,7 @@ export async function bifrostChat(
       throw new Error(`Ollama L3 error: ${ollamaRes.status}`);
     }
 
-    const ollamaData = (await ollamaRes.json()) as OllamaResponse;
+    const ollamaData = fastJsonParse<OllamaResponse>(await ollamaRes.text());
     content = ollamaData.message?.content ?? '';
     tool_calls = ollamaData.message?.tool_calls;
     t_l3 = performance.now() - bifrostStart;

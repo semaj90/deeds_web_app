@@ -1,9 +1,10 @@
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { ENV } from '../env.server.js';
 import { db } from '../db/client.js';
 import { featureMaps, grpoMemorySticks } from '../db/schema/features.js';
 import { getRedis } from '../redis.js';
-import { QdrantManager } from '../vector/qdrant-manager.js';
+import { QdrantManager, qdrant } from '../vector/qdrant-manager.js';
 import { aceContextKey } from '../cache-keys.js';
 import { productionLogger } from '../production-logger.js';
 import {
@@ -54,7 +55,7 @@ export async function buildFeatureSummaryEmbedding(featureMap: FeatureMap): Prom
     .trim();
 
   try {
-    const ollamaUrl = process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
+    const ollamaUrl = ENV.OLLAMA_BASE_URL;
     const model = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
     const res = await fetch(`${ollamaUrl.replace(/\/$/, '')}/api/embed`, {
       method: 'POST',
@@ -225,9 +226,9 @@ export async function storeFeatureMap(map: FeatureMap, prepared?: FeatureMapStor
   await pipe.exec();
 
   try {
-    const qdrant = new QdrantManager();
     const summaryEmbedding = await buildFeatureSummaryEmbedding(map);
-    await qdrant.client.upsert(writes.qdrantFeatureSummaryPoint.collection, {
+    await qdrant.upsert({
+      collection: writes.qdrantFeatureSummaryPoint.collection,
       points: [
         {
           id: writes.qdrantFeatureSummaryPoint.id,
@@ -238,7 +239,7 @@ export async function storeFeatureMap(map: FeatureMap, prepared?: FeatureMapStor
           },
         },
       ],
-    });
+    } as any);
   } catch (err) {
     console.warn(
       `[feature-map-store] Qdrant upsert failed for ${map.featureId}:`,

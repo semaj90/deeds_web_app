@@ -68,26 +68,27 @@ export async function persistFeatureCompileResult(result: FeatureCompileResult):
           await pipe.exec();
         })(),
         (async () => {
-          try {
-            const { collection, id, payload } = writes.qdrantFeatureSummaryPoint;
-            const summaryEmbedding = await buildFeatureSummaryEmbedding(result.featureMap);
-            await qdrant.client.upsert(collection, {
-              points: [
-                {
-                  id,
-                  vector: { summary: summaryEmbedding },
-                  payload: {
-                    ...payload,
-                    encoded64: writes.qdrantFeatureSummaryPoint.vector,
+            try {
+              const { collection, id, payload } = writes.qdrantFeatureSummaryPoint;
+              const summaryEmbedding = await buildFeatureSummaryEmbedding(result.featureMap);
+              await qdrant.upsert({
+                collection,
+                points: [
+                  {
+                    id,
+                    vector: { summary: summaryEmbedding },
+                    payload: {
+                      ...payload,
+                      encoded64: writes.qdrantFeatureSummaryPoint.vector,
+                    },
                   },
-                },
-              ],
-            });
-          } catch (err) {
-            productionLogger.error(
-              `[feature-storage] Qdrant upsert failed: ${(err as Error).message}`
-            );
-          }
+                ],
+              } as any);
+            } catch (err) {
+              productionLogger.error(
+                `[feature-storage] Qdrant upsert failed: ${(err as Error).message}`
+              );
+            }
         })(),
       ]);
 

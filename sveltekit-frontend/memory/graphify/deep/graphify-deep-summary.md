@@ -1,22 +1,22 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-28T03:28:04.333Z
+Generated: 2026-05-28T15:36:44.851Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 48496 |
-| Total edges | 81073 |
-| Resolved edges | 9148 |
+| Nodes | 48543 |
+| Total edges | 81136 |
+| Resolved edges | 9149 |
 | Unresolved (local) | 8522 |
-| External refs | 61700 |
+| External refs | 61762 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 992 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 41660 |
-| script | 4151 |
+| shared | 41691 |
+| script | 4167 |
 | test | 1467 |
 | types | 1040 |
 | config | 140 |
@@ -27,13 +27,13 @@ Generated: 2026-05-28T03:28:04.333Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 64511 |
+| imports_static | 64562 |
 | test_covers_file | 4930 |
 | redis_dependency | 3193 |
 | imports_dynamic | 2348 |
 | exports_from | 1868 |
-| env_dependency | 1738 |
-| qdrant_dependency | 1221 |
+| env_dependency | 1740 |
+| qdrant_dependency | 1231 |
 | mcp_tool_calls | 463 |
 | neo4j_dependency | 453 |
 | db_dependency | 344 |
@@ -62,4 +62,4 @@ Generated: 2026-05-28T03:28:04.333Z
 | 17 | `deeds_labs/dead-scripts/syntax-repair/pattern-matcher.ts` | shared | 38 | 0 |
 | 18 | `src/lib/server/ace/context-assembler.ts` | server | 38 | 0 |
 | 19 | `claude-mem/src/shared/SettingsDefaultsManager.ts` | shared | 37 | 0 |
-| 20 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 33 | 0 |
+| 20 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 35 | 0 |

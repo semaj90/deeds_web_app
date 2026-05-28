@@ -3,7 +3,7 @@ import { ENV } from '../env.server.js';
 import crypto from 'crypto';
 import type { VarianceRecovery } from '../ace/variance-recovery-schema.js';
 
-const redis = new Redis(ENV.REDIS_URL || 'redis://127.0.0.1:6379');
+const redis = new Redis(ENV.REDIS_URL);
 
 export type AcePacket = {
   query: string;
