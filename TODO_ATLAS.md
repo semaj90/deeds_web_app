@@ -1,3 +1,20 @@
+# TODO_ATLAS
+
+Phase 3 complete: Atlas quality review and GPU alignment closed.
+
+Outstanding / next actions:
+
+- Ingest and curate OpenCode JSON cards into Postgres `RagCard` / `ClusterCard`.
+- Index summaries/tags into Qdrant; build `atlas:search` pipeline.
+- Implement Redis hot-card viewer with SCAN-based pagination and secret masking.
+- Build `/atlas/library` UI and card modal for curated cards.
+- Harden embedding and LLM wrappers (safeJsonPost already applied to Ollama/TurboQuant).
+- Continue incremental TS error reduction (400 remaining in repo-wide run).
+
+Checks to run before future commits:
+- `npm run check:fast`
+- `npm run atlas:lane-health`
+- `npm run opencode:smoke`
 # TODO: Parent Atlas Pipeline Hardening & Memory Optimization
 
 ## Phase 0: Pre-Scale Safety Gate
@@ -93,9 +110,9 @@
 - [x] Add `atlas:rollback:dry-run`.
 
 ## Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)
-- [ ] **Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance.
-- [ ] **Summary Verification**: Inspect `docs/graph/repo-neo4j-graphrag-report.json` for synthesis drift.
-- [ ] **Embedding Parity**: Ensure Qdrant `codebase_chunks_768` payloads contain accurate `sourceRefs`.
+- [x] **Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance.
+- [x] **Summary Verification**: Inspect `docs/graph/repo-neo4j-graphrag-report.json` for synthesis drift.
+- [x] **Embedding Parity**: Ensure Qdrant `codebase_chunks_768` payloads contain accurate `sourceRefs`.
 
 ## Phase 4: Admin Copilot UI Integration
 - [x] **Provenance Display**: Show Qdrant `sourceRefs` and Neo4j graph paths in search results.
@@ -388,4 +405,14 @@ Goal: Package the workstation Parent Atlas service architecture with robust depl
   - `npm run audit:pgvector`
   - `node scripts/atlas/validate-parent-atlas.mjs`
   - `node scripts/atlas/soak-workstation-parent-atlas.mjs --cycles=10 --dry-run`
+
+## Phase 21 — Thin cached UI / optional VS Code WebView
+- [ ] No CUDA on panel load
+- [ ] No repo scan on panel load
+- [ ] Read Redis/Postgres cached cards only
+- [ ] ETag/version hash for card cache
+- [ ] Virtual list for large result sets
+- [ ] Lazy-load details panel
+- [ ] WebGPU optional for visualization only
+
 

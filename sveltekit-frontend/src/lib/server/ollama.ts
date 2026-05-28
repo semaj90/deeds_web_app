@@ -70,6 +70,7 @@ import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
 import * as Hypergraph from '$lib/server/ai/hypergraph-store.js';
+import safeJsonPost from '$lib/server/utils/safe-json-post.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -393,16 +394,14 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
       tqRequestBody.tools = ollamaBody.tools;
     }
 
-    const tqRes = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(tqRequestBody),
-      signal: AbortSignal.timeout(120_000),
+    const tqRaw = await safeJsonPost(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, tqRequestBody, {
+      timeoutMs: 120_000,
+      maxResponseBytes: 2_000_000,
     });
 
-    if (!tqRes.ok) return null;
+    if (!tqRaw) return null;
 
-    const tqData = (await tqRes.json()) as {
+    const tqData = tqRaw as {
       choices?: Array<{
         message?: {
           content?: string;
@@ -715,19 +714,16 @@ export async function turboQuantChat(
   };
 
   const startedAt = Date.now();
-  const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestBody),
-    signal: AbortSignal.timeout(timeoutMs),
+  const dataRaw = await safeJsonPost(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, requestBody, {
+    timeoutMs: timeoutMs,
+    maxResponseBytes: 2_000_000,
   });
 
-  if (!res.ok) {
-    const errorText = await res.text().catch(() => '');
-    throw new Error(`TurboQuant chat failed (${res.status}): ${errorText.slice(0, 240)}`);
+  if (!dataRaw) {
+    throw new Error(`TurboQuant chat failed (no response)`);
   }
 
-  const data = (await res.json()) as {
+  const data = dataRaw as {
     usage?: {
       prompt_tokens?: number;
       completion_tokens?: number;

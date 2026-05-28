@@ -314,6 +314,28 @@ paket-files/
 .svelte-error-fixes-backup/
 sveltekit-frontend/backups/
 
+# OpenCode / agent generated state (bulk, do not commit)
+.opencode/sessions/
+.opencode/logs/
+.opencode/cache/
+.opencode/tmp/
+.opencode/**/*.tmp.json
+.opencode/**/*.trace.json
+.opencode/**/*.run.json
+
+# Bulk generated cards/reports
+.tmp/
+logs/
+reports/*.json
+reports/*.jsonl
+**/batch-fix-progress/*.json
+
+# Keep curated config/docs under .opencode
+!.opencode/agents/
+!.opencode/commands/
+!.opencode/skills/
+!.opencode/config*.json
+
 # Tabs Studio
 *.tss
 
