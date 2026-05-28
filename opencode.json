@@ -78,11 +78,7 @@
       "agent": "antigravity",
       "subtask": false,
       "prompt": "Run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE context, daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, bash tools, and the next safe action. Do not edit files.",
-      "template": {
-        "run": "npm run opencode:bootstrap",
-        "description": "Canonical bootstrap command: runs repo-level setup checks and loads ACE context",
-        "timeout": 600000
-      }
+      "template": "npm run opencode:bootstrap"
     }
   },
   "permission": {
@@ -117,7 +113,10 @@
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp",
       "enabled": true,
-      "timeout": 60000
+      "timeout": 60000,
+      "headers": {
+        "Accept": "application/json, text/event-stream"
+      }
     },
     "turbovec": {
       "type": "remote",
@@ -125,22 +124,19 @@
       "enabled": false,
       "timeout": 30000
     },
-    "engram": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8792/mcp",
-      "enabled": false,
-      "timeout": 60000
-    },
-    "langextract": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8793/mcp",
-      "enabled": false,
+    "engram-embed": {
+      "type": "local",
+      "command": [
+        "node",
+        "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"
+      ],
+      "enabled": true,
       "timeout": 60000
     },
     "gemma4-offload": {
       "type": "local",
-      "command": "node",
-      "args": [
+      "command": [
+        "node",
         "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"
       ],
       "enabled": true,

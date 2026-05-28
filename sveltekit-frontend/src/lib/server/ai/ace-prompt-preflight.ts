@@ -109,6 +109,7 @@ export type AcePromptPreflightResult = {
     totalMs: number;
   };
   degraded: boolean;
+  cacheHit?: boolean;
 };
 
 type QueryEntities = {
@@ -387,14 +388,72 @@ function normalizeCardFromPayload(payload: Record<string, unknown>, overrides: P
   };
 }
 
+const ACE_CTX_TTL_SECONDS = 3600; // 1h — matches MASTER-TODO §10I ACE packet caching
+
 export async function buildAcePromptPreflight(
   input: AcePromptPreflightInput
 ): Promise<AcePromptPreflightResult> {
   const startMs = Date.now();
-  const queryHash = sha1(input.query);
+  const queryHash = sha1(`${input.query}:${input.intent ?? 'find'}:${input.backend}`);
   const contextPackKey = `${DOCUMENT_KNOWLEDGE_CONTEXT_PREFIX}${queryHash}`;
   const repoRoot = findRepoRoot(process.cwd());
   const redis = getRedis();
+
+  // 0. Full packet cache short-circuit (Phase 10I)
+  // Skip all retrieval if a complete ace:ctx:<hash> entry already exists.
+  // Raw context_timeline rows are excluded from ACE — only sourceRef-linked packets are stored.
+  try {
+    const cachedRaw = await redis.get(contextPackKey);
+    if (cachedRaw) {
+      const cached = JSON.parse(cachedRaw) as {
+        version?: string;
+        queryHash?: string;
+        packet?: unknown;
+        selectedCards?: KnowledgeCardForPrompt[];
+        timing?: Record<string, number>;
+        prompt?: { system: string; context: string; user: string; estimatedTokens: number };
+        routing?: { selectedLane: string; reason: string };
+        sourceRefs?: string[];
+        chunkIds?: string[];
+        featureLabels?: string[];
+        graphPaths?: string[];
+      };
+      if (
+        cached.version === ACE_NES_PACKET_VERSION &&
+        cached.selectedCards?.length &&
+        cached.prompt
+      ) {
+        return {
+          version: ACE_NES_PACKET_VERSION,
+          queryHash,
+          contextPackKey,
+          selectedCards: cached.selectedCards,
+          sourceRefs: cached.sourceRefs ?? [],
+          chunkIds: cached.chunkIds ?? [],
+          featureLabels: cached.featureLabels ?? [],
+          graphPaths: cached.graphPaths ?? [],
+          prompt: cached.prompt,
+          routing: (cached.routing as AcePromptPreflightResult['routing']) ?? {
+            selectedLane: 'turboquant',
+            reason: 'cache_hit',
+          },
+          timing: {
+            redisMs: Date.now() - startMs,
+            qdrantMs: 0,
+            postgresMs: 0,
+            turbovecMs: 0,
+            graphMs: 0,
+            totalMs: Date.now() - startMs,
+          },
+          degraded: false,
+          cacheHit: true,
+        } as AcePromptPreflightResult;
+      }
+    }
+  } catch {
+    // cache miss or parse error — fall through to full build
+  }
+
   const queryEntities = extractQueryEntities(input.query);
   const selectedCards: KnowledgeCardForPrompt[] = [];
   const sourceRefs = new Set<string>();
@@ -694,25 +753,58 @@ export async function buildAcePromptPreflight(
   const promptUser = input.query;
   const estimatedTokens = countTokens(`${promptSystem}\n${promptContext}\n${promptUser}`);
 
-  await redis
-    .set(contextPackKey, JSON.stringify({
-      generatedAt: new Date().toISOString(),
-      version: ACE_NES_PACKET_VERSION,
-      queryHash,
-      modelName: input.modelName,
-      backend: input.backend,
-      packet: contextPacket,
-      selectedCards: packedCards,
-      timing: {
-        redisMs,
-        qdrantMs,
-        postgresMs,
-        turbovecMs,
-        graphMs,
-        totalMs: Date.now() - startMs,
-      },
-    }))
-    .catch(() => {});
+  // Only cache packets that have sourceRef-linked cards — raw logs must not enter ACE (Phase 10I)
+  const cacheableCards = packedCards.filter((c) => c.sourceRefs.length > 0);
+  if (cacheableCards.length > 0) {
+    await redis
+      .set(
+        contextPackKey,
+        JSON.stringify({
+          generatedAt: new Date().toISOString(),
+          version: ACE_NES_PACKET_VERSION,
+          queryHash,
+          modelName: input.modelName,
+          backend: input.backend,
+          packet: contextPacket,
+          selectedCards: cacheableCards,
+          sourceRefs: uniq([...sourceRefs]),
+          chunkIds: uniq([...chunkIds, ...cacheableCards.flatMap((c) => c.chunkIds)]),
+          featureLabels: uniq([...featureLabels, ...cacheableCards.flatMap((c) => c.featureLabels)]),
+          graphPaths: uniq([...graphPaths]),
+          prompt: {
+            system: promptSystem,
+            context: promptContext,
+            user: promptUser,
+            estimatedTokens,
+          },
+          routing: {
+            selectedLane:
+              estimatedTokens > 6000 || input.tokenBudget > 4096 || input.backend === 'turboquant'
+                ? 'turboquant'
+                : 'bifrost',
+            reason:
+              estimatedTokens > 6000
+                ? 'large_context'
+                : input.backend === 'turboquant'
+                  ? 'backend_hint'
+                  : packedCards.length <= 2
+                    ? 'compact_prompt'
+                    : 'semantic_reuse',
+          },
+          timing: {
+            redisMs,
+            qdrantMs,
+            postgresMs,
+            turbovecMs,
+            graphMs,
+            totalMs: Date.now() - startMs,
+          },
+        }),
+        'EX',
+        ACE_CTX_TTL_SECONDS,
+      )
+      .catch(() => {});
+  }
 
   return {
     version: ACE_NES_PACKET_VERSION,
@@ -752,6 +844,7 @@ export async function buildAcePromptPreflight(
       totalMs: Date.now() - startMs,
     },
     degraded,
+    cacheHit: false,
   };
 }
 

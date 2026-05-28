@@ -128,68 +128,60 @@
       }
     }
   },
-  "tools": {
-    "ace_packet": {
-      "command": "node scripts/ace/build-packet.mjs"
-    },
-    "ace_ask": {
-      "command": "node scripts/ace/ask-gemma4.mjs"
-    }
-  },
   "command": {
     "atlas-context": {
       "description": "Use Atlas-first retrieval without reading full files",
       "agent": "atlas-context",
       "subtask": true,
-      "prompt": "Use ace-stream first, then ace-packet if needed, then npm run index:clusters:query, then atlas.search, then rg exact section, then read only a 40-80 line window. If exact match fails, use Semantic Variance Recovery: file discovery, rg confirmed paths, Qdrant tag recall, Redis ACE semantic cache, LangExtract entities, did-you-mean cosine candidates, ACE packet, and Gemma4 stream. Return sourceRefs, chunkIds, commands, clusterPath, cache keys, and a short answer. Do not read full .md, .txt, .json, docs/llms/generated/*.txt, or large atlas maps."
+      "template": "Use ace-stream first, then ace-packet if needed, then npm run index:clusters:query, then atlas.search, then rg exact section, then read only a 40-80 line window. Return sourceRefs, chunkIds, commands, clusterPath, cache keys, and a short answer. Do not read full .md, .txt, .json files."
     },
     "ace-packet": {
       "description": "Build compact ACE packet for the current query",
       "agent": "atlas-context",
       "subtask": false,
-      "prompt": "Build an ACE packet for the user's query. Prefer cached summaries, sourceRefs, chunkIds, searchGroups, and commands. Do not read full files."
+      "template": "Build an ACE packet for the user's query. Prefer cached summaries, sourceRefs, chunkIds, searchGroups, and commands. Do not read full files."
     },
     "ace-stream": {
       "description": "Stream a compact ACE packet and validate Redis cache packet injection",
       "agent": "atlas-context",
       "subtask": false,
-      "prompt": "Build a compact ACE packet for the user's query, then stream the packet through the cache lane. Prefer cached summaries, sourceRefs, chunkIds, searchGroups, and commands. Verify the Redis hot-path packet injection and report packet hash, cache keys, and any cache miss or fallback used. Do not read full files."
+      "template": "Build a compact ACE packet for the user's query, stream through the cache lane, verify Redis hot-path packet injection, and report packet hash, cache keys, and any cache miss. Do not read full files."
     },
     "atlas-cluster": {
       "description": "Query the Atlas manifold cluster map before reading files",
       "agent": "atlas-context",
       "subtask": true,
-      "prompt": "Run npm run index:clusters:query for the user's query, identify the top cluster path, then use rg inside only that cluster. Return clusterId, clusterPath, sourceRefs, chunkIds, and commands."
+      "template": "Run npm run index:clusters:query for the user's query, identify the top cluster path, then use rg inside only that cluster. Return clusterId, clusterPath, sourceRefs, chunkIds, and commands."
     },
     "workspace-ready": {
       "description": "Validate Windows workspace, sidecars, semantic indexing, and feature readiness",
-      "agent": "workspace-ready",
+      "agent": "atlas-context",
       "subtask": true,
-      "prompt": "Use the Windows agentic recovery skill. First run the repo-root bootstrap lane (`npm --prefix .. run opencode:bootstrap`) to refresh ACE context, daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Then validate config, discover scripts, check sidecars, run codebase indexing, run graph exports only if stale, and write memory/agent-runs/latest-workspace-ready.json. Use turn-based session handoffs for review, plan, research, and build flows."
+      "template": "First run `npm --prefix .. run opencode:bootstrap` to refresh ACE context and MCP health. Then validate config, discover scripts, check sidecars, run codebase indexing, and write memory/agent-runs/latest-workspace-ready.json."
     },
     "workspace-bootstrap": {
       "description": "Refresh ACE context, local health, and report artifacts from the main repo",
-      "agent": "workspace-ready",
+      "agent": "atlas-context",
       "subtask": false,
-      "prompt": "Run the repo-root bootstrap lane with `npm --prefix .. run opencode:bootstrap`. The bootstrap must first ensure Claude-Mem is launched detached when available, then refresh the local ACE context, the daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, bash tools, and the next safe action. Do not edit files."
+      "template": "Run `npm --prefix .. run opencode:bootstrap` from the repo root to refresh ACE context, TODO summary, MCP health, and semantic index. Do not modify files."
     },
     "graph-export-recover": {
       "description": "Recover graph export artifacts without task delegation",
       "agent": "atlas-context",
       "subtask": false,
-      "template": "Run deterministic graph recovery. Do not delegate. Do not inspect hidden agents. Do not use the task tool. Apply OpenCode patches, patch graph export fallback roots, run graph exports, run DuckDB smoke, and write memory/agent-runs/latest-recovery.json."
+      "template": "Run deterministic graph recovery. Do not delegate. Do not use the task tool. Apply OpenCode patches, patch graph export fallback roots, run graph exports, run DuckDB smoke, and write memory/agent-runs/latest-recovery.json."
     },
     "recover:graph": {
       "description": "Run ACE graph export recovery without task delegation",
       "agent": "atlas-context",
       "subtask": false,
-      "template": "Run deterministic graph recovery. Do not delegate. Do not inspect hidden agents. Do not use the task tool. Apply OpenCode patches, patch graph export fallback roots, run graph exports, run DuckDB smoke, and write memory/agent-runs/latest-recovery.json."
+      "template": "Run deterministic graph recovery. Do not delegate. Do not use the task tool. Apply OpenCode patches, patch graph export fallback roots, run graph exports, run DuckDB smoke, and write memory/agent-runs/latest-recovery.json."
     },
     "redis8-eval-smoke": {
       "description": "Smoke the isolated Redis 8 eval lane without touching the Redis 7 app stack",
       "agent": "atlas-context",
       "subtask": false,
-      "prompt": "Run npm run smoke:redis8-eval and report Redis 8, Agent Memory API :8010, and MCP :9010 health only. Do not modify the main request path or the Redis 7 app stack."
+      "template": "Run npm run smoke:redis8-eval and report Redis 8, Agent Memory API :8010, and MCP :9010 health only. Do not modify the main request path or the Redis 7 app stack."
     }
   },
   "mcp": {
@@ -197,7 +189,10 @@
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp",
       "enabled": true,
-      "timeout": 60000
+      "timeout": 60000,
+      "headers": {
+        "Accept": "application/json, text/event-stream"
+      }
     },
     "turbovec": {
       "type": "remote",
@@ -205,22 +200,10 @@
       "enabled": false,
       "timeout": 30000
     },
-    "engram": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8792/mcp",
-      "enabled": false,
-      "timeout": 60000
-    },
-    "langextract-remote": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8793/mcp",
-      "enabled": false,
-      "timeout": 60000
-    },
     "gemma4-offload": {
       "type": "local",
-      "command": "node",
-      "args": [
+      "command": [
+        "node",
         "scripts/mcp/gemma4-offload-mcp.mjs"
       ],
       "enabled": true,
@@ -228,20 +211,11 @@
     },
     "engram-embed": {
       "type": "local",
-      "command": "node",
-      "args": [
+      "command": [
+        "node",
         "scripts/mcp/engram-embed-mcp.mjs"
       ],
-      "enabled": false,
-      "timeout": 60000
-    },
-    "langextract": {
-      "type": "local",
-      "command": "node",
-      "args": [
-        "scripts/mcp/langextract-mcp.mjs"
-      ],
-      "enabled": false,
+      "enabled": true,
       "timeout": 60000
     },
     "turbovec-sidecar": {
@@ -261,81 +235,6 @@
       "description": "Local Deep Research: async multi-engine research via Gemma4 + SearXNG + Wikipedia. Tools: ldr.start_research, ldr.poll_status, ldr.search_history, ldr.quick_summary"
     }
   },
-  "resources": [
-    {
-      "type": "git",
-      "name": "svelte",
-      "url": "https://github.com/sveltejs/svelte.dev",
-      "branch": "main",
-      "searchPath": "apps/svelte.dev",
-      "specialNotes": "Focus on docs content",
-      "labels": [
-        "docs",
-        "ssr",
-        "sveltekit",
-        "frontend"
-      ]
-    },
-    {
-      "type": "npm",
-      "name": "reactNpm",
-      "package": "react",
-      "version": "latest",
-      "labels": [
-        "docs",
-        "npm",
-        "web"
-      ]
-    },
-    {
-      "type": "npm",
-      "name": "drizzleNpm",
-      "package": "drizzle-orm",
-      "version": "latest",
-      "labels": [
-        "postgresql",
-        "drizzle",
-        "schema",
-        "contracts"
-      ]
-    },
-    {
-      "type": "npm",
-      "name": "qdrantNpm",
-      "package": "@qdrant/js-client-rest",
-      "version": "latest",
-      "labels": [
-        "qdrant",
-        "clusters",
-        "semantic",
-        "retrieval"
-      ]
-    },
-    {
-      "type": "npm",
-      "name": "redisNpm",
-      "package": "ioredis",
-      "version": "latest",
-      "labels": [
-        "redis",
-        "cards",
-        "cache-trace",
-        "hot-lane"
-      ]
-    },
-    {
-      "type": "npm",
-      "name": "pgNpm",
-      "package": "pg",
-      "version": "latest",
-      "labels": [
-        "postgresql",
-        "sql",
-        "driver",
-        "bitfrost"
-      ]
-    }
-  ],
   "agent": {
     "atlas-context": {
       "description": "Atlas-first retrieval agent using ACE packets and strict context-budget rules.",
@@ -574,10 +473,16 @@
     "audit": {
       "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor (no MCP, local files only)",
       "model": "turboquant/gemma4-legal.gguf",
-      "prompt": "Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
-      "tools": {
-        "write": false,
-        "edit": false
+      "prompt": "You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "edit": "deny"
       }
     }
   },

@@ -354,6 +354,7 @@ export default defineConfig(({ mode }) => {
         'piper-wasm',
         'nats',
         'ssh2',
+        'claude-mem-opencode', // subpath deep imports not in package exports map — keep as SSR external
       ],
     },
     resolve: {

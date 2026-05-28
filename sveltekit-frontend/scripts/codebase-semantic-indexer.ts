@@ -40,34 +40,66 @@ const COLLECTION = 'codebase_chunks_768';
 const VECTOR_DIM = 768;
 
 // ─── CLI Args ────────────────────────────────────────────────────────────────
+// ─── CLI Args ────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const force = args.includes('--force');
 const tagsOnly = args.includes('--tags-only');
+
+// Roots & Dir parsing
 const dirIdx = args.indexOf('--dir');
-const targetDir = dirIdx >= 0 ? args[dirIdx + 1] : 'src';
+const rootsIdx = args.indexOf('--roots');
+const targetDir = dirIdx >= 0 ? args[dirIdx + 1] : null;
+
+// Determine roots array
+let roots: string[] = ['src'];
+if (rootsIdx >= 0) {
+  roots = [];
+  for (let i = rootsIdx + 1; i < args.length; i++) {
+    if (args[i].startsWith('--')) break;
+    const parts = args[i].split(/[\s,]+/).map(r => r.trim()).filter(Boolean);
+    roots.push(...parts);
+  }
+} else if (targetDir) {
+  roots = [targetDir];
+}
+
+// Excludes parsing
+const excludeIdx = args.indexOf('--exclude');
+let customExcludes: string[] = [];
+if (excludeIdx >= 0) {
+  for (let i = excludeIdx + 1; i < args.length; i++) {
+    if (args[i].startsWith('--')) break;
+    const parts = args[i].split(/[\s,]+/).map(e => e.trim()).filter(Boolean);
+    customExcludes.push(...parts);
+  }
+}
+
 const concIdx = args.indexOf('--concurrency');
 const concurrency = concIdx >= 0 ? parseInt(args[concIdx + 1]) : 4;
 const queryIdx = args.indexOf('--query');
 const searchQuery = queryIdx >= 0 ? args[queryIdx + 1] : null;
 
-// Progress mode: 'tty' (default — overwrite same line with \r) or 'lines'
-// (one log line per progressEvery batches — log-friendly, survives tee/redirects).
+// Progress mode
 const progressIdx   = args.indexOf('--progress-every');
 const progressEvery = progressIdx >= 0 ? Math.max(1, parseInt(args[progressIdx + 1]) || 100) : 100;
 const progressMode: 'tty' | 'lines' =
   args.includes('--progress-mode=lines') || args.includes('--progress-lines') ? 'lines' :
-  (process.stdout.isTTY ? 'tty' : 'lines');  // auto: lines when piped/redirected
+  (process.stdout.isTTY ? 'tty' : 'lines');
 
 // ─── File Extensions ─────────────────────────────────────────────────────────
 const CODE_EXTENSIONS = new Set([
   '.ts', '.svelte', '.js', '.mjs', '.mts', '.json', '.css',
   '.go', '.py', '.sql', '.proto', '.wgsl', '.md', '.txt',
 ]);
-const IGNORE_PATTERNS = [
+
+const DEFAULT_IGNORE_PATTERNS = [
   'node_modules', '.svelte-kit', 'build', 'dist', '.git',
   'deeds_labs', 'phase104-backups', 'scripts/tests/screenshots',
+  '.cache', '.tmp', 'logs', 'coverage', '.qdrant'
 ];
+const IGNORE_PATTERNS = customExcludes.length > 0 ? customExcludes : DEFAULT_IGNORE_PATTERNS;
+
 const MAX_FILE_SIZE = 100_000; // 100KB max per file
 const CHUNK_SIZE = 800;
 const CHUNK_OVERLAP = 100;
@@ -106,6 +138,95 @@ function hashToUint(str: string): number {
     hash = ((hash << 5) - hash + char) | 0;
   }
   return Math.abs(hash);
+}
+
+// Deterministic sparse word embedding generator (Pseudo-embedding)
+function getPseudoEmbedding(text: string): number[] {
+  const vec = new Array(VECTOR_DIM).fill(0);
+  const words = text.toLowerCase().split(/\s+/);
+  for (const word of words) {
+    let hash = 0;
+    for (let i = 0; i < word.length; i++) {
+      hash = (hash * 31 + word.charCodeAt(i)) | 0;
+    }
+    const idx = Math.abs(hash) % VECTOR_DIM;
+    vec[idx] += 1.0;
+  }
+  for (let i = 0; i < VECTOR_DIM; i++) {
+    vec[i] += 0.0001;
+  }
+  const norm = Math.sqrt(vec.reduce((sum, v) => sum + v * v, 0)) || 1.0;
+  return vec.map(v => v / norm);
+}
+
+// Deterministic tagger
+function extractDeterministicTags(filePath: string, content: string): string[] {
+  const tags: string[] = [];
+  const ext = extname(filePath).toLowerCase();
+  if (ext) tags.push(ext.replace('.', ''));
+
+  const pathParts = filePath.split('/');
+  for (const part of pathParts) {
+    const cleaned = part.replace(/\.[^/.]+$/, "");
+    if (cleaned && cleaned !== 'src' && cleaned !== 'lib' && cleaned !== 'server') {
+      tags.push(cleaned.toLowerCase());
+    }
+  }
+
+  const baseName = basename(filePath, ext);
+  const wordParts = baseName.split(/[-_]|\b/);
+  for (const wp of wordParts) {
+    if (wp.trim().length > 2) tags.push(wp.toLowerCase());
+  }
+
+  if (ext === '.md' || ext === '.markdown') {
+    const headingMatches = content.match(/^#+\s+(.+)$/gm);
+    if (headingMatches) {
+      for (const h of headingMatches) {
+        const cleaned = h.replace(/^#+\s+/, '').trim().toLowerCase();
+        const words = cleaned.split(/[^a-zA-Z0-9]+/);
+        for (const w of words) {
+          if (w.length > 3) tags.push(w);
+        }
+      }
+    }
+  }
+
+  const importMatches = content.match(/import\s+.*\s+from\s+['"]([^'"]+)['"]/g);
+  if (importMatches) {
+    for (const imp of importMatches) {
+      const match = imp.match(/from\s+['"]([^'"]+)['"]/);
+      if (match && match[1]) {
+        const pkg = match[1].replace(/^\$lib\//, '');
+        tags.push(pkg.split('/').pop()?.toLowerCase() || '');
+      }
+    }
+  }
+
+  const pgTableMatches = content.match(/pgTable\(\s*['"]([^'"]+)['"]/g);
+  if (pgTableMatches) {
+    for (const tm of pgTableMatches) {
+      const match = tm.match(/pgTable\(\s*['"]([^'"]+)['"]/);
+      if (match && match[1]) tags.push(`db:${match[1]}`);
+    }
+  }
+
+  if (filePath.includes('test') || filePath.includes('spec')) {
+    const testMatches = content.match(/(?:test|describe|it)\(\s*['"]([^'"]+)['"]/g);
+    if (testMatches) {
+      for (const tm of testMatches) {
+        const match = tm.match(/(?:test|describe|it)\(\s*['"]([^'"]+)['"]/);
+        if (match && match[1]) {
+          const words = match[1].split(/[^a-zA-Z0-9]+/);
+          for (const w of words) {
+            if (w.length > 3) tags.push(w.toLowerCase());
+          }
+        }
+      }
+    }
+  }
+
+  return Array.from(new Set(tags.map(t => t.trim()).filter(t => t.length > 2 && t.length < 30)));
 }
 
 // ─── Redis Cache ─────────────────────────────────────────────────────────────
@@ -177,12 +298,25 @@ async function ensureCollection(): Promise<void> {
 
 async function upsertPoints(points: Array<{ id: string; vector: number[]; payload: Record<string, any> }>): Promise<void> {
   if (points.length === 0) return;
-  const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points?wait=true`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ points }),
-  });
-  if (!res.ok) throw new Error(`Qdrant upsert failed: ${await res.text()}`);
+  const maxRetries = 3;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points?wait=true`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Connection': 'close'
+        },
+        body: JSON.stringify({ points }),
+      });
+      if (!res.ok) throw new Error(`Qdrant upsert failed: ${await res.text()}`);
+      return; // success
+    } catch (err) {
+      if (attempt === maxRetries) throw err;
+      console.warn(`  ⚠️ Qdrant upsert failed (attempt ${attempt}/${maxRetries}), retrying in 200ms... Error: ${err.message}`);
+      await new Promise(r => setTimeout(r, 200));
+    }
+  }
 }
 
 async function searchQdrant(query: string, limit = 10): Promise<any[]> {
@@ -202,7 +336,61 @@ async function searchQdrant(query: string, limit = 10): Promise<any[]> {
 }
 
 // ─── Ollama Embedding ────────────────────────────────────────────────────────
+let precomputedMap: Map<string, number[]> | null = null;
+function loadPrecomputedSync(): Map<string, number[]> {
+  if (precomputedMap !== null) return precomputedMap;
+  precomputedMap = new Map();
+  const precomputedPath = process.env.PRECOMPUTED_EMB_PATH || join(process.cwd(), '.tmp', 'precomputed_embeddings.jsonl');
+  try {
+    if (existsSync(precomputedPath)) {
+      const raw = readFileSync(precomputedPath, 'utf8');
+      for (const line of raw.trim().split('\n')) {
+        if (!line) continue;
+        try {
+          const obj = JSON.parse(line);
+          if (obj.id && obj.vector) precomputedMap.set(obj.id, obj.vector);
+          if (obj.source_ref && obj.vector) precomputedMap.set(obj.source_ref, obj.vector);
+          if (obj.text && obj.vector) precomputedMap.set(obj.text, obj.vector);
+        } catch {}
+      }
+    }
+  } catch {}
+  return precomputedMap;
+}
+
 async function embed(text: string): Promise<number[]> {
+  const embedMode = (process.env.EMBED_MODE || (args.includes('--embed-mode=pseudo') || args.includes('--pseudo') ? 'pseudo' : 'ollama')).toLowerCase();
+  
+  if (embedMode === 'pseudo') {
+    return getPseudoEmbedding(text);
+  }
+
+  if (embedMode === 'file') {
+    const map = loadPrecomputedSync();
+    const cleanText = text.trim();
+    if (map.has(cleanText)) return map.get(cleanText)!;
+    return getPseudoEmbedding(text);
+  }
+
+  if (embedMode === 'http') {
+    const embedUrl = process.env.EMBED_URL || 'http://localhost:5173/api/embed';
+    const res = await fetch(embedUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: text })
+    });
+    if (!res.ok) throw new Error(`HTTP Embedding failed: ${res.status}`);
+    const data = await res.json();
+    const vec = data.embeddings?.[0] ?? data.embedding ?? data;
+    if (Array.isArray(vec) && vec.length === VECTOR_DIM) {
+      return vec;
+    }
+    if (data.data && Array.isArray(data.data) && Array.isArray(data.data[0]?.embedding)) {
+      return data.data[0].embedding;
+    }
+    throw new Error('Could not parse vector from HTTP embedding response');
+  }
+
   const res = await fetch(`${OLLAMA_URL}/api/embed`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -218,17 +406,30 @@ async function embed(text: string): Promise<number[]> {
 }
 
 // ─── Ollama Agentic Tagging via Gemma4 ───────────────────────────────────────
-async function tagChunk(chunk: CodeChunk): Promise<{ tags: string[]; purpose: string; domain: string; complexity: string }> {
-  const prompt = `Analyze this code chunk and return a JSON object with exactly these fields:
+interface TagResult {
+  tags: string[];
+  purpose: string;
+  domain: string;
+  complexity: string;
+}
+
+const fileTagsCache = new Map<string, TagResult>();
+
+async function getFileTags(filePath: string, fileContent: string, extension: string): Promise<TagResult> {
+  if (fileTagsCache.has(filePath)) {
+    return fileTagsCache.get(filePath)!;
+  }
+
+  const prompt = `Analyze this code file and return a JSON object with exactly these fields:
 - "tags": array of 3-7 semantic tags (e.g., ["auth", "middleware", "session", "cookie"])
 - "purpose": one-line description of what this code does (max 80 chars)
 - "domain": one of: "auth", "database", "api", "ui", "ai-ml", "cache", "queue", "config", "test", "build", "gpu", "vector-search", "evidence", "legal", "chat", "admin", "utility"
 - "complexity": one of: "low", "medium", "high"
 
-File: ${chunk.filePath} (chunk ${chunk.chunkIndex + 1}/${chunk.totalChunks})
+File: ${filePath}
 
-\`\`\`${chunk.extension.replace('.', '')}
-${chunk.content.slice(0, 1500)}
+\`\`\`${extension.replace('.', '')}
+${fileContent.slice(0, 3000)}
 \`\`\`
 
 Return ONLY valid JSON, no explanation.`;
@@ -245,29 +446,35 @@ Return ONLY valid JSON, no explanation.`;
       }),
       signal: AbortSignal.timeout(30000),
     });
-    if (!res.ok) return { tags: [], purpose: '', domain: 'utility', complexity: 'medium' };
+    if (!res.ok) {
+      return { tags: [], purpose: '', domain: 'utility', complexity: 'medium' };
+    }
 
     const data = await res.json();
     const text = data.response?.trim() ?? '';
-
-    // Extract JSON from response (handle markdown code blocks)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return { tags: [], purpose: '', domain: 'utility', complexity: 'medium' };
+    if (!jsonMatch) {
+      return { tags: [], purpose: '', domain: 'utility', complexity: 'medium' };
+    }
 
     const parsed = JSON.parse(jsonMatch[0]);
-    return {
+    const result = {
       tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 10).map((t: any) => String(t).toLowerCase()) : [],
       purpose: String(parsed.purpose ?? '').slice(0, 120),
       domain: String(parsed.domain ?? 'utility'),
       complexity: String(parsed.complexity ?? 'medium'),
     };
+    fileTagsCache.set(filePath, result);
+    return result;
   } catch {
-    return { tags: [], purpose: '', domain: 'utility', complexity: 'medium' };
+    const result = { tags: [], purpose: '', domain: 'utility', complexity: 'medium' };
+    fileTagsCache.set(filePath, result);
+    return result;
   }
 }
 
 // ─── File Discovery ──────────────────────────────────────────────────────────
-function discoverFiles(dir: string): string[] {
+function discoverFiles(rootsList: string[]): string[] {
   const files: string[] = [];
 
   function walk(d: string) {
@@ -276,7 +483,8 @@ function discoverFiles(dir: string): string[] {
 
     for (const entry of entries) {
       const fullPath = join(d, entry);
-      if (IGNORE_PATTERNS.some(p => fullPath.includes(p))) continue;
+      const relPath = relative(process.cwd(), fullPath).replace(/\\/g, '/');
+      if (IGNORE_PATTERNS.some(p => relPath.includes(p) || entry === p)) continue;
 
       let stat;
       try { stat = statSync(fullPath); } catch { continue; }
@@ -289,7 +497,17 @@ function discoverFiles(dir: string): string[] {
     }
   }
 
-  walk(dir);
+  for (const rootPath of rootsList) {
+    let baseDir = resolve(process.cwd(), rootPath);
+    if (!existsSync(baseDir)) {
+      baseDir = resolve(process.cwd(), '..', rootPath);
+    }
+    console.log(`    🔍 Scanning rootPath: ${rootPath} -> resolved baseDir: ${baseDir} (exists: ${existsSync(baseDir)})`);
+    if (existsSync(baseDir)) {
+      walk(baseDir);
+    }
+  }
+  console.log(`    🔍 Finished scanning. Total files collected: ${files.length}`);
   return files;
 }
 
@@ -388,9 +606,33 @@ async function processChunkBatch(
         // Tag with Gemma4 (optional — can be slow)
         let tagResult = { tags: [] as string[], purpose: '', domain: 'utility', complexity: 'medium' };
         if (enableTags) {
-          tagResult = await tagChunk(chunk);
-          stats.chunksTagged++;
+          try {
+            const fullPath = resolve(process.cwd(), chunk.filePath);
+            let content = '';
+            if (existsSync(fullPath)) {
+              content = readFileSync(fullPath, 'utf-8');
+            } else {
+              const altPath = resolve(process.cwd(), '..', chunk.filePath);
+              if (existsSync(altPath)) {
+                content = readFileSync(altPath, 'utf-8');
+              }
+            }
+            tagResult = await getFileTags(chunk.filePath, content, chunk.extension);
+            stats.chunksTagged++;
+          } catch (e) {
+            // fallback
+          }
         }
+
+        const determTags = extractDeterministicTags(chunk.filePath, chunk.content);
+        const combinedTags = Array.from(new Set([...determTags, ...tagResult.tags]));
+        const rootDir = chunk.filePath.split('/')[0] || '';
+        const areaDir = chunk.filePath.split('/')[1] || rootDir;
+        
+        let agentArea = 'atlas-context';
+        if (chunk.filePath.includes('.opencode')) agentArea = 'opencode-agents';
+        else if (chunk.filePath.includes('src/lib/server/ai')) agentArea = 'ai-agents';
+        else if (chunk.filePath.includes('src/lib/server/db')) agentArea = 'db-analyst';
 
         // Build point — collection uses named vectors: content + signature
         const point = {
@@ -398,14 +640,29 @@ async function processChunkBatch(
           vector: { content: vector, signature: vector },
           payload: {
             chunk_id: chunk.id,
+            sourceRef: `${chunk.filePath}#chunk-${chunk.chunkIndex}`,
             file_path: chunk.filePath,
+            root: rootDir,
+            area: areaDir,
+            kind: chunk.extension.replace('.', ''),
+            tags: combinedTags,
+            agent_area: agentArea,
+            feature_status: 'candidate_complete',
+            centroid_id: 'ae_0',
+            content_hash: chunk.contentHash,
+            schema_version: 1,
+            // Feature-profile retrieval loop additions
+            feature_label: areaDir || 'unknown',
+            phase_lane: agentArea === 'db-analyst' ? 'schema_contract' : 'workspace_gap',
+            dependency_cluster: rootDir || 'general',
+            hot_keyword_cluster: combinedTags[0] || 'general',
+            parent_atlas_card_id: agentArea === 'db-analyst' ? 'schema-indexer:contract' : 'general-card',
+            // Keep backward-compatible fields
             file_name: chunk.fileName,
             extension: chunk.extension,
             chunk_index: chunk.chunkIndex,
             total_chunks: chunk.totalChunks,
             content: chunk.content,
-            content_hash: chunk.contentHash,
-            tags: tagResult.tags,
             purpose: tagResult.purpose,
             domain: tagResult.domain,
             complexity: tagResult.complexity,
@@ -492,9 +749,8 @@ async function main() {
   }
 
   // Discover files
-  const baseDir = resolve(process.cwd(), targetDir);
-  console.log(`  📁 Scanning: ${relative(process.cwd(), baseDir) || targetDir}`);
-  const files = discoverFiles(baseDir);
+  console.log(`  📁 Scanning roots: ${roots.join(', ')}`);
+  const files = discoverFiles(roots);
   console.log(`  📄 Found ${files.length} indexable files`);
 
   // Chunk all files
@@ -552,7 +808,7 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('\n  ✗ Fatal error:', err.message);
+  console.error('\n  ✗ Fatal error:', err);
   process.exit(1);
 });
 

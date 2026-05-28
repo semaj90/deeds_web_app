@@ -340,22 +340,64 @@ export async function orchestrateRetrieval(req: RetrievalRequest): Promise<Retri
 	// 3.5 TurboVec Rerank Blend
 	if (!req.skipRerank && chunks.length > 0) {
 		const t25 = performance.now();
-		const rerankResult = await turbovecRerank(vector, chunks, {
-			topK,
-			graphNeighbors: preRetrievalNeighbors,
+		
+		// Translate ContextDoc[] to QdrantHit[]
+		const qdrantHits = chunks.map((c, i) => {
+			const parts = c.documentId.split(':');
+			const id = parts.length > 1 ? parts[1] : i;
+			return {
+				id,
+				score: c.similarity,
+				payload: {
+					file_path: c.sourceId,
+					content: c.content
+				}
+			};
 		});
-		chunks = rerankResult.chunks;
+
+		// Build GraphRAGHints from preRetrievalNeighbors
+		const authorityScores: Record<string, number> = {};
+		for (const n of preRetrievalNeighbors) {
+			if (n.evidenceIds) {
+				for (const eid of n.evidenceIds) {
+					authorityScores[eid] = (n.strength / 100);
+				}
+			}
+		}
+
+		const rerankResult = await turbovecRerank({
+			query: req.query,
+			hits: qdrantHits,
+			graphHints: { authorityScores }
+		});
+
+		if (rerankResult.ok) {
+			// Map hits back to ContextDoc[]
+			chunks = rerankResult.hits.map((h, i) => {
+				const filePath = h.payload?.file_path || '';
+				const original = chunks.find(c => c.sourceId === filePath || c.documentId.endsWith(String(h.id))) || chunks[i];
+				return {
+					...original,
+					similarity: h.score
+				};
+			});
+		}
+
 		timings.turbovec = rerankResult.latencyMs;
 		
 		// Emit before/after top-N diff
-		if (rerankResult.diff.length > 0) {
+		const beforeIds = qdrantHits.map(h => String(h.id));
+		const afterIds = rerankResult.hits.map(h => String(h.id));
+		const diff = afterIds.filter((id, idx) => id !== beforeIds[idx]);
+
+		if (diff.length > 0) {
 			logInference({
 				type: 'turbovec_rerank',
 				backend: 'js',
 				latencyMs: rerankResult.latencyMs,
 				cacheHit: false,
 				resultCount: chunks.length,
-				details: { diff: rerankResult.diff }
+				metadata: { diff }
 			});
 		}
 	}

@@ -1,6 +1,6 @@
 # OpenCode Workspace Bootstrap
 
-Generated: 2026-05-26T23:13:05.675Z
+Generated: 2026-05-27T17:21:02.585Z
 Repo: C:\Users\james\Videos\deeds-web-app
 
 ## Steps
@@ -17,6 +17,7 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - C:\Users\james\Videos\deeds-web-app\.tmp\claude-mem-ensure.json
 
 ## Loaded Docs
+- docs\atlas-vendor-wheels.md
 - docs\documents-atlas-index.md
 - docs\status\feature-tracking-roadmap.md
 - docs\status\GPU_SEMANTIC_WIKI_SUMMARY.md
@@ -59,6 +60,8 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\reports\gpu-job-queue-smoke-report.md
 - docs\reports\hermes-self-healing-events.jsonl
 - docs\reports\hermes-self-healing-report.json
+- docs\reports\index-gap-memory-report.json
+- docs\reports\index-gap-memory-report.md
 - docs\reports\inference-backend-benchmark.json
 - docs\reports\inference-backend-benchmark.md
 - docs\reports\lane-routing-eval.json
@@ -82,6 +85,8 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\reports\rg-search-integrity-report.md
 - docs\reports\rg_napi.txt
 - docs\reports\rg_turbovec.txt
+- docs\reports\schema-indexer-contract-report.json
+- docs\reports\schema-indexer-contract-report.md
 - docs\reports\schema-mismatch-remediation-plan.md
 - docs\reports\simd-bridge-memory-audit.json
 - docs\reports\simd-bridge-memory-audit.md
@@ -92,11 +97,6 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\reports\trace-full-loop-smoke-report-2026-05-20.md
 - docs\reports\ts7-suppressed-errors.md
 - docs\reports\turbovec-benchmark-report.md
-- docs\reports\turbovec-evaluation-plan.md
-- docs\reports\vram-hygiene-smoke-report.json
-- docs\reports\vram-hygiene-smoke-report.md
-- docs\reports\vram-recovery-smoke-report.json
-- docs\reports\vram-recovery-smoke-report.md
 
 ## Bash Tools
 - agents:write:workspace => node sveltekit-frontend/scripts/generate-agents-md.mjs

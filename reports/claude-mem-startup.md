@@ -1,24 +1,22 @@
 # Claude-Mem Startup
 
-Generated: 2026-05-27T16:06:56.959Z
+Generated: 2026-05-27T17:20:48.148Z
 Repo: C:\Users\james\Videos\deeds-web-app
 Runtime: worker
 Runtime reason: defaulting to legacy worker runtime
 
 ## Status
 - running
-- worker started detached
+- worker already running
 
 ## Detach
-- alreadyRunning: false
-- startedDetached: true
-- detachedPid: 43152
+- alreadyRunning: true
+- startedDetached: false
+- detachedPid: n/a
 
 ## Status Check
 - running: true
 - exit: 0
 
 ## Launch
-- ok: true
-- exit: 0
-- pid: 43152
+- none

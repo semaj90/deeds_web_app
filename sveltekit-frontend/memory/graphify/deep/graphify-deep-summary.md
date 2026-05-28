@@ -1,22 +1,22 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-27T16:09:47.952Z
+Generated: 2026-05-27T21:46:48.487Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 34718 |
-| Total edges | 80690 |
-| Resolved edges | 9127 |
+| Nodes | 34782 |
+| Total edges | 80787 |
+| Resolved edges | 9132 |
 | Unresolved (local) | 8511 |
-| External refs | 61349 |
+| External refs | 61441 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 992 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 27960 |
-| script | 4079 |
+| shared | 28012 |
+| script | 4091 |
 | test | 1467 |
 | types | 1040 |
 | config | 140 |
@@ -27,16 +27,16 @@ Generated: 2026-05-27T16:09:47.952Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 64203 |
+| imports_static | 64288 |
 | test_covers_file | 4930 |
-| redis_dependency | 3173 |
-| imports_dynamic | 2336 |
+| redis_dependency | 3177 |
+| imports_dynamic | 2339 |
 | exports_from | 1868 |
 | env_dependency | 1738 |
-| qdrant_dependency | 1182 |
-| mcp_tool_calls | 460 |
+| qdrant_dependency | 1185 |
+| mcp_tool_calls | 463 |
 | neo4j_dependency | 453 |
-| db_dependency | 343 |
+| db_dependency | 342 |
 | svelte_route_uses_loader | 3 |
 | server_route_depends_on | 1 |
 
@@ -45,7 +45,7 @@ Generated: 2026-05-27T16:09:47.952Z
 |------|------|------|-------|--------|
 | 1 | `claude-mem/src/utils/logger.ts` | shared | 178 | 1 |
 | 2 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 78 | 0 |
-| 3 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 70 | 5 |
+| 3 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 69 | 5 |
 | 4 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |
 | 5 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |
 | 6 | `claude-mem/src/shared/paths.ts` | shared | 57 | 2 |

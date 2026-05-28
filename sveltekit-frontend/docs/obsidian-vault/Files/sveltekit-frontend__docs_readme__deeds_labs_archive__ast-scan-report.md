@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/docs_readme/deeds_labs_archive/ast-scan-report.json"
-last_updated_by_llm: "2026-05-24T16:40:21.009Z"
+last_updated_by_llm: "2026-05-27T19:49:20.042Z"
 ai-first: true
 confidence: "high"
 up: []

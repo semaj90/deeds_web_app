@@ -90,6 +90,22 @@ for (const [key, { meta }] of metaMap.entries()) {
   written++;
 }
 
-await outHandle.close();
-await fs.writeFile(reportPath, JSON.stringify({ exported: written, ndjson: path.relative(root, outNdjson) }, null, 2), 'utf8');
-console.log(`Exported ${written} records → ${path.relative(root, outNdjson)}; report: ${path.relative(root, reportPath)}`);
+  await outHandle.close();
+  const report = {
+    exported: written,
+    ndjson: path.relative(root, outNdjson),
+    report: path.relative(root, reportPath),
+  };
+  await fs.writeFile(reportPath, JSON.stringify(report, null, 2), 'utf8');
+  const summaryPath = path.join(outDir, 'jsonb_export_summary.md');
+  const summary = `# JSONB Export Summary\n\n- exported: ${written}\n- ndjson: ${path.relative(root, outNdjson)}\n- report: ${path.relative(root, reportPath)}\n`;
+  await fs.writeFile(summaryPath, summary, 'utf8');
+  // Minimal machine-readable console output (anti-OOM)
+  console.log(
+    JSON.stringify({
+      status: 'ok',
+      report_path: path.relative(root, reportPath),
+      summary_path: path.relative(root, summaryPath),
+      counts: { exported: written },
+    })
+  );

@@ -409,105 +409,252 @@ const TOOLS = {
       }
     },
   },
+
+  // ── Gemma4 / llama-server KV prompt-cache tools ───────────────────────────
+
+  'engram.kv_cache_prime': {
+    description: 'Prime the llama-server KV cache by sending a system-prompt prefix to /v1/chat/completions with cache_prompt:true. Call once per session with the ACE context block so subsequent Gemma4 calls reuse the cached KV state.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        system_prompt: { type: 'string', description: 'System prompt / ACE context to cache' },
+        turbo_url: { type: 'string', default: 'http://127.0.0.1:8090', description: 'llama-server base URL' },
+        model: { type: 'string', default: 'gemma4' },
+      },
+      required: ['system_prompt'],
+    },
+    handler: async (args) => {
+      const base = (args.turbo_url ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+      const cacheKey = `engram:kv:prime:${createHash('sha1').update(args.system_prompt).digest('hex').slice(0, 16)}`;
+      try {
+        // Check Redis first — avoid re-priming if already cached this session
+        let alreadyPrimed = false;
+        try {
+          const redis = await getRedis();
+          alreadyPrimed = (await redis.exists(cacheKey)) === 1;
+        } catch { /* redis optional */ }
+
+        if (alreadyPrimed) {
+          return { ok: true, status: 'already_primed', cache_key: cacheKey };
+        }
+
+        const res = await fetch(`${base}/v1/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: args.model ?? 'gemma4',
+            messages: [
+              { role: 'system', content: args.system_prompt },
+              { role: 'user', content: 'Ready.' },
+            ],
+            max_tokens: 1,
+            temperature: 0,
+            cache_prompt: true,
+            stream: false,
+          }),
+          signal: AbortSignal.timeout(30_000),
+        });
+
+        const primed = res.ok;
+        if (primed) {
+          try {
+            const redis = await getRedis();
+            await redis.set(cacheKey, '1', 'EX', 3600); // 1h — matches llama-server KV TTL
+          } catch { /* redis optional */ }
+        }
+        return {
+          ok: primed,
+          status: primed ? 'primed' : 'failed',
+          http_status: res.status,
+          cache_key: cacheKey,
+          prompt_chars: args.system_prompt.length,
+          turbo_url: base,
+        };
+      } catch (err) {
+        return { ok: false, status: 'error', error: err.message, cache_key: cacheKey };
+      }
+    },
+  },
+
+  'engram.kv_cache_status': {
+    description: 'Check llama-server KV cache slot usage via /health and /slots endpoints',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        turbo_url: { type: 'string', default: 'http://127.0.0.1:8090' },
+      },
+    },
+    handler: async (args) => {
+      const base = (args.turbo_url ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+      const results = {};
+      for (const path of ['/health', '/slots']) {
+        try {
+          const res = await fetch(`${base}${path}`, { signal: AbortSignal.timeout(5000) });
+          results[path] = res.ok ? await res.json() : { status: res.status };
+        } catch (err) {
+          results[path] = { error: err.message };
+        }
+      }
+      return { turbo_url: base, ...results };
+    },
+  },
+
+  'engram.session_context_inject': {
+    description: 'Build and inject a compact ACE+engram context block into the llama-server KV cache for the current OpenCode session. Reads ace-context.json + recent chat memory, primes the cache, writes ace:packet:{runId} to Redis.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        run_id: { type: 'string', description: 'Session/run identifier for the Redis packet key' },
+        user_id: { type: 'string', default: 'opencode', description: 'User ID for chat memory lookup' },
+        ace_context_path: { type: 'string', default: '.opencode/ace-context.json' },
+        turbo_url: { type: 'string', default: 'http://127.0.0.1:8090' },
+        memory_turns: { type: 'number', default: 5 },
+      },
+      required: ['run_id'],
+    },
+    handler: async (args) => {
+      const { readFileSync, existsSync } = await import('node:fs');
+      const { resolve } = await import('node:path');
+
+      // 1. Load ACE context card
+      let aceCard = '';
+      const acePath = resolve(args.ace_context_path ?? '.opencode/ace-context.json');
+      if (existsSync(acePath)) {
+        try {
+          const raw = JSON.parse(readFileSync(acePath, 'utf8'));
+          const tools = (raw.bashTools ?? []).slice(0, 10).join('\n');
+          const docs = (raw.docArtifacts ?? []).slice(0, 8).join('\n');
+          aceCard = `## ACE Context\nBash tools:\n${tools}\nDocs:\n${docs}`;
+        } catch { aceCard = ''; }
+      }
+
+      // 2. Load recent chat memory from Redis
+      let memoryBlock = '';
+      try {
+        const redis = await getRedis();
+        const key = `user:memory:${args.user_id ?? 'opencode'}`;
+        const rows = await redis.zrevrange(key, 0, (args.memory_turns ?? 5) - 1);
+        if (rows.length) {
+          const turns = rows.map(r => { try { const t = JSON.parse(r); return `${t.role}: ${String(t.content).slice(0, 120)}`; } catch { return r.slice(0, 120); } });
+          memoryBlock = `## Recent Session Memory\n${turns.join('\n')}`;
+        }
+      } catch { /* redis optional */ }
+
+      const systemPrompt = [
+        'You are Gemma4, a local legal AI assistant. Use the context below to answer concisely.',
+        aceCard,
+        memoryBlock,
+      ].filter(Boolean).join('\n\n');
+
+      // 3. Prime the KV cache
+      const primeResult = await TOOLS['engram.kv_cache_prime'].handler({
+        system_prompt: systemPrompt,
+        turbo_url: args.turbo_url,
+      });
+
+      // 4. Write the packet to Redis for other tools to read
+      const packetResult = await TOOLS['engram.ace_packet_inject'].handler({
+        run_id: args.run_id,
+        context_blob: systemPrompt,
+        ttl_seconds: 3600,
+      });
+
+      return {
+        ok: primeResult.ok,
+        kv_prime: primeResult,
+        ace_packet: packetResult,
+        prompt_chars: systemPrompt.length,
+        ace_loaded: Boolean(aceCard),
+        memory_turns_loaded: memoryBlock ? (memoryBlock.match(/\n/g)?.length ?? 0) : 0,
+      };
+    },
+  },
 };
 
-// ── MCP Streamable HTTP server ─────────────────────────────────────────────────
+// ── MCP stdio transport (type: local) ─────────────────────────────────────────
+// opencode spawns this as a child process and speaks newline-delimited JSON-RPC
+// over stdin/stdout. stderr is for human-readable logs only.
 
-const server = createServer(async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+const log = (...a) => process.stderr.write('[engram-embed] ' + a.join(' ') + '\n');
 
-  if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
+function send(obj) {
+  process.stdout.write(JSON.stringify(obj) + '\n');
+}
 
-  if (req.url === '/health' || req.url === '/healthz') {
-    const health = await TOOLS['engram.health'].handler({});
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: health.ollama_ok ? 'ok' : 'degraded', ...health }));
+async function dispatch(rpc) {
+  const { method, params, id } = rpc;
+
+  if (method === 'initialize') {
+    send({
+      jsonrpc: '2.0', id,
+      result: {
+        protocolVersion: '2024-11-05',
+        capabilities: { tools: {} },
+        serverInfo: { name: 'engram-embed', version: '2.0.0' },
+      },
+    });
     return;
   }
 
-  if (req.method === 'POST' && req.url === '/mcp') {
-    let body = '';
-    for await (const chunk of req) body += chunk;
+  if (method === 'notifications/initialized') return; // no response needed
 
-    let rpc;
-    try { rpc = JSON.parse(body); } catch {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Invalid JSON' }));
-      return;
-    }
-
-    const { method, params, id } = rpc;
-
-    if (method === 'initialize') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        jsonrpc: '2.0', id,
-        result: {
-          protocolVersion: '2024-11-05',
-          capabilities: { tools: {} },
-          serverInfo: { name: 'engram-embed', version: '1.0.0' },
-        },
-      }));
-      return;
-    }
-
-    if (method === 'tools/list') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        jsonrpc: '2.0', id,
-        result: {
-          tools: Object.entries(TOOLS).map(([name, t]) => ({
-            name, description: t.description, inputSchema: t.inputSchema,
-          })),
-        },
-      }));
-      return;
-    }
-
-    if (method === 'tools/call') {
-      const toolName = params?.name;
-      const tool = TOOLS[toolName];
-      if (!tool) {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          jsonrpc: '2.0', id,
-          error: { code: -32601, message: `Tool not found: ${toolName}` },
-        }));
-        return;
-      }
-      try {
-        const result = await tool.handler(params?.arguments ?? {});
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          jsonrpc: '2.0', id,
-          result: { content: [{ type: 'text', text: JSON.stringify(result) }] },
-        }));
-      } catch (err) {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ jsonrpc: '2.0', id, error: { code: -32603, message: err.message } }));
-      }
-      return;
-    }
-
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ jsonrpc: '2.0', id, error: { code: -32601, message: 'Unknown method' } }));
+  if (method === 'tools/list') {
+    send({
+      jsonrpc: '2.0', id,
+      result: {
+        tools: Object.entries(TOOLS).map(([name, t]) => ({
+          name, description: t.description, inputSchema: t.inputSchema,
+        })),
+      },
+    });
     return;
   }
 
-  res.writeHead(404);
-  res.end();
+  if (method === 'tools/call') {
+    const toolName = params?.name;
+    const tool = TOOLS[toolName];
+    if (!tool) {
+      send({ jsonrpc: '2.0', id, error: { code: -32601, message: `Tool not found: ${toolName}` } });
+      return;
+    }
+    try {
+      const result = await tool.handler(params?.arguments ?? {});
+      send({ jsonrpc: '2.0', id, result: { content: [{ type: 'text', text: JSON.stringify(result) }] } });
+    } catch (err) {
+      send({ jsonrpc: '2.0', id, error: { code: -32603, message: err.message } });
+    }
+    return;
+  }
+
+  if (id !== undefined) {
+    send({ jsonrpc: '2.0', id, error: { code: -32601, message: `Unknown method: ${method}` } });
+  }
+}
+
+// Health-check mode: node engram-embed-mcp.mjs --health
+if (process.argv.includes('--health')) {
+  const result = await TOOLS['engram.health'].handler({});
+  process.stdout.write(JSON.stringify(result) + '\n');
+  process.exit(result.ollama_ok ? 0 : 1);
+}
+
+log(`ready — embed=${EMBED_MODEL} ollama=${OLLAMA_URL} qdrant=${QDRANT_URL} redis=${REDIS_URL}`);
+log(`tools: ${Object.keys(TOOLS).join(', ')}`);
+
+// Read newline-delimited JSON-RPC from stdin
+import { createInterface } from 'node:readline';
+const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
+rl.on('line', async (line) => {
+  const trimmed = line.trim();
+  if (!trimmed) return;
+  let rpc;
+  try { rpc = JSON.parse(trimmed); } catch {
+    send({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } });
+    return;
+  }
+  await dispatch(rpc);
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`[engram-embed-mcp] Listening on http://127.0.0.1:${PORT}/mcp`);
-  console.log(`  Embed model: ${EMBED_MODEL} via ${OLLAMA_URL}`);
-  console.log(`  Qdrant: ${QDRANT_URL}`);
-  console.log(`  Tools: ${Object.keys(TOOLS).join(', ')}`);
-});
-
-server.on('error', (err) => {
-  console.error('[engram-embed-mcp] Server error:', err.message);
-  process.exit(1);
-});
+rl.on('close', () => process.exit(0));
+process.on('SIGTERM', () => process.exit(0));
+process.on('SIGINT',  () => process.exit(0));

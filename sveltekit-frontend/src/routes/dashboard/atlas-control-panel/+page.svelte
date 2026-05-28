@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import { $state, $derived, $effect } from 'svelte';
   import Button from '$lib/components/ui/Button.svelte';
 
   // --- State Management using runes ---

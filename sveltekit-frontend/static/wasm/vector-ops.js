@@ -18,29 +18,29 @@ async function instantiate(module, imports = {}) {
   const memory = exports.memory || imports.env.memory;
   const adaptedExports = Object.setPrototypeOf({
     allocateVectorMemory(length) {
-      // sveltekit-frontend/src/wasm/vector-operations/allocateVectorMemory(i32) => usize
+      // src/wasm/vector-operations/allocateVectorMemory(i32) => usize
       return exports.allocateVectorMemory(length) >>> 0;
     },
     hybridCosineSimilarity(aPtr, bPtr, length, useServer) {
-      // sveltekit-frontend/src/wasm/vector-operations/hybridCosineSimilarity(usize, usize, usize, bool) => f32
+      // src/wasm/vector-operations/hybridCosineSimilarity(usize, usize, usize, bool) => f32
       useServer = useServer ? 1 : 0;
       return exports.hybridCosineSimilarity(aPtr, bPtr, length, useServer);
     },
     batchVectorChunking(vectorsPtr, numVectors, vectorLength, chunkSize, resultsPtr) {
-      // sveltekit-frontend/src/wasm/vector-operations/batchVectorChunking(usize, i32, i32, i32, usize) => usize
+      // src/wasm/vector-operations/batchVectorChunking(usize, i32, i32, i32, usize) => usize
       return exports.batchVectorChunking(vectorsPtr, numVectors, vectorLength, chunkSize, resultsPtr) >>> 0;
     },
     prepareTensorForCUDA(tensorPtr, dimensions, dimCount, outputPtr) {
-      // sveltekit-frontend/src/wasm/vector-operations/prepareTensorForCUDA(usize, ~lib/array/Array<i32>, i32, usize) => void
+      // src/wasm/vector-operations/prepareTensorForCUDA(usize, ~lib/array/Array<i32>, i32, usize) => void
       dimensions = __lowerArray(__setU32, 4, 2, dimensions) || __notnull();
       exports.prepareTensorForCUDA(tensorPtr, dimensions, dimCount, outputPtr);
     },
     optimizedEmbeddingTransfer(embeddingPtr, length, compressionLevel) {
-      // sveltekit-frontend/src/wasm/vector-operations/optimizedEmbeddingTransfer(usize, i32, i32) => usize
+      // src/wasm/vector-operations/optimizedEmbeddingTransfer(usize, i32, i32) => usize
       return exports.optimizedEmbeddingTransfer(embeddingPtr, length, compressionLevel) >>> 0;
     },
     shouldUseServer(operationType, dataSize, complexityScore) {
-      // sveltekit-frontend/src/wasm/vector-operations/shouldUseServer(i32, i32, i32) => bool
+      // src/wasm/vector-operations/shouldUseServer(i32, i32, i32) => bool
       return exports.shouldUseServer(operationType, dataSize, complexityScore) != 0;
     },
   }, exports);

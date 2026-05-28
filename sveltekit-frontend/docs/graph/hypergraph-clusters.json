@@ -126,11 +126,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.9208,
+      "avgBlend": 1.7326,
       "avgPr": 4.0503,
-      "totalBlend": 1.9208,
+      "totalBlend": 1.7326,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -138,18 +138,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ]
     },
-    "clusterBlend": 1.9208
+    "clusterBlend": 1.7326
   },
   {
     "id": 55,
@@ -318,11 +318,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.9208,
+      "avgBlend": 1.7326,
       "avgPr": 4.0503,
-      "totalBlend": 7.6834,
+      "totalBlend": 6.9306,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 4,
       "totalFiles": 8,
@@ -330,18 +330,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ]
     },
-    "clusterBlend": 1.9208
+    "clusterBlend": 1.7326
   },
   {
     "id": 65,
@@ -409,11 +409,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.9208,
+      "avgBlend": 1.7326,
       "avgPr": 4.0503,
-      "totalBlend": 1.9208,
+      "totalBlend": 1.7326,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 1,
@@ -421,18 +421,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ]
     },
-    "clusterBlend": 1.9208
+    "clusterBlend": 1.7326
   },
   {
     "id": 76,
@@ -500,11 +500,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.9208,
+      "avgBlend": 1.7326,
       "avgPr": 4.0503,
-      "totalBlend": 1.9208,
+      "totalBlend": 1.7326,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 1,
@@ -512,18 +512,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ]
     },
-    "clusterBlend": 1.9208
+    "clusterBlend": 1.7326
   },
   {
     "id": 84,
@@ -692,11 +692,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.9208,
+      "avgBlend": 1.7326,
       "avgPr": 4.0503,
-      "totalBlend": 1.9208,
+      "totalBlend": 1.7326,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -704,18 +704,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ]
     },
-    "clusterBlend": 1.9208
+    "clusterBlend": 1.7326
   },
   {
     "id": 91,
@@ -884,11 +884,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.9208,
+      "avgBlend": 1.7326,
       "avgPr": 4.0503,
-      "totalBlend": 5.7625,
+      "totalBlend": 5.1979,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 3,
       "totalFiles": 8,
@@ -896,18 +896,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ]
     },
-    "clusterBlend": 1.9208
+    "clusterBlend": 1.7326
   },
   {
     "id": 95,
@@ -1076,11 +1076,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.9208,
+      "avgBlend": 1.7326,
       "avgPr": 4.0503,
-      "totalBlend": 1.9208,
+      "totalBlend": 1.7326,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -1088,18 +1088,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ]
     },
-    "clusterBlend": 1.9208
+    "clusterBlend": 1.7326
   },
   {
     "id": 13,
@@ -1268,11 +1268,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.9208,
+      "avgBlend": 1.7326,
       "avgPr": 4.0503,
-      "totalBlend": 5.7625,
+      "totalBlend": 5.1979,
       "clusterAuthorityScore": 4.0503,
       "scoredFiles": 3,
       "totalFiles": 8,
@@ -1280,18 +1280,18 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         }
       ]
     },
-    "clusterBlend": 1.9208
+    "clusterBlend": 1.7326
   },
   {
     "id": 88,
@@ -1460,11 +1460,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.7363,
+      "avgBlend": 1.5481,
       "avgPr": 3.6072,
-      "totalBlend": 8.6815,
+      "totalBlend": 7.7404,
       "clusterAuthorityScore": 3.9173,
       "scoredFiles": 5,
       "totalFiles": 8,
@@ -1472,28 +1472,28 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         },
         {
           "filePath": "src/lib/server/db/relations.ts",
           "pageRank": 1.8346582262300364,
-          "karpathyBlend": 0.9981295339312428
+          "karpathyBlend": 0.8097932904920147
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         },
         {
           "filePath": "src/lib/server/db/relations.ts",
           "pageRank": 1.8346582262300364,
-          "karpathyBlend": 0.9981295339312428
+          "karpathyBlend": 0.8097932904920147
         }
       ]
     },
-    "clusterBlend": 1.8655
+    "clusterBlend": 1.6773
   },
   {
     "id": 53,
@@ -1666,11 +1666,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.9208,
+      "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.4443,
+      "avgBlend": 1.2589,
       "avgPr": 2.9106,
-      "totalBlend": 5.7774,
+      "totalBlend": 5.0356,
       "clusterAuthorityScore": 3.7084,
       "scoredFiles": 4,
       "totalFiles": 8,
@@ -1678,38 +1678,38 @@
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         },
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
           "pageRank": 1.7821034441546988,
-          "karpathyBlend": 0.9696920496763418
+          "karpathyBlend": 0.7898213776618797
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
           "pageRank": 1.759711817574462,
-          "karpathyBlend": 0.9660065201549021
+          "karpathyBlend": 0.7805347270297848
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
           "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.9208428102629216
+          "karpathyBlend": 1.7326413272583336
         },
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
           "pageRank": 1.7821034441546988,
-          "karpathyBlend": 0.9696920496763418
+          "karpathyBlend": 0.7898213776618797
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
           "pageRank": 1.759711817574462,
-          "karpathyBlend": 0.9660065201549021
+          "karpathyBlend": 0.7805347270297848
         }
       ]
     },
-    "clusterBlend": 1.7779
+    "clusterBlend": 1.5905
   },
   {
     "id": 75,
@@ -1886,11 +1886,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.3294,
+      "maxBlend": 1.1448,
       "maxPr": 2.7145,
-      "avgBlend": 1.1858,
+      "avgBlend": 1.0012,
       "avgPr": 2.3562,
-      "totalBlend": 3.5574,
+      "totalBlend": 3.0035,
       "clusterAuthorityScore": 2.607,
       "scoredFiles": 3,
       "totalFiles": 8,
@@ -1898,28 +1898,28 @@
         {
           "filePath": "src/lib/config/env.server.ts",
           "pageRank": 2.7145393537960754,
-          "karpathyBlend": 1.3294009141046608
+          "karpathyBlend": 1.1448257415184302
         },
         {
           "filePath": "src/lib/server/minio.ts",
           "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.8985495793745494
+          "karpathyBlend": 0.7138869260299371
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/config/env.server.ts",
           "pageRank": 2.7145393537960754,
-          "karpathyBlend": 1.3294009141046608
+          "karpathyBlend": 1.1448257415184302
         },
         {
           "filePath": "src/lib/server/minio.ts",
           "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.8985495793745494
+          "karpathyBlend": 0.7138869260299371
         }
       ]
     },
-    "clusterBlend": 1.2863
+    "clusterBlend": 1.1017
   },
   {
     "id": 59,
@@ -2052,11 +2052,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.0894,
+      "maxBlend": 0.9154,
       "maxPr": 2.1297,
-      "avgBlend": 1.0894,
+      "avgBlend": 0.9154,
       "avgPr": 2.1297,
-      "totalBlend": 4.3577,
+      "totalBlend": 3.6615,
       "clusterAuthorityScore": 2.1297,
       "scoredFiles": 4,
       "totalFiles": 8,
@@ -2064,18 +2064,18 @@
         {
           "filePath": "src/lib/server/observability/inference-log.ts",
           "pageRank": 2.1297194485430113,
-          "karpathyBlend": 1.0894140763721238
+          "karpathyBlend": 0.9153677794172046
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/observability/inference-log.ts",
           "pageRank": 2.1297194485430113,
-          "karpathyBlend": 1.0894140763721238
+          "karpathyBlend": 0.9153677794172046
         }
       ]
     },
-    "clusterBlend": 1.0894
+    "clusterBlend": 0.9154
   },
   {
     "id": 94,
@@ -2252,11 +2252,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.0184,
+      "maxBlend": 0.827,
       "maxPr": 1.8989,
-      "avgBlend": 1.0184,
+      "avgBlend": 0.827,
       "avgPr": 1.8989,
-      "totalBlend": 3.0551,
+      "totalBlend": 2.4809,
       "clusterAuthorityScore": 1.8989,
       "scoredFiles": 3,
       "totalFiles": 8,
@@ -2264,18 +2264,18 @@
         {
           "filePath": "src/lib/server/cache.ts",
           "pageRank": 1.8989401144504947,
-          "karpathyBlend": 1.0183531635847747
+          "karpathyBlend": 0.8269560457801979
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
           "pageRank": 1.8989401144504947,
-          "karpathyBlend": 1.0183531635847747
+          "karpathyBlend": 0.8269560457801979
         }
       ]
     },
-    "clusterBlend": 1.0184
+    "clusterBlend": 0.827
   },
   {
     "id": 90,
@@ -2444,11 +2444,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9552,
+      "maxBlend": 0.7787,
       "maxPr": 1.7783,
-      "avgBlend": 0.9552,
+      "avgBlend": 0.7787,
       "avgPr": 1.7783,
-      "totalBlend": 2.8657,
+      "totalBlend": 2.3362,
       "clusterAuthorityScore": 1.7783,
       "scoredFiles": 3,
       "totalFiles": 8,
@@ -2456,18 +2456,18 @@
         {
           "filePath": "src/lib/server/lucia.ts",
           "pageRank": 1.7783166924245375,
-          "karpathyBlend": 0.9552279602550585
+          "karpathyBlend": 0.778736676969815
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/lucia.ts",
           "pageRank": 1.7783166924245375,
-          "karpathyBlend": 0.9552279602550585
+          "karpathyBlend": 0.778736676969815
         }
       ]
     },
-    "clusterBlend": 0.9552
+    "clusterBlend": 0.7787
   },
   {
     "id": 20,
@@ -2648,11 +2648,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9545,
+      "maxBlend": 0.777,
       "maxPr": 1.7873,
-      "avgBlend": 0.9545,
+      "avgBlend": 0.777,
       "avgPr": 1.7873,
-      "totalBlend": 0.9545,
+      "totalBlend": 0.777,
       "clusterAuthorityScore": 1.7873,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -2660,18 +2660,18 @@
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.7872801029204415,
-          "karpathyBlend": 0.9544773403457018
+          "karpathyBlend": 0.7769820411681766
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.7872801029204415,
-          "karpathyBlend": 0.9544773403457018
+          "karpathyBlend": 0.7769820411681766
         }
       ]
     },
-    "clusterBlend": 0.9545
+    "clusterBlend": 0.777
   },
   {
     "id": 57,
@@ -2852,11 +2852,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9545,
+      "maxBlend": 0.777,
       "maxPr": 1.7873,
-      "avgBlend": 0.9443,
+      "avgBlend": 0.7621,
       "avgPr": 1.7536,
-      "totalBlend": 1.8887,
+      "totalBlend": 1.5242,
       "clusterAuthorityScore": 1.7772,
       "scoredFiles": 2,
       "totalFiles": 8,
@@ -2864,28 +2864,28 @@
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.7872801029204415,
-          "karpathyBlend": 0.9544773403457018
+          "karpathyBlend": 0.7769820411681766
         },
         {
           "filePath": "src/lib/server/retrieval/context-buffer.ts",
           "pageRank": 1.7199154807794785,
-          "karpathyBlend": 0.9341958051762647
+          "karpathyBlend": 0.7471861923117915
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
           "pageRank": 1.7872801029204415,
-          "karpathyBlend": 0.9544773403457018
+          "karpathyBlend": 0.7769820411681766
         },
         {
           "filePath": "src/lib/server/retrieval/context-buffer.ts",
           "pageRank": 1.7199154807794785,
-          "karpathyBlend": 0.9341958051762647
+          "karpathyBlend": 0.7471861923117915
         }
       ]
     },
-    "clusterBlend": 0.9514
+    "clusterBlend": 0.7725
   },
   {
     "id": 25,
@@ -3058,11 +3058,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9282,
+      "maxBlend": 0.7423,
       "maxPr": 1.6816,
-      "avgBlend": 0.9282,
+      "avgBlend": 0.7423,
       "avgPr": 1.6816,
-      "totalBlend": 0.9282,
+      "totalBlend": 0.7423,
       "clusterAuthorityScore": 1.6816,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3070,18 +3070,18 @@
         {
           "filePath": "src/routes/api/cache/metrics/+server.ts",
           "pageRank": 1.681587169392756,
-          "karpathyBlend": 0.9282421567209729
+          "karpathyBlend": 0.7422648677571024
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/routes/api/cache/metrics/+server.ts",
           "pageRank": 1.681587169392756,
-          "karpathyBlend": 0.9282421567209729
+          "karpathyBlend": 0.7422648677571024
         }
       ]
     },
-    "clusterBlend": 0.9282
+    "clusterBlend": 0.7423
   },
   {
     "id": 56,
@@ -3234,11 +3234,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9105,
+      "maxBlend": 0.7305,
       "maxPr": 1.6752,
-      "avgBlend": 0.9105,
+      "avgBlend": 0.7305,
       "avgPr": 1.6752,
-      "totalBlend": 0.9105,
+      "totalBlend": 0.7305,
       "clusterAuthorityScore": 1.6752,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3246,18 +3246,18 @@
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
           "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.9104999428035834
+          "karpathyBlend": 0.7304560740552781
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
           "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.9104999428035834
+          "karpathyBlend": 0.7304560740552781
         }
       ]
     },
-    "clusterBlend": 0.9105
+    "clusterBlend": 0.7305
   },
   {
     "id": 86,
@@ -3430,11 +3430,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9105,
+      "maxBlend": 0.7305,
       "maxPr": 1.6752,
-      "avgBlend": 0.9105,
+      "avgBlend": 0.7305,
       "avgPr": 1.6752,
-      "totalBlend": 0.9105,
+      "totalBlend": 0.7305,
       "clusterAuthorityScore": 1.6752,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3442,18 +3442,18 @@
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
           "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.9104999428035834
+          "karpathyBlend": 0.7304560740552781
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/embeddings/ollama.ts",
           "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.9104999428035834
+          "karpathyBlend": 0.7304560740552781
         }
       ]
     },
-    "clusterBlend": 0.9105
+    "clusterBlend": 0.7305
   },
   {
     "id": 36,
@@ -3549,11 +3549,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.8906,
+      "maxBlend": 0.7116,
       "maxPr": 1.6746,
-      "avgBlend": 0.8906,
+      "avgBlend": 0.7116,
       "avgPr": 1.6746,
-      "totalBlend": 0.8906,
+      "totalBlend": 0.7116,
       "clusterAuthorityScore": 1.6746,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3561,18 +3561,18 @@
         {
           "filePath": "src/lib/webgpu/init.ts",
           "pageRank": 1.674647868099066,
-          "karpathyBlend": 0.8906088616221666
+          "karpathyBlend": 0.7115891472396265
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
           "pageRank": 1.674647868099066,
-          "karpathyBlend": 0.8906088616221666
+          "karpathyBlend": 0.7115891472396265
         }
       ]
     },
-    "clusterBlend": 0.8906
+    "clusterBlend": 0.7116
   },
   {
     "id": 23,
@@ -3757,11 +3757,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.8906,
+      "maxBlend": 0.7116,
       "maxPr": 1.6746,
-      "avgBlend": 0.8906,
+      "avgBlend": 0.7116,
       "avgPr": 1.6746,
-      "totalBlend": 0.8906,
+      "totalBlend": 0.7116,
       "clusterAuthorityScore": 1.6746,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3769,18 +3769,18 @@
         {
           "filePath": "src/lib/webgpu/init.ts",
           "pageRank": 1.674647868099066,
-          "karpathyBlend": 0.8906088616221666
+          "karpathyBlend": 0.7115891472396265
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/webgpu/init.ts",
           "pageRank": 1.674647868099066,
-          "karpathyBlend": 0.8906088616221666
+          "karpathyBlend": 0.7115891472396265
         }
       ]
     },
-    "clusterBlend": 0.8906
+    "clusterBlend": 0.7116
   },
   {
     "id": 92,
@@ -3953,11 +3953,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.8541,
+      "maxBlend": 0.6806,
       "maxPr": 1.6043,
-      "avgBlend": 0.8541,
+      "avgBlend": 0.6806,
       "avgPr": 1.6043,
-      "totalBlend": 0.8541,
+      "totalBlend": 0.6806,
       "clusterAuthorityScore": 1.6043,
       "scoredFiles": 1,
       "totalFiles": 8,
@@ -3965,18 +3965,18 @@
         {
           "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
           "pageRank": 1.6042923723218958,
-          "karpathyBlend": 0.8541377293518897
+          "karpathyBlend": 0.6805669489287585
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
           "pageRank": 1.6042923723218958,
-          "karpathyBlend": 0.8541377293518897
+          "karpathyBlend": 0.6805669489287585
         }
       ]
     },
-    "clusterBlend": 0.8541
+    "clusterBlend": 0.6806
   },
   {
     "id": 46,

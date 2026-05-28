@@ -52,7 +52,7 @@ function getAuthHeader(): string {
 }
 
 export interface InferenceLogEntry {
-  type: 'llm' | 'embedding' | 'vector_search' | 'graph_query' | 'dag_ordering' | 'policy';
+  type: 'llm' | 'embedding' | 'vector_search' | 'graph_query' | 'dag_ordering' | 'policy' | 'turbovec_rerank';
   model?: string;
   backend?:
     | 'ollama'
@@ -66,7 +66,8 @@ export interface InferenceLogEntry {
     | 'pgvector'
     | 'neo4j'
     | 'couchdb'
-    | 'ace-policy';
+    | 'ace-policy'
+    | 'js';
   latencyMs: number;
   tokenCount?: number;
   cacheHit: boolean;

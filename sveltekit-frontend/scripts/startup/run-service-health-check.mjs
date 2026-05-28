@@ -14,7 +14,7 @@ const services = [
   { name: 'Bifrost', url: 'http://127.0.0.1:3040/health' },
   { name: 'TurboQuant', url: 'http://127.0.0.1:8090/health' },
   { name: 'MCP Server', url: 'http://127.0.0.1:8788/health' },
-  { name: 'RabbitMQ API', kind: 'http-json', url: 'http://127.0.0.1:5173/api/rabbitmq/health', expectConnected: true },
+  { name: 'RabbitMQ API', kind: 'rabbitmq' },
 ];
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -68,6 +68,15 @@ function testPostgres() {
   return run('pwsh', ['-NoProfile', '-Command', body]);
 }
 
+function testRabbitMQ() {
+  // Probe management API directly — avoids SvelteKit proxy race on startup
+  const body = [
+    '$ErrorActionPreference = "Stop";',
+    "Invoke-RestMethod -Uri 'http://127.0.0.1:15672/api/healthchecks/node' -TimeoutSec 3 | Out-Null;",
+  ].join(' ');
+  return run('pwsh', ['-NoProfile', '-Command', body]);
+}
+
 console.log('── Startup Health Check ──');
 
 for (const service of services) {
@@ -85,6 +94,14 @@ for (const service of services) {
       result = testPostgres();
       if (result.status !== 0) throw new Error((result.stderr || result.stdout || '').trim() || 'postgres container not detected');
       console.log('✅ Postgres container');
+      pass += 1;
+      continue;
+    }
+
+    if (service.kind === 'rabbitmq') {
+      result = testRabbitMQ();
+      if (result.status !== 0) throw new Error((result.stderr || result.stdout || '').trim() || 'RabbitMQ management API unreachable');
+      console.log('✅ RabbitMQ API');
       pass += 1;
       continue;
     }

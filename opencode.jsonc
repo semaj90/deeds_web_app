@@ -33,22 +33,35 @@
     "trace": {
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp",
-      "enabled": true
+      "enabled": true,
+      "timeout": 60000,
+      "headers": {
+        "Accept": "application/json, text/event-stream"
+      }
     },
     "turbovec": {
       "type": "remote",
       "url": "http://127.0.0.1:8791/mcp",
-      "enabled": true
+      "enabled": false,
+      "timeout": 30000
     },
-    "engram": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8792/mcp",
-      "enabled": true
+    "engram-embed": {
+      "type": "local",
+      "command": [
+        "node",
+        "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"
+      ],
+      "enabled": true,
+      "timeout": 60000
     },
-    "langextract": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8793/mcp",
-      "enabled": true
+    "gemma4-offload": {
+      "type": "local",
+      "command": [
+        "node",
+        "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"
+      ],
+      "enabled": true,
+      "timeout": 30000
     }
   },
   "instructions": [

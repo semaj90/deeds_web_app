@@ -9,8 +9,11 @@ async function exists(p){ try{ await fs.access(p); return true;}catch(e){return 
 
 async function run(){
   const files = {
+    parent_atlas_cards: path.join('.tmp', 'parent-atlas-profile-cards.jsonl'),
     phase17: path.join('.tmp','phase17-pytorch-features.jsonl'),
-    phase18: path.join('.tmp','phase18-xgboost-rerank.jsonl')
+    phase18: path.join('.tmp','phase18-xgboost-rerank.jsonl'),
+    hot_keyword_clusters: path.join('.tmp', 'hot-keyword-clusters.json'),
+    retrieval_loop_log: path.join('.tmp', 'atlas-retrieval-loop.jsonl')
   };
   const status = {};
   for(const k of Object.keys(files)){

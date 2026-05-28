@@ -199,7 +199,19 @@ fs.writeFileSync(path.join(opencodeDir, 'startup-context.json'), JSON.stringify(
   bashTools,
   loadedDocs: docArtifacts,
   loadedReports,
-  loadedArtifacts: summary.loadedArtifacts,
+  // Store paths only — full blobs are too large for VS Code session serialization
+  loadedArtifactPaths: {
+    aceContext: path.join(opencodeDir, 'ace-context.json'),
+    featureFiles: path.join(opencodeDir, 'feature-files.json'),
+    claudeMem: path.join(repoRoot, '.tmp', 'claude-mem-ensure.json'),
+    startupTruth: path.join(repoRoot, '.tmp', 'startup-truth.json'),
+    dailySummary: path.join(repoRoot, '.tmp', 'ace-daily-todo-summary.json'),
+    mcpHealth: path.join(repoRoot, '.tmp', 'mcp-health-status.json'),
+  },
+  loadedArtifacts: {
+    claudeMem: summary.loadedArtifacts.claudeMem,
+    mcpHealth: summary.loadedArtifacts.mcpHealth,
+  },
   warnings: summary.warnings,
 }, null, 2));
 fs.writeFileSync(path.join(reportsDir, 'opencode-bootstrap.md'), [

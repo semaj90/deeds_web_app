@@ -22,14 +22,31 @@ for(let i=0;i<argv.length;i++){
 }
 // allow positional: node find-feature.mjs ace-context
 if(!feature) feature = argv.find(a => a && !a.startsWith('--')) || process.env.FEATURE || process.argv[2];
-if(!feature) {
-  // try npm config env var (npm run --feature=...) fallback
-  feature = process.env.npm_config_feature || process.env.npm_config_argv || null;
-  if(feature && typeof feature === 'string') {
-    // npm_config_argv can be JSON; if so, skip
-    if(feature.startsWith('{')) feature = null;
-  }
+// If still not found, try parsing npm's npm_config_argv JSON (when run via `npm run`)
+if(!feature && process.env.npm_config_argv){
+  try{
+    const parsed = JSON.parse(process.env.npm_config_argv);
+    const orig = parsed.original || parsed.cooked || [];
+    // Look for explicit flags
+    for(let i=0;i<orig.length;i++){
+      const v = String(orig[i]);
+      if(v === '--feature' && orig[i+1]){ feature = String(orig[i+1]); break; }
+      if(v.startsWith('--feature=')){ feature = v.split('=')[1]; break; }
+    }
+    // If still no feature, take first non-flag after the "--" separator
+    if(!feature){
+      const dash = orig.indexOf('--');
+      if(dash >= 0){
+        for(let j=dash+1;j<orig.length;j++){ if(!String(orig[j]).startsWith('--')){ feature = String(orig[j]); break; } }
+      }
+    }
+    // Last-resort: pick the first non-flag token that's not 'run' or the script name
+    if(!feature){
+      for(const tok of orig){ if(!String(tok).startsWith('--') && tok !== 'run'){ feature = String(tok); break; } }
+    }
+  }catch(e){ /* ignore parse errors */ }
 }
+
 if(!feature) usage();
 
 function walk(dir){

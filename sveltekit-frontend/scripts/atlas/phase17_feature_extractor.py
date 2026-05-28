@@ -2,9 +2,10 @@
 import argparse
 import json
 import os
+import hashlib
 from pathlib import Path
 
-parser = argparse.ArgumentParser(description='Phase17 PyTorch feature extractor (lightweight)')
+parser = argparse.ArgumentParser(description='Phase17 PyTorch feature extractor')
 parser.add_argument('--input', required=True)
 parser.add_argument('--out', required=True)
 parser.add_argument('--report', required=True)
@@ -38,38 +39,52 @@ if not IN.exists():
 
 with IN.open('r', encoding='utf8') as fh:
     for line in fh:
-        line=line.strip()
+        line = line.strip()
         if not line: continue
         try:
             card = json.loads(line)
         except Exception:
             continue
+        
         cid = card.get('cardId') or card.get('card_id') or card.get('id') or f'card_{count}'
-        meta = {
-            'card_id': cid,
-            'metadata': {
-                'title': card.get('title') or card.get('name'),
-            }
-        }
+        has_source = bool(card.get('sourceRefs') and len(card['sourceRefs']) > 0)
+        source_ref = card['sourceRefs'][0] if has_source else 'unknown'
+        lane = 'schema_contract' if cid.startswith('schema') else 'untracked_local'
+        
+        feature_vector_path = None
         if TORCH_AVAILABLE:
-            # create a deterministic pseudo-feature using torch seeded by card id
             try:
-                import hashlib
-                h = int(hashlib.sha256(cid.encode('utf8')).hexdigest()[:8],16)
+                h = int(hashlib.sha256(cid.encode('utf8')).hexdigest()[:8], 16)
                 torch.manual_seed(h)
                 vec = torch.randn(768, dtype=torch.float32)
-                vec_path = VECT_DIR / (cid + '.npy')
+                vec_path = VECT_DIR / f'{cid}.npy'
                 np.save(str(vec_path), vec.numpy())
-                meta['feature_vector_ref'] = str(vec_path)
-                meta['extraction'] = 'pytorch-rand-deterministic'
-            except Exception as e:
-                meta['feature_vector_ref'] = None
-                meta['extraction'] = 'pytorch-failed'
-        else:
-            meta['feature_vector_ref'] = None
-            meta['extraction'] = 'no-pytorch'
+                feature_vector_path = str(vec_path)
+            except Exception:
+                pass
 
-        rows.append(meta)
+        row = {
+            "card_id": cid,
+            "sourceRef": source_ref,
+            "lane": lane,
+            "feature_vector_ref": feature_vector_path,
+            "metadata": {
+                "file_path": card.get('entities', {}).get('files', [None])[0] if card.get('entities') else None,
+                "symbol": None,
+                "schema_name": None,
+                "retrieval_mode": "pytorch-rand-deterministic" if TORCH_AVAILABLE else "no-pytorch-fallback",
+                "indexed": bool(card.get('indexedState', {}).get('indexed')),
+                "tracked_by_git": bool(card.get('workspaceState', {}).get('tracked'))
+            },
+            "signals": {
+                "has_sourceRef": has_source,
+                "has_schema_contract": lane == 'schema_contract',
+                "has_mcp_route": False,
+                "is_untracked_local": lane == 'untracked_local',
+                "embedding_available": bool(feature_vector_path)
+            }
+        }
+        rows.append(row)
         count += 1
 
 with OUT.open('w', encoding='utf8') as w:

@@ -5249,6 +5249,26 @@ export async function fetchCodebaseContext(
       } catch {
         /* FTS unavailable — fall through to null */
       }
+      // ── Tier-3: Parent atlas seeds (codebase-context only, read-only) ────────
+      // Only injected when both Qdrant ANN and Postgres FTS return nothing.
+      // Seeds are keyword-matched feature cards from the parent atlas pipeline.
+      // Scored at ≤0.25 — below FTS (0.3×) and Qdrant (1.0×).
+      // NEVER used for legal/evidence queries — atlas data is codebase-only.
+      try {
+        const { queryAtlasSeeds } = await import('$lib/server/retrieval/atlas-cartridge-seeds.js');
+        const atlasMatches = queryAtlasSeeds(query, 6);
+        if (atlasMatches.length > 0) {
+          if (statsOut) {
+            (statsOut as Record<string, unknown>).atlasSeedTier = {
+              used: true,
+              matches: atlasMatches.length,
+            };
+          }
+          return atlasMatches;
+        }
+      } catch {
+        /* seeds unavailable — non-fatal */
+      }
       return null;
     }
 

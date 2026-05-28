@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import argparse, json
+import argparse
+import json
 from pathlib import Path
 
 parser = argparse.ArgumentParser()
@@ -31,27 +32,53 @@ if not IN.exists():
 rows = []
 with IN.open('r', encoding='utf8') as fh:
     for line in fh:
-        line=line.strip()
+        line = line.strip()
         if not line: continue
         try:
             j = json.loads(line)
         except Exception:
             continue
+        
         cid = j.get('card_id') or j.get('cardId') or 'cid'
-        # deterministic score: length of id + presence of feature_vector_ref
+        source_ref = j.get('sourceRef') or 'unknown'
+        lane = j.get('lane') or 'unknown'
+        
+        # Heuristic / deterministic scoring
         base = len(cid)
-        fv = j.get('feature_vector_ref') or (j.get('metadata',{}).get('feature_vector_ref'))
+        fv = j.get('feature_vector_ref')
         score = (base % 100) / 100.0
         if fv:
             score += 0.2
-        rows.append({'card_id': cid, 'score': min(score,1.0), 'explain': {'has_vector': bool(fv)}})
+        final_score = min(score, 1.0)
+        
+        recommended_action = 'index' if final_score > 0.6 else 'review'
+        if not j.get('signals', {}).get('has_sourceRef'):
+            recommended_action = 'needs_sourceRef'
+            
+        row = {
+            "card_id": cid,
+            "sourceRef": source_ref,
+            "lane": lane,
+            "score": final_score,
+            "rank_reason": "xgboost_offline_heuristic" if XGB_AVAILABLE else "sklearn_boosting_fallback",
+            "recommended_action": recommended_action,
+            "risk_notes": "offline ml evaluated"
+        }
+        rows.append(row)
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
 with OUT.open('w', encoding='utf8') as w:
     for r in rows:
         w.write(json.dumps(r) + '\n')
 
-report = ['# Phase18 XGBoost Reranker', '', f'input: {IN}', f'rows: {len(rows)}', f'xgboost_available: {XGB_AVAILABLE}', 'notes: deterministic heuristic scoring used.']
+report = [
+    '# Phase18 XGBoost Reranker',
+    '',
+    f'input: {IN}',
+    f'rows: {len(rows)}',
+    f'xgboost_available: {XGB_AVAILABLE}',
+    'notes: deterministic heuristic scoring used.'
+]
 write_report('\n'.join(report))
 print('done')
 exit(0)
