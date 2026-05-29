@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import { ENV } from '../env.server.js';
-const redis = new Redis(ENV.REDIS_URL || 'redis://127.0.0.1:6379');
+const redis = new Redis(ENV.REDIS_URL);
 import { db } from '../db/client.js';
 import { sql } from 'drizzle-orm';
 
@@ -55,9 +55,9 @@ async function canPingPostgres(): Promise<boolean> {
 export async function detectAccelerators(): Promise<AcceleratorCapabilities> {
   return {
     simdJson: await canLoadSimdJson(),
-    qdrant: await canPing('http://127.0.0.1:6333/collections'),
+    qdrant: await canPing(`${ENV.QDRANT_URL}/collections`),
     redis: await canPingRedis(),
     postgres: await canPingPostgres(),
-    cuvs: false
+    cuvs: false,
   };
 }

@@ -141,6 +141,15 @@
       ],
       "enabled": true,
       "timeout": 30000
+    },
+    "atlas-tools": {
+      "type": "local",
+      "command": [
+        "node",
+        "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"
+      ],
+      "enabled": true,
+      "timeout": 30000
     }
   },
   "agent": {
@@ -160,6 +169,7 @@
         "todowrite": "allow",
         "atlas_*": "allow",
         "atlas.*": "allow",
+        "atlas-tools.*": "allow",
         "context_*": "allow",
         "context.*": "allow",
         "trace_*": "allow",
@@ -206,6 +216,7 @@
         "langextract.*": "allow",
         "engram_*": "allow",
         "engram.*": "allow",
+        "atlas-tools.*": "allow",
         "edit": "deny",
         "webfetch": "allow",
         "websearch": "allow"

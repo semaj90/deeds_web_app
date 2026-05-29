@@ -374,7 +374,7 @@
     {
       "label": "ACE: Stub + Rank + Rerank + Recommend (full pipeline)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$stamp = 'logs/task-output/.ace-startup-last-run'; $cooldownSec = 3600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('ACE pipeline skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (1h cooldown)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run ace:startup 2>&1 | Tee-Object logs/task-output/ace-startup-latest.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host 'ACE startup pipeline green' } else { Write-Host 'ACE startup pipeline FAILED — check logs/task-output/ace-startup-latest.log' } }\"",
+      "command": "pwsh -NoProfile -Command \"`$stamp = 'logs/task-output/.ace-startup-last-run'; `$cooldownSec = 3600; if ((Test-Path `$stamp) -and ((Get-Date) - (Get-Item `$stamp).LastWriteTime).TotalSeconds -lt `$cooldownSec) { Write-Host ('ACE pipeline skipped — last run ' + [int]((Get-Date) - (Get-Item `$stamp).LastWriteTime).TotalMinutes + ' min ago (1h cooldown)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run ace:startup 2>&1 | Tee-Object logs/task-output/ace-startup-latest.log; if (`$LASTEXITCODE -eq 0) { Set-Content -Path `$stamp -Value (Get-Date -Format o); Write-Host 'ACE startup pipeline green' } else { Write-Host 'ACE startup pipeline FAILED — check logs/task-output/ace-startup-latest.log' } }\"",
       "options": { "cwd": "${workspaceFolder}" },
       "group": "build",
       "problemMatcher": [],

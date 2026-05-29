@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-26T05:55:19.964Z",
+  "generatedAt": "2026-05-29T02:43:36.858Z",
   "manifest": {
-    "generatedAt": "2026-05-26T05:55:09.369Z",
+    "generatedAt": "2026-05-29T02:42:43.295Z",
     "counts": {
-      "cards": 13,
-      "edges": 20
+      "cards": 46,
+      "edges": 492
     },
     "sources": {
       "sidecar": false,
@@ -21,9 +21,9 @@
     }
   },
   "counts": {
-    "cards": 13,
-    "active": 4,
-    "candidate_prune": 8,
+    "cards": 46,
+    "active": 28,
+    "candidate_prune": 17,
     "archive_to_deeds_lab": 0,
     "production_ready": 1
   },
@@ -50,36 +50,503 @@
       }
     },
     {
-      "cardId": "e400848fa0dceaa9d8ff33e592f50a9920881f78",
-      "kind": "json-card",
+      "cardId": "cluster:5",
+      "kind": "cluster",
       "title": "untitled",
-      "summary": "Generated pathway card for imports_static edges.",
+      "summary": "This cluster contains various UI components and page components for a complex legal/research application. It handles displaying legal corpus information, managing evidence views, and providing interactive dashboards and…",
       "sourceRefs": [
-        ".claude/hooks/posttooluse-audit.mjs:L1",
-        "EXTERNAL:node:fs:L1",
-        "EXTERNAL:node:path:L1",
-        ".claude/hooks/pretooluse-deny.mjs:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AdvancedRichTextEditor.svelte:L1",
-        "EXTERNAL:svelte:L1",
-        "EXTERNAL:lucide-svelte:L1",
-        "EXTERNAL:svelte/store:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/agentic/AgenticController.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AgentOrchestrator.svelte:L1",
-        "EXTERNAL:$lib/components/ErrorBoundary.svelte:L1",
-        "EXTERNAL:$lib/components/ui/enhanced-bits:L1"
+        "docs/graph/cluster-summaries.json",
+        "src/lib/components/legal-corpus/CorpusSidebar.svelte",
+        "src/lib/components/ClientGemmaInference.svelte",
+        "src/lib/components/evidence/EvidenceViewModal.svelte"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:7",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster comprises various components and pages for a sophisticated command center and development tooling suite. It provides dashboards for monitoring system health, exploring codebases, managing AI interactions, a…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/routes/(app)/command-center/+page.svelte",
+        "src/routes/(app)/command-center/codebase/graph/+page.svelte",
+        "src/lib/components/ui/GlobalCommandPalette.svelte"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:14",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster contains various reusable UI components, utility functions, and state management logic for building a modern web application. Key components include graph rendering, form elements (checkboxes, fields), moda…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/components/NESGraphRenderer.svelte",
+        "src/lib/components/ui/radio/Svelte5RadioGroup.svelte",
+        "src/lib/utils/media-query.svelte.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:8",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster contains various backend services and utilities for complex evidence analysis, including state management, machine learning inference, and data processing pipelines. It manages the lifecycle of evidence, an…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/machines/evidence-analysis-machine.ts",
+        "src/lib/server/context/contextual.ts",
+        "src/lib/server/agent/supervisor.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:11",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides a comprehensive set of components for visualizing, managing, and analyzing evidence within a case file. It includes interactive canvases for mapping relationships, modals for detailed evidence view…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/components/evidence/EvidenceAssistant.svelte",
+        "src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte",
+        "src/lib/components/modals/EvidenceModal.svelte"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:19",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides core backend services for application functionality, including database interaction, authentication management, API routing, and external service integration (Langfuse, Redis, RabbitMQ). It establi…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/server/observability/langfuse.ts",
+        "src/lib/server/redis-streams.ts",
+        "src/lib/server/api-registry.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:4",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides a comprehensive suite of components for a legal research and case management application. It handles complex AI-driven tasks like automated legal research, evidence summarization, and strategic rea…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/components/ai/RecommendationEngine.svelte",
+        "src/lib/components/ai/LocalImageGenerator.svelte",
+        "src/lib/components/courtroom/StrategyWizard.svelte"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:9",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster contains various backend services and utilities related to data processing, knowledge retrieval, and content management. Key functionalities include handling file uploads, managing asynchronous message queu…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/schemas/forms.ts",
+        "src/lib/server/utils/avatar-upload.ts",
+        "src/lib/server/queue/rabbitmq-manager-fixed.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:6",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides core server-side logic for advanced AI features, including Retrieval-Augmented Generation (RAG), vector search, and complex agentic workflows. It manages context, processes evidence, and integrates…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/server/context/contextual.ts",
+        "src/lib/server/api-registry.ts",
+        "src/lib/server/phase72/astVectorizer.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:17",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides components and pages for managing and analyzing legal cases within a courtroom simulation application. It handles displaying case details, tracking evidence, constructing legal theories, and simula…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/components/case/SimilarCasesPanel.svelte",
+        "src/lib/components/legal/ChainOfCustodyTracker.svelte",
+        "src/lib/components/yorha/CrossExaminationAssistant.svelte"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:16",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster contains numerous SQL migration files, schema definitions, and index creation scripts, indicating a robust and complex relational database structure. It manages legal case data, AI interactions, user sessio…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/db/migrations/enhanced-grpo-migration.sql",
+        "src/lib/server/db/migrations/004_add_missing_api_tables.sql",
+        "src/lib/server/db/0000_stiff_the_hood.sql"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:2",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides core functionalities for managing, searching, and generating embeddings, primarily utilizing vector databases like Qdrant. It includes services for caching embeddings, performing similarity searche…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/server/vector-cache.ts",
+        "src/lib/server/ml/recommendation-metrics.ts",
+        "src/lib/server/db/qdrant-sync.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:15",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides core backend logic for data persistence, complex data retrieval, and background processing management. It handles database interactions for tracking analysis jobs, managing error/evidence clusters,…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/db/queries/route-health-queries.ts",
+        "src/routes/(app)/evidence/+page.server.ts",
+        "src/routes/(app)/admin/phase89/+page.server.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:3",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster implements a sophisticated AI chat interface, integrating multiple components for user interaction, real-time inference, and context management. It handles streaming responses, confidence scoring, and provi…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/components/ai/YorhaAIAssistant.svelte",
+        "src/lib/models/ChatSession.svelte.ts",
+        "src/lib/components/yorha/EnhancedYoRHaAIAssistant.svelte"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:18",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides core utilities and components for advanced machine learning inference, focusing heavily on GPU acceleration via WebGPU. It includes modules for quantization, tensor manipulation, and running comple…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/shared/quantize.ts",
+        "src/lib/webgpu/som-webgpu-cache.ts",
+        "src/lib/webgpu/webgpu-polyfill.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:10",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/routes/(app)/admin/dev-tools/+page.svelte",
+        "src/lib/server/nlp/analyzer.ts",
+        "src/lib/server/analysis/granite-docling.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:12",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster provides comprehensive caching and data persistence utilities across multiple layers (Redis, in-memory, LokiJS, etc.). It includes services for managing cache invalidation, tracking performance metrics, and…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/server/db/drizzle-cache.ts",
+        "src/lib/server/cache/report-template-cache.ts",
+        "src/lib/server/glyph-prompt-cache.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:1",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster of components manages the lifecycle and display of legal citations within a web application. It handles citation verification, saving, viewing detailed citation information, and integrating citations into R…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/lib/components/legal/CitationManager.svelte",
+        "src/lib/components/citations/CitationSaveForm.svelte",
+        "src/routes/(app)/citations/+page.svelte"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:13",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "This cluster consists of multiple files, primarily containing simple boolean exports to disable Server-Side Rendering (SSR). The repeated pattern suggests a configuration mechanism to explicitly control rendering behavi…",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "cluster:0",
+      "kind": "cluster",
+      "title": "untitled",
+      "summary": "Contains SvelteKit page bootstrap files (+page.ts) and small const declarations. These files configure SSR behavior, preloading, and module-level constants for the legal case management and admin dashboard routes.",
+      "sourceRefs": [
+        "docs/graph/cluster-summaries.json",
+        "src/routes/(app)/cases/[id]/+page.ts",
+        "src/routes/(app)/cases/[id]/overview/+page.ts",
+        "src/routes/(app)/demos/bits-ui/+page.ts"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:4e60a12695aab971",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-presets/preset-mini/src/_rules/default.ts — zone shared, fanOut 44, fanIn 2, lines 89",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
       "lifecycle": {
         "status": "candidate_prune",
         "confidence": 0.5,
-        "reason": "backup-only source"
+        "reason": "deprecated or fallback-oriented summary"
       },
       "graphLinks": [
         {
           "relation": "archives_to",
           "targetId": "deeds_lab",
-          "reason": "backup-only source"
+          "reason": "deprecated or fallback-oriented summary"
         }
       ],
       "retrieval": {
@@ -88,39 +555,26 @@
       }
     },
     {
-      "cardId": "8e70ae88dd78bd383c851e4a9ed87b095f1b2125",
-      "kind": "json-card",
+      "cardId": "pathway:c32c6204860ce031",
+      "kind": "pathway",
       "title": "untitled",
-      "summary": "Generated pathway card for imports_dynamic edges.",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/alert-dialog/AlertDialog.svelte — zone shared, fanOut 42, fanIn 3, lines 90",
       "sourceRefs": [
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AdvancedRichTextEditor.svelte:L1",
-        "EXTERNAL:@tiptap/core:L1",
-        "EXTERNAL:@tiptap/starter-kit:L1",
-        "EXTERNAL:@tiptap/extension-image:L1",
-        "EXTERNAL:@tiptap/extension-text-align:L1",
-        "EXTERNAL:@tiptap/extension-highlight:L1",
-        "EXTERNAL:@tiptap/extension-typography:L1",
-        "EXTERNAL:@tiptap/extension-placeholder:L1",
-        "EXTERNAL:@tiptap/extension-table:L1",
-        "EXTERNAL:@tiptap/extension-table-row:L1",
-        "EXTERNAL:@tiptap/extension-table-header:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EvidenceCanvas.svelte:L1",
-        "EXTERNAL:fabric:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/MultiAgentAnalysisCard.svelte:L1",
-        "EXTERNAL:svelte:L1"
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
       "lifecycle": {
         "status": "candidate_prune",
         "confidence": 0.5,
-        "reason": "backup-only source"
+        "reason": "deprecated or fallback-oriented summary"
       },
       "graphLinks": [
         {
           "relation": "archives_to",
           "targetId": "deeds_lab",
-          "reason": "backup-only source"
+          "reason": "deprecated or fallback-oriented summary"
         }
       ],
       "retrieval": {
@@ -129,39 +583,26 @@
       }
     },
     {
-      "cardId": "4df17d7c1449a050923e807005820122f9695146",
-      "kind": "json-card",
+      "cardId": "pathway:162980e542c4d133",
+      "kind": "pathway",
       "title": "untitled",
-      "summary": "Generated pathway card for env_dependency edges.",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/alert-dialog/index.js — zone shared, fanOut 36, fanIn 0, lines 29",
       "sourceRefs": [
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIAssistantButton.svelte:L1",
-        "SVELTEKIT:$app/navigation:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatInput.svelte:L1",
-        "SVELTEKIT:$app/environment:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatMessage.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AskAI.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/Enhanced3DLegalAIInterface.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedAIChatTest.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/IntegratedAIChat.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/IntelligentWebAnalysisDemo.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/ProactiveAIAssistant.svelte:L1",
-        "SVELTEKIT:$app/forms:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/EnhancedAuthForm.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/LoginButton.svelte:L1"
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
       "lifecycle": {
         "status": "candidate_prune",
         "confidence": 0.5,
-        "reason": "backup-only source"
+        "reason": "deprecated or fallback-oriented summary"
       },
       "graphLinks": [
         {
           "relation": "archives_to",
           "targetId": "deeds_lab",
-          "reason": "backup-only source"
+          "reason": "deprecated or fallback-oriented summary"
         }
       ],
       "retrieval": {
@@ -170,38 +611,48 @@
       }
     },
     {
-      "cardId": "e0d3db1c8117a882c7ab32032becdc2b302a0c71",
-      "kind": "json-card",
+      "cardId": "pathway:0e22b341b1b1b20f",
+      "kind": "pathway",
       "title": "untitled",
-      "summary": "Generated pathway card for neo4j_dependency edges.",
+      "summary": "claude-mem/src/services/worker-service.ts — zone shared, fanOut 32, fanIn 4, lines 1270",
       "sourceRefs": [
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/Enhanced3DLegalAIInterface.svelte:L1",
-        "EXTERNAL:$lib/services/neo4j-recommendation-engine:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/FileUploadSection.svelte:L1",
-        "EXTERNAL:$lib/services/minio-neo4j-pgvector-integration:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/Neo4jRecommendation3DViewer.svelte:L1",
-        "EXTERNAL:$lib/services/neo4j-3d-recommendation-engine.js:L1",
-        "deeds_labs/api-legacy/api/graph/plan/+server.ts:L1",
-        "EXTERNAL:$lib/services/neo4j-planner-singleton:L1",
-        "deeds_labs/frontend/features-archive/ai/_core/enhanced-neo4j-reranker.ts:L1",
-        "EXTERNAL:$lib/types/sharedTypes:L1",
-        "EXTERNAL:neo4j-driver:L1",
-        "EXTERNAL:$lib/types/enhanced-svelte5-types:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/sdk/kag/index.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/adapter-ranking.ts:L1"
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:68d90ce7fcd38c42",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-presets/preset-mini/src/_variants/default.ts — zone shared, fanOut 30, fanIn 2, lines 55",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
       "lifecycle": {
         "status": "candidate_prune",
         "confidence": 0.5,
-        "reason": "backup-only source"
+        "reason": "deprecated or fallback-oriented summary"
       },
       "graphLinks": [
         {
           "relation": "archives_to",
           "targetId": "deeds_lab",
-          "reason": "backup-only source"
+          "reason": "deprecated or fallback-oriented summary"
         }
       ],
       "retrieval": {
@@ -210,40 +661,48 @@
       }
     },
     {
-      "cardId": "f16dcd2422cc7d1404e80e4476c7286e44d5591f",
-      "kind": "json-card",
+      "cardId": "pathway:a5e7dc6249bccc1c",
+      "kind": "pathway",
       "title": "untitled",
-      "summary": "Generated pathway card for qdrant_dependency edges.",
+      "summary": "deeds_labs/dead_code/contradictionEngine/index.ts — zone shared, fanOut 30, fanIn 0, lines 96",
       "sourceRefs": [
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/SimpleFileUpload.svelte:L1",
-        "EXTERNAL:$lib/services/qdrantService:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EvidenceCanvasEditor.svelte:L1",
-        "EXTERNAL:$lib/ai/qdrant-service:L1",
-        "deeds_labs/api-legacy/api/ai/repairs/+server.ts:L1",
-        "EXTERNAL:@qdrant/js-client-rest:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ingest/qdrant_client.mjs:L1",
-        "EXTERNAL:node-fetch:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ingest/worker.mjs:L1",
-        "deeds_labs/archived-dead-code/lokiHybridStore.ts:L1",
-        "deeds_labs/archived-server-modules/connections/connection-pool.ts:L1",
-        "deeds_labs/dead-scripts/phase-scripts/agentic-knowledge-pipeline.mjs:L1",
-        "deeds_labs/dead-scripts/phase-scripts/analyze-legal-ai-features.mjs:L1",
-        "deeds_labs/dead-scripts/phase-scripts/context7-mcp-agentic-server.mjs:L1",
-        "deeds_labs/dead-scripts/phase-scripts/contextual-prompt-synthesizer.mjs:L1",
-        "deeds_labs/dead-scripts/phase-scripts/demo-policy-first-retrieval.mjs:L1"
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:60980c57b0c7db5e",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/svelte4-archive/components/evidence-graph/index.ts — zone shared, fanOut 27, fanIn 0, lines 14",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
       "lifecycle": {
         "status": "candidate_prune",
         "confidence": 0.5,
-        "reason": "archived source tree"
+        "reason": "deprecated or fallback-oriented summary"
       },
       "graphLinks": [
         {
           "relation": "archives_to",
           "targetId": "deeds_lab",
-          "reason": "archived source tree"
+          "reason": "deprecated or fallback-oriented summary"
         }
       ],
       "retrieval": {
@@ -252,39 +711,26 @@
       }
     },
     {
-      "cardId": "4b9f0cc0b01685d67603effa7a287b5a57bb7b14",
-      "kind": "json-card",
+      "cardId": "pathway:9edb30797ac740bc",
+      "kind": "pathway",
       "title": "untitled",
-      "summary": "Generated pathway card for redis_dependency edges.",
+      "summary": "deeds_labs/archived-dead-code/dead-lib-dirs/ui/index.ts — zone shared, fanOut 27, fanIn 0, lines 47",
       "sourceRefs": [
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte:L1",
-        "EXTERNAL:$lib/server/redisPubSub:L1",
-        "EXTERNAL:$lib/config/redis-config:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor/RichTextEditor.svelte:L1",
-        "EXTERNAL:$lib/cache/loki-redis-integration:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/redis/AdvancedRedisMonitoringDashboard.svelte:L1",
-        "EXTERNAL:svelte:L1",
-        "EXTERNAL:svelte/store:L1",
-        "EXTERNAL:$lib/stores/unified:L1",
-        "EXTERNAL:$lib/services/unified-simd-parser:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/redis/RedisOrchestratorDashboard.svelte:L1",
-        "EXTERNAL:$lib/hooks/useRedisOrchestrator:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/admin/redis/+page.svelte:L1",
-        "EXTERNAL:$lib/components/redis/AdvancedRedisMonitoringDashboard.svelte:L1",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/admin/redis/detailed/+page.svelte:L1"
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
       "lifecycle": {
         "status": "candidate_prune",
         "confidence": 0.5,
-        "reason": "backup-only source"
+        "reason": "deprecated or fallback-oriented summary"
       },
       "graphLinks": [
         {
           "relation": "archives_to",
           "targetId": "deeds_lab",
-          "reason": "backup-only source"
+          "reason": "deprecated or fallback-oriented summary"
         }
       ],
       "retrieval": {
@@ -293,39 +739,26 @@
       }
     },
     {
-      "cardId": "f555717f882d0e669e11a04e1f75d9bcb605b747",
-      "kind": "json-card",
+      "cardId": "pathway:de0f8f59390c9c67",
+      "kind": "pathway",
       "title": "untitled",
-      "summary": "Generated pathway card for exports_from edges.",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/drawer/Drawer.svelte — zone shared, fanOut 26, fanIn 2, lines 64",
       "sourceRefs": [
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/tabs/TabsBits.svelte:L1",
-        "EXTERNAL:bits-ui/tabs:L1",
-        "deeds_labs/archived-dead-code/auth/authUtils.ts:L1",
-        "EXTERNAL:$lib/server/lucia:L1",
-        "deeds_labs/archived-dead-code/auth/lucia.ts:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/index.ts:L1",
-        "UNRESOLVED:./Card.svelte:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/Panel.svelte:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/Terminal.svelte:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/GridList.svelte:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/SectionHeader.svelte:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/TabsPanel.svelte:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/Modal.svelte:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/RetroButton.svelte:L1",
-        "deeds_labs/archived-dead-code/dead-lib-dirs/ui/SearchBar.svelte:L1"
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
       "lifecycle": {
         "status": "candidate_prune",
         "confidence": 0.5,
-        "reason": "archived source tree"
+        "reason": "deprecated or fallback-oriented summary"
       },
       "graphLinks": [
         {
           "relation": "archives_to",
           "targetId": "deeds_lab",
-          "reason": "archived source tree"
+          "reason": "deprecated or fallback-oriented summary"
         }
       ],
       "retrieval": {
@@ -334,35 +767,26 @@
       }
     },
     {
-      "cardId": "d5d36526391f0d0a3abab77c788eb4ffea726bd4",
-      "kind": "json-card",
+      "cardId": "pathway:4e0af0f1640997df",
+      "kind": "pathway",
       "title": "untitled",
-      "summary": "Generated pathway card for mcp_tool_calls edges.",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/services/index.ts — zone shared, fanOut 24, fanIn 0, lines 16",
       "sourceRefs": [
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/mcp/+page.svelte:L1",
-        "EXTERNAL:svelte:L1",
-        "EXTERNAL:$lib/api/mcp-client.js:L1",
-        "EXTERNAL:svelte/store:L1",
-        "deeds_labs/api-legacy/api/mcp/context72/get-library-docs/+server.ts:L1",
-        "EXTERNAL:@sveltejs/kit:L1",
-        "UNRESOLVED:./$types.js:L1",
-        "EXTERNAL:$lib/types/enhanced-svelte5-types:L1",
-        "deeds_labs/api-legacy/api/mcp/metrics/+server.ts:L1",
-        "EXTERNAL:$lib/services/mcp-registry:L1",
-        "deeds_labs/api-legacy/api/mcp/registry/+server.ts:L1"
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
       "lifecycle": {
         "status": "candidate_prune",
         "confidence": 0.5,
-        "reason": "unresolved source reference"
+        "reason": "deprecated or fallback-oriented summary"
       },
       "graphLinks": [
         {
           "relation": "archives_to",
           "targetId": "deeds_lab",
-          "reason": "unresolved source reference"
+          "reason": "deprecated or fallback-oriented summary"
         }
       ],
       "retrieval": {
@@ -371,20 +795,375 @@
       }
     },
     {
-      "cardId": "e1eaaafb6c2ef71d35b9c092ab847c74a73be6a7",
-      "kind": "json-card",
+      "cardId": "pathway:b2c4ac33dda55ec1",
+      "kind": "pathway",
       "title": "untitled",
-      "summary": "Generated pathway card for test_covers_file edges.",
+      "summary": "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-presets/preset-mini/src/_rules/default.ts — zone shared, fanOut 22, fanIn 1, lines 89",
       "sourceRefs": [
-        "deeds_labs/api-legacy/api/error-brain/server.test.ts:L1",
-        "EXTERNAL:vitest:L1",
-        "deeds_labs/api-legacy/api/error-brain/+server.ts:L1",
-        "EXTERNAL:$lib/middleware/featureFlagEnforcer:L1",
-        "EXTERNAL:$lib/middleware/authSeparation:L1",
-        "EXTERNAL:$lib/services/dataIsolation:L1",
-        "EXTERNAL:$lib/services/featureLogger:L1",
-        "deeds_labs/api-legacy/api/legal-ai/server.test.ts:L1",
-        "deeds_labs/api-legacy/api/legal-ai/+server.ts:L1"
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:29da1b7c102bf65b",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "sveltekit-frontend/src/lib/components/ui/alert-dialog/AlertDialog.svelte — zone shared, fanOut 21, fanIn 0, lines 90",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:c8c414e2bbaebbf0",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diffs/DiffRunner.ts — zone shared, fanOut 21, fanIn 0, lines 233",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:025c6971cef101ec",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/enhanced-ai-synthesis-orchestrator.ts — zone shared, fanOut 20, fanIn 0, lines 131",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:2f5e2aaa28069c4c",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/n64/index.ts — zone shared, fanOut 20, fanIn 0, lines 39",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:3ee50787f5c554bf",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-presets/preset-mini/src/_variants/index.ts — zone shared, fanOut 20, fanIn 0, lines 18",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:497b78be22cd1c44",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/stores/unified/index.ts — zone shared, fanOut 20, fanIn 0, lines 112",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:8f53c70739c03567",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/command/Command.svelte — zone shared, fanOut 20, fanIn 2, lines 46",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:ba6a24a21a8cefa6",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "claude-mem/src/services/worker/http/routes/SessionRoutes.ts — zone shared, fanOut 20, fanIn 0, lines 525",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:e29e65b53af45e18",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-presets/preset-mini/src/_rules/index.ts — zone shared, fanOut 20, fanIn 0, lines 25",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:f3aa36fb713b5196",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.ts — zone shared, fanOut 20, fanIn 5, lines 188",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:f5cbdee7b621392e",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/knowledge-search/index.ts — zone shared, fanOut 20, fanIn 0, lines 41",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "candidate_prune",
+        "confidence": 0.5,
+        "reason": "deprecated or fallback-oriented summary"
+      },
+      "graphLinks": [
+        {
+          "relation": "archives_to",
+          "targetId": "deeds_lab",
+          "reason": "deprecated or fallback-oriented summary"
+        }
+      ],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:bec1193a9a561d45",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "claude-mem/src/npx-cli/commands/install.ts — zone shared, fanOut 19, fanIn 5, lines 1437",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:0a5b9b6a708fd652",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "claude-mem/src/storage/postgres/index.ts — zone shared, fanOut 18, fanIn 15, lines 52",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
+      ],
+      "featureLabels": [],
+      "clusterTags": [],
+      "lifecycle": {
+        "status": "active",
+        "confidence": 0.5,
+        "reason": "no prune/archive signals"
+      },
+      "graphLinks": [],
+      "retrieval": {
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDim": 768
+      }
+    },
+    {
+      "cardId": "pathway:0aa612a768301ab4",
+      "kind": "pathway",
+      "title": "untitled",
+      "summary": "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts — zone test, fanOut 18, fanIn 0, lines 373",
+      "sourceRefs": [
+        "memory/graphify/deep/deep-import-graph.json",
+        "memory/graphify/deep/deep-import-edges.jsonl"
       ],
       "featureLabels": [],
       "clusterTags": [],
@@ -400,92 +1179,6 @@
           "reason": "stable source refs and production indicators"
         }
       ],
-      "retrieval": {
-        "embeddingModel": "embeddinggemma:latest",
-        "embeddingDim": 768
-      }
-    },
-    {
-      "cardId": "dbf186c88911486003410fb324c298218d4f72be",
-      "kind": "json-card",
-      "title": "untitled",
-      "summary": "Generated pathway card for db_dependency edges.",
-      "sourceRefs": [
-        "deeds_labs/dead_code/duplicate-embedding-auth/embeddings-client.ts:L1",
-        "deeds_labs/dead_code/duplicate-embedding-auth/schema-embeddings.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/database/connection.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/database/schema.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/queries/nes-command-center-archive.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/pool.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/auth.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/drizzle.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/embedding-cache-service.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/embedding-cache-utils.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/health-check.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/connections.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/legal-db-init.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/qdrant-sync.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/postgres-knowledge.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/evidence.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/cases.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/persons.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/reports.ts:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/seed-dev-user.ts:L1"
-      ],
-      "featureLabels": [],
-      "clusterTags": [],
-      "lifecycle": {
-        "status": "active",
-        "confidence": 0.5,
-        "reason": "no prune/archive signals"
-      },
-      "graphLinks": [],
-      "retrieval": {
-        "embeddingModel": "embeddinggemma:latest",
-        "embeddingDim": 768
-      }
-    },
-    {
-      "cardId": "02e24784195e6d3ec3575bc38925cbf94549b503",
-      "kind": "json-card",
-      "title": "untitled",
-      "summary": "Generated pathway card for svelte_route_uses_loader edges.",
-      "sourceRefs": [
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/backups/phase34-backups/src/routes/(tools)/search/+page.svelte:L1",
-        "deeds_labs/frontend/sveltekit-frontend-archive/dirs/backups/phase34-backups/src/routes/(tools)/search/+page.server.ts:L1",
-        "sveltekit-frontend/src/routes/(app)/admin/document-search/+page.svelte:L1",
-        "sveltekit-frontend/src/routes/(app)/admin/document-search/+page.server.ts:L1"
-      ],
-      "featureLabels": [],
-      "clusterTags": [],
-      "lifecycle": {
-        "status": "active",
-        "confidence": 0.5,
-        "reason": "no prune/archive signals"
-      },
-      "graphLinks": [],
-      "retrieval": {
-        "embeddingModel": "embeddinggemma:latest",
-        "embeddingDim": 768
-      }
-    },
-    {
-      "cardId": "41826fa5019f19cf93a74016eed2691910e0aaa0",
-      "kind": "json-card",
-      "title": "untitled",
-      "summary": "Generated pathway card for server_route_depends_on edges.",
-      "sourceRefs": [
-        "src/routes/api/chat/stream/+server.ts:L1",
-        "src/lib/server/observability/synthesis-logger.ts:L1"
-      ],
-      "featureLabels": [],
-      "clusterTags": [],
-      "lifecycle": {
-        "status": "active",
-        "confidence": 0.5,
-        "reason": "no prune/archive signals"
-      },
-      "graphLinks": [],
       "retrieval": {
         "embeddingModel": "embeddinggemma:latest",
         "embeddingDim": 768

@@ -1,0 +1,25 @@
+{
+  "includeRoots": [
+    "src/",
+    "sveltekit-frontend/src/",
+    "packages/",
+    "lib/"
+  ],
+  "excludePatterns": [
+    ".venv/",
+    "**/.venv/**",
+    "venv/",
+    "**/venv/**",
+    "site-packages/",
+    "**/site-packages/**",
+    "__pycache__/",
+    "**/__pycache__/**",
+    "node_modules/",
+    "**/node_modules/**",
+    "dist/",
+    "build/",
+    "out/",
+    "*.min.js",
+    "*.map"
+  ]
+}

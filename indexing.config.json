@@ -1,0 +1,23 @@
+{
+  "excludePatterns": [
+    ".venv/",
+    "**/.venv/",
+    "venv/",
+    "**/venv/",
+    "site-packages/",
+    "dist-packages/",
+    "__pycache__/",
+    "node_modules/",
+    ".svelte-kit/",
+    ".vite/",
+    "dist/",
+    "build/",
+    ".git/",
+    "deeds_labs/",
+    "*.pyc",
+    "*.pyd",
+    "*.dll",
+    "*.so",
+    "*.bin"
+  ]
+}

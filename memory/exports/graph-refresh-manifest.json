@@ -1,8 +1,39 @@
 {
-  "graph-refresh-manifest": {
-    "status": "stub",
-    "promotionState": "unpromoted",
-    "lastUpdated": "YYYY-MM-DD_T12:00:00Z",
-    "sourceRefs": []
+  "version": 1,
+  "status": "generated",
+  "promotionState": "unpromoted",
+  "generatedAt": "2026-05-29T05:22:59.011Z",
+  "generator": "scripts/atlas/generate-graph-exports.mjs",
+  "sources": [
+    "docs/graph/codebase-graph.json",
+    "memory/graphify/deep/deep-import-graph.json",
+    "memory/graphify/deep/deep-import-edges.jsonl"
+  ],
+  "exports": {
+    "clusterCards": "memory/exports/cluster-cards.jsonl",
+    "pathwayCards": "memory/exports/pathway-cards.jsonl"
+  },
+  "nodeCount": 55214,
+  "edgeCount": 81136,
+  "counts": {
+    "nodes": 55214,
+    "edges": 81136,
+    "clusterCards": 433,
+    "pathwayCards": 12,
+    "clusterCardRows": 433,
+    "pathwayCardRows": 12
+  },
+  "hashes": {
+    "clusterCardsSha256": "976b22721b9cb974a42f2c18c59ead376d4e0ea602f3a84f31add8d184300fab",
+    "pathwayCardsSha256": "4477cbe3baa955a1a3bc27dca44ccd4aee98a627eab710bd9f91e6b84dd6ee90"
+  },
+  "validation": {
+    "isStub": false,
+    "promoted": false,
+    "notes": [
+      "Generated from available graph artifacts.",
+      "promotionState remains unpromoted until downstream validation passes.",
+      "Do not treat as final graph truth until promoted."
+    ]
   }
 }

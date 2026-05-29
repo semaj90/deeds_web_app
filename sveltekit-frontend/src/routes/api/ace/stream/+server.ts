@@ -79,9 +79,10 @@ async function buildAcePacket(query: string) {
   };
 }
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
+  if (!locals.user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   const { query } = await request.json();
-  
+
   const stream = new ReadableStream({
     async start(controller) {
       const send = (event: unknown) => {

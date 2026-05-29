@@ -223,7 +223,7 @@ async function main() {
   // Write outputs
   await fs.mkdir(TMP_DIR, { recursive: true });
   await fs.writeFile(OUT_LABELS, JSON.stringify(labels, null, 2), 'utf8');
-  await fs.writeFile(OUT_TOPO,   JSON.stringify(topology, null, 2), 'utf8');
+  await fs.writeFile(OUT_TOPO,   JSON.stringify({ generatedAt: new Date().toISOString(), nodeCount: Object.keys(topology).length, domains: topology }, null, 2), 'utf8');
   console.log(`\n  ✅ wrote ${OUT_LABELS}`);
   console.log(`  ✅ wrote ${OUT_TOPO}`);
 

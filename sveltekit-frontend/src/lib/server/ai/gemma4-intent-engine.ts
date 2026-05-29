@@ -1,4 +1,5 @@
 import { writeIntentSynthesisRecord, buildIntentSynthesisQueryHash } from '$lib/server/ace/intent-synthesis.js';
+import { ENV } from '../env.server.js';
 
 export interface Gemma4IntentLaneResult {
   synthesis: string;
@@ -19,10 +20,10 @@ function stripGemmaThoughtBlock(raw: string): { visible: string; hadThoughtBlock
 
 export async function processGemma4IntentionLane(
   userQuery: string,
-  targetClusterId: number,
+  targetClusterId: number
 ): Promise<Gemma4IntentLaneResult> {
   const basePrompt = `<|think|>\nResolve explicit action items for this operational constraint: "${userQuery}"`;
-  const response = await fetch('http://127.0.0.1:8090/v1/chat/completions', {
+  const response = await fetch(`${ENV.TURBOQUANT_BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

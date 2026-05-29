@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-05-26T05:55:18.312Z",
+  "generatedAt": "2026-05-29T02:42:54.356Z",
   "collection": "document_knowledge_768",
   "model": "embeddinggemma:latest",
   "vectorSize": 768,
-  "inputCards": 13,
-  "embeddedCount": 13,
-  "redisWrites": 26,
-  "qdrantPoints": 13,
+  "inputCards": 46,
+  "embeddedCount": 46,
+  "redisWrites": 92,
+  "qdrantPoints": 46,
   "collectionInfo": {
     "result": {
       "status": "green",
       "optimizer_status": "ok",
       "indexed_vectors_count": 0,
-      "points_count": 13,
+      "points_count": 58,
       "segments_count": 4,
       "config": {
         "params": {
@@ -58,10 +58,43 @@
           "enabled": false
         }
       },
-      "payload_schema": {}
+      "payload_schema": {
+        "chunkIds": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "status": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "clusterTags": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "topoClass": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "sourceRefs": {
+          "data_type": "keyword",
+          "points": 58
+        },
+        "featureLabels": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "cardId": {
+          "data_type": "keyword",
+          "points": 58
+        },
+        "kind": {
+          "data_type": "keyword",
+          "points": 58
+        }
+      }
     },
     "status": "ok",
-    "time": 0.000538727
+    "time": 0.001188649
   },
   "errors": []
 }

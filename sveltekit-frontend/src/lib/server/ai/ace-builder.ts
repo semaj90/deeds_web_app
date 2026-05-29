@@ -2,12 +2,12 @@ import Redis from 'ioredis';
 import { ENV } from '../env.server.js';
 import { tool_graph_expand_neighborhood, tool_search_hybrid } from './mcp-tool-dispatch.js';
 
-const redis = new Redis(ENV.REDIS_URL || 'redis://127.0.0.1:6379');
+const redis = new Redis(ENV.REDIS_URL);
 
 export async function buildACEPacket(query: string, ctx: any) {
   // 1. Fetch Graph Traversal Data (Topology)
   const graphData = await tool_graph_expand_neighborhood({ maxHops: 1, limit: 10 });
-  
+
   // Upgrade to Cluster Summaries (Phase 8C/9)
   // We prefer cluster summaries + top edges to save tokens and improve reasoning stability for Gemma4.
   // We keep raw nodes only as fallback/debug.
@@ -15,7 +15,7 @@ export async function buildACEPacket(query: string, ctx: any) {
   if (graphData.success && graphData.data) {
     const rawNodes = (graphData.data as any).nodes || [];
     const topEdges = (graphData.data as any).edges || [];
-    
+
     // Group raw nodes into conceptual cluster summaries
     const clusters = rawNodes.reduce((acc: any, node: any) => {
       const clusterId = node.clusterId || 'uncategorized';
@@ -24,7 +24,7 @@ export async function buildACEPacket(query: string, ctx: any) {
       }
       return acc;
     }, {});
-    
+
     clusteredContext = {
       clusterSummaries: Object.values(clusters),
       topEdges,

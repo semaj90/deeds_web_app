@@ -21,7 +21,8 @@ function makeRequestFromUrl(url: URL) {
   });
 }
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const { query } = await request.json();
   if (!query) {
     return json({ error: "Missing query" }, { status: 400 });

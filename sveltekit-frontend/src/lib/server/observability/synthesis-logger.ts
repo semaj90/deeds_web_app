@@ -9,7 +9,9 @@ const sc = StringCodec();
 
 async function getNatsConnection() {
   if (!_nc) {
-    _nc = await connect({ servers: ENV.NATS_URL || 'nats://127.0.0.1:4222' }).catch(() => null);
+    const servers = ENV.NATS_URL ?? null;
+    if (!servers) return null;
+    _nc = await connect({ servers }).catch(() => null);
   }
   return _nc;
 }

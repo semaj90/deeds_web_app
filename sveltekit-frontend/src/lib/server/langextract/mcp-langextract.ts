@@ -3,7 +3,7 @@ import http from 'node:http';
 import { ENV } from '../env.server.js';
 import { extractDocument, langextractFetch, invalidateLangExtractResolution } from '../langextract-client.js';
 
-const PORT = Number(process.env.LANGEXTRACT_MCP_PORT ?? 8793);
+const PORT = Number(ENV.LANGEXTRACT_MCP_PORT ?? 8793);
 
 if (process.argv.includes('--health')) {
   const health: {
@@ -15,7 +15,10 @@ if (process.argv.includes('--health')) {
     error?: string;
   } = { ok: true, langextract_enabled: ENV.LANGEXTRACT_ENABLED === true };
   try {
-    const resp = await langextractFetch('/health', { method: 'GET', signal: AbortSignal.timeout(3000) });
+    const resp = await langextractFetch('/health', {
+      method: 'GET',
+      signal: AbortSignal.timeout(3000),
+    });
     health.healthy = resp?.ok === true;
     health.resolvedUrl = ENV.LANGEXTRACT_URL || 'native-ts';
     if (resp?.headers) {
@@ -43,7 +46,10 @@ const TOOLS = {
       let healthy = false;
       let error: string | undefined;
       try {
-        const resp = await langextractFetch('/health', { method: 'GET', signal: AbortSignal.timeout(3000) });
+        const resp = await langextractFetch('/health', {
+          method: 'GET',
+          signal: AbortSignal.timeout(3000),
+        });
         healthy = resp?.ok === true;
       } catch (err) {
         healthy = false;
@@ -133,25 +139,35 @@ const server = http.createServer(async (req, res) => {
 
     if (method === 'initialize') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        jsonrpc: '2.0', id,
-        result: {
-          protocolVersion: '2024-11-05',
-          capabilities: { tools: {} },
-          serverInfo: { name: 'langextract-mcp', version: '1.0.0' },
-        },
-      }));
+      res.end(
+        JSON.stringify({
+          jsonrpc: '2.0',
+          id,
+          result: {
+            protocolVersion: '2024-11-05',
+            capabilities: { tools: {} },
+            serverInfo: { name: 'langextract-mcp', version: '1.0.0' },
+          },
+        })
+      );
       return;
     }
 
     if (method === 'tools/list') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        jsonrpc: '2.0', id,
-        result: {
-          tools: Object.entries(TOOLS).map(([name, tool]) => ({ name, description: tool.description, inputSchema: tool.inputSchema })),
-        },
-      }));
+      res.end(
+        JSON.stringify({
+          jsonrpc: '2.0',
+          id,
+          result: {
+            tools: Object.entries(TOOLS).map(([name, tool]) => ({
+              name,
+              description: tool.description,
+              inputSchema: tool.inputSchema,
+            })),
+          },
+        })
+      );
       return;
     }
 
@@ -160,7 +176,13 @@ const server = http.createServer(async (req, res) => {
       const tool = TOOLS[toolName];
       if (!tool) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ jsonrpc: '2.0', id, error: { code: -32601, message: `Tool not found: ${toolName}` } }));
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id,
+            error: { code: -32601, message: `Tool not found: ${toolName}` },
+          })
+        );
         return;
       }
       try {
@@ -169,13 +191,17 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({ jsonrpc: '2.0', id, result }));
       } catch (err) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ jsonrpc: '2.0', id, error: { code: -32603, message: String(err) } }));
+        res.end(
+          JSON.stringify({ jsonrpc: '2.0', id, error: { code: -32603, message: String(err) } })
+        );
       }
       return;
     }
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ jsonrpc: '2.0', id, error: { code: -32601, message: 'Unknown method' } }));
+    res.end(
+      JSON.stringify({ jsonrpc: '2.0', id, error: { code: -32601, message: 'Unknown method' } })
+    );
     return;
   }
 
@@ -183,8 +209,10 @@ const server = http.createServer(async (req, res) => {
   res.end(JSON.stringify({ error: 'Not found' }));
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`[langextract-mcp] Listening on http://127.0.0.1:${PORT}/mcp`);
+const HOST = ENV.LANGEXTRACT_MCP_HOST ?? undefined;
+server.listen(PORT, HOST, () => {
+  const resolvedHost = ENV.LANGEXTRACT_MCP_HOST ?? '0.0.0.0';
+  console.log(`[langextract-mcp] Listening on http://${resolvedHost}:${PORT}/mcp`);
   console.log(`  LangExtract URL: ${ENV.LANGEXTRACT_URL || 'native-ts'}`);
   console.log(`  LangExtract enabled: ${ENV.LANGEXTRACT_ENABLED}`);
 });

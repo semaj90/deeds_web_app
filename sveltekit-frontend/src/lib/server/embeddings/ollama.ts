@@ -31,7 +31,9 @@ export async function tryEmbedOllama(
   }
 ): Promise<OllamaEmbedResult | null> {
   const model = assertEmbeddingModel(opts?.model ?? 'embeddinggemma:latest');
-  const baseUrl = (opts?.baseUrl ?? ENV.OLLAMA_BASE_URL).replace(/\/$/, '');
+  const base = opts?.baseUrl ?? ENV.OLLAMA_BASE_URL ?? null;
+  if (!base) return null;
+  const baseUrl = base.replace(/\/$/, '');
   const url = `${baseUrl}/api/embeddings`;
 
   const controller = new AbortController();

@@ -83,7 +83,8 @@ async function buildAcePacket(query: string): Promise<AcePacket> {
   };
 }
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
+  if (!locals.user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   const { messages, query } = await request.json();
   
   const stream = new ReadableStream({

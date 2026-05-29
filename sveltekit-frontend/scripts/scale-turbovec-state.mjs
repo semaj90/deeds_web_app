@@ -158,7 +158,20 @@ async function parallelIngestion() {
       const points = makeBatch(batchStart, batchSize);
 
       try {
-        await client.upsert(COLLECTION, { wait: false, points });
+        // Validate vectors in the batch before upsert
+        const EXPECTED_DIM = Number(process.env.EMBED_DIM ?? '768');
+        const validPoints = points.filter(p => Array.isArray(p.vector) && p.vector.length === EXPECTED_DIM);
+        const dropped = points.length - validPoints.length;
+        if (dropped > 0) {
+          console.warn(`[w${idx}] ⚠️ Dropped ${dropped} points with invalid vector dims in batch starting ${batchStart}`);
+        }
+        if (validPoints.length === 0) {
+          console.warn(`[w${idx}] ⏭️ All points invalid for batch ${batchStart}; skipping`);
+          stats.errors += 1;
+          continue;
+        }
+
+        await client.upsert(COLLECTION, { wait: false, points: validPoints });
         stats.processed += batchSize;
       } catch (e) {
         console.error(`[w${idx}] ❌ upsert @${batchStart}: ${e.message}`);

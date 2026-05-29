@@ -56,7 +56,7 @@ export class AgenticDiagnosticService {
 
 		// 1. Check trace MCP
 		try {
-			const res = await fetch('http://127.0.0.1:8788/mcp', { method: 'OPTIONS' });
+			const res = await fetch(`${ENV.TRACE_MCP_URL}/mcp`, { method: 'OPTIONS' });
 			checks.mcpServer = res.ok;
 		} catch {
 			checks.mcpServer = false;
@@ -64,7 +64,7 @@ export class AgenticDiagnosticService {
 
 		// 2. Check deep research (LangGraph Synthesis container)
 		try {
-			const res = await fetch('http://127.0.0.1:8091/health');
+			const res = await fetch(`${ENV.LANGGRAPH_URL}/health`);
 			checks.deepResearch = res.ok;
 		} catch {
 			checks.deepResearch = false;

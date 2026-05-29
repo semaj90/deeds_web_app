@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClusterCard",
+  "description": "Schema for cluster-cards produced by the codebase clustering pipeline. One JSON object per line in cluster-cards.jsonl.",
+  "type": "object",
+  "required": ["id","cluster_key","centroid_vector","top_members","created_at","sourceRefs"],
+  "properties": {
+    "id": {"type": "string", "description": "Stable UUID for this cluster card"},
+    "cluster_key": {"type": "string", "description": "Human-friendly cluster key (e.g., 'gpu-som-42' or centroid id)"},
+    "centroid_vector": {
+      "type": "array",
+      "description": "Centroid embedding vector (Float32 array). Typical dims: 768",
+      "items": {"type": "number"},
+      "minItems": 1
+    },
+    "centroid_norm": {"type": "number", "description": "Optional L2 norm of centroid"},
+    "top_members": {
+      "type": "array",
+      "description": "Top member list for the cluster (sampled file paths + score)",
+      "items": {
+        "type": "object",
+        "required": ["path","score"],
+        "properties": {
+          "path": {"type": "string"},
+          "score": {"type": "number"},
+          "snippet": {"type": "string"}
+        }
+      }
+    },
+    "hotness": {"type": "number", "minimum": 0, "maximum": 1, "description": "Normalized hotness/usage score"},
+    "pagerank": {"type": "number", "description": "Optional PageRank-like authority score"},
+    "som_cluster": {"type": "integer", "description": "Optional SOM cluster id"},
+    "cluster_tag": {"type": "string", "description": "Optional human-readable tag"},
+    "sample_snippets": {"type": "array", "items": {"type": "string"}},
+    "manifold4d": {
+      "type": "array",
+      "items": {"type": "number"},
+      "minItems": 4,
+      "maxItems": 4,
+      "description": "Optional 4D manifold coordinates (UMAP/PCA)"
+    },
+    "scores": {
+      "type": "object",
+      "properties": {
+        "structural": {"type": "number"},
+        "semantic": {"type": "number"},
+        "topology": {"type": "number"},
+        "authority": {"type": "number"},
+        "rerank": {"type": "number"}
+      }
+    },
+    "sourceRefs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "List of source ids or file paths used to build this cluster card"
+    },
+    "metadata": {"type": "object", "description": "Optional free-form metadata JSONB-compatible object"},
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}

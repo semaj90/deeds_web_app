@@ -1,11 +1,13 @@
 import 'dotenv/config';
 import postgres from 'postgres';
 import { QdrantClient } from '@qdrant/js-client-rest';
+import { upsertValidated } from './lib/upsert-validated.mjs';
 import { generateCachedEmbedding } from '../src/lib/ai/ollama-config';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const COLLECTION_NAME = 'codemod_memories';
+const EMBED_DIM = Number(process.env.EMBED_DIM ?? '384');
 
 async function sync() {
     if (!DATABASE_URL) {
@@ -42,53 +44,60 @@ async function sync() {
         let embeddedCount = 0;
 
         for (const cluster of clusters) {
-            let vector = cluster.embedding;
+          let vector = cluster.embedding;
 
-            // 3. Generate embedding if missing in Postgres
-            if (!vector) {
-                console.log(`🧠 Generating missing embedding for cluster: ${cluster.cluster_id}`);
-                try {
-                    vector = await generateCachedEmbedding(cluster.message);
-                    // Save back to Postgres
-                    await sql`
-                        UPDATE error_cluster 
+          // 3. Generate embedding if missing in Postgres
+          if (!vector) {
+            console.log(`🧠 Generating missing embedding for cluster: ${cluster.cluster_id}`);
+            try {
+              vector = await generateCachedEmbedding(cluster.message);
+              // Save back to Postgres
+              await sql`
+                        UPDATE error_cluster
                         SET embedding = ${JSON.stringify(vector)}::vector
                         WHERE id = ${cluster.id};
                     `;
-                    embeddedCount++;
-                } catch (e) {
-                    console.error(`❌ Failed to embed cluster ${cluster.cluster_id}:`, e);
-                    continue;
-                }
-            } else if (typeof vector === 'string') {
-                vector = JSON.parse(vector);
+              embeddedCount++;
+            } catch (e) {
+              console.error(`❌ Failed to embed cluster ${cluster.cluster_id}:`, e);
+              continue;
             }
+          } else if (typeof vector === 'string') {
+            vector = JSON.parse(vector);
+          }
 
-            // 4. Upsert to Qdrant
-            const payload = {
-                cluster_id: cluster.cluster_id,
-                error_code: cluster.code,
-                message: cluster.message,
-                category: cluster.category || 'unknown',
-                affected_routes: cluster.affected_routes || [],
-                occurrence_count: cluster.count,
-                file_path: cluster.file_path,
-                source: 'error_cluster_sync',
-                timestamp: new Date().toISOString(),
-                content: `Error ${cluster.code}: ${cluster.message}\nFile: ${cluster.file_path}`,
-            };
+          // 4. Upsert to Qdrant
+          const payload = {
+            cluster_id: cluster.cluster_id,
+            error_code: cluster.code,
+            message: cluster.message,
+            category: cluster.category || 'unknown',
+            affected_routes: cluster.affected_routes || [],
+            occurrence_count: cluster.count,
+            file_path: cluster.file_path,
+            source: 'error_cluster_sync',
+            timestamp: new Date().toISOString(),
+            content: `Error ${cluster.code}: ${cluster.message}\nFile: ${cluster.file_path}`,
+          };
 
-            await qdrant.upsert(COLLECTION_NAME, {
-                wait: true,
-                points: [{
-                    id: cluster.id, // Use same UUID as Postgres
-                    vector: vector,
-                    payload: payload
-                }]
-            });
+          // Validate embedding before upsert
+          if (!Array.isArray(vector) || vector.length !== EMBED_DIM) {
+            console.warn(
+              `⚠️ Skipping cluster ${cluster.cluster_id}: invalid embedding dim ${Array.isArray(vector) ? vector.length : typeof vector} (expected ${EMBED_DIM})`
+            );
+            continue;
+          }
 
-            syncedCount++;
-            if (syncedCount % 10 === 0) console.log(`✅ Synced ${syncedCount}/${clusters.length}...`);
+          await upsertValidated({
+            client: qdrant,
+            collection: COLLECTION_NAME,
+            points: [{ id: cluster.id, vector: vector, payload }],
+            expectedDim: EMBED_DIM,
+            wait: true,
+          });
+
+          syncedCount++;
+          if (syncedCount % 10 === 0) console.log(`✅ Synced ${syncedCount}/${clusters.length}...`);
         }
 
         console.log('\n✨ Sync Summary:');

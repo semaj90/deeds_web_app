@@ -11,6 +11,7 @@ import { processKarpathyHook } from '../src/lib/server/indexer/karpathy-hook.js'
 import { persistKarpathyHook } from '../src/lib/server/indexer/karpathy-persistence.js';
 import { getOllamaEmbedding } from '../src/lib/server/ollama.js';
 import { qdrant } from '../src/lib/server/vector/qdrant-manager.js';
+import { upsertValidated } from '../../scripts/lib/upsert-validated.mjs';
 
 const REPO_ROOT = process.cwd();
 const BATCH_SIZE = 50; // Files per batch
@@ -78,11 +79,17 @@ async function runIndexer() {
 
 		// 4. Upsert to Qdrant (Bulk)
 		if (output.qdrantPayloads.length > 0) {
-			await qdrant.upsert({
-				collection: qdrant.collections.codebase_chunks,
-				wait: true,
-				points: output.qdrantPayloads.map(p => ({ id: p.id, vector: p.vector, payload: p.payload }))
-			} as any);
+			await upsertValidated({
+        client: qdrant,
+        collection: qdrant.collections.codebase_chunks,
+        points: output.qdrantPayloads.map((p) => ({
+          id: p.id,
+          vector: p.vector,
+          payload: p.payload,
+        })),
+        expectedDim: Number(process.env.EMBED_DIM ?? 768),
+        wait: true,
+      });
 		}
 	}
 

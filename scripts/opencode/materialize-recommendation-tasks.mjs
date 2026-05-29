@@ -12,6 +12,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { normalizeTaskPayload, validateTaskPayload } from './normalize-task-payload.mjs';
 
 const ROOT    = process.cwd();
 const IN_JSON = path.join(ROOT, '.opencode', 'recommendations', 'recommendations.json');
@@ -66,23 +67,26 @@ async function main() {
   console.log(`  recommendations: ${recs.length}`);
 
   const createdAt = new Date().toISOString();
-  const tasks = recs.map(rec => {
+  const tasks = recs.map((rec) => {
     const task_id = `task_${crypto.randomBytes(4).toString('hex')}`;
     return {
       task_id,
       recommendation_id: rec.id,
-      cluster:      rec.cluster   || 'General',
-      type:         rec.type      || 'unknown',
-      title:        rec.title     || '',
-      why:          rec.why       || '',
-      action:       rec.action    || '',
-      sourceRefs:   rec.sourceRefs || [],
+      cluster: rec.cluster || 'General',
+      type: rec.type || 'unknown',
+      title: rec.title || '',
+      // description included for OpenCode / delegation schema
+      description:
+        (rec.title || '') + '\n\nWhy: ' + (rec.why || '') + '\n\nAction: ' + (rec.action || ''),
+      why: rec.why || '',
+      action: rec.action || '',
+      sourceRefs: rec.sourceRefs || [],
       next_command: rec.next_command || '',
-      status:       'todo',
-      priority:     rec.priority  || 'low',
-      risk:         deriveRisk(rec),
+      status: 'todo',
+      priority: rec.priority || 'low',
+      risk: deriveRisk(rec),
       storage_lane: deriveStorageLane(rec),
-      ttl_days:     deriveTtlDays(rec),
+      ttl_days: deriveTtlDays(rec),
       featureStatus: rec.featureStatus || 'active',
       createdAt,
     };
@@ -107,37 +111,72 @@ async function main() {
     `## Task Summary`,
     `| # | Risk | Cluster | Title | Command |`,
     `|---|------|---------|-------|---------|`,
-    ...tasks.map((t, i) =>
-      `| ${i+1} | ${t.risk.toUpperCase()} | ${t.cluster} | ${t.title.slice(0,60).replace(/\|/g,'/')} | ${t.next_command ? `\`${t.next_command}\`` : '—'} |`
+    ...tasks.map(
+      (t, i) =>
+        `| ${i + 1} | ${t.risk.toUpperCase()} | ${t.cluster} | ${t.title.slice(0, 60).replace(/\|/g, '/')} | ${t.next_command ? `\`${t.next_command}\`` : '—'} |`
     ),
     ``,
     `## By Cluster`,
     ...Object.entries(byCluster).flatMap(([cluster, clusterTasks]) => [
       `### ${cluster}`,
-      ...clusterTasks.map(t => [
-        `#### [${t.risk.toUpperCase()}] ${t.title}`,
-        `- **Type**: \`${t.type}\`  **Status**: \`${t.status}\`  **TTL**: ${t.ttl_days}d`,
-        `- **Why**: ${t.why}`,
-        `- **Action**: ${t.action}`,
-        t.next_command ? `- **Run**: \`${t.next_command}\`` : '',
-        t.sourceRefs?.length ? `- **sourceRefs**: ${t.sourceRefs.slice(0,3).join(', ')}` : '',
-        `- **task_id**: \`${t.task_id}\``,
-        ``,
-      ].filter(Boolean).join('\n')),
+      ...clusterTasks.map((t) =>
+        [
+          `#### [${t.risk.toUpperCase()}] ${t.title}`,
+          `- **Type**: \`${t.type}\`  **Status**: \`${t.status}\`  **TTL**: ${t.ttl_days}d`,
+          `- **Why**: ${t.why}`,
+          `- **Action**: ${t.action}`,
+          t.next_command ? `- **Run**: \`${t.next_command}\`` : '',
+          t.sourceRefs?.length ? `- **sourceRefs**: ${t.sourceRefs.slice(0, 3).join(', ')}` : '',
+          `- **task_id**: \`${t.task_id}\``,
+          ``,
+        ]
+          .filter(Boolean)
+          .join('\n')
+      ),
       '',
     ]),
   ];
   const md = mdLines.join('\n');
 
+  // Normalize tasks to the shared OpenCode task shape and validate
+  const normalizedTasks = tasks.map((t) => {
+    const n = normalizeTaskPayload(t);
+    if (!validateTaskPayload(n)) {
+      // Keep original if normalization somehow fails, but mark as invalid
+      n._validation_failed = true;
+      n._raw = t;
+    }
+    // preserve original meta fields
+    n.task_id = t.task_id;
+    n.recommendation_id = t.recommendation_id;
+    n.cluster = t.cluster;
+    n.type = t.type;
+    n.title = t.title;
+    n.status = t.status;
+    n.priority = t.priority;
+    n.risk = t.risk;
+    n.storage_lane = t.storage_lane;
+    n.ttl_days = t.ttl_days;
+    n.featureStatus = t.featureStatus;
+    n.createdAt = t.createdAt;
+    n.sourceRefs = t.sourceRefs || n.context.sourceRefs || [];
+    n.next_command = t.next_command || n.expected_output.safe_next_command || '';
+    return n;
+  });
+
   if (!DRY_RUN) {
     await fs.mkdir(OUT_DIR, { recursive: true });
-    await fs.writeFile(OUT_NDJ, tasks.map(t => JSON.stringify(t)).join('\n') + '\n', 'utf8');
+    await fs.writeFile(
+      OUT_NDJ,
+      normalizedTasks.map((t) => JSON.stringify(t)).join('\n') + '\n',
+      'utf8'
+    );
     await fs.writeFile(OUT_MD, md, 'utf8');
     console.log(`\n  ✅ wrote ${OUT_NDJ}`);
     console.log(`  ✅ wrote ${OUT_MD}`);
   } else {
-    console.log(`\n  dry-run: would write ${tasks.length} tasks`);
-    for (const t of tasks.slice(0, 5)) {
+    console.log(`\n  dry-run: would write ${normalizedTasks.length} tasks`);
+    for (const t of normalizedTasks.slice(0, 5)) {
       console.log(`    [${t.risk}] ${t.cluster} — ${t.title.slice(0, 60)}`);
     }
   }
@@ -145,7 +184,9 @@ async function main() {
   // Summary counts
   const riskCounts = { high: 0, medium: 0, low: 0 };
   for (const t of tasks) riskCounts[t.risk] = (riskCounts[t.risk] || 0) + 1;
-  console.log(`\n  risk breakdown: high=${riskCounts.high} medium=${riskCounts.medium} low=${riskCounts.low}`);
+  console.log(
+    `\n  risk breakdown: high=${riskCounts.high} medium=${riskCounts.medium} low=${riskCounts.low}`
+  );
   console.log('──────────────────────────────────────────────────────────\n');
 }
 

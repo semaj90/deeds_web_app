@@ -22,6 +22,8 @@ import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { logEmbedIndex } from './ast-ingest-logger.js';
 import { topoByteFromPath, classifyPath } from '$lib/server/tensor/topology-byte-mapper.js';
 import { normalizeLabels } from '$lib/server/labels/normalize-labels.js';
+import fs from 'fs';
+import path from 'path';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const INITIAL_BATCH = 24; // starting batch size; runWithAdaptiveBatch halves on OOM
@@ -35,6 +37,7 @@ interface IndexResult {
   embeddingsGenerated: number;
   storedInQdrant: number;
   failed: number;
+  skippedIgnored?: number;
   durationMs: number;
 }
 
@@ -46,6 +49,7 @@ export interface IndexChunksProgress {
   failed: number;
   batchIndex: number;
   batchSize: number;
+  skippedIgnored?: number;
 }
 
 interface IndexChunksOptions {
@@ -127,6 +131,53 @@ async function ensureCollection(): Promise<void> {
       }),
     }).catch(() => {}); // ignore if already exists
   }
+}
+
+// Load index configuration (optional). Look for `indexing.config.json` at
+// process.cwd() (CI / scripts) or repo root when running from npm tasks.
+function loadIndexingConfig(): { excludePatterns?: string[] } | null {
+  try {
+    const cfgPath = path.join(process.cwd(), 'indexing.config.json');
+    if (!fs.existsSync(cfgPath)) return null;
+    const raw = fs.readFileSync(cfgPath, 'utf8');
+    return JSON.parse(raw) as { excludePatterns?: string[] };
+  } catch {
+    return null;
+  }
+}
+
+const INDEXING_CONFIG = loadIndexingConfig();
+const EXCLUDE_PATTERNS: string[] = INDEXING_CONFIG?.excludePatterns ?? [
+  '.venv/',
+  '/.venv/',
+  '/venv/',
+  'venv/',
+  'site-packages/',
+  '__pycache__/',
+];
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function matchesExclude(lp: string): boolean {
+  const low = lp.toLowerCase();
+  for (const patRaw of EXCLUDE_PATTERNS) {
+    const pat = patRaw.replace(/\\\\/g, '/').toLowerCase();
+    if (pat.includes('*')) {
+      const re = new RegExp('^' + pat.split('*').map(escapeRegExp).join('.*') + '$');
+      if (re.test(low)) return true;
+      continue;
+    }
+    if (pat.startsWith('**/')) {
+      const sub = pat.slice(3);
+      if (low.includes(sub)) return true;
+      continue;
+    }
+    // simple substring or startsWith checks
+    if (low.includes(pat) || low.startsWith(pat)) return true;
+  }
+  return false;
 }
 
 /**
@@ -365,6 +416,7 @@ export async function indexChunks(
   let embeddingsGenerated = 0;
   let storedInQdrant = 0;
   let failed = 0;
+  let skippedIgnored = 0;
   let chunksCompleted = 0;
 
   await ensureCollection();
@@ -408,6 +460,7 @@ export async function indexChunks(
           embeddingsGenerated,
           storedInQdrant,
           failed,
+          skippedIgnored,
           batchIndex,
           batchSize: batch.length,
         });
@@ -423,6 +476,24 @@ export async function indexChunks(
           continue;
         }
         embeddingsGenerated += 2;
+        // Defensive ignore: skip ephemeral or virtualenv files that should not be
+        // indexed. Many dev environments create .venv/ or venv/ folders and
+        // Python site-packages which can pollute the code index. Also ignore
+        // __pycache__ folders. If a chunk's relativePath matches any of these
+        // patterns, do not create a Qdrant point for it.
+        const relPath = (batch[i].metadata as Record<string, unknown>)?.relativePath as
+          | string
+          | undefined;
+        if (relPath) {
+          const lp = relPath.replace(/\\/g, '/').toLowerCase();
+          if (matchesExclude(lp)) {
+            // Skip indexing this chunk; it's environment noise.
+            skippedIgnored++;
+            // Emit a lightweight console log for traceability in smoke runs
+            console.info('[indexer] skipped ignored path:', relPath);
+            continue;
+          }
+        }
         points.push({
           id: batch[i].id,
           vectors: { content: contentEmb, signature: signatureEmb },
@@ -495,6 +566,7 @@ export async function indexChunks(
         embeddingsGenerated,
         storedInQdrant,
         failed,
+        skippedIgnored,
         batchIndex,
         batchSize: batch.length,
       });
@@ -507,6 +579,7 @@ export async function indexChunks(
     embeddingsGenerated,
     storedInQdrant,
     failed,
+    skippedIgnored,
     durationMs: Math.round(performance.now() - start),
   };
 
@@ -516,6 +589,7 @@ export async function indexChunks(
     samplePath: chunks[0]?.metadata?.relativePath ?? '',
     chunksProcessed: result.chunksProcessed,
     skippedExisting: 0,
+    skippedIgnored,
     embeddingsGenerated: result.embeddingsGenerated,
     storedInQdrant: result.storedInQdrant,
     failed: result.failed,
@@ -603,6 +677,8 @@ export async function indexChunksIncremental(
   }
 
   const result = await indexChunks(newChunks, options);
+  // Pull skippedIgnored from the inner result (indexChunks now returns it)
+  const skippedIgnoredFromInner = (result as any).skippedIgnored ?? 0;
   // Override the 'full' log written by indexChunks with an incremental one
   // (the full log was already emitted inside indexChunks above — this is a summary)
   logEmbedIndex({
@@ -610,10 +686,16 @@ export async function indexChunksIncremental(
     samplePath: chunks[0]?.metadata?.relativePath ?? '',
     chunksProcessed: chunks.length,
     skippedExisting,
+    skippedIgnored: skippedIgnoredFromInner,
     embeddingsGenerated: result.embeddingsGenerated,
     storedInQdrant: result.storedInQdrant,
     failed: result.failed,
     durationMs: result.durationMs,
   });
-  return { ...result, chunksProcessed: chunks.length, skippedExisting };
+  return {
+    ...result,
+    chunksProcessed: chunks.length,
+    skippedExisting,
+    skippedIgnored: skippedIgnoredFromInner,
+  };
 }

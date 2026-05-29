@@ -48,10 +48,12 @@ function dedupeAndLimit(values: string[] | undefined, max: number): string[] | u
 
 // Setup Bifrost / Gemma4 local OpenAI-compatible endpoint.
 // Points to TurboQuant (llama-server) running on port 8090.
+import { ENV } from '../env.server.js';
+
 export const bifrost = createOpenAICompatible({
   name: 'bifrost',
-  baseURL: 'http://127.0.0.1:8090/v1',
-  apiKey: 'local'
+  baseURL: `${String(ENV.TURBOQUANT_BASE_URL || ENV.TURBOQUANT_URL).replace(/\/$/, '')}/v1`,
+  apiKey: 'local',
 });
 
 export async function searchEngramMemory(query: string) {

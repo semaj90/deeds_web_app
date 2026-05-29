@@ -83,12 +83,6 @@ const config = {
       privatePrefix: '', // Default: all non-PUBLIC_ vars accessible server-side via $env/dynamic/private
     },
   },
-  // Top-level Vite options (moved from kit.vite to satisfy SvelteKit validation)
-  vite: {
-    server: {
-      allowedHosts: ['host.docker.internal', 'localhost', '127.0.0.1'],
-    },
-  },
 };
 
 export default config;

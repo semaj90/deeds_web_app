@@ -95,8 +95,8 @@ const TOOLS = [
       properties: {
         prompt: { type: 'string', description: 'User prompt (single-turn).' },
         system: { type: 'string', description: 'Optional system prompt.' },
-        max_tokens: { type: 'number', default: 256 },
-        temperature: { type: 'number', default: 0.2 },
+        max_tokens: { type: 'number', default: 256, description: 'Maximum tokens to generate. Default 256.' },
+        temperature: { type: 'number', default: 0.2, description: 'Sampling temperature (0=deterministic, 1=creative). Default 0.2.' },
       },
       required: ['prompt'],
     },
@@ -115,8 +115,8 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        text: { type: 'string' },
-        target_words: { type: 'number', default: 80 },
+        text: { type: 'string', description: 'The text to summarise.' },
+        target_words: { type: 'number', default: 80, description: 'Target summary length in words. Default 80.' },
       },
       required: ['text'],
     },
@@ -135,8 +135,8 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        text: { type: 'string' },
-        labels: { type: 'array', items: { type: 'string' }, minItems: 2 },
+        text: { type: 'string', description: 'The text to classify.' },
+        labels: { type: 'array', items: { type: 'string', description: 'A candidate label.' }, minItems: 2, description: 'List of candidate labels (minimum 2). The model picks exactly one.' },
       },
       required: ['text', 'labels'],
     },

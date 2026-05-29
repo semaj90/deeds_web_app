@@ -89,7 +89,7 @@ export async function getDocumentTags(documentId: string): Promise<GeneratedTag[
   // Fallback: Qdrant
   try {
     const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-    const results = await client.scroll('document_tags', {
+    const results = await qdrant.client.scroll('document_tags', {
       filter: { must: [{ key: 'document_id', match: { value: documentId } }] },
       limit: 30,
       with_payload: true,

@@ -158,4 +158,25 @@ If an edit fails twice (oldString not found / multiple matches / syntax error af
 validation error
   → classify (schema_contract / missing_module / etc.)
   → local rg search
-  → ACE Redis cache (ace:packet:latest) + .opencode/ace-packet.jso
+  → ACE Redis cache (ace:packet:latest) + .opencode/ace-packet.json
+  → .tmp/retrieval-ranking-report.json inspection
+  → docs/atlas + MASTER TODO
+  → SearXNG fallback (smoke test first)
+  → patch recommendation
+  → rerun validator
+  → produce output contract
+```
+
+**Validation failures NEVER trigger finalize/milestone automatically.**
+
+---
+
+## Hot File Cache Policy
+
+Cache frequently-accessed summaries in Redis/Valkey:
+- Validation errors: 1 day TTL
+- Active repair context: 1 day TTL
+- Hot docs/skills: 7 days TTL
+- Stable weekly summary: 30 days (cold storage)
+
+Do NOT store raw large files in Redis — store sourceRefs + compact summaries only.

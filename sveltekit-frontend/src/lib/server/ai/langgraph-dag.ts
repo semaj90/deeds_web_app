@@ -8,7 +8,7 @@ import { ENV } from '../env.server.js';
 import Redis from 'ioredis';
 import crypto from 'crypto';
 
-const redis = new Redis(ENV.REDIS_URL || 'redis://127.0.0.1:6379');
+const redis = new Redis(ENV.REDIS_URL);
 
 function canonicalJson(obj: any): string {
   if (typeof obj !== 'object' || obj === null) return JSON.stringify(obj);
@@ -76,7 +76,7 @@ function preventLoop(toolCall: any) {
 async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
   const normalizedUserQuery = state.query.trim().toLowerCase();
   const queryHash = hashContent(normalizedUserQuery);
-  
+
   // Phase 8B: check llm_output
   const cachedLlmOutput = await redis.get(`llm_output:${queryHash}`);
   if (cachedLlmOutput) {
@@ -95,7 +95,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
     modelId: state.ctx.modelId || "gemma4-tq",
     stablePolicy: state.ctx.stablePolicy || "Strict adherence to legal texts"
   };
-  
+
   const dynamicSuffix = {
     query: state.query,
     timestamp: state.ctx.runId || Date.now()
@@ -105,7 +105,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
   const suffixHash = hashContent(dynamicSuffix);
   const modelId = stablePrefix.modelId;
   const cachedBifrost = await redis.get(`semantic:bifrost:${modelId}:${prefixHash}:${suffixHash}`);
-  
+
   if (cachedBifrost) {
     state.ctx.cacheLayerUsed = 'bifrost_semantic';
     return {
@@ -158,14 +158,14 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
 
 async function failureLookupNode(state: AgentState): Promise<Partial<AgentState>> {
   const fix = await suggestFix(state.query, state.ctx.atlas || []);
-  
+
   const queryHash = hashContent(state.query.trim().toLowerCase());
   const clusterId = state.ctx.clusterId || `cluster_${queryHash.substring(0, 8)}`;
   const stableKey = state.ctx.stableKey || `path_${queryHash.substring(0, 8)}`;
 
   // Phase 10: Punish strategy failure in reinforcement loop
   await recordExecutionOutcome(state.query, false, state.ctx);
-  
+
   // Phase 8C/9: Engram ranked reinforcement (Decay)
   const { reinforceEngramPath } = await import('./engram-registry.js');
   await reinforceEngramPath(`memory_${queryHash}`, false, 0.1, clusterId, stableKey);
@@ -181,7 +181,7 @@ async function finalizeSuccessNode(state: AgentState): Promise<Partial<AgentStat
 
   // Phase 8B: Save successful execution cache to llm_output (7 days TTL)
   await redis.set(`llm_output:${queryHash}`, JSON.stringify(state.lastResult), "EX", 3600 * 24 * 7);
-  
+
   // Phase 10: Reward strategy success in reinforcement loop
   await recordExecutionOutcome(state.query, true, state.ctx);
 
@@ -204,16 +204,16 @@ async function finalizeSuccessNode(state: AgentState): Promise<Partial<AgentStat
 // --- Conditional Edges ---
 function evaluateExecution(state: AgentState) {
   const res = state.lastResult;
-  
+
   // Explicit success checking instead of naive regex
   if (res.startsWith("Successful")) {
     return "finalizeSuccess";
   }
-  
+
   if (state.hasLookedUpFailure) {
     return "finalizeFailure"; // We already tried fixing it once, exit now.
   }
-  
+
   if (res.includes("duplicate_tool_call") || res.includes("generic_answer") || res.includes("missing_sourceRefs") || res.includes("Error:") || state.attempts >= state.maxAttempts) {
     return "failureLookup";
   }

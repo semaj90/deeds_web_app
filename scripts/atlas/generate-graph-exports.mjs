@@ -278,19 +278,22 @@ function main() {
     sources: sourceFiles.map((p) => normalizePathLike(path.relative(root, p))),
     exports: {
       clusterCards: normalizePathLike(path.relative(root, CLUSTER_CARDS_PATH)),
-      pathwayCards: normalizePathLike(path.relative(root, PATHWAY_CARDS_PATH))
+      pathwayCards: normalizePathLike(path.relative(root, PATHWAY_CARDS_PATH)),
     },
+    // Top-level counts for legacy/consumer scripts that expect flat fields
+    nodeCount: Number(nodes?.length || 0),
+    edgeCount: Number(edges?.length || 0),
     counts: {
-      nodes: nodes.length,
-      edges: edges.length,
-      clusterCards: clusterCards.length,
-      pathwayCards: pathwayCards.length,
-      clusterCardRows: countLines(CLUSTER_CARDS_PATH),
-      pathwayCardRows: countLines(PATHWAY_CARDS_PATH)
+      nodes: Number(nodes?.length || 0),
+      edges: Number(edges?.length || 0),
+      clusterCards: Number(clusterCards?.length || 0),
+      pathwayCards: Number(pathwayCards?.length || 0),
+      clusterCardRows: Number(countLines(CLUSTER_CARDS_PATH) || 0),
+      pathwayCardRows: Number(countLines(PATHWAY_CARDS_PATH) || 0),
     },
     hashes: {
       clusterCardsSha256: sha256(fs.readFileSync(CLUSTER_CARDS_PATH)),
-      pathwayCardsSha256: sha256(fs.readFileSync(PATHWAY_CARDS_PATH))
+      pathwayCardsSha256: sha256(fs.readFileSync(PATHWAY_CARDS_PATH)),
     },
     validation: {
       isStub: false,
@@ -298,12 +301,24 @@ function main() {
       notes: [
         'Generated from available graph artifacts.',
         'promotionState remains unpromoted until downstream validation passes.',
-        'Do not treat as final graph truth until promoted.'
-      ]
-    }
+        'Do not treat as final graph truth until promoted.',
+      ],
+    },
   };
 
-  fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+  try {
+    fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+  } catch (err) {
+    // If direct write fails (file lock/permission), write a temp file then rename
+    try {
+      const tmpPath = MANIFEST_PATH + '.tmp';
+      fs.writeFileSync(tmpPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+      fs.renameSync(tmpPath, MANIFEST_PATH);
+    } catch (err2) {
+      console.error('[graph-exports] Failed to write manifest:', err.message, err2 && err2.message);
+      throw err2 || err;
+    }
+  }
 
   console.log('[graph-exports] wrote:', path.relative(root, MANIFEST_PATH));
   console.log('[graph-exports] wrote:', path.relative(root, CLUSTER_CARDS_PATH), clusterCards.length, 'rows');

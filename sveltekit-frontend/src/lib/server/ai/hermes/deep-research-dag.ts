@@ -442,7 +442,7 @@ function formatContextPacketForSynthesis(packet: ResearchContextPacket): string 
     lines.push(`- runtime: ${packet.cudaPrefilter.runtime}`);
     lines.push(`- kv cache: ${packet.cudaPrefilter.kvCache.k}/${packet.cudaPrefilter.kvCache.v}`);
   }
-  
+
   if (Array.isArray(packet.topologyContext) && packet.topologyContext.length > 0) {
     lines.push('', '## Topological Context');
     for (const topo of packet.topologyContext.slice(0, 5)) {
@@ -593,9 +593,10 @@ async function redisTopologyNode(state: ResearchState) {
   const topologyContext: any[] = [];
   try {
     const { default: Redis } = await import('ioredis');
-    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', { lazyConnect: true, maxRetriesPerRequest: 1 });
+    const { ENV } = await import('../../env.server.js');
+    const redis = new Redis(ENV.REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1 });
     await redis.connect();
-    
+
     // Fetch some hot cluster summaries to inject into context
     const keys = await redis.keys('summary:cluster:*');
     if (keys.length > 0) {

@@ -3,10 +3,12 @@ import path from 'path';
 import pg from 'pg';
 import dotenv from 'dotenv';
 import { QdrantClient } from '@qdrant/js-client-rest';
+import crypto from 'crypto';
 
 dotenv.config({ path: path.resolve(process.cwd(), 'sveltekit-frontend/.env') });
 
-const dbUrl = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const dbUrl =
+  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const pool = new pg.Pool({ connectionString: dbUrl });
 
 const qdrantUrl = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
@@ -19,8 +21,8 @@ async function embed(text) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'embeddinggemma:latest',
-      prompt: text
-    })
+      prompt: text,
+    }),
   });
   if (!res.ok) {
     throw new Error(`Embedding failed: ${res.statusText}`);
@@ -47,45 +49,65 @@ async function run() {
   const { rows } = await pool.query(`SELECT * FROM atlas_cards WHERE type = 'log_summary'`);
   console.log(`Found ${rows.length} atlas cards to embed.`);
 
-  const parsedCards = rows.map(r => r.data);
+  const parsedCards = rows.map((r) => r.data);
 
   for (const card of parsedCards) {
     const text = `
 Patterns:
-${card.patterns?.join("\n")}
+${card.patterns?.join('\n')}
 
 Modules:
-${card.modules?.join(",")}
+${card.modules?.join(',')}
 `;
     try {
       // Determine pseudo-cluster key for tagging
       const patterns = card.patterns || [];
-      const cluster_tag = patterns.length > 0 ? patterns[0].split(' ').slice(0, 3).join('_').toLowerCase() : 'unknown_cluster';
-      
-      const enrichedPayload = { 
-        ...card, 
+      const cluster_tag =
+        patterns.length > 0
+          ? patterns[0].split(' ').slice(0, 3).join('_').toLowerCase()
+          : 'unknown_cluster';
+
+      const enrichedPayload = {
+        ...card,
         cluster_tag,
-        topo_class: card.modules ? card.modules[0] : 'core_system'
+        topo_class: card.modules ? card.modules[0] : 'core_system',
       };
 
       const embedding = await embed(text);
-      await qdrant.upsert('documents_atlas', {
-        wait: true,
-        points: [{
-          id: Buffer.from(card.file).toString('hex').slice(0, 32).padEnd(32, '0').slice(0, 32),
-          vector: embedding,
-          payload: enrichedPayload
-        }]
-      }).catch((err) => {
-        return qdrant.upsert('documents_atlas', {
+      const EXPECTED_DIM = Number(process.env.EMBED_DIM ?? '768');
+      if (!Array.isArray(embedding) && !(embedding instanceof Float32Array)) {
+        throw new Error(`Invalid embedding type for ${card.file}`);
+      }
+      if (embedding.length !== EXPECTED_DIM) {
+        throw new Error(
+          `Invalid embedding dimension for ${card.file}: expected ${EXPECTED_DIM}, got ${embedding.length}`
+        );
+      }
+      // Upsert the validated vector
+      try {
+        await qdrant.upsert('documents_atlas', {
           wait: true,
-          points: [{
-            id: crypto.randomUUID(),
-            vector: embedding,
-            payload: { ...enrichedPayload, original_file: card.file }
-          }]
+          points: [
+            {
+              id: Buffer.from(card.file).toString('hex').slice(0, 32).padEnd(32, '0').slice(0, 32),
+              vector: embedding,
+              payload: enrichedPayload,
+            },
+          ],
         });
-      });
+      } catch (err) {
+        // Fallback: generate random id and include original file in payload
+        await qdrant.upsert('documents_atlas', {
+          wait: true,
+          points: [
+            {
+              id: crypto.randomUUID(),
+              vector: embedding,
+              payload: { ...enrichedPayload, original_file: card.file },
+            },
+          ],
+        });
+      }
       console.log(`Embedded ${card.file} (cluster: ${cluster_tag})`);
     } catch (e) {
       console.error(`Failed to embed ${card.file}:`, e.message);

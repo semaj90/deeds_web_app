@@ -5,8 +5,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG, buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { generateSparseVector, type SparseVector } from './bm42-sparse.js';
-import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
-import { traceVectorSearch } from '$lib/server/observability/langfuse.js';
+import { fastJsonParse } from '../gpu/simdjson-bridge.js';
+import { traceVectorSearch } from '../observability/langfuse.js';
 
 // Re-export for existing consumers
 export { generateSparseVector, type SparseVector };

@@ -25,11 +25,37 @@ async function main() {
   }
   const client = new QdrantClient({ url });
   const collection = process.env.QDRANT_COLLECTION || 'rag_cards';
-  // create collection if missing (assume 768 dims)
+  const EMBED_DIM = Number(process.env.EMBED_DIM ?? '768');
+
+  // create collection if missing
   try {
     await client.getCollection(collection);
   } catch (e) {
-    await client.recreateCollection(collection, { vectors: { size: 768, distance: 'Cosine' } });
+    await client.recreateCollection(collection, {
+      vectors: { size: EMBED_DIM, distance: 'Cosine' },
+    });
+  }
+
+  // Helper: validate vectors and perform upsert in safe batches
+  async function upsertValidated(client, collectionName, pts, batchSize = 100) {
+    if (!Array.isArray(pts) || pts.length === 0) return;
+    // Validate dimensions
+    for (const p of pts) {
+      const v = p?.vector;
+      if (!Array.isArray(v) && !(v instanceof Float32Array)) {
+        throw new Error(`Invalid vector for id=${String(p?.id)}: not an array`);
+      }
+      if (v.length !== EMBED_DIM) {
+        throw new Error(
+          `Invalid vector dimension for id=${String(p?.id)}: expected ${EMBED_DIM}, got ${v.length}`
+        );
+      }
+    }
+    // Batch upsert
+    for (let i = 0; i < pts.length; i += batchSize) {
+      const slice = pts.slice(i, i + batchSize);
+      await client.upsert(collectionName, { points: slice });
+    }
   }
   const files = await fs.readdir(EMB_DIR).catch(() => []);
   const points = [];
@@ -38,11 +64,11 @@ async function main() {
     const j = JSON.parse(await fs.readFile(path.join(EMB_DIR, f), 'utf8'));
     points.push({ id: j.id, vector: j.vector, payload: j.metadata });
     if (points.length >= 100) {
-      await client.upsert(collection, { points });
+      await upsertValidated(client, collection, points);
       points.length = 0;
     }
   }
-  if (points.length) await client.upsert(collection, { points });
+  if (points.length) await upsertValidated(client, collection, points);
   console.log('Upserted embeddings to Qdrant collection', collection);
 }
 

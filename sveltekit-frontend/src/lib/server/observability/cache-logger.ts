@@ -1,12 +1,12 @@
 import { Redis } from 'ioredis';
 import { db } from '$lib/server/db/client.js';
+import { ENV } from '../env.server.js';
 import { retrievalCacheTraces } from '$lib/server/db/schema/documents-atlas.js';
 
-// Assuming standard env vars for redis
-const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const redis = new Redis(redisUrl);
+// Use central ENV defaults for Redis
+const redis = new Redis(ENV.REDIS_URL);
 
-export type CacheLayer = 
+export type CacheLayer =
   | 'redis_exact'
   | 'redis_semantic'
   | 'qdrant'
@@ -48,7 +48,7 @@ export class CacheLogger {
       bifrostModelId: ctx.bifrostModelId,
       latencyMs: ctx.latencyMs,
       traceDetails: ctx.traceDetails ?? {},
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     // 1. Redis bounded list logging
@@ -65,24 +65,26 @@ export class CacheLogger {
 
     // 2. Postgres async write
     // Fire and forget so we don't block inference
-    db.insert(retrievalCacheTraces).values({
-      runId: ctx.runId,
-      queryHash: ctx.queryHash,
-      packetId: ctx.packetId,
-      hits: ctx.hits ?? [],
-      selected: ctx.selected ?? [],
-      tokenEstimate: ctx.tokenEstimate,
-      toonBytes: ctx.toonBytes,
-      bifrostModelId: ctx.bifrostModelId,
-      latencyMs: ctx.latencyMs,
-      metadata: { 
-        cacheHit: ctx.cacheHit,
-        cacheLayerUsed: ctx.cacheLayerUsed,
-        traceDetails: ctx.traceDetails ?? {}
-      },
-      createdAt: new Date()
-    }).catch(err => {
-      console.error('[CacheLogger] Failed async write to Postgres:', err);
-    });
+    db.insert(retrievalCacheTraces)
+      .values({
+        runId: ctx.runId,
+        queryHash: ctx.queryHash,
+        packetId: ctx.packetId,
+        hits: ctx.hits ?? [],
+        selected: ctx.selected ?? [],
+        tokenEstimate: ctx.tokenEstimate,
+        toonBytes: ctx.toonBytes,
+        bifrostModelId: ctx.bifrostModelId,
+        latencyMs: ctx.latencyMs,
+        metadata: {
+          cacheHit: ctx.cacheHit,
+          cacheLayerUsed: ctx.cacheLayerUsed,
+          traceDetails: ctx.traceDetails ?? {},
+        },
+        createdAt: new Date(),
+      })
+      .catch((err) => {
+        console.error('[CacheLogger] Failed async write to Postgres:', err);
+      });
   }
 }

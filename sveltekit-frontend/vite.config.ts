@@ -186,6 +186,7 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       strictPort: true,
       host: '0.0.0.0',
+      allowedHosts: ['host.docker.internal', 'localhost', '127.0.0.1'],
       // Pre-transform frequently imported modules on dev server start
       warmup: {
         clientFiles: [

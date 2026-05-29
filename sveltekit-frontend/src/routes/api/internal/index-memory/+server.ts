@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit'
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
+  if (!locals.user) return json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   const body = await request.json()
   try {
     // delegate to server-side ingestion library

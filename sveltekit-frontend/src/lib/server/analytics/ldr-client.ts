@@ -21,11 +21,11 @@ import { ENV } from '$lib/server/env.server.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const LDR_BASE_URL    = process.env.LDR_BASE_URL ?? 'http://127.0.0.1:5000';
-const LDR_ENABLED     = (ENV as unknown as Record<string, string>).LDR_ENABLED !== 'false';
-const TASK_TTL        = 24 * 60 * 60;  // 24h
-const RESULT_TTL      = 4  * 60 * 60;  // 4h
-const TIMEOUT_MS      = 15_000;
+const LDR_BASE_URL = (ENV as unknown as Record<string, string>).LDR_BASE_URL ?? null;
+const LDR_ENABLED = (ENV as unknown as Record<string, string>).LDR_ENABLED !== 'false';
+const TASK_TTL = 24 * 60 * 60; // 24h
+const RESULT_TTL = 4 * 60 * 60; // 4h
+const TIMEOUT_MS = 15_000;
 
 // ── FNV-1a hash ───────────────────────────────────────────────────────────────
 
@@ -41,26 +41,26 @@ function fnv1a8(s: string): string {
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface LdrSource {
-  title:   string;
-  url:     string;
+  title: string;
+  url: string;
   snippet: string;
 }
 
 export interface LdrResearchResult {
-  taskId:       string;
-  query:        string;
-  queryHash:    string;
-  status:       'completed' | 'running' | 'failed' | 'cached';
-  summary:      string;
-  sources:      LdrSource[];
-  sections?:    Array<{ heading: string; content: string }>;
-  metadata?:    Record<string, unknown>;
-  completedAt:  string;
-  durationMs?:  number;
+  taskId: string;
+  query: string;
+  queryHash: string;
+  status: 'completed' | 'running' | 'failed' | 'cached';
+  summary: string;
+  sources: LdrSource[];
+  sections?: Array<{ heading: string; content: string }>;
+  metadata?: Record<string, unknown>;
+  completedAt: string;
+  durationMs?: number;
 }
 
 export interface LdrTaskRef {
-  taskId:    string;
+  taskId: string;
   queryHash: string;
   startedAt: string;
 }
@@ -68,12 +68,13 @@ export interface LdrTaskRef {
 // ── Low-level HTTP helpers ────────────────────────────────────────────────────
 
 async function ldrFetch(path: string, init?: RequestInit): Promise<Response> {
+  if (!LDR_BASE_URL) throw new Error('LDR_BASE_URL not configured');
   return fetch(`${LDR_BASE_URL}${path}`, {
     ...init,
     signal: AbortSignal.timeout(TIMEOUT_MS),
     headers: {
       'Content-Type': 'application/json',
-      'Accept':       'application/json',
+      Accept: 'application/json',
       ...(init?.headers ?? {}),
     },
   });

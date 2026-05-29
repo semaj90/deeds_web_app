@@ -1,6 +1,30 @@
 # Drizzle ↔ Postgres Contract Report
 
-Generated: 2026-05-28T01:36:02.324Z  |  Findings: 828
+Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
@@ -3835,6 +3859,66 @@ Generated: 2026-05-28T01:36:02.324Z  |  Findings: 828
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
 **File:** `sveltekit-frontend\src\lib\server\db\schema\models.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`
+
+### missing_table  (medium)
+**Problem:** Table "rag_cards" declared in Drizzle schema but absent from live DB — migration pending.
+**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`, `npm run db:generate`
+
+### missing_table  (medium)
+**Problem:** Table "rag_embeddings" declared in Drizzle schema but absent from live DB — migration pending.
+**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`, `npm run db:generate`
+
+### missing_table  (medium)
+**Problem:** Table "rag_edges" declared in Drizzle schema but absent from live DB — migration pending.
+**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`, `npm run db:generate`
+
+### missing_table  (medium)
+**Problem:** Table "ace_packets" declared in Drizzle schema but absent from live DB — migration pending.
+**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`, `npm run db:generate`
+
+### missing_column  (medium)
+**Problem:** Column cluster_cards.id in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE cluster_cards ADD COLUMN IF NOT EXISTS id ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column cluster_cards.cluster_id in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE cluster_cards ADD COLUMN IF NOT EXISTS cluster_id ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column cluster_cards.centroid_label in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE cluster_cards ADD COLUMN IF NOT EXISTS centroid_label ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column cluster_cards.top_files in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE cluster_cards ADD COLUMN IF NOT EXISTS top_files ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column cluster_cards.summary in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE cluster_cards ADD COLUMN IF NOT EXISTS summary ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column cluster_cards.created_at in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE cluster_cards ADD COLUMN IF NOT EXISTS created_at ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
+**Validate:** `npm run db:check`
 
 ### live_db_schema_drift  (high)
 **Problem:** route_metadata.path: Drizzle says text, live DB says character varying.

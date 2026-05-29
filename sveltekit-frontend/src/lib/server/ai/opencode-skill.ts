@@ -3,6 +3,7 @@ import { db } from '$lib/server/db/client.js';
 import { engramCards } from '$lib/server/db/schema.js';
 import fs from 'node:fs';
 import path from 'node:path';
+import { ENV } from '../env.server.js';
 
 // Validates that deterministic source refs point to actual files in the repo
 async function validateSourceRefsExist(sourceRefs: string[]) {
@@ -63,19 +64,23 @@ async function saveAtlasCard(args: InjectSummaryArgs) {
   return { id: memoryId };
 }
 
-async function dispatchLocalDeepResearch(args: { featureKey?: string, sourceRefs: string[], reason: string }) {
+async function dispatchLocalDeepResearch(args: {
+  featureKey?: string;
+  sourceRefs: string[];
+  reason: string;
+}) {
   // Fire and forget deep research. Do NOT await the response body/completion.
   const query = `Expand upon references: ${args.sourceRefs.join(', ')}. Context: ${args.reason}`;
 
   // Try LangGraph Synthesis first (port 8091)
-  fetch('http://127.0.0.1:8091/synthesize', {
+  fetch(`${ENV.LANGGRAPH_URL}/synthesize`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query }),
     signal: AbortSignal.timeout(5000),
   }).catch(() => {
     // Fallback to LDR MCP if LangGraph is unavailable
-    fetch('http://127.0.0.1:5000/api/research/start', {
+    fetch(`${ENV.LDR_BASE_URL}/api/research/start`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, max_iterations: 2 }),

@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-28T20:24:45.521Z
+> Generated: 2026-05-29T06:18:23.387Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,19 +8,19 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 55132 |
-| Directories analysed | 1381 |
+| Files scanned | 55291 |
+| Directories analysed | 1367 |
 | Route files | 1087 |
 | Svelte components | 5346 |
 | API handlers | 5538 |
-| API routes without auth | 35 |
+| API routes without auth | 29 |
 | API routes without Zod | 4 |
 | SSR-unsafe files | 0 |
 | Svelte 4 legacy patterns | 120 |
-| Hardcoded localhost refs | 1531 |
+| Hardcoded localhost refs | 1525 |
 | Routes without test pairing | 84 |
 | Cyclic import pairs | 2 |
-| Drizzle table refs | 2703 |
+| Drizzle table refs | 2704 |
 | TODO/FIXME markers | 7706 |
 
 ---
@@ -29,22 +29,22 @@
 
 | Gate | Check | Pass | Fail |
 |------|-------|------|------|
-| G4  | Auth guard on API routes | 810 | 26 |
-| G5  | Zod validation on API routes | 572 | 4 |
-| G11 | No hardcoded localhost (excl env.server) | 53601 | 1531 |
-| G14a | No `export let` (Svelte 4 props) | 55093 | 39 |
-| G14b | No `$:` reactive declarations | 55117 | 15 |
-| G14c | No `on:event=` directives | 55076 | 56 |
-| G14d | No `createEventDispatcher()` | 55099 | 33 |
-| G14e | No runes in plain `.ts` files | 54498 | 634 |
-| G15 | No SSR-unsafe globals (unguarded) | 55132 | 0 |
+| G4  | Auth guard on API routes | 816 | 20 |
+| G5  | Zod validation on API routes | 573 | 4 |
+| G11 | No hardcoded localhost (excl env.server) | 53766 | 1525 |
+| G14a | No `export let` (Svelte 4 props) | 55252 | 39 |
+| G14b | No `$:` reactive declarations | 55276 | 15 |
+| G14c | No `on:event=` directives | 55235 | 56 |
+| G14d | No `createEventDispatcher()` | 55258 | 33 |
+| G14e | No runes in plain `.ts` files | 54657 | 634 |
+| G15 | No SSR-unsafe globals (unguarded) | 55291 | 0 |
 | G16 | Server routes have test pairing | 690 | 84 |
-| G17 | Server routes have error handling | 733 | 117 |
+| G17 | Server routes have error handling | 734 | 116 |
 | G20 | Cyclic import pairs | — | 2 |
 
 ---
 
-## Directory Scorecard (1381 dirs · lowest score = most attention needed)
+## Directory Scorecard (1367 dirs · lowest score = most attention needed)
 
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
@@ -53,27 +53,29 @@
 
 | Status | Directory | Score | Files | Lines | APIs | Auth/Zod | TODOs | Flags |
 |--------|-----------|-------|-------|-------|------|----------|-------|-------|
-| ❌ | `deeds_labs/api-legacy/api/phase82` | 30 | 5 | 170 | 5 | 0/0 | 3 | — |
 | ❌ | `deeds_labs/projects/legacy-projects/svelte_ui` | 33 | 6 | 2205 | 1 | 0/0 | 1 | 🟡sv4 |
-| ❌ | `deeds_labs/api-legacy/api/phase78` | 35 | 7 | 255 | 7 | 0/0 | 5 | — |
-| ❌ | `deeds_labs/api-legacy/api/phase72` | 38 | 6 | 404 | 6 | 0/0 | 2 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/ai` | 42 | 84 | 3716 | 50 | 2/4 | 18 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/rag` | 43 | 6 | 830 | 4 | 0/2 | 4 | — |
-| ⚠️ | `deeds_labs/frontend/sveltekit-frontend-archive/dirs` | 43 | 10307 | 1186002 | 1415 | 305/1655 | 5840 | 🔴ssr 🟡sv4 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api` | 44 | 2 | 44025 | 494 | 54/50 | 74 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/agents` | 45 | 2 | 320 | 2 | 0/0 | 0 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/analytics` | 45 | 2 | 20 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/brain` | 45 | 2 | 14 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/chat-test` | 45 | 2 | 186 | 2 | 0/0 | 0 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/debug` | 45 | 2 | 8 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/document` | 45 | 2 | 20 | 2 | 0/0 | 12 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/embeddings` | 45 | 6 | 434 | 6 | 0/0 | 0 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/metrics` | 45 | 2 | 4 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/native` | 45 | 2 | 62 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/orchestrator` | 45 | 2 | 118 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/pgai` | 45 | 2 | 10 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/security` | 45 | 2 | 22 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/websearch` | 45 | 2 | 52 | 2 | 0/0 | 0 | — |
+| ❌ | `deeds_labs/routes-parked-full/api/phase78` | 35 | 7 | 255 | 7 | 0/0 | 5 | — |
+| ❌ | `deeds_labs/frontend/svelte4-archive/routes` | 35 | 18 | 1837 | 14 | 3/0 | 3 | 🟠lh |
+| ❌ | `deeds_labs/routes-parked-full` | 36 | 1 | 97590 | 496 | 71/76 | 129 | 🟡sv4 🟠lh |
+| ❌ | `deeds_labs/routes-parked-full/api/phase72` | 38 | 6 | 404 | 6 | 0/0 | 2 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/ai` | 42 | 84 | 3716 | 50 | 2/4 | 18 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/rag` | 43 | 6 | 830 | 4 | 0/2 | 4 | — |
+| ⚠️ | `deeds_labs/snapshots/2026-03-10/bucket-c-stale` | 43 | 10086 | 1316185 | 1401 | 303/1602 | 6091 | 🔴ssr 🟡sv4 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api` | 44 | 2 | 43965 | 491 | 54/50 | 71 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/agents` | 45 | 2 | 320 | 2 | 0/0 | 0 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/analytics` | 45 | 2 | 20 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/brain` | 45 | 2 | 14 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/chat-test` | 45 | 2 | 186 | 2 | 0/0 | 0 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/debug` | 45 | 2 | 8 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/document` | 45 | 2 | 20 | 2 | 0/0 | 12 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/embeddings` | 45 | 6 | 434 | 6 | 0/0 | 0 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/metrics` | 45 | 2 | 4 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/native` | 45 | 2 | 62 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/orchestrator` | 45 | 2 | 118 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/pgai` | 45 | 2 | 10 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/phase82` | 45 | 2 | 110 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/security` | 45 | 2 | 22 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/websearch` | 45 | 2 | 52 | 2 | 0/0 | 0 | — |
 | ⚠️ | `deeds_labs/archived-dead-code/dev-routes/test` | 45 | 2 | 12 | 1 | 0/0 | 0 | — |
 | ⚠️ | `deeds_labs/projects/legacy-projects/commas-previews` | 45 | 20 | 304 | 7 | 0/0 | 0 | — |
 | ⚠️ | `deeds_labs/routes-parked-full/websocket` | 45 | 1 | 54 | 1 | 0/0 | 0 | — |
@@ -82,44 +84,43 @@
 | ⚠️ | `scripts/api-cleanup` | 45 | 40 | 203692 | 2488 | 284/384 | 674 | 🟠lh |
 | ⚠️ | `scripts/api-cleanup/reports` | 45 | 6 | 194132 | 2480 | 284/380 | 672 | 🟠lh |
 | ⚠️ | `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z` | 45 | 2648 | 183248 | 2474 | 280/376 | 668 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/legal` | 47 | 12 | 1456 | 12 | 2/0 | 2 | — |
-| ⚠️ | `deeds_labs/frontend/svelte4-archive/routes` | 47 | 13 | 1743 | 11 | 1/0 | 0 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/ace` | 50 | 10 | 418 | 10 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/attention` | 50 | 2 | 470 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/audit` | 50 | 4 | 344 | 4 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/cache` | 50 | 2 | 12 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/chat` | 50 | 2 | 192 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/consolidation` | 50 | 2 | 202 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/dashboard` | 50 | 4 | 180 | 4 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/dev` | 50 | 2 | 180 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/dimensional-cache` | 50 | 2 | 190 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/docling` | 50 | 2 | 98 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/documents` | 50 | 12 | 1636 | 12 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/embed` | 50 | 4 | 294 | 4 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/error-brain` | 50 | 4 | 1626 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/errors` | 50 | 4 | 576 | 4 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/evidence-canvas` | 50 | 4 | 16 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/gpu-test-simple` | 50 | 2 | 52 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/ibm-vision` | 50 | 2 | 108 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/ingestion` | 50 | 2 | 98 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/jobs` | 50 | 2 | 84 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/laws` | 50 | 14 | 564 | 14 | 4/0 | 2 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/legal-ai` | 50 | 4 | 1806 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/mcp` | 50 | 6 | 248 | 6 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/ocr` | 50 | 2 | 100 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/ollama` | 50 | 6 | 322 | 6 | 0/2 | 0 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/onnx` | 50 | 2 | 108 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/persons` | 50 | 4 | 266 | 4 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/realtime` | 50 | 2 | 14 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/redis-orchestrator` | 50 | 2 | 14 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/route-operations` | 50 | 2 | 218 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/setup-database` | 50 | 2 | 246 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/sse` | 50 | 4 | 28 | 4 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/system` | 50 | 6 | 130 | 6 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/test` | 50 | 6 | 102 | 6 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/upload-analyze` | 50 | 2 | 92 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/vector` | 50 | 4 | 32 | 4 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/wasm` | 50 | 2 | 56 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/legal` | 47 | 12 | 1456 | 12 | 2/0 | 2 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/ace` | 50 | 10 | 418 | 10 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/attention` | 50 | 2 | 470 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/audit` | 50 | 4 | 344 | 4 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/cache` | 50 | 2 | 12 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/chat` | 50 | 2 | 192 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/consolidation` | 50 | 2 | 202 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/dashboard` | 50 | 4 | 180 | 4 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/dev` | 50 | 2 | 180 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/dimensional-cache` | 50 | 2 | 190 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/docling` | 50 | 2 | 98 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/documents` | 50 | 12 | 1636 | 12 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/embed` | 50 | 4 | 294 | 4 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/error-brain` | 50 | 4 | 1626 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/errors` | 50 | 4 | 576 | 4 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/evidence-canvas` | 50 | 4 | 16 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/gpu-test-simple` | 50 | 2 | 52 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/ibm-vision` | 50 | 2 | 108 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/ingestion` | 50 | 2 | 98 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/jobs` | 50 | 2 | 84 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/laws` | 50 | 14 | 564 | 14 | 4/0 | 2 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/legal-ai` | 50 | 4 | 1806 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/mcp` | 50 | 6 | 248 | 6 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/ocr` | 50 | 2 | 100 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/ollama` | 50 | 6 | 322 | 6 | 0/2 | 0 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/onnx` | 50 | 2 | 108 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/persons` | 50 | 4 | 266 | 4 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/realtime` | 50 | 2 | 14 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/redis-orchestrator` | 50 | 2 | 14 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/route-operations` | 50 | 2 | 218 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/setup-database` | 50 | 2 | 246 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/sse` | 50 | 4 | 28 | 4 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/system` | 50 | 6 | 130 | 6 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/test` | 50 | 6 | 102 | 6 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/upload-analyze` | 50 | 2 | 92 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/vector` | 50 | 4 | 32 | 4 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/wasm` | 50 | 2 | 56 | 2 | 0/0 | 0 | — |
 | ⚠️ | `deeds_labs/api-routes/health/search` | 50 | 1 | 62 | 1 | 0/0 | 0 | — |
 | ⚠️ | `deeds_labs/routes-parked-full/auth/test-relay` | 50 | 1 | 5 | 1 | 0/0 | 0 | — |
 | ⚠️ | `deeds_labs/routes-parked-full/healthz` | 50 | 1 | 26 | 1 | 0/0 | 0 | — |
@@ -127,86 +128,90 @@
 | ⚠️ | `deeds_labs/services/archived-apis/stubs` | 50 | 1 | 41 | 1 | 0/0 | 0 | — |
 | ⚠️ | `src/routes/api/atlas` | 50 | 4 | 233 | 4 | 0/0 | 0 | ⬜notest |
 | ⚠️ | `deeds_labs/projects/legacy-projects/sveltekit-evidence` | 51 | 29 | 11577 | 4 | 0/3 | 13 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/bench` | 53 | 10 | 144 | 10 | 0/2 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/cases` | 53 | 16 | 872 | 16 | 0/0 | 2 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/internal` | 53 | 22 | 1266 | 22 | 0/0 | 2 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/bench` | 53 | 10 | 144 | 10 | 0/2 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/cases` | 53 | 16 | 872 | 16 | 0/0 | 2 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/internal` | 53 | 22 | 1266 | 22 | 0/0 | 2 | — |
 | ⚠️ | `deeds_labs/docs/reference/api-backups` | 53 | 8 | 56 | 7 | 1/2 | 3 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/v1` | 54 | 80 | 7294 | 68 | 22/26 | 18 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/search` | 55 | 10 | 704 | 10 | 2/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/trt-llm` | 55 | 6 | 366 | 6 | 0/2 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/yorha` | 55 | 8 | 1846 | 6 | 0/0 | 0 | 🟠lh |
-| ⚠️ | `deeds_labs/docs/reference` | 55 | 21 | 5743 | 7 | 1/3 | 3 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/v1` | 54 | 80 | 7294 | 68 | 22/26 | 18 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/search` | 55 | 10 | 704 | 10 | 2/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/trt-llm` | 55 | 6 | 366 | 6 | 0/2 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/yorha` | 55 | 8 | 1846 | 6 | 0/0 | 0 | 🟠lh |
+| ⚠️ | `deeds_labs/docs/reference` | 55 | 5 | 885 | 7 | 1/3 | 3 | — |
 | ⚠️ | `deeds_labs/projects/legacy-projects/src` | 55 | 152 | 31543 | 23 | 6/28 | 4 | 🟡sv4 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/citations` | 56 | 16 | 850 | 16 | 4/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/evidence` | 57 | 14 | 692 | 14 | 4/2 | 2 | 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/doc` | 58 | 2 | 74 | 2 | 0/2 | 2 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/citations` | 56 | 16 | 850 | 16 | 4/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/evidence` | 57 | 14 | 692 | 14 | 4/2 | 2 | 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/doc` | 58 | 2 | 74 | 2 | 0/2 | 2 | — |
 | ⚠️ | `sveltekit-frontend/src/routes/.well-known` | 58 | 4 | 506 | 4 | 0/2 | 0 | — |
 | ⚠️ | `deeds_labs/frontend/svelte4-archive/api-routes` | 59 | 9 | 1385 | 9 | 1/2 | 2 | — |
 | ⚠️ | `.svelte-error-fixes-backup/sveltekit-frontend/src/lib` | 60 | 516 | 235866 | 0 | 0/45 | 45 | 🔴ssr 🟡sv4 🟠lh |
 | ⚠️ | `.svelte-error-fixes-backup/sveltekit-frontend/src/routes` | 60 | 115 | 51846 | 0 | 2/7 | 7 | 🔴ssr 🟡sv4 🟠lh |
-| ⚠️ | `deeds_labs/api-legacy/api/admin` | 60 | 8 | 560 | 8 | 2/2 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/canvas` | 60 | 2 | 174 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/database-test` | 60 | 2 | 208 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/db-test` | 60 | 2 | 76 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/dev-auth` | 60 | 2 | 16 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/fix-schema` | 60 | 2 | 10 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/graph` | 60 | 8 | 196 | 8 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/poi` | 60 | 2 | 50 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/routes` | 60 | 46 | 6966 | 26 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/search-pgvector-optimized` | 60 | 2 | 12 | 2 | 0/0 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/ws` | 60 | 2 | 686 | 2 | 0/2 | 0 | 🟠lh |
-| ⚠️ | `deeds_labs/frontend/svelte4-archive/components` | 60 | 319 | 86352 | 0 | 6/22 | 67 | 🔴ssr 🟡sv4 🟠lh |
+| ⚠️ | `deeds_labs/routes-parked-full/api/admin` | 60 | 8 | 560 | 8 | 2/2 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/canvas` | 60 | 2 | 174 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/database-test` | 60 | 2 | 208 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/db-test` | 60 | 2 | 76 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/dev-auth` | 60 | 2 | 16 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/fix-schema` | 60 | 2 | 10 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/graph` | 60 | 8 | 196 | 8 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/poi` | 60 | 2 | 50 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/routes` | 60 | 46 | 6966 | 26 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/search-pgvector-optimized` | 60 | 2 | 12 | 2 | 0/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/ws` | 60 | 2 | 686 | 2 | 0/2 | 0 | 🟠lh |
+| ⚠️ | `deeds_labs/frontend/svelte4-archive/components` | 60 | 118 | 27087 | 0 | 0/16 | 7 | 🔴ssr 🟠lh |
 | ⚠️ | `deeds_labs/frontend/svelte4-archive/routes-test-archive` | 60 | 2 | 18 | 1 | 0/1 | 0 | — |
 | ⚠️ | `src/routes/api/ace` | 60 | 1 | 32 | 1 | 0/1 | 0 | — |
-| ⚠️ | `deeds_labs/snapshots/2026-03-10/root-stale` | 62 | 723 | 387072 | 76 | 32/56 | 27 | 🟠lh |
-| ⚠️ | `.venv/Lib/site-packages/torch` | 65 | 10 | 4811 | 0 | 0/0 | 42 | 🔴ssr |
-| ⚠️ | `deeds_labs/api-legacy/api/document-processing` | 65 | 2 | 104 | 2 | 0/2 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/yolo` | 65 | 2 | 100 | 2 | 0/2 | 0 | — |
+| ⚠️ | `deeds_labs/snapshots/2026-03-10/root-stale` | 61 | 740 | 385634 | 76 | 32/53 | 27 | 🟠lh |
+| ⚠️ | `docker/langgraph-synthesis/.venv/Lib` | 65 | 82 | 302366 | 0 | 0/8 | 74 | 🔴ssr |
+| ⚠️ | `deeds_labs/routes-parked-full/api/document-processing` | 65 | 2 | 104 | 2 | 0/2 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/yolo` | 65 | 2 | 100 | 2 | 0/2 | 0 | — |
 | ⚠️ | `deeds_labs/dead-routes/error-brain/escalations` | 65 | 1 | 116 | 1 | 0/1 | 0 | — |
 | ⚠️ | `deeds_labs/dead-routes/error-brain/experience` | 65 | 1 | 109 | 1 | 0/1 | 0 | — |
 | ⚠️ | `deeds_labs/dead-routes/error-brain/metrics` | 65 | 1 | 76 | 1 | 0/1 | 0 | — |
 | ⚠️ | `deeds_labs/dead-routes/error-brain/pipeline` | 65 | 1 | 101 | 1 | 0/1 | 0 | — |
-| ⚠️ | `deeds_labs/api-legacy/api/contextual` | 67 | 6 | 524 | 6 | 4/0 | 0 | — |
+| ⚠️ | `deeds_labs/routes-parked-full/api/contextual` | 67 | 6 | 524 | 6 | 4/0 | 0 | — |
 | ⚠️ | `deeds_labs/infra/tensorrt-archive/sveltekit-legacy` | 68 | 20 | 1186 | 0 | 0/6 | 1 | 🔴ssr 🟠lh |
-| ✅ | `deeds_labs/api-legacy/api/bits-ui` | 70 | 2 | 24 | 2 | 2/0 | 0 | — |
-| ✅ | `deeds_labs/api-legacy/api/chrrom` | 70 | 2 | 28 | 2 | 2/0 | 0 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/bits-ui` | 70 | 2 | 24 | 2 | 2/0 | 0 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/chrrom` | 70 | 2 | 28 | 2 | 2/0 | 0 | — |
+| ✅ | `deeds_labs/services/development-tools/ast-analysis` | 70 | 34 | 6304 | 4 | 0/4 | 0 | 🟠lh |
+| ✅ | `deeds_labs/services/archived-dead-files/orphan-components-2026-03` | 70 | 56 | 10830 | 0 | 0/1 | 4 | 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/api-orphans-2026-03-09` | 70 | 20 | 942 | 0 | 0/1 | 17 | 🟠lh |
+| ✅ | `deeds_labs/services/development-tools/cuda-grpc-stubs` | 70 | 63 | 15526 | 0 | 0/21 | 4 | 🟠lh |
+| ✅ | `deeds_labs/services/archived-dead-workers` | 70 | 16 | 2807 | 0 | 0/4 | 60 | 🟠lh |
+| ✅ | `deeds_labs/orphan-consolidation-2026-03-29/server-helpers` | 70 | 5 | 343 | 0 | 0/0 | 3 | 🟠lh |
 | ✅ | `deeds_labs/projects/agentic-error-resolution/scripts` | 70 | 4 | 841 | 0 | 0/2 | 3 | 🟠lh |
-| ✅ | `deeds_labs/services/archived-dead-files/orphan-components-2026-03` | 70 | 24 | 5117 | 0 | 0/1 | 4 | 🟠lh |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/api-orphans-2026-03-09` | 70 | 17 | 936 | 0 | 0/1 | 17 | 🟠lh |
 | ✅ | `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z` | 72 | 6 | 224 | 6 | 4/4 | 4 | — |
 | ✅ | `deeds_labs/routes-parked-full/(tools)_disabled` | 73 | 1 | 2501 | 0 | 0/1 | 2 | 🟡sv4 |
-| ✅ | `deeds_labs/frontend/svelte4-archive` | 74 | 3 | 110614 | 21 | 8/62 | 69 | 🔴ssr 🟡sv4 🟠lh |
-| ✅ | `deeds_labs/api-legacy/api/summarize` | 75 | 2 | 80 | 2 | 2/0 | 0 | — |
-| ✅ | `deeds_labs/api-legacy/api/user` | 75 | 2 | 54 | 2 | 2/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/evidence-canvas` | 75 | 10 | 2746 | 0 | 0/0 | 5 | — |
-| ✅ | `deeds_labs/frontend/corrupted-demos` | 75 | 7 | 1414 | 0 | 0/0 | 3 | — |
-| ✅ | `deeds_labs/frontend/features-archive/workflows` | 75 | 31 | 4843 | 0 | 0/0 | 10 | — |
-| ✅ | `deeds_labs/frontend/orphaned-components` | 75 | 7 | 10525 | 0 | 0/4 | 12 | — |
-| ✅ | `deeds_labs/frontend/orphaned-components/chat-variants` | 75 | 10 | 2024 | 0 | 0/0 | 5 | — |
-| ✅ | `deeds_labs/frontend/orphaned-components/ui-dead-2026-03-08` | 75 | 39 | 4800 | 0 | 0/2 | 4 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/summarize` | 75 | 2 | 80 | 2 | 2/0 | 0 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/user` | 75 | 2 | 54 | 2 | 2/0 | 0 | — |
+| ✅ | `deeds_labs/services/archived-dead-files/cache` | 75 | 41 | 12562 | 0 | 4/13 | 31 | — |
+| ✅ | `deeds_labs/frontend/orphaned-components` | 75 | 5 | 6659 | 0 | 0/4 | 5 | — |
+| ✅ | `deeds_labs/services/archived-machines` | 75 | 19 | 2009 | 0 | 0/2 | 3 | — |
 | ✅ | `deeds_labs/frontend-cjs-scripts` | 75 | 56 | 7631 | 1 | 0/2 | 0 | 🟠lh |
 | ✅ | `deeds_labs/projects/legacy-projects/ingestion-phase66` | 75 | 17 | 4277 | 0 | 0/1 | 0 | 🟡sv4 🟠lh |
 | ✅ | `deeds_labs/routes-parked-full/archive/demos` | 75 | 17 | 2778 | 0 | 1/0 | 3 | — |
 | ✅ | `deeds_labs/routes-parked-full/auth/logout` | 75 | 5 | 2175 | 0 | 0/0 | 5 | — |
 | ✅ | `deeds_labs/routes-parked-full/logout` | 75 | 3 | 120 | 1 | 1/0 | 0 | — |
-| ✅ | `deeds_labs/services/development-tools/error-analysis` | 75 | 37 | 8535 | 0 | 2/3 | 3 | — |
 | ✅ | `deeds_labs/snapshots/2026-03-15-root/node-tests` | 75 | 54 | 9956 | 0 | 0/7 | 0 | 🔴ssr 🟠lh |
-| ✅ | `docker/langgraph-synthesis/.venv/Lib` | 75 | 63 | 294141 | 0 | 0/8 | 32 | — |
+| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs` | 78 | 6 | 24525 | 0 | 0/7 | 2 | 🟠lh |
 | ✅ | `deeds_labs/routes-parked-full/cases_disabled/[id]` | 78 | 2 | 216 | 0 | 1/1 | 1 | 🟠lh |
 | ✅ | `deeds_labs/routes-parked-full/dashboard_disabled` | 78 | 1 | 644 | 0 | 0/1 | 1 | 🟠lh |
 | ✅ | `deeds_labs/routes-parked-full/dashboard_disabled/legal-progress` | 78 | 1 | 325 | 0 | 0/0 | 1 | 🟠lh |
 | ✅ | `deeds_labs/routes-parked-full/monitor` | 78 | 1 | 420 | 0 | 0/0 | 1 | 🟠lh |
-| ✅ | `deeds_labs/services/python-middleware/python_codebase` | 78 | 1816 | 109537 | 203 | 48/436 | 244 | 🟠lh |
+| ✅ | `deeds_labs/services/python-middleware/python_codebase` | 78 | 1813 | 109306 | 203 | 48/436 | 244 | 🟠lh |
 | ✅ | `.venv/Lib/site-packages/matplotlib` | 80 | 3 | 993 | 0 | 0/1 | 0 | 🔴ssr |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs` | 80 | 8 | 39566 | 0 | 0/12 | 5 | 🟠lh |
+| ✅ | `deeds_labs/services/archived-dead-files` | 80 | 1 | 32415 | 0 | 4/36 | 40 | 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/server-root-orphans-2026-03-09` | 80 | 87 | 10205 | 0 | 6/11 | 4 | 🟠lh |
 | ✅ | `deeds_labs/routes-parked-full/(tools)_disabled/report-builder` | 80 | 5 | 964 | 0 | 0/0 | 0 | 🟡sv4 |
-| ✅ | `deeds_labs/services/archived-dead-files` | 80 | 1 | 9753 | 0 | 0/9 | 9 | 🟠lh |
 | ✅ | `src/routes/atlas/studio` | 80 | 1 | 130 | 0 | 0/0 | 0 | 🟡sv4 |
-| ✅ | `sveltekit-frontend/src/lib/components` | 80 | 622 | 163425 | 0 | 0/47 | 5 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/lib/components` | 80 | 628 | 167065 | 0 | 0/47 | 5 | 🟠lh |
+| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/evidence-canvas` | 83 | 3 | 1207 | 0 | 0/0 | 2 | — |
 | ✅ | `deeds_labs/archived-server-modules/simd` | 83 | 1 | 167 | 0 | 0/1 | 1 | — |
-| ✅ | `deeds_labs/dead_code/src-lib/auth` | 83 | 6 | 158 | 0 | 2/2 | 2 | — |
-| ✅ | `deeds_labs/dead_code/src-lib/integrations` | 83 | 20 | 5182 | 0 | 0/0 | 2 | — |
+| ✅ | `deeds_labs/lib-dead-directories/auth` | 83 | 9 | 362 | 0 | 2/5 | 2 | — |
+| ✅ | `deeds_labs/lib-dead-directories/integrations` | 83 | 4 | 458 | 0 | 0/0 | 2 | — |
+| ✅ | `deeds_labs/frontend/features-archive/workflows` | 83 | 1 | 145 | 0 | 0/0 | 1 | — |
 | ✅ | `deeds_labs/frontend/orphaned-components/ai-stubs` | 83 | 1 | 12 | 0 | 0/0 | 1 | — |
+| ✅ | `deeds_labs/frontend/orphaned-components/chat-variants` | 83 | 6 | 1120 | 0 | 0/0 | 1 | — |
+| ✅ | `deeds_labs/services/archived-dead-files/stubs-ai` | 83 | 4 | 330 | 0 | 0/0 | 1 | — |
+| ✅ | `deeds_labs/frontend/orphaned-components/ui-dead-2026-03-08` | 83 | 33 | 3324 | 0 | 0/2 | 1 | — |
 | ✅ | `deeds_labs/infra/wasm-archive` | 83 | 2 | 360 | 0 | 0/0 | 1 | — |
 | ✅ | `deeds_labs/routes-parked-full/(ai)_disabled/orchestrator` | 83 | 1 | 435 | 0 | 0/0 | 1 | — |
 | ✅ | `deeds_labs/routes-parked-full/(demo)_disabled` | 83 | 1 | 1022 | 0 | 0/0 | 1 | — |
@@ -234,24 +239,26 @@
 | ✅ | `deeds_labs/routes-parked-full/perf` | 83 | 1 | 444 | 0 | 0/0 | 1 | — |
 | ✅ | `deeds_labs/routes-parked-full/shader_search` | 83 | 1 | 585 | 0 | 0/0 | 1 | — |
 | ✅ | `deeds_labs/services/archived-dead-files/crewai-xstate` | 83 | 1 | 130 | 0 | 0/0 | 1 | — |
-| ✅ | `deeds_labs/services/archived-dead-files/stubs-ai` | 83 | 2 | 268 | 0 | 0/0 | 1 | — |
 | ✅ | `sveltekit-frontend/src/lib/workers` | 83 | 10 | 1873 | 0 | 0/1 | 2 | — |
-| ✅ | `sveltekit-frontend/src/routes/api` | 83 | 726 | 107348 | 720 | 694/547 | 1 | 🟠lh ⬜notest |
+| ✅ | `sveltekit-frontend/src/routes/api` | 84 | 726 | 107380 | 720 | 700/548 | 1 | 🟠lh ⬜notest |
 | ✅ | `.venv/Lib/site-packages/litellm` | 85 | 32 | 18675 | 0 | 0/12 | 0 | 🟠lh |
 | ✅ | `claude-mem/src/npx-cli` | 85 | 3 | 3852 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `claude-mem/src/npx-cli/commands` | 85 | 6 | 2903 | 0 | 0/2 | 0 | 🟠lh |
-| ✅ | `deeds_labs/archived-corrupted-phase99` | 85 | 13 | 1328 | 0 | 0/3 | 6 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/simd` | 85 | 7 | 1620 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/simd` | 85 | 1 | 318 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/systems` | 85 | 1 | 563 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `deeds_labs/dead_code` | 85 | 1 | 16322 | 0 | 2/17 | 4 | — |
-| ✅ | `deeds_labs/frontend/svelte4-archive/moogle` | 85 | 3 | 2520 | 0 | 0/0 | 0 | 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/server-orphans-2026-03-09` | 85 | 42 | 2160 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/broken-import-orphans-2026-03-09` | 85 | 14 | 2569 | 0 | 0/0 | 0 | 🟡sv4 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/services-orphans-2026-03-09` | 85 | 34 | 8246 | 0 | 0/12 | 12 | — |
+| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/ocr` | 85 | 5 | 430 | 0 | 0/0 | 0 | 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/ollama-duplicates-2026-03-09` | 85 | 18 | 1857 | 0 | 0/3 | 0 | 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/qdrant-duplicates-2026-03-09` | 85 | 12 | 3006 | 0 | 0/0 | 0 | 🟠lh |
+| ✅ | `deeds_labs/services/archived-dead-files/superseded-services` | 85 | 9 | 1500 | 0 | 0/6 | 3 | — |
+| ✅ | `deeds_labs/services/development-tools/error-analysis` | 85 | 125 | 41895 | 0 | 8/6 | 9 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/constants` | 85 | 1 | 57 | 0 | 0/0 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/lib/utils` | 85 | 27 | 4698 | 0 | 2/4 | 0 | 🟠lh |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/json` | 85 | 1 | 261 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/moogle` | 85 | 1 | 839 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `deeds_labs/lib-dead-directories/constants/constants` | 85 | 2 | 116 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `deeds_labs/lib-dead-directories/json` | 85 | 3 | 687 | 0 | 0/3 | 0 | 🟠lh |
-| ✅ | `deeds_labs/lib-dead-directories/optimization` | 85 | 3 | 1371 | 0 | 0/9 | 0 | 🟠lh |
-| ✅ | `deeds_labs/lib-dead-directories/optimization/optimization` | 85 | 9 | 1275 | 0 | 0/9 | 0 | 🟠lh |
 | ✅ | `deeds_labs/lib-dead-directories/server-orphans` | 85 | 2 | 469 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `deeds_labs/lib-dead-directories/workers` | 85 | 2 | 570 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `deeds_labs/projects/auto-solve-demo` | 85 | 1 | 1467 | 0 | 0/0 | 0 | 🟠lh |
@@ -262,17 +269,13 @@
 | ✅ | `deeds_labs/routes-parked-full/admin` | 85 | 3 | 1648 | 0 | 2/1 | 15 | — |
 | ✅ | `deeds_labs/routes-parked-full/admin/users` | 85 | 4 | 399 | 0 | 2/1 | 13 | — |
 | ✅ | `deeds_labs/routes-parked-full/auth` | 85 | 2 | 3375 | 2 | 2/2 | 6 | — |
-| ✅ | `deeds_labs/services/archived-dead-files/superseded-services` | 85 | 6 | 1320 | 0 | 0/3 | 3 | — |
-| ✅ | `deeds_labs/services/development-tools/cuda-grpc-stubs` | 85 | 16 | 2544 | 0 | 0/6 | 0 | 🟠lh |
 | ✅ | `deeds_labs/services/orphan-services-20260320` | 85 | 2 | 169 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/config-orphans-2026-03-09` | 85 | 5 | 1169 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/ollama-duplicates-2026-03-09` | 85 | 9 | 768 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/server-orphans-2026-03-09` | 85 | 5 | 862 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/services-orphans-2026-03-09` | 85 | 8 | 1376 | 0 | 0/0 | 3 | — |
 | ✅ | `deeds_labs/snapshots/2026-03-15-v1/services-dead` | 85 | 2 | 326 | 0 | 0/0 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/static` | 85 | 17 | 12241815 | 0 | 0/6 | 0 | 🟠lh |
 | ✅ | `scripts/ai` | 85 | 8 | 714 | 0 | 0/8 | 0 | 🟠lh |
 | ✅ | `scripts/audit` | 85 | 4 | 1456 | 0 | 0/2 | 0 | 🟠lh |
-| ✅ | `scripts/opencode` | 85 | 76 | 9450 | 0 | 0/66 | 0 | 🟠lh |
+| ✅ | `scripts/opencode` | 85 | 106 | 13092 | 0 | 0/94 | 0 | 🟠lh |
 | ✅ | `scripts/operator` | 85 | 6 | 1362 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/qdrant` | 85 | 2 | 124 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `scripts/smoke` | 85 | 6 | 728 | 0 | 0/4 | 0 | 🟠lh |
@@ -286,30 +289,26 @@
 | ✅ | `sveltekit-frontend/scripts/ace` | 85 | 16 | 1275 | 0 | 0/7 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/diagnose` | 85 | 2 | 379 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/diagnostics` | 85 | 8 | 571 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/mcp` | 85 | 13 | 3729 | 0 | 0/7 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/scenarios` | 85 | 3 | 321 | 0 | 0/3 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/lib/utils` | 85 | 24 | 4599 | 0 | 2/4 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/static` | 85 | 17 | 35063 | 0 | 0/6 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/static/workers` | 85 | 13 | 9339 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/tests/helpers` | 85 | 3 | 374 | 0 | 1/1 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/tests/scripts` | 85 | 3 | 104 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `vscode-extension/out` | 85 | 8 | 854 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `vscode-extension/src` | 85 | 8 | 1054 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/server-subdirs-orphans-2026-03-09` | 88 | 63 | 7248 | 0 | 0/9 | 1 | 🟠lh |
 | ✅ | `deeds_labs/routes-parked-full/(ai)_disabled` | 88 | 2 | 5332 | 0 | 2/3 | 2 | 🟠lh |
 | ✅ | `deeds_labs/services/archived-client-lib/sdk` | 88 | 4 | 723 | 0 | 0/0 | 1 | 🟠lh |
 | ✅ | `deeds_labs/services/python-middleware/backend` | 88 | 26 | 4911 | 0 | 0/3 | 1 | 🟠lh |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/server-root-orphans-2026-03-09` | 88 | 24 | 4082 | 0 | 3/8 | 1 | 🟠lh |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/server-subdirs-orphans-2026-03-09` | 88 | 21 | 4914 | 0 | 0/3 | 1 | 🟠lh |
 | ✅ | `$lib/utils` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
 | ✅ | `.cache/cards` | 90 | 2 | 20 | 0 | 0/0 | 0 | — |
 | ✅ | `.github/hooks` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `.opencode/ace-packets` | 90 | 13 | 64064 | 0 | 0/0 | 0 | — |
-| ✅ | `.opencode/ace-packets_stale` | 90 | 1 | 31884 | 0 | 0/0 | 0 | — |
+| ✅ | `.opencode/ace-packets` | 90 | 1 | 52 | 0 | 0/0 | 0 | — |
+| ✅ | `.opencode/ace-packets_stale` | 90 | 13 | 95896 | 0 | 0/0 | 0 | — |
 | ✅ | `.opencode/cache` | 90 | 1384 | 19139 | 0 | 0/0 | 0 | — |
 | ✅ | `.opencode/cards` | 90 | 9372 | 124673 | 0 | 0/0 | 0 | — |
 | ✅ | `.opencode/command` | 90 | 1 | 8 | 0 | 0/0 | 0 | — |
 | ✅ | `.opencode/context` | 90 | 1 | 48 | 0 | 0/0 | 0 | — |
-| ✅ | `.opencode/embeddings` | 90 | 9370 | 9370 | 0 | 0/0 | 0 | — |
+| ✅ | `.opencode/embeddings` | 90 | 9371 | 9371 | 0 | 0/0 | 0 | — |
 | ✅ | `.opencode/feature-map` | 90 | 2 | 86 | 0 | 0/0 | 0 | — |
 | ✅ | `.opencode/memory` | 90 | 1 | 49 | 0 | 0/0 | 0 | — |
 | ✅ | `.opencode/recommendations` | 90 | 1 | 158 | 0 | 0/0 | 0 | — |
@@ -346,12 +345,11 @@
 | ✅ | `.venv/Lib/site-packages/ratelimiter-1.2.0.post0.dist-info` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `.venv/Lib/site-packages/retry-0.9.2.dist-info` | 90 | 2 | 2 | 0 | 0/0 | 0 | — |
 | ✅ | `.venv/Lib/site-packages/schemas` | 90 | 25 | 711 | 0 | 0/0 | 0 | — |
-| ✅ | `.venv/Lib/site-packages/scipy` | 90 | 4 | 5996 | 0 | 0/0 | 0 | — |
 | ✅ | `.venv/Lib/site-packages/sklearn` | 90 | 1 | 43 | 0 | 0/0 | 0 | — |
+| ✅ | `.venv/Lib/site-packages/torch` | 90 | 1 | 2723 | 0 | 0/0 | 0 | — |
 | ✅ | `.venv/Lib/site-packages/urllib3` | 90 | 1 | 111 | 0 | 0/0 | 0 | — |
 | ✅ | `.venv/Lib/site-packages/werkzeug` | 90 | 1 | 345 | 0 | 0/0 | 0 | — |
 | ✅ | `.venv/Lib/site-packages/whisper` | 90 | 1 | 1741 | 0 | 0/0 | 0 | — |
-| ✅ | `.venv/Lib/site-packages/win32com` | 90 | 6 | 141 | 0 | 0/0 | 0 | — |
 | ✅ | `.venv/Lib/site-packages/yt_dlp` | 90 | 3 | 389 | 0 | 0/1 | 0 | — |
 | ✅ | `.venv/share/jupyter/kernels` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
 | ✅ | `.vscode/tasks` | 90 | 1 | 11 | 0 | 0/0 | 0 | — |
@@ -460,12 +458,12 @@
 | ✅ | `claude-mem/tests/worker/http` | 90 | 4 | 749 | 0 | 3/0 | 0 | — |
 | ✅ | `claude-mem/tests/worker/middleware` | 90 | 1 | 185 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/tests/worker/search` | 90 | 5 | 1961 | 0 | 3/0 | 0 | — |
-| ✅ | `deeds_labs/api-legacy/api/gpu-error-processor` | 90 | 2 | 610 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/api-legacy/api/gpu-final-processing` | 90 | 2 | 100 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/api-legacy/api/predictor` | 90 | 2 | 30 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/api-legacy/api/webgpu` | 90 | 2 | 12 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/api-legacy/api/workers` | 90 | 2 | 12 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-components` | 90 | 5 | 835 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/gpu-error-processor` | 90 | 2 | 610 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/gpu-final-processing` | 90 | 2 | 100 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/predictor` | 90 | 2 | 30 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/webgpu` | 90 | 2 | 12 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/routes-parked-full/api/workers` | 90 | 2 | 12 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/archived-components` | 90 | 1 | 143 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/binary` | 90 | 1 | 27 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/compression` | 90 | 1 | 521 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/demo` | 90 | 1 | 113 | 0 | 0/0 | 0 | — |
@@ -475,22 +473,16 @@
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/generated` | 90 | 8 | 16640 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/ingest` | 90 | 4 | 4 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/phase14` | 90 | 1 | 9 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/proto` | 90 | 8 | 136 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/push` | 90 | 1 | 112 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/stories` | 90 | 285 | 5130 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/taxonomy` | 90 | 3 | 336 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/telemetry` | 90 | 9 | 1614 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/ui` | 90 | 124 | 6485 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/vendor` | 90 | 3 | 75 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/vision` | 90 | 3 | 225 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-scripts/storybook` | 90 | 300 | 5340 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/ui` | 90 | 7 | 2003 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/websocket` | 90 | 1 | 129 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/websocket-client` | 90 | 1 | 177 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dev-routes/dashboard-phase14` | 90 | 3 | 171 | 0 | 3/0 | 0 | — |
+| ✅ | `deeds_labs/archived-dead-code/dev-routes/dashboard-phase14` | 90 | 1 | 137 | 0 | 1/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dev-routes/phase89` | 90 | 1 | 572 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/dev-routes/test-user-store` | 90 | 1 | 41 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/headless` | 90 | 4 | 64 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/orchestrated` | 90 | 2 | 218 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/phase99-stubs/canvas` | 90 | 6 | 396 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/route-stubs/health` | 90 | 1 | 13 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-lib/contracts` | 90 | 1 | 230 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-lib/validation` | 90 | 1 | 19 | 0 | 0/1 | 0 | — |
@@ -498,17 +490,14 @@
 | ✅ | `deeds_labs/archived-server-modules/connections` | 90 | 1 | 346 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-server-modules/context` | 90 | 1 | 191 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-server-modules/json` | 90 | 1 | 146 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/archived-server-modules/log-adapters` | 90 | 3 | 51 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-server-modules/logging` | 90 | 1 | 382 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/archived-server-modules/messaging` | 90 | 1 | 134 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-shims/lucide-shim` | 90 | 3 | 330 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-tsconfig-audits` | 90 | 7 | 1732 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/archived-type-shims` | 90 | 3 | 219 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/community-refs/gemma4-ocr/test_pdf` | 90 | 1 | 1696 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/components` | 90 | 1 | 622 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/components/headless` | 90 | 6 | 582 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/components` | 90 | 1 | 40 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/components-backup/.svelte-kit_generated` | 90 | 1 | 18 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-barrels` | 90 | 1 | 1681 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-barrels` | 90 | 1 | 680 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-barrels/components-ai-CaseScoringDashboard` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-barrels/components-ai-PatternDetectionInterface` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-barrels/components-Dialog` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
@@ -530,57 +519,64 @@
 | ✅ | `deeds_labs/dead-barrels/lib-db` | 90 | 1 | 9 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-barrels/lib-features-evidence-command-center` | 90 | 1 | 8 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-barrels/lib-schemas` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-barrels/server-pgai` | 90 | 3 | 21 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-barrels/stores-machines` | 90 | 3 | 75 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-barrels/utils-syntax-repair` | 90 | 4 | 212 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-barrels/utils-syntax-repair-patterns` | 90 | 2 | 258 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-barrels/yorha` | 90 | 4 | 468 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-proto/src-proto` | 90 | 7 | 23192 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-barrels/yorha` | 90 | 1 | 33 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-proto/src-proto` | 90 | 4 | 23168 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-scripts/src-mjs` | 90 | 4 | 4 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-scripts/storybook` | 90 | 12 | 1473 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-scripts/zombie-barrels` | 90 | 4 | 428 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-ui-components/alert` | 90 | 10 | 285 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-scripts/zombie-barrels` | 90 | 1 | 74 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-server-files` | 90 | 5 | 973 | 0 | 0/1 | 0 | — |
+| ✅ | `deeds_labs/dead-ui-components/alert` | 90 | 4 | 186 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-ui-components/checkbox` | 90 | 3 | 168 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-ui-components/command` | 90 | 10 | 476 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-ui-components/context-menu` | 90 | 9 | 443 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-ui-components/drawer` | 90 | 14 | 694 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-ui-components/dropdown-menu` | 90 | 13 | 427 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-ui-components/context-menu` | 90 | 6 | 236 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-ui-components/drawer` | 90 | 11 | 532 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-ui-components/dropdown-menu` | 90 | 7 | 166 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-ui-components/scroll-area` | 90 | 2 | 59 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-ui-components/separator` | 90 | 4 | 77 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-ui-components/slider` | 90 | 5 | 696 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-ui-components/switch` | 90 | 4 | 237 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-ui-components/toast` | 90 | 6 | 417 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-ui-components/separator` | 90 | 1 | 2 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-ui-components/slider` | 90 | 2 | 210 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-ui-components/switch` | 90 | 1 | 153 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-ui-components/toast` | 90 | 3 | 144 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-ui-components/tooltip` | 90 | 8 | 454 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead_code/contradictionEngine` | 90 | 6 | 1952 | 0 | 0/4 | 0 | — |
-| ✅ | `deeds_labs/dead_code/contradictionEngine/extractors` | 90 | 7 | 159 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/dead_code/contradictionEngine/integration` | 90 | 6 | 156 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead_code/contradictionEngine/llm` | 90 | 4 | 146 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead_code/contradictionEngine/mcp` | 90 | 3 | 87 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead_code/contradictionEngine/semantic` | 90 | 6 | 189 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead_code/contradictionEngine/timeline` | 90 | 15 | 522 | 0 | 0/3 | 0 | — |
-| ✅ | `deeds_labs/dead_code/duplicate-vector-files` | 90 | 4 | 277 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead_code/src-lib/icons` | 90 | 8 | 224 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead_code/src-lib/logging` | 90 | 6 | 298 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead_code/src-lib/validation` | 90 | 2 | 658 | 0 | 0/2 | 0 | — |
-| ✅ | `deeds_labs/dead_code/src-lib/yorha` | 90 | 10 | 1750 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/docs/enhanced-reference` | 90 | 5 | 1122 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead_code/contradictionEngine/extractors` | 90 | 1 | 57 | 0 | 0/1 | 0 | — |
+| ✅ | `deeds_labs/dead_code/contradictionEngine/llm` | 90 | 1 | 44 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead_code/duplicate-vector-files` | 90 | 1 | 217 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/icons` | 90 | 4 | 52 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/logging` | 90 | 2 | 14 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/validation` | 90 | 2 | 658 | 0 | 0/2 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/yorha` | 90 | 2 | 346 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/docs/enhanced-reference` | 90 | 2 | 297 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/embedding-duplicates-2026-03-09` | 90 | 1 | 217 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/frontend/command-center-original` | 90 | 2 | 1366 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/features-archive/demos` | 90 | 3 | 336 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/features-archive/memory` | 90 | 3 | 1269 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/features-archive/search` | 90 | 7 | 782 | 0 | 0/3 | 0 | — |
+| ✅ | `deeds_labs/frontend/corrupted-demos` | 90 | 1 | 184 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/frontend/features-archive/search` | 90 | 1 | 59 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/frontend/orphaned-components/evidence-card-variants` | 90 | 3 | 842 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/orphaned-components/rag-stubs` | 90 | 89 | 1424 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/services/archived-dead-files/stubs-legal` | 90 | 89 | 1424 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/frontend/ssr-disable-archive` | 90 | 3 | 34 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/svelte4-archive/cache` | 90 | 4 | 136 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/services/development-tools/dead-cache` | 90 | 16 | 4668 | 0 | 0/3 | 0 | — |
 | ✅ | `deeds_labs/frontend/svelte4-archive/client` | 90 | 2 | 360 | 0 | 0/2 | 0 | — |
-| ✅ | `deeds_labs/frontend/svelte4-archive/db` | 90 | 3 | 1308 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/svelte4-archive/features` | 90 | 3 | 78 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/frontend/svelte4-archive/forms` | 90 | 1 | 422 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/frontend/svelte4-archive/routing` | 90 | 1 | 188 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/svelte4-archive/services` | 90 | 2 | 366 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/svelte4-archive/shims` | 90 | 6 | 63 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/frontend/svelte4-archive/utils` | 90 | 3 | 1011 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/phantom-code-lab` | 90 | 12 | 3597 | 0 | 0/4 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/components-orphans` | 90 | 28 | 6282 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16-orphans/components` | 90 | 12 | 780 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/orphan-consolidation-2026-03-29/ui-bits-wrappers` | 90 | 10 | 1947 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/orphan-consolidation-2026-03-29/ui-dead-barrels` | 90 | 3 | 228 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/error-brain` | 90 | 5 | 339 | 0 | 0/1 | 0 | — |
+| ✅ | `deeds_labs/services/archived-unreachable` | 90 | 1 | 2829 | 0 | 0/3 | 0 | — |
+| ✅ | `deeds_labs/services/archived-unreachable/machines` | 90 | 7 | 2803 | 0 | 0/3 | 0 | — |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/machines-orphans-2026-03-09` | 90 | 4 | 1248 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16-orphans/messaging` | 90 | 4 | 1033 | 0 | 0/4 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/middleware` | 90 | 12 | 3456 | 0 | 3/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/modules` | 90 | 7 | 1995 | 0 | 0/7 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/optimization` | 90 | 4 | 343 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/orchestration` | 90 | 4 | 1139 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/services/archived-dead-files/zero-importer-server` | 90 | 15 | 4290 | 0 | 0/12 | 0 | — |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/schema` | 90 | 3 | 12 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/services/archived-dead-files/phase1-consolidation` | 90 | 10 | 1196 | 0 | 0/4 | 0 | — |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/dead-stores-2026-03-09` | 90 | 23 | 2233 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/types-orphans-2026-03-09` | 90 | 75 | 10200 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/services/development-tools/vite-tooling` | 90 | 6 | 1254 | 0 | 0/6 | 0 | — |
+| ✅ | `sveltekit-frontend/test-results` | 90 | 3 | 916 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/unsloth-training/COLAB_PACKAGE/training-datasets` | 90 | 3 | 297 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/frontend/xstate-archive` | 90 | 3 | 837 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/infra/cuda-binaries/cmake-cuda-qlora-trainer` | 90 | 1 | 18 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/infra/cuda-binaries/cpp-ast-exporter` | 90 | 1 | 27 | 0 | 0/0 | 0 | — |
@@ -594,42 +590,27 @@
 | ✅ | `deeds_labs/lib-dead-directories/animations/animations` | 90 | 3 | 69 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/ast` | 90 | 9 | 3072 | 0 | 0/4 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/compat` | 90 | 2 | 240 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/core` | 90 | 5 | 239 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/core` | 90 | 2 | 140 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/errors` | 90 | 1 | 285 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/optimization` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/orchestration` | 90 | 1 | 32 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/rabbitmq` | 90 | 1 | 91 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/registry` | 90 | 2 | 582 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/routing` | 90 | 2 | 164 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16-audit/phase72` | 90 | 1 | 5 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16-audit/shared` | 90 | 6 | 476 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/shared` | 90 | 7 | 508 | 0 | 0/2 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16-orphans/client` | 90 | 4 | 434 | 0 | 0/2 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16-orphans/client-ui` | 90 | 1 | 61 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16-orphans/components` | 90 | 4 | 128 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16-orphans/messaging` | 90 | 1 | 700 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/cache-orphans` | 90 | 3 | 407 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/components-orphans` | 90 | 13 | 2076 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/dashboard` | 90 | 1 | 68 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/error-brain` | 90 | 2 | 246 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/error-brain/transport` | 90 | 4 | 80 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/errors` | 90 | 1 | 286 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/middleware` | 90 | 3 | 111 | 0 | 0/3 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/modules` | 90 | 3 | 1419 | 0 | 0/3 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/moogle/moogle` | 90 | 3 | 108 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/orchestration` | 90 | 9 | 174 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/rabbitmq` | 90 | 1 | 92 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/routing` | 90 | 6 | 1227 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/schema-orphans` | 90 | 3 | 241 | 0 | 0/3 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/state` | 90 | 1 | 603 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/storage/storage` | 90 | 3 | 45 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/themes` | 90 | 1 | 403 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/vite` | 90 | 2 | 454 | 0 | 0/6 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/vite/vite` | 90 | 4 | 38 | 0 | 0/4 | 0 | — |
+| ✅ | `deeds_labs/lib-dead-directories/vite` | 90 | 2 | 416 | 0 | 0/2 | 0 | — |
 | ✅ | `deeds_labs/lib-dead-directories/wasm` | 90 | 1 | 658 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/orphan-consolidation-2026-03-29/legal-ai-tests` | 90 | 6 | 995 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/orphan-consolidation-2026-03-29/server-adapters` | 90 | 4 | 117 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/orphan-consolidation-2026-03-29/ui-bits-wrappers` | 90 | 1 | 489 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/phantom-code-lab` | 90 | 6 | 1356 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/projects/agentic-error-resolution/errors` | 90 | 2 | 14 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/projects/agentic-error-resolution/logs` | 90 | 2 | 21 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/projects/agentic-error-resolution/reports` | 90 | 2 | 31 | 0 | 0/0 | 0 | — |
@@ -637,7 +618,7 @@
 | ✅ | `deeds_labs/projects/legacy-projects/ace_runs` | 90 | 1 | 1118 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/projects/legacy-projects/archive` | 90 | 2 | 46 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/projects/legacy-projects/context7` | 90 | 1 | 120 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/projects/legacy-projects/context7-docs` | 90 | 12 | 866 | 0 | 0/1 | 0 | — |
+| ✅ | `deeds_labs/projects/legacy-projects/context7-docs` | 90 | 9 | 665 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/projects/legacy-projects/data` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/projects/legacy-projects/datasets` | 90 | 1 | 6 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/projects/legacy-projects/error-analysis` | 90 | 1 | 25743 | 0 | 0/0 | 0 | — |
@@ -753,29 +734,17 @@
 | ✅ | `deeds_labs/routes-parked-full/_yorha_legacy/terminal` | 90 | 1 | 72 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/routes-parked-full/_yorha_legacy/timeline` | 90 | 2 | 30 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/services/archived-client-lib/machines-tests` | 90 | 4 | 181 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/archived-dead-files/cache` | 90 | 7 | 1965 | 0 | 0/5 | 0 | — |
-| ✅ | `deeds_labs/services/archived-dead-files/phase1-consolidation` | 90 | 2 | 800 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/archived-dead-workers` | 90 | 1 | 164 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/services/archived-machines` | 90 | 1 | 1373 | 0 | 0/2 | 0 | — |
 | ✅ | `deeds_labs/services/archived-machines/xstate-dead` | 90 | 2 | 464 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/services/archived-unreachable` | 90 | 1 | 26 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/development-tools/ast-analysis` | 90 | 3 | 623 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/services/development-tools/dead-cache` | 90 | 4 | 2324 | 0 | 0/3 | 0 | — |
-| ✅ | `deeds_labs/services/development-tools/syntax-repair` | 90 | 1 | 607 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/gpu` | 90 | 18 | 5021 | 0 | 0/3 | 0 | — |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/ai` | 90 | 5 | 527 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/cache` | 90 | 1 | 8 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/database` | 90 | 1 | 180 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/dead-stores-2026-03-09` | 90 | 7 | 1196 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/dead-types-2026-03-09` | 90 | 1 | 34 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/machines-orphans-2026-03-09` | 90 | 1 | 213 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/ollama` | 90 | 1 | 41 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/phase72-adapters-orphans-2026-03-09` | 90 | 2 | 388 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/qdrant-duplicates-2026-03-09` | 90 | 8 | 1490 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/queue` | 90 | 2 | 387 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/types-orphans-2026-03-09` | 90 | 6 | 1335 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/vector` | 90 | 3 | 1221 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/snapshots/2026-03-15-root/configs` | 90 | 44 | 16528 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/snapshots/2026-03-15-v1/types-dead` | 90 | 6 | 803 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/snapshots/2026-03-15-v1/types-dead` | 90 | 2 | 519 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/snapshots/2026-03-15-v2/ts-root` | 90 | 1 | 100 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/stores-reference/svelte4_stores` | 90 | 28 | 3362 | 0 | 0/5 | 0 | — |
 | ✅ | `deeds_labs/unwired-features-archive-2026-05-05` | 90 | 1 | 548 | 0 | 0/1 | 0 | — |
@@ -784,23 +753,26 @@
 | ✅ | `docker/seaweedfs` | 90 | 2 | 82 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/ai-os` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/atlas` | 90 | 5 | 102285 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/graph` | 90 | 22 | 651246 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports` | 90 | 37 | 75615 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/graph` | 90 | 23 | 913716 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports` | 90 | 37 | 75779 | 0 | 0/0 | 0 | — |
 | ✅ | `drizzle/meta` | 90 | 4 | 4562 | 0 | 0/0 | 0 | — |
 | ✅ | `logs/ace-context-cache` | 90 | 1 | 3 | 0 | 0/0 | 0 | — |
 | ✅ | `logs/claude-mem` | 90 | 1 | 18 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/clusters` | 90 | 7 | 7 | 0 | 0/0 | 0 | — |
-| ✅ | `memory/exports` | 90 | 1 | 8 | 0 | 0/0 | 0 | — |
-| ✅ | `memory/graph` | 90 | 1 | 776 | 0 | 0/0 | 0 | — |
-| ✅ | `memory/knowledge` | 90 | 6 | 681 | 0 | 0/0 | 0 | — |
+| ✅ | `memory/exports` | 90 | 1 | 40 | 0 | 0/0 | 0 | — |
+| ✅ | `memory/graph` | 90 | 1 | 782 | 0 | 0/0 | 0 | — |
+| ✅ | `memory/graphify/deep` | 90 | 1 | 663970 | 0 | 0/0 | 0 | — |
+| ✅ | `memory/knowledge` | 90 | 6 | 1440 | 0 | 0/0 | 0 | — |
 | ✅ | `minio-data/.minio.sys` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `models/embeddinggemma_300m` | 90 | 22 | 7344812 | 0 | 0/0 | 0 | — |
+| ✅ | `models/embeddinggemma_300m` | 90 | 6 | 100 | 0 | 0/0 | 0 | — |
 | ✅ | `models/embeddinggemma_300m/1_Pooling` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `models/embeddinggemma_300m/2_Dense` | 90 | 1 | 6 | 0 | 0/0 | 0 | — |
 | ✅ | `models/embeddinggemma_300m/3_Dense` | 90 | 1 | 6 | 0 | 0/0 | 0 | — |
-| ✅ | `models/embeddinggemma_300m_onnx` | 90 | 4 | 2379668 | 0 | 0/0 | 0 | — |
-| ✅ | `models/gemma3-client-onnx` | 90 | 9 | 2482399 | 0 | 0/0 | 0 | — |
-| ✅ | `models/gemma3_270m` | 90 | 5 | 4810631 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/static/embeddinggemma_300m_onnx` | 90 | 19 | 7344742 | 0 | 0/0 | 0 | — |
+| ✅ | `models/embeddinggemma_300m_onnx` | 90 | 1 | 2379638 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/static/gemma3_270m_onnx` | 90 | 10 | 4862010 | 0 | 0/0 | 0 | — |
+| ✅ | `models/gemma3-client-onnx` | 90 | 1 | 2379611 | 0 | 0/0 | 0 | — |
+| ✅ | `models/gemma3_270m` | 90 | 3 | 51409 | 0 | 0/0 | 0 | — |
 | ✅ | `models/xgboost-hotness` | 90 | 1 | 780 | 0 | 0/0 | 0 | — |
 | ✅ | `next_steps/active` | 90 | 2 | 464350 | 0 | 0/0 | 0 | — |
 | ✅ | `qdrant-windows/qdrant_storage` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
@@ -822,6 +794,7 @@
 | ✅ | `scripts/error-resolution/tests` | 90 | 12 | 5436 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/eval/data` | 90 | 2 | 328 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/graph` | 90 | 6 | 1178 | 0 | 0/4 | 0 | — |
+| ✅ | `scripts/lib` | 90 | 2 | 200 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/logs/task-output/pipeline-test` | 90 | 18 | 21648 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/mapreduce` | 90 | 4 | 176 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/memory` | 90 | 2 | 574460 | 0 | 0/2 | 0 | — |
@@ -932,17 +905,17 @@
 | ✅ | `sveltekit-frontend/.venv_turbovec/Lib/site-packages` | 90 | 1 | 7857 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/config` | 90 | 1 | 131 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/deeds_labs/archived/phase72` | 90 | 1 | 41 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/docs` | 90 | 1 | 4234225 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 4 | 144000 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 19 | 4077461 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 19 | 4080996 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/obsidian-vault` | 90 | 2 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports` | 90 | 21 | 9059 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive` | 90 | 84 | 3001137 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive/components` | 90 | 6 | 3640 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive` | 90 | 84 | 2997497 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/introspected/meta` | 90 | 2 | 17338 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/meta` | 90 | 25 | 469316 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/meta_backup_20260101` | 90 | 10 | 32129 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/logs` | 90 | 1 | 98319 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/logs/ace-context-cache` | 90 | 4 | 56 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/logs` | 90 | 1 | 98689 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/logs/ace-context-cache` | 90 | 4 | 426 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/logs/ace-cuda-rnn-reranker` | 90 | 1 | 16 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/logs/ace-intent-reward` | 90 | 1 | 227 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/logs/ace-intent-synthesis` | 90 | 1 | 80 | 0 | 0/0 | 0 | — |
@@ -963,7 +936,7 @@
 | ✅ | `sveltekit-frontend/memory/codebase` | 90 | 2 | 35582 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/datasets/legal-contracts` | 90 | 2 | 12 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/docstore` | 90 | 1 | 34 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/exports` | 90 | 4 | 2096 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/exports` | 90 | 4 | 2092 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/exports/xgboost-hotness` | 90 | 1 | 780 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/features` | 90 | 3 | 623 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/graph` | 90 | 1 | 3480 | 0 | 0/0 | 0 | — |
@@ -1100,7 +1073,7 @@
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-12T19-48-04` | 90 | 1 | 45 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-03-16` | 90 | 9 | 8959 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-06-14` | 90 | 1 | 95 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-06-59` | 90 | 84 | 4159671 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-06-59` | 90 | 100 | 5051527 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-15T21-39-17` | 90 | 68 | 47090 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-17T00-26-41` | 90 | 41 | 980942 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-17T01-26-59` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
@@ -1167,16 +1140,32 @@
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-20T21-28-24` | 90 | 13 | 5184 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-21T22-17-08` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-21T22-18-05` | 90 | 6 | 3059 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-22T01-44-37` | 90 | 25 | 289830 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-22T01-44-37` | 90 | 41 | 793798 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-22T13-23-31` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-22T13-24-30` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-23T02-44-53` | 90 | 10 | 3805 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-24T16-28-25` | 90 | 16 | 5812 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-24T16-28-25` | 90 | 32 | 9028 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-24T23-07-15` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-24T23-09-00` | 90 | 6 | 3205 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-26T17-32-25` | 90 | 8 | 3174 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-26T17-32-26` | 90 | 6 | 3255 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-27T19-37-18` | 90 | 9 | 3538 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-00-27` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-01-53` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-16-15` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-17-36` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-09-19` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-11-06` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-14-58` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-15-48` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-38-52` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-40-05` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-46-36` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-47-57` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-59-03` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-00-23` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-05-46` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-07-17` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/synthesis` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/mini_active_nvme_cache` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/reports` | 90 | 6 | 245755 | 0 | 0/0 | 0 | — |
@@ -1241,6 +1230,7 @@
 | ✅ | `sveltekit-frontend/scripts/export` | 90 | 1 | 112 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/features` | 90 | 6 | 358 | 0 | 0/4 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/health` | 90 | 1 | 241 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/ingest` | 90 | 1 | 137 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/legal` | 90 | 2 | 135 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/lib` | 90 | 1 | 67 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/llms` | 90 | 5 | 1472 | 0 | 0/3 | 0 | — |
@@ -1272,7 +1262,6 @@
 | ✅ | `sveltekit-frontend/src/lib/courtroom` | 90 | 4 | 1561 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/env` | 90 | 2 | 27 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/features` | 90 | 6 | 546 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/gpu` | 90 | 16 | 4731 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/graph` | 90 | 1 | 54 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/icons` | 90 | 15 | 572 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/machines` | 90 | 11 | 4093 | 0 | 0/1 | 0 | — |
@@ -1281,7 +1270,6 @@
 | ✅ | `sveltekit-frontend/src/lib/phase72` | 90 | 1 | 148 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/schemas` | 90 | 12 | 1018 | 0 | 0/4 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/services` | 90 | 5 | 704 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/shared` | 90 | 1 | 32 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/shims` | 90 | 10 | 1230 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/state` | 90 | 1 | 8 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/stores` | 90 | 25 | 4832 | 0 | 0/6 | 0 | — |
@@ -1306,7 +1294,6 @@
 | ✅ | `sveltekit-frontend/static/wasm` | 90 | 8 | 1123 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/.docker-build` | 90 | 3 | 21 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/.tmp` | 90 | 2 | 28 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/test-results` | 90 | 1 | 908 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/accessibility` | 90 | 2 | 557 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/e2e` | 90 | 30 | 9084 | 0 | 10/3 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/e2e/route-forensic` | 90 | 35 | 1750 | 0 | 4/0 | 0 | — |
@@ -1332,58 +1319,64 @@
 | ✅ | `turbovec/target/release/.fingerprint` | 90 | 308 | 308 | 0 | 0/0 | 0 | — |
 | ✅ | `vscode-extension/media` | 90 | 1 | 391 | 0 | 0/0 | 0 | — |
 | ✅ | `vscode-extension/workers` | 90 | 1 | 51 | 0 | 0/1 | 0 | — |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/stubs-orphans-2026-03-09` | 93 | 25 | 1695 | 0 | 0/0 | 2 | — |
 | ✅ | `deeds_labs/routes-parked-full/(ai)_disabled/ai-rag` | 93 | 2 | 64 | 0 | 1/0 | 1 | — |
 | ✅ | `deeds_labs/routes-parked-full/interactive-canvas` | 93 | 4 | 248 | 0 | 2/0 | 2 | — |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/stubs-orphans-2026-03-09` | 93 | 9 | 627 | 0 | 0/0 | 2 | — |
 | ✅ | `claude-mem/plugin` | 95 | 2 | 24717 | 0 | 2/10 | 0 | 🟠lh |
 | ✅ | `claude-mem/plugin/scripts` | 95 | 9 | 23096 | 0 | 2/8 | 0 | 🟠lh |
 | ✅ | `deeds_labs/dead-configs` | 95 | 13 | 272 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `deeds_labs/dead-scripts/root-scripts` | 95 | 69 | 7532 | 0 | 0/6 | 0 | 🟠lh |
-| ✅ | `deeds_labs/frontend/features-archive/ai` | 95 | 25 | 5337 | 0 | 0/13 | 0 | 🟠lh |
-| ✅ | `deeds_labs/frontend/svelte4-archive/lib-archives` | 95 | 111 | 11763 | 0 | 0/29 | 0 | 🟠lh |
-| ✅ | `deeds_labs/lib-archive/corrupted-files-feb-8-2026` | 95 | 12 | 2925 | 0 | 0/2 | 0 | 🟠lh |
+| ✅ | `deeds_labs/lib-archive/corrupted-files-feb-8-2026` | 95 | 17 | 7640 | 0 | 0/7 | 0 | 🟠lh |
 | ✅ | `deeds_labs/projects/evidence-service` | 95 | 4 | 8665 | 0 | 1/8 | 0 | 🟠lh |
 | ✅ | `deeds_labs/projects/evidence-service/src` | 95 | 29 | 2804 | 0 | 1/8 | 0 | 🟠lh |
 | ✅ | `deeds_labs/projects/legacy-projects/jstests` | 95 | 4 | 1324 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `deeds_labs/services/ts-consolidation-archive/embedding-duplicates-2026-03-09` | 95 | 5 | 876 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `scripts/agent` | 95 | 6 | 1154 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/docs-atlas` | 95 | 24 | 3754 | 0 | 0/10 | 0 | 🟠lh |
-| ✅ | `scripts/ingest` | 95 | 36 | 4584 | 0 | 0/30 | 0 | 🟠lh |
+| ✅ | `scripts/ingest` | 95 | 44 | 4926 | 0 | 0/32 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/.docker-build` | 95 | 2 | 45750 | 0 | 2/66 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/.docker-build/scripts/atlas` | 95 | 92 | 14474 | 0 | 2/66 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scratch` | 95 | 46 | 7043 | 0 | 0/2 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/atlas` | 95 | 12 | 1618 | 0 | 0/7 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/atlas` | 95 | 13 | 1745 | 0 | 0/8 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/graph` | 95 | 12 | 2899 | 0 | 1/8 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/index` | 95 | 10 | 807 | 0 | 0/7 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/smoke` | 95 | 27 | 3867 | 0 | 0/11 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/mcp` | 95 | 14 | 4028 | 0 | 0/8 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/smoke` | 95 | 27 | 3924 | 0 | 0/11 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/startup` | 95 | 11 | 1762 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/tests` | 95 | 70 | 14656 | 0 | 4/24 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/mcp` | 95 | 16 | 16292 | 0 | 1/21 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/src` | 99 | 16 | 699945 | 733 | 1151/976 | 12 | 🟠lh ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes` | 99 | 6 | 231974 | 728 | 1135/602 | 1 | 🟠lh ⬜notest |
 | ✅ | `.claude/hooks` | 100 | 2 | 164 | 0 | 0/2 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code` | 100 | 35 | 47950 | 1 | 6/17 | 7 | 🟠lh |
-| ✅ | `deeds_labs/archived-dead-code/auth` | 100 | 8 | 533 | 0 | 2/0 | 0 | — |
+| ✅ | `.opencode/tools` | 100 | 3 | 273 | 0 | 0/3 | 0 | — |
+| ✅ | `deeds_labs/frontend/sveltekit-frontend-archive/dirs` | 100 | 827 | 137364 | 8 | 3/86 | 32 | 🟡sv4 🟠lh |
+| ✅ | `deeds_labs/archived-dead-code` | 100 | 8 | 28833 | 1 | 4/9 | 4 | 🟠lh |
+| ✅ | `deeds_labs/archived-dead-code/auth` | 100 | 5 | 350 | 0 | 2/0 | 0 | — |
 | ✅ | `deeds_labs/archived-dead-code/db` | 100 | 3 | 260 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/dead-lib-dirs/phase78` | 100 | 2 | 96 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/services/ts-consolidation-archive` | 100 | 81 | 91204 | 4 | 10/88 | 69 | 🟡sv4 🟠lh |
+| ✅ | `deeds_labs/dead-scripts` | 100 | 26 | 185968 | 10 | 11/219 | 48 | 🟠lh |
 | ✅ | `deeds_labs/archived-dead-code/dev-routes/verify-drizzle` | 100 | 2 | 35 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/archived-dead-code/sprint2-2026-03-15` | 100 | 13 | 908 | 0 | 1/0 | 0 | — |
-| ✅ | `deeds_labs/db-schema-archive` | 100 | 56 | 2584 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-orphans-2026-04-06` | 100 | 9 | 1652 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/dead-scripts` | 100 | 26 | 193495 | 10 | 11/219 | 48 | 🟠lh |
+| ✅ | `deeds_labs/archived-dead-code/sprint2-2026-03-15` | 100 | 4 | 524 | 0 | 1/0 | 0 | — |
+| ✅ | `deeds_labs/db-schema-archive` | 100 | 5 | 744 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src` | 100 | 16 | 705893 | 733 | 1157/984 | 12 | 🟠lh ⬜notest |
+| ✅ | `sveltekit-frontend/src/lib` | 100 | 6 | 452422 | 5 | 14/357 | 11 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 1011 | 233275 | 5 | 11/271 | 4 | — |
+| ✅ | `deeds_labs/services/development-tools/syntax-repair` | 100 | 18 | 8035 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-orphans-2026-04-06` | 100 | 3 | 1025 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/dead-scripts/phase-scripts` | 100 | 721 | 167585 | 9 | 9/199 | 47 | 🟠lh |
-| ✅ | `deeds_labs/dead-scripts/syntax-repair` | 100 | 15 | 14093 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/dead-scripts/syntax-repair/patterns` | 100 | 27 | 8444 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-scripts/syntax-repair` | 100 | 3 | 3053 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/dead-scripts/syntax-repair/patterns` | 100 | 3 | 1676 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds_labs/dead-scripts/utils-mjs` | 100 | 80 | 89 | 1 | 2/13 | 1 | — |
-| ✅ | `deeds_labs/dead-server-files` | 100 | 8 | 988 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/dead_code/dead-chains` | 100 | 8 | 4290 | 0 | 0/6 | 0 | — |
-| ✅ | `deeds_labs/dead_code/dead-chains/workflows` | 100 | 9 | 1733 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/dead_code/duplicate-embedding-auth` | 100 | 19 | 1495 | 0 | 0/3 | 0 | — |
-| ✅ | `deeds_labs/frontend/svelte4-archive/server` | 100 | 9 | 1680 | 0 | 0/2 | 0 | — |
+| ✅ | `deeds_labs/dead_code` | 100 | 1 | 3279 | 0 | 0/4 | 0 | — |
+| ✅ | `deeds_labs/dead_code/dead-chains` | 100 | 2 | 2085 | 0 | 0/3 | 0 | — |
+| ✅ | `deeds_labs/dead_code/dead-chains/workflows` | 100 | 3 | 1055 | 0 | 0/1 | 0 | — |
+| ✅ | `deeds_labs/dead_code/duplicate-embedding-auth` | 100 | 9 | 838 | 0 | 0/0 | 0 | — |
+| ✅ | `deeds_labs/frontend/features-archive/ai` | 100 | 1 | 537 | 0 | 0/1 | 0 | — |
+| ✅ | `deeds_labs/frontend/svelte4-archive/server` | 100 | 3 | 642 | 0 | 0/2 | 0 | — |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/superseded-2026-03-09` | 100 | 88 | 20756 | 1 | 1/22 | 10 | 🟠lh |
+| ✅ | `deeds_labs/services/ts-consolidation-archive/dead-types-2026-03-09` | 100 | 16 | 3601 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts` | 100 | 362 | 191128 | 16 | 26/411 | 36 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/phase104-backups/src` | 100 | 431 | 47364 | 14 | 10/112 | 36 | 🟠lh |
 | ✅ | `deeds_labs/lib-dead-directories/batch-2026-03-16/performance` | 100 | 1 | 138 | 0 | 0/1 | 0 | — |
-| ✅ | `deeds_labs/lib-dead-directories/performance` | 100 | 3 | 51 | 0 | 0/3 | 0 | — |
 | ✅ | `deeds_labs/projects/agentic-error-resolution/fixed` | 100 | 243 | 102256 | 1 | 0/28 | 23 | 🟡sv4 🟠lh |
-| ✅ | `deeds_labs/routes-parked-full` | 100 | 1 | 53625 | 5 | 17/26 | 58 | 🟡sv4 🟠lh |
 | ✅ | `deeds_labs/routes-parked-full/(auth)_disabled` | 100 | 2 | 936 | 0 | 1/0 | 0 | — |
 | ✅ | `deeds_labs/routes-parked-full/(auth)_disabled/profile` | 100 | 2 | 557 | 0 | 1/0 | 0 | — |
 | ✅ | `deeds_labs/routes-parked-full/auth/login` | 100 | 5 | 382 | 1 | 1/1 | 0 | — |
@@ -1393,36 +1386,29 @@
 | ✅ | `deeds_labs/routes-parked-full/login` | 100 | 2 | 219 | 0 | 0/1 | 0 | — |
 | ✅ | `deeds_labs/routes-parked-full/saved-citations` | 100 | 2 | 33 | 0 | 1/1 | 0 | — |
 | ✅ | `deeds_labs/routes-parked-full/system-dashboard` | 100 | 2 | 51 | 0 | 1/0 | 0 | — |
-| ✅ | `deeds_labs/services/ts-consolidation-archive` | 100 | 26 | 44937 | 1 | 4/49 | 36 | 🟠lh |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/broken-import-orphans-2026-03-09` | 100 | 4 | 554 | 0 | 0/0 | 0 | — |
-| ✅ | `deeds_labs/services/ts-consolidation-archive/superseded-2026-03-09` | 100 | 67 | 16718 | 1 | 1/22 | 7 | 🟠lh |
-| ✅ | `deeds_labs/snapshots/2026-03-10/bucket-c-stale` | 100 | 529 | 280075 | 3 | 14/83 | 335 | 🔴ssr 🟡sv4 🟠lh |
+| ✅ | `scripts/tests` | 100 | 125 | 86346 | 2 | 4/15 | 0 | 🟠lh |
 | ✅ | `deeds_labs/snapshots/2026-03-15-root/node-scripts` | 100 | 71 | 11610 | 1 | 3/8 | 1 | 🟠lh |
-| ✅ | `scripts/atlas` | 100 | 218 | 53902 | 5 | 0/110 | 2 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/lib/types` | 100 | 26 | 3447 | 0 | 0/5 | 0 | — |
+| ✅ | `scripts/atlas` | 100 | 222 | 54322 | 5 | 0/114 | 2 | 🟠lh |
 | ✅ | `scripts/atlas/lib` | 100 | 33 | 4992 | 3 | 0/12 | 0 | 🟠lh |
 | ✅ | `scripts/db-tests` | 100 | 12 | 560 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/graphify` | 100 | 8 | 772 | 0 | 0/4 | 0 | — |
-| ✅ | `scripts/tests` | 100 | 122 | 84462 | 2 | 4/12 | 0 | 🟠lh |
 | ✅ | `src/lib/schema` | 100 | 1 | 17 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/db` | 100 | 3 | 102 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/graph` | 100 | 2 | 153 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/.tmp` | 100 | 19 | 121241 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/.tmp` | 100 | 20 | 121252 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.tmp/mega-audit` | 100 | 9 | 114837 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/schema` | 100 | 1 | 311 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts` | 100 | 362 | 186636 | 14 | 26/384 | 36 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/docs` | 100 | 1 | 224 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/kb` | 100 | 16 | 3802 | 0 | 1/10 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/knowledge` | 100 | 20 | 3138 | 0 | 0/19 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/mapreduce` | 100 | 2 | 549 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/phase104-backups/src` | 100 | 383 | 43530 | 12 | 10/88 | 36 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/screenshots` | 100 | 3 | 695 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/validate` | 100 | 2 | 1539 | 0 | 1/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib` | 100 | 6 | 446506 | 5 | 14/350 | 11 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/lib/data` | 100 | 5 | 1687 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/db` | 100 | 12 | 2542 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/intent` | 100 | 1 | 239 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 997 | 232148 | 5 | 11/268 | 4 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/lib/types` | 100 | 22 | 3163 | 0 | 0/5 | 0 | — |
+| ✅ | `sveltekit-frontend/src/routes` | 100 | 6 | 232006 | 728 | 1141/603 | 1 | 🟠lh ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/(app)` | 100 | 424 | 108231 | 4 | 424/44 | 0 | 🟠lh ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/admin` | 100 | 4 | 2702 | 0 | 2/2 | 0 | ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/atlas` | 100 | 2 | 432 | 0 | 0/1 | 0 | ⬜notest |
@@ -1484,8 +1470,8 @@
 | `sveltekit-frontend/api/wiki/watch/+server.ts` | GET, POST, DELETE | ✅ | ❌ | ❌ |
 | `sveltekit-frontend/(app)/admin/api-testing/agentic-loop/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/(app)/evidence/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/ace/packet/+server.ts` | POST, GET | ❌ | ✅ | ✅ |
-| `sveltekit-frontend/api/ace/stream/+server.ts` | POST, GET | ❌ | ✅ | ✅ |
+| `sveltekit-frontend/api/ace/packet/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/ace/stream/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/atlas/cache/+server.ts` | GET, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/grpo/flush/+server.ts` | GET, POST | ✅ | ✅ | ❌ |
 | `sveltekit-frontend/api/admin/model/validate-checkpoint/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
@@ -1506,7 +1492,7 @@ _…and 673 more. See `codebase-graph.json` for full list._
 
 ---
 
-## G4 — API Routes Missing Auth Guard (35)
+## G4 — API Routes Missing Auth Guard (29)
 - `src/routes/api/ace/ask/+server.ts` · POST
 - `src/routes/api/atlas/studio/cards/+server.ts` · GET
 - `src/routes/api/atlas/studio/cards/[id]/+server.ts` · GET
@@ -1517,11 +1503,8 @@ _…and 673 more. See `codebase-graph.json` for full list._
 - `sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts` · GET
 - `sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/ace/ask/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/ace/packet/+server.ts` · POST/GET
-- `sveltekit-frontend/src/routes/api/ace/stream/+server.ts` · POST/GET
 - `sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/ai/scenario/+server.ts` · POST/GET
-- `sveltekit-frontend/src/routes/api/atlas/audit/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/atlas/cards/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts` · GET
@@ -1532,11 +1515,13 @@ _…and 673 more. See `codebase-graph.json` for full list._
 - `sveltekit-frontend/src/routes/api/auth/register/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/auth/reset-password/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/auth/session/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/chat/stream/+server.ts` · POST/GET
 - `sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/graphify/stream/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/health/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/ingestion/stream/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/memory/agent-observation/+server.ts` · POST
+- `sveltekit-frontend/src/routes/api/memory/claude-mem/import/+server.ts` · POST/GET
+- `sveltekit-frontend/src/routes/api/v1/query/+server.ts` · POST
 
 ---
 
@@ -1611,7 +1596,7 @@ _No unguarded SSR-unsafe globals. ✅_
 
 ---
 
-## G11 — Hardcoded Localhost References (1531 files)
+## G11 — Hardcoded Localhost References (1525 files)
 - `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatInterface.svelte` · http://localhost:11434, http://localhost:8000
 - `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/DocumentUploadSimulator.svelte` · http://localhost:8081, http://localhost:11434
 - `.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/Enhanced3DLegalAIInterface.svelte` · http://localhost:8000
@@ -1773,32 +1758,32 @@ _No unguarded SSR-unsafe globals. ✅_
 ## Top External Module Imports
 | Module | Consumer Count |
 |--------|----------------|
-| `@sveltejs/kit` | 5851 |
+| `@sveltejs/kit` | 5852 |
 | `$lib/types` | 4202 |
-| `path` | 2005 |
+| `path` | 2030 |
 | `$lib/types/enhanced-svelte5-types` | 1924 |
+| `fs` | 1651 |
 | `drizzle-orm` | 1634 |
-| `fs` | 1631 |
 | `svelte` | 1600 |
 | `vitest` | 1177 |
-| `zod` | 1057 |
+| `zod` | 1060 |
 | `svelte/store` | 1025 |
 | `$app/environment` | 945 |
-| `crypto` | 864 |
-| `node:path` | 805 |
-| `url` | 767 |
-| `node:fs` | 659 |
+| `crypto` | 870 |
+| `node:path` | 817 |
+| `url` | 769 |
+| `node:fs` | 673 |
 | `$lib/server/db` | 608 |
-| `child_process` | 587 |
-| `fs/promises` | 580 |
+| `child_process` | 593 |
+| `fs/promises` | 591 |
 | `$lib/server/db/client` | 554 |
 | `xstate` | 538 |
 | `lucide-svelte` | 534 |
-| `ioredis` | 514 |
+| `ioredis` | 516 |
 | `pg` | 502 |
 | `$lib/server/env.server.js` | 483 |
 | `$lib/components/ui/Button.svelte` | 444 |
-| `node:url` | 421 |
+| `node:url` | 434 |
 | `$lib/server/db/schema-postgres` | 402 |
 | `svelte/transition` | 368 |
 | `drizzle-orm/pg-core` | 364 |
@@ -1807,21 +1792,21 @@ _No unguarded SSR-unsafe globals. ✅_
 ---
 
 ## Directories with TODO/FIXME
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs` — 5840 marker(s), score 43
+- `deeds_labs/snapshots/2026-03-10/bucket-c-stale` — 6091 marker(s), score 43
 - `scripts/api-cleanup` — 674 marker(s), score 45
 - `scripts/api-cleanup/reports` — 672 marker(s), score 45
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z` — 668 marker(s), score 45
-- `deeds_labs/snapshots/2026-03-10/bucket-c-stale` — 335 marker(s), score 100
 - `deeds_labs/services/python-middleware/python_codebase` — 244 marker(s), score 78
-- `deeds_labs/api-legacy/api` — 74 marker(s), score 44
-- `deeds_labs/frontend/svelte4-archive` — 69 marker(s), score 74
-- `deeds_labs/frontend/svelte4-archive/components` — 67 marker(s), score 60
-- `deeds_labs/routes-parked-full` — 58 marker(s), score 100
+- `deeds_labs/routes-parked-full` — 129 marker(s), score 36
+- `docker/langgraph-synthesis/.venv/Lib` — 74 marker(s), score 65
+- `deeds_labs/routes-parked-full/api` — 71 marker(s), score 44
+- `deeds_labs/services/ts-consolidation-archive` — 69 marker(s), score 100
+- `deeds_labs/services/archived-dead-workers` — 60 marker(s), score 70
 - `deeds_labs/dead-scripts` — 48 marker(s), score 100
 - `deeds_labs/dead-scripts/phase-scripts` — 47 marker(s), score 100
 - `.svelte-error-fixes-backup/sveltekit-frontend/src/lib` — 45 marker(s), score 60
-- `.venv/Lib/site-packages/torch` — 42 marker(s), score 65
-- `deeds_labs/services/ts-consolidation-archive` — 36 marker(s), score 100
+- `deeds_labs/services/archived-dead-files` — 40 marker(s), score 80
+- `sveltekit-frontend/scripts` — 36 marker(s), score 100
 
 ---
 

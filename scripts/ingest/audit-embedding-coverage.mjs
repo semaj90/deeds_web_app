@@ -34,7 +34,8 @@ async function run() {
   for (const f of cardFiles) {
     const p = path.join(CARDS_DIR, f);
     const j = await readJsonSafe(p);
-    if (!j) continue;
+    // skip invalid JSON and index/array files (e.g., index.json)
+    if (!j || Array.isArray(j)) continue;
     const quarantined = j.metadata && j.metadata.quarantined === true;
     if (quarantined) continue;
     validNonQuarantined++;

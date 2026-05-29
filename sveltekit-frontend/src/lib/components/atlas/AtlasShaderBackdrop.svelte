@@ -82,7 +82,7 @@
 			const ctx = canvas.getContext('webgpu') as GPUCanvasContext | null;
 			if (!ctx) return false;
 
-			const format = navigator.gpu.getPreferredCanvasFormat();
+			const format = navigator.gpu.getPreferredCanvasFormat() as GPUTextureFormat;
 			ctx.configure({ device, format, alphaMode: 'opaque' });
 
 			// Minimal fullscreen triangle shader — NES phosphor green tint
@@ -121,13 +121,13 @@
 				fragment: {
 					module: shader,
 					entryPoint: 'fs',
-					targets: [{ format }]
+					targets: [{ format }] as GPUColorTargetState[]
 				},
 				primitive: { topology: 'triangle-list' }
 			});
 
 			const bindGroup = device.createBindGroup({
-				layout: pipeline.getBindGroupLayout(0),
+				layout: pipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
 				entries: [{ binding: 0, resource: { buffer: uniformBuf } }]
 			});
 

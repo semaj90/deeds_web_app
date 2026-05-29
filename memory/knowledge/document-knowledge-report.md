@@ -1,11 +1,11 @@
 # Document Knowledge Report
 
-Generated: 2026-05-26T05:55:19.964Z
+Generated: 2026-05-29T02:43:36.858Z
 
 ## Summary
-- cards: 13
-- active: 4
-- candidate_prune: 8
+- cards: 46
+- active: 28
+- candidate_prune: 17
 - archive_to_deeds_lab: 0
 - production_ready: 1
 
@@ -13,42 +13,141 @@ Generated: 2026-05-26T05:55:19.964Z
 - [active] 947d923ec0eaf5ceb34ee5f4c993f18297554cfe :: parent-atlas
   - reason: no prune/archive signals
   - sourceRefs: C:\Users\james\Videos\deeds-web-app\docs\atlas\parent-atlas.json
-- [candidate_prune] e400848fa0dceaa9d8ff33e592f50a9920881f78 :: untitled
-  - reason: backup-only source
-  - sourceRefs: .claude/hooks/posttooluse-audit.mjs:L1, EXTERNAL:node:fs:L1, EXTERNAL:node:path:L1, .claude/hooks/pretooluse-deny.mjs:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AdvancedRichTextEditor.svelte:L1, EXTERNAL:svelte:L1, EXTERNAL:lucide-svelte:L1, EXTERNAL:svelte/store:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/agentic/AgenticController.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AgentOrchestrator.svelte:L1, EXTERNAL:$lib/components/ErrorBoundary.svelte:L1, EXTERNAL:$lib/components/ui/enhanced-bits:L1
-- [candidate_prune] 8e70ae88dd78bd383c851e4a9ed87b095f1b2125 :: untitled
-  - reason: backup-only source
-  - sourceRefs: .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/AdvancedRichTextEditor.svelte:L1, EXTERNAL:@tiptap/core:L1, EXTERNAL:@tiptap/starter-kit:L1, EXTERNAL:@tiptap/extension-image:L1, EXTERNAL:@tiptap/extension-text-align:L1, EXTERNAL:@tiptap/extension-highlight:L1, EXTERNAL:@tiptap/extension-typography:L1, EXTERNAL:@tiptap/extension-placeholder:L1, EXTERNAL:@tiptap/extension-table:L1, EXTERNAL:@tiptap/extension-table-row:L1, EXTERNAL:@tiptap/extension-table-header:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EvidenceCanvas.svelte:L1, EXTERNAL:fabric:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/MultiAgentAnalysisCard.svelte:L1, EXTERNAL:svelte:L1
-- [candidate_prune] 4df17d7c1449a050923e807005820122f9695146 :: untitled
-  - reason: backup-only source
-  - sourceRefs: .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIAssistantButton.svelte:L1, SVELTEKIT:$app/navigation:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatInput.svelte:L1, SVELTEKIT:$app/environment:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AIChatMessage.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/AskAI.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/Enhanced3DLegalAIInterface.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedAIChatTest.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/IntegratedAIChat.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/IntelligentWebAnalysisDemo.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/ProactiveAIAssistant.svelte:L1, SVELTEKIT:$app/forms:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/EnhancedAuthForm.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/auth/LoginButton.svelte:L1
-- [candidate_prune] e0d3db1c8117a882c7ab32032becdc2b302a0c71 :: untitled
-  - reason: backup-only source
-  - sourceRefs: .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/Enhanced3DLegalAIInterface.svelte:L1, EXTERNAL:$lib/services/neo4j-recommendation-engine:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/FileUploadSection.svelte:L1, EXTERNAL:$lib/services/minio-neo4j-pgvector-integration:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/Neo4jRecommendation3DViewer.svelte:L1, EXTERNAL:$lib/services/neo4j-3d-recommendation-engine.js:L1, deeds_labs/api-legacy/api/graph/plan/+server.ts:L1, EXTERNAL:$lib/services/neo4j-planner-singleton:L1, deeds_labs/frontend/features-archive/ai/_core/enhanced-neo4j-reranker.ts:L1, EXTERNAL:$lib/types/sharedTypes:L1, EXTERNAL:neo4j-driver:L1, EXTERNAL:$lib/types/enhanced-svelte5-types:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/sdk/kag/index.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/adapter-ranking.ts:L1
-- [candidate_prune] f16dcd2422cc7d1404e80e4476c7286e44d5591f :: untitled
-  - reason: archived source tree
-  - sourceRefs: .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/SimpleFileUpload.svelte:L1, EXTERNAL:$lib/services/qdrantService:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EvidenceCanvasEditor.svelte:L1, EXTERNAL:$lib/ai/qdrant-service:L1, deeds_labs/api-legacy/api/ai/repairs/+server.ts:L1, EXTERNAL:@qdrant/js-client-rest:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ingest/qdrant_client.mjs:L1, EXTERNAL:node-fetch:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ingest/worker.mjs:L1, deeds_labs/archived-dead-code/lokiHybridStore.ts:L1, deeds_labs/archived-server-modules/connections/connection-pool.ts:L1, deeds_labs/dead-scripts/phase-scripts/agentic-knowledge-pipeline.mjs:L1, deeds_labs/dead-scripts/phase-scripts/analyze-legal-ai-features.mjs:L1, deeds_labs/dead-scripts/phase-scripts/context7-mcp-agentic-server.mjs:L1, deeds_labs/dead-scripts/phase-scripts/contextual-prompt-synthesizer.mjs:L1, deeds_labs/dead-scripts/phase-scripts/demo-policy-first-retrieval.mjs:L1
-- [candidate_prune] 4b9f0cc0b01685d67603effa7a287b5a57bb7b14 :: untitled
-  - reason: backup-only source
-  - sourceRefs: .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte:L1, EXTERNAL:$lib/server/redisPubSub:L1, EXTERNAL:$lib/config/redis-config:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/editor/RichTextEditor.svelte:L1, EXTERNAL:$lib/cache/loki-redis-integration:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/redis/AdvancedRedisMonitoringDashboard.svelte:L1, EXTERNAL:svelte:L1, EXTERNAL:svelte/store:L1, EXTERNAL:$lib/stores/unified:L1, EXTERNAL:$lib/services/unified-simd-parser:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/redis/RedisOrchestratorDashboard.svelte:L1, EXTERNAL:$lib/hooks/useRedisOrchestrator:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/routes/admin/redis/+page.svelte:L1, EXTERNAL:$lib/components/redis/AdvancedRedisMonitoringDashboard.svelte:L1, .svelte-error-fixes-backup/sveltekit-frontend/src/routes/admin/redis/detailed/+page.svelte:L1
-- [candidate_prune] f555717f882d0e669e11a04e1f75d9bcb605b747 :: untitled
-  - reason: archived source tree
-  - sourceRefs: .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/tabs/TabsBits.svelte:L1, EXTERNAL:bits-ui/tabs:L1, deeds_labs/archived-dead-code/auth/authUtils.ts:L1, EXTERNAL:$lib/server/lucia:L1, deeds_labs/archived-dead-code/auth/lucia.ts:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/index.ts:L1, UNRESOLVED:./Card.svelte:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/Panel.svelte:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/Terminal.svelte:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/GridList.svelte:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/SectionHeader.svelte:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/TabsPanel.svelte:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/Modal.svelte:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/RetroButton.svelte:L1, deeds_labs/archived-dead-code/dead-lib-dirs/ui/SearchBar.svelte:L1
-- [candidate_prune] d5d36526391f0d0a3abab77c788eb4ffea726bd4 :: untitled
-  - reason: unresolved source reference
-  - sourceRefs: .svelte-error-fixes-backup/sveltekit-frontend/src/routes/mcp/+page.svelte:L1, EXTERNAL:svelte:L1, EXTERNAL:$lib/api/mcp-client.js:L1, EXTERNAL:svelte/store:L1, deeds_labs/api-legacy/api/mcp/context72/get-library-docs/+server.ts:L1, EXTERNAL:@sveltejs/kit:L1, UNRESOLVED:./$types.js:L1, EXTERNAL:$lib/types/enhanced-svelte5-types:L1, deeds_labs/api-legacy/api/mcp/metrics/+server.ts:L1, EXTERNAL:$lib/services/mcp-registry:L1, deeds_labs/api-legacy/api/mcp/registry/+server.ts:L1
-- [production_ready] e1eaaafb6c2ef71d35b9c092ab847c74a73be6a7 :: untitled
+- [active] cluster:5 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/components/legal-corpus/CorpusSidebar.svelte, src/lib/components/ClientGemmaInference.svelte, src/lib/components/evidence/EvidenceViewModal.svelte
+- [active] cluster:7 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/routes/(app)/command-center/+page.svelte, src/routes/(app)/command-center/codebase/graph/+page.svelte, src/lib/components/ui/GlobalCommandPalette.svelte
+- [active] cluster:14 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/components/NESGraphRenderer.svelte, src/lib/components/ui/radio/Svelte5RadioGroup.svelte, src/lib/utils/media-query.svelte.ts
+- [active] cluster:8 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/machines/evidence-analysis-machine.ts, src/lib/server/context/contextual.ts, src/lib/server/agent/supervisor.ts
+- [active] cluster:11 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/components/evidence/EvidenceAssistant.svelte, src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte, src/lib/components/modals/EvidenceModal.svelte
+- [active] cluster:19 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/server/observability/langfuse.ts, src/lib/server/redis-streams.ts, src/lib/server/api-registry.ts
+- [active] cluster:4 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/components/ai/RecommendationEngine.svelte, src/lib/components/ai/LocalImageGenerator.svelte, src/lib/components/courtroom/StrategyWizard.svelte
+- [active] cluster:9 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/schemas/forms.ts, src/lib/server/utils/avatar-upload.ts, src/lib/server/queue/rabbitmq-manager-fixed.ts
+- [active] cluster:6 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/server/context/contextual.ts, src/lib/server/api-registry.ts, src/lib/server/phase72/astVectorizer.ts
+- [active] cluster:17 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/components/case/SimilarCasesPanel.svelte, src/lib/components/legal/ChainOfCustodyTracker.svelte, src/lib/components/yorha/CrossExaminationAssistant.svelte
+- [active] cluster:16 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/db/migrations/enhanced-grpo-migration.sql, src/lib/server/db/migrations/004_add_missing_api_tables.sql, src/lib/server/db/0000_stiff_the_hood.sql
+- [active] cluster:2 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/server/vector-cache.ts, src/lib/server/ml/recommendation-metrics.ts, src/lib/server/db/qdrant-sync.ts
+- [active] cluster:15 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/db/queries/route-health-queries.ts, src/routes/(app)/evidence/+page.server.ts, src/routes/(app)/admin/phase89/+page.server.ts
+- [active] cluster:3 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/components/ai/YorhaAIAssistant.svelte, src/lib/models/ChatSession.svelte.ts, src/lib/components/yorha/EnhancedYoRHaAIAssistant.svelte
+- [active] cluster:18 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/shared/quantize.ts, src/lib/webgpu/som-webgpu-cache.ts, src/lib/webgpu/webgpu-polyfill.ts
+- [active] cluster:10 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/routes/(app)/admin/dev-tools/+page.svelte, src/lib/server/nlp/analyzer.ts, src/lib/server/analysis/granite-docling.ts
+- [active] cluster:12 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/server/db/drizzle-cache.ts, src/lib/server/cache/report-template-cache.ts, src/lib/server/glyph-prompt-cache.ts
+- [active] cluster:1 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/lib/components/legal/CitationManager.svelte, src/lib/components/citations/CitationSaveForm.svelte, src/routes/(app)/citations/+page.svelte
+- [active] cluster:13 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json
+- [active] cluster:0 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: docs/graph/cluster-summaries.json, src/routes/(app)/cases/[id]/+page.ts, src/routes/(app)/cases/[id]/overview/+page.ts, src/routes/(app)/demos/bits-ui/+page.ts
+- [candidate_prune] pathway:4e60a12695aab971 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:c32c6204860ce031 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:162980e542c4d133 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [active] pathway:0e22b341b1b1b20f :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:68d90ce7fcd38c42 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [active] pathway:a5e7dc6249bccc1c :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:60980c57b0c7db5e :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:9edb30797ac740bc :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:de0f8f59390c9c67 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:4e0af0f1640997df :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [active] pathway:b2c4ac33dda55ec1 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [active] pathway:29da1b7c102bf65b :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:c8c414e2bbaebbf0 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:025c6971cef101ec :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:2f5e2aaa28069c4c :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:3ee50787f5c554bf :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:497b78be22cd1c44 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:8f53c70739c03567 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [active] pathway:ba6a24a21a8cefa6 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:e29e65b53af45e18 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:f3aa36fb713b5196 :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [candidate_prune] pathway:f5cbdee7b621392e :: untitled
+  - reason: deprecated or fallback-oriented summary
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [active] pathway:bec1193a9a561d45 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [active] pathway:0a5b9b6a708fd652 :: untitled
+  - reason: no prune/archive signals
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
+- [production_ready] pathway:0aa612a768301ab4 :: untitled
   - reason: stable source refs and production indicators
-  - sourceRefs: deeds_labs/api-legacy/api/error-brain/server.test.ts:L1, EXTERNAL:vitest:L1, deeds_labs/api-legacy/api/error-brain/+server.ts:L1, EXTERNAL:$lib/middleware/featureFlagEnforcer:L1, EXTERNAL:$lib/middleware/authSeparation:L1, EXTERNAL:$lib/services/dataIsolation:L1, EXTERNAL:$lib/services/featureLogger:L1, deeds_labs/api-legacy/api/legal-ai/server.test.ts:L1, deeds_labs/api-legacy/api/legal-ai/+server.ts:L1
-- [active] dbf186c88911486003410fb324c298218d4f72be :: untitled
-  - reason: no prune/archive signals
-  - sourceRefs: deeds_labs/dead_code/duplicate-embedding-auth/embeddings-client.ts:L1, deeds_labs/dead_code/duplicate-embedding-auth/schema-embeddings.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/database/connection.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/database/schema.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/queries/nes-command-center-archive.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/db/pool.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/auth.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/drizzle.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/embedding-cache-service.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/embedding-cache-utils.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/health-check.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/connections.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/legal-db-init.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/qdrant-sync.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/postgres-knowledge.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/evidence.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/cases.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/persons.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/schema/reports.ts:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/db/seed-dev-user.ts:L1
-- [active] 02e24784195e6d3ec3575bc38925cbf94549b503 :: untitled
-  - reason: no prune/archive signals
-  - sourceRefs: deeds_labs/frontend/sveltekit-frontend-archive/dirs/backups/phase34-backups/src/routes/(tools)/search/+page.svelte:L1, deeds_labs/frontend/sveltekit-frontend-archive/dirs/backups/phase34-backups/src/routes/(tools)/search/+page.server.ts:L1, sveltekit-frontend/src/routes/(app)/admin/document-search/+page.svelte:L1, sveltekit-frontend/src/routes/(app)/admin/document-search/+page.server.ts:L1
-- [active] 41826fa5019f19cf93a74016eed2691910e0aaa0 :: untitled
-  - reason: no prune/archive signals
-  - sourceRefs: src/routes/api/chat/stream/+server.ts:L1, src/lib/server/observability/synthesis-logger.ts:L1
+  - sourceRefs: memory/graphify/deep/deep-import-graph.json, memory/graphify/deep/deep-import-edges.jsonl
 
 ## Next Steps
 - Review candidate_prune cards for deletion or replacement.

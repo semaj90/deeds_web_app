@@ -10,11 +10,17 @@
       "description": "Diagnose errors or research a topic: local rg → ACE Redis cache → ranking reports → SearXNG fallback",
       "agent": "error-inference-research",
       "template": "Use the error-inference-research skill. Follow the research order exactly: (1) classify the error or topic, (2) rg search in the local repo, (3) read ace:packet:latest from Redis (`node -e \"const Redis=require('ioredis');const r=new Redis();r.get('ace:packet:latest').then(v=>{if(v){const p=JSON.parse(v);console.log(p.totalCards,'cards,',p.tokenEstimate,'tokens,',p.query);p.cards?.slice(0,3).forEach(c=>console.log(' -',c.title));} r.disconnect();})\"`), (4) inspect .tmp/retrieval-ranking-report.json and .tmp/rerank-diff.json, (5) check docs/atlas and MASTER TODO, (6) run `node scripts/opencode/smoke-searxng.mjs` then query http://localhost:8889/search?q=QUERY&format=json only if local evidence is insufficient. Produce: likely_cause, evidence, patch_targets, safe_next_command, do_not_do."
+    },
+    "gemma4": {
+      "description": "Pre-warm ACE context for Gemma4: check staleness → run ingest pipeline if needed → print top cards ready for injection",
+      "agent": "gemma4",
+      "template": "Use the gemma4 skill. (1) Check if ace:packet:latest is fresh in Redis (under 24h). If fresh, print top 10 cards and domain topology — done. If stale or missing: (2) run `npm run ingest:pipeline` to rebuild rank → rerank → label → compress → cache. (3) After pipeline completes, print the top 10 cards with scores and sourceRefs, the domain topology summary from .tmp/domain-topology.json, and the feature labels. (4) Confirm: 'ACE context ready for Gemma4 — {N} cards, ~{T} tokens, domains: {D}'. Do NOT rerun the pipeline if the packet is already fresh."
     }
   },
   "instructions": [
     "AGENTS.md",
     ".opencode/skills/ace-recovery/SKILL.md",
-    ".opencode/skills/error-inference-research.md"
+    ".opencode/skills/error-inference-research.md",
+    ".opencode/skills/gemma4.md"
   ]
 }

@@ -374,10 +374,10 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 - Slot in pipeline: `rank-cards → turbovec-rerank → compress-cards`
 
 **Tasks**:
-- [ ] `scripts/ingest/rerank-cards.mjs` — cosine rerank using existing embedding cache, emit `turbovec_rank` delta
-- [ ] Before/after diff output to `.tmp/rerank-diff.json`
-- [ ] Add `rerank:cards` npm script
-- [ ] Wire into `recommendations:build` chain: `rank-cards → rerank:cards → compress-cards`
+- [x] `scripts/ingest/rerank-cards.mjs` — cosine rerank using existing embedding cache, emit `turbovec_rank` delta
+- [x] Before/after diff output to `.tmp/rerank-diff.json`
+- [x] Add `rerank:cards` npm script
+- [x] Wire into `recommendations:build` chain: `rank-cards → rerank:cards → compress-cards`
 
 ---
 
@@ -395,9 +395,9 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 | Weekly user/project summary | `ace:summary:weekly:{iso_week}` | 30 days cold |
 
 **Tasks**:
-- [ ] `scripts/ingest/cache-ace-packet.mjs` — write ace-packet.json → Valkey with TTL
-- [ ] `scripts/ingest/load-ace-packet.mjs` — read from Valkey, fallback to disk, fallback to rerank
-- [ ] Add `ace:cache` and `ace:cache:load` npm scripts
+- [x] `scripts/ingest/cache-ace-packet.mjs` — write ace-packet.json → Valkey with TTL
+- [x] `scripts/ingest/load-ace-packet.mjs` — read from Valkey, fallback to disk, fallback to rerank
+- [x] Add `ace:cache` and `ace:cache:load` npm scripts
 
 ---
 
@@ -429,11 +429,11 @@ output: .tmp/domain-topology.json + graphify refresh manifest
 ```
 
 **Tasks**:
-- [ ] `scripts/graphify/feature-labeling.mjs` — sourceRef → domain + feature_label + owner_area
-- [ ] `scripts/graphify/domain-topology.mjs` — build domain graph from feature labels
-- [ ] Intent cache write/read helpers in `scripts/ingest/intent-cache.mjs`
-- [ ] Wire intent cache into `recommendations:build` after rank step
-- [ ] Add `graphify:feature-labels` and `graphify:domain-topology` npm scripts
+- [x] `scripts/graphify/feature-labeling.mjs` — sourceRef → domain + feature_label + owner_area
+- [x] `scripts/graphify/domain-topology.mjs` — build domain graph from feature labels
+- [x] Intent cache write/read helpers in `scripts/ingest/intent-cache.mjs`
+- [x] Wire intent cache into `recommendations:build` after rank step
+- [x] Add `graphify:feature-labels` and `graphify:domain-topology` npm scripts
 
 ---
 

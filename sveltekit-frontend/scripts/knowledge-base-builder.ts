@@ -398,6 +398,13 @@ async function upsertPoint(
   sparse: ReturnType<typeof generateSparseVector>,
   payload: Record<string, unknown>
 ): Promise<void> {
+  const EXPECTED_DIM = Number(process.env.EMBED_DIM ?? '768');
+  if (!Array.isArray(embedding) || embedding.length !== EXPECTED_DIM) {
+    console.warn(
+      `[kb-builder] Skipping upsert for ${pointId}: invalid embedding dimension ${Array.isArray(embedding) ? embedding.length : typeof embedding} (expected ${EXPECTED_DIM})`
+    );
+    return;
+  }
   if (collectionSupportsSparse !== false) {
     try {
       await qdrant.upsert(collection, {
