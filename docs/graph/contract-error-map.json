@@ -1,32 +1,6 @@
 {
-  "generatedAt": "2026-05-29T05:48:26.849Z",
-  "totalFindings": 5,
-  "nodes": [
-    {
-      "id": "contract:schema_mismatch",
-      "label": "Schema Mismatch",
-      "state": "schema_mismatch",
-      "severity": "medium",
-      "findingCount": 1,
-      "rootCauseScore": 0.25,
-      "fixOrder": 5
-    },
-    {
-      "id": "contract:api_validation_gap",
-      "label": "API Validation Gap",
-      "state": "api_validation_gap",
-      "severity": "high",
-      "findingCount": 4,
-      "rootCauseScore": 0.8,
-      "fixOrder": 8
-    }
-  ],
-  "edges": [
-    {
-      "from": "contract:schema_mismatch",
-      "to": "contract:api_validation_gap",
-      "weight": 0.6,
-      "label": "60% cascade"
-    }
-  ]
+  "generatedAt": "2026-05-29T23:19:02.604Z",
+  "totalFindings": 0,
+  "nodes": [],
+  "edges": []
 }

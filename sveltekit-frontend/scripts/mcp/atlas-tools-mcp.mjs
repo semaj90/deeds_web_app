@@ -20,8 +20,26 @@ import { createInterface } from 'node:readline';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import neo4j from 'neo4j-driver';
 
 const log = (...a) => process.stderr.write('[atlas-tools] ' + a.join(' ') + '\n');
+
+let neo4jDriver = null;
+function getNeo4jDriver() {
+  if (!neo4jDriver) {
+    const URI = process.env.NEO4J_URI || 'neo4j://localhost:7687';
+    const USER = process.env.NEO4J_USER || 'neo4j';
+    const PASSWORD = process.env.NEO4J_PASSWORD || 'neo4j123';
+    neo4jDriver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
+  }
+  return neo4jDriver;
+}
+
+process.on('exit', () => {
+  if (neo4jDriver) {
+    neo4jDriver.close();
+  }
+});
 
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_INFO = { name: 'atlas-tools', version: '0.2.0' };
@@ -90,6 +108,100 @@ const TOOLS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'record_outcome',
+    description: 'Record the outcome of a RAG query or code-repair task. Writes trace details to a local NDJSON ledger and creates behavioral relationships in Neo4j.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        intent: { type: 'string', description: 'The intent classified for this task (e.g. "repair_glyph_ingestion").' },
+        tool: { type: 'string', description: 'The tool choice that was made.' },
+        sourceRefs: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'The source files or references involved in the selection.',
+        },
+        recommendationAccepted: { type: 'boolean', description: 'Whether the suggestion was accepted.' },
+        reward: { type: 'number', description: 'The calculated reward score (0.0 to 1.0).' },
+        graphVersion: { type: 'string', description: 'The version of the codebase graph (e.g., "2026-05-29").' },
+        errorMsg: { type: 'string', description: 'Optional error description if the recommendation failed.' }
+      },
+      required: ['intent', 'tool', 'sourceRefs', 'recommendationAccepted', 'reward'],
+      additionalProperties: false,
+    }
+  },
+  {
+    name: 'find_dependencies',
+    description: 'Find dependencies (IMPORTS, CALLS) of a target codebase file in the graph.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        target: { type: 'string', description: 'Target file path (relative to sveltekit-frontend/src or absolute).' }
+      },
+      required: ['target'],
+      additionalProperties: false,
+    }
+  },
+  {
+    name: 'trace_database',
+    description: 'Find files in the codebase mapping database usage (USES_DB) for a table name or query.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Table name or search term.' }
+      },
+      required: ['query'],
+      additionalProperties: false,
+    }
+  },
+  {
+    name: 'trace_tool_chain',
+    description: 'Trace files invoking specific tools or tools mapped in the knowledge graph.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        tool: { type: 'string', description: 'Tool name pattern to trace.' }
+      },
+      required: ['tool'],
+      additionalProperties: false,
+    }
+  },
+  {
+    name: 'find_source_refs',
+    description: 'Query SourceRef or CodebaseFile nodes in the knowledge graph.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Name pattern or file path substring.' }
+      },
+      required: ['query'],
+      additionalProperties: false,
+    }
+  },
+  {
+    name: 'find_feature',
+    description: 'Query Feature nodes mapped in the knowledge graph.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        feature: { type: 'string', description: 'Feature name pattern.' }
+      },
+      required: ['feature'],
+      additionalProperties: false,
+    }
+  },
+  {
+    name: 'find_route',
+    description: 'Query layouts or SvelteKit route endpoints mapped in the graph.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        route: { type: 'string', description: 'Route path pattern (e.g. "/api/ace").' }
+      },
+      required: ['route'],
+      additionalProperties: false,
+    }
+  }
 ];
 
 // ── Tool implementations ────────────────────────────────────────────────────────
@@ -245,9 +357,224 @@ function buildRecommendation({ intent, domain, errorSummary, evidenceLines, patc
   };
 }
 
+async function recordOutcome(args) {
+  const { intent, tool, sourceRefs, recommendationAccepted, reward, graphVersion = '2026-05-29', errorMsg = null } = args;
+
+  const outcomeRecord = {
+    id: crypto.randomUUID(),
+    intent,
+    tool,
+    sourceRefs,
+    recommendationAccepted,
+    reward,
+    graphVersion,
+    errorMsg,
+    timestamp: new Date().toISOString()
+  };
+
+  // 1. Write to local NDJSON ledger
+  const ledgerDir = path.join(process.cwd(), '.opencode');
+  if (!fs.existsSync(ledgerDir)) {
+    fs.mkdirSync(ledgerDir, { recursive: true });
+  }
+  const ledgerPath = path.join(ledgerDir, 'outcome-ledger.ndjson');
+  fs.appendFileSync(ledgerPath, JSON.stringify(outcomeRecord) + '\n');
+  log(`Logged outcome to ${ledgerPath}`);
+
+  // 2. Sync to Neo4j
+  let syncedToNeo4j = false;
+  try {
+    const driver = getNeo4jDriver();
+    const session = driver.session();
+    try {
+        // MERGE Intent
+        await session.run(
+          `MERGE (i:Intent { name: $intent })
+           ON CREATE SET i.created_at = datetime()
+           SET i.updated_at = datetime()`,
+          { intent }
+        );
+
+        // MERGE Tool
+        await session.run(
+          `MERGE (t:Tool { name: $tool })
+           ON CREATE SET t.created_at = datetime()
+           SET t.updated_at = datetime()`,
+          { tool }
+        );
+
+        // Link Intent -> Tool
+        await session.run(
+          `MATCH (i:Intent { name: $intent })
+           MATCH (t:Tool { name: $tool })
+           MERGE (i)-[r:RESOLVED_BY]->(t)
+           SET r.recommendationAccepted = $recommendationAccepted,
+               r.reward = $reward,
+               r.updated_at = datetime()`,
+          { intent, tool, recommendationAccepted, reward }
+        );
+
+        // CREATE Outcome
+        await session.run(
+          `CREATE (o:Outcome {
+             id: $outcomeId,
+             reward: $reward,
+             recommendationAccepted: $recommendationAccepted,
+             graphVersion: $graphVersion,
+             timestamp: datetime()
+           })`,
+          { outcomeId: outcomeRecord.id, reward, recommendationAccepted, graphVersion }
+        );
+
+        // Connect SourceRefs / CodebaseFiles
+        for (const ref of sourceRefs) {
+          const normalizedRef = ref.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
+
+          const fileCheck = await session.run(
+            `MATCH (f:CodebaseFile { filePath: $normalizedRef }) RETURN f`,
+            { normalizedRef }
+          );
+
+          if (fileCheck.records.length > 0) {
+            await session.run(
+              `MATCH (t:Tool { name: $tool })
+               MATCH (f:CodebaseFile { filePath: $normalizedRef })
+               MATCH (o:Outcome { id: $outcomeId })
+               MERGE (t)-[r1:USED]->(f)
+               SET r1.updated_at = datetime()
+               MERGE (f)-[r2:PRODUCED]->(o)
+               SET r2.updated_at = datetime()`,
+              { tool, normalizedRef, outcomeId: outcomeRecord.id }
+            );
+          } else {
+            await session.run(
+              `MERGE (s:SourceRef { name: $ref })
+               ON CREATE SET s.created_at = datetime()
+               SET s.updated_at = datetime()
+               WITH s
+               MATCH (t:Tool { name: $tool })
+               MATCH (o:Outcome { id: $outcomeId })
+               MERGE (t)-[r1:USED]->(s)
+               SET r1.updated_at = datetime()
+               MERGE (s)-[r2:PRODUCED]->(o)
+               SET r2.updated_at = datetime()`,
+              { tool, ref, outcomeId: outcomeRecord.id }
+            );
+          }
+        }
+      syncedToNeo4j = true;
+    } finally {
+      await session.close();
+    }
+  } catch (err) {
+    log(`Warning: Failed to sync outcome to Neo4j: ${err.message}`);
+  }
+
+  return { ok: true, id: outcomeRecord.id, syncedToNeo4j };
+}
+
+async function findDependencies({ target }) {
+  const normalizedTarget = target.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  try {
+    const res = await session.run(
+      `MATCH (f:CodebaseFile { filePath: $normalizedTarget })-[r:IMPORTS|CALLS]->(dep)
+       RETURN dep.filePath as dep, type(r) as type`,
+      { normalizedTarget }
+    );
+    const deps = res.records.map(r => ({ dep: r.get('dep'), type: r.get('type') }));
+    return { target: normalizedTarget, dependencies: deps };
+  } finally {
+    await session.close();
+  }
+}
+
+async function traceDatabase({ query }) {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  try {
+    const res = await session.run(
+      `MATCH (f:CodebaseFile)-[r:USES_DB]->(t:Table)
+       WHERE t.name CONTAINS $query OR f.filePath CONTAINS $query
+       RETURN f.filePath as file, t.name as table, r.operation as operation`,
+      { query }
+    );
+    const traces = res.records.map(r => ({ file: r.get('file'), table: r.get('table'), operation: r.get('operation') }));
+    return { query, traces };
+  } finally {
+    await session.close();
+  }
+}
+
+async function traceToolChain({ tool }) {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  try {
+    const res = await session.run(
+      `MATCH (f:CodebaseFile)-[r:USES_TOOL]->(t:Tool)
+       WHERE t.name CONTAINS $tool
+       RETURN f.filePath as file, t.name as tool, r.type as type`,
+      { tool }
+    );
+    const traces = res.records.map(r => ({ file: r.get('file'), tool: r.get('tool'), type: r.get('type') }));
+    return { tool, traces };
+  } finally {
+    await session.close();
+  }
+}
+
+async function findSourceRefs({ query }) {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  try {
+    const res = await session.run(
+      `MATCH (s:SourceRef) WHERE s.name CONTAINS $query
+       RETURN s.name as name`,
+      { query }
+    );
+    const refs = res.records.map(r => r.get('name'));
+    return { query, sourceRefs: refs };
+  } finally {
+    await session.close();
+  }
+}
+
+async function findFeature({ feature }) {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  try {
+    const res = await session.run(
+      `MATCH (f:Feature) WHERE f.name CONTAINS $feature
+       RETURN f.name as name, f.description as description`,
+      { feature }
+    );
+    const features = res.records.map(r => ({ name: r.get('name'), description: r.get('description') }));
+    return { feature, features };
+  } finally {
+    await session.close();
+  }
+}
+
+async function findRoute({ route }) {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  try {
+    const res = await session.run(
+      `MATCH (r:Route) WHERE r.path CONTAINS $route
+       RETURN r.path as path, r.type as type`,
+      { route }
+    );
+    const routes = res.records.map(r => ({ path: r.get('path'), type: r.get('type') }));
+    return { route, routes };
+  } finally {
+    await session.close();
+  }
+}
+
 // ── JSON-RPC dispatch ──────────────────────────────────────────────────────────
 
-function dispatch(method, params, id) {
+async function dispatch(method, params, id) {
   if (method === 'initialize') {
     return { protocolVersion: PROTOCOL_VERSION, serverInfo: SERVER_INFO, capabilities: { tools: {} } };
   }
@@ -262,6 +589,13 @@ function dispatch(method, params, id) {
       if (name === 'classify_intent')           result = classifyIntent(args);
       else if (name === 'build_agentic_rag_context') result = buildAgenticRagContext(args);
       else if (name === 'build_recommendation') result = buildRecommendation(args);
+      else if (name === 'record_outcome') result = await recordOutcome(args);
+      else if (name === 'find_dependencies') result = await findDependencies(args);
+      else if (name === 'trace_database') result = await traceDatabase(args);
+      else if (name === 'trace_tool_chain') result = await traceToolChain(args);
+      else if (name === 'find_source_refs') result = await findSourceRefs(args);
+      else if (name === 'find_feature') result = await findFeature(args);
+      else if (name === 'find_route') result = await findRoute(args);
       else throw new Error(`Unknown tool: ${name}`);
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
     } catch (e) {
@@ -275,7 +609,23 @@ function dispatch(method, params, id) {
 
 const rl = createInterface({ input: process.stdin, terminal: false });
 
-rl.on('line', line => {
+let pendingOperations = 0;
+let isClosed = false;
+
+function shutdown() {
+  log('Stdin closed and operations complete, shutting down...');
+  if (neo4jDriver) {
+    neo4jDriver.close().then(() => {
+      process.exit(0);
+    }).catch(() => {
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+}
+
+rl.on('line', async line => {
   if (!line.trim()) return;
   let msg;
   try { msg = JSON.parse(line); } catch { return; }
@@ -283,8 +633,9 @@ rl.on('line', line => {
   const { method, params, id } = msg;
   const isNotif = id === undefined || id === null;
 
+  pendingOperations++;
   try {
-    const result = dispatch(method, params, id);
+    const result = await dispatch(method, params, id);
     if (isNotif || result === null) return;
     process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id, result }) + '\n');
   } catch (e) {
@@ -293,7 +644,19 @@ rl.on('line', line => {
       jsonrpc: '2.0', id,
       error: { code: e.code ?? -32603, message: e.message },
     }) + '\n');
+  } finally {
+    pendingOperations--;
+    if (isClosed && pendingOperations === 0) {
+      shutdown();
+    }
   }
 });
 
-log('atlas-tools MCP ready (classify_intent, build_agentic_rag_context, build_recommendation)');
+rl.on('close', () => {
+  isClosed = true;
+  if (pendingOperations === 0) {
+    shutdown();
+  }
+});
+
+log('atlas-tools MCP ready (classify_intent, build_agentic_rag_context, build_recommendation, record_outcome, and path trace tools)');

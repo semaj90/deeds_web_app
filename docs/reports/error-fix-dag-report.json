@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-29T05:48:26.851Z",
-  "inputFindings": 5,
-  "activeStates": 2,
+  "generatedAt": "2026-05-29T23:19:02.604Z",
+  "inputFindings": 0,
+  "activeStates": 0,
   "topoOrder": [
     "env_url_mismatch",
     "ssr_safety_violation",
@@ -12,76 +12,14 @@
     "route_contract_mismatch",
     "api_validation_gap"
   ],
-  "dagNodes": [
-    {
-      "errorId": "contract:schema_mismatch",
-      "hmmState": "schema_mismatch",
-      "hmmLabel": "Schema Mismatch",
-      "hmmDescription": "Drizzle schema column type does not match the live Postgres column type.",
-      "rootCauseScore": 0.25,
-      "findingCount": 1,
-      "severity": "medium",
-      "downstreamErrors": [
-        "contract:api_validation_gap"
-      ],
-      "kagRecall": [],
-      "recommendedOrder": 5,
-      "validationCommands": [
-        "npm run db:check",
-        "npm run audit:contracts",
-        "npm run test:network-contracts"
-      ],
-      "agentCommandKeys": [
-        "db.check",
-        "contract.audit",
-        "drizzle.inspect"
-      ],
-      "findings": [
-        "contract:drizzle-meta-stale_migration-006-9d10ac6b"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "errorId": "contract:api_validation_gap",
-      "hmmState": "api_validation_gap",
-      "hmmLabel": "API Validation Gap",
-      "hmmDescription": "API route processes untrusted input without Zod validation.",
-      "rootCauseScore": 0.8,
-      "findingCount": 4,
-      "severity": "high",
-      "downstreamErrors": [],
-      "kagRecall": [],
-      "recommendedOrder": 8,
-      "validationCommands": [
-        "npm run audit:forms",
-        "npm run lint:drizzle"
-      ],
-      "agentCommandKeys": [
-        "forms.audit",
-        "zod.check"
-      ],
-      "findings": [
-        "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\ace\\ask\\+server.ts",
-        "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\memory\\claude-mem\\import\\+server.ts",
-        "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\memory\\agent-observation\\+server.ts",
-        "forms:api-route-json-without-zod:sveltekit-frontend\\src\\routes\\api\\internal\\index-memory\\+server.ts"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    }
-  ],
-  "dagEdges": [
-    {
-      "from": "schema_mismatch",
-      "to": "api_validation_gap",
-      "weight": 0.6
-    }
-  ],
+  "dagNodes": [],
+  "dagEdges": [],
   "redisKagAvailable": false,
   "summary": {
-    "high": 1,
-    "medium": 1,
+    "high": 0,
+    "medium": 0,
     "low": 0,
-    "totalFindings": 5
+    "totalFindings": 0
   },
-  "status": "action-required"
+  "status": "ok"
 }

@@ -58,6 +58,8 @@ export interface EmbedIndexEvent {
   chunksProcessed: number;
   /** Chunks already in Qdrant that were skipped (incremental only) */
   skippedExisting: number;
+  /** Chunks skipped because their path matched an exclusion pattern (e.g. .venv/, site-packages/) */
+  skippedIgnored?: number;
   embeddingsGenerated: number;
   storedInQdrant: number;
   failed: number;

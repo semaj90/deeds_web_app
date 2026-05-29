@@ -166,6 +166,16 @@ export interface GlyphSearchOptions {
   minReward?: number;
 }
 
+// ─── Serialized form (for Drizzle JSONB storage) ─────────────────────────────
+
+/**
+ * SerializedGlyphRecord: GlyphRecord with embedding768 omitted (stored in Qdrant).
+ * Used for Postgres JSONB storage in glyph_records.record_json column.
+ */
+export type SerializedGlyphRecord = Omit<GlyphRecord, 'vector'> & {
+  vector: Omit<GlyphVectorLayer, 'embedding768'>;
+};
+
 // ─── GlyphBridge interface ────────────────────────────────────────────────────
 
 export interface GlyphBridge {

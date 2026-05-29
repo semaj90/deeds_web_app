@@ -1,6 +1,7 @@
 import { AgenticSearchService } from '$lib/server/vector/agentic-search';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface DiagnosticResult {
 	error: string;

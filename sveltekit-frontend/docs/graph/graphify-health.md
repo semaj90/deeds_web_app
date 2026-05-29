@@ -1,13 +1,13 @@
 # Graphify Health Report
 
-*Generated: 2026-05-20T03:49:31.259Z*
+*Generated: 2026-05-29T22:13:00.602Z*
 
 ## Summary
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| Redis wiki notes | 8190 | ✅ |
-| Gemma4 summaries | 0 / 8190 (0%) | ❌ |
+| Redis wiki notes | 1534 | ✅ |
+| Gemma4 summaries | 0 / 1534 (0%) | ❌ |
 | BoW chunk tiles | 0 | ⚠️ |
 | BoW cluster tiles | 0 | ⚠️ |
 | Qdrant glyph_atlas | 1336 pts | ✅ |
@@ -16,7 +16,10 @@
 | AGENTS.md mirrors | 2 | ✅ |
 | Manifold clusters | 20 | ✅ |
 | SOM Weights | ✅ | ✅ |
-| Autoencoder weights | trainedAt=2026-05-20T00:23:17.117093+00:00, centroids=yes, encoded=3256 | ✅ |
+| Autoencoder weights | weightsType=hash, encodedType=none, centroids=yes | ⚠️ |
+| Atlas seed count | 2 | ❌ |
+| Atlas seed status | ok | - |
+
 
 ## Graphify Tiers
 
@@ -33,6 +36,7 @@
 - ⚠️  Run `npm run graphify:batch-gpu-analysis` — only 0% of wiki notes have Gemma4 summaries
 - ⚠️  Run `npm run graphify:bow-tiles:fast` — no BoW tiles in Redis
 
+- ⚠️  Run `npm run graphify:autoencoder:train` — autoencoder is still on Xavier placeholder weights
 
 ## Raw JSON
 

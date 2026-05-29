@@ -2,7 +2,7 @@
   "version": 1,
   "status": "generated",
   "promotionState": "unpromoted",
-  "generatedAt": "2026-05-29T03:16:07.323Z",
+  "generatedAt": "2026-05-29T15:34:25.904Z",
   "generator": "scripts/atlas/generate-graph-exports.mjs",
   "sources": [
     "docs/graph/codebase-graph.json",
@@ -16,8 +16,8 @@
     "pathwayCards": "memory/exports/pathway-cards.jsonl"
   },
   "counts": {
-    "nodes": 48543,
-    "edges": 81136,
+    "nodes": 55303,
+    "edges": 81495,
     "clusterCards": 0,
     "pathwayCards": 12,
     "clusterCardRows": 0,
@@ -25,7 +25,7 @@
   },
   "hashes": {
     "clusterCardsSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-    "pathwayCardsSha256": "4477cbe3baa955a1a3bc27dca44ccd4aee98a627eab710bd9f91e6b84dd6ee90"
+    "pathwayCardsSha256": "65512f59a6d0d4aafba6e6deaa0f917d55176f5e5232f61e618dfd90848e4939"
   },
   "validation": {
     "isStub": false,

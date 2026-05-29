@@ -140,6 +140,10 @@ export const ENV = {
   /** Native TS langextract is the default. Override to 'false' to fall back to the Python service. */
   LANGEXTRACT_NATIVE:
     (privateEnv.LANGEXTRACT_NATIVE ?? 'true') === 'true' ? 'true' : 'false',
+  /** HTTP port for the langextract-mcp.ts stdio-HTTP bridge (default 8793) */
+  LANGEXTRACT_MCP_PORT: privateEnv.LANGEXTRACT_MCP_PORT ?? '8793',
+  /** Bind host for the langextract-mcp.ts bridge (default: all interfaces) */
+  LANGEXTRACT_MCP_HOST: privateEnv.LANGEXTRACT_MCP_HOST ?? undefined,
   /**
    * RAG_RRF_ENABLED — Phase 1 canary flag.
    *

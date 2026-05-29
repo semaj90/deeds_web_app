@@ -3,7 +3,7 @@
 End-to-end guide for the 10-stage codebase indexing pipeline with TurboQuant inference,
 Karpathy wiki feedback loop, and event-driven cache invalidation.
 
-**Last updated:** 2026-04-23 (post cache-invalidation cascade + GRPO reranker wiring)
+**Last updated:** 2026-05-29 (post GDS implementation + Behavioral Supervision alignment)
 
 ---
 
@@ -51,6 +51,131 @@ flowchart TB
 
 ---
 
+## SourceRef-Centric Indexing
+
+Stop thinking of the graph, vectors, and memory as separate, siloed systems. Instead, treat them as **different index views pointing to the same SourceRef**.
+
+```
+                   [ SourceRef ]
+                         │
+      ┌──────────────────┼──────────────────┬──────────────────┐
+      ▼                  ▼                  ▼                  ▼
+   [Neo4j]            [Qdrant]          [Postgres]          [Redis]
+Topology Index    Semantic Index      JSONB Records       Hot Cache
+      │                                                        │
+      ▼                                                        ▼
+   [DuckDB]                                                 [Glyph]
+Auditor View                                            Reward History
+```
+
+Every piece of information revolves around the `SourceRef` identifier. The backends organize this mapping as follows:
+- **Neo4j**: Relationships and topological connections between `SourceRefs`.
+- **Qdrant**: High-dimensional semantic embeddings (768-dim content/signature vectors).
+- **Postgres**: Raw metadata, structured columns, and raw JSONB payloads.
+- **Redis**: Low-latency hot caching of transient states, intent targets, and active ACE packets.
+- **DuckDB**: Fast, read-heavy analytical auditing of the indexes.
+- **Glyph**: Performance history and execution reward tracking.
+
+---
+
+## The Behavioral Topology Layer
+
+To transition the indexing pipeline from a static structure representation into an active agentic helper, the graph representation must expand beyond raw files (`IMPORTS` and `CALLS`). We are expanding the structural graph into a **Behavioral Topology Layer**:
+
+### Core Node Types
+- **File**: System source files and modules.
+- **Function**: Declarative routines, functions, and logic blocks.
+- **Feature**: End-user functional features or requirements.
+- **Intent**: Classified developer intentions or queries.
+- **Tool**: Executable MCP/CLI tools and commands.
+- **Route**: Exposed API or page endpoints (e.g. SvelteKit route contracts).
+- **Table**: Database tables, schemas, and schemas.
+- **CacheKey**: Shared caches, tags, or keys (e.g. Bifrost Redis keys).
+- **State**: Runtime configurations or environment variables.
+- **Event**: Indexing changes, user inputs, or trace events.
+- **Glyph**: Reward anchors, diagnostics, and code-synthesis quality outputs.
+
+### Edge Types & Directives
+- **Structural**: `CALLS`, `IMPORTS`, `USES_DB`, `USES_TOOL`.
+- **Behavioral**: `RESOLVES_INTENT`, `TRIGGERED_BY`, `DEPENDS_ON_STATE`, `GENERATES_GLYPH`, `REWARDED_BY`, `INVALIDATED_BY`.
+- **Operational**: `RETRIEVES`, `RERANKS`, `CACHES`.
+
+---
+
+## DuckDB: The Atlas Auditor
+
+DuckDB is **not** used for runtime path retrieval or low-latency operations. Instead, it serves as the **Atlas Auditor**, detecting gaps and inconsistencies in our multi-backend indexing stack.
+
+### Audit Query: Identifying Graph & Ingest Gaps
+```sql
+SELECT feature,
+       count(*) AS unresolved_edges
+FROM topology_edges
+WHERE resolved = false
+GROUP BY feature
+ORDER BY unresolved_edges DESC;
+```
+
+### Audit Query: Finding Missing Glyphs & Unrewarded Paths
+```sql
+SELECT sourceRef
+FROM calls_edges
+LEFT JOIN glyph_records
+ON calls_edges.sourceRef = glyph_records.source_ref
+WHERE glyph_records.source_ref IS NULL;
+```
+
+These queries instantly reveal:
+1. Features not yet indexed.
+2. Code files without embeddings.
+3. Disconnected nodes or gaps in the GDS projection.
+4. Orphaned `SourceRefs`.
+5. Dead/unused imports.
+6. Dormant or unused tools.
+
+---
+
+## GPU Scaling Pipeline (cuJSON & cuDF)
+
+For normal indexing runs, NodeJS parsing handles the JSONL streams. However, as retrieval loops, tool traces, glyph rewards, and synthetic runs scale into the millions, CPU serialization becomes a major bottleneck.
+
+Our future scale architecture shifts parsing directly to the GPU:
+```
+[JSONL Data] ──► [cuJSON Parser] ──► [GPU Memory (cuDF Dataframe)] ──► [Embedding Engine] ──► [Qdrant]
+```
+This optimization eliminates:
+- CPU parsing bottlenecks.
+- Costly PCIe memory copies between CPU and GPU.
+- NodeJS/Python thread overhead.
+
+---
+
+## Protocol & Interaction Layer Definitions
+
+To keep terminology aligned, here are the distinctions between our formats, protocols, and APIs:
+
+| Technology | Role | Representation / Example |
+|---|---|---|
+| **JSON** | Raw, stateless data serialization. | `{"query": "find dependencies"}` |
+| **JSONB** | PostgreSQL binary JSON storage allowing deep querying and indexing. | `record_json->>'intent'` |
+| **JSON-RPC 2.0** | Stateless, light remote procedure call transport format. | `{"jsonrpc": "2.0", "method": "tools/call", "params": {}}` |
+| **MCP** | Model Context Protocol. A standardized client-server protocol built over JSON-RPC. | Gemma4 ──► OpenCode ──► MCP Client ──► atlas-tools-mcp |
+| **Gemma4 Tool Calling** | LLM-driven intent matching where Gemma selects tools, which are executed by the local client runtime. | `{"tool": "find_dependencies", "args": {"sourceRef": "server.ts"}}` |
+
+*Note: The model never runs code itself; it produces structured arguments that the local client runtime intercepts and executes.*
+
+---
+
+## Engram: Memory Orchestration
+
+Engram does **not** replace the storage layer. It sits above the databases as a memory orchestrator:
+
+- **Qdrant**: Stores vector embeddings for fast semantic cosine lookup.
+- **Neo4j**: Stores topological relationships, communities, and authority scores.
+- **Engram**: Orchestrates the memory lifecycle. It tracks retrieval traces, tool invocation logs, user decisions, reward values, and graph version history.
+
+---
+
 ## Stage Reference
 
 | # | Stage | Implementation | Output |
@@ -90,24 +215,6 @@ curl -N -X POST http://localhost:5173/api/codebase-index/orchestrate \
 SSE events stream back as `{ stage, status, message, progress }` so the admin page
 can render a live progress bar.
 
-### Single-stage (e.g., refresh summaries only)
-
-```bash
-curl -N -X POST http://localhost:5173/api/codebase-index/orchestrate \
-  -H "Content-Type: application/json" \
-  -d '{ "stages": ["summarize"], "summarize": true }'
-```
-
-### TurboQuant-first cluster summarization (standalone script)
-
-```bash
-# Requires TurboQuant llama-server on :8090 (see "TurboQuant setup" below)
-cd sveltekit-frontend
-npx tsx scripts/summarize-clusters-pg.ts --force --cluster=0
-
-# Falls back to Ollama :11434 (legacy fallback lane) automatically if TurboQuant unhealthy
-```
-
 ---
 
 ## TurboQuant Setup (Inference Layer)
@@ -128,182 +235,27 @@ Health check: `curl http://127.0.0.1:8090/health` → `{"status":"ok"}`
 
 ## Cache Invalidation Cascade
 
-Before this session the pipeline relied on TTL expiry only (10–30 min stale data).
-Now it's event-driven:
-
 | Trigger | Function | Patterns Cleared |
 |---|---|---|
 | `cluster_assign` completes | `invalidateIndexingCaches()` | `turbo:prefix:*`, `turbo:warm:*`, `turbo:dym:*`, `graph:case:*:neighbors`, `kb_bundle:*`, `research_bundle:*`, `summary:cluster:*`, `rag:search*`, `llm:semantic:*` + CouchDB `dag_cache` purge |
 | `summarize` completes | `invalidateResearchCaches()` | `turbo:prefix:*`, `turbo:warm:*`, `research_bundle:*`, `kb_bundle:*`, `rag:search*` |
 | `deep_research` completes | `invalidateResearchCaches()` | (same as above — refreshes TurboQuant prefix anchors that embed research summaries) |
 
-**Why:** TurboQuant pre-loads "prefix anchors" into GPU KV slots — system prompts
-that include the latest cluster summaries, RL policy weights, and DYM suggestions.
-When the underlying RAG data changes, those anchors go stale. Invalidation forces
-them to rebuild on next inference.
-
 ---
 
-## Karpathy Wiki Feedback Loop
+## The Next Atlas Milestones: Behavioral Supervision
 
-Deep research findings and error-prone domains are captured as durable notes:
+Rather than focusing on building UI changes or generating more embeddings, the next phase focuses on **Behavioral Supervision**: answering *why* specific tools were selected, *why* particular `SourceRefs` were returned, and *when* decisions become stale.
 
-| Node Type | Function | Triggered By |
-|---|---|---|
-| **Cluster note** | `generateClusterNote` | Stage 8 (wiki_export) |
-| **Research note** | `recordResearchNote` | Stage 10 (deep_research) |
-| **Playbook note** | `buildPlaybookNote` | Stage 6 (summarize) — fires for `ace`, `rag`, `indexer` domains |
-| **Retrieval note** | `recordRetrievalNote` | Per-query in RAG orchestrator |
-
-All notes live in CouchDB + Redis (`kb_bundle:*`), feeding back into ACE context
-assembly and GRPO reranking on the next query.
-
-## Query Routing Evaluation — Phase 18
-
-Phase 18 is the query-side hardening layer for the Atlas / HyperRAG stack. It validates messy developer query routing against the same Karpathy-indexed codebase state that this pipeline builds:
-
-- uses `codebase_chunks_768` as the indexed retrieval corpus
-- samples `gpu:karpathy:scores` as the authority blend signal
-- audits CHR97 fast-path gating and HyperRAG fallback decisions
-- writes evaluation reports to `docs/reports/messy-query-routing-eval.json` and `docs/reports/messy-query-routing-eval.md`
-
-Read the engineering completion doc at `docs/operator/PHASE_18_MESSY_QUERY_ROUTING.md`.
-
-This evaluation phase is intentionally non-production at first: it exists to verify that the indexed Karpathy retrieval surfaces and HyperRAG fallback are aligned before promoting the pattern to a live route.
-
----
-
-## Export & Analysis Surface
-
-All export paths share the indexed state built by the orchestrate pipeline
-(Postgres `codebase_chunk_index` + `cluster_summaries`, Qdrant `codebase_chunks_768`
-+ `knowledge_base`, Neo4j `CodebaseFile` nodes, Redis `wiki:note:*`).
-
-### Unified Bundle (primary entry point)
-
-`GET /api/codebase-index/export/bundle` returns everything in one JSON payload:
-
-```json
-{
-  "graph":     { "nodes": [...], "edges": [...] },
-  "clusters":  [{ "id", "purpose", "patterns", "warnings", "tags", "memberCount" }],
-  "wikiNotes": [{ "id", "type", "body": { ... } }],
-  "manifold4": [{ "id", "manifold": [som_cluster, gpu_cluster, pageRank, community_id] }],
-  "tileAtlas": { "tileCount", "source" },
-  "cacheStats":{ "turbo:*", "summary:cluster:*", "wiki:*", ... }
-}
-```
-
-Query params:
-- `?include=graph,clusters,wikiNotes,manifold4,tileAtlas,cacheStats` — selective parts
-- `?limit=N` — cap graph nodes/edges (default 2000)
-- `?repoId=default` — filter cluster_summaries by repo
-- `?format=ipynb` — 302 redirect to `/api/graph/colab-export` (Jupyter notebook)
-
-Degrades per-part: if Postgres is down, `graph`/`clusters`/`manifold4` are null
-but `wikiNotes`/`tileAtlas`/`cacheStats` (different backends) still return.
-
-### Downstream Consumers
-
-| Consumer | Path | What it ingests |
-|---|---|---|
-| **Google Colab (PyTorch)** | `GET /api/graph/colab-export` → `.ipynb` | 768-dim embeddings from Qdrant + Neo4j adjacency → GPU PageRank + K-Means + Kohonen SOM → writes `pagerank_score` + `SIMILAR_TOPOLOGY` back |
-| **LangGraph synthesis** | Docker `legal-ai-langgraph:8091` via `langgraph-client.ts` | HMM Baum-Welch + Redis KAG neighbor cache + `torch.compile()` GPU kernels |
-| **CouchDB PageRank** | `src/lib/server/graph/couchdb-pagerank.ts` | MapReduce views (`link_matrix`, `in_degree`, `out_degree`) → power iteration → Redis cache `couchdb:pagerank_scores` |
-| **Glyph Tile Atlas** | `src/lib/server/cartridge/glyph-tile-engine.ts` | kMeans centroids → 2D Voronoi → CouchDB `glyph_topology` + Redis tile cache |
-| **Minified Research** | `src/lib/server/analytics/minified-research-cache.ts` | Int8-quantized summary embeddings (768 f32 → Int8Array) + 64-bit tag bitmask atlas |
-| **Obsidian export** | `POST /api/codebase-index/export/obsidian` | Karpathy wiki notes → `.md` files with frontmatter |
-
-### Gemma4 → embeddinggemma Summary Path
-
-Stage 6 (`summarize`) writes:
-1. **Text summary** → Postgres `cluster_summaries.summary` (gemma4-rotorquant:latest via Ollama/TurboQuant)
-2. **768-dim embedding** → Postgres `cluster_summaries.summary_embedding` halfvec (embeddinggemma)
-3. **Qdrant mirror** → `codebase_chunks_768` payload `summary_embedding` vector (named-vector mode)
-4. **Minified** → Int8 quantized via `minified-research-cache.ts` (serves L1/L2/L3 cache tiers)
-
-This feeds back into:
-- **Graph nodes** — bundled via `/api/codebase-index/export/bundle` (`clusters[].hasSummaryEmbedding`)
-- **ACE context** — `assembleACEContext` pulls `cluster_summaries.summary` for query-relevant clusters
-- **MCP tools** — `rag:search` + `evidence:search_similar` over the Int8 atlas
-
-### FastMCP Agentic Tool Calling
-
-MCP server at `src/mcp/server.ts` exposes 28+ tools over stdio. Cosine similarity
-flows: WebGPU compute shader → WASM fallback → CPU (see `src/lib/gpu/gpu-compute-pipeline.ts`).
-
-Tool examples wired to the indexed state:
-- `rag:search` → Qdrant `codebase_chunks_768` / `knowledge_base` hybrid search
-- `evidence:search_similar` — cross-modal (CLIP/Whisper embeddings)
-- `neo4j_dependency_graph` — traverses `IMPORTS` + `SIMILAR_TOPOLOGY` edges
-- `cross_language_similarity` — GPU batch cosine over N:M vector sets
-- `agentic_recommendation` — combines cluster_summaries + wiki playbooks + PageRank to suggest fixes
-
-### Topological DB Backends (summary)
-
-| Backend | Role | Written By | Read By |
-|---|---|---|---|
-| **Postgres** `codebase_chunk_index` | Chunk metadata + halfvec embeddings | Stage 1 (ast_embed) | Bundle endpoint, cluster_summaries joins |
-| **Postgres** `cluster_summaries` | Gemma4 cluster summaries + embeddings | Stage 6 (summarize) | ACE context, bundle, MCP |
-| **Qdrant** `codebase_chunks_768` | Dual-vector (content + signature) ANN index | Stage 1 + mirror from Postgres | RAG search, MCP `rag:search` |
-| **Qdrant** `knowledge_base` | Deep research web results | Stage 10 (deep_research) | ACE, MCP |
-| **Neo4j** `CodebaseFile` + `SIMILAR_TOPOLOGY` | Graph relationships | Stage 3 (som_topology) + Colab write-back | Graph queries, bundle edges |
-| **CouchDB** `wiki_notes`, `glyph_topology`, `dag_cache` | Durable memory layer | Stages 6/8/10 + DAG ordering | Karpathy wiki browser, glyph renderer |
-| **Redis** `wiki:note:*`, `turbo:*`, `summary:cluster:*`, `embed:*` | Hot cache tier | Every stage (write-through) | Bundle cacheStats, invalidation cascade |
-
----
-
-## Admin Visualization
-
-**URL:** [http://localhost:5173/admin/codebase-index](http://localhost:5173/admin/codebase-index)
-
-Sibling pages:
-- `/admin/cache` — Redis / memory / GPU buffer pool stats
-- `/admin/codebase-graph` — Neo4j graph explorer (SIMILAR_TOPOLOGY edges)
-- `/admin/search-intelligence` — GRPO reranker leaderboard, RL audit trail
-- `/admin/topology` — SOM grid + cluster heatmap
-- `/admin/knowledge-search` — wiki note browser
-
-The orchestrate endpoint streams SSE events so any of these pages can subscribe
-to live progress via `EventSource`.
-
----
-
-## VS Code Tasks (Pipeline Control)
-
-All tasks live in `.vscode/tasks.json`. Run via `Ctrl+Shift+P` → **Tasks: Run Task**:
-
-| Task Label | Action |
-|---|---|
-| `📚 Admin: Open Codebase Pipeline` | Opens `/admin/codebase-index` in VS Code Simple Browser |
-| `🔄 Pipeline: Run Full Orchestrate (SSE)` | Triggers all 10 stages, streams progress to terminal |
-| `🔄 Pipeline: Summarize Only` | Stage 6 only — regenerates cluster summaries via TurboQuant |
-| `🔄 Pipeline: Deep Research Only` | Stage 10 only — refreshes research notes |
-| `🔄 Pipeline: Invalidate Downstream Caches` | Fires `invalidateIndexingCaches` manually |
-| `⚡ TurboQuant: Start (vision + text, :8090)` | Starts llama-server with VLM |
-| `⚡ TurboQuant: Health Check` | Verifies `:8090/health` |
-
----
-
-## Troubleshooting
-
-**TurboQuant falls back to Ollama** — check `curl http://127.0.0.1:8090/health`.
-If llama-server crashed, restart via the TurboQuant task.
-
-**Stale summaries after re-indexing** — Verify invalidation fired:
-```bash
-redis-cli --scan --pattern "turbo:prefix:*" | head
-# should be empty or only have fresh keys (TTL < original)
-```
-
-**Deep research runs but no wiki notes** — Check CouchDB `wiki_notes` DB.
-`recordResearchNote` is fire-and-forget; errors are swallowed to avoid
-blocking the pipeline. Check server logs for `[karpathy-wiki]` entries.
-
-**svelte-check errors after changes** — Expected invariants:
-- `AceChunkContext` has both `gpuCluster` and `somCluster` fields
-- `CACHE_PATTERNS` includes `TURBO_PREFIX`, `TURBO_WARM`, `TURBO_DYM`
-- `InvalidationType` includes `'indexing_complete'`, `'cluster_reassign'`, `'research_update'`
+### Execution Roadmap Priority
+1. **`USES_DB` Extraction**: Map all direct schema and database dependencies to `SourceRefs`.
+2. **`USES_TOOL` Extraction**: Standardize the extraction of tool dependencies and schemas across codebase paths.
+3. **Runtime Intent Graph**: Track query intent changes over the course of multi-turn sessions.
+4. **Graph Mutation Ledger**: Build a transactional audit log of structural codebase edits.
+5. **Synthetic Trace Simulator**: Generate fake execution and search paths to run offline tool validation.
+6. **Glyph Reward Computation**: Calculate performance scores based on the usefulness of context and tool results.
+7. **Training Pair Generation**: Export state-action pairs (decisions & outcomes) to build fine-tuning datasets.
+8. **LoRA Training**: Run local parameter-efficient fine-tuning on Gemma4 to automate optimal tool and context selection.
 
 ---
 

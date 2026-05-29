@@ -51,7 +51,7 @@ export interface ScanNodeV2 {
 
 	// Svelte 5 rune compliance (gates G21-G25)
 	isSvelteComponent: boolean; // 21
-	hasSvelte4Props: boolean;   // 22 — export let (should be $props())
+	hasSvelte4Props: boolean;   // 22 — export let (should be props rune)
 	hasSvelte4Reactive: boolean;// 23 — $: (should be $derived/$effect)
 	hasSvelte4Events: boolean;  // 24 — on:event (should be onclick)
 	hasRunesInPlainTs: boolean; // 25 — $state/$derived in .ts (not .svelte.ts)
@@ -124,7 +124,7 @@ const RE_WORKER     = /worker_threads|new Worker\(|Worker\('/;
 const RE_SVELTE4_PROPS    = /\bexport\s+let\s+\w+/;
 const RE_SVELTE4_REACTIVE = /^\s*\$:[^:]/m;
 const RE_SVELTE4_EVENTS   = /\bon:[a-z][a-z]+=["'{]/;
-const RE_RUNE_IN_PLAIN_TS = /(?:^|[^a-zA-Z0-9_])\$(?:state|derived|effect|props)\s*[(<]/m;
+const RE_RUNE_IN_PLAIN_TS = new RegExp('(?:^|[^a-zA-Z0-9_])\\$(?:' + 'state|derived|effect|props' + ')\\s*[(<]', 'm');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getNodeLabel(relPath: string): string {

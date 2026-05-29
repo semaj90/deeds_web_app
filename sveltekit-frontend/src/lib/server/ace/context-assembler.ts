@@ -52,6 +52,7 @@ import {
   traceVectorSearch,
   traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
+import { mkdirSync, appendFileSync } from 'node:fs';
 
 const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 65536);
 const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
@@ -147,6 +148,13 @@ import {
   rrfFuse,
   type ScoredResult,
 } from '$lib/server/routing/query-router-4x4.js';
+import {
+  buildAtlasRoutingMatrix,
+  scoreAceCandidate,
+  type SchemaMask,
+  formatRoutingSummary,
+  MATRIX_VERSION,
+} from './atlas-routing-matrix.js';
 import { buildRetrievalEdge, insertHyperedge } from '$lib/server/hypergraph/hypergraph-builder.js';
 import { recordLastQuery, recordEngramTransition } from '$lib/server/search/engram-bigram.js';
 import {
@@ -2382,6 +2390,89 @@ export async function assembleACEContext(opts: {
         ],
         { snippetCap: 300, totalBudget: 8000 }
       );
+
+      // Build a small Atlas routing matrix and score each ACE payload.
+      try {
+        const matrix = buildAtlasRoutingMatrix(String(query ?? ''));
+        const matrixSummary = formatRoutingSummary(matrix);
+        // Score, annotate, and emit traces for each payload (no behavior change)
+        finalContext.acePayloads = (finalContext.acePayloads || []).map((p: any, idx: number) => {
+          const schemaMask: SchemaMask = {
+            hasSourceRef: Array.isArray(p.sourceRefs) && p.sourceRefs.length > 0,
+            hasGraphNode: Boolean(p.graphPath || p.graphNode || p.hasGraphNode),
+            hasReward: typeof p.rewardScore === 'number' && p.rewardScore > 0,
+            isStale: Boolean(p.isStale),
+            isGenerated: Boolean(p.isGenerated),
+            isArchiveNoise: Boolean(p.isArchiveNoise),
+          };
+          const { score, breakdown } = scoreAceCandidate(p, matrix, schemaMask);
+          (p as any)._aceRouting = { score, breakdown, schemaMask };
+
+          // Build trace entry
+          const traceEntry = {
+            matrixVersion: MATRIX_VERSION,
+            matrix: matrixSummary,
+            query: String(query ?? ''),
+            payloadIndex: idx,
+            candidateSourceRef: p.sourceRef ?? p.filePath ?? null,
+            schemaMask,
+            routingScore: score,
+            scoreBreakdown: breakdown,
+            timestamp: new Date().toISOString(),
+          } as any;
+
+          // Emit to observability backends (best-effort)
+          try {
+            const policyPayload = { event: 'ace_routing', data: traceEntry } as any;
+            try {
+              (tracePolicy as any)?.(policyPayload);
+            } catch {}
+            try {
+              (traceVectorSearch as any)?.(policyPayload);
+            } catch {}
+          } catch {}
+
+          // Append to local dry-run trace file (no DB/Redis writes)
+          try {
+            mkdirSync('.tmp', { recursive: true });
+            appendFileSync(
+              '.tmp/ace-routing-matrix-trace.jsonl',
+              JSON.stringify(traceEntry) + '\n',
+              { encoding: 'utf8' }
+            );
+          } catch {}
+
+          return p;
+        });
+
+        // Sort by computed routing score but do not change semantics beyond annotation
+        (finalContext.acePayloads as any[]).sort(
+          (a: any, b: any) => (b._aceRouting?.score ?? 0) - (a._aceRouting?.score ?? 0)
+        );
+
+        // Write final rank summary line
+        try {
+          const ranked = (finalContext.acePayloads as any[]).map((p, i) => ({
+            index: i,
+            score: p._aceRouting?.score ?? 0,
+            candidateSourceRef: p.sourceRef ?? p.filePath ?? null,
+          }));
+          const summary = {
+            matrixVersion: MATRIX_VERSION,
+            query: String(query ?? ''),
+            ranked,
+            timestamp: new Date().toISOString(),
+          };
+          appendFileSync(
+            '.tmp/ace-routing-matrix-trace.jsonl',
+            JSON.stringify({ summary }) + '\n',
+            { encoding: 'utf8' }
+          );
+        } catch {}
+      } catch (err) {
+        // non-fatal: leave acePayloads as-is
+        console.warn('[ACE routing] matrix scoring failed:', (err as Error)?.message ?? err);
+      }
 
       // Fire-and-forget: persist top chunks to ace_chunks for future cache hits
       if (caseId) {

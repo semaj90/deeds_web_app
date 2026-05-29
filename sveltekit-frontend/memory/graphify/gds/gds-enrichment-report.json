@@ -1,0 +1,218 @@
+{
+  "timestamp": "2026-05-29T22:12:09.688Z",
+  "dryRun": false,
+  "force": false,
+  "algorithms": {
+    "louvain": {
+      "success": true,
+      "data": {
+        "communities": 14525,
+        "nodesProcessed": 17056
+      },
+      "communities": 14525,
+      "nodesProcessed": 17056,
+      "records": [
+        {
+          "keys": [
+            "communities",
+            "nodesProcessed"
+          ],
+          "length": 2,
+          "_fields": [
+            {
+              "low": 14525,
+              "high": 0
+            },
+            {
+              "low": 17056,
+              "high": 0
+            }
+          ],
+          "_fieldLookup": {
+            "communities": 0,
+            "nodesProcessed": 1
+          }
+        }
+      ]
+    },
+    "betweenness": {
+      "success": true,
+      "data": {
+        "nodesScored": 17056,
+        "maxScore": 12749.399999999996
+      },
+      "nodesScored": 17056,
+      "maxScore": 12749.399999999996,
+      "records": [
+        {
+          "keys": [
+            "nodesScored",
+            "maxScore"
+          ],
+          "length": 2,
+          "_fields": [
+            {
+              "low": 17056,
+              "high": 0
+            },
+            12749.399999999996
+          ],
+          "_fieldLookup": {
+            "nodesScored": 0,
+            "maxScore": 1
+          }
+        }
+      ]
+    },
+    "pagerank": {
+      "success": true,
+      "data": {
+        "nodesScored": 17056,
+        "maxScore": 54.809619503524075,
+        "avgScore": 0.1738618464256337
+      },
+      "nodesScored": 17056,
+      "maxScore": 54.809619503524075,
+      "avgScore": 0.1738618464256337,
+      "records": [
+        {
+          "keys": [
+            "nodesScored",
+            "maxScore",
+            "avgScore"
+          ],
+          "length": 3,
+          "_fields": [
+            {
+              "low": 17056,
+              "high": 0
+            },
+            54.809619503524075,
+            0.1738618464256337
+          ],
+          "_fieldLookup": {
+            "nodesScored": 0,
+            "maxScore": 1,
+            "avgScore": 2
+          }
+        }
+      ]
+    }
+  },
+  "edges": {
+    "shares_cluster": {
+      "success": true,
+      "data": {
+        "edgesCreated": 36791
+      },
+      "edgesCreated": 36791,
+      "records": [
+        {
+          "keys": [
+            "edgesCreated"
+          ],
+          "length": 1,
+          "_fields": [
+            {
+              "low": 36791,
+              "high": 0
+            }
+          ],
+          "_fieldLookup": {
+            "edgesCreated": 0
+          }
+        }
+      ]
+    },
+    "high_authority": {
+      "success": true,
+      "data": {
+        "edgesCreated": 4696
+      },
+      "edgesCreated": 4696,
+      "records": [
+        {
+          "keys": [
+            "edgesCreated"
+          ],
+          "length": 1,
+          "_fields": [
+            {
+              "low": 4696,
+              "high": 0
+            }
+          ],
+          "_fieldLookup": {
+            "edgesCreated": 0
+          }
+        }
+      ]
+    }
+  },
+  "errors": [],
+  "stats": {
+    "totalFiles": 17056,
+    "withCommunity": 17032,
+    "withBetweenness": 11240,
+    "withPageRank": 17032
+  },
+  "projection": {
+    "success": true,
+    "data": {
+      "graphName": "codeGraph",
+      "nodeCount": 17056,
+      "relationshipCount": 4696
+    },
+    "graphName": "codeGraph",
+    "nodeCount": 17056,
+    "relationshipCount": 4696,
+    "records": [
+      {
+        "keys": [
+          "graphName",
+          "nodeCount",
+          "relationshipCount"
+        ],
+        "length": 3,
+        "_fields": [
+          "codeGraph",
+          {
+            "low": 17056,
+            "high": 0
+          },
+          {
+            "low": 4696,
+            "high": 0
+          }
+        ],
+        "_fieldLookup": {
+          "graphName": 0,
+          "nodeCount": 1,
+          "relationshipCount": 2
+        }
+      }
+    ]
+  },
+  "dropProjection": {
+    "success": true,
+    "data": {
+      "graphName": "codeGraph"
+    },
+    "graphName": "codeGraph",
+    "records": [
+      {
+        "keys": [
+          "graphName"
+        ],
+        "length": 1,
+        "_fields": [
+          "codeGraph"
+        ],
+        "_fieldLookup": {
+          "graphName": 0
+        }
+      }
+    ]
+  },
+  "duration_ms": 12885
+}

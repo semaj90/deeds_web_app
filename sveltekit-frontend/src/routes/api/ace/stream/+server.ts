@@ -1,5 +1,7 @@
+import { z } from 'zod';
 import { redisGetAcePacket, redisSetAcePacket, hashQuery } from '$lib/server/cache/ace-packet-cache.js';
 import { buildVarianceRecoveryContext } from '$lib/server/ace/variance-recovery.js';
+import { buildStreamPreamble } from '$lib/server/mcp/atlas-tools-client.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
@@ -10,6 +12,10 @@ import {
 } from '$lib/server/token-map/token-map-service.js';
 
 const execAsync = promisify(exec);
+
+const postSchema = z.object({
+  query: z.string().min(1),
+});
 
 function makeRequestFromUrl(url: URL) {
   const query = url.searchParams.get('q') ?? url.searchParams.get('query') ?? '';
@@ -81,7 +87,20 @@ async function buildAcePacket(query: string) {
 
 export async function POST({ request, locals }) {
   if (!locals.user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
-  const { query } = await request.json();
+  
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  const parsed = postSchema.safeParse(body);
+  if (!parsed.success) {
+    return new Response(JSON.stringify({ error: 'Invalid input parameters', details: parsed.error.format() }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  const { query } = parsed.data;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -93,8 +112,29 @@ export async function POST({ request, locals }) {
       
       const cacheKey = hashQuery(query);
       const queryHash = cacheKey.split(':').pop() ?? `query-${Date.now()}`;
+
+      // ── Atlas-tools preamble (classify intent + RAG context) ─────────────────
+      // Runs in parallel with cache lookup. Fails silently — stream continues.
+      const preamblePromise = buildStreamPreamble(query, 12).catch((err) => {
+        console.warn(`[ace:stream] atlas-tools preamble skipped: ${(err as Error).message}`);
+        return null;
+      });
+
       const cached = await redisGetAcePacket(cacheKey).catch(() => null);
       let packetToUse = cached;
+
+      const preamble = await preamblePromise;
+      if (preamble) {
+        send({ type: 'atlas.intent', ...preamble.intent });
+        send({
+          type: 'atlas.rag',
+          ok: preamble.rag.ok,
+          totalCards: preamble.rag.totalCards,
+          packetAge: preamble.rag.packetAge,
+          sourceRefs: preamble.rag.sourceRefs.slice(0, 5),
+          promptPacket: preamble.rag.promptPacket,
+        });
+      }
 
       if (cached) {
         send({ type: 'cache.hit', key: cacheKey });
@@ -167,7 +207,9 @@ export async function POST({ request, locals }) {
 }
 
 export async function GET({ url, params, locals }) {
+  if (!locals.user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   return POST({
     request: makeRequestFromUrl(url),
+    locals,
   } as Parameters<typeof POST>[0]);
 }

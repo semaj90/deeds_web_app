@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T16:22:51.722Z",
+  "generatedAt": "2026-05-29T22:17:13.464Z",
   "queries": [
     {
       "query": "why does the evidence upload modal reject files when qdrant is healthy and the Redis cache shows old gpu:karpathy:scores values",
@@ -1699,7 +1699,78 @@
       ]
     }
   ],
-  "sampleKarpathy": [],
+  "sampleKarpathy": [
+    {
+      "file": "src/lib/server/db/client.ts",
+      "blend": 3219.3631755785373,
+      "pr": 21.13428017365547,
+      "attn": null,
+      "authority": 10702.526190476186
+    },
+    {
+      "file": "src/lib/server/research/web-research-ingester.ts",
+      "blend": 167.0451124268324,
+      "pr": 0.9877810670809659,
+      "attn": null,
+      "authority": 555.5
+    },
+    {
+      "file": "src/lib/server/db/schema-postgres.ts",
+      "blend": 96.89884780140962,
+      "pr": 54.809619503524075,
+      "attn": null,
+      "authority": 249.91666666666663
+    },
+    {
+      "file": "src/lib/server/vector/qdrant-manager.ts",
+      "blend": 94.5323831278126,
+      "pr": 1.343457819531431,
+      "attn": null,
+      "authority": 313.3166666666667
+    },
+    {
+      "file": "src/lib/types/enhanced-svelte5-types.ts",
+      "blend": 41.54890408892606,
+      "pr": 3.3972602223151713,
+      "attn": null,
+      "authority": 133.96666666666664
+    },
+    {
+      "file": "src/lib/server/env.server.ts",
+      "blend": 16.680229599777636,
+      "pr": 41.21980881314656,
+      "attn": null,
+      "authority": 0
+    },
+    {
+      "file": "src/lib/server/observability/langfuse.ts",
+      "blend": 6.69874387116438,
+      "pr": 8.346859677910949,
+      "attn": null,
+      "authority": 11.2
+    },
+    {
+      "file": "src/lib/server/minio-client.ts",
+      "blend": 2.585938298611111,
+      "pr": 0.7773457465277779,
+      "attn": null,
+      "authority": 7.583333333333333
+    },
+    {
+      "file": "src/lib/server/cache-keys.ts",
+      "blend": 2.4918771646164495,
+      "pr": 0.8762021115451389,
+      "attn": null,
+      "authority": 6.666666666666666
+    },
+    {
+      "file": "src/lib/env/index.ts",
+      "blend": 1.8437774817369885,
+      "pr": 4.221378571428572,
+      "attn": null,
+      "authority": 0
+    }
+  ],
   "documentationRefs": [
     {
       "title": "Parent Atlas Karpathy Pipeline",

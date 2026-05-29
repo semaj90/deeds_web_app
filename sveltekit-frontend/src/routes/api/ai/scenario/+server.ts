@@ -2,14 +2,25 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
 import { upsertScenario, findScenarioBySourceRefAndHash, getScenarioById } from '$lib/server/ai/scenario-cache';
 
+import { z } from 'zod';
+
+const scenarioUpsertSchema = z.object({
+  source_ref: z.string(),
+  content_hash: z.string(),
+  name: z.string().nullish(),
+  description: z.string().nullish(),
+  metadata: z.record(z.string(), z.any()).nullish(),
+  embedding: z.array(z.number()).nullish(),
+});
+
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const body = await request.json();
-    // Expecting Scenario shape: source_ref, content_hash, name, description, metadata, embedding
-    if (!body?.source_ref || !body?.content_hash) {
-      return json({ error: 'missing source_ref or content_hash' }, { status: 400 });
+    const result = scenarioUpsertSchema.safeParse(body);
+    if (!result.success) {
+      return json({ error: 'Validation failed', details: result.error.flatten() }, { status: 400 });
     }
-    const row = await upsertScenario(body);
+    const row = await upsertScenario(result.data);
     return json({ ok: true, row });
   } catch (err) {
     return json({ error: String(err) }, { status: 500 });

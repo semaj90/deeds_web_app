@@ -78,13 +78,40 @@ async function main() {
 
   const line = JSON.stringify(row) + '\n';
   try {
-    // append atomically
+    // append atomically to legacy path
     fs.appendFileSync(outPath, line, { encoding: 'utf8' });
-    console.log('Appended retrieval-loop row to', outPath);
-    console.log(JSON.stringify(row, null, 2));
+    console.log('Appended legacy retrieval-loop row to', outPath);
   } catch (e) {
-    console.error('Failed to append retrieval-loop row:', e);
-    process.exitCode = 1;
+    console.warn('Failed to append to legacy path (non-fatal):', e);
+  }
+
+  // Forward to new record-retrieval-outcome.mjs ledger
+  try {
+    const { execSync } = await import('child_process');
+    const newOutcomePayload = {
+      query: row.query,
+      intent: row.intent,
+      domain: row.domain,
+      subdomain: 'legacy-hook',
+      toolsUsed: [row.tool],
+      sourceRefs: row.sourceRefs,
+      graphNodes: row.selectedCardIds,
+      cacheHit: false,
+      recommendationAccepted: row.feedback === 'accepted' ? true : (row.feedback === 'rejected' ? false : null),
+      outcome: row.outcome === 'dry_run' ? 'pending' : (row.outcome || 'pending'),
+      reward: row.rerankScore,
+      graphVersion: '2026-05-29',
+      notes: `Legacy feedback: ${row.feedback}`
+    };
+
+    const recordScript = path.join(root, 'scripts/atlas/record-retrieval-outcome.mjs');
+    execSync(`node "${recordScript}"`, {
+      input: JSON.stringify(newOutcomePayload),
+      encoding: 'utf-8'
+    });
+    console.log('Successfully forwarded to scripts/atlas/record-retrieval-outcome.mjs');
+  } catch (e) {
+    console.error('Failed to forward to record-retrieval-outcome.mjs:', e.message);
   }
 }
 

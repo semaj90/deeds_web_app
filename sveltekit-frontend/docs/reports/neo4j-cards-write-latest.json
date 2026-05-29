@@ -1,11 +1,8 @@
 {
   "ok": true,
-  "skipped": true,
-  "reason": "Unable to authenticate to Neo4j at bolt://127.0.0.1:7687 as neo4j_bad_user. Last error: The client is unauthorized due to authentication failure. (fail-open enabled)",
+  "skipped": false,
+  "cards": 100,
+  "edges": 3358,
   "reportPath": "docs/reports/neo4j-cards-write-latest.json",
-  "failOpen": true,
-  "errorClass": "service_auth_failure",
-  "service": "neo4j",
-  "repairLane": "env_credentials",
   "smokeCommand": "npm run neo4j:cards:write"
 }

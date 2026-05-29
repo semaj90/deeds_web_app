@@ -401,6 +401,35 @@ export const agentObservations = pgTable('agent_observations', {
 export type AgentObservation = typeof agentObservations.$inferSelect;
 export type NewAgentObservation = typeof agentObservations.$inferInsert;
 
+// === GLYPH RECORDS & LORA TRAINING RUNS ===
+// glyphRecords is declared below at the canonical location (~line 3748).
+// Types are exported alongside the table definition.
+
+export const loraTrainingRuns = pgTable('lora_training_runs', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  runId: text('run_id').notNull(),
+  modelId: text('model_id').notNull(),
+  baseModel: text('base_model'),
+  datasetUri: text('dataset_uri'),
+  checkpointUri: text('checkpoint_uri'),
+  seaweedObjectKey: text('seaweed_object_key'),
+  status: text('status').notNull().default('planned'),
+  metricsJson: jsonb('metrics_json').default({}),
+  configJson: jsonb('config_json').default({}),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+}, (t) => ({
+  indexes: [
+    index('lora_runs_run_id_idx').on(t.runId),
+    index('lora_runs_model_id_idx').on(t.modelId),
+    index('lora_runs_checkpoint_idx').on(t.checkpointUri),
+    index('lora_runs_created_at_idx').on(t.createdAt),
+  ],
+}));
+
+export type LoraTrainingRun = typeof loraTrainingRuns.$inferSelect;
+export type NewLoraTrainingRun = typeof loraTrainingRuns.$inferInsert;
+
 // === EVIDENCE RELATIONSHIPS ===
 export const evidenceRelationships = pgTable('evidence_relationships',
  {
@@ -3742,20 +3771,34 @@ export const glyphRecords = pgTable('glyph_records', {
   // Full canonical GlyphRecord for round-trip fidelity (embedding omitted — stays in Qdrant)
   recordJson: jsonb('record_json').notNull().default(sql`'{}'::jsonb`),
 
+  // Atlas training metadata
+  sourceRef: text('source_ref'),
+  glyphKind: text('glyph_kind'),
+  embeddingModel: text('embedding_model').notNull().default('embeddinggemma:latest'),
+  batchId: text('batch_id'),
+
   createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => ({
-  glyphIdIdx:   index('glyph_records_glyph_id_idx').on(table.glyphId),
-  sourceIdx:    index('glyph_records_source_idx').on(table.sourceId),
-  caseIdx:      index('glyph_records_case_idx').on(table.caseId),
-  clusterIdx:   index('glyph_records_cluster_idx').on(table.somCluster),
-  centroidIdx:  index('glyph_records_centroid_idx').on(table.centroidId),
-  sectionIdx:   index('glyph_records_section_idx').on(table.section),
-  rewardIdx:    index('glyph_records_reward_idx').on(table.grpoRewardScore),
+  glyphIdIdx:    index('glyph_records_glyph_id_idx').on(table.glyphId),
+  sourceIdx:     index('glyph_records_source_idx').on(table.sourceId),
+  caseIdx:       index('glyph_records_case_idx').on(table.caseId),
+  clusterIdx:    index('glyph_records_cluster_idx').on(table.somCluster),
+  centroidIdx:   index('glyph_records_centroid_idx').on(table.centroidId),
+  sectionIdx:    index('glyph_records_section_idx').on(table.section),
+  rewardIdx:     index('glyph_records_reward_idx').on(table.grpoRewardScore),
+  sourceRefIdx:  index('glyph_records_source_ref_idx').on(table.sourceRef),
+  glyphKindIdx:  index('glyph_records_glyph_kind_idx').on(table.glyphKind),
+  batchIdIdx:    index('glyph_records_batch_id_idx').on(table.batchId),
 }));
 
-export type GlyphRecordRow = typeof glyphRecords.$inferSelect;
+// All glyph type aliases in one place
+export type GlyphRecordRow  = typeof glyphRecords.$inferSelect;
 export type NewGlyphRecordRow = typeof glyphRecords.$inferInsert;
+/** @deprecated use GlyphRecordRow */
+export type GlyphRecord     = GlyphRecordRow;
+/** @deprecated use NewGlyphRecordRow */
+export type NewGlyphRecord  = NewGlyphRecordRow;
 
 // QLoRA training examples live in schema/search-analytics.ts (drizzle-kit managed).
 // Import from there: import { qloraExamples } from '$lib/server/db/schema';
@@ -4650,4 +4693,6 @@ export const llmSynthesisEvents = pgTable('llm_synthesis_events', {
 export type LlmSynthesisEvent = typeof llmSynthesisEvents.$inferSelect;
 export type NewLlmSynthesisEvent = typeof llmSynthesisEvents.$inferInsert;
 
-
+// GlyphRecord_DB aliases the canonical glyphRecords table (defined at line ~3748).
+export type GlyphRecord_DB = typeof glyphRecords.$inferSelect;
+export type NewGlyphRecord_DB = typeof glyphRecords.$inferInsert;

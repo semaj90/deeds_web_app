@@ -143,8 +143,9 @@ for (const file of files) {
       if (lastImportIdx !== -1) {
         const lineEnd = changed.indexOf('\n', lastImportIdx + 1);
         if (lineEnd !== -1) {
-          changed = changed.slice(0, lineEnd + 1) +
-            "import { ENV } from '$lib/server/env.server.js';\n" +
+          changed =
+            changed.slice(0, lineEnd + 1) +
+            "import { ENV } from 'sveltekit-frontend/src/lib/server/env.server.ts';\n" +
             changed.slice(lineEnd + 1);
         }
       }

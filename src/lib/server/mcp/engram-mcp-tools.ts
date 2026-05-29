@@ -1,5 +1,5 @@
 import { RedisClient } from '@redis/client';
-import { injectEngramPacket } from '$lib/server/db/schema-engram.js';
+import { injectEngramPacket } from 'sveltekit-frontend/src/lib/server/db/schema-engram.ts';
 import { RedisClientType } from 'redis';
 
 // Assuming a singleton Redis connection pool is available via a service module
@@ -17,7 +17,7 @@ export async function engram_ace_packet_inject(runId: string, packetData: { summ
         // 1. Write to Redis (Redis-first approach for <10ms latency)
         const redisKey = `ace:packet:${runId}`;
         await redisClient.set(redisKey, JSON.stringify(packetData));
-        
+
         // 2. Persist to Drizzle Schema (Asynchronous sync job)
         // This call is intentionally fire-and-forget from the MCP perspective
         await db.insert(injectEngramPacket).values({

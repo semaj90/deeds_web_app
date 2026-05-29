@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { json } from '@sveltejs/kit';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -12,6 +13,10 @@ import {
 
 const execAsync = promisify(exec);
 
+const postSchema = z.object({
+  query: z.string().min(1),
+});
+
 function makeRequestFromUrl(url: URL) {
   const query = url.searchParams.get('q') ?? url.searchParams.get('query') ?? '';
   return new Request(url, {
@@ -23,10 +28,20 @@ function makeRequestFromUrl(url: URL) {
 
 export async function POST({ request, locals }) {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
-  const { query } = await request.json();
-  if (!query) {
-    return json({ error: "Missing query" }, { status: 400 });
+  
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: 'Invalid JSON body' }, { status: 400 });
   }
+
+  const parsed = postSchema.safeParse(body);
+  if (!parsed.success) {
+    return json({ error: 'Invalid input parameters', details: parsed.error.format() }, { status: 400 });
+  }
+
+  const { query } = parsed.data;
 
   const scriptPath = path.join(process.cwd(), 'scripts', 'ace', 'build-packet.mjs');
   await execAsync(`node ${scriptPath} "${query}"`);
@@ -79,7 +94,9 @@ export async function POST({ request, locals }) {
 }
 
 export async function GET({ url, request, params, locals }) {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   return POST({
     request: makeRequestFromUrl(url),
+    locals,
   } as Parameters<typeof POST>[0]);
 }

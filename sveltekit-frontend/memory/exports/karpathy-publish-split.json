@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T19:48:47.863Z",
+  "generatedAt": "2026-05-29T15:41:07.590Z",
   "sourceCount": 100,
   "selectedCount": 16,
   "maxRawHotness": 1.7326,
@@ -226,7 +226,7 @@
     {
       "clusterKey": "cluster:gpu:88",
       "clusterId": 88,
-      "hotness": 0.9681,
+      "hotness": 0.9748,
       "source": "ace:cluster:hot",
       "fileCount": 123,
       "summary": "const chunks in `src/lib/server/db` (tag: database)",
@@ -250,12 +250,12 @@
         "src/lib/db/schema"
       ],
       "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/relations.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
-      "scalarSeed": 0.7762
+      "scalarSeed": 0.7798
     },
     {
       "clusterKey": "cluster:gpu:53",
       "clusterId": 53,
-      "hotness": 0.918,
+      "hotness": 0.934,
       "source": "ace:cluster:hot",
       "fileCount": 84,
       "summary": "const chunks in `src/lib/server/db` (tag: database)",
@@ -280,17 +280,17 @@
         "src/lib/server/db/schema"
       ],
       "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/schema/legal-citations.ts, src/lib/server/db/schema-evidence-crud.ts | Topo: src/lib/server/db, src/lib/types, src/lib/server/db/schema",
-      "scalarSeed": 0.7481
+      "scalarSeed": 0.7569
     },
     {
       "clusterKey": "cluster:gpu:75",
       "clusterId": 75,
-      "hotness": 0.6359,
+      "hotness": 0.7146,
       "source": "ace:cluster:hot",
       "fileCount": 416,
       "summary": "function chunks in `src/lib/config` (tag: embedding)",
       "purpose": "",
-      "riskLevel": "low",
+      "riskLevel": "medium",
       "mitigationProtocols": [],
       "topTags": [
         "embedding",
@@ -308,8 +308,36 @@
         "src/lib/server",
         "src/lib/server/config"
       ],
-      "metadataSummary": "function chunks in `src/lib/config` (tag: embedding) | Risk: low | Tags: embedding, vector, redis, rabbitmq, ai | Files: src/lib/config/env.server.ts, src/lib/server/minio.ts | Topo: src/lib/config, src/lib/server, src/lib/server/config",
-      "scalarSeed": 0.6285
+      "metadataSummary": "function chunks in `src/lib/config` (tag: embedding) | Risk: medium | Tags: embedding, vector, redis, rabbitmq, ai | Files: src/lib/config/env.server.ts, src/lib/server/minio.ts | Topo: src/lib/config, src/lib/server, src/lib/server/config",
+      "scalarSeed": 0.6718
+    },
+    {
+      "clusterKey": "cluster:gpu:94",
+      "clusterId": 94,
+      "hotness": 0.5648,
+      "source": "ace:cluster:hot",
+      "fileCount": 921,
+      "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "redis",
+        "cache",
+        "api",
+        "server",
+        "embedding"
+      ],
+      "topFiles": [
+        "src/lib/server/cache.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/cache",
+        "src/lib/server",
+        "src/lib/cache"
+      ],
+      "metadataSummary": "function chunks in `src/lib/server/cache` (tag: redis) | Risk: low | Tags: redis, cache, api, server, embedding | Files: src/lib/server/cache.ts | Topo: src/lib/server/cache, src/lib/server, src/lib/cache",
+      "scalarSeed": 0.602
     },
     {
       "clusterKey": "cluster:gpu:59",
@@ -337,115 +365,86 @@
       "scalarSeed": 0.4576
     },
     {
-      "clusterKey": "cluster:gpu:94",
-      "clusterId": 94,
-      "hotness": 0.4773,
+      "clusterKey": "cluster:gpu:86",
+      "clusterId": 86,
+      "hotness": 0.5216,
       "source": "ace:cluster:hot",
-      "fileCount": 921,
-      "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+      "fileCount": 680,
+      "summary": "function chunks in `src/lib/components/evidence` (tag: embedding)",
       "purpose": "",
       "riskLevel": "low",
       "mitigationProtocols": [],
       "topTags": [
-        "redis",
-        "cache",
-        "api",
-        "server",
-        "embedding"
+        "embedding",
+        "server-module",
+        "vector",
+        "page-component",
+        "redis"
       ],
       "topFiles": [
-        "src/lib/server/cache.ts"
+        "src/lib/server/embeddings/ollama.ts"
       ],
       "topoClasses": [
-        "src/lib/server/cache",
-        "src/lib/server",
-        "src/lib/cache"
+        "src/lib/components/evidence",
+        "src/lib/types",
+        "src/lib/server/cartridge"
       ],
-      "metadataSummary": "function chunks in `src/lib/server/cache` (tag: redis) | Risk: low | Tags: redis, cache, api, server, embedding | Files: src/lib/server/cache.ts | Topo: src/lib/server/cache, src/lib/server, src/lib/cache",
-      "scalarSeed": 0.5539
+      "metadataSummary": "function chunks in `src/lib/components/evidence` (tag: embedding) | Risk: low | Tags: embedding, server-module, vector, page-component, redis | Files: src/lib/server/embeddings/ollama.ts | Topo: src/lib/components/evidence, src/lib/types, src/lib/server/cartridge",
+      "scalarSeed": 0.5695
     },
     {
-      "clusterKey": "cluster:gpu:90",
-      "clusterId": 90,
-      "hotness": 0.4494,
+      "clusterKey": "cluster:gpu:56",
+      "clusterId": 56,
+      "hotness": 0.5216,
       "source": "ace:cluster:hot",
-      "fileCount": 158,
-      "summary": "function chunks in `src/lib/server` (tag: auth)",
+      "fileCount": 10,
+      "summary": "type chunks in `src/lib/server` (tag: embedding)",
       "purpose": "",
       "riskLevel": "low",
       "mitigationProtocols": [],
       "topTags": [
-        "auth",
-        "api",
-        "server"
+        "embedding",
+        "vector",
+        "redis",
+        "types"
       ],
       "topFiles": [
-        "src/lib/server/lucia.ts"
+        "src/lib/server/embeddings/ollama.ts"
       ],
       "topoClasses": [
         "src/lib/server",
-        "src/routes/api/auth/logout",
+        "src/lib/server/embeddings",
         "src/lib/types"
       ],
-      "metadataSummary": "function chunks in `src/lib/server` (tag: auth) | Risk: low | Tags: auth, api, server | Files: src/lib/server/lucia.ts | Topo: src/lib/server, src/routes/api/auth/logout, src/lib/types",
-      "scalarSeed": 0.4668
+      "metadataSummary": "type chunks in `src/lib/server` (tag: embedding) | Risk: low | Tags: embedding, vector, redis, types | Files: src/lib/server/embeddings/ollama.ts | Topo: src/lib/server, src/lib/server/embeddings, src/lib/types",
+      "scalarSeed": 0.4396
     },
     {
-      "clusterKey": "cluster:gpu:20",
-      "clusterId": 20,
-      "hotness": 0.4485,
+      "clusterKey": "cluster:gpu:92",
+      "clusterId": 92,
+      "hotness": 0.4822,
       "source": "ace:cluster:hot",
-      "fileCount": 883,
-      "summary": "function chunks in `src/lib/webgpu` (tag: embedding)",
+      "fileCount": 940,
+      "summary": "component chunks in `src/lib/components/evidence` (tag: embedding)",
       "purpose": "",
       "riskLevel": "low",
       "mitigationProtocols": [],
       "topTags": [
         "embedding",
-        "redis",
-        "vector",
-        "auth",
-        "schema"
+        "page",
+        "component",
+        "xstate"
       ],
       "topFiles": [
-        "src/lib/server/gpu/libtorch-bridge.ts"
+        "src/lib/client/ui/POIPhotoUploader.svelte"
       ],
       "topoClasses": [
-        "src/lib/webgpu",
-        "src/lib/server/gpu",
-        "src/lib/gpu"
+        "src/lib/components/evidence",
+        "src/lib/components",
+        "src/lib/components/yorha/evidence"
       ],
-      "metadataSummary": "function chunks in `src/lib/webgpu` (tag: embedding) | Risk: low | Tags: embedding, redis, vector, auth, schema | Files: src/lib/server/gpu/libtorch-bridge.ts | Topo: src/lib/webgpu, src/lib/server/gpu, src/lib/gpu",
-      "scalarSeed": 0.5368
-    },
-    {
-      "clusterKey": "cluster:gpu:57",
-      "clusterId": 57,
-      "hotness": 0.4459,
-      "source": "ace:cluster:hot",
-      "fileCount": 1099,
-      "summary": "const chunks in `src/lib/shims` (tag: embedding)",
-      "purpose": "",
-      "riskLevel": "low",
-      "mitigationProtocols": [],
-      "topTags": [
-        "embedding",
-        "vector",
-        "auth",
-        "server-module",
-        "config"
-      ],
-      "topFiles": [
-        "src/lib/server/gpu/libtorch-bridge.ts",
-        "src/lib/server/retrieval/context-buffer.ts"
-      ],
-      "topoClasses": [
-        "src/lib/shims",
-        "src/lib/server/vector",
-        "src/lib"
-      ],
-      "metadataSummary": "const chunks in `src/lib/shims` (tag: embedding) | Risk: low | Tags: embedding, vector, auth, server-module, config | Files: src/lib/server/gpu/libtorch-bridge.ts, src/lib/server/retrieval/context-buffer.ts | Topo: src/lib/shims, src/lib/server/vector, src/lib",
-      "scalarSeed": 0.5494
+      "metadataSummary": "component chunks in `src/lib/components/evidence` (tag: embedding) | Risk: low | Tags: embedding, page, component, xstate | Files: src/lib/client/ui/POIPhotoUploader.svelte | Topo: src/lib/components/evidence, src/lib/components, src/lib/components/yorha/evidence",
+      "scalarSeed": 0.5467
     }
   ],
   "scrollRows": [
@@ -671,8 +670,8 @@
     {
       "clusterKey": "cluster:gpu:88",
       "clusterId": 88,
-      "rawHotness": 1.6773,
-      "hotness": 0.9681,
+      "rawHotness": 1.6889,
+      "hotness": 0.9748,
       "fileCount": 123,
       "summary": "const chunks in `src/lib/server/db` (tag: database)",
       "purpose": "",
@@ -694,14 +693,14 @@
         "src/lib/server/db/schema",
         "src/lib/db/schema"
       ],
-      "scalarSeed": 0.7762,
+      "scalarSeed": 0.7798,
       "source": "ace:cluster:hot"
     },
     {
       "clusterKey": "cluster:gpu:53",
       "clusterId": 53,
-      "rawHotness": 1.5905,
-      "hotness": 0.918,
+      "rawHotness": 1.6182,
+      "hotness": 0.934,
       "fileCount": 84,
       "summary": "const chunks in `src/lib/server/db` (tag: database)",
       "purpose": "",
@@ -724,18 +723,18 @@
         "src/lib/types",
         "src/lib/server/db/schema"
       ],
-      "scalarSeed": 0.7481,
+      "scalarSeed": 0.7569,
       "source": "ace:cluster:hot"
     },
     {
       "clusterKey": "cluster:gpu:75",
       "clusterId": 75,
-      "rawHotness": 1.1017,
-      "hotness": 0.6359,
+      "rawHotness": 1.2381,
+      "hotness": 0.7146,
       "fileCount": 416,
       "summary": "function chunks in `src/lib/config` (tag: embedding)",
       "purpose": "",
-      "riskLevel": "low",
+      "riskLevel": "medium",
       "mitigationProtocols": [],
       "topTags": [
         "embedding",
@@ -753,7 +752,35 @@
         "src/lib/server",
         "src/lib/server/config"
       ],
-      "scalarSeed": 0.6285,
+      "scalarSeed": 0.6718,
+      "source": "ace:cluster:hot"
+    },
+    {
+      "clusterKey": "cluster:gpu:94",
+      "clusterId": 94,
+      "rawHotness": 0.9786,
+      "hotness": 0.5648,
+      "fileCount": 921,
+      "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+      "purpose": "",
+      "riskLevel": "low",
+      "mitigationProtocols": [],
+      "topTags": [
+        "redis",
+        "cache",
+        "api",
+        "server",
+        "embedding"
+      ],
+      "topFiles": [
+        "src/lib/server/cache.ts"
+      ],
+      "topoClasses": [
+        "src/lib/server/cache",
+        "src/lib/server",
+        "src/lib/cache"
+      ],
+      "scalarSeed": 0.602,
       "source": "ace:cluster:hot"
     },
     {
@@ -782,114 +809,85 @@
       "source": "ace:cluster:hot"
     },
     {
-      "clusterKey": "cluster:gpu:94",
-      "clusterId": 94,
-      "rawHotness": 0.827,
-      "hotness": 0.4773,
-      "fileCount": 921,
-      "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+      "clusterKey": "cluster:gpu:86",
+      "clusterId": 86,
+      "rawHotness": 0.9037,
+      "hotness": 0.5216,
+      "fileCount": 680,
+      "summary": "function chunks in `src/lib/components/evidence` (tag: embedding)",
       "purpose": "",
       "riskLevel": "low",
       "mitigationProtocols": [],
       "topTags": [
-        "redis",
-        "cache",
-        "api",
-        "server",
-        "embedding"
+        "embedding",
+        "server-module",
+        "vector",
+        "page-component",
+        "redis"
       ],
       "topFiles": [
-        "src/lib/server/cache.ts"
+        "src/lib/server/embeddings/ollama.ts"
       ],
       "topoClasses": [
-        "src/lib/server/cache",
-        "src/lib/server",
-        "src/lib/cache"
+        "src/lib/components/evidence",
+        "src/lib/types",
+        "src/lib/server/cartridge"
       ],
-      "scalarSeed": 0.5539,
+      "scalarSeed": 0.5695,
       "source": "ace:cluster:hot"
     },
     {
-      "clusterKey": "cluster:gpu:90",
-      "clusterId": 90,
-      "rawHotness": 0.7787,
-      "hotness": 0.4494,
-      "fileCount": 158,
-      "summary": "function chunks in `src/lib/server` (tag: auth)",
+      "clusterKey": "cluster:gpu:56",
+      "clusterId": 56,
+      "rawHotness": 0.9037,
+      "hotness": 0.5216,
+      "fileCount": 10,
+      "summary": "type chunks in `src/lib/server` (tag: embedding)",
       "purpose": "",
       "riskLevel": "low",
       "mitigationProtocols": [],
       "topTags": [
-        "auth",
-        "api",
-        "server"
+        "embedding",
+        "vector",
+        "redis",
+        "types"
       ],
       "topFiles": [
-        "src/lib/server/lucia.ts"
+        "src/lib/server/embeddings/ollama.ts"
       ],
       "topoClasses": [
         "src/lib/server",
-        "src/routes/api/auth/logout",
+        "src/lib/server/embeddings",
         "src/lib/types"
       ],
-      "scalarSeed": 0.4668,
+      "scalarSeed": 0.4396,
       "source": "ace:cluster:hot"
     },
     {
-      "clusterKey": "cluster:gpu:20",
-      "clusterId": 20,
-      "rawHotness": 0.777,
-      "hotness": 0.4485,
-      "fileCount": 883,
-      "summary": "function chunks in `src/lib/webgpu` (tag: embedding)",
+      "clusterKey": "cluster:gpu:92",
+      "clusterId": 92,
+      "rawHotness": 0.8354,
+      "hotness": 0.4822,
+      "fileCount": 940,
+      "summary": "component chunks in `src/lib/components/evidence` (tag: embedding)",
       "purpose": "",
       "riskLevel": "low",
       "mitigationProtocols": [],
       "topTags": [
         "embedding",
-        "redis",
-        "vector",
-        "auth",
-        "schema"
+        "page",
+        "component",
+        "xstate"
       ],
       "topFiles": [
-        "src/lib/server/gpu/libtorch-bridge.ts"
+        "src/lib/client/ui/POIPhotoUploader.svelte"
       ],
       "topoClasses": [
-        "src/lib/webgpu",
-        "src/lib/server/gpu",
-        "src/lib/gpu"
+        "src/lib/components/evidence",
+        "src/lib/components",
+        "src/lib/components/yorha/evidence"
       ],
-      "scalarSeed": 0.5368,
-      "source": "ace:cluster:hot"
-    },
-    {
-      "clusterKey": "cluster:gpu:57",
-      "clusterId": 57,
-      "rawHotness": 0.7725,
-      "hotness": 0.4459,
-      "fileCount": 1099,
-      "summary": "const chunks in `src/lib/shims` (tag: embedding)",
-      "purpose": "",
-      "riskLevel": "low",
-      "mitigationProtocols": [],
-      "topTags": [
-        "embedding",
-        "vector",
-        "auth",
-        "server-module",
-        "config"
-      ],
-      "topFiles": [
-        "src/lib/server/gpu/libtorch-bridge.ts",
-        "src/lib/server/retrieval/context-buffer.ts"
-      ],
-      "topoClasses": [
-        "src/lib/shims",
-        "src/lib/server/vector",
-        "src/lib"
-      ],
-      "scalarSeed": 0.5494,
+      "scalarSeed": 0.5467,
       "source": "ace:cluster:hot"
     }
   ],
@@ -929,35 +927,35 @@
       },
       {
         "clusterKey": "cluster:gpu:88",
-        "hotness": 0.9681
+        "hotness": 0.9748
       },
       {
         "clusterKey": "cluster:gpu:53",
-        "hotness": 0.918
+        "hotness": 0.934
       },
       {
         "clusterKey": "cluster:gpu:75",
-        "hotness": 0.6359
+        "hotness": 0.7146
+      },
+      {
+        "clusterKey": "cluster:gpu:94",
+        "hotness": 0.5648
       },
       {
         "clusterKey": "cluster:gpu:59",
         "hotness": 0.5283
       },
       {
-        "clusterKey": "cluster:gpu:94",
-        "hotness": 0.4773
+        "clusterKey": "cluster:gpu:86",
+        "hotness": 0.5216
       },
       {
-        "clusterKey": "cluster:gpu:90",
-        "hotness": 0.4494
+        "clusterKey": "cluster:gpu:56",
+        "hotness": 0.5216
       },
       {
-        "clusterKey": "cluster:gpu:20",
-        "hotness": 0.4485
-      },
-      {
-        "clusterKey": "cluster:gpu:57",
-        "hotness": 0.4459
+        "clusterKey": "cluster:gpu:92",
+        "hotness": 0.4822
       }
     ],
     "meta": {
@@ -973,13 +971,13 @@
         "cluster:gpu:88",
         "cluster:gpu:53",
         "cluster:gpu:75",
-        "cluster:gpu:59",
         "cluster:gpu:94",
-        "cluster:gpu:90",
-        "cluster:gpu:20",
-        "cluster:gpu:57"
+        "cluster:gpu:59",
+        "cluster:gpu:86",
+        "cluster:gpu:56",
+        "cluster:gpu:92"
       ],
-      "generatedAt": "2026-05-27T19:48:47.863Z",
+      "generatedAt": "2026-05-29T15:41:07.590Z",
       "sourceCount": 100,
       "selectedCount": 16,
       "maxRawHotness": 1.7326
@@ -999,7 +997,7 @@
         "hotness": "1",
         "scalarSeed": "0.8279",
         "metadataSummary": "table-def chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:95": {
         "summary": "type chunks in `src/lib/server/db/schema` (tag: database)",
@@ -1015,7 +1013,7 @@
         "hotness": "1",
         "scalarSeed": "0.7947",
         "metadataSummary": "type chunks in `src/lib/server/db/schema` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db/schema, src/lib/server/db, src/lib/db/schema",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:91": {
         "summary": "type chunks in `src/lib/server/db` (tag: database)",
@@ -1031,7 +1029,7 @@
         "hotness": "1",
         "scalarSeed": "0.7912",
         "metadataSummary": "type chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, auth | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:51": {
         "summary": "table-def chunks in `src/lib/db/schema` (tag: database)",
@@ -1047,7 +1045,7 @@
         "hotness": "1",
         "scalarSeed": "0.7669",
         "metadataSummary": "table-def chunks in `src/lib/db/schema` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/db/schema, src/lib/server/db",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:84": {
         "summary": "function chunks in `src/lib/server/audit` (tag: vector)",
@@ -1063,7 +1061,7 @@
         "hotness": "1",
         "scalarSeed": "0.7667",
         "metadataSummary": "function chunks in `src/lib/server/audit` (tag: vector) | Risk: high | Tags: vector, embedding, database, schema, drizzle | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/audit, src/lib/server/db, src/routes/api/audit/gpu",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:13": {
         "summary": "table-def chunks in `src/lib/server/db` (tag: database)",
@@ -1079,7 +1077,7 @@
         "hotness": "1",
         "scalarSeed": "0.752",
         "metadataSummary": "table-def chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, auth | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db, src/lib/db/schema, src/routes/api/persons-of-interest/[id]/timeline",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:65": {
         "summary": "const chunks in `src/lib/server/db` (tag: database)",
@@ -1095,7 +1093,7 @@
         "hotness": "1",
         "scalarSeed": "0.643",
         "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:76": {
         "summary": "type chunks in `src/lib/server/db` (tag: database)",
@@ -1111,7 +1109,7 @@
         "hotness": "1",
         "scalarSeed": "0.643",
         "metadataSummary": "type chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, vector, redis | Files: src/lib/server/db/schema-postgres.ts | Topo: src/lib/server/db",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:88": {
         "summary": "const chunks in `src/lib/server/db` (tag: database)",
@@ -1124,10 +1122,10 @@
         "fileCount": "123",
         "source": "ace:cluster:hot",
         "clusterId": "88",
-        "hotness": "0.9681",
-        "scalarSeed": "0.7762",
+        "hotness": "0.9748",
+        "scalarSeed": "0.7798",
         "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, auth, embedding | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/relations.ts | Topo: src/lib/server/db, src/lib/server/db/schema, src/lib/db/schema",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:53": {
         "summary": "const chunks in `src/lib/server/db` (tag: database)",
@@ -1140,15 +1138,15 @@
         "fileCount": "84",
         "source": "ace:cluster:hot",
         "clusterId": "53",
-        "hotness": "0.918",
-        "scalarSeed": "0.7481",
+        "hotness": "0.934",
+        "scalarSeed": "0.7569",
         "metadataSummary": "const chunks in `src/lib/server/db` (tag: database) | Risk: high | Tags: database, schema, drizzle, embedding, vector | Files: src/lib/server/db/schema-postgres.ts, src/lib/server/db/schema/legal-citations.ts, src/lib/server/db/schema-evidence-crud.ts | Topo: src/lib/server/db, src/lib/types, src/lib/server/db/schema",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:75": {
         "summary": "function chunks in `src/lib/config` (tag: embedding)",
         "purpose": "",
-        "risk_level": "low",
+        "risk_level": "medium",
         "mitigation_protocols": "[]",
         "topTags": "[\"embedding\",\"vector\",\"redis\",\"rabbitmq\",\"ai\"]",
         "topFiles": "[\"src/lib/config/env.server.ts\",\"src/lib/server/minio.ts\"]",
@@ -1156,10 +1154,26 @@
         "fileCount": "416",
         "source": "ace:cluster:hot",
         "clusterId": "75",
-        "hotness": "0.6359",
-        "scalarSeed": "0.6285",
-        "metadataSummary": "function chunks in `src/lib/config` (tag: embedding) | Risk: low | Tags: embedding, vector, redis, rabbitmq, ai | Files: src/lib/config/env.server.ts, src/lib/server/minio.ts | Topo: src/lib/config, src/lib/server, src/lib/server/config",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "hotness": "0.7146",
+        "scalarSeed": "0.6718",
+        "metadataSummary": "function chunks in `src/lib/config` (tag: embedding) | Risk: medium | Tags: embedding, vector, redis, rabbitmq, ai | Files: src/lib/config/env.server.ts, src/lib/server/minio.ts | Topo: src/lib/config, src/lib/server, src/lib/server/config",
+        "generatedAt": "2026-05-29T15:41:07.590Z"
+      },
+      "cluster:gpu:94": {
+        "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+        "purpose": "",
+        "risk_level": "low",
+        "mitigation_protocols": "[]",
+        "topTags": "[\"redis\",\"cache\",\"api\",\"server\",\"embedding\"]",
+        "topFiles": "[\"src/lib/server/cache.ts\"]",
+        "topoClasses": "[\"src/lib/server/cache\",\"src/lib/server\",\"src/lib/cache\"]",
+        "fileCount": "921",
+        "source": "ace:cluster:hot",
+        "clusterId": "94",
+        "hotness": "0.5648",
+        "scalarSeed": "0.602",
+        "metadataSummary": "function chunks in `src/lib/server/cache` (tag: redis) | Risk: low | Tags: redis, cache, api, server, embedding | Files: src/lib/server/cache.ts | Topo: src/lib/server/cache, src/lib/server, src/lib/cache",
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
       "cluster:gpu:59": {
         "summary": "function chunks in `src/lib/server/observability` (tag: vector)",
@@ -1175,71 +1189,55 @@
         "hotness": "0.5283",
         "scalarSeed": "0.4576",
         "metadataSummary": "function chunks in `src/lib/server/observability` (tag: vector) | Risk: low | Tags: vector, embedding, auth | Files: src/lib/server/observability/inference-log.ts | Topo: src/lib/server/observability, src/lib/components/evidence",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
-      "cluster:gpu:94": {
-        "summary": "function chunks in `src/lib/server/cache` (tag: redis)",
+      "cluster:gpu:86": {
+        "summary": "function chunks in `src/lib/components/evidence` (tag: embedding)",
         "purpose": "",
         "risk_level": "low",
         "mitigation_protocols": "[]",
-        "topTags": "[\"redis\",\"cache\",\"api\",\"server\",\"embedding\"]",
-        "topFiles": "[\"src/lib/server/cache.ts\"]",
-        "topoClasses": "[\"src/lib/server/cache\",\"src/lib/server\",\"src/lib/cache\"]",
-        "fileCount": "921",
+        "topTags": "[\"embedding\",\"server-module\",\"vector\",\"page-component\",\"redis\"]",
+        "topFiles": "[\"src/lib/server/embeddings/ollama.ts\"]",
+        "topoClasses": "[\"src/lib/components/evidence\",\"src/lib/types\",\"src/lib/server/cartridge\"]",
+        "fileCount": "680",
         "source": "ace:cluster:hot",
-        "clusterId": "94",
-        "hotness": "0.4773",
-        "scalarSeed": "0.5539",
-        "metadataSummary": "function chunks in `src/lib/server/cache` (tag: redis) | Risk: low | Tags: redis, cache, api, server, embedding | Files: src/lib/server/cache.ts | Topo: src/lib/server/cache, src/lib/server, src/lib/cache",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "clusterId": "86",
+        "hotness": "0.5216",
+        "scalarSeed": "0.5695",
+        "metadataSummary": "function chunks in `src/lib/components/evidence` (tag: embedding) | Risk: low | Tags: embedding, server-module, vector, page-component, redis | Files: src/lib/server/embeddings/ollama.ts | Topo: src/lib/components/evidence, src/lib/types, src/lib/server/cartridge",
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
-      "cluster:gpu:90": {
-        "summary": "function chunks in `src/lib/server` (tag: auth)",
+      "cluster:gpu:56": {
+        "summary": "type chunks in `src/lib/server` (tag: embedding)",
         "purpose": "",
         "risk_level": "low",
         "mitigation_protocols": "[]",
-        "topTags": "[\"auth\",\"api\",\"server\"]",
-        "topFiles": "[\"src/lib/server/lucia.ts\"]",
-        "topoClasses": "[\"src/lib/server\",\"src/routes/api/auth/logout\",\"src/lib/types\"]",
-        "fileCount": "158",
+        "topTags": "[\"embedding\",\"vector\",\"redis\",\"types\"]",
+        "topFiles": "[\"src/lib/server/embeddings/ollama.ts\"]",
+        "topoClasses": "[\"src/lib/server\",\"src/lib/server/embeddings\",\"src/lib/types\"]",
+        "fileCount": "10",
         "source": "ace:cluster:hot",
-        "clusterId": "90",
-        "hotness": "0.4494",
-        "scalarSeed": "0.4668",
-        "metadataSummary": "function chunks in `src/lib/server` (tag: auth) | Risk: low | Tags: auth, api, server | Files: src/lib/server/lucia.ts | Topo: src/lib/server, src/routes/api/auth/logout, src/lib/types",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "clusterId": "56",
+        "hotness": "0.5216",
+        "scalarSeed": "0.4396",
+        "metadataSummary": "type chunks in `src/lib/server` (tag: embedding) | Risk: low | Tags: embedding, vector, redis, types | Files: src/lib/server/embeddings/ollama.ts | Topo: src/lib/server, src/lib/server/embeddings, src/lib/types",
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       },
-      "cluster:gpu:20": {
-        "summary": "function chunks in `src/lib/webgpu` (tag: embedding)",
+      "cluster:gpu:92": {
+        "summary": "component chunks in `src/lib/components/evidence` (tag: embedding)",
         "purpose": "",
         "risk_level": "low",
         "mitigation_protocols": "[]",
-        "topTags": "[\"embedding\",\"redis\",\"vector\",\"auth\",\"schema\"]",
-        "topFiles": "[\"src/lib/server/gpu/libtorch-bridge.ts\"]",
-        "topoClasses": "[\"src/lib/webgpu\",\"src/lib/server/gpu\",\"src/lib/gpu\"]",
-        "fileCount": "883",
+        "topTags": "[\"embedding\",\"page\",\"component\",\"xstate\"]",
+        "topFiles": "[\"src/lib/client/ui/POIPhotoUploader.svelte\"]",
+        "topoClasses": "[\"src/lib/components/evidence\",\"src/lib/components\",\"src/lib/components/yorha/evidence\"]",
+        "fileCount": "940",
         "source": "ace:cluster:hot",
-        "clusterId": "20",
-        "hotness": "0.4485",
-        "scalarSeed": "0.5368",
-        "metadataSummary": "function chunks in `src/lib/webgpu` (tag: embedding) | Risk: low | Tags: embedding, redis, vector, auth, schema | Files: src/lib/server/gpu/libtorch-bridge.ts | Topo: src/lib/webgpu, src/lib/server/gpu, src/lib/gpu",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
-      },
-      "cluster:gpu:57": {
-        "summary": "const chunks in `src/lib/shims` (tag: embedding)",
-        "purpose": "",
-        "risk_level": "low",
-        "mitigation_protocols": "[]",
-        "topTags": "[\"embedding\",\"vector\",\"auth\",\"server-module\",\"config\"]",
-        "topFiles": "[\"src/lib/server/gpu/libtorch-bridge.ts\",\"src/lib/server/retrieval/context-buffer.ts\"]",
-        "topoClasses": "[\"src/lib/shims\",\"src/lib/server/vector\",\"src/lib\"]",
-        "fileCount": "1099",
-        "source": "ace:cluster:hot",
-        "clusterId": "57",
-        "hotness": "0.4459",
-        "scalarSeed": "0.5494",
-        "metadataSummary": "const chunks in `src/lib/shims` (tag: embedding) | Risk: low | Tags: embedding, vector, auth, server-module, config | Files: src/lib/server/gpu/libtorch-bridge.ts, src/lib/server/retrieval/context-buffer.ts | Topo: src/lib/shims, src/lib/server/vector, src/lib",
-        "generatedAt": "2026-05-27T19:48:47.863Z"
+        "clusterId": "92",
+        "hotness": "0.4822",
+        "scalarSeed": "0.5467",
+        "metadataSummary": "component chunks in `src/lib/components/evidence` (tag: embedding) | Risk: low | Tags: embedding, page, component, xstate | Files: src/lib/client/ui/POIPhotoUploader.svelte | Topo: src/lib/components/evidence, src/lib/components, src/lib/components/yorha/evidence",
+        "generatedAt": "2026-05-29T15:41:07.590Z"
       }
     }
   }

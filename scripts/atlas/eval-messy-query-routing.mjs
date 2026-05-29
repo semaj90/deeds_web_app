@@ -291,18 +291,20 @@ class QueryRouter4x4 {
 
 async function getKarpathyBoost(redis) {
   try {
-    const sample = await redis.hscan('gpu:karpathy:scores', 0, 'COUNT', 20);
+    const [cursor, sample] = await redis.hscan('gpu:karpathy:scores', 0, 'COUNT', 20);
     const entries = [];
-    for (let i = 1; i < sample.length; i += 2) {
-      const key = sample[i - 1];
-      const value = JSON.parse(sample[i]);
-      entries.push({
-        file: key,
-        blend: value.blend ?? null,
-        pr: value.pr ?? null,
-        attn: value.attn ?? null,
-        authority: value.authority ?? null,
-      });
+    if (sample && Array.isArray(sample)) {
+      for (let i = 1; i < sample.length; i += 2) {
+        const key = sample[i - 1];
+        const value = JSON.parse(sample[i]);
+        entries.push({
+          file: key,
+          blend: value.blend ?? null,
+          pr: value.pr ?? null,
+          attn: value.attn ?? null,
+          authority: value.authority ?? null,
+        });
+      }
     }
     return entries.sort((a, b) => (b.blend ?? 0) - (a.blend ?? 0)).slice(0, 10);
   } catch {

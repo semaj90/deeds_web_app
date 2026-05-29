@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T02:25:16.637Z",
+  "generatedAt": "2026-05-29T22:26:40.065Z",
   "embeddingDim": 768,
   "allowedDims": [
     768,
@@ -69,6 +69,7 @@
         "embedded_summaries.idx_embedded_summaries_vector_hnsw",
         "embedding_cache.embedding_cache_hnsw_idx",
         "evidence_vectors.evidence_vectors_hnsw_idx",
+        "feature_registry_vectors.feature_registry_vectors_embedding_hnsw",
         "fixer_patterns.fp_embedding_hnsw_idx",
         "legal_documents.legal_documents_hnsw_idx",
         "rag_query_log.rag_query_log_embedding_hnsw",
@@ -80,7 +81,7 @@
         "warden_chunks.warden_chunks_hnsw_idx"
       ],
       "missingHnswOnExistingTables": [],
-      "message": "pgvector 0.8.1 installed. 19 HNSW index(es) found.",
+      "message": "pgvector 0.8.1 installed. 20 HNSW index(es) found.",
       "suggestedFix": null
     }
   ],

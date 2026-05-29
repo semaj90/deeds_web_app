@@ -1462,9 +1462,9 @@
     "authority": {
       "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.5481,
+      "avgBlend": 1.5869,
       "avgPr": 3.6072,
-      "totalBlend": 7.7404,
+      "totalBlend": 7.9344,
       "clusterAuthorityScore": 3.9173,
       "scoredFiles": 5,
       "totalFiles": 8,
@@ -1477,7 +1477,7 @@
         {
           "filePath": "src/lib/server/db/relations.ts",
           "pageRank": 1.8346582262300364,
-          "karpathyBlend": 0.8097932904920147
+          "karpathyBlend": 1.0037879059422468
         }
       ],
       "topBlendFiles": [
@@ -1489,11 +1489,11 @@
         {
           "filePath": "src/lib/server/db/relations.ts",
           "pageRank": 1.8346582262300364,
-          "karpathyBlend": 0.8097932904920147
+          "karpathyBlend": 1.0037879059422468
         }
       ]
     },
-    "clusterBlend": 1.6773
+    "clusterBlend": 1.6889
   },
   {
     "id": 53,
@@ -1668,9 +1668,9 @@
     "authority": {
       "maxBlend": 1.7326,
       "maxPr": 4.0503,
-      "avgBlend": 1.2589,
+      "avgBlend": 1.3513,
       "avgPr": 2.9106,
-      "totalBlend": 5.0356,
+      "totalBlend": 5.4051,
       "clusterAuthorityScore": 3.7084,
       "scoredFiles": 4,
       "totalFiles": 8,
@@ -1683,12 +1683,12 @@
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
           "pageRank": 1.7821034441546988,
-          "karpathyBlend": 0.7898213776618797
+          "karpathyBlend": 0.9755046339313211
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
           "pageRank": 1.759711817574462,
-          "karpathyBlend": 0.7805347270297848
+          "karpathyBlend": 0.9642640694797127
         }
       ],
       "topBlendFiles": [
@@ -1700,16 +1700,16 @@
         {
           "filePath": "src/lib/server/db/schema/legal-citations.ts",
           "pageRank": 1.7821034441546988,
-          "karpathyBlend": 0.7898213776618797
+          "karpathyBlend": 0.9755046339313211
         },
         {
           "filePath": "src/lib/server/db/schema-evidence-crud.ts",
           "pageRank": 1.759711817574462,
-          "karpathyBlend": 0.7805347270297848
+          "karpathyBlend": 0.9642640694797127
         }
       ]
     },
-    "clusterBlend": 1.5905
+    "clusterBlend": 1.6182
   },
   {
     "id": 75,
@@ -1886,11 +1886,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.1448,
+      "maxBlend": 1.2964,
       "maxPr": 2.7145,
-      "avgBlend": 1.0012,
+      "avgBlend": 1.1022,
       "avgPr": 2.3562,
-      "totalBlend": 3.0035,
+      "totalBlend": 3.3066,
       "clusterAuthorityScore": 2.607,
       "scoredFiles": 3,
       "totalFiles": 8,
@@ -1898,7 +1898,7 @@
         {
           "filePath": "src/lib/config/env.server.ts",
           "pageRank": 2.7145393537960754,
-          "karpathyBlend": 1.1448257415184302
+          "karpathyBlend": 1.2963760760131462
         },
         {
           "filePath": "src/lib/server/minio.ts",
@@ -1910,7 +1910,7 @@
         {
           "filePath": "src/lib/config/env.server.ts",
           "pageRank": 2.7145393537960754,
-          "karpathyBlend": 1.1448257415184302
+          "karpathyBlend": 1.2963760760131462
         },
         {
           "filePath": "src/lib/server/minio.ts",
@@ -1919,163 +1919,7 @@
         }
       ]
     },
-    "clusterBlend": 1.1017
-  },
-  {
-    "id": 59,
-    "size": 36,
-    "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/server/observability` (tag: vector)",
-    "topKinds": [
-      {
-        "kind": "function",
-        "count": 5
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "vector",
-        "count": 4
-      },
-      {
-        "tag": "embedding",
-        "count": 4
-      },
-      {
-        "tag": "auth",
-        "count": 1
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "logInference",
-        "count": 1
-      },
-      {
-        "symbol": "flushInferenceLog",
-        "count": 1
-      },
-      {
-        "symbol": "startInferenceLogCleanup",
-        "count": 1
-      },
-      {
-        "symbol": "flushServerSave",
-        "count": 1
-      },
-      {
-        "symbol": "getInferenceLogStats",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server/observability",
-        "count": 4
-      },
-      {
-        "dir": "src/lib/components/evidence",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/observability/inference-log.ts",
-        "count": 4
-      },
-      {
-        "path": "src/lib/components/evidence/board-persistence.svelte.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/observability/inference-log.ts",
-        "kind": "function",
-        "symbol": "logInference",
-        "lineStart": 78,
-        "lineEnd": 90
-      },
-      {
-        "path": "src/lib/server/observability/inference-log.ts",
-        "kind": "function",
-        "symbol": "flushInferenceLog",
-        "lineStart": 148,
-        "lineEnd": 154
-      },
-      {
-        "path": "src/lib/server/observability/inference-log.ts",
-        "kind": "function",
-        "symbol": "startInferenceLogCleanup",
-        "lineStart": 263,
-        "lineEnd": 271
-      },
-      {
-        "path": "src/lib/components/evidence/board-persistence.svelte.ts",
-        "kind": "function",
-        "symbol": "flushServerSave",
-        "lineStart": 194,
-        "lineEnd": 214
-      },
-      {
-        "path": "src/lib/server/observability/inference-log.ts",
-        "kind": "function",
-        "symbol": "getInferenceLogStats",
-        "lineStart": 249,
-        "lineEnd": 257
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.9154,
-      "maxPr": 2.1297,
-      "avgBlend": 0.9154,
-      "avgPr": 2.1297,
-      "totalBlend": 3.6615,
-      "clusterAuthorityScore": 2.1297,
-      "scoredFiles": 4,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/observability/inference-log.ts",
-          "pageRank": 2.1297194485430113,
-          "karpathyBlend": 0.9153677794172046
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/observability/inference-log.ts",
-          "pageRank": 2.1297194485430113,
-          "karpathyBlend": 0.9153677794172046
-        }
-      ]
-    },
-    "clusterBlend": 0.9154
+    "clusterBlend": 1.2381
   },
   {
     "id": 94,
@@ -2252,11 +2096,11 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.827,
+      "maxBlend": 0.9786,
       "maxPr": 1.8989,
-      "avgBlend": 0.827,
+      "avgBlend": 0.9786,
       "avgPr": 1.8989,
-      "totalBlend": 2.4809,
+      "totalBlend": 2.9358,
       "clusterAuthorityScore": 1.8989,
       "scoredFiles": 3,
       "totalFiles": 8,
@@ -2264,18 +2108,742 @@
         {
           "filePath": "src/lib/server/cache.ts",
           "pageRank": 1.8989401144504947,
-          "karpathyBlend": 0.8269560457801979
+          "karpathyBlend": 0.978602431855857
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
           "pageRank": 1.8989401144504947,
-          "karpathyBlend": 0.8269560457801979
+          "karpathyBlend": 0.978602431855857
         }
       ]
     },
-    "clusterBlend": 0.827
+    "clusterBlend": 0.9786
+  },
+  {
+    "id": 59,
+    "size": 36,
+    "sampledFor": 16,
+    "inferredTopic": "function chunks in `src/lib/server/observability` (tag: vector)",
+    "topKinds": [
+      {
+        "kind": "function",
+        "count": 5
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "vector",
+        "count": 4
+      },
+      {
+        "tag": "embedding",
+        "count": 4
+      },
+      {
+        "tag": "auth",
+        "count": 1
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "logInference",
+        "count": 1
+      },
+      {
+        "symbol": "flushInferenceLog",
+        "count": 1
+      },
+      {
+        "symbol": "startInferenceLogCleanup",
+        "count": 1
+      },
+      {
+        "symbol": "flushServerSave",
+        "count": 1
+      },
+      {
+        "symbol": "getInferenceLogStats",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server/observability",
+        "count": 4
+      },
+      {
+        "dir": "src/lib/components/evidence",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/observability/inference-log.ts",
+        "count": 4
+      },
+      {
+        "path": "src/lib/components/evidence/board-persistence.svelte.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/observability/inference-log.ts",
+        "kind": "function",
+        "symbol": "logInference",
+        "lineStart": 78,
+        "lineEnd": 90
+      },
+      {
+        "path": "src/lib/server/observability/inference-log.ts",
+        "kind": "function",
+        "symbol": "flushInferenceLog",
+        "lineStart": 148,
+        "lineEnd": 154
+      },
+      {
+        "path": "src/lib/server/observability/inference-log.ts",
+        "kind": "function",
+        "symbol": "startInferenceLogCleanup",
+        "lineStart": 263,
+        "lineEnd": 271
+      },
+      {
+        "path": "src/lib/components/evidence/board-persistence.svelte.ts",
+        "kind": "function",
+        "symbol": "flushServerSave",
+        "lineStart": 194,
+        "lineEnd": 214
+      },
+      {
+        "path": "src/lib/server/observability/inference-log.ts",
+        "kind": "function",
+        "symbol": "getInferenceLogStats",
+        "lineStart": 249,
+        "lineEnd": 257
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0.9154,
+      "maxPr": 2.1297,
+      "avgBlend": 0.9154,
+      "avgPr": 2.1297,
+      "totalBlend": 3.6615,
+      "clusterAuthorityScore": 2.1297,
+      "scoredFiles": 4,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/server/observability/inference-log.ts",
+          "pageRank": 2.1297194485430113,
+          "karpathyBlend": 0.9153677794172046
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/server/observability/inference-log.ts",
+          "pageRank": 2.1297194485430113,
+          "karpathyBlend": 0.9153677794172046
+        }
+      ]
+    },
+    "clusterBlend": 0.9154
+  },
+  {
+    "id": 56,
+    "size": 10,
+    "sampledFor": 10,
+    "inferredTopic": "type chunks in `src/lib/server` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "type",
+        "count": 7
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 2
+      },
+      {
+        "tag": "vector",
+        "count": 1
+      },
+      {
+        "tag": "redis",
+        "count": 1
+      },
+      {
+        "tag": "types",
+        "count": 1
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "DoclingResult",
+        "count": 1
+      },
+      {
+        "symbol": "VLMOCRResult",
+        "count": 1
+      },
+      {
+        "symbol": "YoloVLMResult",
+        "count": 1
+      },
+      {
+        "symbol": "OllamaEmbedResult",
+        "count": 1
+      },
+      {
+        "symbol": "EvidenceAnalysisResult",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server",
+        "count": 4
+      },
+      {
+        "dir": "src/lib/server/embeddings",
+        "count": 1
+      },
+      {
+        "dir": "src/lib/types",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/docling.ts",
+        "count": 3
+      },
+      {
+        "path": "src/lib/server/embeddings/ollama.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/evidence.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/shared/types/parser.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/db-shim.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/docling.ts",
+        "kind": "type",
+        "symbol": "DoclingResult",
+        "lineStart": 19,
+        "lineEnd": 24
+      },
+      {
+        "path": "src/lib/server/docling.ts",
+        "kind": "type",
+        "symbol": "VLMOCRResult",
+        "lineStart": 208,
+        "lineEnd": 214
+      },
+      {
+        "path": "src/lib/server/docling.ts",
+        "kind": "type",
+        "symbol": "YoloVLMResult",
+        "lineStart": 216,
+        "lineEnd": 219
+      },
+      {
+        "path": "src/lib/server/embeddings/ollama.ts",
+        "kind": "type",
+        "symbol": "OllamaEmbedResult",
+        "lineStart": 12,
+        "lineEnd": 15
+      },
+      {
+        "path": "src/lib/types/evidence.ts",
+        "kind": "type",
+        "symbol": "EvidenceAnalysisResult",
+        "lineStart": 64,
+        "lineEnd": 73
+      },
+      {
+        "path": "src/lib/shared/types/parser.ts",
+        "kind": "type",
+        "symbol": "LegalDocWASMOutput",
+        "lineStart": 1,
+        "lineEnd": 8
+      },
+      {
+        "path": "src/lib/server/db-shim.ts",
+        "kind": "type",
+        "symbol": "QueryResult",
+        "lineStart": 13,
+        "lineEnd": 13
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0.9037,
+      "maxPr": 1.6752,
+      "avgBlend": 0.9037,
+      "avgPr": 1.6752,
+      "totalBlend": 0.9037,
+      "clusterAuthorityScore": 1.6752,
+      "scoredFiles": 1,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/server/embeddings/ollama.ts",
+          "pageRank": 1.675165185138195,
+          "karpathyBlend": 0.9037193000637296
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/server/embeddings/ollama.ts",
+          "pageRank": 1.675165185138195,
+          "karpathyBlend": 0.9037193000637296
+        }
+      ]
+    },
+    "clusterBlend": 0.9037
+  },
+  {
+    "id": 86,
+    "size": 680,
+    "sampledFor": 16,
+    "inferredTopic": "function chunks in `src/lib/components/evidence` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "function",
+        "count": 14
+      },
+      {
+        "kind": "const",
+        "count": 2
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 7
+      },
+      {
+        "tag": "server-module",
+        "count": 3
+      },
+      {
+        "tag": "vector",
+        "count": 3
+      },
+      {
+        "tag": "page-component",
+        "count": 2
+      },
+      {
+        "tag": "redis",
+        "count": 2
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "toReaderModel",
+        "count": 1
+      },
+      {
+        "symbol": "runeBatchToGlyphRecords",
+        "count": 1
+      },
+      {
+        "symbol": "createBulkMoveCommand",
+        "count": 1
+      },
+      {
+        "symbol": "legalCorpusViews",
+        "count": 1
+      },
+      {
+        "symbol": "extractLegalMetadata",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/components/evidence",
+        "count": 3
+      },
+      {
+        "dir": "src/lib/types",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/server/cartridge",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/components/evidence/board-history.svelte.ts",
+        "count": 3
+      },
+      {
+        "path": "src/lib/types/legal-corpus-views.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/cartridge/glyph-mappers.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/png-embed-extractor.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/embeddings/ollama.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/shims/worker-threads-browser-shim.js",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/ml/recommendation-glyph.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/data/types.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/types/legal-corpus-views.ts",
+        "kind": "function",
+        "symbol": "toReaderModel",
+        "lineStart": 78,
+        "lineEnd": 80
+      },
+      {
+        "path": "src/lib/server/cartridge/glyph-mappers.ts",
+        "kind": "function",
+        "symbol": "runeBatchToGlyphRecords",
+        "lineStart": 127,
+        "lineEnd": 129
+      },
+      {
+        "path": "src/lib/components/evidence/board-history.svelte.ts",
+        "kind": "function",
+        "symbol": "createBulkMoveCommand",
+        "lineStart": 73,
+        "lineEnd": 82
+      },
+      {
+        "path": "src/lib/types/legal-corpus-views.ts",
+        "kind": "const",
+        "symbol": "legalCorpusViews",
+        "lineStart": 5,
+        "lineEnd": 5
+      },
+      {
+        "path": "src/lib/server/png-embed-extractor.ts",
+        "kind": "const",
+        "symbol": "extractLegalMetadata",
+        "lineStart": 295,
+        "lineEnd": 295
+      },
+      {
+        "path": "src/lib/server/embeddings/ollama.ts",
+        "kind": "function",
+        "symbol": "embeddingDims",
+        "lineStart": 66,
+        "lineEnd": 68
+      },
+      {
+        "path": "src/lib/shims/worker-threads-browser-shim.js",
+        "kind": "function",
+        "symbol": "moveMessagePortToContext",
+        "lineStart": 112,
+        "lineEnd": 112
+      },
+      {
+        "path": "src/lib/server/ml/recommendation-glyph.ts",
+        "kind": "function",
+        "symbol": "toGlyph",
+        "lineStart": 249,
+        "lineEnd": 256
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0.9037,
+      "maxPr": 1.6752,
+      "avgBlend": 0.9037,
+      "avgPr": 1.6752,
+      "totalBlend": 0.9037,
+      "clusterAuthorityScore": 1.6752,
+      "scoredFiles": 1,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/server/embeddings/ollama.ts",
+          "pageRank": 1.675165185138195,
+          "karpathyBlend": 0.9037193000637296
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/server/embeddings/ollama.ts",
+          "pageRank": 1.675165185138195,
+          "karpathyBlend": 0.9037193000637296
+        }
+      ]
+    },
+    "clusterBlend": 0.9037
+  },
+  {
+    "id": 92,
+    "size": 940,
+    "sampledFor": 16,
+    "inferredTopic": "component chunks in `src/lib/components/evidence` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "component",
+        "count": 14
+      },
+      {
+        "kind": "const",
+        "count": 1
+      },
+      {
+        "kind": "function",
+        "count": 1
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 4
+      },
+      {
+        "tag": "page",
+        "count": 3
+      },
+      {
+        "tag": "component",
+        "count": 3
+      },
+      {
+        "tag": "xstate",
+        "count": 1
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "+page.svelte",
+        "count": 3
+      },
+      {
+        "symbol": "UploadZone.svelte",
+        "count": 2
+      },
+      {
+        "symbol": "POIPhotoUploader.svelte",
+        "count": 1
+      },
+      {
+        "symbol": "UploadProgressCard.svelte",
+        "count": 1
+      },
+      {
+        "symbol": "AIFileUpload.svelte",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/components/evidence",
+        "count": 3
+      },
+      {
+        "dir": "src/lib/components",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/components/yorha/evidence",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/components/yorha/evidence/UploadZone.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/client/ui/POIPhotoUploader.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/routes/(app)/evidence/upload/+page.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/components/evidence/UploadProgressCard.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/components/ui/AIFileUpload.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/components/yorha/evidence/UploadZone.svelte",
+        "kind": "component",
+        "symbol": "UploadZone.svelte",
+        "lineStart": 1,
+        "lineEnd": 205
+      },
+      {
+        "path": "src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte",
+        "kind": "component",
+        "symbol": "UploadZone.svelte",
+        "lineStart": 1,
+        "lineEnd": 205
+      },
+      {
+        "path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+        "kind": "component",
+        "symbol": "+page.svelte",
+        "lineStart": 1,
+        "lineEnd": 599
+      },
+      {
+        "path": "src/lib/client/ui/POIPhotoUploader.svelte",
+        "kind": "component",
+        "symbol": "POIPhotoUploader.svelte",
+        "lineStart": 1,
+        "lineEnd": 126
+      },
+      {
+        "path": "src/routes/(app)/evidence/upload/+page.svelte",
+        "kind": "component",
+        "symbol": "+page.svelte",
+        "lineStart": 1,
+        "lineEnd": 442
+      },
+      {
+        "path": "src/lib/components/evidence/UploadProgressCard.svelte",
+        "kind": "component",
+        "symbol": "UploadProgressCard.svelte",
+        "lineStart": 1,
+        "lineEnd": 63
+      },
+      {
+        "path": "src/lib/components/ui/AIFileUpload.svelte",
+        "kind": "component",
+        "symbol": "AIFileUpload.svelte",
+        "lineStart": 1,
+        "lineEnd": 642
+      },
+      {
+        "path": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
+        "kind": "component",
+        "symbol": "EvidenceBulkUploadDialog.svelte",
+        "lineStart": 1,
+        "lineEnd": 140
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0.8354,
+      "maxPr": 1.6043,
+      "avgBlend": 0.8354,
+      "avgPr": 1.6043,
+      "totalBlend": 0.8354,
+      "clusterAuthorityScore": 1.6043,
+      "scoredFiles": 1,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
+          "pageRank": 1.6042923723218958,
+          "karpathyBlend": 0.8354393634244506
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
+          "pageRank": 1.6042923723218958,
+          "karpathyBlend": 0.8354393634244506
+        }
+      ]
+    },
+    "clusterBlend": 0.8354
   },
   {
     "id": 90,
@@ -3084,378 +3652,6 @@
     "clusterBlend": 0.7423
   },
   {
-    "id": 56,
-    "size": 10,
-    "sampledFor": 10,
-    "inferredTopic": "type chunks in `src/lib/server` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "type",
-        "count": 7
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 2
-      },
-      {
-        "tag": "vector",
-        "count": 1
-      },
-      {
-        "tag": "redis",
-        "count": 1
-      },
-      {
-        "tag": "types",
-        "count": 1
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "DoclingResult",
-        "count": 1
-      },
-      {
-        "symbol": "VLMOCRResult",
-        "count": 1
-      },
-      {
-        "symbol": "YoloVLMResult",
-        "count": 1
-      },
-      {
-        "symbol": "OllamaEmbedResult",
-        "count": 1
-      },
-      {
-        "symbol": "EvidenceAnalysisResult",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server",
-        "count": 4
-      },
-      {
-        "dir": "src/lib/server/embeddings",
-        "count": 1
-      },
-      {
-        "dir": "src/lib/types",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/docling.ts",
-        "count": 3
-      },
-      {
-        "path": "src/lib/server/embeddings/ollama.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/evidence.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/shared/types/parser.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/db-shim.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/docling.ts",
-        "kind": "type",
-        "symbol": "DoclingResult",
-        "lineStart": 19,
-        "lineEnd": 24
-      },
-      {
-        "path": "src/lib/server/docling.ts",
-        "kind": "type",
-        "symbol": "VLMOCRResult",
-        "lineStart": 208,
-        "lineEnd": 214
-      },
-      {
-        "path": "src/lib/server/docling.ts",
-        "kind": "type",
-        "symbol": "YoloVLMResult",
-        "lineStart": 216,
-        "lineEnd": 219
-      },
-      {
-        "path": "src/lib/server/embeddings/ollama.ts",
-        "kind": "type",
-        "symbol": "OllamaEmbedResult",
-        "lineStart": 12,
-        "lineEnd": 15
-      },
-      {
-        "path": "src/lib/types/evidence.ts",
-        "kind": "type",
-        "symbol": "EvidenceAnalysisResult",
-        "lineStart": 64,
-        "lineEnd": 73
-      },
-      {
-        "path": "src/lib/shared/types/parser.ts",
-        "kind": "type",
-        "symbol": "LegalDocWASMOutput",
-        "lineStart": 1,
-        "lineEnd": 8
-      },
-      {
-        "path": "src/lib/server/db-shim.ts",
-        "kind": "type",
-        "symbol": "QueryResult",
-        "lineStart": 13,
-        "lineEnd": 13
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.7305,
-      "maxPr": 1.6752,
-      "avgBlend": 0.7305,
-      "avgPr": 1.6752,
-      "totalBlend": 0.7305,
-      "clusterAuthorityScore": 1.6752,
-      "scoredFiles": 1,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.7304560740552781
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.7304560740552781
-        }
-      ]
-    },
-    "clusterBlend": 0.7305
-  },
-  {
-    "id": 86,
-    "size": 680,
-    "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/components/evidence` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "function",
-        "count": 14
-      },
-      {
-        "kind": "const",
-        "count": 2
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 7
-      },
-      {
-        "tag": "server-module",
-        "count": 3
-      },
-      {
-        "tag": "vector",
-        "count": 3
-      },
-      {
-        "tag": "page-component",
-        "count": 2
-      },
-      {
-        "tag": "redis",
-        "count": 2
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "toReaderModel",
-        "count": 1
-      },
-      {
-        "symbol": "runeBatchToGlyphRecords",
-        "count": 1
-      },
-      {
-        "symbol": "createBulkMoveCommand",
-        "count": 1
-      },
-      {
-        "symbol": "legalCorpusViews",
-        "count": 1
-      },
-      {
-        "symbol": "extractLegalMetadata",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/components/evidence",
-        "count": 3
-      },
-      {
-        "dir": "src/lib/types",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/server/cartridge",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/components/evidence/board-history.svelte.ts",
-        "count": 3
-      },
-      {
-        "path": "src/lib/types/legal-corpus-views.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/cartridge/glyph-mappers.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/png-embed-extractor.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/embeddings/ollama.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/shims/worker-threads-browser-shim.js",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/ml/recommendation-glyph.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/data/types.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/types/legal-corpus-views.ts",
-        "kind": "function",
-        "symbol": "toReaderModel",
-        "lineStart": 78,
-        "lineEnd": 80
-      },
-      {
-        "path": "src/lib/server/cartridge/glyph-mappers.ts",
-        "kind": "function",
-        "symbol": "runeBatchToGlyphRecords",
-        "lineStart": 127,
-        "lineEnd": 129
-      },
-      {
-        "path": "src/lib/components/evidence/board-history.svelte.ts",
-        "kind": "function",
-        "symbol": "createBulkMoveCommand",
-        "lineStart": 73,
-        "lineEnd": 82
-      },
-      {
-        "path": "src/lib/types/legal-corpus-views.ts",
-        "kind": "const",
-        "symbol": "legalCorpusViews",
-        "lineStart": 5,
-        "lineEnd": 5
-      },
-      {
-        "path": "src/lib/server/png-embed-extractor.ts",
-        "kind": "const",
-        "symbol": "extractLegalMetadata",
-        "lineStart": 295,
-        "lineEnd": 295
-      },
-      {
-        "path": "src/lib/server/embeddings/ollama.ts",
-        "kind": "function",
-        "symbol": "embeddingDims",
-        "lineStart": 66,
-        "lineEnd": 68
-      },
-      {
-        "path": "src/lib/shims/worker-threads-browser-shim.js",
-        "kind": "function",
-        "symbol": "moveMessagePortToContext",
-        "lineStart": 112,
-        "lineEnd": 112
-      },
-      {
-        "path": "src/lib/server/ml/recommendation-glyph.ts",
-        "kind": "function",
-        "symbol": "toGlyph",
-        "lineStart": 249,
-        "lineEnd": 256
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.7305,
-      "maxPr": 1.6752,
-      "avgBlend": 0.7305,
-      "avgPr": 1.6752,
-      "totalBlend": 0.7305,
-      "clusterAuthorityScore": 1.6752,
-      "scoredFiles": 1,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.7304560740552781
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.7304560740552781
-        }
-      ]
-    },
-    "clusterBlend": 0.7305
-  },
-  {
     "id": 36,
     "size": 17,
     "sampledFor": 16,
@@ -3781,202 +3977,6 @@
       ]
     },
     "clusterBlend": 0.7116
-  },
-  {
-    "id": 92,
-    "size": 940,
-    "sampledFor": 16,
-    "inferredTopic": "component chunks in `src/lib/components/evidence` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "component",
-        "count": 14
-      },
-      {
-        "kind": "const",
-        "count": 1
-      },
-      {
-        "kind": "function",
-        "count": 1
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 4
-      },
-      {
-        "tag": "page",
-        "count": 3
-      },
-      {
-        "tag": "component",
-        "count": 3
-      },
-      {
-        "tag": "xstate",
-        "count": 1
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "+page.svelte",
-        "count": 3
-      },
-      {
-        "symbol": "UploadZone.svelte",
-        "count": 2
-      },
-      {
-        "symbol": "POIPhotoUploader.svelte",
-        "count": 1
-      },
-      {
-        "symbol": "UploadProgressCard.svelte",
-        "count": 1
-      },
-      {
-        "symbol": "AIFileUpload.svelte",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/components/evidence",
-        "count": 3
-      },
-      {
-        "dir": "src/lib/components",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/components/yorha/evidence",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/components/yorha/evidence/UploadZone.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/client/ui/POIPhotoUploader.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/routes/(app)/evidence/upload/+page.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/components/evidence/UploadProgressCard.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/components/ui/AIFileUpload.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/components/yorha/evidence/UploadZone.svelte",
-        "kind": "component",
-        "symbol": "UploadZone.svelte",
-        "lineStart": 1,
-        "lineEnd": 205
-      },
-      {
-        "path": "src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte",
-        "kind": "component",
-        "symbol": "UploadZone.svelte",
-        "lineStart": 1,
-        "lineEnd": 205
-      },
-      {
-        "path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
-        "kind": "component",
-        "symbol": "+page.svelte",
-        "lineStart": 1,
-        "lineEnd": 599
-      },
-      {
-        "path": "src/lib/client/ui/POIPhotoUploader.svelte",
-        "kind": "component",
-        "symbol": "POIPhotoUploader.svelte",
-        "lineStart": 1,
-        "lineEnd": 126
-      },
-      {
-        "path": "src/routes/(app)/evidence/upload/+page.svelte",
-        "kind": "component",
-        "symbol": "+page.svelte",
-        "lineStart": 1,
-        "lineEnd": 442
-      },
-      {
-        "path": "src/lib/components/evidence/UploadProgressCard.svelte",
-        "kind": "component",
-        "symbol": "UploadProgressCard.svelte",
-        "lineStart": 1,
-        "lineEnd": 63
-      },
-      {
-        "path": "src/lib/components/ui/AIFileUpload.svelte",
-        "kind": "component",
-        "symbol": "AIFileUpload.svelte",
-        "lineStart": 1,
-        "lineEnd": 642
-      },
-      {
-        "path": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
-        "kind": "component",
-        "symbol": "EvidenceBulkUploadDialog.svelte",
-        "lineStart": 1,
-        "lineEnd": 140
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.6806,
-      "maxPr": 1.6043,
-      "avgBlend": 0.6806,
-      "avgPr": 1.6043,
-      "totalBlend": 0.6806,
-      "clusterAuthorityScore": 1.6043,
-      "scoredFiles": 1,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.6042923723218958,
-          "karpathyBlend": 0.6805669489287585
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.6042923723218958,
-          "karpathyBlend": 0.6805669489287585
-        }
-      ]
-    },
-    "clusterBlend": 0.6806
   },
   {
     "id": 46,

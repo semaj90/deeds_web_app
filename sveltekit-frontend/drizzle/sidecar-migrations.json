@@ -144,6 +144,15 @@
       "appliedAt": "2026-05-25",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='agent_memory_observations' AND column_name='embedding';\""
+    },
+    {
+      "file": "9999_agent_observations.sql",
+      "status": "manual_sidecar",
+      "reason": "Migration adds agent_observations table for OpenCode / Claude-mem ingest.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-29",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_observations';\""
     }
   ]
 }

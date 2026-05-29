@@ -1,11 +1,16 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { ingestAgentObservation } from '$lib/server/memory/agent-observation-ingest.js';
+import { ingestAgentObservation, agentObservationSchema } from '$lib/server/memory/agent-observation-ingest.js';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const result = await ingestAgentObservation(await request.json());
-    return json(result, { status: 201 });
+    const body = await request.json();
+    const result = agentObservationSchema.safeParse(body);
+    if (!result.success) {
+      return json({ ok: false, error: 'Validation failed', details: result.error.flatten() }, { status: 400 });
+    }
+    const ingestResult = await ingestAgentObservation(result.data);
+    return json(ingestResult, { status: 201 });
   } catch (error) {
     return json(
       {

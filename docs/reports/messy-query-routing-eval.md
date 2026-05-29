@@ -1,6 +1,6 @@
 # Phase 18 — Messy Query Orchestration Evaluation
 
-Generated: 2026-05-22T16:22:51.722Z
+Generated: 2026-05-29T22:17:13.464Z
 
 ## 1. Codebase Documentation References
 
@@ -23,7 +23,18 @@ Generated: 2026-05-22T16:22:51.722Z
 
 ## 2. Redis BitFrost Sample
 
-- No `gpu:karpathy:scores` sample available from Redis.
+| File | Blend | PR | Attn | Authority |
+| --- | --- | --- | --- | --- |
+| src/lib/server/db/client.ts | 3219.3631755785373 | 21.13428017365547 | n/a | 10702.526190476186 |
+| src/lib/server/research/web-research-ingester.ts | 167.0451124268324 | 0.9877810670809659 | n/a | 555.5 |
+| src/lib/server/db/schema-postgres.ts | 96.89884780140962 | 54.809619503524075 | n/a | 249.91666666666663 |
+| src/lib/server/vector/qdrant-manager.ts | 94.5323831278126 | 1.343457819531431 | n/a | 313.3166666666667 |
+| src/lib/types/enhanced-svelte5-types.ts | 41.54890408892606 | 3.3972602223151713 | n/a | 133.96666666666664 |
+| src/lib/server/env.server.ts | 16.680229599777636 | 41.21980881314656 | n/a | 0 |
+| src/lib/server/observability/langfuse.ts | 6.69874387116438 | 8.346859677910949 | n/a | 11.2 |
+| src/lib/server/minio-client.ts | 2.585938298611111 | 0.7773457465277779 | n/a | 7.583333333333333 |
+| src/lib/server/cache-keys.ts | 2.4918771646164495 | 0.8762021115451389 | n/a | 6.666666666666666 |
+| src/lib/env/index.ts | 1.8437774817369885 | 4.221378571428572 | n/a | 0 |
 
 ## 3. Query Routing Results
 

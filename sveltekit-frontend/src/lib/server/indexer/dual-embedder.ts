@@ -481,7 +481,7 @@ export async function indexChunks(
         // Python site-packages which can pollute the code index. Also ignore
         // __pycache__ folders. If a chunk's relativePath matches any of these
         // patterns, do not create a Qdrant point for it.
-        const relPath = (batch[i].metadata as Record<string, unknown>)?.relativePath as
+        const relPath = (batch[i].metadata as unknown as Record<string, unknown>)?.relativePath as
           | string
           | undefined;
         if (relPath) {

@@ -181,10 +181,11 @@ export async function setCachedCtxPacket(featureKey: string, packet: any): Promi
   } catch { /* non-fatal */ }
 }
 
+import { invalidationRegistry } from '../cache/invalidation-registry.js';
+
 /** Invalidate all cached data for a feature key (card + ctx). */
 export async function invalidateFeature(featureKey: string): Promise<void> {
-  const redis = getRedis();
   try {
-    await redis.del(`${FEATURE_PREFIX}:${featureKey}`, `${CTX_PREFIX}:${featureKey}`);
+    await invalidationRegistry.invalidate('feature_updated', { featureKey });
   } catch { /* non-fatal */ }
 }

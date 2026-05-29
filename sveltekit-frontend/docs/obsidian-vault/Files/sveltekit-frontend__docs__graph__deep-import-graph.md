@@ -4,7 +4,7 @@ path: "sveltekit-frontend/docs/graph/deep-import-graph.json"
 aliases: ["deep-import-graph.json","sveltekit-frontend/docs/graph/deep-import-graph.json"]
 clusterId: -1
 ext: ".json"
-lineCount: 189235
+lineCount: 2422383
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/sveltekit-frontend/docs/graph/deep-import-graph.json"
-last_updated_by_llm: "2026-05-27T19:49:20.042Z"
+last_updated_by_llm: "2026-05-29T15:41:25.015Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/json","t/json"]
 > JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 189235
+lines:: 2422383
 ## Summary
 
 JSON data file

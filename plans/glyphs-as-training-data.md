@@ -1,8 +1,10 @@
 # Plan: ES Glyphs As Training Data
 
-**Created:** 2026-05-28
-**Scope:** Wire the existing GlyphRecord infrastructure into a QLoRA training pipeline that teaches Gemma Atlas concepts via compressed symbolic glyphs instead of raw text.
-**Status:** Phase 0 (discovery) complete — ready to implement.
+**Created:** 2026-05-28  
+**Updated:** 2026-05-29 (Phase 1 complete + integrated into master implementation roadmap)  
+**Scope:** Wire the existing GlyphRecord infrastructure into a QLoRA training pipeline that teaches Gemma Atlas concepts via compressed symbolic glyphs instead of raw text.  
+**Status:** **Phase 1 COMPLETE** — Phase 2 ready to launch  
+**Master Status:** See [MASTER-IMPLEMENTATION-STATUS-2026-05-29.md](../MASTER-IMPLEMENTATION-STATUS-2026-05-29.md) for full 4-stream roadmap (Glyphs + NES UI + 3-Track Reconstruction + Codebase Organization).
 
 ---
 
@@ -51,9 +53,18 @@ GlyphRenderLayer    — cartridgeId, pageIndex, tileIndex, promptCacheKey, atlas
 
 **Goal:** Give GlyphRecord a Postgres home and a script that populates it from the existing ACE packet cards.
 
+**Status:** ✅ COMPLETE
+
 ### 1A — Drizzle schema entry
 
-Add to `sveltekit-frontend/src/lib/server/db/schema-postgres.ts`:
+**File:** `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` (lines 4708-4728)
+**Changes:**
+- Added `SerializedGlyphRecord` type to `sveltekit-frontend/src/lib/server/types/glyph.ts` (lines 171-176)
+- Added `glyphRecords` pgTable definition with proper indexes
+- Removed 2 conflicting duplicate declarations (original lines 405 and 3748)
+- Exported types: `GlyphRecord_DB`, `NewGlyphRecord_DB`
+
+Schema entry:
 
 ```typescript
 export const glyphRecords = pgTable('glyph_records', {
@@ -77,7 +88,10 @@ Note: `embedding768` is stored in Qdrant `codebase_chunks_768` (already operatio
 
 ### 1B — Manual SQL migration
 
-Write `sveltekit-frontend/drizzle/manual/20260529_glyph_records.sql`:
+**File:** `sveltekit-frontend/drizzle/manual/20260529_glyph_records.sql`
+**Status:** ✅ CREATED
+
+Content:
 
 ```sql
 CREATE TABLE IF NOT EXISTS glyph_records (
@@ -104,7 +118,10 @@ Apply: `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sv
 
 ### 1C — ACE cards → GlyphRecord ingestion script
 
-Create `scripts/atlas/ingest-ace-cards-to-glyphs.mjs`:
+**File:** `scripts/atlas/ingest-ace-cards-to-glyphs.mjs` (lines 1-253)
+**Status:** ✅ CREATED
+
+Implementation:
 
 **Logic:**
 1. Read `.opencode/ace-packet.json` (existing ACE packet, 78+ cards)
@@ -117,9 +134,18 @@ Create `scripts/atlas/ingest-ace-cards-to-glyphs.mjs`:
 3. Upsert into `glyph_records` ON CONFLICT (source_ref) DO UPDATE
 4. Report: N rows written, N existing skipped
 
-**npm alias** (add to root `package.json`):
+**npm aliases** (added to root `package.json`)
+**File:** `package.json` (lines 30-35)
+**Status:** ✅ ADDED
+
+Aliases:
 ```json
-"atlas:ingest-glyphs": "node scripts/atlas/ingest-ace-cards-to-glyphs.mjs"
+"atlas:ingest-glyphs": "node scripts/atlas/ingest-ace-cards-to-glyphs.mjs",
+"atlas:compute-rewards": "node scripts/atlas/compute-glyph-rewards.mjs",
+"atlas:sample-training": "node scripts/atlas/sample-glyphs-for-training.mjs",
+"atlas:build-pairs": "node scripts/atlas/glyphs-to-training-pairs.mjs",
+"atlas:smoke-glyphs": "node scripts/atlas/smoke-glyph-pipeline.mjs",
+"atlas:train": "node scripts/atlas/sample-glyphs-for-training.mjs && python scripts/train_lora_adapter.py --dataset scripts/training-datasets/active-sample-latest.jsonl"
 ```
 
 ### Phase 1 verification checklist

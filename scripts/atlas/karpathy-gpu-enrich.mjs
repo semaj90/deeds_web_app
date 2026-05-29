@@ -18,6 +18,8 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { computeKarpathyBlend, computeAttentionScore } from '../../sveltekit-frontend/src/lib/server/scoring/authority-scorer.js';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../../sveltekit-frontend');
 const REPO = resolve(ROOT, '..');
@@ -479,18 +481,10 @@ async function main() {
     const emb = embeddingMap.get(normalizeRepoPath(c.stableKey));
     let attention = 0;
     if (emb && probe) {
-      // CPU cosine similarity (GPU path deferred until tensorrt_bridge is stable for attention)
-      let dot = 0, normE = 0, normP = 0;
-      for (let i = 0; i < 768; i++) {
-        dot   += emb[i] * probe[i];
-        normE += emb[i] * emb[i];
-        normP += probe[i] * probe[i];
-      }
-      const cosine = normE > 0 && normP > 0 ? dot / (Math.sqrt(normE) * Math.sqrt(normP)) : 0;
-      attention = Math.max(0, Math.min(1, (cosine + 1) / 2)); // map [-1,1] → [0,1]
+      attention = computeAttentionScore(emb, probe);
     }
     
-    const blend = (c.pr * 0.4) + (c.authority * 0.3) + (attention * 0.3);
+    const blend = computeKarpathyBlend(c.pr, c.authority, attention);
     finalResults.push({ ...c, attention, blend });
   }
 

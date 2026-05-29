@@ -1,0 +1,148 @@
+# Atlas Graph Plan Update — 2026-05-29 (REVISED)
+
+## Executive Summary
+
+Atlas is at a **critical architectural pivot**. Currently it's a semantic search index (files → AST → embeddings → Qdrant → ACE). It needs to become a **Knowledge Graph** (files → entities → relationships → Neo4j → reasoning).
+
+**The Gap**: You have 9,203 resolved edges + 7,692 nodes, but those edges are mostly IMPORTS. You're missing CALLS, USES_DB, USES_TOOL, SHARES_FEATURE edges — the semantic relationships that make graphs useful for reasoning.
+
+## What You Have Today
+
+```
+Files
+  ↓
+AST parser
+  ↓
+768-d embeddings
+  ↓
+Qdrant (semantic search)
+  ↓
+TurboVec rerank
+  ↓
+ACE packet
+  ↓
+Gemma4 (synthesis)
+```
+
+## What You're Missing (and why it matters)
+
+```
+Files
+  ↓
+AST entities (functions, classes, exports)
+  ↓
+Knowledge Graph (CALLS, USES_DB, USES_TOOL, SHARES_FEATURE edges)
+  ↓
+Feature Graph (which features use which entities)
+  ↓
+Dependency Graph (transitive closure)
+  ↓
+Tool Graph (which tools call which endpoints)
+  ↓
+Domain Graph (semantic clustering by domain)
+  ↓
+Atlas Memory Graph (connected reasoning layer)
+```
+
+Once these edges exist, Atlas becomes **reasoning-capable**. Example:
+
+- Question: "Where do we handle authentication?"
+- Gemma4 calls: `atlas-tools.find_dependencies` → returns auth-related functions
+- Gemma4 calls: `atlas-tools.find_tool_usage` → returns which endpoints use auth
+- Gemma4 calls: `atlas-tools.classify_intent` → groups by security domain
+- Result: **Grounded context** instead of vibes-based retrieval
+
+## High-ROI Next Step (10-phase roadmap)
+
+1. **Resolve 49 active-source unresolved imports** (30-45min) — ⏸️ DEFERRED
+   - All 10 proposals require module creation, not import fixes
+   - Non-blocking for Phase 2+
+   - Decision: Skip; focus on semantic edges first
+
+2. **Build TypeScript AST CALLS extractor** (3-4h) — ✅ COMPLETE
+   - Extracted 164,909 CALLS edges from 5,613 files
+   - Quality validation: 66.1% active-source, 17.4% framework noise, 100% sourceRef
+   - Status: **Ready for Neo4j ingestion**
+   - Recommendation: ✅ **Proceed to Phase 3**
+
+3. **Generate USES_DB edges** (2-3h) — 🔴 NEXT
+   - Detect Drizzle queries, direct SQL, Qdrant calls
+   - Tag files with database dependencies
+   - Enable queries: "What reads/writes this table?"
+   - Implementation: `scripts/atlas/extract-db-usage.mjs` (spec written)
+
+4. **Generate USES_TOOL edges** (2-3h)
+   - Detect `POST /api/...` calls
+   - Detect MCP tool invocations
+   - Enable queries: "Which routes use this tool?"
+
+5. **Sync to Neo4j** (1-2h)
+   - Write CALLS/USES_DB/USES_TOOL edges to Neo4j
+   - Create composite indexes for traversal performance
+
+6. **Generate Feature Graph** (3-4h)
+   - Use `label-features.mjs` (needs to be written) to map files → features
+   - Create `(feature) -[CONTAINS]-> (file)` edges
+   - Consolidate with CALLS edges to create feature dependency graph
+
+7. **Autoencoder 768→64** (2-3h)
+   - Train encoder on 768-d embeddings
+   - Project to 64-d latent space
+   - Save centroids for SOM input
+
+8. **SOM clustering** (1-2h)
+   - Run k-means on 64-d latents
+   - Assign each file to nearest centroid
+   - Generate `(file) -[SIMILAR_TOPOLOGY]-> (neighbor_files)` edges
+
+9. **Glyph reward pipeline** (2-3h)
+   - Score glyphs by graph centrality (PageRank)
+   - Score by semantic coherence
+   - Store in Redis for ACE context reranking
+
+10. **MCP tool routing** (1-2h)
+    - Use graph to suggest which tools Gemma4 should call
+    - Cache routing decisions in Redis
+
+## Why This Order?
+
+- Phase 1 (unresolved imports) unblocks phases 2-4 (accurate edge generation)
+- Phases 2-5 (core edges) are load-bearing for all downstream phases
+- Phases 6-10 multiply the value of phases 2-5
+
+## Current State (what's ready)
+
+✅ Phase 1 Semantic Caching (just validated)
+✅ 9,203 resolved edges + sourceRefs
+✅ 7,692 Neo4j nodes
+✅ 768-d Qdrant embeddings
+✅ TurboVec reranking
+✅ ACE packet assembly
+
+## Proposed Immediate Action
+
+**A) Quick Win Path** (30-45min to 1h):
+- Resolve the 49 active-source unresolved imports
+- Generate active-unresolved-edit-proposals.json with safe candidates
+- Prepare patches (no apply) for manual review
+
+**B) Architecture Path** (3-4h):
+- Skip import resolution for now
+- Build the TypeScript AST CALLS extractor from scratch
+- Run it on clean AST (unresolved imports don't block CALLS extraction)
+- Get 5K-10K new CALLS edges into Neo4j immediately
+
+**Recommendation**: Start with **A + B in parallel**:
+- Spend 30min on quick-win imports
+- Spend 3-4h building CALLS extractor
+- Net result: cleaner graph + semantic edges in <5h
+
+---
+
+## Related Documents
+
+- `ARCHITECTURE_NEXT_PHASES_2026-05-29.md` — Full architectural analysis (DuckDB, 6-degree expansion, synthesis synthesis)
+- `SEMANTIC_CACHING_PHASE1_COMPLETE.md` — Phase 1 validation (just completed)
+- `.claude/memory/MEMORY.md` — Session history and architectural decisions
+
+Generated by Claude (Anthropic) on 2026-05-29 15:41 PST

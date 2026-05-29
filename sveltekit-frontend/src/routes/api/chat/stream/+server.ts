@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { redisGetAcePacket, redisSetAcePacket, hashQuery, type AcePacket } from '$lib/server/cache/ace-packet-cache.js';
 import { buildVarianceRecoveryContext } from '$lib/server/ace/variance-recovery.js';
 import { exec } from 'child_process';
@@ -6,6 +7,11 @@ import path from 'path';
 import fs from 'fs';
 
 const execAsync = promisify(exec);
+
+const postSchema = z.object({
+  messages: z.array(z.any()).optional().default([]),
+  query: z.string().min(1),
+});
 
 function makeRequestFromUrl(url: URL) {
   const query = url.searchParams.get('q') ?? url.searchParams.get('query') ?? '';
@@ -85,7 +91,20 @@ async function buildAcePacket(query: string): Promise<AcePacket> {
 
 export async function POST({ request, locals }) {
   if (!locals.user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
-  const { messages, query } = await request.json();
+  
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  const parsed = postSchema.safeParse(body);
+  if (!parsed.success) {
+    return new Response(JSON.stringify({ error: 'Invalid input parameters', details: parsed.error.format() }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  const { messages, query } = parsed.data;
   
   const stream = new ReadableStream({
     async start(controller) {
@@ -167,7 +186,9 @@ export async function POST({ request, locals }) {
 }
 
 export async function GET({ url, params, locals }) {
+  if (!locals.user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   return POST({
     request: makeRequestFromUrl(url),
+    locals,
   } as Parameters<typeof POST>[0]);
 }

@@ -1,6 +1,6 @@
 # Cross-Layer Contract Error Map
 
-Generated: 2026-05-29T05:48:26.306Z  |  Findings: 6  |  High: 0  Medium: 1  Low: 0  Info: 5
+Generated: 2026-05-29T23:19:02.374Z  |  Findings: 6  |  High: 0  Medium: 0  Low: 0  Info: 6
 
 ## Findings
 
@@ -69,15 +69,15 @@ Generated: 2026-05-29T05:48:26.306Z  |  Findings: 6  |  High: 0  Medium: 1  Low:
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-stale_migration-006-9d10ac6b
-**Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
+### contract:drizzle-meta-documented_sidecar-006-65c917c7
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
-**Problem:** "9999_agent_observations.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
+**Problem:** Documented sidecar "9999_agent_observations.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
 
-**Expected:** Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
 
-**Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/9999_agent_observations.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
 
 **Files:** `sveltekit-frontend\drizzle\9999_agent_observations.sql`
 
-**Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
+**Validation:** `npm run audit:drizzle-meta`

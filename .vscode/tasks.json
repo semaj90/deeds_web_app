@@ -8482,6 +8482,36 @@
       "detail": "Standalone summarizer — tries TurboQuant :8090 first, falls back to Ollama :11434. Bypasses SvelteKit."
     },
     {
+      "label": "🔄 Pipeline: GDS Graph Enrichment",
+      "type": "shell",
+      "command": "npm run graphify:gds",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Execute GDS community detection, betweenness centrality, PageRank, SHARES_CLUSTER and HIGH_AUTHORITY edges."
+    },
+    {
+      "label": "🔄 Pipeline: GDS Smoke Test",
+      "type": "shell",
+      "command": "npm run graphify:gds:smoke",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Execute 10-gate GDS smoke test to validate Neo4j, GDS plugin, projections, Node scores, Qdrant payload authority scores, Redis hash entries."
+    },
+    {
       "label": "🗑️ Pipeline: Invalidate Downstream Caches",
       "type": "shell",
       "command": "curl -s -X POST http://localhost:5173/api/cache/invalidate -H \"Content-Type: application/json\" -d \"{\\\"type\\\":\\\"indexing_complete\\\"}\"",
