@@ -340,6 +340,10 @@ reports/*.jsonl
 !.opencode/skills/
 !.opencode/config*.json
 
+# Ignore NDJSON artifacts (generated, large)
+.opencode/**/*.ndjson
+.opencode/*.ndjson
+
 # Tabs Studio
 *.tss
 
