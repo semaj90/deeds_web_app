@@ -255,8 +255,15 @@ function runSingletonBootTasks(): void {
           .catch((err) =>
             console.warn('[Boot] Idle scanner failed (non-fatal):', (err as Error).message)
           );
+
+        // Start offline pipeline listener for tracking rewards and ledger updates
+        import('$lib/server/observability/offline-pipeline.js')
+          .then(({ startOfflinePipelineListener }) => startOfflinePipelineListener())
+          .catch((err) =>
+            console.warn('[Boot] Offline pipeline failed (non-fatal):', (err as Error).message)
+          );
       } else {
-        console.log('[Boot] Redis unavailable, skipping cache warmups and idle scanner');
+        console.log('[Boot] Redis unavailable, skipping cache warmups, idle scanner, and offline pipeline');
       }
     })
     .catch((err) => {
