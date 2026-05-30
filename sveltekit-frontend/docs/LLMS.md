@@ -36,3 +36,7 @@ Documented planning and architecture notes that should be visible to the repo's 
 ## Summary
 
 This directory contains human-facing index notes that should still be machine-discoverable. The goal is to keep the docs aligned with the same walk-up and path mapping behavior used by the rest of the codebase index.
+
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards

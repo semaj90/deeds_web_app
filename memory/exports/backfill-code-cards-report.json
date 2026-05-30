@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-05-30T04:43:54.171Z",
+  "mode": "apply",
+  "inputs": {
+    "outcomeRows": 6,
+    "uniqueSourceRefs": 1
+  },
+  "outputs": {
+    "cardsBackfilled": 1,
+    "cardIds": [
+      "d705bfd010c76907"
+    ],
+    "graphVersion": "2026-05-30"
+  },
+  "expectedJoinResult": {
+    "before": "0/6 matches (0% success)",
+    "after": "1/1 matches (100% success)"
+  },
+  "details": {
+    "sourceRefs": {
+      "sveltekit-frontend/src/lib/server/cache/cache-config.ts": {
+        "originalSourceRef": "sveltekit-frontend/src/lib/server/cache/cache-config.ts",
+        "normalized": "sveltekit-frontend/src/lib/server/cache/cache-config.ts",
+        "outcomes": [
+          {
+            "id": "3cac056f-e2a2-4927-842b-3f7ca709544f",
+            "reward": 0.99,
+            "tool": "smoke_test_tool",
+            "timestamp": "2026-05-29T22:34:28.149Z"
+          },
+          {
+            "id": "e96a070d-b8d9-4640-bcf2-24042d5b8ea1",
+            "reward": 0.99,
+            "tool": "smoke_test_tool",
+            "timestamp": "2026-05-29T22:35:21.776Z"
+          },
+          {
+            "id": "d149bad6-0b16-457b-87dc-e600189be714",
+            "reward": 0.99,
+            "tool": "smoke_test_tool",
+            "timestamp": "2026-05-29T22:35:34.262Z"
+          },
+          {
+            "id": "d313796c-5835-4971-8404-f3f80b84654a",
+            "reward": 0.99,
+            "tool": "smoke_test_tool",
+            "timestamp": "2026-05-29T22:35:43.138Z"
+          },
+          {
+            "id": "d8489fef-a703-4d89-8f62-4331c618ea51",
+            "reward": 0.99,
+            "tool": "smoke_test_tool",
+            "timestamp": "2026-05-29T22:36:06.631Z"
+          },
+          {
+            "id": "72e0e979-ff71-4c46-86ac-550119d88d24",
+            "reward": 0.99,
+            "tool": "smoke_test_tool",
+            "timestamp": "2026-05-29T22:36:32.423Z"
+          }
+        ],
+        "outcomeCount": 6,
+        "totalReward": 5.94,
+        "avgReward": 0.9900000000000001
+      }
+    }
+  },
+  "nextSteps": [
+    "1. Run: npm run atlas:fix-joins:apply",
+    "2. Verify: sourceRef-cardId-map.json generated",
+    "3. Verify: sourceRef-performance.json generated",
+    "4. Verify: outcome-ledger-with-cardIds.ndjson generated",
+    "5. Check join success rate: should be 6/6 (100%)",
+    "6. Load sourceRef-performance.json into DuckDB for analytics"
+  ]
+}

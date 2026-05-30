@@ -4487,3 +4487,10 @@ Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.
 - [`docs/ace-kag-howto.md`](./docs/ace-kag-howto.md) — KAG ingestion + ACE retrieval pipeline (this is what populates `wiki:note:dir:*`)
 - [`docs/graph/codebase-map.md`](./docs/graph/codebase-map.md) — 20-gate audit dashboard (G4/G5/G15/G16/G20 coverage)
 - [`docs/graph/hypergraph-clusters.md`](./docs/graph/hypergraph-clusters.md) — full per-cluster digest (topic + member files)
+
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards
+
+
+[2026-05-30T04:39:26.319Z] Phase19 CSV export and archive-preview generated (dry-run)

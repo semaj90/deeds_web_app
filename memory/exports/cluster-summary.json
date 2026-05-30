@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-05-30T05:14:13.537Z",
+  "totalCards": 9373,
+  "cardsWithClusterMeta": 9372,
+  "clusterCount": 0,
+  "status": "Ready for full cluster attribution (requires Qdrant + Neo4j services)"
+}

@@ -1,0 +1,7 @@
+{
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\exports\\atlas\\sample_cards.jsonl",
+  "out": ".tmp/atlas-cluster-assignments.1780110981204.jsonl",
+  "k": 16,
+  "createdAt": "2026-05-30T03:16:21.204Z",
+  "dryRun": true
+}

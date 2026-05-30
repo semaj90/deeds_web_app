@@ -69,7 +69,7 @@ export const RewardEventSchema = z.object({
   reason: z.string().max(500),
   createdAt: z.date(),
   sourceRefs: z.array(z.string()),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 export type RewardEvent = z.infer<typeof RewardEventSchema>;
 
@@ -119,10 +119,10 @@ export type PromoteResponse = z.infer<typeof PromoteResponseSchema>;
 export const LogRequestSchema = z.object({
   traceId: z.string().uuid(),
   tool: z.string(),
-  args: z.record(z.unknown()).optional(),
+  args: z.record(z.string(), z.unknown()).optional(),
   result: z.enum(['ok', 'fail', 'timeout']),
   durationMs: z.number().int(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 export type LogRequest = z.infer<typeof LogRequestSchema>;
 
@@ -150,7 +150,7 @@ export const MCPResponseSchema = z.object({
   error: z.object({
     code: z.number(),
     message: z.string(),
-    data: z.record(z.unknown()).optional(),
+    data: z.record(z.string(), z.unknown()).optional(),
   }).optional(),
   id: z.union([z.string(), z.number()]),
 });

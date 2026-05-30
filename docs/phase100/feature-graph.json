@@ -1,0 +1,541 @@
+{
+  "timestamp": "2026-05-30T07:54:57.990Z",
+  "phase": "100.6 (Unified Feature Graph)",
+  "featureCount": 18,
+  "acyclic": true,
+  "cycles": [],
+  "features": [
+    {
+      "key": "hyperrag.lane.qdrant",
+      "name": "HyperRAG Qdrant Lane",
+      "status": "active",
+      "domain": "rag",
+      "nodes": {
+        "files": [
+          "src/lib/server/vector/qdrant-manager.ts"
+        ],
+        "tables": [],
+        "caches": [
+          "ace:qdrant:*"
+        ],
+        "qdrantCollections": [
+          "codebase_chunks_768",
+          "evidence_items",
+          "legal_documents"
+        ],
+        "neo4jLabels": []
+      },
+      "dependencies": [
+        "cache.bifrost_semantic"
+      ],
+      "dependents": [
+        "ace.context_assembler",
+        "hyperrag.lane.hypergraph",
+        "hyperrag.lane.som",
+        "mcp.kb_retrieval"
+      ],
+      "fanIn": 4,
+      "fanOut": 1
+    },
+    {
+      "key": "hyperrag.lane.couchdb",
+      "name": "HyperRAG CouchDB Lane",
+      "status": "active",
+      "domain": "rag",
+      "nodes": {
+        "files": [
+          "src/lib/server/couchdb-client.ts"
+        ],
+        "tables": [],
+        "caches": [
+          "couchdb:pagerank_scores"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [],
+      "dependents": [
+        "hyperrag.lane.pagerank"
+      ],
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "key": "hyperrag.lane.neo4j",
+      "name": "HyperRAG Neo4j Lane",
+      "status": "active",
+      "domain": "graph",
+      "nodes": {
+        "files": [
+          "src/lib/server/graph/neo4j-client.ts"
+        ],
+        "tables": [],
+        "caches": [
+          "ace:neo4j:*"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": [
+          "CodebaseFile",
+          "GPUCluster",
+          "DirectorySummary"
+        ]
+      },
+      "dependencies": [],
+      "dependents": [
+        "hyperrag.lane.pagerank",
+        "ace.kag_traverser"
+      ],
+      "fanIn": 2,
+      "fanOut": 0
+    },
+    {
+      "key": "hyperrag.lane.redis_kag",
+      "name": "HyperRAG Redis KAG",
+      "status": "active",
+      "domain": "cache",
+      "nodes": {
+        "files": [
+          "src/lib/server/redis.ts",
+          "src/lib/server/cache/redis-exact-match.ts"
+        ],
+        "tables": [],
+        "caches": [
+          "ace:kag:*",
+          "wiki:note:*"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [],
+      "dependents": [
+        "ace.context_assembler",
+        "hyperrag.lane.feature_atlas",
+        "ace.kag_traverser"
+      ],
+      "fanIn": 3,
+      "fanOut": 0
+    },
+    {
+      "key": "hyperrag.lane.fast_ast",
+      "name": "HyperRAG Fast AST",
+      "status": "active",
+      "domain": "rag",
+      "nodes": {
+        "files": [
+          "src/lib/server/ace/fast-ast-scorer.ts"
+        ],
+        "tables": [],
+        "caches": [
+          "ace:fast_ast:*"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [],
+      "dependents": [
+        "ace.context_assembler"
+      ],
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "key": "hyperrag.lane.som",
+      "name": "HyperRAG SOM Topology",
+      "status": "active",
+      "domain": "graph",
+      "nodes": {
+        "files": [
+          "src/lib/server/graph/som-topology-pipeline.ts"
+        ],
+        "tables": [
+          "research_summaries"
+        ],
+        "caches": [
+          "ace:topo:*"
+        ],
+        "qdrantCollections": [
+          "codebase_chunks_768"
+        ],
+        "neo4jLabels": [
+          "DirectorySummary"
+        ]
+      },
+      "dependencies": [
+        "hyperrag.lane.qdrant"
+      ],
+      "dependents": [
+        "ace.context_assembler"
+      ],
+      "fanIn": 1,
+      "fanOut": 1
+    },
+    {
+      "key": "hyperrag.lane.hypergraph",
+      "name": "HyperRAG Hypergraph",
+      "status": "active",
+      "domain": "graph",
+      "nodes": {
+        "files": [
+          "src/lib/server/graph/hypergraph-4d.ts",
+          "scripts/run-hypergraph.ts"
+        ],
+        "tables": [
+          "hyperedges"
+        ],
+        "caches": [
+          "hg:checkpoint:kmeans:*"
+        ],
+        "qdrantCollections": [
+          "codebase_chunks_768"
+        ],
+        "neo4jLabels": [
+          "Hyperedge"
+        ]
+      },
+      "dependencies": [
+        "hyperrag.lane.pagerank",
+        "hyperrag.lane.qdrant"
+      ],
+      "dependents": [
+        "ace.context_assembler"
+      ],
+      "fanIn": 1,
+      "fanOut": 2
+    },
+    {
+      "key": "hyperrag.lane.pagerank",
+      "name": "HyperRAG PageRank",
+      "status": "active",
+      "domain": "graph",
+      "nodes": {
+        "files": [
+          "scripts/run-pagerank.ts"
+        ],
+        "tables": [],
+        "caches": [
+          "couchdb:pagerank_scores"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": [
+          "CodebaseFile"
+        ]
+      },
+      "dependencies": [
+        "hyperrag.lane.couchdb",
+        "hyperrag.lane.neo4j"
+      ],
+      "dependents": [
+        "hyperrag.lane.hypergraph"
+      ],
+      "fanIn": 1,
+      "fanOut": 2
+    },
+    {
+      "key": "hyperrag.lane.feature_atlas",
+      "name": "HyperRAG Feature Atlas",
+      "status": "active",
+      "domain": "rag",
+      "nodes": {
+        "files": [
+          "src/lib/server/ace/context-assembler.ts"
+        ],
+        "tables": [
+          "feature_implementations",
+          "feature_file_edges"
+        ],
+        "caches": [
+          "ace:authority:top"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [
+        "hyperrag.lane.redis_kag"
+      ],
+      "dependents": [
+        "ace.context_assembler"
+      ],
+      "fanIn": 1,
+      "fanOut": 1
+    },
+    {
+      "key": "hyperrag.lane.web_search",
+      "name": "HyperRAG Web Search",
+      "status": "active",
+      "domain": "rag",
+      "nodes": {
+        "files": [
+          "src/lib/server/web-research-crawler.ts"
+        ],
+        "tables": [
+          "research_summaries",
+          "web_search_cache"
+        ],
+        "caches": [
+          "web:search:*"
+        ],
+        "qdrantCollections": [
+          "research_summaries"
+        ],
+        "neo4jLabels": []
+      },
+      "dependencies": [],
+      "dependents": [],
+      "fanIn": 0,
+      "fanOut": 0
+    },
+    {
+      "key": "hyperrag.lane.prior_answer",
+      "name": "HyperRAG Prior Answer",
+      "status": "active",
+      "domain": "cache",
+      "nodes": {
+        "files": [
+          "src/lib/server/ai/llm-cache.ts"
+        ],
+        "tables": [
+          "code_llm_index"
+        ],
+        "caches": [
+          "llm:cache:*"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [
+        "cache.bifrost_semantic"
+      ],
+      "dependents": [],
+      "fanIn": 0,
+      "fanOut": 1
+    },
+    {
+      "key": "ace.context_assembler",
+      "name": "ACE Context Assembler",
+      "status": "active",
+      "domain": "rag",
+      "nodes": {
+        "files": [
+          "src/lib/server/ace/context-assembler.ts"
+        ],
+        "tables": [
+          "ace_chunks",
+          "ace_context_sources",
+          "metadata_envelopes"
+        ],
+        "caches": [
+          "ace:context:*",
+          "ace:rank:dirty_files"
+        ],
+        "qdrantCollections": [
+          "codebase_chunks_768"
+        ],
+        "neo4jLabels": []
+      },
+      "dependencies": [
+        "hyperrag.lane.qdrant",
+        "hyperrag.lane.redis_kag",
+        "hyperrag.lane.fast_ast",
+        "hyperrag.lane.som",
+        "hyperrag.lane.hypergraph",
+        "hyperrag.lane.feature_atlas",
+        "ace.trust_tier"
+      ],
+      "dependents": [
+        "gemma4.tool_calling"
+      ],
+      "fanIn": 1,
+      "fanOut": 7
+    },
+    {
+      "key": "ace.trust_tier",
+      "name": "ACE Trust Tier System",
+      "status": "active",
+      "domain": "admin",
+      "nodes": {
+        "files": [
+          "src/lib/server/ace/trust-meta.ts"
+        ],
+        "tables": [
+          "trust_audit"
+        ],
+        "caches": [],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [],
+      "dependents": [
+        "ace.context_assembler"
+      ],
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "key": "ace.kag_traverser",
+      "name": "ACE KAG Traverser",
+      "status": "active",
+      "domain": "graph",
+      "nodes": {
+        "files": [
+          "src/lib/services/error-analysis/KAGTraverser.ts"
+        ],
+        "tables": [
+          "kg_nodes",
+          "kg_edges"
+        ],
+        "caches": [
+          "ace:kag:*"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": [
+          "CodebaseFile",
+          "GPUCluster"
+        ]
+      },
+      "dependencies": [
+        "hyperrag.lane.neo4j",
+        "hyperrag.lane.redis_kag"
+      ],
+      "dependents": [],
+      "fanIn": 0,
+      "fanOut": 2
+    },
+    {
+      "key": "gemma4.tool_calling",
+      "name": "Gemma4 Tool Calling",
+      "status": "active",
+      "domain": "llm",
+      "nodes": {
+        "files": [
+          "src/lib/server/ai/gemma4-agent.ts",
+          "src/lib/server/ai/gemma4-tool-controller.ts",
+          "src/lib/server/ai/mcp-tool-bridge.ts"
+        ],
+        "tables": [
+          "context_timeline"
+        ],
+        "caches": [
+          "gemma4:tool:*"
+        ],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [
+        "mcp.trace_server",
+        "ace.context_assembler",
+        "cache.bifrost_semantic"
+      ],
+      "dependents": [],
+      "fanIn": 0,
+      "fanOut": 3
+    },
+    {
+      "key": "mcp.trace_server",
+      "name": "TRACE MCP Server",
+      "status": "active",
+      "domain": "llm",
+      "nodes": {
+        "files": [
+          "src/mcp/server.ts"
+        ],
+        "tables": [],
+        "caches": [],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [],
+      "dependents": [
+        "gemma4.tool_calling"
+      ],
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "key": "mcp.kb_retrieval",
+      "name": "KB Retrieval MCP",
+      "status": "active",
+      "domain": "rag",
+      "nodes": {
+        "files": [
+          "src/mcp/kb-server.ts"
+        ],
+        "tables": [],
+        "caches": [],
+        "qdrantCollections": [],
+        "neo4jLabels": []
+      },
+      "dependencies": [
+        "hyperrag.lane.qdrant"
+      ],
+      "dependents": [],
+      "fanIn": 0,
+      "fanOut": 1
+    },
+    {
+      "key": "cache.bifrost_semantic",
+      "name": "Bifrost Semantic Cache",
+      "status": "active",
+      "domain": "cache",
+      "nodes": {
+        "files": [
+          "src/lib/server/cache/redis-exact-match.ts",
+          "src/lib/server/ollama.ts"
+        ],
+        "tables": [],
+        "caches": [
+          "bifrost:*"
+        ],
+        "qdrantCollections": [
+          "embedding_cache"
+        ],
+        "neo4jLabels": []
+      },
+      "dependencies": [],
+      "dependents": [
+        "gemma4.tool_calling",
+        "hyperrag.lane.qdrant",
+        "hyperrag.lane.prior_answer"
+      ],
+      "fanIn": 3,
+      "fanOut": 0
+    }
+  ],
+  "missingFiles": [
+    {
+      "feature": "hyperrag.lane.couchdb",
+      "file": "src/lib/server/couchdb-client.ts"
+    },
+    {
+      "feature": "hyperrag.lane.neo4j",
+      "file": "src/lib/server/graph/neo4j-client.ts"
+    },
+    {
+      "feature": "hyperrag.lane.fast_ast",
+      "file": "src/lib/server/ace/fast-ast-scorer.ts"
+    },
+    {
+      "feature": "hyperrag.lane.web_search",
+      "file": "src/lib/server/web-research-crawler.ts"
+    },
+    {
+      "feature": "ace.trust_tier",
+      "file": "src/lib/server/ace/trust-meta.ts"
+    },
+    {
+      "feature": "ace.kag_traverser",
+      "file": "src/lib/services/error-analysis/KAGTraverser.ts"
+    },
+    {
+      "feature": "mcp.kb_retrieval",
+      "file": "src/mcp/kb-server.ts"
+    }
+  ],
+  "stats": {
+    "totalFeatures": 18,
+    "totalFiles": 23,
+    "foundFiles": 16,
+    "missingFileCount": 7,
+    "totalEdges": 21,
+    "activeFeatures": 18
+  }
+}

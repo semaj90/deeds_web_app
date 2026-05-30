@@ -175,3 +175,6 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 Agents (Claude Code, Cursor, Codex, Aider) automatically pick up the nearest `LLMS.md` when editing files in this tree. The root `LLMS.md` provides repo-wide rules; this file overlays directory-specific signals from the Redis KAG cache.
 
 Run `npm run llms:write` to regenerate after `npm run index:codebase:fast`.
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards

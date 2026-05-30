@@ -1,56 +1,284 @@
-import { pool } from '$lib/server/db/client';
+import { db } from '$lib/server/db/index.js';
+import { scenarioCache } from '$lib/server/db/schema.js';
+import { eq } from 'drizzle-orm';
+import { getRedis } from '$lib/server/redis.js';
+import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
+import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
+import crypto from 'crypto';
 
-type UpsertScenarioInput = {
-  source_ref: string;
-  content_hash: string;
-  name?: string | null;
-  description?: string | null;
-  metadata?: Record<string, unknown> | null;
-  embedding?: number[] | null;
-};
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
+const SCENARIO_HIT_THRESHOLD = 0.85;
+const REDIS_TTL = 24 * 60 * 60; // 24 hours
 
-export async function upsertScenario(input: UpsertScenarioInput) {
-  const { source_ref, content_hash, name = null, description = null, metadata = null, embedding = null } = input;
-  const client = await pool.connect();
+export interface ScenarioCacheResult {
+  hit: boolean;
+  response?: string;
+  similarity?: number;
+  source?: 'redis' | 'qdrant_postgres';
+}
+
+function getQueryHash(query: string): string {
+  return crypto.createHash('sha256').update(query.trim().toLowerCase()).digest('hex');
+}
+
+async function embedQuery(query: string): Promise<number[] | null> {
   try {
-    const res = await client.query(
-      `INSERT INTO scenarios (source_ref, content_hash, name, description, metadata, embedding, created_at, updated_at)
-       VALUES ($1,$2,$3,$4,$5, $6, now(), now())
-       ON CONFLICT (source_ref, content_hash) DO UPDATE SET
-         name = COALESCE(EXCLUDED.name, scenarios.name),
-         description = COALESCE(EXCLUDED.description, scenarios.description),
-         metadata = COALESCE(EXCLUDED.metadata, scenarios.metadata),
-         embedding = COALESCE(EXCLUDED.embedding, scenarios.embedding),
-         updated_at = now()
-       RETURNING id, created_at, updated_at;
-      `,
-      [source_ref, content_hash, name, description, metadata ? JSON.stringify(metadata) : null, embedding]
+    const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    return Array.isArray(data.embedding) ? data.embedding : null;
+  } catch (error) {
+    console.warn('[Scenario Cache] Embedding generation failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Tiered Scenario Cache Lookup:
+ * Tier 1: Redis exact-match query hash
+ * Tier 2: Qdrant semantic search + Postgres payload hydration
+ */
+export async function lookupScenario(query: string): Promise<ScenarioCacheResult> {
+  const hash = getQueryHash(query);
+  const redisKey = `scenario:exact:${hash}`;
+
+  // Tier 1: Redis Exact Match
+  try {
+    const redis = getRedis();
+    const cached = await redis.get(redisKey);
+    if (cached) {
+      console.log(`[Scenario Cache] Tier 1 HIT (Redis exact match) hash=${hash.slice(0, 8)}`);
+      return {
+        hit: true,
+        response: cached,
+        source: 'redis',
+      };
+    }
+  } catch (err) {
+    console.warn('[Scenario Cache] Redis lookup failed:', err);
+  }
+
+  // Tier 2: Qdrant ANN + Postgres hydration
+  try {
+    const embedding = await embedQuery(query);
+    if (!embedding) {
+      return { hit: false };
+    }
+
+    const qdrantClient = qdrant.client;
+    const searchRes = await qdrantClient.search('scenario_cache', {
+      vector: embedding,
+      limit: 1,
+      score_threshold: SCENARIO_HIT_THRESHOLD,
+      with_payload: true,
+    });
+
+    if (searchRes.length === 0) {
+      return { hit: false };
+    }
+
+    const topHit = searchRes[0];
+    const scenarioId = topHit.payload?.scenario_id as string;
+    if (!scenarioId) {
+      return { hit: false };
+    }
+
+    // Hydrate full response from Postgres
+    const rows = await db
+      .select()
+      .from(scenarioCache)
+      .where(eq(scenarioCache.id, scenarioId))
+      .limit(1);
+
+    if (rows.length === 0) {
+      return { hit: false };
+    }
+
+    const row = rows[0];
+    console.log(
+      `[Scenario Cache] Tier 2 HIT (Qdrant + Postgres) similarity=${topHit.score?.toFixed(3)} id=${scenarioId}`
     );
-    return res.rows[0];
-  } finally {
-    client.release();
+
+    // Warm up exact-match cache in Redis for next queries
+    try {
+      const redis = getRedis();
+      await redis.set(redisKey, row.response, 'EX', REDIS_TTL);
+    } catch (err) {
+      console.warn('[Scenario Cache] Redis warming failed:', err);
+    }
+
+    return {
+      hit: true,
+      response: row.response,
+      similarity: topHit.score,
+      source: 'qdrant_postgres',
+    };
+  } catch (err) {
+    console.warn('[Scenario Cache] Tier 2 lookup failed:', err);
+    return { hit: false };
+  }
+}
+
+/**
+ * Store a new scenario cache entry in both Postgres (relational & metadata)
+ * and Qdrant (embedding index for similarity match).
+ */
+export async function storeScenario(query: string, response: string, metadata: Record<string, any> = {}): Promise<void> {
+  try {
+    const hash = getQueryHash(query);
+    const embedding = await embedQuery(query);
+    if (!embedding) {
+      throw new Error('Failed to generate embedding for scenario storing');
+    }
+
+    // Insert into Postgres
+    const [inserted] = await db
+      .insert(scenarioCache)
+      .values({
+        queryHash: hash,
+        query,
+        response,
+        metadata,
+      })
+      .onConflictDoUpdate({
+        target: scenarioCache.queryHash,
+        set: {
+          response,
+          metadata,
+        },
+      })
+      .returning();
+
+    // Upsert into Qdrant scenario_cache
+    const qdrantClient = qdrant.client;
+    const pointId = deterministicPointId(`${hash}:scenario_cache`);
+
+    await qdrantClient.upsert('scenario_cache', {
+      wait: true,
+      points: [
+        {
+          id: pointId,
+          vector: embedding,
+          payload: {
+            scenario_id: inserted.id,
+            query_hash: hash,
+            metadata,
+          },
+        },
+      ],
+    });
+
+    // Also populate Redis exact-match cache immediately
+    try {
+      const redis = getRedis();
+      await redis.set(`scenario:exact:${hash}`, response, 'EX', REDIS_TTL);
+    } catch (err) {
+      console.warn('[Scenario Cache] Redis pre-warming failed:', err);
+    }
+
+    console.log(`[Scenario Cache] Successfully stored scenario query_hash=${hash.slice(0, 8)}`);
+  } catch (err) {
+    console.error('[Scenario Cache] Failed to store scenario:', err);
+    throw err;
   }
 }
 
 export async function getScenarioById(id: string) {
-  const client = await pool.connect();
-  try {
-    const res = await client.query(`SELECT * FROM scenarios WHERE id = $1 LIMIT 1`, [id]);
-    return res.rows[0] ?? null;
-  } finally {
-    client.release();
-  }
+  const rows = await db
+    .select()
+    .from(scenarioCache)
+    .where(eq(scenarioCache.id, id))
+    .limit(1);
+  return rows[0] || null;
 }
 
-export async function findScenarioBySourceRefAndHash(source_ref: string, content_hash: string) {
-  const client = await pool.connect();
-  try {
-    const res = await client.query(
-      `SELECT * FROM scenarios WHERE source_ref = $1 AND content_hash = $2 LIMIT 1`,
-      [source_ref, content_hash]
-    );
-    return res.rows[0] ?? null;
-  } finally {
-    client.release();
-  }
+export async function findScenarioBySourceRefAndHash(sourceRef: string, contentHash: string) {
+  const compositeHash = crypto.createHash('sha256').update(`${sourceRef}:${contentHash}`).digest('hex');
+  const rows = await db
+    .select()
+    .from(scenarioCache)
+    .where(eq(scenarioCache.queryHash, compositeHash))
+    .limit(1);
+  return rows[0] || null;
 }
+
+interface UpsertScenarioInput {
+  source_ref: string;
+  content_hash: string;
+  name?: string | null;
+  description?: string | null;
+  metadata?: Record<string, any> | null;
+  embedding?: number[] | null;
+}
+
+export async function upsertScenario(data: UpsertScenarioInput) {
+  const compositeHash = crypto.createHash('sha256').update(`${data.source_ref}:${data.content_hash}`).digest('hex');
+  const queryText = data.name ?? data.source_ref;
+  const responseText = data.description ?? '';
+  const meta = {
+    source_ref: data.source_ref,
+    content_hash: data.content_hash,
+    name: data.name,
+    description: data.description,
+    ...(data.metadata || {}),
+  };
+
+  const [inserted] = await db
+    .insert(scenarioCache)
+    .values({
+      queryHash: compositeHash,
+      query: queryText,
+      response: responseText,
+      metadata: meta,
+    })
+    .onConflictDoUpdate({
+      target: scenarioCache.queryHash,
+      set: {
+        query: queryText,
+        response: responseText,
+        metadata: meta,
+      },
+    })
+    .returning();
+
+  if (data.embedding) {
+    try {
+      const qdrantClient = qdrant.client;
+      const pointId = deterministicPointId(`${compositeHash}:scenario_cache`);
+      await qdrantClient.upsert('scenario_cache', {
+        wait: true,
+        points: [
+          {
+            id: pointId,
+            vector: data.embedding,
+            payload: {
+              scenario_id: inserted.id,
+              query_hash: compositeHash,
+              metadata: meta,
+            },
+          },
+        ],
+      });
+    } catch (err) {
+      console.warn('[Scenario Cache] Qdrant upsert failed in upsertScenario:', err);
+    }
+  }
+
+  try {
+    const redis = getRedis();
+    await redis.set(`scenario:exact:${compositeHash}`, responseText, 'EX', REDIS_TTL);
+  } catch (err) {
+    console.warn('[Scenario Cache] Redis set failed in upsertScenario:', err);
+  }
+
+  return inserted;
+}
+

@@ -51,3 +51,10 @@ npm run agents:write       # Regenerates per-dir docs (use --root-only for speed
 
 ---
 *This file is protected from auto-generation overwrites.*
+
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards
+
+
+[2026-05-30T04:39:26.319Z] Phase19 CSV export and archive-preview generated (dry-run)

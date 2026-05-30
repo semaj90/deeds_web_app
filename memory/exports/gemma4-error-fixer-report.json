@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-05-30T07:50:46.777Z",
+  "input_tasks": 5,
+  "filtered_tasks": 5,
+  "fixes_emitted": 5,
+  "avg_confidence": 0.5,
+  "llm": {
+    "url": "http://localhost:8090",
+    "up": true,
+    "invocations": 5
+  },
+  "mcp": {
+    "url": "http://localhost:8788",
+    "up": false,
+    "invocations": 0
+  },
+  "by_priority": {
+    "P1": 5
+  }
+}

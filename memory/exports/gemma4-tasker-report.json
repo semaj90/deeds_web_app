@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-05-30T07:50:07.845Z",
+  "llm": {
+    "url": "http://localhost:8090",
+    "up": true,
+    "invocations": 5,
+    "failures": 0
+  },
+  "mcp": {
+    "url": "http://localhost:8788",
+    "up": false
+  },
+  "summary": {
+    "total": 5,
+    "by_priority": {
+      "P1": 5
+    },
+    "llm_enhanced": 3
+  }
+}

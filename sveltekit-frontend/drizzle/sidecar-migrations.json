@@ -154,5 +154,24 @@
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_observations';\""
     }
+    ,
+    {
+      "file": "20260530_phase19b_join_keys.sql",
+      "status": "manual_sidecar",
+      "reason": "Phase19B: Add card_source_refs mapping and nullable card_id columns for reliable sourceRef -> card joins; best-effort HNSW index for summary_cards.embedding.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='card_source_refs';\""
+    },
+    {
+      "file": "20260530_phase19d_scenario_cache.sql",
+      "status": "manual_sidecar",
+      "reason": "Phase19D: Add scenario_cache table to bypass preflight logic on exact match query hashes.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='scenario_cache';\""
+    }
   ]
 }

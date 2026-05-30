@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T01:48:47.757Z",
+  "generatedAt": "2026-05-30T02:27:10.387Z",
   "totalErrors": 848,
   "proposals": [
     {
@@ -45,7 +45,7 @@
       ],
       "featureStatus": "unknown",
       "priority": "HIGH",
-      "generatedAt": "2026-05-30T01:48:47.751Z",
+      "generatedAt": "2026-05-30T02:27:10.383Z",
       "usedLlm": false
     },
     {
@@ -101,7 +101,7 @@
       ],
       "featureStatus": "partial",
       "priority": "HIGH",
-      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "generatedAt": "2026-05-30T02:27:10.384Z",
       "usedLlm": false
     },
     {
@@ -145,7 +145,7 @@
       ],
       "featureStatus": "partial",
       "priority": "HIGH",
-      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "generatedAt": "2026-05-30T02:27:10.384Z",
       "usedLlm": false
     },
     {
@@ -191,7 +191,7 @@
       ],
       "featureStatus": "implemented",
       "priority": "MEDIUM",
-      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "generatedAt": "2026-05-30T02:27:10.384Z",
       "usedLlm": false
     },
     {
@@ -237,7 +237,7 @@
       ],
       "featureStatus": "implemented",
       "priority": "LOW",
-      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "generatedAt": "2026-05-30T02:27:10.384Z",
       "usedLlm": false
     },
     {
@@ -267,7 +267,7 @@
       ],
       "featureStatus": "implemented",
       "priority": "LOW",
-      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "generatedAt": "2026-05-30T02:27:10.384Z",
       "usedLlm": false
     }
   ]

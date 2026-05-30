@@ -325,6 +325,7 @@
     "@unocss/core": "^66.0.0",
     "@unocss/preset-uno": "^66.0.0",
     "@unocss/vite": "^66.0.0",
+    "better-sqlite3": "12.10.0",
     "dotenv": "17.4.2",
     "eslint": "^8.0.0",
     "eslint-plugin-svelte": "^2.0.0",

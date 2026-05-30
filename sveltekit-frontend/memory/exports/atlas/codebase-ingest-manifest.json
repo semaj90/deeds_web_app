@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-05-30T07:43:52.176Z",
+  "stats": {
+    "totalRecords": 1,
+    "kinds": {
+      "node": 1,
+      "edge": 0,
+      "card": 0,
+      "reward": 0,
+      "glyph": 0
+    },
+    "lanes": {
+      "lane-default": 1
+    },
+    "filesProcessed": [
+      "test-lane.ndjson"
+    ]
+  },
+  "totalFailed": 0
+}

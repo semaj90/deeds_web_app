@@ -58,6 +58,7 @@ import {
   AcePromptPreflightInput,
   AcePromptPreflightResult,
 } from '$lib/server/ai/ace-prompt-preflight.js';
+import { lookupScenario, storeScenario } from '$lib/server/ai/scenario-cache.js';
 
 const OPENAI_DEFAULT_MAX_TOKENS = Number(process.env.OPENAI_DEFAULT_MAX_TOKENS ?? '1024');
 const OPENAI_MAX_OUTPUT_TOKENS = Number(
@@ -461,6 +462,50 @@ export async function runChatCompletion(
 
   if (!query) {
     throw new Error('No user query found in messages — last message must be role:user');
+  }
+
+  // Tiered Scenario Cache (Tier 1 Redis, Tier 2 Qdrant + Postgres hydration)
+  try {
+    const cachedScenario = await lookupScenario(query);
+    if (cachedScenario.hit && cachedScenario.response) {
+      return wrapResponse({
+        content: cachedScenario.response,
+        model: internalModel,
+        durationMs: Date.now() - startMs,
+        inferenceLane: cachedScenario.source === 'redis' ? undefined : (canUseTurboQuantNow ? 'turboquant' : 'hermes'),
+        runtimeProfile: runtime.profile,
+        runtimeAvailable: runtime.runtimeAvailable,
+        turboQuantEnabled: runtime.turboQuant,
+        rotorQuantKv: runtime.rotorQuantKv,
+        draftModel: draftModelEnabled,
+        backend: cachedScenario.source === 'redis' ? 'redis-exact-match' : 'scenario-cache-qdrant',
+        selectedLane: cachedScenario.source === 'redis' ? 'redis' : 'bifrost',
+        ace: {
+          used: false,
+          chunks: 0,
+          agentsMd: false,
+          codeLlmHit: true,
+          cacheHit: 'prior-answer',
+          inputTokens: countTokens(query),
+          maxContextSize: RUNTIME_CONTEXT_SIZE,
+          availableContextTokens: RUNTIME_CONTEXT_SIZE,
+          budgetGuardTriggered: false,
+        },
+        timingTrace: {
+          redisMs: cachedScenario.source === 'redis' ? Date.now() - startMs : 0,
+          qdrantMs: cachedScenario.source === 'qdrant_postgres' ? Date.now() - startMs : 0,
+          postgresMs: 0,
+          graphMs: 0,
+          bifrostMs: 0,
+          turboquantMs: 0,
+          totalMs: Date.now() - startMs,
+          selectedLane: cachedScenario.source === 'redis' ? 'redis' : 'bifrost',
+          fallbackReason: null,
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('[Scenario Cache] Lookup failed (non-fatal):', err);
   }
 
   // ── Raw passthrough mode: skip ACE, use messages verbatim ──
@@ -1425,6 +1470,11 @@ export async function runChatCompletion(
       86400 // 24h
     ),
   ]).catch(() => {});
+
+  // Store in Scenario Cache (Qdrant + Postgres + Redis) for future lookup
+  storeScenario(query, text).catch((err) => {
+    console.warn('[Scenario Cache] Storing scenario failed:', err);
+  });
 
   // Fire-and-forget: store answer so run-2 gets a prior-answer cache hit
   import('$lib/server/cache/code-llm-index.js')

@@ -27,10 +27,10 @@ services:
   # ESSENTIAL SERVICES (always start) — ~6GB total
   # ═══════════════════════════════════════════════════════════════════
 
-  # PostgreSQL 17 + pgvector — primary database
+  # PostgreSQL 18 + pgvector — primary database
   # NOTE: Stop native postgres.exe first to free port 5432
   postgres:
-    image: pgvector/pgvector:pg17
+    image: pgvector/pgvector:pg18
     container_name: legal-ai-postgres
     restart: unless-stopped
     deploy:
@@ -54,7 +54,7 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
       - ./sql/init:/docker-entrypoint-initdb.d
     networks:
       - legal-ai-network
@@ -396,7 +396,7 @@ services:
     networks:
       - legal-ai-network
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --header='Host: localhost' -O /dev/null http://localhost:${CADDY_PORT:-5178}/health || exit 1"]
+      test: ["CMD-SHELL", "wget -q --no-check-certificate -O /dev/null https://localhost:${CADDY_PORT:-5178}/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3

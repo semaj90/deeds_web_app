@@ -105,8 +105,8 @@ import {
 import { recordContextCacheAccess } from '$lib/server/cache/ace-context-cache-metrics.js';
 import { recallPastChats } from './chat-memory.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
-import { loadCardPromotionStates, applyPromotionBoost } from './card-promotion-loader.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
+
 import type { ACPKnowledgeSearchResult } from '$lib/server/services/knowledge-search/ACPToolRegistry.js';
 import {
   applyClusterCoherenceBoost,
@@ -1239,6 +1239,7 @@ export async function assembleACEContext(opts: {
   filePath?: string;
   tokenAwarePacking?: boolean;
   statsOut?: Record<string, any>;
+  traceId?: string;
 }): Promise<ACEContext> {
   if (opts.statsOut) {
     opts.statsOut.topo_hit = false;
@@ -1614,15 +1615,16 @@ export async function assembleACEContext(opts: {
             ragChunks.map((c) => c.filePath || c.url || '').filter(Boolean)
           );
           if (opts.traceId) {
-            tracePolicy({
-              traceId: opts.traceId,
-              stage: 'phase19b_promotion_boost',
-              metadata: {
+            await tracePolicy(
+              'phase19b_promotion_boost',
+              {
+                traceId: opts.traceId,
                 appliedBoosts: boostStats.appliedBoosts,
                 avgBoost: boostStats.avgBoost,
                 maxBoost: boostStats.maxBoost,
               },
-            });
+              async () => {}
+            );
           }
         }
       }
@@ -4147,7 +4149,13 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
 
 // ── Tiered Retrieval: KB (stable corpus) + Case (user evidence) ──
 
-type RAGChunk = { content: string; score: number; source: string };
+type RAGChunk = {
+  content: string;
+  score: number;
+  source: string;
+  filePath?: string;
+  url?: string;
+};
 
 const KB_SOURCE_SCORE_WEIGHTS = {
   contextualDocument: 0.9,

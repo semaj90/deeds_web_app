@@ -940,4 +940,88 @@ export const TOOL_DISPATCH: Record<
     tool_kb_explain_retrieval(a as Parameters<typeof tool_kb_explain_retrieval>[0]),
   'opencode.inject_summary': (a) =>
     tool_opencode_inject_summary(a as Parameters<typeof tool_opencode_inject_summary>[0]),
+  'atlas-tools.create_task': (a) =>
+    tool_atlas_create_task(a as Parameters<typeof tool_atlas_create_task>[0]),
+  'atlas-tools.propose_fix': (a) =>
+    tool_atlas_propose_fix(a as Parameters<typeof tool_atlas_propose_fix>[0]),
+  'atlas-tools.record_fix_outcome': (a) =>
+    tool_atlas_record_fix_outcome(a as Parameters<typeof tool_atlas_record_fix_outcome>[0]),
 };
+
+/** atlas-tools.create_task — create a task with sourceRefs */
+export async function tool_atlas_create_task(args: {
+  taskName: string;
+  description: string;
+  sourceRefs: string[];
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const taskId = `task-${Math.random().toString(36).slice(2, 9)}`;
+    return ok(
+      'atlas-tools.create_task',
+      {
+        taskId,
+        status: 'created',
+        taskName: args.taskName,
+        description: args.description,
+        sourceRefs: args.sourceRefs || [],
+      },
+      Date.now() - t0
+    );
+  } catch (e) {
+    return err('atlas-tools.create_task', String(e), Date.now() - t0);
+  }
+}
+
+/** atlas-tools.propose_fix — propose a fix with sourceRefs and requiresOperatorApproval */
+export async function tool_atlas_propose_fix(args: {
+  targetFile: string;
+  issue: string;
+  suggestedFix: string;
+  sourceRefs: string[];
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const fixId = `fix-${Math.random().toString(36).slice(2, 9)}`;
+    return ok(
+      'atlas-tools.propose_fix',
+      {
+        fixId,
+        status: 'proposed',
+        targetFile: args.targetFile,
+        issue: args.issue,
+        suggestedFix: args.suggestedFix,
+        sourceRefs: args.sourceRefs || [],
+        requiresOperatorApproval: true,
+      },
+      Date.now() - t0
+    );
+  } catch (e) {
+    return err('atlas-tools.propose_fix', String(e), Date.now() - t0);
+  }
+}
+
+/** atlas-tools.record_fix_outcome — record outcome of a proposed fix */
+export async function tool_atlas_record_fix_outcome(args: {
+  fixId: string;
+  outcome: 'success' | 'failed';
+  notes: string;
+  sourceRefs: string[];
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    return ok(
+      'atlas-tools.record_fix_outcome',
+      {
+        fixId: args.fixId,
+        status: 'recorded',
+        outcome: args.outcome,
+        notes: args.notes,
+        sourceRefs: args.sourceRefs || [],
+      },
+      Date.now() - t0
+    );
+  } catch (e) {
+    return err('atlas-tools.record_fix_outcome', String(e), Date.now() - t0);
+  }
+}

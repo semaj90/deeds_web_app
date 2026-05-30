@@ -188,3 +188,6 @@ rg "SIMILAR_TOPOLOGY" src/lib/server/ --type ts
 Agents automatically pick up the nearest `LLMS.md` when editing. The root `LLMS.md` provides repo-wide rules.
 
 Run `npm run llms:write` to regenerate.
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards

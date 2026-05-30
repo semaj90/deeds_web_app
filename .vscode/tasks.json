@@ -157,6 +157,25 @@
       "detail": "Spawn trace-mcp-server.ts detached (same pattern as TurboQuant), idempotent — health-checks :8788 first and returns immediately if already alive. Required by Gemma4 agent + clusters.get_members + 35-tool MCP surface."
     },
     {
+      "label": "🧪 MCP JSON-RPC 2.0 Verification",
+      "type": "shell",
+      "command": "node scripts/verify-mcp-json-rpc.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Verify the unified MCP JSON-RPC 2.0 pipeline is working. Tests TRACE MCP :8788/mcp responds to tools/list and tools/call JSON-RPC requests. Run after 'MCP TRACE Server (detached)' starts."
+    },
+    {
       "label": "Agents Pipeline (Safe)",
       "type": "shell",
       "command": "npm run agents:pipeline:safe",

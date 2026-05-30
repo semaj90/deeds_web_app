@@ -1,0 +1,140 @@
+{
+  "timestamp": "2026-05-30T05:15:39.967Z",
+  "mode": "apply",
+  "phase": "Phase 4: Vector64 Dry-Run",
+  "inputs": {
+    "totalCards": 9373,
+    "cardsWithRewards": 1
+  },
+  "findings": {
+    "compressionRatio": 91.67,
+    "avgReconstructionError": 0.04806,
+    "memorySavings": "91.67%",
+    "status": "Compression viable, ready for full implementation",
+    "nextSteps": [
+      "1. Verify reconstruction error acceptable for downstream use",
+      "2. Test SOM clustering with compressed vectors",
+      "3. Measure impact on model quality metrics",
+      "4. Proceed to Phase 5: SOM Clustering"
+    ]
+  },
+  "metrics": {
+    "timestamp": "2026-05-30T05:15:39.966Z",
+    "phase": "Phase 4: Vector64 Dry-Run",
+    "compression": {
+      "fromDim": 768,
+      "toDim": 64,
+      "compressionRatio": 91.67,
+      "memorySavingsPercent": 91.67,
+      "bytesPerVector": {
+        "original": 3072,
+        "compressed": 256,
+        "savings": 2816
+      }
+    },
+    "reconstructionMetrics": {
+      "avgError": 0.04806,
+      "minError": 0.046809,
+      "maxError": 0.049712
+    },
+    "compatibility": {
+      "downstreamPhases": [
+        "Phase 5: SOM Clustering (compatible with 64-dim)",
+        "Phase 6: LoRA Dataset Generation (uses 64-dim vectors)"
+      ],
+      "testStatus": "READY FOR FULL COMPRESSION"
+    },
+    "sampleResults": [
+      {
+        "cardIndex": 0,
+        "cardId": "000678ef52ca67b0",
+        "originalDim": 768,
+        "compressedDim": 64,
+        "compressionRatio": 91.67,
+        "reconstructionError": 0.046809,
+        "compressedVectorSample": [
+          0.08663777102326624,
+          0.212150162189941,
+          0.27597707043430175,
+          0.32516290577257795,
+          0.3014041195882086,
+          0.19744088842578664,
+          0.068881144966845,
+          -0.1162983001316084
+        ]
+      },
+      {
+        "cardIndex": 1,
+        "cardId": "00116e85cfe0456e",
+        "originalDim": 768,
+        "compressedDim": 64,
+        "compressionRatio": 91.67,
+        "reconstructionError": 0.048295,
+        "compressedVectorSample": [
+          0.11064205422253413,
+          0.20665521011514135,
+          0.2900750104306305,
+          0.3167340260264667,
+          0.29131274221015874,
+          0.20432836353995454,
+          0.05539864768411429,
+          -0.1356257526141434
+        ]
+      },
+      {
+        "cardIndex": 2,
+        "cardId": "0012bc7350ff2a70",
+        "originalDim": 768,
+        "compressedDim": 64,
+        "compressionRatio": 91.67,
+        "reconstructionError": 0.049712,
+        "compressedVectorSample": [
+          0.10815070350327714,
+          0.2224521276047944,
+          0.2834809176113082,
+          0.32201505494302,
+          0.3012522250686301,
+          0.20685767615733955,
+          0.0606960003459129,
+          -0.10689357210134552
+        ]
+      },
+      {
+        "cardIndex": 3,
+        "cardId": "001570455730d2d7",
+        "originalDim": 768,
+        "compressedDim": 64,
+        "compressionRatio": 91.67,
+        "reconstructionError": 0.047658,
+        "compressedVectorSample": [
+          0.10470307296860755,
+          0.21220860032651956,
+          0.29693593320245015,
+          0.311086166971368,
+          0.2849679523559638,
+          0.20248946017781191,
+          0.05160581384391447,
+          -0.12721951090474412
+        ]
+      },
+      {
+        "cardIndex": 4,
+        "cardId": "001f2d08e4459234",
+        "originalDim": 768,
+        "compressedDim": 64,
+        "compressionRatio": 91.67,
+        "reconstructionError": 0.047825,
+        "compressedVectorSample": [
+          0.0948248687920888,
+          0.22498129966334093,
+          0.2819907623677451,
+          0.3220941218004925,
+          0.2963302988329392,
+          0.19952390846779575,
+          0.051637911770630686,
+          -0.11842256836452729
+        ]
+      }
+    ]
+  }
+}

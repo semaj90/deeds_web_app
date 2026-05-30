@@ -32,3 +32,7 @@ Go embedding service. HTTP :8097 / gRPC :50051. Wraps the Ollama `embeddinggemma
 ```
 trace.kag_search({ query: "go embedding service grpc 50051" })
 ```
+
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards

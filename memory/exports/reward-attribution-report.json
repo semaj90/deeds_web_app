@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-05-30T05:12:22.288Z",
+  "mode": "apply",
+  "phase": "Phase 2: Reward Attribution",
+  "inputs": {
+    "outcomeRows": 6,
+    "sourceRefMappings": 1380
+  },
+  "outputs": {
+    "cardsEnriched": 1,
+    "cardsNotFound": 0,
+    "totalRewardValue": 5.94,
+    "avgRewardValue": 5.94
+  },
+  "statistics": {
+    "rewardDistribution": {
+      "min": 0.99,
+      "max": 0.99,
+      "avg": 5.94,
+      "total": 5.94
+    },
+    "countDistribution": {
+      "min": 6,
+      "max": 6,
+      "total": 6
+    }
+  },
+  "nextSteps": [
+    "1. Verify: enriched cards have reward fields",
+    "2. Load reward-summary.json for analytics",
+    "3. Begin Phase 3: Cluster Attribution",
+    "4. Map GPU clusters to card objects",
+    "5. Run Phase 4: Vector64 dry-run"
+  ]
+}

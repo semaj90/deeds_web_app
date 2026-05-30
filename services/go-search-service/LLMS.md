@@ -34,3 +34,7 @@ Search orchestrator (`src/lib/server/search/hybrid-search.ts` or equivalent) use
 trace.kag_search({ query: "go search service http" })
 graph.expand_neighborhood({ stableKeys: ["services/go-search-service/main.go"] })
 ```
+
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards

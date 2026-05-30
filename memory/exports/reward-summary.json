@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-05-30T05:12:22.289Z",
+  "cardsWithRewards": [
+    {
+      "cardId": "d705bfd010c76907",
+      "sourceRef": "sveltekit-frontend/src/lib/server/cache/cache-config.ts",
+      "reward": {
+        "count": 6,
+        "total": 5.94,
+        "avg": 0.9900000000000001
+      }
+    }
+  ],
+  "statistics": {
+    "rewardDistribution": {
+      "min": 0.99,
+      "max": 0.99,
+      "avg": 5.94,
+      "total": 5.94
+    },
+    "countDistribution": {
+      "min": 6,
+      "max": 6,
+      "total": 6
+    }
+  }
+}

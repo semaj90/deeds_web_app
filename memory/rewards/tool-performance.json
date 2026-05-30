@@ -1,14 +1,13 @@
 {
   "smoke_test_tool": {
-    "count": 6,
-    "average": 0.9900000000000001,
-    "latest": {
-      "ts": "2026-05-29T22:36:32.423Z",
-      "reward": 0.99,
-      "sourceRef": [
-        "sveltekit-frontend/src/lib/server/cache/cache-config.ts"
-      ],
-      "graphVersion": "2026-05-29"
-    }
+    "tool": "smoke_test_tool",
+    "callCount": 6,
+    "recommendationAcceptedCount": 6,
+    "acceptanceRate": 1,
+    "avgReward": 0.9900000000000001,
+    "totalReward": 5.94,
+    "sourceRefCount": 1,
+    "graphVersion": "2026-05-29",
+    "lastUpdated": "2026-05-30T03:50:08.914Z"
   }
 }

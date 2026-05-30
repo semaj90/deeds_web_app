@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T22:26:40.065Z",
+  "generatedAt": "2026-05-30T07:08:46.763Z",
   "embeddingDim": 768,
   "allowedDims": [
     768,
@@ -57,7 +57,7 @@
       "check": "live_postgres",
       "reachable": true,
       "pass": true,
-      "vectorExtension": "v0.8.1",
+      "vectorExtension": "v0.8.2",
       "hnswIndexes": [
         "agent_memory_observations.agent_memory_observations_embedding_hnsw",
         "cluster_summaries.cluster_summaries_embedding_hnsw",
@@ -81,7 +81,7 @@
         "warden_chunks.warden_chunks_hnsw_idx"
       ],
       "missingHnswOnExistingTables": [],
-      "message": "pgvector 0.8.1 installed. 20 HNSW index(es) found.",
+      "message": "pgvector 0.8.2 installed. 20 HNSW index(es) found.",
       "suggestedFix": null
     }
   ],

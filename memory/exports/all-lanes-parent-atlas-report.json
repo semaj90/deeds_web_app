@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-05-30T06:47:32.044Z",
+  "mode": "apply",
+  "lanes": {
+    "card": {
+      "nodes": 9373,
+      "edges": 0
+    },
+    "outcome": {
+      "nodes": 6,
+      "edges": 6
+    },
+    "route": {
+      "nodes": 250,
+      "edges": 0
+    },
+    "env": {
+      "nodes": 583,
+      "edges": 0
+    },
+    "language": {
+      "nodes": 4,
+      "edges": 0
+    },
+    "import": {
+      "nodes": 100,
+      "edges": 0
+    },
+    "workspace": {
+      "nodes": 20,
+      "edges": 0
+    },
+    "som_edge": {
+      "nodes": 396,
+      "edges": 9372
+    }
+  },
+  "totalNodes": 10732,
+  "totalEdges": 9378
+}

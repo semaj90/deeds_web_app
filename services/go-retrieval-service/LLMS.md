@@ -35,3 +35,7 @@ Go gRPC + HTTP retrieval service. Serves `SearchEvidence`, `StreamEvidence`, `Se
 trace.kag_search({ query: "go retrieval service grpc" })
 graph.shortest_path({ sourceFile: "services/go-retrieval-service/main.go", targetFile: "src/lib/server/grpc/retrieval-client.ts" })
 ```
+
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards

@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-05-30T07:12:14.517Z",
+  "redis": "localhost:6379",
+  "ttl_seconds": 86400,
+  "written": {
+    "nodes": 10732,
+    "lanes": 8,
+    "clusters": 396
+  },
+  "zsets": [
+    "atlas:parent:degree:rank",
+    "atlas:parent:cluster:rank"
+  ],
+  "meta_key": "atlas:parent:meta"
+}

@@ -31,6 +31,7 @@
 import { TOOL_DISPATCH, type MCPToolResult } from './mcp-tool-dispatch.js';
 import { compressToHCACard, hcaCardToContextSnippet, type HCACard } from './hca-compressor.js';
 import { recordAgentAction } from '$lib/server/trace/trace-collector.js';
+import { callTraceMcpTool } from './mcp-tool-bridge.js';
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 
@@ -60,6 +61,9 @@ export const ALLOWED_MCP_TOOLS = new Set([
   'context.get_compressed_card',
   'context.explain_compression',
   'workspace.timeline',
+  'atlas-tools.create_task',
+  'atlas-tools.propose_fix',
+  'atlas-tools.record_fix_outcome',
 ]);
 
 /** Pattern-based blocklist — matched against tool names AND arguments */
@@ -144,23 +148,36 @@ export function buildToolResultMessage(
   return { role: 'tool', content: result, name: toolCall.name };
 }
 
-// ── MCP HTTP dispatch (tries :8788, falls back to in-process) ─────────────────
+// ── MCP HTTP dispatch (tries :8788 via JSON-RPC 2.0, falls back to in-process) ──
 
+/**
+ * Dispatch tool call to TRACE MCP server via JSON-RPC 2.0.
+ * Uses callTraceMcpTool() from mcp-tool-bridge.ts which posts to /mcp
+ * with proper tools/call JSON-RPC envelope.
+ */
 async function dispatchViaHTTP(toolName: string, args: Record<string, unknown>): Promise<MCPToolResult | null> {
   try {
     const ctrl = new AbortController();
     const tid  = setTimeout(() => ctrl.abort(), MCP_TIMEOUT_MS);
-    const res  = await fetch(`${MCP_SERVER_URL}/tools/${encodeURIComponent(toolName)}`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(args),
-      signal:  ctrl.signal,
-    });
+
+    // Use callTraceMcpTool from mcp-tool-bridge which handles JSON-RPC 2.0
+    const result = await Promise.race([
+      callTraceMcpTool(toolName, args),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), MCP_TIMEOUT_MS)
+      )
+    ]);
+
     clearTimeout(tid);
-    if (!res.ok) return null;
-    return await res.json() as MCPToolResult;
+
+    // callTraceMcpTool returns { error: ... } on failure, actual result on success
+    if (result && typeof result === 'object' && 'error' in result) {
+      return null; // error response from MCP → fall through to in-process
+    }
+
+    return result as MCPToolResult;
   } catch {
-    return null; // server not running — fall through to in-process
+    return null; // server not running or timeout — fall through to in-process
   }
 }
 

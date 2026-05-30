@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-05-30T05:20:27.511Z",
+  "phase": "Phase 6: LoRA Dataset Generation",
+  "dataset": {
+    "totalExamples": 9372,
+    "totalCards": 9373,
+    "cardsUtilized": "99.99"
+  },
+  "enrichment": {
+    "cardsWithRewards": 1,
+    "cardsWithSOM": 9372,
+    "cardsFullyEnriched": 0,
+    "enrichmentCoverage": "0.00"
+  },
+  "reward": {
+    "avg": 0.500052,
+    "min": 0.5,
+    "max": 0.99
+  },
+  "distribution": {
+    "highReward": 1,
+    "mediumReward": 9371,
+    "lowReward": 0
+  },
+  "grpoTrainingConfig": {
+    "batch_size": 4,
+    "num_train_epochs": 3,
+    "learning_rate": 0.00005,
+    "num_reward_functions": 7,
+    "reward_weighting": {
+      "correctness": 0.4,
+      "clarity": 0.2,
+      "efficiency": 0.2,
+      "legal_domain": 0.1,
+      "documentation": 0.1
+    }
+  }
+}

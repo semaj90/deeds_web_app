@@ -85,3 +85,10 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 Agents (Claude Code, Cursor, Codex, Aider) automatically pick up the nearest `AGENTS.md` when editing files in this tree. The root `AGENTS.md` provides repo-wide rules; this file overlays directory-specific signals from the Redis KAG cache.
 
 Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.
+
+
+<!-- ingest: 2026-05-30T02:17:10.013Z -->
+- ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards
+
+
+[2026-05-30T04:39:26.319Z] Phase19 CSV export and archive-preview generated (dry-run)

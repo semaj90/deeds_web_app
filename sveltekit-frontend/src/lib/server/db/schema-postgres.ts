@@ -4696,3 +4696,16 @@ export type NewLlmSynthesisEvent = typeof llmSynthesisEvents.$inferInsert;
 // GlyphRecord_DB aliases the canonical glyphRecords table (defined at line ~3748).
 export type GlyphRecord_DB = typeof glyphRecords.$inferSelect;
 export type NewGlyphRecord_DB = typeof glyphRecords.$inferInsert;
+
+// === SCENARIO CACHE ===
+export const scenarioCache = pgTable('scenario_cache', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  queryHash: varchar('query_hash', { length: 64 }).notNull().unique(),
+  query: text('query').notNull(),
+  response: text('response').notNull(),
+  metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull().defaultNow(),
+});
+
+export type ScenarioCache = typeof scenarioCache.$inferSelect;
+export type NewScenarioCache = typeof scenarioCache.$inferInsert;

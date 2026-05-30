@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-05-30T07:10:18.906Z",
+  "mode": "apply",
+  "phase": "DuckDB Map-Reduce Atlas Join",
+  "extraction": {
+    "cards": 9373,
+    "outcomes": 6,
+    "training_examples": 9372
+  },
+  "export": {
+    "enriched_cards": 9373,
+    "cluster_summaries": 357,
+    "parent_atlas_entries": 9373
+  },
+  "status": "Map-reduce join complete, canonical tables ready for Bitfrost cache and offline analysis",
+  "nextSteps": [
+    "1. Load CSV exports into Redis cache warmup",
+    "2. Index parent_atlas_index for Bitfrost semantic reranking",
+    "3. Use cluster_summary for SOM topology-aware recommendation",
+    "4. Archive enriched_cards to CouchDB for durable persistence"
+  ]
+}
