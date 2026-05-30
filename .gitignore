@@ -890,3 +890,12 @@ sveltekit-frontend/memory/graphify/deep/deep-import-graph.json
 /sveltekit-frontend/docs/documents-atlas-index.json
 /sveltekit-frontend/memory/atlas/documents-atlas.inverted.json
 /sveltekit-frontend/memory/kb/notecards/graph_file_cards.rank.json
+
+# Allow tracking of atlas memory/index files when desired
+#! Note: negations only work if parent directories are not fully ignored.
+!/memory/atlas/
+!/memory/atlas/**
+!/sveltekit-frontend/memory/atlas/
+!/sveltekit-frontend/memory/atlas/**
+!/docs/documents-atlas-index.json
+!/sveltekit-frontend/docs/documents-atlas-index.json
