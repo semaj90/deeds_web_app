@@ -798,6 +798,13 @@ scripts/tests/screenshots/cases-ui/
 # Source code EXCEPTIONS
 # Later rules override earlier ones in .gitignore.
 # These ensure source code is never hidden by broad binary/build patterns.
+
+########################################
+# OpenCode NDJSON artifacts (large generated files kept locally, not tracked)
+########################################
+# Ignore generated NDJSON artifacts produced by OpenCode pipelines and runs
+.opencode/**/*.ndjson
+.tmp/**/*.ndjson
 ########################################
 
 # GPU TypeScript source files (override gpu-* Go binary pattern)
