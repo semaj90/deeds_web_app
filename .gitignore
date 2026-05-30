@@ -917,3 +917,6 @@ legal_ai_db_backup.dump
 .opencode/recommendations/tasks.ndjson
 .opencode/ingest/nodes.ndjson
 
+# Structured offline directory
+/offline-data/
+
