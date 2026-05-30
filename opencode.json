@@ -1,7 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "gemma4-local/gemma4-local",
-  "small_model": "gemma4-local/gemma4-local",
+  "model": "turboquant/gemma4-tq",
+  "small_model": "turboquant/gemma4-tq",
   "default_agent": "antigravity",
   "shell": "pwsh.exe",
   "provider": {
@@ -159,6 +159,26 @@
       "temperature": 0,
       "steps": 10,
       "prompt": "Use MCP tools first, but call only what is needed for the current question. Default tool order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Only use gemma4-offload for runtime/model checks. Keep engram, turbovec, and langextract opt-in unless explicitly requested. Do not edit files without approval.",
+      "tools": {
+        "enabled": true,
+        "max_calls": 3,
+        "call_type": "function",
+        "auto_select": true,
+        "fallback_on_error": true
+      },
+      "function_calling": {
+        "enabled": true,
+        "provider": "gemma4-local",
+        "trigger_mode": "auto",
+        "semantic_routing": true,
+        "max_tokens_for_tool_context": 2000
+      },
+      "redis_packets": {
+        "enabled": true,
+        "key_prefix": "gemma4:agent:antigravity",
+        "ttl": 3600,
+        "semantic_tags": ["mcp-first", "read-only"]
+      },
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -284,6 +304,58 @@
     },
     "atlas-context": {
       "prompt": "\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n"
+    },
+    "gemma4-function-caller": {
+      "description": "Gemma4 agent with automatic function-calling for tool dispatch",
+      "model": "gemma4-local/gemma4-local",
+      "temperature": 0,
+      "steps": 12,
+      "prompt": "You are a function-calling agent. Analyze the user query and automatically select the best tools to use from the available MCP tool set. Always use function calls to accomplish tasks rather than explanations.\n\nTool Selection Strategy:\n1. Semantic queries → trace.kag_search or trace.atlas_query\n2. Graph traversal → graph.expand_neighborhood or graph.shortest_path\n3. Topology analysis → topology.search_near or clusters.get_summary_lenses\n4. Context building → context.build_kv_packet or context.get_compressed_card\n5. Code search → trace.explain_retrieval or codebase.rg_search\n\nFunction-Calling Rules:\n- Call functions immediately when identified\n- Bundle related calls together\n- Don't explain before calling — just call\n- Report results inline after each call\n- Stop after 3 rounds of calls or when the query is fully answered\n- If function returns error, try fallback from the same category\n\nDo not edit files without explicit approval.",
+      "tools": {
+        "enabled": true,
+        "max_calls": 5,
+        "call_type": "function",
+        "auto_select": true,
+        "fallback_on_error": true,
+        "parallel_calls": true
+      },
+      "function_calling": {
+        "enabled": true,
+        "provider": "gemma4-local",
+        "trigger_mode": "auto",
+        "semantic_routing": true,
+        "max_tokens_for_tool_context": 3000,
+        "timeout_ms": 8000,
+        "retry_on_timeout": true
+      },
+      "redis_packets": {
+        "enabled": true,
+        "key_prefix": "gemma4:agent:function-caller",
+        "ttl": 3600,
+        "semantic_tags": ["function-calling", "auto-dispatch", "mcp-tools"]
+      },
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "mcp_*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "topology_*": "allow",
+        "topology.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "clusters_*": "allow",
+        "clusters.*": "allow",
+        "edit": "deny",
+        "webfetch": "allow"
+      }
     }
   },
   "instructions": [
