@@ -38,21 +38,26 @@ import { codeRepos } from './codebase-intelligence';
 // Powers: heatmap, pipeline memory, cross-pipeline champions, trending queries.
 
 export const chunkHitLog = pgTable('chunk_hit_log', {
-	id:          bigserial('id', { mode: 'number' }).primaryKey(),
-	chunkId:     text('chunk_id').notNull(),
-	relativePath: text('relative_path').notNull().default(''),
-	gpuCluster:  integer('gpu_cluster'),
-	somCluster:  integer('som_cluster'),
-	pipeline:    text('pipeline').notNull(),               // 'ace'|'kag'|'dag'|'rag'|'reranker'|'codebase'|'feedback'
-	queryHash:   varchar('query_hash', { length: 16 }).notNull(),
-	score:       real('score'),
-	rerankScore: real('rerank_score'),
-	userId:      integer('user_id'),
-	caseId:      uuid('case_id'),
-	hitAt:       timestamp('hit_at', { withTimezone: true }).notNull().default(sql`now()`),
+	id:               bigserial('id', { mode: 'number' }).primaryKey(),
+	chunkId:          text('chunk_id').notNull(),
+	relativePath:     text('relative_path').notNull().default(''),
+	gpuCluster:       integer('gpu_cluster'),
+	somCluster:       integer('som_cluster'),
+	pipeline:         text('pipeline').notNull(),               // 'ace'|'kag'|'dag'|'rag'|'reranker'|'codebase'|'feedback'
+	queryHash:        varchar('query_hash', { length: 16 }).notNull(),
+	score:            real('score'),
+	rerankScore:      real('rerank_score'),
+	// Phase 19B: Card Promotion State
+	promotionState:   text('promotion_state'),                 // 'fresh'|'engaged'|'warm'|'hot'|'archived'
+	promotionBoost:   real('promotion_boost'),                 // 1.0, 1.2, 1.8, 3.0, 0.1
+	baseScore:        real('base_score'),                      // Original score before boost
+	userId:           integer('user_id'),
+	caseId:           uuid('case_id'),
+	hitAt:            timestamp('hit_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => ({
 	pipelineClusterIdx: index('chunk_hit_pipeline_cluster_idx').on(t.pipeline, t.gpuCluster, t.hitAt),
 	queryHashIdx:       index('chunk_hit_query_hash_idx').on(t.queryHash, t.hitAt),
+	promotionStateIdx:   index('chunk_hit_promotion_state_idx').on(t.promotionState, t.hitAt),
 }));
 
 export type ChunkHitLog    = typeof chunkHitLog.$inferSelect;

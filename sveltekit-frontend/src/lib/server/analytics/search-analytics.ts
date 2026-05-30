@@ -33,13 +33,17 @@ export type HitPipeline =
   | 'contextual';
 
 export interface ChunkHit {
-	id:              string;
-	relativePath?:   string;
-	gpuCluster?:     number | null;
-	somCluster?:     number | null;
-	score:           number;
-	rerankScore?:    number;
-	rerankBreakdown?: import('$lib/server/ace/types.js').RerankBreakdown | null;
+	id:                   string;
+	relativePath?:        string;
+	gpuCluster?:          number | null;
+	somCluster?:          number | null;
+	score:                number;
+	rerankScore?:         number;
+	rerankBreakdown?:     import('$lib/server/ace/types.js').RerankBreakdown | null;
+	// Phase 19B: Card Promotion State
+	promotionState?:      'fresh' | 'engaged' | 'warm' | 'hot' | 'archived';
+	promotionBoost?:      number; // 1.0, 1.2, 1.8, 3.0, 0.1
+	baseScore?:           number; // Original score before promotion boost
 }
 
 export interface QueryLogEntry {
@@ -135,6 +139,8 @@ export function recordSearchQuery(opts: {
  * Record a chunk_hit_log row for every retrieved chunk.
  * Called once per pipeline pass (ACE, KAG, DAG, RAG, reranker, codebase).
  * Fire-and-forget.
+ *
+ * Includes Phase 19B promotion state tracking for memory lifecycle analysis.
  */
 export function recordChunkHits(
   hits: ChunkHit[],
@@ -149,14 +155,16 @@ export function recordChunkHits(
     .query(
       `INSERT INTO chunk_hit_log
 		   (chunk_id, relative_path, gpu_cluster, som_cluster, pipeline, query_hash,
-		    score, rerank_score, rerank_breakdown, user_id, case_id)
+		    score, rerank_score, promotion_state, promotion_boost, base_score, user_id, case_id)
 		 SELECT t.chunk_id, t.relative_path, t.gpu_cluster::int, t.som_cluster::int,
 		        t.pipeline, t.query_hash, t.score::real, t.rerank_score::real,
-		        t.rerank_breakdown::jsonb, t.user_id::uuid, t.case_id::uuid
+		        t.promotion_state, t.promotion_boost::real, t.base_score::real,
+		        t.user_id::uuid, t.case_id::uuid
 		 FROM jsonb_to_recordset($1::jsonb) AS t(
 		   chunk_id text, relative_path text, gpu_cluster text, som_cluster text,
 		   pipeline text, query_hash text, score text, rerank_score text,
-		   rerank_breakdown text, user_id text, case_id text
+		   promotion_state text, promotion_boost text, base_score text,
+		   user_id text, case_id text
 		 )`,
       [
         JSON.stringify(
@@ -169,7 +177,9 @@ export function recordChunkHits(
             query_hash: qHash,
             score: String(h.score),
             rerank_score: h.rerankScore != null ? String(h.rerankScore) : null,
-            rerank_breakdown: h.rerankBreakdown != null ? JSON.stringify(h.rerankBreakdown) : null,
+            promotion_state: h.promotionState ?? 'fresh',
+            promotion_boost: h.promotionBoost != null ? String(h.promotionBoost) : '1.0',
+            base_score: h.baseScore != null ? String(h.baseScore) : String(h.score),
             user_id: opts.userId ?? null,
             case_id: opts.caseId ?? null,
           }))

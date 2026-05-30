@@ -1,0 +1,4667 @@
+{
+  "generatedAt": "2026-05-30T01:42:11.737Z",
+  "repoName": "deeds-web-app",
+  "totalFiles": 7499,
+  "totalFeatureAreas": 117,
+  "features": {
+    "api.sveltekit_routes": {
+      "fileCount": 1374,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/server/api/service-registry.ts",
+      "dbTables": [
+        "cases",
+        "evidence",
+        "documents",
+        "citations",
+        "users",
+        "sessions",
+        "statutes",
+        "contextTimeline",
+        "codebaseChunks",
+        "fileSummaries"
+      ],
+      "cacheKeys": [
+        "code:search",
+        "summary:cluster:*",
+        "summary:som:*",
+        "gpu:karpathy:scores",
+        "ace:topo:*",
+        "ace:autoencoder:weights:candidate:",
+        "ace:autoencoder:weights:live",
+        "ace:research:graph",
+        "ace:research:policy",
+        "wiki:note:*"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "layout_server",
+        "layout",
+        "page_server",
+        "svelte_page",
+        "error_boundary"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 223905,
+      "exports": [
+        "GET",
+        "POST",
+        "APIResponse",
+        "apiSuccess",
+        "apiError",
+        "apiResponses",
+        "legalApiResponses",
+        "ApiHandler",
+        "withErrorHandling",
+        "validateRequest",
+        "paginatedResponse",
+        "EvidenceAIAnalysis",
+        "AnalysisMetrics",
+        "ApiResponse",
+        "ClusteringConfig"
+      ],
+      "errorMarkers": [
+        "TypeError",
+        "ERR_ANALYSIS_FAILED"
+      ],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase72/routes/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase78/routes/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase78/routes/[routePath]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/routes/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/routes/all/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/phase78/routes/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/routes/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/routes/all/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/client/api/analytics.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/api/service-registry.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/vision/api.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes/api/codebase/apply-patch/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/documents/process/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/error-brain/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/legal-ai/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/phase72/suggest-fix/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/phase82/upgrade-route/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/v1/detective/insights/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/v1/detective/patterns/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/ws/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/yorha/enhanced-rag/+server.ts",
+        "sveltekit-frontend/src/lib/server/api/response-helper.ts",
+        "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
+        "sveltekit-frontend/src/lib/types/api.ts",
+        "sveltekit-frontend/src/routes/(admin)/error-brain/components/ErrorEventsList.svelte",
+        "sveltekit-frontend/src/routes/(admin)/error-brain/components/ErrorModal.svelte",
+        "sveltekit-frontend/src/routes/(admin)/error-brain/components/SuggestionsList.svelte",
+        "sveltekit-frontend/src/routes/(analysis)/+layout.server.ts",
+        "sveltekit-frontend/src/routes/(analysis)/+layout.svelte",
+        "sveltekit-frontend/src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts"
+      ]
+    },
+    "workspace.scripts": {
+      "fileCount": 1191,
+      "status": "implemented",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/foaf/[personId]/+server.ts",
+      "dbTables": [
+        "evidence",
+        "users",
+        "cases",
+        "documents",
+        "sessions",
+        "citations",
+        "statutes",
+        "ragMessages",
+        "fileSummaries"
+      ],
+      "cacheKeys": [
+        "ace:diff:latest",
+        "ace:packet:latest",
+        "ace:daily-todo-summary",
+        "ace:memory:events-eval",
+        "ace:packet:sampleQueryHash",
+        "ace:vscode:performance:latest"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 126064,
+      "exports": [
+        "buildAtlasRetryIndex",
+        "logProgress",
+        "queryProgress",
+        "BuildError",
+        "BuildReport",
+        "BuildValidator",
+        "RouteCategory",
+        "RoutePriority",
+        "CategorizedFile",
+        "CategorizationManifest",
+        "ApiCategorizer",
+        "GET",
+        "DisableLog",
+        "DisableEntry",
+        "ImportUpdate"
+      ],
+      "errorMarkers": [
+        "unknown",
+        "timeout",
+        "connection_refused",
+        "dns_error",
+        "ERR_ANALYSIS_FAILED"
+      ],
+      "files": [
+        "scripts/10-layer-audit-cli.mjs",
+        "scripts/_check_glossary.cjs",
+        "scripts/_check_glossary_db.cjs",
+        "scripts/ace-daily-todo-summary.mjs",
+        "scripts/ace-diff-sniffer.mjs",
+        "scripts/ace-startup-health.mjs",
+        "scripts/agent/log-subagent.mjs",
+        "scripts/agent/prompt-generator.mjs",
+        "scripts/agent/turbovec-search-memory.mjs",
+        "scripts/agents/generate-monorepo-agents.mjs",
+        "scripts/agents/offline_passes.mjs",
+        "scripts/aggregate-failures.js",
+        "scripts/ai-os/build-atlas-retry-index.mjs",
+        "scripts/ai-os/log-progress.mjs",
+        "scripts/ai-os/query-progress.mjs",
+        "scripts/analyze-consolidation.mjs",
+        "scripts/analyze-current-errors.mjs",
+        "scripts/api-cleanup/build-validator.test.ts",
+        "scripts/api-cleanup/build-validator.ts",
+        "scripts/api-cleanup/categorizer.test.ts",
+        "scripts/api-cleanup/categorizer.ts",
+        "scripts/api-cleanup/disabler.test.ts",
+        "scripts/api-cleanup/disabler.ts",
+        "scripts/api-cleanup/fixer.test.ts",
+        "scripts/api-cleanup/fixer.ts",
+        "scripts/api-cleanup/generate-unfixable-analysis.ts",
+        "scripts/api-cleanup/index.ts",
+        "scripts/api-cleanup/pipeline.ts",
+        "scripts/api-cleanup/production-route-fixer.ts",
+        "scripts/api-cleanup/recovery.test.ts"
+      ]
+    },
+    "workspace.sveltekit-frontend": {
+      "fileCount": 993,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/types/ambient.d.ts",
+      "dbTables": [
+        "evidence",
+        "cases",
+        "statutes",
+        "users",
+        "sessions",
+        "documents",
+        "citations",
+        "featureImplementations",
+        "contextTimeline",
+        "ragMessages",
+        "codebaseChunks"
+      ],
+      "cacheKeys": [
+        "gpu:karpathy:scores",
+        "gpu:karpathy:encoded",
+        "ace:autoencoder:weights",
+        "ace:autoencoder:meta",
+        "ace:fixer:patterns",
+        "ace:atlas:latest:summary",
+        "ace:authority:top",
+        "gpu:autoencoder:centroids_64",
+        "gpu:autoencoder:centroids_64_meta",
+        "gpu:activity:dir_scores"
+      ],
+      "mcpTools": [
+        "name"
+      ],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 206509,
+      "exports": [
+        "toast",
+        "useSonner",
+        "Toaster",
+        "marked",
+        "parse",
+        "lexer",
+        "parser",
+        "AuthUser",
+        "Session",
+        "UserSession",
+        "authStore",
+        "VideoMetadata",
+        "evidenceUploadSchema",
+        "EvidenceUploadData",
+        "Duration"
+      ],
+      "errorMarkers": [
+        "TS2345"
+      ],
+      "files": [
+        "sveltekit-frontend/scripts/__fixtures__/audit-fail.ts",
+        "sveltekit-frontend/scripts/__tests__/powershell-scripts.test.ts",
+        "sveltekit-frontend/scripts/_check-langextract-usage.mjs",
+        "sveltekit-frontend/scripts/_deep-audit-rollup.mjs",
+        "sveltekit-frontend/scripts/_patch-semantic-cluster.cjs",
+        "sveltekit-frontend/scripts/_tmp_check.mjs",
+        "sveltekit-frontend/scripts/ace-policy-synthesis.ts",
+        "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+        "sveltekit-frontend/scripts/ae-encode-to-redis.mjs",
+        "sveltekit-frontend/scripts/agent-diagnose.mjs",
+        "sveltekit-frontend/scripts/agent-worker.ts",
+        "sveltekit-frontend/scripts/agentic-batch-fix.mjs",
+        "sveltekit-frontend/scripts/agentic-error-fix.mjs",
+        "sveltekit-frontend/scripts/alter-evidence-type-enum.ts",
+        "sveltekit-frontend/scripts/analyze-graph-ai.mjs",
+        "sveltekit-frontend/scripts/analyze-graph.mjs",
+        "sveltekit-frontend/scripts/analyze_errors_v3.cjs",
+        "sveltekit-frontend/scripts/archive-llm-summaries.mjs",
+        "sveltekit-frontend/scripts/ast-repair.ts",
+        "sveltekit-frontend/scripts/atlas-10q-demo.mjs",
+        "sveltekit-frontend/scripts/audit-build-risk.ts",
+        "sveltekit-frontend/scripts/audit-mcp-tool-surface.mjs",
+        "sveltekit-frontend/scripts/audit-parity.mjs",
+        "sveltekit-frontend/scripts/audit-schema-drift.mjs",
+        "sveltekit-frontend/scripts/autoencoder-backfill-qdrant.mjs",
+        "sveltekit-frontend/scripts/autoencoder-centroids.mjs",
+        "sveltekit-frontend/scripts/backfill-activity-scores.ts",
+        "sveltekit-frontend/scripts/backfill-llms-md-envelope.mjs",
+        "sveltekit-frontend/scripts/backfill-manifold4.mjs",
+        "sveltekit-frontend/scripts/backfill-research-embeddings.mjs"
+      ]
+    },
+    "lib.server": {
+      "fileCount": 621,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
+      "dbTables": [
+        "evidence",
+        "cases",
+        "sessions",
+        "documents",
+        "citations",
+        "statutes",
+        "contextTimeline",
+        "featureImplementations",
+        "users",
+        "ragMessages",
+        "llmSynthesisEvents",
+        "codebaseChunks",
+        "workflowRuns"
+      ],
+      "cacheKeys": [
+        "ace:model:weights:candidate",
+        "ace:model:weights:live",
+        "graph:none",
+        "ace:cluster:summary:*",
+        "ace:research:graph",
+        "ace:research:policy",
+        "ace:reward:queue",
+        "ace:prompt",
+        "ace:context",
+        "code:llm_output:path"
+      ],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 130144,
+      "exports": [
+        "AceIngestStep",
+        "AceIngestJob",
+        "createAceIngestJob",
+        "updateAceIngestJob",
+        "getAceIngestJob",
+        "phase90_search_errors",
+        "phase90_get_cluster",
+        "phase90_get_fix_order",
+        "phase90_query_glyphs",
+        "phase90_get_stats",
+        "phase90_get_file_errors",
+        "phase90_get_fix_recommendation",
+        "executePhase90Tool",
+        "getPhase90ToolDefinitions",
+        "phase89Tools"
+      ],
+      "errorMarkers": [
+        "INTERNAL_ERROR",
+        "runtime"
+      ],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/authUtils.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/chat/history-service.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/chrrom/patterns.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/concurrency/advisory-locks.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/database-api-bridge.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/database/redis-client.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/database/vector-schema-simple.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/docling.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/document-processor.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/embedding/embedding-repository.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/error-brain/knowledge-base.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/gemma3-vlm-embedder.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/ibm-vision.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/index.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/ingest/ingest-worker.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/ingest/worker-pool.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/keyword-extractor.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/knowledge-cache.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/llm/ollama-client.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/message-queue.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/monitoring/logger.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/orchestrator/gemma-agent.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/rag-query.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/rag-sync.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/rag/cache-old.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/rag/rag-types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/rag/types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/redis-service.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/services/QdrantService.ts"
+      ]
+    },
+    "lib.components": {
+      "fileCount": 532,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/components/dashboard/gamification-types.ts",
+      "dbTables": [
+        "evidence",
+        "citations",
+        "sessions",
+        "documents",
+        "cases",
+        "statutes",
+        "users"
+      ],
+      "cacheKeys": [
+        "summary:cluster:*",
+        "graph:3-hop",
+        "graph:custody"
+      ],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 118067,
+      "exports": [
+        "Vec2",
+        "BoardViewport",
+        "BoardNodeKind",
+        "BoardNode",
+        "BoardEdge",
+        "BoardSnapshot",
+        "serialize",
+        "addNote",
+        "updateNodeBody",
+        "updateNodeTitle",
+        "addEvidenceNode",
+        "updateNodePosition",
+        "clearNodes",
+        "getNodes",
+        "getEdges"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/detective/index.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/headless/texture-streaming.svelte.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/three/yorha-ui/webgpu/YoRHaOptimizedTextureManager.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/bits/types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/gaming/types/gaming-types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/slider/index.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/switch/index.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/components/yorha/index.ts",
+        "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte",
+        "sveltekit-frontend/src/lib/components/APITesterModal.svelte",
+        "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+        "sveltekit-frontend/src/lib/components/ArchivedRoutesPanel.svelte",
+        "sveltekit-frontend/src/lib/components/CanvasEditor.svelte",
+        "sveltekit-frontend/src/lib/components/CaseOutcomePrediction.svelte",
+        "sveltekit-frontend/src/lib/components/CaseSelector.svelte",
+        "sveltekit-frontend/src/lib/components/ChatContextPanel.svelte",
+        "sveltekit-frontend/src/lib/components/ChatMessages.svelte",
+        "sveltekit-frontend/src/lib/components/ChatPanel.svelte",
+        "sveltekit-frontend/src/lib/components/CitationLink.svelte",
+        "sveltekit-frontend/src/lib/components/ClientGemmaDemo.svelte",
+        "sveltekit-frontend/src/lib/components/ClientGemmaInference.svelte",
+        "sveltekit-frontend/src/lib/components/CodebaseSearch.svelte",
+        "sveltekit-frontend/src/lib/components/ContextConfirmModal.svelte",
+        "sveltekit-frontend/src/lib/components/DevReviewPanel.svelte",
+        "sveltekit-frontend/src/lib/components/DocumentDetailModal.svelte",
+        "sveltekit-frontend/src/lib/components/DocumentUploadMachineIntegration.svelte",
+        "sveltekit-frontend/src/lib/components/ErrorStreamMonitor.svelte",
+        "sveltekit-frontend/src/lib/components/EvidenceCard.svelte",
+        "sveltekit-frontend/src/lib/components/EvidenceConnections.svelte"
+      ]
+    },
+    "ai.llm_synthesis": {
+      "fileCount": 483,
+      "status": "implemented",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find/+server.ts",
+      "dbTables": [
+        "evidence",
+        "cases",
+        "documents",
+        "citations",
+        "statutes",
+        "sessions",
+        "users",
+        "contextTimeline"
+      ],
+      "cacheKeys": [
+        "ace:ctx:",
+        "bifrost:kv:prefix:",
+        "ace:packet:run-123",
+        "user:memory:user-9",
+        "ace:packet:run-404",
+        "summary:cluster:*",
+        "code:repair",
+        "gpu:rerank",
+        "gpu:topological_filter",
+        "gpu:embed"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "page_server",
+        "svelte_page"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 75239,
+      "exports": [
+        "POST",
+        "GET",
+        "Source",
+        "UnknownModuleOrFn",
+        "AIResponse",
+        "OPTIONS",
+        "PATCH",
+        "PUT",
+        "DELETE",
+        "DeepAnalysisRequest",
+        "DocumentDraftingRequest",
+        "DraftingAssistance",
+        "EnhancedChatRequest",
+        "EnhancedChatResponse",
+        "GoMicroserviceConfig"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/ai/cache_startup_prompt.mjs",
+        "scripts/ai/embed_and_index_scenarios.mjs",
+        "scripts/ai/index_scenarios.mjs",
+        "scripts/ai/smoke_scenario_pipeline.mjs",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/analyze-element/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/analyze-evidence/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/analyze/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/ask/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/case-prediction/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/case-scoring/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/chat-mock/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/chat-simple/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/chat-sse/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/chat-tensorrt/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/chat/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/cluster/stream/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/connect-mock/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/connect/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/context/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/contextual-chat/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/conversation/[conversationId]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/conversation/save/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/cross-exam/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/cuda-accelerated/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/cuda-indexing/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/deep-analysis/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/document-drafting/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/document-drafting/history/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/document-drafting/recent/+server.ts"
+      ]
+    },
+    "knowledge.atlas_pipeline": {
+      "fileCount": 264,
+      "status": "implemented",
+      "topScoreFile": "scripts/atlas/build-codebase-feature-map.mjs",
+      "dbTables": [
+        "documents",
+        "evidence",
+        "sessions",
+        "cases",
+        "users",
+        "citations",
+        "ragMessages",
+        "statutes",
+        "codebaseChunks",
+        "contextTimeline",
+        "featureImplementations",
+        "fileSummaries",
+        "fixerPatterns",
+        "llmSynthesisEvents",
+        "graphPathwayCards",
+        "graphHyperedges",
+        "agentObservations",
+        "workflowRuns",
+        "scenarioCache",
+        "errorFingerprints"
+      ],
+      "cacheKeys": [
+        "ace:feature",
+        "ace:engram:lessons",
+        "ace:router4x4:matrix",
+        "ace:lane:routing_policy",
+        "gpu:karpathy:scores",
+        "wiki:note:dir:*",
+        "wiki:note:dir:",
+        "ace:cluster:graphrag:meta",
+        "ace:cartridge:threshold",
+        "ace:cluster:members:__index"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "page_server",
+        "svelte_page",
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 58010,
+      "exports": [
+        "appendLlmSynthesisJsonl",
+        "load",
+        "actions",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "loadDocumentedSidecars",
+        "classifyDrizzlePendingSql",
+        "sidecarResolutionAdvice",
+        "undocumentedSqlAdvice",
+        "createNoopEngramPluginAdapter",
+        "createRedisEngramAdapter",
+        "extractLogSignals",
+        "summarizeLog"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/atlas/_atlas-utils.mjs",
+        "scripts/atlas/analyze-directory-roles.mjs",
+        "scripts/atlas/append-llm-synthesis-jsonl.mjs",
+        "scripts/atlas/append-soak-history.mjs",
+        "scripts/atlas/atlas-lane-health-loop.mjs",
+        "scripts/atlas/atlas-to-cartridge-seed.mjs",
+        "scripts/atlas/audit-contract-map.mjs",
+        "scripts/atlas/audit-drizzle-meta-hygiene.mjs",
+        "scripts/atlas/audit-drizzle-postgres-contracts.mjs",
+        "scripts/atlas/audit-feature-registry.mjs",
+        "scripts/atlas/audit-model-artifacts.mjs",
+        "scripts/atlas/audit-pgvector-schema.mjs",
+        "scripts/atlas/audit-repo-hygiene.mjs",
+        "scripts/atlas/audit-rg-search-integrity.mjs",
+        "scripts/atlas/audit-simd-bridge-memory.mjs",
+        "scripts/atlas/audit-sveltekit-form-contracts.mjs",
+        "scripts/atlas/auto-schema-evolution.mjs",
+        "scripts/atlas/bench-inference-backends.mjs",
+        "scripts/atlas/build-ast-topology-dry-run.mjs",
+        "scripts/atlas/build-atlas-token-map.mjs",
+        "scripts/atlas/build-codebase-feature-map.mjs",
+        "scripts/atlas/build-component-profiles.mjs",
+        "scripts/atlas/build-error-fix-dag.mjs",
+        "scripts/atlas/build-repo-env-map.mjs",
+        "scripts/atlas/build-repo-import-map.mjs",
+        "scripts/atlas/build-repo-language-map.mjs",
+        "scripts/atlas/build-repo-workspace-map.mjs",
+        "scripts/atlas/build-rg-search-matrix.mjs",
+        "scripts/atlas/cache-feature-cards.mjs",
+        "scripts/atlas/check-chat-data.mjs"
+      ]
+    },
+    "legal.evidence": {
+      "fileCount": 238,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts",
+      "dbTables": [
+        "evidence",
+        "documents",
+        "cases",
+        "users",
+        "sessions",
+        "citations",
+        "statutes"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "page_server",
+        "svelte_page",
+        "layout"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 38017,
+      "exports": [
+        "GET",
+        "Entity",
+        "Relationship",
+        "BoardPosition",
+        "ProcessingOptions",
+        "AIAnalysis",
+        "EvidenceData",
+        "POST",
+        "PATCH",
+        "PUT",
+        "DELETE",
+        "AnalyzeRequest",
+        "AnalysisResult",
+        "StepName",
+        "ProcessingRequest"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/evidence/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/DEPRECATED.+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/[caseId]_disabled/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/[id]/approve/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/[id]/suggest-summary/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/[id]/tags/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/analyze/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/connections/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/demo/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/from-url/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/hash/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/hash/bulk/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/hash/history/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/list/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/nodes/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/nodes/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/pending/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/process/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/process/stream/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/relationships/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/relationships/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/save-node/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/stream/[sessionId]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/summarize/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/summary/[id]/approve/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/synthesize/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/test/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/upload-simple/+server.ts"
+      ]
+    },
+    "db.drizzle_schema": {
+      "fileCount": 178,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "dbTables": [
+        "users",
+        "sessions",
+        "documents",
+        "cases",
+        "evidence",
+        "ragMessages",
+        "statutes",
+        "citations",
+        "contextTimeline",
+        "graphPathwayCards",
+        "agentObservations",
+        "errorFingerprints",
+        "featureImplementations",
+        "llmSynthesisEvents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 21808,
+      "exports": [
+        "GET",
+        "OPTIONS",
+        "POST",
+        "EditorCacheDocument",
+        "saveDraft",
+        "loadDraft",
+        "ChatMessage",
+        "DocumentCache",
+        "SearchHistory",
+        "VectorSearchCache",
+        "UserAnnotation",
+        "LegalEntity",
+        "GraphVisualizationData",
+        "AIAnalysisCache",
+        "UserPreferences"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/db/health/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/db/setup/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/debug/db/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/health/db/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test-db/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/yorha/test-db/+server.ts",
+        "sveltekit-frontend/scripts/db/apply-sidecar-migration.mjs",
+        "sveltekit-frontend/scripts/db/test_upsert_dry_run.mjs",
+        "sveltekit-frontend/scripts/db/upsert_feature_cards.mjs",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/db/client-db.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/db/dexie-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/db/queries/nes-command-center-archive.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/db/schema-example-legal.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/mirror-query.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/qdrant-sync.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema-gpu-metrics.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema-poi.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema-test-rag.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema/ai_chat.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema/gpu-cache-schema.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema/poi.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/unified-client-backup.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/vector-operations.ts",
+        "sveltekit-frontend/scripts/test-db.ts",
+        "sveltekit-frontend/src/lib/client/db/loki-client.ts",
+        "sveltekit-frontend/src/lib/db/client-db.ts",
+        "sveltekit-frontend/src/lib/db/pool.ts",
+        "sveltekit-frontend/src/lib/db/queries/route-health-archive.ts",
+        "sveltekit-frontend/src/lib/db/queries/route-health-queries.ts",
+        "sveltekit-frontend/src/lib/db/schema.ts"
+      ]
+    },
+    "legal.case_management": {
+      "fileCount": 144,
+      "status": "implemented",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test-cases/+server.ts",
+      "dbTables": [
+        "cases",
+        "evidence",
+        "statutes",
+        "citations",
+        "users",
+        "documents",
+        "contextTimeline",
+        "ragMessages"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "page_server",
+        "svelte_page",
+        "layout_server",
+        "layout"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 24381,
+      "exports": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "CaseStatus",
+        "CasePriority",
+        "CaseFilterOptions",
+        "CaseSynthesis",
+        "buildCaseSynthesis",
+        "formatSynthesisForLLM",
+        "extractNotesText",
+        "buildCaseTimeline",
+        "autoCreateCaseForProsecutor",
+        "getProsecutorCases"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/board/layout/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/export/memo/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/export/packet/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/export/pdf/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/laws/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/laws/[statute_code]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/notes/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/notes/[noteId]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/notes/[noteId]/refs/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/notes/[noteId]/refs/[evidenceId]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/persons/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/reports/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/summary/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/summary/export-pdf/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/summary/generate/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/summary/similar/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/__tests__/case-links.test.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/recent/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/recommend/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/suggest-title/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/summary/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/cases/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test-cases/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/cases.disabled/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/cases.disabled/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/cases.disabled/[id]/detective/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/cases.disabled/index.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/yorha/cases/+server.ts"
+      ]
+    },
+    "lib.services": {
+      "fileCount": 126,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/crud-client.ts",
+      "dbTables": [
+        "cases",
+        "evidence",
+        "citations",
+        "documents",
+        "users",
+        "ragMessages",
+        "statutes"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 9945,
+      "exports": [
+        "Case",
+        "CaseStats",
+        "Evidence",
+        "EvidenceStats",
+        "PersonOfInterest",
+        "SearchResult",
+        "SystemMetrics",
+        "caseApi",
+        "evidenceApi",
+        "poiApi",
+        "searchApi",
+        "systemApi",
+        "sourceValidationAPI",
+        "ttsService",
+        "VoiceCommand"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/ace-web/ace-context-service.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/advanced-bit-encoder.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/advanced-simd-pipeline.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/ai-error-fixer.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/ai-evidence-analyzer.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/ai-service.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/ai-suggestions-grpc-client.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/ai-worker-manager.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/aiAutoTagging.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/api-orchestrator.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/autosuggester-service.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/caseService.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/chr-rom-pattern-optimizer.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/chr-rom-precomputation-service.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/complete-gpu-error-pipeline.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/comprehensive-database-orchestrator.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/comprehensive-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/comprehensive-ollama-summarizer.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/concurrent-indexeddb-search.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/context-aware-ai-memory-types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/context7-mcp-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/context7-phase13-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/contextual-memory-chat-service.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/couchdb-client.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/cross-encoder-reranker.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/crud-client.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/cuda-vector-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/dashboard/DocumentProcessingAPI.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/documentUpdateLoop.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/end-to-end-pipeline.ts"
+      ]
+    },
+    "search.retrieval": {
+      "fileCount": 122,
+      "status": "implemented",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/legal/+server.ts",
+      "dbTables": [
+        "documents",
+        "evidence",
+        "citations",
+        "cases",
+        "users",
+        "statutes",
+        "sessions",
+        "codebaseChunks",
+        "ragMessages"
+      ],
+      "cacheKeys": [
+        "ace:engram:bigram:*",
+        "ace:engram:query:*",
+        "ace:engram:last:*"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "page_server"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 13703,
+      "exports": [
+        "POST",
+        "GET",
+        "AdvancedSearchFilters",
+        "prerender",
+        "SearchResult",
+        "searchAce",
+        "searchHyperRag",
+        "tokenizeBowQuery",
+        "weightedBowOverlapScore",
+        "boundedBowBoost",
+        "recordEngramTransition",
+        "recordLastQuery",
+        "EngramSuggestion",
+        "getEngramSuggestions",
+        "getEngramStats"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/rag/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/brain/3d-assets/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/notes/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/desktop/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/documents/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/embed/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/gallery/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/glyph/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/health/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/help/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/integrated/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/laws/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/precedent/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/research/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/persons/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/rag/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/advanced/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/fulltext/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/index/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/laws/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/legal/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/semantic/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/suggestions/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/search/unified/+server.ts"
+      ]
+    },
+    "cache.redis_bifrost": {
+      "fileCount": 120,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/cache/code-llm-index.ts",
+      "dbTables": [
+        "cases",
+        "evidence",
+        "documents",
+        "citations",
+        "contextTimeline",
+        "sessions"
+      ],
+      "cacheKeys": [
+        "ace:cluster:hot",
+        "code:ts:diag:manifest",
+        "summary:cluster:*",
+        "ace:graph:edges:*",
+        "cluster:forest:known_ids",
+        "cluster:summary:*",
+        "cluster:summary:",
+        "code:llm_output:path:",
+        "code:llm_output:hot",
+        "code:llm_output:recent"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "page_server",
+        "svelte_page"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 18107,
+      "exports": [
+        "GET",
+        "DELETE",
+        "POST",
+        "cacheFailure",
+        "CacheInvalidation",
+        "CacheMonitoring",
+        "CacheStrategy",
+        "cache",
+        "useCache",
+        "CacheStrategies",
+        "indexedDBCache",
+        "lokiCache",
+        "useLokiCache",
+        "offlineFetch",
+        "offlineMutate"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/summarize/cache/[key]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/[key]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/manifest/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/metrics/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/redis/get-recent/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/redis/get/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/redis/ping/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/redis/set/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/sse/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/test/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/debug/redis/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/health/redis/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/cache/ranking/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/cache/test/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/redis/metrics/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/redis/publish/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/admin/cache/stats/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ai/summarize/cache/[key]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/cache/redis/get-recent/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/health/redis/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/redis/metrics/+server.ts",
+        "scripts/cache/invalidate-stale-cache.mjs",
+        "scripts/cache/log-failure-pattern.mjs",
+        "scripts/cache/verify-bifrost-cache.mjs",
+        "scripts/cache/warm-semantic-cache.mjs",
+        "scripts/redis/cache-graph-relations.mjs",
+        "sveltekit-frontend/scripts/bifrost/ensure-ollama-provider.mjs",
+        "sveltekit-frontend/scripts/bifrost/smoke-card-context.mjs"
+      ]
+    },
+    "ace.context_assembly": {
+      "fileCount": 119,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "dbTables": [
+        "cases",
+        "evidence",
+        "citations",
+        "documents",
+        "statutes",
+        "users",
+        "sessions",
+        "featureImplementations"
+      ],
+      "cacheKeys": [
+        "ace:chunk:hits:",
+        "wiki:gap:report:latest",
+        "ace:router4x4:matrix",
+        "ace:authority:top",
+        "gpu:karpathy:rev",
+        "gpu:karpathy:scores",
+        "ace:lane:routing_policy",
+        "ace:cartridge:threshold",
+        "ace:engram:dym:",
+        "code:index:manifest"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 26556,
+      "exports": [
+        "POST",
+        "ACE_TOOLS",
+        "AceAgentResult",
+        "runAceAgentQuery",
+        "ErrorKagInput",
+        "ErrorSummary",
+        "ErrorKagResult",
+        "summarizeErrorToKag",
+        "AceHitSummary",
+        "tagAceHits",
+        "getChunkHitCount",
+        "getChunkHitCountBulk",
+        "syncHitCountsToQdrant",
+        "HmmErrorClass",
+        "AcePayload"
+      ],
+      "errorMarkers": [
+        "parse-failed"
+      ],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/web-crawl/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ace/graph-build/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ace/llm-analyze/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ace/vector-index/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ace/vlm-process/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ace/web-crawl/+server.ts",
+        "scripts/opencode/get-ace-context.mjs",
+        "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+        "sveltekit-frontend/scripts/ace/build-packet.mjs",
+        "sveltekit-frontend/scripts/ace/export-browser-cache.mjs",
+        "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+        "sveltekit-frontend/scripts/ace/persist-authority-test.mjs",
+        "sveltekit-frontend/scripts/ace/run-assemble-smoke.ts",
+        "sveltekit-frontend/scripts/ace/smoke-context-pack-cache.mjs",
+        "sveltekit-frontend/scripts/ace/smoke-context-pack-metrics.mjs",
+        "sveltekit-frontend/scripts/ace/smoke-cuda-rnn-reranker.mjs",
+        "sveltekit-frontend/scripts/ace/smoke-draft-model-policy.mjs",
+        "sveltekit-frontend/scripts/ace/smoke-draft-off-json.mjs",
+        "sveltekit-frontend/scripts/ace/smoke-flashattention-gate.mjs",
+        "sveltekit-frontend/scripts/ace/smoke-intent-reward.ts",
+        "sveltekit-frontend/scripts/ace/smoke-intent-synthesis.ts",
+        "sveltekit-frontend/scripts/ace/smoke-top-retrieval-cache.mjs",
+        "sveltekit-frontend/scripts/ace/smoke-transition-memory.mjs",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes/api/ace/summarize-clusters/+server.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-error-kag.ts"
+      ]
+    },
+    "graph.neo4j_traversal": {
+      "fileCount": 117,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/graph/relationship-extractor.ts",
+      "dbTables": [
+        "users",
+        "evidence",
+        "cases",
+        "documents",
+        "sessions",
+        "citations",
+        "statutes",
+        "ragMessages",
+        "contextTimeline"
+      ],
+      "cacheKeys": [
+        "graph:neo4j_cached",
+        "graph:export_jsonl",
+        "graph:materialize",
+        "ace:research:cluster-summary:*",
+        "code:index:manifest",
+        "wiki:note:dir:dir_src_lib_server*",
+        "wiki:note:dir:*",
+        "gpu:karpathy:scores",
+        "wiki:note:",
+        "graph:cluster-agents"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "svelte_page"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 23349,
+      "exports": [
+        "GET",
+        "POST",
+        "BowTextureTile",
+        "BowTextureResult",
+        "BowTextureArgs",
+        "getBagOfWordsTexture",
+        "LoadGraphOptions",
+        "loadGraph",
+        "GRAPH_SKILLS",
+        "GraphNodeType",
+        "GraphEdgeType",
+        "GraphNode",
+        "GraphEdge",
+        "DiagnosticEntry",
+        "FileEdit"
+      ],
+      "errorMarkers": [
+        "service_auth_failure",
+        "service_runtime_failure",
+        "auth_failure"
+      ],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/brain/graph/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/clusters/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/compare/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/contradictions/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/data/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/metadata/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/plan/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/recommendations/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/timeline/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase78/ast/graph/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/neo4j/health/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/brain/graph/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/graph/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/graph/compare/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/graph/plan/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/phase78/ast/graph/+server.ts",
+        "scripts/graph/backfill-synthesis-manifold4.mjs",
+        "scripts/graph/build-clusters.mjs",
+        "scripts/graph/build-deep-relations-jsonl.mjs",
+        "sveltekit-frontend/scripts/check-neo4j.cjs",
+        "sveltekit-frontend/scripts/graph/backfill-synthesis-manifold4.mjs",
+        "sveltekit-frontend/scripts/graph/build-cluster-llms-index.mjs",
+        "sveltekit-frontend/scripts/graph/build-codebase-relationships.mjs",
+        "sveltekit-frontend/scripts/graph/build-community-graph.mjs",
+        "sveltekit-frontend/scripts/graph/debug-gds-lookup.mjs",
+        "sveltekit-frontend/scripts/graph/ingest-to-kag-notes.mjs",
+        "sveltekit-frontend/scripts/graph/prune-graph-triples.mjs",
+        "sveltekit-frontend/scripts/graph/synthesize-next-actions.mjs",
+        "sveltekit-frontend/scripts/graph/synthesize-relationships.mjs"
+      ]
+    },
+    "lib.types": {
+      "fileCount": 74,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/types/global.ts",
+      "dbTables": [
+        "citations",
+        "cases",
+        "users",
+        "evidence",
+        "documents",
+        "sessions",
+        "statutes"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 7985,
+      "exports": [
+        "ToolCall",
+        "ToolResult",
+        "AgentResponse",
+        "AgentExecutionResult",
+        "ToolDefinition",
+        "HealthCheckResponse",
+        "RagLookupResult",
+        "WebCrawlResult",
+        "WebDocSummaryResult",
+        "WebSearchResult",
+        "CodeSearchResult",
+        "CookieAttributes",
+        "SessionCookieAttributesOptions",
+        "SessionCookie",
+        "Lucia"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/admin.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/ai-assistant.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/canvas.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/case.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/common.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/component-props.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/database.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/global.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/gpu-cache-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/gpu-services.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/ingest.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/legal-ai-metadata.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/legal-types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/llm.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/predictor.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/quic-types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/route-analytics.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/rust-bridge.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/search.types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/shared.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/source-validation.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/state.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/tensorrt-types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/upload.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/user.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/vector-search.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/vector.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/wasm-types.ts",
+        "sveltekit-frontend/src/lib/types/advanced-patches.d.ts",
+        "sveltekit-frontend/src/lib/types/agent.ts"
+      ]
+    },
+    "legal.citations": {
+      "fileCount": 70,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/v1/citations/verify/+server.ts",
+      "dbTables": [
+        "citations",
+        "statutes",
+        "cases",
+        "evidence",
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "layout",
+        "svelte_page",
+        "page_server"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 10969,
+      "exports": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PUT",
+        "savedCitations",
+        "savedCitationAnnotations",
+        "evidenceBoardEdges",
+        "CITATION_ANNOTATION_PROGRESS_STATES",
+        "CitationAnnotationProgressState",
+        "CITATION_ANNOTATION_EVENTS",
+        "citationAnnotationRedisKeys",
+        "SavedCitationAnnotation",
+        "NewSavedCitationAnnotation",
+        "EvidenceBoardEdge",
+        "NewEvidenceBoardEdge"
+      ],
+      "errorMarkers": [
+        "ERR_ANALYSIS_FAILED"
+      ],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/[id]/tags/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/[id]/tags/[tag]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/__tests__/citations.test.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/collections/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/collections/[collectionId]/items/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/collections/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/collections/[id]/citations/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/collections/[id]/citations/[citation_id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/search-history/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/documents/process/citations/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/citations/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/citations/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/citations/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/citations/verify/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/citations/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/citations/[id]/tags/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/citations/[id]/tags/[tag]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/citations/__tests__/citations.test.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/citations/collections/[collectionId]/items/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/citations/collections/[id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/citations/collections/[id]/citations/[citation_id]/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/citations/search-history/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/citations/verify/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/v1/citations/verify/+server.ts",
+        "sveltekit-frontend/scripts/tests/test-citations.mjs",
+        "sveltekit-frontend/src/lib/components/citations/CitationCollections.svelte",
+        "sveltekit-frontend/src/lib/components/citations/CitationList.svelte",
+        "sveltekit-frontend/src/lib/components/citations/CitationSaveForm.svelte"
+      ]
+    },
+    "api.mcp_tools": {
+      "fileCount": 61,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/mcp/server.ts",
+      "dbTables": [
+        "cases",
+        "evidence",
+        "users",
+        "citations",
+        "documents",
+        "statutes",
+        "codebaseChunks",
+        "featureImplementations"
+      ],
+      "cacheKeys": [
+        "gpu:similarity",
+        "cluster:summary:*",
+        "wiki:note:dir:dir:*",
+        "gpu:998",
+        "gpu:karpathy:scores",
+        "ace:injection:blocked:*",
+        "ace:injection:blocked:",
+        "kag:ok",
+        "kag:timeout"
+      ],
+      "mcpTools": [
+        "kb.search_cards",
+        "kb.search_schema_contract",
+        "kb.get_card",
+        "kb.expand_neighbors"
+      ],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 22617,
+      "exports": [
+        "POST",
+        "GET",
+        "MCPCallRequest",
+        "MCPCallResponse",
+        "ClassifyIntentResult",
+        "RagCard",
+        "BuildAgenticRagContextResult",
+        "BuildRecommendationResult",
+        "classifyIntent",
+        "buildAgenticRagContext",
+        "buildRecommendation",
+        "buildStreamPreamble",
+        "initialize",
+        "list",
+        "call"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/context72/get-library-docs/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/docs/test/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/metrics/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/registry/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/status/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test-mcp/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/mcp/call/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/mcp/health/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/mcp/context72/get-library-docs/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/mcp/metrics/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/mcp/registry/+server.ts",
+        "sveltekit-frontend/scripts/mcp/agent-orchestrator.mjs",
+        "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+        "sveltekit-frontend/scripts/mcp/contextual-prompt-engineer.mjs",
+        "sveltekit-frontend/scripts/mcp/demo-svelte5-query.mjs",
+        "sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs",
+        "sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs",
+        "sveltekit-frontend/scripts/mcp/ldr-mcp.mjs",
+        "sveltekit-frontend/scripts/mcp/query-db-for-svelte5-errors.mjs",
+        "sveltekit-frontend/scripts/mcp/redis-semantic-cache-mcp.mjs",
+        "sveltekit-frontend/scripts/mcp/svelte5-migration-tools.mjs",
+        "sveltekit-frontend/scripts/mcp/tail-and-ingest-errors.mjs",
+        "sveltekit-frontend/scripts/mcp/test-direct-ollama.mjs",
+        "sveltekit-frontend/scripts/mcp/test-svelte5-migration.mjs",
+        "sveltekit-frontend/scripts/mcp/turbovec-sidecar-mcp.mjs",
+        "sveltekit-frontend/scripts/mcp/upload-svelte-docs-to-minio.mjs",
+        "sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts",
+        "sveltekit-frontend/src/lib/server/mcp/client.spec.ts",
+        "sveltekit-frontend/src/lib/server/mcp/client.ts"
+      ]
+    },
+    "lib.utils": {
+      "fileCount": 58,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/utils/fast-json.ts",
+      "dbTables": [
+        "evidence",
+        "cases",
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 8698,
+      "exports": [
+        "AccessibilityValidator",
+        "KeyboardNavigationHelper",
+        "accessibilityValidator",
+        "keyboardNavigationHelper",
+        "FocusManager",
+        "KeyboardNavigation",
+        "ColorContrast",
+        "AriaUtils",
+        "MotionUtils",
+        "accessibleClick",
+        "accessibleButton",
+        "accessibleMenuItem",
+        "getHealthEndpoint",
+        "getGpuMetricsEndpoint",
+        "getGoServiceBaseUrl"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/buffer-utils.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/case-transform.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/dashboard/ErrorHandler.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/data-helpers.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/errorHandler.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/flatbuffer-legal.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/llm-retry-wrapper.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/rag-cache.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/security.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/simd-json-parser.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/simd-markdown-parser.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/todo-autogen.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/transitions.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/type-guards.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/ux-pattern-validator.ts",
+        "sveltekit-frontend/src/lib/utils/accessibility-validator.ts",
+        "sveltekit-frontend/src/lib/utils/accessibility.ts",
+        "sveltekit-frontend/src/lib/utils/accessibleClick.ts",
+        "sveltekit-frontend/src/lib/utils/api-endpoints.ts",
+        "sveltekit-frontend/src/lib/utils/bits-ui-adapter.ts",
+        "sveltekit-frontend/src/lib/utils/buffer-conversion.ts",
+        "sveltekit-frontend/src/lib/utils/case-logic.ts",
+        "sveltekit-frontend/src/lib/utils/cn.ts",
+        "sveltekit-frontend/src/lib/utils/cuid.ts",
+        "sveltekit-frontend/src/lib/utils/debounce.ts",
+        "sveltekit-frontend/src/lib/utils/dynamic-imports.ts",
+        "sveltekit-frontend/src/lib/utils/endpoints.ts",
+        "sveltekit-frontend/src/lib/utils/ensure-error.ts",
+        "sveltekit-frontend/src/lib/utils/fast-json.ts",
+        "sveltekit-frontend/src/lib/utils/file-uploader.ts"
+      ]
+    },
+    "gpu.libtorch_bridge": {
+      "fileCount": 53,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/lib/gpu/webgpu-palace-core.ts",
+      "dbTables": [
+        "citations",
+        "documents",
+        "evidence",
+        "cases"
+      ],
+      "cacheKeys": [
+        "ace:autoencoder:weights",
+        "ace:autoencoder:meta"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 12551,
+      "exports": [
+        "GPUApiRequest",
+        "GPUApiResponse",
+        "GET",
+        "POST",
+        "OPTIONS",
+        "globalGPUManager",
+        "ComputeBackend",
+        "ComputeResult",
+        "BufferDescriptor",
+        "DispatchDimensions",
+        "BufferPoolStats",
+        "DeedsGPUCompute",
+        "getGPUCompute",
+        "getCachedGPUCompute",
+        "EmbeddingBatchResult"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/gpu/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/health/gpu/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/gpu/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/metrics/gpu/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/gpu/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/gpu/orchestrate/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/typescript-optimizer/gpu/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/legal/gpu/+server.ts",
+        "sveltekit-frontend/src/lib/gpu/global-gpu-manager.ts",
+        "sveltekit-frontend/src/lib/gpu/gpu-compute-pipeline.ts",
+        "sveltekit-frontend/src/lib/gpu/gpu-embedding-bridge.ts",
+        "sveltekit-frontend/src/lib/gpu/gpu-search-reranker.ts",
+        "sveltekit-frontend/src/lib/gpu/hybrid-gpu-context.ts",
+        "sveltekit-frontend/src/lib/gpu/index.ts",
+        "sveltekit-frontend/src/lib/gpu/markdown-processor.ts",
+        "sveltekit-frontend/src/lib/gpu/nes-glyph-webgpu.ts",
+        "sveltekit-frontend/src/lib/gpu/nes-gpu-memory-bridge.ts",
+        "sveltekit-frontend/src/lib/gpu/nes-memory-architecture.ts",
+        "sveltekit-frontend/src/lib/gpu/rune-to-legal-doc.ts",
+        "sveltekit-frontend/src/lib/gpu/runtime-optimizations.ts",
+        "sveltekit-frontend/src/lib/gpu/shader-registry.ts",
+        "sveltekit-frontend/src/lib/gpu/webgpu-pagerank.ts",
+        "sveltekit-frontend/src/lib/gpu/webgpu-palace-compression.ts",
+        "sveltekit-frontend/src/lib/gpu/webgpu-palace-core.ts",
+        "sveltekit-frontend/src/lib/gpu/webgpu-palace-shaders.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder-session.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts"
+      ]
+    },
+    "lib.stores": {
+      "fileCount": 52,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/stores/unified/ai-assistant-store.svelte.ts",
+      "dbTables": [
+        "sessions",
+        "evidence",
+        "cases",
+        "citations",
+        "users",
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 6082,
+      "exports": [
+        "ChatRole",
+        "ChatMessage",
+        "SummaryStyle",
+        "PanelSummarySpec",
+        "PanelSummaryResult",
+        "adminChat",
+        "ChatContext",
+        "ChatEvent",
+        "chatMachine",
+        "DiagnosisResult",
+        "analysisPanel",
+        "analytics",
+        "appStore",
+        "AppState",
+        "appState"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/ai-agent.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/analyticsStore.svelte.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/barrel-functions.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/barrel-store-manager.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/component-adapter-store.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/component-metadata-cache.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/enhanced-auth.svelte.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/enhancedLokiStore.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/evidence-cache-service.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/evidence-global-store.svelte.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/evidence-unified-fixed.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/evidence-unified.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/evidence-workflow.svelte.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/global-loki-store.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/global-loki.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-case.svelte.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-platform-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/legal-reports.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/lokiStore.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/realtime.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/types.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/ui.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/userDataStore.svelte.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/vector-search.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/machines/types.ts",
+        "sveltekit-frontend/src/lib/stores/admin-chat-assistant.svelte.ts",
+        "sveltekit-frontend/src/lib/stores/admin-chat-machine.ts",
+        "sveltekit-frontend/src/lib/stores/analysis-panel.svelte.ts",
+        "sveltekit-frontend/src/lib/stores/analytics.svelte.ts",
+        "sveltekit-frontend/src/lib/stores/app-store.svelte.ts"
+      ]
+    },
+    "auth.authentication": {
+      "fileCount": 47,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/auth.ts",
+      "dbTables": [
+        "users",
+        "sessions",
+        "cases",
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": false,
+      "totalLines": 2309,
+      "exports": [
+        "GET",
+        "POST",
+        "DELETE",
+        "loginSchema",
+        "LoginSchema",
+        "registerSchema",
+        "RegisterSchema",
+        "hashPassword",
+        "verifyPassword",
+        "generateRandomToken",
+        "generateVerificationCode",
+        "auth",
+        "Auth",
+        "AuthService",
+        "authService"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/debug/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/demo-login/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/health/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/login/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/logout/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/me/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/password/confirm/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/password/request/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/profile/avatar/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/profile/update/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/quic-login/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/register/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/reset-password/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/sessions/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/sessions/revoke-others/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/verify-email/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/proto/auth/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test-auth/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/auth/debug/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/auth/demo-login/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/auth/health/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/auth/login/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/auth/logout/+server.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/server/auth/utils.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/types/auth.ts",
+        "sveltekit-frontend/src/lib/schemas/auth.ts",
+        "sveltekit-frontend/src/lib/server/auth.ts",
+        "sveltekit-frontend/src/lib/server/auth/password.ts",
+        "sveltekit-frontend/src/routes/api/auth/debug/+server.ts",
+        "sveltekit-frontend/src/routes/api/auth/demo-login/+server.ts"
+      ]
+    },
+    "knowledge.wiki_notes": {
+      "fileCount": 42,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/scripts/wiki/extract-code-relations.mjs",
+      "dbTables": [
+        "documents",
+        "errorFingerprints",
+        "evidence",
+        "users",
+        "sessions",
+        "cases",
+        "citations",
+        "statutes"
+      ],
+      "cacheKeys": [
+        "wiki:ace-multi-lane-retrieval",
+        "ace:topk:*:embeddinggemma:768",
+        "ace:error:fp:*",
+        "wiki:ace-cache-key-contract",
+        "wiki:error-fingerprint-pipeline",
+        "wiki:codebase-relationship-spine",
+        "code:graph:node:*",
+        "code:index:manifest",
+        "code:index:tag:*",
+        "ace:topo:*"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "page_server",
+        "svelte_page",
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 6939,
+      "exports": [
+        "EncyclopediaResult",
+        "assembleACEContext",
+        "GapSeverity",
+        "GapStatus",
+        "GapType",
+        "WikiGap",
+        "WikiCard",
+        "GapReport",
+        "ArtifactWriteResult",
+        "writeWikiArtifacts",
+        "buildWikiCards",
+        "formatCardMarkdown",
+        "writeWikiCards",
+        "writeGapDocs",
+        "writeGapReport"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/wiki/analyze-wiki-gaps.mjs",
+        "sveltekit-frontend/scripts/wiki/backfill-error-fingerprints.mjs",
+        "sveltekit-frontend/scripts/wiki/backfill-qdrant-cluster-keys.mjs",
+        "sveltekit-frontend/scripts/wiki/backfill-rerank-scores.mjs",
+        "sveltekit-frontend/scripts/wiki/extract-code-relations.mjs",
+        "sveltekit-frontend/scripts/wiki/index-codebase-to-docstore.mjs",
+        "sveltekit-frontend/scripts/wiki/ingest-kag-notes.mjs",
+        "sveltekit-frontend/scripts/wiki/run-mapreduce-pipeline.mjs",
+        "sveltekit-frontend/scripts/wiki/setup-couchdb-mapreduce.mjs",
+        "sveltekit-frontend/scripts/wiki/wiki-gpu-gap-analysis.mjs",
+        "sveltekit-frontend/scripts/wiki/writeback-rerank-to-qdrant.mjs",
+        "sveltekit-frontend/src/lib/server/wiki/encyclopedia.ts",
+        "sveltekit-frontend/src/lib/server/wiki/types.ts",
+        "sveltekit-frontend/src/lib/server/wiki/wiki-artifact-writer.ts",
+        "sveltekit-frontend/src/lib/server/wiki/wiki-card-writer.ts",
+        "sveltekit-frontend/src/lib/server/wiki/wiki-couchdb-client.ts",
+        "sveltekit-frontend/src/lib/server/wiki/wiki-gap-analyzer.ts",
+        "sveltekit-frontend/src/lib/server/wiki/wiki-mcp-service.ts",
+        "sveltekit-frontend/src/lib/server/wiki/wiki-neo4j-sync.ts",
+        "sveltekit-frontend/src/lib/server/wiki/wiki-redis-cache.ts",
+        "sveltekit-frontend/src/routes/(app)/code-intel/wiki/+page.server.ts",
+        "sveltekit-frontend/src/routes/(app)/code-intel/wiki/+page.svelte",
+        "sveltekit-frontend/src/routes/api/codebase-index/wiki/+server.ts",
+        "sveltekit-frontend/src/routes/api/codebase/wiki/+server.ts",
+        "sveltekit-frontend/src/routes/api/codebase/wiki/index/+server.ts",
+        "sveltekit-frontend/src/routes/api/codeintel/wiki/+server.ts",
+        "sveltekit-frontend/src/routes/api/wiki/encyclopedia/+server.ts",
+        "sveltekit-frontend/src/routes/api/wiki/moc/+server.ts",
+        "sveltekit-frontend/src/routes/api/wiki/page/[id]/+server.ts",
+        "sveltekit-frontend/src/routes/api/wiki/refresh-directory/+server.ts"
+      ]
+    },
+    "analysis.entity_extraction": {
+      "fileCount": 38,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/analysis/analysis-jobs.ts",
+      "dbTables": [
+        "citations",
+        "evidence",
+        "documents",
+        "contextTimeline",
+        "statutes",
+        "cases"
+      ],
+      "cacheKeys": [
+        "graph:hmm-ace-flow",
+        "cache:hmm-interim"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "page_server",
+        "svelte_page"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 8309,
+      "exports": [
+        "POST",
+        "JobType",
+        "JobStatus",
+        "enqueueJob",
+        "createAnalysisJob",
+        "claimNextJob",
+        "getAnalysisJob",
+        "getJobsForEvidence",
+        "resetStaleJobs",
+        "updateAnalysisJob",
+        "completeAnalysisJob",
+        "failAnalysisJob",
+        "getJobCounts",
+        "BatchTask",
+        "BatchTaskStatus"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/analysis/check-dirs.mjs",
+        "scripts/analysis/key-dirs.mjs",
+        "scripts/analysis/size-report.mjs",
+        "scripts/analysis/top-others.mjs",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/analysis/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/legal/analysis/+server.ts",
+        "sveltekit-frontend/src/lib/components/analysis/AnalysisPanel.svelte",
+        "sveltekit-frontend/src/lib/components/analysis/AnalysisToast.svelte",
+        "sveltekit-frontend/src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
+        "sveltekit-frontend/src/lib/server/analysis/analysis-jobs.ts",
+        "sveltekit-frontend/src/lib/server/analysis/batch-error-analysis.ts",
+        "sveltekit-frontend/src/lib/server/analysis/concurrency-gate.ts",
+        "sveltekit-frontend/src/lib/server/analysis/entity-extraction.ts",
+        "sveltekit-frontend/src/lib/server/analysis/entity-extractor-unified.ts",
+        "sveltekit-frontend/src/lib/server/analysis/evidence-analysis-pipeline.ts",
+        "sveltekit-frontend/src/lib/server/analysis/granite-docling.ts",
+        "sveltekit-frontend/src/lib/server/analysis/hmm-ace-analyzer.ts",
+        "sveltekit-frontend/src/lib/server/analysis/hmm-section-classifier.ts",
+        "sveltekit-frontend/src/lib/server/analysis/holistic-synthesizer.ts",
+        "sveltekit-frontend/src/lib/server/analysis/media-processing.ts",
+        "sveltekit-frontend/src/lib/server/analysis/summarizer.ts",
+        "sveltekit-frontend/src/lib/server/analysis/vlm-evidence-analyzer.ts",
+        "sveltekit-frontend/src/lib/server/analysis/worker.ts",
+        "sveltekit-frontend/src/lib/server/pgai/analysis.ts",
+        "sveltekit-frontend/src/routes/(app)/demos/agentic-errors/analysis/+page.server.ts",
+        "sveltekit-frontend/src/routes/(app)/demos/agentic-errors/analysis/+page.svelte",
+        "sveltekit-frontend/src/routes/api/analysis/page-context/+server.ts",
+        "sveltekit-frontend/src/routes/api/audio/analysis/[evidenceId]/+server.ts",
+        "sveltekit-frontend/src/routes/api/codebase-index/claude-assist/feedback/analysis/+server.ts",
+        "sveltekit-frontend/src/routes/api/document/analysis/[evidenceId]/+server.ts"
+      ]
+    },
+    "knowledge.doc_ingestion": {
+      "fileCount": 36,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/routes/api/knowledge/+server.ts",
+      "dbTables": [
+        "documents",
+        "citations",
+        "evidence",
+        "cases",
+        "users"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "svelte_page",
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 5675,
+      "exports": [
+        "GET",
+        "POST",
+        "PATCH"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/knowledge/build-document-knowledge-layer.mjs",
+        "sveltekit-frontend/scripts/knowledge/build-index-gap-memory-cards.mjs",
+        "sveltekit-frontend/scripts/knowledge/build-schema-indexer-contract.mjs",
+        "sveltekit-frontend/scripts/knowledge/embed-and-upsert-cards.mjs",
+        "sveltekit-frontend/scripts/knowledge/embed-document-knowledge-layer.mjs",
+        "sveltekit-frontend/scripts/knowledge/generate-ace-packs.mjs",
+        "sveltekit-frontend/scripts/knowledge/generate-hypergraph-edges.mjs",
+        "sveltekit-frontend/scripts/knowledge/gpu-batch-worker.mjs",
+        "sveltekit-frontend/scripts/knowledge/graph-document-knowledge-layer.mjs",
+        "sveltekit-frontend/scripts/knowledge/langextract-document-cards.mjs",
+        "sveltekit-frontend/scripts/knowledge/prune-archive-decision.mjs",
+        "sveltekit-frontend/scripts/knowledge/publish-cards-pointer.mjs",
+        "sveltekit-frontend/scripts/knowledge/redis-write-preview.mjs",
+        "sveltekit-frontend/scripts/knowledge/report-document-knowledge-layer.mjs",
+        "sveltekit-frontend/scripts/knowledge/report-index-gap-memory-cards.mjs",
+        "sveltekit-frontend/scripts/knowledge/report-schema-indexer-contract.mjs",
+        "sveltekit-frontend/scripts/knowledge/smoke-document-knowledge-embed.mjs",
+        "sveltekit-frontend/scripts/knowledge/smoke-document-knowledge-layer.mjs",
+        "sveltekit-frontend/scripts/knowledge/smoke-document-knowledge-synthesis.mjs",
+        "sveltekit-frontend/scripts/knowledge/synthesize-document-knowledge-layer.mjs",
+        "sveltekit-frontend/src/routes/(app)/knowledge/+page.svelte",
+        "sveltekit-frontend/src/routes/api/admin/knowledge/+server.ts",
+        "sveltekit-frontend/src/routes/api/knowledge/+server.ts",
+        "sveltekit-frontend/src/routes/api/knowledge/backfill/+server.ts",
+        "sveltekit-frontend/src/routes/api/knowledge/document/[id]/+server.ts",
+        "sveltekit-frontend/src/routes/api/knowledge/lint/+server.ts",
+        "sveltekit-frontend/src/routes/api/knowledge/stats/+server.ts",
+        "sveltekit-frontend/src/routes/api/knowledge/stream/+server.ts",
+        "sveltekit-frontend/src/routes/api/knowledge/youtube/+server.ts",
+        "sveltekit-frontend/tests/routes/auto/api/knowledge/backfill.test.ts"
+      ]
+    },
+    "memory.episodic": {
+      "fileCount": 27,
+      "status": "implemented",
+      "topScoreFile": "sveltekit-frontend/src/routes/api/chat/memory/settings/+server.ts",
+      "dbTables": [
+        "sessions",
+        "cases"
+      ],
+      "cacheKeys": [
+        "ace:memory:claude-mem:latest"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "page_server",
+        "svelte_page"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 2907,
+      "exports": [
+        "MEMORY_SKILLS",
+        "PromotionStateSchema",
+        "PromotionState",
+        "RetrievalKindSchema",
+        "RetrievalKind",
+        "RewardActionSchema",
+        "RewardAction",
+        "ENGRAM_SCHEMA_VERSION",
+        "RetrievalResultSchema",
+        "RetrievalResult",
+        "RetrievalTraceSchema",
+        "RetrievalTrace",
+        "RewardEventSchema",
+        "RewardEvent",
+        "RecallRequestSchema"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/memory/neural/+server.ts",
+        "scripts/engram/upgrade-engram-ranker.mjs",
+        "scripts/memory/import-claude-mem-observations.mjs",
+        "scripts/opencode/post-memory.mjs",
+        "sveltekit-frontend/scripts/engram/upgrade-engram-ranker.mjs",
+        "sveltekit-frontend/scripts/memory/post-agent-observation-smoke.mjs",
+        "sveltekit-frontend/scripts/memory/smoke-claude-mem-api.mjs",
+        "sveltekit-frontend/src/lib/server/ai/hermes/skills/memory.ts",
+        "sveltekit-frontend/src/lib/server/engram/engram-types.ts",
+        "sveltekit-frontend/src/lib/server/memory/agent-observation-ingest.ts",
+        "sveltekit-frontend/src/lib/server/memory/claude-mem-ingest.ts",
+        "sveltekit-frontend/src/lib/server/memory/claude-mem.ts",
+        "sveltekit-frontend/src/lib/server/memory/engram-plugin-adapter.ts",
+        "sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts",
+        "sveltekit-frontend/src/lib/server/memory/memory-gain-validator.ts",
+        "sveltekit-frontend/src/routes/(app)/code-intel/memory/+page.server.ts",
+        "sveltekit-frontend/src/routes/(app)/code-intel/memory/+page.svelte",
+        "sveltekit-frontend/src/routes/api/chat/memory/backfill/+server.ts",
+        "sveltekit-frontend/src/routes/api/chat/memory/settings/+server.ts",
+        "sveltekit-frontend/src/routes/api/internal/index-memory/+server.ts",
+        "sveltekit-frontend/src/routes/api/memory/agent-observation/+server.ts",
+        "sveltekit-frontend/src/routes/api/memory/claude-mem/+server.ts",
+        "sveltekit-frontend/src/routes/api/memory/claude-mem/import/+server.ts",
+        "sveltekit-frontend/src/routes/api/memory/status/+server.ts",
+        "sveltekit-frontend/tests/routes/auto/api/chat/memory/backfill.test.ts",
+        "sveltekit-frontend/tests/routes/auto/api/chat/memory/search.test.ts",
+        "sveltekit-frontend/tests/routes/auto/api/chat/memory/settings.test.ts"
+      ]
+    },
+    "lib.webgpu": {
+      "fileCount": 21,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/webgpu/dimensional-tensor-store.ts",
+      "dbTables": [
+        "documents",
+        "evidence",
+        "statutes"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 5801,
+      "exports": [
+        "ComputeShaderEngine",
+        "getComputeShaderEngine",
+        "computeSimilarity",
+        "TensorDimensions",
+        "TensorSlice",
+        "TensorSliceMetadata",
+        "LODLevel",
+        "TensorMemoryLayout",
+        "StreamingConfig",
+        "DimensionalTensorStore",
+        "SplatRenderConfig",
+        "SplatRenderStats",
+        "GaussianSplatRenderer",
+        "WebGPUContext",
+        "WebGPUInitOptions"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/webgpu/graph-texture-layout.ts",
+        "sveltekit-frontend/src/lib/webgpu/N64TextureLODSystem.ts",
+        "sveltekit-frontend/src/lib/webgpu/compute-shader-engine.ts",
+        "sveltekit-frontend/src/lib/webgpu/dimensional-tensor-store.ts",
+        "sveltekit-frontend/src/lib/webgpu/gaussian-splat-renderer.ts",
+        "sveltekit-frontend/src/lib/webgpu/init.ts",
+        "sveltekit-frontend/src/lib/webgpu/legal-compute-shaders.ts",
+        "sveltekit-frontend/src/lib/webgpu/legal-document-graph.ts",
+        "sveltekit-frontend/src/lib/webgpu/shader-cache-manager.ts",
+        "sveltekit-frontend/src/lib/webgpu/som-webgpu-cache.ts",
+        "sveltekit-frontend/src/lib/webgpu/texture-streaming.ts",
+        "sveltekit-frontend/src/lib/webgpu/unified-runtime-abstraction.js",
+        "sveltekit-frontend/src/lib/webgpu/webgpu-autoencoder.ts",
+        "sveltekit-frontend/src/lib/webgpu/webgpu-cpu-fallback.ts",
+        "sveltekit-frontend/src/lib/webgpu/webgpu-gemma-client.js",
+        "sveltekit-frontend/src/lib/webgpu/webgpu-init.ts",
+        "sveltekit-frontend/src/lib/webgpu/webgpu-polyfill.ts",
+        "sveltekit-frontend/src/lib/webgpu/webgpu-rag-service.ts",
+        "sveltekit-frontend/src/lib/webgpu/webgpu-similarity-engine.ts",
+        "sveltekit-frontend/src/lib/webgpu/webgpu-similarity-service.ts",
+        "sveltekit-frontend/src/lib/webgpu/wire-telemetry.ts"
+      ]
+    },
+    "gpu.som_topology": {
+      "fileCount": 19,
+      "status": "implemented",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/webgpu/topology/+server.ts",
+      "dbTables": [
+        "evidence",
+        "sessions",
+        "cases"
+      ],
+      "cacheKeys": [
+        "gpu:autoencoder:centroids_64",
+        "gpu:autoencoder:centroids_64_meta"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route",
+        "svelte_page",
+        "page_server"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 2983,
+      "exports": [
+        "RequestHandler",
+        "POST",
+        "GET",
+        "topologySnapshots",
+        "topologyPositions",
+        "tensorAnalysisCache",
+        "TensorAnalysisCache",
+        "NewTensorAnalysisCache",
+        "Manifold4Coords",
+        "ProjectionSource",
+        "EmbeddingInput",
+        "TopologyNode",
+        "AutoencoderWeights",
+        "ProjectionPipelineOptions",
+        "ProjectionAudit"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/webgpu/topology/$types.d.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/webgpu/topology/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/webgpu/topology/$types.d.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/topology.ts",
+        "sveltekit-frontend/src/lib/server/topology/gpu-topology-projection.ts",
+        "sveltekit-frontend/src/routes/(app)/admin/topology/+page.svelte",
+        "sveltekit-frontend/src/routes/(app)/code-intel/topology/+page.server.ts",
+        "sveltekit-frontend/src/routes/(app)/code-intel/topology/+page.svelte",
+        "sveltekit-frontend/src/routes/api/admin/topology/recompute/+server.ts",
+        "sveltekit-frontend/src/routes/api/code-intel/topology/+server.ts",
+        "sveltekit-frontend/src/routes/api/code-intel/topology/node/[stableKey]/+server.ts",
+        "sveltekit-frontend/src/routes/api/phase89/topology/+server.ts",
+        "sveltekit-frontend/src/routes/api/topology/+server.ts",
+        "sveltekit-frontend/src/routes/api/topology/centroids/+server.ts",
+        "sveltekit-frontend/src/routes/api/topology/stream/+server.ts",
+        "sveltekit-frontend/tests/routes/auto/api/admin/topology/recompute.test.ts",
+        "sveltekit-frontend/tests/routes/auto/api/code-intel/topology/node/__stableKey.test.ts",
+        "sveltekit-frontend/tests/routes/auto/api/topology/centroids.test.ts",
+        "sveltekit-frontend/tests/routes/auto/api/topology/stream.test.ts"
+      ]
+    },
+    "workspace.vscode-extension": {
+      "fileCount": 18,
+      "status": "partial",
+      "topScoreFile": "vscode-extension/src/localGraphCache.ts",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 2350,
+      "exports": [
+        "ClaudePlan",
+        "createClaudePlan",
+        "activate",
+        "deactivate",
+        "askGemma4AboutSelection",
+        "GraphPanel",
+        "GraphTreeProvider",
+        "GraphNode",
+        "GraphEdge",
+        "ClusterEntry",
+        "GraphData",
+        "load",
+        "invalidate",
+        "GraphStatusBar",
+        "ClusterInfo"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "vscode-extension/media/topology-viewer.js",
+        "vscode-extension/out/claudePlan.js",
+        "vscode-extension/out/extension.js",
+        "vscode-extension/out/gemmaAsk.js",
+        "vscode-extension/out/graphPanel.js",
+        "vscode-extension/out/graphTree.js",
+        "vscode-extension/out/localGraphCache.js",
+        "vscode-extension/out/statusBar.js",
+        "vscode-extension/out/traceClient.js",
+        "vscode-extension/src/claudePlan.ts",
+        "vscode-extension/src/extension.ts",
+        "vscode-extension/src/gemmaAsk.ts",
+        "vscode-extension/src/graphPanel.ts",
+        "vscode-extension/src/graphTree.ts",
+        "vscode-extension/src/localGraphCache.ts",
+        "vscode-extension/src/statusBar.ts",
+        "vscode-extension/src/traceClient.ts",
+        "vscode-extension/workers/graphParseWorker.js"
+      ]
+    },
+    "lib.machines": {
+      "fileCount": 16,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/machines/evidenceCustodyMachine.ts",
+      "dbTables": [
+        "evidence",
+        "documents",
+        "cases"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 4181,
+      "exports": [
+        "AudioUploadContext",
+        "AudioUploadEvent",
+        "audioUploadMachine",
+        "User",
+        "Session",
+        "AuthContext",
+        "AuthEvent",
+        "authMachine",
+        "AuthMachine",
+        "authActor",
+        "DocumentUploadContext",
+        "documentUploadMachine",
+        "AnalysisContext",
+        "AnalysisEvent",
+        "evidenceAnalysisMachine"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/machines/aiAssistantMachine.minimal.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/machines/case-workflow-machine.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/machines/graph-cache-machine.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/machines/legalAIMachine.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/machines/predictive-typing-machine.ts",
+        "sveltekit-frontend/src/lib/machines/AIAssistantMachineComponent.svelte",
+        "sveltekit-frontend/src/lib/machines/audio-upload-machine.ts",
+        "sveltekit-frontend/src/lib/machines/auth-machine.ts",
+        "sveltekit-frontend/src/lib/machines/document-upload-machine.ts",
+        "sveltekit-frontend/src/lib/machines/evidence-analysis-machine.ts",
+        "sveltekit-frontend/src/lib/machines/evidence-processing-machine.ts",
+        "sveltekit-frontend/src/lib/machines/evidenceCustodyMachine.ts",
+        "sveltekit-frontend/src/lib/machines/gpu-process-machine.ts",
+        "sveltekit-frontend/src/lib/machines/retrieval-machine.ts",
+        "sveltekit-frontend/src/lib/machines/uploadMachine.ts",
+        "sveltekit-frontend/src/lib/machines/userTypingStateMachine.ts"
+      ]
+    },
+    "lib.workers": {
+      "fileCount": 16,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/workers/ast-graph-worker.mjs",
+      "dbTables": [
+        "users",
+        "sessions",
+        "cases",
+        "evidence",
+        "documents",
+        "citations",
+        "statutes",
+        "ragMessages"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 2770,
+      "exports": [
+        "enhancedEmbeddingWorker",
+        "MultiDimArray",
+        "WorkerMessageData",
+        "WorkerMessage",
+        "WorkerResponse",
+        "GPUProcessingStats",
+        "LayoutNode",
+        "LayoutEdge",
+        "LayoutInput",
+        "LayoutPosition",
+        "LayoutOutput",
+        "LayoutError",
+        "EmbeddingJob",
+        "EmbeddingResult",
+        "EnhancedEmbeddingWorker"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/comprehensive-worker.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/embedding-worker-enhanced.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/embeddings-worker.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/predictive-prefetch.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/queue-worker.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts",
+        "sveltekit-frontend/src/lib/workers/ace-artifact-cache.worker.ts",
+        "sveltekit-frontend/src/lib/workers/admin-chat.worker.ts",
+        "sveltekit-frontend/src/lib/workers/ast-graph-worker.mjs",
+        "sveltekit-frontend/src/lib/workers/browser-context-embed.worker.ts",
+        "sveltekit-frontend/src/lib/workers/compute-worker.mjs",
+        "sveltekit-frontend/src/lib/workers/embedding-worker-enhanced.js",
+        "sveltekit-frontend/src/lib/workers/gpu-tensor-worker.ts",
+        "sveltekit-frontend/src/lib/workers/gpu-worker.mjs",
+        "sveltekit-frontend/src/lib/workers/graph-layout.worker.ts",
+        "sveltekit-frontend/src/lib/workers/packet-cache.worker.ts"
+      ]
+    },
+    "search.qdrant_vector": {
+      "fileCount": 15,
+      "status": "partial",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/optimized/+server.ts",
+      "dbTables": [
+        "users",
+        "cases",
+        "documents",
+        "citations",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": false,
+      "totalLines": 935,
+      "exports": [
+        "GET",
+        "QdrantSyncRequest",
+        "CollectionRequest",
+        "SearchRequest",
+        "POST",
+        "PUT",
+        "DELETE",
+        "QdrantPointStruct",
+        "OptimizedSearchRequest",
+        "BatchUpsertRequest",
+        "CacheManagementRequest",
+        "TestResult",
+        "TagHistogram",
+        "scrollClusterTags",
+        "QDRANT_SIMDJSON_THRESHOLD_BYTES"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/dev/qdrant/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/init/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/optimized/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/tag/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test/qdrant/+server.ts",
+        "scripts/qdrant/sync-centroids-to-redis.mjs",
+        "sveltekit-frontend/scripts/qdrant/parse-qdrant-json.ts",
+        "sveltekit-frontend/scripts/qdrant/simdjson-smoke.mjs",
+        "sveltekit-frontend/scripts/qdrant/write-rerank-feedback.mjs",
+        "sveltekit-frontend/src/lib/server/qdrant/cluster-tag-scroll.ts",
+        "sveltekit-frontend/src/lib/server/qdrant/parse-qdrant-json.ts",
+        "sveltekit-frontend/src/lib/server/types/qdrant.ts",
+        "sveltekit-frontend/src/lib/types/qdrant.ts",
+        "sveltekit-frontend/src/routes/api/health/qdrant/+server.ts"
+      ]
+    },
+    "lib.icons": {
+      "fileCount": 15,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/src/lib/icons/yorha/index.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 572,
+      "exports": [
+        "YorhaIconProps"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/icons/yorha/IconAiAssistant.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconCitation.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconEvidenceFile.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconGlossaryTerm.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconIntegrityShield.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconLawBook.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconNetworkGraph.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconPanelClose.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconPanelOpen.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconPrecedentCase.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconRegulation.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconSubjectProfile.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconTimeline.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/IconWarningFlag.svelte",
+        "sveltekit-frontend/src/lib/icons/yorha/index.ts"
+      ]
+    },
+    "gpu.simd_bridge": {
+      "fileCount": 12,
+      "status": "partial",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd/+server.ts",
+      "dbTables": [
+        "documents",
+        "citations"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": false,
+      "totalLines": 164,
+      "exports": [
+        "POST",
+        "GET",
+        "PUT"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/hot/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/load/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/metrics/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/toggle/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/simd/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/simd/parse/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/simd/test/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/bench/simd/hot/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/bench/simd/load/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/bench/simd/metrics/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/bench/simd/toggle/+server.ts"
+      ]
+    },
+    "lib.shims": {
+      "fileCount": 12,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/src/lib/shims/svelte-env-shim.d.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 1264,
+      "exports": [
+        "lookup",
+        "resolve",
+        "resolve4",
+        "resolve6",
+        "reverse",
+        "resolveSrv",
+        "resolveTxt",
+        "resolveMx",
+        "resolveCname",
+        "resolveNs",
+        "resolveSoa",
+        "resolveNaptr",
+        "resolvePtr",
+        "setServers",
+        "getServers"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/shims/melt-ui-shim.ts",
+        "sveltekit-frontend/src/lib/shims/commonjs-shim.js",
+        "sveltekit-frontend/src/lib/shims/dns-browser-shim.js",
+        "sveltekit-frontend/src/lib/shims/drizzle-node-postgres.ts",
+        "sveltekit-frontend/src/lib/shims/fs-browser-shim.js",
+        "sveltekit-frontend/src/lib/shims/ioredis-browser-shim.js",
+        "sveltekit-frontend/src/lib/shims/lokijs-browser-adapter.js",
+        "sveltekit-frontend/src/lib/shims/missing-types-shim.d.ts",
+        "sveltekit-frontend/src/lib/shims/os-browser-shim.js",
+        "sveltekit-frontend/src/lib/shims/piper-expressions-shim.js",
+        "sveltekit-frontend/src/lib/shims/svelte-env-shim.d.ts",
+        "sveltekit-frontend/src/lib/shims/worker-threads-browser-shim.js"
+      ]
+    },
+    "auth.session_management": {
+      "fileCount": 9,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/ai/onnx/session.ts",
+      "dbTables": [
+        "sessions"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": false,
+      "totalLines": 959,
+      "exports": [
+        "GET",
+        "OPTIONS",
+        "POST",
+        "getE2bSession",
+        "isE2bSessionReady",
+        "getWebGPUInfo",
+        "getE2bLoadError",
+        "disposeE2bSession",
+        "invalidateGPUDevice",
+        "getOnnxSession",
+        "getActiveProvider",
+        "getProviderLabel",
+        "isSessionCached",
+        "clearSessionCache"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/session/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/chat/session/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/debug/session/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/legal/session/create/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/debug/session/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/legal/session/create/+server.ts",
+        "sveltekit-frontend/src/lib/ai/e2b/session.ts",
+        "sveltekit-frontend/src/lib/ai/onnx/session.ts",
+        "sveltekit-frontend/src/routes/api/auth/session/+server.ts"
+      ]
+    },
+    "lib.client": {
+      "fileCount": 9,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/client/search-client.ts",
+      "dbTables": [
+        "cases",
+        "evidence",
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 1706,
+      "exports": [
+        "SearchQuery",
+        "SearchResult",
+        "SearchResponse",
+        "searchCases",
+        "searchLaws",
+        "getSearchSuggestions",
+        "getSearchFilters",
+        "unifiedSearch",
+        "trackSearch",
+        "StreamingOptions",
+        "handleStreamingResponse",
+        "fetchWithStreaming",
+        "createTimeoutController",
+        "EmbeddingStreamEvent",
+        "embeddingStream"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/client/ocr-tensor-processor.ts",
+        "sveltekit-frontend/src/lib/client/search-client.ts",
+        "sveltekit-frontend/src/lib/client/streaming-handler.ts",
+        "sveltekit-frontend/src/lib/client/subscribeEmbedding.svelte.ts",
+        "sveltekit-frontend/src/lib/client/sw-register.ts",
+        "sveltekit-frontend/src/lib/client/timeline-client.ts",
+        "sveltekit-frontend/src/lib/client/ui/POIPhotoModal.svelte",
+        "sveltekit-frontend/src/lib/client/ui/POIPhotoUploader.svelte",
+        "sveltekit-frontend/src/lib/client/workflow-event-stream.ts"
+      ]
+    },
+    "gpu.cuda_compute": {
+      "fileCount": 7,
+      "status": "partial",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/health/cuda/+server.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": false,
+      "totalLines": 237,
+      "exports": [
+        "POST",
+        "GET",
+        "CudaHealthCheck",
+        "ServiceHealth"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/compute/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/health/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/metrics/enhanced/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/stats/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/cuda/ocr/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/gpu/cuda/preprocess/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/health/cuda/+server.ts"
+      ]
+    },
+    "analysis.lang_extraction": {
+      "fileCount": 7,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/langextract/native.ts",
+      "dbTables": [
+        "evidence",
+        "documents",
+        "citations",
+        "statutes"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 1253,
+      "exports": [
+        "POST",
+        "GET",
+        "PUT",
+        "DELETE",
+        "BowTextureTile",
+        "chunkBowKey",
+        "clusterBowKey",
+        "somBowKey",
+        "getBowTile",
+        "setBowTile",
+        "getBowTextureFromRedis",
+        "setBowTextureToRedis",
+        "getClusterBowTexture",
+        "getSomBowTexture",
+        "buildBowTextureForChunk"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal-ai/langextract/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ocr/langextract/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/webgpu/langextract/+server.ts",
+        "sveltekit-frontend/src/lib/server/langextract/bag-cache.ts",
+        "sveltekit-frontend/src/lib/server/langextract/google-langextract.ts",
+        "sveltekit-frontend/src/lib/server/langextract/mcp-langextract.ts",
+        "sveltekit-frontend/src/lib/server/langextract/native.ts"
+      ]
+    },
+    "lib.config": {
+      "fileCount": 7,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/config/themes.ts",
+      "dbTables": [
+        "sessions",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 1490,
+      "exports": [
+        "PoolConfig",
+        "getPoolConfig",
+        "getDatabaseUrl",
+        "getRedisUrl",
+        "getRedisHost",
+        "getRedisPort",
+        "getRedisPassword",
+        "getRabbitMQUrl",
+        "getQdrantUrl",
+        "getOllamaUrl",
+        "getCouchDbUrl",
+        "getMcpMulticoreUrl",
+        "getMinioConfig",
+        "getNeo4jConfig",
+        "getCodebaseIndexUrl"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/config/database.ts",
+        "sveltekit-frontend/src/lib/config/env.server.ts",
+        "sveltekit-frontend/src/lib/config/env.ts",
+        "sveltekit-frontend/src/lib/config/pgvector-gpu-config.js",
+        "sveltekit-frontend/src/lib/config/redis-config.ts",
+        "sveltekit-frontend/src/lib/config/retro-console-palettes.ts",
+        "sveltekit-frontend/src/lib/config/themes.ts"
+      ]
+    },
+    "search.hyperrag": {
+      "fileCount": 7,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/routes/api/admin/atlas/hyperrag/+server.ts",
+      "dbTables": [
+        "users",
+        "evidence",
+        "cases"
+      ],
+      "cacheKeys": [
+        "gpu:karpathy:scores",
+        "cluster:kmeans:k20:manifold4:all",
+        "cluster:kmeans:k20:centroids",
+        "wiki:note:dir:src:lib:server:vector"
+      ],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": true,
+      "totalLines": 1548,
+      "exports": [
+        "POST"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/smoke-hyperrag.mjs",
+        "sveltekit-frontend/scripts/smoke/smoke-hyperrag.mjs",
+        "sveltekit-frontend/src/routes/api/admin/atlas/hyperrag/+server.ts",
+        "sveltekit-frontend/src/routes/api/rag/hyperrag/+server.ts",
+        "sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts",
+        "sveltekit-frontend/src/routes/api/search/hyperrag/+server.ts",
+        "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts"
+      ]
+    },
+    "lib.features": {
+      "fileCount": 6,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceBoardPane.svelte",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 546,
+      "exports": [
+        "poiService"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/features/evidence-command-center/CommandCenterShell.svelte",
+        "sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceBoardPane.svelte",
+        "sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceChatPane.svelte",
+        "sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceCommandPalette.svelte",
+        "sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceGraphPane.svelte",
+        "sveltekit-frontend/src/lib/features/poi/services/poi.ts"
+      ]
+    },
+    "lib.shared": {
+      "fileCount": 6,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/src/lib/shared/chr97-reader.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 291,
+      "exports": [
+        "CartridgeHeader",
+        "CartridgeMetadata",
+        "ParsedRune",
+        "ParsedCartridge",
+        "parseCartridgeHeader",
+        "parseCartridge",
+        "QuantizedEmbedding",
+        "EmbeddingResult",
+        "quantizeFloat32ToUint8",
+        "dequantizeUint8ToFloat32",
+        "cosineSimilarity",
+        "quantizedCosineSimilarity",
+        "LegalDocWASMOutput"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/shared/types/parser.ts",
+        "sveltekit-frontend/src/lib/shared/chr97-reader.ts",
+        "sveltekit-frontend/src/lib/shared/embedding-types.ts",
+        "sveltekit-frontend/src/lib/shared/quantize.ts",
+        "sveltekit-frontend/src/lib/shared/schemas/protocol.ts",
+        "sveltekit-frontend/src/lib/shared/types/parser.ts"
+      ]
+    },
+    "lib.state": {
+      "fileCount": 6,
+      "status": "partial",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/state/evidence-processing-machine-corrupted.ts",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 1727,
+      "exports": [
+        "aiOsState",
+        "AgentResponse",
+        "DocumentReviewTask",
+        "CrewAIContext",
+        "crewAIOrchestrationMachine",
+        "EvidenceProcessingContext",
+        "evidenceProcessingMachine",
+        "getProcessingProgress",
+        "getCurrentStep",
+        "getStepProgress",
+        "EvidenceCustodyContext",
+        "evidenceCustodyMachine",
+        "EvidenceCustodyMachine",
+        "Phase13Context",
+        "Phase13Event"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/state/crewAIOrchestrationMachine.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/state/evidence-processing-machine-corrupted.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/state/evidence-processing-machine.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/state/evidenceCustodyMachine.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/state/phase13StateMachine.ts",
+        "sveltekit-frontend/src/lib/state/ai-os-state.svelte.ts"
+      ]
+    },
+    "lib.data": {
+      "fileCount": 5,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/src/lib/data/route-groups-config.ts",
+      "dbTables": [
+        "evidence",
+        "statutes",
+        "citations",
+        "cases",
+        "documents",
+        "users"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 1689,
+      "exports": [
+        "ReportTemplate",
+        "REPORT_TEMPLATES",
+        "getTemplate",
+        "getAllTemplates",
+        "getTemplateTypes",
+        "RouteGroupDefinition",
+        "RouteDefinition",
+        "routeGroups",
+        "legacyRouteMapping",
+        "getRouteGroupByTheme",
+        "getAllRoutes",
+        "getRouteById",
+        "getRouteGroup",
+        "CaseType",
+        "NewCase"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/data/mock-legal-data.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/data/types.ts",
+        "sveltekit-frontend/src/lib/data/report-templates.ts",
+        "sveltekit-frontend/src/lib/data/route-groups-config.ts",
+        "sveltekit-frontend/src/lib/data/types.ts"
+      ]
+    },
+    "lib.integrations": {
+      "fileCount": 5,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/integrations/full-stack-workflow.ts",
+      "dbTables": [
+        "evidence",
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 107,
+      "exports": [
+        "ClaudeAgentRequest",
+        "CrewAIAgentRequest",
+        "AutoGenAgentRequest",
+        "ComprehensiveAgentRequest",
+        "AgentResult",
+        "ComprehensiveAgentResponse",
+        "TaskWaitResult",
+        "MulticoreAnalysis",
+        "ErrorAnalysisResult",
+        "ComprehensiveAgentOrchestrator",
+        "comprehensiveOrchestrator",
+        "executeAgents",
+        "analyzeAndFixErrors",
+        "FlashAttentionMulticoreRequest",
+        "FlashAttentionMulticoreResponse"
+      ],
+      "errorMarkers": [
+        "compilation_errors"
+      ],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/integrations/comprehensive-agent-orchestration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/integrations/flashattention-multicore-bridge.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/integrations/full-stack-workflow.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/integrations/redis-webgpu-simd-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/integrations/revolutionary-multicore-bridge.ts"
+      ]
+    },
+    "workspace.simd-bridge": {
+      "fileCount": 5,
+      "status": "stub",
+      "topScoreFile": "simd-bridge/examples/bridge-wrapper.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 422,
+      "exports": [
+        "bridgeSIMD"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "simd-bridge/cpp/test-addon.cjs",
+        "simd-bridge/examples/bridge-wrapper.ts",
+        "simd-bridge/examples/run-bridge.js",
+        "simd-bridge/rust/graph-engine/index.js",
+        "simd-bridge/rust/hmm-repair/index.js"
+      ]
+    },
+    "lib.courtroom": {
+      "fileCount": 4,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/src/lib/courtroom/courtroom-types.ts",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 1561,
+      "exports": [
+        "ModelDef",
+        "CourtroomScene",
+        "CourtroomCharacter",
+        "CameraPreset",
+        "CourtroomView",
+        "PHASE_CAMERA_MAP",
+        "ROLE_CAMERA_MAP",
+        "ROLE_COLORS",
+        "ANIMATION_TYPES",
+        "CourtroomAnimType",
+        "TIMELINE_EFFECTS",
+        "TimelineEffect",
+        "CRTOptions",
+        "createCRTPostProcess",
+        "TimelineKeyframe"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/courtroom/courtroom-scene.svelte.ts",
+        "sveltekit-frontend/src/lib/courtroom/courtroom-types.ts",
+        "sveltekit-frontend/src/lib/courtroom/crt-postprocess.ts",
+        "sveltekit-frontend/src/lib/courtroom/timeline-engine.svelte.ts"
+      ]
+    },
+    "lib.schemas": {
+      "fileCount": 4,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/src/lib/schemas/evidence-upload.ts",
+      "dbTables": [
+        "evidence",
+        "documents",
+        "citations"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 516,
+      "exports": [
+        "boardViewportSchema",
+        "boardNodeSchema",
+        "boardEdgeSchema",
+        "boardSnapshotSchema",
+        "BoardSnapshotSchema",
+        "EvidenceMetadata",
+        "LEGACY_EVIDENCE_TYPES",
+        "legacyEvidenceTypeEnum",
+        "chainOfCustodyEntrySchema",
+        "evidenceUploadSchema",
+        "pdfMetadataSchema",
+        "imageMetadataSchema",
+        "videoMetadataSchema",
+        "audioMetadataSchema",
+        "textMetadataSchema"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/schemas/vector.ts",
+        "sveltekit-frontend/src/lib/schemas/board.ts",
+        "sveltekit-frontend/src/lib/schemas/evidence-upload.ts",
+        "sveltekit-frontend/src/lib/schemas/forms.ts"
+      ]
+    },
+    "lib.optimization": {
+      "fileCount": 4,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/optimization/context7-mcp-integration.ts",
+      "dbTables": [
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 457,
+      "exports": [
+        "Context7BestPractice",
+        "Context7Integration",
+        "AIRecommendation",
+        "MCPEnhancedRecommendation",
+        "RecommendationContext",
+        "context7MCPIntegration",
+        "bestPracticesStore",
+        "integrationsStore",
+        "mcpConnectionStatus",
+        "getEnhancedRecommendations",
+        "createComponentIntegration",
+        "searchLegalBestPractices",
+        "SIMDJSONParser",
+        "CopilotIndexEntry",
+        "CopilotCluster"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/optimization/context7-mcp-integration.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/optimization/simd-json-index-processor.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/optimization/simd-json-parser-bridge.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/optimization/simd-json-parser.ts"
+      ]
+    },
+    "lib.wasm": {
+      "fileCount": 4,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/wasm/ultra-json-parser.ts",
+      "dbTables": [
+        "citations",
+        "documents",
+        "statutes",
+        "cases",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 507,
+      "exports": [
+        "GraphNode",
+        "GraphEdge",
+        "GraphResult",
+        "WasmGraphEngine",
+        "WasmEngineStats",
+        "wasmGraphEngine",
+        "createWasmGraphEngine",
+        "WasmLegalProcessor",
+        "BrowserSIMDCapabilities",
+        "UltraJSONConfig",
+        "UltraJSONMetrics",
+        "UltraJSONParser",
+        "ultraJSONParser",
+        "WasmModule",
+        "WasmCompileOptions"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/wasm/graphEngine.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/wasm/legal-processor.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/wasm/ultra-json-parser.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/wasm/webassembly-accelerator.ts"
+      ]
+    },
+    "errors.error_handling": {
+      "fileCount": 3,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 537,
+      "exports": [
+        "runWorkflowLoopLangGraph",
+        "HmmErrorClass",
+        "WorkflowLoopInput",
+        "WorkflowClassification",
+        "WorkflowRepairResult",
+        "WorkflowSmokeResult",
+        "WorkflowLogEntry",
+        "WorkflowLoopResult",
+        "WorkflowLoopDeps",
+        "classifyWorkflowInput",
+        "runWorkflowLoop"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop-langgraph.ts",
+        "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
+        "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts"
+      ]
+    },
+    "lib.orchestration": {
+      "fileCount": 3,
+      "status": "stub",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/orchestration/complete-legal-ai-orchestrator.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 58,
+      "exports": [
+        "AutoencoderContextSwitcher",
+        "autoencoderContextSwitcher",
+        "CompleteLegalAIStatus",
+        "LegalAIPerformanceMetrics",
+        "ProcessResult",
+        "CompleteLegalAIOrchestrator",
+        "completeLegalAIOrchestrator",
+        "MasterCognitiveState",
+        "CognitiveCapabilities",
+        "DeveloperToolkit",
+        "MasterCognitiveHub",
+        "masterCognitiveHub"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/orchestration/autoencoder-context-switcher.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/orchestration/complete-legal-ai-orchestrator.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/orchestration/master-cognitive-hub.ts"
+      ]
+    },
+    "lib.command-center-manifest.ts": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/command-center-manifest.ts",
+      "dbTables": [
+        "cases",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 519,
+      "exports": [
+        "TabId",
+        "CommandCenterRoute",
+        "Phase72Task",
+        "BADGE_DESCRIPTIONS",
+        "COMMAND_CENTER_MANIFEST",
+        "getRoutesByTab",
+        "RouteAstNode",
+        "RouteAstEdge",
+        "RouteAstGraph",
+        "enrichRoutesWithPhase72",
+        "phase6_72_restructure_tasks",
+        "tasksByPriority",
+        "tasksByTab"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/command-center-manifest.ts",
+        "sveltekit-frontend/src/lib/command-center-manifest.ts"
+      ]
+    },
+    "lib.env": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/env/index.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 27,
+      "exports": [
+        "env"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/env/index.ts",
+        "sveltekit-frontend/src/lib/env/public.ts"
+      ]
+    },
+    "legal.forensics": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/analysis/forensics.ts",
+      "dbTables": [
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 227,
+      "exports": [
+        "ForensicFlag",
+        "detectForensicPatterns",
+        "detectForensicPatternsAsync",
+        "detectSuspiciousPatterns"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/server/analysis/forensics.ts",
+        "sveltekit-frontend/src/lib/server/evidence/services/forensics.ts"
+      ]
+    },
+    "ranking.authority_score": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/scoring/authority-scorer.ts",
+      "dbTables": [],
+      "cacheKeys": [
+        "ace:authority:top",
+        "gpu:karpathy:scores"
+      ],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 331,
+      "exports": [
+        "computeKarpathyBlend",
+        "cosineSimilarity",
+        "computeAttentionScore"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/authority/build-authority-snapshot.mjs",
+        "sveltekit-frontend/src/lib/server/scoring/authority-scorer.ts"
+      ]
+    },
+    "lib.caching": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/caching/multi-dimensional-image-cache.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 42,
+      "exports": [
+        "GraphNode",
+        "GraphEdge",
+        "GraphData",
+        "DocumentMetadata",
+        "ParsedDocument",
+        "ImageCacheEntry",
+        "ImageMetadata",
+        "CacheStats",
+        "CacheDimensions",
+        "CacheLayer",
+        "MultiDimensionalQuery",
+        "MultiDimensionalImageCache",
+        "multiDimensionalImageCache",
+        "reinforcementLearningCache"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/caching/multi-dimensional-image-cache.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/caching/reinforcement-learning-cache.server.ts"
+      ]
+    },
+    "lib.detective-mode": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/detective-mode/comprehensive-integration.svelte.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 83,
+      "exports": [
+        "SemanticAnalysisResult",
+        "RAGQuery",
+        "RAGResult",
+        "RAGResponse",
+        "WebGPUCapabilities",
+        "SystemStatus",
+        "IntegratedQuery",
+        "IntegratedResponse",
+        "Neo4jResultRow",
+        "QdrantPoint",
+        "QdrantSearchResult",
+        "DatabaseOperations",
+        "store",
+        "KeyValue",
+        "comprehensiveIntegration"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/detective-mode/comprehensive-integration.svelte.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/detective-mode/comprehensive-integration.ts"
+      ]
+    },
+    "lib.logic": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/logic/Report.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 17,
+      "exports": [
+        "ContentNode",
+        "HistoryManager",
+        "Report",
+        "ReportSerialized",
+        "fromJSON"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/logic/HistoryManager.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/logic/Report.ts"
+      ]
+    },
+    "lib.routing": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/routing/index.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 409,
+      "exports": [
+        "RouteDefinition",
+        "routeRegistry",
+        "dynamicRoutes",
+        "currentRoute",
+        "favoriteRoutes",
+        "recentRoutes",
+        "routeStatistics",
+        "registerRoute",
+        "unregisterRoute",
+        "getRoute",
+        "searchRoutes",
+        "addToFavorites",
+        "removeFromFavorites",
+        "isFavorite",
+        "registerDynamicRouteExport"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/routing/index.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/routing/route-guards.ts"
+      ]
+    },
+    "lib.ui": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/ui/autocomplete/indexeddb-cache.ts",
+      "dbTables": [
+        "statutes",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 293,
+      "exports": [
+        "CachedStatute",
+        "AutocompleteResult",
+        "initIndexedDB",
+        "syncStatutesFromServer",
+        "searchLocal",
+        "searchSemantic",
+        "getStatutesByCluster",
+        "isCacheStale",
+        "clearCache",
+        "getCacheStats",
+        "LODCache",
+        "ViewportFocus",
+        "GPULoadMetrics",
+        "MatrixLODSystem",
+        "createLODRenderer"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/ui/autocomplete/indexeddb-cache.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/ui/matrix-lod.ts"
+      ]
+    },
+    "lib.vite": {
+      "fileCount": 2,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/vite/vscode-extension.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 19,
+      "exports": [
+        "vscodeErrorLogger",
+        "defaultVSCodeErrorConfig",
+        "VSCodeCommand",
+        "VSCodeAction",
+        "VSCodeNotification",
+        "ErrorRecord",
+        "VSCodeIntegration",
+        "ErrorNavigator",
+        "AutoFixSuggestions",
+        "vscodeIntegration",
+        "errorNavigator"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/vite/vscode-error-logger.ts",
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/vite/vscode-extension.ts"
+      ]
+    },
+    "db.migrations": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/migrations/+server.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": false,
+      "totalLines": 3,
+      "exports": [
+        "GET",
+        "POST"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/migrations/+server.ts"
+      ]
+    },
+    "lib.upsert-validated.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "scripts/lib/upsert-validated.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 100,
+      "exports": [
+        "upsertValidated"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/lib/upsert-validated.mjs"
+      ]
+    },
+    "lib.ambient-events.d.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 22,
+      "exports": [],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/ambient-events.d.ts"
+      ]
+    },
+    "lib.canvas": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/canvas/webgpu-shader-cache.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 15,
+      "exports": [
+        "getShaderModule"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/canvas/webgpu-shader-cache.ts"
+      ]
+    },
+    "lib.client-logging.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/client-logging.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 29,
+      "exports": [
+        "LogFields",
+        "logInfo",
+        "logWarn",
+        "logError"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/client-logging.ts"
+      ]
+    },
+    "lib.collaboration": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/collaboration/yjs-provider.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 267,
+      "exports": [
+        "yjsStreamKey",
+        "yjsPresenceKey",
+        "YJS_REPLAY_LIMIT",
+        "YJS_STREAM_TTL_SECONDS",
+        "YjsServerDeps",
+        "StoreUpdateResult",
+        "storeYjsUpdate",
+        "ReplayEntry",
+        "replayYjsUpdates",
+        "YjsSseEvent",
+        "formatYjsSseEvent",
+        "formatYjsPresenceEvent",
+        "formatYjsHeartbeat",
+        "YjsProviderOptions",
+        "YjsSseProvider"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/collaboration/yjs-provider.ts"
+      ]
+    },
+    "lib.env.server.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/env.server.ts",
+      "dbTables": [
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 57,
+      "exports": [
+        "Env"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/env.server.ts"
+      ]
+    },
+    "lib.index.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/index.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 111,
+      "exports": [
+        "VERSION",
+        "BUILD_DATE",
+        "FRAMEWORK_INFO",
+        "FEATURES",
+        "DEV_TOOLS"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/index.ts"
+      ]
+    },
+    "lib.intent": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/intent/regex-intent.ts",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 239,
+      "exports": [
+        "IntentLabel",
+        "IntentResult",
+        "inferIntent",
+        "rankIntent"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/intent/regex-intent.ts"
+      ]
+    },
+    "lib.messaging": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/messaging/rabbitmq-xstate-integration.ts",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 168,
+      "exports": [
+        "QueueName",
+        "fromRabbitPublish",
+        "rabbitActors"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/messaging/rabbitmq-xstate-integration.ts"
+      ]
+    },
+    "lib.models": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/models/ChatSession.svelte.ts",
+      "dbTables": [
+        "citations",
+        "documents",
+        "cases"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 1390,
+      "exports": [
+        "ChatRole",
+        "GlossaryMatch",
+        "AceEvalSummary",
+        "ExtractedCitation",
+        "ChatMessage",
+        "ConfidenceFactors",
+        "SSEChunk",
+        "SendMessageOptions",
+        "ChatSession"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/models/ChatSession.svelte.ts"
+      ]
+    },
+    "lib.phase72": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/phase72/routeGraphAdapter.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 148,
+      "exports": [
+        "GraphNode",
+        "CodebaseGraph",
+        "refreshGraph",
+        "getRouteNodes",
+        "getApiRouteNodes",
+        "getNode",
+        "getImporters",
+        "getOrphanCandidates",
+        "getUnauthenticatedRoutes",
+        "getUnvalidatedRoutes",
+        "getLegacySvelteNodes",
+        "getGraphSummary"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/phase72/routeGraphAdapter.ts"
+      ]
+    },
+    "lib.polyfills.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/polyfills.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 209,
+      "exports": [
+        "pathUtils",
+        "urlUtils",
+        "enhancedFetch",
+        "debounce",
+        "throttle",
+        "storage",
+        "webGPU"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/polyfills.ts"
+      ]
+    },
+    "lib.schemas.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/schemas.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 21,
+      "exports": [
+        "loginSchema",
+        "registerSchema"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/schemas.ts"
+      ]
+    },
+    "ranking.karpathy_blend": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/server/agents/regen/loaders/karpathy.ts",
+      "dbTables": [],
+      "cacheKeys": [
+        "gpu:karpathy:scores"
+      ],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 71,
+      "exports": [
+        "LoadKarpathyOptions",
+        "loadKarpathyScores"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/server/agents/regen/loaders/karpathy.ts"
+      ]
+    },
+    "lib.stores.svelte.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/stores.svelte.ts",
+      "dbTables": [
+        "citations",
+        "cases"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": true,
+      "totalLines": 380,
+      "exports": [
+        "UserSession",
+        "Case",
+        "AIMessage",
+        "ChatMetadata",
+        "authStore",
+        "caseStore",
+        "aiStore",
+        "chatStore",
+        "themeStore",
+        "stores"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/stores.svelte.ts"
+      ]
+    },
+    "lib.test-utils": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/test-utils/setup.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 11,
+      "exports": [
+        "setupTest",
+        "cleanupTest"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/test-utils/setup.ts"
+      ]
+    },
+    "lib.types.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/types.ts",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 103,
+      "exports": [
+        "ButtonVariant",
+        "ButtonSize",
+        "StatusVariant",
+        "User",
+        "Case",
+        "Evidence",
+        "Document",
+        "FormField",
+        "AITaskType",
+        "AITask",
+        "SearchResult"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/types.ts"
+      ]
+    },
+    "lib.uno-shortcuts.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/uno-shortcuts.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 4,
+      "exports": [
+        "shortcuts"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/uno-shortcuts.ts"
+      ]
+    },
+    "lib.utils.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/src/lib/utils.ts",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 362,
+      "exports": [
+        "cn",
+        "WithoutChild",
+        "WithoutChildren",
+        "WithoutChildrenOrChild",
+        "WithElementRef",
+        "formatFileSize",
+        "formatDate",
+        "generateId",
+        "debounce",
+        "throttle",
+        "getConfidenceLevel",
+        "getCaseStatusStyling",
+        "getEvidenceTypeStyling",
+        "formatProcessingTime",
+        "getInitials"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/src/lib/utils.ts"
+      ]
+    },
+    "lib.avx2-simdjson-bridge.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/avx2-simdjson-bridge.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 67,
+      "exports": [
+        "getNativeBridgeStatus",
+        "parseJsonFast"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/avx2-simdjson-bridge.mjs"
+      ]
+    },
+    "lib.bounded-output.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/bounded-output.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 93,
+      "exports": [
+        "DEFAULT_MAX_STDOUT_CHARS",
+        "timestampSlug",
+        "ensureLogDir",
+        "writeBoundedOutput",
+        "writeSummary"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/bounded-output.mjs"
+      ]
+    },
+    "lib.duplicate-detector.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 129,
+      "exports": [],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/duplicate-detector.mjs"
+      ]
+    },
+    "lib.mcp-streaming.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/mcp-streaming.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 445,
+      "exports": [
+        "StdioJsonRpc2Transport",
+        "StreamableHttpTransport",
+        "ValkeyStreamTransport",
+        "HybridMcpTransport",
+        "McpToolHandler",
+        "McpToolRegistry",
+        "JsonRpc2Server"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/mcp-streaming.mjs"
+      ]
+    },
+    "lib.mcp_unwrap.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/mcp_unwrap.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 43,
+      "exports": [
+        "unwrapMcpText",
+        "safeSlice",
+        "unwrapMcpJson"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/mcp_unwrap.mjs"
+      ]
+    },
+    "lib.phase89-adaptive-chunker.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/phase89-adaptive-chunker.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 386,
+      "exports": [
+        "ChunkStrategy",
+        "AdaptiveChunker",
+        "ChunkMetadata"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/phase89-adaptive-chunker.mjs"
+      ]
+    },
+    "lib.phase89-cache.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/phase89-cache.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 32,
+      "exports": [
+        "sha256",
+        "redisFromEnv",
+        "getJson",
+        "setJson",
+        "hashContent"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/phase89-cache.mjs"
+      ]
+    },
+    "lib.phase89-cuda-tags.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/phase89-cuda-tags.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 67,
+      "exports": [
+        "isCudaFile",
+        "cudaTags",
+        "tsTags",
+        "extractTags"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/phase89-cuda-tags.mjs"
+      ]
+    },
+    "lib.phase89-embed.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/phase89-embed.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 50,
+      "exports": [
+        "embedCached",
+        "embedBatchCached"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/phase89-embed.mjs"
+      ]
+    },
+    "lib.phase89-graph-visualizer.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/phase89-graph-visualizer.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 158,
+      "exports": [
+        "ASTGraphVisualizer"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/phase89-graph-visualizer.mjs"
+      ]
+    },
+    "lib.phase89-rrf.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/phase89-rrf.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 95,
+      "exports": [
+        "rrf",
+        "fuseRRF",
+        "fuseWeightedRRF"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/phase89-rrf.mjs"
+      ]
+    },
+    "lib.phase89-sse-stream.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/phase89-sse-stream.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 315,
+      "exports": [
+        "GET",
+        "streamRetrieve",
+        "createStreamEndpoint",
+        "clientStreamExample"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/phase89-sse-stream.mjs"
+      ]
+    },
+    "lib.progress.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/progress.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 140,
+      "exports": [
+        "Progress",
+        "mapWithProgress"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/progress.mjs"
+      ]
+    },
+    "lib.redis-semantic.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/redis-semantic.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 344,
+      "exports": [
+        "SemanticRedisCache",
+        "semanticCacheMain"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/redis-semantic.mjs"
+      ]
+    },
+    "lib.reference-verifier.mjs": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/lib/reference-verifier.mjs",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 285,
+      "exports": [
+        "CHUNK_SIZE",
+        "CACHE_DIR",
+        "CACHE_VERSION",
+        "moduleStem",
+        "classifyEntry",
+        "verifyReferences",
+        "verifyBatch",
+        "summarise",
+        "_resetForTests",
+        "getCacheStats"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/lib/reference-verifier.mjs"
+      ]
+    },
+    "lib.ast": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/ast/error-vectorizer.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 130,
+      "exports": [
+        "ErrorVector",
+        "WebGPUExport",
+        "ErrorVectorizer",
+        "errorVectorizer"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/ast/error-vectorizer.ts"
+      ]
+    },
+    "lib.ClientEmbeddingGemma.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/ClientEmbeddingGemma.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 293,
+      "exports": [
+        "ClientEmbeddingGemma",
+        "getClientEmbeddingGemma",
+        "cosineSimilarity",
+        "findSimilar"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/ClientEmbeddingGemma.ts"
+      ]
+    },
+    "lib.ClientEmbeddingService.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/ClientEmbeddingService.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 242,
+      "exports": [
+        "ClientEmbeddingService",
+        "getClientEmbeddingService"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/ClientEmbeddingService.ts"
+      ]
+    },
+    "lib.composables": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/composables/legal-data-runes.svelte.ts",
+      "dbTables": [
+        "cases",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 22,
+      "exports": [
+        "LegalCase",
+        "Evidence",
+        "PersonOfInterest",
+        "useLegalCase",
+        "useEvidence",
+        "usePersonsOfInterest",
+        "useLegalData"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/composables/legal-data-runes.svelte.ts"
+      ]
+    },
+    "lib.database": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/database/drizzle-compatibility-fix.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 14,
+      "exports": [
+        "DBRow",
+        "QueryResult",
+        "DBClient",
+        "getBarrelStore",
+        "safeEnsureProperties",
+        "handleQueryResult",
+        "safePropertyAccess",
+        "vectorOperations",
+        "ensureConnection",
+        "enhanceResultWithTypes",
+        "entityEnhancers",
+        "createTypeSafeQuery"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/database/drizzle-compatibility-fix.ts"
+      ]
+    },
+    "lib.embedding": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/embedding/client-embedding-generator.ts",
+      "dbTables": [
+        "documents",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 15,
+      "exports": [
+        "ClientEmbeddingGenerator",
+        "clientEmbeddingGenerator",
+        "EmbeddingCache",
+        "embeddingCache"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/embedding/client-embedding-generator.ts"
+      ]
+    },
+    "lib.error-brain": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/error-brain/types.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 63,
+      "exports": [
+        "PatchConfidence",
+        "PatchCandidate",
+        "ApplyMode",
+        "RunProgress",
+        "ApplyResult"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/error-brain/types.ts"
+      ]
+    },
+    "lib.gemma3Client.ts": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/gemma3Client.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 273,
+      "exports": [
+        "ChatMessage",
+        "ChatCompletionRequest",
+        "ChatCompletionResponse",
+        "CompletionRequest",
+        "CompletionResponse",
+        "ServerInfo",
+        "Gemma3Client",
+        "gemma3Client",
+        "detectAvailableServer",
+        "createGemma3Store"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/gemma3Client.ts"
+      ]
+    },
+    "lib.json": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/json/fastjson.ts",
+      "dbTables": [
+        "documents",
+        "cases"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 229,
+      "exports": [
+        "FastJSONResult",
+        "fastjson",
+        "fastjsonSync",
+        "checkBackends"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/json/fastjson.ts"
+      ]
+    },
+    "lib.llms": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 102,
+      "exports": [
+        "ToolCall",
+        "ToolResult",
+        "AgentResponse",
+        "AgentExecutionResult",
+        "ToolDefinition",
+        "HealthCheckResponse",
+        "RagLookupResult",
+        "WebCrawlResult",
+        "WebDocSummaryResult",
+        "WebSearchResult",
+        "CodeSearchResult"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts"
+      ]
+    },
+    "lib.metrics": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/metrics/gpuMetricsBatcher.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 8,
+      "exports": [
+        "GpuMetric",
+        "FlushHandler",
+        "GpuMetricsBatcher"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/metrics/gpuMetricsBatcher.ts"
+      ]
+    },
+    "lib.middleware": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/middleware/binary-encoding.ts",
+      "dbTables": [
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 37,
+      "exports": [
+        "EncodingFormat",
+        "BinaryEncodingOptions",
+        "EncodingMetrics",
+        "LegalWorkflowContext",
+        "BinaryStreamConfig",
+        "AdvancedBinaryEncodingService",
+        "binaryEncoder",
+        "documentUploadEncoder",
+        "evidenceReviewEncoder",
+        "caseAnalysisEncoder",
+        "encodeCBOR",
+        "encodeMessagePack",
+        "decodeCBOR",
+        "decodeMessagePack",
+        "encodeLegalDocument"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/middleware/binary-encoding.ts"
+      ]
+    },
+    "lib.moogle": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts",
+      "dbTables": [
+        "evidence",
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 36,
+      "exports": [
+        "MoogleComponent",
+        "ComponentPerformance",
+        "MoogleQuery",
+        "MoogleResult",
+        "MoogleGraphSynthesizerOrchestrator",
+        "moogleOrchestrator",
+        "systemHealth",
+        "createMoogleQuery"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts"
+      ]
+    },
+    "lib.parsers": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/parsers/simd-json-parser.ts",
+      "dbTables": [
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 14,
+      "exports": [
+        "SIMDParseOptions",
+        "ParsedLegalDocument",
+        "TextChunk",
+        "SIMDJSONParser",
+        "simdParser"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/parsers/simd-json-parser.ts"
+      ]
+    },
+    "lib.performance": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/performance/optimizations.ts",
+      "dbTables": [
+        "cases",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 17,
+      "exports": [
+        "OptimizedQueries",
+        "CacheService",
+        "createDebouncedSearch",
+        "VirtualScrollManager",
+        "performanceConfig"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/performance/optimizations.ts"
+      ]
+    },
+    "lib.polyfills": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/polyfills/sveltekit2-universal-polyfill.ts",
+      "dbTables": [
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 14,
+      "exports": [
+        "NodePolyfills",
+        "svelteKit2Polyfill"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/polyfills/sveltekit2-universal-polyfill.ts"
+      ]
+    },
+    "lib.proto": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/proto/legal-ai-types.ts",
+      "dbTables": [
+        "documents"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 322,
+      "exports": [
+        "InferenceRequest",
+        "InferenceResponse",
+        "InferenceChunk",
+        "EmbeddingRequest",
+        "EmbeddingResponse",
+        "SearchRequest",
+        "SearchResponse",
+        "SearchResult",
+        "MetricsRequest",
+        "MetricsResponse",
+        "GPUMetrics",
+        "MemoryMetrics",
+        "CacheMetrics",
+        "DocumentRequest",
+        "DocumentResponse"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/proto/legal-ai-types.ts"
+      ]
+    },
+    "lib.storage": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/storage/vector-quantization.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 15,
+      "exports": [
+        "QuantizationConfig",
+        "QuantizedVector",
+        "ProductQuantizationCodebook",
+        "VectorQuantizationService",
+        "vectorQuantization"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/storage/vector-quantization.ts"
+      ]
+    },
+    "lib.webasm": {
+      "fileCount": 1,
+      "status": "candidate",
+      "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/webasm/llama-cpp-engine.ts",
+      "dbTables": [],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [],
+      "hasLlmCall": false,
+      "totalLines": 11,
+      "exports": [
+        "LlamaCppConfig",
+        "InferenceRequest",
+        "InferenceResult",
+        "WebASMLlamaCppEngine"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/webasm/llama-cpp-engine.ts"
+      ]
+    }
+  }
+}

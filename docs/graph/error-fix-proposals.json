@@ -1,0 +1,274 @@
+{
+  "generatedAt": "2026-05-30T01:48:47.757Z",
+  "totalErrors": 848,
+  "proposals": [
+    {
+      "proposalId": "f03b4f74919b",
+      "featureKey": "unknown",
+      "errorCount": 596,
+      "topErrorCode": "unsafe_drizzle_update_delete",
+      "topErrorCount": 590,
+      "affectedFiles": [
+        "unknown",
+        "C"
+      ],
+      "errorCodes": [
+        "CONTRACT",
+        "unsafe_drizzle_update_delete"
+      ],
+      "sampleErrors": [
+        {
+          "file": "unknown",
+          "line": 1,
+          "code": "CONTRACT",
+          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-001-3b35ccb8\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
+        },
+        {
+          "file": "unknown",
+          "line": 1,
+          "code": "CONTRACT",
+          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-002-f1ac684e\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
+        },
+        {
+          "file": "unknown",
+          "line": 1,
+          "code": "CONTRACT",
+          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-003-4b9906be\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
+        }
+      ],
+      "suggestedFix": "Fix 596 CONTRACT, unsafe_drizzle_update_delete errors in unknown. Check: unknown, C. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"unknown\"",
+      "confidence": 0.4,
+      "sourceRefs": [
+        "local:unknown#L1",
+        "local:unknown#L1",
+        "local:unknown#L1"
+      ],
+      "featureStatus": "unknown",
+      "priority": "HIGH",
+      "generatedAt": "2026-05-30T01:48:47.751Z",
+      "usedLlm": false
+    },
+    {
+      "proposalId": "956a8024c090",
+      "featureKey": "workspace.sveltekit-frontend",
+      "errorCount": 227,
+      "topErrorCode": "migration_schema_drift",
+      "topErrorCount": 91,
+      "affectedFiles": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\atlas-chunks.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\codebase-intelligence.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\context-timeline.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\errorBrainDiffs.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\error_clusters.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\evidence-multi-modal.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\evidence.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\jurisdictions.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\legal-cases.ts"
+      ],
+      "errorCodes": [
+        "missing_table",
+        "missing_column",
+        "live_db_schema_drift",
+        "migration_schema_drift"
+      ],
+      "sampleErrors": [
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
+          "line": 1,
+          "code": "missing_table",
+          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\ace-web-crawl.ts\","
+        },
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
+          "line": 1,
+          "code": "missing_table",
+          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\ace-web-crawl.ts\","
+        },
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
+          "line": 1,
+          "code": "missing_table",
+          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\ace-web-crawl.ts\","
+        }
+      ],
+      "suggestedFix": "Fix 227 missing_table, missing_column, live_db_schema_drift, migration_schema_drift errors in workspace.sveltekit-frontend. Check: sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts, sveltekit-frontend\\src\\lib\\server\\db\\schema\\atlas-chunks.ts, sveltekit-frontend\\src\\lib\\server\\db\\schema\\codebase-intelligence.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"sveltekit-frontend\"",
+      "confidence": 0.4,
+      "sourceRefs": [
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts#L1",
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts#L1",
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts#L1"
+      ],
+      "featureStatus": "partial",
+      "priority": "HIGH",
+      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "usedLlm": false
+    },
+    {
+      "proposalId": "5aba26933bd0",
+      "featureKey": "lib.types",
+      "errorCount": 11,
+      "topErrorCode": "missing_column",
+      "topErrorCount": 11,
+      "affectedFiles": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas.ts"
+      ],
+      "errorCodes": [
+        "missing_column"
+      ],
+      "sampleErrors": [
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas.ts",
+          "line": 1,
+          "code": "missing_column",
+          "message": "{\"type\":\"missing_column\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema-canvas.ts\",\"table\""
+        },
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas.ts",
+          "line": 1,
+          "code": "missing_column",
+          "message": "{\"type\":\"missing_column\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema-canvas.ts\",\"table\""
+        },
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas.ts",
+          "line": 1,
+          "code": "missing_column",
+          "message": "{\"type\":\"missing_column\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema-canvas.ts\",\"table\""
+        }
+      ],
+      "suggestedFix": "Fix 11 missing_column errors in lib.types. Check: sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"types\"",
+      "confidence": 0.4,
+      "sourceRefs": [
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas.ts#L1",
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas.ts#L1",
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas.ts#L1"
+      ],
+      "featureStatus": "partial",
+      "priority": "HIGH",
+      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "usedLlm": false
+    },
+    {
+      "proposalId": "13a21958e219",
+      "featureKey": "db.drizzle_schema",
+      "errorCount": 10,
+      "topErrorCode": "missing_table",
+      "topErrorCount": 10,
+      "affectedFiles": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\jsonb-legal-schema.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ai_chat.ts",
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-test-rag.ts"
+      ],
+      "errorCodes": [
+        "missing_table"
+      ],
+      "sampleErrors": [
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\jsonb-legal-schema.ts",
+          "line": 1,
+          "code": "missing_table",
+          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\jsonb-legal-schema.ts\",\"ta"
+        },
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\jsonb-legal-schema.ts",
+          "line": 1,
+          "code": "missing_table",
+          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\jsonb-legal-schema.ts\",\"ta"
+        },
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\jsonb-legal-schema.ts",
+          "line": 1,
+          "code": "missing_table",
+          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\jsonb-legal-schema.ts\",\"ta"
+        }
+      ],
+      "suggestedFix": "Fix 10 missing_table errors in db.drizzle_schema. Check: sveltekit-frontend\\src\\lib\\server\\db\\jsonb-legal-schema.ts, sveltekit-frontend\\src\\lib\\server\\db\\schema\\ai_chat.ts, sveltekit-frontend\\src\\lib\\server\\db\\schema-test-rag.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"drizzle_schema\"",
+      "confidence": 0.4,
+      "sourceRefs": [
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\jsonb-legal-schema.ts#L1",
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\jsonb-legal-schema.ts#L1",
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\jsonb-legal-schema.ts#L1"
+      ],
+      "featureStatus": "implemented",
+      "priority": "MEDIUM",
+      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "usedLlm": false
+    },
+    {
+      "proposalId": "2866867402af",
+      "featureKey": "api.sveltekit_routes",
+      "errorCount": 3,
+      "topErrorCode": "missing_column",
+      "topErrorCount": 1,
+      "affectedFiles": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts"
+      ],
+      "errorCodes": [
+        "missing_column",
+        "missing_table",
+        "live_db_schema_drift"
+      ],
+      "sampleErrors": [
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts",
+          "line": 1,
+          "code": "missing_column",
+          "message": "{\"type\":\"missing_column\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\search-analytics."
+        },
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts",
+          "line": 1,
+          "code": "missing_table",
+          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\search-analytics.t"
+        },
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts",
+          "line": 1,
+          "code": "live_db_schema_drift",
+          "message": "{\"type\":\"live_db_schema_drift\",\"severity\":\"high\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\search-analyt"
+        }
+      ],
+      "suggestedFix": "Fix 3 missing_column, missing_table, live_db_schema_drift errors in api.sveltekit_routes. Check: sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"sveltekit_routes\"",
+      "confidence": 0.4,
+      "sourceRefs": [
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts#L1",
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts#L1",
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts#L1"
+      ],
+      "featureStatus": "implemented",
+      "priority": "LOW",
+      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "usedLlm": false
+    },
+    {
+      "proposalId": "fe9fbfd1fe74",
+      "featureKey": "analysis.entity_extraction",
+      "errorCount": 1,
+      "topErrorCode": "missing_table",
+      "topErrorCount": 1,
+      "affectedFiles": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\error_brain_analysis.ts"
+      ],
+      "errorCodes": [
+        "missing_table"
+      ],
+      "sampleErrors": [
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\error_brain_analysis.ts",
+          "line": 1,
+          "code": "missing_table",
+          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\error_brain_analys"
+        }
+      ],
+      "suggestedFix": "Fix 1 missing_table errors in analysis.entity_extraction. Check: sveltekit-frontend\\src\\lib\\server\\db\\schema\\error_brain_analysis.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"entity_extraction\"",
+      "confidence": 0.4,
+      "sourceRefs": [
+        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\error_brain_analysis.ts#L1"
+      ],
+      "featureStatus": "implemented",
+      "priority": "LOW",
+      "generatedAt": "2026-05-30T01:48:47.753Z",
+      "usedLlm": false
+    }
+  ]
+}

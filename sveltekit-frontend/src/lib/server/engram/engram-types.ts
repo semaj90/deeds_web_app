@@ -1,107 +1,197 @@
+/**
+ * Engram Protocol Types — Canonical schema for memory orchestration
+ * Defines retrieval traces, rewards, promotions, and policy versioning
+ */
+
 import { z } from 'zod';
 
-// Promotion state for a memory
-export const EngramPromotionStateSchema = z.enum(['active', 'superseded', 'archived', 'rejected']);
-export type EngramPromotionState = z.infer<typeof EngramPromotionStateSchema>;
+// ═══════════════════════════════════════════════════════════════════════
+// Enums
+// ═══════════════════════════════════════════════════════════════════════
 
-// Core memory record (Atlas Card-like compact representation)
-export const EngramMemorySchema = z.object({
-  id: z.string().optional(),
-  sourceRef: z.string(), // required for promoted memory
-  title: z.string().optional(),
-  summary: z.string().optional(),
-  cluster: z.number().optional(),
-  somX: z.number().optional(),
-  somY: z.number().optional(),
-  authority: z.number().optional(), // 0..1
-  reward: z.number().optional(), // 0..1
-  vector768: z.array(z.number()).length(768).optional(),
-  vector64: z.array(z.number()).length(64).optional(),
-  graphPaths: z.array(z.string()).optional(),
-  sourceTags: z.array(z.string()).optional(),
-  metadata: z.record(z.any()).optional(),
-  createdAt: z.string().optional(),
-  graphVersion: z.string(), // required per spec
-  promotionState: EngramPromotionStateSchema.optional(),
+export const PromotionStateSchema = z.enum(['active', 'superseded', 'archived', 'rejected']);
+export type PromotionState = z.infer<typeof PromotionStateSchema>;
+
+export const RetrievalKindSchema = z.enum(['chunk', 'summary', 'card']);
+export type RetrievalKind = z.infer<typeof RetrievalKindSchema>;
+
+export const RewardActionSchema = z.enum(['promote', 'demote', 'feedback_up', 'feedback_down', 'click']);
+export type RewardAction = z.infer<typeof RewardActionSchema>;
+
+export const ENGRAM_SCHEMA_VERSION = 1;
+
+// ═══════════════════════════════════════════════════════════════════════
+// Retrieval Trace Schema
+// ═══════════════════════════════════════════════════════════════════════
+
+export const RetrievalResultSchema = z.object({
+  id: z.string().uuid(),
+  score: z.number().min(0).max(1),
+  sourceRef: z.string(),
+  kind: RetrievalKindSchema,
+  provenance: z.object({
+    collection: z.string(),
+    qdrantId: z.string().optional(),
+    qdrantScore: z.number().optional(),
+    neo4jNode: z.string().optional(),
+    neo4jEdge: z.string().optional(),
+  }).strict(),
 });
-export type EngramMemory = z.infer<typeof EngramMemorySchema>;
+export type RetrievalResult = z.infer<typeof RetrievalResultSchema>;
 
-// Session-level context that Engram manages for injection
-export const EngramSessionContextSchema = z.object({
-  sessionId: z.string(),
-  userId: z.string().optional(),
-  intent: z.string().optional(),
-  recentEngramIds: z.array(z.string()).optional(),
-  engramSummary: z.string().optional(),
-  createdAt: z.string().optional(),
-  graphVersion: z.string(),
+export const RetrievalTraceSchema = z.object({
+  traceId: z.string().uuid(),
+  createdAt: z.date(),
+  query: z.string().max(4000),
+  queryHash: z.string().length(64),
+  policy: z.string(),
+  policyVersion: z.number().int().min(1),
+  maxResults: z.number().int().min(1).max(100),
+  retrieved: z.array(RetrievalResultSchema),
+  aggregateConfidence: z.number().min(0).max(1),
+  durationMs: z.number().int(),
+  userId: z.string().uuid().optional(),
+  sessionId: z.string().uuid().optional(),
+  version: z.number().int().min(1),
 });
-export type EngramSessionContext = z.infer<typeof EngramSessionContextSchema>;
+export type RetrievalTrace = z.infer<typeof RetrievalTraceSchema>;
 
-// Request to inject one or more memories into a session (KV or context)
-export const EngramInjectionRequestSchema = z.object({
-  requestId: z.string().optional(),
-  sessionId: z.string(),
-  userId: z.string().optional(),
-  mode: z.enum(['dry', 'apply']).default('dry'),
-  injectTo: z.enum(['kv', 'context']).default('kv'),
-  maxTokens: z.number().optional(),
-  memories: z.array(EngramMemorySchema).optional(), // inline memories
-  memoryIds: z.array(z.string()).optional(), // or references
-  graphVersion: z.string(),
+// ═══════════════════════════════════════════════════════════════════════
+// Reward / Telemetry Schema
+// ═══════════════════════════════════════════════════════════════════════
+
+export const RewardEventSchema = z.object({
+  eventId: z.string().uuid(),
+  traceId: z.string().uuid().optional(),
+  actor: z.string(),
+  action: RewardActionSchema,
+  delta: z.number(),
+  reason: z.string().max(500),
+  createdAt: z.date(),
+  sourceRefs: z.array(z.string()),
+  metadata: z.record(z.unknown()).optional(),
 });
-export type EngramInjectionRequest = z.infer<typeof EngramInjectionRequestSchema>;
+export type RewardEvent = z.infer<typeof RewardEventSchema>;
 
-// Result of an injection attempt
-export const EngramInjectionResultSchema = z.object({
-  requestId: z.string().optional(),
-  sessionId: z.string(),
-  injectedCount: z.number(),
-  injectedIds: z.array(z.string()).optional(),
-  mode: z.enum(['dry', 'apply']),
-  success: z.boolean(),
-  reason: z.string().optional(),
-  trace: z.array(z.any()).optional(),
+// ═══════════════════════════════════════════════════════════════════════
+// Request/Response Schemas
+// ═══════════════════════════════════════════════════════════════════════
+
+export const RecallRequestSchema = z.object({
+  query: z.string().max(4000),
+  maxResults: z.number().int().min(1).max(100).default(10),
+  policy: z.string().default('ace_v1'),
+  userId: z.string().uuid().optional(),
+  sessionId: z.string().uuid().optional(),
 });
-export type EngramInjectionResult = z.infer<typeof EngramInjectionResultSchema>;
+export type RecallRequest = z.infer<typeof RecallRequestSchema>;
 
-// Outcome trace for events, promotions, injections
-export const EngramOutcomeTraceSchema = z.object({
-  id: z.string().optional(),
-  timestamp: z.string(),
-  action: z.enum(['record_outcome', 'promote', 'inject', 'supersede', 'archive']).optional(),
-  actor: z.string().optional(),
-  details: z.record(z.any()).optional(),
+export const RecallResponseSchema = z.object({
+  traceId: z.string().uuid(),
+  results: z.array(RetrievalResultSchema),
+  policyUsed: z.string(),
+  policyVersion: z.number().int(),
+  aggregateConfidence: z.number().min(0).max(1),
+  durationMs: z.number().int(),
 });
-export type EngramOutcomeTrace = z.infer<typeof EngramOutcomeTraceSchema>;
+export type RecallResponse = z.infer<typeof RecallResponseSchema>;
 
-// Promotion state record persisted for auditing
-export const EngramPromotionStateRecordSchema = z.object({
-  memoryId: z.string(),
-  promotedAt: z.string(),
-  promotedBy: z.string().optional(),
-  promotionState: EngramPromotionStateSchema,
-  reason: z.string().optional(),
-  sourceRefs: z.array(z.string()), // required for promoted memory
-  graphVersion: z.string(),
-  metadata: z.record(z.any()).optional(),
+export const PromoteRequestSchema = z.object({
+  itemId: z.string().uuid(),
+  promotion: PromotionStateSchema,
+  reason: z.string().max(500),
+  actor: z.string(),
+  sourceRefs: z.array(z.string()).optional(),
 });
-export type EngramPromotionStateRecord = z.infer<typeof EngramPromotionStateRecordSchema>;
+export type PromoteRequest = z.infer<typeof PromoteRequestSchema>;
 
-// Convenience exports for validation usage
-export const Schemas = {
-  EngramMemorySchema,
-  EngramSessionContextSchema,
-  EngramInjectionRequestSchema,
-  EngramInjectionResultSchema,
-  EngramOutcomeTraceSchema,
-  EngramPromotionStateRecordSchema,
-};
+export const PromoteResponseSchema = z.object({
+  ok: z.boolean(),
+  updated: z.object({
+    itemId: z.string().uuid(),
+    promotion: PromotionStateSchema,
+    updatedAt: z.date(),
+  }).optional(),
+  error: z.string().optional(),
+});
+export type PromoteResponse = z.infer<typeof PromoteResponseSchema>;
 
-// Example usage (runtime validation)
-/*
-import { Schemas } from './engram-types';
-const req = Schemas.EngramInjectionRequestSchema.parse(payload);
-*/
+export const LogRequestSchema = z.object({
+  traceId: z.string().uuid(),
+  tool: z.string(),
+  args: z.record(z.unknown()).optional(),
+  result: z.enum(['ok', 'fail', 'timeout']),
+  durationMs: z.number().int(),
+  metadata: z.record(z.unknown()).optional(),
+});
+export type LogRequest = z.infer<typeof LogRequestSchema>;
 
-export default Schemas;
+export const LogResponseSchema = z.object({
+  ok: z.boolean(),
+  error: z.string().optional(),
+});
+export type LogResponse = z.infer<typeof LogResponseSchema>;
+
+// ═══════════════════════════════════════════════════════════════════════
+// MCP JSON-RPC Envelopes
+// ═══════════════════════════════════════════════════════════════════════
+
+export const MCPRequestSchema = z.object({
+  jsonrpc: z.literal('2.0'),
+  method: z.enum(['engram.recall', 'engram.promote', 'engram.log']),
+  params: z.union([RecallRequestSchema, PromoteRequestSchema, LogRequestSchema]),
+  id: z.union([z.string(), z.number()]),
+});
+export type MCPRequest = z.infer<typeof MCPRequestSchema>;
+
+export const MCPResponseSchema = z.object({
+  jsonrpc: z.literal('2.0'),
+  result: z.union([RecallResponseSchema, PromoteResponseSchema, LogResponseSchema]).optional(),
+  error: z.object({
+    code: z.number(),
+    message: z.string(),
+    data: z.record(z.unknown()).optional(),
+  }).optional(),
+  id: z.union([z.string(), z.number()]),
+});
+export type MCPResponse = z.infer<typeof MCPResponseSchema>;
+
+// ═══════════════════════════════════════════════════════════════════════
+// Memory Artifact Schema
+// ═══════════════════════════════════════════════════════════════════════
+
+export const MemoryArtifactSchema = z.object({
+  id: z.string().uuid(),
+  kind: RetrievalKindSchema,
+  promotion: PromotionStateSchema,
+  title: z.string().max(200),
+  content: z.string().max(8000),
+  grpoScore: z.number().min(0).max(1),
+  sourceRefs: z.array(z.string()),
+  tags: z.array(z.string()).optional(),
+  hitCount: z.number().int().min(0).default(0),
+  lastHitAt: z.date().optional(),
+  supersededBy: z.string().uuid().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  expiresAt: z.date().optional(),
+});
+export type MemoryArtifact = z.infer<typeof MemoryArtifactSchema>;
+
+// ═══════════════════════════════════════════════════════════════════════
+// Policy Config (versioned retrieval strategy)
+// ═══════════════════════════════════════════════════════════════════════
+
+export const PolicyConfigSchema = z.object({
+  name: z.string(),
+  version: z.number().int().min(1),
+  description: z.string().optional(),
+  qdrantWeight: z.number().min(0).max(1).default(0.6),
+  neo4jWeight: z.number().min(0).max(1).default(0.4),
+  minConfidence: z.number().min(0).max(1).default(0.3),
+  rerankMethod: z.string().default('karpathy_blend'),
+  maxResults: z.number().int().min(1).max(100).default(10),
+  createdAt: z.date(),
+  active: z.boolean().default(true),
+});
+export type PolicyConfig = z.infer<typeof PolicyConfigSchema>;

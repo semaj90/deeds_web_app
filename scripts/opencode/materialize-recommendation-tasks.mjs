@@ -66,6 +66,70 @@ async function main() {
 
   console.log(`  recommendations: ${recs.length}`);
 
+  // ── Load feature registry (optional) to attach feature IDs/context to tasks
+  let registry = null;
+  const REG_PATH = path.join(ROOT, '.tmp', 'atlas-feature-registry.json');
+  try {
+    await fs.access(REG_PATH);
+    registry = JSON.parse(await fs.readFile(REG_PATH, 'utf8'));
+  } catch (e) {
+    // file missing or unreadable — that's fine in dry-run
+    if (e && e.code && e.code !== 'ENOENT')
+      console.warn('Could not read feature registry:', e.message);
+    registry = null;
+  }
+  const fileToFeatures = new Map();
+  // build multiple indexes for flexible matching: normalized path, basename, route, and path-segments
+  const basenameToFeatures = new Map();
+  const routeToFeatures = new Map();
+  const segmentToFeatures = new Map();
+
+  function normalizePathRef(p) {
+    if (!p) return '';
+    let s = p.replace(/\\/g, '/');
+    s = s.replace(/^\.\//, '');
+    s = s.replace(/^\/[A-Za-z]:\//, '');
+    s = s.replace(/^[A-Za-z]:\//, '');
+    s = s.replace(/^\//, '');
+    return s.toLowerCase();
+  }
+
+  if (registry && Array.isArray(registry.features)) {
+    for (const f of registry.features) {
+      // index by normalized file path
+      for (const rawFile of f.files || []) {
+        const file = normalizePathRef(rawFile);
+        const arr = fileToFeatures.get(file) || [];
+        arr.push(f);
+        fileToFeatures.set(file, arr);
+
+        // basename
+        try {
+          const b = path.basename(file);
+          const ba = basenameToFeatures.get(b) || [];
+          ba.push(f);
+          basenameToFeatures.set(b, ba);
+        } catch (e) {}
+
+        // segments
+        const parts = file.split('/').filter(Boolean);
+        for (const p of parts) {
+          const seg = segmentToFeatures.get(p) || [];
+          seg.push(f);
+          segmentToFeatures.set(p, seg);
+        }
+      }
+
+      // index by declared routes if present
+      for (const r of f.routes || []) {
+        const rr = normalizePathRef(r);
+        const ra = routeToFeatures.get(rr) || [];
+        ra.push(f);
+        routeToFeatures.set(rr, ra);
+      }
+    }
+  }
+
   const createdAt = new Date().toISOString();
   const tasks = recs.map((rec) => {
     const task_id = `task_${crypto.randomBytes(4).toString('hex')}`;
@@ -164,6 +228,58 @@ async function main() {
     return n;
   });
 
+  // Attach feature context (feature IDs + small summary) to normalized tasks
+  for (const t of normalizedTasks) {
+    const matched = new Map();
+    const srefs = Array.isArray(t.sourceRefs) ? t.sourceRefs : [];
+    for (const s of srefs) {
+      const ns = normalizePathRef(s);
+
+      // exact normalized file match
+      if (fileToFeatures.has(ns)) {
+        for (const f of fileToFeatures.get(ns)) matched.set(f.id, f);
+        continue;
+      }
+
+      // route match
+      if (routeToFeatures.has(ns)) {
+        for (const f of routeToFeatures.get(ns)) matched.set(f.id, f);
+      }
+
+      // basename match
+      try {
+        const base = path.basename(ns);
+        if (basenameToFeatures.has(base)) {
+          for (const f of basenameToFeatures.get(base)) matched.set(f.id, f);
+        }
+      } catch (e) {}
+
+      // suffix / contains heuristics
+      for (const [file, feats] of fileToFeatures.entries()) {
+        try {
+          if (file.includes(ns) || ns.includes(file) || file.endsWith(ns) || ns.endsWith(file)) {
+            for (const f of feats) matched.set(f.id, f);
+          }
+        } catch (e) {}
+      }
+
+      // token/segment matching (pick up route segments or directory names)
+      const tokens = ns.split('/').filter(Boolean);
+      for (const tok of tokens) {
+        if (segmentToFeatures.has(tok)) {
+          for (const f of segmentToFeatures.get(tok)) matched.set(f.id, f);
+        }
+      }
+    }
+    const featureList = Array.from(matched.values());
+    t.featureIds = featureList.map((f) => f.id);
+    t.featureContext = featureList.map((f) => ({
+      id: f.id,
+      label: f.label,
+      confidence: f.confidence,
+    }));
+  }
+
   if (!DRY_RUN) {
     await fs.mkdir(OUT_DIR, { recursive: true });
     await fs.writeFile(
@@ -174,6 +290,34 @@ async function main() {
     await fs.writeFile(OUT_MD, md, 'utf8');
     console.log(`\n  ✅ wrote ${OUT_NDJ}`);
     console.log(`  ✅ wrote ${OUT_MD}`);
+    // Forward a summary of created tasks to the local gemma4 retrieval hook (dry-run safe)
+    try {
+      const { execSync } = await import('child_process');
+      const hookScript = path.join(ROOT, 'scripts', 'opencode', 'gemma4-retrieval-hook.mjs');
+      const MAX_HOOKS = 20;
+      const toSend = normalizedTasks.slice(0, MAX_HOOKS);
+      for (const t of toSend) {
+        const payload = {
+          query: t.title || 'materialize task',
+          selectedCardIds: [t.task_id],
+          sourceRefs: t.sourceRefs || [],
+          rerankScore: 0,
+          tool: 'materialize_recommendation_task',
+          outcome: 'task_created',
+          feedback: 'accepted',
+        };
+        try {
+          execSync(`node "${hookScript}"`, { input: JSON.stringify(payload), encoding: 'utf-8' });
+        } catch (e) {
+          console.warn('hook forward failed for', t.task_id, e.message);
+        }
+      }
+      console.log(
+        `  forwarded ${Math.min(toSend.length, MAX_HOOKS)} tasks to gemma4 retrieval hook (legacy)`
+      );
+    } catch (e) {
+      console.warn('Failed to forward tasks to gemma4 hook:', e.message);
+    }
   } else {
     console.log(`\n  dry-run: would write ${normalizedTasks.length} tasks`);
     for (const t of normalizedTasks.slice(0, 5)) {

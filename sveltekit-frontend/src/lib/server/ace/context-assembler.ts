@@ -52,7 +52,8 @@ import {
   traceVectorSearch,
   traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
-import { mkdirSync, appendFileSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
+import { promises as fsPromises } from 'node:fs';
 
 const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 65536);
 const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
@@ -77,6 +78,11 @@ import {
 import { selectAcePayloads } from '$lib/server/ace/ace-payload-selector.js';
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { embedText, embedTexts } from '$lib/server/embedding/embed.js';
+import {
+  loadCardPromotionStates,
+  applyPromotionBoost,
+  getBoostStats,
+} from '$lib/server/ace/card-promotion-loader.js';
 import { runRgAsync } from '../../../../scripts/rg-atlas/run-rg.mjs';
 import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js';
 import {
@@ -99,6 +105,7 @@ import {
 import { recordContextCacheAccess } from '$lib/server/cache/ace-context-cache-metrics.js';
 import { recallPastChats } from './chat-memory.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
+import { loadCardPromotionStates, applyPromotionBoost } from './card-promotion-loader.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
 import type { ACPKnowledgeSearchResult } from '$lib/server/services/knowledge-search/ACPToolRegistry.js';
 import {
@@ -581,7 +588,9 @@ export async function runCHR97Search(
     const _cr = getRedis();
     const persisted = await _cr.get(cartridgeCacheKey);
     if (persisted) return JSON.parse(persisted) as CHR97SearchResult;
-  } catch {}
+  } catch (err) {
+    console.debug('[ace-routing] suppressed error', err);
+  }
 
   let karpathyRev = 'v1';
   try {
@@ -593,7 +602,9 @@ export async function runCHR97Search(
       const len = await r.hlen('gpu:karpathy:scores').catch(() => 0);
       karpathyRev = `len_${len}`;
     }
-  } catch {}
+  } catch (err) {
+    console.debug('[ace-routing] suppressed error', err);
+  }
 
   const cached = await getTopoCandidates(queryClass, query, karpathyRev);
   if (cached && cached.length > 0) {
@@ -788,7 +799,9 @@ export async function runCHR97Search(
   try {
     const _cr = getRedis();
     await _cr.setex(cartridgeCacheKey, 300, JSON.stringify(result));
-  } catch {}
+  } catch (err) {
+    console.debug('[ace-routing] suppressed error', err);
+  }
 
   return result;
 }
@@ -1239,6 +1252,63 @@ export async function assembleACEContext(opts: {
     async () => {
       const policyStartedAt = Date.now();
       const { query, userId, caseId, conversationId } = opts;
+      // === ACE routing trace safety (per-request helpers & state) ===
+      const TRACE_ENABLED = String(process.env.ACE_ROUTING_TRACE_ENABLED ?? 'false') === 'true';
+      const TRACE_SAMPLE_RATE = Number(process.env.ACE_ROUTING_TRACE_SAMPLE_RATE ?? '0.01');
+      const TRACE_MAX_PER_REQUEST = Number(process.env.ACE_ROUTING_TRACE_MAX_PER_REQUEST ?? '8');
+      const traceDate = new Date().toISOString().slice(0, 10);
+      const traceFilePath = `.tmp/ace-routing-matrix-trace-${traceDate}.jsonl`;
+      let traceCount = 0;
+
+      if (TRACE_ENABLED) {
+        try {
+          mkdirSync('.tmp', { recursive: true });
+        } catch (e) {
+          console.debug('[ace-routing] mkdir .tmp failed', e);
+        }
+      }
+
+      function compactBreakdown(b: any) {
+        if (!b || typeof b !== 'object') return b;
+        const out: Record<string, any> = {};
+        for (const [k, v] of Object.entries(b)) {
+          out[k] = typeof v === 'number' ? Number(v.toFixed(3)) : v;
+        }
+        return out;
+      }
+
+      function compactTraceEntry(orig: any, rank?: number) {
+        return {
+          sourceRef: orig.candidateSourceRef ?? null,
+          matrixVersion: orig.matrixVersion,
+          score:
+            typeof orig.routingScore === 'number'
+              ? Number(orig.routingScore.toFixed(3))
+              : orig.routingScore,
+          rank: typeof rank === 'number' ? rank : (orig.payloadIndex ?? null),
+          schemaMask: orig.schemaMask ?? null,
+          breakdown: compactBreakdown(orig.scoreBreakdown ?? orig.breakdown),
+          queryHash: typeof query === 'string' ? queryHash(String(query)) : null,
+          timestamp: orig.timestamp ?? new Date().toISOString(),
+        };
+      }
+
+      function writeTraceAsync(payload: any) {
+        if (!TRACE_ENABLED) return Promise.resolve();
+        try {
+          if (Math.random() > TRACE_SAMPLE_RATE) return Promise.resolve();
+          if (traceCount >= TRACE_MAX_PER_REQUEST) return Promise.resolve();
+          traceCount++;
+          return fsPromises
+            .appendFile(traceFilePath, JSON.stringify(payload) + '\n', 'utf8')
+            .catch((err) => {
+              console.debug('[ace-routing] trace write failed', err);
+            });
+        } catch (err) {
+          console.debug('[ace-routing] trace failed', err);
+          return Promise.resolve();
+        }
+      }
       const acePlannerState = buildAceContextPlannerState({
         query,
         userId,
@@ -1513,7 +1583,49 @@ export async function assembleACEContext(opts: {
         ? dbSchemaRows.map((entry) => entry.content).join('\n\n')
         : '';
 
-      const { ragChunks, kbChunks, caseChunks } = ragResult;
+      let { ragChunks } = ragResult;
+      const { kbChunks, caseChunks } = ragResult;
+
+      // ── Phase 19B: Apply Card Promotion Boosts ──────────────────────────────
+      // Load promotion states from outcome ledger and boost scores for hot cards.
+      // Promotion states flow from historical retrieval success (loaded from memory/rewards/sourceRef-performance.json).
+      // This closes the RL loop: past decisions → promotion boost → better future ranking.
+      if (ragChunks && ragChunks.length > 0) {
+        const promotionStates = loadCardPromotionStates();
+
+        if (promotionStates.size > 0) {
+          ragChunks = ragChunks.map((chunk) => {
+            const sourceRef = chunk.filePath || chunk.url;
+            if (sourceRef) {
+              const boostedScore = applyPromotionBoost(chunk.score ?? 0, sourceRef);
+              return {
+                ...chunk,
+                score: boostedScore,
+                promotionState: promotionStates.get(sourceRef)?.state,
+                promotionBoost: promotionStates.get(sourceRef)?.boost,
+                baseScore: chunk.score, // Store original score for audit
+              };
+            }
+            return chunk;
+          });
+
+          // Capture boost stats for Langfuse trace
+          const boostStats = getBoostStats(
+            ragChunks.map((c) => c.filePath || c.url || '').filter(Boolean)
+          );
+          if (opts.traceId) {
+            tracePolicy({
+              traceId: opts.traceId,
+              stage: 'phase19b_promotion_boost',
+              metadata: {
+                appliedBoosts: boostStats.appliedBoosts,
+                avgBoost: boostStats.avgBoost,
+                maxBoost: boostStats.maxBoost,
+              },
+            });
+          }
+        }
+      }
 
       // Fetch evidence metadata, connections, semantic chat recall, and Phase A
       // deep-import-graph expansion in parallel.
@@ -2395,6 +2507,9 @@ export async function assembleACEContext(opts: {
       try {
         const matrix = buildAtlasRoutingMatrix(String(query ?? ''));
         const matrixSummary = formatRoutingSummary(matrix);
+        // Trace helpers and state are defined at function root above.
+
+        // use writeTraceAsync/compactTraceEntry defined above (function-scope helpers)
         // Score, annotate, and emit traces for each payload (no behavior change)
         finalContext.acePayloads = (finalContext.acePayloads || []).map((p: any, idx: number) => {
           const schemaMask: SchemaMask = {
@@ -2426,21 +2541,24 @@ export async function assembleACEContext(opts: {
             const policyPayload = { event: 'ace_routing', data: traceEntry } as any;
             try {
               (tracePolicy as any)?.(policyPayload);
-            } catch {}
+            } catch (err) {
+              console.debug('[ace-routing] tracePolicy emit failed', err);
+            }
             try {
               (traceVectorSearch as any)?.(policyPayload);
-            } catch {}
-          } catch {}
+            } catch (err) {
+              console.debug('[ace-routing] traceVectorSearch emit failed', err);
+            }
+          } catch (err) {
+            console.debug('[ace-routing] observability emit failed', err);
+          }
 
-          // Append to local dry-run trace file (no DB/Redis writes)
+          // Fire-and-forget: write compacted trace (async, sampled, capped)
           try {
-            mkdirSync('.tmp', { recursive: true });
-            appendFileSync(
-              '.tmp/ace-routing-matrix-trace.jsonl',
-              JSON.stringify(traceEntry) + '\n',
-              { encoding: 'utf8' }
-            );
-          } catch {}
+            writeTraceAsync(compactTraceEntry(traceEntry, idx));
+          } catch (err) {
+            console.debug('[ace-routing] trace write failed', err);
+          }
 
           return p;
         });
@@ -2457,18 +2575,24 @@ export async function assembleACEContext(opts: {
             score: p._aceRouting?.score ?? 0,
             candidateSourceRef: p.sourceRef ?? p.filePath ?? null,
           }));
-          const summary = {
-            matrixVersion: MATRIX_VERSION,
-            query: String(query ?? ''),
-            ranked,
-            timestamp: new Date().toISOString(),
-          };
-          appendFileSync(
-            '.tmp/ace-routing-matrix-trace.jsonl',
-            JSON.stringify({ summary }) + '\n',
-            { encoding: 'utf8' }
-          );
-        } catch {}
+          try {
+            const compactSummary = {
+              matrixVersion: MATRIX_VERSION,
+              queryHash: queryHash(String(query ?? '')),
+              ranked: ranked.map((r) => ({
+                index: r.index,
+                score: Number(r.score?.toFixed?.(3) ?? r.score),
+                candidateSourceRef: r.candidateSourceRef,
+              })),
+              timestamp: new Date().toISOString(),
+            };
+            writeTraceAsync({ summary: compactSummary });
+          } catch (err) {
+            console.debug('[ace-routing] summary write failed', err);
+          }
+        } catch (err) {
+          console.debug('[ace-routing] summary assembly failed', err);
+        }
       } catch (err) {
         // non-fatal: leave acePayloads as-is
         console.warn('[ACE routing] matrix scoring failed:', (err as Error)?.message ?? err);
@@ -3261,7 +3385,9 @@ async function setCachedACEBundle(
   try {
     const { redis } = await import('$lib/server/redis.js');
     await redis.set(key, JSON.stringify(prompt), 'EX', ttlSeconds);
-  } catch {}
+  } catch (err) {
+    console.debug('[ace-routing] suppressed error', err);
+  }
 }
 
 function buildACEContextWeightsBlock(
@@ -4074,7 +4200,9 @@ async function setCachedBundle(key: string, chunks: RAGChunk[], ttlSeconds: numb
   try {
     const { redis } = await import('$lib/server/redis.js');
     await redis.set(key, JSON.stringify(chunks), 'EX', ttlSeconds);
-  } catch {}
+  } catch (err) {
+    console.debug('[ace-routing] suppressed error', err);
+  }
 }
 
 /**
@@ -5220,7 +5348,7 @@ export async function fetchCodebaseContext(
     // Reads ace:cluster:graphrag:neighbors:* (written by graphify:graphrag-recommend)
     // and adds the top-2 structural neighbors of the winning BoW cluster as extra
     // `should` boost entries. Non-breaking: silently skips when key absent.
-    let graphragNeighborShould: Array<{ key: string; match: { value: number } }> = [];
+    const graphragNeighborShould: Array<{ key: string; match: { value: number } }> = [];
     if (_topBowClusterId != null && process.env.ACE_CLUSTER_FILTER_ENABLED !== 'false') {
       try {
         const { getRedis } = await import('$lib/server/redis.js');
@@ -5260,7 +5388,7 @@ export async function fetchCodebaseContext(
 
     // Fetch broader initial set so the reranker has candidates to work with
     const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
-    let results = await searchCodebase(query, {
+    const results = await searchCodebase(query, {
       limit: 20,
       contentWeight: 0.6,
       signatureWeight: 0.4,
@@ -5747,7 +5875,9 @@ async function applyKarpathyBoost(
       }
     }
     edgeResults = await pipeline.exec().catch(() => null);
-  } catch {}
+  } catch (err) {
+    console.debug('[ace-routing] suppressed error', err);
+  }
 
   // Normalise the LLMS.md resolved dir for fast prefix-match checks.
   // Empty string means "repo root fallback" — no useful prefix to match.
@@ -5964,7 +6094,9 @@ async function applyKarpathyBoost(
             );
             relationScore = Math.min(sumConfidence, 5.0);
           }
-        } catch {}
+        } catch (err) {
+          console.debug('[ace-routing] parse edges failed', err);
+        }
       }
     }
     const relationBoost = relationScore * 0.05;
@@ -6189,7 +6321,9 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
             clusterSummariesList.push(
               `### Cluster: ${parsed.clusterId} (${parsed.nodeCount} nodes)\nSummary: ${parsed.summary}\nNodes: ${parsed.representativeNodes.join(', ')}`
             );
-          } catch {}
+          } catch (err) {
+            console.debug('[ace-routing] parse cluster summary failed', err);
+          }
         }
       }
       if (clusterSummariesList.length > 0) {
@@ -6210,7 +6344,9 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
             relationCardsList.push(
               `- **${parsed.nodeId}** connections: ${parsed.connections.join(', ')}\n  *Summary*: ${parsed.summary}`
             );
-          } catch {}
+          } catch (err) {
+            console.debug('[ace-routing] parse neighbor summary failed', err);
+          }
         }
 
         const rawEdges = await redis.get(`graph:edges:${fileNode}`).catch(() => null);
@@ -6229,7 +6365,9 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
                 }
               }
             }
-          } catch {}
+          } catch (err) {
+            console.debug('[ace-routing] parse graph edges failed', err);
+          }
         }
       }
 
@@ -6269,7 +6407,9 @@ async function fetchGraphRelationSummaries(query: string, codebaseContext: any[]
           .join('\n');
       }
     }
-  } catch {}
+  } catch (err) {
+    console.debug('[ace-routing] suppressed error', err);
+  }
 
   return result;
 }
