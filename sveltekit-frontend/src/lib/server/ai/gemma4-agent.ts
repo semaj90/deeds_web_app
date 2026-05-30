@@ -35,6 +35,7 @@ import { queryTopology } from '$lib/server/retrieval/topology-search-client.js';
 import { db, pool } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
+import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant, gatePreferredBackend } from '$lib/server/ai/backend-runtime-guards.js';
@@ -53,7 +54,7 @@ import {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const MAX_ROUNDS = 5;    // max tool-call rounds before forcing a final answer
+const MAX_ROUNDS = 5; // max tool-call rounds before forcing a final answer
 const TIMEOUT_MS = 180_000;
 
 // ── Model broker boundary ─────────────────────────────────────────────────────
@@ -65,8 +66,8 @@ const TIMEOUT_MS = 180_000;
 // To activate FunctionGemma once pulled:
 //   Set FUNCTION_GEMMA_MODEL=functiongemma:latest in .env
 //   The TOOL_MODEL slot will route structured calls through it automatically.
-const PLANNER_MODEL = VLM_MODELS.legal;  // full reasoning + synthesis
-const TOOL_MODEL    = VLM_MODELS.tool;   // structured-call translation (FunctionGemma when available)
+const PLANNER_MODEL = VLM_MODELS.legal; // full reasoning + synthesis
+const TOOL_MODEL = VLM_MODELS.tool; // structured-call translation (FunctionGemma when available)
 
 // ── Ollama wire types ──────────────────────────────────────────────────────────
 
@@ -171,11 +172,16 @@ const AGENT_TOOLS = [
     type: 'function',
     function: {
       name: 'read_file',
-      description: 'Read the contents of a source file to understand the current code or structure.',
+      description:
+        'Read the contents of a source file to understand the current code or structure.',
       parameters: {
         type: 'object',
         properties: {
-          filePath: { type: 'string', description: 'Path to the file relative to workspace root (e.g., src/routes/+page.svelte)' },
+          filePath: {
+            type: 'string',
+            description:
+              'Path to the file relative to workspace root (e.g., src/routes/+page.svelte)',
+          },
         },
         required: ['filePath'],
       },
@@ -248,12 +254,19 @@ const AGENT_TOOLS = [
     type: 'function',
     function: {
       name: 'verify_fix',
-      description: 'Run svelte-check or tsc on a specific file to verify it is free of syntax/type errors. Use this AFTER applying a shadow patch.',
+      description:
+        'Run svelte-check or tsc on a specific file to verify it is free of syntax/type errors. Use this AFTER applying a shadow patch.',
       parameters: {
         type: 'object',
         properties: {
-          filePath: { type: 'string', description: 'Path to the file to verify (e.g., src/routes/+page.svelte)' },
-          checkFull: { type: 'boolean', description: 'Whether to check the entire project for regressions (default: false)' },
+          filePath: {
+            type: 'string',
+            description: 'Path to the file to verify (e.g., src/routes/+page.svelte)',
+          },
+          checkFull: {
+            type: 'boolean',
+            description: 'Whether to check the entire project for regressions (default: false)',
+          },
         },
         required: ['filePath'],
       },
@@ -263,7 +276,8 @@ const AGENT_TOOLS = [
     type: 'function',
     function: {
       name: 'apply_shadow_patch',
-      description: 'Apply a temporary patch to a file for verification. This creates a .bak file automatically.',
+      description:
+        'Apply a temporary patch to a file for verification. This creates a .bak file automatically.',
       parameters: {
         type: 'object',
         properties: {
@@ -278,7 +292,8 @@ const AGENT_TOOLS = [
     type: 'function',
     function: {
       name: 'revert_fix',
-      description: 'Revert a shadow patch by restoring the .bak file. Use this to cleanup after verification.',
+      description:
+        'Revert a shadow patch by restoring the .bak file. Use this to cleanup after verification.',
       parameters: {
         type: 'object',
         properties: {
@@ -299,11 +314,23 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          query:       { type: 'string',  description: 'Keywords to search for (file path, tags, or summary words)' },
-          topK:        { type: 'number',  description: 'Max files to return (default 8, max 20)' },
-          onlyRoutes:  { type: 'boolean', description: 'Restrict to SvelteKit route files (+server.ts, +page.server.ts)' },
-          onlyNoAuth:  { type: 'boolean', description: 'Return only routes missing auth guard (locals.user check)' },
-          hasTodos:    { type: 'boolean', description: 'Return only files with at least one TODO/FIXME' },
+          query: {
+            type: 'string',
+            description: 'Keywords to search for (file path, tags, or summary words)',
+          },
+          topK: { type: 'number', description: 'Max files to return (default 8, max 20)' },
+          onlyRoutes: {
+            type: 'boolean',
+            description: 'Restrict to SvelteKit route files (+server.ts, +page.server.ts)',
+          },
+          onlyNoAuth: {
+            type: 'boolean',
+            description: 'Return only routes missing auth guard (locals.user check)',
+          },
+          hasTodos: {
+            type: 'boolean',
+            description: 'Return only files with at least one TODO/FIXME',
+          },
         },
         required: ['query'],
       },
@@ -320,7 +347,11 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          query: { type: 'string', description: 'Directory name, tag, or topic to look up (e.g. "server/cache", "auth", "embedding")' },
+          query: {
+            type: 'string',
+            description:
+              'Directory name, tag, or topic to look up (e.g. "server/cache", "auth", "embedding")',
+          },
           limit: { type: 'number', description: 'Max notes to return (default 5, max 15)' },
         },
         required: ['query'],
@@ -338,7 +369,10 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          limit: { type: 'number', description: 'How many hotspot directories to return (default 10, max 30)' },
+          limit: {
+            type: 'number',
+            description: 'How many hotspot directories to return (default 10, max 30)',
+          },
         },
         required: [],
       },
@@ -359,7 +393,8 @@ const AGENT_TOOLS = [
           intent: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Optional intent lenses: purpose, risk, api_surface, dependencies, retrieval_role',
+            description:
+              'Optional intent lenses: purpose, risk, api_surface, dependencies, retrieval_role',
           },
         },
         required: ['query'],
@@ -377,7 +412,7 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          query:      { type: 'string', description: 'Web search query' },
+          query: { type: 'string', description: 'Web search query' },
           maxResults: { type: 'number', description: 'Max results to return (default 3, max 5)' },
         },
         required: ['query'],
@@ -396,9 +431,13 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          stableKey: { type: 'string', description: 'Node stable key (e.g. "file:src/lib/server/ace/context-assembler.ts" or "dir:src/routes/api")' },
-          depth:     { type: 'number', description: 'Hop depth 1-3 (default 2)' },
-          limit:     { type: 'number', description: 'Max neighbors (default 30, max 80)' },
+          stableKey: {
+            type: 'string',
+            description:
+              'Node stable key (e.g. "file:src/lib/server/ace/context-assembler.ts" or "dir:src/routes/api")',
+          },
+          depth: { type: 'number', description: 'Hop depth 1-3 (default 2)' },
+          limit: { type: 'number', description: 'Max neighbors (default 30, max 80)' },
         },
         required: ['stableKey'],
       },
@@ -415,7 +454,7 @@ const AGENT_TOOLS = [
         type: 'object',
         properties: {
           fromKey: { type: 'string', description: 'Source node stableKey' },
-          toKey:   { type: 'string', description: 'Target node stableKey' },
+          toKey: { type: 'string', description: 'Target node stableKey' },
           maxHops: { type: 'number', description: 'Max path length (default 5, max 8)' },
         },
         required: ['fromKey', 'toKey'],
@@ -449,8 +488,14 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          limit:    { type: 'number', description: 'How many top nodes to return (default 15, max 50)' },
-          nodeType: { type: 'string', description: 'Optional Neo4j label filter (e.g. "CodebaseFile")' },
+          limit: {
+            type: 'number',
+            description: 'How many top nodes to return (default 15, max 50)',
+          },
+          nodeType: {
+            type: 'string',
+            description: 'Optional Neo4j label filter (e.g. "CodebaseFile")',
+          },
         },
         required: [],
       },
@@ -469,9 +514,16 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          query:     { type: 'string',  description: 'Symbol name, function, or keywords to search for' },
-          topoClass: { type: 'string',  description: 'Optional: filter to a topology class (e.g. "gpu-cuda", "search-retrieval")' },
-          limit:     { type: 'number',  description: 'Max results (default 10, max 30)' },
+          query: {
+            type: 'string',
+            description: 'Symbol name, function, or keywords to search for',
+          },
+          topoClass: {
+            type: 'string',
+            description:
+              'Optional: filter to a topology class (e.g. "gpu-cuda", "search-retrieval")',
+          },
+          limit: { type: 'number', description: 'Max results (default 10, max 30)' },
         },
         required: ['query'],
       },
@@ -488,9 +540,9 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          query:     { type: 'string', description: 'Natural language or mixed symbol+concept query' },
+          query: { type: 'string', description: 'Natural language or mixed symbol+concept query' },
           topoClass: { type: 'string', description: 'Optional topology class filter' },
-          limit:     { type: 'number', description: 'Max results (default 10, max 30)' },
+          limit: { type: 'number', description: 'Max results (default 10, max 30)' },
         },
         required: ['query'],
       },
@@ -507,13 +559,22 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          som_x:      { type: 'number', description: 'SOM X coordinate (BMU column, 0-based)' },
-          som_y:      { type: 'number', description: 'SOM Y coordinate (BMU row, 0-based)' },
-          semantic_z: { type: 'number', description: 'Semantic centroid projection 0–1 (default 0.5)' },
-          grpo_w:     { type: 'number', description: 'GRPO quality weight 0–1 (default 0.5)' },
-          radius:     { type: 'number', description: 'Euclidean radius in 4D manifold space (default 0.5)' },
-          limit:      { type: 'number', description: 'Max results (default 20, max 50)' },
-          filters:    { type: 'object', description: 'Optional JSONB payload filters (e.g. { "topo_class": "server" })' },
+          som_x: { type: 'number', description: 'SOM X coordinate (BMU column, 0-based)' },
+          som_y: { type: 'number', description: 'SOM Y coordinate (BMU row, 0-based)' },
+          semantic_z: {
+            type: 'number',
+            description: 'Semantic centroid projection 0–1 (default 0.5)',
+          },
+          grpo_w: { type: 'number', description: 'GRPO quality weight 0–1 (default 0.5)' },
+          radius: {
+            type: 'number',
+            description: 'Euclidean radius in 4D manifold space (default 0.5)',
+          },
+          limit: { type: 'number', description: 'Max results (default 20, max 50)' },
+          filters: {
+            type: 'object',
+            description: 'Optional JSONB payload filters (e.g. { "topo_class": "server" })',
+          },
         },
         required: ['som_x', 'som_y'],
       },
@@ -530,9 +591,12 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          query:   { type: 'string', description: 'Search query' },
-          type:    { type: 'string', description: '"codebase", "legal", or "hybrid" (default: codebase)' },
-          limit:   { type: 'number', description: 'Max results (default 20, max 50)' },
+          query: { type: 'string', description: 'Search query' },
+          type: {
+            type: 'string',
+            description: '"codebase", "legal", or "hybrid" (default: codebase)',
+          },
+          limit: { type: 'number', description: 'Max results (default 20, max 50)' },
           filters: { type: 'object', description: 'Optional JSONB metadata filters' },
         },
         required: ['query'],
@@ -567,7 +631,10 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          id: { type: 'string', description: 'Stable card ID (e.g., card:src/lib/server/ai/gemma4-agent.ts:7a2b3)' },
+          id: {
+            type: 'string',
+            description: 'Stable card ID (e.g., card:src/lib/server/ai/gemma4-agent.ts:7a2b3)',
+          },
         },
         required: ['id'],
       },
@@ -583,7 +650,7 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          id:    { type: 'string', description: 'Card or file ID to expand from' },
+          id: { type: 'string', description: 'Card or file ID to expand from' },
           limit: { type: 'number', description: 'Max neighbors (default 20)' },
         },
         required: ['id'],
@@ -600,7 +667,7 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          id:    { type: 'string', description: 'Card ID or query string to explain' },
+          id: { type: 'string', description: 'Card ID or query string to explain' },
           limit: { type: 'number', description: 'Max grounding signals (default 5)' },
         },
         required: ['id'],
@@ -611,32 +678,32 @@ const AGENT_TOOLS = [
 
 // ── GEMMA4_ALLOWED_TOOLS — exported allowlist for MCP graph/search tools ──────
 export const GEMMA4_ALLOWED_TOOLS = {
-  'trace.kag_search':               { write: false },
-  'trace.explain_retrieval':        { write: false },
-  'topology.search_near':           { write: false },
-  'context.build_kv_packet':        { write: false },
-  'context.get_compressed_card':    { write: false },
-  'context.explain_compression':    { write: false },
-  'context.refresh_task_toc':       { write: false },
-  'topology.same_som_cluster':   { write: false },
-  'graph.expand_neighborhood':   { write: false },
-  'graph.shortest_path':         { write: false },
-  'graph.community_for_node':    { write: false },
-  'graph.pagerank_top':          { write: false },
-  'clusters.get_members':        { write: false },
+  'trace.kag_search': { write: false },
+  'trace.explain_retrieval': { write: false },
+  'topology.search_near': { write: false },
+  'context.build_kv_packet': { write: false },
+  'context.get_compressed_card': { write: false },
+  'context.explain_compression': { write: false },
+  'context.refresh_task_toc': { write: false },
+  'topology.same_som_cluster': { write: false },
+  'graph.expand_neighborhood': { write: false },
+  'graph.shortest_path': { write: false },
+  'graph.community_for_node': { write: false },
+  'graph.pagerank_top': { write: false },
+  'clusters.get_members': { write: false },
   'clusters.get_summary_lenses': { write: false },
-  'trace.validate_ace_hit':      { write: false },
-  'web.search':                  { write: false },
-  'search.dev_context':          { write: false },
-  'kag.record_agent_run':        { write: true,  requiresGainValidation: false },
-  'kag.ingest_memory_directory': { write: true,  requiresGainValidation: false },
-  'research.encode':             { write: true, requiresGainValidation: true },
-  'topology.search_4d':         { write: false },
-  'search.go_hybrid':           { write: false },
-  'kb.search_cards':                 { write: false },
-  'kb.get_card':                     { write: false },
-  'kb.expand_neighbors':             { write: false },
-  'kb.explain_retrieval':            { write: false },
+  'trace.validate_ace_hit': { write: false },
+  'web.search': { write: false },
+  'search.dev_context': { write: false },
+  'kag.record_agent_run': { write: true, requiresGainValidation: false },
+  'kag.ingest_memory_directory': { write: true, requiresGainValidation: false },
+  'research.encode': { write: true, requiresGainValidation: true },
+  'topology.search_4d': { write: false },
+  'search.go_hybrid': { write: false },
+  'kb.search_cards': { write: false },
+  'kb.get_card': { write: false },
+  'kb.expand_neighbors': { write: false },
+  'kb.explain_retrieval': { write: false },
 } as const;
 
 export function truncateToolResult(result: unknown, maxChars = 12_000): unknown {
@@ -651,10 +718,13 @@ export function truncateToolResult(result: unknown, maxChars = 12_000): unknown 
  * Groups by clusterKey (or topoClass fallback), max 3 packets.
  */
 function buildGoClusterPackets(
-  hits: Array<{ clusterKey?: string; topoClass?: string; path?: string; score?: number }>,
+  hits: Array<{ clusterKey?: string; topoClass?: string; path?: string; score?: number }>
 ): AgentRunResult['goToolClusterContext'] {
   if (!hits.length) return undefined;
-  const byKey = new Map<string, { count: number; topoClass: string; files: Set<string>; scores: number[] }>();
+  const byKey = new Map<
+    string,
+    { count: number; topoClass: string; files: Set<string>; scores: number[] }
+  >();
   for (const h of hits) {
     const key = h.clusterKey ?? `topo:${h.topoClass ?? 'unknown'}`;
     let entry = byKey.get(key);
@@ -671,8 +741,8 @@ function buildGoClusterPackets(
     .slice(0, 3)
     .map(([clusterKey, { count, topoClass, files, scores }]) => {
       const clusterId = parseInt(clusterKey.replace(/\D/g, ''), 10) || 0;
-      const topFiles  = [...files].slice(0, 5).map(f => f.split('/').pop() ?? f);
-      const avgScore  = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
+      const topFiles = [...files].slice(0, 5).map((f) => f.split('/').pop() ?? f);
+      const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
       const scoreHint = avgScore != null ? `, avg score ${avgScore.toFixed(3)}` : '';
       return {
         clusterId,
@@ -693,44 +763,80 @@ function buildGoClusterPackets(
 // gated — dangerous / indexing ops; require ALLOW_GATED_TOOLS flag or separate endpoint
 const ALLOWED_TOOLS = {
   read: new Set([
-    'rag_search', 'case_search', 'memory_recall', 'hyperedge_stats',
-    'topology_search', 'trace_search', 'LLMS.md', 'read_file',
-    'graph_search', 'wiki_note_lookup', 'audit_hotspots', 'web_search',
+    'rag_search',
+    'case_search',
+    'memory_recall',
+    'hyperedge_stats',
+    'topology_search',
+    'trace_search',
+    'LLMS.md',
+    'read_file',
+    'graph_search',
+    'wiki_note_lookup',
+    'audit_hotspots',
+    'web_search',
     // TRACE MCP graph tools (proxy to :8788)
-    'graph_expand', 'graph_path', 'graph_community', 'graph_pagerank',
-    'graph.expand_neighborhood', 'graph.shortest_path',
-    'graph.community_for_node', 'graph.pagerank_top',
-    'search_postgres_fts', 'search_hybrid',
-    'search.postgres_fts', 'search.hybrid',
+    'graph_expand',
+    'graph_path',
+    'graph_community',
+    'graph_pagerank',
+    'graph.expand_neighborhood',
+    'graph.shortest_path',
+    'graph.community_for_node',
+    'graph.pagerank_top',
+    'search_postgres_fts',
+    'search_hybrid',
+    'search.postgres_fts',
+    'search.hybrid',
     // TRACE MCP topology + cluster + KAG tools
-    'trace.kag_search', 'trace.explain_retrieval',
-    'topology.search_near', 'topology.same_som_cluster',
-    'clusters.get_members', 'clusters.get_summary_lenses',
+    'trace.kag_search',
+    'trace.explain_retrieval',
+    'topology.search_near',
+    'topology.same_som_cluster',
+    'clusters.get_members',
+    'clusters.get_summary_lenses',
     'web.search',
-    'context.build_kv_packet', 'context.get_compressed_card',
-    'context.explain_compression', 'context.refresh_task_toc',
+    'context.build_kv_packet',
+    'context.get_compressed_card',
+    'context.explain_compression',
+    'context.refresh_task_toc',
     // MCP dev-context tool (Step 5B)
     'search.dev_context',
     // B1 new tools: graph expansion, cluster lenses, ACE hit validator
     'trace.validate_ace_hit',
     // topology.search_4d + search.go_hybrid (4D manifold + RRF Go service)
-    'topology_search_4d', 'topology.search_4d',
-    'search_go_hybrid', 'search.go_hybrid',
+    'topology_search_4d',
+    'topology.search_4d',
+    'search_go_hybrid',
+    'search.go_hybrid',
     // LLAMA __ names (TurboQuant native function-call format)
-    'search__dev_context', 'graph__expand_neighborhood', 'graph__shortest_path',
-    'graph__community_for_node', 'graph__pagerank_top', 'topology__search_near',
-    'topology__same_som_cluster', 'clusters__get_members', 'clusters__get_summary_lenses',
-    'trace__kag_search', 'trace__explain_retrieval', 'context__get_compressed_card',
-    'context__build_kv_packet', 'trace__validate_ace_hit',
-    'topology__search_4d', 'search__go_hybrid',
+    'search__dev_context',
+    'graph__expand_neighborhood',
+    'graph__shortest_path',
+    'graph__community_for_node',
+    'graph__pagerank_top',
+    'topology__search_near',
+    'topology__same_som_cluster',
+    'clusters__get_members',
+    'clusters__get_summary_lenses',
+    'trace__kag_search',
+    'trace__explain_retrieval',
+    'context__get_compressed_card',
+    'context__build_kv_packet',
+    'trace__validate_ace_hit',
+    'topology__search_4d',
+    'search__go_hybrid',
     // KB Identity Spine tools
-    'kb.search_cards', 'kb.get_card', 'kb.expand_neighbors', 'kb.explain_retrieval',
-    'kb__search_cards', 'kb__get_card', 'kb__expand_neighbors', 'kb__explain_retrieval',
+    'kb.search_cards',
+    'kb.get_card',
+    'kb.expand_neighbors',
+    'kb.explain_retrieval',
+    'kb__search_cards',
+    'kb__get_card',
+    'kb__expand_neighbors',
+    'kb__explain_retrieval',
   ]),
-  write: new Set([
-    'apply_shadow_patch', 'revert_fix', 'verify_fix',
-    'research.encode',
-  ]),
+  write: new Set(['apply_shadow_patch', 'revert_fix', 'verify_fix', 'research.encode']),
   gated: new Set<string>([
     // reserved for future indexing / DB-mutation tools
   ]),
@@ -741,7 +847,7 @@ function fnv1a32(s: string): string {
   let h = 0x811c9dc5;
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);
-    h = (Math.imul(h, 0x01000193) >>> 0);
+    h = Math.imul(h, 0x01000193) >>> 0;
   }
   return h.toString(16);
 }
@@ -759,15 +865,33 @@ function fnv1a32(s: string): string {
 /** Extract all top-level JSON objects from text using balanced-brace scanning. */
 function extractJsonObjects(text: string): string[] {
   const objects: string[] = [];
-  let depth = 0, start = -1, inString = false, escaped = false;
+  let depth = 0,
+    start = -1,
+    inString = false,
+    escaped = false;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
-    if (escaped)          { escaped = false; continue; }
-    if (ch === '\\')      { escaped = true;  continue; }
-    if (ch === '"')       { inString = !inString; continue; }
-    if (inString)          continue;
-    if (ch === '{')       { if (depth++ === 0) start = i; }
-    else if (ch === '}')  { if (--depth === 0 && start >= 0) { objects.push(text.slice(start, i + 1)); start = -1; } }
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\') {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (ch === '{') {
+      if (depth++ === 0) start = i;
+    } else if (ch === '}') {
+      if (--depth === 0 && start >= 0) {
+        objects.push(text.slice(start, i + 1));
+        start = -1;
+      }
+    }
   }
   return objects;
 }
@@ -777,9 +901,11 @@ function tryParseToolObject(obj: Record<string, unknown>): OllamaToolCall | null
   if (typeof obj['tool'] === 'string') {
     const name = (obj['tool'] as string).replace(/\./g, '_');
     const args = (
-      typeof obj['args'] === 'object' && obj['args'] !== null ? obj['args']
-      : typeof obj['arguments'] === 'object' && obj['arguments'] !== null ? obj['arguments']
-      : {}
+      typeof obj['args'] === 'object' && obj['args'] !== null
+        ? obj['args']
+        : typeof obj['arguments'] === 'object' && obj['arguments'] !== null
+          ? obj['arguments']
+          : {}
     ) as Record<string, unknown>;
     return { function: { name, arguments: args } };
   }
@@ -787,9 +913,17 @@ function tryParseToolObject(obj: Record<string, unknown>): OllamaToolCall | null
   if (typeof obj['name'] === 'string') {
     const name = (obj['name'] as string).replace(/\./g, '_');
     const rawArgs = obj['arguments'] ?? obj['args'] ?? obj['parameters'] ?? {};
-    const args = (typeof rawArgs === 'string'
-      ? (() => { try { return JSON.parse(rawArgs); } catch { return {}; } })()
-      : rawArgs) as Record<string, unknown>;
+    const args = (
+      typeof rawArgs === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(rawArgs);
+            } catch {
+              return {};
+            }
+          })()
+        : rawArgs
+    ) as Record<string, unknown>;
     return { function: { name, arguments: args } };
   }
   return null;
@@ -799,7 +933,8 @@ export function parseToolRequest(content: string): OllamaToolCall[] {
   if (!content?.trim()) return [];
 
   // Fast path: strip ```json fences and try direct parse
-  const stripped = content.trim()
+  const stripped = content
+    .trim()
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/\s*```$/, '')
     .trim();
@@ -809,7 +944,9 @@ export function parseToolRequest(content: string): OllamaToolCall[] {
       const obj = JSON.parse(stripped) as Record<string, unknown>;
       const tc = tryParseToolObject(obj);
       if (tc) return [tc];
-    } catch { /* fall through to balanced scan */ }
+    } catch {
+      /* fall through to balanced scan */
+    }
   }
 
   // General path: extract all JSON objects from prose (handles nested braces)
@@ -818,7 +955,9 @@ export function parseToolRequest(content: string): OllamaToolCall[] {
       const obj = JSON.parse(candidate) as Record<string, unknown>;
       const tc = tryParseToolObject(obj);
       if (tc) return [tc];
-    } catch { /* keep scanning */ }
+    } catch {
+      /* keep scanning */
+    }
   }
 
   return [];
@@ -836,28 +975,38 @@ async function callTraceMcp(
 ): Promise<unknown> {
   try {
     const res = await fetch(`${TRACE_MCP_URL}/mcp`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
-      body:    JSON.stringify({
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+      },
+      body: JSON.stringify({
         jsonrpc: '2.0',
-        id:      1,
-        method:  'tools/call',
-        params:  {
+        id: 1,
+        method: 'tools/call',
+        params: {
           name: toolName,
           arguments: {
             ...toolArgs,
             parentTaskId: traceContext?.parentTaskId,
-            runId:        traceContext?.runId,
-          }
+            runId: traceContext?.runId,
+          },
         },
       }),
       signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) return { error: `TRACE MCP HTTP ${res.status}` };
-    const body = await res.json() as { result?: { content?: Array<{ text?: string }> }; error?: unknown };
+    const body = (await res.json()) as {
+      result?: { content?: Array<{ text?: string }> };
+      error?: unknown;
+    };
     const text = body.result?.content?.[0]?.text;
     if (!text) return body.error ?? null;
-    try { return JSON.parse(text); } catch { return text; }
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
   } catch (e) {
     return { error: `TRACE MCP unavailable: ${(e as Error).message}` };
   }
@@ -866,8 +1015,8 @@ async function callTraceMcp(
 // ── In-process tool dispatch ───────────────────────────────────────────────────
 
 interface ToolResult {
-  tool:    string;
-  result:  unknown;
+  tool: string;
+  result: unknown;
   errorMsg?: string;
 }
 
@@ -878,8 +1027,8 @@ async function dispatchTool(
   args: Record<string, unknown>,
   options?: {
     goRetrievalHits?: GoHit[];
-    parentTaskId?:    string;
-    runId?:           string;
+    parentTaskId?: string;
+    runId?: string;
   }
 ): Promise<ToolResult> {
   try {
@@ -889,45 +1038,55 @@ async function dispatchTool(
         tool: name,
         result: await callTraceMcp(toolName, args, {
           parentTaskId: options?.parentTaskId,
-          runId:        options?.runId,
-        })
+          runId: options?.runId,
+        }),
       };
     }
 
     if (name === 'rag_search') {
-      const query      = String(args.query ?? '');
+      const query = String(args.query ?? '');
       const collection = String(args.collection ?? 'research_summaries');
-      const topK       = Math.min(Number(args.topK ?? 5), 20);
+      const topK = Math.min(Number(args.topK ?? 5), 20);
 
       let emb: number[] | null = null;
       try {
         emb = await Promise.race([
           generateEmbedding(query),
-          new Promise<null>((_, reject) => setTimeout(() => reject(new Error('embed-timeout')), 12_000)),
+          new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('embed-timeout')), 12_000)
+          ),
         ]);
-      } catch { emb = null; }
-      if (!emb) return { tool: name, result: [], errorMsg: 'Embedding unavailable (VRAM contention)' };
+      } catch {
+        emb = null;
+      }
+      if (!emb)
+        return { tool: name, result: [], errorMsg: 'Embedding unavailable (VRAM contention)' };
 
-      const VALID = ['research_summaries', 'codebase_chunks_768', 'legal_documents', 'evidence_items'] as const;
-      const col   = VALID.includes(collection as typeof VALID[number])
-        ? (collection as typeof VALID[number])
+      const VALID = [
+        'research_summaries',
+        'codebase_chunks_768',
+        'legal_documents',
+        'evidence_items',
+      ] as const;
+      const col = VALID.includes(collection as (typeof VALID)[number])
+        ? (collection as (typeof VALID)[number])
         : 'research_summaries';
 
       const hits = await qdrant.hybridSearch({
-        collection:     col,
+        collection: col,
         query,
         queryEmbedding: emb,
-        limit:          topK,
+        limit: topK,
       });
 
       return {
         tool: name,
         result: hits.results.map((h) => ({
-          id:       h.id,
-          score:    h.score,
-          summary:  (h.payload?.['summary']  ?? h.payload?.['content'] ?? '') as string,
-          title:    (h.payload?.['title']    ?? '') as string,
-          source:   (h.payload?.['source']   ?? col) as string,
+          id: h.id,
+          score: h.score,
+          summary: (h.payload?.['summary'] ?? h.payload?.['content'] ?? '') as string,
+          title: (h.payload?.['title'] ?? '') as string,
+          source: (h.payload?.['source'] ?? col) as string,
           pipeline: (h.payload?.['pipeline'] ?? '') as string,
         })),
       };
@@ -938,7 +1097,10 @@ async function dispatchTool(
       const limit = Math.min(Number(args.limit ?? 5), 20);
 
       const { rows } = await pool.query<{
-        id: string; title: string; status: string; description: string | null;
+        id: string;
+        title: string;
+        status: string;
+        description: string | null;
       }>(
         `SELECT id, title, status, description
            FROM cases
@@ -947,7 +1109,7 @@ async function dispatchTool(
           ORDER BY ts_rank(to_tsvector('english', title || ' ' || COALESCE(description, '')),
                            plainto_tsquery('english', $1)) DESC
           LIMIT $2`,
-        [query, limit],
+        [query, limit]
       );
 
       return { tool: name, result: rows };
@@ -955,55 +1117,60 @@ async function dispatchTool(
 
     if (name === 'memory_recall') {
       const query = String(args.query ?? '');
-      const topK  = Math.min(Number(args.topK ?? 3), 10);
+      const topK = Math.min(Number(args.topK ?? 3), 10);
 
       let emb: number[] | null = null;
       try {
         emb = await Promise.race([
           generateEmbedding(query),
-          new Promise<null>((_, reject) => setTimeout(() => reject(new Error('embed-timeout')), 12_000)),
+          new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('embed-timeout')), 12_000)
+          ),
         ]);
-      } catch { emb = null; }
-      if (!emb) return { tool: name, result: [], errorMsg: 'Embedding unavailable (VRAM contention)' };
+      } catch {
+        emb = null;
+      }
+      if (!emb)
+        return { tool: name, result: [], errorMsg: 'Embedding unavailable (VRAM contention)' };
 
       const modules = await selectAdaptiveMemory(emb, topK);
       return {
         tool: name,
         result: modules.map((m) => ({
-          hash:        m.hyperedgeHash,
-          grade:       m.gradeLabel,
-          score:       m.gradeScore,
-          pipeline:    m.pipeline,
-          summary:     m.summary,
-          members:     m.memberCount,
-          similarity:  m.similarity,
-          loraHint:    m.loraHint,
+          hash: m.hyperedgeHash,
+          grade: m.gradeLabel,
+          score: m.gradeScore,
+          pipeline: m.pipeline,
+          summary: m.summary,
+          members: m.memberCount,
+          similarity: m.similarity,
+          loraHint: m.loraHint,
         })),
       };
     }
 
     if (name === 'hyperedge_stats') {
       const minGrade = (args.minGrade as 'A' | 'B' | 'C') ?? 'B';
-      const limit    = Math.min(Number(args.limit ?? 5), 20);
+      const limit = Math.min(Number(args.limit ?? 5), 20);
 
       const edges = await queryTopHyperedges(minGrade, limit);
       return {
         tool: name,
         result: edges.map((e) => ({
-          hash:      e.hash,
-          grade:     e.gradeLabel,
-          score:     e.gradeScore,
-          pipeline:  e.pipeline,
-          members:   e.memberIds.length,
-          summary:   e.summary?.slice(0, 300) ?? '',
+          hash: e.hash,
+          grade: e.gradeLabel,
+          score: e.gradeScore,
+          pipeline: e.pipeline,
+          members: e.memberIds.length,
+          summary: e.summary?.slice(0, 300) ?? '',
         })),
       };
     }
 
     if (name === 'topology_search') {
-      const query      = String(args.query ?? '').trim();
-      const radius     = Math.min(Math.max(Number(args.radius ?? 0.25), 0.05), 2.0);
-      const limit      = Math.min(Number(args.limit ?? 15), 40);
+      const query = String(args.query ?? '').trim();
+      const radius = Math.min(Math.max(Number(args.radius ?? 0.25), 0.05), 2.0);
+      const limit = Math.min(Number(args.limit ?? 15), 40);
       const somCluster = args.somCluster != null ? Number(args.somCluster) : undefined;
 
       const result = await queryTopology(query, { radius, limit, somCluster });
@@ -1011,27 +1178,28 @@ async function dispatchTool(
         return {
           tool: name,
           result: [],
-          errorMsg: 'Topology search engine unavailable (port 8101). Run: node scripts/topology-search-server.mjs',
+          errorMsg:
+            'Topology search engine unavailable (port 8101). Run: node scripts/topology-search-server.mjs',
         };
       }
 
       return {
         tool: name,
         result: {
-          center:     result.center,
-          radius:     result.radius,
+          center: result.center,
+          radius: result.radius,
           totalFound: result.totalFound,
           durationMs: result.durationMs,
           hits: (result.hits ?? []).slice(0, limit).map((h) => ({
-            path:               h.path,
-            topoClass:          h.topoClass,
-            topoHex:            h.topoHex,
-            somCluster:         h.somCluster,
-            hybridScore:        h.hybridScore ?? h.manifoldScore,
-            cosineScore:        h.cosineScore ?? null,
-            manifoldDistance:   h.manifoldDistance ?? null,
+            path: h.path,
+            topoClass: h.topoClass,
+            topoHex: h.topoHex,
+            somCluster: h.somCluster,
+            hybridScore: h.hybridScore ?? h.manifoldScore,
+            cosineScore: h.cosineScore ?? null,
+            manifoldDistance: h.manifoldDistance ?? null,
             graphAuthorityScore: h.graphAuthorityScore ?? null,
-            summary:            (h.summary ?? h.contentPreview ?? ''),
+            summary: h.summary ?? h.contentPreview ?? '',
           })),
         },
       };
@@ -1102,7 +1270,9 @@ async function dispatchTool(
       try {
         const emb = await Promise.race([
           generateEmbedding(query),
-          new Promise<null>((_, reject) => setTimeout(() => reject(new Error('embed-timeout')), 12_000)),
+          new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('embed-timeout')), 12_000)
+          ),
         ]).catch(() => null);
         if (emb) {
           const hits = await qdrant.hybridSearch({
@@ -1130,7 +1300,8 @@ async function dispatchTool(
 
     if (name === 'read_file') {
       const fp = String(args.filePath ?? '');
-      if (!fp.startsWith('src/')) return { tool: name, result: null, errorMsg: 'Access denied: outside src/' };
+      if (!fp.startsWith('src/'))
+        return { tool: name, result: null, errorMsg: 'Access denied: outside src/' };
       const abs = path.join(process.cwd(), fp);
       try {
         const content = await fs.readFile(abs, 'utf-8');
@@ -1179,12 +1350,14 @@ async function dispatchTool(
     if (name === 'apply_shadow_patch') {
       const fp = String(args.filePath ?? '');
       const patch = String(args.patch ?? '');
-      if (!fp.startsWith('src/')) return { tool: name, result: null, errorMsg: 'Access denied: outside src/' };
+      if (!fp.startsWith('src/'))
+        return { tool: name, result: null, errorMsg: 'Access denied: outside src/' };
       const abs = path.join(process.cwd(), fp);
       const bak = `${abs}.bak`;
 
       try {
-        if (!process.env.DEV_BYPASS_AUTH) return { tool: name, result: null, errorMsg: 'Write access disabled' };
+        if (!process.env.DEV_BYPASS_AUTH)
+          return { tool: name, result: null, errorMsg: 'Write access disabled' };
         await fs.copyFile(abs, bak);
         await fs.writeFile(abs, patch, 'utf-8');
         return { tool: name, result: { success: true, backup: bak } };
@@ -1208,33 +1381,33 @@ async function dispatchTool(
 
     if (name === 'graph_search') {
       const { searchGraph } = await import('$lib/server/graph/graph-intel.js');
-      const query      = String(args.query ?? '');
-      const topK       = Math.min(Number(args.topK ?? 8), 20);
+      const query = String(args.query ?? '');
+      const topK = Math.min(Number(args.topK ?? 8), 20);
       const onlyRoutes = Boolean(args.onlyRoutes ?? false);
       const onlyNoAuth = Boolean(args.onlyNoAuth ?? false);
-      const hasTodos   = Boolean(args.hasTodos   ?? false);
-      const hits       = await searchGraph(query, topK, { onlyRoutes, onlyNoAuth, hasTodos });
+      const hasTodos = Boolean(args.hasTodos ?? false);
+      const hits = await searchGraph(query, topK, { onlyRoutes, onlyNoAuth, hasTodos });
       return { tool: name, result: hits };
     }
 
     if (name === 'wiki_note_lookup') {
       const { lookupWikiNotes } = await import('$lib/server/graph/graph-intel.js');
-      const query  = String(args.query ?? '');
-      const limit  = Math.min(Number(args.limit ?? 5), 15);
-      const notes  = await lookupWikiNotes(query, limit);
+      const query = String(args.query ?? '');
+      const limit = Math.min(Number(args.limit ?? 5), 15);
+      const notes = await lookupWikiNotes(query, limit);
       return { tool: name, result: notes };
     }
 
     if (name === 'audit_hotspots') {
       const { getAuditHotspots } = await import('$lib/server/graph/graph-intel.js');
-      const limit    = Math.min(Number(args.limit ?? 10), 30);
+      const limit = Math.min(Number(args.limit ?? 10), 30);
       const hotspots = await getAuditHotspots(limit);
       return { tool: name, result: hotspots };
     }
 
     if (name === 'trace_search') {
       const query = String(args.query ?? '');
-      const topK  = Math.min(Number(args.topK ?? 5), 15);
+      const topK = Math.min(Number(args.topK ?? 5), 15);
       const intent = Array.isArray(args.intent) ? args.intent.map(String) : undefined;
 
       const emb = await generateEmbedding(query).catch(() => null);
@@ -1245,19 +1418,19 @@ async function dispatchTool(
         query,
         queryEmbedding: emb,
         limit: topK,
-        intentOverride: intent
+        intentOverride: intent,
       });
 
       return {
         tool: name,
-        result: hits.map(h => ({
+        result: hits.map((h) => ({
           id: h.id,
           score: h.score,
           path: h.payload?.path,
           content: (h.payload?.content ?? '').slice(0, 1000),
           lenses: h.lenses,
-          tags: h.payload?.tags
-        }))
+          tags: h.payload?.tags,
+        })),
       };
     }
 
@@ -1279,7 +1452,7 @@ async function dispatchTool(
 
     if (name === 'graph_path' || name === 'graph.shortest_path') {
       const fromKey = String(args.fromKey ?? '');
-      const toKey   = String(args.toKey ?? '');
+      const toKey = String(args.toKey ?? '');
       const maxHops = Math.min(Number(args.maxHops ?? 5), 8);
       const data = await callTraceMcp('graph.shortest_path', { fromKey, toKey, maxHops });
       return { tool: name, result: data };
@@ -1292,43 +1465,58 @@ async function dispatchTool(
     }
 
     if (name === 'graph_pagerank' || name === 'graph.pagerank_top') {
-      const limit    = Math.min(Number(args.limit ?? 15), 50);
+      const limit = Math.min(Number(args.limit ?? 15), 50);
       const nodeType = args.nodeType ? String(args.nodeType) : undefined;
-      const data = await callTraceMcp('graph.pagerank_top', { limit, ...(nodeType ? { nodeType } : {}) });
+      const data = await callTraceMcp('graph.pagerank_top', {
+        limit,
+        ...(nodeType ? { nodeType } : {}),
+      });
       return { tool: name, result: data };
     }
 
     if (name === 'search_postgres_fts' || name === 'search.postgres_fts') {
-      const query     = String(args.query ?? '');
+      const query = String(args.query ?? '');
       const topoClass = args.topoClass ? String(args.topoClass) : undefined;
-      const limit     = Math.min(Number(args.limit ?? 10), 30);
-      const data = await callTraceMcp('search.postgres_fts', { query, limit, ...(topoClass ? { topo_class: topoClass } : {}) });
+      const limit = Math.min(Number(args.limit ?? 10), 30);
+      const data = await callTraceMcp('search.postgres_fts', {
+        query,
+        limit,
+        ...(topoClass ? { topo_class: topoClass } : {}),
+      });
       return { tool: name, result: data };
     }
 
     if (name === 'search_hybrid' || name === 'search.hybrid') {
-      const query     = String(args.query ?? '');
+      const query = String(args.query ?? '');
       const topoClass = args.topoClass ? String(args.topoClass) : undefined;
-      const limit     = Math.min(Number(args.limit ?? 10), 30);
-      const data = await callTraceMcp('search.hybrid', { query, limit, ...(topoClass ? { topo_class: topoClass } : {}) });
+      const limit = Math.min(Number(args.limit ?? 10), 30);
+      const data = await callTraceMcp('search.hybrid', {
+        query,
+        limit,
+        ...(topoClass ? { topo_class: topoClass } : {}),
+      });
       return { tool: name, result: data };
     }
 
     if (name === 'topology_search_4d' || name === 'topology.search_4d') {
-      const som_x      = Number(args.som_x ?? 0);
-      const som_y      = Number(args.som_y ?? 0);
+      const som_x = Number(args.som_x ?? 0);
+      const som_y = Number(args.som_y ?? 0);
       const semantic_z = args.semantic_z != null ? Number(args.semantic_z) : undefined;
-      const grpo_w     = args.grpo_w     != null ? Number(args.grpo_w)     : undefined;
-      const radius     = Math.min(Math.max(Number(args.radius ?? 0.5), 0.01), 5.0);
-      const limit      = Math.min(Number(args.limit ?? 20), 50);
-      const filters    = args.filters && typeof args.filters === 'object'
-        ? (args.filters as Record<string, unknown>)
-        : undefined;
+      const grpo_w = args.grpo_w != null ? Number(args.grpo_w) : undefined;
+      const radius = Math.min(Math.max(Number(args.radius ?? 0.5), 0.01), 5.0);
+      const limit = Math.min(Number(args.limit ?? 20), 50);
+      const filters =
+        args.filters && typeof args.filters === 'object'
+          ? (args.filters as Record<string, unknown>)
+          : undefined;
       const data = await callTraceMcp('topology.search_4d', {
-        som_x, som_y, radius, limit,
+        som_x,
+        som_y,
+        radius,
+        limit,
         ...(semantic_z != null ? { semantic_z } : {}),
-        ...(grpo_w     != null ? { grpo_w }     : {}),
-        ...(filters               ? { filters }   : {}),
+        ...(grpo_w != null ? { grpo_w } : {}),
+        ...(filters ? { filters } : {}),
       });
       // Accumulate hits for cluster context injection before final synthesis
       const topoNorm = data as { ok?: boolean; hits?: Array<Record<string, unknown>> };
@@ -1346,15 +1534,19 @@ async function dispatchTool(
     }
 
     if (name === 'search_go_hybrid' || name === 'search.go_hybrid') {
-      const query   = String(args.query ?? '');
-      const type    = ['codebase', 'legal', 'hybrid'].includes(String(args.type ?? ''))
-        ? String(args.type) : 'codebase';
-      const limit   = Math.min(Number(args.limit ?? 20), 50);
-      const filters = args.filters && typeof args.filters === 'object'
-        ? (args.filters as Record<string, unknown>)
-        : undefined;
+      const query = String(args.query ?? '');
+      const type = ['codebase', 'legal', 'hybrid'].includes(String(args.type ?? ''))
+        ? String(args.type)
+        : 'codebase';
+      const limit = Math.min(Number(args.limit ?? 20), 50);
+      const filters =
+        args.filters && typeof args.filters === 'object'
+          ? (args.filters as Record<string, unknown>)
+          : undefined;
       const data = await callTraceMcp('search.go_hybrid', {
-        query, type, limit,
+        query,
+        type,
+        limit,
         ...(filters ? { filters } : {}),
       });
       // Accumulate hits for cluster context injection before final synthesis
@@ -1379,50 +1571,93 @@ async function dispatchTool(
     }
 
     if (name === 'trace.explain_retrieval' || name === 'trace_explain_retrieval') {
-      const query      = String(args.query ?? '');
+      const query = String(args.query ?? '');
       const stableKeys = Array.isArray(args.stableKeys) ? args.stableKeys.map(String) : [];
-      return { tool: name, result: await callTraceMcp('trace.explain_retrieval', { query, stableKeys }) };
+      return {
+        tool: name,
+        result: await callTraceMcp('trace.explain_retrieval', { query, stableKeys }),
+      };
     }
 
     if (name === 'topology.same_som_cluster' || name === 'topology_same_som_cluster') {
       const stableKey = String(args.stableKey ?? '');
-      const limit     = Math.min(Number(args.limit ?? 20), 50);
-      return { tool: name, result: await callTraceMcp('topology.same_som_cluster', { stableKey, limit }) };
+      const limit = Math.min(Number(args.limit ?? 20), 50);
+      return {
+        tool: name,
+        result: await callTraceMcp('topology.same_som_cluster', { stableKey, limit }),
+      };
     }
 
     if (name === 'clusters.get_members' || name === 'clusters_get_members') {
       const clusterKey = String(args.clusterKey ?? '');
-      const limit      = Math.min(Number(args.limit ?? 30), 100);
-      return { tool: name, result: await callTraceMcp('clusters.get_members', { clusterKey, limit }) };
+      const limit = Math.min(Number(args.limit ?? 30), 100);
+      return {
+        tool: name,
+        result: await callTraceMcp('clusters.get_members', { clusterKey, limit }),
+      };
     }
 
     if (name === 'clusters.get_summary_lenses' || name === 'clusters_get_summary_lenses') {
       const clusterKey = String(args.clusterKey ?? '');
-      const lenses     = Array.isArray(args.lenses) ? args.lenses.map(String) : undefined;
-      return { tool: name, result: await callTraceMcp('clusters.get_summary_lenses', { clusterKey, ...(lenses ? { lenses } : {}) }) };
+      const lenses = Array.isArray(args.lenses) ? args.lenses.map(String) : undefined;
+      return {
+        tool: name,
+        result: await callTraceMcp('clusters.get_summary_lenses', {
+          clusterKey,
+          ...(lenses ? { lenses } : {}),
+        }),
+      };
     }
 
     if (name === 'research.encode' || name === 'research_encode') {
       const content = String(args.content ?? '').trim();
-      const title   = String(args.title   ?? '').slice(0, 80);
-      const source  = String(args.source  ?? 'agent');
-      const tags    = Array.isArray(args.tags) ? args.tags.map(String) : [];
+      const title = String(args.title ?? '').slice(0, 80);
+      const source = String(args.source ?? 'agent');
+      const tags = Array.isArray(args.tags) ? args.tags.map(String) : [];
       if (!content) return { tool: name, result: null, errorMsg: 'content is required' };
       try {
-        const { validateInformationGain, heuristicQualityCheck } = await import('./information-gain-validator.js');
+        const { validateInformationGain, heuristicQualityCheck } = await import(
+          './information-gain-validator.js'
+        );
         if (!heuristicQualityCheck(content))
-          return { tool: name, result: { encoded: false, reason: 'heuristic quality check failed' } };
+          return {
+            tool: name,
+            result: { encoded: false, reason: 'heuristic quality check failed' },
+          };
         const emb = await generateEmbedding(title || content.slice(0, 200)).catch(() => null);
         let existingText = '';
         if (emb) {
-          const existing = await qdrant.hybridSearch({ collection: 'research_summaries', query: title || content.slice(0, 100), queryEmbedding: emb, limit: 1 });
+          const existing = await qdrant.hybridSearch({
+            collection: 'research_summaries',
+            query: title || content.slice(0, 100),
+            queryEmbedding: emb,
+            limit: 1,
+          });
           existingText = (existing.results[0]?.payload?.['summary'] as string) ?? '';
         }
-        const validation = await validateInformationGain({ context: title, existing: existingText, candidate: content });
+        const validation = await validateInformationGain({
+          context: title,
+          existing: existingText,
+          candidate: content,
+        });
         if (!validation.success || !validation.shouldUpdate || (validation.gainScore ?? 0) < 0.25)
-          return { tool: name, result: { encoded: false, reason: `gain check rejected (score=${validation.gainScore?.toFixed(2)})` } };
-        const { archiveSynthesisMemory } = await import('$lib/server/indexer/synthesis-memory-archiver.js');
-        await archiveSynthesisMemory({ title, content, source, tags, metadata: { gainScore: validation.gainScore } });
+          return {
+            tool: name,
+            result: {
+              encoded: false,
+              reason: `gain check rejected (score=${validation.gainScore?.toFixed(2)})`,
+            },
+          };
+        const { archiveSynthesisMemory } = await import(
+          '$lib/server/indexer/synthesis-memory-archiver.js'
+        );
+        await archiveSynthesisMemory({
+          title,
+          content,
+          source,
+          tags,
+          metadata: { gainScore: validation.gainScore },
+        });
         return { tool: name, result: { encoded: true, gainScore: validation.gainScore, title } };
       } catch (e: any) {
         return { tool: name, result: null, errorMsg: (e as Error).message };
@@ -1431,61 +1666,96 @@ async function dispatchTool(
 
     // ── KV context tools — proxy to trace-mcp-server :8788 ────────────────
     if (name === 'context.build_kv_packet' || name === 'context_build_kv_packet') {
-      const taskId  = String(args.taskId ?? `agent:${Date.now()}`);
-      const q       = String(args.query ?? '');
-      const files   = Array.isArray(args.hotFiles)     ? (args.hotFiles    as string[]) : [];
-      const syms    = Array.isArray(args.hotSymbols)   ? (args.hotSymbols  as string[]) : [];
+      const taskId = String(args.taskId ?? `agent:${Date.now()}`);
+      const q = String(args.query ?? '');
+      const files = Array.isArray(args.hotFiles) ? (args.hotFiles as string[]) : [];
+      const syms = Array.isArray(args.hotSymbols) ? (args.hotSymbols as string[]) : [];
       const blocked = Array.isArray(args.blockedAreas) ? (args.blockedAreas as string[]) : [];
-      const maxTok  = Math.min(Number(args.maxInputTokens ?? 12000), 32000);
-      return { tool: name, result: await callTraceMcp('context.build_kv_packet', { taskId, query: q, hotFiles: files, hotSymbols: syms, blockedAreas: blocked, maxInputTokens: maxTok }) };
+      const maxTok = Math.min(Number(args.maxInputTokens ?? 12000), 32000);
+      return {
+        tool: name,
+        result: await callTraceMcp('context.build_kv_packet', {
+          taskId,
+          query: q,
+          hotFiles: files,
+          hotSymbols: syms,
+          blockedAreas: blocked,
+          maxInputTokens: maxTok,
+        }),
+      };
     }
 
     if (name === 'context.get_compressed_card' || name === 'context_get_compressed_card') {
       const stableKey = String(args.stableKey ?? '');
       if (!stableKey) return { tool: name, result: null, errorMsg: 'stableKey is required' };
-      return { tool: name, result: await callTraceMcp('context.get_compressed_card', { stableKey }) };
+      return {
+        tool: name,
+        result: await callTraceMcp('context.get_compressed_card', { stableKey }),
+      };
     }
 
     if (name === 'context.explain_compression' || name === 'context_explain_compression') {
-      return { tool: name, result: await callTraceMcp('context.explain_compression', { taskId: String(args.taskId ?? '') }) };
+      return {
+        tool: name,
+        result: await callTraceMcp('context.explain_compression', {
+          taskId: String(args.taskId ?? ''),
+        }),
+      };
     }
 
     if (name === 'context.refresh_task_toc' || name === 'context_refresh_task_toc') {
-      const taskId  = String(args.taskId ?? '');
-      const files   = Array.isArray(args.hotFiles)     ? (args.hotFiles    as string[]) : [];
-      const syms    = Array.isArray(args.hotSymbols)   ? (args.hotSymbols  as string[]) : [];
+      const taskId = String(args.taskId ?? '');
+      const files = Array.isArray(args.hotFiles) ? (args.hotFiles as string[]) : [];
+      const syms = Array.isArray(args.hotSymbols) ? (args.hotSymbols as string[]) : [];
       const blocked = Array.isArray(args.blockedAreas) ? (args.blockedAreas as string[]) : [];
-      return { tool: name, result: await callTraceMcp('context.refresh_task_toc', { taskId, hotFiles: files, hotSymbols: syms, blockedAreas: blocked }) };
+      return {
+        tool: name,
+        result: await callTraceMcp('context.refresh_task_toc', {
+          taskId,
+          hotFiles: files,
+          hotSymbols: syms,
+          blockedAreas: blocked,
+        }),
+      };
     }
 
     if (name === 'search.dev_context' || name === 'search__dev_context') {
-      const query    = String(args.query ?? '');
+      const query = String(args.query ?? '');
       const filePath = args.filePath ? String(args.filePath) : undefined;
-      const limit    = Math.min(Number(args.limit ?? 8), 20);
-      return { tool: name, result: await callTraceMcp('search.dev_context', {
-        query,
-        limit,
-        ...(filePath ? { filePath } : {}),
-      }) };
+      const limit = Math.min(Number(args.limit ?? 8), 20);
+      return {
+        tool: name,
+        result: await callTraceMcp('search.dev_context', {
+          query,
+          limit,
+          ...(filePath ? { filePath } : {}),
+        }),
+      };
     }
 
     if (name === 'kag.record_agent_run') {
-      return { tool: name, result: await callTraceMcp('kag.record_agent_run', {
-        taskId:            String(args.taskId ?? `kag-${Date.now().toString(36)}`),
-        errorSummary:      String(args.errorSummary ?? args.summary ?? ''),
-        files:             Array.isArray(args.files)   ? args.files   : [],
-        tags:              Array.isArray(args.tags)    ? args.tags    : [],
-        confidence:        typeof args.confidence === 'number' ? args.confidence : 0.5,
-        patchResult:       String(args.patchResult ?? 'unknown'),
-        researchNotes:     args.researchNotes ? String(args.researchNotes) : undefined,
-        needsDeepResearch: Boolean(args.needsDeepResearch ?? false),
-      }) };
+      return {
+        tool: name,
+        result: await callTraceMcp('kag.record_agent_run', {
+          taskId: String(args.taskId ?? `kag-${Date.now().toString(36)}`),
+          errorSummary: String(args.errorSummary ?? args.summary ?? ''),
+          files: Array.isArray(args.files) ? args.files : [],
+          tags: Array.isArray(args.tags) ? args.tags : [],
+          confidence: typeof args.confidence === 'number' ? args.confidence : 0.5,
+          patchResult: String(args.patchResult ?? 'unknown'),
+          researchNotes: args.researchNotes ? String(args.researchNotes) : undefined,
+          needsDeepResearch: Boolean(args.needsDeepResearch ?? false),
+        }),
+      };
     }
 
     if (name === 'kag.ingest_memory_directory') {
-      return { tool: name, result: await callTraceMcp('kag.ingest_memory_directory', {
-        dir: args.dir ? String(args.dir) : undefined,
-      }) };
+      return {
+        tool: name,
+        result: await callTraceMcp('kag.ingest_memory_directory', {
+          dir: args.dir ? String(args.dir) : undefined,
+        }),
+      };
     }
 
     return { tool: name, result: null, errorMsg: `Unknown tool: ${name}` };
@@ -1531,33 +1801,43 @@ export interface AgentRunResult {
 // caller would silently corrupt state (side-effect cache poisoning).
 const SIDE_EFFECT_TOOLS = new Set(['apply_shadow_patch', 'revert_fix', 'verify_fix']);
 
-function getPreferredBackend(metadata?: Record<string, unknown>, runtime?: ReturnType<typeof resolveRuntimeConfig>): 'bifrost' | 'turboquant' {
+function getPreferredBackend(
+  metadata?: Record<string, unknown>,
+  runtime?: ReturnType<typeof resolveRuntimeConfig>
+): 'bifrost' | 'turboquant' {
   const config = runtime ?? resolveRuntimeConfig();
   const isTurboRequested = metadata?.preferredBackend === 'turboquant';
-  return gatePreferredBackend(isTurboRequested ? 'turboquant' : undefined, config) as 'bifrost' | 'turboquant';
+  return gatePreferredBackend(isTurboRequested ? 'turboquant' : undefined, config) as
+    | 'bifrost'
+    | 'turboquant';
 }
 
 export async function runGemma4Agent(
-  query:       string,
+  query: string,
   options?: {
     systemPrompt?: string;
-    pipeline?:     string;
-    userId?:       string;
-    sessionId?:    string;
-    bypassCache?:  boolean;
-    metadata?:     Record<string, unknown>;
-  },
+    pipeline?: string;
+    userId?: string;
+    sessionId?: string;
+    bypassCache?: boolean;
+    metadata?: Record<string, unknown>;
+  }
 ): Promise<AgentRunResult> {
-  const t0          = Date.now();
-  const pipeline    = options?.pipeline ?? 'ace';
-  const toolsUsed:  string[]  = [];
-  const sources:    unknown[] = [];
+  const t0 = Date.now();
+  const pipeline = options?.pipeline ?? 'ace';
+  const toolsUsed: string[] = [];
+  const sources: unknown[] = [];
   // Accumulates cluster/topology hits from Go retrieval tools across all rounds.
   // Converted to ClusterContextPacket[] and injected before final synthesis.
-  const goRetrievalHits: Array<{ clusterKey?: string; topoClass?: string; path?: string; score?: number }> = [];
+  const goRetrievalHits: Array<{
+    clusterKey?: string;
+    topoClass?: string;
+    path?: string;
+    score?: number;
+  }> = [];
   // Bypass cache when caller requests it, or when side-effect tools were used
   let hasSideEffect = false;
-  let bypassCache   = options?.bypassCache ?? false;
+  let bypassCache = options?.bypassCache ?? false;
 
   // ── Level-1: stable system prefix (KV-cacheable on llama-server) ──────────
   // When a caller provides a custom systemPrompt (e.g. tests / raw mode) we
@@ -1574,41 +1854,50 @@ export async function runGemma4Agent(
     system = getStableSystemPrefix();
 
     // ── Level 2 + 3: build KV context packet when caller provides hints ────
-    const taskId    = typeof options?.metadata?.taskId    === 'string' ? options.metadata.taskId    : undefined;
-    const hotFiles  = Array.isArray(options?.metadata?.hotFiles)  ? (options!.metadata!.hotFiles  as string[]) : [];
-    const hotSymbols = Array.isArray(options?.metadata?.hotSymbols) ? (options!.metadata!.hotSymbols as string[]) : [];
-    const blocked   = Array.isArray(options?.metadata?.blockedAreas) ? (options!.metadata!.blockedAreas as string[]) : [];
+    const taskId =
+      typeof options?.metadata?.taskId === 'string' ? options.metadata.taskId : undefined;
+    const hotFiles = Array.isArray(options?.metadata?.hotFiles)
+      ? (options!.metadata!.hotFiles as string[])
+      : [];
+    const hotSymbols = Array.isArray(options?.metadata?.hotSymbols)
+      ? (options!.metadata!.hotSymbols as string[])
+      : [];
+    const blocked = Array.isArray(options?.metadata?.blockedAreas)
+      ? (options!.metadata!.blockedAreas as string[])
+      : [];
 
     if (taskId || hotFiles.length > 0) {
       try {
-        const { buildKvContextPacket, formatKvPacketForPrompt } = await import('./kv-context-controller.js');
+        const { buildKvContextPacket, formatKvPacketForPrompt } = await import(
+          './kv-context-controller.js'
+        );
         const packet = await buildKvContextPacket({
-          taskId:      taskId ?? `agent:${pipeline}:${Date.now()}`,
+          taskId: taskId ?? `agent:${pipeline}:${Date.now()}`,
           query,
           hotFiles,
           hotSymbols,
           blockedAreas: blocked,
         });
         kvPacketText = formatKvPacketForPrompt(packet);
-      } catch { /* non-fatal — run without KV packet */ }
+      } catch {
+        /* non-fatal — run without KV packet */
+      }
     }
   }
 
   // User content: prepend the KV packet (dynamic section) before the raw query
-  const userContent = kvPacketText
-    ? `${kvPacketText}\n\n---\n\nUser request: ${query}`
-    : query;
+  const userContent = kvPacketText ? `${kvPacketText}\n\n---\n\nUser request: ${query}` : query;
 
   const messages: OllamaMessage[] = [
     { role: 'system', content: system },
-    { role: 'user',   content: userContent },
+    { role: 'user', content: userContent },
   ];
 
-  let finalAnswer    = '';
-  let round          = 0;
-  let resultCacheTier: AgentRunResult['cacheTier']  = undefined;
-  let resultCacheMs:   number | undefined           = undefined;
-  let totalPromptTokens     = 0;
+  let finalAnswer = '';
+  let round = 0;
+  let resultCacheTier: AgentRunResult['cacheTier'] = undefined;
+  let resultCacheMs: number | undefined = undefined;
+  let totalPromptTokens = 0;
   let totalCompletionTokens = 0;
   const runtime = resolveRuntimeConfig();
   const requestedBackend = getPreferredBackend(options?.metadata, runtime);
@@ -1618,25 +1907,34 @@ export async function runGemma4Agent(
   // Error-fix memory pre-flight: if the query references an error / file /
   // route, look up any previously verified fix for it. Populates the
   // `errorFixMemoryHit` + `verificationStatus` fields on the result.
-  const filePathMeta = typeof options?.metadata?.filePath === 'string' ? options.metadata.filePath : undefined;
-  const routeMeta    = typeof options?.metadata?.route    === 'string' ? options.metadata.route    : undefined;
+  const filePathMeta =
+    typeof options?.metadata?.filePath === 'string' ? options.metadata.filePath : undefined;
+  const routeMeta =
+    typeof options?.metadata?.route === 'string' ? options.metadata.route : undefined;
   let errorFixMemoryHit = false;
   let verificationStatus: string | undefined;
   try {
-    const prior = await getErrorFixMemory({ errorText: query, filePath: filePathMeta, route: routeMeta });
+    const prior = await getErrorFixMemory({
+      errorText: query,
+      filePath: filePathMeta,
+      route: routeMeta,
+    });
     if (prior) {
-      errorFixMemoryHit  = true;
+      errorFixMemoryHit = true;
       verificationStatus = prior.verificationStatus;
       // Inject the prior fix as a system hint so the model can reuse / refine
       messages.splice(1, 0, {
         role: 'system',
-        content: `## Prior fix memory\n` +
+        content:
+          `## Prior fix memory\n` +
           `Verification: ${prior.verificationStatus} · path: ${prior.filePath ?? 'n/a'} · tools: ${prior.toolCalls.join(', ')}\n\n` +
           `Diagnosis: ${prior.diagnosis}\n\n` +
           `Patch summary: ${prior.patchSummary}`.trim(),
       });
     }
-  } catch { /* non-fatal — Redis miss is fine */ }
+  } catch {
+    /* non-fatal — Redis miss is fine */
+  }
 
   // ── Stuck detector ────────────────────────────────────────────────────────
   // Tracks how many times the same query fingerprint has been submitted.
@@ -1647,13 +1945,13 @@ export async function runGemma4Agent(
   let stuckCount = 0;
   try {
     const { createHash: _sha } = await import('node:crypto');
-    const queryHash  = _sha('sha1').update(query.slice(0, 200)).digest('hex').slice(0, 12);
-    const stuckKey   = `kag:stuck:${queryHash}`;
+    const queryHash = _sha('sha1').update(query.slice(0, 200)).digest('hex').slice(0, 12);
+    const stuckKey = `kag:stuck:${queryHash}`;
     const { getRedis } = await import('$lib/server/redis.js');
     const _redis = getRedis();
-    const raw    = await _redis.get(stuckKey);
-    stuckCount   = raw ? parseInt(raw, 10) : 0;
-    isStuck      = stuckCount >= 2;
+    const raw = await _redis.get(stuckKey);
+    stuckCount = raw ? parseInt(raw, 10) : 0;
+    isStuck = stuckCount >= 2;
 
     // Increment counter (TTL 1h — resets after the session window)
     await _redis.setex(stuckKey, 3600, String(stuckCount + 1));
@@ -1661,14 +1959,17 @@ export async function runGemma4Agent(
     if (isStuck) {
       messages.splice(1, 0, {
         role: 'system',
-        content: `## Stuck detector — escalation required\n` +
+        content:
+          `## Stuck detector — escalation required\n` +
           `This query pattern has been submitted ${stuckCount} time(s) without resolution.\n` +
           `After your analysis, call **kag.record_agent_run** with:\n` +
-          `  taskId: "kag-${queryHash.slice(0,8)}", needsDeepResearch: true\n` +
+          `  taskId: "kag-${queryHash.slice(0, 8)}", needsDeepResearch: true\n` +
           `Do NOT retry the same approach. Escalate or propose a fundamentally different fix.`,
       });
     }
-  } catch { /* non-fatal — stuck detection is advisory */ }
+  } catch {
+    /* non-fatal — stuck detection is advisory */
+  }
 
   // coding/openai-facade pipelines use MCP tool surface (LLAMA_TOOL_DEFINITIONS);
   // legal pipelines use in-process Ollama tools (AGENT_TOOLS).
@@ -1714,17 +2015,17 @@ export async function runGemma4Agent(
   if (!bypassCache) {
     try {
       const cached = await tieredLLMQuery(messages, {
-        model:       PLANNER_MODEL,
+        model: PLANNER_MODEL,
         temperature: 0.2,
-        maxTokens:   2048,
-        context:     pipeline,
+        maxTokens: 2048,
+        context: pipeline,
         bypassCache: false,
       });
       // Only accept cache hits — L3 would just be a cold Ollama call with no tools
       if (cached.tier !== 'L3_ollama') {
-        finalAnswer    = cached.response;
+        finalAnswer = cached.response;
         resultCacheTier = cached.tier;
-        resultCacheMs   = cached.latencyMs;
+        resultCacheMs = cached.latencyMs;
         inferenceBackend = 'cache';
         round = 0; // no tool rounds consumed
       }
@@ -1741,8 +2042,8 @@ export async function runGemma4Agent(
     // Accumulate token counts across rounds (Ollama returns these on non-streaming calls)
     if (typeof rawResult === 'object' && rawResult !== null) {
       const rd = rawResult as Record<string, unknown>;
-      if (typeof rd.prompt_eval_count === 'number')  totalPromptTokens     += rd.prompt_eval_count;
-      if (typeof rd.eval_count         === 'number')  totalCompletionTokens += rd.eval_count;
+      if (typeof rd.prompt_eval_count === 'number') totalPromptTokens += rd.prompt_eval_count;
+      if (typeof rd.eval_count === 'number') totalCompletionTokens += rd.eval_count;
     }
 
     const raw = rawResult as { content?: string; tool_calls?: OllamaToolCall[] } | string;
@@ -1783,19 +2084,27 @@ export async function runGemma4Agent(
       const rawArgs = tc.function.arguments as unknown;
       const tArgs: Record<string, unknown> =
         typeof rawArgs === 'string'
-          ? (() => { try { return JSON.parse(rawArgs) as Record<string, unknown>; } catch { return {}; } })()
-          : (rawArgs as Record<string, unknown> ?? {});
+          ? (() => {
+              try {
+                return JSON.parse(rawArgs) as Record<string, unknown>;
+              } catch {
+                return {};
+              }
+            })()
+          : ((rawArgs as Record<string, unknown>) ?? {});
 
       // Enforce allowlist — skip tools the caller has not opted into
-      const allowWrite  = options?.metadata?.allowWriteTools  === true;
-      const allowGated  = options?.metadata?.allowGatedTools  === true;
+      const allowWrite = options?.metadata?.allowWriteTools === true;
+      const allowGated = options?.metadata?.allowGatedTools === true;
       if (
-        ALLOWED_TOOLS.write.has(name) && !allowWrite ||
-        ALLOWED_TOOLS.gated.has(name) && !allowGated ||
-        (!ALLOWED_TOOLS.read.has(name) && !ALLOWED_TOOLS.write.has(name) && !ALLOWED_TOOLS.gated.has(name))
+        (ALLOWED_TOOLS.write.has(name) && !allowWrite) ||
+        (ALLOWED_TOOLS.gated.has(name) && !allowGated) ||
+        (!ALLOWED_TOOLS.read.has(name) &&
+          !ALLOWED_TOOLS.write.has(name) &&
+          !ALLOWED_TOOLS.gated.has(name))
       ) {
         messages.push({
-          role:    'tool',
+          role: 'tool',
           content: JSON.stringify({ error: `Tool "${name}" is not permitted in this context.` }),
         });
         continue;
@@ -1807,17 +2116,14 @@ export async function runGemma4Agent(
       const result = await dispatchTool(name, tArgs ?? {}, {
         goRetrievalHits,
         parentTaskId: options?.metadata?.parentTaskId as string | undefined,
-        runId:        options?.metadata?.runId        as string | undefined,
+        runId: options?.metadata?.runId as string | undefined,
       });
       if (Array.isArray(result.result)) sources.push(...result.result);
 
       // Ollama expects role:"tool" messages with the result as content
       messages.push({
-        role:    'tool',
-        content: JSON.stringify(result.errorMsg
-          ? { error: result.errorMsg }
-          : result.result
-        ),
+        role: 'tool',
+        content: JSON.stringify(result.errorMsg ? { error: result.errorMsg } : result.result),
       });
     }
   }
@@ -1828,8 +2134,11 @@ export async function runGemma4Agent(
   const goClusterPackets = buildGoClusterPackets(goRetrievalHits);
   if (goClusterPackets?.length && !finalAnswer) {
     const clusterBlock = goClusterPackets
-      .map(p => `[${p.clusterKey ?? p.clusterId}] ${p.topoClass}: ${p.chunkCount} hits` +
-                `${p.topFiles?.length ? ', top: ' + p.topFiles.slice(0, 3).join(', ') : ''}`)
+      .map(
+        (p) =>
+          `[${p.clusterKey ?? p.clusterId}] ${p.topoClass}: ${p.chunkCount} hits` +
+          `${p.topFiles?.length ? ', top: ' + p.topFiles.slice(0, 3).join(', ') : ''}`
+      )
       .join('\n');
     messages.push({
       role: 'user' as const,
@@ -1970,6 +2279,17 @@ export async function runGemma4Agent(
       /* non-fatal */
     });
 
+  // Append a lightweight observation to the outcome ledger for downstream reward attribution
+  void appendOutcomeLedger({
+    source: 'gemma4-agent',
+    intent: pipeline ?? query,
+    tools: toolsUsed,
+    sourceRefs: filePathMeta ? [filePathMeta] : [],
+    graphVersion: process.env.ATLAS_VERSION ?? null,
+    outcome: hasSideEffect ? 'side_effect' : 'answer',
+    reward: null,
+  });
+
   // Persist a fresh fix-memory entry when the agent ran a side-effect tool
   // (apply_shadow_patch / revert_fix / verify_fix). Verification status is
   // 'unknown' until the next agent run probes the same error and confirms
@@ -1978,25 +2298,25 @@ export async function runGemma4Agent(
     void saveErrorFixMemory(
       { errorText: query, filePath: filePathMeta, route: routeMeta },
       {
-        diagnosis:          finalAnswer.slice(0, 600),
-        patchSummary:       toolsUsed.includes('apply_shadow_patch')
+        diagnosis: finalAnswer.slice(0, 600),
+        patchSummary: toolsUsed.includes('apply_shadow_patch')
           ? 'Patch applied via apply_shadow_patch'
           : 'Side-effect tool sequence executed',
         verificationStatus: 'unknown',
-        toolCalls:          toolsUsed.filter((t) => SIDE_EFFECT_TOOLS.has(t)),
-      },
+        toolCalls: toolsUsed.filter((t) => SIDE_EFFECT_TOOLS.has(t)),
+      }
     ).catch(() => null);
   }
 
   // ── 7. Encode (Long-term Memory) ───────────────────────────────────────────
   const MEMORY_THRESHOLDS = {
-    synthesis_memory: 0.30,
+    synthesis_memory: 0.3,
     architecture_note: 0.35,
     bug_fix_memory: 0.25,
-    audit_discovery: 0.20,
-    user_instruction: 0.10,
-    cluster_summary: 0.40,
-    directory_summary: 0.35
+    audit_discovery: 0.2,
+    user_instruction: 0.1,
+    cluster_summary: 0.4,
+    directory_summary: 0.35,
   };
 
   let yorhaMetadata: any = {
@@ -2008,9 +2328,15 @@ export async function runGemma4Agent(
   };
 
   // If the answer is substantial and successful, archive it as synthesis memory
-  if (finalAnswer.length > 500 && !finalAnswer.includes('I don\'t know') && !finalAnswer.includes('error')) {
+  if (
+    finalAnswer.length > 500 &&
+    !finalAnswer.includes("I don't know") &&
+    !finalAnswer.includes('error')
+  ) {
     try {
-      const { validateInformationGain, heuristicQualityCheck } = await import('./information-gain-validator.js');
+      const { validateInformationGain, heuristicQualityCheck } = await import(
+        './information-gain-validator.js'
+      );
 
       if (heuristicQualityCheck(finalAnswer)) {
         // 1. Look up existing memory for this query
@@ -2023,7 +2349,7 @@ export async function runGemma4Agent(
             collection: 'synthesis_memory',
             query,
             queryEmbedding: emb,
-            limit: 1
+            limit: 1,
           });
           existingText = (existing.results[0]?.payload?.content as string) ?? '';
         }
@@ -2032,20 +2358,26 @@ export async function runGemma4Agent(
         const validation = await validateInformationGain({
           context: query,
           existing: existingText,
-          candidate: finalAnswer
+          candidate: finalAnswer,
         });
 
         // 3. Populate YorHA UI metadata
         yorhaMetadata.informationGain = {
           score: validation.gainScore,
           decision: validation.shouldUpdate ? 'accepted' : 'rejected',
-          reason: validation.reasoning
+          reason: validation.reasoning,
         };
 
         // 4. Archive only if it provides significant improvement (respecting threshold)
         const threshold = MEMORY_THRESHOLDS.synthesis_memory;
-        if (validation.success && validation.shouldUpdate && (validation.gainScore ?? 0) >= threshold) {
-          const { archiveSynthesisMemory } = await import('$lib/server/indexer/synthesis-memory-archiver.js');
+        if (
+          validation.success &&
+          validation.shouldUpdate &&
+          (validation.gainScore ?? 0) >= threshold
+        ) {
+          const { archiveSynthesisMemory } = await import(
+            '$lib/server/indexer/synthesis-memory-archiver.js'
+          );
           await archiveSynthesisMemory({
             title: query.slice(0, 60),
             content: finalAnswer,
@@ -2058,7 +2390,9 @@ export async function runGemma4Agent(
             },
           });
           yorhaMetadata.memoryEncoded = true;
-          console.log(`[agent] High-gain memory encoded: ${query.slice(0, 30)}... (Gain: ${validation.gainScore})`);
+          console.log(
+            `[agent] High-gain memory encoded: ${query.slice(0, 30)}... (Gain: ${validation.gainScore})`
+          );
         }
       }
     } catch (e) {
@@ -2068,12 +2402,12 @@ export async function runGemma4Agent(
   }
 
   return {
-    answer:      finalAnswer,
+    answer: finalAnswer,
     toolsUsed,
-    rounds:      round,
+    rounds: round,
     sources,
-    durationMs:  Date.now() - t0,
-    cacheTier:   resultCacheTier,
+    durationMs: Date.now() - t0,
+    cacheTier: resultCacheTier,
     cacheLatencyMs: resultCacheMs,
     errorFixMemoryHit,
     verificationStatus,

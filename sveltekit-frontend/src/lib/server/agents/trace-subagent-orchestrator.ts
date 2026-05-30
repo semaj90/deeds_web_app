@@ -6,6 +6,7 @@ import { ontologySortationAgent } from './ontology-sortation-agent.js';
 import { memoryEncodingAgent } from './memory-encoding-agent.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { archiveSynthesisMemory } from '$lib/server/indexer/synthesis-memory-archiver.js';
+import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
 import type {
 	TraceSubagentContext,
 	TraceSubagentResult,
@@ -71,9 +72,28 @@ export async function runTraceSubagentDag(ctx: TraceSubagentContext) {
 			finishedAt: new Date()
 		}).where(sql`id = ${runUuid}`);
 
+		void appendOutcomeLedger({
+			source: 'trace-subagent-orchestrator',
+			runId: ctx.runId,
+			runUuid,
+			query: ctx.query,
+			status: 'ok',
+			durationMs: Date.now() - t0
+		});
+
 	} catch (error) {
 		console.error('[orchestrator] DAG execution interrupted:', error);
 		await db.update(kagDagRuns).set({ status: 'failed', metadata: { error: String(error) } }).where(sql`id = ${runUuid}`);
+		
+		void appendOutcomeLedger({
+			source: 'trace-subagent-orchestrator',
+			runId: ctx.runId,
+			runUuid,
+			query: ctx.query,
+			status: 'failed',
+			error: String(error),
+			durationMs: Date.now() - t0
+		});
 	}
 
 	return {

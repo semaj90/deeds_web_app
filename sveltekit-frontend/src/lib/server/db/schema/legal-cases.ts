@@ -4,6 +4,7 @@ import {
     integer,
     jsonb,
     pgTable,
+    serial,
     text,
     timestamp,
     uuid,
@@ -20,8 +21,8 @@ export const cases = pgTable('cases', {
     title: varchar('title').notNull(),
     description: text('description'),
     caseNumber: varchar('case_number'),
-    status: varchar('status').default('active').notNull(),
-    priority: varchar('priority').default('medium').notNull(),
+    status: text('status').default('active').notNull(),
+    priority: text('priority').default('medium').notNull(),
     practiceArea: varchar('practice_area'),
     jurisdiction: varchar('jurisdiction'),
     court: varchar('court'),
@@ -65,18 +66,15 @@ export const crimes = pgTable('crimes', {
  * Each chunk is a section of a case with metadata
  */
 export const caseChunks = pgTable('case_chunks', {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: serial('id').primaryKey(),
     caseId: uuid('case_id')
         .notNull()
         .references(() => cases.id, { onDelete: 'cascade' }),
-    chunkIndex: integer('chunk_index').notNull(),
-    sectionType: text('section_type').notNull(),
-    sectionSubtype: text('section_subtype'),
-    text: text('text').notNull(),
-    embedding: vector('embedding', { dimensions: 768 }),
-    tokenStart: integer('token_start'),
-    tokenEnd: integer('token_end'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    chunkText: text('chunk_text').notNull(),
+    chunkSource: text('chunk_source').notNull(),
+    chunkEmbeddingId: integer('chunk_embedding_id'),
+    chunkEmbedding: vector('chunk_embedding', { dimensions: 384 }),
+    chunkMetadata: jsonb('chunk_metadata'),
 });
 
 /**

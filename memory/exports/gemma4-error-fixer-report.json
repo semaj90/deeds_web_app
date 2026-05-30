@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-05-30T07:50:46.777Z",
-  "input_tasks": 5,
-  "filtered_tasks": 5,
-  "fixes_emitted": 5,
-  "avg_confidence": 0.5,
+  "timestamp": "2026-05-30T08:55:53.267Z",
+  "input_tasks": 1,
+  "filtered_tasks": 1,
+  "fixes_emitted": 1,
+  "avg_confidence": 0.6,
   "llm": {
     "url": "http://localhost:8090",
     "up": true,
-    "invocations": 5
+    "invocations": 1
   },
   "mcp": {
     "url": "http://localhost:8788",
@@ -15,6 +15,6 @@
     "invocations": 0
   },
   "by_priority": {
-    "P1": 5
+    "P1": 1
   }
 }

@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-05-26T23:38:58.041Z",
+  "generatedAt": "2026-05-30T08:18:04.022Z",
   "manifest": {
-    "generatedAt": "2026-05-26T23:38:57.138Z",
+    "generatedAt": "2026-05-30T08:18:04.022Z",
     "root": "C:\\Users\\james\\Videos\\deeds-web-app",
     "counts": {
       "cards": 1,
-      "schemaFiles": 84,
-      "tables": 310,
+      "schemaFiles": 86,
+      "tables": 317,
       "domains": 7
     },
     "outputs": {
@@ -26,15 +26,15 @@
   },
   "counts": {
     "cards": 1,
-    "schemaFiles": 84,
-    "tables": 310,
+    "schemaFiles": 86,
+    "tables": 317,
     "domains": 7
   },
   "card": {
     "cardId": "schema-indexer:contract",
     "kind": "schema-indexer-contract",
     "title": "Schema Semantic Indexer Contract",
-    "summary": "schema-focused semantic indexer contract | schema files: 84 | tables: 310 | domains: 7 | builds 768d embeddings for prompt context engineering | writes Postgres metadata envelopes, codebase files, and embeddings | warmed Redis exact pointers for MCP/ACE routing | not a full-repo crawler",
+    "summary": "schema-focused semantic indexer contract | schema files: 86 | tables: 317 | domains: 7 | builds 768d embeddings for prompt context engineering | writes Postgres metadata envelopes, codebase files, and embeddings | warmed Redis exact pointers for MCP/ACE routing | not a full-repo crawler",
     "sourceRefs": [
       "scripts/codebase-semantic-indexer.mjs",
       "src/lib/server/db/schema/ace-web-crawl.ts",
@@ -87,6 +87,7 @@
       "src/lib/server/db/schema/normalize-labels.ts",
       "src/lib/server/db/schema/page-artifacts.ts",
       "src/lib/server/db/schema/persons.ts",
+      "src/lib/server/db/schema/rag-cards.ts",
       "src/lib/server/db/schema/reports.ts",
       "src/lib/server/db/schema/route_error_patches.ts",
       "src/lib/server/db/schema/route_health.ts",
@@ -115,6 +116,7 @@
       "src/lib/server/db/schema-phase89-preserved.ts",
       "src/lib/server/db/schema-postgres.ts",
       "src/lib/server/db/schema-prosecutor.ts",
+      "src/lib/server/db/schema-scenarios.ts",
       "src/lib/server/db/schema-search.ts",
       "src/lib/server/db/schema-sqlite.ts",
       "src/lib/server/db/schema-test-rag.ts",
@@ -229,6 +231,7 @@
         "src/lib/server/db/schema/normalize-labels.ts",
         "src/lib/server/db/schema/page-artifacts.ts",
         "src/lib/server/db/schema/persons.ts",
+        "src/lib/server/db/schema/rag-cards.ts",
         "src/lib/server/db/schema/reports.ts",
         "src/lib/server/db/schema/route_error_patches.ts",
         "src/lib/server/db/schema/route_health.ts",
@@ -257,6 +260,7 @@
         "src/lib/server/db/schema-phase89-preserved.ts",
         "src/lib/server/db/schema-postgres.ts",
         "src/lib/server/db/schema-prosecutor.ts",
+        "src/lib/server/db/schema-scenarios.ts",
         "src/lib/server/db/schema-search.ts",
         "src/lib/server/db/schema-sqlite.ts",
         "src/lib/server/db/schema-test-rag.ts",
@@ -349,6 +353,11 @@
         "model_artifacts",
         "page_artifacts",
         "case_persons",
+        "rag_cards",
+        "rag_embeddings",
+        "rag_edges",
+        "ace_packets",
+        "cluster_cards",
         "route_error_patches",
         "route_health",
         "route_metadata",
@@ -440,6 +449,7 @@
         "intent_synthesis",
         "agent_memory_observations",
         "agent_observations",
+        "lora_training_runs",
         "evidence_relationships",
         "documents",
         "legal_documents",
@@ -542,7 +552,6 @@
         "courtroom_animations",
         "courtroom_keyframes",
         "centroid_registry",
-        "cluster_cards",
         "community_reports",
         "hypergraph_edges",
         "context_buffers",
@@ -555,11 +564,13 @@
         "rg_search_runs",
         "rg_search_hits",
         "llm_synthesis_events",
+        "scenario_cache",
         "prosecutor_cases",
         "prosecutor_persons",
         "prosecutor_case_persons",
         "prosecutor_evidence",
         "prosecutor_reports",
+        "scenarios",
         "rg_search_results",
         "search_centroids",
         "test_rag_documents",
@@ -621,7 +632,7 @@
     ],
     "retrieval": {
       "redisKey": "knowledge:schema-indexer:contract",
-      "qdrantPointId": "8de4aba4cd25",
+      "qdrantPointId": "8436e8a22767",
       "embeddingModel": "embeddinggemma:latest",
       "embeddingDim": 768,
       "score": 1
@@ -632,8 +643,8 @@
       "reason": "schema contract is live, file-backed, and independent of workspace-gap cards"
     },
     "schemaIndex": {
-      "files": 84,
-      "tables": 310,
+      "files": 86,
+      "tables": 317,
       "domains": [
         "general",
         "admin-ops",
@@ -659,14 +670,9 @@
       "rg -n -uu \"metadata_envelopes|codebase_embeddings|codebase_files\" sveltekit-frontend/src/lib/server/db scripts"
     ]
   },
-  "coverage": {
-    "atlasOverlayPresent": true,
-    "liveAtlasContract": true,
-    "schemaContractPresent": true
-  },
   "nextActions": [
-    "Use the standalone schema-indexer contract as the MCP search anchor for schema-only work.",
-    "Keep workspace-gap cards and schema contract cards in separate search lanes.",
-    "Rebuild the contract after schema file or semantic indexer changes."
+    "Use this contract as the schema-only MCP search anchor.",
+    "Keep workspace-gap cards separate from schema-indexer contract coverage.",
+    "Run the codebase semantic indexer only against schema sources and verified contract tables."
   ]
 }

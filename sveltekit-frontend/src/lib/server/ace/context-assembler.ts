@@ -52,6 +52,7 @@ import {
   traceVectorSearch,
   traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
+import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
 import { mkdirSync } from 'node:fs';
 import { promises as fsPromises } from 'node:fs';
 
@@ -2693,6 +2694,16 @@ export async function assembleACEContext(opts: {
           },
         })
         .catch((err) => console.warn('[ACE Run Log] failed:', (err as Error)?.message ?? err));
+
+      // Append a lightweight observation to the outcome ledger for retrieval runs
+      void appendOutcomeLedger({
+        source: 'context-assembler',
+        intent: query,
+        tool: 'retrieval',
+        sourceRefs: agentsMd?.resolvedKey ? [agentsMd.resolvedKey] : [],
+        totalFound: aceHits.length + (codebaseContext?.length ?? 0),
+        metadata: { budgetTier: policyDecision.budget.tier },
+      });
 
       // Fire-and-forget: record retrieval event as a HyperGraphRAG hyperedge
       {

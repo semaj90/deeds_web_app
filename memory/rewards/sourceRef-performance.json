@@ -1,15 +1,38 @@
 {
   "sveltekit-frontend/src/lib/server/cache/cache-config.ts": {
-    "sourceRef": "sveltekit-frontend/src/lib/server/cache/cache-config.ts",
-    "usageCount": 6,
-    "rewardCount": 6,
-    "rewardRate": 1,
-    "avgReward": 0.9900000000000001,
-    "totalReward": 5.94,
-    "promotionState": "hot",
-    "authority": 0,
-    "toolCount": 1,
-    "graphVersion": "2026-05-29",
-    "lastUpdated": "2026-05-30T03:50:08.915Z"
+    "count": 6,
+    "average": 0.9900000000000001,
+    "latest": {
+      "ts": "2026-05-29T22:36:32.423Z",
+      "reward": 0.99,
+      "graphVersion": "2026-05-29"
+    },
+    "graphVersions": [
+      "2026-05-29"
+    ],
+    "cardId": "d705bfd010c76907",
+    "authority": null,
+    "som": null,
+    "cluster": "unknown",
+    "promotionState": "promoted",
+    "retentionClass": "hot"
+  },
+  "null": {
+    "count": 0,
+    "average": null,
+    "latest": {
+      "ts": "2026-05-30T08:52:37.855Z",
+      "reward": null,
+      "graphVersion": null
+    },
+    "graphVersions": [
+      null
+    ],
+    "cardId": null,
+    "authority": null,
+    "som": null,
+    "cluster": "unknown",
+    "promotionState": "cold",
+    "retentionClass": "cold"
   }
 }

@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         .where(
           and(
             arrayContains(personsOfInterest.caseIds, [id]),
-            or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))!
+            or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))!
           )
         );
     } catch {

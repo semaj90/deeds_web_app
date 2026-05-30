@@ -125,7 +125,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     .from(personsOfInterest)
     .where(and(
       eq(personsOfInterest.id, refPoiId),
-      or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+      or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))
     ))
     .limit(1);
 
@@ -157,7 +157,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     .where(
       and(
         ne(personsOfInterest.id, refPoiId),
-        or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)),
+        or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy)),
         ...(candidateIds && candidateIds.length > 0
           ? [inArray(personsOfInterest.id, candidateIds.filter(isUuid))]
           : [])

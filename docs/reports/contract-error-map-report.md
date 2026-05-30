@@ -1,6 +1,6 @@
 # Cross-Layer Contract Error Map
 
-Generated: 2026-05-29T23:19:02.374Z  |  Findings: 6  |  High: 0  Medium: 0  Low: 0  Info: 6
+Generated: 2026-05-30T09:19:56.271Z  |  Findings: 6  |  High: 0  Medium: 0  Low: 0  Info: 6
 
 ## Findings
 

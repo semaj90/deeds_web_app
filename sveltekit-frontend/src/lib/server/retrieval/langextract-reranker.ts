@@ -13,8 +13,8 @@
  * Entity extraction is cached 5 minutes per query hash to avoid repeated calls.
  */
 
-import { extractDocument, type LangExtractEntity } from '$lib/server/langextract-client.js';
-import { getRedis } from '$lib/server/redis.js';
+import { entityExtractor } from '$lib/server/analysis/entity-extractor-unified.js';
+import type { LangExtractEntity } from '$lib/server/langextract-client.js';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -77,33 +77,21 @@ const SECTION_RELEVANCE: Record<string, number> = {
  * Results are cached in Redis for 5 minutes per query hash.
  */
 async function extractQueryEntities(query: string): Promise<LangExtractEntity[]> {
-	// Check Redis cache first
-	const { createHash } = await import('crypto');
-	const qHash = createHash('md5').update(query).digest('hex').slice(0, 12);
-	const cacheKey = `${ENTITY_CACHE_PREFIX}:${qHash}`;
-
 	try {
-		const redis = getRedis();
-		const cached = await redis.get(cacheKey);
-		if (cached) return JSON.parse(cached);
-	} catch { /* Redis unavailable — continue */ }
-
-	// Call LangExtract
-	const result = await extractDocument(query, {
-		documentType: 'legal',
-		extractEntities: true,
-		extractStructure: false,
-	});
-
-	const entities = result?.entities ?? [];
-
-	// Cache result
-	try {
-		const redis = getRedis();
-		await redis.set(cacheKey, JSON.stringify(entities), 'EX', ENTITY_CACHE_TTL);
-	} catch { /* non-fatal */ }
-
-	return entities;
+		const result = await entityExtractor.extract({
+			text: query,
+			useLLM: true,
+		});
+		return result.entities.map((e) => ({
+			text: e.value,
+			label: String(e.type),
+			start: e.position?.start ?? 0,
+			end: e.position?.end ?? 0,
+		}));
+	} catch (err) {
+		console.warn('[langextract-reranker] Unified entityExtractor failed:', err);
+		return [];
+	}
 }
 
 /**

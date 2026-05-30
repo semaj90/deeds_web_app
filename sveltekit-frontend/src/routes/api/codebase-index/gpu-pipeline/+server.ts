@@ -35,6 +35,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
 import { pool as pgPool } from '$lib/server/db/client';
+import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
 
 const QDRANT_URL = ENV.QDRANT_URL;
 
@@ -1157,6 +1158,16 @@ export const POST: RequestHandler = async ({ request, locals, fetch: svelteKitFe
   }
 
   const totalMs = performance.now() - pipelineStart;
+
+  void appendOutcomeLedger({
+    source: 'gpu-pipeline',
+    action,
+    query,
+    totalMs: Math.round(totalMs),
+    codebaseChunksCount: codebaseChunks.length,
+    ragHitsCount: ragChunks.length,
+    user: locals.user?.id
+  });
 
   return json({
     action,

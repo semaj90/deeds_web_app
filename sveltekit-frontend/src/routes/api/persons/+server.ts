@@ -47,7 +47,7 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
 
   try {
     const filters: SQL[] = [];
-    filters.push(or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))!);
+    filters.push(or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))!);
 
     if (id) {
       // Check if id is in the caseIds array
@@ -124,7 +124,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       .insert(personsOfInterest)
       .values({
         caseIds: [id],
-        createdBy: locals.user.id,
+        createdBy: Number(locals.user.id),
         name: body.name,
         aliases: body.aliases,
         description: body.description ?? '',

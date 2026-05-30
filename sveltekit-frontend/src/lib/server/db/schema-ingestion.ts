@@ -128,7 +128,7 @@ export const ingestedDocumentChunks = pgTable('document_chunks', {
     id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 
     // Document reference
-    documentId: uuid('document_id').notNull(),
+    documentId: text('document_id').notNull(),
 
     // Chunk metadata
     chunkIndex: integer('chunk_index').notNull(),

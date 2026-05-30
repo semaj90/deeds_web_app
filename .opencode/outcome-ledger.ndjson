@@ -4,3 +4,4 @@
 {"id":"d313796c-5835-4971-8404-f3f80b84654a","intent":"smoke_test_intent","tool":"smoke_test_tool","sourceRefs":["sveltekit-frontend/src/lib/server/cache/cache-config.ts"],"recommendationAccepted":true,"reward":0.99,"graphVersion":"2026-05-29","errorMsg":null,"timestamp":"2026-05-29T22:35:43.138Z"}
 {"id":"d8489fef-a703-4d89-8f62-4331c618ea51","intent":"smoke_test_intent","tool":"smoke_test_tool","sourceRefs":["sveltekit-frontend/src/lib/server/cache/cache-config.ts"],"recommendationAccepted":true,"reward":0.99,"graphVersion":"2026-05-29","errorMsg":null,"timestamp":"2026-05-29T22:36:06.631Z"}
 {"id":"72e0e979-ff71-4c46-86ac-550119d88d24","intent":"smoke_test_intent","tool":"smoke_test_tool","sourceRefs":["sveltekit-frontend/src/lib/server/cache/cache-config.ts"],"recommendationAccepted":true,"reward":0.99,"graphVersion":"2026-05-29","errorMsg":null,"timestamp":"2026-05-29T22:36:32.423Z"}
+{"test":"ok","who":"copilot","ts":"2026-05-30T08:52:37.855Z"}

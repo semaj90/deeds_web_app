@@ -23,7 +23,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
       .where(
         and(
           eq(personsOfInterest.id, poiId),
-          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+          or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))
         )
       )
       .limit(1);
@@ -40,7 +40,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
       .where(
         and(
           ne(personsOfInterest.id, poiId),
-          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)),
+          or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy)),
           sql`${personsOfInterest.caseIds} && ${caseArray}::text[]`
         )
       )

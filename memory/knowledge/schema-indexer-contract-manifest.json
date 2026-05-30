@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-26T23:38:57.138Z",
+  "generatedAt": "2026-05-30T08:18:04.022Z",
   "root": "C:\\Users\\james\\Videos\\deeds-web-app",
   "counts": {
     "cards": 1,
-    "schemaFiles": 84,
-    "tables": 310,
+    "schemaFiles": 86,
+    "tables": 317,
     "domains": 7
   },
   "outputs": {

@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       .from(personsOfInterest)
       .where(
         and(
-          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)),
+          or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy)),
           sql`(
 					lower(${personsOfInterest.name}) LIKE ${searchTerm}
 					OR lower(coalesce(${personsOfInterest.description}, '')) LIKE ${searchTerm}

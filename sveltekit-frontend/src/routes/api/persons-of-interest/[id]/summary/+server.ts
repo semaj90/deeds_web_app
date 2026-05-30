@@ -35,7 +35,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
       .where(
         and(
           eq(personsOfInterest.id, params.id),
-          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+          or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))
         )
       )
       .limit(1)
@@ -78,7 +78,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
     .select()
     .from(personsOfInterest)
     .where(
-      and(eq(personsOfInterest.id, params.id), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)))
+      and(eq(personsOfInterest.id, params.id), or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy)))
     )
     .limit(1)
     .then((r) => r[0]);

@@ -93,8 +93,7 @@ export const ragIndexMetadata = pgTable('rag_index_metadata', {
  .notNull()
  .references(() => evidence.id, { onDelete: 'cascade' }),
  // Array of tag names for weighting
- tags: text('tags')
- .array()
+ tags: text('tags').array()
  .default(sql`'{}'::text[]`)
  .notNull(),
  // Weight multiplier (default 1.0: 1.5 if tags match)

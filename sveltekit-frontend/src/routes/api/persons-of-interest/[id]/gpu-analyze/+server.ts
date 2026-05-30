@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
     const owners = await db
       .select({ id: personsOfInterest.id })
       .from(personsOfInterest)
-      .where(and(eq(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))))
+      .where(and(eq(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))))
       .limit(1);
 
     if (!owners[0]) {

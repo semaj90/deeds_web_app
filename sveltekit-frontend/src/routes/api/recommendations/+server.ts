@@ -51,13 +51,37 @@ const JOB_TTL = 300; // 5 minutes
  */
 export const GET: RequestHandler = async (event) => {
   if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  
+  const redis = getRedis();
+  const recCacheKey = `user:rec:${event.locals.user.id}`;
+  
+  try {
+    const cached = await redis.get(recCacheKey);
+    if (cached) {
+      return json(
+        {
+          success: true,
+          data: JSON.parse(cached),
+          metadata: {
+            timestamp: new Date().toISOString(),
+            version: '1.0',
+            cache: 'hit',
+          },
+        },
+        { status: 200 }
+      );
+    }
+  } catch (err) {
+    console.warn('[recommendations] Redis cache read failed:', err);
+  }
+
   let auth: Awaited<ReturnType<typeof requireAuth>>;
   try {
     auth = await requireAuth(event);
   } catch {
     return json({
       success: true,
-      data: { topicPreferences: [], recentInteractions: [], stats: null },
+      data: { topicPreferences: [], recentInteractions: [], stats: null, personalizedCases: [] },
     });
   }
   const startTime = Date.now();
@@ -76,20 +100,28 @@ export const GET: RequestHandler = async (event) => {
     );
 
     const processingTime = Date.now() - startTime;
+    const resultData = {
+      topicPreferences: (topicPreferences ?? []).slice(0, 10),
+      recentInteractions: recentInteractions ?? [],
+      stats: interactionStats ?? null,
+      personalizedCases,
+    };
+
+    try {
+      await redis.setex(recCacheKey, 86400, JSON.stringify(resultData));
+    } catch (err) {
+      console.warn('[recommendations] Redis cache write failed:', err);
+    }
 
     return json(
       {
         success: true,
-        data: {
-          topicPreferences: (topicPreferences ?? []).slice(0, 10),
-          recentInteractions: recentInteractions ?? [],
-          stats: interactionStats ?? null,
-          personalizedCases,
-        },
+        data: resultData,
         metadata: {
           timestamp: new Date().toISOString(),
           version: '1.0',
           processing_time: processingTime,
+          cache: 'miss',
         },
       },
       { status: 200 }

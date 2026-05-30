@@ -18,6 +18,30 @@ import { ENV } from '$lib/server/env.server.js';
 let _langfuse: any = null;
 let _langfuseCtorPromise: Promise<any> | null = null;
 
+// Helper to normalize possibly-undefined callbacks into an async function
+function _safeCallback<T>(cb?: (...args: any[]) => Promise<T> | T, defaultReturn?: T) {
+	if (typeof cb === 'function') {
+		return (...args: any[]) => Promise.resolve((cb as any)(...args));
+	}
+	return async (..._args: any[]) => defaultReturn as T;
+}
+
+// Safe stringify helper — returns a truncated JSON string or empty string on failure
+function _safeStringify(obj: unknown, max = 300): string {
+	try {
+		const s = JSON.stringify(obj);
+		if (!s) return '';
+		return s.length > max ? s.slice(0, max) : s;
+	} catch {
+		try {
+			const s = String(obj ?? '');
+			return s.length > max ? s.slice(0, max) : s;
+		} catch {
+			return '';
+		}
+	}
+}
+
 export async function getLangfuse() {
   if (_langfuse) return _langfuse;
   if (!ENV.LANGFUSE_ENABLED || !ENV.LANGFUSE_PUBLIC_KEY || !ENV.LANGFUSE_SECRET_KEY) {
@@ -64,9 +88,10 @@ export async function traceLLM<T>(
 	callback: (gen: TraceGenerationHandle) => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
 	if (!langfuse) {
-		// No-op handle when disabled
-		return callback({ end: () => {} });
+		// No-op handle when disabled — call safe callback if caller omitted it
+		return safeCb({ end: () => {} } as TraceGenerationHandle);
 	}
 
 	const trace = langfuse.trace({
@@ -114,7 +139,8 @@ export async function traceEmbedding<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: 'embedding',
@@ -144,9 +170,10 @@ export async function traceRAG<T>(
 	callback: (trace: { span: (name: string) => { end: (output?: string) => void } }) => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
 	if (!langfuse) {
-		// No-op trace
-		return callback({
+		// No-op trace — call safe callback
+		return safeCb({
 			span: () => ({ end: () => {} }),
 		});
 	}
@@ -179,7 +206,8 @@ export async function traceVectorSearch<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `vector:${collection}`,
@@ -189,7 +217,7 @@ export async function traceVectorSearch<T>(
 
 	const span = trace.span({
 		name: 'vector-search',
-		input: JSON.stringify(metadata).slice(0, 500),
+		input: _safeStringify(metadata, 500),
 	});
 	const start = Date.now();
 
@@ -214,7 +242,8 @@ export async function traceDB<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `db:${operation}`,
@@ -250,7 +279,8 @@ export async function traceQueue<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `queue:${operation}:${queue}`,
@@ -260,7 +290,7 @@ export async function traceQueue<T>(
 
 	const span = trace.span({
 		name: `${operation}-${queue}`,
-		input: JSON.stringify(metadata).slice(0, 300),
+		input: _safeStringify(metadata, 300),
 	});
 	const start = Date.now();
 
@@ -283,7 +313,8 @@ export async function traceWorker<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `worker:${taskType}`,
@@ -293,7 +324,7 @@ export async function traceWorker<T>(
 
 	const span = trace.span({
 		name: `compute-${taskType}`,
-		input: JSON.stringify(metadata).slice(0, 300),
+		input: _safeStringify(metadata, 300),
 	});
 	const start = Date.now();
 
@@ -316,7 +347,8 @@ export async function traceCouchDB<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `couchdb:${operation}`,
@@ -346,7 +378,8 @@ export async function traceCache<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `cache:${operation}`,
@@ -378,7 +411,8 @@ export async function traceGraph<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `graph:${operation}`,
@@ -388,7 +422,7 @@ export async function traceGraph<T>(
 
 	const span = trace.span({
 		name: `graph-${operation}`,
-		input: JSON.stringify(metadata).slice(0, 300),
+		input: _safeStringify(metadata, 300),
 	});
 	const start = Date.now();
 
@@ -413,7 +447,8 @@ export async function tracePolicy<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `policy:${operation}`,
@@ -423,7 +458,7 @@ export async function tracePolicy<T>(
 
 	const span = trace.span({
 		name: `policy-${operation}`,
-		input: JSON.stringify(metadata).slice(0, 300),
+		input: _safeStringify(metadata, 300),
 	});
 	const start = Date.now();
 
@@ -447,7 +482,8 @@ export async function traceCartridge<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `cartridge:${operation}`,
@@ -457,7 +493,7 @@ export async function traceCartridge<T>(
 
 	const span = trace.span({
 		name: `cartridge-${operation}`,
-		input: JSON.stringify(metadata).slice(0, 400),
+		input: _safeStringify(metadata, 400),
 	});
 	const start = Date.now();
 
@@ -483,7 +519,8 @@ export async function traceMCPTool<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `mcp:${toolName}`,
@@ -493,7 +530,7 @@ export async function traceMCPTool<T>(
 
 	const span = trace.span({
 		name: `tool-${toolName}`,
-		input: JSON.stringify(metadata).slice(0, 400),
+		input: _safeStringify(metadata, 400),
 	});
 	const start = Date.now();
 
@@ -519,7 +556,8 @@ export async function traceBifrost<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name: `bifrost:${operation}`,
@@ -529,7 +567,7 @@ export async function traceBifrost<T>(
 
 	const span = trace.span({
 		name: `bifrost-${operation}`,
-		input: JSON.stringify(metadata).slice(0, 300),
+		input: _safeStringify(metadata, 300),
 	});
 	const start = Date.now();
 
@@ -566,7 +604,8 @@ export async function traceSpan<T>(
 	callback: () => Promise<T>
 ): Promise<T> {
 	const langfuse = await getLangfuse();
-	if (!langfuse) return callback();
+	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({
 		name,
@@ -576,7 +615,7 @@ export async function traceSpan<T>(
 
 	const span = trace.span({
 		name,
-		input: JSON.stringify(metadata).slice(0, 500),
+		input: _safeStringify(metadata, 500),
 	});
 	const start = Date.now();
 

@@ -45,7 +45,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
   const offset = (page - 1) * limit;
 
   try {
-    const conditions = [or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))];
+    const conditions = [or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))];
     if (status)
       conditions.push(
         eq(personsOfInterest.status, status as (typeof personsOfInterest.status.enumValues)[number])
@@ -162,7 +162,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         relationship: parsed.data.relationship ?? null,
         crimes: parsed.data.crimes ?? [],
         caseIds: parsed.data.caseIds ?? [],
-        createdBy: locals.user.id,
+        createdBy: Number(locals.user.id),
       })
       .returning();
 

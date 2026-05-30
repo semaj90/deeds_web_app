@@ -910,3 +910,10 @@ sveltekit-frontend/memory/graphify/deep/deep-import-graph.json
 !/sveltekit-frontend/memory/atlas/**
 !/docs/documents-atlas-index.json
 !/sveltekit-frontend/docs/documents-atlas-index.json
+
+# Large databases, backups, and CSV outputs
+legal_ai_db_backup.dump
+*.csv
+.opencode/recommendations/tasks.ndjson
+.opencode/ingest/nodes.ndjson
+

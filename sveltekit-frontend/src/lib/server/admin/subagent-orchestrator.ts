@@ -3,6 +3,7 @@ import { adminAiSkills, adminAiSubagentRuns } from '$lib/server/db/schema.js';
 import { traceMcpClient } from '$lib/server/mcp-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { eq } from 'drizzle-orm';
+import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
 
 const MODEL_URL = ENV.TURBOQUANT_BASE_URL;
 
@@ -109,6 +110,15 @@ export class SubagentOrchestrator {
         completedAt: new Date()
       })
       .where(eq(adminAiSubagentRuns.id, run.id));
+
+    void appendOutcomeLedger({
+      source: 'subagent-orchestrator',
+      runId: run.id,
+      skillName,
+      mission,
+      status: status === 'completed' ? 'ok' : 'failed',
+      tokensUsed
+    });
 
     return { runId: run.id, result, trace };
   }

@@ -40,7 +40,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+          or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))
         )
       )
       .limit(1);
@@ -134,7 +134,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+          or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))
         )
       )
       .returning();
@@ -175,7 +175,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+          or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))
         )
       )
       .limit(1);
@@ -193,7 +193,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+          or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))
         )
       )
       .returning({ id: personsOfInterest.id, name: personsOfInterest.name });

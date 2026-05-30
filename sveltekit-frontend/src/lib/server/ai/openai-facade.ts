@@ -868,28 +868,50 @@ export async function runChatCompletion(
 
   // Build ACE preflight packet (compact prompt mapping + selected cards)
   let acePreflight: AcePromptPreflightResult | undefined;
+  const pipeline = 'ace';
+  const ctxCacheKey = `ace:ctx:${createHash('sha256').update(query + pipeline).digest('hex')}`;
+  const redisClientForAce = getRedis();
+  let acePreflightCacheHit = false;
+
   try {
-    if (typeof buildAcePromptPreflight === 'function') {
-      acePreflight = await buildAcePromptPreflight({
-        query,
-        intent: undefined,
-        modelName: internalModel,
-        backend: canUseTurboQuantNow ? 'turboquant' : 'bifrost',
-        tokenBudget: ACE_PACKET_TOKEN_CAP,
-        repoGitSha: process.env.GIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
-        aceCtx,
-      } as AcePromptPreflightInput);
-    } else {
-      console.warn(
-        '[ACE Preflight] buildAcePromptPreflight is not a function; skipping preflight.'
-      );
-    }
-    if (acePreflight) {
-      aceStats.preflight_selected = acePreflight.selectedCards.length;
-      aceStats.preflight_ms = acePreflight.timing.totalMs;
+    const cachedPreflight = await redisClientForAce.get(ctxCacheKey);
+    if (cachedPreflight) {
+      acePreflight = JSON.parse(cachedPreflight);
+      acePreflightCacheHit = true;
     }
   } catch (err) {
-    console.warn('[ACE Preflight] failed:', err instanceof Error ? err.message : err);
+    console.warn('[ACE Preflight Cache] Read failed:', err);
+  }
+
+  if (!acePreflightCacheHit) {
+    try {
+      if (typeof buildAcePromptPreflight === 'function') {
+        acePreflight = await buildAcePromptPreflight({
+          query,
+          intent: undefined,
+          modelName: internalModel,
+          backend: canUseTurboQuantNow ? 'turboquant' : 'bifrost',
+          tokenBudget: ACE_PACKET_TOKEN_CAP,
+          repoGitSha: process.env.GIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
+          aceCtx,
+        } as AcePromptPreflightInput);
+        
+        if (acePreflight) {
+          await redisClientForAce.setex(ctxCacheKey, 3600, JSON.stringify(acePreflight));
+        }
+      } else {
+        console.warn(
+          '[ACE Preflight] buildAcePromptPreflight is not a function; skipping preflight.'
+        );
+      }
+    } catch (err) {
+      console.warn('[ACE Preflight] failed:', err instanceof Error ? err.message : err);
+    }
+  }
+
+  if (acePreflight) {
+    aceStats.preflight_selected = acePreflight.selectedCards.length;
+    aceStats.preflight_ms = acePreflightCacheHit ? 0 : acePreflight.timing.totalMs;
   }
 
   const prompt = await buildACEPromptCached(aceCtx, query, aceStats);

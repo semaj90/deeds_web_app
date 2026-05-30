@@ -337,7 +337,7 @@ export const llmOutputChunks = pgTable('llm_output_chunks', {
 	chunkId:  uuid('chunk_id').notNull().references(() => codebaseChunkIndex.id, { onDelete: 'cascade' }),
 	rank:     integer('rank').notNull(),
 	score:    real('score'),
-	role:     text('role'),
+	role:     varchar('role', { length: 50 }),
 	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
 }, (t) => ({
 	pk:       primaryKey({ columns: [t.outputId, t.chunkId] }),

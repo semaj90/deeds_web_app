@@ -14,6 +14,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import Redis from 'ioredis';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const root = process.cwd();
 
@@ -240,7 +244,26 @@ function countLines(filePath) {
   return text.trim() ? text.trim().split(/\r?\n/).length : 0;
 }
 
-function main() {
+async function publishVersionHashToRedis(versionHash) {
+  const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+  const redis = new Redis(redisUrl, {
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+  });
+  redis.on('error', () => {});
+  try {
+    await redis.connect();
+    await redis.set('graph:refresh:version', versionHash);
+    console.log(`[graph-exports] Published version hash ${versionHash} to Redis 'graph:refresh:version'`);
+    await redis.quit();
+  } catch (err) {
+    console.warn('[graph-exports] Redis unavailable for version hash publishing:', err.message);
+  }
+}
+
+async function main() {
   fs.mkdirSync(EXPORT_DIR, { recursive: true });
 
   const graph = readJsonIfExists(GRAPH_PATH, null);
@@ -324,6 +347,10 @@ function main() {
   console.log('[graph-exports] wrote:', path.relative(root, CLUSTER_CARDS_PATH), clusterCards.length, 'rows');
   console.log('[graph-exports] wrote:', path.relative(root, PATHWAY_CARDS_PATH), pathwayCards.length, 'rows');
   console.log('[graph-exports] status: generated, promotionState: unpromoted');
+
+  // Publish refresh version hash to Redis
+  const versionHash = manifest.hashes.clusterCardsSha256.slice(0, 16);
+  await publishVersionHashToRedis(versionHash);
 }
 
 main();

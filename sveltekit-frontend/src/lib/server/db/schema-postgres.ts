@@ -338,7 +338,10 @@ export type NewAnalysisJob = typeof analysisJobs.$inferInsert;
 
 // === INTENT SYNTHESIS (ACE captures non-blocking synthesis records) ===
 export const intentSynthesis = pgTable('intent_synthesis', {
-  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
   queryHash: text('query_hash'),
   contextPackKey: text('context_pack_key'),
   authority: jsonb('authority').default({}),
@@ -347,7 +350,9 @@ export const intentSynthesis = pgTable('intent_synthesis', {
   summaryIds: jsonb('summary_ids').default([]).$type<string[]>(),
   retrievalTrace: jsonb('retrieval_trace').default({}),
   cachedSteps: jsonb('cached_steps').default({}),
-  rewardScore: real('reward_score'),
+  // NOTE: Postgres stores reward scores as floating-point (real) in production.
+  // This is a non-destructive TypeScript schema alignment to match the live DB.
+  rewardScore: numeric('reward_score'),
   degraded: boolean('degraded').notNull().default(false),
   degradedReason: text('degraded_reason'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
@@ -357,46 +362,61 @@ export type IntentSynthesis = typeof intentSynthesis.$inferSelect;
 export type NewIntentSynthesis = typeof intentSynthesis.$inferInsert;
 
 // === AGENT MEMORY OBSERVATIONS (Claude-Mem/OpenCode mirror, Postgres canonical) ===
-export const agentMemoryObservations = pgTable('agent_memory_observations', {
-  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-  source: varchar('source', { length: 100 }).notNull().default('claude-mem'),
-  ide: varchar('ide', { length: 50 }).default('opencode'),
-  sessionId: text('session_id'),
-  observationId: text('observation_id'),
-  projectPath: text('project_path'),
-  summary: text('summary').notNull(),
-  tags: jsonb('tags').default([]).$type<string[]>(),
-  sourceRefs: jsonb('source_refs').default([]).$type<string[]>(),
-  toolCalls: jsonb('tool_calls').default([]).$type<Array<Record<string, unknown> | string>>(),
-  rawJson: jsonb('raw_json').default({}),
-  embedding: vector('embedding', { dimensions: 768 }),
-  embeddingModel: varchar('embedding_model', { length: 100 }).default('embeddinggemma:latest'),
-  embeddingDim: integer('embedding_dim').default(768),
-  qdrantPointId: text('qdrant_point_id'),
-  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-}, (table) => ({
-  sessionIdx: index('agent_memory_observations_session_idx').on(table.sessionId),
-  observationIdx: index('agent_memory_observations_observation_idx').on(table.observationId),
-  qdrantIdx: index('agent_memory_observations_qdrant_idx').on(table.qdrantPointId),
-  createdIdx: index('agent_memory_observations_created_idx').on(table.createdAt),
-}));
+export const agentMemoryObservations = pgTable(
+  'agent_memory_observations',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    source: text('source').notNull().default('claude-mem'),
+    ide: text('ide').default('opencode'),
+    sessionId: text('session_id'),
+    observationId: text('observation_id'),
+    projectPath: text('project_path'),
+    summary: text('summary').notNull(),
+    tags: jsonb('tags').default([]).$type<string[]>(),
+    sourceRefs: jsonb('source_refs').default([]).$type<string[]>(),
+    toolCalls: jsonb('tool_calls').default([]).$type<Array<Record<string, unknown> | string>>(),
+    rawJson: jsonb('raw_json').default({}),
+    embedding: vector('embedding', { dimensions: 768 }),
+    embeddingModel: text('embedding_model').default('embeddinggemma:latest'),
+    embeddingDim: integer('embedding_dim').default(768),
+    qdrantPointId: text('qdrant_point_id'),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    sessionIdx: index('agent_memory_observations_session_idx').on(table.sessionId),
+    observationIdx: index('agent_memory_observations_observation_idx').on(table.observationId),
+    qdrantIdx: index('agent_memory_observations_qdrant_idx').on(table.qdrantPointId),
+    createdIdx: index('agent_memory_observations_created_idx').on(table.createdAt),
+  })
+);
 
 export type AgentMemoryObservation = typeof agentMemoryObservations.$inferSelect;
 export type NewAgentMemoryObservation = typeof agentMemoryObservations.$inferInsert;
 
 // === AGENT OBSERVATIONS (OpenCode progressive memory timeline / ingest canonical) ===
-export const agentObservations = pgTable('agent_observations', {
-  id: serial('id').primaryKey().notNull(),
-  sessionType: text('session_type').notNull(), // 'decision', 'bugfix', 'feature'
-  filePath: text('file_path'),
-  observationText: text('observation_text').notNull(),
-  charIntervalStart: integer('char_interval_start'),
-  somClusterId: integer('som_cluster_id'), // 64D projected latent tag mapping to SOM centroid id
-  timestamp: timestamp('timestamp', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-}, (table) => ({
-  somIdx: index('agent_observations_som_idx').on(table.somClusterId),
-  tsIdx: index('agent_observations_ts_idx').on(table.timestamp),
-}));
+export const agentObservations = pgTable(
+  'agent_observations',
+  {
+    id: serial('id').primaryKey().notNull(),
+    sessionType: text('session_type').notNull(), // 'decision', 'bugfix', 'feature'
+    filePath: text('file_path'),
+    observationText: text('observation_text').notNull(),
+    charIntervalStart: integer('char_interval_start'),
+    somClusterId: integer('som_cluster_id'), // 64D projected latent tag mapping to SOM centroid id
+    timestamp: timestamp('timestamp', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    somIdx: index('agent_observations_som_idx').on(table.somClusterId),
+    tsIdx: index('agent_observations_ts_idx').on(table.timestamp),
+  })
+);
 
 export type AgentObservation = typeof agentObservations.$inferSelect;
 export type NewAgentObservation = typeof agentObservations.$inferInsert;
@@ -405,236 +425,254 @@ export type NewAgentObservation = typeof agentObservations.$inferInsert;
 // glyphRecords is declared below at the canonical location (~line 3748).
 // Types are exported alongside the table definition.
 
-export const loraTrainingRuns = pgTable('lora_training_runs', {
-  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-  runId: text('run_id').notNull(),
-  modelId: text('model_id').notNull(),
-  baseModel: text('base_model'),
-  datasetUri: text('dataset_uri'),
-  checkpointUri: text('checkpoint_uri'),
-  seaweedObjectKey: text('seaweed_object_key'),
-  status: text('status').notNull().default('planned'),
-  metricsJson: jsonb('metrics_json').default({}),
-  configJson: jsonb('config_json').default({}),
-  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-}, (t) => ({
-  indexes: [
-    index('lora_runs_run_id_idx').on(t.runId),
-    index('lora_runs_model_id_idx').on(t.modelId),
-    index('lora_runs_checkpoint_idx').on(t.checkpointUri),
-    index('lora_runs_created_at_idx').on(t.createdAt),
-  ],
-}));
+export const loraTrainingRuns = pgTable(
+  'lora_training_runs',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    runId: text('run_id').notNull(),
+    modelId: text('model_id').notNull(),
+    baseModel: text('base_model'),
+    datasetUri: text('dataset_uri'),
+    checkpointUri: text('checkpoint_uri'),
+    seaweedObjectKey: text('seaweed_object_key'),
+    status: text('status').notNull().default('planned'),
+    metricsJson: jsonb('metrics_json').default({}),
+    configJson: jsonb('config_json').default({}),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => ({
+    indexes: [
+      index('lora_runs_run_id_idx').on(t.runId),
+      index('lora_runs_model_id_idx').on(t.modelId),
+      index('lora_runs_checkpoint_idx').on(t.checkpointUri),
+      index('lora_runs_created_at_idx').on(t.createdAt),
+    ],
+  })
+);
 
 export type LoraTrainingRun = typeof loraTrainingRuns.$inferSelect;
 export type NewLoraTrainingRun = typeof loraTrainingRuns.$inferInsert;
 
 // === EVIDENCE RELATIONSHIPS ===
-export const evidenceRelationships = pgTable('evidence_relationships',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id').notNull(),
- fromEvidenceId: uuid('from_evidence_id').notNull(),
- toEvidenceId: uuid('to_evidence_id').notNull(),
- relationshipType: relationTypeEnum('relationship_type').notNull(),
- label: text('label'),
- strength: varchar('strength', { length: 20 }).default('medium').notNull(),
- createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
- },
-	(table) => ({
- indexes: [
- index('evidence_relationships_case_id_idx').on(table.caseId),
- index('evidence_relationships_from_idx').on(table.fromEvidenceId),
- index('evidence_relationships_to_idx').on(table.toEvidenceId)],
- foreignKeys: [
- foreignKey({
- columns: [table.caseId],
- foreignColumns: [cases.id],
- name: 'evidence_relationships_case_id_fk',
- }).onDelete('cascade'),
- foreignKey({
- columns: [table.fromEvidenceId],
- foreignColumns: [evidence.id],
- name: 'evidence_relationships_from_fk',
- }).onDelete('cascade'),
- foreignKey({
- columns: [table.toEvidenceId],
- foreignColumns: [evidence.id],
- name: 'evidence_relationships_to_fk',
- }).onDelete('cascade')],
- })
+export const evidenceRelationships = pgTable(
+  'evidence_relationships',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    caseId: uuid('case_id').notNull(),
+    fromEvidenceId: uuid('from_evidence_id').notNull(),
+    toEvidenceId: uuid('to_evidence_id').notNull(),
+    relationshipType: relationTypeEnum('relationship_type').notNull(),
+    label: text('label'),
+    strength: varchar('strength', { length: 20 }).default('medium').notNull(),
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => ({
+    indexes: [
+      index('evidence_relationships_case_id_idx').on(table.caseId),
+      index('evidence_relationships_from_idx').on(table.fromEvidenceId),
+      index('evidence_relationships_to_idx').on(table.toEvidenceId),
+    ],
+    foreignKeys: [
+      foreignKey({
+        columns: [table.caseId],
+        foreignColumns: [cases.id],
+        name: 'evidence_relationships_case_id_fk',
+      }).onDelete('cascade'),
+      foreignKey({
+        columns: [table.fromEvidenceId],
+        foreignColumns: [evidence.id],
+        name: 'evidence_relationships_from_fk',
+      }).onDelete('cascade'),
+      foreignKey({
+        columns: [table.toEvidenceId],
+        foreignColumns: [evidence.id],
+        name: 'evidence_relationships_to_fk',
+      }).onDelete('cascade'),
+    ],
+  })
 );
 
 // Define documents table
 export const documents = pgTable('documents', {
- id: text('id')
-  .primaryKey()
-  .notNull(),
- caseId: uuid('case_id'),
- title: text('title').notNull(),
- // OLD COLUMNS (preserve existing data)
- description: text('description'),
- filePath: varchar('file_path', { length: 500 }),
- fileType: varchar('file_type', { length: 100 }),
- fileSize: bigint('file_size', { mode: 'number' }),
- content: text('content'),
- summary: text('summary'),
- embeddingId: varchar('embedding_id', { length: 255 }),
- metadata: jsonb('metadata'),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- status: varchar('status', { length: 50 }).default('pending'),
- // NEW COLUMNS (for S3/MinIO integration - graceful fallback if null)
- s3Key: text('s3_key'),
- s3Bucket: text('s3_bucket').default('legal-documents'),
- originalName: text('original_name'),
- mimeType: text('mime_type'),
- userId: integer('user_id'),
+  id: text('id').primaryKey().notNull(),
+  caseId: uuid('case_id'),
+  title: text('title').notNull(),
+  // OLD COLUMNS (preserve existing data)
+  description: text('description'),
+  filePath: varchar('file_path', { length: 500 }),
+  fileType: varchar('file_type', { length: 100 }),
+  fileSize: bigint('file_size', { mode: 'number' }),
+  content: text('content'),
+  summary: text('summary'),
+  embeddingId: varchar('embedding_id', { length: 255 }),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  status: varchar('status', { length: 50 }).default('pending'),
+  // NEW COLUMNS (for S3/MinIO integration - graceful fallback if null)
+  s3Key: text('s3_key'),
+  s3Bucket: text('s3_bucket').default('legal-documents'),
+  originalName: text('original_name'),
+  mimeType: text('mime_type'),
+  userId: integer('user_id'),
 });
 
 // Define legalDocuments table (based on documents, with additional fields for Qdrant integration)
-export const legalDocuments = pgTable('legal_documents',
- {
- id: text('id')
-  .primaryKey()
-  .notNull(),
- title: text('title').notNull(),
- content: text('content'),
- s3Key: text('s3_key').notNull(),
- s3Bucket: text('s3_bucket').notNull().default('legal-documents'),
- originalName: text('original_name').notNull(),
- mimeType: text('mime_type').notNull(),
- fileSize: bigint('file_size', { mode: 'number' }).notNull().default(0),
- caseId: uuid('case_id'), // Foreign key to cases table
- userId: integer('user_id'), // Foreign key to users table
- evidenceId: uuid('evidence_id'), // Added: Foreign key to evidence table
- createdBy: integer('created_by'), // Added: Foreign key to users table
- status: documentStatusEnum('status').notNull().default('queued'),
- documentType: documentTypeEnum('document_type'), // Specific legal document type
- practiceArea: varchar('practice_area', { length: 100 }),
- metadata: jsonb('metadata'), // General metadata
- contentEmbedding: vector('content_embedding', { dimensions: 768 }),
- qdrantId: uuid('qdrant_id'), // ID in Qdrant
- qdrantCollection: varchar('qdrant_collection', { length: 100 }), // Qdrant collection name
- lastSyncedToQdrant: timestamp('last_synced_to_qdrant', { withTimezone: true, mode: 'string' }),
- deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }), // Soft delete
- createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
- .defaultNow()
- .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
- .defaultNow()
- .notNull(),
- },
-	(table) => ({
- indexes: [
- index('idx_legal_documents_case_id').on(table.caseId),
- index('idx_legal_documents_user_id').on(table.userId),
- index('idx_legal_documents_status').on(table.status),
- index('idx_legal_documents_qdrant_id').on(table.qdrantId),
- // HNSW index for contentEmbedding for fast similarity search
- // Note: HNSW indexes must be created via raw SQL migration, not in schema
- index('idx_legal_documents_content_embedding_hnsw').on(table.contentEmbedding)],
- foreignKeys: [
- foreignKey({
- columns: [table.caseId],
- foreignColumns: [cases.id],
- name: 'legal_documents_case_id_cases_id_fk',
- }).onDelete('cascade'),
- foreignKey({
- columns: [table.userId],
- foreignColumns: [users.id],
- name: 'legal_documents_user_id_users_id_fk',
- }).onDelete('set null'),
- foreignKey({
- // Added foreign key for evidenceId
- columns: [table.evidenceId],
- foreignColumns: [evidence.id],
- name: 'legal_documents_evidence_id_evidence_id_fk',
- }).onDelete('set null'),
- foreignKey({
- // Added foreign key for createdBy
- columns: [table.createdBy],
- foreignColumns: [users.id],
- name: 'legal_documents_created_by_users_id_fk',
- }).onDelete('set null')],
- })
+export const legalDocuments = pgTable(
+  'legal_documents',
+  {
+    id: text('id').primaryKey().notNull(),
+    title: text('title').notNull(),
+    content: text('content'),
+    s3Key: text('s3_key').notNull(),
+    s3Bucket: text('s3_bucket').notNull().default('legal-documents'),
+    originalName: text('original_name').notNull(),
+    mimeType: text('mime_type').notNull(),
+    fileSize: bigint('file_size', { mode: 'number' }).notNull().default(0),
+    caseId: uuid('case_id'), // Foreign key to cases table
+    userId: integer('user_id'), // Foreign key to users table
+    evidenceId: uuid('evidence_id'), // Added: Foreign key to evidence table
+    createdBy: integer('created_by'), // Added: Foreign key to users table
+    status: documentStatusEnum('status').notNull().default('queued'),
+    documentType: documentTypeEnum('document_type'), // Specific legal document type
+    practiceArea: varchar('practice_area', { length: 100 }),
+    metadata: jsonb('metadata'), // General metadata
+    contentEmbedding: vector('content_embedding', { dimensions: 768 }),
+    qdrantId: uuid('qdrant_id'), // ID in Qdrant
+    qdrantCollection: varchar('qdrant_collection', { length: 100 }), // Qdrant collection name
+    lastSyncedToQdrant: timestamp('last_synced_to_qdrant', { withTimezone: true, mode: 'string' }),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }), // Soft delete
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    indexes: [
+      index('idx_legal_documents_case_id').on(table.caseId),
+      index('idx_legal_documents_user_id').on(table.userId),
+      index('idx_legal_documents_status').on(table.status),
+      index('idx_legal_documents_qdrant_id').on(table.qdrantId),
+      // HNSW index for contentEmbedding for fast similarity search
+      // Note: HNSW indexes must be created via raw SQL migration, not in schema
+      index('idx_legal_documents_content_embedding_hnsw').on(table.contentEmbedding),
+    ],
+    foreignKeys: [
+      foreignKey({
+        columns: [table.caseId],
+        foreignColumns: [cases.id],
+        name: 'legal_documents_case_id_cases_id_fk',
+      }).onDelete('cascade'),
+      foreignKey({
+        columns: [table.userId],
+        foreignColumns: [users.id],
+        name: 'legal_documents_user_id_users_id_fk',
+      }).onDelete('set null'),
+      foreignKey({
+        // Added foreign key for evidenceId
+        columns: [table.evidenceId],
+        foreignColumns: [evidence.id],
+        name: 'legal_documents_evidence_id_evidence_id_fk',
+      }).onDelete('set null'),
+      foreignKey({
+        // Added foreign key for createdBy
+        columns: [table.createdBy],
+        foreignColumns: [users.id],
+        name: 'legal_documents_created_by_users_id_fk',
+      }).onDelete('set null'),
+    ],
+  })
 );
 
 // Define storageFiles table
-export const storageFiles = pgTable('storage_files',
- {
- id: uuid('id')
- .primaryKey()
- .notNull()
- .default(sql`gen_random_uuid()`),
- key: text('key').notNull(),
- original_name: text('original_name'),
- bucket: text('bucket').notNull(),
- userId: integer('user_id'), // Foreign key to users table
- size: bigint('size', { mode: 'bigint' }).notNull(),
- mime: text('mime'),
- uploadedAt: timestamp('uploaded_at').defaultNow().notNull(), // Changed to uploadedAt for consistency
- },
-	(table) => ({
- foreignKeys: [
- foreignKey({
- columns: [table.userId],
- foreignColumns: [users.id],
- name: 'storage_files_user_id_users_id_fk',
- }).onDelete('set null')],
- })
+export const storageFiles = pgTable(
+  'storage_files',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .notNull()
+      .default(sql`gen_random_uuid()`),
+    key: text('key').notNull(),
+    original_name: text('original_name'),
+    bucket: text('bucket').notNull(),
+    userId: integer('user_id'), // Foreign key to users table
+    size: bigint('size', { mode: 'bigint' }).notNull(),
+    mime: text('mime'),
+    uploadedAt: timestamp('uploaded_at').defaultNow().notNull(), // Changed to uploadedAt for consistency
+  },
+  (table) => ({
+    foreignKeys: [
+      foreignKey({
+        columns: [table.userId],
+        foreignColumns: [users.id],
+        name: 'storage_files_user_id_users_id_fk',
+      }).onDelete('set null'),
+    ],
+  })
 );
 
 // === VECTOR METADATA ===
-export const vectorMetadata = pgTable('vector_metadata',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- documentId: text('document_id').notNull(), // This might be a foreign key to documents.id or legalDocuments.id
- collectionName: varchar('collection_name', { length: 100 }).notNull(),
- metadata: jsonb('metadata').default({}).notNull(),
- contentHash: text('content_hash').notNull(),
- createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow(),
- },
-	(table) => [unique('vector_metadata_document_id_unique').on(table.documentId)]
+export const vectorMetadata = pgTable(
+  'vector_metadata',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    documentId: text('document_id').notNull(), // This might be a foreign key to documents.id or legalDocuments.id
+    collectionName: varchar('collection_name', { length: 100 }).notNull(),
+    metadata: jsonb('metadata').default({}).notNull(),
+    contentHash: text('content_hash').notNull(),
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow(),
+  },
+  (table) => [unique('vector_metadata_document_id_unique').on(table.documentId)]
 );
 
 // === CASE SCORING SYSTEM ===
-export const caseScores = pgTable('case_scores',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- // Foreign key to users.id; who performed the calculation (nullable to allow on delete set null)
- calculatedBy: integer('calculated_by'),
- caseId: uuid('case_id').notNull(),
- score: numeric('score', { precision: 5, scale: 2 }).notNull(),
- riskLevel: caseRiskLevelEnum('risk_level').notNull(),
- breakdown: jsonb('breakdown').default({}).notNull(),
- criteria: jsonb('criteria').default({}).notNull(),
- recommendations: jsonb('recommendations').default([]).notNull().$type<string[]>(),
- calculatedAt: timestamp('calculated_at', { mode: 'string' }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
- },
-	(table) => [
- foreignKey({
- columns: [table.caseId],
- foreignColumns: [cases.id],
- name: `case_scores_case_id_cases_id_fk`,
- }).onDelete('cascade'),
- foreignKey({
- columns: [table.calculatedBy],
- foreignColumns: [users.id],
- name: `case_scores_calculated_by_users_id_fk`,
- }).onDelete('set null')]
+export const caseScores = pgTable(
+  'case_scores',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    // Foreign key to users.id; who performed the calculation (nullable to allow on delete set null)
+    calculatedBy: integer('calculated_by'),
+    caseId: uuid('case_id').notNull(),
+    score: numeric('score', { precision: 5, scale: 2 }).notNull(),
+    riskLevel: caseRiskLevelEnum('risk_level').notNull(),
+    breakdown: jsonb('breakdown').default({}).notNull(),
+    criteria: jsonb('criteria').default({}).notNull(),
+    recommendations: jsonb('recommendations').default([]).notNull().$type<string[]>(),
+    calculatedAt: timestamp('calculated_at', { mode: 'string' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.caseId],
+      foreignColumns: [cases.id],
+      name: `case_scores_case_id_cases_id_fk`,
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.calculatedBy],
+      foreignColumns: [users.id],
+      name: `case_scores_calculated_by_users_id_fk`,
+    }).onDelete('set null'),
+  ]
 );
 
 // === EMBEDDING CACHE ===
@@ -844,69 +882,77 @@ export const aiReports = pgTable('ai_reports', {
  *   source: 'gpu' | 'cpu'
  * }
  */
-export const codebaseAuditReports = pgTable('codebase_audit_reports', {
-  id: uuid('id')
-    .default(sql`gen_random_uuid()`)
-    .primaryKey()
-    .notNull(),
-  caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
-   createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
-  reportType: varchar('report_type', { length: 50 }).notNull().default('full'), // 'graph', 'evidence', 'codebase', 'full'
+export const codebaseAuditReports = pgTable(
+  'codebase_audit_reports',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
+    createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+    reportType: varchar('report_type', { length: 50 }).notNull().default('full'), // 'graph', 'evidence', 'codebase', 'full'
 
-  // GPU metrics
-  cudaAvailable: boolean('cuda_available').notNull().default(false),
-  gpuMemoryMb: integer('gpu_memory_mb'),
-  gpuMemoryFreeMb: integer('gpu_memory_free_mb'),
+    // GPU metrics
+    cudaAvailable: boolean('cuda_available').notNull().default(false),
+    gpuMemoryMb: integer('gpu_memory_mb'),
+    gpuMemoryFreeMb: integer('gpu_memory_free_mb'),
 
-  // Analysis components (JSONB)
-  graphAnalysis: jsonb('graph_analysis'), // Neo4j + GPU clustering results
-  evidenceAnalysis: jsonb('evidence_analysis'), // Evidence similarity + case embeddings
-  codebaseAnalysis: jsonb('codebase_analysis'), // Code duplicate detection + clustering
+    // Analysis components (JSONB)
+    graphAnalysis: jsonb('graph_analysis'), // Neo4j + GPU clustering results
+    evidenceAnalysis: jsonb('evidence_analysis'), // Evidence similarity + case embeddings
+    codebaseAnalysis: jsonb('codebase_analysis'), // Code duplicate detection + clustering
 
-  // Performance metrics
-  durationMs: integer('duration_ms').notNull(),
-  graphDurationMs: integer('graph_duration_ms'),
-  evidenceDurationMs: integer('evidence_duration_ms'),
-  codebaseDurationMs: integer('codebase_duration_ms'),
+    // Performance metrics
+    durationMs: integer('duration_ms').notNull(),
+    graphDurationMs: integer('graph_duration_ms'),
+    evidenceDurationMs: integer('evidence_duration_ms'),
+    codebaseDurationMs: integer('codebase_duration_ms'),
 
-  // Status
-  status: varchar('status', { length: 32 }).notNull().default('completed'), // 'queued', 'running', 'completed', 'failed'
-  error: text('error'),
+    // Status
+    status: varchar('status', { length: 32 }).notNull().default('completed'), // 'queued', 'running', 'completed', 'failed'
+    error: text('error'),
 
-  // Cache key for CouchDB integration
-  cacheKey: varchar('cache_key', { length: 255 }),
+    // Cache key for CouchDB integration
+    cacheKey: varchar('cache_key', { length: 255 }),
 
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-}, (t) => ({
-  caseIdx: index('codebase_audit_reports_case_idx').on(t.caseId),
-  statusIdx: index('codebase_audit_reports_status_idx').on(t.status),
-  typeIdx: index('codebase_audit_reports_type_idx').on(t.reportType),
-  createdIdx: index('codebase_audit_reports_created_idx').on(t.createdAt),
-}));
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({
+    caseIdx: index('codebase_audit_reports_case_idx').on(t.caseId),
+    statusIdx: index('codebase_audit_reports_status_idx').on(t.status),
+    typeIdx: index('codebase_audit_reports_type_idx').on(t.reportType),
+    createdIdx: index('codebase_audit_reports_created_idx').on(t.createdAt),
+  })
+);
 
 // === AGENT SESSIONS (Phase 76+ / Lane-Aware Store) ===
 /**
  * Stores interactive and background agent sessions.
  * This is the 'Hypergraph Store' for Lane 1 and background lanes.
  */
-export const agentSessions = pgTable('agent_sessions', {
-  id: serial('id').primaryKey().notNull(),
-  sessionId: varchar('session_id', { length: 255 }).unique().notNull(),
-  lane: varchar('lane', { length: 64 }).notNull(), // 'interactive-agent', 'background-analysis'
-  taskType: varchar('task_type', { length: 64 }).notNull(), // 'fix-recommender', 'wiki-generation', etc.
-  status: varchar('status', { length: 32 }).notNull().default('active'),
-  outcome: text('outcome'),
-  metadata: jsonb('metadata').default({}),
-  startTime: timestamp('start_time', { withTimezone: true }).defaultNow().notNull(),
-  endTime: timestamp('end_time', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-}, (t) => ({
-  sessionIdx: index('idx_agent_sessions_id').on(t.sessionId),
-  laneIdx: index('idx_agent_sessions_lane').on(t.lane),
-  statusIdx: index('idx_agent_sessions_status').on(t.status),
-}));
+export const agentSessions = pgTable(
+  'agent_sessions',
+  {
+    id: serial('id').primaryKey().notNull(),
+    sessionId: varchar('session_id', { length: 255 }).unique().notNull(),
+    lane: varchar('lane', { length: 64 }).notNull(), // 'interactive-agent', 'background-analysis'
+    taskType: varchar('task_type', { length: 64 }).notNull(), // 'fix-recommender', 'wiki-generation', etc.
+    status: varchar('status', { length: 32 }).notNull().default('active'),
+    outcome: text('outcome'),
+    metadata: jsonb('metadata').default({}),
+    startTime: timestamp('start_time', { withTimezone: true }).defaultNow().notNull(),
+    endTime: timestamp('end_time', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({
+    sessionIdx: index('idx_agent_sessions_id').on(t.sessionId),
+    laneIdx: index('idx_agent_sessions_lane').on(t.lane),
+    statusIdx: index('idx_agent_sessions_status').on(t.status),
+  })
+);
 
 export type AgentSession = typeof agentSessions.$inferSelect;
 export type NewAgentSession = typeof agentSessions.$inferInsert;
@@ -1161,7 +1207,7 @@ export const personsOfInterest = pgTable('persons_of_interest', {
   photoUrl: text('photo_url'),
   notes: text('notes'),
   metadata: jsonb('metadata').default({}),
-  createdBy: uuid('created_by'),
+  createdBy: integer('created_by'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -1270,7 +1316,10 @@ export const timelineEvents = pgTable(
 
 // === VLM IMAGE TAGS ===
 export const vlmImageTags = pgTable('vlm_image_tags', {
-  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
   name: varchar('name', { length: 200 }).unique().notNull(),
   description: text('description'),
   source: varchar('source', { length: 50 }).notNull().default('manual'),
@@ -1319,13 +1368,9 @@ export const userEmbeddings = pgTable('user_embeddings', {
 });
 
 export const chatEmbeddings = pgTable('chat_embeddings', {
-  id: uuid('id')
-    .default(sql`gen_random_uuid()`)
-    .primaryKey()
-    .notNull(),
-  ragMessageId: uuid('rag_message_id').notNull(),
-  embedding: vector('embedding', { dimensions: 768 }).notNull(),
-  model: varchar('model', { length: 100 }).notNull(),
+  id: serial('id').primaryKey().notNull(),
+  text: text('text').notNull(),
+  embedding: vector('embedding', { dimensions: 384 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -1345,30 +1390,37 @@ export const evidenceVectors = pgTable('evidence_vectors', {
  * Stores YOLO detections, VLM findings, LLM synthesis, and graph connections
  * so the client can query by case_id + analysis_type without parsing JSONB metadata.
  */
-export const evidenceAnalysisCache = pgTable('evidence_analysis_cache', {
-  id: uuid('id')
-    .default(sql`gen_random_uuid()`)
-    .primaryKey()
-    .notNull(),
-  evidenceId: uuid('evidence_id').notNull(),
-  caseId: uuid('case_id'),
-  analysisType: varchar('analysis_type', { length: 50 }).notNull(), // 'yolo', 'vlm', 'llm_synthesis', 'combined'
-  result: jsonb('result').notNull(), // full analysis payload
-  resultEmbedding: vector('result_embedding', { dimensions: 768 }), // embedded summary for semantic search
-  confidence: real('confidence').default(0.0),
-  objectCount: integer('object_count').default(0),
-  tags: jsonb('tags').$type<string[]>().default([]),
-  llmEscalated: boolean('llm_escalated').default(false),
-  processingTimeMs: integer('processing_time_ms').default(0),
-  expiresAt: timestamp('expires_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-}, (table) => ({
-  evidenceIdIdx: index('evidence_analysis_cache_evidence_id_idx').on(table.evidenceId),
-  caseIdIdx: index('evidence_analysis_cache_case_id_idx').on(table.caseId),
-  analysisTypeIdx: index('evidence_analysis_cache_type_idx').on(table.analysisType),
-  caseTypeIdx: index('evidence_analysis_cache_case_type_idx').on(table.caseId, table.analysisType),
-}));
+export const evidenceAnalysisCache = pgTable(
+  'evidence_analysis_cache',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    evidenceId: uuid('evidence_id').notNull(),
+    caseId: uuid('case_id'),
+    analysisType: varchar('analysis_type', { length: 50 }).notNull(), // 'yolo', 'vlm', 'llm_synthesis', 'combined'
+    result: jsonb('result').notNull(), // full analysis payload
+    resultEmbedding: vector('result_embedding', { dimensions: 768 }), // embedded summary for semantic search
+    confidence: real('confidence').default(0.0),
+    objectCount: integer('object_count').default(0),
+    tags: jsonb('tags').$type<string[]>().default([]),
+    llmEscalated: boolean('llm_escalated').default(false),
+    processingTimeMs: integer('processing_time_ms').default(0),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    evidenceIdIdx: index('evidence_analysis_cache_evidence_id_idx').on(table.evidenceId),
+    caseIdIdx: index('evidence_analysis_cache_case_id_idx').on(table.caseId),
+    analysisTypeIdx: index('evidence_analysis_cache_type_idx').on(table.analysisType),
+    caseTypeIdx: index('evidence_analysis_cache_case_type_idx').on(
+      table.caseId,
+      table.analysisType
+    ),
+  })
+);
 
 export const caseEmbeddings = pgTable('case_embeddings', {
   id: uuid('id')
@@ -1559,561 +1611,565 @@ export const documentChunks = pgTable('document_chunks', {
     .default(sql`gen_random_uuid()`)
     .primaryKey()
     .notNull(),
-  documentId: uuid('document_id').notNull(),
+  // document_id is a UUID in Postgres; align Drizzle type to avoid drift
+  documentId: text('document_id').notNull(),
   chunkIndex: integer('chunk_index').notNull(),
   content: text('content').notNull(),
-  // embedding column removed — evidence chunks are stored in evidence_vectors (pgvector)
-  // and evidence_items (Qdrant). document_chunks.embedding had no active writer.
+  // Embedding column: optional 384-dim vector. Some deployments store document
+  // chunk embeddings here; keep it optional to match mixed-state DBs.
+  embedding: vector('embedding', { dimensions: 384 }),
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const documentSummaries = pgTable('document_summaries', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- documentId: uuid('document_id').notNull(),
- summaryType: summaryTypeEnum('summary_type').notNull(),
- summaryText: text('summary_text').notNull(),
- model: varchar('model', { length: 100 }),
- metadata: jsonb('metadata'),
- createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  documentId: uuid('document_id').notNull(),
+  summaryType: summaryTypeEnum('summary_type').notNull(),
+  summaryText: text('summary_text').notNull(),
+  model: varchar('model', { length: 100 }),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 // === RELATIONS ===
 // (All relations are now defined only once, with syntax fixed and duplicates removed)
 
 export const usersRelations = relations(users, ({ many }) => ({
- sessions: many(sessions),
- emailVerificationCodes: many(emailVerificationCodes),
- passwordResetTokens: many(passwordResetTokens),
- criminalsCreated: many(criminals),
- evidenceUploaded: many(evidence),
- legalDocumentsCreated: many(legalDocuments, { relationName: 'createdBy' }),
- legalDocumentsOwned: many(legalDocuments, { relationName: 'ownedDocuments' }),
- storageFiles: many(storageFiles), // Added storageFiles relation
- caseActivitiesAssigned: many(caseActivities, { relationName: `assignedTo` }),
- caseActivitiesCreated: many(caseActivities, { relationName: `createdBy` }),
- attachmentVerificationsPerformed: many(attachmentVerifications),
- canvasAnnotationsCreated: many(canvasAnnotations),
- canvasStatesCreated: many(canvasStates),
- aiReportsCreated: many(aiReports),
- citationsCreated: many(citations),
- citationCollections: many(citationCollections),
- reportsCreated: many(reports),
- savedReportsCreated: many(savedReports),
- themesCreated: many(themes),
- personsOfInterestCreated: many(personsOfInterest),
- hashVerificationsPerformed: many(hashVerifications),
- userEmbeddings: many(userEmbeddings),
- ragSessions: many(ragSessions),
- legalAnalysisSessions: many(legalAnalysisSessions),
- legalResearchCreated: many(legalResearch, { relationName: 'createdBy' }),
- caseScoresCalculated: many(caseScores, { relationName: 'calculatedBy' }),
- userAiQueries: many(userAiQueries),
- autoTagsConfirmed: many(autoTags, { relationName: 'confirmedBy' }),
+  sessions: many(sessions),
+  emailVerificationCodes: many(emailVerificationCodes),
+  passwordResetTokens: many(passwordResetTokens),
+  criminalsCreated: many(criminals),
+  evidenceUploaded: many(evidence),
+  legalDocumentsCreated: many(legalDocuments, { relationName: 'createdBy' }),
+  legalDocumentsOwned: many(legalDocuments, { relationName: 'ownedDocuments' }),
+  storageFiles: many(storageFiles), // Added storageFiles relation
+  caseActivitiesAssigned: many(caseActivities, { relationName: `assignedTo` }),
+  caseActivitiesCreated: many(caseActivities, { relationName: `createdBy` }),
+  attachmentVerificationsPerformed: many(attachmentVerifications),
+  canvasAnnotationsCreated: many(canvasAnnotations),
+  canvasStatesCreated: many(canvasStates),
+  aiReportsCreated: many(aiReports),
+  citationsCreated: many(citations),
+  citationCollections: many(citationCollections),
+  reportsCreated: many(reports),
+  savedReportsCreated: many(savedReports),
+  themesCreated: many(themes),
+  personsOfInterestCreated: many(personsOfInterest),
+  hashVerificationsPerformed: many(hashVerifications),
+  userEmbeddings: many(userEmbeddings),
+  ragSessions: many(ragSessions),
+  legalAnalysisSessions: many(legalAnalysisSessions),
+  legalResearchCreated: many(legalResearch, { relationName: 'createdBy' }),
+  caseScoresCalculated: many(caseScores, { relationName: 'calculatedBy' }),
+  userAiQueries: many(userAiQueries),
+  autoTagsConfirmed: many(autoTags, { relationName: 'confirmedBy' }),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
- user: one(users, { fields: [sessions.userId], references: [users.id] }),
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
 export const emailVerificationCodesRelations = relations(emailVerificationCodes, ({ one }) => ({
- user: one(users, { fields: [emailVerificationCodes.userId], references: [users.id] }),
+  user: one(users, { fields: [emailVerificationCodes.userId], references: [users.id] }),
 }));
 
 export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
- user: one(users, { fields: [passwordResetTokens.userId], references: [users.id] }),
+  user: one(users, { fields: [passwordResetTokens.userId], references: [users.id] }),
 }));
 
 export const casesRelations = relations(cases, ({ one, many }) => ({
- assignedAttorney: one(users, { fields: [cases.assignedAttorney], references: [users.id] }),
- evidence: many(evidence),
- activities: many(caseActivities),
- legalDocuments: many(legalDocuments),
- aiReports: many(aiReports),
- citations: many(citations),
- reports: many(reports),
- savedReports: many(savedReports),
- personsOfInterest: many(personsOfInterest),
- caseEmbeddings: many(caseEmbeddings),
- ragSessions: many(ragSessions),
- legalAnalysisSessions: many(legalAnalysisSessions),
- legalResearch: many(legalResearch),
- caseScores: many(caseScores),
- userAiQueries: many(userAiQueries),
- canvasStates: many(canvasStates),
- statuteLinks: many(caseStatuteLinks),
+  assignedAttorney: one(users, { fields: [cases.assignedAttorney], references: [users.id] }),
+  evidence: many(evidence),
+  activities: many(caseActivities),
+  legalDocuments: many(legalDocuments),
+  aiReports: many(aiReports),
+  citations: many(citations),
+  reports: many(reports),
+  savedReports: many(savedReports),
+  personsOfInterest: many(personsOfInterest),
+  caseEmbeddings: many(caseEmbeddings),
+  ragSessions: many(ragSessions),
+  legalAnalysisSessions: many(legalAnalysisSessions),
+  legalResearch: many(legalResearch),
+  caseScores: many(caseScores),
+  userAiQueries: many(userAiQueries),
+  canvasStates: many(canvasStates),
+  statuteLinks: many(caseStatuteLinks),
 }));
 
 export const caseStatuteLinksRelations = relations(caseStatuteLinks, ({ one }) => ({
- case: one(cases, { fields: [caseStatuteLinks.caseId], references: [cases.id] }),
- statute: one(statutes, { fields: [caseStatuteLinks.statuteId], references: [statutes.id] }),
- citation: one(citations, { fields: [caseStatuteLinks.citationId], references: [citations.id] }),
- createdBy: one(users, { fields: [caseStatuteLinks.createdBy], references: [users.id] }),
+  case: one(cases, { fields: [caseStatuteLinks.caseId], references: [cases.id] }),
+  statute: one(statutes, { fields: [caseStatuteLinks.statuteId], references: [statutes.id] }),
+  citation: one(citations, { fields: [caseStatuteLinks.citationId], references: [citations.id] }),
+  createdBy: one(users, { fields: [caseStatuteLinks.createdBy], references: [users.id] }),
 }));
 
 export const criminalsRelations = relations(criminals, ({ one, many }) => ({
- createdBy: one(users, { fields: [criminals.createdBy], references: [users.id] }),
- evidence: many(evidence),
+  createdBy: one(users, { fields: [criminals.createdBy], references: [users.id] }),
+  evidence: many(evidence),
 }));
 
 export const evidenceRelations = relations(evidence, ({ one, many }) => ({
- uploadedBy: one(users, { fields: [evidence.uploadedBy], references: [users.id] }),
- case: one(cases, { fields: [evidence.caseId], references: [cases.id] }),
- criminal: one(criminals, { fields: [evidence.criminalId], references: [criminals.id] }),
- legalDocuments: many(legalDocuments),
- canvasAnnotations: many(canvasAnnotations),
- evidenceVectors: many(evidenceVectors),
- hashVerifications: many(hashVerifications),
+  uploadedBy: one(users, { fields: [evidence.uploadedBy], references: [users.id] }),
+  case: one(cases, { fields: [evidence.caseId], references: [cases.id] }),
+  criminal: one(criminals, { fields: [evidence.criminalId], references: [criminals.id] }),
+  legalDocuments: many(legalDocuments),
+  canvasAnnotations: many(canvasAnnotations),
+  evidenceVectors: many(evidenceVectors),
+  hashVerifications: many(hashVerifications),
 }));
 
 export const documentsRelations = relations(documents, ({ one, many }) => ({
- case: one(cases, { fields: [documents.caseId], references: [cases.id] }),
- user: one(users, { fields: [documents.userId], references: [users.id] }),
- documentProcessing: many(documentProcessing),
- documentChunks: many(documentChunks),
- documentSummaries: many(documentSummaries),
+  case: one(cases, { fields: [documents.caseId], references: [cases.id] }),
+  user: one(users, { fields: [documents.userId], references: [users.id] }),
+  documentProcessing: many(documentProcessing),
+  documentChunks: many(documentChunks),
+  documentSummaries: many(documentSummaries),
 }));
 
 export const legalDocumentsRelations = relations(legalDocuments, ({ one, many }) => ({
- case: one(cases, { fields: [legalDocuments.caseId], references: [cases.id] }),
- user: one(users, {
- fields: [legalDocuments.userId],
- references: [users.id],
- relationName: 'ownedDocuments',
- }),
- evidence: one(evidence, { fields: [legalDocuments.evidenceId], references: [evidence.id] }),
- createdBy: one(users, {
- fields: [legalDocuments.createdBy],
- references: [users.id],
- relationName: 'createdBy',
- }),
- citations: many(citations),
+  case: one(cases, { fields: [legalDocuments.caseId], references: [cases.id] }),
+  user: one(users, {
+    fields: [legalDocuments.userId],
+    references: [users.id],
+    relationName: 'ownedDocuments',
+  }),
+  evidence: one(evidence, { fields: [legalDocuments.evidenceId], references: [evidence.id] }),
+  createdBy: one(users, {
+    fields: [legalDocuments.createdBy],
+    references: [users.id],
+    relationName: 'createdBy',
+  }),
+  citations: many(citations),
 }));
 
 export const storageFilesRelations = relations(storageFiles, ({ one }) => ({
- user: one(users, { fields: [storageFiles.userId], references: [users.id] }),
+  user: one(users, { fields: [storageFiles.userId], references: [users.id] }),
 }));
 
 export const caseActivitiesRelations = relations(caseActivities, ({ one }) => ({
- case: one(cases, { fields: [caseActivities.caseId], references: [cases.id] }),
- assignedTo: one(users, {
- fields: [caseActivities.assignedTo],
- references: [users.id],
- relationName: `assignedTo`,
- }),
- createdBy: one(users, {
- fields: [caseActivities.createdBy],
- references: [users.id],
- relationName: `createdBy`,
- }),
+  case: one(cases, { fields: [caseActivities.caseId], references: [cases.id] }),
+  assignedTo: one(users, {
+    fields: [caseActivities.assignedTo],
+    references: [users.id],
+    relationName: `assignedTo`,
+  }),
+  createdBy: one(users, {
+    fields: [caseActivities.createdBy],
+    references: [users.id],
+    relationName: `createdBy`,
+  }),
 }));
 
 export const attachmentVerificationsRelations = relations(attachmentVerifications, ({ one }) => ({
- verifiedBy: one(users, { fields: [attachmentVerifications.verifiedBy], references: [users.id] }),
- attachment: one(evidence, {
- fields: [attachmentVerifications.attachmentId],
- references: [evidence.id],
- }), // Assuming attachmentId refers to evidence
+  verifiedBy: one(users, { fields: [attachmentVerifications.verifiedBy], references: [users.id] }),
+  attachment: one(evidence, {
+    fields: [attachmentVerifications.attachmentId],
+    references: [evidence.id],
+  }), // Assuming attachmentId refers to evidence
 }));
 
 export const canvasStatesRelations = relations(canvasStates, ({ one, many }) => ({
- case: one(cases, { fields: [canvasStates.caseId], references: [cases.id] }),
- user: one(users, { fields: [canvasStates.userId], references: [users.id] }),
- annotations: many(canvasAnnotations),
- autosaves: many(canvasAutosaves),
+  case: one(cases, { fields: [canvasStates.caseId], references: [cases.id] }),
+  user: one(users, { fields: [canvasStates.userId], references: [users.id] }),
+  annotations: many(canvasAnnotations),
+  autosaves: many(canvasAutosaves),
 }));
 
 export const canvasAnnotationsRelations = relations(canvasAnnotations, ({ one }) => ({
- canvasState: one(canvasStates, {
- fields: [canvasAnnotations.canvasStateId],
- references: [canvasStates.id],
- }),
- createdBy: one(users, { fields: [canvasAnnotations.createdBy], references: [users.id] }),
+  canvasState: one(canvasStates, {
+    fields: [canvasAnnotations.canvasStateId],
+    references: [canvasStates.id],
+  }),
+  createdBy: one(users, { fields: [canvasAnnotations.createdBy], references: [users.id] }),
 }));
 
 export const canvasAutosavesRelations = relations(canvasAutosaves, ({ one }) => ({
- canvasState: one(canvasStates, {
- fields: [canvasAutosaves.canvasStateId],
- references: [canvasStates.id],
- }),
+  canvasState: one(canvasStates, {
+    fields: [canvasAutosaves.canvasStateId],
+    references: [canvasStates.id],
+  }),
 }));
 
 export const aiReportsRelations = relations(aiReports, ({ one }) => ({
- case: one(cases, { fields: [aiReports.caseId], references: [cases.id] }),
- createdBy: one(users, { fields: [aiReports.createdBy], references: [users.id] }),
+  case: one(cases, { fields: [aiReports.caseId], references: [cases.id] }),
+  createdBy: one(users, { fields: [aiReports.createdBy], references: [users.id] }),
 }));
 
 export const codebaseAuditReportsRelations = relations(codebaseAuditReports, ({ one }) => ({
- case: one(cases, { fields: [codebaseAuditReports.caseId], references: [cases.id] }),
- createdBy: one(users, { fields: [codebaseAuditReports.createdBy], references: [users.id] }),
+  case: one(cases, { fields: [codebaseAuditReports.caseId], references: [cases.id] }),
+  createdBy: one(users, { fields: [codebaseAuditReports.createdBy], references: [users.id] }),
 }));
 
 export const citationsRelations = relations(citations, ({ one, many }) => ({
- document: one(legalDocuments, {
- fields: [citations.documentId],
- references: [legalDocuments.id],
- }),
- case: one(cases, { fields: [citations.caseId], references: [cases.id] }),
- createdBy: one(users, { fields: [citations.createdBy], references: [users.id] }),
- collectionCitations: many(collectionCitations),
+  document: one(legalDocuments, {
+    fields: [citations.documentId],
+    references: [legalDocuments.id],
+  }),
+  case: one(cases, { fields: [citations.caseId], references: [cases.id] }),
+  createdBy: one(users, { fields: [citations.createdBy], references: [users.id] }),
+  collectionCitations: many(collectionCitations),
 }));
 
 export const citationCollectionsRelations = relations(citationCollections, ({ one, many }) => ({
- user: one(users, { fields: [citationCollections.userId], references: [users.id] }),
- collectionCitations: many(collectionCitations),
+  user: one(users, { fields: [citationCollections.userId], references: [users.id] }),
+  collectionCitations: many(collectionCitations),
 }));
 
 export const collectionCitationsRelations = relations(collectionCitations, ({ one }) => ({
- collection: one(citationCollections, {
- fields: [collectionCitations.collectionId],
- references: [citationCollections.id],
- }),
- citation: one(citations, {
- fields: [collectionCitations.citationId],
- references: [citations.id],
- }),
+  collection: one(citationCollections, {
+    fields: [collectionCitations.collectionId],
+    references: [citationCollections.id],
+  }),
+  citation: one(citations, {
+    fields: [collectionCitations.citationId],
+    references: [citations.id],
+  }),
 }));
 
 export const reportsRelations = relations(reports, ({ one, many }) => ({
- case: one(cases, { fields: [reports.caseId], references: [cases.id] }),
- createdBy: one(users, { fields: [reports.createdBy], references: [users.id] }),
- savedReports: many(savedReports),
- auditLogs: many(reportAuditLog),
+  case: one(cases, { fields: [reports.caseId], references: [cases.id] }),
+  createdBy: one(users, { fields: [reports.createdBy], references: [users.id] }),
+  savedReports: many(savedReports),
+  auditLogs: many(reportAuditLog),
 }));
 
 export const reportAuditLogRelations = relations(reportAuditLog, ({ one }) => ({
- report: one(reports, { fields: [reportAuditLog.reportId], references: [reports.id] }),
- user: one(users, { fields: [reportAuditLog.userId], references: [users.id] }),
+  report: one(reports, { fields: [reportAuditLog.reportId], references: [reports.id] }),
+  user: one(users, { fields: [reportAuditLog.userId], references: [users.id] }),
 }));
 
 export const savedReportsRelations = relations(savedReports, ({ one }) => ({
- user: one(users, { fields: [savedReports.userId], references: [users.id] }),
- report: one(reports, { fields: [savedReports.reportId], references: [reports.id] }),
- case: one(cases, { fields: [savedReports.caseId], references: [cases.id] }),
+  user: one(users, { fields: [savedReports.userId], references: [users.id] }),
+  report: one(reports, { fields: [savedReports.reportId], references: [reports.id] }),
+  case: one(cases, { fields: [savedReports.caseId], references: [cases.id] }),
 }));
 
 export const themesRelations = relations(themes, ({ one }) => ({
- user: one(users, { fields: [themes.userId], references: [users.id] }),
+  user: one(users, { fields: [themes.userId], references: [users.id] }),
 }));
 
 export const personsOfInterestRelations = relations(personsOfInterest, ({ one, many }) => ({
-	photos: many(poiPhotos),
-	case: one(cases, { fields: [personsOfInterest.caseId], references: [cases.id] }),
+  photos: many(poiPhotos),
+  case: one(cases, { fields: [personsOfInterest.caseId], references: [cases.id] }),
 }));
 
 export const poiPhotosRelations = relations(poiPhotos, ({ one }) => ({
- poi: one(personsOfInterest, { fields: [poiPhotos.poiId], references: [personsOfInterest.id] }),
+  poi: one(personsOfInterest, { fields: [poiPhotos.poiId], references: [personsOfInterest.id] }),
 }));
 
 export const hashVerificationsRelations = relations(hashVerifications, ({ one }) => ({
- evidence: one(evidence, { fields: [hashVerifications.evidenceId], references: [evidence.id] }),
- verifiedBy: one(users, { fields: [hashVerifications.verifiedBy], references: [users.id] }),
+  evidence: one(evidence, { fields: [hashVerifications.evidenceId], references: [evidence.id] }),
+  verifiedBy: one(users, { fields: [hashVerifications.verifiedBy], references: [users.id] }),
 }));
 
 export const contentEmbeddingsRelations = relations(contentEmbeddings, ({ one }) => ({
- document: one(legalDocuments, {
- fields: [contentEmbeddings.documentId],
- references: [legalDocuments.id],
- }),
+  document: one(legalDocuments, {
+    fields: [contentEmbeddings.documentId],
+    references: [legalDocuments.id],
+  }),
 }));
 
 export const userEmbeddingsRelations = relations(userEmbeddings, ({ one }) => ({
- user: one(users, { fields: [userEmbeddings.userId], references: [users.id] }),
+  user: one(users, { fields: [userEmbeddings.userId], references: [users.id] }),
 }));
 
 // === EVIDENCE BOARD MANAGEMENT ===
-export const evidenceBoardConnections = pgTable('evidence_board_connections',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id')
- .notNull()
- .references(() => cases.id, { onDelete: 'cascade' }),
- fromEvidenceId: uuid('from_evidence_id')
- .notNull()
- .references(() => evidence.id, { onDelete: 'cascade' }),
- toEvidenceId: uuid('to_evidence_id')
- .notNull()
- .references(() => evidence.id, { onDelete: 'cascade' }),
- connectionType: varchar('connection_type', { length: 50 }).default('related').notNull(), // 'related', 'contradicts', 'supports', 'references'
- label: varchar('label', { length: 255 }),
- notes: text('notes'),
- strength: real('strength').default(1.0), // 0.0 to 1.0 confidence
- isVisible: boolean('is_visible').default(true),
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- caseIdIdx: index('evidence_board_connections_case_id_idx').on(table.caseId),
- fromEvidenceIdIdx: index('evidence_board_connections_from_evidence_id_idx').on(
- table.fromEvidenceId
- ),
- toEvidenceIdIdx: index('evidence_board_connections_to_evidence_id_idx').on(table.toEvidenceId),
- connectionTypeIdx: index('evidence_board_connections_type_idx').on(table.connectionType),
- })
+export const evidenceBoardConnections = pgTable(
+  'evidence_board_connections',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => cases.id, { onDelete: 'cascade' }),
+    fromEvidenceId: uuid('from_evidence_id')
+      .notNull()
+      .references(() => evidence.id, { onDelete: 'cascade' }),
+    toEvidenceId: uuid('to_evidence_id')
+      .notNull()
+      .references(() => evidence.id, { onDelete: 'cascade' }),
+    connectionType: varchar('connection_type', { length: 50 }).default('related').notNull(), // 'related', 'contradicts', 'supports', 'references'
+    label: varchar('label', { length: 255 }),
+    notes: text('notes'),
+    strength: real('strength').default(1.0), // 0.0 to 1.0 confidence
+    isVisible: boolean('is_visible').default(true),
+    createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    caseIdIdx: index('evidence_board_connections_case_id_idx').on(table.caseId),
+    fromEvidenceIdIdx: index('evidence_board_connections_from_evidence_id_idx').on(
+      table.fromEvidenceId
+    ),
+    toEvidenceIdIdx: index('evidence_board_connections_to_evidence_id_idx').on(table.toEvidenceId),
+    connectionTypeIdx: index('evidence_board_connections_type_idx').on(table.connectionType),
+  })
 );
 
 // === CASE NOTES ===
 // User notes attached to cases (searchable, with optional AI-generated content)
-export const caseNotes = pgTable('case_notes',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id')
- .notNull()
- .references(() => cases.id, { onDelete: 'cascade' }),
- title: varchar('title', { length: 255 }),
- content: text('content').notNull(),
- isAI: boolean('is_ai').default(false),
- isPinned: boolean('is_pinned').default(false),
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- caseIdIdx: index('case_notes_case_id_idx').on(table.caseId),
- isPinnedIdx: index('case_notes_is_pinned_idx').on(table.isPinned),
- createdAtIdx: index('case_notes_created_at_idx').on(table.createdAt),
- })
+export const caseNotes = pgTable(
+  'case_notes',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => cases.id, { onDelete: 'cascade' }),
+    title: varchar('title', { length: 255 }),
+    content: text('content').notNull(),
+    isAI: boolean('is_ai').default(false),
+    isPinned: boolean('is_pinned').default(false),
+    createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    caseIdIdx: index('case_notes_case_id_idx').on(table.caseId),
+    isPinnedIdx: index('case_notes_is_pinned_idx').on(table.isPinned),
+    createdAtIdx: index('case_notes_created_at_idx').on(table.createdAt),
+  })
 );
 
 // === CASE NOTE VERSIONS ===
 // Tracks edit history for case notes (snapshot before each update)
-export const caseNoteVersions = pgTable('case_note_versions',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- noteId: uuid('note_id')
- .notNull()
- .references(() => caseNotes.id, { onDelete: 'cascade' }),
- title: varchar('title', { length: 255 }),
- content: text('content').notNull(),
- versionNumber: integer('version_number').notNull(),
- editedBy: integer('edited_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- noteIdIdx: index('case_note_versions_note_id_idx').on(table.noteId),
- versionIdx: index('case_note_versions_version_idx').on(table.noteId, table.versionNumber),
- })
+export const caseNoteVersions = pgTable(
+  'case_note_versions',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    noteId: uuid('note_id')
+      .notNull()
+      .references(() => caseNotes.id, { onDelete: 'cascade' }),
+    title: varchar('title', { length: 255 }),
+    content: text('content').notNull(),
+    versionNumber: integer('version_number').notNull(),
+    editedBy: integer('edited_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    noteIdIdx: index('case_note_versions_note_id_idx').on(table.noteId),
+    versionIdx: index('case_note_versions_version_idx').on(table.noteId, table.versionNumber),
+  })
 );
 
 // === CASE NOTE EVIDENCE REFERENCES ===
 // Links case notes to evidence items for cross-referencing
-export const caseNoteEvidenceRefs = pgTable('case_note_evidence_refs',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- noteId: uuid('note_id')
- .notNull()
- .references(() => caseNotes.id, { onDelete: 'cascade' }),
- evidenceId: uuid('evidence_id')
- .notNull()
- .references(() => evidence.id, { onDelete: 'cascade' }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- noteIdIdx: index('case_note_refs_note_id_idx').on(table.noteId),
- evidenceIdIdx: index('case_note_refs_evidence_id_idx').on(table.evidenceId),
- uniqueRef: unique('case_note_refs_unique').on(table.noteId, table.evidenceId),
- })
+export const caseNoteEvidenceRefs = pgTable(
+  'case_note_evidence_refs',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    noteId: uuid('note_id')
+      .notNull()
+      .references(() => caseNotes.id, { onDelete: 'cascade' }),
+    evidenceId: uuid('evidence_id')
+      .notNull()
+      .references(() => evidence.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    noteIdIdx: index('case_note_refs_note_id_idx').on(table.noteId),
+    evidenceIdIdx: index('case_note_refs_evidence_id_idx').on(table.evidenceId),
+    uniqueRef: unique('case_note_refs_unique').on(table.noteId, table.evidenceId),
+  })
 );
 
 // === MULTI-PANEL WORKSPACE MANAGEMENT ===
 // Workspaces group chat sessions with evidence, statutes, notes, and citations
-export const workspaces = pgTable('workspaces',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- title: text('title').notNull(),
- description: text('description'),
- caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- caseIdIdx: index('workspaces_case_id_idx').on(table.caseId),
- createdByIdx: index('workspaces_created_by_idx').on(table.createdBy),
- })
+export const workspaces = pgTable(
+  'workspaces',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    title: text('title').notNull(),
+    description: text('description'),
+    caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
+    createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    caseIdIdx: index('workspaces_case_id_idx').on(table.caseId),
+    createdByIdx: index('workspaces_created_by_idx').on(table.createdBy),
+  })
 );
 
 // Link chat sessions to workspaces (one workspace can have multiple chat sessions)
-export const workspaceSessions = pgTable('workspace_sessions',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- workspaceId: uuid('workspace_id')
- .notNull()
- .references(() => workspaces.id, { onDelete: 'cascade' }),
- sessionId: uuid('session_id')
- .notNull()
- .references(() => ragSessions.id, { onDelete: 'cascade' }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- workspaceIdIdx: index('workspace_sessions_workspace_id_idx').on(table.workspaceId),
- sessionIdIdx: index('workspace_sessions_session_id_idx').on(table.sessionId),
- })
+export const workspaceSessions = pgTable(
+  'workspace_sessions',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    workspaceId: uuid('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    sessionId: uuid('session_id')
+      .notNull()
+      .references(() => ragSessions.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    workspaceIdIdx: index('workspace_sessions_workspace_id_idx').on(table.workspaceId),
+    sessionIdIdx: index('workspace_sessions_session_id_idx').on(table.sessionId),
+  })
 );
 
 // Evidence panel: link evidence items to workspaces
-export const workspaceEvidence = pgTable('workspace_evidence',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- workspaceId: uuid('workspace_id')
- .notNull()
- .references(() => workspaces.id, { onDelete: 'cascade' }),
- evidenceId: uuid('evidence_id')
- .notNull()
- .references(() => evidence.id, { onDelete: 'cascade' }),
- relevanceScore: real('relevance_score').default(0),
- addedBy: varchar('added_by', { length: 50 }).default('user'), // 'system', 'user'
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- workspaceIdIdx: index('workspace_evidence_workspace_id_idx').on(table.workspaceId),
- evidenceIdIdx: index('workspace_evidence_evidence_id_idx').on(table.evidenceId),
- })
+export const workspaceEvidence = pgTable(
+  'workspace_evidence',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    workspaceId: uuid('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    evidenceId: uuid('evidence_id')
+      .notNull()
+      .references(() => evidence.id, { onDelete: 'cascade' }),
+    relevanceScore: real('relevance_score').default(0),
+    addedBy: varchar('added_by', { length: 50 }).default('user'), // 'system', 'user'
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    workspaceIdIdx: index('workspace_evidence_workspace_id_idx').on(table.workspaceId),
+    evidenceIdIdx: index('workspace_evidence_evidence_id_idx').on(table.evidenceId),
+  })
 );
 
 // Statute panel: link statutes/laws to workspaces
-export const workspaceStatutes = pgTable('workspace_statutes',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- workspaceId: uuid('workspace_id')
- .notNull()
- .references(() => workspaces.id, { onDelete: 'cascade' }),
- statuteId: uuid('statute_id').references(() => statutes.id, { onDelete: 'cascade' }),
- statuteText: text('statute_text'), // Fallback if statute not in DB
- relevanceScore: real('relevance_score').default(0),
- source: varchar('source', { length: 50 }).default('user'), // 'ai', 'user', 'citation'
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- workspaceIdIdx: index('workspace_statutes_workspace_id_idx').on(table.workspaceId),
- statuteIdIdx: index('workspace_statutes_statute_id_idx').on(table.statuteId),
- })
+export const workspaceStatutes = pgTable(
+  'workspace_statutes',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    workspaceId: uuid('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    statuteId: uuid('statute_id').references(() => statutes.id, { onDelete: 'cascade' }),
+    statuteText: text('statute_text'), // Fallback if statute not in DB
+    relevanceScore: real('relevance_score').default(0),
+    source: varchar('source', { length: 50 }).default('user'), // 'ai', 'user', 'citation'
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    workspaceIdIdx: index('workspace_statutes_workspace_id_idx').on(table.workspaceId),
+    statuteIdIdx: index('workspace_statutes_statute_id_idx').on(table.statuteId),
+  })
 );
 
 // User notes and legal memos (searchable via vector embeddings)
-export const workspaceNotes = pgTable('workspace_notes',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- workspaceId: uuid('workspace_id')
- .notNull()
- .references(() => workspaces.id, { onDelete: 'cascade' }),
- content: text('content').notNull(),
- isAI: boolean('is_ai').default(false),
- embedding: vector('embedding', { dimensions: 768 }),
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- workspaceIdIdx: index('workspace_notes_workspace_id_idx').on(table.workspaceId),
- isAIIdx: index('workspace_notes_is_ai_idx').on(table.isAI),
- })
+export const workspaceNotes = pgTable(
+  'workspace_notes',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    workspaceId: uuid('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    content: text('content').notNull(),
+    isAI: boolean('is_ai').default(false),
+    embedding: vector('embedding', { dimensions: 768 }),
+    createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    workspaceIdIdx: index('workspace_notes_workspace_id_idx').on(table.workspaceId),
+    isAIIdx: index('workspace_notes_is_ai_idx').on(table.isAI),
+  })
 );
 
 // Citations and references (links messages to legal sources)
-export const workspaceCitations = pgTable('workspace_citations',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- workspaceId: uuid('workspace_id')
- .notNull()
- .references(() => workspaces.id, { onDelete: 'cascade' }),
- messageId: uuid('message_id').references(() => ragMessages.id, { onDelete: 'cascade' }),
- citationText: text('citation_text').notNull(), // e.g., "Penal Code 187(a)"
- citationURL: text('citation_url'),
- citationType: varchar('citation_type', { length: 50 }).default('statute'), // 'statute', 'case', 'regulation', 'precedent'
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- workspaceIdIdx: index('workspace_citations_workspace_id_idx').on(table.workspaceId),
- messageIdIdx: index('workspace_citations_message_id_idx').on(table.messageId),
- })
+export const workspaceCitations = pgTable(
+  'workspace_citations',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    workspaceId: uuid('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    messageId: uuid('message_id').references(() => ragMessages.id, { onDelete: 'cascade' }),
+    citationText: text('citation_text').notNull(), // e.g., "Penal Code 187(a)"
+    citationURL: text('citation_url'),
+    citationType: varchar('citation_type', { length: 50 }).default('statute'), // 'statute', 'case', 'regulation', 'precedent'
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    workspaceIdIdx: index('workspace_citations_workspace_id_idx').on(table.workspaceId),
+    messageIdIdx: index('workspace_citations_message_id_idx').on(table.messageId),
+  })
 );
 
-export const chatEmbeddingsRelations = relations(chatEmbeddings, ({ one }) => ({
- ragMessage: one(ragMessages, {
- fields: [chatEmbeddings.ragMessageId],
- references: [ragMessages.id],
- }),
-}));
-
 export const evidenceVectorsRelations = relations(evidenceVectors, ({ one }) => ({
- evidence: one(evidence, { fields: [evidenceVectors.evidenceId], references: [evidence.id] }),
+  evidence: one(evidence, { fields: [evidenceVectors.evidenceId], references: [evidence.id] }),
 }));
 
 export const caseEmbeddingsRelations = relations(caseEmbeddings, ({ one }) => ({
- case: one(cases, { fields: [caseEmbeddings.caseId], references: [cases.id] }),
+  case: one(cases, { fields: [caseEmbeddings.caseId], references: [cases.id] }),
 }));
 
 export const ragSessionsRelations = relations(ragSessions, ({ one, many }) => ({
- user: one(users, { fields: [ragSessions.userId], references: [users.id] }),
- messages: many(ragMessages),
+  user: one(users, { fields: [ragSessions.userId], references: [users.id] }),
+  messages: many(ragMessages),
 }));
 
-export const ragMessagesRelations = relations(ragMessages, ({ one, many }) => ({
- session: one(ragSessions, { fields: [ragMessages.sessionId], references: [ragSessions.id] }),
- chatEmbeddings: many(chatEmbeddings),
+export const ragMessagesRelations = relations(ragMessages, ({ one }) => ({
+  session: one(ragSessions, { fields: [ragMessages.sessionId], references: [ragSessions.id] }),
 }));
 
 export const statutesRelations = relations(statutes, ({ many }) => ({

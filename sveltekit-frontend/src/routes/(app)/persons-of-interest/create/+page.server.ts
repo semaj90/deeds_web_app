@@ -57,7 +57,7 @@ export const actions: Actions = {
           relationship: form.data.relationship || null,
           crimes,
           caseIds: id ? [id] : [],
-          createdBy: locals.user?.id ?? null,
+          createdBy: locals.user?.id ? Number(locals.user.id) : null,
         })
         .returning();
 

@@ -18,7 +18,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const [target] = await db
       .select()
       .from(personsOfInterest)
-      .where(and(eq(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))))
+      .where(and(eq(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))))
       .limit(1);
 
     if (!target) {
@@ -43,7 +43,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				)`.as('photo_url'),
       })
       .from(personsOfInterest)
-      .where(and(ne(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))))
+      .where(and(ne(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))))
       .orderBy(desc(personsOfInterest.updatedAt))
       .limit(50);
 

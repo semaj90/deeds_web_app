@@ -1,3545 +1,3581 @@
 # Drizzle ↔ Postgres Contract Report
 
-Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
+Generated: 2026-05-30T09:15:37.118Z  |  Findings: 853
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
 **Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
-**File:** `C`
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `sveltekit-frontend\C`
 **Validate:** `npm run lint:drizzle`
 
 ### missing_table  (medium)
@@ -3740,18 +3776,6 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **File:** `sveltekit-frontend\src\lib\server\db\schema\jurisdictions.ts`
 **Validate:** `npm run db:check`
 
-### live_db_schema_drift  (high)
-**Problem:** cases.status: Drizzle says varchar, live DB says text.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### live_db_schema_drift  (high)
-**Problem:** cases.priority: Drizzle says varchar, live DB says text.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
 ### missing_column  (medium)
 **Problem:** Column cases.case_embedding in Drizzle schema but absent from live DB.
 **Fix:** ALTER TABLE cases ADD COLUMN IF NOT EXISTS case_embedding ...
@@ -3761,60 +3785,6 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 ### missing_column  (medium)
 **Problem:** Column cases.case_embedding_384 in Drizzle schema but absent from live DB.
 **Fix:** ALTER TABLE cases ADD COLUMN IF NOT EXISTS case_embedding_384 ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`
-
-### live_db_schema_drift  (high)
-**Problem:** case_chunks.id: Drizzle says uuid, live DB says integer.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### missing_column  (medium)
-**Problem:** Column case_chunks.chunk_index in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS chunk_index ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column case_chunks.section_type in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS section_type ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column case_chunks.section_subtype in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS section_subtype ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column case_chunks.text in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS text ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column case_chunks.embedding in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS embedding ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column case_chunks.token_start in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS token_start ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column case_chunks.token_end in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS token_end ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column case_chunks.created_at in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE case_chunks ADD COLUMN IF NOT EXISTS created_at ...
 **File:** `sveltekit-frontend\src\lib\server\db\schema\legal-cases.ts`
 **Validate:** `npm run db:check`
 
@@ -3920,12 +3890,6 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **File:** `sveltekit-frontend\src\lib\server\db\schema\rag-cards.ts`
 **Validate:** `npm run db:check`
 
-### live_db_schema_drift  (high)
-**Problem:** route_metadata.path: Drizzle says text, live DB says character varying.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema\route_metadata.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
 ### missing_table  (medium)
 **Problem:** Table "entities" declared in Drizzle schema but absent from live DB — migration pending.
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
@@ -3939,6 +3903,24 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **Validate:** `npm run db:check`, `npm run db:generate`
 
 ### missing_column  (medium)
+**Problem:** Column chunk_hit_log.promotion_state in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE chunk_hit_log ADD COLUMN IF NOT EXISTS promotion_state ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\search-analytics.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column chunk_hit_log.promotion_boost in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE chunk_hit_log ADD COLUMN IF NOT EXISTS promotion_boost ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\search-analytics.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column chunk_hit_log.base_score in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE chunk_hit_log ADD COLUMN IF NOT EXISTS base_score ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema\search-analytics.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
 **Problem:** Column qlora_examples.som_clusters in Drizzle schema but absent from live DB.
 **Fix:** ALTER TABLE qlora_examples ADD COLUMN IF NOT EXISTS som_clusters ...
 **File:** `sveltekit-frontend\src\lib\server\db\schema\search-analytics.ts`
@@ -3949,12 +3931,6 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
 **File:** `sveltekit-frontend\src\lib\server\db\schema\search-analytics.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`
-
-### live_db_schema_drift  (high)
-**Problem:** llm_output_chunks.role: Drizzle says text, live DB says character varying.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema\search-analytics.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
 
 ### missing_column  (medium)
 **Problem:** Column canvas_autosaves.canvas_id in Drizzle schema but absent from live DB.
@@ -4076,12 +4052,6 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **File:** `sveltekit-frontend\src\lib\server\db\schema-chat.ts`
 **Validate:** `npm run db:check`
 
-### live_db_schema_drift  (high)
-**Problem:** rag_index_metadata.tags: Drizzle says text, live DB says ARRAY.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-evidence-crud.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
 ### missing_table  (medium)
 **Problem:** Table "shader_cache_entries" declared in Drizzle schema but absent from live DB — migration pending.
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
@@ -4123,12 +4093,6 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
 **File:** `sveltekit-frontend\src\lib\server\db\schema-ingestion.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`
-
-### live_db_schema_drift  (high)
-**Problem:** document_chunks.document_id: Drizzle says uuid, live DB says text.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-ingestion.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
 
 ### missing_column  (medium)
 **Problem:** Column document_chunks.text in Drizzle schema but absent from live DB.
@@ -4220,36 +4184,6 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **File:** `sveltekit-frontend\src\lib\server\db\schema-ingestion.ts`
 **Validate:** `npm run db:check`
 
-### live_db_schema_drift  (high)
-**Problem:** intent_synthesis.reward_score: Drizzle says real, live DB says numeric.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### live_db_schema_drift  (high)
-**Problem:** agent_memory_observations.source: Drizzle says varchar, live DB says text.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### live_db_schema_drift  (high)
-**Problem:** agent_memory_observations.ide: Drizzle says varchar, live DB says text.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### live_db_schema_drift  (high)
-**Problem:** agent_memory_observations.embedding_model: Drizzle says varchar, live DB says text.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### missing_table  (medium)
-**Problem:** Table "agent_observations" declared in Drizzle schema but absent from live DB — migration pending.
-**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run db:generate`
-
 ### missing_column  (medium)
 **Problem:** Column documents.case_id in Drizzle schema but absent from live DB.
 **Fix:** ALTER TABLE documents ADD COLUMN IF NOT EXISTS case_id ...
@@ -4334,33 +4268,33 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
 **Validate:** `npm run db:check`
 
-### live_db_schema_drift  (high)
-**Problem:** persons_of_interest.created_by: Drizzle says uuid, live DB says integer.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### live_db_schema_drift  (high)
-**Problem:** chat_embeddings.id: Drizzle says uuid, live DB says integer.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### missing_column  (medium)
-**Problem:** Column chat_embeddings.rag_message_id in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE chat_embeddings ADD COLUMN IF NOT EXISTS rag_message_id ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column chat_embeddings.model in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE chat_embeddings ADD COLUMN IF NOT EXISTS model ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`
-
 ### missing_column  (medium)
 **Problem:** Column evidence_vectors.vector in Drizzle schema but absent from live DB.
 **Fix:** ALTER TABLE evidence_vectors ADD COLUMN IF NOT EXISTS vector ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column glyph_records.source_ref in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE glyph_records ADD COLUMN IF NOT EXISTS source_ref ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column glyph_records.glyph_kind in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE glyph_records ADD COLUMN IF NOT EXISTS glyph_kind ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column glyph_records.embedding_model in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE glyph_records ADD COLUMN IF NOT EXISTS embedding_model ...
+**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
+**Validate:** `npm run db:check`
+
+### missing_column  (medium)
+**Problem:** Column glyph_records.batch_id in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE glyph_records ADD COLUMN IF NOT EXISTS batch_id ...
 **File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
 **Validate:** `npm run db:check`
 
@@ -4515,7 +4449,43 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **Validate:** `npm run db:check`
 
 ### migration_schema_drift  (low)
+**Problem:** Table "case_note_evidence_refs" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "case_notes" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "case_scores" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
 **Problem:** Table "embedding_cache" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "evidence_board_connections" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "evidence_relationships" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "legal_documents" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
 **Validate:** `npm run db:check`
@@ -4539,7 +4509,55 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **Validate:** `npm run db:check`
 
 ### migration_schema_drift  (low)
+**Problem:** Table "storage_files" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
 **Problem:** Table "user_ai_queries" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "vector_metadata" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "workspace_citations" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "workspace_evidence" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "workspace_notes" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "workspace_sessions" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "workspace_statutes" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "workspaces" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
 **Validate:** `npm run db:check`
@@ -4599,6 +4617,12 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **Validate:** `npm run db:check`
 
 ### migration_schema_drift  (low)
+**Problem:** Table "case_note_versions" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
 **Problem:** Table "citation_collections" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
@@ -4641,6 +4665,18 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 **Validate:** `npm run db:check`
 
 ### migration_schema_drift  (low)
+**Problem:** Table "codebase_audit_reports" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "evidence_analysis_cache" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
 **Problem:** Table "poi_relationships" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
@@ -4654,6 +4690,12 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 
 ### migration_schema_drift  (low)
 **Problem:** Table "timeline_events" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "agent_sessions" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
 **Validate:** `npm run db:check`
@@ -4696,6 +4738,18 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 
 ### migration_schema_drift  (low)
 **Problem:** Table "token_map_cards" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "agent_memory_observations" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "agent_observations" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
 **Validate:** `npm run db:check`
@@ -4960,6 +5014,18 @@ Generated: 2026-05-29T04:29:18.909Z  |  Findings: 842
 
 ### migration_schema_drift  (low)
 **Problem:** Table "hermes_dag_runs" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "lora_training_runs" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "card_source_refs" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
 **Validate:** `npm run db:check`
