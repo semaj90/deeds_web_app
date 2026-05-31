@@ -1,3 +1,18 @@
+/**
+ * !!! MERGED-WITH-CANONICAL — 2026-05-31 !!!
+ *
+ * This file is a 27-line naive CPU cosine + sort rerank with ZERO consumers.
+ * The canonical rerank lives in:
+ *   sveltekit-frontend/src/lib/server/retrieval/turbovec-rerank.ts
+ *
+ * That file blends Qdrant semantic similarity + Neo4j GraphRAG authority
+ * scores + Autoencoder latent centroids. Use it via:
+ *   import { turbovecRerank } from '$lib/server/retrieval/turbovec-rerank.js';
+ *
+ * Retained as a reference snapshot of the simplest cosine rerank for
+ * smoke/test fixtures. Do NOT import from production code.
+ */
+
 export function dot(a: number[], b: number[]) {
   let s = 0;
   for (let i = 0; i < a.length; i++) s += a[i] * b[i];

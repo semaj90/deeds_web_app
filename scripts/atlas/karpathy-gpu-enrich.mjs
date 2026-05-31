@@ -38,12 +38,12 @@ const limitIdx = args.indexOf('--limit');
 const LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 50;
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const QDRANT_URL = process.env.QDRANT_URL;
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const COLLECTION = 'codebase_chunks_768';
 const NEO4J_URL = process.env.NEO4J_HTTP_URL ?? (process.env.NEO4J_URL ?? process.env.NEO4J_URI ?? 'http://localhost:7474').replace(/^bolt:\/\/|^neo4j:\/\//, 'http://').replace(':7687', ':7474');
 const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
-const REDIS_URL    = process.env.REDIS_URL;
+const REDIS_URL    = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const REDIS_PASS   = process.env.REDIS_PASSWORD ?? 'redis';
 const DATABASE_URL = process.env.DATABASE_URL;
 
@@ -493,13 +493,13 @@ async function main() {
 
   if (!DRY) {
     const redis = new Redis(REDIS_URL);
-    // Write scores as a pipeline for atomicity + set 24h TTL to match summary
+    // Write scores as a pipeline for atomicity + set 7-day TTL to match summary
     const pipe = redis.pipeline();
     pipe.del('gpu:karpathy:scores');
     for (const r of finalResults) {
       pipe.hset('gpu:karpathy:scores', r.stableKey, JSON.stringify(r));
     }
-    pipe.expire('gpu:karpathy:scores', 86400);
+    pipe.expire('gpu:karpathy:scores', 604800);
 
     // Phase B: write path→cluster reverse index + cluster member sorted sets
     const clusterPipe = redis.pipeline();
@@ -507,19 +507,19 @@ async function main() {
     for (const r of finalResults) {
       const ck = _pathToCluster.get(r.stableKey);
       if (ck) {
-        clusterPipe.setex(`ace:path:cluster:${r.stableKey}`, 86400, ck);
+        clusterPipe.setex(`ace:path:cluster:${r.stableKey}`, 604800, ck);
         clusterPipe.zadd(`ace:cluster:members:${ck}`, r.blend, r.stableKey);
       }
     }
     // Set TTL on all cluster member sets
     const seenClusters = new Set([..._pathToCluster.values()]);
     for (const ck of seenClusters) {
-      clusterPipe.expire(`ace:cluster:members:${ck}`, 86400);
+      clusterPipe.expire(`ace:cluster:members:${ck}`, 604800);
     }
     await pipe.exec();
     await clusterPipe.exec();
 
-    await redis.setex('gpu:karpathy:summary', 86400, JSON.stringify({
+    await redis.setex('gpu:karpathy:summary', 604800, JSON.stringify({
       ts: new Date().toISOString(),
       candidates: finalResults.length,
       topBlend: finalResults[0]?.blend ?? 0,

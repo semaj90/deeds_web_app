@@ -29,12 +29,12 @@ async function run() {
       try {
         const obj = JSON.parse(line);
         batch.push(obj);
-        if (batch.length >= BATCH_SIZE) {
-          await flush(batch);
-          batch = [];
-        }
       } catch (e) {
         console.error('JSON parse error, skipping line:', e.message);
+      }
+      if (batch.length >= BATCH_SIZE) {
+        await flush(batch);
+        batch = [];
       }
     }
   }
@@ -47,20 +47,42 @@ async function run() {
 }
 
 async function flush(rows) {
+  // Deduplicate rows in the batch by ID, keeping the last occurrence
+  const uniqueRows = [];
+  const seenIds = new Set();
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i];
+    const id = r.id || r.node_id || r.record_id || (r.payload && r.payload.id) || null;
+    if (id) {
+      if (seenIds.has(id)) continue;
+      seenIds.add(id);
+    }
+    uniqueRows.unshift(r);
+  }
+
   const text = `INSERT INTO parent_atlas_records (id, lane, node_id, title, source_ref, payload, index_version, created_at)
-  VALUES ${rows.map((_,i)=>`($${i*8+1},$${i*8+2},$${i*8+3},$${i*8+4},$${i*8+5},$${i*8+6},$${i*8+7},$${i*8+8})`).join(',')}
+  VALUES ${uniqueRows.map((_,i)=>`($${i*8+1},$${i*8+2},$${i*8+3},$${i*8+4},$${i*8+5},$${i*8+6},$${i*8+7},$${i*8+8})`).join(',')}
   ON CONFLICT (id) DO UPDATE SET payload = EXCLUDED.payload, title = EXCLUDED.title, source_ref = EXCLUDED.source_ref, index_version = EXCLUDED.index_version;`;
   const values = [];
-  for (const r of rows) {
-    // tolerate multiple id sources: top-level id, node_id, record_id, or payload.id
+  for (const r of uniqueRows) {
     const id = r.id || r.node_id || r.record_id || (r.payload && r.payload.id) || null;
-    // prefer node_id but fall back to payload.id for node_id as well
-    const nodeId = r.node_id || (r.payload && r.payload.id) || null;
-    values.push(id, r.lane || null, nodeId, r.title || null, r.source_ref || null, JSON.stringify(r.payload || r), r.index_version || 0, r.created_at || new Date().toISOString());
+    const nodeId = r.node_id || (r.payload && r.payload.id) || id || null;
+    const lane = r.lane || r.lane_id || 'features';
+    values.push(
+      id === undefined ? null : id,
+      lane,
+      nodeId === undefined ? null : nodeId,
+      r.title === undefined ? null : r.title,
+      r.source_ref === undefined ? null : r.source_ref,
+      JSON.stringify(r.payload || r),
+      r.index_version === undefined ? 0 : r.index_version,
+      r.created_at === undefined ? new Date().toISOString() : r.created_at
+    );
   }
+  const sanitizedValues = values.map(v => v === undefined ? null : v);
   try {
     await client.query('BEGIN');
-    await client.query(text, values);
+    await client.query(text, sanitizedValues);
     await client.query('COMMIT');
     console.log('Flushed', rows.length, 'rows');
   } catch (e) {

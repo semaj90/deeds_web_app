@@ -17,7 +17,7 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const REDIS_URL = process.env.REDIS_URL;
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 const COLLECTION = 'codebase_chunks_768';
-const TTL = 86400;
+const TTL = 604800; // 7 days
 const MAX_NEIGHBORS = 5;
 
 const args = process.argv.slice(2);

@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-05-31T09:19:25.821Z",
+  "sourceDocument": "MASTER-FEATURE-TODO-2026-05-20.md",
+  "openItems": 19,
+  "tasksGenerated": 19,
+  "byStatus": {
+    "BACKLOG": 19
+  },
+  "byPriority": {
+    "LOW": 13,
+    "MEDIUM": 6
+  },
+  "fileResolution": {
+    "allRefsResolved": 0,
+    "someRefsMissing": 5,
+    "noFileRefs": 14
+  }
+}

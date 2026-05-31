@@ -1,0 +1,433 @@
+{
+  "timestamp": "2026-05-31T09:51:04.390Z",
+  "topKanbanTasks": [
+    {
+      "taskId": "TASK-8F878955",
+      "title": "memory › episodic",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.7233,
+      "testingScore": 1,
+      "architectureScore": 0.667,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-58468344",
+      "title": "ai › llm synthesis",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.56,
+      "testingScore": 1,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-ED4E47DC",
+      "title": "gpu › som topology",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.5233,
+      "testingScore": 0.667,
+      "architectureScore": 0.333,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-6931F591",
+      "title": "knowledge › atlas pipeline",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4933,
+      "testingScore": 0.667,
+      "architectureScore": 0.333,
+      "recommendedActions": [
+        "Run npm run audit:contracts to verify schema alignment"
+      ]
+    },
+    {
+      "taskId": "TASK-14A07D5F",
+      "title": "api › sveltekit routes",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4567,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-5E79F750",
+      "title": "analysis › entity extraction",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4567,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-5363FC86",
+      "title": "search › hyperrag",
+      "kanbanStatus": "TODO",
+      "rankScore": 0.4333,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-4D08EB7D",
+      "title": "workspace › scripts",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-B5036EE4",
+      "title": "legal › evidence",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-8511C3D3",
+      "title": "db › drizzle schema",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": [
+        "Run npm run audit:contracts to verify schema alignment"
+      ]
+    },
+    {
+      "taskId": "TASK-821524A0",
+      "title": "legal › case management",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-CC7CA801",
+      "title": "search › retrieval",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-1548130F",
+      "title": "cache › redis bifrost",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-D9BE188D",
+      "title": "ace › context assembly",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-B6D3E59B",
+      "title": "graph › neo4j traversal",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-14D7C5E1",
+      "title": "legal › citations",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-E3FA8EA2",
+      "title": "api › mcp tools",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-607E4D8F",
+      "title": "gpu › libtorch bridge",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-BE4F5C61",
+      "title": "auth › authentication",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-F6A02060",
+      "title": "knowledge › wiki notes",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    }
+  ],
+  "criticalGaps": [],
+  "productionRiskDocs": {
+    "ai": [
+      {
+        "name": "@ai-sdk/openai-compatible",
+        "repo": "git+https://github.com/vercel/ai.git",
+        "homepage": "https://ai-sdk.dev/docs",
+        "description": "This package provides a foundation for implementing providers that expose an OpenAI-compatible API."
+      },
+      {
+        "name": "ai",
+        "repo": "git+https://github.com/vercel/ai.git",
+        "homepage": "https://ai-sdk.dev/docs",
+        "description": "AI SDK by Vercel - build apps like ChatGPT, Claude, Gemini, and more with a single interface for any model using the Vercel AI Gateway or go direct to OpenAI, Anthropic, Google, or any other model provider."
+      },
+      {
+        "name": "ollama",
+        "repo": "git+https://github.com/ollama/ollama-js.git",
+        "homepage": "https://github.com/ollama/ollama-js",
+        "description": "Ollama Javascript library"
+      },
+      {
+        "name": "langfuse",
+        "repo": null,
+        "homepage": null,
+        "description": null
+      },
+      {
+        "name": "@ai-sdk/openai",
+        "repo": "git+https://github.com/vercel/ai.git",
+        "homepage": "https://ai-sdk.dev/docs",
+        "description": "The **[OpenAI provider](https://ai-sdk.dev/providers/ai-sdk-providers/openai)** for the [AI SDK](https://ai-sdk.dev/docs) contains language model support for the OpenAI chat and completion APIs and embedding model support for the OpenAI embeddings API."
+      }
+    ],
+    "vector": [
+      {
+        "name": "@qdrant/js-client-rest",
+        "repo": "git+https://github.com/qdrant/qdrant-js.git",
+        "homepage": "https://github.com/qdrant/qdrant-js#readme",
+        "description": "This repository contains the REST client for the [Qdrant](https://github.com/qdrant/qdrant) vector search engine."
+      }
+    ],
+    "queue": [
+      {
+        "name": "amqplib",
+        "repo": "git+https://github.com/amqp-node/amqplib.git",
+        "homepage": "http://amqp-node.github.io/amqplib/",
+        "description": "An AMQP 0-9-1 (e.g., RabbitMQ) library and client."
+      }
+    ],
+    "ui": [
+      {
+        "name": "bits-ui",
+        "repo": "git+https://github.com/huntabyte/bits-ui.git",
+        "homepage": "https://github.com/huntabyte/bits-ui#readme",
+        "description": "The headless components for Svelte."
+      },
+      {
+        "name": "lucide-svelte",
+        "repo": "git+https://github.com/lucide-icons/lucide.git",
+        "homepage": "https://lucide.dev",
+        "description": "A Lucide icon library package for Svelte applications."
+      },
+      {
+        "name": "@unocss/svelte-scoped",
+        "repo": "git+https://github.com/unocss/unocss.git",
+        "homepage": "https://unocss.dev",
+        "description": "Use UnoCSS in a modular fashion with styles being stored only in the Svelte component they are used in: Vite plugin for apps, Svelte preprocessor for component libraries"
+      },
+      {
+        "name": "unocss",
+        "repo": "git+https://github.com/unocss/unocss.git",
+        "homepage": "https://unocss.dev",
+        "description": "The instant on-demand Atomic CSS engine."
+      }
+    ],
+    "cache": [
+      {
+        "name": "ioredis",
+        "repo": "git://github.com/luin/ioredis.git",
+        "homepage": "https://github.com/luin/ioredis#readme",
+        "description": "A robust, performance-focused and full-featured Redis client for Node.js."
+      },
+      {
+        "name": "redis",
+        "repo": "git://github.com/redis/node-redis.git",
+        "homepage": "https://github.com/redis/node-redis",
+        "description": "A modern, high performance Redis client"
+      }
+    ],
+    "storage": [
+      {
+        "name": "minio",
+        "repo": "git+https://github.com/minio/minio-js.git",
+        "homepage": "https://github.com/minio/minio-js#readme",
+        "description": "S3 Compatible Cloud Storage client"
+      }
+    ],
+    "database": [
+      {
+        "name": "pg",
+        "repo": "git://github.com/brianc/node-postgres.git",
+        "homepage": "https://github.com/brianc/node-postgres",
+        "description": "PostgreSQL client - pure javascript & libpq with the same API"
+      },
+      {
+        "name": "better-sqlite3",
+        "repo": "git://github.com/WiseLibs/better-sqlite3.git",
+        "homepage": "http://github.com/WiseLibs/better-sqlite3",
+        "description": "The fastest and simplest library for SQLite in Node.js."
+      },
+      {
+        "name": "pgvector",
+        "repo": "git+https://github.com/pgvector/pgvector-node.git",
+        "homepage": "https://github.com/pgvector/pgvector-node",
+        "description": "pgvector support for Node.js, Deno, and Bun (and TypeScript)"
+      },
+      {
+        "name": "postgres",
+        "repo": "git+https://github.com/porsager/postgres.git",
+        "homepage": "https://github.com/porsager/postgres",
+        "description": "Fastest full featured PostgreSQL client for Node.js"
+      },
+      {
+        "name": "drizzle-orm",
+        "repo": "git+https://github.com/drizzle-team/drizzle-orm.git",
+        "homepage": "https://orm.drizzle.team",
+        "description": "Drizzle ORM package for SQL databases"
+      }
+    ],
+    "validation": [
+      {
+        "name": "sveltekit-superforms",
+        "repo": "git+https://github.com/ciscoheat/sveltekit-superforms.git",
+        "homepage": "https://superforms.rocks",
+        "description": "Making SvelteKit forms a pleasure to use!"
+      },
+      {
+        "name": "zod",
+        "repo": "git+https://github.com/colinhacks/zod.git",
+        "homepage": "https://zod.dev",
+        "description": "TypeScript-first schema declaration and validation library with static type inference"
+      }
+    ],
+    "framework": [
+      {
+        "name": "@sveltejs/kit",
+        "repo": "git+https://github.com/sveltejs/kit.git",
+        "homepage": "https://svelte.dev",
+        "description": "SvelteKit is the fastest way to build Svelte apps"
+      },
+      {
+        "name": "svelte",
+        "repo": "git+https://github.com/sveltejs/svelte.git",
+        "homepage": "https://svelte.dev",
+        "description": "Cybernetically enhanced web apps"
+      },
+      {
+        "name": "vite",
+        "repo": "git+https://github.com/vitejs/vite.git",
+        "homepage": "https://vite.dev",
+        "description": "Native-ESM powered web dev build tool"
+      },
+      {
+        "name": "@sveltejs/adapter-node",
+        "repo": "git+https://github.com/sveltejs/kit.git",
+        "homepage": "https://svelte.dev/docs/kit/adapter-node",
+        "description": "Adapter for SvelteKit apps that generates a standalone Node server"
+      }
+    ],
+    "testing": [
+      {
+        "name": "vitest",
+        "repo": "git+https://github.com/vitest-dev/vitest.git",
+        "homepage": "https://vitest.dev",
+        "description": "Next generation testing framework powered by Vite"
+      },
+      {
+        "name": "@playwright/test",
+        "repo": "git+https://github.com/microsoft/playwright.git",
+        "homepage": "https://playwright.dev",
+        "description": "A high-level API to automate web browsers"
+      },
+      {
+        "name": "playwright",
+        "repo": "git+https://github.com/microsoft/playwright.git",
+        "homepage": "https://playwright.dev",
+        "description": "A high-level API to automate web browsers"
+      }
+    ],
+    "auth": [
+      {
+        "name": "@lucia-auth/adapter-drizzle",
+        "repo": "git+https://github.com/pilcrowOnPaper/lucia.git",
+        "homepage": "https://github.com/pilcrowOnPaper/lucia#readme",
+        "description": "Drizzle ORM adapter for Lucia"
+      },
+      {
+        "name": "lucia",
+        "repo": "git+https://github.com/pilcrowOnPaper/lucia.git",
+        "homepage": "https://github.com/pilcrowOnPaper/lucia#readme",
+        "description": "A simple and flexible authentication library"
+      },
+      {
+        "name": "oslo",
+        "repo": "git+https://github.com/pilcrowOnPaper/oslo.git",
+        "homepage": "https://github.com/pilcrowOnPaper/oslo#readme",
+        "description": "A collection of auth-related utilities"
+      }
+    ],
+    "state": [
+      {
+        "name": "@xstate/svelte",
+        "repo": "git+ssh://git@github.com/statelyai/xstate.git",
+        "homepage": "https://github.com/statelyai/xstate/tree/main/packages/xstate-svelte#readme",
+        "description": "XState tools for Svelte"
+      },
+      {
+        "name": "xstate",
+        "repo": "git+https://github.com/statelyai/xstate.git",
+        "homepage": "https://github.com/statelyai/xstate/tree/main/packages/core#readme",
+        "description": "Finite State Machines and Statecharts for the Modern Web."
+      }
+    ],
+    "graph": [
+      {
+        "name": "neo4j-driver",
+        "repo": "git://github.com/neo4j/neo4j-javascript-driver.git",
+        "homepage": "https://github.com/neo4j/neo4j-javascript-driver#readme",
+        "description": "The official Neo4j driver for Javascript"
+      }
+    ]
+  },
+  "overallRecommendation": {
+    "testingCoverage": "106/143 tasks lack tests — wire Playwright/Vitest gates",
+    "productionHardening": "Prioritise database, auth, vector, cache, queue docs (in that order)",
+    "immediateMoves": [
+      "Write Playwright spec for top REVIEW tasks",
+      "Add Vitest unit tests for top server modules",
+      "Run npm run audit:contracts after each schema change",
+      "Refresh docs/graph/codebase-graph.json (3 days stale)",
+      "Move CHR97 training-ready clusters (language|c10, outcome|c16) into Unsloth pipeline"
+    ]
+  }
+}

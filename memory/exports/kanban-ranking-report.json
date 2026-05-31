@@ -1,0 +1,199 @@
+{
+  "timestamp": "2026-05-31T09:45:04.268Z",
+  "rubric": {
+    "testing": 0.4,
+    "architecture": 0.2,
+    "enhancement": 0.2,
+    "completion": 0.1,
+    "clientServer": 0.1
+  },
+  "totalTasks": 143,
+  "needsTesting": 106,
+  "top20": [
+    {
+      "taskId": "TASK-8F878955",
+      "title": "memory › episodic",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.7233,
+      "testingScore": 1,
+      "architectureScore": 0.667,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-58468344",
+      "title": "ai › llm synthesis",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.56,
+      "testingScore": 1,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-ED4E47DC",
+      "title": "gpu › som topology",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.5233,
+      "testingScore": 0.667,
+      "architectureScore": 0.333,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-6931F591",
+      "title": "knowledge › atlas pipeline",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4933,
+      "testingScore": 0.667,
+      "architectureScore": 0.333,
+      "recommendedActions": [
+        "Run npm run audit:contracts to verify schema alignment"
+      ]
+    },
+    {
+      "taskId": "TASK-14A07D5F",
+      "title": "api › sveltekit routes",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4567,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-5E79F750",
+      "title": "analysis › entity extraction",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4567,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-5363FC86",
+      "title": "search › hyperrag",
+      "kanbanStatus": "TODO",
+      "rankScore": 0.4333,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-4D08EB7D",
+      "title": "workspace › scripts",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-B5036EE4",
+      "title": "legal › evidence",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-8511C3D3",
+      "title": "db › drizzle schema",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": [
+        "Run npm run audit:contracts to verify schema alignment"
+      ]
+    },
+    {
+      "taskId": "TASK-821524A0",
+      "title": "legal › case management",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-CC7CA801",
+      "title": "search › retrieval",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-1548130F",
+      "title": "cache › redis bifrost",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-D9BE188D",
+      "title": "ace › context assembly",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-B6D3E59B",
+      "title": "graph › neo4j traversal",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-14D7C5E1",
+      "title": "legal › citations",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-E3FA8EA2",
+      "title": "api › mcp tools",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-607E4D8F",
+      "title": "gpu › libtorch bridge",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-BE4F5C61",
+      "title": "auth › authentication",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-F6A02060",
+      "title": "knowledge › wiki notes",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    }
+  ],
+  "criticalGaps": []
+}

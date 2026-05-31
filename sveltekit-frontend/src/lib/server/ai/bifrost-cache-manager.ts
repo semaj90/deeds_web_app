@@ -1,5 +1,25 @@
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import crypto from 'crypto';
+import { createRequire } from 'module';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const require = createRequire(import.meta.url);
+let __dirname = '';
+try {
+  __dirname = path.dirname(fileURLToPath(import.meta.url));
+} catch (e) {}
+
+let native: any = null;
+try {
+  if (__dirname) {
+    const nativePath = path.resolve(__dirname, '../../../../simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node');
+    native = require(nativePath);
+  }
+} catch (e: any) {
+  console.warn('[bifrost-cache] Native Rust bridge load failed, using JS fallback:', e.message);
+}
 
 /**
  * BifrostCacheManager
@@ -34,13 +54,7 @@ export class BifrostCacheManager {
    * Generate a stable hash for a prompt prefix.
    */
   private static hashContent(content: string): string {
-    // Simple fast hash for demo; in prod use crypto.createHash('sha256')
-    let hash = 0;
-    for (let i = 0; i < content.length; i++) {
-      hash = ((hash << 5) - hash) + content.charCodeAt(i);
-      hash |= 0;
-    }
-    return hash.toString(16);
+    return crypto.createHash('sha256').update(content).digest('hex');
   }
 
   /**
@@ -51,6 +65,11 @@ export class BifrostCacheManager {
     const raw = await redis.get(`bifrost:kag:${cacheKey}`);
     if (!raw) return null;
     try {
+      if (native && (typeof native.parseFast === 'function' || typeof native.parse_fast === 'function')) {
+        const fn = native.parseFast || native.parse_fast;
+        const parsedStr = fn(raw);
+        return JSON.parse(parsedStr);
+      }
       return JSON.parse(raw);
     } catch {
       return null;

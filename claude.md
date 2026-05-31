@@ -303,6 +303,16 @@ return json({ error: 'Failed' }, { status: 500 });
 
 ## Svelte 5 Runes (REQUIRED — No Svelte 4 Patterns)
 
+### Svelte 5 Runes vs. XState v5 Decision Matrix
+
+| Use Case | State Store choice | Implementation Pattern |
+|---|---|---|
+| UI Toggles & Modals | Runes / Bits UI | Use `$bindable()` properties directly in Bits components |
+| Linear Multi-step Wizards | Runes | Use class-backed `.svelte.ts` class with `$state.raw({ step: 1 })` |
+| Async Form Validation | Runes / Superforms | Use `superValidate` with server-side Zod + client state |
+| Parallel Fetch & Watchdog timers | XState v5 | Use XState machine with `Promise.race` + `watchdog` timer |
+| Multi-Actor Retries & Back-offs | XState v5 | Use XState machine (`retrieval-machine.ts`, `chat-machine.ts`) |
+
 ```typescript
 // State
 let count = $state(0);

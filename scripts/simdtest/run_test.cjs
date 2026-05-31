@@ -1,0 +1,67 @@
+// CommonJS test harness to exercise the native napi-rs crate if built.
+// Usage: node run_test.cjs <path-to-json-file>
+
+const path = require('path');
+const fs = require('fs');
+
+async function main() {
+  const file = process.argv[2] || path.join(__dirname, '..', '..', '.tmp', 'parent_atlas_packets', '00a337a7c6c8fadc.json');
+  if (!fs.existsSync(file)) {
+    console.error('Test file not found:', file);
+    process.exit(1);
+  }
+  const input = fs.readFileSync(file, 'utf8');
+
+  try {
+    const candidates = [
+      path.join(__dirname, '..', '..', 'simd-bridge', 'rust-simdjson', 'target', 'release', 'simd_bridge_rs.node'),
+      path.join(__dirname, '..', '..', 'simd-bridge', 'rust-simdjson', 'target', 'release', 'simd_bridge_rs.dll'),
+      path.join(__dirname, '..', '..', 'simd-bridge', 'rust-simdjson', 'target', 'release', 'libsimd_bridge_rs.so'),
+      path.join(__dirname, '..', '..', 'simd-bridge', 'rust-simdjson', 'target', 'release', 'simd_bridge_rs.dylib')
+    ];
+    let native = null;
+    for (const c of candidates) {
+      if (fs.existsSync(c)) {
+        try {
+          native = require(c);
+          console.log('Loaded native addon from', c);
+          break;
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+
+    if (!native) {
+      console.warn('Native addon not found; falling back to pure-Node JSON.parse for test. Build the crate first.');
+      const parsed = JSON.parse(input);
+      console.log('Top-level type:', Array.isArray(parsed) ? 'array' : typeof parsed);
+      if (parsed && typeof parsed === 'object') console.log('Keys:', Object.keys(parsed).slice(0,10));
+      process.exit(0);
+    }
+
+    if (typeof native.parse_fast === 'function' || typeof native.parseFast === 'function') {
+      const fn = native.parse_fast || native.parseFast;
+      const out = fn(input);
+      console.log('Native parse output length:', out.length);
+      try {
+        const parsed = JSON.parse(out);
+        console.log('Parsed OK; top keys:', Object.keys(parsed).slice(0,10));
+      } catch (e) {
+        console.error('Native output not valid JSON:', e.message);
+      }
+    } else if (typeof native.parse_fast_count === 'function' || typeof native.parseFastCount === 'function') {
+      const fn = native.parse_fast_count || native.parseFastCount;
+      const count = fn(input);
+      console.log('Native parse count:', count);
+    } else {
+      console.error('Native addon loaded but expected symbols not found. Exported keys:', Object.keys(native));
+    }
+
+  } catch (err) {
+    console.error('Test failed:', err);
+    process.exit(1);
+  }
+}
+
+main();

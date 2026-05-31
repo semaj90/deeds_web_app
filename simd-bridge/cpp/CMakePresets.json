@@ -63,6 +63,36 @@
                 "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo"
             }
         }
+        ,
+        {
+            "name": "windows-x64-fallback",
+            "displayName": "Windows x64 fallback no CUDA/LibTorch",
+            "description": "Release build x64 without CUDA or LibTorch, using CPU stubs",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build-x64-fallback",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "SIMD_ENABLE_CUDA": "OFF",
+                "SIMD_ENABLE_LIBTORCH": "OFF",
+                "SIMD_ENABLE_FALLBACK_STUBS": "ON"
+            }
+        },
+        {
+            "name": "windows-x64-cuda-libtorch",
+            "displayName": "Windows x64 CUDA LibTorch",
+            "description": "Release build x64 with CUDA and LibTorch",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build-x64-cuda",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "SIMD_ENABLE_CUDA": "ON",
+                "SIMD_ENABLE_LIBTORCH": "ON",
+                "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+                "CMAKE_PREFIX_PATH": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
+            }
+        }
     ],
     "buildPresets": [
         {

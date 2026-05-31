@@ -38,6 +38,10 @@ import { resolveRepoPath, readJson, toPosixPath } from './_atlas-utils.mjs';
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const argv  = process.argv.slice(2);
 
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const WorkerPool = require('../../simd-bridge/worker-pool.cjs');
+
 const DRY_RUN   = argv.includes('--dry-run');
 const NO_EMBED  = argv.includes('--no-embed');
 const NO_REDIS  = argv.includes('--no-redis');
@@ -174,6 +178,51 @@ async function main() {
     .map(f => path.join(CARDS_DIR, f));
 
   console.log(`[cards] Found ${cardFiles.length} card files`);
+
+  if (DRY_RUN && cardFiles.length > 0) {
+    console.log('[cards] Dry-run: starting side-by-side benchmark comparison...');
+    
+    // 1. JSON.parse Benchmark
+    const t0 = performance.now();
+    let countStandard = 0;
+    for (const file of cardFiles) {
+      try {
+        const raw = fs.readFileSync(file, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.id) countStandard++;
+      } catch (e) {}
+    }
+    const t1 = performance.now();
+    const durationStandard = t1 - t0;
+    console.log(`[benchmark] standard JSON.parse: ${durationStandard.toFixed(2)}ms for ${countStandard} items`);
+
+    // 2. Rust WorkerPool Benchmark
+    const t2 = performance.now();
+    const contents = [];
+    for (const file of cardFiles) {
+      try {
+        contents.push(fs.readFileSync(file, 'utf8'));
+      } catch (e) {}
+    }
+    const pool = new WorkerPool(path.join(__dir, '../../simd-bridge/worker.cjs'));
+    const res = await pool.exec({ type: 'parse', contents });
+    pool.destroy();
+    
+    let countRust = 0;
+    if (res && res.success && Array.isArray(res.result)) {
+      for (const item of res.result) {
+        if (item) {
+          // Verify that it can be parsed or count it
+          countRust++;
+        }
+      }
+    }
+    const t3 = performance.now();
+    const durationRust = t3 - t2;
+    console.log(`[benchmark] Rust Rayon worker-pool: ${durationRust.toFixed(2)}ms for ${countRust} items`);
+    const speedup = durationStandard / durationRust;
+    console.log(`[benchmark] Speedup factor: ${speedup.toFixed(2)}x`);
+  }
 
   const state = loadState();
   const qdrantOK = NO_EMBED ? false : await ensureQdrantCollection();

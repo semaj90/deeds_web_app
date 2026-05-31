@@ -25,7 +25,7 @@ dotenv.config();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../../sveltekit-frontend');
 const REDIS_URL = process.env.REDIS_URL;
-const TTL = 86400; // 24h — matches gpu:karpathy:scores
+const TTL = 604800; // 7 days — matches gpu:karpathy:scores
 
 if (!REDIS_URL) {
   console.error('[cluster-tags-redis] REDIS_URL not set — skipping');
@@ -58,14 +58,15 @@ async function loadClusterTags() {
   const synPath = join(latestDir, 'synthesis_summary.json');
   if (existsSync(synPath)) {
     const synData = JSON.parse(readFileSync(synPath, 'utf-8'));
-    const synMap = new Map(synData.map(s => [`cluster:gpu:${s.cluster_id}`, s]));
+    const synList = [...(synData.p0 || []), ...(synData.p1 || [])];
+    const synMap = new Map(synList.map(s => [s.cluster, s]));
     for (const t of tags) {
       const syn = synMap.get(t.clusterKey);
       if (syn) {
         t.summary = syn.summary ?? t.summary;
         t.purpose = syn.purpose ?? t.purpose;
-        t.risk_level = syn.risk_level ?? t.risk_level;
-        t.mitigation_protocols = syn.mitigation_protocols ?? t.mitigation_protocols;
+        t.risk_level = syn.risk !== undefined ? String(syn.risk) : (syn.risk_level ?? t.risk_level);
+        t.mitigation_protocols = syn.protocols ?? syn.mitigation_protocols ?? t.mitigation_protocols;
       }
     }
   }

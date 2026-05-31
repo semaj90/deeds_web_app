@@ -30,18 +30,18 @@ const APPLY = args.includes('--apply');
 //   legal_documents, statute_chunks, timeline_events,
 //   workspaces, workspace_notes, workspace_sessions
 
-// Round 2 (2026-05-30) — Tier A from real-gap-classification.md
-// These are confirmed undeclared in any Drizzle file (sidecar OR schema-postgres.ts)
-// and have active rows. Promote them to sidecar status.
+// Round 3 (2026-05-30) — Tier D promotions from real-gap-classification.md
+// `embeddings` is FK-referenced by case_chunks.chunk_embedding_id (schema dep).
+// `model_weights` is consumed by admin/model-manager + 2 routes + dashboard.
 const TARGETS = [
-  { table: 'feature_registry_vectors',     exportName: 'featureRegistryVectors' },
-  { table: 'codebase_embeddings',          exportName: 'codebaseEmbeddings' },
-  { table: 'codebase_files',               exportName: 'codebaseFiles' },
-  { table: 'intent_synthesis_rewards',     exportName: 'intentSynthesisRewards' },
-  { table: 'feature_cards',                exportName: 'featureCards' },
-  { table: 'codebase_relationship_reports',exportName: 'codebaseRelationshipReports' },
-  { table: 'vector_smoke',                 exportName: 'vectorSmoke' },
+  { table: 'embeddings',    exportName: 'embeddings' },
+  { table: 'model_weights', exportName: 'modelWeights' },
 ];
+
+// Round 2 (2026-05-30) — Tier A from real-gap-classification.md (DONE):
+//   feature_registry_vectors, codebase_embeddings, codebase_files,
+//   intent_synthesis_rewards, feature_cards, codebase_relationship_reports,
+//   vector_smoke
 
 function camelToKebab(name) {
   return name.replace(/_/g, '-');

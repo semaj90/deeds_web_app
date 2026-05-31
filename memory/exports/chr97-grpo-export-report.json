@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-05-31T08:58:12.100Z",
+  "params": {
+    "minDelta": 0.05,
+    "maxPerBucket": 40
+  },
+  "input": {
+    "bouts": 1500,
+    "sprites": 200
+  },
+  "filter": {
+    "strongBouts": 407,
+    "bucketsBeforeCap": 7,
+    "afterCap": 250,
+    "validPairs": 250
+  },
+  "distribution": {
+    "byLane": {
+      "language": 40,
+      "som_edge": 109,
+      "audit": 61,
+      "outcome": 40
+    },
+    "byCluster": {
+      "c10": 61,
+      "c20": 40,
+      "c16": 109,
+      "c3": 40
+    }
+  },
+  "advantageStats": {
+    "min": 0.05,
+    "max": 0.2886,
+    "avg": 0.12230880000000008
+  },
+  "outputs": {
+    "dataset": "C:\\Users\\james\\Videos\\deeds-web-app\\training-datasets\\chr97-grpo-pairs-2026-05-31T08-58-12-096Z.jsonl",
+    "latest": "C:\\Users\\james\\Videos\\deeds-web-app\\training-datasets\\chr97-grpo-pairs-latest.jsonl"
+  }
+}

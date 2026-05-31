@@ -76,15 +76,32 @@ export * from './rag-cards.js';
 export * from './summary-cards.js';
 export * from './normalize-labels.js';
 
-// 2026-05-30 drift remediation — Tier 1 core-app sidecars auto-extracted from drizzle-kit introspect
-export * from './case-notes.js';
-export * from './case-statute-links.js';
-export * from './case-note-versions.js';
-export * from './case-note-evidence-refs.js';
-export * from './legal-documents.js';
-export * from './statute-chunks.js';
-export * from './timeline-events.js';
-export * from './workspaces.js';
-export * from './workspace-notes.js';
-export * from './workspace-sessions.js';
+// 2026-05-30 drift remediation — DO NOT add the Round-1 sidecars
+// (case-notes, case-statute-links, case-note-versions, case-note-evidence-refs,
+//  legal-documents, statute-chunks, timeline-events, workspaces,
+//  workspace-notes, workspace-sessions) to this barrel — they are REDUNDANT with
+// schema-postgres.ts. See the MERGED-WITH-CANONICAL banner inside each file.
+//
+// Round 2 (Tier-A from real-gap-classification.md): these are confirmed
+// undeclared in any canonical schema file and have active rows. Safe to export.
+export * from './feature-registry-vectors.js';
+export * from './codebase-embeddings.js';
+export * from './codebase-files.js';
+export * from './intent-synthesis-rewards.js';
+export * from './feature-cards.js';
+export * from './codebase-relationship-reports.js';
+export * from './vector-smoke.js';
+
+// Round 3 (Tier-D promotions from real-gap-classification.md):
+// `embeddings` is FK-referenced by case_chunks.chunk_embedding_id.
+// `model_weights` is consumed by admin/model-manager + admin routes + dashboard.
+// `migrations` is custom journal (managed by db/migrate.ts) — added to tablesFilter.
+export * from './embeddings.js';
+export * from './model-weights.js';
+
+// Round 3 (Tier-D promotions, 2026-05-30):
+// `embeddings` (384-dim, FK target of case_chunks) — 4 active consumers
+// `model_weights` (SeaweedFS-backed) — 4 active consumers in admin paths
+export * from './embeddings.js';
+export * from './model-weights.js';
 

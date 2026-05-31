@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-05-31T08:41:22.428Z",
+  "mode": "apply",
+  "query": "chr97 sprite eval — top reward nodes",
+  "queryHash": "5ec50afb3e4bd9ab",
+  "counts": {
+    "spritesIngested": 50,
+    "engramWritten": 50,
+    "rankedCards": 50,
+    "sourceRefs": 3,
+    "lessonsInSet": 50
+  },
+  "rabbitmq": {
+    "ok": true,
+    "error": null
+  },
+  "keys": {
+    "acePacket": "ace:packet:5ec50afb3e4bd9ab",
+    "tilePointer": "glyph:tile:atlas:chr97:5ec50afb3e4bd9ab"
+  },
+  "sample": {
+    "firstEngramKey": "glyph:tile:51edb0108913",
+    "firstRankedCard": {
+      "id": "som:19:0",
+      "lane": "som_edge",
+      "sourceRef": null,
+      "score": 0.70301,
+      "kind": "glyph_tile",
+      "meta": {
+        "kmeans_cluster": 1,
+        "pagerank": 0.000014,
+        "attention": 0.002509,
+        "reward": 0.70301,
+        "degree": 396
+      }
+    }
+  }
+}

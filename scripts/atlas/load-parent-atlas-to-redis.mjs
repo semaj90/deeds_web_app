@@ -32,7 +32,7 @@ const argv = process.argv.slice(2);
 const APPLY = argv.includes('--apply');
 const VERBOSE = argv.includes('--verbose');
 const ttlIdx = argv.indexOf('--ttl');
-const TTL = ttlIdx >= 0 ? parseInt(argv[ttlIdx + 1], 10) : 86400; // 24h default
+const TTL = ttlIdx >= 0 ? parseInt(argv[ttlIdx + 1], 10) : 604800; // 7 days default
 
 // ─── Env Loader ──────────────────────────────────────────────────────────
 

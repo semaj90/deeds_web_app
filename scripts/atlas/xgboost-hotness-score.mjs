@@ -44,7 +44,7 @@ const NEO4J_USER = process.env.NEO4J_USER || 'neo4j';
 const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || process.env.NEO4J_PASS || 'neo4j123';
 const COLLECTION = 'codebase_chunks_768';
 const HOT_SET_KEY = 'ace:cluster:hot';
-const HOT_SET_TTL = 3600; // 1h
+const HOT_SET_TTL = 604800; // 7 days
 const DEEP_IMPORT_GRAPH_PATH = resolve(ROOT, 'docs/graph/deep-import-graph.json');
 
 const args = process.argv.slice(2);

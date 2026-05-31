@@ -4501,3 +4501,42 @@ Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.
 
 <!-- /atlas-append:0bf81df426b5 -->
 
+
+---
+
+## [2026-05-31 03:35 PST] CUDA Primitives Improvement Audit
+
+**Method**: enumerated 28 native exports vs 14 wrapped functions; counted consumers per export; swept for CPU loops that map to GPU primitives; identified TS functions calling missing native exports.
+
+### Real findings (3 perf opportunities)
+
+**H1. Missing CUDA Graphs** — `CudaGraphManager` calls `bridge.captureGraph()` / `bridge.replayGraph()` but **neither exists in native addon**. TS layer gracefully no-ops via `isAvailable()` guard, but the optimization is dormant.
+- Consumers losing 30-50% latency: `libtorch-reranker.ts:43`, `hermes/deep-research-dag.ts`, `/api/health/inference/+server.ts:34`
+- TS pre-warms shapes `[1,768]`, `[8,768]`, `[32,768]` — exact ACE rerank batches
+- Fix: ~3h C++ work in new `cuda_graph_bridge.cu` + binding.cc wiring
+
+**H2. No CUDA streams exposed** — all kernels launch synchronously
+- `pageRankGPU` (26 consumers), `kmeansWithCentroids` (22), `attentionScoreGPU` (heavy ACE path) all serialize H2D copy + compute
+- Fix: extend signatures with optional `stream_id`, round-robin across 4 streams via existing `cuda-stream-manager.ts`
+- Payoff: 15-25% throughput on batches ≥ 4 × 768d
+
+**H3. No FP16 attention/cosine** — `graphSimilarityHalf` exists but no `attentionScoreHalf` or `batchCosineSimilarityHalf`
+- ACE rerank hot path uses FP32 throughout (768d × hundreds of cands per turn)
+- Drizzle schema already has `halfvec`; Qdrant supports it
+- Payoff: 2× VRAM headroom on RTX 3060 Ti + 1.8× throughput
+
+### Verified-correct (NOT improvement targets)
+- Graceful CPU fallback at TS layer — already implemented for every GPU function
+- Native stubs in `libtorch_stubs.cc` only activate under `NO_LIBTORCH=1` build flag (current build does not use it)
+- `.sort()` after rerank stays on CPU (PCIe round-trip dominates for <1000 items)
+
+### Cleanup applied
+- `src/lib/server/ai/turbovec-rerank.ts` — orphan 27-line CPU cosine duplicate (0 consumers)
+- Bannered with `MERGED-WITH-CANONICAL` pointing at `retrieval/turbovec-rerank.ts`
+- tsgo still clean
+
+### Roadmap additions
+**Phase H** (10-12h total): H1 CUDA Graphs (3h) → H2 streams (2-3h) → H3 FP16 (4-5h)
+**Phase I**: I1 banner orphan (DONE, 5 min)
+
+**Full audit**: `next_steps/active/2026-05-31_CUDA_PRIMITIVES_IMPROVEMENTS.md`

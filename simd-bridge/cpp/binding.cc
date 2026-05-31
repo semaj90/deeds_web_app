@@ -113,6 +113,11 @@ extern "C" int bridge_dot_product(const float* a, const float* b, float* out, in
 extern "C" int bridge_scale(const float* in, float* out, float scalar, int n);
 extern "C" int bridge_relu(const float* in, float* out, int n);
 
+// CUDA Graph capture/replay (cuda_graph_bridge.cu)
+extern "C" int captureGraph(const char* key, int n, int dim);
+extern "C" int replayGraph(const char* key, const float* input, int input_len, float* output, int output_len);
+extern "C" int cudaGraphCount();
+
 // SOM cache (som_cache.cu)
 extern "C" void runSOMCache(const float* in, float* out, int n);
 
@@ -1031,6 +1036,79 @@ static napi_value PcaProjectWrapper(napi_env env, napi_callback_info info) {
   return result;
 }
 
+// ── CUDA Graph capture/replay wrappers ───────────────────────────────
+
+static napi_value CaptureGraphWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 3;
+  napi_value argv[3];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 3) return throw_type_error(env, "captureGraph(key:string, n:number, dim:number)");
+
+  char key_buf[256] = {0};
+  size_t key_len = 0;
+  if (napi_get_value_string_utf8(env, argv[0], key_buf, sizeof(key_buf), &key_len) != napi_ok)
+    return throw_type_error(env, "captureGraph: key must be a string");
+
+  int32_t n = 0, dim = 0;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &dim);
+
+  int rc = captureGraph(key_buf, n, dim);
+  napi_value result;
+  napi_create_int32(env, rc, &result);
+  return result;
+}
+
+static napi_value ReplayGraphWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 2;
+  napi_value argv[2];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 2) return throw_type_error(env, "replayGraph(key:string, input:Float32Array)");
+
+  char key_buf[256] = {0};
+  size_t key_len = 0;
+  if (napi_get_value_string_utf8(env, argv[0], key_buf, sizeof(key_buf), &key_len) != napi_ok)
+    return throw_type_error(env, "replayGraph: key must be a string");
+
+  bool is_ta = false;
+  napi_is_typedarray(env, argv[1], &is_ta);
+  if (!is_ta) return throw_type_error(env, "replayGraph: input must be a Float32Array");
+
+  napi_typedarray_type ta_type;
+  size_t in_len = 0;
+  void* in_data = nullptr;
+  napi_get_typedarray_info(env, argv[1], &ta_type, &in_len, &in_data, nullptr, nullptr);
+  if (ta_type != napi_float32_array)
+    return throw_type_error(env, "replayGraph: input must be a Float32Array");
+
+  // Output sized by the captured graph; allocate generously (n rows scalar output).
+  // The native function validates input_len against the captured shape.
+  // We allocate input_len/dim_estimate worst-case (n rows) — but the captured n
+  // is known by cudaGraphCount-style introspection. Simplest: allocate same size
+  // as input, trim on JS side.
+  napi_value out_ab;
+  void* out_data = nullptr;
+  size_t out_len = in_len;  // upper bound
+  napi_create_arraybuffer(env, out_len * sizeof(float), &out_data, &out_ab);
+
+  int rc = replayGraph(key_buf, (const float*)in_data, (int)in_len, (float*)out_data, (int)out_len);
+  if (rc != 0) {
+    char msg[128];
+    snprintf(msg, sizeof(msg), "replayGraph failed: rc=%d", rc);
+    return throw_error(env, msg);
+  }
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, out_len, out_ab, 0, &result);
+  return result;
+}
+
+static napi_value CudaGraphCountWrapper(napi_env env, napi_callback_info info) {
+  (void)info;
+  napi_value result;
+  napi_create_int32(env, cudaGraphCount(), &result);
+  return result;
+}
+
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
@@ -1066,6 +1144,10 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);
   registerFn(env, exports, "simdJsonExtractNumbers", RegisterSimdJsonExtractNumbers);
   registerFn(env, exports, "simdJsonBackend", RegisterSimdJsonBackend);
+  // CUDA Graph capture/replay (Phase H1)
+  registerFn(env, exports, "captureGraph", CaptureGraphWrapper);
+  registerFn(env, exports, "replayGraph", ReplayGraphWrapper);
+  registerFn(env, exports, "cudaGraphCount", CudaGraphCountWrapper);
   return exports;
 }
 

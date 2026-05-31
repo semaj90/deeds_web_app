@@ -52,5 +52,16 @@ export default {
     '!statute_chunks', '!symbol_runtime_stats', '!taxonomy_edges',
     '!taxonomy_nodes', '!timeline_events', '!trace_events', '!trace_runs',
     '!user_interaction_history', '!vault_md_index', '!vault_md_join',
+
+    // Added 2026-05-30 (real-gap-classification Tier B): ACE sidecar SQL-managed
+    '!ace_chunks', '!ace_context_packets', '!ace_context_sources',
+    '!ace_docs', '!ace_hit_logs', '!ace_sources',
+    // Added 2026-05-30 (Tier C): Pipeline / MapReduce / GPU SQL-managed
+    '!card_source_refs', '!codebase_graph_analysis', '!codebase_mapreduce_jobs',
+    '!codebase_search_cache', '!codebase_wiki_pages',
+    '!graph_expansion_cache', '!gpu_performance_metrics',
+    '!hermes_dag_runs', '!mapreduce_map_queue', '!mapreduce_reduce_results',
+    // Added 2026-05-30 (Tier D): custom migrations journal (managed by db/migrate.ts, not drizzle-kit)
+    '!migrations',
   ],
 } satisfies Config;

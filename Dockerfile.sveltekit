@@ -1,77 +1,86 @@
-# Multi-stage build for SvelteKit 2 with QUIC/HTTP3 support
-FROM node:22-alpine AS base
+# Multi-stage build for SvelteKit 2 with native C++/Rust NAPI bindings
+FROM node:22-slim AS base
 
-# Install dependencies for building
-RUN apk add --no-cache libc6-compat git python3 make g++
+# Install dependencies for building native C++/Rust modules
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    gcc \
+    libc6-dev \
+    git \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust toolchain
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /app
 
-# Copy package files
+# Copy package configuration
+COPY sveltekit-frontend/package*.json ./sveltekit-frontend/
 COPY package*.json ./
 COPY pnpm-lock.yaml* ./
 
 # Install pnpm
 RUN npm install -g pnpm
 
-# Install dependencies
+# Copy native bridge source code first (needed to compile the addon)
+COPY simd-bridge ./simd-bridge
+
+# Build the Rust native addon from source inside the container
+RUN cd simd-bridge/rust-simdjson && \
+    cargo build --release && \
+    cp target/release/libsimd_bridge_rs.so target/release/simd_bridge_rs.node || \
+    cp target/release/simd_bridge_rs.dll target/release/simd_bridge_rs.node || \
+    cp target/release/libsimd_bridge_rs.dylib target/release/simd_bridge_rs.node || true
+
+# Install dependencies for SvelteKit
+WORKDIR /app/sveltekit-frontend
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
-COPY . .
-
-# Build arguments
-ARG NODE_ENV=development
-ARG DATABASE_URL
-ARG REDIS_URL
-ARG VITE_API_URL
-
-ENV NODE_ENV=$NODE_ENV
-ENV DATABASE_URL=$DATABASE_URL
-ENV REDIS_URL=$REDIS_URL
-ENV VITE_API_URL=$VITE_API_URL
+# Copy SvelteKit frontend source
+COPY sveltekit-frontend/ .
 
 # Build for development
 FROM base AS development
-
-# Install development dependencies
+WORKDIR /app/sveltekit-frontend
 RUN pnpm install --dev
-
-# Expose ports
 EXPOSE 5173 5174
-
-# Start development server with QUIC optimization
 CMD ["pnpm", "run", "dev", "--host", "0.0.0.0"]
 
-# Build for production
+# Build SvelteKit for production
 FROM base AS build
-
-# Build the application
+WORKDIR /app/sveltekit-frontend
 RUN pnpm run build
 
-# Production image
-FROM node:22-alpine AS production
+# Production runner image (glibc-based node:22-slim)
+FROM node:22-slim AS production
 
 WORKDIR /app
 
-# Install production dependencies only
-COPY package*.json ./
-COPY pnpm-lock.yaml* ./
+# Install runtime dependencies if any (production only)
+COPY sveltekit-frontend/package*.json ./
 RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
 
-# Copy built application
-COPY --from=build /app/build ./build
-COPY --from=build /app/static ./static
-COPY --from=build /app/package.json ./package.json
+# Copy built frontend assets
+COPY --from=build /app/sveltekit-frontend/build ./build
+COPY --from=build /app/sveltekit-frontend/static ./static
+COPY --from=build /app/sveltekit-frontend/package.json ./package.json
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S sveltekit -u 1001
+# Copy compiled native binaries
+COPY --from=build /app/simd-bridge /app/simd-bridge
 
-# Change ownership
-RUN chown -R sveltekit:nodejs /app
+# Create non-root user for security
+RUN groupadd -r sveltekit && useradd -r -g sveltekit -u 1001 sveltekit
+RUN chown -R sveltekit:sveltekit /app
 USER sveltekit
 
 EXPOSE 3000
 
-# Start production server
+ENV NODE_ENV=production
+
+# Start SvelteKit production server
 CMD ["node", "build"]

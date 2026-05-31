@@ -112,23 +112,39 @@ function spriteToAscii(tile) {
 
 // ─── ACE packet builder ────────────────────────────────────────────────
 
+// Engram-shaped sprite packet — meant for injection as an ACE rankedCard
+// AND as an engram-registry entry. Aligns with existing
+// sveltekit-frontend/src/lib/server/cartridge/glyph-tile-engine.ts conventions.
 function buildPacket(node) {
   const tile = generateSprite(node);
+  const sprite_hash = createHash('sha256').update(tile).digest('hex').slice(0, 12);
   return {
-    kind: 'ace.packet',
-    version: '1.0',
-    nodeId: node.node_id,
-    lane: node.lane,
-    sprite_b64: tile.toString('base64'),
-    sprite_hash: createHash('sha256').update(tile).digest('hex').slice(0, 12),
-    gpu_features: {
-      kmeans_cluster: node.gpu_kmeans_cluster,
-      pagerank: node.gpu_pagerank,
-      attention: node.gpu_attention,
-      reward: node.gpu_reward,
+    // Engram entry shell (compatible with engram-registry.ts)
+    engramKey: `glyph:tile:${sprite_hash}`,
+    engramKind: 'glyph_tile',
+    // Card-shape for ACE rankedCards injection
+    rankedCard: {
+      id: node.node_id,
+      lane: node.lane,
+      sourceRef: node.sourceRef || null,
+      score: node.gpu_reward || 0,
+      kind: 'glyph_tile',
+      meta: {
+        kmeans_cluster: node.gpu_kmeans_cluster,
+        pagerank: node.gpu_pagerank,
+        attention: node.gpu_attention,
+        reward: node.gpu_reward,
+        degree: node.degree || 0,
+      },
     },
-    sourceRef: node.sourceRef || null,
-    sprite_ascii: spriteToAscii(tile),
+    // CHR97 tile payload (16 NES CHR bytes, two-plane 8x8 sprite)
+    sprite: {
+      bytes_b64: tile.toString('base64'),
+      hash: sprite_hash,
+      ascii: spriteToAscii(tile),
+      palette: ['00 transparent', '01 light', '10 mid', '11 dark'],
+      origin: 'chr97-sprite-eval',
+    },
   };
 }
 
@@ -163,20 +179,20 @@ function runSelfPlay(packets, bouts, seed) {
     const ci = Math.floor(rng() * packets.length);
     let di = Math.floor(rng() * packets.length);
     if (di === ci) di = (di + 1) % packets.length;
-    const challenger = packets[ci];
-    const defender = packets[di];
-    const cr = challenger.gpu_features.reward || 0;
-    const dr = defender.gpu_features.reward || 0;
+    const challenger = packets[ci].rankedCard;
+    const defender = packets[di].rankedCard;
+    const cr = challenger.meta.reward || 0;
+    const dr = defender.meta.reward || 0;
     const delta = cr - dr;
     const winner = delta > 0 ? 'challenger' : delta < 0 ? 'defender' : 'draw';
 
-    bumpStats(`${challenger.lane}|${challenger.gpu_features.kmeans_cluster}`, winner === 'challenger');
-    bumpStats(`${defender.lane}|${defender.gpu_features.kmeans_cluster}`, winner === 'defender');
+    bumpStats(`${challenger.lane}|${challenger.meta.kmeans_cluster}`, winner === 'challenger');
+    bumpStats(`${defender.lane}|${defender.meta.kmeans_cluster}`, winner === 'defender');
 
     bouts_log.push({
       bout: b,
-      challenger: { nodeId: challenger.nodeId, lane: challenger.lane, cluster: challenger.gpu_features.kmeans_cluster, reward: cr },
-      defender: { nodeId: defender.nodeId, lane: defender.lane, cluster: defender.gpu_features.kmeans_cluster, reward: dr },
+      challenger: { nodeId: challenger.id, lane: challenger.lane, cluster: challenger.meta.kmeans_cluster, reward: cr },
+      defender: { nodeId: defender.id, lane: defender.lane, cluster: defender.meta.kmeans_cluster, reward: dr },
       reward_delta: parseFloat(delta.toFixed(4)),
       winner,
     });
@@ -213,8 +229,8 @@ async function main() {
   const packets = topNodes.map((n) => buildPacket(n));
   console.log(`  ✅ ${packets.length} packets`);
   console.log('\n  Sample sprite (top-1):');
-  console.log(packets[0].sprite_ascii.split('\n').map((l) => '    ' + l).join('\n'));
-  console.log(`    cluster=${packets[0].gpu_features.kmeans_cluster}  reward=${(packets[0].gpu_features.reward || 0).toFixed(3)}`);
+  console.log(packets[0].sprite.ascii.split('\n').map((l) => '    ' + l).join('\n'));
+  console.log(`    cluster=${packets[0].rankedCard.meta.kmeans_cluster}  reward=${(packets[0].rankedCard.meta.reward || 0).toFixed(3)}  engramKey=${packets[0].engramKey}`);
 
   // Self-play eval
   console.log(`\n  Step 4: Run ${BOUTS} self-play bouts...`);

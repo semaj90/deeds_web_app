@@ -198,7 +198,7 @@ function extractCardsData(db) {
 
   // Insert into cards_raw table
   const stmt = db.prepare(`
-    INSERT INTO cards_raw (id, sourceRef, kind, reward_count, reward_total, reward_avg,
+    INSERT OR REPLACE INTO cards_raw (id, sourceRef, kind, reward_count, reward_total, reward_avg,
                           som_bmu_row, som_bmu_col, som_bmu_distance, vector64_compressed)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
@@ -250,7 +250,7 @@ function extractOutcomesData(db) {
 
   // Insert into outcomes_raw
   const stmt = db.prepare(`
-    INSERT INTO outcomes_raw (id, cardId, reward, sourceRef, created_at)
+    INSERT OR REPLACE INTO outcomes_raw (id, cardId, reward, sourceRef, created_at)
     VALUES (?, ?, ?, ?, ?)
   `);
 
@@ -299,7 +299,7 @@ function extractTrainingData(db) {
 
   // Insert into training_examples
   const stmt = db.prepare(`
-    INSERT INTO training_examples (id, instruction, input, output, reward,
+    INSERT OR REPLACE INTO training_examples (id, instruction, input, output, reward,
                                    som_cluster_row, som_cluster_col, enrichment_phase)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);

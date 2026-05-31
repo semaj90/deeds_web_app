@@ -1,0 +1,157 @@
+{
+  "timestamp": "2026-05-31T08:50:34.713Z",
+  "seed": 20260530,
+  "inputs": {
+    "atlas": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\ingest\\parent_atlas_gpu.parquet",
+    "totalNodes": 10751,
+    "topN": 200,
+    "bouts": 1500
+  },
+  "sprites": {
+    "count": 200,
+    "sizeBytes": 3200,
+    "palette": [
+      "00 transparent",
+      "01 light",
+      "10 mid",
+      "11 dark"
+    ]
+  },
+  "eval": {
+    "totalBouts": 1500,
+    "uniqueGroups": 8
+  },
+  "topWinners": [
+    {
+      "lane": "language",
+      "cluster": 10,
+      "wins": 67,
+      "losses": 2,
+      "total": 69,
+      "winRate": 0.9710144927536232
+    },
+    {
+      "lane": "outcome",
+      "cluster": 16,
+      "wins": 88,
+      "losses": 3,
+      "total": 91,
+      "winRate": 0.967032967032967
+    },
+    {
+      "lane": "audit",
+      "cluster": 10,
+      "wins": 45,
+      "losses": 7,
+      "total": 52,
+      "winRate": 0.8653846153846154
+    },
+    {
+      "lane": "audit",
+      "cluster": 16,
+      "wins": 158,
+      "losses": 36,
+      "total": 194,
+      "winRate": 0.8144329896907216
+    },
+    {
+      "lane": "workspace",
+      "cluster": 10,
+      "wins": 180,
+      "losses": 136,
+      "total": 316,
+      "winRate": 0.569620253164557
+    },
+    {
+      "lane": "som_edge",
+      "cluster": 16,
+      "wins": 264,
+      "losses": 318,
+      "total": 582,
+      "winRate": 0.4536082474226804
+    },
+    {
+      "lane": "som_edge",
+      "cluster": 3,
+      "wins": 179,
+      "losses": 233,
+      "total": 412,
+      "winRate": 0.4344660194174757
+    },
+    {
+      "lane": "som_edge",
+      "cluster": 20,
+      "wins": 483,
+      "losses": 801,
+      "total": 1284,
+      "winRate": 0.37616822429906543
+    }
+  ],
+  "bottomLosers": [
+    {
+      "lane": "language",
+      "cluster": 10,
+      "wins": 67,
+      "losses": 2,
+      "total": 69,
+      "winRate": 0.9710144927536232
+    },
+    {
+      "lane": "outcome",
+      "cluster": 16,
+      "wins": 88,
+      "losses": 3,
+      "total": 91,
+      "winRate": 0.967032967032967
+    },
+    {
+      "lane": "audit",
+      "cluster": 10,
+      "wins": 45,
+      "losses": 7,
+      "total": 52,
+      "winRate": 0.8653846153846154
+    },
+    {
+      "lane": "audit",
+      "cluster": 16,
+      "wins": 158,
+      "losses": 36,
+      "total": 194,
+      "winRate": 0.8144329896907216
+    },
+    {
+      "lane": "workspace",
+      "cluster": 10,
+      "wins": 180,
+      "losses": 136,
+      "total": 316,
+      "winRate": 0.569620253164557
+    },
+    {
+      "lane": "som_edge",
+      "cluster": 16,
+      "wins": 264,
+      "losses": 318,
+      "total": 582,
+      "winRate": 0.4536082474226804
+    },
+    {
+      "lane": "som_edge",
+      "cluster": 3,
+      "wins": 179,
+      "losses": 233,
+      "total": 412,
+      "winRate": 0.4344660194174757
+    },
+    {
+      "lane": "som_edge",
+      "cluster": 20,
+      "wins": 483,
+      "losses": 801,
+      "total": 1284,
+      "winRate": 0.37616822429906543
+    }
+  ],
+  "trainingRecommendation": "Train on top 8 (lane, cluster) pairs with win rate ≥ 38%"
+}

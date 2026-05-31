@@ -1,0 +1,86 @@
+{
+  "timestamp": "2026-05-31T08:50:34.727Z",
+  "params": {
+    "kValues": [
+      12,
+      20,
+      24
+    ],
+    "topN": 200,
+    "bouts": 1500
+  },
+  "results": [
+    {
+      "k": 12,
+      "uniqueGroups": 8,
+      "topWinner": {
+        "key": "language|10",
+        "rate": 0.9710144927536232,
+        "wins": 67,
+        "total": 69
+      },
+      "bottomLoser": {
+        "key": "som_edge|1",
+        "rate": 0.37616822429906543,
+        "total": 1284
+      },
+      "avgWinRate": 0.6815,
+      "spread": 0.5948
+    },
+    {
+      "k": 20,
+      "uniqueGroups": 7,
+      "topWinner": {
+        "key": "language|16",
+        "rate": 1,
+        "wins": 35,
+        "total": 35
+      },
+      "bottomLoser": {
+        "key": "som_edge|1",
+        "rate": 0.37616822429906543,
+        "total": 1284
+      },
+      "avgWinRate": 0.7321,
+      "spread": 0.6238
+    },
+    {
+      "k": 24,
+      "uniqueGroups": 8,
+      "topWinner": {
+        "key": "language|10",
+        "rate": 0.9710144927536232,
+        "wins": 67,
+        "total": 69
+      },
+      "bottomLoser": {
+        "key": "som_edge|20",
+        "rate": 0.37616822429906543,
+        "total": 1284
+      },
+      "avgWinRate": 0.6815,
+      "spread": 0.5948
+    }
+  ],
+  "rankedBySpread": [
+    {
+      "k": 20,
+      "spread": 0.6238,
+      "topRate": 1,
+      "bottomRate": 0.37616822429906543
+    },
+    {
+      "k": 12,
+      "spread": 0.5948,
+      "topRate": 0.9710144927536232,
+      "bottomRate": 0.37616822429906543
+    },
+    {
+      "k": 24,
+      "spread": 0.5948,
+      "topRate": 0.9710144927536232,
+      "bottomRate": 0.37616822429906543
+    }
+  ],
+  "recommendation": "Use K=20 — spread 62.4% (top=100.0% vs bottom=37.6%)"
+}

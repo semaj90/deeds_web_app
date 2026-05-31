@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-05-31T09:05:55.570Z",
+  "tasksGenerated": 7,
+  "byStatus": {
+    "BACKLOG": 2,
+    "IN_PROGRESS": 1,
+    "REVIEW": 3,
+    "DONE": 1
+  },
+  "board": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\chr97-kanban-board.json",
+  "ndjson": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\chr97-kanban-tasks.jsonl",
+  "mergedIntoDocs": true
+}
