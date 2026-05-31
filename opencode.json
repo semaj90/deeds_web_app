@@ -122,6 +122,7 @@
       "type": "remote",
       "url": "http://127.0.0.1:8791/mcp",
       "enabled": false,
+      "_comment": "TurboVec at :8791 is a custom HTTP service (probe /health), not MCP/JSON-RPC. Keep disabled until an MCP wrapper exists.",
       "timeout": 30000
     },
     "engram-embed": {
@@ -160,11 +161,11 @@
       "steps": 10,
       "prompt": "Use MCP tools first, but call only what is needed for the current question. Default tool order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Only use gemma4-offload for runtime/model checks. Keep engram, turbovec, and langextract opt-in unless explicitly requested. Do not edit files without approval.",
       "tools": {
-        "enabled": true,
-        "max_calls": 3,
-        "call_type": "function",
-        "auto_select": true,
-        "fallback_on_error": true
+        "trace": true,
+        "atlas-tools": true,
+        "engram-embed": true,
+        "gemma4-offload": true,
+        "turbovec": false
       },
       "function_calling": {
         "enabled": true,
@@ -312,12 +313,11 @@
       "steps": 12,
       "prompt": "You are a function-calling agent. Analyze the user query and automatically select the best tools to use from the available MCP tool set. Always use function calls to accomplish tasks rather than explanations.\n\nTool Selection Strategy:\n1. Semantic queries → trace.kag_search or trace.atlas_query\n2. Graph traversal → graph.expand_neighborhood or graph.shortest_path\n3. Topology analysis → topology.search_near or clusters.get_summary_lenses\n4. Context building → context.build_kv_packet or context.get_compressed_card\n5. Code search → trace.explain_retrieval or codebase.rg_search\n\nFunction-Calling Rules:\n- Call functions immediately when identified\n- Bundle related calls together\n- Don't explain before calling — just call\n- Report results inline after each call\n- Stop after 3 rounds of calls or when the query is fully answered\n- If function returns error, try fallback from the same category\n\nDo not edit files without explicit approval.",
       "tools": {
-        "enabled": true,
-        "max_calls": 5,
-        "call_type": "function",
-        "auto_select": true,
-        "fallback_on_error": true,
-        "parallel_calls": true
+        "trace": true,
+        "atlas-tools": true,
+        "engram-embed": true,
+        "gemma4-offload": true,
+        "turbovec": false
       },
       "function_calling": {
         "enabled": true,

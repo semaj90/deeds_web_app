@@ -1,6 +1,6 @@
 # Cross-Layer Contract Error Map
 
-Generated: 2026-05-30T09:19:56.271Z  |  Findings: 6  |  High: 0  Medium: 0  Low: 0  Info: 6
+Generated: 2026-05-31T03:51:29.733Z  |  Findings: 8  |  High: 0  Medium: 0  Low: 0  Info: 8
 
 ## Findings
 
@@ -69,7 +69,20 @@ Generated: 2026-05-30T09:19:56.271Z  |  Findings: 6  |  High: 0  Medium: 0  Low:
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-006-65c917c7
+### contract:drizzle-meta-documented_sidecar-006-163be963
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
+
+**Problem:** Documented sidecar "9998_create_agent_pickup_queue.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
+
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
+
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
+
+**Files:** `sveltekit-frontend\drizzle\9998_create_agent_pickup_queue.sql`
+
+**Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-documented_sidecar-007-65c917c7
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "9999_agent_observations.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -79,5 +92,18 @@ Generated: 2026-05-30T09:19:56.271Z  |  Findings: 6  |  High: 0  Medium: 0  Low:
 **Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
 
 **Files:** `sveltekit-frontend\drizzle\9999_agent_observations.sql`
+
+**Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-documented_sidecar-008-692ac40a
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
+
+**Problem:** Documented sidecar "9999_create_task_semantic_packets.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
+
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
+
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
+
+**Files:** `sveltekit-frontend\drizzle\9999_create_task_semantic_packets.sql`
 
 **Validation:** `npm run audit:drizzle-meta`

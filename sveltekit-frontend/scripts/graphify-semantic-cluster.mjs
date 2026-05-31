@@ -463,7 +463,7 @@ if (!SKIP_BACKFILL) {
   let bfOffset = null;
 
   while (true) {
-    const body = { limit: SCROLL_BATCH, with_payload: ['filePath', 'relativePath', 'gpuCluster'], with_vector: false };
+    const body = { limit: SCROLL_BATCH, with_payload: ['filePath', 'relativePath', 'file_path', 'gpuCluster'], with_vector: false };
     if (bfOffset) body.offset = bfOffset;
     let res, d;
     try {
@@ -482,7 +482,7 @@ if (!SKIP_BACKFILL) {
     const byPayload = new Map();
     for (const pt of pts) {
       if (!pt.payload) continue;
-      const fp = pt.payload.relativePath ?? pt.payload.filePath ?? '';
+      const fp = pt.payload.relativePath ?? pt.payload.filePath ?? pt.payload.file_path ?? '';
       if (!fp) continue;
       const dir = fp.includes('/') ? fp.split('/').slice(0, -1).join('/') : '.';
       const entry = dirToCentroid.get(dir);

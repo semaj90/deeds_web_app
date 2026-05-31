@@ -1,15 +1,15 @@
 # Graphify Health Report
 
-*Generated: 2026-05-29T22:13:00.602Z*
+*Generated: 2026-05-31T00:09:05.428Z*
 
 ## Summary
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| Redis wiki notes | 1534 | ✅ |
-| Gemma4 summaries | 0 / 1534 (0%) | ❌ |
+| Redis wiki notes | 1547 | ✅ |
+| Gemma4 summaries | 0 / 1547 (0%) | ❌ |
 | BoW chunk tiles | 0 | ⚠️ |
-| BoW cluster tiles | 0 | ⚠️ |
+| BoW cluster tiles | 100 | ⚠️ |
 | Qdrant glyph_atlas | 1336 pts | ✅ |
 | Graph JSON nodes | 0 | ⚠️ |
 | Graph JSON edges | 0 | ⚠️ |

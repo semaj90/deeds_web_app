@@ -53,9 +53,9 @@ test('exports all 14 functions', () => {
   }
 });
 
-test('checkCudaAvailable returns 0 or 1', () => {
+test('checkCudaAvailable returns 0, 1, or 2', () => {
   const val = a.checkCudaAvailable();
-  assert(val === 0 || val === 1, `Expected 0 or 1, got ${val}`);
+  assert(val === 0 || val === 1 || val === 2, `Expected 0, 1, or 2, got ${val}`);
 });
 
 test('simdJsonBackend returns non-empty string', () => {

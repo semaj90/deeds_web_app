@@ -1,9 +1,149 @@
-import { db } from '$lib/server/db/index.js';
-import { scenarioCache } from '$lib/server/db/schema.js';
+/**
+ * Scenario cache: Redis L1 with optional Qdrant L2 persistence.
+ *
+ * - Primary use: fast lookup of assembled ACE/context packs by queryHash+pipelineKey
+ * - L1: Redis JSON with TTL (hot cache)
+ * - L2: Qdrant point upsert (optional, best-effort) for longer-term dedupe across restarts
+ */
+import { getJson, setJsonWithTtl } from '$lib/server/redis.js';
+import { ENV } from '$lib/server/env.server.js';
+
+type ScenarioCacheValue = {
+  queryHash: string;
+  pipelineKey: string;
+  contextChunks?: string[];
+  cachedResult?: Record<string, unknown>;
+  qdrantPointIds?: string[];
+  expiresAt?: string | null;
+};
+
+export function makeScenarioKey(queryHash: string, pipelineKey: string) {
+  return `ace:ctx:${queryHash}:${pipelineKey}`;
+}
+
+/**
+ * Read from Redis hot cache. Returns null on miss or error.
+ */
+export async function getScenarioCache(
+  queryHash: string,
+  pipelineKey: string
+): Promise<ScenarioCacheValue | null> {
+  try {
+    const key = makeScenarioKey(queryHash, pipelineKey);
+    const val = await getJson<ScenarioCacheValue>(key);
+    return val;
+  } catch (err) {
+    console.warn('[scenario-cache] get failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Set value into Redis L1 and optionally upsert to Qdrant L2 (best-effort).
+ * ttlSeconds defaults to 3600 (1h)
+ */
+export async function setScenarioCache(
+  queryHash: string,
+  pipelineKey: string,
+  value: Omit<ScenarioCacheValue, 'queryHash' | 'pipelineKey'>,
+  ttlSeconds = 3600
+): Promise<void> {
+  try {
+    const key = makeScenarioKey(queryHash, pipelineKey);
+    const payload: ScenarioCacheValue = {
+      queryHash,
+      pipelineKey,
+      contextChunks: value.contextChunks ?? [],
+      cachedResult: value.cachedResult ?? {},
+      qdrantPointIds: value.qdrantPointIds ?? [],
+      expiresAt: value.expiresAt ?? null,
+    };
+    await setJsonWithTtl(key, payload, ttlSeconds);
+  } catch (err) {
+    console.warn('[scenario-cache] set failed (redis):', err);
+  }
+
+  // Best-effort Qdrant L2 persistence if configured
+  if (ENV.QDRANT_URL) {
+    try {
+      const { QdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
+      const mgr = new QdrantManager(ENV.QDRANT_URL);
+      const collection = 'scenario_cache';
+      // Upsert a single point with id = queryHash (safe short id)
+      const pointId = queryHash.slice(0, 32); // trimmed deterministic string id
+      const upsertBody: any = {
+        points: [
+          {
+            id: pointId,
+            payload: {
+              queryHash,
+              pipelineKey,
+              cachedResult: value.cachedResult ?? {},
+              contextChunks: value.contextChunks ?? [],
+              expiresAt: value.expiresAt ?? null,
+            },
+          },
+        ],
+      };
+      try {
+        // try client.upsert (wrapped in manager)
+        await mgr.client.upsert(collection, upsertBody as any);
+      } catch (e) {
+        // If upsert fails, just log; Qdrant L2 is optional
+        console.warn('[scenario-cache] qdrant upsert failed (non-fatal):', e?.message ?? e);
+      }
+    } catch (e) {
+      // Import failure / Qdrant unavailable — do not block
+      // keep silent-ish but informative on first occurrences
+      console.info('[scenario-cache] Qdrant unavailable, skipping L2 persistence');
+    }
+  }
+}
+
+/**
+ * Try to read a longer-term record from Qdrant collection 'scenario_cache'.
+ * Best-effort; returns null if Qdrant not available or no payload.
+ */
+export async function getScenarioCacheFromQdrant(
+  queryHash: string
+): Promise<ScenarioCacheValue | null> {
+  if (!ENV.QDRANT_URL) return null;
+  try {
+    const { QdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
+    const mgr = new QdrantManager(ENV.QDRANT_URL);
+    const collection = 'scenario_cache';
+    const pointId = queryHash.slice(0, 32);
+    try {
+      // Use getPoint (client has getPoint in js client)
+      const res = await (mgr.client as any).getPoint(collection, pointId);
+      const payload = res?.result?.payload ?? res?.payload ?? null;
+      if (!payload) return null;
+      return {
+        queryHash: payload.queryHash ?? queryHash,
+        pipelineKey: payload.pipelineKey ?? '',
+        contextChunks: payload.contextChunks ?? [],
+        cachedResult: payload.cachedResult ?? {},
+        qdrantPointIds: payload.qdrantPointIds ?? [],
+        expiresAt: payload.expiresAt ?? null,
+      } as ScenarioCacheValue;
+    } catch (err) {
+      return null;
+    }
+  } catch (err) {
+    return null;
+  }
+}
+
+export default {
+  getScenarioCache,
+  setScenarioCache,
+  getScenarioCacheFromQdrant,
+};
+import { db } from '$lib/server/db/client';
+import { scenarioCache } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
-import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import crypto from 'crypto';
 
@@ -110,17 +250,28 @@ export async function lookupScenario(query: string): Promise<ScenarioCacheResult
     // Warm up exact-match cache in Redis for next queries
     try {
       const redis = getRedis();
-      await redis.set(redisKey, row.response, 'EX', REDIS_TTL);
+      const responseText =
+        (row.cachedResult && (row.cachedResult as any).response) ||
+        JSON.stringify(row.cachedResult || {});
+      await redis.set(redisKey, responseText, 'EX', REDIS_TTL);
+      return {
+        hit: true,
+        response: responseText,
+        similarity: topHit.score,
+        source: 'qdrant_postgres',
+      };
     } catch (err) {
       console.warn('[Scenario Cache] Redis warming failed:', err);
+      const responseText =
+        (row.cachedResult && (row.cachedResult as any).response) ||
+        JSON.stringify(row.cachedResult || {});
+      return {
+        hit: true,
+        response: responseText,
+        similarity: topHit.score,
+        source: 'qdrant_postgres',
+      };
     }
-
-    return {
-      hit: true,
-      response: row.response,
-      similarity: topHit.score,
-      source: 'qdrant_postgres',
-    };
   } catch (err) {
     console.warn('[Scenario Cache] Tier 2 lookup failed:', err);
     return { hit: false };
@@ -131,7 +282,11 @@ export async function lookupScenario(query: string): Promise<ScenarioCacheResult
  * Store a new scenario cache entry in both Postgres (relational & metadata)
  * and Qdrant (embedding index for similarity match).
  */
-export async function storeScenario(query: string, response: string, metadata: Record<string, any> = {}): Promise<void> {
+export async function storeScenario(
+  query: string,
+  response: string,
+  metadata: Record<string, any> = {}
+): Promise<void> {
   try {
     const hash = getQueryHash(query);
     const embedding = await embedQuery(query);
@@ -139,20 +294,23 @@ export async function storeScenario(query: string, response: string, metadata: R
       throw new Error('Failed to generate embedding for scenario storing');
     }
 
-    // Insert into Postgres
+    // Insert into Postgres (store the generated response inside `cachedResult` JSON)
     const [inserted] = await db
       .insert(scenarioCache)
-      .values({
-        queryHash: hash,
-        query,
-        response,
-        metadata,
-      })
+      .values([
+        {
+          queryHash: hash,
+          pipelineKey: 'default',
+          cachedResult: { response, metadata },
+          ttlSeconds: REDIS_TTL,
+        },
+      ])
       .onConflictDoUpdate({
         target: scenarioCache.queryHash,
         set: {
-          response,
-          metadata,
+          cachedResult: { response, metadata },
+          ttlSeconds: REDIS_TTL,
+          updatedAt: new Date().toISOString(),
         },
       })
       .returning();
@@ -192,16 +350,15 @@ export async function storeScenario(query: string, response: string, metadata: R
 }
 
 export async function getScenarioById(id: string) {
-  const rows = await db
-    .select()
-    .from(scenarioCache)
-    .where(eq(scenarioCache.id, id))
-    .limit(1);
+  const rows = await db.select().from(scenarioCache).where(eq(scenarioCache.id, id)).limit(1);
   return rows[0] || null;
 }
 
 export async function findScenarioBySourceRefAndHash(sourceRef: string, contentHash: string) {
-  const compositeHash = crypto.createHash('sha256').update(`${sourceRef}:${contentHash}`).digest('hex');
+  const compositeHash = crypto
+    .createHash('sha256')
+    .update(`${sourceRef}:${contentHash}`)
+    .digest('hex');
   const rows = await db
     .select()
     .from(scenarioCache)
@@ -220,7 +377,10 @@ interface UpsertScenarioInput {
 }
 
 export async function upsertScenario(data: UpsertScenarioInput) {
-  const compositeHash = crypto.createHash('sha256').update(`${data.source_ref}:${data.content_hash}`).digest('hex');
+  const compositeHash = crypto
+    .createHash('sha256')
+    .update(`${data.source_ref}:${data.content_hash}`)
+    .digest('hex');
   const queryText = data.name ?? data.source_ref;
   const responseText = data.description ?? '';
   const meta = {
@@ -233,18 +393,20 @@ export async function upsertScenario(data: UpsertScenarioInput) {
 
   const [inserted] = await db
     .insert(scenarioCache)
-    .values({
-      queryHash: compositeHash,
-      query: queryText,
-      response: responseText,
-      metadata: meta,
-    })
+    .values([
+      {
+        queryHash: compositeHash,
+        pipelineKey: 'default',
+        cachedResult: { response: responseText, metadata: meta },
+        ttlSeconds: REDIS_TTL,
+      },
+    ])
     .onConflictDoUpdate({
       target: scenarioCache.queryHash,
       set: {
-        query: queryText,
-        response: responseText,
-        metadata: meta,
+        cachedResult: { response: responseText, metadata: meta },
+        ttlSeconds: REDIS_TTL,
+        updatedAt: new Date().toISOString(),
       },
     })
     .returning();
@@ -281,4 +443,3 @@ export async function upsertScenario(data: UpsertScenarioInput) {
 
   return inserted;
 }
-

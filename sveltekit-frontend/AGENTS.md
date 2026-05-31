@@ -4468,7 +4468,6 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `vscode-extension/out` | 8 | — | — | `vscode_extension_out` | `agents_md({ path: "vscode-extension/out" })` |
 | `vscode-extension/src` | 8 | — | — | `vscode_extension_src` | `agents_md({ path: "vscode-extension/src" })` |
 
-
 ## How to use this file
 
 When an agent (or human) needs to work in a directory:
@@ -4488,9 +4487,17 @@ Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.
 - [`docs/graph/codebase-map.md`](./docs/graph/codebase-map.md) — 20-gate audit dashboard (G4/G5/G15/G16/G20 coverage)
 - [`docs/graph/hypergraph-clusters.md`](./docs/graph/hypergraph-clusters.md) — full per-cluster digest (topic + member files)
 
-
 <!-- ingest: 2026-05-30T02:17:10.013Z -->
 - ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards
 
-
 [2026-05-30T04:39:26.319Z] Phase19 CSV export and archive-preview generated (dry-run)
+<!-- atlas-append:0bf81df426b5:2026-05-30T16:27:00.892Z -->
+## Atlas Activity — 2026-05-30T16:27:00.892Z
+
+- **Parent atlas rebuild**: 10,732 nodes / 9,378 edges across 8 lanes
+- **Redis cache**: 10,732 nodes warmed (24h TTL)
+- **CouchDB archive**: 11,136 docs durably persisted
+- **This directory**: no tasks or fixes in current run
+
+<!-- /atlas-append:0bf81df426b5 -->
+

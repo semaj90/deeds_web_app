@@ -89,13 +89,48 @@ let seededRedis = 0, seededPg = 0, skipped = 0;
 const clusterPipe = r.pipeline();
 
 for (const k of keys) {
-  const v = await r.get(k);
+  const keyType = await r.type(k);
+  let v = null;
+  if (keyType === 'none') {
+    skipped++;
+    continue;
+  }
+  try {
+    if (keyType === 'string') {
+      v = await r.get(k);
+    } else if (keyType === 'hash') {
+      const obj = await r.hgetall(k);
+      v = JSON.stringify(obj);
+    } else if (keyType === 'list') {
+      const arr = await r.lrange(k, 0, -1);
+      v = JSON.stringify(arr);
+    } else if (keyType === 'set') {
+      const arr = await r.smembers(k);
+      v = JSON.stringify(arr);
+    } else if (keyType === 'zset') {
+      const arr = await r.zrange(k, 0, -1);
+      v = JSON.stringify(arr);
+    } else {
+      console.warn('[seed-llm-output-index] skipping unsupported key type', { key: k, keyType });
+      skipped++;
+      continue;
+    }
+  } catch (err) {
+    console.warn('[seed-llm-output-index] redis read error', { key: k, keyType, err: err.message });
+    skipped++;
+    continue;
+  }
+  if (!v) { skipped++; continue; }
   if (!v) { skipped++; continue; }
   let note;
   try { note = JSON.parse(v); } catch { skipped++; continue; }
-  if (!note.gemma4Summary || !note.directoryPath) { skipped++; continue; }
+  // Prefer gemma4Summary, fall back to generic summary/purpose text if present.
+  const llmOutput = note.gemma4Summary ?? note.summary ?? note.purpose ?? null;
+  if (!llmOutput) { skipped++; continue; }
 
-  const path = note.directoryPath.replace(/\\/g, '/').replace(/^\.\//, '').toLowerCase();
+  // Determine a directory path; fall back to known note fields or the redis key when absent.
+  const rawPath = note.directoryPath ?? note.path ?? note.directory ?? k.replace(/^wiki:note:dir:/, '');
+  const path = String(rawPath).replace(/\\/g, '/').replace(/^\.\//, '').toLowerCase();
   const hash = createHash('sha1').update(path).digest('hex').slice(0, 16);
   const now  = Date.now();
   const meta = dirMeta.get(path) ?? null;
@@ -105,14 +140,20 @@ for (const k of keys) {
 
   if (!NO_REDIS) {
     const entry = {
-      path, pathHash: hash, isDir: true,
-      llmOutput:      note.gemma4Summary,
-      source:         'gemma4-summary',
+      path,
+      pathHash: hash,
+      isDir: true,
+      llmOutput: llmOutput,
+      source: note.gemma4Summary
+        ? 'gemma4-summary'
+        : note.summary
+          ? 'note-summary'
+          : 'note-purpose',
       glyphClusterId: cid ?? undefined,
-      generatedAt:    note.summaryUpdatedAt ?? new Date(now).toISOString(),
-      hitCount:       0,
-      lastHitMs:      now,
-      embedded:       false,
+      generatedAt: note.summaryUpdatedAt ?? new Date(now).toISOString(),
+      hitCount: 0,
+      lastHitMs: now,
+      embedded: false,
     };
     await r.set(`code:llm_output:path:${hash}`, JSON.stringify(entry), 'EX', TTL);
     await r.zadd('code:llm_output:recent', now, hash);
@@ -136,11 +177,15 @@ for (const k of keys) {
            som_bmu_col      = COALESCE(EXCLUDED.som_bmu_col, code_llm_index.som_bmu_col),
            refreshed_at     = now()`,
         [
-          hash, path, note.gemma4Summary, cid,
-          somRow, somCol,
+          hash,
+          path,
+          llmOutput,
+          cid,
+          somRow,
+          somCol,
           note.summaryUpdatedAt ?? new Date(now).toISOString(),
           now / 1000,
-        ],
+        ]
       );
       seededPg++;
     } catch (err) {

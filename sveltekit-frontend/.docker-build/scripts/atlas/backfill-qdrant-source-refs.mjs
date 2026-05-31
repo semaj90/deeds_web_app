@@ -5,7 +5,7 @@ import { Pool } from 'pg';
 
 const ROOT = resolve(process.cwd());
 const REPORTS_DIR = join(ROOT, 'docs', 'reports');
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+// Qdrant URL comes from the canonical helper (resolved below)
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
 const DATABASE_URL =
   process.env.DATABASE_URL ??
@@ -18,6 +18,11 @@ const sampleQdrant = args.has('--sample-qdrant');
 const limitArg = [...process.argv.slice(2)].find((arg) => arg.startsWith('--limit='));
 const limit = limitArg ? Math.max(1, Number(limitArg.split('=')[1]) || 25) : 25;
 const batchSize = 100;
+
+import { qdrantScroll, qdrantUpdatePayload, qdrantUpdatePayloadByFilter, getQdrantUrl } from '../qdrant-client.mjs';
+
+// resolve canonical Qdrant URL
+const QDRANT_URL = getQdrantUrl();
 
 function writeJson(pathname, value) {
   mkdirSync(join(pathname, '..'), { recursive: true });
@@ -37,21 +42,14 @@ function buildSourceRefs(relativePath) {
 
 async function qdrantCoverageSample(sampleLimit = 25) {
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        limit: sampleLimit,
-        with_payload: true,
-        with_vector: false,
-      }),
-      signal: AbortSignal.timeout(10_000),
+    const points = await qdrantScroll(QDRANT_COLLECTION, {
+      limit: sampleLimit,
+      with_payload: true,
+      with_vector: false,
     });
-    if (!res.ok) {
-      return { ok: false, status: res.status, total: 0, withSourceRefs: 0, coverage: 0 };
+    if (!Array.isArray(points)) {
+      return { ok: false, status: 0, total: 0, withSourceRefs: 0, coverage: 0 };
     }
-    const data = await res.json();
-    const points = Array.isArray(data?.result?.points) ? data.result.points : [];
     const withSourceRefs = points.filter((point) => {
       const payload = point?.payload ?? {};
       const refs = Array.isArray(payload.sourceRefs)
@@ -63,7 +61,7 @@ async function qdrantCoverageSample(sampleLimit = 25) {
     }).length;
     return {
       ok: true,
-      status: res.status,
+      status: 200,
       total: points.length,
       withSourceRefs,
       coverage: points.length > 0 ? Number((withSourceRefs / points.length).toFixed(3)) : 0,
@@ -95,7 +93,9 @@ async function main() {
   let skipped = 0;
 
   if (sampleQdrant) {
-    const sample = before.ok ? await qdrantCoverageSample(limit) : { ok: false, total: 0, sample: [] };
+    const sample = before.ok
+      ? await qdrantCoverageSample(limit)
+      : { ok: false, total: 0, sample: [] };
     const points = Array.isArray(sample.sample) ? sample.sample : [];
     attempted = points.length;
     if (!dryRun) {
@@ -109,23 +109,12 @@ async function main() {
             return;
           }
           try {
-            const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                points: [point.id],
-                payload: {
-                  sourceRefs,
-                  source_refs: sourceRefs,
-                },
-              }),
-              signal: AbortSignal.timeout(15_000),
+            const res = await qdrantUpdatePayload(QDRANT_COLLECTION, {
+              points: [point.id],
+              payload: { sourceRefs, source_refs: sourceRefs },
             });
-            if (res.ok) {
-              updated++;
-            } else {
-              skipped++;
-            }
+            if (res) updated++;
+            else skipped++;
           } catch {
             skipped++;
           }
@@ -136,14 +125,15 @@ async function main() {
     }
   } else {
     try {
-      const { rows } = await pool.query<{ relative_path: string }>(
+      const { rows } =
+        (await pool.query) <
+        { relative_path: string } >
         `SELECT DISTINCT relative_path
          FROM codebase_chunk_index
          WHERE relative_path IS NOT NULL
            AND relative_path <> ''
            AND relative_path <> '__unknown__'
-         ORDER BY relative_path`
-      );
+         ORDER BY relative_path`;
 
       for (let i = 0; i < rows.length; i += batchSize) {
         const batch = rows.slice(i, i + batchSize);
@@ -163,29 +153,19 @@ async function main() {
             }
 
             try {
-              const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  filter: {
-                    should: [
-                      { key: 'relativePath', match: { value: row.relative_path } },
-                      { key: 'file_path', match: { value: row.relative_path } },
-                    ],
-                    minimum_should_match: 1,
-                  },
-                  payload: {
-                    sourceRefs,
-                    source_refs: sourceRefs,
-                  },
-                }),
-                signal: AbortSignal.timeout(15_000),
-              });
-              if (res.ok) {
-                updated++;
-              } else {
-                skipped++;
-              }
+              const ok = await qdrantUpdatePayloadByFilter(
+                QDRANT_COLLECTION,
+                { sourceRefs, source_refs: sourceRefs },
+                {
+                  should: [
+                    { key: 'relativePath', match: { value: row.relative_path } },
+                    { key: 'file_path', match: { value: row.relative_path } },
+                  ],
+                  minimum_should_match: 1,
+                }
+              );
+              if (ok) updated++;
+              else skipped++;
             } catch {
               skipped++;
             }
@@ -216,18 +196,21 @@ async function main() {
   const jsonPath = join(REPORTS_DIR, 'qdrant-source-refs-backfill-latest.json');
   const mdPath = join(REPORTS_DIR, 'qdrant-source-refs-backfill-latest.md');
   writeJson(jsonPath, report);
-  writeText(mdPath, [
-    '# Qdrant SourceRefs Backfill',
-    '',
-    `Generated: ${report.generatedAt}`,
-    `Dry run: ${dryRun ? 'yes' : 'no'}`,
-    `Collection: ${QDRANT_COLLECTION}`,
-    `Attempted: ${attempted}`,
-    `Updated: ${updated}`,
-    `Skipped: ${skipped}`,
-    `Coverage before: ${before.coverage}`,
-    `Coverage after: ${after.coverage}`,
-  ].join('\n'));
+  writeText(
+    mdPath,
+    [
+      '# Qdrant SourceRefs Backfill',
+      '',
+      `Generated: ${report.generatedAt}`,
+      `Dry run: ${dryRun ? 'yes' : 'no'}`,
+      `Collection: ${QDRANT_COLLECTION}`,
+      `Attempted: ${attempted}`,
+      `Updated: ${updated}`,
+      `Skipped: ${skipped}`,
+      `Coverage before: ${before.coverage}`,
+      `Coverage after: ${after.coverage}`,
+    ].join('\n')
+  );
 
   console.log(JSON.stringify({ ok: true, report }, null, 2));
 }

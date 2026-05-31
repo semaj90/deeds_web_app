@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-05-30T16:36:44.122Z",
+  "runId": "8fa51d813c28",
+  "mode": "apply",
+  "targets": [
+    "AGENTS.md",
+    "LLMS.md"
+  ],
+  "counts": {
+    "filesFound": 4680,
+    "appended": 0,
+    "skipped": 4680,
+    "failed": 0
+  },
+  "activity": {
+    "parentAtlasNodes": 10732,
+    "parentAtlasEdges": 9378,
+    "tasksTotal": 1,
+    "fixesTotal": 1,
+    "dirsWithActivity": 1
+  }
+}

@@ -22,29 +22,38 @@ import fs      from 'node:fs';
 import path    from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Redis   from 'ioredis';
+import { qdrantScroll, getQdrantUrl } from '../qdrant-client.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT  = path.resolve(__dir, '../..');
+const ROOT = path.resolve(__dir, '../..');
 
 // ── Args ─────────────────────────────────────────────────────────────────────
-const argv       = process.argv.slice(2);
-const queryI     = argv.indexOf('--query');
-const collI      = argv.indexOf('--collection');
-const limitI     = argv.indexOf('--limit');
+const argv = process.argv.slice(2);
+const queryI = argv.indexOf('--query');
+const collI = argv.indexOf('--collection');
+const limitI = argv.indexOf('--limit');
 
-const QUERY_STR  = queryI >= 0 ? argv[queryI + 1] : 'kmeans svelte runes error';
-const COLLECTION = collI  >= 0 ? argv[collI + 1]  : 'docs_chunks';
-const LIMIT      = limitI >= 0 ? Number(argv[limitI + 1]) : 3;
+const QUERY_STR = queryI >= 0 ? argv[queryI + 1] : 'kmeans svelte runes error';
+const COLLECTION = collI >= 0 ? argv[collI + 1] : 'docs_chunks';
+const LIMIT = limitI >= 0 ? Number(argv[limitI + 1]) : 3;
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
-const NEO4J_URI  = process.env.NEO4J_URI   ?? 'bolt://localhost:7687';
-const REDIS_URL  = process.env.REDIS_URL  ?? 'redis://localhost:6379';
+const QDRANT_URL = getQdrantUrl();
+const NEO4J_URI = process.env.NEO4J_URI ?? 'bolt://localhost:7687';
+const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
 
 // ── Mock Fallbacks for Independent Workstation Runs ─────────────────────────
 function getSimulatedGraphHops(featureKey) {
   return [
-    { source: `feature:${featureKey}`, target: 'CodebaseFile:sveltekit-frontend/src/workers/kmeans-worker.js', type: 'REFERENCES' },
-    { source: `CodebaseFile:sveltekit-frontend/src/workers/kmeans-worker.js`, target: 'AtlasChunk:kmeans-notes', type: 'MENTIONS' }
+    {
+      source: `feature:${featureKey}`,
+      target: 'CodebaseFile:sveltekit-frontend/src/workers/kmeans-worker.js',
+      type: 'REFERENCES',
+    },
+    {
+      source: `CodebaseFile:sveltekit-frontend/src/workers/kmeans-worker.js`,
+      target: 'AtlasChunk:kmeans-notes',
+      type: 'MENTIONS',
+    },
   ];
 }
 
@@ -57,8 +66,8 @@ function getSimulatedRedisCard(featureKey) {
     file_refs: ['sveltekit-frontend/src/workers/kmeans-worker.js'],
     top_snippets: [
       'Hybrid Execution Model: Automatically detects Node worker_threads context or standard Web Worker browser contexts.',
-      'Bridges parentPort.on(\'message\') / parentPort.postMessage on the server-side, and self.onmessage / self.postMessage on client.'
-    ]
+      "Bridges parentPort.on('message') / parentPort.postMessage on the server-side, and self.onmessage / self.postMessage on client.",
+    ],
   };
 }
 
@@ -67,24 +76,14 @@ async function fetchSemanticHits(query, collection, limit) {
   // Since we require embeddings to run query against Qdrant, we fall back to a text scroll
   // or a mock retrieval if Ollama isn't ready. This ensures the orchestrator is robust!
   try {
-    const r = await fetch(`${QDRANT_URL}/collections/${collection}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit, with_payload: true }),
-      signal: AbortSignal.timeout(5000)
-    });
-    if (r.ok) {
-      const data = await r.json();
-      return (data.result?.points ?? []).map(p => ({
-        id: p.id,
-        score: 0.92,
-        payload: p.payload
-      }));
+    const data = await qdrantScroll(collection, { limit, with_payload: true });
+    if (Array.isArray(data)) {
+      return data.map((p) => ({ id: p.id, score: 0.92, payload: p.payload }));
     }
   } catch {
     // Fall through
   }
-  
+
   // High-fidelity fallback
   return [
     {
@@ -96,11 +95,13 @@ async function fetchSemanticHits(query, collection, limit) {
         source_type: 'docs',
         text: 'kmeans-worker.js implementation has been hardened to support both server-side Node.js worker_threads and browser Web Workers under Svelte 5.',
         tags: ['feature:workers.kmeans', 'feature:workers'],
-        file_refs: ['sveltekit-frontend/src/workers/kmeans-worker.js']
-      }
-    }
+        file_refs: ['sveltekit-frontend/src/workers/kmeans-worker.js'],
+      },
+    },
   ];
 }
+
+// qdrant functions imported at top
 
 // ── Lane 2: Neo4j Graph Relationship Traversal ────────────────────────────────
 async function fetchGraphPaths(featureKey) {
@@ -108,7 +109,7 @@ async function fetchGraphPaths(featureKey) {
     const neo4j = await import('neo4j-driver');
     const driver = neo4j.default.driver(NEO4J_URI, neo4j.default.auth.basic('neo4j', 'neo4j123'));
     const session = driver.session();
-    
+
     const query = `
       MATCH (f:AtlasFeature {key: $featureKey})-[r1:REFERENCES]->(file:CodebaseFile)
       MATCH (chunk:AtlasChunk)-[r2:MENTIONS]->(file)
@@ -119,10 +120,10 @@ async function fetchGraphPaths(featureKey) {
     await session.close();
     await driver.close();
 
-    return res.records.map(rec => ({
+    return res.records.map((rec) => ({
       source: `feature:${rec.get('feature')}`,
       target: `CodebaseFile:${rec.get('file_path')}`,
-      type: rec.get('r1_type')
+      type: rec.get('r1_type'),
     }));
   } catch {
     return getSimulatedGraphHops(featureKey);
@@ -134,7 +135,7 @@ async function fetchRedisContext(featureKey) {
   const redis = new Redis(REDIS_URL, {
     lazyConnect: true,
     maxRetriesPerRequest: 1,
-    enableOfflineQueue: false
+    enableOfflineQueue: false,
   });
   redis.on('error', () => {});
 
@@ -162,8 +163,9 @@ async function main() {
   console.log(`  ✔ Semantic ANN: retrieved ${semanticHits.length} dense candidates.`);
 
   const primaryHit = semanticHits[0]?.payload;
-  const featureKey = primaryHit?.tags?.filter(t => t.startsWith('feature:'))?.[0]?.replace('feature:', '') 
-    || 'workers.kmeans';
+  const featureKey =
+    primaryHit?.tags?.filter((t) => t.startsWith('feature:'))?.[0]?.replace('feature:', '') ||
+    'workers.kmeans';
 
   // Step 2: Traverse graph relationships in parallel
   const graphHops = await fetchGraphPaths(featureKey);
@@ -184,13 +186,12 @@ async function main() {
   console.log(`Primary MoE : feature:${featureKey}`);
   console.log(`Status      : 100.0% Gated Alignment`);
   console.log('-'.repeat(80));
-  
+
   console.log('\n1. VERIFIED CITATIONS & SOURCEREFS:');
-  const citations = new Set([
-    primaryHit?.source_path,
-    ...(redisCard?.file_refs ?? [])
-  ].filter(Boolean));
-  
+  const citations = new Set(
+    [primaryHit?.source_path, ...(redisCard?.file_refs ?? [])].filter(Boolean)
+  );
+
   [...citations].forEach((ref, idx) => {
     console.log(`  [sourceRef_${idx + 1}] file:///${ROOT.replace(/\\/g, '/')}/${ref}`);
   });
@@ -206,12 +207,14 @@ async function main() {
   console.log(`  Top Snippet: "${redisCard?.top_snippets?.[0] ?? 'N/A'}"`);
 
   console.log('\n4. MULTI-HOP DEPENDENCY GRAPH SCHEMA:');
-  graphHops.forEach(hop => {
+  graphHops.forEach((hop) => {
     console.log(`  (${hop.source}) -[:${hop.type}]-> (${hop.target})`);
   });
 
   console.log('\n5. SYNTHESIZED SYSTEM ANSWER (ZERO-HIDDEN-THOUGHT CONSTRAINED):');
-  console.log(`  The system resolved your query regarding "${QUERY_STR}". The "${featureKey}" module is successfully mapped to sveltekit-frontend/src/workers/kmeans-worker.js. It features a robust multi-threaded implementation enabling concurrent client/server computations under Svelte 5 Runes reactivity. Any typescript compilation warnings are fully aligned using integer-based Number conversions in citation controllers.`);
+  console.log(
+    `  The system resolved your query regarding "${QUERY_STR}". The "${featureKey}" module is successfully mapped to sveltekit-frontend/src/workers/kmeans-worker.js. It features a robust multi-threaded implementation enabling concurrent client/server computations under Svelte 5 Runes reactivity. Any typescript compilation warnings are fully aligned using integer-based Number conversions in citation controllers.`
+  );
   console.log('='.repeat(80) + '\n');
 }
 

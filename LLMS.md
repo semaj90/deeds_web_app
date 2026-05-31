@@ -48,13 +48,20 @@ npm run agents:write       # Regenerates per-dir docs (use --root-only for speed
 - **Engram Memory (Lane -1)**: Low-trust pre-routing hints. MUST NOT store hidden thoughts, raw tensors, or model cache. Boosting (0.05) is restricted to debug/workflow profiles and requires `accepted: true`.
 - **Port Reservation**: Port 8888 is reserved for SeaweedFS Filer. SearXNG is relocated to port 8889.
 
-
 ---
 *This file is protected from auto-generation overwrites.*
-
 
 <!-- ingest: 2026-05-30T02:17:10.013Z -->
 - ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards
 
-
 [2026-05-30T04:39:26.319Z] Phase19 CSV export and archive-preview generated (dry-run)
+<!-- atlas-append:0bf81df426b5:2026-05-30T16:27:00.892Z -->
+## Atlas Activity — 2026-05-30T16:27:00.892Z
+
+- **Parent atlas rebuild**: 10,732 nodes / 9,378 edges across 8 lanes
+- **Redis cache**: 10,732 nodes warmed (24h TTL)
+- **CouchDB archive**: 11,136 docs durably persisted
+- **This directory**: no tasks or fixes in current run
+
+<!-- /atlas-append:0bf81df426b5 -->
+

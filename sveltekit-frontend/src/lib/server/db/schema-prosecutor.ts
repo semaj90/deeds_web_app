@@ -68,7 +68,6 @@ export const prosecutorEvidence = pgTable('prosecutor_evidence', {
 	hashAlgorithm: varchar('hash_algorithm', { length: 32 }),
 	tags: jsonb('tags').$type<string[]>().default([]),
 	aiSummary: text('ai_summary'),
-	uploadedByUserId: uuid('uploaded_by_user_id'),
 	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull()
 });
 

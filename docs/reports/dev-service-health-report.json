@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T08:55:42.544Z",
+  "generatedAt": "2026-05-31T00:37:25.604Z",
   "strict": false,
   "services": [
     {
@@ -8,7 +8,7 @@
       "port": 5434,
       "required": true,
       "status": "up",
-      "latencyMs": 2,
+      "latencyMs": 1,
       "error": null,
       "envVar": "DATABASE_URL"
     },
@@ -18,7 +18,7 @@
       "port": 6379,
       "required": true,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": "REDIS_URL"
     },
@@ -37,9 +37,9 @@
       "host": "127.0.0.1",
       "port": 8788,
       "required": false,
-      "status": "up",
-      "latencyMs": 0,
-      "error": null,
+      "status": "down_optional",
+      "latencyMs": 1,
+      "error": "ECONNREFUSED",
       "envVar": "TRACE_MCP_URL"
     },
     {
@@ -48,7 +48,7 @@
       "port": 7687,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": null
     },
@@ -58,7 +58,7 @@
       "port": 7474,
       "required": false,
       "status": "up",
-      "latencyMs": 0,
+      "latencyMs": 1,
       "error": null,
       "envVar": null
     },
@@ -107,32 +107,16 @@
       "host": "127.0.0.1",
       "port": 5173,
       "required": false,
-      "status": "up",
-      "latencyMs": 0,
-      "error": null,
+      "status": "down_optional",
+      "latencyMs": 1,
+      "error": "ECONNREFUSED",
       "envVar": null
-    },
-    {
-      "name": "TRACE MCP protocol",
-      "host": "127.0.0.1",
-      "port": 8788,
-      "required": false,
-      "envVar": "TRACE_MCP_URL",
-      "status": "up",
-      "latencyMs": 0,
-      "error": null,
-      "details": {
-        "healthStatus": 200,
-        "getMcpStatus": 406,
-        "getMcpExpected": true,
-        "postMcpStatus": 200
-      }
     }
   ],
   "summary": {
-    "up": 12,
+    "up": 9,
     "downRequired": 0,
-    "downOptional": 0,
+    "downOptional": 2,
     "skipped": 0
   },
   "status": "healthy"

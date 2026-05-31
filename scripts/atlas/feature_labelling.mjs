@@ -4,6 +4,7 @@ import readline from 'readline'
 import { createHash } from 'crypto'
 import path from 'path'
 
+const FRONTEND_ROOT = 'sveltekit-frontend'
 const tmp = '.tmp'
 const callsFile = path.join(tmp, 'calls.jsonl')
 const identityFile = path.join(tmp, 'identity-catalog.jsonl')
@@ -87,7 +88,87 @@ for(const [file,meta] of fileFeatures.entries()){
   kanbanLines.push(JSON.stringify({title:`Label: ${top} — Review ${path.basename(file)}`, file, id, feature:top, notes:`Review ${file} for feature '${top}'. Example: ${JSON.stringify(meta.examples.get(top)||{})}`}))
 }
 
+// ── Integrate Schema Drift & Gaps into Feature Labeling and Kanban Tasks ─────
+const temporalAuditPath = path.join(FRONTEND_ROOT || 'sveltekit-frontend', '.tmp', 'drizzle-temporal-audit.latest.json')
+if (fs.existsSync(temporalAuditPath)) {
+  try {
+    const auditData = JSON.parse(fs.readFileSync(temporalAuditPath, 'utf8'))
+    let taskCounter = 1
+    
+    for (const c of auditData.classifications || []) {
+      // 1. Process Column-level Drifts
+      if (c.columnDrifts && c.columnDrifts.length > 0) {
+        for (const drift of c.columnDrifts) {
+          const taskId = `TASK-schema-drift-${String(taskCounter++).padStart(3, '0')}`
+          const gapRecord = {
+            feature_id: `schema.drift.${c.tableName}.${drift.column}`,
+            workspace_task_id: taskId,
+            source_ref: c.file || `src/lib/server/db/schema/${c.tableName}.ts`,
+            schema_table: c.tableName,
+            schema_column: drift.column,
+            drift_status: drift.driftType,
+            risk: 'medium'
+          }
+          
+          featureLines.push(JSON.stringify({
+            file: gapRecord.source_ref,
+            id: sha256hex(gapRecord.feature_id),
+            features: [{name: 'database', count: 1}],
+            topFeature: 'database',
+            schema_gap: gapRecord
+          }))
+          
+          kanbanLines.push(JSON.stringify({
+            title: `Fix Schema Drift: ${c.tableName}.${drift.column}`,
+            file: gapRecord.source_ref,
+            id: sha256hex(gapRecord.feature_id),
+            feature: 'database',
+            workspace_task_id: taskId,
+            notes: `Drift Type: ${drift.driftType}. Details: ${drift.details}. Table: ${c.tableName}. Column: ${drift.column}`
+          }))
+        }
+      }
+      
+      // 2. Process Table-level Gaps (Undeclared or high risk empty)
+      if (['LIVE_UNDECLARED_ACTIVE', 'HIGH_RISK_DO_NOT_DROP', 'UNKNOWN_NEEDS_OPERATOR'].includes(c.classification)) {
+        const taskId = `TASK-schema-drift-${String(taskCounter++).padStart(3, '0')}`
+        const risk = c.classification === 'LIVE_UNDECLARED_ACTIVE' ? 'high' : 'medium'
+        const gapRecord = {
+          feature_id: `schema.drift.${c.tableName}`,
+          workspace_task_id: taskId,
+          source_ref: 'drizzle/manual/unjournaled',
+          schema_table: c.tableName,
+          schema_column: '*',
+          drift_status: c.classification,
+          risk: risk
+        }
+        
+        featureLines.push(JSON.stringify({
+          file: gapRecord.source_ref,
+          id: sha256hex(gapRecord.feature_id),
+          features: [{name: 'database', count: 1}],
+          topFeature: 'database',
+          schema_gap: gapRecord
+        }))
+        
+        kanbanLines.push(JSON.stringify({
+          title: `Fix Table Gap: ${c.tableName} (${c.classification})`,
+          file: gapRecord.source_ref,
+          id: sha256hex(gapRecord.feature_id),
+          feature: 'database',
+          workspace_task_id: taskId,
+          notes: `Table: ${c.tableName} is ${c.classification} with row count ${c.rowCount}. Risk: ${risk}`
+        }))
+      }
+    }
+    console.log(`🔗 Integrated ${taskCounter - 1} schema drift/gap tasks from temporal audit`)
+  } catch (e) {
+    console.error(`[ERROR] Failed to integrate temporal audit: ${e.message}`)
+  }
+}
+
 fs.writeFileSync(outFeatures, featureLines.join('\n') + (featureLines.length? '\n':''))
 fs.writeFileSync(outKanban, kanbanLines.join('\n') + (kanbanLines.length? '\n':''))
 
 console.log('Feature labelling complete. Wrote:', outFeatures, outKanban)
+

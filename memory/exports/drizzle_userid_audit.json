@@ -1,0 +1,538 @@
+{
+  "generatedAt": "2026-05-30T21:38:05.720Z",
+  "databaseUrlHost": "localhost",
+  "schemaDeclaredUuid": [
+    {
+      "tableVar": "auditLog",
+      "tableName": "audit_log"
+    },
+    {
+      "tableVar": "canvasStates",
+      "tableName": "canvas_states"
+    },
+    {
+      "tableVar": "citationCollections",
+      "tableName": "citation_collections"
+    },
+    {
+      "tableVar": "emailVerificationCodes",
+      "tableName": "email_verification_codes"
+    },
+    {
+      "tableVar": "evidenceAuditLog",
+      "tableName": "evidence_audit_log"
+    },
+    {
+      "tableVar": "legalAnalysisSessions",
+      "tableName": "legal_analysis_sessions"
+    },
+    {
+      "tableVar": "evidence",
+      "tableName": "evidence"
+    },
+    {
+      "tableVar": "pushSubscriptions",
+      "tableName": "push_subscriptions"
+    },
+    {
+      "tableVar": "ragSessions",
+      "tableName": "rag_sessions"
+    },
+    {
+      "tableVar": "savedReports",
+      "tableName": "saved_reports"
+    },
+    {
+      "tableVar": "sessions",
+      "tableName": "sessions"
+    },
+    {
+      "tableVar": "reportAuditLog",
+      "tableName": "report_audit_log"
+    },
+    {
+      "tableVar": "themes",
+      "tableName": "themes"
+    },
+    {
+      "tableVar": "userAiQueries",
+      "tableName": "user_ai_queries"
+    },
+    {
+      "tableVar": "userInteractionHistory",
+      "tableName": "user_interaction_history"
+    },
+    {
+      "tableVar": "storageFiles",
+      "tableName": "storage_files"
+    },
+    {
+      "tableVar": "userEmbeddings",
+      "tableName": "user_embeddings"
+    },
+    {
+      "tableVar": "yorhaChatSessions",
+      "tableName": "yorha_chat_sessions"
+    },
+    {
+      "tableVar": "apiAuditLog",
+      "tableName": "api_audit_log"
+    },
+    {
+      "tableVar": "ragQueryLog",
+      "tableName": "rag_query_log"
+    },
+    {
+      "tableVar": "responseFeedback",
+      "tableName": "response_feedback"
+    }
+  ],
+  "dbUserIdColumns": [
+    {
+      "table_name": "ace_context_cache",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "admin_ai_chat_sessions",
+      "column_name": "user_id",
+      "data_type": "text",
+      "udt_name": "text"
+    },
+    {
+      "table_name": "admin_telemetry",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "agent_actions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "ai_usage_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "analytics_events",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "api_audit_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "audit_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "canvas_states",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "cases",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "chat_messages",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "chat_metadata",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "chunk_hit_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "citation_collections",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "context_timeline",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "diagnosis_events",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "documents",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "email_verification_codes",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "error_suggestion_states",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "evidence",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "evidence_audit_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "legal_analysis_sessions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "legal_documents",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "llm_outputs",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "llm_synthesis_events",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "panel_activity_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "rag_query_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "rag_sessions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "report_audit_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "research_summaries",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "response_feedback",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "rg_search_runs",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "saved_citation_annotations",
+      "column_name": "user_id",
+      "data_type": "text",
+      "udt_name": "text"
+    },
+    {
+      "table_name": "saved_citations",
+      "column_name": "user_id",
+      "data_type": "text",
+      "udt_name": "text"
+    },
+    {
+      "table_name": "saved_reports",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "storage_files",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "synthesis_runs",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "themes",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "user_ai_queries",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "user_analytics_events",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "user_embeddings",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "user_interaction_history",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "user_research_tasks",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    },
+    {
+      "table_name": "yorha_chat_sessions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4"
+    }
+  ],
+  "mismatches": [
+    {
+      "tableVar": "auditLog",
+      "tableName": "audit_log",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "canvasStates",
+      "tableName": "canvas_states",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "citationCollections",
+      "tableName": "citation_collections",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "emailVerificationCodes",
+      "tableName": "email_verification_codes",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "evidenceAuditLog",
+      "tableName": "evidence_audit_log",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "legalAnalysisSessions",
+      "tableName": "legal_analysis_sessions",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "evidence",
+      "tableName": "evidence",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "pushSubscriptions",
+      "tableName": "push_subscriptions",
+      "declared": "uuid",
+      "actual": null,
+      "data_type": null,
+      "presentInDb": false
+    },
+    {
+      "tableVar": "ragSessions",
+      "tableName": "rag_sessions",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "savedReports",
+      "tableName": "saved_reports",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "sessions",
+      "tableName": "sessions",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "reportAuditLog",
+      "tableName": "report_audit_log",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "themes",
+      "tableName": "themes",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "userAiQueries",
+      "tableName": "user_ai_queries",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "userInteractionHistory",
+      "tableName": "user_interaction_history",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "storageFiles",
+      "tableName": "storage_files",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "userEmbeddings",
+      "tableName": "user_embeddings",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "yorhaChatSessions",
+      "tableName": "yorha_chat_sessions",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "apiAuditLog",
+      "tableName": "api_audit_log",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "ragQueryLog",
+      "tableName": "rag_query_log",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    },
+    {
+      "tableVar": "responseFeedback",
+      "tableName": "response_feedback",
+      "declared": "uuid",
+      "actual": "int4",
+      "data_type": "integer",
+      "presentInDb": true
+    }
+  ]
+}

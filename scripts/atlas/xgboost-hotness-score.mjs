@@ -71,7 +71,7 @@ async function discoverClusters() {
   const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/facet`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key: 'neo4j_gpuCluster', limit: 50 }),
+    body: JSON.stringify({ key: 'gpuCluster', limit: 50 }),
   });
   if (!res.ok) throw new Error(`Facet API failed: ${res.status}`);
   const data = await res.json();
@@ -102,7 +102,7 @@ async function scrollClusterSignals(clusterId) {
   let offset = null;
   do {
     const body = {
-      filter: { must: [{ key: 'neo4j_gpuCluster', match: { value: clusterId } }] },
+      filter: { must: [{ key: 'gpuCluster', match: { value: clusterId } }] },
       with_payload: ['relativePath', 'file_path', 'path', 'tags', 'language'],
       with_vector: false,
       limit: 200,
@@ -341,14 +341,14 @@ async function backfillChunkHitLog(pgPool) {
             filter: {
               must: [{ key: 'relativePath', match: { value: row.relative_path } }],
             },
-            with_payload: ['neo4j_gpuCluster'],
+            with_payload: ['gpuCluster'],
             with_vector: false,
             limit: 1,
           }),
         }
       );
       const data = await searchRes.json();
-      const cluster = data.result?.points?.[0]?.payload?.neo4j_gpuCluster;
+      const cluster = data.result?.points?.[0]?.payload?.gpuCluster;
       if (cluster != null) {
         await pgPool.query(`UPDATE chunk_hit_log SET gpu_cluster = $1 WHERE id = $2`, [
           cluster,

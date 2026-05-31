@@ -172,6 +172,24 @@
       "appliedAt": "2026-05-30",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='scenario_cache';\""
+    },
+    {
+      "file": "9998_create_agent_pickup_queue.sql",
+      "status": "manual_sidecar",
+      "reason": "Drizzle migration for agent_pickup_queue table to support agent pickup loop.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_pickup_queue';\""
+    },
+    {
+      "file": "9999_create_task_semantic_packets.sql",
+      "status": "manual_sidecar",
+      "reason": "Drizzle migration for task_semantic_packets table to support semantic packet generation and tracking.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='task_semantic_packets';\""
     }
   ]
 }

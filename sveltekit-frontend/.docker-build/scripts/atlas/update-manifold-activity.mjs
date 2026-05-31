@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
  * scripts/atlas/update-manifold-activity.mjs
- * 
+ *
  * Updates the activity_w signal in the 4D manifold based on retrieval feedback.
  */
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+import { qdrantUpdatePayloadByFilter, getQdrantUrl } from '../qdrant-client.mjs';
+const QDRANT_URL = getQdrantUrl();
 const COLLECTION = 'codebase_chunks_768';
 
 async function main() {
@@ -18,23 +19,13 @@ async function main() {
   try {
     for (const id of activeClusters) {
       console.log(`   Boosting activity_w for Cluster ${id}...`);
-      
-      const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          payload: { activity_w: 0.85 },
-          filter: {
-            must: [
-              { key: 'gpu_cluster', match: { value: id } }
-            ]
-          }
-        })
-      });
 
-      if (!res.ok) {
-        console.warn(`⚠️  Failed to update Cluster ${id}`);
-      }
+      const ok = await qdrantUpdatePayloadByFilter(
+        COLLECTION,
+        { activity_w: 0.85 },
+        { must: [{ key: 'gpu_cluster', match: { value: id } }] }
+      );
+      if (!ok) console.warn(`⚠️  Failed to update Cluster ${id}`);
     }
     console.log('✅ Manifold activity signals updated.');
   } catch (err) {

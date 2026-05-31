@@ -23,9 +23,8 @@ export const evidence = pgTable('evidence', {
  tags: jsonb('tags')
   .$type<string[]>()
   .default([] as any),
- aiSummary: text('ai_summary'),
- uploadedByUserId: integer('uploaded_by_user_id'),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  aiSummary: text('ai_summary'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 

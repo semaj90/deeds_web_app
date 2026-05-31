@@ -222,7 +222,7 @@ export async function traceVectorSearch<T>(
 	const start = Date.now();
 
 	try {
-		const result = await callback();
+		const result = await safeCb();
 		const ms = Date.now() - start;
 		const count = Array.isArray(result) ? result.length : (result as { length?: number })?.length ?? 1;
 		span.end({ output: `${count} results (${ms}ms)` });
@@ -463,7 +463,7 @@ export async function tracePolicy<T>(
 	const start = Date.now();
 
 	try {
-		const result = await callback();
+		const result = await safeCb();
 		span.end({ output: `policy ok (${Date.now() - start}ms)` });
 		return result;
 	} catch (err) {

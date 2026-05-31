@@ -43,3 +43,14 @@ ORDER BY db_count + tool_count DESC LIMIT 10;
 - ✅ Persistence: CouchDB snapshots + DuckDB CSVs + Neo4j live graph
 - ✅ Verification: Multi-hop traversal returns supervision hotspots
 - ⏳ Phase 6+: Wire observation stream to capture tool selections + outcomes at these hotspots
+
+<!-- atlas-append:0bf81df426b5:2026-05-30T16:27:00.892Z -->
+## Atlas Activity — 2026-05-30T16:27:00.892Z
+
+- **Parent atlas rebuild**: 10,732 nodes / 9,378 edges across 8 lanes
+- **Redis cache**: 10,732 nodes warmed (24h TTL)
+- **CouchDB archive**: 11,136 docs durably persisted
+- **This directory**: no tasks or fixes in current run
+
+<!-- /atlas-append:0bf81df426b5 -->
+

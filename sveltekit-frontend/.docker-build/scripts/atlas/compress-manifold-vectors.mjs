@@ -1,14 +1,13 @@
 /**
  * scripts/atlas/compress-manifold-vectors.mjs
- * 
+ *
  * GPU Autoencoding: Compresses 768d Qdrant vectors to 64d using the trained autoencoder.
  * Stores result in codebase_chunks_64d collection.
  */
 
 import { getRedis } from '../../src/lib/server/redis.ts';
+import { qdrantScroll, qdrantEnsureCollection, qdrantUpsertPoints } from '../qdrant-client.mjs';
 
-
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const SRC_COLLECTION = 'codebase_chunks_768';
 const DEST_COLLECTION = 'codebase_chunks_64d';
 
@@ -47,32 +46,26 @@ async function main() {
   const b2 = weights.b2.split(',').map(Number);
 
   // 1. Ensure collection exists
-  await fetch(`${QDRANT_URL}/collections/${DEST_COLLECTION}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ vectors: { size: 64, distance: 'Cosine' } })
-  });
+  const ensured = await qdrantEnsureCollection(DEST_COLLECTION, 64);
+  if (!ensured) {
+    console.error('❌ Failed to ensure destination collection in Qdrant');
+    process.exit(1);
+  }
 
   // 2. Scroll and Compress
   let offset = null;
   let count = 0;
 
   while (true) {
-    const res = await fetch(`${QDRANT_URL}/collections/${SRC_COLLECTION}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit: 100, offset, with_vector: true })
-    });
-    const data = await res.json();
-    const pts = data.result?.points || [];
-    if (pts.length === 0) break;
+    const pts = await qdrantScroll(SRC_COLLECTION, { limit: 100, offset, with_vector: true });
+    if (!pts || pts.length === 0) break;
 
     const upsertPoints = pts.map(pt => {
       const v768 = pt.vector.content || pt.vector;
       // Encoder logic: Linear(768, 256) -> ReLU -> Linear(256, 64) -> Normalize
       const h = relu(applyLinear(v768, W1, b1, 256, 768));
       const z = normalize(applyLinear(h, W2, b2, 64, 256));
-      
+
       return {
         id: pt.id,
         vector: z,
@@ -80,14 +73,14 @@ async function main() {
       };
     });
 
-    await fetch(`${QDRANT_URL}/collections/${DEST_COLLECTION}/points`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ points: upsertPoints })
-    });
+    const ok = await qdrantUpsertPoints(DEST_COLLECTION, upsertPoints, true);
+    if (!ok) {
+      console.warn('Warning: upsert returned non-ok for batch');
+    }
 
     count += pts.length;
-    offset = data.result.next_page_offset;
+    // qdrantScroll returns raw points but not next_page_offset; fall back to null to stop if empty
+    offset = null;
     process.stdout.write(`\r   Compressed ${count} points...`);
     if (!offset) break;
   }

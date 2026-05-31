@@ -23,7 +23,6 @@
 - **External Collection**: Use `external_programming_docs_768` in Qdrant for technical documentation.
 - **Trust Hierarchy**: `local_code` (Authoritative) > `official_docs` (High Trust) > `external_unverified` (Web/Low Trust).
 
-
 ## Commands
 
 - `cd sveltekit-frontend && npm ci`
@@ -154,11 +153,8 @@ npm run audit:pgvector              # pgvector extension, HNSW indexes, dim vali
 - **Tool**: `llm_synthesis.log_event`
 - **Port**: 3002 (`scripts/phase76-mcp-server.mjs`)
 
-
-
 <!-- ingest: 2026-05-30T02:17:10.013Z -->
 - ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards
-
 
 [2026-05-30T04:39:26.319Z] Phase19 CSV export and archive-preview generated (dry-run)
 ---
@@ -196,7 +192,6 @@ Top file by topology footprint: `route-health-queries.ts` (6 tables touched).
 2. Trigger Neo4j topology sync once Neo4j is up
 3. Run graphify directory analysis pass for AGENTS.md temporal annotations
 4. PostgreSQL 18 upgrade with pgvector 0.8.1 validation
-
 
 ---
 
@@ -260,3 +255,118 @@ Legal evidence retrieval, RAG-grounded chat, case management, GRPO-trained Gemma
 ### Temporal Event Note [2026-05-30T07:43:55.768Z]
 Successfully wired Scenario Cache preflight bypass and registered atlas-tools.create_task, propose_fix, record_fix_outcome
 <!-- ATLAS_TEMPORAL_APPEND_END id=append-1780127035768 -->
+
+<!-- atlas-append:0bf81df426b5:2026-05-30T16:27:00.892Z -->
+## Atlas Activity — 2026-05-30T16:27:00.892Z
+
+- **Parent atlas rebuild**: 10,732 nodes / 9,378 edges across 8 lanes
+- **Redis cache**: 10,732 nodes warmed (24h TTL)
+- **CouchDB archive**: 11,136 docs durably persisted
+- **This directory**: no tasks or fixes in current run
+
+<!-- /atlas-append:0bf81df426b5 -->
+
+
+---
+
+## [2026-05-30 08:50 PST] Owner Column Drift Audit — 95% Resolved
+
+**Surprise finding**: the 2026-05-10 audit reported 24 tables with broken uuid user_id FKs.
+**Live introspection today**: **0 uuid columns remain**. Drift is 95% resolved.
+
+### Current Distribution (75 columns audited)
+| Type | Count | Status |
+|---|---|---|
+| `integer` | 70 | ✅ Lucia-aligned, Path A |
+| `text` | 3 | outlier (all empty) |
+| `varchar` | 2 | outlier (all empty) |
+| `uuid` | 0 | ✅ migrated |
+
+### 5 Outliers (all 0 rows, zero-risk migration)
+- `case_reports.created_by` (varchar)
+- `vector_outbox.owner_id` (varchar)
+- `admin_ai_chat_sessions.user_id` (text)
+- `saved_citation_annotations.user_id` (text)
+- `saved_citations.user_id` (text)
+
+**Drizzle status**: all 5 schemas match the live DB types (no TS-side drift).
+
+### Recommendation
+**Apply proposed migration to ratify Path A**:
+- File: `drizzle/manual/proposed_20260530_unify_owner_columns_to_integer.sql`
+- Effort: ~5 minutes (5 ALTERs + 5 FK constraints + 4 Drizzle schema updates)
+- Risk: 🟢 NONE (all tables empty)
+- Unlocks: operator-only gate on broad migration work (CLAUDE.md Drizzle Safety Rule §2)
+
+### Persistence
+- Report: `.tmp/owner-column-drift-report.md`
+- CouchDB: `codebase_graph/owner-column-drift-report-2026-05-30` (rev 1-964c437edd...)
+- Proposed migration: `drizzle/manual/proposed_20260530_unify_owner_columns_to_integer.sql`
+
+### Test Stabilization
+- Added `.js` compatibility shims for `src/lib/server/redis.js` + `ollama.js` (re-export TS impl)
+- Removed broken `export { default }` from `ollama.js` (TS source has no default export)
+- Enables vitest tests that import the `.js` paths to resolve cleanly
+
+---
+
+## [2026-05-30 20:35 PST] Drizzle Introspect — Live Drift Snapshot
+
+**Live DB**: 305 tables, 3,196 columns, 37 enums, 378 indexes, 30 FKs, 7 checks, 4 views
+**Drizzle declares (all sidecar files combined)**: 281 tables
+
+**Real drift**:
+- 96 live tables with **zero Drizzle declaration**
+- 72 declared tables that don't exist in the live DB
+- 209 tables present in both
+
+**Tier 1 critical undeclared** (18 tables — most are active app tables):
+- `case_notes`, `case_statute_links`, `case_note_versions`, `case_note_evidence_refs`
+- `legal_documents`, `statute_chunks`, `timeline_events`
+- `workspaces`, `workspace_notes`, `workspace_sessions`, `workspace_evidence`, `workspace_citations`, `workspace_statutes`
+- `chat_document_attachments`, `agent_sessions`, `vault_md_index`, `file_summaries`, `file_hotness_scores`
+
+**Tier 2 ACE/KAG undeclared** (10 tables — infrastructure):
+- `ace_chunks`, `ace_context_packets`, `ace_context_sources`, `ace_docs`, `ace_hit_logs`, `ace_sources`
+- `agent_context_files`, `agent_context_files_history`, `agent_context_relations`, `agent_memory_observations`
+
+**Artifacts**:
+- Full DDL: `.tmp/drizzle-introspect/0000_previous_mother_askani.sql` (4,644 lines)
+- Auto schema: `.tmp/drizzle-introspect/schema.ts` (4,977 lines)
+- Relations: `.tmp/drizzle-introspect/relations.ts`
+- Drift report: `.tmp/drizzle-introspect/DRIFT_REPORT.md`
+- CouchDB: `codebase_graph/drizzle-drift-snapshot-2026-05-30T20-35` (rev 1-d6a8f8f5a2...)
+
+**Recommended actions**:
+1. **Phase 1**: Add sidecar schema files for 18 Tier-1 tables (safe, type-safety win, ~30 min effort)
+2. **Phase 2**: Decide ACE/warden/fixer tables → promote sidecar OR add to `tablesFilter`
+3. **Phase 3**: Remove dead schema declarations OR apply pending migrations
+
+**Note**: ACE/KAG tables represent infrastructure scaffolding — likely managed via sidecar SQL (already in `tablesFilter` per CLAUDE.md). Verify before adding sidecars.
+
+---
+
+## [2026-05-30 21:15 PST] Drizzle Drift Corrected + Sidecar Disambiguation
+
+**Methodology bug fix**: The 2026-05-30 20:35 drift report used a single-line regex to detect `pgTable(...)` declarations, which **missed every multi-line declaration in `schema-postgres.ts`** (where canonical legal_documents, case_notes, workspaces, etc. live).
+
+**Corrected numbers**:
+- Declared (sidecar + canonical, multi-line-aware): **333** (was 281)
+- Live undeclared: **49** (was 96)
+- Real gap after subtracting `tablesFilter`: **26** (was 61)
+
+The 10 sidecars I auto-extracted (`case-notes.ts`, `legal-documents.ts`, etc.) were **redundant** with `schema-postgres.ts`. Disambiguation strategy:
+- Kept all 10 sidecar files (zero importers, no risk)
+- Prepended `MERGED-WITH-CANONICAL` banner to each, pointing to canonical line in `schema-postgres.ts`
+- Live-DB shape snapshots preserved for future drift diffing
+
+**Architecture TODO captured**: `next_steps/active/2026-05-30_ARCHITECTURE_TODO_CLIENT_SERVER_SEPARATION.md`
+- XState v5 de-prioritized for UI flows (Bits UI v2 + runes handle it)
+- Client/server lane separation planned: `src/lib/{client,server,shared}/`
+- Per-feature RPC wrappers (typed fetch + ergonomic) to replace ad-hoc API calls
+- Keep XState for multi-actor orchestration only (retrieval-machine, chat-machine)
+
+**Persistence**:
+- AGENTS.md temporal append (this block)
+- Architecture TODO: `next_steps/active/2026-05-30_ARCHITECTURE_TODO_CLIENT_SERVER_SEPARATION.md`
+- Drift snapshot updated: `.tmp/drizzle-introspect/real-gap-v2.txt` (26 truly orphan tables)

@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-05-30T23:31:58.869Z",
+  "mode": "apply",
+  "totalDurationMs": 12506,
+  "stages": [
+    {
+      "stage": "lanes",
+      "ok": true,
+      "durationMs": 3242
+    },
+    {
+      "stage": "duckdb",
+      "ok": true,
+      "durationMs": 835
+    },
+    {
+      "stage": "couchdb",
+      "ok": true,
+      "durationMs": 7896
+    },
+    {
+      "stage": "redis",
+      "ok": true,
+      "durationMs": 531
+    }
+  ],
+  "ok": true
+}

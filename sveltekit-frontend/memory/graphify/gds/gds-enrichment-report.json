@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-05-29T22:12:09.688Z",
+  "timestamp": "2026-05-30T20:11:34.335Z",
   "dryRun": false,
   "force": false,
   "algorithms": {
     "louvain": {
       "success": true,
       "data": {
-        "communities": 14525,
-        "nodesProcessed": 17056
+        "communities": 15334,
+        "nodesProcessed": 17866
       },
-      "communities": 14525,
-      "nodesProcessed": 17056,
+      "communities": 15334,
+      "nodesProcessed": 17866,
       "records": [
         {
           "keys": [
@@ -20,11 +20,11 @@
           "length": 2,
           "_fields": [
             {
-              "low": 14525,
+              "low": 15334,
               "high": 0
             },
             {
-              "low": 17056,
+              "low": 17866,
               "high": 0
             }
           ],
@@ -38,10 +38,10 @@
     "betweenness": {
       "success": true,
       "data": {
-        "nodesScored": 17056,
+        "nodesScored": 17866,
         "maxScore": 12749.399999999996
       },
-      "nodesScored": 17056,
+      "nodesScored": 17866,
       "maxScore": 12749.399999999996,
       "records": [
         {
@@ -52,7 +52,7 @@
           "length": 2,
           "_fields": [
             {
-              "low": 17056,
+              "low": 17866,
               "high": 0
             },
             12749.399999999996
@@ -67,13 +67,13 @@
     "pagerank": {
       "success": true,
       "data": {
-        "nodesScored": 17056,
+        "nodesScored": 17866,
         "maxScore": 54.809619503524075,
-        "avgScore": 0.1738618464256337
+        "avgScore": 0.17278000966280155
       },
-      "nodesScored": 17056,
+      "nodesScored": 17866,
       "maxScore": 54.809619503524075,
-      "avgScore": 0.1738618464256337,
+      "avgScore": 0.17278000966280155,
       "records": [
         {
           "keys": [
@@ -84,11 +84,11 @@
           "length": 3,
           "_fields": [
             {
-              "low": 17056,
+              "low": 17866,
               "high": 0
             },
             54.809619503524075,
-            0.1738618464256337
+            0.17278000966280155
           ],
           "_fieldLookup": {
             "nodesScored": 0,
@@ -103,9 +103,9 @@
     "shares_cluster": {
       "success": true,
       "data": {
-        "edgesCreated": 36791
+        "edgesCreated": 44235
       },
-      "edgesCreated": 36791,
+      "edgesCreated": 44235,
       "records": [
         {
           "keys": [
@@ -114,7 +114,7 @@
           "length": 1,
           "_fields": [
             {
-              "low": 36791,
+              "low": 44235,
               "high": 0
             }
           ],
@@ -151,20 +151,20 @@
   },
   "errors": [],
   "stats": {
-    "totalFiles": 17056,
-    "withCommunity": 17032,
-    "withBetweenness": 11240,
-    "withPageRank": 17032
+    "totalFiles": 17866,
+    "withCommunity": 17056,
+    "withBetweenness": 17056,
+    "withPageRank": 17056
   },
   "projection": {
     "success": true,
     "data": {
       "graphName": "codeGraph",
-      "nodeCount": 17056,
+      "nodeCount": 17866,
       "relationshipCount": 4696
     },
     "graphName": "codeGraph",
-    "nodeCount": 17056,
+    "nodeCount": 17866,
     "relationshipCount": 4696,
     "records": [
       {
@@ -177,7 +177,7 @@
         "_fields": [
           "codeGraph",
           {
-            "low": 17056,
+            "low": 17866,
             "high": 0
           },
           {
@@ -214,5 +214,5 @@
       }
     ]
   },
-  "duration_ms": 12885
+  "duration_ms": 32460
 }

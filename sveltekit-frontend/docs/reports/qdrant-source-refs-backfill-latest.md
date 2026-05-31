@@ -1,10 +1,10 @@
 # Qdrant SourceRefs Backfill
 
-Generated: 2026-05-26T23:42:55.452Z
-Dry run: no
+Generated: 2026-05-30T19:52:05.764Z
+Dry run: yes
 Collection: codebase_chunks_768
-Attempted: 25
-Updated: 25
-Skipped: 0
-Coverage before: 1
-Coverage after: 1
+Attempted: 10
+Updated: 0
+Skipped: 10
+Coverage before: 0
+Coverage after: 0

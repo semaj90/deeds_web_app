@@ -23,12 +23,13 @@ import { Redis } from 'ioredis';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { getQdrantUrl } from '../qdrant-client.mjs';
 
 const __dir  = path.dirname(fileURLToPath(import.meta.url));
 const ROOT   = path.resolve(__dir, '../..');
 const OUT_DIR = path.join(ROOT, 'docs', 'reports');
 
-const QDRANT_URL     = process.env.QDRANT_URL  ?? 'http://localhost:6333';
+const QDRANT_URL = getQdrantUrl();
 const REDIS_URL      = process.env.REDIS_URL   ?? 'redis://localhost:6379';
 const COLLECTION     = 'codebase_chunks_768';
 const ENCODED_KEY    = 'gpu:karpathy:encoded';
@@ -93,22 +94,22 @@ function nearestCentroid(vec, centroids) {
 
 // ── Qdrant helpers ────────────────────────────────────────────────────────────
 
+import { qdrantScroll, qdrantEnsureCollection } from '../qdrant-client.mjs';
+
 async function scrollQdrantSample(limit) {
-  const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ limit, with_payload: ['file_path'], with_vector: ['content'] }),
+  const pts = await qdrantScroll(COLLECTION, {
+    limit,
+    with_payload: ['file_path'],
+    with_vector: ['content'],
   });
-  if (!res.ok) throw new Error(`Qdrant scroll ${res.status}: ${await res.text()}`);
-  const data = await res.json();
-  return data.result?.points ?? [];
+  return pts ?? [];
 }
 
 async function qdrantCollectionInfo() {
-  const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}`);
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.result;
+  // qdrant-client does not expose direct metadata route; try ensureCollection as a probe
+  const ok = await qdrantEnsureCollection(COLLECTION, CONTENT_DIM);
+  if (!ok) return null;
+  return { vectors_count: 'unknown' };
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -168,18 +169,13 @@ async function main() {
   const alignFps    = encoded64.slice(0, 50).map(e => e.fp);
   log(`  Fetching Qdrant 768d for ${alignFps.length} Redis keys (filter by file_path)...`);
 
-  const filterRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      limit: alignFps.length,
-      with_payload: ['file_path'],
-      with_vector: ['content'],
-      filter: { must: [{ key: 'file_path', match: { any: alignFps } }] },
-    }),
-  });
-  const filterData   = filterRes.ok ? await filterRes.json() : null;
-  const qdrantPoints = filterData?.result?.points ?? [];
+  const filterBody = {
+    limit: alignFps.length,
+    with_payload: ['file_path'],
+    with_vector: ['content'],
+    filter: { must: [{ key: 'file_path', match: { any: alignFps } }] },
+  };
+  const qdrantPoints = (await qdrantScroll(COLLECTION, filterBody)) || [];
 
   const aligned = [];
   for (const pt of qdrantPoints) {

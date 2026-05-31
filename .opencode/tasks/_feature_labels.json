@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-30T18:00:00Z",
+  "description": "Stable feature_id catalog. Tasks reference these IDs; they survive directory reorgs.",
+  "labels": {
+    "evidence": {
+      "display": "Evidence Pipeline",
+      "pillar": "evidence",
+      "semantic_path": ["evidence"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/evidence", "sveltekit-frontend/src/routes/api/evidence"],
+      "qdrant_collection": "evidence_items",
+      "key_tables": ["evidence", "evidence_vectors", "evidence_audit_log"]
+    },
+    "ai-retrieval": {
+      "display": "AI Retrieval (RAG/KAG/ACE)",
+      "pillar": "ai-retrieval",
+      "semantic_path": ["rag", "kag", "ace"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/ace", "sveltekit-frontend/src/lib/server/rag", "sveltekit-frontend/src/lib/server/retrieval"],
+      "qdrant_collection": "codebase_chunks_768",
+      "key_tables": ["ace_chunks", "ace_retrieval_runs", "chunk_hit_log"]
+    },
+    "ai-inference": {
+      "display": "AI Inference (LLM + GPU)",
+      "pillar": "ai-inference",
+      "semantic_path": ["llm", "gpu", "agent"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/ai", "sveltekit-frontend/src/lib/server/inference", "sveltekit-frontend/src/lib/server/gpu"],
+      "qdrant_collection": null,
+      "key_tables": ["llm_outputs", "llm_synthesis_events", "ai_usage_log"]
+    },
+    "cases": {
+      "display": "Case Management",
+      "pillar": "cases-legal",
+      "semantic_path": ["cases", "discovery", "timeline"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/cases", "sveltekit-frontend/src/routes/api/cases"],
+      "qdrant_collection": "legal_cases",
+      "key_tables": ["cases", "case_notes", "case_activities", "case_reports"]
+    },
+    "legal-corpus": {
+      "display": "Legal Corpus (statutes + citations)",
+      "pillar": "cases-legal",
+      "semantic_path": ["legal", "statutes", "citations"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/legal"],
+      "qdrant_collection": "legal_documents",
+      "key_tables": ["legal_documents", "statutes", "citations", "legal_glossary"]
+    },
+    "data-layer": {
+      "display": "Database + Schema",
+      "pillar": "data-layer",
+      "semantic_path": ["db", "drizzle", "pgvector"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/db", "drizzle"],
+      "qdrant_collection": null,
+      "key_tables": []
+    },
+    "cache-storage": {
+      "display": "Cache + Object Storage",
+      "pillar": "cache-storage",
+      "semantic_path": ["redis", "bifrost", "seaweedfs", "minio"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/cache", "sveltekit-frontend/src/lib/server/redis", "sveltekit-frontend/src/lib/server/minio"],
+      "qdrant_collection": null,
+      "key_tables": []
+    },
+    "vector-graph": {
+      "display": "Vector + Graph DB (Qdrant + Neo4j)",
+      "pillar": "vector-graph",
+      "semantic_path": ["qdrant", "neo4j", "hypergraph"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/vector", "sveltekit-frontend/src/lib/server/graph", "sveltekit-frontend/src/lib/server/hypergraph"],
+      "qdrant_collection": null,
+      "key_tables": []
+    },
+    "agents-mcp": {
+      "display": "Agents + MCP Tools (FastMCP)",
+      "pillar": "agents-mcp",
+      "semantic_path": ["mcp", "agents", "tools", "hermes"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/mcp", "sveltekit-frontend/src/lib/server/tools", "sveltekit-frontend/src/lib/server/agents", "sveltekit-frontend/src/mcp"],
+      "qdrant_collection": null,
+      "key_tables": ["kag_dag_runs", "kag_dag_nodes", "kag_dag_edges"]
+    },
+    "queue-streaming": {
+      "display": "Queue + Streaming (RabbitMQ + SSE)",
+      "pillar": "queue-streaming",
+      "semantic_path": ["rabbitmq", "sse", "workers", "nats"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/queue", "sveltekit-frontend/src/lib/server/streaming", "sveltekit-frontend/src/lib/server/workers"],
+      "qdrant_collection": null,
+      "key_tables": []
+    },
+    "security-middleware": {
+      "display": "Security + Middleware (Auth + CSRF)",
+      "pillar": "security-middleware",
+      "semantic_path": ["auth", "lucia", "csrf", "validation"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/auth", "sveltekit-frontend/src/lib/server/security", "sveltekit-frontend/src/lib/server/middleware"],
+      "qdrant_collection": null,
+      "key_tables": ["users", "sessions", "api_audit_log"]
+    },
+    "observability": {
+      "display": "Observability (Analytics + Langfuse)",
+      "pillar": "analytics",
+      "semantic_path": ["analytics", "langfuse", "rl-signals"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/analytics", "sveltekit-frontend/src/lib/server/observability"],
+      "qdrant_collection": null,
+      "key_tables": ["context_timeline", "chunk_hit_log", "rg_search_runs", "response_feedback"]
+    },
+    "platform": {
+      "display": "Platform (env, config, startup)",
+      "pillar": "platform",
+      "semantic_path": ["env", "config", "startup", "utils"],
+      "anchor_dirs": ["sveltekit-frontend/src/lib/server/env", "sveltekit-frontend/src/lib/server/config", "sveltekit-frontend/src/lib/server/startup"],
+      "qdrant_collection": null,
+      "key_tables": []
+    }
+  }
+}

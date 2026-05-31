@@ -43,13 +43,14 @@ const DRY_RUN     = argv.includes('--dry-run');
 const OLLAMA_URL   = process.env.OLLAMA_URL      ?? 'http://localhost:11434';
 const EMBED_MODEL  = process.env.EMBED_MODEL     ?? 'embeddinggemma:latest';
 const SVELTEKIT    = process.env.SVELTEKIT_URL   ?? 'http://localhost:5173';
-const QDRANT_URL   = process.env.QDRANT_URL      ?? 'http://localhost:6333';
-const REDIS_URL    = process.env.REDIS_URL       ?? 'redis://127.0.0.1:6379';
-const TURBOVEC_URL = process.env.TURBOVEC_URL    ?? 'http://127.0.0.1:8792';
-const COLLECTION   = process.env.COLLECTION      ?? 'codebase_chunks_768';
-const AUTHORITY_SNAPSHOT_PATH = process.env.AUTHORITY_SNAPSHOT_PATH
-  ?? path.join(ROOT, 'logs', 'authority', 'latest.json');
-const RRF_K        = 60;  // Reciprocal Rank Fusion constant
+import { getQdrantUrl } from '../qdrant-client.mjs';
+const QDRANT_URL = getQdrantUrl();
+const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+const TURBOVEC_URL = process.env.TURBOVEC_URL ?? 'http://127.0.0.1:8792';
+const COLLECTION = process.env.COLLECTION ?? 'codebase_chunks_768';
+const AUTHORITY_SNAPSHOT_PATH =
+  process.env.AUTHORITY_SNAPSHOT_PATH ?? path.join(ROOT, 'logs', 'authority', 'latest.json');
+const RRF_K = 60; // Reciprocal Rank Fusion constant
 
 if (!QUERY) {
   console.error('Usage: node hyperrag-dense-multiquery.mjs --query "your question"');
@@ -69,7 +70,9 @@ try {
   await redis.connect();
   await redis.ping();
   redisReady = true;
-} catch { /* offline — no Karpathy enrichment */ }
+} catch {
+  /* offline — no Karpathy enrichment */
+}
 
 // ── Step 1: Embed the query ────────────────────────────────────────────────────
 async function embedQuery(query) {
@@ -86,7 +89,9 @@ async function embedQuery(query) {
       const vec = d.embedding ?? d.embeddings?.[0];
       if (Array.isArray(vec) && vec.length > 0) return vec;
     }
-  } catch { /* fall through */ }
+  } catch {
+    /* fall through */
+  }
 
   // Direct Ollama fallback
   const r = await fetch(`${OLLAMA_URL}/api/embed`, {
@@ -118,7 +123,9 @@ async function getClusterIds(vector) {
       const d = await r.json();
       if (Array.isArray(d.clusterIds)) return { ...d, backend: 'prefilter' };
     }
-  } catch { /* fall through to /search */ }
+  } catch {
+    /* fall through to /search */
+  }
 
   // Fallback: use /search and derive unique cluster IDs from results
   try {
@@ -145,7 +152,9 @@ async function getClusterIds(vector) {
       }
       if (clusterIds.length > 0) return { clusterIds, centroidScores, backend: 'search-derived' };
     }
-  } catch { /* sidecar offline */ }
+  } catch {
+    /* sidecar offline */
+  }
 
   return { clusterIds: [], centroidScores: {}, backend: 'offline' };
 }
@@ -195,8 +204,10 @@ function authorityForRef(ref, snapshot) {
   return snapshot.byRef.get(key) ?? null;
 }
 
-// ── Step 3: Qdrant dense search ────────────────────────────────────────────────
-async function qdrantSearch(vector, { filter, limit, label }) {
+// ── Step 3: Qdrant dense search ───────────────────────────────────────────────
+import { qdrantSearch } from '../qdrant-client.mjs';
+
+async function localQdrantSearch(vector, { filter, limit, label }) {
   const body = {
     vector: { name: 'content', vector },
     limit,
@@ -204,18 +215,9 @@ async function qdrantSearch(vector, { filter, limit, label }) {
     with_vector: false,
     ...(filter ? { filter } : {}),
   };
-  const r = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(10000),
-  });
-  if (!r.ok) {
-    const err = await r.text().catch(() => r.statusText);
-    throw new Error(`Qdrant search (${label}) failed ${r.status}: ${err}`);
-  }
-  const { result } = await r.json();
-  return result ?? [];
+  const res = await qdrantSearch(COLLECTION, body);
+  if (!Array.isArray(res)) throw new Error(`Qdrant search (${label}) failed`);
+  return res;
 }
 
 // ── Step 4: RRF merge ─────────────────────────────────────────────────────────
@@ -235,16 +237,14 @@ function rrfMerge(resultSets) {
     });
   }
 
-  return [...scoreMap.entries()]
-    .map(([id, v]) => ({ id, ...v }))
-    .sort((a, b) => b.rrf - a.rrf);
+  return [...scoreMap.entries()].map(([id, v]) => ({ id, ...v })).sort((a, b) => b.rrf - a.rrf);
 }
 
 // ── Step 5: Karpathy blend enrichment ─────────────────────────────────────────
 async function enrichWithKarpathy(hits) {
   const authoritySnapshot = await loadAuthoritySnapshot();
   if (!redisReady) {
-    return hits.map(h => {
+    return hits.map((h) => {
       const ref = sourceRef(h.payload);
       const authority = authorityForRef(ref, authoritySnapshot);
       return {
@@ -256,7 +256,7 @@ async function enrichWithKarpathy(hits) {
   }
 
   // Batch HGET for paths from payload
-  const refs = hits.map(h => sourceRef(h.payload)).filter(Boolean);
+  const refs = hits.map((h) => sourceRef(h.payload)).filter(Boolean);
   if (!refs.length) return hits;
 
   const pipeline = redis.pipeline();
@@ -267,11 +267,15 @@ async function enrichWithKarpathy(hits) {
   refs.forEach((ref, i) => {
     const raw = results[i]?.[1];
     if (raw) {
-      try { karpathyMap.set(ref, JSON.parse(raw)); } catch { /* skip */ }
+      try {
+        karpathyMap.set(ref, JSON.parse(raw));
+      } catch {
+        /* skip */
+      }
     }
   });
 
-  return hits.map(h => {
+  return hits.map((h) => {
     const ref = sourceRef(h.payload);
     const karpathy = karpathyMap.get(ref);
     const authority = authorityForRef(ref, authoritySnapshot);
@@ -287,10 +291,12 @@ async function enrichWithKarpathy(hits) {
 function buildClusterFilter(clusterIds) {
   if (!clusterIds.length) return null;
   return {
-    must: [{
-      key: 'som_cluster',
-      match: { any: clusterIds.map(Number) },
-    }],
+    must: [
+      {
+        key: 'som_cluster',
+        match: { any: clusterIds.map(Number) },
+      },
+    ],
   };
 }
 
@@ -317,7 +323,8 @@ if (!JSON_OUT) console.log(`done (${embedding.length}d, ${Date.now() - t0}ms)`);
 // 2. Cluster prefilter
 if (!JSON_OUT) process.stdout.write('[hyperrag] Cluster prefilter… ');
 const { clusterIds, centroidScores, backend: sidecarBackend } = await getClusterIds(embedding);
-if (!JSON_OUT) console.log(`${clusterIds.length} clusters via ${sidecarBackend} (${Date.now() - t0}ms)`);
+if (!JSON_OUT)
+  console.log(`${clusterIds.length} clusters via ${sidecarBackend} (${Date.now() - t0}ms)`);
 
 const clusterFilter = buildClusterFilter(clusterIds);
 
@@ -325,9 +332,9 @@ const clusterFilter = buildClusterFilter(clusterIds);
 if (!JSON_OUT) process.stdout.write('[hyperrag] Qdrant dual-search… ');
 const [filteredHits, unfilteredHits] = await Promise.all([
   clusterFilter
-    ? qdrantSearch(embedding, { filter: clusterFilter, limit: TOP_K * 2, label: 'filtered' })
+    ? localQdrantSearch(embedding, { filter: clusterFilter, limit: TOP_K * 2, label: 'filtered' })
     : Promise.resolve([]),
-  qdrantSearch(embedding, { filter: null, limit: TOP_K * 2, label: 'unfiltered' }),
+  localQdrantSearch(embedding, { filter: null, limit: TOP_K * 2, label: 'unfiltered' }),
 ]);
 if (!JSON_OUT) {
   console.log(`filtered=${filteredHits.length}, unfiltered=${unfilteredHits.length} (${Date.now() - t0}ms)`);

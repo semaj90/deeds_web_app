@@ -1,0 +1,287 @@
+{
+  "timestamp": "2026-05-31T03:50:29.087Z",
+  "targetColumns": [
+    "user_id",
+    "uploaded_by"
+  ],
+  "counts": {
+    "schemaFilesScanned": 147,
+    "drizzleDeclarations": 65,
+    "liveColumns": 48,
+    "driftRows": 2,
+    "matchRows": 43,
+    "orphanDrizzleDeclarations": 20,
+    "orphanLiveColumns": 16
+  },
+  "distributions": {
+    "liveTypeDistribution": {
+      "integer": 45,
+      "text": 3
+    },
+    "drizzleTypeDistribution": {
+      "uuid": 5,
+      "integer": 54,
+      "text": 6
+    }
+  },
+  "drift": [
+    {
+      "table": "user_ai_queries",
+      "column": "user_id",
+      "drizzleType": "uuid",
+      "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "liveType": "integer",
+      "conflict": "Drizzle says uuid, DB has integer"
+    },
+    {
+      "table": "rag_sessions",
+      "column": "user_id",
+      "drizzleType": "uuid",
+      "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "liveType": "integer",
+      "conflict": "Drizzle says uuid, DB has integer"
+    }
+  ],
+  "orphanDeclarations": [
+    {
+      "table": "case_assignments",
+      "column": "user_id",
+      "drizzleType": "uuid",
+      "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "search_queries",
+      "column": "user_id",
+      "drizzleType": "text",
+      "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "web_crawl_jobs",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "user_analytics",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "ai_chat_sessions",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "conversations",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "case_timeline",
+      "column": "user_id",
+      "drizzleType": "uuid",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-charges.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "shader_user_patterns",
+      "column": "user_id",
+      "drizzleType": "text",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "shader_compilation_queue",
+      "column": "user_id",
+      "drizzleType": "text",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "shader_recommendations_view",
+      "column": "user_id",
+      "drizzleType": "text",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "ingested_documents",
+      "column": "uploaded_by",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-ingestion.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "vector_search_logs",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-ingestion.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "sessions",
+      "column": "uploaded_by",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "citation_tags",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "route_health",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "route_health",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "document_topics",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "document_topics",
+      "column": "user_id",
+      "drizzleType": "integer",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    },
+    {
+      "table": "user_timeline",
+      "column": "user_id",
+      "drizzleType": "uuid",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-timeline.ts",
+      "reason": "declared in Drizzle but column missing from DB"
+    }
+  ],
+  "orphanColumns": [
+    {
+      "table": "admin_telemetry",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "agent_actions",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "citation_collections",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "diagnosis_events",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "documents",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "email_verification_codes",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "error_suggestion_states",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "evidence",
+      "column": "uploaded_by",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "evidence",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "evidence_audit_log",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "password_reset_tokens",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "saved_citation_annotations",
+      "column": "user_id",
+      "liveType": "text",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "saved_reports",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "storage_files",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "user_interaction_history",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    },
+    {
+      "table": "yorha_chat_sessions",
+      "column": "user_id",
+      "liveType": "integer",
+      "reason": "present in DB, no Drizzle declaration"
+    }
+  ],
+  "fullDriftCount": 2,
+  "recommendation": "2 drift rows detected. Run drizzle-kit introspect to regenerate canonical schema from live DB, then diff against schema-postgres.ts."
+}

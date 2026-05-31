@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-05-30T17:46:33.657Z",
+  "mode": "apply",
+  "totalGlyphs": 78,
+  "withEmbedding": 0,
+  "rewardsComputed": 78,
+  "computeMs": 1,
+  "gpuAvailable": true,
+  "rewardStats": {
+    "avg": 0.5051282051282051,
+    "min": 0.5,
+    "max": 0.55
+  },
+  "topGlyphs": [
+    {
+      "id": "1132b39f-baa9-45ad-ab5e-309cd04b7056",
+      "reward": 0.55
+    },
+    {
+      "id": "b9228ba4-4028-4e4d-8f83-a79a959af5f6",
+      "reward": 0.55
+    },
+    {
+      "id": "bf09e5d6-790e-4caf-b460-2784e82c788e",
+      "reward": 0.55
+    },
+    {
+      "id": "c969458f-ea52-4efb-a0eb-4c8d2c3c58c4",
+      "reward": 0.55
+    },
+    {
+      "id": "7db4087e-1e9c-4f50-bae9-28842bb722de",
+      "reward": 0.55
+    },
+    {
+      "id": "ab86ad10-f453-499e-86c5-780f80536019",
+      "reward": 0.55
+    },
+    {
+      "id": "3c5e252f-2cd3-419a-8497-713617e5c174",
+      "reward": 0.55
+    },
+    {
+      "id": "174235b8-2e9f-4b42-a1e9-de66259fda65",
+      "reward": 0.55
+    },
+    {
+      "id": "88dd1b06-6891-4e63-8853-421d28913a93",
+      "reward": 0.5
+    },
+    {
+      "id": "35312971-7f2d-42cf-9310-0c71d6ca169e",
+      "reward": 0.5
+    }
+  ]
+}

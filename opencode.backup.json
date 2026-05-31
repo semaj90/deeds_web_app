@@ -1,0 +1,369 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "turboquant/gemma4-tq",
+  "small_model": "turboquant/gemma4-tq",
+  "default_agent": "antigravity",
+  "shell": "pwsh.exe",
+  "provider": {
+    "gemma4-local": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Gemma4 Local",
+      "options": {
+        "baseURL": "http://127.0.0.1:8090/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-local": {
+          "name": "Gemma4 Local"
+        }
+      }
+    },
+    "turboquant": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Local llama-server :8090",
+      "options": {
+        "baseURL": "http://127.0.0.1:8090/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-iq4xs": {
+          "name": "Gemma4 Legal 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+        "gemma4-tq": {
+          "name": "Gemma4 TurboQuant 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        }
+      }
+    },
+    "yorha": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "YorHA OpenAI facade :5173",
+      "options": {
+        "baseURL": "http://127.0.0.1:5173/api/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "yorha-hermes": {
+          "name": "YorHA ACE Hermes 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+        "yorha-legal": {
+          "name": "YorHA ACE Legal 64K",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        }
+      }
+    }
+  },
+  "skills": {
+    "paths": [
+      ".opencode/skills"
+    ]
+  },
+  "command": {
+    "workspace-bootstrap": {
+      "description": "Refresh ACE context, local health, and report artifacts before starting OpenCode work",
+      "agent": "antigravity",
+      "subtask": false,
+      "prompt": "Run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE context, daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, bash tools, and the next safe action. Do not edit files.",
+      "template": "npm run opencode:bootstrap"
+    }
+  },
+  "permission": {
+    "read": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "lsp": "allow",
+    "todowrite": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "bash": {
+      "npm run tools:check:structural": "allow",
+      "npm run index:*": "allow",
+      "npm run graphify:dependency:audit": "allow",
+      "npm --prefix * run index:*": "allow",
+      "npm --prefix * run graphify:dependency:audit": "allow",
+      "node scripts/index/*": "allow",
+      "rg *": "allow",
+      "ast-grep *": "allow",
+      "sg *": "allow",
+      "jq *": "allow",
+      "git status": "allow",
+      "git diff *": "allow",
+      "rm *": "deny",
+      "del *": "deny",
+      "Remove-Item *": "deny",
+      "*": "ask"
+    }
+  },
+  "mcp": {
+    "trace": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8788/mcp",
+      "enabled": true,
+      "timeout": 60000,
+      "headers": {
+        "Accept": "application/json, text/event-stream"
+      }
+    },
+    "turbovec": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8791/mcp",
+      "enabled": false,
+      "timeout": 30000
+    },
+    "engram-embed": {
+      "type": "local",
+      "command": [
+        "node",
+        "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "gemma4-offload": {
+      "type": "local",
+      "command": [
+        "node",
+        "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    },
+    "atlas-tools": {
+      "type": "local",
+      "command": [
+        "node",
+        "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    }
+  },
+  "agent": {
+    "antigravity": {
+      "description": "Minimal MCP-first Gemma4 agent for VS Code/OpenCode.",
+      "model": "gemma4-local/gemma4-local",
+      "temperature": 0,
+      "steps": 10,
+      "prompt": "Use MCP tools first, but call only what is needed for the current question. Default tool order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Only use gemma4-offload for runtime/model checks. Keep engram, turbovec, and langextract opt-in unless explicitly requested. Do not edit files without approval.",
+      "tools": {
+        "enabled": true,
+        "max_calls": 3,
+        "call_type": "function",
+        "auto_select": true,
+        "fallback_on_error": true
+      },
+      "function_calling": {
+        "enabled": true,
+        "provider": "gemma4-local",
+        "trigger_mode": "auto",
+        "semantic_routing": true,
+        "max_tokens_for_tool_context": 2000
+      },
+      "redis_packets": {
+        "enabled": true,
+        "key_prefix": "gemma4:agent:antigravity",
+        "ttl": 3600,
+        "semantic_tags": ["mcp-first", "read-only"]
+      },
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "atlas-tools.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "ace_*": "allow",
+        "ace.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "edit": "deny"
+      }
+    },
+    "hermes-ace": {
+      "description": "Hermes-ACE local agent using ACE context, MCP tools, and local Gemma4 64K.",
+      "model": "gemma4-local/gemma4-local",
+      "temperature": 0,
+      "steps": 12,
+      "prompt": "Use MCP tools in this priority order: trace.kag_search or trace.atlas_query, turbovec for cosine ranking and chunk-id scoring, engram for memory, and langextract for citation and entity extraction. Always include chunk_ids and cluster_labels in synthesis context. Do not edit files without explicit approval. Do not mutate live Postgres schema.\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "mcp_*": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "wiki_*": "allow",
+        "wiki.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "kag_*": "allow",
+        "kag.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "turbovec_*": "allow",
+        "turbovec.*": "allow",
+        "langextract_*": "allow",
+        "langextract.*": "allow",
+        "engram_*": "allow",
+        "engram.*": "allow",
+        "atlas-tools.*": "allow",
+        "edit": "deny",
+        "webfetch": "allow",
+        "websearch": "allow"
+      }
+    },
+    "trace-audit": {
+      "description": "Read-only TRACE audit agent with compact context tools.",
+      "model": "gemma4-local/gemma4-local",
+      "temperature": 0,
+      "steps": 8,
+      "prompt": "Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval. Prefer cached compressed cards over raw file expansion. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "atlas_*": "allow",
+        "atlas.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "wiki_*": "allow",
+        "wiki.*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "kag_*": "allow",
+        "kag.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "search_*": "allow",
+        "search.*": "allow",
+        "edit": "deny",
+        "webfetch": "allow",
+        "websearch": "allow"
+      }
+    },
+    "audit": {
+      "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor.",
+      "model": "gemma4-local/gemma4-local",
+      "temperature": 0,
+      "steps": 8,
+      "prompt": "You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "edit": "deny"
+      }
+    },
+    "atlas-audit": {
+      "description": "Searches Parent Atlas/Qdrant before editing code",
+      "prompt": "Always retrieve sourceRefs first. Never answer architecture questions without file paths, line refs, and commands.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "bash": true,
+        "edit": false
+      }
+    },
+    "atlas-context": {
+      "prompt": "\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n"
+    },
+    "gemma4-function-caller": {
+      "description": "Gemma4 agent with automatic function-calling for tool dispatch",
+      "model": "gemma4-local/gemma4-local",
+      "temperature": 0,
+      "steps": 12,
+      "prompt": "You are a function-calling agent. Analyze the user query and automatically select the best tools to use from the available MCP tool set. Always use function calls to accomplish tasks rather than explanations.\n\nTool Selection Strategy:\n1. Semantic queries → trace.kag_search or trace.atlas_query\n2. Graph traversal → graph.expand_neighborhood or graph.shortest_path\n3. Topology analysis → topology.search_near or clusters.get_summary_lenses\n4. Context building → context.build_kv_packet or context.get_compressed_card\n5. Code search → trace.explain_retrieval or codebase.rg_search\n\nFunction-Calling Rules:\n- Call functions immediately when identified\n- Bundle related calls together\n- Don't explain before calling — just call\n- Report results inline after each call\n- Stop after 3 rounds of calls or when the query is fully answered\n- If function returns error, try fallback from the same category\n\nDo not edit files without explicit approval.",
+      "tools": {
+        "enabled": true,
+        "max_calls": 5,
+        "call_type": "function",
+        "auto_select": true,
+        "fallback_on_error": true,
+        "parallel_calls": true
+      },
+      "function_calling": {
+        "enabled": true,
+        "provider": "gemma4-local",
+        "trigger_mode": "auto",
+        "semantic_routing": true,
+        "max_tokens_for_tool_context": 3000,
+        "timeout_ms": 8000,
+        "retry_on_timeout": true
+      },
+      "redis_packets": {
+        "enabled": true,
+        "key_prefix": "gemma4:agent:function-caller",
+        "ttl": 3600,
+        "semantic_tags": ["function-calling", "auto-dispatch", "mcp-tools"]
+      },
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "lsp": "allow",
+        "todowrite": "allow",
+        "mcp_*": "allow",
+        "graph_*": "allow",
+        "graph.*": "allow",
+        "topology_*": "allow",
+        "topology.*": "allow",
+        "trace_*": "allow",
+        "trace.*": "allow",
+        "context_*": "allow",
+        "context.*": "allow",
+        "clusters_*": "allow",
+        "clusters.*": "allow",
+        "edit": "deny",
+        "webfetch": "allow"
+      }
+    }
+  },
+  "instructions": [
+    ".github/instructions/opencode-context-prefetch.instructions.md",
+    "sveltekit-frontend/docs/architecture/cline-opencode-system-prompt.md",
+    "AGENTS.md",
+    ".claude/skills/trace-mcp-tooling/SKILL.md",
+    "sveltekit-frontend/docs/architecture/gemma4-to-claude-code-handoff.md"
+  ],
+  "share": "disabled"
+}

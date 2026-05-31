@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-05-30T07:12:14.517Z",
+  "timestamp": "2026-05-30T23:31:58.856Z",
   "redis": "localhost:6379",
   "ttl_seconds": 86400,
   "written": {
-    "nodes": 10732,
-    "lanes": 8,
+    "nodes": 10751,
+    "lanes": 9,
     "clusters": 396
   },
   "zsets": [

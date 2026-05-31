@@ -29,26 +29,27 @@
 import fs        from 'node:fs';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { qdrantEnsureCollection, qdrantUpsertPoints, getQdrantUrl } from '../qdrant-client.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT  = path.resolve(__dir, '../..');
+const ROOT = path.resolve(__dir, '../..');
 
 // ── Args ─────────────────────────────────────────────────────────────────────
-const argv         = process.argv.slice(2);
-const inputI       = argv.indexOf('--input');
-const collI        = argv.indexOf('--collection');
-const batchI       = argv.indexOf('--batch');
-const DRY_RUN      = argv.includes('--dry-run');
-const VERBOSE      = argv.includes('--verbose');
+const argv = process.argv.slice(2);
+const inputI = argv.indexOf('--input');
+const collI = argv.indexOf('--collection');
+const batchI = argv.indexOf('--batch');
+const DRY_RUN = argv.includes('--dry-run');
+const VERBOSE = argv.includes('--verbose');
 
-const INPUT_PATH   = inputI >= 0 ? argv[inputI + 1] : null;
-const COLLECTION   = collI  >= 0 ? argv[collI + 1]  : 'docs_chunks';
-const BATCH_SIZE   = batchI >= 0 ? Number(argv[batchI + 1]) : 20;
+const INPUT_PATH = inputI >= 0 ? argv[inputI + 1] : null;
+const COLLECTION = collI >= 0 ? argv[collI + 1] : 'docs_chunks';
+const BATCH_SIZE = batchI >= 0 ? Number(argv[batchI + 1]) : 20;
 
-const QDRANT_URL   = process.env.QDRANT_URL    ?? 'http://localhost:6333';
-const OLLAMA_URL   = process.env.OLLAMA_URL    ?? 'http://localhost:11434';
-const SK_URL       = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
-const EMBED_MODEL  = process.env.EMBED_MODEL   ?? 'embeddinggemma:latest';
+const QDRANT_URL = getQdrantUrl();
+const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const SK_URL = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
+const EMBED_MODEL = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
 
 // ── Embedding ─────────────────────────────────────────────────────────────────
 let skAvailable = false;
@@ -88,40 +89,26 @@ async function embedViaOllama(text) {
 
 async function embed(text) {
   if (skAvailable) {
-    try { return await embedViaSvelteKit(text); } catch { /* fall through */ }
+    try {
+      return await embedViaSvelteKit(text);
+    } catch {
+      /* fall through */
+    }
   }
   return embedViaOllama(text);
 }
 
 // ── Qdrant upsert ─────────────────────────────────────────────────────────────
 async function ensureCollection(name, vectorSize) {
-  // Check if exists
-  const check = await fetch(`${QDRANT_URL}/collections/${name}`, { signal: AbortSignal.timeout(5000) });
-  if (check.status === 200) return;
-
-  // Create
-  const r = await fetch(`${QDRANT_URL}/collections/${name}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      vectors: { size: vectorSize, distance: 'Cosine' },
-    }),
-    signal: AbortSignal.timeout(10000),
-  });
-  if (!r.ok) throw new Error(`Create collection ${name}: ${r.status}`);
-  console.log(`[embed-chunks] Created Qdrant collection: ${name}`);
+  const ok = await qdrantEnsureCollection(name, vectorSize);
+  if (!ok) throw new Error(`Create collection ${name}: failed`);
+  console.log(`[embed-chunks] Ensured Qdrant collection: ${name}`);
 }
 
 async function upsertPoints(collectionName, points) {
-  const r = await fetch(`${QDRANT_URL}/collections/${collectionName}/points?wait=true`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ points }),
-    signal: AbortSignal.timeout(30000),
-  });
-  if (!r.ok) {
-    const body = await r.text();
-    throw new Error(`Qdrant upsert ${r.status}: ${body.slice(0, 200)}`);
+  const ok = await qdrantUpsertPoints(collectionName, points, true);
+  if (!ok) {
+    throw new Error('Qdrant upsert failed');
   }
 }
 

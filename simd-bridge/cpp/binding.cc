@@ -495,13 +495,17 @@ static napi_value DotProductWrapper(napi_env env, napi_callback_info info) {
 
   if (argc < 3) return throw_type_error(env, "dotProduct(Float32Array a, Float32Array b, n)");
 
-  size_t a_len;
-  void* a_data;
-  napi_get_typedarray_info(env, argv[0], nullptr, &a_len, &a_data, nullptr, nullptr);
+  size_t a_len = 0;
+  void* a_data = nullptr;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &a_len, &a_data, nullptr, nullptr) != napi_ok) {
+    return throw_type_error(env, "dotProduct: Argument 1 must be a Float32Array");
+  }
 
-  size_t b_len;
-  void* b_data;
-  napi_get_typedarray_info(env, argv[1], nullptr, &b_len, &b_data, nullptr, nullptr);
+  size_t b_len = 0;
+  void* b_data = nullptr;
+  if (napi_get_typedarray_info(env, argv[1], nullptr, &b_len, &b_data, nullptr, nullptr) != napi_ok) {
+    return throw_type_error(env, "dotProduct: Argument 2 must be a Float32Array");
+  }
 
   int32_t n;
   napi_get_value_int32(env, argv[2], &n);

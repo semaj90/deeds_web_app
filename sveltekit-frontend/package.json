@@ -7,6 +7,7 @@
 		"node": ">=22.0.0"
 	},
 	"scripts": {
+		"audit:drizzle:temporal": "node scripts/audit/drizzle-temporal-audit.mjs",
 		"codebase:feature-map": "node ../scripts/atlas/build-codebase-feature-map.mjs",
 		"codebase:feature-map:dry": "node ../scripts/atlas/build-codebase-feature-map.mjs --dry-run",
 		"codebase:tasker": "node ../scripts/atlas/ingest-codebase-tasker.mjs",
@@ -300,6 +301,10 @@
 		"graphify:cluster": "npx tsx scripts/graphify-som-cluster-summaries.mjs",
 		"graphify:cluster:fast": "npx tsx scripts/graphify-som-cluster-summaries.mjs --skip-llm",
 		"graphify:semantic-cluster": "node scripts/graphify-semantic-cluster.mjs",
+		"mapreduce:som-prepare": "node scripts/atlas/mapreduce/som_prepare.mjs",
+		"mapreduce:inventory": "node scripts/atlas/inventory-atlas-data-files.mjs",
+		"mapreduce:merge": "node scripts/atlas/merge-atlas-ndjson-hypergraph.mjs",
+		"graphify:mapreduce:som": "npm run graphify:semantic-cluster && npm run mapreduce:som-prepare && npm run graphify:som",
 		"graphify:semantic-cluster:dry": "node scripts/graphify-semantic-cluster.mjs --dry-run",
 		"graphify:semantic-cluster:force": "node scripts/graphify-semantic-cluster.mjs --force",
 		"graphify:batch-gpu-analysis": "node scripts/graphify-batch-gpu-analysis.mjs",

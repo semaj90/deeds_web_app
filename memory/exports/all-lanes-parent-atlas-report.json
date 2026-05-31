@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-30T06:47:32.044Z",
+  "timestamp": "2026-05-30T23:31:46.454Z",
   "mode": "apply",
   "lanes": {
     "card": {
@@ -31,10 +31,14 @@
       "edges": 0
     },
     "som_edge": {
-      "nodes": 396,
+      "nodes": 399,
       "edges": 9372
+    },
+    "audit": {
+      "nodes": 16,
+      "edges": 22
     }
   },
-  "totalNodes": 10732,
-  "totalEdges": 9378
+  "totalNodes": 10751,
+  "totalEdges": 9400
 }

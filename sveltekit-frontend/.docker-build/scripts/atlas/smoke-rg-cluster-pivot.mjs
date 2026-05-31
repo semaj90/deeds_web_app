@@ -14,7 +14,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+import { getQdrantUrl } from '../qdrant-client.mjs';
+const QDRANT_URL = getQdrantUrl();
 const CODEBASE_COLLECTION = 'codebase_chunks_768';
 const CLUSTER_PIVOT_SCORE_CAP = 0.12;
 const MAX_FILES_PER_CLUSTER = 6;
@@ -88,19 +89,24 @@ async function runSmokeTest() {
         // Run ripgrep inside sveltekit-frontend src directory to avoid Windows special device errors
         const cmd = `rg -l -i "${queryVal}" src/`;
         const stdout = execSync(cmd, { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
-        const relativePaths = stdout.split('\n')
-          .map(p => p.trim())
+        const relativePaths = stdout
+          .split('\n')
+          .map((p) => p.trim())
           .filter(Boolean)
-          .map(p => p.startsWith('src/') ? 'sveltekit-frontend/' + p : p)
-          .filter(p => !p.includes('node_modules') && !p.includes('.git') && !p.includes('dist'));
-        
+          .map((p) => (p.startsWith('src/') ? 'sveltekit-frontend/' + p : p))
+          .filter((p) => !p.includes('node_modules') && !p.includes('.git') && !p.includes('dist'));
+
         filePaths = relativePaths.slice(0, 10);
         console.log(`✔️ Lexical paths found: ${filePaths.length} matches.`);
         if (filePaths.length === 0) {
-          console.log('⚠️ No lexical matches found via ripgrep. Falling back to Redis sample keys.');
+          console.log(
+            '⚠️ No lexical matches found via ripgrep. Falling back to Redis sample keys.'
+          );
         }
       } catch (err) {
-        console.warn('⚠️ Ripgrep failed or returned empty results. Falling back to Redis sample keys.');
+        console.warn(
+          '⚠️ Ripgrep failed or returned empty results. Falling back to Redis sample keys.'
+        );
       }
     }
 
@@ -114,7 +120,7 @@ async function runSmokeTest() {
         filePaths = [
           'sveltekit-frontend/src/lib/server/db/schema-postgres.ts',
           'sveltekit-frontend/src/lib/server/db/client.ts',
-          'sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts'
+          'sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts',
         ];
       }
     }
@@ -130,19 +136,15 @@ async function runSmokeTest() {
       with_vector: false,
       limit: 40,
     };
-    
-    const qRes = await fetch(`${QDRANT_URL}/collections/${CODEBASE_COLLECTION}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+
+    // Use qdrant-client scroll helper
+    const { qdrantScroll } = await import('../qdrant-client.mjs');
+    const points = await qdrantScroll(CODEBASE_COLLECTION, {
+      filter: body.filter,
+      with_payload: true,
+      with_vector: false,
+      limit: 40,
     });
-
-    if (!qRes.ok) {
-      throw new Error(`Failed to query Qdrant collection codebase_chunks_768: ${qRes.statusText}`);
-    }
-
-    const qData = await qRes.json();
-    const points = qData.result?.points ?? [];
     console.log(`ℹ️ Qdrant returned ${points.length} matching points.`);
 
     const membership = new Map();
@@ -161,12 +163,16 @@ async function runSmokeTest() {
     // 3. Load vectors, centroids, and cluster tags
     console.log('🔄 Loading encoded vectors & pre-computed cluster centroids...');
     const allClusterFiles = [...membership.values()].flatMap((m) => m.files);
-    
+
     const [encodedVal, precomputedVal, clusterTags] = await Promise.all([
-      allClusterFiles.length ? redis.hmget('gpu:karpathy:encoded', ...allClusterFiles) : Promise.resolve([]),
+      allClusterFiles.length
+        ? redis.hmget('gpu:karpathy:encoded', ...allClusterFiles)
+        : Promise.resolve([]),
       redis.hkeys('gpu:autoencoder:centroids_64').then(async (ck) => {
         if (!ck.length) return [];
-        return redis.hmget('gpu:autoencoder:centroids_64', ...ck).then((v) => ({ keys: ck, vals: v }));
+        return redis
+          .hmget('gpu:autoencoder:centroids_64', ...ck)
+          .then((v) => ({ keys: ck, vals: v }));
       }),
       Promise.resolve(readLatestQdrantClusterTags()),
     ]);
@@ -248,7 +254,7 @@ async function runSmokeTest() {
     // 5. Query expansion in Qdrant
     console.log('🔄 Performing cluster expansion retrieval in Qdrant...');
     const clusterIds = Array.from(pivotSet).slice(0, MAX_PIVOT_CLUSTERS * 2);
-    
+
     let exPoints = [];
     if (clusterIds.length > 0) {
       const expandBody = {
@@ -260,18 +266,13 @@ async function runSmokeTest() {
         limit: clusterIds.length * MAX_FILES_PER_CLUSTER,
       };
 
-      const exRes = await fetch(`${QDRANT_URL}/collections/${CODEBASE_COLLECTION}/points/scroll`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(expandBody),
+      const { qdrantScroll: qScroll } = await import('../qdrant-client.mjs');
+      exPoints = await qScroll(CODEBASE_COLLECTION, {
+        filter: expandBody.filter,
+        with_payload: true,
+        with_vector: false,
+        limit: expandBody.limit,
       });
-
-      if (!exRes.ok) {
-        throw new Error(`Failed cluster-pivot Qdrant expansion: ${exRes.statusText}`);
-      }
-
-      const exData = await exRes.json();
-      exPoints = exData.result?.points ?? [];
     } else {
       console.log('⚠️ No matched clusters to expand in Qdrant.');
     }
@@ -304,7 +305,8 @@ async function runSmokeTest() {
           som_cluster: cid,
           topoClass: pt.payload?.topoClass ?? 'general',
           sourceRefs: [fp],
-          why_retrieved: 'rg_cluster_pivot: lexical hit expanded through som_cluster using trained centroid cache',
+          why_retrieved:
+            'rg_cluster_pivot: lexical hit expanded through som_cluster using trained centroid cache',
           retrievalLane: 'rg_cluster_pivot',
         },
       });
@@ -312,20 +314,26 @@ async function runSmokeTest() {
 
     // 6. Assert and Validate outcomes
     console.log('\n📝 Validation Assertions:');
-    
+
     console.log(`✔️ Total hits surfaced: ${hits.length}`);
     if (hits.length > 0) {
       const sampleHit = hits[0];
       console.log(`   └─ Sample Hit ID: ${sampleHit.id}`);
       console.log(`   └─ Sample Hit Content Field holds: "${sampleHit.content}"`);
-      console.log(`   └─ Sample Hit Tags contains 'cluster-pivot': ${sampleHit.tags.includes('cluster-pivot')}`);
+      console.log(
+        `   └─ Sample Hit Tags contains 'cluster-pivot': ${sampleHit.tags.includes('cluster-pivot')}`
+      );
       console.log(`   └─ Sample Hit Metadata som_cluster: ${sampleHit.metadata.som_cluster}`);
-      
-      const sourceRefsPresent = hits.every(h => Array.isArray(h.metadata?.sourceRefs) && h.metadata.sourceRefs.length > 0);
+
+      const sourceRefsPresent = hits.every(
+        (h) => Array.isArray(h.metadata?.sourceRefs) && h.metadata.sourceRefs.length > 0
+      );
       console.log(`✔️ SourceRefs present on all hits: ${sourceRefsPresent}`);
 
-      const scoresCapped = hits.every(h => h.score <= CLUSTER_PIVOT_SCORE_CAP);
-      console.log(`✔️ Pivot score capped correctly (<= ${CLUSTER_PIVOT_SCORE_CAP}): ${scoresCapped}`);
+      const scoresCapped = hits.every((h) => h.score <= CLUSTER_PIVOT_SCORE_CAP);
+      console.log(
+        `✔️ Pivot score capped correctly (<= ${CLUSTER_PIVOT_SCORE_CAP}): ${scoresCapped}`
+      );
 
       // Verify no fields are undefined or malformed
       for (const hit of hits) {

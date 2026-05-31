@@ -35,6 +35,16 @@ trace.kag_search({ query: "go search service http" })
 graph.expand_neighborhood({ stableKeys: ["services/go-search-service/main.go"] })
 ```
 
-
 <!-- ingest: 2026-05-30T02:17:10.013Z -->
 - ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards
+
+<!-- atlas-append:0bf81df426b5:2026-05-30T16:27:00.892Z -->
+## Atlas Activity — 2026-05-30T16:27:00.892Z
+
+- **Parent atlas rebuild**: 10,732 nodes / 9,378 edges across 8 lanes
+- **Redis cache**: 10,732 nodes warmed (24h TTL)
+- **CouchDB archive**: 11,136 docs durably persisted
+- **This directory**: no tasks or fixes in current run
+
+<!-- /atlas-append:0bf81df426b5 -->
+

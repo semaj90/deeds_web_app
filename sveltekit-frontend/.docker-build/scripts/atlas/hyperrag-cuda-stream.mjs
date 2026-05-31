@@ -35,24 +35,28 @@ import fs   from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { getQdrantUrl } from '../qdrant-client.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 
 // ── Config ─────────────────────────────────────────────────────────────────────
-const argv   = process.argv.slice(2);
-const argGet = (f) => { const i = argv.indexOf(f); return i >= 0 ? argv[i + 1] : null; };
+const argv = process.argv.slice(2);
+const argGet = (f) => {
+  const i = argv.indexOf(f);
+  return i >= 0 ? argv[i + 1] : null;
+};
 
-const INPUT_PATH   = argGet('--input');
-const QUERY        = argGet('--query') ?? '';
-const MAX_K        = Number(process.env.MAX_K             ?? 8);
-const MAX_CTX      = Number(process.env.MAX_CONTEXT_CHARS ?? 6000);
-const DRY_RUN      = argv.includes('--dry-run');
-const JSON_OUT     = argv.includes('--json') || !process.stdout.isTTY;
-const SKIP_INFER   = argv.includes('--no-inference');
+const INPUT_PATH = argGet('--input');
+const QUERY = argGet('--query') ?? '';
+const MAX_K = Number(process.env.MAX_K ?? 8);
+const MAX_CTX = Number(process.env.MAX_CONTEXT_CHARS ?? 6000);
+const DRY_RUN = argv.includes('--dry-run');
+const JSON_OUT = argv.includes('--json') || !process.stdout.isTTY;
+const SKIP_INFER = argv.includes('--no-inference');
 
 const ROTORQUANT_URL = (process.env.ROTORQUANT_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
-const QDRANT_URL     = (process.env.QDRANT_URL     ?? 'http://localhost:6333').replace(/\/+$/, '');
-const COLLECTION     = process.env.COLLECTION      ?? 'codebase_chunks_768';
+const QDRANT_URL = getQdrantUrl().replace(/\/+$/, '');
+const COLLECTION = process.env.COLLECTION ?? 'codebase_chunks_768';
 
 // ── Load tensorrt_bridge (CUDA N-API) ─────────────────────────────────────────
 const require = createRequire(import.meta.url);
@@ -62,14 +66,25 @@ const BRIDGE_PATHS = [
   path.resolve(__dir, '../../../..', 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 ];
 for (const p of BRIDGE_PATHS) {
-  try { bridge = require(p); break; } catch { /* try next */ }
+  try {
+    bridge = require(p);
+    break;
+  } catch {
+    /* try next */
+  }
 }
 const CUDA_AVAILABLE = Boolean(bridge?.kmeansWithCentroids);
 
 // ── Pure-JS k-means fallback ───────────────────────────────────────────────────
 function cosineSim(a, b) {
-  let dot = 0, na = 0, nb = 0;
-  for (let i = 0; i < a.length; i++) { dot += a[i]*b[i]; na += a[i]*a[i]; nb += b[i]*b[i]; }
+  let dot = 0,
+    na = 0,
+    nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
   return dot / (Math.sqrt(na * nb) + 1e-9);
 }
 
@@ -80,20 +95,29 @@ function kmeansJS(vectors, k, maxIters = 20) {
   k = Math.min(k, n);
 
   // Forgy init
-  const idxs = Array.from({ length: n }, (_, i) => i).sort(() => Math.random() - 0.5).slice(0, k);
-  let centroids = idxs.map(i => [...vectors[i]]);
+  const idxs = Array.from({ length: n }, (_, i) => i)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, k);
+  let centroids = idxs.map((i) => [...vectors[i]]);
 
   let assignments = new Array(n).fill(0);
   for (let iter = 0; iter < maxIters; iter++) {
     let changed = false;
     // Assign
     for (let i = 0; i < n; i++) {
-      let best = 0, bestSim = -Infinity;
+      let best = 0,
+        bestSim = -Infinity;
       for (let j = 0; j < centroids.length; j++) {
         const s = cosineSim(vectors[i], centroids[j]);
-        if (s > bestSim) { bestSim = s; best = j; }
+        if (s > bestSim) {
+          bestSim = s;
+          best = j;
+        }
       }
-      if (assignments[i] !== best) { assignments[i] = best; changed = true; }
+      if (assignments[i] !== best) {
+        assignments[i] = best;
+        changed = true;
+      }
     }
     if (!changed) break;
     // Update centroids
@@ -104,24 +128,18 @@ function kmeansJS(vectors, k, maxIters = 20) {
       for (let d = 0; d < dim; d++) sums[c][d] += vectors[i][d];
       counts[c]++;
     }
-    centroids = sums.map((s, c) => counts[c] > 0 ? s.map(v => v / counts[c]) : centroids[c]);
+    centroids = sums.map((s, c) => (counts[c] > 0 ? s.map((v) => v / counts[c]) : centroids[c]));
   }
 
   return { centroids, assignments };
 }
 
 // ── Fetch vector for a Qdrant point ───────────────────────────────────────────
+import { qdrantGetPoints } from '../qdrant-client.mjs';
 async function fetchVectors(pointIds) {
   if (!pointIds.length) return [];
-  const r = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ids: pointIds, with_vectors: ['content'], with_payload: false }),
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (!r.ok) return [];
-  const { result } = await r.json();
-  return result ?? [];
+  const pts = await qdrantGetPoints(COLLECTION, pointIds).catch(() => []);
+  return Array.isArray(pts) ? pts : [];
 }
 
 // ── Build compact Atlas context string ────────────────────────────────────────

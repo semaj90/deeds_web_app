@@ -1,60 +1,15 @@
 {
-  "generatedAt": "2026-05-30T02:27:10.387Z",
-  "totalErrors": 848,
+  "generatedAt": "2026-05-30T16:55:38.683Z",
+  "totalErrors": 859,
   "proposals": [
     {
-      "proposalId": "f03b4f74919b",
-      "featureKey": "unknown",
-      "errorCount": 596,
-      "topErrorCode": "unsafe_drizzle_update_delete",
-      "topErrorCount": 590,
-      "affectedFiles": [
-        "unknown",
-        "C"
-      ],
-      "errorCodes": [
-        "CONTRACT",
-        "unsafe_drizzle_update_delete"
-      ],
-      "sampleErrors": [
-        {
-          "file": "unknown",
-          "line": 1,
-          "code": "CONTRACT",
-          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-001-3b35ccb8\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
-        },
-        {
-          "file": "unknown",
-          "line": 1,
-          "code": "CONTRACT",
-          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-002-f1ac684e\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
-        },
-        {
-          "file": "unknown",
-          "line": 1,
-          "code": "CONTRACT",
-          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-003-4b9906be\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
-        }
-      ],
-      "suggestedFix": "Fix 596 CONTRACT, unsafe_drizzle_update_delete errors in unknown. Check: unknown, C. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"unknown\"",
-      "confidence": 0.4,
-      "sourceRefs": [
-        "local:unknown#L1",
-        "local:unknown#L1",
-        "local:unknown#L1"
-      ],
-      "featureStatus": "unknown",
-      "priority": "HIGH",
-      "generatedAt": "2026-05-30T02:27:10.383Z",
-      "usedLlm": false
-    },
-    {
-      "proposalId": "956a8024c090",
+      "proposalId": "566bd3ab943f",
       "featureKey": "workspace.sveltekit-frontend",
-      "errorCount": 227,
-      "topErrorCode": "migration_schema_drift",
-      "topErrorCount": 91,
+      "errorCount": 826,
+      "topErrorCode": "unsafe_drizzle_update_delete",
+      "topErrorCount": 596,
       "affectedFiles": [
+        "sveltekit-frontend\\C",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema\\atlas-chunks.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema\\codebase-intelligence.ts",
@@ -63,45 +18,44 @@
         "sveltekit-frontend\\src\\lib\\server\\db\\schema\\error_clusters.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema\\evidence-multi-modal.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema\\evidence.ts",
-        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\jurisdictions.ts",
-        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\legal-cases.ts"
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\jurisdictions.ts"
       ],
       "errorCodes": [
+        "unsafe_drizzle_update_delete",
         "missing_table",
         "missing_column",
-        "live_db_schema_drift",
         "migration_schema_drift"
       ],
       "sampleErrors": [
         {
-          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
-          "line": 1,
-          "code": "missing_table",
-          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\ace-web-crawl.ts\","
+          "file": "sveltekit-frontend\\C",
+          "line": "\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\workers\\packet-cache.worker.ts:67:    tx.objectStore(STORE_",
+          "code": "unsafe_drizzle_update_delete",
+          "message": "{\"type\":\"unsafe_drizzle_update_delete\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\C\",\"line\":\"\\\\Users\\\\james\\\\Videos"
         },
         {
-          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
-          "line": 1,
-          "code": "missing_table",
-          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\ace-web-crawl.ts\","
+          "file": "sveltekit-frontend\\C",
+          "line": "\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\poi-store.ts:122:\t\t\tthis.subscribers.delete(fn);",
+          "code": "unsafe_drizzle_update_delete",
+          "message": "{\"type\":\"unsafe_drizzle_update_delete\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\C\",\"line\":\"\\\\Users\\\\james\\\\Videos"
         },
         {
-          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
-          "line": 1,
-          "code": "missing_table",
-          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\ace-web-crawl.ts\","
+          "file": "sveltekit-frontend\\C",
+          "line": "\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\poi-store.ts:131:\t\tthis.update((s) => ({ ...s, isLoading: true,",
+          "code": "unsafe_drizzle_update_delete",
+          "message": "{\"type\":\"unsafe_drizzle_update_delete\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\C\",\"line\":\"\\\\Users\\\\james\\\\Videos"
         }
       ],
-      "suggestedFix": "Fix 227 missing_table, missing_column, live_db_schema_drift, migration_schema_drift errors in workspace.sveltekit-frontend. Check: sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts, sveltekit-frontend\\src\\lib\\server\\db\\schema\\atlas-chunks.ts, sveltekit-frontend\\src\\lib\\server\\db\\schema\\codebase-intelligence.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"sveltekit-frontend\"",
+      "suggestedFix": "Fix 826 unsafe_drizzle_update_delete, missing_table, missing_column, migration_schema_drift errors in workspace.sveltekit-frontend. Check: sveltekit-frontend\\C, sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts, sveltekit-frontend\\src\\lib\\server\\db\\schema\\atlas-chunks.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"sveltekit-frontend\"",
       "confidence": 0.4,
       "sourceRefs": [
-        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts#L1",
-        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts#L1",
-        "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts#L1"
+        "local:sveltekit-frontend\\C#L\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\workers\\packet-cache.worker.ts:67:    tx.objectStore(STORE_",
+        "local:sveltekit-frontend\\C#L\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\poi-store.ts:122:\t\t\tthis.subscribers.delete(fn);",
+        "local:sveltekit-frontend\\C#L\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\poi-store.ts:131:\t\tthis.update((s) => ({ ...s, isLoading: true,"
       ],
       "featureStatus": "partial",
       "priority": "HIGH",
-      "generatedAt": "2026-05-30T02:27:10.384Z",
+      "generatedAt": "2026-05-30T16:55:38.668Z",
       "usedLlm": false
     },
     {
@@ -145,7 +99,7 @@
       ],
       "featureStatus": "partial",
       "priority": "HIGH",
-      "generatedAt": "2026-05-30T02:27:10.384Z",
+      "generatedAt": "2026-05-30T16:55:38.669Z",
       "usedLlm": false
     },
     {
@@ -191,22 +145,65 @@
       ],
       "featureStatus": "implemented",
       "priority": "MEDIUM",
-      "generatedAt": "2026-05-30T02:27:10.384Z",
+      "generatedAt": "2026-05-30T16:55:38.669Z",
+      "usedLlm": false
+    },
+    {
+      "proposalId": "f03b4f74919b",
+      "featureKey": "unknown",
+      "errorCount": 6,
+      "topErrorCode": "CONTRACT",
+      "topErrorCount": 6,
+      "affectedFiles": [
+        "unknown"
+      ],
+      "errorCodes": [
+        "CONTRACT"
+      ],
+      "sampleErrors": [
+        {
+          "file": "unknown",
+          "line": 1,
+          "code": "CONTRACT",
+          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-001-3b35ccb8\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
+        },
+        {
+          "file": "unknown",
+          "line": 1,
+          "code": "CONTRACT",
+          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-002-f1ac684e\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
+        },
+        {
+          "file": "unknown",
+          "line": 1,
+          "code": "CONTRACT",
+          "message": "{\"findingId\":\"contract:drizzle-meta-documented_sidecar-003-4b9906be\",\"severity\":\"info\",\"layer\":\"drizzle-meta\",\"hmmState\""
+        }
+      ],
+      "suggestedFix": "Fix 6 CONTRACT errors in unknown. Check: unknown. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"unknown\"",
+      "confidence": 0.4,
+      "sourceRefs": [
+        "local:unknown#L1",
+        "local:unknown#L1",
+        "local:unknown#L1"
+      ],
+      "featureStatus": "unknown",
+      "priority": "MEDIUM",
+      "generatedAt": "2026-05-30T16:55:38.669Z",
       "usedLlm": false
     },
     {
       "proposalId": "2866867402af",
       "featureKey": "api.sveltekit_routes",
-      "errorCount": 3,
+      "errorCount": 5,
       "topErrorCode": "missing_column",
-      "topErrorCount": 1,
+      "topErrorCount": 4,
       "affectedFiles": [
         "sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts"
       ],
       "errorCodes": [
         "missing_column",
-        "missing_table",
-        "live_db_schema_drift"
+        "missing_table"
       ],
       "sampleErrors": [
         {
@@ -218,17 +215,17 @@
         {
           "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts",
           "line": 1,
-          "code": "missing_table",
-          "message": "{\"type\":\"missing_table\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\search-analytics.t"
+          "code": "missing_column",
+          "message": "{\"type\":\"missing_column\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\search-analytics."
         },
         {
           "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts",
           "line": 1,
-          "code": "live_db_schema_drift",
-          "message": "{\"type\":\"live_db_schema_drift\",\"severity\":\"high\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\search-analyt"
+          "code": "missing_column",
+          "message": "{\"type\":\"missing_column\",\"severity\":\"medium\",\"file\":\"sveltekit-frontend\\\\src\\\\lib\\\\server\\\\db\\\\schema\\\\search-analytics."
         }
       ],
-      "suggestedFix": "Fix 3 missing_column, missing_table, live_db_schema_drift errors in api.sveltekit_routes. Check: sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"sveltekit_routes\"",
+      "suggestedFix": "Fix 5 missing_column, missing_table errors in api.sveltekit_routes. Check: sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts. Run: cd sveltekit-frontend && npm run check:fast 2>&1 | grep \"sveltekit_routes\"",
       "confidence": 0.4,
       "sourceRefs": [
         "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts#L1",
@@ -236,8 +233,8 @@
         "local:sveltekit-frontend\\src\\lib\\server\\db\\schema\\search-analytics.ts#L1"
       ],
       "featureStatus": "implemented",
-      "priority": "LOW",
-      "generatedAt": "2026-05-30T02:27:10.384Z",
+      "priority": "MEDIUM",
+      "generatedAt": "2026-05-30T16:55:38.669Z",
       "usedLlm": false
     },
     {
@@ -267,7 +264,7 @@
       ],
       "featureStatus": "implemented",
       "priority": "LOW",
-      "generatedAt": "2026-05-30T02:27:10.384Z",
+      "generatedAt": "2026-05-30T16:55:38.669Z",
       "usedLlm": false
     }
   ]

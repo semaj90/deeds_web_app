@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-30T01:42:11.737Z",
+  "generatedAt": "2026-05-30T18:50:06.469Z",
   "repoName": "deeds-web-app",
-  "totalFiles": 7499,
+  "totalFiles": 7604,
   "totalFeatureAreas": 117,
   "features": {
     "api.sveltekit_routes": {
@@ -42,7 +42,7 @@
         "error_boundary"
       ],
       "hasLlmCall": true,
-      "totalLines": 223905,
+      "totalLines": 223948,
       "exports": [
         "GET",
         "POST",
@@ -98,7 +98,7 @@
       ]
     },
     "workspace.scripts": {
-      "fileCount": 1191,
+      "fileCount": 1207,
       "status": "implemented",
       "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/foaf/[personId]/+server.ts",
       "dbTables": [
@@ -125,7 +125,7 @@
         "api_route"
       ],
       "hasLlmCall": true,
-      "totalLines": 126064,
+      "totalLines": 129400,
       "exports": [
         "buildAtlasRetryIndex",
         "logProgress",
@@ -184,7 +184,7 @@
       ]
     },
     "workspace.sveltekit-frontend": {
-      "fileCount": 993,
+      "fileCount": 1000,
       "status": "partial",
       "topScoreFile": "sveltekit-frontend/src/types/ambient.d.ts",
       "dbTables": [
@@ -206,18 +206,18 @@
         "ace:autoencoder:weights",
         "ace:autoencoder:meta",
         "ace:fixer:patterns",
+        "kag:cluster:agents:_index",
         "ace:atlas:latest:summary",
         "ace:authority:top",
         "gpu:autoencoder:centroids_64",
-        "gpu:autoencoder:centroids_64_meta",
-        "gpu:activity:dir_scores"
+        "gpu:autoencoder:centroids_64_meta"
       ],
       "mcpTools": [
         "name"
       ],
       "routeTypes": [],
       "hasLlmCall": true,
-      "totalLines": 206509,
+      "totalLines": 206881,
       "exports": [
         "toast",
         "useSonner",
@@ -252,6 +252,9 @@
         "sveltekit-frontend/scripts/agent-worker.ts",
         "sveltekit-frontend/scripts/agentic-batch-fix.mjs",
         "sveltekit-frontend/scripts/agentic-error-fix.mjs",
+        "sveltekit-frontend/scripts/agents/build-agents-index.mjs",
+        "sveltekit-frontend/scripts/agents/build-mini-active-cache.mjs",
+        "sveltekit-frontend/scripts/agents/som-cluster-cards.mjs",
         "sveltekit-frontend/scripts/alter-evidence-type-enum.ts",
         "sveltekit-frontend/scripts/analyze-graph-ai.mjs",
         "sveltekit-frontend/scripts/analyze-graph.mjs",
@@ -265,14 +268,11 @@
         "sveltekit-frontend/scripts/audit-schema-drift.mjs",
         "sveltekit-frontend/scripts/autoencoder-backfill-qdrant.mjs",
         "sveltekit-frontend/scripts/autoencoder-centroids.mjs",
-        "sveltekit-frontend/scripts/backfill-activity-scores.ts",
-        "sveltekit-frontend/scripts/backfill-llms-md-envelope.mjs",
-        "sveltekit-frontend/scripts/backfill-manifold4.mjs",
-        "sveltekit-frontend/scripts/backfill-research-embeddings.mjs"
+        "sveltekit-frontend/scripts/backfill-activity-scores.ts"
       ]
     },
     "lib.server": {
-      "fileCount": 621,
+      "fileCount": 633,
       "status": "partial",
       "topScoreFile": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
       "dbTables": [
@@ -305,7 +305,7 @@
       "mcpTools": [],
       "routeTypes": [],
       "hasLlmCall": true,
-      "totalLines": 130144,
+      "totalLines": 131267,
       "exports": [
         "AceIngestStep",
         "AceIngestJob",
@@ -434,7 +434,7 @@
       ]
     },
     "ai.llm_synthesis": {
-      "fileCount": 483,
+      "fileCount": 486,
       "status": "implemented",
       "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find/+server.ts",
       "dbTables": [
@@ -445,7 +445,8 @@
         "statutes",
         "sessions",
         "users",
-        "contextTimeline"
+        "contextTimeline",
+        "scenarioCache"
       ],
       "cacheKeys": [
         "ace:ctx:",
@@ -466,7 +467,7 @@
         "svelte_page"
       ],
       "hasLlmCall": true,
-      "totalLines": 75239,
+      "totalLines": 76345,
       "exports": [
         "POST",
         "GET",
@@ -519,7 +520,7 @@
       ]
     },
     "knowledge.atlas_pipeline": {
-      "fileCount": 264,
+      "fileCount": 324,
       "status": "implemented",
       "topScoreFile": "scripts/atlas/build-codebase-feature-map.mjs",
       "dbTables": [
@@ -545,16 +546,16 @@
         "errorFingerprints"
       ],
       "cacheKeys": [
-        "ace:feature",
-        "ace:engram:lessons",
-        "ace:router4x4:matrix",
-        "ace:lane:routing_policy",
-        "gpu:karpathy:scores",
-        "wiki:note:dir:*",
-        "wiki:note:dir:",
-        "ace:cluster:graphrag:meta",
-        "ace:cartridge:threshold",
-        "ace:cluster:members:__index"
+        "ace:qdrant:*",
+        "ace:neo4j:*",
+        "ace:kag:*",
+        "wiki:note:*",
+        "ace:fast_ast:*",
+        "ace:topo:*",
+        "ace:authority:top",
+        "ace:context:*",
+        "ace:rank:dirty_files",
+        "ace:feature"
       ],
       "mcpTools": [],
       "routeTypes": [
@@ -563,7 +564,7 @@
         "api_route"
       ],
       "hasLlmCall": true,
-      "totalLines": 58010,
+      "totalLines": 69691,
       "exports": [
         "appendLlmSynthesisJsonl",
         "load",
@@ -585,14 +586,18 @@
       "files": [
         "scripts/atlas/_atlas-utils.mjs",
         "scripts/atlas/analyze-directory-roles.mjs",
+        "scripts/atlas/append-dir-agents-llms.mjs",
         "scripts/atlas/append-llm-synthesis-jsonl.mjs",
         "scripts/atlas/append-soak-history.mjs",
+        "scripts/atlas/append-timestamp-to-master-md.mjs",
+        "scripts/atlas/archive-to-couchdb.mjs",
         "scripts/atlas/atlas-lane-health-loop.mjs",
         "scripts/atlas/atlas-to-cartridge-seed.mjs",
         "scripts/atlas/audit-contract-map.mjs",
         "scripts/atlas/audit-drizzle-meta-hygiene.mjs",
         "scripts/atlas/audit-drizzle-postgres-contracts.mjs",
         "scripts/atlas/audit-feature-registry.mjs",
+        "scripts/atlas/audit-filesystem.mjs",
         "scripts/atlas/audit-model-artifacts.mjs",
         "scripts/atlas/audit-pgvector-schema.mjs",
         "scripts/atlas/audit-repo-hygiene.mjs",
@@ -600,23 +605,19 @@
         "scripts/atlas/audit-simd-bridge-memory.mjs",
         "scripts/atlas/audit-sveltekit-form-contracts.mjs",
         "scripts/atlas/auto-schema-evolution.mjs",
+        "scripts/atlas/backfill-code-cards.mjs",
+        "scripts/atlas/backfill-som-coordinates.mjs",
         "scripts/atlas/bench-inference-backends.mjs",
+        "scripts/atlas/build-all-lanes-parent-atlas.mjs",
         "scripts/atlas/build-ast-topology-dry-run.mjs",
         "scripts/atlas/build-atlas-token-map.mjs",
         "scripts/atlas/build-codebase-feature-map.mjs",
         "scripts/atlas/build-component-profiles.mjs",
-        "scripts/atlas/build-error-fix-dag.mjs",
-        "scripts/atlas/build-repo-env-map.mjs",
-        "scripts/atlas/build-repo-import-map.mjs",
-        "scripts/atlas/build-repo-language-map.mjs",
-        "scripts/atlas/build-repo-workspace-map.mjs",
-        "scripts/atlas/build-rg-search-matrix.mjs",
-        "scripts/atlas/cache-feature-cards.mjs",
-        "scripts/atlas/check-chat-data.mjs"
+        "scripts/atlas/build-error-fix-dag.mjs"
       ]
     },
     "legal.evidence": {
-      "fileCount": 238,
+      "fileCount": 239,
       "status": "implemented",
       "topScoreFile": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts",
       "dbTables": [
@@ -637,7 +638,7 @@
         "layout"
       ],
       "hasLlmCall": true,
-      "totalLines": 38017,
+      "totalLines": 38049,
       "exports": [
         "GET",
         "Entity",
@@ -690,7 +691,7 @@
       ]
     },
     "db.drizzle_schema": {
-      "fileCount": 178,
+      "fileCount": 179,
       "status": "implemented",
       "topScoreFile": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
       "dbTables": [
@@ -707,7 +708,8 @@
         "agentObservations",
         "errorFingerprints",
         "featureImplementations",
-        "llmSynthesisEvents"
+        "llmSynthesisEvents",
+        "scenarioCache"
       ],
       "cacheKeys": [],
       "mcpTools": [],
@@ -715,7 +717,7 @@
         "api_route"
       ],
       "hasLlmCall": true,
-      "totalLines": 21808,
+      "totalLines": 21925,
       "exports": [
         "GET",
         "OPTIONS",
@@ -768,7 +770,7 @@
       ]
     },
     "legal.case_management": {
-      "fileCount": 144,
+      "fileCount": 145,
       "status": "implemented",
       "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test-cases/+server.ts",
       "dbTables": [
@@ -791,7 +793,7 @@
         "layout"
       ],
       "hasLlmCall": true,
-      "totalLines": 24381,
+      "totalLines": 24426,
       "exports": [
         "GET",
         "POST",
@@ -844,7 +846,7 @@
       ]
     },
     "lib.services": {
-      "fileCount": 126,
+      "fileCount": 127,
       "status": "partial",
       "topScoreFile": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/crud-client.ts",
       "dbTables": [
@@ -860,7 +862,7 @@
       "mcpTools": [],
       "routeTypes": [],
       "hasLlmCall": true,
-      "totalLines": 9945,
+      "totalLines": 9979,
       "exports": [
         "Case",
         "CaseStats",
@@ -874,9 +876,9 @@
         "poiApi",
         "searchApi",
         "systemApi",
+        "couchdb",
         "sourceValidationAPI",
-        "ttsService",
-        "VoiceCommand"
+        "ttsService"
       ],
       "errorMarkers": [],
       "files": [
@@ -991,7 +993,7 @@
       ]
     },
     "cache.redis_bifrost": {
-      "fileCount": 120,
+      "fileCount": 121,
       "status": "implemented",
       "topScoreFile": "sveltekit-frontend/src/lib/server/cache/code-llm-index.ts",
       "dbTables": [
@@ -1021,7 +1023,7 @@
         "svelte_page"
       ],
       "hasLlmCall": true,
-      "totalLines": 18107,
+      "totalLines": 18213,
       "exports": [
         "GET",
         "DELETE",
@@ -1104,7 +1106,7 @@
         "api_route"
       ],
       "hasLlmCall": true,
-      "totalLines": 26556,
+      "totalLines": 26603,
       "exports": [
         "POST",
         "ACE_TOOLS",
@@ -2202,6 +2204,62 @@
         "vscode-extension/workers/graphParseWorker.js"
       ]
     },
+    "search.qdrant_vector": {
+      "fileCount": 17,
+      "status": "implemented",
+      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/optimized/+server.ts",
+      "dbTables": [
+        "users",
+        "cases",
+        "documents",
+        "citations",
+        "evidence"
+      ],
+      "cacheKeys": [],
+      "mcpTools": [],
+      "routeTypes": [
+        "api_route"
+      ],
+      "hasLlmCall": false,
+      "totalLines": 1175,
+      "exports": [
+        "GET",
+        "QdrantSyncRequest",
+        "CollectionRequest",
+        "SearchRequest",
+        "POST",
+        "PUT",
+        "DELETE",
+        "QdrantPointStruct",
+        "OptimizedSearchRequest",
+        "BatchUpsertRequest",
+        "CacheManagementRequest",
+        "TestResult",
+        "TagHistogram",
+        "scrollClusterTags",
+        "QDRANT_SIMDJSON_THRESHOLD_BYTES"
+      ],
+      "errorMarkers": [],
+      "files": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/dev/qdrant/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/init/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/optimized/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/tag/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test/qdrant/+server.ts",
+        "scripts/qdrant/create-payload-indexes-task-semantic-packets.mjs",
+        "scripts/qdrant/create-payload-indexes.mjs",
+        "scripts/qdrant/sync-centroids-to-redis.mjs",
+        "sveltekit-frontend/scripts/qdrant/parse-qdrant-json.ts",
+        "sveltekit-frontend/scripts/qdrant/simdjson-smoke.mjs",
+        "sveltekit-frontend/scripts/qdrant/write-rerank-feedback.mjs",
+        "sveltekit-frontend/src/lib/server/qdrant/cluster-tag-scroll.ts",
+        "sveltekit-frontend/src/lib/server/qdrant/parse-qdrant-json.ts",
+        "sveltekit-frontend/src/lib/server/types/qdrant.ts",
+        "sveltekit-frontend/src/lib/types/qdrant.ts",
+        "sveltekit-frontend/src/routes/api/health/qdrant/+server.ts"
+      ]
+    },
     "lib.machines": {
       "fileCount": 16,
       "status": "partial",
@@ -2307,60 +2365,6 @@
         "sveltekit-frontend/src/lib/workers/gpu-worker.mjs",
         "sveltekit-frontend/src/lib/workers/graph-layout.worker.ts",
         "sveltekit-frontend/src/lib/workers/packet-cache.worker.ts"
-      ]
-    },
-    "search.qdrant_vector": {
-      "fileCount": 15,
-      "status": "partial",
-      "topScoreFile": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/optimized/+server.ts",
-      "dbTables": [
-        "users",
-        "cases",
-        "documents",
-        "citations",
-        "evidence"
-      ],
-      "cacheKeys": [],
-      "mcpTools": [],
-      "routeTypes": [
-        "api_route"
-      ],
-      "hasLlmCall": false,
-      "totalLines": 935,
-      "exports": [
-        "GET",
-        "QdrantSyncRequest",
-        "CollectionRequest",
-        "SearchRequest",
-        "POST",
-        "PUT",
-        "DELETE",
-        "QdrantPointStruct",
-        "OptimizedSearchRequest",
-        "BatchUpsertRequest",
-        "CacheManagementRequest",
-        "TestResult",
-        "TagHistogram",
-        "scrollClusterTags",
-        "QDRANT_SIMDJSON_THRESHOLD_BYTES"
-      ],
-      "errorMarkers": [],
-      "files": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/dev/qdrant/+server.ts",
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/+server.ts",
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/init/+server.ts",
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/optimized/+server.ts",
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/tag/+server.ts",
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test/qdrant/+server.ts",
-        "scripts/qdrant/sync-centroids-to-redis.mjs",
-        "sveltekit-frontend/scripts/qdrant/parse-qdrant-json.ts",
-        "sveltekit-frontend/scripts/qdrant/simdjson-smoke.mjs",
-        "sveltekit-frontend/scripts/qdrant/write-rerank-feedback.mjs",
-        "sveltekit-frontend/src/lib/server/qdrant/cluster-tag-scroll.ts",
-        "sveltekit-frontend/src/lib/server/qdrant/parse-qdrant-json.ts",
-        "sveltekit-frontend/src/lib/server/types/qdrant.ts",
-        "sveltekit-frontend/src/lib/types/qdrant.ts",
-        "sveltekit-frontend/src/routes/api/health/qdrant/+server.ts"
       ]
     },
     "lib.icons": {

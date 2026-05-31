@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T01:42:50.139Z",
+  "generatedAt": "2026-05-30T16:55:38.169Z",
   "repoName": "deeds-web-app",
   "totalTasks": 117,
   "usedLlm": false,
@@ -39,7 +39,7 @@
             "local:sveltekit-frontend/src/lib/icons/yorha/IconCitation.svelte#L1",
             "local:sveltekit-frontend/src/lib/icons/yorha/IconEvidenceFile.svelte#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -74,7 +74,7 @@
             "local:sveltekit-frontend/src/lib/shims/commonjs-shim.js#L1",
             "local:sveltekit-frontend/src/lib/shims/dns-browser-shim.js#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -105,7 +105,7 @@
             "local:sveltekit-frontend/src/lib/shared/chr97-reader.ts#L1",
             "local:sveltekit-frontend/src/lib/shared/embedding-types.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -142,7 +142,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/data/types.ts#L1",
             "local:sveltekit-frontend/src/lib/data/report-templates.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -175,7 +175,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/integrations/flashattention-multicore-bridge.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/integrations/full-stack-workflow.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -205,7 +205,7 @@
             "local:simd-bridge/examples/bridge-wrapper.ts#L1",
             "local:simd-bridge/examples/run-bridge.js#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -236,7 +236,7 @@
             "local:sveltekit-frontend/src/lib/courtroom/courtroom-types.ts#L1",
             "local:sveltekit-frontend/src/lib/courtroom/crt-postprocess.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -269,7 +269,7 @@
             "local:sveltekit-frontend/src/lib/schemas/board.ts#L1",
             "local:sveltekit-frontend/src/lib/schemas/evidence-upload.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -300,7 +300,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/optimization/simd-json-index-processor.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/optimization/simd-json-parser-bridge.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -335,7 +335,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/wasm/legal-processor.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/wasm/ultra-json-parser.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -363,7 +363,7 @@
             "local:sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts#L1",
             "local:sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -391,7 +391,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/orchestration/complete-legal-ai-orchestrator.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/orchestration/master-cognitive-hub.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -420,7 +420,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/command-center-manifest.ts#L1",
             "local:sveltekit-frontend/src/lib/command-center-manifest.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -446,7 +446,7 @@
             "local:sveltekit-frontend/src/lib/env/index.ts#L1",
             "local:sveltekit-frontend/src/lib/env/public.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -474,7 +474,7 @@
             "local:sveltekit-frontend/src/lib/server/analysis/forensics.ts#L1",
             "local:sveltekit-frontend/src/lib/server/evidence/services/forensics.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -503,7 +503,7 @@
             "local:sveltekit-frontend/scripts/authority/build-authority-snapshot.mjs#L1",
             "local:sveltekit-frontend/src/lib/server/scoring/authority-scorer.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -529,7 +529,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/caching/multi-dimensional-image-cache.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/caching/reinforcement-learning-cache.server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -555,7 +555,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/detective-mode/comprehensive-integration.svelte.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/detective-mode/comprehensive-integration.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -581,7 +581,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/logic/HistoryManager.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/logic/Report.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -607,7 +607,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/routing/index.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/routing/route-guards.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -636,7 +636,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/ui/autocomplete/indexeddb-cache.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/ui/matrix-lod.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -662,7 +662,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/vite/vscode-error-logger.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/vite/vscode-extension.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -688,7 +688,7 @@
           "sourceRefs": [
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/migrations/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -712,7 +712,7 @@
           "sourceRefs": [
             "local:scripts/lib/upsert-validated.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -736,7 +736,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/ambient-events.d.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -760,7 +760,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/canvas/webgpu-shader-cache.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -784,7 +784,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/client-logging.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -808,7 +808,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/collaboration/yjs-provider.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -834,7 +834,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/env.server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -858,7 +858,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/index.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -884,7 +884,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/intent/regex-intent.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -910,7 +910,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/messaging/rabbitmq-xstate-integration.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -938,7 +938,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/models/ChatSession.svelte.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -962,7 +962,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/phase72/routeGraphAdapter.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -986,7 +986,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/polyfills.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1010,7 +1010,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/schemas.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1036,7 +1036,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/server/agents/regen/loaders/karpathy.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1063,7 +1063,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/stores.svelte.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1087,7 +1087,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/test-utils/setup.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1113,7 +1113,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/types.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1137,7 +1137,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/uno-shortcuts.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1163,7 +1163,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/src/lib/utils.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1187,7 +1187,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/avx2-simdjson-bridge.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1211,7 +1211,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/bounded-output.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1235,7 +1235,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/duplicate-detector.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1259,7 +1259,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/mcp-streaming.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1283,7 +1283,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/mcp_unwrap.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1307,7 +1307,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/phase89-adaptive-chunker.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1331,7 +1331,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/phase89-cache.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1355,7 +1355,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/phase89-cuda-tags.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1379,7 +1379,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/phase89-embed.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1403,7 +1403,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/phase89-graph-visualizer.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1427,7 +1427,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/phase89-rrf.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1451,7 +1451,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/phase89-sse-stream.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1475,7 +1475,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/progress.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1499,7 +1499,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/redis-semantic.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1523,7 +1523,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/lib/reference-verifier.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1547,7 +1547,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/ast/error-vectorizer.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.138Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1571,7 +1571,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/ClientEmbeddingGemma.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1595,7 +1595,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/ClientEmbeddingService.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.168Z",
           "usedLlm": false
         },
         {
@@ -1622,7 +1622,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/composables/legal-data-runes.svelte.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1646,7 +1646,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/database/drizzle-compatibility-fix.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1673,7 +1673,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/embedding/client-embedding-generator.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1697,7 +1697,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/error-brain/types.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1721,7 +1721,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/gemma3Client.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1748,7 +1748,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/json/fastjson.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1772,7 +1772,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1796,7 +1796,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/metrics/gpuMetricsBatcher.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1822,7 +1822,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/middleware/binary-encoding.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1849,7 +1849,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1875,7 +1875,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/parsers/simd-json-parser.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1902,7 +1902,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/performance/optimizations.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1928,7 +1928,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/polyfills/sveltekit2-universal-polyfill.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1954,7 +1954,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/proto/legal-ai-types.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -1978,7 +1978,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/storage/vector-quantization.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -2002,7 +2002,7 @@
           "sourceRefs": [
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/webasm/llama-cpp-engine.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         }
       ]
@@ -2062,7 +2062,7 @@
             "local:sveltekit-frontend/scripts/__tests__/powershell-scripts.test.ts#L1",
             "local:sveltekit-frontend/scripts/_check-langextract-usage.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.135Z",
+          "generatedAt": "2026-05-30T16:55:38.164Z",
           "usedLlm": false
         },
         {
@@ -2117,7 +2117,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/server/chat/history-service.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.136Z",
+          "generatedAt": "2026-05-30T16:55:38.165Z",
           "usedLlm": false
         },
         {
@@ -2164,7 +2164,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/components/headless/texture-streaming.svelte.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/components/three/yorha-ui/webgpu/YoRHaOptimizedTextureManager.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.136Z",
+          "generatedAt": "2026-05-30T16:55:38.165Z",
           "usedLlm": false
         },
         {
@@ -2207,7 +2207,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/services/advanced-bit-encoder.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/services/advanced-simd-pipeline.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.136Z",
+          "generatedAt": "2026-05-30T16:55:38.165Z",
           "usedLlm": false
         },
         {
@@ -2250,7 +2250,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/types/ai-assistant.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/types/canvas.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.136Z",
+          "generatedAt": "2026-05-30T16:55:38.165Z",
           "usedLlm": false
         },
         {
@@ -2289,7 +2289,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/utils/case-transform.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/utils/dashboard/ErrorHandler.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.136Z",
+          "generatedAt": "2026-05-30T16:55:38.165Z",
           "usedLlm": false
         },
         {
@@ -2331,7 +2331,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/analyticsStore.svelte.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/barrel-functions.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.136Z",
+          "generatedAt": "2026-05-30T16:55:38.166Z",
           "usedLlm": false
         },
         {
@@ -2370,7 +2370,7 @@
             "local:sveltekit-frontend/src/lib/webgpu/N64TextureLODSystem.ts#L1",
             "local:sveltekit-frontend/src/lib/webgpu/compute-shader-engine.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.136Z",
+          "generatedAt": "2026-05-30T16:55:38.166Z",
           "usedLlm": false
         },
         {
@@ -2407,7 +2407,7 @@
             "local:vscode-extension/out/claudePlan.js#L1",
             "local:vscode-extension/out/extension.js#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.166Z",
           "usedLlm": false
         },
         {
@@ -2446,7 +2446,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/machines/case-workflow-machine.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/machines/graph-cache-machine.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2490,7 +2490,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/workers/embedding-worker-enhanced.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/workers/embeddings-worker.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2533,7 +2533,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/init/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2573,7 +2573,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/load/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/metrics/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2611,7 +2611,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/chat/session/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/debug/session/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2649,7 +2649,7 @@
             "local:sveltekit-frontend/src/lib/client/search-client.ts#L1",
             "local:sveltekit-frontend/src/lib/client/streaming-handler.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2683,7 +2683,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/health/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/metrics/enhanced/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2722,7 +2722,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ocr/langextract/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/webgpu/langextract/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2757,7 +2757,7 @@
             "local:sveltekit-frontend/src/lib/config/env.server.ts#L1",
             "local:sveltekit-frontend/src/lib/config/env.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2800,7 +2800,7 @@
             "local:sveltekit-frontend/scripts/smoke/smoke-hyperrag.mjs#L1",
             "local:sveltekit-frontend/src/routes/api/admin/atlas/hyperrag/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2833,7 +2833,7 @@
             "local:sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceBoardPane.svelte#L1",
             "local:sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceChatPane.svelte#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         },
         {
@@ -2866,7 +2866,7 @@
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/state/evidence-processing-machine-corrupted.ts#L1",
             "local:sveltekit-frontend/scripts/phase104-backups/src/lib/state/evidence-processing-machine.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.137Z",
+          "generatedAt": "2026-05-30T16:55:38.167Z",
           "usedLlm": false
         }
       ]
@@ -2934,7 +2934,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase78/routes/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase78/routes/[routePath]/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -2987,7 +2987,7 @@
             "local:scripts/_check_glossary.cjs#L1",
             "local:scripts/_check_glossary_db.cjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3041,7 +3041,7 @@
             "local:scripts/ai/embed_and_index_scenarios.mjs#L1",
             "local:scripts/ai/index_scenarios.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3107,7 +3107,7 @@
             "local:scripts/atlas/analyze-directory-roles.mjs#L1",
             "local:scripts/atlas/append-llm-synthesis-jsonl.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3155,7 +3155,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/evidence/DEPRECATED.+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3207,7 +3207,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/db/setup/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/debug/db/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3257,7 +3257,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/board/layout/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3309,7 +3309,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/search/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/brain/3d-assets/search/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3361,7 +3361,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/summarize/cache/[key]/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cache/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3413,7 +3413,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3467,7 +3467,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/graph/clusters/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3513,7 +3513,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/[id]/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/[id]/tags/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3570,7 +3570,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/context72/get-library-docs/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/docs/test/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3615,7 +3615,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/health/gpu/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/gpu/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3657,7 +3657,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/demo-login/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/health/+server.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3711,7 +3711,7 @@
             "local:sveltekit-frontend/scripts/wiki/backfill-error-fingerprints.mjs#L1",
             "local:sveltekit-frontend/scripts/wiki/backfill-qdrant-cluster-keys.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3760,7 +3760,7 @@
             "local:scripts/analysis/key-dirs.mjs#L1",
             "local:scripts/analysis/size-report.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3804,7 +3804,7 @@
             "local:sveltekit-frontend/scripts/knowledge/build-index-gap-memory-cards.mjs#L1",
             "local:sveltekit-frontend/scripts/knowledge/build-schema-indexer-contract.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3848,7 +3848,7 @@
             "local:scripts/engram/upgrade-engram-ranker.mjs#L1",
             "local:scripts/memory/import-claude-mem-observations.mjs#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         },
         {
@@ -3894,7 +3894,7 @@
             "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/webgpu/topology/+server.ts#L1",
             "local:scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/webgpu/topology/$types.d.ts#L1"
           ],
-          "generatedAt": "2026-05-30T01:42:50.139Z",
+          "generatedAt": "2026-05-30T16:55:38.169Z",
           "usedLlm": false
         }
       ]

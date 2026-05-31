@@ -122,9 +122,9 @@ describe('src/routes/api/health/+server.ts', () => {
     };
   }
 
-  it('401 if not logged in', async () => {
+  it('200 even if not logged in (public endpoint)', async () => {
     const resp = await handler({ ...makeReq(), locals: {} });
-    expect(resp.status).toBe(401);
+    expect(resp.status).toBe(200);
   });
 
   it('400 for invalid service query', async () => {

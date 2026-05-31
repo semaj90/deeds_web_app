@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-05-30T21:56:24.429Z",
+  "configPath": "c:\\Users\\james\\Videos\\deeds-web-app\\opencode.json",
+  "totalMcpEntries": 5,
+  "liveMcp": 1,
+  "mcpUpButDisabled": 0,
+  "customHttpOnly": 1,
+  "broken": 0,
+  "notListening": 0,
+  "localStdio": 3,
+  "wsl2DockerNotes": {
+    "rule": "Loopback 127.0.0.1 works when MCPs run on Windows host. Docker containers calling host services need host.docker.internal.",
+    "detected": {
+      "windows_host_loopback_count": 2,
+      "docker_internal_count": 0
+    }
+  },
+  "entries": [
+    {
+      "name": "trace",
+      "type": "remote",
+      "url": "http://127.0.0.1:8788/mcp",
+      "enabledInConfig": true,
+      "toolsListStatus": 200,
+      "toolsListMs": 64,
+      "toolCount": 127,
+      "sampleTools": [
+        "kb.organize_messy_text",
+        "kb.extract_citations",
+        "kb.trace_search",
+        "atlas.query",
+        "trace_search"
+      ],
+      "mcpHealthy": true,
+      "healthEndpointStatus": 200,
+      "healthBody": "{\"ok\":true,\"version\":\"1.0.0\",\"uptime\":2774.687303}",
+      "classification": "live_mcp"
+    },
+    {
+      "name": "turbovec",
+      "type": "remote",
+      "url": "http://127.0.0.1:8791/mcp",
+      "enabledInConfig": false,
+      "toolsListStatus": 404,
+      "toolsListMs": 47,
+      "mcpHealthy": false,
+      "errorBody": "{\"error\": \"not found\"}",
+      "healthEndpointStatus": 200,
+      "healthBody": "{\"status\": \"ok\", \"indexed\": 0, \"dim\": 768, \"bit_width\": 2}",
+      "classification": "custom_http_only"
+    },
+    {
+      "name": "engram-embed",
+      "type": "local",
+      "command": "node ./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs",
+      "enabledInConfig": true,
+      "classification": "local_stdio_not_probed"
+    },
+    {
+      "name": "gemma4-offload",
+      "type": "local",
+      "command": "node ./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs",
+      "enabledInConfig": true,
+      "classification": "local_stdio_not_probed"
+    },
+    {
+      "name": "atlas-tools",
+      "type": "local",
+      "command": "node ./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+      "enabledInConfig": true,
+      "classification": "local_stdio_not_probed"
+    }
+  ]
+}

@@ -11,7 +11,6 @@
 - Audit score: _(no GPU audit)_
 - no audit signals
 
-
 ## Files (5)
 
 - `cases.test.ts`
@@ -46,13 +45,22 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "sveltekit-frontend/tests/routes/auto/api/search/<file>" })` — fetch any file's contents (sandboxed to src/)
 
-
 ## How to use this file
 
 Agents (Claude Code, Cursor, Codex, Aider) automatically pick up the nearest `AGENTS.md` when editing files in this tree. The root `AGENTS.md` provides repo-wide rules; this file overlays directory-specific signals from the Redis KAG cache.
 
 Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.
 
-
 <!-- ingest: 2026-05-30T02:17:10.013Z -->
 - ingested_nodes: 18742 from C:\Users\james\Videos\deeds-web-app\.opencode\cards
+
+<!-- atlas-append:0bf81df426b5:2026-05-30T16:27:00.892Z -->
+## Atlas Activity — 2026-05-30T16:27:00.892Z
+
+- **Parent atlas rebuild**: 10,732 nodes / 9,378 edges across 8 lanes
+- **Redis cache**: 10,732 nodes warmed (24h TTL)
+- **CouchDB archive**: 11,136 docs durably persisted
+- **This directory**: no tasks or fixes in current run
+
+<!-- /atlas-append:0bf81df426b5 -->
+

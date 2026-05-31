@@ -9,6 +9,7 @@ import { db } from '$lib/server/db/client.js';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { desc, sql as drizzleSql } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';
+import { ENV } from '$lib/server/env.server.js';
 import { CACHE_KEYS, CACHE_TTL, type TimelineEvent } from '../cache/cache-config.js';
 
 interface TimelineQueryOptions {
@@ -55,9 +56,9 @@ async function fetchSqlTimeline(caseId: string, limit: number): Promise<Timeline
  */
 async function fetchNeo4jTimeline(caseId: string, limit: number): Promise<TimelineEvent[]> {
   try {
-    const neo4jUrl = process.env.NEO4J_HTTP_URL ?? 'http://localhost:7474';
-    const user = process.env.NEO4J_USER ?? 'neo4j';
-    const pass = process.env.NEO4J_PASSWORD ?? 'neo4j123';
+    const neo4jUrl = ENV.NEO4J_HTTP_URL;
+    const user = ENV.NEO4J_USER;
+    const pass = ENV.NEO4J_PASSWORD;
 
     const cypher = `
       MATCH (c:Case {id: $caseId})-[r:HAS_EVENT]->(e:Event)

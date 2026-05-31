@@ -172,9 +172,13 @@ function findTargetFiles() {
   return found;
 }
 
-function alreadyHasRun(filePath, runId) {
+function alreadyHasRun(filePath, runId, bodySignature) {
   const content = fs.readFileSync(filePath, 'utf8');
-  return content.includes(`atlas-append:${runId}:`);
+  // Stable runId check
+  if (content.includes(`atlas-append:${runId}:`)) return true;
+  // Fallback: legacy blocks that match by body content
+  if (bodySignature && content.includes(bodySignature)) return true;
+  return false;
 }
 
 // ─── Main ──────────────────────────────────────────────────────────────
@@ -185,7 +189,16 @@ function main() {
   console.log(`  Targets: ${TARGET_FILES.join(', ')}`);
 
   const record = buildActivityRecord();
-  const runId = createHash('sha1').update(record.timestamp).digest('hex').slice(0, 12);
+  // Stable runId: hash of CONTENT (not timestamp). Same activity = same runId = idempotent.
+  const fingerprint = JSON.stringify({
+    nodes: record.parentAtlas.totalNodes,
+    edges: record.parentAtlas.totalEdges,
+    tasksTotal: record.tasksTotal,
+    fixesTotal: record.fixesTotal,
+    redisAt: record.redis.cachedAt,
+    couchAt: record.couchdb.archivedAt,
+  });
+  const runId = createHash('sha1').update(fingerprint).digest('hex').slice(0, 12);
 
   console.log(`  Run ID:  ${runId}`);
   console.log(`  Atlas:   ${record.parentAtlas.totalNodes} nodes, ${record.parentAtlas.totalEdges} edges`);
@@ -204,7 +217,9 @@ function main() {
 
   for (const fp of targets) {
     try {
-      if (alreadyHasRun(fp, runId)) {
+      // Body signature = the load-bearing summary line (deterministic, no timestamp)
+      const bodySignature = `**Parent atlas rebuild**: ${record.parentAtlas.totalNodes.toLocaleString()} nodes / ${record.parentAtlas.totalEdges.toLocaleString()} edges`;
+      if (alreadyHasRun(fp, runId, bodySignature)) {
         skipped++;
         if (VERBOSE) console.log(`    [skip dup] ${path.relative(ROOT, fp)}`);
         continue;

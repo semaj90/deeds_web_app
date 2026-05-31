@@ -19,7 +19,7 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 
-const TRACE_MCP_URL = ENV.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
+const TRACE_MCP_URL = ENV.TRACE_MCP_URL;
 
 /**
  * Call a TRACE MCP tool via JSON-RPC 2.0.

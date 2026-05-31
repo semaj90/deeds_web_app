@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path';
 const ROOT = resolve(process.cwd());
 const REPORTS_DIR = join(ROOT, 'docs', 'reports');
 const GRAPH_DIR = join(ROOT, 'docs', 'graph');
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+// Qdrant URL resolved from canonical helper
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
 
 const FILES = {
@@ -51,25 +51,24 @@ function normalizeRef(value) {
   return String(value ?? '').trim();
 }
 
+import { qdrantScroll, getQdrantUrl } from '../qdrant-client.mjs';
+const QDRANT_URL = getQdrantUrl();
+
 async function qdrantScrollSample() {
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        limit: 25,
-        with_payload: true,
-        with_vector: false,
-      }),
+    const points = await qdrantScroll(QDRANT_COLLECTION, {
+      limit: 25,
+      with_payload: true,
+      with_vector: false,
     });
-    if (!res.ok) {
-      return { ok: false, status: res.status, sample: [], error: `Qdrant scroll failed: ${res.status}` };
-    }
-    const data = await res.json();
-    const points = Array.isArray(data?.result?.points) ? data.result.points : [];
-    return { ok: true, status: res.status, sample: points };
+    return { ok: true, status: 200, sample: Array.isArray(points) ? points : [] };
   } catch (error) {
-    return { ok: false, status: 0, sample: [], error: error instanceof Error ? error.message : String(error) };
+    return {
+      ok: false,
+      status: 0,
+      sample: [],
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 

@@ -4245,28 +4245,43 @@ async function fetchKBChunks(
   try {
     const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
 
-    const searchOpts = (limit: number, threshold: number) => ({
-      vector: { name: 'content', vector: embedding },
-      limit,
-      score_threshold: threshold,
-      with_payload: true,
-      ...(graphFilter ? { filter: graphFilter } : {}),
-    });
-
-    const [docResults, canonResults, kbResults] = await Promise.all([
-      qdrantMgr.client.search('legal_documents', searchOpts(4, 0.45)).catch(() => []),
-      qdrantMgr.client.search('legal_canon_chunks', searchOpts(6, 0.4)).catch(() => []),
-      // knowledge_base uses unnamed vectors (raw array, not named)
-      qdrantMgr.client
-        .search('knowledge_base', {
-          vector: embedding,
+    // Route searches through QdrantManager dense search to ensure tracing/telemetry
+    const [docResultsRes, canonResultsRes, kbResultsRes] = await Promise.all([
+      qdrantMgr
+        ._denseSearch({
+          query: '',
+          queryEmbedding: embedding,
+          collection: 'legal_documents',
+          filters: graphFilter,
           limit: 4,
-          score_threshold: 0.4,
-          with_payload: true,
-          ...(graphFilter ? { filter: graphFilter } : {}),
+          scoreThreshold: 0.45,
         })
-        .catch(() => []),
+        .catch(() => ({ results: [] }) as any),
+      qdrantMgr
+        ._denseSearch({
+          query: '',
+          queryEmbedding: embedding,
+          collection: 'legal_canon_chunks',
+          filters: graphFilter,
+          limit: 6,
+          scoreThreshold: 0.4,
+        })
+        .catch(() => ({ results: [] }) as any),
+      qdrantMgr
+        ._denseSearch({
+          query: '',
+          queryEmbedding: embedding,
+          collection: 'knowledge_base',
+          filters: graphFilter,
+          limit: 4,
+          scoreThreshold: 0.4,
+        })
+        .catch(() => ({ results: [] }) as any),
     ]);
+
+    const docResults = docResultsRes.results ?? [];
+    const canonResults = canonResultsRes.results ?? [];
+    const kbResults = kbResultsRes.results ?? [];
 
     const chunks: RAGChunk[] = [
       ...docResults.map((r: any) => ({
@@ -4382,27 +4397,35 @@ async function fetchResearchSummaryChunks(
 
   try {
     const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
-    const baseOpts = {
-      vector: embedding, // research_summaries uses unnamed single vector
-      limit: 6,
-      score_threshold: 0.38,
-      with_payload: true,
-    };
-
-    // Prefiltered ANN: narrow to detected SOM cluster first
-    let results: any[] =
-      somCluster != null
-        ? await qdrantMgr.client
-            .search('research_summaries', {
-              ...baseOpts,
-              filter: { must: [{ key: 'som_cluster', match: { value: somCluster } }] },
-            })
-            .catch(() => [])
-        : [];
+    const baseLimit = 6;
+    // Prefiltered ANN: narrow to detected SOM cluster first — use QdrantManager dense search
+    let results: any[] = [];
+    if (somCluster != null) {
+      const preRes = await qdrantMgr
+        ._denseSearch({
+          query: '',
+          queryEmbedding: embedding,
+          collection: 'research_summaries',
+          filters: { som_cluster: somCluster },
+          limit: baseLimit,
+          scoreThreshold: 0.38,
+        })
+        .catch(() => ({ results: [] }) as any);
+      results = preRes.results ?? [];
+    }
 
     // Fallback: full sweep when cluster filter is empty or cluster unknown
-    if (results.length < 2) {
-      results = await qdrantMgr.client.search('research_summaries', baseOpts).catch(() => []);
+    if ((results?.length ?? 0) < 2) {
+      const fullRes = await qdrantMgr
+        ._denseSearch({
+          query: '',
+          queryEmbedding: embedding,
+          collection: 'research_summaries',
+          limit: baseLimit,
+          scoreThreshold: 0.38,
+        })
+        .catch(() => ({ results: [] }) as any);
+      results = fullRes.results ?? [];
       if (results.length && somCluster != null) {
         console.log(
           `[ACE Research] cluster=${somCluster} prefilter sparse, fell back to full sweep`
@@ -6212,11 +6235,16 @@ async function fetchACEContextPacket(query: string): Promise<any | null> {
     const qdrant = new QdrantManager();
     const embedding = await embedText(query);
 
-    const results = await qdrant.client.search(qdrant.collections.feature_maps, {
-      vector: { name: 'summary', vector: embedding },
-      limit: 1,
-      with_payload: true,
-    });
+    const res = await qdrant
+      ._denseSearch({
+        query: '',
+        queryEmbedding: embedding,
+        collection: 'feature_maps',
+        limit: 1,
+        scoreThreshold: 0.0,
+      })
+      .catch(() => ({ results: [] }) as any);
+    const results = res.results ?? [];
 
     if (results.length > 0 && results[0].score > 0.6) {
       const payload = results[0].payload as any;

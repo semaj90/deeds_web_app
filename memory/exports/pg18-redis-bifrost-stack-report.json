@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-05-31T04:08:15.312Z",
+  "probes": {
+    "pg18": {
+      "versionOk": true,
+      "version": "PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu",
+      "extensions": [
+        "plpgsql@1.0",
+        "pg_trgm@1.6",
+        "pgcrypto@1.4",
+        "vector@0.8.2"
+      ],
+      "usersQueryRows": "7",
+      "pgvectorPresent": true,
+      "elapsedMs": 32
+    },
+    "redis": {
+      "pingOk": true,
+      "setRoundtripMs": 3,
+      "getMatched": true,
+      "ttlPresent": true
+    },
+    "bifrost": {
+      "healthOk": true,
+      "statusCode": 200,
+      "elapsedMs": 35
+    },
+    "concurrent": {
+      "elapsedMs": 85,
+      "pgPassed": 50,
+      "pgTotal": 50,
+      "redisPassed": 50,
+      "redisTotal": 50,
+      "bifrostPassed": 10,
+      "bifrostTotal": 10,
+      "pgAvgMs": 47.84,
+      "redisAvgMs": 9.18
+    }
+  },
+  "verdict": {
+    "pg18Healthy": true,
+    "redisHealthy": true,
+    "bifrostHealthy": true,
+    "concurrentStable": true,
+    "allPass": true
+  }
+}

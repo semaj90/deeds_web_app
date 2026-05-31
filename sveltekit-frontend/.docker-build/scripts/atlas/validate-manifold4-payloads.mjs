@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /**
  * scripts/atlas/validate-manifold4-payloads.mjs
- * 
+ *
  * Validates that Qdrant points have manifold4 metadata, and can repair
  * missing cluster aliases / manifold metadata from nearest-centroid lookup.
  */
 
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { qdrantScroll, qdrantUpdatePayload, getQdrantUrl } from '../qdrant-client.mjs';
 
-const QDRANT_URL = process.env.QDRANT_URL;
+const QDRANT_URL = getQdrantUrl();
 const HG_LOOKUP_URL = process.env.HG_LOOKUP_URL || process.env.TOPOLOGY_SEARCH_URL;
 const COLLECTION = process.argv[2] || 'codebase_chunks_768';
 const SAMPLE_SIZE = Number(process.env.MANIFOLD_SAMPLE_SIZE || 100);
@@ -74,19 +75,13 @@ async function main() {
   console.log(`🔍 Validating manifold4 payloads in ${COLLECTION}...`);
   const aliasMap = loadAliasMap();
 
-  const scrollRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ limit: SAMPLE_SIZE, with_payload: true, with_vector: REPAIR_MODE })
-  });
-
-  if (!scrollRes.ok) {
+  const scrollBody = { limit: SAMPLE_SIZE, with_payload: true, with_vector: REPAIR_MODE };
+  const pts = await qdrantScroll(COLLECTION, scrollBody);
+  if (!pts) {
     console.error('❌ Failed to scroll Qdrant.');
     process.exit(1);
   }
-
-  const data = await scrollRes.json();
-  const points = data.result?.points || [];
+  const points = pts;
 
   let withManifold = 0;
   let repaired = 0;
@@ -115,11 +110,7 @@ async function main() {
         }
 
         if (Object.keys(patch).length > 0) {
-          await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ points: [p.id], payload: patch })
-          });
+          await qdrantUpdatePayload(COLLECTION, { points: [p.id], payload: patch });
           repaired++;
           if (!p.payload?.cluster_alias && resolvedAlias) aliased++;
         }

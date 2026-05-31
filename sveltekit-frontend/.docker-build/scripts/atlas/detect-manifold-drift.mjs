@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 /**
  * scripts/atlas/detect-manifold-drift.mjs
- * 
+ *
  * Detects drift in the hypergraph/manifold infrastructure.
  */
 
 import { getRedis } from '../../src/lib/server/redis.js';
+import { qdrantScroll, getQdrantUrl } from '../qdrant-client.mjs';
 import { db } from '../../src/lib/server/db/client.js';
 import { embeddedSummaries } from '../../src/lib/server/db/schema/embedded-summaries.js';
 import { sql } from 'drizzle-orm';
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const QDRANT_URL = getQdrantUrl();
 const COLLECTION = 'codebase_chunks_768';
 
 async function main() {
@@ -28,19 +29,11 @@ async function main() {
 
   try {
     // 1. Check Qdrant for missing tags
-    const scrollRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit: 100, with_payload: true })
-    });
-    
-    if (scrollRes.ok) {
-      const data = await scrollRes.json();
-      const points = data.result?.points || [];
-      for (const p of points) {
-        if (p.payload.gpu_cluster == null && p.payload.gpuCluster == null) {
-          report.missingClusterTags++;
-        }
+    const resPoints = await qdrantScroll(COLLECTION, { limit: 100, with_payload: true });
+    const points = resPoints ?? [];
+    for (const p of points) {
+      if (p.payload.gpu_cluster == null && p.payload.gpuCluster == null) {
+        report.missingClusterTags++;
       }
     }
 

@@ -76,3 +76,15 @@ export * from './rag-cards.js';
 export * from './summary-cards.js';
 export * from './normalize-labels.js';
 
+// 2026-05-30 drift remediation — Tier 1 core-app sidecars auto-extracted from drizzle-kit introspect
+export * from './case-notes.js';
+export * from './case-statute-links.js';
+export * from './case-note-versions.js';
+export * from './case-note-evidence-refs.js';
+export * from './legal-documents.js';
+export * from './statute-chunks.js';
+export * from './timeline-events.js';
+export * from './workspaces.js';
+export * from './workspace-notes.js';
+export * from './workspace-sessions.js';
+

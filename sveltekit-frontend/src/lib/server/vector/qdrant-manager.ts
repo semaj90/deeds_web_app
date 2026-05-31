@@ -36,6 +36,37 @@ export function deterministicPointId(key: string): number {
   return raw % 2147483648;
 }
 
+/**
+ * Generate a deterministic UUID-like string from a SHA-256 hash.
+ * Formats the hash as a valid UUID string (8-4-4-4-12) for Qdrant compatibility.
+ */
+export function sha256ToUuid(key: string): string {
+  const hash = createHash('sha256').update(key).digest('hex');
+  return [
+    hash.slice(0, 8),
+    hash.slice(8, 12),
+    hash.slice(12, 16),
+    hash.slice(16, 20),
+    hash.slice(20, 32)
+  ].join('-');
+}
+
+/**
+ * Deterministic chunk/point id using SHA-256 of canonical parts.
+ * Returns the hex digest (full 64-char) which is safe to use as a string id in Qdrant.
+ * Key format: sha256(`${workspaceId}:${sourceRef}:${chunkIndex}:${contentHash}`)
+ */
+export function deterministicChunkId(
+  workspaceId: string,
+  sourceRef: string,
+  chunkIndex: number | string,
+  contentHash: string
+): string {
+  const raw = `${workspaceId}:${sourceRef}:${chunkIndex}:${contentHash}`;
+  return createHash('sha256').update(raw).digest('hex');
+}
+
+
 const sparseSupportCache = new Map<string, boolean>();
 const denseOnlyNoticeEmitted = new Set<string>();
 
@@ -43,6 +74,8 @@ export class QdrantManager {
   public client: QdrantClient;
   /** Canonical collection names — sourced from VECTOR_CONFIG */
   public readonly collections = VECTOR_CONFIG.COLLECTIONS;
+  /** In-flight concurrent search dedupe map. Keys are short hashes of search params. */
+  private inflightSearches: Map<string, Promise<QdrantSearchResult>> = new Map();
 
   constructor(url = ENV.QDRANT_URL) {
     this.client = new QdrantClient({ url });
@@ -106,6 +139,37 @@ export class QdrantManager {
       // Non-fatal: if wrapping fails, rely on explicit batchUpsert/storeDocument checks
       console.warn('[qdrant] failed to wrap client.upsert for additional validation:', e);
     }
+  }
+
+  /**
+   * Build a canonical telemetry metadata object for Langfuse traces.
+   * Ensures all expected fields exist (may be null) so downstream consumers
+   * have a stable schema even when callers provide partial metadata.
+   */
+  private buildTelemetryMetadata(base: Record<string, unknown> | undefined) {
+    const b = base ?? {};
+    return {
+      // Core fields
+      collection: b['collection'] ?? null,
+      operation: b['searchType'] ?? b['operation'] ?? null,
+      query: b['query'] ?? null,
+      // Semantic/packet fields
+      feature_id: b['feature_id'] ?? b['featureId'] ?? null,
+      workspace_task_id: b['workspace_task_id'] ?? b['workspaceTaskId'] ?? null,
+      source_ref: b['source_ref'] ?? b['sourceRef'] ?? null,
+      semantic_path: b['semantic_path'] ?? null,
+      cluster_id: b['cluster_id'] ?? b['clusterId'] ?? null,
+      parent_cluster_id: b['parent_cluster_id'] ?? b['parentClusterId'] ?? null,
+      schema_table: b['schema_table'] ?? b['table'] ?? null,
+      schema_column: b['schema_column'] ?? b['column'] ?? null,
+      embedding_model: b['embedding_model'] ?? b['embeddingModel'] ?? null,
+      retrieval_version: b['retrieval_version'] ?? b['retrievalVersion'] ?? null,
+      // performance / count fields (populated by trace wrapper)
+      hit_count: b['hit_count'] ?? null,
+      response_time_ms: b['response_time_ms'] ?? b['responseTime'] ?? null,
+      // include any additional provided metadata (keeps original keys)
+      __raw: b,
+    } as Record<string, unknown>;
   }
 
   private sparseSupportCacheKey(collectionName: string, sparseVectorName: string): string {
@@ -349,50 +413,122 @@ export class QdrantManager {
   }): Promise<QdrantSearchResult> {
     return traceVectorSearch(
       params.collection,
-      { searchType: 'multi-query-fusion', queryCount: params.queries.length, limit: params.limit },
+      this.buildTelemetryMetadata({ searchType: 'multi-query-fusion', queryCount: params.queries.length, limit: params.limit }),
       async () => {
         const startTime = Date.now();
+        // Try to dedupe concurrent identical multi-query searches using a short hash key
+        try {
+          const rawKeyObj = {
+            c: params.collection,
+            q: params.queries.map((q) => ({
+              vectorName: q.vectorName ?? null,
+              filter: q.filter ?? null,
+              limit: q.limit ?? null,
+              vecLen: Array.isArray(q.vector)
+                ? (q.vector as any).length
+                : q.vector && typeof q.vector === 'object'
+                  ? ((q.vector as any).indices?.length ?? null)
+                  : null,
+            })),
+            fusion: params.fusion ?? null,
+            limit: params.limit ?? null,
+          };
+          const key = createHash('sha256')
+            .update(JSON.stringify(rawKeyObj))
+            .digest('hex')
+            .slice(0, 16);
+          if (this.inflightSearches.has(key)) {
+            return await this.inflightSearches.get(key)!;
+          }
+
+          const promise = (async () => {
+            const collectionName =
+              this.collections[params.collection as keyof typeof this.collections] ??
+              params.collection;
+            const prefetches = params.queries.map((q) => {
+              const prefetch: any = { limit: q.limit ?? params.limit ?? 20 };
+              if (q.vector) {
+                if (Array.isArray(q.vector)) {
+                  prefetch.query = q.vector;
+                  if (q.vectorName) prefetch.using = q.vectorName;
+                } else {
+                  prefetch.query = { indices: q.vector.indices, values: q.vector.values };
+                  prefetch.using = q.vectorName ?? 'bm25';
+                }
+              }
+              if (q.filter) prefetch.filter = this.buildQdrantFilter(q.filter);
+              return prefetch;
+            });
+
+            const searchRequest: any = {
+              prefetch: prefetches,
+              query: { fusion: params.fusion ?? 'rrf' },
+              limit: params.limit ?? 10,
+              score_threshold: params.scoreThreshold ?? 0.01,
+              with_payload: true,
+            };
+
+            const results = (await this.client.query(collectionName, searchRequest)) as any;
+            const responseTime = Date.now() - startTime;
+
+            return {
+              results: results.points.map((p: any) => ({
+                id: p.id,
+                score: p.score,
+                payload: p.payload,
+              })),
+              metadata: {
+                query: 'multi-query-fusion',
+                collection: params.collection,
+                responseTime,
+                total_results: results.points.length,
+                cached: false,
+                searchType: 'multi-query-fusion',
+                fusion: params.fusion ?? 'rrf',
+              },
+            };
+          })();
+
+          this.inflightSearches.set(key, promise);
+          try {
+            return await promise;
+          } finally {
+            this.inflightSearches.delete(key);
+          }
+        } catch (err) {
+          console.debug(
+            '[qdrant] multiQuerySearch dedupe failed, falling back:',
+            err?.message ?? err
+          );
+        }
+
+        // Fallback: original behavior (no dedupe)
         const collectionName =
           this.collections[params.collection as keyof typeof this.collections] ?? params.collection;
-
-        // Build prefetch sub-queries
         const prefetches = params.queries.map((q) => {
-          const prefetch: any = {
-            limit: q.limit ?? params.limit ?? 20,
-          };
+          const prefetch: any = { limit: q.limit ?? params.limit ?? 20 };
           if (q.vector) {
             if (Array.isArray(q.vector)) {
-              // Dense vector
               prefetch.query = q.vector;
               if (q.vectorName) prefetch.using = q.vectorName;
             } else {
-              // Sparse vector (Indices/Values)
-              prefetch.query = {
-                indices: q.vector.indices,
-                values: q.vector.values,
-              };
+              prefetch.query = { indices: q.vector.indices, values: q.vector.values };
               prefetch.using = q.vectorName ?? 'bm25';
             }
           }
-          if (q.filter) {
-            prefetch.filter = this.buildQdrantFilter(q.filter);
-          }
+          if (q.filter) prefetch.filter = this.buildQdrantFilter(q.filter);
           return prefetch;
         });
 
         const searchRequest: any = {
           prefetch: prefetches,
-          query: {
-            fusion: params.fusion ?? 'rrf',
-          },
+          query: { fusion: params.fusion ?? 'rrf' },
           limit: params.limit ?? 10,
-          score_threshold: params.scoreThreshold ?? 0.01, // Let fusion decide final scores
+          score_threshold: params.scoreThreshold ?? 0.01,
           with_payload: true,
         };
-
         const results = (await this.client.query(collectionName, searchRequest)) as any;
         const responseTime = Date.now() - startTime;
-
         return {
           results: results.points.map((p: any) => ({
             id: p.id,
@@ -475,28 +611,114 @@ export class QdrantManager {
   }): Promise<QdrantSearchResult> {
     return traceVectorSearch(
       params.collection,
-      { searchType: 'dense-cosine', query: params.query, limit: params.limit },
+      this.buildTelemetryMetadata({ searchType: 'dense-cosine', query: params.query, limit: params.limit }),
       async () => {
         const startTime = Date.now();
-
-        // Check Redis cache for identical query+collection+filters
         const cacheKey = params.skipCache ? null : await this.buildSearchCacheKey(params);
-        if (cacheKey) {
-          try {
-            const { getRedis } = await import('../redis.js');
-            const redis = getRedis();
-            if (redis) {
-              const cached = await redis.get(cacheKey);
-              if (cached) {
-                const parsed = fastJsonParse<QdrantSearchResult>(cached);
-                parsed.metadata.responseTime = Date.now() - startTime;
-                parsed.metadata.cached = true;
-                return parsed;
+
+        // Dedupe concurrent identical dense searches (per-process)
+        try {
+          const raw = JSON.stringify({
+            q: params.query,
+            c: params.collection,
+            f: params.filters ?? params.filters ?? null,
+            l: params.limit ?? null,
+            s: params.scoreThreshold ?? null,
+          });
+          const key = createHash('sha256').update(raw).digest('hex').slice(0, 16);
+          if (this.inflightSearches.has(key)) {
+            return await this.inflightSearches.get(key)!;
+          }
+
+          const promise = (async () => {
+            if (cacheKey) {
+              try {
+                const { getRedis } = await import('../redis.js');
+                const redis = getRedis();
+                if (redis) {
+                  const cached = await redis.get(cacheKey);
+                  if (cached) {
+                    const parsed = fastJsonParse<QdrantSearchResult>(cached);
+                    parsed.metadata.responseTime = Date.now() - startTime;
+                    parsed.metadata.cached = true;
+                    return parsed;
+                  }
+                }
+              } catch {
+                /* cache miss — proceed */
               }
             }
-          } catch {
-            /* cache miss — proceed */
+
+            try {
+              // Resolve collection name and build correct vector payload from VECTOR_CONFIG
+              const collectionName =
+                this.collections[params.collection as keyof typeof this.collections] ??
+                params.collection;
+              const vectorField = buildVectorPayload(collectionName, params.queryEmbedding);
+
+              const searchRequest: any = {
+                vector: vectorField,
+                limit: params.limit ?? 10,
+                score_threshold: params.scoreThreshold ?? 0.7,
+                with_payload: true,
+                with_vector: false,
+              };
+
+              if (params.filters) {
+                searchRequest.filter = this.buildQdrantFilter(params.filters);
+              }
+
+              const results = await this.client.search(collectionName, searchRequest);
+
+              const responseTime = Date.now() - startTime;
+
+              const response = {
+                results: results.map((result) => ({
+                  id: result.id,
+                  score: result.score,
+                  payload: result.payload,
+                })),
+                metadata: {
+                  query: params.query,
+                  collection: params.collection,
+                  responseTime,
+                  total_results: results.length,
+                  cached: false,
+                  searchType: 'dense-cosine',
+                },
+              };
+
+              // Cache for 5 minutes
+              if (cacheKey) {
+                try {
+                  const { getRedis } = await import('../redis.js');
+                  const redis = getRedis();
+                  if (redis) {
+                    await redis.set(cacheKey, JSON.stringify(response), 'EX', 300);
+                  }
+                } catch {
+                  /* cache write failure — non-fatal */
+                }
+              }
+
+              return response;
+            } catch (error: any) {
+              console.error('Qdrant dense search error:', error);
+              throw new Error(`Qdrant search failed: ${error.message}`);
+            }
+          })();
+
+          this.inflightSearches.set(key, promise);
+          try {
+            return await promise;
+          } finally {
+            this.inflightSearches.delete(key);
           }
+        } catch (e) {
+          console.debug(
+            '[qdrant] denseSearch dedupe failed, continuing without dedupe:',
+            e?.message ?? e
+          );
         }
 
         try {
@@ -574,7 +796,7 @@ export class QdrantManager {
   }): Promise<QdrantSearchResult> {
     return traceVectorSearch(
       'evidence',
-      { searchType: 'section-filtered', query: params.query, sectionTypes: params.sectionTypes },
+      this.buildTelemetryMetadata({ searchType: 'section-filtered', query: params.query, sectionTypes: params.sectionTypes }),
       async () => {
         const startTime = Date.now();
         const mustConditions: any[] = [
@@ -703,6 +925,23 @@ export class QdrantManager {
   }) {
     const batchSize = params.batchSize ?? 100;
     const collectionName = this.collections[params.collection];
+    // If points don't include an id but include canonical payload fields, synthesize a deterministic id
+    for (const p of params.points) {
+      try {
+        if ((p.id === undefined || p.id === null) && p.payload && typeof p.payload === 'object') {
+          const ws = p.payload.workspace_id ?? p.payload.workspaceId ?? p.payload.workspace ?? null;
+          const src = p.payload.source_ref ?? p.payload.sourceRef ?? p.payload.source ?? null;
+          const idx = p.payload.chunk_index ?? p.payload.chunkIndex ?? p.payload.index ?? null;
+          const ch = p.payload.content_hash ?? p.payload.contentHash ?? p.payload.hash ?? null;
+          if (ws && src && (idx !== null && idx !== undefined) && ch) {
+            p.id = deterministicChunkId(String(ws), String(src), String(idx), String(ch));
+          }
+        }
+      } catch (e) {
+        /* non-fatal id synth failure — continue */
+      }
+    }
+
     // Validate all vectors before performing any network upsert to avoid partial writes
     const invalids: Array<{ id: string | number; vectorName?: string; found?: string | number }> =
       [];
@@ -783,6 +1022,86 @@ export class QdrantManager {
     }
     return { totalUpserted };
   }
+
+  /**
+   * Scroll wrapper for Qdrant /points/scroll endpoint.
+   * Centralizes scroll usage so we can add tracing, dedupe, and consistent headers.
+   */
+  async scroll(params: {
+    collection: keyof typeof this.collections | string;
+    limit?: number;
+    offset?: any;
+    filter?: any;
+    withPayload?: boolean | string[] | any;
+    withVector?: boolean | string[] | any;
+    with_payload?: boolean;
+    with_vector?: boolean;
+    order?: any;
+  }): Promise<{
+    points: any[];
+    nextPageOffset: any;
+    next_page_offset: any;
+    metadata: { collection: string; responseTime: number };
+  }> {
+    const rawCollection = params.collection;
+    const collectionName = String(
+      (this.collections as any)[rawCollection as any] ?? rawCollection
+    );
+
+    return traceVectorSearch(
+      collectionName,
+      this.buildTelemetryMetadata({ searchType: 'scroll', query: 'scroll', collection: collectionName }),
+      async () => {
+        const startTime = Date.now();
+        try {
+          const scrollRequest: any = {
+            limit: params.limit ?? 100,
+            with_payload: params.withPayload ?? params.with_payload ?? true,
+            with_vector: params.withVector ?? params.with_vector ?? false,
+          };
+          if (params.offset !== undefined && params.offset !== null) {
+            scrollRequest.offset = params.offset;
+          }
+          if (params.filter) {
+            scrollRequest.filter = this.buildQdrantFilter(params.filter);
+          }
+          if (params.order) {
+            scrollRequest.order = params.order;
+          }
+
+          const result = await this.client.scroll(collectionName, scrollRequest);
+          const points = (result.points ?? []).map((p: any) => ({
+            id: p.id,
+            vector: p.vector,
+            payload: p.payload,
+          }));
+          const nextPageOffset = result.next_page_offset ?? null;
+
+          return {
+            points,
+            nextPageOffset,
+            next_page_offset: nextPageOffset,
+            metadata: {
+              collection: collectionName,
+              responseTime: Date.now() - startTime,
+            },
+          };
+        } catch (error: any) {
+          console.error(`[qdrant] scroll failed for ${collectionName}:`, error);
+          return {
+            points: [],
+            nextPageOffset: null,
+            next_page_offset: null,
+            metadata: {
+              collection: collectionName,
+              responseTime: Date.now() - startTime,
+            },
+          };
+        }
+      }
+    );
+  }
+
 
   /**
    * Canonical upsert wrapper — validates vectors, delegates to batchUpsert when
@@ -953,8 +1272,11 @@ export class QdrantManager {
       );
     }
 
+    const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(document.id);
+    const pointId = isValidUuid ? document.id : sha256ToUuid(document.id);
+
     const point: any = {
-      id: document.id,
+      id: pointId,
       vector: {
         content: document.contentEmbedding,
         ...(document.summaryEmbedding && { summary: document.summaryEmbedding }),
@@ -970,6 +1292,8 @@ export class QdrantManager {
     };
     await this.client.upsert(this.collections.documents, { wait: true, points: [point] });
   }
+
+
 
   async findRelatedEvidence(evidenceId: string, embedding: number[], limit = 5) {
     const searchRequest: any = {

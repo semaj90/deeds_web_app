@@ -602,243 +602,257 @@
   "claude-mem/src/npx-cli/utils/paths.ts": [
     "claude-mem/tests/write-json-file-atomic.test.ts"
   ],
-  "deeds_labs/routes-parked-full/api/error-brain/+server.ts": [
-    "deeds_labs/routes-parked-full/api/error-brain/server.test.ts",
-    "deeds_labs/routes-parked-full/api/error-brain/server.test.ts"
+  "deeds_labs/api-legacy/api/error-brain/+server.ts": [
+    "deeds_labs/api-legacy/api/error-brain/server.test.ts",
+    "deeds_labs/api-legacy/api/error-brain/server.test.ts"
   ],
-  "deeds_labs/routes-parked-full/api/legal-ai/+server.ts": [
-    "deeds_labs/routes-parked-full/api/legal-ai/server.test.ts",
-    "deeds_labs/routes-parked-full/api/legal-ai/server.test.ts"
+  "deeds_labs/api-legacy/api/legal-ai/+server.ts": [
+    "deeds_labs/api-legacy/api/legal-ai/server.test.ts",
+    "deeds_labs/api-legacy/api/legal-ai/server.test.ts"
   ],
-  "deeds_labs/routes-parked-full/api/routes/metadata/+server.ts": [
-    "deeds_labs/routes-parked-full/api/routes/metadata/server.test.ts",
-    "deeds_labs/routes-parked-full/api/routes/metadata/server.test.ts"
+  "deeds_labs/api-legacy/api/routes/metadata/+server.ts": [
+    "deeds_labs/api-legacy/api/routes/metadata/server.test.ts",
+    "deeds_labs/api-legacy/api/routes/metadata/server.test.ts"
   ],
-  "deeds_labs/routes-parked-full/api/routes/[routeId]/errors/+server.ts": [
-    "deeds_labs/routes-parked-full/api/routes/[routeId]/errors/server.test.ts",
-    "deeds_labs/routes-parked-full/api/routes/[routeId]/errors/server.test.ts"
+  "deeds_labs/api-legacy/api/routes/[routeId]/errors/+server.ts": [
+    "deeds_labs/api-legacy/api/routes/[routeId]/errors/server.test.ts",
+    "deeds_labs/api-legacy/api/routes/[routeId]/errors/server.test.ts"
   ],
-  "deeds_labs/routes-parked-full/api/routes/[routeId]/health-event/+server.ts": [
-    "deeds_labs/routes-parked-full/api/routes/[routeId]/health-event/server.test.ts",
-    "deeds_labs/routes-parked-full/api/routes/[routeId]/health-event/server.test.ts"
+  "deeds_labs/api-legacy/api/routes/[routeId]/health-event/+server.ts": [
+    "deeds_labs/api-legacy/api/routes/[routeId]/health-event/server.test.ts",
+    "deeds_labs/api-legacy/api/routes/[routeId]/health-event/server.test.ts"
   ],
-  "deeds_labs/routes-parked-full/api/routes/[routeId]/interactions/+server.ts": [
-    "deeds_labs/routes-parked-full/api/routes/[routeId]/interactions/server.test.ts",
-    "deeds_labs/routes-parked-full/api/routes/[routeId]/interactions/server.test.ts"
+  "deeds_labs/api-legacy/api/routes/[routeId]/interactions/+server.ts": [
+    "deeds_labs/api-legacy/api/routes/[routeId]/interactions/server.test.ts",
+    "deeds_labs/api-legacy/api/routes/[routeId]/interactions/server.test.ts"
   ],
-  "deeds_labs/routes-parked-full/api/routes/[routePath]/error-brain-analysis/+server.ts": [
-    "deeds_labs/routes-parked-full/api/routes/[routePath]/error-brain-analysis/server.test.ts",
-    "deeds_labs/routes-parked-full/api/routes/[routePath]/error-brain-analysis/server.test.ts"
+  "deeds_labs/api-legacy/api/routes/[routePath]/error-brain-analysis/+server.ts": [
+    "deeds_labs/api-legacy/api/routes/[routePath]/error-brain-analysis/server.test.ts",
+    "deeds_labs/api-legacy/api/routes/[routePath]/error-brain-analysis/server.test.ts"
   ],
   "deeds_labs/dead-scripts/phase-scripts/phase79-safety-gate.mjs": [
     "deeds_labs/dead-scripts/phase-scripts/phase79-safety-gate.test.mjs"
   ],
-  "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.ts": [
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts"
+  "deeds_labs/dead-scripts/syntax-repair/pattern-matcher.ts": [
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts"
   ],
-  "deeds_labs/services/development-tools/syntax-repair/src/patterns/index.ts": [
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/multi-pass-processor.test.ts"
+  "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.ts": [
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/multi-pass-processor.test.ts"
   ],
-  "deeds_labs/services/development-tools/syntax-repair/src/patterns/a11y-label-fix.ts": [
-    "deeds_labs/services/development-tools/syntax-repair/src/patterns/a11y-label-fix.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/patterns/a11y-label-fix.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/patterns/a11y-label-fix.test.ts",
-    "deeds_labs/services/development-tools/syntax-repair/src/patterns/a11y-label-fix.test.ts"
+  "deeds_labs/dead-scripts/syntax-repair/patterns/a11y-label-fix.ts": [
+    "deeds_labs/dead-scripts/syntax-repair/patterns/a11y-label-fix.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/patterns/a11y-label-fix.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/patterns/a11y-label-fix.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/patterns/a11y-label-fix.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/middleware/featureFlagEnforcer.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/middleware/featureFlagEnforcer.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/middleware/featureFlagEnforcer.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/middleware/featureFlagEnforcer.test.ts"
+  "deeds_labs/dead-scripts/syntax-repair/patterns/import-type-fix.ts": [
+    "deeds_labs/dead-scripts/syntax-repair/patterns/import-type-fix.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/patterns/import-type-fix.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/patterns/import-type-fix.test.ts",
+    "deeds_labs/dead-scripts/syntax-repair/patterns/import-type-fix.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/ace-context-manager.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/ace-context-manager.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/ace-context-manager.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/ace-context-manager.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/middleware/featureFlagEnforcer.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/middleware/featureFlagEnforcer.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/middleware/featureFlagEnforcer.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/middleware/featureFlagEnforcer.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/agentic-analyzer.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/agentic-analyzer.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/agentic-analyzer.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/agentic-analyzer.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/ace-context-manager.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/ace-context-manager.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/ace-context-manager.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/ace-context-manager.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/audit-trail.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/audit-trail.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/audit-trail.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/audit-trail.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/agentic-analyzer.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/agentic-analyzer.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/agentic-analyzer.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/agentic-analyzer.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/context-formatter.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/context-formatter.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/context-formatter.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/context-formatter.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/audit-trail.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/audit-trail.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/audit-trail.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/audit-trail.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-applicator.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-applicator.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-applicator.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-applicator.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/context-formatter.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/context-formatter.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/context-formatter.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/context-formatter.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-generator.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-generator.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-generator.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-generator.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-applicator.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-applicator.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-applicator.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-applicator.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-storage.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-storage.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-storage.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/diff-storage.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-generator.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-generator.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-generator.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-generator.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/embedding-service.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/embedding-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/embedding-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/embedding-service.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-storage.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-storage.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-storage.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/diff-storage.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/embedding-service.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/embedding-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/embedding-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/embedding-service.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/progress-tracker.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/progress-tracker.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/progress-tracker.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/progress-tracker.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-handler.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-handler.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-handler.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-handler.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/progress-tracker.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/progress-tracker.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/progress-tracker.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/progress-tracker.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base-learning.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base-learning.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base-learning.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base-learning.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-handler.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-handler.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-handler.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-handler.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base-learning.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base-learning.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base-learning.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-integration.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/knowledge-base-learning.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-api.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-api.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-api.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-api.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-analysis-pipeline.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-middleware.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-middleware.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-middleware.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-middleware.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-api.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-api.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-api.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-api.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-clusterer.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-clusterer.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-clusterer.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-clusterer.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-middleware.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-middleware.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-middleware.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-brain-middleware.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.unit.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.unit.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.unit.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-clusterer.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-clusterer.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-clusterer.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-clusterer.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/feature-flags.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/feature-flags.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/feature-flags.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/feature-flags.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.unit.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.unit.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/error-extractor.unit.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/llm-prompt-service.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/llm-prompt-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/llm-prompt-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/llm-prompt-service.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/feature-flags.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/feature-flags.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/feature-flags.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/feature-flags.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/rag-retriever.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/rag-retriever.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/rag-retriever.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/rag-retriever.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/llm-prompt-service.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/llm-prompt-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/llm-prompt-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/llm-prompt-service.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/validation-service.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/validation-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/validation-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/services/error-analysis/validation-service.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/rag-retriever.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/rag-retriever.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/rag-retriever.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/rag-retriever.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/server/cache.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/tests/cache/cache.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/archives/unused-2026-02-14/lib/tests/cache/cache.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/validation-service.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/validation-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/validation-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/services/error-analysis/validation-service.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-adapter.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-adapter.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-adapter.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-adapter.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-adapter.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/server/cache.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/tests/cache/cache.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/tests/cache/cache.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-context-service.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-context-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-context-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-context-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/ace-context-service.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-adapter.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-adapter.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-adapter.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-adapter.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-adapter.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/minio-service.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/minio-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/minio-service.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-context-service.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-context-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-context-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-context-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/ace-context-service.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/web-search-service.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/web-search-service.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/ace-web/web-search-service.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/minio-service.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/minio-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/minio-service.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/dataIsolation.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/dataIsolation.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/dataIsolation.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/web-search-service.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/web-search-service.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/ace-web/web-search-service.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/featureFlags.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/featureFlags.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/featureFlags.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/dataIsolation.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/dataIsolation.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/dataIsolation.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdates.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdates.batch.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdates.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdates.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdates.batch.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdates.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdates.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/featureFlags.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/featureFlags.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/featureFlags.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdatesPerformance.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdatesPerformance.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/healthUpdatesPerformance.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdates.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdates.batch.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdates.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdates.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdates.batch.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdates.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdates.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/knowledge-search/TfIdfRanker.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/knowledge-search/knowledge-search.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/knowledge-search/knowledge-search.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdatesPerformance.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdatesPerformance.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/healthUpdatesPerformance.test.ts"
   ],
-  "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/knowledge-search/types.ts": [
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/knowledge-search/knowledge-search.test.ts",
-    "deeds_labs/snapshots/2026-03-10/bucket-c-stale/_archived/services-corrupted/knowledge-search/knowledge-search.test.ts"
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/knowledge-search/TfIdfRanker.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/knowledge-search/knowledge-search.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/knowledge-search/knowledge-search.test.ts"
+  ],
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/knowledge-search/types.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/knowledge-search/knowledge-search.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/knowledge-search/knowledge-search.test.ts"
   ],
   "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/recovery.ts": [
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/recovery.test.ts",
+    "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/recovery.test.ts"
+  ],
+  "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/featureLogger.ts": [
     "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/recovery.test.ts",
     "deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/recovery.test.ts"
   ],

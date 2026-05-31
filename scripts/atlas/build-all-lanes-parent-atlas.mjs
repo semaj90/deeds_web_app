@@ -208,6 +208,98 @@ function extractSomEdgeLane() {
   return { nodes, edges };
 }
 
+function extractAuditLane() {
+  // Read latest audit run from sveltekit-frontend/memory/runs/
+  const runsDir = path.join(ROOT, 'sveltekit-frontend', 'memory', 'runs');
+  const nodes = [];
+  const edges = [];
+  if (!fs.existsSync(runsDir)) return { nodes, edges };
+
+  // Find newest run dir with audit_gates.json (walk newest → oldest)
+  const runs = fs.readdirSync(runsDir).filter((d) => /^\d{4}/.test(d)).sort();
+  let runId = null;
+  let gatesPath = null;
+  let failuresPath = null;
+  let synthPath = null;
+
+  for (let i = runs.length - 1; i >= 0; i--) {
+    const candidate = path.join(runsDir, runs[i], 'audit_gates.json');
+    if (fs.existsSync(candidate)) {
+      runId = runs[i];
+      gatesPath = candidate;
+      failuresPath = path.join(runsDir, runs[i], 'audit_failures.json');
+      synthPath = path.join(runsDir, runs[i], 'synthesis_summary.json');
+      break;
+    }
+  }
+  if (!runId) return { nodes, edges };
+
+  // Run-level node (anchor for all audit data in this lane)
+  const runNodeId = `audit:run:${runId}`;
+  const gatesData = JSON.parse(fs.readFileSync(gatesPath, 'utf8'));
+  nodes.push(makeNode('audit', runNodeId, `Audit run ${runId}`, gatesPath, {
+    runId,
+    allPass: gatesData.allPass,
+    gates: gatesData.gates,
+  }));
+
+  // Gate-level nodes — one per gate
+  for (const [gateName, value] of Object.entries(gatesData.gates || {})) {
+    const id = `audit:gate:${runId}:${gateName}`;
+    const failing = typeof value === 'number' && value > 0 && !gateName.includes('consumer') && !gateName.includes('pass') && !gateName.includes('kmeans') && !gateName.includes('som');
+    nodes.push(makeNode('audit', id, gateName, '', {
+      runId,
+      gate: gateName,
+      value,
+      failing,
+    }));
+    edges.push(makeEdge('audit', runNodeId, id, 'HAS_GATE', failing ? 1.0 : 0.1));
+  }
+
+  // Failure-level nodes — one per failure, with edge to its source file
+  if (fs.existsSync(failuresPath)) {
+    const failData = JSON.parse(fs.readFileSync(failuresPath, 'utf8'));
+    for (const f of (failData.failures || [])) {
+      const id = `audit:failure:${runId}:${f.gate}:${f.file.replace(/[/\\]/g, '_')}`;
+      nodes.push(makeNode('audit', id, `${f.gate} ${path.basename(f.file)}`, f.file, {
+        runId,
+        gate: f.gate,
+        file: f.file,
+        msg: f.msg,
+      }));
+      edges.push(makeEdge('audit', runNodeId, id, 'HAS_FAILURE', 1.0));
+      edges.push(makeEdge('audit', id, f.file, 'TARGETS_FILE', 1.0));
+    }
+  }
+
+  // P0/P1 cluster hotspots from synthesis_summary.json
+  if (fs.existsSync(synthPath)) {
+    const synth = JSON.parse(fs.readFileSync(synthPath, 'utf8'));
+    for (const tier of ['p0', 'p1']) {
+      for (const c of (synth[tier] || [])) {
+        const id = `audit:hotspot:${runId}:${c.cluster}`;
+        nodes.push(makeNode('audit', id, `${tier.toUpperCase()} ${c.cluster}`, '', {
+          runId,
+          tier,
+          cluster: c.cluster,
+          risk: c.risk,
+          diagCount: c.diagCount,
+          shallowCount: c.shallowCount,
+          protocols: c.protocols,
+          topFiles: c.topFiles,
+        }));
+        edges.push(makeEdge('audit', runNodeId, id, 'HAS_HOTSPOT', c.risk || 0.5));
+        // Edge from hotspot to each top file (so Gemma4 can navigate)
+        for (const tf of (c.topFiles || []).slice(0, 5)) {
+          edges.push(makeEdge('audit', id, tf, 'TARGETS_FILE', 1.0));
+        }
+      }
+    }
+  }
+
+  return { nodes, edges };
+}
+
 // ─── Writers ─────────────────────────────────────────────────────────────
 
 function writeNDJSON(filepath, rows) {
@@ -252,6 +344,7 @@ async function main() {
     { name: 'import', fn: extractImportLane },
     { name: 'workspace', fn: extractWorkspaceLane },
     { name: 'som_edge', fn: extractSomEdgeLane },
+    { name: 'audit', fn: extractAuditLane },
   ];
 
   const summary = {

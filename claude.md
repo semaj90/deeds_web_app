@@ -664,40 +664,30 @@ docker exec legal-ai-minio mc mirror --overwrite local/legal-evidence/ \
 
 ---
 
-## Schema Mismatch: `user_id` columns split across 3 types in DB (May 10, 2026)
+## Schema Mismatch: `user_id` columns — RESOLVED (May 30, 2026)
 
-**The schema is fragmented.** A live audit of `information_schema.columns` shows 44 tables with `user_id` (or `uploaded_by`) columns, split across **integer / uuid / text**:
+**Previously fragmented (May 10, 2026): 16 integer / 24 uuid / 3 text.**
+**Now (verified live 2026-05-30): 45 integer / 0 uuid / 3 text.** All 24 legacy uuid `user_id` columns have been migrated to integer, aligning with Lucia's integer `users.id`.
 
 ```sql
--- See full breakdown:
-SELECT table_name, column_name, data_type
+-- Verify (should match 45 integer / 0 uuid / 3 text):
+SELECT data_type, count(*) AS tables
 FROM information_schema.columns
 WHERE column_name IN ('user_id','uploaded_by') AND table_schema='public'
-ORDER BY data_type, table_name;
+GROUP BY data_type ORDER BY data_type;
 ```
 
-| Pattern | Count | Examples |
-|---|---|---|
-| `integer` (Lucia-aligned, FK-correct to `users.id`) | 16 tables | `sessions`, `evidence.uploaded_by`, `documents`, `legal_documents`, `rag_sessions`, `research_summaries`, `llm_outputs`, `canvas_states`, `themes`, `context_timeline` |
-| `uuid` (pre-Lucia legacy, **broken FK** — won't resolve to integer `users.id`) | 24 tables | `cases`, `evidence.user_id` (orphan, 0 rows), `chat_messages`, `audit_log`, `analytics_events`, `chunk_hit_log`, `synthesis_runs`, `email_verification_codes`, `yorha_chat_sessions` |
-| `text` (middle ground, accepts string IDs) | 3 tables | `admin_ai_chat_sessions`, `agent_actions`, `saved_citations` |
+**Confirmed identical on pg17 production and pg18 restored side container** (`legal-ai-postgres18-test:5433`).
 
-**Drizzle schema lies in places.** Many `userId: uuid('user_id')` definitions in `schema-postgres.ts` describe the historical intent, not the current DB. The DB is ground truth — verify with `\d table_name` before adding new code.
+**Lucia contract (unchanged):** `users.id` is `serial` integer. `locals.user.id` is `string` (Lucia v3 always strings IDs). `sessions.user_id` is integer in DB ✅.
 
-**Lucia contract:** `users.id` is `serial` integer. `locals.user.id` is `string` (Lucia v3 always strings IDs). `sessions.user_id` is integer in DB ✅.
-
-**Coding pattern (use until a structural fix lands):**
+**Simplified coding pattern (post-migration):**
 - Going INTO Lucia API (`createSession`, `getSession`): `String(user.id)`
-- Going INTO Drizzle `eq()` against an `integer user_id` column: `Number(locals.user.id)`
-- Going INTO Drizzle `eq()` against a `uuid user_id` column: pass `locals.user.id` as-is (string) — **never `Number()`**, but be aware this query will return zero rows for any integer-PK user
-- Going INTO Drizzle `eq()` against a `text user_id` column: pass `locals.user.id` as-is
-- **Before writing the query:** `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "\d <table>"` to confirm column type
+- Going INTO Drizzle `eq()` against an `integer user_id` column (45 tables): `Number(locals.user.id)`
+- Going INTO Drizzle `eq()` against a `text user_id` column (`admin_ai_chat_sessions`, `agent_actions`, `saved_citations`): pass `locals.user.id` as-is
+- **Per-table verification still recommended** for any newly-created table: `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "\d <table>"`
 
-**The 24 `uuid user_id` tables are technical debt.** They will never return data for current Lucia users. Three resolution paths:
-
-1. **Convert `users.id` to uuid** (multi-day refactor; requires backfill + FK swap across all 16 integer tables; aligns everything to uuid)
-2. **Migrate the 24 uuid columns to integer** (zero-downtime if tables are empty/low-row; quick if rows can be dropped; each needs `ALTER TABLE … ALTER COLUMN user_id TYPE integer USING NULL` for empty tables)
-3. **Two-tier identity** (keep both — `users.id integer` for Lucia/auth, separate `users.uuid uuid` for cross-system identity referenced by analytics/audit). Most pragmatic; documents intent.
+**Drizzle schema cleanup remaining:** Several files in `schema-postgres.ts` still declare `userId: uuid('user_id')` reflecting the OLD intent. The DB has moved on — these declarations are inert but should be migrated to `integer('user_id')` for documentation accuracy. Use `drizzle-kit introspect` to regenerate the canonical schema from the live DB.
 
 **Migrations applied this session (2026-05-10):**
 - `password_reset_tokens.user_id`: uuid → integer (0 rows; safe; matches `users.id` PK)

@@ -361,6 +361,38 @@ export const intentSynthesis = pgTable('intent_synthesis', {
 export type IntentSynthesis = typeof intentSynthesis.$inferSelect;
 export type NewIntentSynthesis = typeof intentSynthesis.$inferInsert;
 
+// === SCENARIO CACHE ===
+/**
+ * Lightweight scenario cache for ACE/context assembly results.
+ * Primary access is Redis L1 (fast TTL'd JSON). Qdrant L2 persistence is optional
+ * and can be used for longer-term, deduplicated retrieval across restarts.
+ */
+export const scenarioCache = pgTable(
+  'scenario_cache',
+  {
+    id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    queryHash: text('query_hash').notNull(), // sha256 of query+pipeline
+    pipelineKey: varchar('pipeline_key', { length: 255 }).notNull(),
+    qdrantCollection: varchar('qdrant_collection', { length: 200 }),
+    qdrantPointIds: jsonb('qdrant_point_ids').default([]).$type<string[]>(),
+    contextChunks: jsonb('context_chunks').default([]).$type<string[]>(),
+    cachedResult: jsonb('cached_result').default({}).notNull(),
+    ttlSeconds: integer('ttl_seconds').default(3600).notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  },
+  (t) => ({
+    indexes: [
+      index('idx_scenario_cache_query_hash').on(t.queryHash),
+      index('idx_scenario_cache_pipeline').on(t.pipelineKey),
+    ],
+  })
+);
+
+export type ScenarioCache = typeof scenarioCache.$inferSelect;
+export type NewScenarioCache = typeof scenarioCache.$inferInsert;
+
 // === AGENT MEMORY OBSERVATIONS (Claude-Mem/OpenCode mirror, Postgres canonical) ===
 export const agentMemoryObservations = pgTable(
   'agent_memory_observations',
@@ -4753,15 +4785,3 @@ export type NewLlmSynthesisEvent = typeof llmSynthesisEvents.$inferInsert;
 export type GlyphRecord_DB = typeof glyphRecords.$inferSelect;
 export type NewGlyphRecord_DB = typeof glyphRecords.$inferInsert;
 
-// === SCENARIO CACHE ===
-export const scenarioCache = pgTable('scenario_cache', {
-  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
-  queryHash: varchar('query_hash', { length: 64 }).notNull().unique(),
-  query: text('query').notNull(),
-  response: text('response').notNull(),
-  metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
-  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull().defaultNow(),
-});
-
-export type ScenarioCache = typeof scenarioCache.$inferSelect;
-export type NewScenarioCache = typeof scenarioCache.$inferInsert;
