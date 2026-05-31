@@ -92,6 +92,10 @@ namespace {
   }
 }
 
+// Forward declaration for Phase H2 stream-aware replay.
+extern "C" int replayGraphOnStream(const char* key, const float* input, int input_len,
+                                   float* output, int output_len, int stream_id);
+
 extern "C" int captureGraph(const char* key, int n, int dim) {
   if (!key || n <= 0 || dim <= 0) return -1;
 
@@ -156,6 +160,16 @@ extern "C" int captureGraph(const char* key, int n, int dim) {
 
 extern "C" int replayGraph(const char* key, const float* input, int input_len,
                            float* output, int output_len) {
+  // Legacy synchronous API — uses round-robin stream pool for better throughput
+  // when multiple concurrent calls arrive. Default stream_id = 0.
+  return replayGraphOnStream(key, input, input_len, output, output_len, 0);
+}
+
+// ── Phase H2: stream-aware replay ───────────────────────────────────────
+// Accepts a stream_id (0–3 round-robin). Dispatches H2D + graph launch + D2H
+// on the same stream so concurrent calls don't block each other.
+extern "C" int replayGraphOnStream(const char* key, const float* input, int input_len,
+                                   float* output, int output_len, int stream_id) {
   if (!key || !input || !output) return -1;
 
   std::unique_lock<std::mutex> lock(g_mutex);
@@ -167,23 +181,28 @@ extern "C" int replayGraph(const char* key, const float* input, int input_len,
   if (static_cast<size_t>(input_len) < need_in) return -3;
   if (static_cast<size_t>(output_len) < static_cast<size_t>(e.n)) return -4;
 
-  // Copy host → captured device buffer.
-  if (!cudaOk(cudaMemcpy(e.d_input, input, need_in * sizeof(float), cudaMemcpyHostToDevice),
-              "Memcpy H2D")) return -5;
+  // Release lock during H2D (CPU-GPU transfer doesn't access g_graphs).
+  lock.unlock();
 
-  cudaStream_t stream;
-  if (!cudaOk(cudaStreamCreate(&stream), "cudaStreamCreate")) return -6;
-  if (!cudaOk(cudaGraphLaunch(e.exec, stream), "GraphLaunch")) {
-    cudaStreamDestroy(stream); return -7;
-  }
-  if (!cudaOk(cudaStreamSynchronize(stream), "StreamSync")) {
-    cudaStreamDestroy(stream); return -8;
-  }
-  cudaStreamDestroy(stream);
+  // Get stream from pool (round-robin 0–3).
+  cudaStream_t stream = getStream(stream_id % STREAM_POOL_SIZE);
+  if (!stream) return -10;  // stream pool not ready
 
-  // Copy captured device output → host.
-  if (!cudaOk(cudaMemcpy(output, e.d_output, static_cast<size_t>(e.n) * sizeof(float),
-                         cudaMemcpyDeviceToHost), "Memcpy D2H")) return -9;
+  // Copy host → captured device buffer (async on this stream).
+  if (!cudaOk(cudaMemcpyAsync(e.d_input, input, need_in * sizeof(float),
+                              cudaMemcpyHostToDevice, stream),
+              "Memcpy H2D async")) return -5;
+
+  // Launch graph on this stream (no serialization with other stream calls).
+  if (!cudaOk(cudaGraphLaunch(e.exec, stream), "GraphLaunch")) return -7;
+
+  // Copy captured device output → host (async on this stream).
+  if (!cudaOk(cudaMemcpyAsync(output, e.d_output, static_cast<size_t>(e.n) * sizeof(float),
+                              cudaMemcpyDeviceToHost, stream),
+              "Memcpy D2H async")) return -9;
+
+  // Synchronize this stream to ensure output is ready.
+  if (!cudaOk(cudaStreamSynchronize(stream), "StreamSync")) return -8;
 
   return 0;
 }
@@ -198,6 +217,8 @@ extern "C" int cudaGraphCount() {
 extern "C" int captureGraph(const char* /*key*/, int /*n*/, int /*dim*/) { return -99; }
 extern "C" int replayGraph(const char* /*key*/, const float* /*input*/, int /*input_len*/,
                            float* /*output*/, int /*output_len*/) { return -99; }
+extern "C" int replayGraphOnStream(const char* /*key*/, const float* /*input*/, int /*input_len*/,
+                                   float* /*output*/, int /*output_len*/, int /*stream_id*/) { return -99; }
 extern "C" int cudaGraphCount() { return 0; }
 
 #endif  // CUDA_GRAPH_HAVE_CUDA

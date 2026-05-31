@@ -150,7 +150,7 @@ endif()
 
 # Add either the LibTorch-backed implementation or the CPU fallback stubs.
 if(SIMD_HAVE_LIBTORCH)
-  list(APPEND ADDON_SOURCES libtorch_graph_impl.cpp pytorch_graph.cc)
+  list(APPEND ADDON_SOURCES libtorch_graph_impl.cpp pytorch_graph.cc pytorch_graph_fp16.cc)
 else()
   if(SIMD_ENABLE_FALLBACK_STUBS)
     list(APPEND ADDON_SOURCES graph_fallback_stubs.cpp)

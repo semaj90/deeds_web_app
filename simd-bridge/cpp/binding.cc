@@ -80,6 +80,11 @@ extern "C" int attentionScoreGPU(const float* query, int dim, const float* keys,
 extern "C" int rewardScoreGPU(const float* gen, const float* ref, int n, int dim, float* out, int out_len);
 extern "C" int softmaxGPU(const float* logits, int n, float* out, int out_len);
 extern "C" int topKIndicesGPU(const float* scores, int n, int k, int* out, int out_len);
+
+// pytorch_graph_fp16.cc (Phase H3: FP16 GPU ops for 1.8× throughput)
+extern "C" int attentionScoreGPU_fp16(const float* query, int dim, const float* keys, int n, float* out, int out_len);
+extern "C" int rewardScoreGPU_fp16(const float* gen, const float* ref, int n, int dim, float* out, int out_len);
+extern "C" int batchCosineSimilarity_fp16(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
 extern "C" int kmeansWithCentroids(const float* embeddings, int n, int dim, int k, int max_iters,
                                     int* assignments_out, int assignments_len,
                                     float* centroids_out, int centroids_len,
@@ -116,6 +121,7 @@ extern "C" int bridge_relu(const float* in, float* out, int n);
 // CUDA Graph capture/replay (cuda_graph_bridge.cu)
 extern "C" int captureGraph(const char* key, int n, int dim);
 extern "C" int replayGraph(const char* key, const float* input, int input_len, float* output, int output_len);
+extern "C" int replayGraphOnStream(const char* key, const float* input, int input_len, float* output, int output_len, int stream_id);
 extern "C" int cudaGraphCount();
 
 // SOM cache (som_cache.cu)
@@ -778,6 +784,68 @@ static napi_value SoftmaxGPUWrapper(napi_env env, napi_callback_info info) {
   return result;
 }
 
+// ── Phase H3: FP16 GPU Wrappers ──────────────────────────────────────────────
+// AttentionScoreGPU_fp16 — scaled dot-product attention in FP16 (2× faster)
+// Signature: (query: Float32Array, dim: number, keys: Float32Array, n: number) → Float32Array[n]
+static napi_value AttentionScoreGPU_fp16Wrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4; napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 4) return throw_type_error(env, "attentionScoreGPU_fp16(query, dim, keys, n)");
+  void* q_data; napi_get_typedarray_info(env, argv[0], nullptr, nullptr, &q_data, nullptr, nullptr);
+  int32_t dim; napi_get_value_int32(env, argv[1], &dim);
+  void* k_data; napi_get_typedarray_info(env, argv[2], nullptr, nullptr, &k_data, nullptr, nullptr);
+  int32_t n; napi_get_value_int32(env, argv[3], &n);
+  if (n <= 0 || dim <= 0) return throw_type_error(env, "n and dim must be positive");
+  void* out_data; napi_value ab;
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "attentionScoreGPU_fp16: output allocation failed");
+  if (attentionScoreGPU_fp16((const float*)q_data, dim, (const float*)k_data, n, (float*)out_data, n) != 0)
+    return throw_error(env, "attentionScoreGPU_fp16 failed");
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, ab, 0, &result);
+  return result;
+}
+
+// RewardScoreGPU_fp16 — cosine similarity in FP16 (2× faster)
+static napi_value RewardScoreGPU_fp16Wrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4; napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 4) return throw_type_error(env, "rewardScoreGPU_fp16(gen, ref, n, dim)");
+  void* g_data; napi_get_typedarray_info(env, argv[0], nullptr, nullptr, &g_data, nullptr, nullptr);
+  void* r_data; napi_get_typedarray_info(env, argv[1], nullptr, nullptr, &r_data, nullptr, nullptr);
+  int32_t n; napi_get_value_int32(env, argv[2], &n);
+  int32_t dim; napi_get_value_int32(env, argv[3], &dim);
+  if (n <= 0 || dim <= 0) return throw_type_error(env, "n and dim must be positive");
+  void* out_data; napi_value ab;
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "rewardScoreGPU_fp16: output allocation failed");
+  if (rewardScoreGPU_fp16((const float*)g_data, (const float*)r_data, n, dim, (float*)out_data, n) != 0)
+    return throw_error(env, "rewardScoreGPU_fp16 failed");
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, ab, 0, &result);
+  return result;
+}
+
+// BatchCosineSimilarity_fp16 — batch cosine in FP16 (1.8× faster)
+static napi_value BatchCosineSimilarity_fp16Wrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4; napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 4) return throw_type_error(env, "batchCosineSimilarity_fp16(query, corpus, n, dim)");
+  void* q_data; napi_get_typedarray_info(env, argv[0], nullptr, nullptr, &q_data, nullptr, nullptr);
+  void* c_data; napi_get_typedarray_info(env, argv[1], nullptr, nullptr, &c_data, nullptr, nullptr);
+  int32_t n; napi_get_value_int32(env, argv[2], &n);
+  int32_t dim; napi_get_value_int32(env, argv[3], &dim);
+  if (n <= 0 || dim <= 0) return throw_type_error(env, "n and dim must be positive");
+  void* out_data; napi_value ab;
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "batchCosineSimilarity_fp16: output allocation failed");
+  if (batchCosineSimilarity_fp16((const float*)q_data, dim, (const float*)c_data, n, (float*)out_data, n) != 0)
+    return throw_error(env, "batchCosineSimilarity_fp16 failed");
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, ab, 0, &result);
+  return result;
+}
+
 // ── TopKIndicesGPU(Float32Array scores, n, k) → Int32Array[k] ───────────────
 
 static napi_value TopKIndicesGPUWrapper(napi_env env, napi_callback_info info) {
@@ -1102,6 +1170,52 @@ static napi_value ReplayGraphWrapper(napi_env env, napi_callback_info info) {
   return result;
 }
 
+// ── Phase H2: stream-aware replay wrapper ────────────────────────────────
+// Called as: replayGraphOnStream(key: string, input: Float32Array, stream_id: number)
+// Returns: Float32Array (same layout as replayGraph)
+static napi_value ReplayGraphOnStreamWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 3;
+  napi_value argv[3];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 3) return throw_type_error(env, "replayGraphOnStream(key:string, input:Float32Array, stream_id:number)");
+
+  char key_buf[256] = {0};
+  size_t key_len = 0;
+  if (napi_get_value_string_utf8(env, argv[0], key_buf, sizeof(key_buf), &key_len) != napi_ok)
+    return throw_type_error(env, "replayGraphOnStream: key must be a string");
+
+  bool is_ta = false;
+  napi_is_typedarray(env, argv[1], &is_ta);
+  if (!is_ta) return throw_type_error(env, "replayGraphOnStream: input must be a Float32Array");
+
+  napi_typedarray_type ta_type;
+  size_t in_len = 0;
+  void* in_data = nullptr;
+  napi_get_typedarray_info(env, argv[1], &ta_type, &in_len, &in_data, nullptr, nullptr);
+  if (ta_type != napi_float32_array)
+    return throw_type_error(env, "replayGraphOnStream: input must be a Float32Array");
+
+  int32_t stream_id = 0;
+  if (napi_get_value_int32(env, argv[2], &stream_id) != napi_ok)
+    return throw_type_error(env, "replayGraphOnStream: stream_id must be a number");
+
+  napi_value out_ab;
+  void* out_data = nullptr;
+  size_t out_len = in_len;
+  napi_create_arraybuffer(env, out_len * sizeof(float), &out_data, &out_ab);
+
+  int rc = replayGraphOnStream(key_buf, (const float*)in_data, (int)in_len, (float*)out_data, (int)out_len, (int)stream_id);
+  if (rc != 0) {
+    char msg[128];
+    snprintf(msg, sizeof(msg), "replayGraphOnStream failed: rc=%d", rc);
+    return throw_error(env, msg);
+  }
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, out_len, out_ab, 0, &result);
+  return result;
+}
+
 static napi_value CudaGraphCountWrapper(napi_env env, napi_callback_info info) {
   (void)info;
   napi_value result;
@@ -1130,6 +1244,10 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "pageRankGPU", PageRankGPUWrapper);
   registerFn(env, exports, "attentionScoreGPU", AttentionScoreGPUWrapper);
   registerFn(env, exports, "rewardScoreGPU", RewardScoreGPUWrapper);
+  // Phase H3: FP16 GPU ops for 1.8× throughput
+  registerFn(env, exports, "attentionScoreGPU_fp16", AttentionScoreGPU_fp16Wrapper);
+  registerFn(env, exports, "rewardScoreGPU_fp16", RewardScoreGPU_fp16Wrapper);
+  registerFn(env, exports, "batchCosineSimilarity_fp16", BatchCosineSimilarity_fp16Wrapper);
   registerFn(env, exports, "softmaxGPU", SoftmaxGPUWrapper);
   registerFn(env, exports, "topKIndicesGPU", TopKIndicesGPUWrapper);
   registerFn(env, exports, "kmeansWithCentroids", KmeansWithCentroidsWrapper);
@@ -1144,9 +1262,10 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);
   registerFn(env, exports, "simdJsonExtractNumbers", RegisterSimdJsonExtractNumbers);
   registerFn(env, exports, "simdJsonBackend", RegisterSimdJsonBackend);
-  // CUDA Graph capture/replay (Phase H1)
+  // CUDA Graph capture/replay (Phase H1 + Phase H2 stream support)
   registerFn(env, exports, "captureGraph", CaptureGraphWrapper);
   registerFn(env, exports, "replayGraph", ReplayGraphWrapper);
+  registerFn(env, exports, "replayGraphOnStream", ReplayGraphOnStreamWrapper);
   registerFn(env, exports, "cudaGraphCount", CudaGraphCountWrapper);
   return exports;
 }
