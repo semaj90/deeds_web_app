@@ -6,3 +6,6 @@ scripts/tag-legacy-go-files.mjs eol=lf
 sveltekit-frontend/docs/graph/codebase-graph.json filter=lfs diff=lfs merge=lfs -text
 sveltekit-frontend/docs/graph/sveltekit-route-gap-atlas.json filter=lfs diff=lfs merge=lfs -text
 sveltekit-frontend/docs/graph/sveltekit-route-map.json filter=lfs diff=lfs merge=lfs -text
+*.ndjson filter=lfs diff=lfs merge=lfs -text
+recommendations/tasks.ndjson filter=lfs diff=lfs merge=lfs -text
+ingest/nodes.ndjson filter=lfs diff=lfs merge=lfs -text
