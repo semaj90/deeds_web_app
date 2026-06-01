@@ -45,6 +45,15 @@
   - cuVS ❌ (needs `conda install -c rapidsai cuvs-cu13` in WSL2)
   - CUTLASS ❌ (needs `git clone https://github.com/NVIDIA/cutlass C:/cutlass`)
 
+### Native Bridge Verification ✅ (2026-05-31) — 38/38 tests pass
+- `simd-bridge/cpp/binding.cc` — `DotProductWrapper` upgraded: proper TypedArray validation, throws `TypeError` on non-TypedArray args
+- `simd-bridge/cpp/test-addon.cjs` — test suite updated to accept `checkCudaAvailable() === 2` (CUDA 13.0 + cuDNN)
+- All 38 diagnostic, math, and performance benchmark tests passed (0 failures):
+  - 10K-element `dotProduct` SIMD: **0.28 ms**
+  - 50×768 cosine similarity matrix: **15.12 ms**
+  - 200×128 k-means clustering (k=5): **27.64 ms**
+  - 10K-key simdjson fast parsing: **1.50 ms**
+
 ### Rust NAPI-RS Bridge ✅ (2026-05-30)
 - `simd_bridge_rs.node` — Rayon parallel batch parser: 1.92× faster than JSON.parse (9,373 cards: 3221ms → 1681ms)
 - `som_cache.cu` compiled with `SOM_HAVE_CUDA=1` via `build.rs`, `run_som_cache` NAPI-RS export bound
@@ -130,7 +139,12 @@ const b = require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node');
 const fns = ['checkCudaAvailable','relu','dotProduct','graphSimilarity','clusterEmbeddings',
              'attentionScoreGPU_fp16','rewardScoreGPU_fp16','batchCosineSimilarity_fp16'];
 fns.forEach(f => console.log(f + ':', typeof b[f] === 'function' ? 'OK' : 'MISSING'));
+// checkCudaAvailable() returns: 0=none, 1=CUDA only, 2=CUDA+cuDNN
+console.log('CUDA level:', b.checkCudaAvailable());
 "
+
+# Full 38-test suite (validates dotProduct TypedArray guard, CUDA level 2, perf benchmarks):
+node simd-bridge/cpp/test-addon.cjs
 ```
 
 ---
@@ -155,8 +169,9 @@ VS Code FolderOpen
   └─ ACE Incremental Refresh         (dirty-file embedding refresh)
 
 tensorrt_bridge.node exports (8 functions):
-  FP32: checkCudaAvailable, relu, dotProduct, graphSimilarity, clusterEmbeddings
+  FP32: checkCudaAvailable (returns 0=none/1=CUDA/2=CUDA+cuDNN), relu, dotProduct, graphSimilarity, clusterEmbeddings
   FP16: attentionScoreGPU_fp16, rewardScoreGPU_fp16, batchCosineSimilarity_fp16
+  Note: Phase 11E Rust/Rayon/Tokio pieces are self-contained — LibTorch not required for that lane
 ```
 
 ---
@@ -166,5 +181,7 @@ tensorrt_bridge.node exports (8 functions):
 - `1a577c89d3` → dynamic GPU library detection + cuBLAS/cuVS/CUTLASS presets
 - `0abba595f3` → simd-bridge: dynamic GPU library detection + CMake x64 presets + capability audit
 - `8ec4261b7f` → GPU capability matrix — primitives map + extended audit + cuDNN/cuVS/CUTLASS presets
+- `c5715f178e` → docs: clarify cuDNN/cuVS/CUTLASS status from live audit output
+- `binding.cc` → DotProductWrapper TypedArray guard + test-addon.cjs CUDA level 2 support (38/38 pass)
 - `.vscode/settings.json` → cmake x64 settings (gitignored, local only; preset: `windows-cuda`)
 - `.vscode/tasks.json` → CMake folderOpen task updated
