@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-31T09:45:04.268Z",
+  "timestamp": "2026-06-01T01:14:36.654Z",
   "rubric": {
     "testing": 0.4,
     "architecture": 0.2,
@@ -7,8 +7,8 @@
     "completion": 0.1,
     "clientServer": 0.1
   },
-  "totalTasks": 143,
-  "needsTesting": 106,
+  "totalTasks": 131,
+  "needsTesting": 98,
   "top20": [
     {
       "taskId": "TASK-8F878955",

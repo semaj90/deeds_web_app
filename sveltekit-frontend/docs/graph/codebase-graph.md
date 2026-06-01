@@ -1,11 +1,11 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-31T23:57:51.690Z
+> Generated: 2026-06-01T01:09:55.576Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 56652 |
+| Files | 56683 |
 | Routes | 1087 |
 | Components | 5346 |
 | API handlers | 5538 |
@@ -35,9 +35,9 @@
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/core/useGamingEvolution.js` — 31 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/utils/parallaxDynamic.js` — 22 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/utils/parallaxDynamic.js` — 22 marker(s)
-- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
-- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
-- `.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `.venv-py313-backup/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `.venv-py313-backup/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
+- `.venv-py313-backup/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
 - `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
 - `sveltekit-frontend/scripts/phase104-backups/src/lib/services/vector-service.ts` — 13 marker(s)

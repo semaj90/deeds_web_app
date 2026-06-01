@@ -1,4 +1,4 @@
-# NPM Library Doc-Fetch Plan — 2026-05-31
+# NPM Library Doc-Fetch Plan — 2026-06-01
 
 **Total deps**: 204 across 5 package.json files
 **Usage**: SERVER=45, UNUSED=108, SHARED=47, TEST=2, CLIENT=2

@@ -64,6 +64,8 @@
   - proposal artifact exists: `.tmp/feature-organization-proposal.md`
   - proposal summary: 64 files classified across 8 feature groups; 23 files remain unclassified for manual review
   - current scan: 3,841 files; 1,760 unclassified
+  - evidence group and its video-sidecar siblings have been moved into `sveltekit-frontend/src/lib/server/features/evidence/`
+  - observability group has been moved into `sveltekit-frontend/src/lib/server/features/observability/`
   - this is the gating step before any schema migration work moves forward
 - [x] Consolidation/schema alignment note exists.
   - `docs/architecture/consolidation-and-schema-alignment.md`
@@ -74,6 +76,28 @@
 - [x] Feature consolidation review queue exists.
   - `docs/architecture/feature-consolidation-review-queue.md`
   - high-confidence groups are now ordered for human approval without moving files yet
+- [x] Kanban-to-parent-atlas alignment note exists.
+  - `docs/architecture/kanban-parent-atlas-alignment.md`
+  - open work is routed from the master todo into kanban tasks and then into parent atlas indexing using shared feature keys and source refs
+- [x] Master todo kanban sync is live.
+  - `docs/graph/kanban-board.json`
+  - `memory/exports/kanban-ranking-report.json`
+  - 14 master-todo tasks were merged into the board and 131 total kanban tasks were ranked with npm inventory
+- [x] Parent atlas indexing remains in sync with the task board.
+  - `memory/exports/parent-atlas/parent_atlas_index.json`
+  - `memory/exports/parent-atlas-report.json`
+  - parent atlas indexing completed after the kanban sync and validation passed on the current atlas snapshot
+- [x] Taskboard / parent atlas sync orchestrator exists.
+  - `scripts/atlas/run-taskboard-parent-atlas-sync.mjs`
+  - `atlas:taskboard:sync`
+  - a single entrypoint now wires master todo → kanban → ranking → parent atlas validation, with optional codebase semantic refresh and graphify/Karpathy refresh
+- [x] Taskboard / parent atlas sync is validated with semantic refresh.
+  - `.tmp/taskboard-parent-atlas-sync.json`
+  - `.tmp/taskboard-parent-atlas-sync.md`
+  - the sync wrapper passes with `--with-codebase --with-graphify`, including the Karpathy batch lane and the parent atlas validation gate; bounded runs use `ATLAS_SYNC_LIMIT`
+- [x] Unified sync alias exists.
+  - `atlas:unified:sync`
+  - one command now routes the full taskboard → semantic → graphify → parent-atlas path; use `ATLAS_SYNC_LIMIT` for bounded runs instead of npm CLI args
 - [x] Clean publish split for local Karpathy follow-on work (P1.5)
   - cluster tag scroll + ACE hot-cluster injection via `karpathy:publish-split`
   - Qdrant cluster payload backfill via `karpathy:qdrant-backfill`
