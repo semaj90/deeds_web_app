@@ -1,29 +1,29 @@
 {
-  "timestamp": "2026-05-30T06:05:34.696Z",
+  "timestamp": "2026-05-31T23:32:35.152Z",
   "scanRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src",
   "stats": {
-    "total": 3801,
+    "total": 3841,
     "byExtension": {
-      ".ts": 2424,
+      ".ts": 2460,
       ".md": 384,
       ".svelte": 906,
-      ".js": 27,
+      ".js": 31,
       ".json": 16,
       ".sql": 38,
       ".mjs": 6
     },
     "byDomain": {
-      "unclassified": 1732,
-      "llm": 195,
-      "cache": 119,
-      "auth": 27,
+      "unclassified": 1760,
+      "llm": 197,
+      "cache": 120,
+      "auth": 28,
       "graph": 166,
-      "rag": 396,
+      "rag": 403,
       "ui": 950,
-      "vector": 45,
+      "vector": 46,
       "admin": 171
     },
-    "unclassified": 1732
+    "unclassified": 1760
   },
   "files": [
     {
@@ -1252,6 +1252,13 @@
       "confidence": "1.00"
     },
     {
+      "relPath": "lib/server/db/schema/workspace-sessions.ts",
+      "name": "workspace-sessions.ts",
+      "ext": ".ts",
+      "domain": "auth",
+      "confidence": "1.00"
+    },
+    {
       "relPath": "lib/server/gpu/autoencoder-session.ts",
       "name": "autoencoder-session.ts",
       "ext": ".ts",
@@ -1899,6 +1906,13 @@
       "relPath": "lib/server/redis-streams.ts",
       "name": "redis-streams.ts",
       "ext": ".ts",
+      "domain": "cache",
+      "confidence": "0.70"
+    },
+    {
+      "relPath": "lib/server/redis.js",
+      "name": "redis.js",
+      "ext": ".js",
       "domain": "cache",
       "confidence": "0.70"
     },
@@ -3905,6 +3919,13 @@
       "confidence": "0.80"
     },
     {
+      "relPath": "lib/server/db/schema/intent-synthesis-rewards.ts",
+      "name": "intent-synthesis-rewards.ts",
+      "ext": ".ts",
+      "domain": "llm",
+      "confidence": "0.80"
+    },
+    {
       "relPath": "lib/server/db/schema/synthesis-logs.ts",
       "name": "synthesis-logs.ts",
       "ext": ".ts",
@@ -4062,6 +4083,13 @@
       "relPath": "lib/server/ollama-service.ts",
       "name": "ollama-service.ts",
       "ext": ".ts",
+      "domain": "llm",
+      "confidence": "0.80"
+    },
+    {
+      "relPath": "lib/server/ollama.js",
+      "name": "ollama.js",
+      "ext": ".js",
       "domain": "llm",
       "confidence": "0.80"
     },
@@ -5340,6 +5368,20 @@
       "confidence": "0.90"
     },
     {
+      "relPath": "lib/server/db/schema/codebase-embeddings.ts",
+      "name": "codebase-embeddings.ts",
+      "ext": ".ts",
+      "domain": "rag",
+      "confidence": "0.90"
+    },
+    {
+      "relPath": "lib/server/db/schema/embeddings.ts",
+      "name": "embeddings.ts",
+      "ext": ".ts",
+      "domain": "rag",
+      "confidence": "0.90"
+    },
+    {
       "relPath": "lib/server/db/schema/legal-chunks.ts",
       "name": "legal-chunks.ts",
       "ext": ".ts",
@@ -5349,6 +5391,13 @@
     {
       "relPath": "lib/server/db/schema/search-analytics.ts",
       "name": "search-analytics.ts",
+      "ext": ".ts",
+      "domain": "rag",
+      "confidence": "0.90"
+    },
+    {
+      "relPath": "lib/server/db/schema/statute-chunks.ts",
+      "name": "statute-chunks.ts",
       "ext": ".ts",
       "domain": "rag",
       "confidence": "0.90"
@@ -5440,6 +5489,20 @@
     {
       "relPath": "lib/server/evidence/services/embedding.ts",
       "name": "embedding.ts",
+      "ext": ".ts",
+      "domain": "rag",
+      "confidence": "0.90"
+    },
+    {
+      "relPath": "lib/server/features/legal-corpus/index.ts",
+      "name": "index.ts",
+      "ext": ".ts",
+      "domain": "rag",
+      "confidence": "0.90"
+    },
+    {
+      "relPath": "lib/server/features/rag/index.ts",
+      "name": "index.ts",
       "ext": ".ts",
       "domain": "rag",
       "confidence": "0.90"
@@ -6026,6 +6089,13 @@
       "confidence": "0.90"
     },
     {
+      "relPath": "lib/server/retrieval/query-router-4x4.ts",
+      "name": "query-router-4x4.ts",
+      "ext": ".ts",
+      "domain": "rag",
+      "confidence": "0.90"
+    },
+    {
       "relPath": "lib/server/retrieval/ranking-features.ts",
       "name": "ranking-features.ts",
       "ext": ".ts",
@@ -6035,6 +6105,13 @@
     {
       "relPath": "lib/server/retrieval/rerank-decision-tree.ts",
       "name": "rerank-decision-tree.ts",
+      "ext": ".ts",
+      "domain": "rag",
+      "confidence": "0.90"
+    },
+    {
+      "relPath": "lib/server/retrieval/router-matrix.ts",
+      "name": "router-matrix.ts",
       "ext": ".ts",
       "domain": "rag",
       "confidence": "0.90"
@@ -15308,6 +15385,13 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/agent-executor.ts",
+      "name": "agent-executor.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/agent/autonomous-agent.ts",
       "name": "autonomous-agent.ts",
       "ext": ".ts",
@@ -17415,6 +17499,34 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/db/schema/case-note-evidence-refs.ts",
+      "name": "case-note-evidence-refs.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/case-note-versions.ts",
+      "name": "case-note-versions.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/case-notes.ts",
+      "name": "case-notes.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/case-statute-links.ts",
+      "name": "case-statute-links.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/db/schema/citations.ts",
       "name": "citations.ts",
       "ext": ".ts",
@@ -17422,8 +17534,22 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/db/schema/codebase-files.ts",
+      "name": "codebase-files.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/db/schema/codebase-intelligence.ts",
       "name": "codebase-intelligence.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/codebase-relationship-reports.ts",
+      "name": "codebase-relationship-reports.ts",
       "ext": ".ts",
       "domain": "unclassified",
       "confidence": "0.00"
@@ -17494,6 +17620,20 @@
     {
       "relPath": "lib/server/db/schema/evidence.ts",
       "name": "evidence.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/feature-cards.ts",
+      "name": "feature-cards.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/feature-registry-vectors.ts",
+      "name": "feature-registry-vectors.ts",
       "ext": ".ts",
       "domain": "unclassified",
       "confidence": "0.00"
@@ -17583,6 +17723,13 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/db/schema/legal-documents.ts",
+      "name": "legal-documents.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/db/schema/legal-nodes.ts",
       "name": "legal-nodes.ts",
       "ext": ".ts",
@@ -17627,6 +17774,13 @@
     {
       "relPath": "lib/server/db/schema/metadata-spine.ts",
       "name": "metadata-spine.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/model-weights.ts",
+      "name": "model-weights.ts",
       "ext": ".ts",
       "domain": "unclassified",
       "confidence": "0.00"
@@ -17709,8 +17863,43 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/db/schema/tasks.ts",
+      "name": "tasks.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/timeline-events.ts",
+      "name": "timeline-events.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/db/schema/token-map.ts",
       "name": "token-map.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/vector-smoke.ts",
+      "name": "vector-smoke.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/workspace-notes.ts",
+      "name": "workspace-notes.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/db/schema/workspaces.ts",
+      "name": "workspaces.ts",
       "ext": ".ts",
       "domain": "unclassified",
       "confidence": "0.00"
@@ -18115,6 +18304,34 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/features/ai/index.ts",
+      "name": "index.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/features/cases/index.ts",
+      "name": "index.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/features/codebase-intel/index.ts",
+      "name": "index.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/features/evidence/index.ts",
+      "name": "index.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/features/feature-glyph-encoder.ts",
       "name": "feature-glyph-encoder.ts",
       "ext": ".ts",
@@ -18150,9 +18367,23 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/features/identity/index.ts",
+      "name": "index.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/features/LLMS.md",
       "name": "LLMS.md",
       "ext": ".md",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/features/observability/index.ts",
+      "name": "index.ts",
+      "ext": ".ts",
       "domain": "unclassified",
       "confidence": "0.00"
     },
@@ -19053,6 +19284,20 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/ndjson-store.js",
+      "name": "ndjson-store.js",
+      "ext": ".js",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/ndjson-store.ts",
+      "name": "ndjson-store.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/nlp/analyzer.ts",
       "name": "analyzer.ts",
       "ext": ".ts",
@@ -19077,6 +19322,20 @@
       "relPath": "lib/server/observability/LLMS.md",
       "name": "LLMS.md",
       "ext": ".md",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/observability/offline-pipeline.ts",
+      "name": "offline-pipeline.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/server/observability/outcome-ledger.ts",
+      "name": "outcome-ledger.ts",
+      "ext": ".ts",
       "domain": "unclassified",
       "confidence": "0.00"
     },
@@ -19676,6 +19935,13 @@
       "confidence": "0.00"
     },
     {
+      "relPath": "lib/server/tasks/agent-pickup-worker.ts",
+      "name": "agent-pickup-worker.ts",
+      "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
       "relPath": "lib/server/tensor/LLMS.md",
       "name": "LLMS.md",
       "ext": ".md",
@@ -20141,6 +20407,13 @@
       "relPath": "lib/services/api-client.ts",
       "name": "api-client.ts",
       "ext": ".ts",
+      "domain": "unclassified",
+      "confidence": "0.00"
+    },
+    {
+      "relPath": "lib/services/couchdb-client.js",
+      "name": "couchdb-client.js",
+      "ext": ".js",
       "domain": "unclassified",
       "confidence": "0.00"
     },
@@ -26475,6 +26748,13 @@
     {
       "relPath": "lib/server/startup/qdrant-init.ts",
       "name": "qdrant-init.ts",
+      "ext": ".ts",
+      "domain": "vector",
+      "confidence": "0.80"
+    },
+    {
+      "relPath": "lib/server/tasks/semantic-packets.ts",
+      "name": "semantic-packets.ts",
       "ext": ".ts",
       "domain": "vector",
       "confidence": "0.80"

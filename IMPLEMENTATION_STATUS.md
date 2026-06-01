@@ -71,6 +71,9 @@
 - [x] Consolidation/schema migration checklist exists.
   - `docs/architecture/consolidation-and-schema-migration-checklist.md`
   - repo consolidation → parent atlas → schema drift → migrate is now explicit
+- [x] Feature consolidation review queue exists.
+  - `docs/architecture/feature-consolidation-review-queue.md`
+  - high-confidence groups are now ordered for human approval without moving files yet
 - [x] Clean publish split for local Karpathy follow-on work (P1.5)
   - cluster tag scroll + ACE hot-cluster injection via `karpathy:publish-split`
   - Qdrant cluster payload backfill via `karpathy:qdrant-backfill`

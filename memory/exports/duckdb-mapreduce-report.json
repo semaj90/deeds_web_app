@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-31T04:54:57.105Z",
+  "timestamp": "2026-05-31T21:49:35.303Z",
   "mode": "apply",
   "phase": "DuckDB Map-Reduce Atlas Join",
   "extraction": {
@@ -10,7 +10,7 @@
   "export": {
     "enriched_cards": 9373,
     "cluster_summaries": 357,
-    "parent_atlas_entries": 9374
+    "parent_atlas_entries": 9375
   },
   "status": "Map-reduce join complete, canonical tables ready for Bitfrost cache and offline analysis",
   "nextSteps": [

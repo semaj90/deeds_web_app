@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-30T06:05:34.880Z",
+  "timestamp": "2026-05-31T23:32:35.185Z",
   "phases": [
     {
       "phase": "Create Directories",
@@ -16,13 +16,13 @@
     },
     {
       "phase": "Move Files (git mv)",
-      "count": 1732,
-      "note": "1732 unclassified files need manual review"
+      "count": 1760,
+      "note": "1760 unclassified files need manual review"
     },
     {
       "phase": "Update Imports",
-      "count": 3801,
-      "estimatedLines": 7602,
+      "count": 3841,
+      "estimatedLines": 7682,
       "note": "Average 2 import statements per file"
     }
   ]

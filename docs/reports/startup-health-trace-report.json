@@ -1,7 +1,7 @@
 {
   "ok": true,
   "strict": false,
-  "timestamp": "2026-05-21T03:59:41.5334103Z",
+  "timestamp": "2026-05-31T19:28:57.9389966Z",
   "output_file": "docs/reports/startup-health-trace-report.json",
   "neo4j_credential_source": {
     "user": ".env",
@@ -19,8 +19,8 @@
       "ok": true,
       "required": true,
       "result": {
-        "hasResult": true,
-        "status": 200
+        "status": 200,
+        "hasResult": true
       }
     },
     "trace-engram-redis-health": {
@@ -38,20 +38,21 @@
       "ok": true,
       "required": true,
       "result": {
+        "uri": "http://127.0.0.1:7474/db/neo4j/tx/commit",
+        "user_source": ".env",
         "password_source": ".env",
         "status": 200,
-        "user_source": ".env",
-        "authenticated": true,
-        "uri": "http://127.0.0.1:7474/db/neo4j/tx/commit"
+        "authenticated": true
       }
     },
     "redis": {
       "ok": true,
       "required": false,
       "result": {
-        "port": 6379,
-        "connected": true,
-        "host": "127.0.0.1"
+        "method": "redis-cli",
+        "error": "NOAUTH Authentication required.\r\n\r\nAUTH failed: WRONGPASS invalid username-password pair or user is disabled.",
+        "status": "degraded",
+        "auth_mode": "auth-or-noauth-mismatch"
       }
     },
     "qdrant": {

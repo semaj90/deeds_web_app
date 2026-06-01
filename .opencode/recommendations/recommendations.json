@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-29T01:27:12.962Z",
+  "generatedAt": "2026-05-31T20:55:35.498Z",
   "totalCount": 5,
   "clusters": {
     "Legal Workspace": [
       {
-        "id": "stale_feature_54425378",
+        "id": "stale_feature_5d95892b",
         "type": "missing_feature",
         "cluster": "Legal Workspace",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -20,7 +20,7 @@
     ],
     "General": [
       {
-        "id": "stale_feature_1b36dec5",
+        "id": "stale_feature_97e21947",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -34,7 +34,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_78b7221c",
+        "id": "stale_feature_b9cda3a9",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -48,7 +48,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_5a50cf1a",
+        "id": "stale_feature_2ddeb9ec",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -62,7 +62,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_4e4ffe2e",
+        "id": "stale_feature_e61d7c7b",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -76,107 +76,10 @@
         "featureStatus": "missing"
       }
     ]
-    ,
-    "TRACE and MCP": [
-      {
-        "id": "rec_trace_mcp_verification",
-        "cluster": "Infrastructure",
-        "type": "missing_feature",
-        "title": "Verify TRACE MCP transport and add health probe route",
-        "why": "TRACE MCP is the canonical retrieval boundary and must be routinely health-checked.",
-        "action": "Add a lightweight GET /health endpoint that proxies a TRACE MCP tools/list call and fails fast if TRACE is unreachable.",
-        "sourceRefs": [
-          "scripts/mcp/",
-          "docs/opencode/SUB-MASTER-FEATURE-TODO-2026-05-27.md"
-        ],
-        "priority": "high",
-        "next_command": "node scripts/mcp/verify-trace-health.mjs"
-      }
-    ],
-    "Atlas Overlay": [
-      {
-        "id": "rec_atlas_schema_indexer",
-        "cluster": "Atlas",
-        "type": "missing_dependency",
-        "title": "Wire schema-indexer contract into MCP search routing",
-        "why": "schema-indexer contract cards exist but no MCP tool or route reads them for query routing.",
-        "action": "Implement a TRACE MCP tool or HTTP GET /api/atlas/schema-search that queries memory/knowledge/schema-indexer-contract-cards.jsonl and returns top candidates.",
-        "sourceRefs": [
-          "memory/knowledge/schema-indexer-contract-cards.jsonl",
-          "src/routes/api/atlas/audit/+server.ts"
-        ],
-        "priority": "high",
-        "next_command": "node scripts/atlas/wire-schema-indexer.mjs"
-      }
-    ],
-    "Vector Drift": [
-      {
-        "id": "rec_vector_drift_shadow_columns",
-        "cluster": "Data",
-        "type": "developer_recommendation",
-        "title": "Add 768d shadow pgvector columns and backfill",
-        "why": "Live DB uses 384d vectors but retrieval expects 768d - add shadow columns to migrate safely.",
-        "action": "Create migration SQL to add vector(768) shadow columns, backfill from embeddings pipeline, and route retrieval to preferred column.",
-        "sourceRefs": [
-          "sveltekit-frontend/drizzle/",
-          "docs/opencode/SUB-MASTER-FEATURE-TODO-2026-05-27.md"
-        ],
-        "priority": "medium",
-        "next_command": "node scripts/drizzle/generate-shadow-vector-migration.mjs"
-      }
-    ],
-    "Cluster Cards": [
-      {
-        "id": "rec_cluster_card_flow",
-        "cluster": "Graph",
-        "type": "missing_feature",
-        "title": "Generate cluster cards after codebase map stabilizes",
-        "why": "Cluster card flow depends on stable codebase map; automation should run post-graph export.",
-        "action": "Run `npm run graphify:cluster-summaries` and write graph-refresh manifest; add a manifest version write step to export pipeline.",
-        "sourceRefs": [
-          "docs/graph/codebase-map.md",
-          "scripts/graphify/"
-        ],
-        "priority": "medium",
-        "next_command": "npm run graphify:cluster-summaries"
-      }
-    ],
-    "Agent Executor": [
-      {
-        "id": "rec_agent_executor_run",
-        "cluster": "Agent",
-        "type": "missing_feature",
-        "title": "Implement runAgentSkill via TRACE MCP",
-        "why": "Agent executor route is a 501 stub; implement minimal runtime to call trace.kag_search and return top-5.",
-        "action": "Implement `sveltekit-frontend/src/lib/server/agent-executor.ts` to call TRACE MCP and hook into /api/atlas/audit route.",
-        "sourceRefs": [
-          "sveltekit-frontend/src/lib/server/agent-executor.ts",
-          "src/routes/api/atlas/audit/+server.ts"
-        ],
-        "priority": "high",
-        "next_command": "node scripts/agents/implement-runAgentSkill.mjs"
-      }
-    ],
-    "Phase Catch-up": [
-      {
-        "id": "rec_phase_engram_prime",
-        "cluster": "Engram",
-        "type": "developer_recommendation",
-        "title": "Prime engram session context on startup",
-        "why": "engram.session_context_inject must be called from workspace-bootstrap to warm KV cache.",
-        "action": "Call engram.session_context_inject in antigravity agent prompt flow and verify in startup smoke.",
-        "sourceRefs": [
-          "docs/opencode/SUB-MASTER-FEATURE-TODO-2026-05-27.md",
-          "scripts/startup/ace-incremental-startup.mjs"
-        ],
-        "priority": "medium",
-        "next_command": "node scripts/startup/prime-engram-session.mjs"
-      }
-    ]
   },
   "top10": [
     {
-      "id": "stale_feature_54425378",
+      "id": "stale_feature_5d95892b",
       "type": "missing_feature",
       "cluster": "Legal Workspace",
       "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -190,7 +93,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_1b36dec5",
+      "id": "stale_feature_97e21947",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -204,7 +107,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_78b7221c",
+      "id": "stale_feature_b9cda3a9",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -218,7 +121,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_5a50cf1a",
+      "id": "stale_feature_2ddeb9ec",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -232,7 +135,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_4e4ffe2e",
+      "id": "stale_feature_e61d7c7b",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
