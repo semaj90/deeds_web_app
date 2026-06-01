@@ -19,7 +19,8 @@
 ├─────────────────────────────────────────────────────────────────────┤
 │  cuDNN 9.x  (fused neural op graphs)                               │
 │  SDPA / FlashAttention, fused normalization, conv fusion            │
-│  Optional if CUDNN_ROOT or a known install path is present         │
+│  ❌ Windows native: NOT available — Linux/WSL2/Docker only          │
+│  ✅ WSL2/Docker: apt-get install libcudnn9-dev-cuda-12              │
 ├─────────────────────────────────────────────────────────────────────┤
 │  cuVS  (ANN / vector search / clustering)                          │
 │  CAGRA graph-ANN (best recall >0.95 for 768-dim)                   │
@@ -77,7 +78,7 @@
 |-----------|---------|---------|
 | Scaled dot-product attention FP32 | `attentionScoreGPU` (LibTorch) | CPU stub |
 | Scaled dot-product attention FP16 | `attentionScoreGPU_fp16` (LibTorch half) | FP32 variant |
-| SDPA fused (FlashAttention) | cuDNN 9.x (Linux only) | LibTorch unfused SDPA |
+| SDPA fused (FlashAttention) | cuDNN 9.x (WSL2/Docker only — ❌ Windows native) | LibTorch unfused SDPA |
 | GRPO reward scoring FP16 | `rewardScoreGPU_fp16` (LibTorch half) | `rewardScoreGPU` FP32 |
 
 ### ANN / Vector Search / Clustering

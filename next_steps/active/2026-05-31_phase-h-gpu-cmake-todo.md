@@ -24,15 +24,34 @@
   - `cmake.sourceDirectory` → `simd-bridge/cpp` (was `simd-bridge`, caused wrong root)
   - `cmake.useCMakePresets: "always"` → forces `CMakePresets.json`
   - `cmake.defaultKit` → `Visual Studio Community 2022 Release - amd64`
-  - `cmake.defaultConfigurePreset` → `windows-cuda`
+  - `cmake.defaultConfigurePreset` → `windows-cuda` (production; `windows-x64-cuda-libtorch` is equivalent)
 - Deleted stale `build/` at workspace root (had `CMAKE_GENERATOR_PLATFORM=win32`)
-- `CMakePresets.json` `windows-cuda` preset already has `architecture: x64`, CUDA 13.0, LibTorch 2.9
+- All presets now enforce `"architecture": "x64"` + `"toolset": { "value": "host=x64" }` — win32 guard added to CMakeLists.txt
 
 ### VS Code FolderOpen CMake Task ✅
 - Replaced `CMake: Auto-Build on Startup` with `CMake: Configure + Build (x64 CUDA, folderOpen)`
 - Runs `cmake --preset windows-cuda` (x64 + CUDA arch 86 + LibTorch) then `cmake --build --parallel 4`
 - Skips if `.node` built <24h ago
 - Probes CUDA availability after build via `checkCudaAvailable()`
+
+### GPU Capability Matrix ✅ (2026-05-31)
+- `docs/native/native-gpu-primitives-map.md` — full layer stack reference + primitives-by-operation tables
+- `scripts/native/audit-gpu-capabilities.mjs` — detects all GPU libs, emits `.tmp/gpu-capabilities-audit.json/.md`
+- New presets: `windows-x64-fallback`, `windows-x64-cuda-runtime`, `windows-x64-cuda-cublas`, `windows-x64-cuda-libtorch`
+- New CMake flag: `SIMD_ENABLE_CUDNN` (OFF by default, Linux/WSL2 only)
+- Validated on this machine:
+  - CUDA 13.0 ✅ | cuBLAS ✅ | cuBLASLt ✅ | LibTorch 2.9.0+cu130 ✅
+  - cuDNN ❌ Windows native (needs WSL2/Docker: `apt-get install libcudnn9-dev-cuda-12`)
+  - cuVS ❌ (needs `conda install -c rapidsai cuvs-cu13` in WSL2)
+  - CUTLASS ❌ (needs `git clone https://github.com/NVIDIA/cutlass C:/cutlass`)
+
+### Rust NAPI-RS Bridge ✅ (2026-05-30)
+- `simd_bridge_rs.node` — Rayon parallel batch parser: 1.92× faster than JSON.parse (9,373 cards: 3221ms → 1681ms)
+- `som_cache.cu` compiled with `SOM_HAVE_CUDA=1` via `build.rs`, `run_som_cache` NAPI-RS export bound
+- `bifrost-cache-manager.ts` — wired `parseFast` for KAG context cache extraction
+- SHA-256 cache-key hashing via Node `crypto` module (replaces collision-prone prior hash)
+- Dockerfile updated: `node:22-alpine` → `node:22-slim` (glibc-compatible for native addons)
+- Autoencoder training complete: 33,215 embeddings 768→64 via cuBLAS, weights saved to Redis (`ace:autoencoder:weights`)
 
 ---
 
@@ -53,7 +72,7 @@
 | 🩺 Startup: Atlas Smoke Gate | 16-probe atlas + Qdrant/Redis/Neo4j | folderOpen |
 | 🔥 Startup: Seed Hit-Demand | chunk_hit_log → Redis routing policy | folderOpen |
 | 🧪 Startup: OpenCode Sidecars Smoke | OpenCode MCP sidecar health | folderOpen |
-| **CMake: Configure + Build (x64 CUDA)** | **cmake --preset windows-cuda → tensorrt_bridge.node** | **folderOpen** |
+| **CMake: Configure + Build (x64 CUDA)** | **cmake --preset windows-cuda (= windows-x64-cuda-libtorch) → tensorrt_bridge.node** | **folderOpen** |
 | Extension: Compile on Startup | vscode-extension compile | folderOpen |
 
 ---
@@ -81,26 +100,30 @@ Wire GPU scoring into the error analysis pipeline:
 ### H6 — Memory Engram Injection + Graph Tree Synthesis
 These require H4+H5 to be stable first:
 
-- [ ] `gpu:karpathy:encoded` (Redis 64-dim) — feed into engram L1 KV cache once autoencoder is trained
+- [ ] `gpu:karpathy:encoded` (Redis 64-dim) — feed into engram L1 KV cache (autoencoder weights now trained ✅ `ace:autoencoder:weights`)
 - [ ] Neo4j `SIMILAR_TOPOLOGY` edges — compute similarity using `batchCosineSimilarityFp16` on SOM coordinates
 - [ ] Synthesis lanes (cluster_context, shared_resource, agents_context, vault_link) — rerank using FP16 ops
 - [ ] `AttentionScoreGPU_fp16` for final ACE context weighting in `fetchACPKnowledgeResults()` Stage A0
 
-### Build Verification (do after next VS Code reload)
+### Build Verification (validated 2026-05-31 ✅)
 ```powershell
-# 1. Reload VS Code (Ctrl+Shift+P → "Developer: Reload Window")
-#    → "CMake: Configure + Build (x64 CUDA, folderOpen)" fires automatically
-#    → Watch output in terminal panel for:
-#      [ RUN ] cmake --preset windows-cuda (x64 CUDA + LibTorch)
-#      [ OK ] tensorrt_bridge.node ready
-#      CUDA: GPU active (RTX 3060 Ti)
+# Audit GPU capabilities first:
+node scripts/native/audit-gpu-capabilities.mjs
+# → .tmp/gpu-capabilities-audit.json + .tmp/gpu-capabilities-audit.md
 
-# 2. Manual test if auto-task skips (already built):
-cd simd-bridge/cpp
-cmake --preset windows-cuda    # Should show: CUDA compiler enabled: nvcc.exe
-cmake --build build --config Release --parallel 4
+# Fallback (no GPU needed — always works):
+cmake --preset windows-x64-fallback
+cmake --build --preset build-windows-x64-fallback
 
-# 3. Verify all 8 H3 exports (5 original + 3 new FP16):
+# CUDA + cuBLAS only (no LibTorch dependency):
+cmake --preset windows-x64-cuda-cublas
+cmake --build --preset build-windows-x64-cuda-cublas
+
+# Full production (default / same as windows-cuda):
+cmake --preset windows-x64-cuda-libtorch    # OR: cmake --preset windows-cuda
+cmake --build --preset build-windows-x64-cuda-libtorch
+
+# Verify all 8 H3 exports (5 FP32 + 3 FP16):
 $env:PATH = "C:\libtorch-win-shared-with-deps-2.9.0+cu130\libtorch\lib;$env:PATH"
 node -e "
 const b = require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node');
@@ -124,8 +147,9 @@ VS Code FolderOpen
   │   └─ vite dev :5173              (SvelteKit + GPU env vars)
   │
   ├─ CMake: Configure + Build (x64 CUDA) → tensorrt_bridge.node
-  │   ├─ cmake --preset windows-cuda  (x64, CUDA 13.0, LibTorch 2.9, SM86)
-  │   └─ cmake --build --parallel 4
+  │   ├─ cmake --preset windows-cuda  (= windows-x64-cuda-libtorch, x64, CUDA 13.0, LibTorch 2.9, SM86)
+  │   ├─ cmake --build --parallel 4
+  │   └─ fallback: cmake --preset windows-x64-fallback (no GPU needed)
   │
   ├─ graphify:daily                  (codebase map + Redis fast cache)
   └─ ACE Incremental Refresh         (dirty-file embedding refresh)
@@ -139,5 +163,8 @@ tensorrt_bridge.node exports (8 functions):
 
 ## Commit Reference
 - `43656e46` → H2+H3 C++ + TS layer (pushed 2026-05-31 via force after LFS blob cleanup)
-- `.vscode/settings.json` → cmake x64 settings (gitignored, local only)
+- `1a577c89d3` → dynamic GPU library detection + cuBLAS/cuVS/CUTLASS presets
+- `0abba595f3` → simd-bridge: dynamic GPU library detection + CMake x64 presets + capability audit
+- `8ec4261b7f` → GPU capability matrix — primitives map + extended audit + cuDNN/cuVS/CUTLASS presets
+- `.vscode/settings.json` → cmake x64 settings (gitignored, local only; preset: `windows-cuda`)
 - `.vscode/tasks.json` → CMake folderOpen task updated
