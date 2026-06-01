@@ -46,9 +46,29 @@ function computeAttentionScore(vector, queryVector) {
   return Math.max(0, Math.min(1, (cosine + 1) / 2));
 }
 
+function computeAttentionScoresGpu(queryVector, corpusVectors, dim) {
+  if (!gpu || typeof gpu.attentionScoreGPU_fp16 !== 'function') return null;
+  if (!(queryVector instanceof Float32Array) || !(corpusVectors instanceof Float32Array)) return null;
+  if (dim <= 0 || corpusVectors.length % dim !== 0) return null;
+  const n = corpusVectors.length / dim;
+  try {
+    const scores = gpu.attentionScoreGPU_fp16(queryVector, dim, corpusVectors, n);
+    if (scores && typeof scores.length === 'number') {
+      return Array.from(scores);
+    }
+  } catch (err) {
+    console.warn(`[karpathy] GPU attention fallback: ${err.message}`);
+  }
+  return null;
+}
+
 // ── Args ──────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
+// FP16 is the default when the GPU addon supports it; --fp32 forces CPU path
+const FORCE_FP32 = args.includes('--fp32');
+const ENABLE_FP16 = !FORCE_FP32; // auto-enabled; was --fp16 flag (H4)
+const COMPARE_FP32 = args.includes('--compare-fp32');
 const DIRTY_ONLY = args.includes('--dirty');
 const SOURCE     = args.find(a => a.startsWith('--source='))?.split('=')[1]
                  ?? (args.includes('--source') ? args[args.indexOf('--source') + 1] : null);
@@ -156,6 +176,8 @@ const log_state = {
   mode: DIRTY_ONLY ? 'dirty' : (SOURCE === 'hit-log' ? 'hit-log' : 'topN'),
   limit: LIMIT,
   dry: DRY,
+  fp16: ENABLE_FP16 ? 'auto' : 'disabled(--fp32)',
+  compareFp32: COMPARE_FP32,
   candidates: 0,
   candidateSource: '',
   embedded: 0,
@@ -167,11 +189,15 @@ const log_state = {
 
 // ── GPU bridge ────────────────────────────────────────────────────────────────
 function loadGpuAddon() {
+  const envPaths = [
+    process.env.TENSORRT_BRIDGE_NODE,
+  ].filter((value) => typeof value === 'string' && value.length > 0);
   const paths = [
+    resolve(REPO, 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
     resolve(REPO, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
     resolve(REPO, 'simd-bridge/cpp/build/tensorrt_bridge.node'),
   ];
-  for (const p of paths) {
+  for (const p of [...envPaths, ...paths]) {
     if (!existsSync(p)) continue;
     try {
       const mod = esmRequire(p);
@@ -185,6 +211,14 @@ const gpu = loadGpuAddon();
 if (!gpu) {
   log_state.gpu.fallback = 'tensorrt_bridge.node not loadable — running in CPU/no-GPU degraded mode';
   console.warn('[karpathy] ' + log_state.gpu.fallback);
+} else {
+  // CUDA pre-flight — log GPU lane so pipeline logs are self-documenting
+  const cudaLevel = typeof gpu.checkCudaAvailable === 'function' ? gpu.checkCudaAvailable() : -1;
+  const gpuLane = cudaLevel === 2 ? 'CUDA+cuDNN' : cudaLevel === 1 ? 'CUDA' : cudaLevel === 0 ? 'no-GPU' : 'unknown';
+  const fp16Ready = typeof gpu.attentionScoreGPU_fp16 === 'function';
+  console.log(`[karpathy] GPU lane: ${gpuLane} | fp16-attention: ${fp16Ready} | fp16-mode: ${ENABLE_FP16 ? 'auto' : 'disabled(--fp32)'}`);
+  log_state.gpu.cudaLevel = cudaLevel;
+  log_state.gpu.fp16Ready = fp16Ready;
 }
 
 // ── Neo4j ─────────────────────────────────────────────────────────────────────
@@ -496,17 +530,66 @@ async function main() {
   }
 
   const probe = await fetchProbeEmbedding('risk vulnerability security architecture');
-  
+
+  const attentionCorpus = new Float32Array(candidates.length * (probe?.length ?? 0));
+  const attentionDim = probe?.length ?? 0;
+  const candidateVectorByIndex = candidates.map(c => {
+    const emb = embeddingMap.get(normalizeRepoPath(c.stableKey));
+    return emb && attentionDim > 0 ? emb : null;
+  });
+  let cpuAttentionScores = null;
+  let gpuAttentionScores = null;
+  if (probe && attentionDim > 0) {
+    for (let i = 0; i < candidateVectorByIndex.length; i++) {
+      const vec = candidateVectorByIndex[i];
+      if (vec) attentionCorpus.set(vec, i * attentionDim);
+    }
+    if (COMPARE_FP32) {
+      cpuAttentionScores = candidateVectorByIndex.map((vec) => (
+        vec ? computeAttentionScore(vec, probe) : 0
+      ));
+    }
+    if (ENABLE_FP16 && gpu && typeof gpu.attentionScoreGPU_fp16 === 'function') {
+      gpuAttentionScores = computeAttentionScoresGpu(probe, attentionCorpus, attentionDim);
+      if (!gpuAttentionScores) {
+        // addon present but call failed — already warned inside computeAttentionScoresGpu
+        console.warn('[karpathy] FP16 attention unavailable, using CPU scores');
+      }
+    }
+  }
+  const runAttentionPeak = gpuAttentionScores && gpuAttentionScores.length
+    ? Math.max(...gpuAttentionScores)
+    : 0;
+  const runAttentionMean = gpuAttentionScores && gpuAttentionScores.length
+    ? gpuAttentionScores.reduce((sum, value) => sum + value, 0) / gpuAttentionScores.length
+    : 0;
+
   const finalResults = [];
-  for (const c of candidates) {
+  for (let i = 0; i < candidates.length; i++) {
+    const c = candidates[i];
     const emb = embeddingMap.get(normalizeRepoPath(c.stableKey));
     let attention = 0;
-    if (emb && probe) {
-      attention = computeAttentionScore(emb, probe);
+    const attentionCpu = cpuAttentionScores?.[i] ?? (probe && emb ? computeAttentionScore(emb, probe) : 0);
+    const attentionGpu = gpuAttentionScores?.[i] ?? null;
+    if (probe && emb) {
+      if (attentionGpu !== null && typeof attentionGpu === 'number') {
+        attention = attentionGpu;
+      } else {
+        attention = attentionCpu;
+      }
     }
     
     const blend = computeKarpathyBlend(c.pr, c.authority, attention);
-    finalResults.push({ ...c, attention, blend });
+    finalResults.push({
+      ...c,
+      attention,
+      attentionCpu,
+      attentionGpu,
+      attentionDelta: attentionGpu !== null ? attentionGpu - attentionCpu : 0,
+      attentionPeak: runAttentionPeak,
+      attentionMean: runAttentionMean,
+      blend,
+    });
   }
 
   finalResults.sort((a, b) => b.blend - a.blend);
@@ -544,14 +627,23 @@ async function main() {
       ts: new Date().toISOString(),
       candidates: finalResults.length,
       topBlend: finalResults[0]?.blend ?? 0,
+      attentionPeak: runAttentionPeak,
+      attentionMean: runAttentionMean,
       clustersIndexed: seenClusters.size,
     }));
     await redis.quit();
     
     let md = `# Karpathy GPU Authority Blend\n\nGenerated: ${new Date().toISOString()}\n\n`;
-    md += `| File | PR | Auth | Attn | Blend |\n|---|---|---|---|---|\n`;
+    md += `- FP16 mode: ${ENABLE_FP16 ? 'auto (default)' : 'disabled (--fp32)'}\n`;
+    md += `- FP32 compare: ${COMPARE_FP32}\n`;
+    md += `- GPU addon loaded: ${Boolean(gpu)}\n`;
+    md += `- GPU attention used: ${Boolean(gpuAttentionScores && gpuAttentionScores.length)}\n\n`;
+    md += `| File | PR | Auth | Attn | CPU | GPU | Δ | Peak | Mean | Blend |\n|---|---|---|---|---|---|---|---|---|---|\n`;
     for (const r of finalResults.slice(0, 25)) {
-      md += `| ${r.stableKey} | ${r.pr.toFixed(3)} | ${r.authority.toFixed(3)} | ${r.attention.toFixed(3)} | ${r.blend.toFixed(3)} |\n`;
+      const cpu = Number.isFinite(r.attentionCpu) ? r.attentionCpu.toFixed(3) : '0.000';
+      const gpuVal = r.attentionGpu === null ? 'n/a' : r.attentionGpu.toFixed(3);
+      const delta = Number.isFinite(r.attentionDelta) ? r.attentionDelta.toFixed(3) : '0.000';
+      md += `| ${r.stableKey} | ${r.pr.toFixed(3)} | ${r.authority.toFixed(3)} | ${r.attention.toFixed(3)} | ${cpu} | ${gpuVal} | ${delta} | ${r.attentionPeak?.toFixed?.(3) ?? '0.000'} | ${r.attentionMean?.toFixed?.(3) ?? '0.000'} | ${r.blend.toFixed(3)} |\n`;
     }
     writeFileSync(REPORT, md);
   }

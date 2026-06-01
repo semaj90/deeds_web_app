@@ -24,6 +24,7 @@
 import pg from 'pg';
 import Redis from 'ioredis';
 import neo4j, { type Driver } from 'neo4j-driver';
+import { createRequire } from 'node:module';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -98,6 +99,66 @@ function l2norm(v: number[]): number[] {
   for (const x of v) sq += x * x;
   const inv = sq > 0 ? 1 / Math.sqrt(sq) : 1;
   return v.map(x => x * inv);
+}
+
+function loadGpuAddon() {
+  const req = createRequire(import.meta.url);
+  const paths = [
+    process.env.TENSORRT_BRIDGE_NODE,
+    '../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node',
+    '../../simd-bridge/cpp/build/Release/tensorrt_bridge.node',
+    '../../simd-bridge/cpp/build/tensorrt_bridge.node',
+  ];
+  for (const rel of paths) {
+    if (!rel) continue;
+    try {
+      const addonPath = new URL(rel, import.meta.url).pathname
+        .replace(/^\/([A-Z]:)/i, '$1')
+        .replace(/\//g, '\\');
+      const addon = req(addonPath) as Record<string, unknown>;
+      if (typeof addon.attentionScoreGPU_fp16 === 'function' || typeof addon.kmeansWithCentroids === 'function') {
+        return addon as {
+          checkCudaAvailable?: () => number;
+          attentionScoreGPU_fp16?: (query: Float32Array, dim: number, keys: Float32Array, n: number) => Float32Array;
+          batchCosineSimilarity_fp16?: (query: Float32Array, corpus: Float32Array, n: number, dim: number) => Float32Array;
+          kmeansWithCentroids?: (flat: Float32Array, n: number, dim: number, k: number, iters: number) => {
+            assignments: Int32Array;
+            centroids: Float32Array;
+          };
+        };
+      }
+    } catch {
+      // try next path
+    }
+  }
+  return null;
+}
+
+const gpuAddon = loadGpuAddon();
+
+function computeAttentionScores(
+  query: number[],
+  members: number[][]
+): { scores: number[]; peak: number; mean: number } {
+  if (!members.length) return { scores: [], peak: 0, mean: 0 };
+  if (gpuAddon?.attentionScoreGPU_fp16) {
+    const queryVec = Float32Array.from(query);
+    const flat = new Float32Array(members.length * query.length);
+    for (let i = 0; i < members.length; i++) flat.set(members[i], i * query.length);
+    try {
+      const scores = gpuAddon.attentionScoreGPU_fp16(queryVec, query.length, flat, members.length);
+      const arr = Array.from(scores ?? []);
+      const peak = arr.length ? Math.max(...arr) : 0;
+      const mean = arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+      return { scores: arr, peak, mean };
+    } catch (err) {
+      console.warn('[hg] FP16 attention failed, falling back to CPU:', (err as Error).message.slice(0, 80));
+    }
+  }
+  const scores = members.map(vec => Math.max(0, Math.min(1, (cosine(query, vec) + 1) / 2)));
+  const peak = scores.length ? Math.max(...scores) : 0;
+  const mean = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+  return { scores, peak, mean };
 }
 
 // ── Qdrant scroll ─────────────────────────────────────────────────────────────
@@ -231,19 +292,8 @@ async function cpuKmeans(nodes: Node[], k: number): Promise<KMeansResult> {
 
   // Try GPU first via pytorch-graph N-API
   try {
-    // scripts/ → sveltekit-frontend/ → deeds-web-app/ → simd-bridge/
-    const addonPath = new URL(
-      '../../simd-bridge/cpp/build/Release/tensorrt_bridge.node',
-      import.meta.url
-    ).pathname.replace(/^\/([A-Z]:)/i, '$1').replace(/\//g, '\\');
-    const { createRequire } = await import('module');
-    const req = createRequire(import.meta.url);
-    const addon = req(addonPath) as {
-      kmeansWithCentroids: (flat: Float32Array, n: number, dim: number, k: number, iters: number) => {
-        assignments: Int32Array;
-        centroids: Float32Array;
-      };
-    };
+    const addon = gpuAddon;
+    if (!addon?.kmeansWithCentroids) throw new Error('GPU addon not available');
     const flat = new Float32Array(n * DIM);
     for (let i = 0; i < n; i++) flat.set(vecs[i], i * DIM);
     const { assignments, centroids: rawCentroids } = addon.kmeansWithCentroids(flat, n, DIM, k, 100);
@@ -419,6 +469,8 @@ async function buildHyperedges(
     centroid: number[];
     gradeScore: number;
     gradeLabel: string;
+    attentionPeak: number;
+    attentionMean: number;
     hash: string;
   };
 
@@ -430,12 +482,13 @@ async function buildHyperedges(
     const memberIds   = memberNodes.map(n => n.id);
     const memberPaths = memberNodes.map(n => n.filePath);
     const centroid    = centroids[c];
+    const attentionStats = computeAttentionScores(centroid, memberNodes.map(n => n.vec));
     // Grade by max PageRank member — a cluster is only as good as its highest-ranked hub file.
     // Using max (not mean) avoids diluting hub-containing clusters with unscored leaf nodes.
     const maxPagerank = Math.max(...memberNodes.map(n => n.pagerank));
     const gradeScore  = maxPagerank;
     const gradeLabel  = gradeScore >= GRADE_A ? 'A' : gradeScore >= GRADE_B ? 'B' : gradeScore >= GRADE_C ? 'C' : 'D';
-    work.push({ c, memberIdxs, memberNodes, memberIds, memberPaths, centroid, gradeScore, gradeLabel, hash: fnv1a(memberIds.sort().join(',')) });
+    work.push({ c, memberIdxs, memberNodes, memberIds, memberPaths, centroid, gradeScore, gradeLabel, attentionPeak: attentionStats.peak, attentionMean: attentionStats.mean, hash: fnv1a(memberIds.sort().join(',')) });
   }
 
   // ── Stage B: Ollama summarization — SUMMARIZE_BATCH concurrent, not all at once
@@ -471,6 +524,8 @@ async function buildHyperedges(
         centroid:    w.centroid,
         gradeScore:  Math.round(w.gradeScore * 1000) / 1000,
         gradeLabel,
+        attentionPeak: Math.round(w.attentionPeak * 1000) / 1000,
+        attentionMean: Math.round(w.attentionMean * 1000) / 1000,
         summary,
         pipeline:    'codebase',
         memberCount: w.memberIds.length,
@@ -480,11 +535,24 @@ async function buildHyperedges(
       await redis.setex(`hg:edge:${w.hash}`, HG_EDGE_TTL, JSON.stringify(edge)).catch(() => {});
       await redis.zadd('hg:edge:idx', w.gradeScore, w.hash).catch(() => {});
 
-      // 4D coords for member nodes — batch within the edge
-      await Promise.allSettled(w.memberIdxs.map(async idx => {
+      // 4D coords for member nodes — batch GPU cosine (FP16) then write
+      const memberVecs = w.memberIdxs.map(i => nodes[i].vec);
+      let zScores: number[] | null = null;
+      if (gpuAddon?.batchCosineSimilarity_fp16 && memberVecs.length > 0) {
+        try {
+          const centroidF32 = Float32Array.from(w.centroid);
+          const corpusF32 = new Float32Array(memberVecs.length * DIM);
+          for (let mi = 0; mi < memberVecs.length; mi++) corpusF32.set(memberVecs[mi], mi * DIM);
+          const sims = gpuAddon.batchCosineSimilarity_fp16(centroidF32, corpusF32, memberVecs.length, DIM);
+          zScores = Array.from(sims ?? []).map(s => 1 - s);
+        } catch (err) {
+          console.warn('[hg] FP16 batch cosine failed, falling back to CPU:', (err as Error).message.slice(0, 80));
+        }
+      }
+      await Promise.allSettled(w.memberIdxs.map(async (idx, mi) => {
         const node = nodes[idx];
-        const z = 1 - cosine(node.vec, w.centroid);
-        const coord = { x: node.somX ?? 0, y: node.somY ?? 0, z, w: node.pagerank, type: 'codebase' };
+        const z = zScores ? (zScores[mi] ?? 1 - cosine(node.vec, w.centroid)) : 1 - cosine(node.vec, w.centroid);
+        const coord = { x: node.somX ?? 0, y: node.somY ?? 0, z, w: node.pagerank, a: w.attentionPeak, type: 'codebase' };
         await redis.setex(`hg:4d:${node.id}`, HG_COORD_TTL, JSON.stringify(coord)).catch(() => {});
       }));
     }));
@@ -505,6 +573,8 @@ interface EdgeBlob {
   centroid: number[];
   gradeScore: number;
   gradeLabel: string;
+  attentionPeak: number;
+  attentionMean: number;
   summary: string;
   memberCount: number;
   builtAt: string;
@@ -564,7 +634,8 @@ async function syncToNeo4j(nodes: Node[], kmeans: KMeansResult): Promise<void> {
       await session.run(
         `MERGE (cl:Cluster { hash: $hash })
            SET cl.gradeScore = $grade, cl.gradeLabel = $label,
-               cl.summary = $summary, cl.memberCount = $count, cl.builtAt = $builtAt
+               cl.summary = $summary, cl.memberCount = $count, cl.builtAt = $builtAt,
+               cl.attentionPeak = $attentionPeak, cl.attentionMean = $attentionMean
          WITH cl
          UNWIND $memberIds AS mid
            MATCH (f:File { id: mid })
@@ -573,6 +644,8 @@ async function syncToNeo4j(nodes: Node[], kmeans: KMeansResult): Promise<void> {
           hash:      edge.hash,
           grade:     edge.gradeScore,
           label:     edge.gradeLabel,
+          attentionPeak: edge.attentionPeak,
+          attentionMean: edge.attentionMean,
           summary:   edge.summary,
           count:     edge.memberCount,
           builtAt:   edge.builtAt,
@@ -623,11 +696,22 @@ async function updateQdrantPayloads(nodes: Node[], kmeans: KMeansResult): Promis
 
       await Promise.allSettled([...byCluster.entries()].map(async ([c, { ids, somX, somY }]) => {
         const somCluster = somY * 44 + somX;
+        const clusterMembers = nodes
+          .filter((_, idx) => kmeans.labels[idx] === c)
+          .map(node => node.vec);
+        const attention = computeAttentionScores(kmeans.centroids[c], clusterMembers);
         const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/payload`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
-            payload: { gpu_cluster: c, som_cluster: somCluster, som_bmu_col: somX, som_bmu_row: somY },
+            payload: {
+              gpu_cluster: c,
+              som_cluster: somCluster,
+              som_bmu_col: somX,
+              som_bmu_row: somY,
+              attention_peak: Math.round(attention.peak * 1000) / 1000,
+              attention_mean: Math.round(attention.mean * 1000) / 1000,
+            },
             points:  ids,
           }),
           signal: AbortSignal.timeout(10_000),
@@ -644,6 +728,15 @@ async function updateQdrantPayloads(nodes: Node[], kmeans: KMeansResult): Promis
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 async function main() {
+  // CUDA pre-flight — log GPU lane availability before heavy stages
+  const cudaLevel = (typeof gpuAddon?.checkCudaAvailable === 'function')
+    ? (gpuAddon as { checkCudaAvailable: () => number }).checkCudaAvailable()
+    : -1;
+  const gpuLane = cudaLevel === 2 ? 'CUDA+cuDNN' : cudaLevel === 1 ? 'CUDA' : cudaLevel === 0 ? 'no-GPU' : 'addon-unavailable';
+  const fp16Avail = typeof gpuAddon?.attentionScoreGPU_fp16 === 'function';
+  const cosineFp16Avail = typeof gpuAddon?.batchCosineSimilarity_fp16 === 'function';
+  console.log(`[hg] GPU lane: ${gpuLane} | fp16-attention: ${fp16Avail} | fp16-cosine: ${cosineFp16Avail}`);
+
   console.log('[hg] Connecting to Redis...');
   await redis.ping(); // ioredis auto-connects; ping verifies
   console.log('[hg] Redis connected.');
