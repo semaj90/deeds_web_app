@@ -69,6 +69,9 @@
   - rag group has been moved into `sveltekit-frontend/src/lib/server/features/rag/`
   - cases group has been moved into `sveltekit-frontend/src/lib/server/features/cases/`
   - aiAgents group has been moved into `sveltekit-frontend/src/lib/server/features/ai/`
+  - legalCorpus group has been moved into `sveltekit-frontend/src/lib/server/features/legal-corpus/`
+  - codebaseIntel group has been moved into `sveltekit-frontend/src/lib/server/features/codebase-intel/`
+  - identity group has been moved into `sveltekit-frontend/src/lib/server/features/identity/`
   - this is the gating step before any schema migration work moves forward
 - [x] Consolidation/schema alignment note exists.
   - `docs/architecture/consolidation-and-schema-alignment.md`
@@ -78,7 +81,7 @@
   - repo consolidation → parent atlas → schema drift → migrate is now explicit
 - [x] Feature consolidation review queue exists.
   - `docs/architecture/feature-consolidation-review-queue.md`
-  - high-confidence groups are now ordered for human approval, with `evidence`, `observability`, `rag`, `cases`, and `aiAgents` already applied and the remaining groups pending
+  - high-confidence groups are now ordered for human approval, with `evidence`, `observability`, `rag`, `cases`, `aiAgents`, `legalCorpus`, `codebaseIntel`, and `identity` applied and the review queue now closed
 - [x] Kanban-to-parent-atlas alignment note exists.
   - `docs/architecture/kanban-parent-atlas-alignment.md`
   - open work is routed from the master todo into kanban tasks and then into parent atlas indexing using shared feature keys and source refs
@@ -176,7 +179,7 @@ Feature Distribution:
 - Remaining 1,587 are genuine unresolved imports (generated files, conditional dynamic imports, cross-package boundaries).
 
 **Remaining open (Phase 101):**
-1. Phase 100.1 file consolidation into 8 feature domains — remaining medium/low-confidence groups only; high-confidence groups including `aiAgents` are now applied
+1. Phase 100.1 file consolidation into 8 feature domains — complete; all groups from the original proposal are now applied into feature folders
 
 **Validated 2026-05-31:**
 - UUID standardization is done for the live schema (45 integer / 0 uuid / 3 text, archived copies still show historical drift).
