@@ -2101,6 +2101,26 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 - `memory/docker-sveltekit.md` — Docker SSR deployment, Dockerfile, docker-compose
 - `tests/e2e/*.spec.ts` — Playwright visual regression / 500-error tester (uses `page.screenshot()`)
 
+## OpenCode / Memory Authority
+
+- `MASTER-FEATURE-TODO-2026-05-20.md` is the master phase plan for lane completion and backlog tracking.
+- `docs/agents-md-howto.md` is the directory-scoped agent guide; use it as the source of truth for per-folder instructions.
+- OpenCode startup should flow through `scripts/opencode/bootstrap-workspace.mjs` and the startup artifacts it writes:
+  - `.opencode/startup-context.json`
+  - `.tmp/claude-mem-ensure.json`
+  - `reports/claude-mem-startup.md`
+- Tie OpenCode memory to Engram through:
+  - `sveltekit-frontend/src/lib/server/memory/engram-memory.ts`
+  - `sveltekit-frontend/src/lib/server/ai/engram-registry.ts`
+  - `sveltekit-frontend/src/lib/gpu/nes-memory-architecture.ts`
+  - `scripts/atlas/sync-engram-memory.mjs`
+  - `scripts/atlas/engram-plugin-adapter.mjs`
+- Use the repo-local memory bridge scripts rather than hand-stuffing prompt context:
+  - `scripts/opencode/post-memory.mjs`
+  - `scripts/opencode/monitor-claude-mem-poll.mjs`
+  - `scripts/memory/import-claude-mem-observations.mjs`
+- Important caveat: the local `claude-mem` plugin cache patch is cache-only. If the plugin is reinstalled or upgraded, recheck the local bundle for the `zod/v3` compatibility fix before trusting the hooks.
+
 Sources:
 - [Bits UI Docs](https://bits-ui.com/) | [Migration Guide](https://bits-ui.com/docs/migration-guide)
 - [Svelte 5 Runes](https://svelte.dev/blog/runes) | [Migration Guide](https://svelte.dev/docs/svelte/v5-migration-guide)

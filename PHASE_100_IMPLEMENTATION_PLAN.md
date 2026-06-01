@@ -13,6 +13,9 @@ This phase consolidates the codebase for comprehensive parent atlas indexing wit
 3. **UUID standardization** across all Drizzle-ORM schemas
 4. **KMeans clustering** for Qdrant collections tied to Neo4j
 5. **GPU CUDA analysis** preparation (RTX 3060 Ti tensors)
+   - CUDA + LibTorch native bridge is now configured and loadable on this workstation
+   - use the existing `tensorrt_bridge.node` exports for the optional GPU/native lane
+   - keep the bridge out of request-critical paths until the remaining phase gates are finished
 6. **File consolidation** into proper directory structure
 7. **Static + dynamic virtual memory mapping** for deep imports
 8. **Documentation reranking** without knowledge graph deletion
@@ -89,6 +92,8 @@ Layer 5: GPU Analysis (Optional, Post-Consolidation)
 
 **Goal**: Upgrade to PG 18, verify pgvector, standardize UUIDs in FK columns
 
+**Execution order**: do not apply any schema migration lane until the file consolidation review boundary is approved and the feature-group move plan is settled.
+
 | Task | Status | Owner | ETA |
 |------|--------|-------|-----|
 | **2.1 PG 18 compatibility audit** | Pending | Manual + script | 3h |
@@ -107,6 +112,10 @@ Layer 5: GPU Analysis (Optional, Post-Consolidation)
 | 2.3.1 Build new Docker image (PG 18.1) | - | Dockerfile update | 30m |
 | 2.3.2 Test docker-compose up with new image | - | docker-compose | 30m |
 | 2.3.3 Run full test suite | - | npm test | 1h |
+| **2.4 Native GPU verification** | Partial | Native addon | 2h |
+| 2.4.1 Verify `tensorrt_bridge.node` loads from `build/Release` | - | node require test | 10m |
+| 2.4.2 Check `checkCudaAvailable() === 1` | - | node require test | 10m |
+| 2.4.3 Record build caveat: incremental link-file race only | - | notes | 10m |
 
 **Deliverable**: PG 18 running locally, all UUID migrations applied, Drizzle schema updated
 
@@ -261,6 +270,7 @@ Layer 5: GPU Analysis (Optional, Post-Consolidation)
 - [ ] Feature gap report generated (50+ recommendations appended to docs)
 - [ ] Zero breaking changes to existing routes/APIs
 - [ ] All changes committed to main, tagged for Phase 101
+- [x] CUDA/LibTorch native addon is configured and loadable on this workstation
 
 ---
 

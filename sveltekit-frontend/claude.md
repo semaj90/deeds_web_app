@@ -864,3 +864,24 @@ Two hard rules added to `docs/architecture/trace-runtime-split.md` Hard Rules af
 - `memory/architecture/browser-context-lane.md` — sanitizer + storage + worker contract for the optional browser snapshot
 - `memory/architecture/admin-chat-assistant.md` — Copilot rune store + AiAnalysisPopup + SummarizeButton drop-in pattern
 - `memory/architecture/client-inference-policy.md` — Service Worker vs Web Worker rules + Phase-2 ONNX-download toggle policy
+
+### OpenCode / Memory Authority
+
+- Treat `MASTER-FEATURE-TODO-2026-05-20.md` as the phase plan for lane completion and backlog status.
+- Treat `docs/agents-md-howto.md` as the canonical guide for directory-scoped agent instructions.
+- OpenCode startup should use the repo-local bootstrap path and its generated truth artifacts:
+  - `scripts/opencode/bootstrap-workspace.mjs`
+  - `.opencode/startup-context.json`
+  - `.tmp/claude-mem-ensure.json`
+  - `reports/claude-mem-startup.md`
+- Tie OpenCode memory to Engram and NES by routing through:
+  - `src/lib/server/memory/engram-memory.ts`
+  - `src/lib/server/ai/engram-registry.ts`
+  - `src/lib/gpu/nes-memory-architecture.ts`
+  - `scripts/atlas/sync-engram-memory.mjs`
+  - `scripts/atlas/engram-plugin-adapter.mjs`
+- Prefer the repo-local memory bridges for capture/import:
+  - `scripts/opencode/post-memory.mjs`
+  - `scripts/opencode/monitor-claude-mem-poll.mjs`
+  - `scripts/memory/import-claude-mem-observations.mjs`
+- Caveat: the local `claude-mem` plugin cache patch is not durable across reinstalls/upgrades. Recheck the local bundle for the `zod/v3` compatibility fix before trusting plugin hooks after an update.

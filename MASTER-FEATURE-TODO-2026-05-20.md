@@ -125,7 +125,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 - [x] `npx tsgo --noEmit` — zero diagnostics on `ollama.ts` after wiring
 
 **Open**:
-- [ ] Add `atlas:cartridge-seed` to graphify daily pipeline (after atlas build, before ACE pack)
+- [x] Add `atlas:cartridge-seed` to graphify daily pipeline — appended to `graphify:daily:tsc` after `graphify:authority` (2026-05-31)
 
 ---
 
@@ -176,7 +176,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 **Current state**: pseudo-embeddings (SHA-256) — real Ollama embed wired in next gate.
 
 **Next gate** (Phase 11D-B):
-- [ ] Replace `pseudoEmbed()` in `rank-cards.mjs` + `embed-cards.mjs` with `POST localhost:11434/api/embed` (embeddinggemma:latest)
+- [x] Replace `pseudoEmbed()` in `rank-cards.mjs` with `POST localhost:11434/api/embed` (embeddinggemma:latest) — real embed with 8s timeout + pseudo fallback; confirmed `ollama (real)` path live (2026-05-31)
 - [ ] Wire Qdrant real search in `retrieval-pass.mjs` (env `QDRANT_URL` already checked)
 - [ ] Wire Neo4j edge expansion (neighbor sourceRefs boost score)
 - [ ] Wire Redis packet cache (TTL 10min, key = sha256(query + budget))
@@ -472,7 +472,7 @@ intent → feature_labels → ACE context chunks → tool signatures
 - [x] `scripts/agent/turbovec-search-memory.mjs` — user intent embedding cache with TTL (2026-05-28)
 - [x] Gemma4 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search` — embedded in prompt-generator.mjs
 - [x] Add `agent:prompt` and `agent:search-memory` npm scripts (2026-05-28)
-- [ ] Wire SearXNG fallback (localhost:8889) into research chain (Phase 20 / Unsloth lane)
+- [x] Wire SearXNG fallback (localhost:8889) into research chain (Phase 20 / Unsloth lane)
 
 ---
 
@@ -490,15 +490,15 @@ changed files (git diff --name-only HEAD~1) → hot errors → hot sourceRefs
 **Weekly cold archive**:
 ```
 7 nightly summaries → user/project summary → cold Postgres insert
-→ ace_context_sources(source_kind='nightly_summary')
+→ ace_context_sources(source_kind='wiki_note' | 'prior_answer' as durable archive note)
 → TTL 30+ days, eligible for Unsloth training corpus
 ```
 
 **Tasks**:
 - [x] `scripts/opencode/nightly-summary.mjs` — git diff + hot errors + hot sourceRefs → markdown (2026-05-28)
 - [x] Add `summary:nightly` and `summary:weekly` npm scripts (2026-05-28)
-- [ ] `scripts/opencode/weekly-cold-archive.mjs` — aggregate 7 nights → Postgres cold insert
-- [ ] Wire nightly into startup heavy lane (`ace-incremental-startup.mjs`) with 24h cooldown
+- [x] `scripts/opencode/weekly-cold-archive.mjs` — aggregate 7 nights → cold archive bundle + Postgres note insert
+- [x] Wire nightly into startup heavy lane (`ace-incremental-startup.mjs`) with 24h cooldown
 
 ---
 

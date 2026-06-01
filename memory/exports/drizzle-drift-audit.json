@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-05-31T03:50:29.087Z",
+  "timestamp": "2026-05-31T23:35:27.564Z",
   "targetColumns": [
     "user_id",
     "uploaded_by"
   ],
   "counts": {
-    "schemaFilesScanned": 147,
+    "schemaFilesScanned": 156,
     "drizzleDeclarations": 65,
     "liveColumns": 48,
     "driftRows": 2,

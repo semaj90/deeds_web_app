@@ -36,4 +36,25 @@ Sub-commands for independent pipeline steps:
 - **Gap Coverage Audit:** `npm run audit:gaps`
 
 ---
+## 4. OpenCode / Memory Authority
+
+- Treat `MASTER-FEATURE-TODO-2026-05-20.md` as the master phase plan for completion tracking.
+- Treat `docs/agents-md-howto.md` as the canonical directory-scoped agent guide.
+- OpenCode startup should flow through `scripts/opencode/bootstrap-workspace.mjs` and its truth artifacts:
+  - `.opencode/startup-context.json`
+  - `.tmp/claude-mem-ensure.json`
+  - `reports/claude-mem-startup.md`
+- Tie memory to Engram / NES through:
+  - `sveltekit-frontend/src/lib/server/memory/engram-memory.ts`
+  - `sveltekit-frontend/src/lib/server/ai/engram-registry.ts`
+  - `sveltekit-frontend/src/lib/gpu/nes-memory-architecture.ts`
+  - `scripts/atlas/sync-engram-memory.mjs`
+  - `scripts/atlas/engram-plugin-adapter.mjs`
+- Use repo-local bridges for memory capture/import:
+  - `scripts/opencode/post-memory.mjs`
+  - `scripts/opencode/monitor-claude-mem-poll.mjs`
+  - `scripts/memory/import-claude-mem-observations.mjs`
+- Caveat: if the local `claude-mem` plugin cache is reinstalled or upgraded, recheck the bundle for the `zod/v3` compatibility fix before trusting hooks.
+
+---
 *Maintained under Deeds Legal-AI Platform Guidelines.*
