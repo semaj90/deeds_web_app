@@ -104,11 +104,20 @@ Wire GPU scoring into the error analysis pipeline:
 - [ ] `src/lib/server/ace/context-assembler.ts` — route H3 FP16 ops when `n > 256` (already has VRAM guard)
 - [ ] Kanban board (`docs/graph/kanban-board.json`) — add H4/H5 cards as "In Progress" lane
 
-### H6 — Memory Engram Injection + Graph Tree Synthesis
-These require H4+H5 to be stable first:
+### H6 — Memory Engram Injection + Graph Tree Synthesis ✅ (2026-05-31)
 
-- [ ] `gpu:karpathy:encoded` (Redis 64-dim) — feed into engram L1 KV cache (autoencoder weights now trained ✅ `ace:autoencoder:weights`)
-- [ ] Neo4j `SIMILAR_TOPOLOGY` edges — compute similarity using `batchCosineSimilarityFp16` on SOM coordinates
+- [x] `gpu:karpathy:encoded` — `karpathy-gpu-enrich.mjs` now runs a 2-layer autoencoder encode pass
+      (768→256 via W1/b1, 256→64 via W2/b2) after blend scoring. Weights loaded from
+      `ace:autoencoder:weights`/`ace:autoencoder:meta` in Redis. Results written to
+      `gpu:karpathy:encoded` HASH (CSV format, 7-day TTL, matching `autoencoder-weights.ts` convention).
+      GPU addon `autoencoderEncode` used if available; CPU tanh fallback otherwise.
+- [x] Engram L1 KV cache wired — `src/lib/server/ai/engram-memory.ts` gains two exports:
+      `getKarpathyEncoded(redis, filePath)` → `Float32Array(64) | null`
+      `seedEngramVec64(redis, filePath)` → writes `ace:engram:vec64:{filePath}` (7-day TTL)
+- [x] Neo4j `SIMILAR_TOPOLOGY` edges — `som-topology-pipeline.ts` now loads `gpu:karpathy:encoded`
+      and computes pair-wise `batchCosineSimilarityFp16` on 64-dim vectors for each candidate edge.
+      Score written as `r.sim` property on the MERGE'd edge. Fallback: grid-distance-only if
+      `gpu:karpathy:encoded` absent.
 - [ ] Synthesis lanes (cluster_context, shared_resource, agents_context, vault_link) — rerank using FP16 ops
 - [ ] `AttentionScoreGPU_fp16` for final ACE context weighting in `fetchACPKnowledgeResults()` Stage A0
 

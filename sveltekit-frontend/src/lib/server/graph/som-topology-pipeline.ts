@@ -12,7 +12,9 @@
  */
 
 import { trainSOM } from '$lib/server/gpu/pytorch-graph.js';
+import { batchCosineSimilarityFp16 } from '$lib/server/gpu/libtorch-bridge.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
+import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { pool } from '$lib/server/db/client';
 import { classifyPath } from '$lib/server/tensor/topology-byte-mapper.js';
@@ -196,12 +198,34 @@ async function updateQdrantSomClusters(
  *  - For each neuron, enumerate itself + up to 4 cardinal neighbours (±1 row/col)
  *  - Connect every file in source neuron to every file in target neuron (within-group included)
  */
+async function loadKarpathyEncoded64(): Promise<Map<string, Float32Array>> {
+	const result = new Map<string, Float32Array>();
+	try {
+		const redis = getRedis();
+		const raw = await redis.hgetall('gpu:karpathy:encoded');
+		if (!raw) return result;
+		for (const [key, csv] of Object.entries(raw)) {
+			if (typeof csv !== 'string') continue;
+			const vals = csv.split(',').map(Number);
+			if (vals.length === 64 && !vals.some(Number.isNaN)) {
+				result.set(key, new Float32Array(vals));
+			}
+		}
+	} catch {
+		// Non-fatal — falls back to grid-distance-only edges
+	}
+	return result;
+}
+
 async function createNeo4jTopologyEdges(
 	files: FileEmbedding[],
 	bmuAssignments: Int32Array,
 	gridW: number,
 	gridH: number
 ): Promise<number> {
+	// H6: load 64-dim Karpathy-encoded vectors for FP16 similarity scoring on edges
+	const encoded64 = await loadKarpathyEncoded64();
+
 	// Build neuron → file list map
 	const neuronMap = new Map<number, string[]>(); // bmuIdx → [filePath, ...]
 	for (let i = 0; i < files.length; i++) {
@@ -213,7 +237,7 @@ async function createNeo4jTopologyEdges(
 
 	// Collect edges: [pathA, pathB] pairs (A < B lexicographically to avoid duplicates)
 	const edgeSet = new Set<string>();
-	const edgePairs: Array<{ a: string; b: string }> = [];
+	const edgePairs: Array<{ a: string; b: string; sim?: number }> = [];
 
 	for (const [bmuIdx, filePaths] of neuronMap) {
 		const bmuRow = Math.floor(bmuIdx / gridW);
@@ -252,6 +276,43 @@ async function createNeo4jTopologyEdges(
 
 	if (edgePairs.length === 0) return 0;
 
+	// H6: score pairs with FP16 cosine similarity on 64-dim Karpathy-encoded vectors
+	// Process in batches of 256 to stay within VRAM budget (~0.1 MB per batch)
+	if (encoded64.size > 0) {
+		const SIM_BATCH = 256;
+		for (let i = 0; i < edgePairs.length; i += SIM_BATCH) {
+			const slice = edgePairs.slice(i, i + SIM_BATCH);
+			const queries: Float32Array[] = [];
+			const corpus: Float32Array[] = [];
+			const indices: number[] = [];
+			for (let j = 0; j < slice.length; j++) {
+				const va = encoded64.get(slice[j].a);
+				const vb = encoded64.get(slice[j].b);
+				if (va && vb) {
+					queries.push(va);
+					corpus.push(vb);
+					indices.push(i + j);
+				}
+			}
+			if (queries.length === 0) continue;
+			try {
+				// Score each pair one-to-one: query[k] vs corpus[k]
+				// batchCosineSimilarityFp16 accepts number[] / number[][] — convert from Float32Array
+				for (let k = 0; k < queries.length; k++) {
+					const result = await batchCosineSimilarityFp16(
+						Array.from(queries[k]),
+						[Array.from(corpus[k])]
+					);
+					if (result?.scores?.[0] != null) {
+						edgePairs[indices[k]].sim = result.scores[0];
+					}
+				}
+			} catch {
+				// Non-fatal — edges still created without sim score
+			}
+		}
+	}
+
 	// Write to Neo4j in batches via MERGE (idempotent)
 	const driver = getNeo4jDriver();
 	const session = driver.session({ database: 'neo4j' });
@@ -268,7 +329,8 @@ async function createNeo4jTopologyEdges(
 					 MATCH (b:CodebaseFile) WHERE b.filePath = pair.b OR b.file_path = pair.b
 					 MERGE (a)-[r:SIMILAR_TOPOLOGY]-(b)
 					 ON CREATE SET r.createdAt = datetime()
-					 SET r.updatedAt = datetime()
+					 SET r.updatedAt = datetime(),
+					     r.sim = CASE WHEN pair.sim IS NOT NULL THEN pair.sim ELSE r.sim END
 					 RETURN count(r) AS cnt`,
 					{ pairs: batch }
 				);

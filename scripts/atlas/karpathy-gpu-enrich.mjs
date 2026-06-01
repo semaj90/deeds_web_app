@@ -595,6 +595,72 @@ async function main() {
   finalResults.sort((a, b) => b.blend - a.blend);
   log_state.topRisk = finalResults.slice(0, 10);
 
+  // ── H6: Autoencoder 768→64 encode pass ──────────────────────────────────────
+  // Compress each file's 768-dim embedding to 64-dim via the trained autoencoder
+  // weights stored at ace:autoencoder:weights in Redis. The 64-dim vectors are
+  // written to gpu:karpathy:encoded for engram L1 KV cache consumers.
+  // Architecture: 768 → tanh(W1·x + b1) [256-dim] → tanh(W2·h + b2) [64-dim]
+  const encodedMap = new Map(); // stableKey → Float32Array(64)
+  if (!DRY) {
+    try {
+      const weightRedis = new Redis(REDIS_URL);
+      const [wData, mData] = await Promise.all([
+        weightRedis.hgetall('ace:autoencoder:weights'),
+        weightRedis.hgetall('ace:autoencoder:meta'),
+      ]);
+      await weightRedis.quit();
+
+      if (wData?.W1 && wData?.b1 && wData?.W2 && wData?.b2) {
+        const parseW = csv => new Float32Array(csv.split(',').map(Number));
+        const W1 = parseW(wData.W1); // [256 × 768]
+        const b1 = parseW(wData.b1); // [256]
+        const W2 = parseW(wData.W2); // [64 × 256]
+        const b2 = parseW(wData.b2); // [64]
+
+        // CPU linear encode: tanh(X @ W^T + b)
+        function cpuLinearTanh(X, n, inDim, W, b, outDim) {
+          const out = new Float32Array(n * outDim);
+          for (let i = 0; i < n; i++) {
+            for (let j = 0; j < outDim; j++) {
+              let v = b[j];
+              for (let k = 0; k < inDim; k++) v += X[i * inDim + k] * W[j * inDim + k];
+              out[i * outDim + j] = Math.tanh(v);
+            }
+          }
+          return out;
+        }
+
+        // GPU encode via addon if available (autoencoderEncode)
+        const gpuEncode = (gpu && typeof gpu.autoencoderEncode === 'function')
+          ? (X, n, inDim, W, b, outDim) => {
+              try { return gpu.autoencoderEncode(X, n, inDim, W, b, outDim); }
+              catch { return cpuLinearTanh(X, n, inDim, W, b, outDim); }
+            }
+          : cpuLinearTanh;
+
+        const filesWithEmbeddings = finalResults.filter(r => embeddingMap.has(normalizeRepoPath(r.stableKey)));
+        if (filesWithEmbeddings.length > 0) {
+          const N = filesWithEmbeddings.length;
+          const flat768 = new Float32Array(N * 768);
+          for (let i = 0; i < N; i++) {
+            const vec = embeddingMap.get(normalizeRepoPath(filesWithEmbeddings[i].stableKey));
+            if (vec) flat768.set(vec, i * 768);
+          }
+          const hidden = gpuEncode(flat768, N, 768, W1, b1, 256);
+          const encoded = gpuEncode(hidden, N, 256, W2, b2, 64);
+          for (let i = 0; i < N; i++) {
+            encodedMap.set(filesWithEmbeddings[i].stableKey, encoded.slice(i * 64, (i + 1) * 64));
+          }
+          console.log(`[karpathy] H6: encoded ${encodedMap.size} files to 64-dim (trainedAt=${mData?.trainedAt ?? 'unknown'})`);
+        }
+      } else {
+        console.warn('[karpathy] H6: ace:autoencoder:weights missing — skipping 64-dim encode');
+      }
+    } catch (err) {
+      console.warn(`[karpathy] H6: autoencoder encode failed: ${err.message}`);
+    }
+  }
+
   if (!DRY) {
     const redis = new Redis(REDIS_URL);
     // Write scores as a pipeline for atomicity + set 7-day TTL to match summary
@@ -623,6 +689,17 @@ async function main() {
     await pipe.exec();
     await clusterPipe.exec();
 
+    // H6: write 64-dim encoded vectors to gpu:karpathy:encoded (7-day TTL)
+    if (encodedMap.size > 0) {
+      const encodedPipe = redis.pipeline();
+      encodedPipe.del('gpu:karpathy:encoded');
+      for (const [key, vec] of encodedMap) {
+        encodedPipe.hset('gpu:karpathy:encoded', key, Array.from(vec).join(','));
+      }
+      encodedPipe.expire('gpu:karpathy:encoded', 604800);
+      await encodedPipe.exec();
+    }
+
     await redis.setex('gpu:karpathy:summary', 604800, JSON.stringify({
       ts: new Date().toISOString(),
       candidates: finalResults.length,
@@ -630,6 +707,7 @@ async function main() {
       attentionPeak: runAttentionPeak,
       attentionMean: runAttentionMean,
       clustersIndexed: seenClusters.size,
+      encoded64: encodedMap.size,
     }));
     await redis.quit();
     

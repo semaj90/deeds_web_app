@@ -61,6 +61,43 @@ export async function recordEngramTransition(
 }
 
 /**
+ * Retrieve the 64-dim Karpathy-encoded vector for a file path from Redis.
+ * Populated by karpathy-gpu-enrich.mjs (H6 encode pass, TTL 7d).
+ * Returns null when the key is absent or weights haven't been run yet.
+ */
+export async function getKarpathyEncoded(
+  redis: Redis,
+  filePath: string
+): Promise<Float32Array | null> {
+  const csv = await redis.hget('gpu:karpathy:encoded', filePath).catch(() => null);
+  if (!csv) return null;
+  const vals = csv.split(',').map(Number);
+  if (vals.length !== 64 || vals.some(Number.isNaN)) return null;
+  return new Float32Array(vals);
+}
+
+/**
+ * Seed the engram L1 KV cache with the 64-dim encoded vector for a file.
+ * Stores as ace:engram:vec64:{normalizedPath} with the same 7-day TTL.
+ * Consumers (e.g. synthesis lane reranker) can read it to avoid a second
+ * Redis round-trip to gpu:karpathy:encoded.
+ */
+export async function seedEngramVec64(
+  redis: Redis,
+  filePath: string
+): Promise<boolean> {
+  const vec = await getKarpathyEncoded(redis, filePath);
+  if (!vec) return false;
+  await redis.set(
+    `ace:engram:vec64:${filePath}`,
+    Array.from(vec).join(','),
+    'EX',
+    QUERY_TTL
+  );
+  return true;
+}
+
+/**
  * Return DYM suggestions for a query using two sources:
  *   1. Bigram transitions — what users queried AFTER this exact query
  *   2. BMU spatial locality — what other queries landed in the same SOM cell
