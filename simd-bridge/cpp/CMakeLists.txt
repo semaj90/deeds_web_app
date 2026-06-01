@@ -4,19 +4,49 @@ project(tensorrt_bridge LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# ── Feature options (all overridable via -D or env vars) ─────────────
-option(SIMD_ENABLE_CUDA          "Enable CUDA-backed kernels"              ON)
-option(SIMD_ENABLE_LIBTORCH      "Enable LibTorch-backed kernels"          ON)
-option(SIMD_ENABLE_FALLBACK_STUBS "Enable CPU fallback stubs"              ON)
-option(SIMD_ENABLE_CUBLAS        "Link cuBLAS for direct GEMM kernels"     ON)
-option(SIMD_ENABLE_CUBLASLT      "Link cuBLASLt for FP16/BF16 matmul"     ON)
-option(SIMD_ENABLE_CUVS          "Link cuVS (CAGRA/IVF-PQ/IVF-RaBitQ)"   OFF)
-option(SIMD_ENABLE_CUTLASS       "Enable CUTLASS 3.x header-only GEMM"    OFF)
+# ── Architecture safety guard ─────────────────────────────────────────
+# Catch accidental -A win32 / host=x86 from VS CMake Tools kit selection.
+# This project requires x64 for CUDA, LibTorch, and AVX2 SIMD.
+if(MSVC)
+  if(CMAKE_GENERATOR_PLATFORM STREQUAL "Win32" OR CMAKE_GENERATOR_PLATFORM STREQUAL "x86")
+    message(FATAL_ERROR
+      "FATAL: 32-bit build detected (CMAKE_GENERATOR_PLATFORM='${CMAKE_GENERATOR_PLATFORM}').\n"
+      "  CUDA, LibTorch, and AVX2 require x64.\n"
+      "  Fix: set cmake.useCMakePresets=always in .vscode/settings.json\n"
+      "  and use a preset with  \"architecture\": \"x64\", \"toolset\": \"host=x64\".\n"
+      "  OR: cmake --preset windows-x64-fallback"
+    )
+  endif()
+  if(CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE STREQUAL "x86")
+    message(FATAL_ERROR
+      "FATAL: 32-bit host toolset detected (host=x86).\n"
+      "  Use CMakePresets.json with  \"toolset\": \"host=x64\"."
+    )
+  endif()
+endif()
+
+# ── Feature options (all overridable via -D or preset cacheVariables) ─
+# Dependency graph:
+#   cuBLAS/cuBLASLt require CUDA Runtime
+#   LibTorch requires CUDA Runtime (for GPU tensor backend)
+#   cuDNN is optional and can be detected independently via CUDNN_ROOT or known paths
+#   cuVS requires CUDA Runtime + RAPIDS install
+#   CUTLASS is header-only — needs CUDA compiler but no extra libs
+#   FALLBACK_STUBS compiled whenever LibTorch is absent (always safe to enable)
+option(SIMD_ENABLE_CUDA          "Enable CUDA Runtime (streams, graphs, kernels)"    ON)
+option(SIMD_ENABLE_CUBLAS        "Link cuBLAS for SGEMM/GEMV kernels"                ON)
+option(SIMD_ENABLE_CUBLASLT      "Link cuBLASLt for FP16/BF16 matmul heuristic"      ON)
+option(SIMD_ENABLE_LIBTORCH      "Enable LibTorch tensor ops (pytorch_graph*.cc)"    ON)
+option(SIMD_ENABLE_CUDNN         "Link cuDNN fused ops when CUDNN_ROOT is available" OFF)
+option(SIMD_ENABLE_CUVS          "Link cuVS CAGRA/IVF-RaBitQ ANN (needs RAPIDS)"    OFF)
+option(SIMD_ENABLE_CUTLASS       "Enable CUTLASS 3.x header-only TensorCore GEMM"   OFF)
+option(SIMD_ENABLE_FALLBACK_STUBS "Compile CPU fallback stubs when LibTorch absent"  ON)
 
 set(SIMD_HAVE_CUDA     OFF)
 set(SIMD_HAVE_LIBTORCH OFF)
 set(SIMD_HAVE_CUBLAS   OFF)
 set(SIMD_HAVE_CUBLASLT OFF)
+set(SIMD_HAVE_CUDNN    OFF)
 set(SIMD_HAVE_CUVS     OFF)
 set(SIMD_HAVE_CUTLASS  OFF)
 
@@ -151,6 +181,50 @@ if(SIMD_ENABLE_CUBLAS AND CUDAToolkit_FOUND)
   endif()
 endif()
 
+# ── cuDNN (fused neural op graphs) ───────────────────────────────────
+# cuDNN 9.x: SDPA/FlashAttention, fused normalization, conv fusion.
+# Optional. If present, link it; otherwise keep fallback stubs.
+set(CUDNN_ROOT "")
+if(SIMD_ENABLE_CUDNN)
+  if(DEFINED ENV{CUDNN_ROOT})
+    set(CUDNN_ROOT "$ENV{CUDNN_ROOT}")
+    message(STATUS "cuDNN root (env): ${CUDNN_ROOT}")
+  else()
+    foreach(_cdnn_candidate
+        "$ENV{CONDA_PREFIX}"
+        "C:/Program Files/NVIDIA/CUDNN"
+        "C:/cudnn"
+        "/usr/local"
+        "/usr"
+        "/opt/conda")
+      if(EXISTS "${_cdnn_candidate}/include/cudnn.h")
+        set(CUDNN_ROOT "${_cdnn_candidate}")
+        message(STATUS "cuDNN root (auto): ${CUDNN_ROOT}")
+        break()
+      endif()
+    endforeach()
+  endif()
+
+  if(CUDNN_ROOT AND EXISTS "${CUDNN_ROOT}/include/cudnn.h")
+    include_directories("${CUDNN_ROOT}/include")
+    find_library(CUDNN_LIB cudnn
+      PATHS
+        "${CUDNN_ROOT}/lib"
+        "${CUDNN_ROOT}/lib64"
+        "${CUDNN_ROOT}/lib/x64"
+      NO_DEFAULT_PATH
+    )
+    if(CUDNN_LIB)
+      set(SIMD_HAVE_CUDNN ON)
+      message(STATUS "cuDNN: found at ${CUDNN_ROOT}")
+    else()
+      message(STATUS "cuDNN: headers found at ${CUDNN_ROOT} but cudnn library is missing")
+    endif()
+  else()
+    message(STATUS "cuDNN: not found (set CUDNN_ROOT to enable if installed)")
+  endif()
+endif()
+
 # ── cuVS (CAGRA graph ANN + IVF-PQ + IVF-RaBitQ) ────────────────────
 # CAGRA: GPU-resident graph index, fastest ANN for 768-dim embeddings
 # IVF-RaBitQ (2026): 2.7x faster than IVF-PQ, no raw-vector reranking
@@ -204,12 +278,14 @@ endif()
 # ── Capability summary ────────────────────────────────────────────────
 message(STATUS "")
 message(STATUS "═══ SIMD-Bridge capability summary ═══════════════════════")
-message(STATUS "  CUDA kernels    : ${SIMD_HAVE_CUDA}  (arch=${CMAKE_CUDA_ARCHITECTURES})")
-message(STATUS "  LibTorch+cuBLASLt: ${SIMD_HAVE_LIBTORCH}")
+message(STATUS "  CUDA Runtime    : ${SIMD_HAVE_CUDA}  (arch=${CMAKE_CUDA_ARCHITECTURES})")
 message(STATUS "  cuBLAS direct   : ${SIMD_HAVE_CUBLAS}")
 message(STATUS "  cuBLASLt direct : ${SIMD_HAVE_CUBLASLT}")
+message(STATUS "  LibTorch+cuBLASLt: ${SIMD_HAVE_LIBTORCH}")
+message(STATUS "  cuDNN fused ops : ${SIMD_HAVE_CUDNN}")
 message(STATUS "  cuVS (CAGRA/ANN): ${SIMD_HAVE_CUVS}")
 message(STATUS "  CUTLASS 3.x     : ${SIMD_HAVE_CUTLASS}")
+message(STATUS "  Fallback stubs  : ${SIMD_ENABLE_FALLBACK_STUBS}")
 message(STATUS "═══════════════════════════════════════════════════════════")
 message(STATUS "")
 
@@ -267,6 +343,7 @@ target_compile_definitions(tensorrt_bridge PRIVATE
   SIMD_HAVE_LIBTORCH=$<BOOL:${SIMD_HAVE_LIBTORCH}>
   SIMD_HAVE_CUBLAS=$<BOOL:${SIMD_HAVE_CUBLAS}>
   SIMD_HAVE_CUBLASLT=$<BOOL:${SIMD_HAVE_CUBLASLT}>
+  SIMD_HAVE_CUDNN=$<BOOL:${SIMD_HAVE_CUDNN}>
   SIMD_HAVE_CUVS=$<BOOL:${SIMD_HAVE_CUVS}>
   SIMD_HAVE_CUTLASS=$<BOOL:${SIMD_HAVE_CUTLASS}>
 )
@@ -300,6 +377,14 @@ if(SIMD_HAVE_CUBLAS)
 endif()
 if(SIMD_HAVE_CUBLASLT AND TARGET CUDA::cublasLt)
   target_link_libraries(tensorrt_bridge PRIVATE CUDA::cublasLt)
+endif()
+
+if(SIMD_HAVE_CUDNN)
+  if(CUDNN_LIB)
+    target_link_libraries(tensorrt_bridge PRIVATE "${CUDNN_LIB}")
+  elseif(TARGET CUDA::cudnn)
+    target_link_libraries(tensorrt_bridge PRIVATE CUDA::cudnn)
+  endif()
 endif()
 
 # cuVS

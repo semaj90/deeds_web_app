@@ -1,160 +1,321 @@
 {
-    "version": 3,
-    "cmakeMinimumRequired": { "major": 3, "minor": 18 },
-    "configurePresets": [
-        {
-            "name": "windows-cuda",
-            "displayName": "Windows CUDA (RTX 3060 Ti, auto-detect libs)",
-            "description": "Release x64: CUDA 13.0 SM86 + LibTorch 2.9 + cuBLAS + cuBLASLt. Paths auto-detected from env vars or well-known locations.",
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x64",
-            "binaryDir": "${sourceDir}/build",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CUDA_ARCHITECTURES": "86",
-                "TORCH_CUDA_ARCH_LIST": "8.6",
-                "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
-                "CMAKE_CXX_FLAGS_RELEASE": "/O2 /arch:AVX2",
-                "SIMD_ENABLE_CUDA": "ON",
-                "SIMD_ENABLE_LIBTORCH": "ON",
-                "SIMD_ENABLE_FALLBACK_STUBS": "ON",
-                "SIMD_ENABLE_CUBLAS": "ON",
-                "SIMD_ENABLE_CUBLASLT": "ON",
-                "SIMD_ENABLE_CUVS": "OFF",
-                "SIMD_ENABLE_CUTLASS": "OFF"
-            },
-            "environment": {
-                "LIBTORCH_ROOT": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
-            }
-        },
-        {
-            "name": "windows-cuda-cuvs",
-            "displayName": "Windows CUDA + cuVS CAGRA/IVF-RaBitQ",
-            "description": "Full GPU stack: LibTorch 2.9 + cuBLAS + cuVS CAGRA. Requires RAPIDS conda: conda install -c rapidsai cuvs-cu13. Set CUVS_ROOT env var.",
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x64",
-            "binaryDir": "${sourceDir}/build-cuvs",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CUDA_ARCHITECTURES": "86",
-                "TORCH_CUDA_ARCH_LIST": "8.6",
-                "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
-                "CMAKE_CXX_FLAGS_RELEASE": "/O2 /arch:AVX2",
-                "SIMD_ENABLE_CUDA": "ON",
-                "SIMD_ENABLE_LIBTORCH": "ON",
-                "SIMD_ENABLE_FALLBACK_STUBS": "ON",
-                "SIMD_ENABLE_CUBLAS": "ON",
-                "SIMD_ENABLE_CUBLASLT": "ON",
-                "SIMD_ENABLE_CUVS": "ON",
-                "SIMD_ENABLE_CUTLASS": "OFF"
-            },
-            "environment": {
-                "LIBTORCH_ROOT": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
-            }
-        },
-        {
-            "name": "windows-debug",
-            "displayName": "Windows Debug (CUDA + symbols)",
-            "description": "Debug build with CUDA and full debug symbols.",
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x64",
-            "binaryDir": "${sourceDir}/build-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CUDA_ARCHITECTURES": "86",
-                "TORCH_CUDA_ARCH_LIST": "8.6",
-                "CMAKE_CUDA_FLAGS": "-G -lineinfo",
-                "SIMD_ENABLE_CUDA": "ON",
-                "SIMD_ENABLE_LIBTORCH": "ON",
-                "SIMD_ENABLE_FALLBACK_STUBS": "ON",
-                "SIMD_ENABLE_CUBLAS": "ON",
-                "SIMD_ENABLE_CUBLASLT": "ON",
-                "SIMD_ENABLE_CUVS": "OFF"
-            },
-            "environment": {
-                "LIBTORCH_ROOT": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
-            }
-        },
-        {
-            "name": "windows-cpu-only",
-            "displayName": "Windows CPU Only (no CUDA, fast iteration)",
-            "description": "Stub-only build. No CUDA, no LibTorch required. ~30s build.",
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x64",
-            "binaryDir": "${sourceDir}/build-cpu",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "SIMD_ENABLE_CUDA": "OFF",
-                "SIMD_ENABLE_LIBTORCH": "OFF",
-                "SIMD_ENABLE_FALLBACK_STUBS": "ON",
-                "SIMD_ENABLE_CUBLAS": "OFF",
-                "SIMD_ENABLE_CUVS": "OFF"
-            },
-            "environment": {
-                "CUDA_PATH": ""
-            }
-        },
-        {
-            "name": "wsl2-cuda",
-            "displayName": "WSL2/Docker CUDA (Ubuntu, Ninja, cuDNN available)",
-            "description": "Linux build under WSL2 or Docker with CUDA 13 + cuDNN 9 + cuVS. cuDNN 9.x SDPA/FlashAttention works on Linux only. Set CUVS_ROOT=/opt/conda or CONDA_PREFIX.",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build-wsl",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CUDA_ARCHITECTURES": "86",
-                "TORCH_CUDA_ARCH_LIST": "8.6",
-                "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
-                "SIMD_ENABLE_CUDA": "ON",
-                "SIMD_ENABLE_LIBTORCH": "ON",
-                "SIMD_ENABLE_FALLBACK_STUBS": "ON",
-                "SIMD_ENABLE_CUBLAS": "ON",
-                "SIMD_ENABLE_CUBLASLT": "ON",
-                "SIMD_ENABLE_CUVS": "ON"
-            }
-        },
-        {
-            "name": "windows-x64-fallback",
-            "displayName": "Windows x64 CPU-only fallback (no CUDA/LibTorch)",
-            "description": "Fastest build, no GPU. Useful for CI or machines without GPU driver.",
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x64",
-            "binaryDir": "${sourceDir}/build-x64-fallback",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "SIMD_ENABLE_CUDA": "OFF",
-                "SIMD_ENABLE_LIBTORCH": "OFF",
-                "SIMD_ENABLE_FALLBACK_STUBS": "ON",
-                "SIMD_ENABLE_CUBLAS": "OFF",
-                "SIMD_ENABLE_CUVS": "OFF"
-            }
-        }
-    ],
-    "buildPresets": [
-        {
-            "name": "release",
-            "configurePreset": "windows-cuda",
-            "configuration": "Release"
-        },
-        {
-            "name": "release-cuvs",
-            "configurePreset": "windows-cuda-cuvs",
-            "configuration": "Release"
-        },
-        {
-            "name": "debug",
-            "configurePreset": "windows-debug",
-            "configuration": "Debug"
-        },
-        {
-            "name": "cpu-only",
-            "configurePreset": "windows-cpu-only",
-            "configuration": "Debug"
-        },
-        {
-            "name": "wsl2",
-            "configurePreset": "wsl2-cuda",
-            "configuration": "Release"
-        }
-    ]
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 18 },
+  "configurePresets": [
+    {
+      "name": "windows-cuda",
+      "displayName": "Windows CUDA (RTX 3060 Ti, auto-detect libs)",
+      "description": "Release x64: CUDA 13.0 SM86 + LibTorch 2.9 + cuBLAS + cuBLASLt. Paths auto-detected from env vars or well-known locations.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "TORCH_CUDA_ARCH_LIST": "8.6",
+        "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
+        "CMAKE_CXX_FLAGS_RELEASE": "/O2 /arch:AVX2",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_LIBTORCH": "ON",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+        "SIMD_ENABLE_CUBLAS": "ON",
+        "SIMD_ENABLE_CUBLASLT": "ON",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "OFF",
+        "SIMD_ENABLE_CUTLASS": "OFF"
+      },
+      "environment": {
+        "LIBTORCH_ROOT": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
+      }
+    },
+    {
+      "name": "windows-cuda-cuvs",
+      "displayName": "Windows CUDA + cuVS CAGRA/IVF-RaBitQ",
+      "description": "Full GPU stack: LibTorch 2.9 + cuBLAS + optional cuVS CAGRA. Requires RAPIDS conda when CUVS_ROOT is set.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build-cuvs",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "TORCH_CUDA_ARCH_LIST": "8.6",
+        "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
+        "CMAKE_CXX_FLAGS_RELEASE": "/O2 /arch:AVX2",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_LIBTORCH": "ON",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+        "SIMD_ENABLE_CUBLAS": "ON",
+        "SIMD_ENABLE_CUBLASLT": "ON",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "ON",
+        "SIMD_ENABLE_CUTLASS": "OFF"
+      },
+      "environment": {
+        "LIBTORCH_ROOT": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
+      }
+    },
+    {
+      "name": "windows-x64-cuda-cuvs",
+      "displayName": "Windows x64 CUDA + cuBLAS + optional cuVS",
+      "description": "Windows x64 GPU lane with LibTorch, cuBLAS/cuBLASLt, and optional cuVS CAGRA/IVF. Builds fallback stubs when cuVS is absent.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build-x64-cuda-cuvs",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "TORCH_CUDA_ARCH_LIST": "8.6",
+        "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
+        "CMAKE_CXX_FLAGS_RELEASE": "/O2 /arch:AVX2",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_LIBTORCH": "ON",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+        "SIMD_ENABLE_CUBLAS": "ON",
+        "SIMD_ENABLE_CUBLASLT": "ON",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "ON",
+        "SIMD_ENABLE_CUTLASS": "OFF"
+      },
+      "environment": {
+        "LIBTORCH_ROOT": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
+      }
+    },
+    {
+      "name": "windows-debug",
+      "displayName": "Windows Debug (CUDA + symbols)",
+      "description": "Debug build with CUDA and full debug symbols.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "TORCH_CUDA_ARCH_LIST": "8.6",
+        "CMAKE_CUDA_FLAGS": "-G -lineinfo",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_LIBTORCH": "ON",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+        "SIMD_ENABLE_CUBLAS": "ON",
+        "SIMD_ENABLE_CUBLASLT": "ON",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "OFF",
+        "SIMD_ENABLE_CUTLASS": "OFF"
+      },
+      "environment": {
+        "LIBTORCH_ROOT": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
+      }
+    },
+    {
+      "name": "windows-cpu-only",
+      "displayName": "Windows CPU Only (no CUDA, fast iteration)",
+      "description": "Stub-only build. No CUDA, no LibTorch required. ~30s build.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build-cpu",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "SIMD_ENABLE_CUDA": "OFF",
+        "SIMD_ENABLE_LIBTORCH": "OFF",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+        "SIMD_ENABLE_CUBLAS": "OFF",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "OFF",
+        "SIMD_ENABLE_CUTLASS": "OFF"
+      },
+      "environment": {
+        "CUDA_PATH": ""
+      }
+    },
+    {
+      "name": "windows-x64-fallback",
+      "displayName": "Windows x64 CPU-only fallback (no CUDA/LibTorch)",
+      "description": "Fastest build, no GPU. Useful for CI or machines without GPU driver.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build-x64-fallback",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "SIMD_ENABLE_CUDA": "OFF",
+        "SIMD_ENABLE_LIBTORCH": "OFF",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+        "SIMD_ENABLE_CUBLAS": "OFF",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "OFF",
+        "SIMD_ENABLE_CUTLASS": "OFF"
+      }
+    },
+    {
+      "name": "windows-x64-cuda-runtime",
+      "displayName": "Windows x64 CUDA Runtime only",
+      "description": "CUDA runtime + graphs/streams + fallback stubs. No LibTorch required.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build-x64-cuda-runtime",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_CUBLAS": "OFF",
+        "SIMD_ENABLE_LIBTORCH": "OFF",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "OFF",
+        "SIMD_ENABLE_CUTLASS": "OFF",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON"
+      }
+    },
+    {
+      "name": "windows-x64-cuda-cublas",
+      "displayName": "Windows x64 CUDA + cuBLAS",
+      "description": "CUDA runtime + cuBLAS/cuBLASLt for GEMM/cosine, with fallback stubs and no LibTorch requirement.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build-x64-cuda-cublas",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "TORCH_CUDA_ARCH_LIST": "8.6",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_CUBLAS": "ON",
+        "SIMD_ENABLE_LIBTORCH": "OFF",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "OFF",
+        "SIMD_ENABLE_CUTLASS": "OFF",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON"
+      }
+    },
+    {
+      "name": "windows-x64-cuda-libtorch",
+      "displayName": "Windows x64 CUDA + cuBLAS + LibTorch",
+      "description": "Full Windows x64 GPU lane with LibTorch-backed tensor ops and cuBLAS/cuBLASLt; fallback stubs remain available.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "toolset": { "value": "host=x64" },
+      "binaryDir": "${sourceDir}/build-x64-cuda",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "TORCH_CUDA_ARCH_LIST": "8.6",
+        "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
+        "CMAKE_CXX_FLAGS_RELEASE": "/O2 /arch:AVX2",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_CUBLAS": "ON",
+        "SIMD_ENABLE_CUBLASLT": "ON",
+        "SIMD_ENABLE_LIBTORCH": "ON",
+        "SIMD_ENABLE_CUDNN": "OFF",
+        "SIMD_ENABLE_CUVS": "OFF",
+        "SIMD_ENABLE_CUTLASS": "OFF",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON"
+      },
+      "environment": {
+        "LIBTORCH_ROOT": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch"
+      }
+    },
+    {
+      "name": "wsl2-cuda",
+      "displayName": "WSL2/Docker CUDA (Ubuntu, Ninja, cuDNN available)",
+      "description": "Linux build under WSL2 or Docker with CUDA 13 + cuDNN 9 + cuVS. cuDNN 9.x SDPA/FlashAttention works on Linux only. Set CUVS_ROOT=/opt/conda or CONDA_PREFIX.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-wsl",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "TORCH_CUDA_ARCH_LIST": "8.6",
+        "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_LIBTORCH": "ON",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+        "SIMD_ENABLE_CUBLAS": "ON",
+        "SIMD_ENABLE_CUBLASLT": "ON",
+        "SIMD_ENABLE_CUDNN": "ON",
+        "SIMD_ENABLE_CUVS": "ON",
+        "SIMD_ENABLE_CUTLASS": "ON"
+      }
+    },
+    {
+      "name": "wsl2-docker-gpu",
+      "displayName": "WSL2/Docker GPU (cuDNN + cuVS)",
+      "description": "Container-first Linux GPU lane with CUDA, cuBLAS, cuDNN, optional LibTorch, and cuVS. Intended for Docker/WSL2 only.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-wsl-gpu",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "TORCH_CUDA_ARCH_LIST": "8.6",
+        "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
+        "SIMD_ENABLE_CUDA": "ON",
+        "SIMD_ENABLE_LIBTORCH": "ON",
+        "SIMD_ENABLE_FALLBACK_STUBS": "ON",
+        "SIMD_ENABLE_CUBLAS": "ON",
+        "SIMD_ENABLE_CUBLASLT": "ON",
+        "SIMD_ENABLE_CUDNN": "ON",
+        "SIMD_ENABLE_CUVS": "ON",
+        "SIMD_ENABLE_CUTLASS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release",
+      "configurePreset": "windows-cuda",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-windows-x64-fallback",
+      "configurePreset": "windows-x64-fallback",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-windows-x64-cuda-runtime",
+      "configurePreset": "windows-x64-cuda-runtime",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-windows-x64-cuda-cublas",
+      "configurePreset": "windows-x64-cuda-cublas",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-windows-x64-cuda-libtorch",
+      "configurePreset": "windows-x64-cuda-libtorch",
+      "configuration": "Release"
+    },
+    {
+      "name": "release-cuvs",
+      "configurePreset": "windows-cuda-cuvs",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-windows-x64-cuda-cuvs",
+      "configurePreset": "windows-x64-cuda-cuvs",
+      "configuration": "Release"
+    },
+    {
+      "name": "debug",
+      "configurePreset": "windows-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "cpu-only",
+      "configurePreset": "windows-cpu-only",
+      "configuration": "Debug"
+    },
+    {
+      "name": "wsl2",
+      "configurePreset": "wsl2-cuda",
+      "configuration": "Release"
+    },
+    {
+      "name": "wsl2-docker-gpu",
+      "configurePreset": "wsl2-docker-gpu",
+      "configuration": "Release"
+    }
+  ]
 }

@@ -85,10 +85,25 @@ extern "C" int topKIndicesGPU(const float* scores, int n, int k, int* out, int o
 extern "C" int attentionScoreGPU_fp16(const float* query, int dim, const float* keys, int n, float* out, int out_len);
 extern "C" int rewardScoreGPU_fp16(const float* gen, const float* ref, int n, int dim, float* out, int out_len);
 extern "C" int batchCosineSimilarity_fp16(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
+extern "C" int batchCosineSimilarity(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
 extern "C" int kmeansWithCentroids(const float* embeddings, int n, int dim, int k, int max_iters,
                                     int* assignments_out, int assignments_len,
                                     float* centroids_out, int centroids_len,
                                     int* out_reseeded_count);
+
+#if !defined(SIMD_HAVE_LIBTORCH) || !SIMD_HAVE_LIBTORCH
+extern "C" int attentionScoreGPU_fp16(const float* query, int dim, const float* keys, int n, float* out, int out_len) {
+  return attentionScoreGPU(query, dim, keys, n, out, out_len);
+}
+
+extern "C" int rewardScoreGPU_fp16(const float* gen, const float* ref, int n, int dim, float* out, int out_len) {
+  return rewardScoreGPU(gen, ref, n, dim, out, out_len);
+}
+
+extern "C" int batchCosineSimilarity_fp16(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len) {
+  return batchCosineSimilarity(query, dim, corpus, n, scores, scores_len);
+}
+#endif
 extern "C" int trainSOM(const float* data, int n, int dim, int grid_w, int grid_h,
                          int iters, float lr_init, float lr_final,
                          float radius_init, float radius_final,
@@ -123,6 +138,9 @@ extern "C" int captureGraph(const char* key, int n, int dim);
 extern "C" int replayGraph(const char* key, const float* input, int input_len, float* output, int output_len);
 extern "C" int replayGraphOnStream(const char* key, const float* input, int input_len, float* output, int output_len, int stream_id);
 extern "C" int cudaGraphCount();
+
+// cuVS ANN compression stub (cuvs_bridge.cc)
+extern "C" napi_value RegisterCuvsCompress(napi_env env, napi_callback_info info);
 
 // SOM cache (som_cache.cu)
 extern "C" void runSOMCache(const float* in, float* out, int n);
@@ -1267,6 +1285,7 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "replayGraph", ReplayGraphWrapper);
   registerFn(env, exports, "replayGraphOnStream", ReplayGraphOnStreamWrapper);
   registerFn(env, exports, "cudaGraphCount", CudaGraphCountWrapper);
+  registerFn(env, exports, "cuvsCompressEmbedding", RegisterCuvsCompress);
   return exports;
 }
 

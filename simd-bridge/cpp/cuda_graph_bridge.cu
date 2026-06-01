@@ -15,10 +15,10 @@
  * cuda_graph_fallback.cpp.
  */
 
-#ifdef SOM_HAVE_CUDA
+#if defined(SOM_HAVE_CUDA) && SOM_HAVE_CUDA
   #define CUDA_GRAPH_HAVE_CUDA 1
 #endif
-#ifdef __CUDACC__
+#if defined(__CUDACC__) && !defined(NO_CUDA)
   #define CUDA_GRAPH_HAVE_CUDA 1
 #endif
 
