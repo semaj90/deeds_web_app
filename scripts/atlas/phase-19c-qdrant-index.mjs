@@ -21,16 +21,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { QdrantClient } from '@qdrant/js-client-rest';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
+const APPLY = argv.includes('--apply') || !DRY_RUN;
 const VERBOSE = argv.includes('--verbose');
 
 const REGISTRY_PATH = path.join(ROOT, '.tmp', 'atlas-feature-registry.json');
 const REPORT_PATH = path.join(ROOT, '.tmp', 'qdrant-index-report.json');
+const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const QDRANT_COLLECTION =
+  process.env.PHASE19C_QDRANT_COLLECTION || 'codebase_chunks_768';
 
 // ─── Qdrant Operations (Stub) ───────────────────────────────────────────────
 // In production, use qdrant-client and connect to QDRANT_URL
@@ -80,6 +85,59 @@ function buildQdrantPayloads(registry) {
   return payloads;
 }
 
+function sha256ToUuid(key) {
+  const hash = crypto.createHash('sha256').update(key).digest('hex');
+  return [
+    hash.slice(0, 8),
+    hash.slice(8, 12),
+    hash.slice(12, 16),
+    hash.slice(16, 20),
+    hash.slice(20, 32),
+  ].join('-');
+}
+
+async function ensureQdrantCollection(client) {
+  try {
+    await client.getCollection(QDRANT_COLLECTION);
+    return true;
+  } catch {
+    await client.createCollection(QDRANT_COLLECTION, {
+      vectors: {
+        content: { size: 768, distance: 'Cosine' },
+        signature: { size: 768, distance: 'Cosine' },
+        error: { size: 768, distance: 'Cosine' },
+        encoded_64: { size: 768, distance: 'Cosine' },
+      },
+      hnsw_config: {
+        m: 16,
+        ef_construct: 128,
+        full_scan_threshold: 10_000,
+        max_indexing_threads: 2,
+        on_disk: false,
+      },
+    });
+    return true;
+  }
+}
+
+async function applyQdrantPayloads(payloads) {
+  const client = new QdrantClient({ url: QDRANT_URL });
+  await ensureQdrantCollection(client);
+  const points = payloads.map((payload) => ({
+    id: sha256ToUuid(String(payload.payload.featureId)),
+    vector: {
+      content: payload.vector,
+    },
+    payload: {
+      ...payload.payload,
+      source: 'phase-19c-qdrant-index',
+      indexed_at: new Date().toISOString(),
+    },
+  }));
+  await client.upsert(QDRANT_COLLECTION, { wait: true, points });
+  return { upserted: points.length, collection: QDRANT_COLLECTION, url: QDRANT_URL };
+}
+
 // ─── Main ──────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -106,6 +164,29 @@ async function main() {
   const payloads = buildQdrantPayloads(registry);
   console.log(`  ✅ Built ${payloads.length} Qdrant payload points`);
 
+  const execution = {
+    attempted: APPLY && !DRY_RUN,
+    applied: false,
+    collection: QDRANT_COLLECTION,
+    url: QDRANT_URL,
+    upserted: 0,
+    error: null,
+  };
+
+  if (execution.attempted) {
+    try {
+      const result = await applyQdrantPayloads(payloads);
+      execution.applied = true;
+      execution.upserted = result.upserted;
+      execution.collection = result.collection;
+      execution.url = result.url;
+      console.log(`  ✅ Qdrant upserted ${result.upserted} points into ${result.collection}`);
+    } catch (error) {
+      execution.error = error?.message || String(error);
+      console.error(`  ❌ Qdrant upsert failed: ${execution.error}`);
+    }
+  }
+
   // Write report
   if (!DRY_RUN) {
     fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
@@ -123,19 +204,21 @@ async function main() {
     outputs: {
       payloadsBuilt: payloads.length,
       embeddingDim: 768,
-      collectionName: 'codebase_chunks_768',
+      collectionName: QDRANT_COLLECTION,
     },
+    execution,
     payloads: DRY_RUN ? payloads.slice(0, 3) : undefined, // Show first 3 in dry-run
     validation: {
       allFeaturesIncluded: payloads.length === registry?.features?.length,
       embeddingsValid: payloads.every((p) => p.vector.length === 768),
       payloadsReady: payloads.length > 0,
+      applied: execution.applied,
     },
     notes: [
       'Qdrant embedding payloads built (using deterministic random embeddings)',
       'In production: replace with actual embeddings from embeddinggemma',
       'Each payload includes feature metadata + tags + source references',
-      'Ready for upsert into Qdrant codebase_chunks_768 collection',
+      `Ready for upsert into Qdrant ${QDRANT_COLLECTION} collection`,
       'Next: Connect to Qdrant and upsert payloads',
     ],
   };
@@ -150,11 +233,13 @@ async function main() {
   console.log(`  Features: ${registry.features?.length || 0}`);
   console.log(`  Payloads built: ${payloads.length}`);
   console.log(`  Embedding dimension: 768`);
-  console.log(`  Collection: codebase_chunks_768`);
-  console.log(`  Validation: ${report.validation.payloadsReady ? '✅ READY' : '❌ BLOCKED'}`);
+  console.log(`  Collection: ${QDRANT_COLLECTION}`);
+  console.log(`  Validation: ${execution.applied ? '✅ APPLIED' : report.validation.payloadsReady ? '⚠️ PREPARED' : '❌ BLOCKED'}`);
 
   if (DRY_RUN) {
     console.log('\n[DRY-RUN] Qdrant payloads prepared. Run without --dry-run to persist.');
+  } else if (!execution.applied) {
+    console.log('\n⚠️ Qdrant payloads were prepared but not applied. Check QDRANT_URL / collection health.');
   }
 
   console.log('\nNext: Connect to Qdrant and upsert payloads');

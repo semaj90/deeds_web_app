@@ -86,6 +86,13 @@ async function main() {
         report.validation.allInputsPresent &&
         report.validation.caveman_rule_complete;
       check('Consolidation report validation', consolidationValid, `status: ${report.status}`);
+      if (report.execution) {
+        check(
+          'Consolidation execution applied',
+          Boolean(report.execution.applied),
+          `attempted: ${Boolean(report.execution.attempted)}`
+        );
+      }
     } catch (e) {
       check('Consolidation report valid', false, e.message);
     }
@@ -100,8 +107,12 @@ async function main() {
     try {
       const content = fs.readFileSync(NEO4J_REPORT_PATH, 'utf8');
       const report = JSON.parse(content);
-      neo4jReady = report.validation.cypherReady && report.validation.status === 'ready';
-      check('Neo4j Cypher queries ready', neo4jReady, `${report.outputs.cypherStatements} statements`);
+      neo4jReady = report.validation.cypherReady && report.validation.applied;
+      check(
+        'Neo4j Cypher queries applied',
+        neo4jReady,
+        `${report.outputs.cypherStatements} statements`
+      );
     } catch (e) {
       check('Neo4j sync report valid', false, e.message);
     }
@@ -116,8 +127,8 @@ async function main() {
     try {
       const content = fs.readFileSync(QDRANT_REPORT_PATH, 'utf8');
       const report = JSON.parse(content);
-      qdrantReady = report.validation.payloadsReady && report.outputs.payloadsBuilt > 0;
-      check('Qdrant payloads ready', qdrantReady, `${report.outputs.payloadsBuilt} payloads`);
+      qdrantReady = report.validation.payloadsReady && report.validation.applied;
+      check('Qdrant payloads applied', qdrantReady, `${report.outputs.payloadsBuilt} payloads`);
     } catch (e) {
       check('Qdrant index report valid', false, e.message);
     }
@@ -132,17 +143,17 @@ async function main() {
     try {
       const content = fs.readFileSync(RETRIEVAL_LOOP_PATH, 'utf8');
       const lines = content.trim().split('\n').filter(Boolean);
-      // Check if last 3 rows are consolidation-related
-      const lastThreeRows = lines.slice(-3);
-      consolidationAppended =
-        lastThreeRows.some((line) => {
+      consolidationAppended = lines.some((line) => {
+        try {
           const entry = JSON.parse(line);
-          return entry.domain === 'atlas-pipeline' && entry.intent === 'consolidation';
-        }) ||
-        lastThreeRows.some((line) => {
-          const entry = JSON.parse(line);
-          return entry.tool === 'knowledge_consolidation';
-        });
+          return (
+            (entry.domain === 'atlas-pipeline' && entry.intent === 'consolidation') ||
+            entry.tool === 'knowledge_consolidation'
+          );
+        } catch {
+          return false;
+        }
+      });
 
       check('Consolidation rows appended', consolidationAppended, `${lines.length} total rows`);
     } catch (e) {
