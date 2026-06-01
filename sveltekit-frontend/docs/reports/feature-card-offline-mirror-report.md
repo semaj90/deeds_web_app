@@ -1,10 +1,10 @@
 # Feature Card Offline Mirror Report
 
-Generated: 2026-05-26T23:19:17.325Z
+Generated: 2026-05-31T23:47:22.926Z
 
 Cards: 19
 
-CouchDB: enabled | wrote: 19 | skipped: 0 | failed: 0
+CouchDB: disabled | wrote: 0 | skipped: 19 | failed: 0
 DuckDB: ready | rows: 19
 
 This mirror is intentionally downstream-only. It does not replace the Postgres registry or the Redis hot path.

@@ -13,6 +13,9 @@
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\lstm_bridge.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\cuvs_bridge.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\vendor\simdjson.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

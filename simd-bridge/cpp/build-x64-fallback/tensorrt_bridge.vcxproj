@@ -103,12 +103,12 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=OFF;SIMD_HAVE_LIBTORCH=OFF;NO_LIBTORCH=1;CMAKE_INTDIR="Debug";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR="Debug";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=OFF;SIMD_HAVE_LIBTORCH=OFF;NO_LIBTORCH=1;CMAKE_INTDIR=\"Debug\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR=\"Debug\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -150,14 +150,14 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=OFF;SIMD_HAVE_LIBTORCH=OFF;NO_LIBTORCH=1;CMAKE_INTDIR="Release";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR="Release";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=OFF;SIMD_HAVE_LIBTORCH=OFF;NO_LIBTORCH=1;CMAKE_INTDIR=\"Release\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR=\"Release\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -199,14 +199,14 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=OFF;SIMD_HAVE_LIBTORCH=OFF;NO_LIBTORCH=1;CMAKE_INTDIR="MinSizeRel";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR="MinSizeRel";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=OFF;SIMD_HAVE_LIBTORCH=OFF;NO_LIBTORCH=1;CMAKE_INTDIR=\"MinSizeRel\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR=\"MinSizeRel\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -249,12 +249,12 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=OFF;SIMD_HAVE_LIBTORCH=OFF;NO_LIBTORCH=1;CMAKE_INTDIR="RelWithDebInfo";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR="RelWithDebInfo";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=OFF;SIMD_HAVE_LIBTORCH=OFF;NO_LIBTORCH=1;CMAKE_INTDIR=\"RelWithDebInfo\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR=\"RelWithDebInfo\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -341,6 +341,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\tensor_bridge.cc" />
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\simdjson_bridge.cc" />
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\lstm_bridge.cc" />
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\cuvs_bridge.cc" />
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\vendor\simdjson.cpp" />
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\graph_fallback_stubs.cpp" />
   </ItemGroup>

@@ -1,121 +1,121 @@
 {
-  "generatedAt": "2026-05-27T15:09:34.420Z",
+  "generatedAt": "2026-05-31T21:46:34.518Z",
   "autoencoder": {
-    "trainedAt": "2026-05-27T15:03:29.074123+00:00",
-    "bestLoss": 0.007056186013545663,
-    "epochs": 30,
-    "nTrainVectors": 74743,
-    "device": "cuda",
-    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "trainedAt": "2026-05-31T07:11:24.020Z",
+    "bestLoss": 0.053537426539458866,
+    "epochs": 1,
+    "nTrainVectors": 33215,
+    "device": "unknown",
+    "gpu": null,
     "dimIn": 768,
     "dimHidden": 256,
     "dimLatent": 64
   },
   "inventory": {
-    "qdrantTotal": 74743,
-    "redisEncodedCount": 3951,
+    "qdrantTotal": 35192,
+    "redisEncodedCount": 33754,
     "redisCentroidCount": 89,
     "sampleSize": 200,
     "flatVectorsSkipped": 0
   },
   "quality": {
-    "variance64d": 0.015160738553750002,
-    "nnOverlapAt5": 0.6100000000000001,
-    "nnOverlapPct": 61.00000000000001,
+    "variance64d": 0.008993082662125004,
+    "nnOverlapAt5": 0.32,
+    "nnOverlapPct": 32,
     "alignedPairs": 50,
-    "centroidAvgCosineSim": 0.7129960174145797,
+    "centroidAvgCosineSim": 0.2619475741567948,
     "centroidsUsed": 20,
     "centroidsTotal": 89,
-    "filePathCoveragePct": 100,
-    "coveredFilePaths": 82,
-    "qdrantSampleFilePaths": 82
+    "filePathCoveragePct": 71,
+    "coveredFilePaths": 71,
+    "qdrantSampleFilePaths": 100
   },
   "centroidTopAssignments": [
+    {
+      "centroidIdx": 68,
+      "count": 12
+    },
+    {
+      "centroidIdx": 80,
+      "count": 8
+    },
+    {
+      "centroidIdx": 23,
+      "count": 6
+    },
+    {
+      "centroidIdx": 34,
+      "count": 6
+    },
+    {
+      "centroidIdx": 71,
+      "count": 6
+    },
+    {
+      "centroidIdx": 25,
+      "count": 5
+    },
     {
       "centroidIdx": 28,
       "count": 5
     },
     {
-      "centroidIdx": 40,
+      "centroidIdx": 29,
       "count": 5
     },
     {
-      "centroidIdx": 81,
+      "centroidIdx": 44,
       "count": 5
-    },
-    {
-      "centroidIdx": 7,
-      "count": 4
-    },
-    {
-      "centroidIdx": 27,
-      "count": 4
     },
     {
       "centroidIdx": 53,
+      "count": 5
+    },
+    {
+      "centroidIdx": 75,
+      "count": 5
+    },
+    {
+      "centroidIdx": 14,
       "count": 4
     },
     {
-      "centroidIdx": 88,
+      "centroidIdx": 52,
       "count": 4
-    },
-    {
-      "centroidIdx": 5,
-      "count": 3
-    },
-    {
-      "centroidIdx": 19,
-      "count": 3
-    },
-    {
-      "centroidIdx": 21,
-      "count": 3
-    },
-    {
-      "centroidIdx": 24,
-      "count": 3
-    },
-    {
-      "centroidIdx": 25,
-      "count": 3
     },
     {
       "centroidIdx": 30,
       "count": 3
     },
     {
-      "centroidIdx": 34,
-      "count": 3
-    },
-    {
-      "centroidIdx": 71,
-      "count": 3
-    },
-    {
-      "centroidIdx": 6,
+      "centroidIdx": 11,
       "count": 2
     },
     {
-      "centroidIdx": 15,
-      "count": 2
-    },
-    {
-      "centroidIdx": 37,
-      "count": 2
-    },
-    {
-      "centroidIdx": 48,
+      "centroidIdx": 17,
       "count": 2
     },
     {
       "centroidIdx": 51,
       "count": 2
+    },
+    {
+      "centroidIdx": 59,
+      "count": 2
+    },
+    {
+      "centroidIdx": 1,
+      "count": 1
+    },
+    {
+      "centroidIdx": 4,
+      "count": 1
     }
   ],
   "validation": {
     "isFlat": false,
     "hasGoodCoverage": true,
-    "hasGoodNNOverlap": true,
+    "hasGoodNNOverlap": false,
     "isTrained": true
   },
   "status": "PASS"

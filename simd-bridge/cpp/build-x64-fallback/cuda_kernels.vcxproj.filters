@@ -7,6 +7,9 @@
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\lstm_gpu.cu">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\cuda_graph_bridge.cu">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\CMakeLists.txt" />

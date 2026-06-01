@@ -1,46 +1,17 @@
 {
-  "generatedAt": "2026-05-26T23:19:17.325Z",
+  "generatedAt": "2026-05-31T23:47:22.926Z",
   "input": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\exports\\feature-map-cards.jsonl",
   "cards": 19,
   "couchdb": {
-    "enabled": true,
-    "db": "feature_cards",
-    "wrote": 19,
-    "skipped": 0,
+    "enabled": false,
+    "wrote": 0,
+    "skipped": 19,
     "failed": 0,
-    "conflicted": 0,
+    "db": "feature_cards",
     "designDoc": {
-      "enabled": true,
+      "enabled": false,
       "changed": false,
-      "upserted": false,
-      "views": [
-        "by_kind",
-        "by_feature_key",
-        "by_term",
-        "by_audit_status"
-      ],
-      "warmChecks": [
-        {
-          "path": "/_design/feature_cards/_view/by_kind?limit=1",
-          "ok": true,
-          "status": 200
-        },
-        {
-          "path": "/_design/feature_cards/_view/by_feature_key?limit=1",
-          "ok": true,
-          "status": 200
-        },
-        {
-          "path": "/_design/feature_cards/_view/by_term?limit=1",
-          "ok": true,
-          "status": 200
-        },
-        {
-          "path": "/_design/feature_cards/_view/by_audit_status?reduce=true&group=true&limit=1",
-          "ok": true,
-          "status": 200
-        }
-      ]
+      "upserted": false
     }
   },
   "duckdb": {
