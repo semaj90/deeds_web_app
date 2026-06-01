@@ -2,6 +2,8 @@
 
 This document ties together the current codebase semantic indexing, ACE packet generation, autoencoder backfill, Engram token memory, and Gemma4/OpenCode assistant path.
 
+Offline batch promotion is documented separately in `docs/architecture/offline-synthesis-parent-atlas.md`.
+
 ## Canonical flow
 
 ```mermaid

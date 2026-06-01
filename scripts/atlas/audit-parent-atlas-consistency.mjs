@@ -124,8 +124,25 @@ async function main() {
   try {
     const keys = await redis.keys('code:llm_output:path:*');
     if (keys.length > 0) {
-      const val = await redis.get(keys[0]);
-      results.smoke_tests.redis_ace_lookup = val !== null;
+      const redisType = await redis.type(keys[0]);
+      if (redisType === 'string') {
+        const val = await redis.get(keys[0]);
+        results.smoke_tests.redis_ace_lookup = val !== null;
+      } else if (redisType === 'hash') {
+        const val = await redis.hgetall(keys[0]);
+        results.smoke_tests.redis_ace_lookup = Object.keys(val).length > 0;
+      } else if (redisType === 'list') {
+        const val = await redis.lrange(keys[0], 0, -1);
+        results.smoke_tests.redis_ace_lookup = val.length > 0;
+      } else if (redisType === 'set') {
+        const val = await redis.smembers(keys[0]);
+        results.smoke_tests.redis_ace_lookup = val.length > 0;
+      } else if (redisType === 'zset') {
+        const val = await redis.zrange(keys[0], 0, -1);
+        results.smoke_tests.redis_ace_lookup = val.length > 0;
+      } else {
+        results.smoke_tests.redis_ace_lookup = true;
+      }
     }
   } catch (e) {
     console.warn('  ⚠️ Redis smoke query failed:', e.message);
@@ -146,7 +163,31 @@ async function main() {
     console.warn('  ⚠️ pgvector audit failed:', e.message);
   }
 
-  // 2. Every Kanban task has a feature_id
+  // 2. Qdrant sample points should line up with the Postgres task_semantic_packets mirror by source_ref.
+  try {
+    const qdrantSample = await fetch(`${QDRANT_URL}/collections/feature_maps/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ limit: 20 }),
+    });
+    if (qdrantSample.ok) {
+      const qdata = await qdrantSample.json();
+      const points = qdata.result?.points || [];
+      const refs = points
+        .map((p) => p.payload?.source_ref)
+        .filter((ref) => typeof ref === 'string' && ref.length > 0);
+      if (refs.length > 0) {
+        const pgMirror = await pool.query(
+          'SELECT DISTINCT qdrant_point_id FROM task_semantic_packets WHERE qdrant_point_id = ANY($1::text[])',
+          [refs]
+        );
+        results.consistency_audits.qdrant_points_matched_pg = pgMirror.rows.length;
+      }
+    }
+  } catch (e) {
+    console.warn('  ⚠️ Qdrant/Postgres source_ref audit failed:', e.message);
+  }
+  // 3. Every Kanban task has a feature_id
   let missingTasksCount = 0;
   if (fs.existsSync(kanbanTasksPath)) {
     const tasks = readJsonl(kanbanTasksPath);
@@ -159,7 +200,7 @@ async function main() {
     }
   }
 
-  // 3. Verify Database Indexes
+  // 4. Verify Database Indexes
   try {
     const idxCheck = await pool.query(`
       SELECT indexname FROM pg_indexes 

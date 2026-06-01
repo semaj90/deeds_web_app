@@ -1,0 +1,54 @@
+{
+  "name": "Missing Features Path Map",
+  "generatedAt": "2026-06-01",
+  "roots": [
+    "sveltekit-frontend/src/lib/server/db/schema/",
+    "sveltekit-frontend/drizzle/manual/",
+    "scripts/atlas/",
+    "scripts/ingest/",
+    "docs/graph/",
+    "docs/reports/",
+    "docs/atlas/",
+    "memory/exports/",
+    ".tmp/",
+    ".opencode/",
+    ".cache/",
+    ".svelte-kit/",
+    ".github/",
+    ".vscode/"
+  ],
+  "inputs": [
+    "docs/graph/repo-root-atlas.md",
+    "docs/graph/repo-root-atlas.json",
+    "docs/graph/kanban-board.json",
+    "docs/reports/feature-gap-registry-live-latest.json",
+    "docs/reports/qdrant-source-refs-backfill-latest.json",
+    "docs/reports/feature-card-duckdb-validation.json",
+    "docs/reports/feature-card-duckdb-inspect.json",
+    "memory/exports/parent-atlas/parent_atlas_index.json",
+    ".tmp/offline-synthesis-report.json",
+    ".tmp/mapreduce-full-v4.ndjson",
+    ".tmp/mapreduce-full-v4.ndjson.manifest.json"
+  ],
+  "fieldAlignment": {
+    "sourceRef": "canonical source identity",
+    "feature_id": "stable feature lane identity",
+    "alias_id": "cross-store alias for task and packet reconciliation",
+    "parent_atlas_card_id": "offline synthesis card identity"
+  },
+  "clusterAliases": [
+    "cluster_id",
+    "cluster_key",
+    "gpu_cluster",
+    "gpuCluster",
+    "som_cluster",
+    "topology_label"
+  ],
+  "targets": [
+    "Postgres",
+    "Qdrant",
+    "Redis",
+    "Neo4j / SOM topology",
+    "SeaweedFS archive"
+  ]
+}

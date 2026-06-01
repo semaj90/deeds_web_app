@@ -1,6 +1,6 @@
 # Codebase PageRank Top 100
 
-- generatedAt: 2026-06-01T01:47:42.288Z
+- generatedAt: 2026-06-01T02:07:15.786Z
 - limit: 100
 - source: codebase-map
 

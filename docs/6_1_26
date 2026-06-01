@@ -1,0 +1,38 @@
+Here's the honest production hardening picture for this stack:
+
+What the Stack Gives You (the real advantages)
+SvelteKit 2 + Svelte 5 runes
+
+Zero-overhead reactivity — no virtual DOM diffing, compiled to direct DOM mutations. Under load (e.g. live SSE evidence streams, kanban updates) this matters vs React.
+SSR + streaming out of the box — the load() / +page.server.ts pattern means the DB query runs server-side, HTML arrives pre-populated, no client waterfall.
+The $state/$derived rune model makes auth state, cache state, and session state provably single-source — no stale closure bugs that plague Redux stores.
+WebGPU + ONNX client inference
+
+768-dim embeddings computed in the browser — zero round-trips for the embedding lane on simple queries. This is the real win: the server never sees the raw query text for client-only paths.
+The WebGPU → WASM SIMD → CPU fallback ladder means it degrades gracefully on older hardware rather than breaking.
+Legal sensitivity benefit: some queries never leave the device at all.
+TurboQuant llama-server on RTX 3060 Ti
+
+65K context at q8_0/turbo3 in 8GB VRAM that would OOM at f16. The asymmetric K=q8_0, V=turbo3 is the key — you get long-context legal document reasoning that a stock Ollama instance can't do at this VRAM budget.
+Qdrant + pgvector dual-write
+
+ANN search at <10ms for 35K+ chunks via Qdrant, with Postgres as the authoritative mirror. If Qdrant goes down, the mirror keeps API routes alive in degraded mode.
+Neo4j hypergraph
+
+The 4-lane hyperedge structure (cluster_context / shared_resource / agents_context / vault_link) is the thing that makes cross-document legal reasoning work — "what cases cite this statute via this evidence chain" is a Cypher query, not a vector scan.
+Where Production Hardening Is Actually Needed
+The audit shows four real gaps:
+
+1. No structured error tracking — Langfuse captures LLM traces but there's no Sentry/GlitchTip equivalent for unhandled exceptions. A server-side crash in a +page.server.ts load() silently returns loadError: null due to the graceful degradation pattern, which means silent data loss goes unobserved.
+
+2. The ONNX WASM binaries are gitignored — three 11-24MB .wasm files must be manually copied from node_modules after every clone. A fresh deploy without that step silently falls back to server inference (slower, private data leaves device).
+
+3. MCP sidecar restarts are manual — if engram (:8792) or turbovec (:8791) crash, nothing restarts them. The health check script detects the gap but doesn't recover it. A supervisor (pm2, systemd, or a Docker restart policy) is missing.
+
+4. The alias_id column blocker — confirmed BLOCKED from the preflight run. Any job that tries to persist alias_id to task_semantic_packets will silently fail or error. The migration SQL is one line but hasn't been applied:
+
+
+ALTER TABLE task_semantic_packets ADD COLUMN IF NOT EXISTS alias_id TEXT;
+Now saving the debug utility:
+
+Write debug-import-resolve.mjs

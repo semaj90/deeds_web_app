@@ -303,6 +303,8 @@ async function getKarpathyBoost(redis) {
           pr: value.pr ?? null,
           attn: value.attn ?? null,
           authority: value.authority ?? null,
+          attentionPeak: value.attentionPeak ?? null,
+          attentionMean: value.attentionMean ?? null,
         });
       }
     }

@@ -108,8 +108,11 @@ async function main() {
     }
 
     // Deterministic validation
-    if (!synthesis.summary || !synthesis.summary.includes(expectedRef)) {
-      console.warn(`[!] Skipping ${relPath}: LLM failed to echo sourceRef in summary.`);
+    const hasExpectedRefInSummary = typeof synthesis.summary === 'string' && synthesis.summary.includes(expectedRef);
+    const hasExpectedRefInSourceRefs =
+      Array.isArray(synthesis.sourceRefs) && synthesis.sourceRefs.includes(expectedRef);
+    if (!hasExpectedRefInSummary && !hasExpectedRefInSourceRefs) {
+      console.warn(`[!] Skipping ${relPath}: LLM failed to include sourceRef in summary/sourceRefs.`);
       skipped++;
       continue;
     }

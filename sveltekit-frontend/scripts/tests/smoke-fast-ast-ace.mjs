@@ -165,11 +165,17 @@ if (NO_REDIS) {
 }
 
 // 4. Static: ACE score cap ≤ 0.07
-const ASSEMBLER = path.join(ROOT, 'src/lib/server/ace/context-assembler.ts');
-if (!existsSync(ASSEMBLER)) {
+const ASSEMBLER =
+  path.join(ROOT, 'src/lib/server/features/ai/ace/context-assembler.ts');
+// Legacy path kept as fallback for repos that haven't migrated the barrel yet
+const ASSEMBLER_LEGACY = path.join(ROOT, 'src/lib/server/ace/context-assembler.ts');
+const assemblerPath = existsSync(ASSEMBLER) ? ASSEMBLER
+  : existsSync(ASSEMBLER_LEGACY) ? ASSEMBLER_LEGACY
+  : null;
+if (!assemblerPath) {
   skip('ACE FAST_AST_SCORE_CAP ≤ 0.07', 'context-assembler.ts not found');
 } else {
-  const src = readFileSync(ASSEMBLER, 'utf8');
+  const src = readFileSync(assemblerPath, 'utf8');
   const match = src.match(/FAST_AST_SCORE_CAP\s*=\s*([\d.]+)/);
   if (!match) {
     fail('ACE FAST_AST_SCORE_CAP ≤ 0.07', 'constant not found in context-assembler.ts');

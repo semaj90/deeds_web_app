@@ -18,6 +18,14 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 - [x] **Phase KG-4**: Ran `npm run graphify:autoencoder:train` to execute the full autoencoder training, backfill Qdrant, encode Redis, and compute centroids.
 - [x] **Phase KG-5**: Verified the end-to-end attention-rank smoke test script (`scripts/smoke-attention-rank.mjs`) and executed Obsidian vault JSONL export (`npm run graph:export:jsonl`). The Karpathy GPU inference loop is now live.
 
+- [ ] **Knowledge Graph Tool Lanes**
+  - [ ] `attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores
+  - [ ] `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats
+  - [ ] `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats
+  - [ ] `playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection
+  - [x] Register RabbitMQ `media.download` and `media.transcribe` queues in `src/lib/server/queue/rabbitmq-manager-fixed.ts`
+  - [ ] Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of truth
+
 - [x] **Phase KG-6 (Hermes Tool Wiring)**
   - [x] `attention_rank_files` — embed query → attentionScoreGPU via libtorch → top-N from Karpathy scores
   - [x] `som_topology_stats` — delegates to `gpu:som_topology` (Redis SOM grid/centroid stats)
@@ -174,6 +182,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 **Verified**: 9372 cards → 200 ranked → 99 deduped → 73 packed at 5964/6000 tokens ✅
 
 **Current state**: pseudo-embeddings (SHA-256) — real Ollama embed wired in next gate.
+**Verified**: 9372 cards → 200 ranked → 99 deduped → 73 packed at 5964/6000 tokens ✅
 
 **Next gate** (Phase 11D-B):
 - [x] Replace `pseudoEmbed()` in `rank-cards.mjs` with `POST localhost:11434/api/embed` (embeddinggemma:latest) — real embed with 8s timeout + pseudo fallback; confirmed `ollama (real)` path live (2026-05-31)
@@ -220,11 +229,115 @@ dependency graph, sourceRefs, startup context, package scripts.
 - Top removable complexity (orphan scripts, dead routes, zero-consumer exports)
 
 **Tasks**:
-- [ ] `scripts/ingest/build-recommendations.mjs` — reads ace-packet + atlas seeds + smoke reports, emits `recommendations.json`
-- [ ] Feature cluster grouping by sourceRef prefix
+- [x] `scripts/opencode/build-recommendations.mjs` — canonical builder; reads ace-packets + atlas seeds + smoke reports, emits `.opencode/recommendations/recommendations.json` and `.opencode/recommendations/recommendations.md`
+- [ ] Feature cluster grouping by `sourceRef` prefix
 - [ ] Stale feature detection (atlas entry exists, no recent git touch)
 - [ ] Duplicate system detection (two scripts/routes with overlapping sourceRefs)
-- [ ] Output: `.opencode/recommendations.json` + `.opencode/recommendations-summary.md`
+- [ ] Wire Qdrant real search in `scripts/ingest/retrieval-pass.mjs` and feed its hits into recommendation scoring
+- [ ] Wire Neo4j edge expansion (neighbor sourceRefs boost score)
+- [ ] Wire Redis packet cache (TTL 10min, key = sha256(query + budget))
+- [ ] Wire Langfuse trace on rank + compress runs
+- [ ] Fuse retrieval-pass output into recommendation scoring (Qdrant hits + Neo4j neighbor boost + Redis packet cache + Langfuse trace metadata)
+- [ ] Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still required
+- [ ] Retrieval hook inventory for Phase 11E:
+  - `scripts/ingest/retrieval-pass.mjs`
+  - `sveltekit-frontend/src/lib/server/search/qdrant-search.ts`
+  - `sveltekit-frontend/src/lib/server/search/neo4j-rerank.ts`
+  - `sveltekit-frontend/src/lib/server/cache/redis-semantic-cache.ts`
+  - `sveltekit-frontend/src/lib/server/observability/langfuse.ts`
+  - `sveltekit-frontend/src/lib/server/retrieval/prompt-listener.ts`
+
+---
+
+## Phase 11F — QueryRouter4x4 Adaptive Routing & Speculative Decoding
+
+**Goal**: Replace static lane defaults with adaptive exploration and CPU-assisted draft validation.
+
+**Tasks**:
+- [x] Add bounded FP16 attention rerank to `fetchACPKnowledgeResults` for final ACE context weighting on the top retrieved slice.
+- [ ] Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults.
+- [ ] Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes.
+- [ ] Configure `gemma3-270m.gguf` draft-model support in TurboQuant for CPU-assisted speculative token validation.
+- [ ] Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite.
+- [ ] Document the live 4x4 router matrix location and usage:
+  - `sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts`
+  - `scripts/atlas/eval-lane-routing.mjs`
+  - `scripts/atlas/eval-messy-query-routing.mjs`
+  - `scripts/atlas/eval-real-world-routing.mjs`
+  - `scripts/atlas/eval-cross-domain-routing.mjs`
+  - Redis keys: `ace:router4x4:matrix`, `ace:router4x4:matrix:{userId}`
+
+---
+
+## Phase 11G — Browser WebGPU Schema Encoder & Service Worker
+
+**Goal**: Move client-side reranking and caching into the browser where it is safe and useful.
+
+**Tasks**:
+- [ ] Create `schema-encoder.wgsl` for client-side reranking of documents.
+- [ ] Establish SharedArrayBuffer zero-copy structures for Web Worker communication.
+- [ ] Implement IndexedDB caching of ONNX models and WebGPU weights inside the Service Worker.
+- [ ] Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productization lane, not greenfield.
+
+---
+
+## Phase 10-19 Follow-on Tasks
+
+**Goal**: Close the remaining productization gaps across retrieval, analysis, and lane completion.
+
+**Tasks**:
+- [ ] Option 2: ClusterCard schema + Redis/Qdrant wiring + API route
+- [ ] Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field
+- [ ] Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path
+- [ ] Wire Qdrant real search in `scripts/ingest/retrieval-pass.mjs` and feed its hits into recommendation scoring
+- [ ] Wire Neo4j edge expansion so neighbor `sourceRef`s boost score
+- [ ] Wire Redis packet cache with TTL 10min and key `sha256(query + budget)`
+- [ ] Wire Langfuse trace on rank + compress runs
+- [ ] Fuse `retrieval-pass` output into recommendation scoring (`Qdrant` hits + `Neo4j` neighbor boost + `Redis` packet cache + `Langfuse` trace metadata)
+- [ ] Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still required
+- [ ] Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema
+- [ ] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema
+- [ ] Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)
+
+---
+
+## Phase 101A — Directory Analysis & Codebase Pruning
+
+**Goal**: Use structural analysis to trim the repo to production-ready source, schemas, scripts, and docs.
+**Scope**: full repo, not just `/src`; use `repo-root-atlas`, `docs/graph/`, `memory/exports/`, `scripts/`, `sveltekit-frontend/`, `docs/`, and the existing directory cards as analysis roots.
+**Hidden roots**: include gitignored workspace roots such as `.opencode/`, `.tmp/`, `.cache/`, `.svelte-kit/`, `.github/`, and `.vscode/` in the traversal surface.
+
+**Tasks**:
+- [ ] Wire `ast-grep` into the directory analysis pipeline for codebase pruning.
+- [ ] Use directory-role analysis plus AST maps to separate missing features from redundant features.
+- [ ] Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically.
+- [ ] Rebuild the parent atlas from the production-ready feature list after archive decisions land.
+- [ ] Keep the pruning lane offline-only; it should not become a startup dependency.
+- [ ] Preserve the existing `tools:ast-grep`, `index:ast`, `audit:directories`, and `graphify:dependency:audit` entrypoints as the core analysis surface.
+- [ ] Use TurboVec-assisted directory summarization to fill gaps in directories that do not yet have `llms.md` / `agents.md` cards.
+- [ ] Inventory and reconcile directory cards (`llms.md`, `agents.md`, generated summaries) so pruning can operate on the whole repository consistently.
+- [x] Missing-features path map exists.
+  - `docs/graph/missing-features-path-map.md`
+  - `docs/graph/missing-features-path-map.json`
+  - quick traversal surface for mapreduce outputs, DuckDB joins, Postgres mirrors, sourceRef-prefix clusters, and archive decisions
+- [x] Missing-features review report exists.
+  - `scripts/atlas/missing-features-review.mjs`
+  - `docs/reports/missing-features-review-latest.json`
+  - `docs/reports/missing-features-review-latest.md`
+  - `docs/reports/missing-features-review-latest.svg`
+  - deterministic report over mapreduce, registry rows, parent atlas coverage, stale features, duplicate systems, and prefix clusters
+
+---
+
+## Phase 101B — AGENTS / Qdrant / Knowledge Base Manager
+
+**Goal**: Use AGENTS metadata to enrich retrieval payloads and expose TRACE MCP tools for OpenCode.
+
+**Tasks**:
+- [ ] AGENTS -> Qdrant Backfill: enrich vector payloads with AGENTS card metadata using a dry-run-safe path first.
+- [ ] RG-Atlas Persistence: stabilize directory-level metadata integration and keep it aligned with the atlas graph exports.
+- [ ] Knowledge Base Manager: expose TRACE MCP tools for OpenCode integration.
+- [ ] Keep this lane tied to the existing graph artifacts in `docs/graph/` rather than inventing a parallel source of truth.
 
 ---
 
@@ -333,9 +446,12 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 - [x] **Phase 10-19 Feature-Profile Retrieval Loop & ML Lanes**
   - [x] Implement Parent Atlas Profile Card generator and output `.tmp/parent-atlas-profile-cards.jsonl` and `reports/parent-atlas-profile-cards.md`
   - [x] Enrich Qdrant semantic indexer payloads with additional `feature_label`, `phase_lane`, `dependency_cluster`, `hot_keyword_cluster`, `sourceRef`, and `parent_atlas_card_id`
+  - [ ] Add `alias_id` to parent atlas profile payloads, task mirror payloads, and retrieval events once the live `task_semantic_packets` migration is applied
   - [x] Build `scripts/atlas/hot-keyword-cluster-summary.mjs` script
   - [x] Create distilled Drizzle/Postgres tables DDL/migration SQL for cards, profiles, edges, and retrieval events
+  - [ ] Extend the distilled DDL/migration SQL to persist `alias_id` in the live task/profile path once the migration is scheduled
   - [x] Implement read-only prompt listener adapter (`src/lib/server/retrieval/prompt-listener.ts`) and logging loop writing to `.tmp/atlas-retrieval-loop.jsonl`
+  - [ ] Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field
   - [x] Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema
   - [x] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema
   - [x] Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)
@@ -527,3 +643,110 @@ User intent
 - Source: nightly summaries + cold archive + RL signal traces
 - Format: prompt/response pairs with sourceRef anchors + reward scores
 - Target: reduce hallucination on legal domain + improve tool-call accuracy
+
+---
+
+## Parent Atlas / Codebase Indexing Missing Checklist
+
+This section is the current gap list for the parent-atlas and codebase-indexing lane. It is intentionally separate from the completed phase summaries above so the remaining work stays visible.
+
+### Open promotion work
+- [ ] Run the full current-corpus offline ingest in bounded chunks until the full scan is promoted, not just summarized
+  - current scan scope is about 133k indexable files
+  - keep the write path bounded and resumable
+- [ ] Promote validated offline outputs into the durable stores only after validation passes
+  - Postgres
+  - Qdrant
+  - Redis
+  - Neo4j / SOM topology
+  - SeaweedFS archive for large generated artifacts
+- [ ] Confirm the live task mirror schema for `task_semantic_packets`
+  - `alias_id` migration path
+  - `feature_id` typing reconciliation
+  - only persist fields the live table actually accepts
+- [ ] Recover or containerize the missing worker lanes required for the full offline path
+  - RabbitMQ topology MCP
+  - TurboVec sidecar (transport fixed; all sidecars green on 2026-05-31)
+  - Engram embed sidecar (transport fixed; all sidecars green on 2026-05-31)
+  - LangExtract sidecar (transport fixed; all sidecars green on 2026-05-31)
+  - graphify / batch helpers that currently time out on large runs
+- [ ] Keep the repo trimmed to source, schemas, scripts, and docs
+  - move raw summaries, large exports, and generated atlas artifacts out of the repo
+  - archive them to external storage instead of keeping them as long-lived source files
+- [ ] Refresh the parent atlas using only the production-ready feature list after archive decisions are made
+  - keep missing features and redundant features separated in the atlas refresh and kanban handoff
+  - re-run kanban-to-parent-atlas sync after archive decisions are made
+
+### Archive / retire after promotion
+- [ ] Archive redundant Svelte 5 runes carry-logic layers once the feature folders are stable
+- [ ] Archive redundant async SvelteKit RPC wrappers once the JSON-RPC 2.0 path is the single canonical route
+- [ ] Archive duplicate JSON-RPC 2.0 shim logic after the canonical handler is confirmed
+- [ ] Archive deep Drizzle audit artifacts after the schema/migration plan is signed off
+- [ ] Archive stale or duplicate feature implementations after the parent atlas tags them as production-ready or redundant
+
+### Phase 1-20 rollup gaps still open
+- [ ] Phase 20 A6000 training lane
+  - [ ] high-RAM LLM tagging
+  - [ ] Unsloth + PyTorch install and validation
+  - [ ] optional LoRA / QLoRA adapter training
+  - [ ] export trained tagger / reranker artifacts
+  - [ ] keep the lane offline-only, not a startup dependency
+- [ ] H4 write-enabled benchmark and FP16 accuracy comparison
+  - [ ] keep CPU fallback as default until benchmark passes
+  - [ ] do not enable FP16 globally before the comparison is recorded
+- [ ] Deep Drizzle audit after consolidation and archiving
+  - [ ] verify schema drift against the moved feature folders
+  - [ ] apply migration only after the repo is trimmed and the live schema is consistent
+- [ ] Parent atlas refresh using only the production-ready feature list
+  - [ ] keep missing features and redundant features separated
+  - [ ] re-run kanban-to-parent-atlas sync after archive decisions are made
+
+---
+
+## NAPI-RS / Rust Native Bridge Roadmap
+
+This lane tracks the native bridge work that moved parsing, CUDA SOM caching, and container alignment off the main JS hot path. Keep it separate from the parent atlas checklist so runtime work and repo-trimming work do not get mixed.
+
+### Completed
+- [x] Rayon-powered batch parsing and worker-pool offload
+  - `parse_batch` uses Rayon in Rust and Node worker threads to keep SvelteKit responsive
+  - benchmarked against `JSON.parse` on 9,373 card files:
+    - Standard `JSON.parse`: 3221.24ms
+    - Rust Rayon worker-pool: 1680.74ms
+    - speedup: 1.92x faster parsing
+- [x] CUDA SOM cache integration
+  - `som_cache.cu` builds with `SOM_HAVE_CUDA=1` on Windows/MSVC
+  - `run_som_cache` binds directly to the native CUDA kernel copy path on `Float32Array` buffers
+  - `build.rs` compiles `som_cache.cu` with CUDA and links `cudart_static`
+  - `run_som_cache` export mapping is wired to the native CUDA kernel copy path
+  - validation matches inputs perfectly
+- [x] Container alignment
+  - runtime base moved from `node:22-alpine` to `node:22-slim` for glibc compatibility
+  - native addons are built in the multi-stage image and copied into runtime
+  - `Dockerfile.sveltekit` now compiles and deploys the optimized C++/Rust addons and runs SvelteKit as a non-root user
+- [x] Valkey / Redis semantic cache wiring
+  - `simd_bridge_rs.node` wired into the Bifrost cache manager path
+  - `parseFast` is used for cached KAG context extraction
+  - SHA-256 cache-key hashing is now the canonical path
+  - `bifrost-cache-manager.ts` now uses the native parse path for cached context structures
+- [x] Autoencoder & Karpathy GPU pipeline execution
+  - `train-autoencoder.mjs` trained the 768 → 64 contrastive autoencoder over 33,215 embeddings and saved weights to Redis (`ace:autoencoder:weights`, `ace:autoencoder:decoder:weights`)
+  - `karpathy-gpu-enrich.mjs` ran through `npx tsx` with Qdrant/Redis URL fallbacks and wrote PageRank / Attention / Authority blend scores back to Redis
+  - `karpathy-ace-hits.mjs` audited retrieval logs against authority scores and surfaced the top ghost files
+  - `karpathy-gpu-recommendations.md` was generated as the report artifact
+- [x] Validation and smoke checks
+  - `npm run check` is green
+  - `npm run bifrost:cards:smoke` is green
+
+### Remaining
+- [ ] Decide whether `simd-bridge-rs/` becomes the next canonical native add-on workspace or remains a staged canary
+- [ ] Scaffold or promote the `napi-rs` prototype API surface (`parse_batch`, `compute_centroids`, Tokio worker handoff)
+- [ ] Add a dedicated benchmark harness for JSON.parse vs simdjson vs Rust roundtrip
+- [ ] Wire the production native base image into CI so the runtime image and addon ABI stay pinned
+- [ ] Add telemetry for parse latency, worker queue time, and GPU allocation metrics
+- [ ] Keep CPU fallback paths available for dev and rollback
+
+### Guardrails
+- [ ] Do not remove the JS fallback path until the Rust native path is benchmarked and canary-validated
+- [ ] Do not treat the CUDA path as mandatory for the browser or startup lanes
+- [ ] Keep offline training and zero-copy handoff separate from the live retrieval path until benchmarks pass

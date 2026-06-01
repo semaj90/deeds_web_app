@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { loadConfig, resolveRepoPath, readJson, readText } from './_atlas-utils.mjs';
 
 const config = loadConfig();
@@ -25,6 +26,10 @@ const batchReport = readJson(resolveRepoPath(config.outputs.batchReportJson), nu
 const routeMapText = readText(resolveRepoPath(config.sources.routeMap), '');
 
 const result = { repo: config.repoName, generatedAt: new Date().toISOString(), missing, ok: missing.length === 0 && Boolean(rootAtlas) && Boolean(batchReport), routeMapBytes: routeMapText.length, rootAtlasRoutes: rootAtlas?.routeSummary?.total ?? 0, batchPayloads: batchReport?.payloadCount ?? 0 };
+
+const reportDir = resolve(process.cwd(), '.tmp');
+mkdirSync(reportDir, { recursive: true });
+writeFileSync(resolve(reportDir, 'parent-atlas-validation.json'), JSON.stringify(result, null, 2) + '\n', 'utf8');
 
 if (missing.length > 0) {
   console.error(`Missing atlas outputs: ${missing.join(', ')}`);

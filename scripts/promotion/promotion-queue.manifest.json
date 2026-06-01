@@ -1,0 +1,202 @@
+{
+  "_comment": "Bounded Promotion Execution Queue — created 2026-05-31. Each item must be run individually via run-promotion-queue.mjs. No broad --apply without explicit --allow-apply and a finite --limit.",
+  "version": "1.0.0",
+  "created_at": "2026-05-31",
+  "safety_policy": {
+    "default_mode": "dry-run",
+    "require_allow_apply_flag": true,
+    "max_apply_limit": 100,
+    "refuse_unbounded_apply": true,
+    "stop_on_first_failure": true
+  },
+  "queue": [
+    {
+      "id": "mcp-sidecar-transport-guard",
+      "phase": "guard",
+      "description": "Regression guard: verify all three MCP sidecars expose HTTP POST /mcp transport. turbovec :8791, engram :8792 (HTTP + stdio), langextract :8793. DOWN is tolerated; TRANSPORT_ERROR fails.",
+      "command": "npm run mcp:sidecars:audit",
+      "cwd": "sveltekit-frontend",
+      "mode": "audit-only",
+      "default_limit": null,
+      "default_offset": null,
+      "writes_to": [],
+      "output_reports": [
+        ".tmp/mcp-sidecar-transport-audit.json",
+        ".tmp/mcp-sidecar-transport-audit.md"
+      ],
+      "required_preflight_reports": [],
+      "stop_on_failure": true,
+      "rollback_note": "No writes — pure probe. Re-run npm run mcp:opencode-sidecars to restart sidecars if DOWN.",
+      "safety_notes": [
+        "Exit code 1 only if a running sidecar is missing /mcp route (TRANSPORT_ERROR).",
+        "DOWN sidecars are tolerated — they need to be started separately.",
+        "Do not remove this item from the queue — it is a permanent regression guard."
+      ]
+    },
+    {
+      "id": "knowledge-card-validation",
+      "phase": "100",
+      "description": "Audit-only: validate knowledge cards in the parent atlas index for required fields, source refs, and integrity. Reports missing/malformed cards. No writes.",
+      "command": "node scripts/atlas/validate-knowledge-cards.mjs",
+      "cwd": ".",
+      "mode": "audit-only",
+      "default_limit": null,
+      "default_offset": null,
+      "writes_to": [],
+      "output_reports": [
+        ".tmp/knowledge-card-validation.json",
+        ".tmp/knowledge-card-validation.md"
+      ],
+      "required_preflight_reports": [],
+      "stop_on_failure": false,
+      "rollback_note": "No writes.",
+      "safety_notes": [
+        "Read-only audit. Safe to run at any time.",
+        "Review output before running source-ref-candidate-generation."
+      ]
+    },
+    {
+      "id": "source-ref-candidate-generation",
+      "phase": "100",
+      "description": "Audit-only: suggest source ref repairs for cards missing source_refs. Outputs NDJSON candidates — does not apply changes.",
+      "command": "node scripts/atlas/suggest-card-source-refs.mjs",
+      "cwd": ".",
+      "mode": "audit-only",
+      "default_limit": null,
+      "default_offset": null,
+      "writes_to": [],
+      "output_reports": [
+        ".tmp/source-ref-repair-candidates.ndjson",
+        ".tmp/source-ref-repair-candidates.md"
+      ],
+      "required_preflight_reports": [
+        ".tmp/knowledge-card-validation.json"
+      ],
+      "stop_on_failure": false,
+      "rollback_note": "No writes.",
+      "safety_notes": [
+        "Run knowledge-card-validation first to establish baseline.",
+        "Candidates are suggestions only — apply separately after manual review."
+      ]
+    },
+    {
+      "id": "consolidation-claim-check",
+      "phase": "100",
+      "description": "Audit-only: verify consolidation claims in parent atlas — checks that merged cards have valid source refs and no duplicate canonical IDs.",
+      "command": "node scripts/atlas/check-knowledge-consolidation-claims.mjs",
+      "cwd": ".",
+      "mode": "audit-only",
+      "default_limit": null,
+      "default_offset": null,
+      "writes_to": [],
+      "output_reports": [
+        ".tmp/knowledge-consolidation-claim-check.json",
+        ".tmp/knowledge-consolidation-claim-check.md"
+      ],
+      "required_preflight_reports": [
+        ".tmp/knowledge-card-validation.json"
+      ],
+      "stop_on_failure": false,
+      "rollback_note": "No writes.",
+      "safety_notes": [
+        "Checks for duplicate canonical IDs — safe to run at any time.",
+        "If duplicate IDs found, do NOT run apply jobs until resolved."
+      ]
+    },
+    {
+      "id": "alias-id-schema-preflight",
+      "phase": "100",
+      "description": "Audit-only: confirm live Postgres schema for task_semantic_packets before persisting alias_id. Reports actual column list, types, and whether alias_id column exists.",
+      "command": "node scripts/atlas/alias-id-migration-preflight.mjs",
+      "cwd": ".",
+      "mode": "audit-only",
+      "default_limit": null,
+      "default_offset": null,
+      "writes_to": [],
+      "output_reports": [
+        ".tmp/alias-id-migration-preflight-report.json",
+        ".tmp/alias-id-migration-preflight-report.md"
+      ],
+      "required_preflight_reports": [],
+      "stop_on_failure": true,
+      "rollback_note": "No writes. If alias_id column is missing, do NOT run any job that writes alias_id until the column migration is applied.",
+      "safety_notes": [
+        "BLOCKER: alias_id must not be persisted until this check passes with column_exists: true.",
+        "If column is missing: run the migration SQL manually, then re-run this preflight.",
+        "Do not treat IMPLEMENTATION_STATUS.md claims as ground truth — query the live schema."
+      ]
+    },
+    {
+      "id": "offline-synthesis-dry-run",
+      "phase": "101",
+      "description": "Dry-run: verify offline synthesis pipeline on 25 cards without writing to Postgres, Qdrant, or Redis. Confirms LLM reachability and output shape.",
+      "command": "node scripts/atlas/run-offline-synthesis.mjs --dry-run --limit 25 --offset 0",
+      "cwd": ".",
+      "mode": "dry-run",
+      "default_limit": 25,
+      "default_offset": 0,
+      "writes_to": [],
+      "output_reports": [
+        ".tmp/offline-synthesis-report.json"
+      ],
+      "required_preflight_reports": [
+        ".tmp/knowledge-card-validation.json",
+        ".tmp/alias-id-migration-preflight-report.json"
+      ],
+      "stop_on_failure": true,
+      "rollback_note": "No writes in dry-run mode. If LLM is unreachable, check Ollama :11434 and TurboQuant :8090.",
+      "safety_notes": [
+        "Must pass before any bounded-apply synthesis run.",
+        "alias-id-schema-preflight must show column_exists: true before switching to --apply.",
+        "Default limit 25 — do not increase without reviewing the dry-run output first."
+      ]
+    },
+    {
+      "id": "qdrant-postgres-reconciliation",
+      "phase": "101",
+      "description": "Audit-only: compare Qdrant codebase_chunks_768 payload against Postgres parent_atlas_documents. Reports cards in one but not the other, and payload field drift.",
+      "command": "node scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs --dry-run",
+      "cwd": ".",
+      "mode": "audit-only",
+      "default_limit": null,
+      "default_offset": null,
+      "writes_to": [],
+      "output_reports": [
+        ".tmp/qdrant-postgres-mirror-reconciliation.json",
+        ".tmp/qdrant-postgres-mirror-reconciliation.md"
+      ],
+      "required_preflight_reports": [
+        ".tmp/knowledge-card-validation.json"
+      ],
+      "stop_on_failure": false,
+      "rollback_note": "No writes.",
+      "safety_notes": [
+        "DuckDB is validation/mirror only — never authoritative.",
+        "CouchDB is disabled — do not attempt CouchDB writes.",
+        "Report drift before running any sync jobs."
+      ]
+    },
+    {
+      "id": "parent-atlas-validation",
+      "phase": "101",
+      "description": "Audit-only: validate the current parent atlas index snapshot for structural integrity, required fields, and internal consistency.",
+      "command": "node scripts/atlas/validate-parent-atlas.mjs",
+      "cwd": ".",
+      "mode": "audit-only",
+      "default_limit": null,
+      "default_offset": null,
+      "writes_to": [],
+      "output_reports": [
+        ".tmp/parent-atlas-validation.json",
+        ".tmp/parent-atlas-validation.md"
+      ],
+      "required_preflight_reports": [],
+      "stop_on_failure": false,
+      "rollback_note": "No writes.",
+      "safety_notes": [
+        "Run before and after any parent atlas apply job.",
+        "If validation fails, do not run qdrant-postgres-reconciliation apply lane."
+      ]
+    }
+  ]
+}

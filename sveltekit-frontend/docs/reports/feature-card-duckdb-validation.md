@@ -1,6 +1,6 @@
 # Feature Card DuckDB Validation
 
-Generated: 2026-06-01T01:45:13.758Z
+Generated: 2026-06-01T06:49:42.987Z
 
 Status: pass
 DuckDB: C:\Users\james\AppData\Local\Programs\DuckDB\duckdb.exe

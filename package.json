@@ -4,6 +4,9 @@
   "description": "YoRHa-styled legal AI frontend with Gemma3 integration - Phase 70 Clean",
   "type": "module",
   "scripts": {
+    "promotion:status": "node scripts/promotion/report-promotion-status.mjs",
+    "promotion:queue:dry": "node scripts/promotion/run-promotion-queue.mjs --dry-run",
+    "promotion:queue:one": "node scripts/promotion/run-promotion-queue.mjs --dry-run --only",
     "agents:write:workspace": "node sveltekit-frontend/scripts/generate-agents-md.mjs",
     "agents:write": "node scripts/agents/generate-monorepo-agents.mjs",
     "atlas:root:index": "node scripts/atlas/index-repo-root.mjs",
@@ -161,6 +164,7 @@
     "atlas:taskboard:sync:graphify": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-graphify",
     "atlas:taskboard:sync:full": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify",
     "atlas:unified:sync": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify",
+    "atlas:offline:synthesis": "node scripts/atlas/run-offline-synthesis.mjs",
     "predev": "npm run opencode:smoke",
     "dev": "vite dev --host 0.0.0.0",
     "dev:agent": "powershell scripts/dev-agentic.ps1",
@@ -325,7 +329,9 @@
     "atlas:taskboard:sync:kmeans": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --with-kmeans",
     "atlas:taskboard:sync:full:write": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --with-kmeans --with-feature-gap --write",
     "atlas:taskboard:sync:feature-gap": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --with-kmeans --with-feature-gap",
-    "atlas:unified:sync:write": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --write"
+    "atlas:unified:sync:write": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --write",
+    "retrieval:pass": "QDRANT_URL=http://localhost:6333 REDIS_URL=redis://localhost:6379 node scripts/ingest/retrieval-pass.mjs",
+    "retrieval:pass:dry": "QDRANT_URL=http://localhost:6333 REDIS_URL=redis://localhost:6379 node scripts/ingest/retrieval-pass.mjs --dry-run"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

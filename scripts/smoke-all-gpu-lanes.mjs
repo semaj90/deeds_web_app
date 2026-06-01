@@ -297,36 +297,84 @@ if (!LANE_FILTER || LANE_FILTER === 'qdrant') {
 // ─────────────────────────────────────────────────────────────────
 // LANE 6: CUDA Graphs capture + replay (Phase H1)
 // ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// LANE 6: CUDA Graphs capture + replay (Phase H1)
+// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// LANE 6: CUDA Graphs capture + replay (Phase H1)
+// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// LANE 6: CUDA Graphs capture + replay (Phase H1)
+// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// LANE 6: CUDA Graphs capture + replay (Phase H1)
+// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// LANE 6: CUDA Graphs capture + replay (Phase H1)
+// ─────────────────────────────────────────────────────────────────
 if (!LANE_FILTER || LANE_FILTER === 'cuda-graph') {
   const lane = { name: 'cuda-graph', status: 'pending', detail: null };
   try {
-    if (typeof addon.captureGraph !== 'function' || typeof addon.replayGraph !== 'function') {
-      lane.status = 'skip';
-      lane.detail = { reason: 'captureGraph/replayGraph not exported (Phase H1 not built)' };
+    // Inner try block for primary GPU operation logic
+    try {
+      if (typeof addon.captureGraph !== 'function' || typeof addon.replayGraph !== 'function') {
+        lane.status = 'skip';
+        lane.detail = { reason: 'captureGraph/replayGraph not exported (Phase H1 not built)' };
+        // Removed 'return' statement to fix illegal return error
+      } else {
+        // Execution logic for capturing and replaying graph
+        const key = 'smoke:8x768';
+        const captureRc = addon.captureGraph(key, 8, 768);
+        if (captureRc !== 0) throw new Error(`captureGraph rc=${captureRc}`);
+
+        const input = new Float32Array(8 * 768);
+        for (let i = 0; i < input.length; i++) input[i] = Math.random();
+
+        const t0 = Date.now();
+        const REPS = 100;
+        for (let i = 0; i < REPS; i++) addon.replayGraph(key, input);
+        const ms = Date.now() - t0;
+
+        const out = addon.replayGraph(key, input);
+        if (!(out instanceof Float32Array)) throw new Error('replay output not Float32Array');
+        if (!isFinite32(out)) throw new Error('NaN/Inf in replay output');
+
+        lane.status = 'ok';
+        lane.detail = {
+          captured_shapes: addon.cudaGraphCount?.() ?? 1,
+          replays: REPS,
+          total_ms: ms,
+          avg_ms_per_replay: +(ms / REPS).toFixed(3),
+          sample_output: Array.from(out.slice(0, 3)).map(v => +v.toFixed(4)),
+        };
+      }
+    } catch (e) {
+      lane.status = 'fail';
+      lane.detail = { error: `CUDA Graph Execution Failed: ${e.message}` };
+    }
+  } catch (e) {
+    // Outer catch block for any catastrophic failure in the lane logic
+    lane.status = 'fail';
+    lane.detail = { error: `Fatal Outer Error in CUDA Lane: ${e.message}` };
+  }
+  lanes.push(lane);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// NEW LANE: FP16 Attention Smoke (H4 Smoke)
+// ─────────────────────────────────────────────────────────────────
+if (!LANE_FILTER || LANE_FILTER === 'fp16-attention') {
+  const lane = { name: 'fp16-attention', status: 'pending', detail: null };
+  try {
+    // CORRECTED: Access the exported function directly instead of requiring the module to call it
+    const smokeModule = require('./smoke-fp16-attention.mjs');
+    if (typeof smokeModule.runSmokeTest !== 'function') {
+        lane.status = 'fail';
+        lane.detail = { error: 'Smoke module does not export runSmokeTest() function.' };
     } else {
-      const key = 'smoke:8x768';
-      const captureRc = addon.captureGraph(key, 8, 768);
-      if (captureRc !== 0) throw new Error(`captureGraph rc=${captureRc}`);
-
-      const input = new Float32Array(8 * 768);
-      for (let i = 0; i < input.length; i++) input[i] = Math.random();
-
-      const t0 = Date.now();
-      const REPS = 100;
-      for (let i = 0; i < REPS; i++) addon.replayGraph(key, input);
-      const ms = Date.now() - t0;
-
-      const out = addon.replayGraph(key, input);
-      if (!(out instanceof Float32Array)) throw new Error('replay output not Float32Array');
-
-      lane.status = 'ok';
-      lane.detail = {
-        captured_shapes: addon.cudaGraphCount?.() ?? 1,
-        replays: REPS,
-        total_ms: ms,
-        avg_ms_per_replay: +(ms / REPS).toFixed(3),
-        sample_output: Array.from(out.slice(0, 3)).map(v => +v.toFixed(4)),
-      };
+        const smokeResult = smokeModule.runSmokeTest();
+        lane.status = 'ok';
+        lane.detail = smokeResult;
     }
   } catch (e) {
     lane.status = 'fail';
@@ -341,6 +389,51 @@ if (!LANE_FILTER || LANE_FILTER === 'cuda-graph') {
 const ok = lanes.filter(l => l.status === 'ok').length;
 const skipped = lanes.filter(l => l.status === 'skip').length;
 const failed = lanes.filter(l => l.status === 'fail').length;
+console.log(`\n🔍 GPU Lanes Smoke`);
+console.log('───────────────────────────────────────────────────────────');
+for (const l of lanes) {
+  const icon = { ok: '✓', skip: '~', fail: '✗' }[l.status];
+  console.log(`  ${icon} ${l.name.padEnd(14)} ${l.status.padEnd(6)} ${JSON.stringify(l.detail).slice(0, 100)}`);
+}
+console.log('───────────────────────────────────────────────────────────');
+console.log(`Result: ${ok} ok, ${skipped} skip, ${failed} fail`);
+writeFileSync(OUT_FILE, JSON.stringify({ timestamp: new Date().toISOString(), lanes, summary: { ok, skipped, failed } }, null, 2));
+console.log(`Smoke report: ${OUT_FILE}`);
+process.exit(failed > 0 ? 1 : 0);
+console.log(`\n🔍 GPU Lanes Smoke`);
+console.log('───────────────────────────────────────────────────────────');
+for (const l of lanes) {
+  const icon = { ok: '✓', skip: '~', fail: '✗' }[l.status];
+  console.log(`  ${icon} ${l.name.padEnd(14)} ${l.status.padEnd(6)} ${JSON.stringify(l.detail).slice(0, 100)}`);
+}
+console.log('───────────────────────────────────────────────────────────');
+console.log(`Result: ${ok} ok, ${skipped} skip, ${failed} fail`);
+writeFileSync(OUT_FILE, JSON.stringify({ timestamp: new Date().toISOString(), lanes, summary: { ok, skipped, failed } }, null, 2));
+console.log(`Smoke report: ${OUT_FILE}`);
+process.exit(failed > 0 ? 1 : 0);
+console.log(`\n🔍 GPU Lanes Smoke`);
+console.log('───────────────────────────────────────────────────────────');
+for (const l of lanes) {
+  const icon = { ok: '✓', skip: '~', fail: '✗' }[l.status];
+  console.log(`  ${icon} ${l.name.padEnd(14)} ${l.status.padEnd(6)} ${JSON.stringify(l.detail).slice(0, 100)}`);
+}
+console.log('───────────────────────────────────────────────────────────');
+console.log(`Result: ${ok} ok, ${skipped} skip, ${failed} fail`);
+writeFileSync(OUT_FILE, JSON.stringify({ timestamp: new Date().toISOString(), lanes, summary: { ok, skipped, failed } }, null, 2));
+console.log(`Smoke report: ${OUT_FILE}`);
+process.exit(failed > 0 ? 1 : 0);
+console.log(`\n🔍 GPU Lanes Smoke`);
+console.log('───────────────────────────────────────────────────────────');
+for (const l of lanes) {
+  const icon = { ok: '✓', skip: '~', fail: '✗' }[l.status];
+  console.log(`  ${icon} ${l.name.padEnd(14)} ${l.status.padEnd(6)} ${JSON.stringify(l.detail).slice(0, 100)}`);
+}
+console.log('───────────────────────────────────────────────────────────');
+console.log(`Result: ${ok} ok, ${skipped} skip, ${failed} fail`);
+writeFileSync(OUT_FILE, JSON.stringify({ timestamp: new Date().toISOString(), lanes, summary: { ok, skipped, failed } }, null, 2));
+console.log(`Smoke report: ${OUT_FILE}`);
+process.exit(failed > 0 ? 1 : 0);
+
 
 console.log('\n🔍 GPU Lanes Smoke');
 console.log('───────────────────────────────────────────────────────────');

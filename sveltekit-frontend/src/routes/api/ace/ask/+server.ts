@@ -16,6 +16,7 @@ const AceAskSchema = z.object({
 });
 
 export const POST = async ({ request, locals }) => {
+  if (!locals.user && !import.meta.env.DEV_BYPASS_AUTH) return json({ error: 'Unauthorized' }, { status: 401 });
   const body = (await safeValidateRequest(request, AceAskSchema, async (error) => {
     throw new Error(JSON.stringify(error));
   })) as any;

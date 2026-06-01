@@ -35,6 +35,10 @@ import {
 } from './_atlas-utils.mjs';
 
 const APPLY = process.argv.includes('--apply');
+const LIMIT_ARG_INDEX = process.argv.indexOf('--limit');
+const LIMIT = LIMIT_ARG_INDEX >= 0 ? Number(process.argv[LIMIT_ARG_INDEX + 1] || '0') : 0;
+const OFFSET_ARG_INDEX = process.argv.indexOf('--offset');
+const OFFSET = OFFSET_ARG_INDEX >= 0 ? Number(process.argv[OFFSET_ARG_INDEX + 1] || '0') : 0;
 const BATCH_SIZE = 500;
 const CURRENT_VERSION = 1;
 
@@ -67,6 +71,7 @@ const NODE_OUTPUT = path.join(OUT_DIR, 'codebase_features.ndjson');
 const NODE_CSV_OUTPUT = path.join(OUT_DIR, 'codebase_features.csv');
 const EDGE_OUTPUT = path.join(EDGES_OUT_DIR, 'codebase_features_edges.ndjson');
 const EDGE_CSV_OUTPUT = path.join(EDGES_OUT_DIR, 'codebase_features_edges.csv');
+let taskSemanticPacketColumns = null;
 
 // Regex classifications
 const FEATURE_RULES = [
@@ -84,6 +89,18 @@ const FEATURE_RULES = [
 
 function sha256hex(s) {
   return createHash('sha256').update(s).digest('hex');
+}
+
+async function getTaskSemanticPacketColumns(sql) {
+  if (taskSemanticPacketColumns) return taskSemanticPacketColumns;
+  const rows = await sql`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = current_schema()
+      AND table_name = 'task_semantic_packets'
+  `;
+  taskSemanticPacketColumns = new Set(rows.map((row) => String(row.column_name)));
+  return taskSemanticPacketColumns;
 }
 
 // 1. Scan codebase files
@@ -408,7 +425,15 @@ async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.mkdirSync(EDGES_OUT_DIR, { recursive: true });
 
-  const files = scanCodebase();
+  let files = scanCodebase();
+  if (Number.isFinite(OFFSET) && OFFSET > 0) {
+    files = files.slice(OFFSET);
+    console.log(`  ✓ Applying offset ${OFFSET}; starting from file index ${OFFSET}.`);
+  }
+  if (Number.isFinite(LIMIT) && LIMIT > 0 && LIMIT < files.length) {
+    files.length = LIMIT;
+    console.log(`  ✓ Limiting offline ingest to ${files.length} files via --limit ${LIMIT}.`);
+  }
 
   // Load existing records if they exist to keep index_version increment stable
   let existingRecords = [];
@@ -511,6 +536,8 @@ async function main() {
       const payload = {
         language: file.lang,
         environment,
+        alias_id: file.rel,
+        source_ref: file.rel,
         features: extractedFeatures,
         top_feature: topFeature,
         index_version: version,
@@ -526,6 +553,7 @@ async function main() {
         node_id: nodeId,
         title: path.basename(file.rel),
         sourceRef: file.rel,
+        alias_id: file.rel,
         payload_json: JSON.stringify(payload),
       };
       nodes.push(node);
@@ -548,25 +576,95 @@ async function main() {
         // A. Mirror to pg (task_semantic_packets)
         if (sql) {
           try {
-            await sql`
-              INSERT INTO task_semantic_packets (
-                id, workspace_id, workspace_task_id, feature_id, point_kind,
-                cluster_id, centroid_id, status, agent_pickup_ready, deleted,
-                semantic_path, related_feature_ids, related_task_ids, related_file_paths,
-                source_ref, metadata, index_version
-              ) VALUES (
-                ${nodeId}, 'default', null, null, 'codebase_chunk',
-                null, null, 'processed', false, false,
-                ${[file.rel]}, ${extractedFeatures}, ${[]}, ${ast.imports || []},
-                ${file.rel}, ${payload}, ${version}
-              )
-              ON CONFLICT (id) DO UPDATE SET
-                metadata = EXCLUDED.metadata,
-                index_version = EXCLUDED.index_version,
-                updated_at = NOW();
-            `;
+            const summaryHash = sha256hex(String(summaryLlm));
+            const packetColumns = await getTaskSemanticPacketColumns(sql);
+            const hasAliasId = packetColumns.has('alias_id');
+            if (hasAliasId) {
+              await sql`
+                INSERT INTO task_semantic_packets (
+                  id,
+                  qdrant_point_id,
+                  workspace_task_id,
+                  feature_id,
+                  alias_id,
+                  summary_model,
+                  summary_hash,
+                  confidence,
+                  status,
+                  agent_pickup_ready,
+                  deleted,
+                  created_at,
+                  updated_at
+                ) VALUES (
+                  ${deterministicPointId(nodeId)},
+                  ${file.rel},
+                  null,
+                  ${topFeature},
+                  ${file.rel},
+                  'gemma4-local',
+                  ${summaryHash},
+                  ${String(Math.round((featureScores[topFeature] || 1) * 10) / 10)},
+                  'processed',
+                  false,
+                  false,
+                  NOW(),
+                  NOW()
+                )
+                ON CONFLICT (id) DO UPDATE SET
+                  qdrant_point_id = EXCLUDED.qdrant_point_id,
+                  feature_id = EXCLUDED.feature_id,
+                  alias_id = EXCLUDED.alias_id,
+                  summary_model = EXCLUDED.summary_model,
+                  summary_hash = EXCLUDED.summary_hash,
+                  confidence = EXCLUDED.confidence,
+                  status = EXCLUDED.status,
+                  agent_pickup_ready = EXCLUDED.agent_pickup_ready,
+                  deleted = EXCLUDED.deleted,
+                  updated_at = NOW();
+              `;
+            } else {
+              await sql`
+                INSERT INTO task_semantic_packets (
+                  id,
+                  qdrant_point_id,
+                  workspace_task_id,
+                  feature_id,
+                  summary_model,
+                  summary_hash,
+                  confidence,
+                  status,
+                  agent_pickup_ready,
+                  deleted,
+                  created_at,
+                  updated_at
+                ) VALUES (
+                  ${deterministicPointId(nodeId)},
+                  ${file.rel},
+                  null,
+                  ${topFeature},
+                  'gemma4-local',
+                  ${summaryHash},
+                  ${String(Math.round((featureScores[topFeature] || 1) * 10) / 10)},
+                  'processed',
+                  false,
+                  false,
+                  NOW(),
+                  NOW()
+                )
+                ON CONFLICT (id) DO UPDATE SET
+                  qdrant_point_id = EXCLUDED.qdrant_point_id,
+                  feature_id = EXCLUDED.feature_id,
+                  summary_model = EXCLUDED.summary_model,
+                  summary_hash = EXCLUDED.summary_hash,
+                  confidence = EXCLUDED.confidence,
+                  status = EXCLUDED.status,
+                  agent_pickup_ready = EXCLUDED.agent_pickup_ready,
+                  deleted = EXCLUDED.deleted,
+                  updated_at = NOW();
+              `;
+            }
           } catch (e) {
-            // Ignore DB insert failure
+            console.warn('  ⚠️ Postgres mirror failed:', e.message);
           }
         }
 
@@ -585,6 +683,7 @@ async function main() {
                 vector: { summary: vec },
                 payload: {
                   source_ref: file.rel,
+                  alias_id: file.rel,
                   featureId: topFeature,
                   kind: 'codebase_chunk',
                   status: 'processed',

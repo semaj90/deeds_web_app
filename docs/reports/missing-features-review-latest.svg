@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080" role="img" aria-label="Missing features review">
+  <rect width="100%" height="100%" fill="#0e1116" />
+  
+      <text x="48" y="48" fill="#e8eef7" font-size="28" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">Missing Features Review</text>
+      <text x="48" y="72" fill="#9aa7b5" font-size="14" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">8 registry rows · 3270 mapreduce entries · 9373 atlas entries</text>
+    
+
+      <rect x="48" y="92" width="220" height="58" rx="14" fill="#11161d" stroke="#263041" />
+      <text x="64" y="114" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Missing</text>
+      <text x="64" y="136" fill="#fbbf24" font-size="24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="800">50</text>
+    
+
+      <rect x="284" y="92" width="220" height="58" rx="14" fill="#11161d" stroke="#263041" />
+      <text x="300" y="114" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Duplicate</text>
+      <text x="300" y="136" fill="#fb7185" font-size="24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="800">28</text>
+    
+
+      <rect x="520" y="92" width="220" height="58" rx="14" fill="#11161d" stroke="#263041" />
+      <text x="536" y="114" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Stale</text>
+      <text x="536" y="136" fill="#34d399" font-size="24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="800">0</text>
+    
+
+      <rect x="756" y="92" width="220" height="58" rx="14" fill="#11161d" stroke="#263041" />
+      <text x="772" y="114" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Prefix clusters</text>
+      <text x="772" y="136" fill="#7dd3fc" font-size="24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="800">14</text>
+    
+
+      <rect x="48" y="166" width="1504" height="280" rx="16" fill="#151a22" stroke="#263041" />
+    
+
+      <text x="66" y="194" fill="#e8eef7" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">SourceRef Prefix Clusters</text>
+      <text x="66" y="214" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Registry rows grouped by sourceRef prefix</text>
+    
+
+      <polygon points="183.3,271.0 183.3,321.0 140.0,346.0 96.7,321.0 96.7,271.0 140.0,246.0" fill="#153047" stroke="#7dd3fc" stroke-width="2" />
+      <text x="140" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">16</text>
+      <text x="140" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/server/ace</text>
+    
+
+      <polygon points="308.4,275.0 308.4,317.0 272.0,338.0 235.6,317.0 235.6,275.0 272.0,254.0" fill="#1b2c3e" stroke="#7dd3fc" stroke-width="2" />
+      <text x="272" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">8</text>
+      <text x="272" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/server/atlas</text>
+    
+
+      <polygon points="436.9,277.0 436.9,315.0 404.0,334.0 371.1,315.0 371.1,277.0 404.0,258.0" fill="#162432" stroke="#7dd3fc" stroke-width="2" />
+      <text x="404" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">4</text>
+      <text x="404" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/server/cache</text>
+    
+
+      <polygon points="568.0,277.5 568.0,314.5 536.0,333.0 504.0,314.5 504.0,277.5 536.0,259.0" fill="#153047" stroke="#7dd3fc" stroke-width="2" />
+      <text x="536" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">3</text>
+      <text x="536" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">.cache/ace</text>
+    
+
+      <polygon points="700.0,277.5 700.0,314.5 668.0,333.0 636.0,314.5 636.0,277.5 668.0,259.0" fill="#1b2c3e" stroke="#7dd3fc" stroke-width="2" />
+      <text x="668" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">3</text>
+      <text x="668" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/server/retrieval</text>
+    
+
+      <polygon points="831.2,278.0 831.2,314.0 800.0,332.0 768.8,314.0 768.8,278.0 800.0,260.0" fill="#162432" stroke="#7dd3fc" stroke-width="2" />
+      <text x="800" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">2</text>
+      <text x="800" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">scripts/atlas</text>
+    
+
+      <polygon points="963.2,278.0 963.2,314.0 932.0,332.0 900.8,314.0 900.8,278.0 932.0,260.0" fill="#153047" stroke="#7dd3fc" stroke-width="2" />
+      <text x="932" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">2</text>
+      <text x="932" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/server/labels</text>
+    
+
+      <polygon points="1094.3,278.5 1094.3,313.5 1064.0,331.0 1033.7,313.5 1033.7,278.5 1064.0,261.0" fill="#1b2c3e" stroke="#7dd3fc" stroke-width="2" />
+      <text x="1064" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">1</text>
+      <text x="1064" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/architecture</text>
+    
+
+      <polygon points="1226.3,278.5 1226.3,313.5 1196.0,331.0 1165.7,313.5 1165.7,278.5 1196.0,261.0" fill="#162432" stroke="#7dd3fc" stroke-width="2" />
+      <text x="1196" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">1</text>
+      <text x="1196" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/atlas-index</text>
+    
+
+      <polygon points="1358.3,278.5 1358.3,313.5 1328.0,331.0 1297.7,313.5 1297.7,278.5 1328.0,261.0" fill="#153047" stroke="#7dd3fc" stroke-width="2" />
+      <text x="1328" y="294.0" text-anchor="middle" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">1</text>
+      <text x="1328" y="310.0" text-anchor="middle" fill="#9aa7b5" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">memory/index</text>
+    
+
+      <rect x="48" y="464" width="1504" height="240" rx="16" fill="#151a22" stroke="#263041" />
+    
+
+      <text x="66" y="492" fill="#e8eef7" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">Top Missing Feature Candidates</text>
+      <text x="66" y="512" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Mapreduce files with import errors or not yet represented in the registry</text>
+    
+
+      <circle cx="66" cy="537" r="4" fill="#fbbf24" />
+      <text x="82" y="540" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/components/ui/index.ts</text>
+      <text x="1262" y="540" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">importErrors:42, not-in-registry</text>
+    
+
+      <circle cx="66" cy="552" r="4" fill="#fbbf24" />
+      <text x="82" y="555" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/components/ui/gaming/n64/index.ts</text>
+      <text x="1262" y="555" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">importErrors:29, not-in-registry</text>
+    
+
+      <circle cx="66" cy="567" r="4" fill="#fbbf24" />
+      <text x="82" y="570" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/components/ui/gaming/index.ts</text>
+      <text x="1262" y="570" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">importErrors:18, not-in-registry</text>
+    
+
+      <circle cx="66" cy="582" r="4" fill="#fbbf24" />
+      <text x="82" y="585" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/icons/yorha/index.ts</text>
+      <text x="1262" y="585" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">unclassified, importErrors:12, not-in-registry</text>
+    
+
+      <circle cx="66" cy="597" r="4" fill="#fbbf24" />
+      <text x="82" y="600" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/components/ui/alert-dialog/index.js</text>
+      <text x="1262" y="600" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">importErrors:12, not-in-registry</text>
+    
+
+      <circle cx="66" cy="612" r="4" fill="#fbbf24" />
+      <text x="82" y="615" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/components/ui/dialog/index.ts</text>
+      <text x="1262" y="615" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">importErrors:11, not-in-registry</text>
+    
+
+      <circle cx="66" cy="627" r="4" fill="#fbbf24" />
+      <text x="82" y="630" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/index.ts</text>
+      <text x="1262" y="630" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">unclassified, importErrors:8, not-in-registry</text>
+    
+
+      <circle cx="66" cy="642" r="4" fill="#fbbf24" />
+      <text x="82" y="645" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/components/ui/svelte5-index.ts</text>
+      <text x="1262" y="645" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">importErrors:8, not-in-registry</text>
+    
+
+      <circle cx="66" cy="657" r="4" fill="#fbbf24" />
+      <text x="82" y="660" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/components/codebase/index.ts</text>
+      <text x="1262" y="660" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">importErrors:8, not-in-registry</text>
+    
+
+      <circle cx="66" cy="672" r="4" fill="#fbbf24" />
+      <text x="82" y="675" fill="#e8eef7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">src/lib/server/services/knowledge-search/index.ts</text>
+      <text x="1262" y="675" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">unclassified, importErrors:7, not-in-registry</text>
+    
+
+    <rect x="48" y="722" width="743" height="250" rx="16" fill="#151a22" stroke="#263041" />
+    <rect x="809" y="722" width="743" height="250" rx="16" fill="#151a22" stroke="#263041" />
+    <text x="66" y="750" fill="#e8eef7" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">Duplicate Systems</text>
+    <text x="66" y="770" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Shared refs or shared prefixes across feature rows</text>
+    <text x="827" y="750" fill="#e8eef7" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700">Atlas Coverage by Prefix</text>
+    <text x="827" y="770" fill="#9aa7b5" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Parent atlas entries grouped by sourceRef prefix</text>
+  
+
+      <circle cx="66" cy="795" r="4" fill="#fb7185" />
+      <text x="82" y="798" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ace.packet_flow / semantic.cache.policy</text>
+    
+
+      <circle cx="66" cy="811" r="4" fill="#fb7185" />
+      <text x="82" y="814" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">memory.address.registry / semantic.cache.policy</text>
+    
+
+      <circle cx="66" cy="827" r="4" fill="#fb7185" />
+      <text x="82" y="830" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ace.packet_flow / cluster.cards</text>
+    
+
+      <circle cx="66" cy="843" r="4" fill="#fb7185" />
+      <text x="82" y="846" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">cluster.cards / semantic.cache.policy</text>
+    
+
+      <circle cx="66" cy="859" r="4" fill="#fb7185" />
+      <text x="82" y="862" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ace.packet_flow / karpathy.hot_lane</text>
+    
+
+      <circle cx="66" cy="875" r="4" fill="#fb7185" />
+      <text x="82" y="878" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ace.packet_flow / memory.address.registry</text>
+    
+
+      <circle cx="66" cy="891" r="4" fill="#fb7185" />
+      <text x="82" y="894" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">cluster.cards / memory.address.registry</text>
+    
+
+      <circle cx="66" cy="907" r="4" fill="#fb7185" />
+      <text x="82" y="910" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">karpathy.hot_lane / semantic.cache.policy</text>
+    
+
+      <circle cx="66" cy="923" r="4" fill="#fb7185" />
+      <text x="82" y="926" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ace.packet_flow / codebase.semantic_index</text>
+    
+
+      <circle cx="66" cy="939" r="4" fill="#fb7185" />
+      <text x="82" y="942" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ace.packet_flow / feature.labeling</text>
+    
+
+      <circle cx="827" cy="795" r="4" fill="#34d399" />
+      <text x="843" y="798" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/documents-atlas-index.md · 1318</text>
+    
+
+      <circle cx="827" cy="811" r="4" fill="#34d399" />
+      <text x="843" y="814" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/CODEBASE_DIRECTORY_MAP.md · 35</text>
+    
+
+      <circle cx="827" cy="827" r="4" fill="#34d399" />
+      <text x="843" y="830" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/CODEBASE_INDEXING_PIPELINE.md · 5</text>
+    
+
+      <circle cx="827" cy="843" r="4" fill="#34d399" />
+      <text x="843" y="846" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/error-analysis-architecture.md · 4</text>
+    
+
+      <circle cx="827" cy="859" r="4" fill="#34d399" />
+      <text x="843" y="862" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/visualization-stack.md · 3</text>
+    
+
+      <circle cx="827" cy="875" r="4" fill="#34d399" />
+      <text x="843" y="878" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/ARCHITECTURE_GUIDE_V1.md · 2</text>
+    
+
+      <circle cx="827" cy="891" r="4" fill="#34d399" />
+      <text x="843" y="894" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/compiler-landscape.md · 2</text>
+    
+
+      <circle cx="827" cy="907" r="4" fill="#34d399" />
+      <text x="843" y="910" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/KARPATHY_PIPELINE_ARCHITECTURE.md · 2</text>
+    
+
+      <circle cx="827" cy="923" r="4" fill="#34d399" />
+      <text x="843" y="926" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/UNIVERSAL_APP_READINESS_CHECKLIST.md · 2</text>
+    
+
+      <circle cx="827" cy="939" r="4" fill="#34d399" />
+      <text x="843" y="942" fill="#e8eef7" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md · 1</text>
+    
+</svg>

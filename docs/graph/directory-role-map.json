@@ -916,7 +916,7 @@
       "rg_mode": "safe_to_respect_gitignore",
       "owner": "Local object storage data",
       "exists": true,
-      "rgModeLabel": "skip / ignore OK"
+      "rgModeLabel": "glob? / ignore OK"
     },
     {
       "path": "test-results",

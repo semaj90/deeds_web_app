@@ -1,23 +1,23 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-06-01T01:25:10.928Z
+> Generated: 2026-06-01T07:59:46.835Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 56702 |
+| Files | 56809 |
 | Routes | 1087 |
 | Components | 5346 |
 | API handlers | 5538 |
 | TODOs | 7726 |
-| Dirs | 1454 |
+| Dirs | 1455 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
-| G4 No auth | 20 |
+| G4 No auth | 18 |
 | G5 No Zod  | 0 |
-| G11 Localhost | 1590 |
+| G11 Localhost | 1593 |
 | G14 Svelte4 | 143 |
 | G15 SSR unsafe | 0 |
 | G16 No test | 84 |

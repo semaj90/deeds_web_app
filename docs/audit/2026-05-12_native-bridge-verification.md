@@ -25,4 +25,4 @@
 ## Next Steps
 1. **AGENTS -> Qdrant Backfill**: Proceed with dry-run safety to enrich vector payloads with AGENTS card metadata.
 2. **RG-Atlas Persistence**: Stabilize directory-level metadata integration.
-3. **Knowledge Base Manager**: Expose TRACE MCP tools for Hermes integration.
+3. **Knowledge Base Manager**: Expose TRACE MCP tools for opencode integration.

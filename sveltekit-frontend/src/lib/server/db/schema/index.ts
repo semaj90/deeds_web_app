@@ -68,6 +68,7 @@ export * from './codebase-intelligence.js';
 export * from './documents-atlas.js';
 export * from './feature-registry.js';
 export * from './atlas-cards.js';
+export * from './atlas-profile-store.js';
 
 // Phase 6f/7 Post-Synthesis metadata
 export * from './synthesis-logs.js';

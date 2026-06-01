@@ -29,7 +29,14 @@ interface AtlasNeighbourCache {
   /** Top-200 graphAuthority hash from `ace:authority:top`. */
   authority: Record<string, { ga: number; pr?: number; cluster?: string } | string>;
   /** Karpathy GPU blend hash from `gpu:karpathy:scores`. */
-  karpathy:  Record<string, { pr: number; attn: number; authority: number; blend: number } | string>;
+  karpathy:  Record<string, {
+    pr: number;
+    attn: number;
+    authority: number;
+    blend: number;
+    attentionPeak?: number;
+    attentionMean?: number;
+  } | string>;
 }
 
 let _atlas:       AtlasIndex          | null = null;

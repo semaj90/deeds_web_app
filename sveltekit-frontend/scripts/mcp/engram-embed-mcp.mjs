@@ -659,26 +659,36 @@ if (process.argv.includes('--health')) {
   process.exit(result.ollama_ok ? 0 : 1);
 }
 
+import { createInterface } from 'node:readline';
+
+// Transport mode:
+//   --stdio  : opencode child-process mode — stdin/stdout JSON-RPC only, no HTTP server
+//              (avoids EADDRINUSE when the long-running HTTP instance is already on :8792)
+//   (default): HTTP-only mode — httpServer keeps the process alive
+const STDIO_MODE = process.argv.includes('--stdio');
+
 log(`ready — embed=${EMBED_MODEL} ollama=${OLLAMA_URL} qdrant=${QDRANT_URL} redis=${REDIS_URL}`);
 log(`tools: ${Object.keys(TOOLS).join(', ')}`);
-log(`HTTP MCP listening on http://127.0.0.1:${PORT}/mcp`);
 
-httpServer.listen(PORT, '127.0.0.1');
-
-// Read newline-delimited JSON-RPC from stdin
-import { createInterface } from 'node:readline';
-const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
-rl.on('line', async (line) => {
-  const trimmed = line.trim();
-  if (!trimmed) return;
-  let rpc;
-  try { rpc = JSON.parse(trimmed); } catch {
-    send({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } });
-    return;
-  }
-  await dispatch(rpc);
-});
-
-rl.on('close', () => process.exit(0));
-process.on('SIGTERM', () => { httpServer.close(); process.exit(0); });
-process.on('SIGINT',  () => { httpServer.close(); process.exit(0); });
+if (STDIO_MODE) {
+  // Pure stdio — do NOT start httpServer so this can coexist with the HTTP instance
+  const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
+  rl.on('line', async (line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    let rpc;
+    try { rpc = JSON.parse(trimmed); } catch {
+      send({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } });
+      return;
+    }
+    await dispatch(rpc);
+  });
+  rl.on('close', () => { process.exit(0); });
+  process.on('SIGTERM', () => process.exit(0));
+  process.on('SIGINT',  () => process.exit(0));
+} else {
+  log(`HTTP MCP listening on http://127.0.0.1:${PORT}/mcp`);
+  httpServer.listen(PORT, '127.0.0.1');
+  process.on('SIGTERM', () => { httpServer.close(); process.exit(0); });
+  process.on('SIGINT',  () => { httpServer.close(); process.exit(0); });
+}

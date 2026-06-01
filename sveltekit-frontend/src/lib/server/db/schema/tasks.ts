@@ -14,6 +14,7 @@ export const taskSemanticPackets = pgTable('task_semantic_packets', {
   qdrant_point_id: text('qdrant_point_id'),
   workspace_task_id: integer('workspace_task_id'),
   feature_id: text('feature_id'),
+  alias_id: text('alias_id'),
   summary_model: text('summary_model'),
   summary_hash: text('summary_hash'),
   confidence: text('confidence'),

@@ -51,7 +51,8 @@ const SAMPLE_CARDS = [
   }
 ];
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const kindParam = url.searchParams.get('kind');
   const q = url.searchParams.get('q') ?? '';
   const limit = clampLimit(url.searchParams.get('limit'));

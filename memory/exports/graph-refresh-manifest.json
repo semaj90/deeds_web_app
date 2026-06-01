@@ -1,39 +1,194 @@
 {
-  "version": 1,
-  "status": "generated",
-  "promotionState": "unpromoted",
-  "generatedAt": "2026-05-29T05:22:59.011Z",
-  "generator": "scripts/atlas/generate-graph-exports.mjs",
-  "sources": [
-    "docs/graph/codebase-graph.json",
-    "memory/graphify/deep/deep-import-graph.json",
-    "memory/graphify/deep/deep-import-edges.jsonl"
+  "generatedAt": "2026-06-01T05:50:47.218Z",
+  "nodeCount": 0,
+  "edgeCount": 0,
+  "exportCount": 486,
+  "exports": [
+    {
+      "file": "memory/exports/cluster-cards.jsonl",
+      "rows": 433
+    },
+    {
+      "file": "memory/exports/pathway-cards.jsonl",
+      "rows": 12
+    },
+    {
+      "file": "memory/exports/all-lanes-parent-atlas-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/backfill-code-cards-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/chr97-eval-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/chr97-grpo-export-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/chr97-inject-engram-ace-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/chr97-k-sweep-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/chr97-kanban-emit-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/cluster-attribution-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/cluster-summary.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/drizzle-drift-audit.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/drizzle-schema-drift-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/drizzle-user-id-drift.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/drizzle_userid_audit.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/duckdb-mapreduce-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/gemma4-error-fixer-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/gemma4-tasker-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/glyph-pairs-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/glyph-rewards-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/gpu-enrich-parent-atlas-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/kanban-ranking-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/lora-dataset-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/lora-dataset-stats.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/master-todo-consolidation-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/mcp-health-probe.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/next-moves-recommendation.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/npm-library-inventory.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/parent-atlas-couchdb-archive.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/parent-atlas-redis-warmup.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/parent-atlas-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/pg18-redis-bifrost-stack-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/reward-attribution-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/reward-summary.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/sample-glyphs-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/som-metrics.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/som-topology-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/sourceRef-cardId-map.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/sourceRef-performance.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/temporal-append-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/unified-ingester-report.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/vector64-compression-metrics.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/vector64-dryrun-report.json",
+      "rows": 1
+    }
   ],
-  "exports": {
-    "clusterCards": "memory/exports/cluster-cards.jsonl",
-    "pathwayCards": "memory/exports/pathway-cards.jsonl"
-  },
-  "nodeCount": 55214,
-  "edgeCount": 81136,
-  "counts": {
-    "nodes": 55214,
-    "edges": 81136,
-    "clusterCards": 433,
-    "pathwayCards": 12,
-    "clusterCardRows": 433,
-    "pathwayCardRows": 12
-  },
-  "hashes": {
-    "clusterCardsSha256": "976b22721b9cb974a42f2c18c59ead376d4e0ea602f3a84f31add8d184300fab",
-    "pathwayCardsSha256": "4477cbe3baa955a1a3bc27dca44ccd4aee98a627eab710bd9f91e6b84dd6ee90"
-  },
-  "validation": {
-    "isStub": false,
-    "promoted": false,
-    "notes": [
-      "Generated from available graph artifacts.",
-      "promotionState remains unpromoted until downstream validation passes.",
-      "Do not treat as final graph truth until promoted."
-    ]
-  }
+  "domains": [
+    "Agent",
+    "General",
+    "Graph",
+    "Infra",
+    "Performance",
+    "Retrieval"
+  ],
+  "producer": "graph-refresh",
+  "source": "docs/graph/codebase-graph.json",
+  "status": "ok",
+  "promotionState": "generated",
+  "generator": "scripts/atlas/write-graph-refresh-manifest.mjs",
+  "notes": "Read from docs/graph/codebase-graph.json"
 }

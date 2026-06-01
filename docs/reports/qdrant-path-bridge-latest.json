@@ -1,0 +1,774 @@
+{
+  "generatedAt": "2026-06-01T07:50:43.798Z",
+  "dryRun": false,
+  "limit": 50,
+  "qdrantUrl": "http://localhost:6333",
+  "collection": "codebase_chunks_768",
+  "inputs": {
+    "pathMap": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\path-map.json",
+    "parentAtlas": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\exports\\parent-atlas\\parent_atlas_index.json"
+  },
+  "summary": {
+    "qdrantPointCount": 50,
+    "bridgeRowCount": 36,
+    "fullMatchCount": 0,
+    "atlasOnlyCount": 0,
+    "mapreduceOnlyCount": 12,
+    "unmatchedCount": 24,
+    "uniqueQdrantPrefixes": 4,
+    "matchedParentAtlasIds": 0
+  },
+  "qdrantPrefixCounts": [
+    {
+      "prefix": ".venv/lib/python3.9",
+      "count": 13
+    },
+    {
+      "prefix": "src/lib/server",
+      "count": 12
+    },
+    {
+      "prefix": "src/lib/components",
+      "count": 10
+    },
+    {
+      "prefix": "src/lib/db",
+      "count": 1
+    }
+  ],
+  "bridgeRows": [
+    {
+      "qdrant_point_id": "119404",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/f2py/tests/test_character.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/f2py/tests/test_character.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "119984",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/_core/overrides.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/_core/overrides.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "174637",
+      "qdrant_file_path": "src/lib/server/ai/contextual-tools.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/ai/contextual-tools.ts"
+      ],
+      "qdrant_feature_tags": [
+        "contextual-tools",
+        "contextual",
+        "tools"
+      ],
+      "mapreduce_stable_key": "aee1ab886f01",
+      "mapreduce_feature": "unclassified",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 2,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "188608",
+      "qdrant_file_path": "src/lib/server/research/reddit-harvester.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/research/reddit-harvester.ts"
+      ],
+      "qdrant_feature_tags": [
+        "research",
+        "reddit-harvester",
+        "reddit",
+        "harvester"
+      ],
+      "mapreduce_stable_key": "6779bbf1ac62",
+      "mapreduce_feature": "unclassified",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 3,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "194586",
+      "qdrant_file_path": "src/lib/server/gpu/libtorch-bridge.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/gpu/libtorch-bridge.ts"
+      ],
+      "qdrant_feature_tags": [
+        "gpu",
+        "libtorch-bridge",
+        "libtorch",
+        "bridge"
+      ],
+      "mapreduce_stable_key": "57f40485f60e",
+      "mapreduce_feature": "unclassified",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 7,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "227675",
+      "qdrant_file_path": "src/lib/server/couchdb/mango-indexes.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/couchdb/mango-indexes.ts"
+      ],
+      "qdrant_feature_tags": [
+        "couchdb",
+        "mango-indexes",
+        "mango",
+        "indexes"
+      ],
+      "mapreduce_stable_key": "d342ed5d39aa",
+      "mapreduce_feature": "unclassified",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 1,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "292522",
+      "qdrant_file_path": "src/lib/components/monitoring/cachemonitoringwidget.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/monitoring/cachemonitoringwidget.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "monitoring",
+        "cachemonitoringwidget"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "436451",
+      "qdrant_file_path": "src/lib/components/citations/citationsaveform.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/citations/citationsaveform.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "citations",
+        "citationsaveform"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "584992",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/pip/_vendor/rich/color.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/pip/_vendor/rich/color.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "733463",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/_core/tests/test_simd.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/_core/tests/test_simd.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "909958",
+      "qdrant_file_path": "src/lib/server/retrieval/centroid-cache.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/retrieval/centroid-cache.ts"
+      ],
+      "qdrant_feature_tags": [
+        "retrieval",
+        "centroid-cache",
+        "centroid",
+        "cache"
+      ],
+      "mapreduce_stable_key": "ada772f91ae2",
+      "mapreduce_feature": "rag",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 5,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "1080785",
+      "qdrant_file_path": "src/lib/components/admin/adminmonitoringdashboard.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/admin/adminmonitoringdashboard.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "admin",
+        "adminmonitoringdashboard"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1103029",
+      "qdrant_file_path": "src/lib/components/graph/graphifyviewer.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/graph/graphifyviewer.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "graph",
+        "graphifyviewer"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1116368",
+      "qdrant_file_path": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/retrieval/cluster-aware-reranker.ts"
+      ],
+      "qdrant_feature_tags": [
+        "retrieval",
+        "cluster-aware-reranker",
+        "cluster",
+        "aware",
+        "reranker",
+        "redis.js",
+        "bag-cache.js"
+      ],
+      "mapreduce_stable_key": "c5f67a8cc504",
+      "mapreduce_feature": "rag",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 2,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "1116474",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1354889",
+      "qdrant_file_path": "src/lib/components/legal/evidencereportsummary.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/legal/evidencereportsummary.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "legal",
+        "evidencereportsummary"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1401737",
+      "qdrant_file_path": "src/lib/db/schema/evidence.ts",
+      "qdrant_source_refs": [
+        "src/lib/db/schema/evidence.ts"
+      ],
+      "qdrant_feature_tags": [
+        "schema",
+        "evidence",
+        "db:graph_edges"
+      ],
+      "mapreduce_stable_key": "f8efcb46c40e",
+      "mapreduce_feature": "database",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 2,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "1472131",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/lib/tests/test_format.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/lib/tests/test_format.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1589319",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/polynomial/hermite_e.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/polynomial/hermite_e.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1604171",
+      "qdrant_file_path": "src/lib/components/admin/contextualassistantmodal.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/admin/contextualassistantmodal.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "admin",
+        "contextualassistantmodal"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1612494",
+      "qdrant_file_path": "src/lib/components/legal-ai/casedocumentwriter.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/legal-ai/casedocumentwriter.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "legal-ai",
+        "casedocumentwriter"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1631859",
+      "qdrant_file_path": "src/lib/server/indexer/directory-summarizer.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/indexer/directory-summarizer.ts"
+      ],
+      "qdrant_feature_tags": [
+        "indexer",
+        "directory-summarizer",
+        "directory",
+        "summarizer"
+      ],
+      "mapreduce_stable_key": "acc049d17b6f",
+      "mapreduce_feature": "unclassified",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 1,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "1672448",
+      "qdrant_file_path": "src/lib/components/analysis/keyboardshortcutshelp.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/analysis/keyboardshortcutshelp.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "analysis",
+        "keyboardshortcutshelp"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1702529",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/pip/_internal/network/xmlrpc.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/pip/_internal/network/xmlrpc.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1705498",
+      "qdrant_file_path": "src/lib/server/grpc/graph_ml.proto",
+      "qdrant_source_refs": [
+        "src/lib/server/grpc/graph_ml.proto"
+      ],
+      "qdrant_feature_tags": [
+        "proto",
+        "grpc",
+        "graph_ml",
+        "graph"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1780556",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/ma/extras.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/ma/extras.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "1864541",
+      "qdrant_file_path": "src/lib/server/services/qdrant-client.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/services/qdrant-client.ts"
+      ],
+      "qdrant_feature_tags": [
+        "services",
+        "qdrant-client",
+        "qdrant",
+        "client"
+      ],
+      "mapreduce_stable_key": "7a11a3d20765",
+      "mapreduce_feature": "vector",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 2,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "1867213",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/pip/_internal/commands/install.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/pip/_internal/commands/install.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "2093783",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/ma/tests/test_extras.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/ma/tests/test_extras.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "2121189",
+      "qdrant_file_path": "src/lib/components/ui/commandpalette.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/ui/commandpalette.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "commandpalette"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "2211723",
+      "qdrant_file_path": "src/lib/components/graph/glyphatlasviewer.svelte",
+      "qdrant_source_refs": [
+        "src/lib/components/graph/glyphatlasviewer.svelte"
+      ],
+      "qdrant_feature_tags": [
+        "svelte",
+        "components",
+        "graph",
+        "glyphatlasviewer"
+      ],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "2253151",
+      "qdrant_file_path": "src/lib/server/ai/legal-reasoning-chain.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/ai/legal-reasoning-chain.ts"
+      ],
+      "qdrant_feature_tags": [
+        "legal-reasoning-chain",
+        "legal",
+        "reasoning",
+        "chain"
+      ],
+      "mapreduce_stable_key": "5efb0226f960",
+      "mapreduce_feature": "unclassified",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 3,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "2367821",
+      "qdrant_file_path": "src/lib/server/ff1/storage/redis-cache.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/ff1/storage/redis-cache.ts"
+      ],
+      "qdrant_feature_tags": [
+        "ff1",
+        "storage",
+        "redis-cache",
+        "redis",
+        "cache",
+        "crypto",
+        "env.server.js"
+      ],
+      "mapreduce_stable_key": "4cf93174d6f8",
+      "mapreduce_feature": "rag",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 3,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "2432278",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/_core/tests/test_indexerrors.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/_core/tests/test_indexerrors.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    },
+    {
+      "qdrant_point_id": "2437269",
+      "qdrant_file_path": "src/lib/server/kb/rerank-weight-loader.ts",
+      "qdrant_source_refs": [
+        "src/lib/server/kb/rerank-weight-loader.ts"
+      ],
+      "qdrant_feature_tags": [
+        "rerank-weight-loader",
+        "rerank",
+        "weight",
+        "loader",
+        "node:fs",
+        "node:path",
+        "module-cartridge-types.js"
+      ],
+      "mapreduce_stable_key": "00f0d9191ebe",
+      "mapreduce_feature": "unclassified",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 1,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "mapreduce-only"
+    },
+    {
+      "qdrant_point_id": "2498265",
+      "qdrant_file_path": ".venv/lib/python3.9/site-packages/numpy/lib/tests/test_nanfunctions.py",
+      "qdrant_source_refs": [
+        ".venv/lib/python3.9/site-packages/numpy/lib/tests/test_nanfunctions.py"
+      ],
+      "qdrant_feature_tags": [],
+      "mapreduce_stable_key": "",
+      "mapreduce_feature": "",
+      "mapreduce_import_error_count": 0,
+      "mapreduce_static_import_count": 0,
+      "parent_atlas_card_id": "",
+      "parent_atlas_source_ref": "",
+      "parent_atlas_kind": "",
+      "parent_atlas_reward_count": 0,
+      "bridge_status": "unmatched"
+    }
+  ]
+}

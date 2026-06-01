@@ -51,7 +51,7 @@ graph TD
 
 ### 3.1 Qdrant Vector Databases
 *   **768 Dimensions (`canonical_recall`)**: Stores official documentation, repository-local codebase indices, and semantic anchors. This is the source of truth for RAG similarity matches.
-*   **384 Dimensions (`compact_routing`)**: Stores compressed named vectors, exact match boundaries, and Nomic embeddings. Used solely for routing decisions, not as a truth layer.
+*   **384 Dimensions (`compact_routing`)**: Stores compressed named vectors, exact match boundaries, and som embeddingemma embeddings. Used solely for routing decisions, not as a truth layer.
 
 ### 3.2 Neo4j Graph Database
 *   Maintains the **KAG-DAG** topological map. Holds semantic associations, class/file dependency graphs, and multi-hop relation weights.

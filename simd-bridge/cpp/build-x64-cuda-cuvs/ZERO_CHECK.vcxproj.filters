@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda-cuvs\CMakeFiles\0db9d1eff9a9ce568ecc4b3f1e9756ed\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{9006BD3C-79CF-373F-AB4A-C8EEB4BEED64}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -100,7 +100,7 @@ const DEFAULT_IGNORE_PATTERNS = [
 ];
 const IGNORE_PATTERNS = customExcludes.length > 0 ? customExcludes : DEFAULT_IGNORE_PATTERNS;
 
-const MAX_FILE_SIZE = 100_000; // 100KB max per file
+const MAX_FILE_SIZE = 500_000; // 500KB max per file (schema-postgres.ts is 216KB)
 const CHUNK_SIZE = 800;
 const CHUNK_OVERLAP = 100;
 

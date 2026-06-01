@@ -10,7 +10,7 @@
  *   node scripts/atlas/mapreduce-consolidated-index.mjs --output consolidated.ndjson
  */
 
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, statSync } from 'fs';
 import { join, resolve, dirname, extname, relative } from 'path';
 import { createHash } from 'crypto';
 
@@ -21,8 +21,21 @@ const outputFile = args.find(a => a.startsWith('--output='))?.split('=')[1] ?? '
 const verbose = args.includes('--verbose');
 
 const REPO_ROOT = resolve('.');
-const SRC_ROOT = join(REPO_ROOT, 'sveltekit-frontend', 'src');
-const DRIZZLE_ROOT = join(REPO_ROOT, 'sveltekit-frontend', 'drizzle');
+const SKIP_DIRS = new Set(['.git', 'node_modules', 'target', 'dist', 'coverage']);
+const ALLOW_HIDDEN_DIRS = new Set(['.opencode', '.tmp', '.cache', '.github', '.vscode', '.svelte-kit', '.docker-build']);
+const ALLOWED_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.json', '.sql', '.md', '.svelte']);
+
+function getAnalysisRoots() {
+  const entries = readdirSync(REPO_ROOT, { withFileTypes: true });
+  return entries
+    .filter((entry) => {
+      if (!entry.isDirectory()) return false;
+      if (SKIP_DIRS.has(entry.name)) return false;
+      if (entry.name.startsWith('.') && !ALLOW_HIDDEN_DIRS.has(entry.name)) return false;
+      return true;
+    })
+    .map((entry) => join(REPO_ROOT, entry.name));
+}
 
 console.log(`\n🗺️  MapReduce Consolidated Index Generator`);
 console.log(`════════════════════════════════════════════════════════\n`);
@@ -30,6 +43,8 @@ console.log(`Repo Root: ${REPO_ROOT}`);
 console.log(`Limit: ${limit} files`);
 console.log(`Dry Run: ${dryRun}`);
 console.log(`Output: ${outputFile}\n`);
+const analysisRoots = getAnalysisRoots();
+console.log(`Roots: ${analysisRoots.map(root => relative(REPO_ROOT, root) || '.').join(', ')}\n`);
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PHASE 1: MAP — Extract metadata from each file
@@ -47,15 +62,15 @@ function scanDirectory(dir, rel = '') {
     const fullPath = join(dir, file.name);
     const relPath = join(rel, file.name);
 
-    // Skip node_modules, .git, hidden dirs
-    if (file.name.startsWith('.') || file.name === 'node_modules' || file.name === 'target') {
+    // Skip VCS / dependency dirs, but allow selected gitignored workspace roots.
+    if (file.isDirectory() && (SKIP_DIRS.has(file.name) || (file.name.startsWith('.') && !ALLOW_HIDDEN_DIRS.has(file.name)))) {
       continue;
     }
 
     if (file.isDirectory()) {
       results.push(...scanDirectory(fullPath, relPath));
     } else if (
-      ['.ts', '.tsx', '.js', '.mjs', '.json', '.sql', '.md'].includes(extname(file.name))
+      ALLOWED_EXTENSIONS.has(extname(file.name))
     ) {
       results.push({ fullPath, relPath, name: file.name });
     }
@@ -67,10 +82,9 @@ function scanDirectory(dir, rel = '') {
 }
 
 console.log(`📂 Scanning files...`);
-const sourceFiles = [
-  ...scanDirectory(SRC_ROOT, 'src'),
-  ...scanDirectory(DRIZZLE_ROOT, 'drizzle'),
-].slice(0, limit);
+const sourceFiles = analysisRoots
+  .flatMap((root) => scanDirectory(root, relative(REPO_ROOT, root)))
+  .slice(0, limit);
 
 console.log(`   Found ${sourceFiles.length} files\n`);
 
@@ -364,6 +378,12 @@ function classifyFeature(filePath) {
 function normalizeImportPath(importPath, fromFile) {
   // Only treat workspace-local imports as resolvable targets.
   // Package/builtin imports are marked external and excluded from dangling-ref counts.
+
+  // SvelteKit auto-generated $types files — never on disk, always mark external
+  if (importPath === './$types' || importPath === './$types.js' || importPath.endsWith('/$types') || importPath.endsWith('/$types.js')) {
+    return null; // treated as external by caller
+  }
+
   let rawAbs = null;
 
   if (importPath.startsWith('$lib')) {
@@ -380,9 +400,12 @@ function normalizeImportPath(importPath, fromFile) {
   rawAbs = stripKnownImportExtension(rawAbs);
   const candidates = expandImportCandidates(rawAbs);
   for (const candidate of candidates) {
-    if (existsSync(candidate)) return toRepoRelative(candidate);
+    if (existsSync(candidate) && !statSync(candidate).isDirectory()) {
+      return toRepoRelative(candidate);
+    }
   }
-  return toRepoRelative(candidates[0]);
+  // No candidate found on disk — return the .ts probe path so the error normalised is useful
+  return toRepoRelative(`${rawAbs.replace(/\.(js|mjs)$/, '')}.ts`);
 }
 
 function stripKnownImportExtension(absPath) {

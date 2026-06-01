@@ -25,7 +25,8 @@ This pipeline treats `graphify:karpathy-batch` as the synthesis lane, not the wh
 6. CouchDB MapReduce rollups
 7. Karpathy batch synthesis
 8. Redis ACE cache sync
-9. Validation reports
+9. Offline synthesis / parent atlas promotion
+10. Validation reports
 
 ## Staged Write Safety
 
@@ -52,6 +53,7 @@ To prevent accidental full-codebase mutations, writes are staged and must be ena
 - `npm run atlas:couchdb:mapreduce`
 - `npm run graphify:karpathy-batch`
 - `npm run atlas:redis:sync`
+- `npm run atlas:offline:synthesis`
 - `npm run atlas:validate`
 
 ## Rule

@@ -70,6 +70,7 @@ import {
   queryBmuCached,
   attentionScoreChunks,
   attentionScoreChunks_fp16,
+  batchCosineSimilarityFp16,
 } from '$lib/server/gpu/libtorch-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from '../../../ace/policy.js';

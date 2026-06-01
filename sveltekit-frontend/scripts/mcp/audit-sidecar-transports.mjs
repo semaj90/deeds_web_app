@@ -133,12 +133,12 @@ async function probeHttp(port) {
 
 // ── stdio transport probe ──────────────────────────────────────────────────────
 
-async function probeStdio(scriptPath) {
+async function probeStdio(scriptPath, extraArgs = []) {
   return new Promise((resolvePromise) => {
     const timeoutMs = 8000;
     let settled = false;
 
-    const child = spawn(process.execPath, [scriptPath], {
+    const child = spawn(process.execPath, [scriptPath, ...extraArgs], {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env },
     });
@@ -244,7 +244,7 @@ for (const sidecar of SIDECARS) {
     if (!existsSync(scriptPath)) {
       entry.stdio = { status: 'FAIL', detail: `Script not found: ${scriptPath}` };
     } else {
-      const stdioResult = await probeStdio(scriptPath);
+      const stdioResult = await probeStdio(scriptPath, ['--stdio']);
       entry.stdio = stdioResult;
       if (stdioResult.status === 'FAIL') {
         // stdio failure is NOT a transport error for exit code purposes

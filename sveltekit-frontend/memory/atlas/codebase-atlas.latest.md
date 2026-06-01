@@ -1,32 +1,32 @@
 # Directory Atlas Recommendations
 
-> Generated: 2026-05-31T21:58:40.511Z · 1167 directories · 8674 files
+> Generated: 2026-06-01T06:19:59.674Z · 1167 directories · 8674 files
 
 ## `src/lib/server/db`
 
 - Rank: **0.539** · files=111 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/db/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.555 avg=0.274, PageRank max=0, Karpathy blend=3828.068
+- Authority max=0.555 avg=0.274, PageRank max=0, Karpathy blend=3213.734
 - Topo classes: `database-schema`
 - Clusters: `gpu:48`, `general`, `gpu:85`, `gpu:75`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/db/schema.ts`, `src/lib/server/db/schema.ts`, `src/lib/server/db/client.ts`
+- Top files: `src/lib/server/db/client.ts`, `src/lib/server/db/client.ts`, `src/lib/server/db/schema-postgres.ts`
 
 ## `src/lib/server/db/schema`
 
 - Rank: **0.525** · files=58 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/db/schema/AGENTS.md` (parent: `agents:src/lib/server/db/AGENTS.md`)
-- Authority max=0.5 avg=0.239, PageRank max=0, Karpathy blend=83.027
+- Authority max=0.5 avg=0.239, PageRank max=0, Karpathy blend=3.859
 - Topo classes: `database-schema`
 - Clusters: `gpu:55`, `gpu:18`, `general`, `database-schema:55`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/db/schema/persons.ts`, `src/lib/server/db/schema/case-library-links.ts`, `src/lib/server/db/schema/case-library-links.ts`
+- Top files: `src/lib/server/db/schema/legal-nodes.ts`, `src/lib/server/db/schema/legal-nodes.ts`, `src/lib/server/db/schema/library-documents.ts`
 
 ## `src/lib/server/vector`
 
 - Rank: **0.525** · files=18 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/vector/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.5 avg=0.255, PageRank max=0, Karpathy blend=94.532
+- Authority max=0.5 avg=0.255, PageRank max=0, Karpathy blend=94.718
 - Topo classes: `trace-retrieval`
 - Clusters: `general`, `gpu:72`, `gpu:20`, `gpu:25`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
@@ -36,167 +36,77 @@
 
 - Rank: **0.513** · files=92 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0.45 avg=0.232, PageRank max=0, Karpathy blend=1593.021
+- Authority max=0.45 avg=0.232, PageRank max=0, Karpathy blend=1591.405
 - Topo classes: `unclassified`
 - Clusters: `unclassified:70`, `general`, `gpu:32`, `gpu:64`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/ollama.ts`, `src/lib/server/ollama.ts`, `src/lib/server/redis.ts`
-
-## `src/lib/server/ai`
-
-- Rank: **0.513** · files=63 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/ai/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.197, PageRank max=0, Karpathy blend=1270.977
-- Topo classes: `unclassified`
-- Clusters: `general`, `gpu:44`, `gpu:94`, `gpu:9`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/ai/hypergraph-store.ts`, `src/lib/server/ai/hypergraph-store.ts`, `src/lib/server/ai/token-tracker.ts`
-
-## `src/lib/server/analysis`
-
-- Rank: **0.513** · files=18 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/analysis/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.225, PageRank max=0, Karpathy blend=32.35
-- Topo classes: `unclassified`
-- Clusters: `general`, `gpu:54`, `gpu:64`, `gpu:70`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/analysis/analysis-jobs.ts`, `src/lib/server/analysis/entity-extraction.ts`, `src/lib/server/analysis/entity-extraction.ts`
-
-## `src/lib/server/analytics`
-
-- Rank: **0.513** · files=29 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/analytics/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.338, PageRank max=0, Karpathy blend=44.668
-- Topo classes: `unclassified`
-- Clusters: `gpu:70`, `general`, `unclassified:25`, `gpu:94`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/analytics/search-analytics.ts`, `src/lib/server/analytics/search-analytics.ts`, `src/lib/server/analytics/event-logger.ts`
-
-## `src/lib/server/research`
-
-- Rank: **0.513** · files=23 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/research/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.217, PageRank max=0, Karpathy blend=167.045
-- Topo classes: `unclassified`
-- Clusters: `general`, `gpu:32`, `gpu:82`, `gpu:73`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/research/web-research-ingester.ts`, `src/lib/server/research/web-research-ingester.ts`, `src/lib/server/research/github-harvester.ts`
-
-## `src/lib/server/retrieval`
-
-- Rank: **0.513** · files=44 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/retrieval/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.224, PageRank max=0, Karpathy blend=6.845
-- Topo classes: `trace-retrieval`, `graph-gpu-topology`
-- Clusters: `general`, `trace-retrieval:72`, `gpu:24`, `gpu:73`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/retrieval/web-search.ts`, `src/lib/server/retrieval/citation-graph.ts`, `src/lib/server/retrieval/citation-graph.ts`
+- Top files: `src/lib/server/ollama.ts`, `src/lib/server/ollama.ts`, `src/lib/server/lucia.ts`
 
 ## `src/lib/server/grpc`
 
 - Rank: **0.500** · files=20 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/grpc/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.286, PageRank max=0, Karpathy blend=326.91
+- Authority max=0.45 avg=0.286, PageRank max=0, Karpathy blend=327.061
 - Topo classes: `unclassified`
 - Clusters: `general`, `gpu:82`, `gpu:75`, `gpu:94`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/grpc/embedding-client.ts`, `src/lib/server/grpc/embedding-client.ts`, `src/lib/server/grpc/graph-ml-client.ts`
-
-## `src/lib/types`
-
-- Rank: **0.500** · files=73 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/types/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0.4 avg=0.217, PageRank max=0, Karpathy blend=41.549
-- Topo classes: `unclassified`, `graph-gpu-topology`
-- Clusters: `gpu:72`, `general`, `gpu:57`, `gpu:77`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/types/enhanced-svelte5-types.ts`, `src/lib/types/api.ts`, `src/lib/types/protocol.ts`
-
-## `src/lib/server/ace`
-
-- Rank: **0.494** · files=45 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/ace/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.244, PageRank max=0, Karpathy blend=3.17
-- Topo classes: `trace-retrieval`
-- Clusters: `gpu:72`, `general`, `gpu:32`, `gpu:2`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/ace/types.ts`, `src/lib/server/ace/types.ts`, `src/lib/server/ace/ace-wiki.ts`
+- Top files: `src/lib/server/grpc/embedding-client.ts`, `src/lib/server/grpc/embedding-client.ts`, `src/lib/server/grpc/chr97-agent-client.ts`
 
 ## `src/lib/config`
 
 - Rank: **0.488** · files=15 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/config/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0.4 avg=0.211, PageRank max=0, Karpathy blend=20.196
+- Authority max=0.4 avg=0.211, PageRank max=0, Karpathy blend=19.537
 - Topo classes: `unclassified`, `graph-gpu-topology`
 - Clusters: `general`, `gpu:75`, `gpu:72`, `gpu:87`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/config/env.server.ts`, `src/lib/config/env.server.ts`, `src/lib/config/database.ts`
 
-## `src/lib/data`
-
-- Rank: **0.488** · files=9 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/data/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0.4 avg=0.131, PageRank max=0, Karpathy blend=3.676
-- Topo classes: `unclassified`
-- Clusters: `general`, `gpu:21`, `gpu:29`, `gpu:57`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/data/types.ts`, `src/lib/data/types.ts`, `src/lib/data/report-templates.ts`
-
-## `src/lib/server/cache`
-
-- Rank: **0.488** · files=21 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/cache/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.214, PageRank max=0, Karpathy blend=62.254
-- Topo classes: `unclassified`
-- Clusters: `general`, `gpu:94`, `unclassified:22`, `unclassified:94`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/cache/cartridge-tensor-bridge.ts`, `src/lib/server/cache/cartridge-tensor-bridge.ts`, `src/lib/server/cache/redis-exact-match.ts`
-
-## `src/lib/server/legal`
-
-- Rank: **0.475** · files=13 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/legal/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.233, PageRank max=0, Karpathy blend=38.812
-- Topo classes: `legal-evidence`
-- Clusters: `general`, `gpu:47`, `gpu:89`, `gpu:32`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/legal/law-citations.ts`, `src/lib/server/legal/law-citations.ts`, `src/lib/server/legal/constitution-fetcher.ts`
-
 ## `src/lib/server/observability`
 
 - Rank: **0.475** · files=4 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/observability/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.21, PageRank max=0, Karpathy blend=6.876
+- Authority max=0.45 avg=0.21, PageRank max=0, Karpathy blend=4.519
 - Topo classes: `unclassified`
 - Clusters: `general`, `gpu:59`, `gpu:60`, `gpu:6`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/server/observability/langfuse.ts`, `src/lib/server/observability/inference-log.ts`, `src/lib/server/observability/inference-log-views.ts`
 
-## `src/lib/server/queue`
+## `src/lib/server/analysis`
 
-- Rank: **0.475** · files=14 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/queue/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.127, PageRank max=0, Karpathy blend=6.907
+- Rank: **0.451** · files=18 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/analysis/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.225, PageRank max=0, Karpathy blend=2.416
 - Topo classes: `unclassified`
-- Clusters: `general`, `gpu:24`, `gpu:9`, `gpu:2`
+- Clusters: `general`, `gpu:54`, `gpu:64`, `gpu:70`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/queue/rabbitmq-manager-fixed.ts`, `src/lib/server/queue/rabbitmq-manager-fixed.ts`, `src/lib/server/queue/workflow-publish.ts`
+- Top files: `src/lib/server/analysis/worker.ts`, `src/lib/server/analysis/entity-extraction.ts`, `src/lib/server/analysis/entity-extraction.ts`
 
-## `src/lib/db/queries`
+## `src/lib/server/embeddings`
 
-- Rank: **0.370** · files=5 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/db/queries/AGENTS.md` (parent: `agents:src/lib/db/AGENTS.md`)
-- Authority max=0.128 avg=0.092, PageRank max=0, Karpathy blend=5.464
-- Topo classes: `database-schema`
-- Clusters: `general`, `gpu:25`
+- Rank: **0.438** · files=1 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
+- Authority max=0.45 avg=0.45, PageRank max=0, Karpathy blend=4.193
+- Topo classes: `trace-retrieval`
+- Clusters: `gpu:10`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/db/queries/route-health-queries.ts`, `src/lib/db/queries/route-health-queries.ts`, `src/lib/db/queries/route-health-archive.ts`
+- Top files: `src/lib/server/embeddings/ollama.ts`
+
+## `src/lib/server/retrieval`
+
+- Rank: **0.363** · files=44 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/retrieval/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.224, PageRank max=0, Karpathy blend=0.886
+- Topo classes: `trace-retrieval`, `graph-gpu-topology`
+- Clusters: `general`, `trace-retrieval:72`, `gpu:24`, `gpu:73`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/retrieval/context-buffer.ts`, `src/lib/server/retrieval/citation-graph.ts`, `src/lib/server/retrieval/citation-graph.ts`
 
 ## `src/lib/server/gpu`
 
-- Rank: **0.357** · files=19 · hits=0 · dirty=0
+- Rank: **0.353** · files=19 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/gpu/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.194, PageRank max=0, Karpathy blend=0.99
+- Authority max=0.45 avg=0.194, PageRank max=0, Karpathy blend=0.926
 - Topo classes: `graph-gpu-topology`
 - Clusters: `general`, `gpu:22`, `gpu:20`, `gpu:23`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
@@ -204,50 +114,140 @@
 
 ## `src/lib/ai`
 
-- Rank: **0.356** · files=25 · hits=0 · dirty=0
+- Rank: **0.344** · files=25 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/ai/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
-- Authority max=0.4 avg=0.161, PageRank max=0, Karpathy blend=0.972
+- Authority max=0.4 avg=0.161, PageRank max=0, Karpathy blend=0.778
 - Topo classes: `unclassified`
 - Clusters: `general`, `gpu:20`, `gpu:72`, `gpu:94`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/ai/model-ids.ts`, `src/lib/ai/model-ids.ts`, `src/lib/ai/base64-fp32-quantizer.ts`
 
-## `src/lib/server/config`
+## `src/lib`
 
-- Rank: **0.353** · files=8 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/config/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.166, PageRank max=0, Karpathy blend=1.155
+- Rank: **0.335** · files=17 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/AGENTS.md` (parent: `agents:src/AGENTS.md`)
+- Authority max=0.4 avg=0.181, PageRank max=0, Karpathy blend=0.617
 - Topo classes: `unclassified`
-- Clusters: `general`, `gpu:57`, `gpu:75`, `unclassified:44`
+- Clusters: `general`, `gpu:57`, `gpu:20`, `gpu:9`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/config/vector-config.ts`, `src/lib/server/config/vector-config.ts`, `src/lib/server/config/ollama.ts`
+- Top files: `src/lib/types.ts`, `src/lib/env.server.ts`, `src/lib/polyfills.ts`
+
+## `src/lib/server/graph`
+
+- Rank: **0.325** · files=30 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/graph/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.5 avg=0.116, PageRank max=0, Karpathy blend=0
+- Topo classes: `graph-gpu-topology`
+- Clusters: `general`, `gpu:70`, `gpu:86`, `gpu:32`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/graph/couchdb-pagerank.ts`, `src/lib/server/graph/couchdb-pagerank.ts`, `src/lib/server/graph/pg-neo4j-sync.ts`
+
+## `src/lib/cache`
+
+- Rank: **0.318** · files=7 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/cache/AGENTS.md` (parent: `agents:src/lib/AGENTS.md`)
+- Authority max=0.4 avg=0.224, PageRank max=0, Karpathy blend=1.407
+- Topo classes: `unclassified`
+- Clusters: `general`, `gpu:94`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/cache/cache-service.svelte.ts`, `src/lib/cache/cache-service.svelte.ts`, `src/lib/cache/indexdb-cache.svelte.ts`
+
+## `src/routes/api/test/redis-direct`
+
+- Rank: **0.316** · files=1 · hits=0 · dirty=0
+- AGENTS: `agents:src/routes/AGENTS.md` (parent: `agents:src/AGENTS.md`)
+- Authority max=0.6 avg=0.6, PageRank max=0, Karpathy blend=0.712
+- Topo classes: `test-audit-devtool`
+- Clusters: `general`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/routes/api/test/redis-direct/+server.ts`
+
+## `src/lib/server/ace`
+
+- Rank: **0.313** · files=45 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/ace/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.244, PageRank max=0, Karpathy blend=0
+- Topo classes: `trace-retrieval`
+- Clusters: `gpu:72`, `general`, `gpu:32`, `gpu:2`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/ace/ace-wiki.ts`, `src/lib/server/ace/ace-wiki.ts`, `src/lib/server/ace/gemma4-codeintel.ts`
+
+## `src/lib/server/ai`
+
+- Rank: **0.313** · files=63 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/ai/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.197, PageRank max=0, Karpathy blend=0
+- Topo classes: `unclassified`
+- Clusters: `general`, `gpu:44`, `gpu:94`, `gpu:9`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/ai/ollama-client.ts`, `src/lib/server/ai/ollama-client.ts`, `src/lib/server/ai/ollama-config.ts`
+
+## `src/lib/server/analytics`
+
+- Rank: **0.313** · files=29 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/analytics/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.338, PageRank max=0, Karpathy blend=0
+- Topo classes: `unclassified`
+- Clusters: `gpu:70`, `general`, `unclassified:25`, `gpu:94`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/analytics/agentic-web-indexer.ts`, `src/lib/server/analytics/minified-research-cache.ts`, `src/lib/server/analytics/minified-research-cache.ts`
 
 ## `src/lib/server/embedding`
 
-- Rank: **0.346** · files=12 · hits=0 · dirty=0
+- Rank: **0.313** · files=12 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/embedding/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.193, PageRank max=0, Karpathy blend=0.587
+- Authority max=0.45 avg=0.193, PageRank max=0, Karpathy blend=0
 - Topo classes: `trace-retrieval`
 - Clusters: `general`, `gpu:15`, `gpu:20`, `gpu:29`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/embedding/embedding-repository.ts`, `src/lib/server/embedding/ingestion-queue.ts`, `src/lib/server/embedding/embed-schema.ts`
+- Top files: `src/lib/server/embedding/embed-schema.ts`, `src/lib/server/embedding/embed-schema.ts`, `src/lib/server/embedding/embed.ts`
+
+## `src/lib/server/indexer`
+
+- Rank: **0.313** · files=29 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/indexer/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.135, PageRank max=0, Karpathy blend=0
+- Topo classes: `trace-retrieval`, `graph-gpu-topology`
+- Clusters: `general`, `gpu:32`, `gpu:60`, `gpu:6`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/indexer/ast-chunker.ts`, `src/lib/server/indexer/ast-chunker.ts`, `src/lib/server/indexer/gpu-karpathy-tagger.ts`
+
+## `src/lib/server/rag`
+
+- Rank: **0.313** · files=11 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/rag/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.269, PageRank max=0, Karpathy blend=0
+- Topo classes: `trace-retrieval`
+- Clusters: `general`, `gpu:72`, `gpu:43`, `trace-retrieval:73`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/rag/rag-types.ts`, `src/lib/server/rag/rag-types.ts`, `src/lib/server/rag/ranker.ts`
+
+## `src/lib/server/research`
+
+- Rank: **0.313** · files=23 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/research/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.217, PageRank max=0, Karpathy blend=0
+- Topo classes: `unclassified`
+- Clusters: `general`, `gpu:32`, `gpu:82`, `gpu:73`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/research/github-harvester.ts`, `src/lib/server/research/github-harvester.ts`, `src/lib/server/research/lane4-feedback.ts`
+
+## `src/lib/server/tools/handlers`
+
+- Rank: **0.313** · files=14 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/tools/handlers/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.254, PageRank max=0, Karpathy blend=0
+- Topo classes: `unclassified`, `test-audit-devtool`
+- Clusters: `general`, `gpu:32`, `test-audit-devtool:69`, `gpu:72`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/tools/handlers/crawlDocs.ts`, `src/lib/server/tools/handlers/crawlDocs.ts`, `src/lib/server/tools/handlers/kbSearch.ts`
 
 ## `src/lib/server/types`
 
-- Rank: **0.338** · files=15 · hits=0 · dirty=0
+- Rank: **0.313** · files=15 · hits=0 · dirty=0
 - AGENTS: `agents:src/lib/server/types/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.187, PageRank max=0, Karpathy blend=0.447
+- Authority max=0.45 avg=0.187, PageRank max=0, Karpathy blend=0
 - Topo classes: `unclassified`
 - Clusters: `gpu:72`, `general`, `gpu:75`, `gpu:77`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/types/retrieval.ts`, `src/lib/server/types/retrieval.ts`, `src/lib/server/types/qdrant.ts`
-
-## `src/lib/server/utils`
-
-- Rank: **0.338** · files=18 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/utils/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.208, PageRank max=0, Karpathy blend=0.447
-- Topo classes: `unclassified`
-- Clusters: `general`, `gpu:86`, `gpu:75`, `unclassified:70`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/utils/retry.ts`, `src/lib/server/utils/avatar-upload.ts`, `src/lib/server/utils/endpoints.ts`
+- Top files: `src/lib/server/types/qdrant.ts`, `src/lib/server/types/retrieval.ts`, `src/lib/server/types/retrieval.ts`
