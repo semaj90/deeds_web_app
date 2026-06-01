@@ -3,6 +3,7 @@
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import VlmTagModal from '$lib/components/evidence/VlmTagModal.svelte';
 	import type { Evidence } from '$lib/types/evidence';
 
 	interface Props {
@@ -180,13 +181,11 @@
 					{/if}
 				</div>
 
-				<!-- Tags -->
+				<!-- Tags — clickable VLM tag chips open detail dialog -->
 				{#if evidence?.tags && evidence.tags.length > 0}
 					<div class="flex flex-wrap gap-1 mt-2">
 						{#each (Array.isArray(evidence.tags) ? evidence.tags.slice(0, 3) : []) as tag}
-							<Badge variant="primary" size="sm">
-								<Icon name="tag" size={10} class="inline mr-1" />{tag}
-							</Badge>
+							<VlmTagModal name={tag} />
 						{/each}
 						{#if evidence.tags.length > 3}
 							<span class="text-xs text-sand/60">+{evidence.tags.length - 3}</span>
