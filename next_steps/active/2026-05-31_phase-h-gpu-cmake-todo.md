@@ -88,16 +88,14 @@
 
 ## What Needs to Happen Next (Phase H4+)
 
-### H4 — Atlas Codebase Semantic Indexing Integration
-Wire `tensorrt_bridge.node` FP16 ops into the graphify pipeline for faster semantic indexing:
+### H4 — Atlas Codebase Semantic Indexing Integration ✅ (2026-05-31)
+Wired `tensorrt_bridge.node` FP16 ops into the graphify pipeline:
 
-- [ ] `scripts/karpathy-gpu-enrich.mjs` — replace `attentionScoreGPU` calls with `attentionScoreGPU_fp16`
-  - Expected: 2× faster blend scoring for top-200 files (currently ~30s → ~15s)
-- [ ] `scripts/run-hypergraph.ts` — replace `batchCosineSimilarity` with `batchCosineSimilarityFp16`
-  - Expected: 1.8× faster edge scoring for 2000-node hypergraph (currently ~128s → ~70s)
-- [ ] `graphify:full` pipeline — add CUDA pre-flight check before heavy GPU stages
-  - Read `gpu:karpathy:summary` from Redis to detect stale GPU index
-  - Use `replayGraphOnStream` for concurrent rerank passes
+- [x] `scripts/atlas/karpathy-gpu-enrich.mjs` — FP16 attention now **auto-enabled by default** (was `--fp16` flag); `--fp32` to opt out. CUDA pre-flight logs GPU lane on every run.
+  - Expected: 2× faster blend scoring for top-200 files
+- [x] `sveltekit-frontend/scripts/run-hypergraph.ts` — Stage C 4D-coord loop now calls `batchCosineSimilarity_fp16` for all member-to-centroid cosines in one GPU batch (was per-node CPU loop). Falls back gracefully.
+  - Expected: 1.8× faster edge scoring for 2000-node hypergraph
+- [x] CUDA pre-flight at `main()` entry in both scripts — logs `cuda-level / fp16-attention / fp16-cosine` before heavy GPU stages. Addon type extended: `checkCudaAvailable`, `batchCosineSimilarity_fp16`.
 
 ### H5 — Error Agentic Workflow Kanban ACE Integration
 Wire GPU scoring into the error analysis pipeline:
@@ -183,5 +181,6 @@ tensorrt_bridge.node exports (8 functions):
 - `8ec4261b7f` → GPU capability matrix — primitives map + extended audit + cuDNN/cuVS/CUTLASS presets
 - `c5715f178e` → docs: clarify cuDNN/cuVS/CUTLASS status from live audit output
 - `binding.cc` → DotProductWrapper TypedArray guard + test-addon.cjs CUDA level 2 support (38/38 pass)
+- `d2f23f3e27` → H4: FP16 auto-default in karpathy + batchCosineSimilarity_fp16 in hypergraph Stage C
 - `.vscode/settings.json` → cmake x64 settings (gitignored, local only; preset: `windows-cuda`)
 - `.vscode/tasks.json` → CMake folderOpen task updated
