@@ -59,6 +59,7 @@ import {
   topKIndices,
   trainSOM,
 } from '$lib/server/gpu/pytorch-graph.js';
+import { batchCosineSimilarityFp16 } from '$lib/server/gpu/libtorch-bridge.js';
 import { analyzeDocumentWithDocling } from '$lib/server/docling.js';
 import { YOLOService }               from '$lib/server/yolo.js';
 import { analyzeEvidenceImage }      from '$lib/server/analysis/vlm-evidence-analyzer.js';
@@ -1395,9 +1396,22 @@ export async function selectAdaptiveMemory(
   const edges = await queryTopHyperedges('C', Math.min(topK * 6, 60)).catch(() => [] as HyperEdge[]);
   if (!edges.length) return [];
 
-  return edges
-    .filter(e => e.centroid?.length >= DIM)
-    .map(e => ({ e, sim: cosineSim(query, e.centroid) }))
+  const candidates = edges.filter(e => e.centroid?.length >= DIM);
+  if (!candidates.length) return [];
+
+  // H6: FP16 synthesis-lane rerank — use GPU cosine if available, CPU fallback
+  let sims: number[];
+  try {
+    const centroids = candidates.map(e => e.centroid);
+    const result = await batchCosineSimilarityFp16(query, centroids);
+    sims = result.scores;
+    if (!Array.isArray(sims) || sims.length !== candidates.length) throw new Error('shape mismatch');
+  } catch {
+    sims = candidates.map(e => cosineSim(query, e.centroid));
+  }
+
+  return candidates
+    .map((e, i) => ({ e, sim: sims[i] ?? cosineSim(query, e.centroid) }))
     .sort((a, b) => b.sim - a.sim)
     .slice(0, topK)
     .map(({ e, sim }) => ({

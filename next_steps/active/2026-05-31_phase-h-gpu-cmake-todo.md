@@ -118,8 +118,13 @@ Wire GPU scoring into the error analysis pipeline:
       and computes pair-wise `batchCosineSimilarityFp16` on 64-dim vectors for each candidate edge.
       Score written as `r.sim` property on the MERGE'd edge. Fallback: grid-distance-only if
       `gpu:karpathy:encoded` absent.
-- [ ] Synthesis lanes (cluster_context, shared_resource, agents_context, vault_link) — rerank using FP16 ops
-- [ ] `AttentionScoreGPU_fp16` for final ACE context weighting in `fetchACPKnowledgeResults()` Stage A0
+- [x] Synthesis lanes (cluster_context, shared_resource, agents_context, vault_link) — rerank using FP16 ops
+      `selectAdaptiveMemory()` in `hypergraph-4d.ts` upgraded: CPU `cosineSim` loop →
+      `batchCosineSimilarityFp16(query, centroids)` (all candidates in one GPU call).
+      Falls back to CPU cosineSim on any error. commit: `H6-synthesis-lanes`
+- [x] `batchCosineSimilarityFp16` for final ACE context weighting in `fetchACPKnowledgeResults()` Stage A0
+      (via 64-dim Karpathy rerank block; capped +0.05 boost; codebase_chunks_768 lane only)
+      commit: `f936614819` — `context-assembler.ts`
 
 ### Build Verification (validated 2026-05-31 ✅)
 ```powershell
