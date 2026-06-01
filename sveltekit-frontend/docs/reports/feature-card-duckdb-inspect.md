@@ -1,6 +1,6 @@
 # Feature Card DuckDB Inspect
 
-Generated: 2026-05-31T23:47:23.925Z
+Generated: 2026-06-01T01:45:14.330Z
 
 DuckDB: C:\Users\james\AppData\Local\Programs\DuckDB\duckdb.exe
 DB: C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\docs\reports\feature-card.duckdb

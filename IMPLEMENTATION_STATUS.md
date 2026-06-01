@@ -58,7 +58,7 @@
 ### Objectives
 - [x] Architecture design complete (PHASE_100_IMPLEMENTATION_PLAN.md)
 - [x] MapReduce consolidation framework created (mapreduce-consolidated-index.mjs)
-- [ ] File system consolidation (Phase 100.1)
+- [x] File system consolidation (Phase 100.1)
   - audit artifact exists: `docs/phase100/file-consolidation-audit.json`
   - recommendations artifact exists: `docs/phase100/consolidation-recommendations.json`
   - proposal artifact exists: `.tmp/feature-organization-proposal.md`
@@ -72,7 +72,7 @@
   - legalCorpus group has been moved into `sveltekit-frontend/src/lib/server/features/legal-corpus/`
   - codebaseIntel group has been moved into `sveltekit-frontend/src/lib/server/features/codebase-intel/`
   - identity group has been moved into `sveltekit-frontend/src/lib/server/features/identity/`
-  - this is the gating step before any schema migration work moves forward
+  - all groups from the proposal are now applied into feature folders; this step is closed
 - [x] Consolidation/schema alignment note exists.
   - `docs/architecture/consolidation-and-schema-alignment.md`
   - repo consolidation scripts and schema-drift scripts are ordered into one workflow note
@@ -81,7 +81,7 @@
   - repo consolidation → parent atlas → schema drift → migrate is now explicit
 - [x] Feature consolidation review queue exists.
   - `docs/architecture/feature-consolidation-review-queue.md`
-  - high-confidence groups are now ordered for human approval, with `evidence`, `observability`, `rag`, `cases`, `aiAgents`, `legalCorpus`, `codebaseIntel`, and `identity` applied and the review queue now closed
+  - high-confidence groups were applied and the review queue is now closed: `evidence`, `observability`, `rag`, `cases`, `aiAgents`, `legalCorpus`, `codebaseIntel`, and `identity`
 - [x] Kanban-to-parent-atlas alignment note exists.
   - `docs/architecture/kanban-parent-atlas-alignment.md`
   - open work is routed from the master todo into kanban tasks and then into parent atlas indexing using shared feature keys and source refs
@@ -127,7 +127,7 @@
 
 | Phase | Task | Est. Hours | Status |
 |-------|------|-----------|--------|
-| **100.1** | File consolidation → 8 feature domains | 8h | Pending |
+| **100.1** | File consolidation → 8 feature domains | 8h | Complete |
 | **100.2** | PG 18 upgrade + UUID standardization | 8h | UUID ✅ Done for live schema (2026-05-30); PG 18 upgrade deferred (PG 16 + pgvector 0.8.2 healthy) |
 | **100.3** | MapReduce joins pipeline | 6h | ✅ Done — 1603 dangling refs, gate PASSED (2026-05-31) |
 | **100.4** | Parent atlas schema + ingest | 4h | Done |
@@ -179,7 +179,7 @@ Feature Distribution:
 - Remaining 1,587 are genuine unresolved imports (generated files, conditional dynamic imports, cross-package boundaries).
 
 **Remaining open (Phase 101):**
-1. Phase 100.1 file consolidation into 8 feature domains — complete; all groups from the original proposal are now applied into feature folders
+1. Offline batch promotion / NDJSON / DuckDB / LangExtract rerun — still partial; current refresh is validated, but the corpus rerun and promotion step remain open
 
 **Validated 2026-05-31:**
 - UUID standardization is done for the live schema (45 integer / 0 uuid / 3 text, archived copies still show historical drift).
