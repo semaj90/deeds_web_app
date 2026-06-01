@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-05-31T21:21:35.351Z",
+  "source": {
+    "unknown_reasoning": "sveltekit-frontend/.tmp/unknown-reasoning-results.json",
+    "gemma_recommendations": "sveltekit-frontend/.tmp/gemma-recommendations.jsonl",
+    "parent_atlas_report": "memory/exports/parent-atlas-report.json"
+  },
+  "counts": {
+    "schema_gaps": 7,
+    "weak_clusters": 18,
+    "materialized_recommendations": 25,
+    "parent_atlas_entries": 9373,
+    "parent_atlas_clusters": 396
+  },
+  "schema_gaps": [
+    "codebase_embeddings",
+    "codebase_files",
+    "codebase_relationship_reports",
+    "feature_cards",
+    "feature_registry_vectors",
+    "intent_synthesis_rewards",
+    "vector_smoke"
+  ],
+  "materialized_outputs": [
+    "sveltekit-frontend/.tmp/gemma-recommendations.jsonl",
+    "sveltekit-frontend/.tmp/kanban_tasks.jsonl",
+    ".tmp/ingest/lanes/gemma_recommendation.ndjson"
+  ],
+  "status": "generated"
+}

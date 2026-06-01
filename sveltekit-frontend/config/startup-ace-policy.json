@@ -29,6 +29,8 @@
     "hypergraph:seed:dry",
     "archive:llm",
     "archive:llm:dry",
+    "archive:weekly-cold",
+    "archive:weekly-cold:dry",
     "wiki:loop",
     "wiki:loop:smoke",
     "smoke:atlas",
