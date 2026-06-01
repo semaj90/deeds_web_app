@@ -135,8 +135,8 @@ async function rankByEmbedding(
 		const resultVecs = embResult.vectors.slice(1);
 
 		// Try GPU cosine similarity (LibTorch N-API)
-		const { batchCosineSimilarity } = await import('$lib/server/gpu/libtorch-bridge.js');
-		const gpuResult = await batchCosineSimilarity(queryVec, resultVecs);
+		const { batchCosineSimilarityFp16 } = await import('$lib/server/gpu/libtorch-bridge.js');
+		const gpuResult = await batchCosineSimilarityFp16(queryVec, resultVecs);
 		return { scores: gpuResult.scores, qdrantTags };
 	} catch {
 		// CPU fallback: positional scoring + empty tags

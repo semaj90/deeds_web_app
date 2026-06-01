@@ -17,7 +17,7 @@
 import { createHash } from 'crypto';
 import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
-import { batchCosineSimilarity } from '$lib/server/gpu/libtorch-bridge.js';
+import { batchCosineSimilarityFp16 } from '$lib/server/gpu/libtorch-bridge.js';
 import { ENV } from '$lib/server/env.server.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -643,7 +643,7 @@ export async function getQloraSmartSuggestions(
 	let cosScores: number[] | null = null;
 	if (querySketch && candidateSketches.every((s) => s !== null)) {
 		try {
-			const result = await batchCosineSimilarity(querySketch, candidateSketches as number[][]);
+			const result = await batchCosineSimilarityFp16(querySketch, candidateSketches as number[][]);
 			cosScores = result.scores;
 		} catch { /* non-fatal — fall through to trgm-only */ }
 	}
