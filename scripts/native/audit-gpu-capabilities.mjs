@@ -1,383 +1,436 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+#!/usr/bin/env node
+// audit-gpu-capabilities.mjs
+// Detect the full GPU/native capability matrix for simd-bridge and emit
+// .tmp/gpu-capabilities-audit.json + .tmp/gpu-capabilities-audit.md
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const cppDir = path.join(repoRoot, 'simd-bridge', 'cpp');
-const vscodeSettingsPath = path.join(repoRoot, '.vscode', 'settings.json');
-const presetsPath = path.join(cppDir, 'CMakePresets.json');
-const tmpDir = path.join(repoRoot, '.tmp');
-const outJson = path.join(tmpDir, 'gpu-capabilities-audit.json');
-const outMd = path.join(tmpDir, 'gpu-capabilities-audit.md');
+import { spawnSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
-function ensureDir(dir) {
-  fs.mkdirSync(dir, { recursive: true });
+const ROOT = path.resolve(process.cwd());
+const TMP = path.join(ROOT, '.tmp');
+const OUT_JSON = path.join(TMP, 'gpu-capabilities-audit.json');
+const OUT_MD = path.join(TMP, 'gpu-capabilities-audit.md');
+const CPP_DIR = path.join(ROOT, 'simd-bridge', 'cpp');
+const PRESETS_FILE = path.join(CPP_DIR, 'CMakePresets.json');
+const VSCODE_SETTINGS = path.join(ROOT, '.vscode', 'settings.json');
+
+fs.mkdirSync(TMP, { recursive: true });
+
+// ── helpers ────────────────────────────────────────────────────────────────
+
+function run(cmd, args = [], opts = {}) {
+  const r = spawnSync(cmd, args, { encoding: 'utf-8', shell: true, ...opts });
+  return { ok: r.status === 0, stdout: (r.stdout || '').trim(), stderr: (r.stderr || '').trim() };
 }
 
-function exists(p) {
+function findFile(candidates) {
+  for (const c of candidates) {
+    if (c && fs.existsSync(c)) return c;
+  }
+  return null;
+}
+
+function globFirst(dir, prefix) {
   try {
-    return fs.existsSync(p);
-  } catch {
-    return false;
+    const entries = fs.readdirSync(dir);
+    const match = entries.filter(e => e.startsWith(prefix)).sort().pop();
+    return match ? path.join(dir, match) : null;
+  } catch { return null; }
+}
+
+// ── 1. CUDA Toolkit ────────────────────────────────────────────────────────
+
+const cudaEnvPath = process.env.CUDA_PATH || process.env.CUDA_HOME || null;
+const nvidiaCudaBase = 'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA';
+const latestCudaDir = globFirst(nvidiaCudaBase, 'v');
+const cudaCandidates = [
+  cudaEnvPath,
+  'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0',
+  latestCudaDir,
+  'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9',
+  'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6',
+  'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1',
+  '/usr/local/cuda',
+  '/usr/local/cuda-13',
+  '/usr/local/cuda-12',
+];
+const cudaRoot = findFile(cudaCandidates);
+const cudaFound = !!cudaRoot;
+
+let nvccVersion = null;
+let cudaToolkitVersion = null;
+if (cudaRoot) {
+  const nvcc = path.join(cudaRoot, 'bin', os.platform() === 'win32' ? 'nvcc.exe' : 'nvcc');
+  if (fs.existsSync(nvcc)) {
+    const r = run(nvcc, ['--version']);
+    if (r.ok) {
+      nvccVersion = r.stdout;
+      const m = r.stdout.match(/release\s+([\d.]+)/i);
+      if (m) cudaToolkitVersion = m[1];
+    }
+  }
+}
+if (!nvccVersion) {
+  const r = run('nvcc', ['--version']);
+  if (r.ok) {
+    nvccVersion = r.stdout;
+    const m = r.stdout.match(/release\s+([\d.]+)/i);
+    if (m) cudaToolkitVersion = m[1];
   }
 }
 
-function readJson(p, fallback = null) {
-  try {
-    return JSON.parse(fs.readFileSync(p, 'utf8'));
-  } catch {
-    return fallback;
-  }
-}
+// cudart
+const cudartFound = cudaRoot
+  ? fs.existsSync(path.join(cudaRoot, 'lib', 'x64', 'cudart.lib')) ||
+    fs.existsSync(path.join(cudaRoot, 'lib64', 'libcudart.so')) ||
+    fs.existsSync(path.join(cudaRoot, 'lib64', 'libcudart_static.a'))
+  : false;
 
-function readText(p, fallback = '') {
-  try {
-    return fs.readFileSync(p, 'utf8');
-  } catch {
-    return fallback;
-  }
-}
+// ── 2. cuBLAS ─────────────────────────────────────────────────────────────
 
-function which(cmd) {
-  try {
-    const raw = execFileSync('where', [cmd], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    return raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
-  } catch {
-    return [];
-  }
-}
+const cublasFound = cudaRoot
+  ? fs.existsSync(path.join(cudaRoot, 'lib', 'x64', 'cublas.lib')) ||
+    fs.existsSync(path.join(cudaRoot, 'lib64', 'libcublas.so'))
+  : false;
 
-function firstExisting(candidates) {
-  for (const candidate of candidates) {
-    if (candidate && exists(candidate)) return candidate;
-  }
-  return '';
-}
+const cublasLtFound = cudaRoot
+  ? fs.existsSync(path.join(cudaRoot, 'lib', 'x64', 'cublasLt.lib')) ||
+    fs.existsSync(path.join(cudaRoot, 'lib64', 'libcublasLt.so'))
+  : false;
 
-function expandWindowsCandidates(candidates) {
-  const expanded = [];
-  for (const candidate of candidates) {
-    if (!candidate) continue;
-    expanded.push(candidate);
-    expanded.push(path.join(candidate, 'Library'));
-  }
-  return [...new Set(expanded)];
-}
+// ── 3. cuDNN ──────────────────────────────────────────────────────────────
 
-function parentDir(p, levels = 1) {
-  let cur = p;
-  for (let i = 0; i < levels; i += 1) cur = path.dirname(cur);
-  return cur;
-}
-
-function readPresetMap() {
-  const data = readJson(presetsPath, null);
-  const map = new Map();
-  for (const item of data?.configurePresets ?? []) {
-    map.set(item.name, item);
-  }
-  return map;
-}
-
-function readVscodeSettings() {
-  return readJson(vscodeSettingsPath, {});
-}
-
-function detectNvcc() {
-  const envCudaPath = process.env.CUDA_PATH || process.env.CUDA_HOME || '';
-  const nvccWhere = which('nvcc')[0] || '';
-  const nvccPath = firstExisting([
-    envCudaPath ? path.join(envCudaPath, 'bin', 'nvcc.exe') : '',
-    nvccWhere,
-  ]);
-  const cudaRoot = envCudaPath || (nvccPath ? parentDir(nvccPath, 2) : '');
-  let nvccVersion = '';
-  if (nvccPath) {
+const condaPrefix = process.env.CONDA_PREFIX || null;
+const cudnnCandidates = [
+  process.env.CUDNN_ROOT,
+  cudaRoot,
+  'C:/Program Files/NVIDIA/CUDNN/v9',
+  '/usr/local',
+  '/usr',
+  condaPrefix,
+  condaPrefix ? path.join(condaPrefix, 'Library') : null,
+];
+let cudnnRoot = null;
+let cudnnVersion = null;
+for (const c of cudnnCandidates) {
+  if (!c) continue;
+  const h = path.join(c, 'include', 'cudnn.h');
+  const h2 = path.join(c, 'include', 'cudnn_version.h');
+  if (fs.existsSync(h) || fs.existsSync(h2)) {
+    cudnnRoot = c;
     try {
-      nvccVersion = execFileSync(nvccPath, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    } catch {
-      nvccVersion = '';
-    }
+      const src = fs.readFileSync(fs.existsSync(h2) ? h2 : h, 'utf-8');
+      const maj = src.match(/#define\s+CUDNN_MAJOR\s+(\d+)/);
+      const min = src.match(/#define\s+CUDNN_MINOR\s+(\d+)/);
+      const pat = src.match(/#define\s+CUDNN_PATCHLEVEL\s+(\d+)/);
+      if (maj) cudnnVersion = `${maj[1]}.${min?.[1] ?? 'x'}.${pat?.[1] ?? 'x'}`;
+    } catch { /* ignore */ }
+    break;
   }
-
-  const libDir = cudaRoot ? path.join(cudaRoot, 'lib', 'x64') : '';
-  const binDir = cudaRoot ? path.join(cudaRoot, 'bin') : '';
-  return {
-    cudaRoot,
-    nvccPath,
-    nvccVersion,
-    cudart: firstExisting([
-      libDir ? path.join(libDir, 'cudart.lib') : '',
-      binDir ? path.join(binDir, 'cudart64_130.dll') : '',
-      binDir ? path.join(binDir, 'cudart64_120.dll') : '',
-    ]),
-    cublas: firstExisting([
-      libDir ? path.join(libDir, 'cublas.lib') : '',
-      binDir ? path.join(binDir, 'cublas64_12.dll') : '',
-    ]),
-    cublasLt: firstExisting([
-      libDir ? path.join(libDir, 'cublasLt.lib') : '',
-      binDir ? path.join(binDir, 'cublasLt64_12.dll') : '',
-    ]),
-    cutlassRoot: process.env.CUTLASS_ROOT || '',
-  };
 }
+const cudnnFound = !!cudnnRoot;
 
-function detectLibtorch() {
-  const envRoot = process.env.LIBTORCH_ROOT || '';
-  const preset = readPresetMap().get((readVscodeSettings()?.['cmake.defaultConfigurePreset']) || '');
-  const presetPrefix = Array.isArray(preset?.environment?.LIBTORCH_ROOT) ? preset.environment.LIBTORCH_ROOT[0] : preset?.environment?.LIBTORCH_ROOT;
-  const candidates = expandWindowsCandidates([
-    envRoot,
-    presetPrefix,
-    'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch',
-    'C:/libtorch',
-    'C:/Program Files/libtorch',
-  ].filter(Boolean));
-  const root = firstExisting(candidates);
-  return {
-    root,
-    torchConfig: firstExisting([
-      root ? path.join(root, 'share', 'cmake', 'Torch', 'TorchConfig.cmake') : '',
-      root ? path.join(root, 'share', 'cmake', 'TorchConfig.cmake') : '',
-      root ? path.join(root, 'TorchConfig.cmake') : '',
-    ]),
-  };
-}
+// ── 4. cuVS ───────────────────────────────────────────────────────────────
 
-function detectCudnn() {
-  const envRoot = process.env.CUDNN_ROOT || '';
-  const candidates = expandWindowsCandidates([
-    envRoot,
-    process.env.CONDA_PREFIX,
-    'C:/Program Files/NVIDIA/CUDNN',
-    'C:/cudnn',
-    'C:/ProgramData/Miniconda3/Library',
-    'C:/Users/james/miniconda3/Library',
-  ].filter(Boolean));
-  const root = firstExisting(candidates.map((candidate) => {
-    const include = path.join(candidate, 'include', 'cudnn.h');
-    return exists(include) ? candidate : '';
-  })) || '';
-  const libDir = root ? [path.join(root, 'lib'), path.join(root, 'lib64'), path.join(root, 'lib', 'x64')] : [];
-  return {
-    root,
-    header: root ? path.join(root, 'include', 'cudnn.h') : '',
-    library: firstExisting(libDir.flatMap((dir) => [
-      path.join(dir, 'cudnn.lib'),
-      path.join(dir, 'cudnn64_9.lib'),
-      path.join(dir, 'cudnn64_8.lib'),
-      path.join(dir, 'cudnn64_9.dll'),
-      path.join(dir, 'cudnn64_8.dll'),
-    ])),
-  };
-}
-
-function detectCuvs() {
-  const envRoot = process.env.CUVS_ROOT || '';
-  const candidates = expandWindowsCandidates([
-    envRoot,
-    process.env.CONDA_PREFIX,
-    'C:/rapids/cuvs',
-    'C:/ProgramData/Miniconda3/Library',
-    'C:/Users/james/miniconda3/Library',
-  ].filter(Boolean));
-  const root = firstExisting(candidates.map((candidate) => {
-    const include = path.join(candidate, 'include', 'cuvs', 'neighbors', 'ivf_pq.hpp');
-    return exists(include) ? candidate : '';
-  })) || '';
-  return {
-    root,
-    ivfPq: root ? path.join(root, 'include', 'cuvs', 'neighbors', 'ivf_pq.hpp') : '',
-    cagra: root ? path.join(root, 'include', 'cuvs', 'neighbors', 'cagra.hpp') : '',
-    ivfRaBitQ: root ? path.join(root, 'include', 'cuvs', 'neighbors', 'ivf_rabitq.hpp') : '',
-  };
-}
-
-function detectCutlass() {
-  const envRoot = process.env.CUTLASS_ROOT || '';
-  const candidates = expandWindowsCandidates([
-    envRoot,
-    'C:/cutlass',
-    path.join(process.env.USERPROFILE || '', 'cutlass'),
-    path.join(process.env.HOME || '', 'cutlass'),
-  ].filter(Boolean));
-  const root = firstExisting(candidates.map((candidate) => {
-    const include = path.join(candidate, 'include', 'cutlass', 'gemm', 'device', 'gemm.h');
-    return exists(include) ? candidate : '';
-  })) || '';
-  return {
-    root,
-    header: root ? path.join(root, 'include', 'cutlass', 'gemm', 'device', 'gemm.h') : '',
-  };
-}
-
-function detectPython() {
-  const vscode = readVscodeSettings();
-  const selected = vscode?.['python.defaultInterpreterPath'] || '';
-  const resolvedSelected = selected
-    .replace('${workspaceFolder}', repoRoot)
-    .replace(/\//g, path.sep);
-  const active = which('python')[0] || which('py')[0] || '';
-  return {
-    selected,
-    resolvedSelected,
-    resolvedSelectedExists: exists(resolvedSelected),
-    active,
-  };
-}
-
-function detectPresetSelection() {
-  const vscode = readVscodeSettings();
-  const presetName = vscode?.['cmake.defaultConfigurePreset'] || '';
-  const presetMap = readPresetMap();
-  const preset = presetMap.get(presetName) || null;
-  const buildPreset = vscode?.['cmake.defaultBuildPreset'] || '';
-  const generator = vscode?.['cmake.generator'] || '';
-  const cache = {};
-
-  const cacheDirs = [
-    path.join(cppDir, 'build-x64-cuda', 'CMakeCache.txt'),
-    path.join(cppDir, 'build-x64-cuda-cublas', 'CMakeCache.txt'),
-    path.join(cppDir, 'build-x64-cuda-runtime', 'CMakeCache.txt'),
-    path.join(cppDir, 'build-x64-fallback', 'CMakeCache.txt'),
-    path.join(cppDir, 'build', 'CMakeCache.txt'),
-  ];
-  const cachePath = firstExisting(cacheDirs);
-  if (cachePath) {
-    const cacheText = readText(cachePath, '');
-    for (const key of ['CMAKE_GENERATOR_PLATFORM', 'CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE', 'CMAKE_CUDA_ARCHITECTURES']) {
-      const match = cacheText.match(new RegExp(`^${key}:.*?=(.*)$`, 'm'));
-      if (match) cache[key] = match[1].trim();
-    }
+const cuvsCandidates = [
+  process.env.CUVS_ROOT,
+  condaPrefix ? path.join(condaPrefix, 'Library') : null,
+  condaPrefix,
+  '/usr/local',
+  '/opt/conda',
+  'C:/rapids/cuvs',
+];
+let cuvsRoot = null;
+let cuvsHasCagra = false;
+let cuvsHasRabitq = false;
+for (const c of cuvsCandidates) {
+  if (!c) continue;
+  if (fs.existsSync(path.join(c, 'include', 'cuvs', 'neighbors', 'ivf_pq.hpp'))) {
+    cuvsRoot = c;
+    cuvsHasCagra = fs.existsSync(path.join(c, 'include', 'cuvs', 'neighbors', 'cagra.hpp'));
+    cuvsHasRabitq = fs.existsSync(path.join(c, 'include', 'cuvs', 'neighbors', 'ivf_rabitq.hpp'));
+    break;
   }
-
-  const accidentalWin32 = [preset?.architecture, cache.CMAKE_GENERATOR_PLATFORM, cache.CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE]
-    .filter(Boolean)
-    .some((value) => /win32|x86/i.test(String(value)));
-
-  return {
-    presetName,
-    buildPreset,
-    generator,
-    preset,
-    cachePath,
-    cache,
-    accidentalWin32,
-    useCMakePresets: vscode?.['cmake.useCMakePresets'] || '',
-  };
 }
+const cuvsFound = !!cuvsRoot;
 
-function summarizeAvailability(section) {
-  return Object.fromEntries(
-    Object.entries(section).map(([key, value]) => [
-      key,
-      typeof value === 'string' ? Boolean(value) : value,
-    ])
-  );
+// ── 5. CUTLASS ────────────────────────────────────────────────────────────
+
+const userHome = process.env.USERPROFILE || process.env.HOME || '';
+const cutlassCandidates = [
+  process.env.CUTLASS_ROOT,
+  'C:/cutlass',
+  userHome ? path.join(userHome, 'cutlass') : null,
+  '/opt/cutlass',
+];
+const cutlassRoot = cutlassCandidates.find(c =>
+  c && fs.existsSync(path.join(c, 'include', 'cutlass', 'gemm', 'device', 'gemm.h'))
+) || null;
+const cutlassFound = !!cutlassRoot;
+
+// ── 6. LibTorch ───────────────────────────────────────────────────────────
+
+const libtorchEnv = process.env.LIBTORCH_ROOT || null;
+// auto-glob C:/libtorch-win-shared-with-deps-*
+const globbedBase = globFirst('C:/', 'libtorch-win-shared-with-deps-');
+const libtorchCandidates = [
+  libtorchEnv,
+  'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch',
+  globbedBase ? path.join(globbedBase, 'libtorch') : null,
+  'C:/libtorch-win-shared-with-deps-2.7.0+cu121/libtorch',
+  '/opt/libtorch',
+  userHome ? path.join(userHome, 'libtorch') : null,
+];
+let libtorchRoot = null;
+let torchConfigFound = false;
+for (const c of libtorchCandidates) {
+  if (!c) continue;
+  const cfg = path.join(c, 'share', 'cmake', 'Torch', 'TorchConfig.cmake');
+  if (fs.existsSync(cfg)) {
+    libtorchRoot = c;
+    torchConfigFound = true;
+    break;
+  }
+  if (fs.existsSync(path.join(c, 'lib')) && fs.existsSync(path.join(c, 'include'))) {
+    libtorchRoot = c;
+    break;
+  }
 }
+const libtorchFound = !!libtorchRoot;
 
-function detectTorchConfig(root) {
-  return firstExisting([
-    root ? path.join(root, 'share', 'cmake', 'Torch', 'TorchConfig.cmake') : '',
-    root ? path.join(root, 'share', 'cmake', 'TorchConfig.cmake') : '',
+// ── 7. Python interpreter ─────────────────────────────────────────────────
+
+let pythonPath = null;
+let pythonVersion = null;
+let pythonSource = 'not found';
+
+if (fs.existsSync(VSCODE_SETTINGS)) {
+  try {
+    const s = JSON.parse(fs.readFileSync(VSCODE_SETTINGS, 'utf-8'));
+    const raw = s['python.defaultInterpreterPath'];
+    if (raw) {
+      const p = raw.replace('${workspaceFolder}', ROOT).replace(/\//g, path.sep);
+      if (fs.existsSync(p)) {
+        pythonPath = p;
+        pythonSource = 'vscode settings.json';
+      }
+    }
+  } catch { /* ignore */ }
+}
+if (!pythonPath) {
+  const venvPy = findFile([
+    path.join(ROOT, '.venv', 'Scripts', 'python.exe'),
+    path.join(ROOT, '.venv', 'bin', 'python'),
   ]);
+  if (venvPy) { pythonPath = venvPy; pythonSource = '.venv (workspace)'; }
+}
+if (!pythonPath) {
+  for (const cmd of ['python', 'python3']) {
+    const r = run(cmd, ['--version']);
+    if (r.ok || r.stderr.startsWith('Python')) {
+      pythonSource = `PATH ${cmd}`;
+      pythonVersion = (r.stdout || r.stderr).trim();
+      break;
+    }
+  }
+}
+if (pythonPath && !pythonVersion) {
+  const r = run(pythonPath, ['--version']);
+  pythonVersion = (r.stdout || r.stderr).trim();
 }
 
-function makeLine(label, value) {
-  return `- ${label}: ${value}`;
+let pyenvVersion = null;
+const pyenvFile = path.join(ROOT, '.python-version');
+if (fs.existsSync(pyenvFile)) pyenvVersion = fs.readFileSync(pyenvFile, 'utf-8').trim();
+
+const versionMismatch = !!(pyenvVersion && pythonVersion &&
+  !pythonVersion.includes(pyenvVersion.split('.').slice(0, 2).join('.')));
+
+// ── 8. VS Code CMake settings ─────────────────────────────────────────────
+
+let vscodePreset = null;
+let vscodeCmakeSourceDir = null;
+let vscodeGenerator = null;
+if (fs.existsSync(VSCODE_SETTINGS)) {
+  try {
+    const s = JSON.parse(fs.readFileSync(VSCODE_SETTINGS, 'utf-8'));
+    vscodePreset = s['cmake.defaultConfigurePreset'] || null;
+    vscodeCmakeSourceDir = s['cmake.sourceDirectory'] || null;
+    vscodeGenerator = s['cmake.generator'] || null;
+  } catch { /* ignore */ }
 }
 
-function writeReport(payload) {
-  ensureDir(tmpDir);
-  fs.writeFileSync(outJson, JSON.stringify(payload, null, 2));
+// ── 9. Preset audit (win32/x86 guard) ────────────────────────────────────
 
-  const md = [];
-  md.push('# GPU Capability Audit');
-  md.push('');
-  md.push(makeLine('Repository', repoRoot));
-  md.push(makeLine('VS Code preset', payload.vscode.presetName || '(unset)'));
-  md.push(makeLine('Build preset', payload.vscode.buildPreset || '(unset)'));
-  md.push(makeLine('Generator', payload.vscode.generator || '(unset)'));
-  md.push(makeLine('Use CMake presets', String(payload.vscode.useCMakePresets || '(unset)')));
-  md.push(makeLine('Accidental Win32/x86', String(payload.vscode.accidentalWin32)));
-  md.push('');
-  md.push('## CUDA');
-  md.push(makeLine('CUDA root', payload.cuda.cudaRoot || '(missing)'));
-  md.push(makeLine('nvcc', payload.cuda.nvccPath || '(missing)'));
-  md.push(makeLine('cudart', payload.cuda.cudart || '(missing)'));
-  md.push(makeLine('cuBLAS', payload.cuda.cublas || '(missing)'));
-  md.push(makeLine('cuBLASLt', payload.cuda.cublasLt || '(missing)'));
-  md.push('');
-  md.push('## cuDNN / cuVS / CUTLASS');
-  md.push(makeLine('cuDNN root', payload.cudnn.root || '(missing)'));
-  md.push(makeLine('cuDNN library', payload.cudnn.library || '(missing)'));
-  md.push(makeLine('cuVS root', payload.cuvs.root || '(missing)'));
-  md.push(makeLine('CUTLASS root', payload.cutlass.root || '(missing)'));
-  md.push('');
-  md.push('## LibTorch');
-  md.push(makeLine('LibTorch root', payload.libtorch.root || '(missing)'));
-  md.push(makeLine('TorchConfig.cmake', payload.libtorch.torchConfig || '(missing)'));
-  md.push('');
-  md.push('## Python');
-  md.push(makeLine('Selected interpreter', payload.python.resolvedSelected || '(missing)'));
-  md.push(makeLine('Selected interpreter exists', String(payload.python.resolvedSelectedExists)));
-  md.push(makeLine('Active python', payload.python.active || '(missing)'));
-  md.push('');
-  md.push('## Summary');
-  md.push(makeLine('CUDA runtime available', String(payload.summary.cudaRuntime)));
-  md.push(makeLine('cuBLAS available', String(payload.summary.cublas)));
-  md.push(makeLine('cuBLASLt available', String(payload.summary.cublasLt)));
-  md.push(makeLine('cuDNN available', String(payload.summary.cudnn)));
-  md.push(makeLine('cuVS available', String(payload.summary.cuvs)));
-  md.push(makeLine('CUTLASS available', String(payload.summary.cutlass)));
-  md.push(makeLine('LibTorch available', String(payload.summary.libtorch)));
-  md.push('');
-
-  fs.writeFileSync(outMd, md.join('\n'));
+const presetAudit = { presetsFile: PRESETS_FILE, found: false, issues: [] };
+if (fs.existsSync(PRESETS_FILE)) {
+  try {
+    const presets = JSON.parse(fs.readFileSync(PRESETS_FILE, 'utf-8'));
+    presetAudit.found = true;
+    for (const p of (presets.configurePresets || [])) {
+      const arch = String(p.architecture || '').toLowerCase();
+      if (arch === 'win32' || arch === 'x86')
+        presetAudit.issues.push(`"${p.name}": architecture="${p.architecture}" (must be x64)`);
+      const ts = typeof p.toolset === 'string' ? p.toolset : (p.toolset?.value || '');
+      if (ts.includes('host=x86'))
+        presetAudit.issues.push(`"${p.name}": toolset host=x86 (must be host=x64)`);
+    }
+  } catch (e) {
+    presetAudit.issues.push(`Parse error: ${e.message}`);
+  }
 }
 
-function main() {
-  const cuda = detectNvcc();
-  const cudnn = detectCudnn();
-  const cuvs = detectCuvs();
-  const cutlass = detectCutlass();
-  const libtorch = detectLibtorch();
-  const python = detectPython();
-  const vscode = detectPresetSelection();
+// ── 10. Assemble and emit ─────────────────────────────────────────────────
 
-  const payload = {
-    timestamp: new Date().toISOString(),
-    repoRoot,
-    vscode,
-    cuda,
-    cudnn,
-    cuvs,
-    cutlass,
-    libtorch,
-    python,
-    summary: {
-      cudaRuntime: Boolean(cuda.nvccPath),
-      cublas: Boolean(cuda.cublas),
-      cublasLt: Boolean(cuda.cublasLt),
-      cudnn: Boolean(cudnn.root && cudnn.library),
-      cuvs: Boolean(cuvs.root),
-      cutlass: Boolean(cutlass.root),
-      libtorch: Boolean(libtorch.root && libtorch.torchConfig),
-    },
-  };
+const timestamp = new Date().toISOString();
+const result = {
+  timestamp,
+  platform: os.platform(),
+  arch: os.arch(),
+  cudaRuntime: {
+    found: cudaFound, root: cudaRoot,
+    toolkitVersion: cudaToolkitVersion,
+    nvccVersion: nvccVersion ? nvccVersion.split('\n')[0] : null,
+    cudartLibFound: cudartFound,
+    envPath: cudaEnvPath,
+  },
+  cuBLAS: { found: cublasFound, ltFound: cublasLtFound },
+  cuDNN: {
+    found: cudnnFound, root: cudnnRoot, version: cudnnVersion,
+    linuxOnly: os.platform() === 'win32',
+    note: os.platform() === 'win32'
+      ? (cudnnFound ? 'found (limited on Windows native)' : 'not found — cuDNN 9.x SDPA requires Linux/WSL2/Docker')
+      : (cudnnFound ? `found at ${cudnnRoot}` : 'not found — apt-get install libcudnn9-dev-cuda-12'),
+  },
+  cuVS: { found: cuvsFound, root: cuvsRoot, hasCagra: cuvsHasCagra, hasIvfRabitq: cuvsHasRabitq },
+  cutlass: { found: cutlassFound, root: cutlassRoot },
+  libtorch: { found: libtorchFound, root: libtorchRoot, torchConfigFound, envVar: libtorchEnv },
+  python: { path: pythonPath, version: pythonVersion, source: pythonSource, pyenvVersion, versionMismatch },
+  vsCode: { cmakePreset: vscodePreset, cmakeSourceDir: vscodeCmakeSourceDir, generator: vscodeGenerator },
+  presetAudit,
+  summary: {
+    canBuildFallback:      true,
+    canBuildCudaRuntime:   cudaFound && !!nvccVersion,
+    canBuildCublas:        cudaFound && cublasFound,
+    canBuildLibtorch:      cudaFound && libtorchFound && torchConfigFound,
+    canBuildCudnn:         cudnnFound,
+    canBuildCuvs:          cuvsFound,
+    canBuildCutlass:       cudaFound && cutlassFound,
+    win32Detected:         presetAudit.issues.length > 0,
+  },
+};
 
-  writeReport(payload);
+fs.writeFileSync(OUT_JSON, JSON.stringify(result, null, 2));
 
-  console.log(JSON.stringify({
-    ok: true,
-    outJson,
-    outMd,
-    summary: payload.summary,
-    preset: vscode.presetName,
-    accidentalWin32: vscode.accidentalWin32,
-  }, null, 2));
-}
+// ── Markdown report ───────────────────────────────────────────────────────
 
-main();
+const ck = v => v ? '✅' : '❌';
+const wn = v => v ? '⚠️' : '✅';
+
+const md = `# GPU Capabilities Audit — simd-bridge
+> Generated: ${timestamp}
+> Platform: \`${result.platform}\` / \`${result.arch}\`
+
+## Capability Matrix
+
+| Component | Status | Detail |
+|-----------|--------|--------|
+| CUDA Runtime | ${ck(result.cudaRuntime.found)} | ${result.cudaRuntime.found ? `v${result.cudaRuntime.toolkitVersion} at \`${result.cudaRuntime.root}\`` : 'Not found — install CUDA Toolkit'} |
+| nvcc | ${ck(!!result.cudaRuntime.nvccVersion)} | ${result.cudaRuntime.nvccVersion ?? 'not found'} |
+| cudart library | ${ck(result.cudaRuntime.cudartLibFound)} | ${result.cudaRuntime.cudartLibFound ? 'found in toolkit lib/' : 'not found'} |
+| cuBLAS | ${ck(result.cuBLAS.found)} | ${result.cuBLAS.found ? 'found in CUDA Toolkit' : 'not found'} |
+| cuBLASLt | ${ck(result.cuBLAS.ltFound)} | ${result.cuBLAS.ltFound ? 'found (FP16/BF16 matmul heuristic)' : 'not found'} |
+| cuDNN | ${ck(result.cuDNN.found)} | ${result.cuDNN.note} |
+| cuVS / CAGRA | ${ck(result.cuVS.found)} | ${result.cuVS.found ? `found at \`${result.cuVS.root}\` (CAGRA=${result.cuVS.hasCagra}, IVF-RaBitQ=${result.cuVS.hasIvfRabitq})` : 'not found — conda install -c rapidsai cuvs-cu13'} |
+| CUTLASS 3.x | ${ck(result.cutlass.found)} | ${result.cutlass.found ? `found at \`${result.cutlass.root}\`` : 'not found — git clone https://github.com/NVIDIA/cutlass C:/cutlass'} |
+| LibTorch | ${ck(result.libtorch.found)} | ${result.libtorch.found ? `\`${result.libtorch.root}\`` : 'not found'} |
+| TorchConfig.cmake | ${ck(result.libtorch.torchConfigFound)} | ${result.libtorch.torchConfigFound ? 'found — CMake find_package(Torch) will succeed' : 'not found — LibTorch path wrong or missing'} |
+
+## Python Interpreter
+
+| Field | Value |
+|-------|-------|
+| Path | \`${result.python.path ?? 'not found'}\` |
+| Version | ${result.python.version ?? 'unknown'} |
+| Source | ${result.python.source} |
+| pyenv .python-version | ${result.python.pyenvVersion ?? 'not set'} |
+| Version mismatch | ${wn(result.python.versionMismatch)} ${result.python.versionMismatch ? `**MISMATCH** — pyenv wants ${result.python.pyenvVersion} but interpreter is ${result.python.version}` : 'OK'} |
+
+## VS Code CMake Settings
+
+| Setting | Value |
+|---------|-------|
+| cmake.defaultConfigurePreset | \`${result.vsCode.cmakePreset ?? '(not set)'}\` |
+| cmake.sourceDirectory | \`${result.vsCode.cmakeSourceDir ?? '(not set)'}\` |
+| cmake.generator | \`${result.vsCode.generator ?? '(not set)'}\` |
+
+## Preset Audit (win32/x86 guard)
+
+${presetAudit.found
+  ? (presetAudit.issues.length === 0
+    ? '✅ All configure presets use x64 architecture and host=x64 toolset — no win32 contamination.'
+    : '⚠️ **Issues detected:**\n\n' + presetAudit.issues.map(i => `- ${i}`).join('\n'))
+  : `❌ \`${PRESETS_FILE}\` not found`}
+
+## Build Capability Summary
+
+| Preset | Buildable | Reason |
+|--------|-----------|--------|
+| \`windows-x64-fallback\` | ✅ | MSVC + Node headers only (always) |
+| \`windows-x64-cuda-runtime\` | ${ck(result.summary.canBuildCudaRuntime)} | ${result.summary.canBuildCudaRuntime ? 'nvcc found' : 'needs nvcc + CUDA Toolkit'} |
+| \`windows-x64-cuda-cublas\` | ${ck(result.summary.canBuildCublas)} | ${result.summary.canBuildCublas ? 'cuBLAS found in toolkit' : 'needs CUDA Toolkit with cuBLAS'} |
+| \`windows-x64-cuda-libtorch\` | ${ck(result.summary.canBuildLibtorch)} | ${result.summary.canBuildLibtorch ? 'LibTorch + TorchConfig found' : 'needs LibTorch download + LIBTORCH_ROOT env'} |
+| \`windows-cuda\` (production) | ${ck(result.summary.canBuildLibtorch)} | same as above |
+| cuDNN (\`wsl2-cuda\`) | ${ck(result.summary.canBuildCudnn)} | ${result.summary.canBuildCudnn ? 'found' : 'Linux/WSL2 only'} |
+| cuVS CAGRA | ${ck(result.summary.canBuildCuvs)} | ${result.summary.canBuildCuvs ? 'RAPIDS found' : 'needs conda install -c rapidsai cuvs-cu13'} |
+| CUTLASS 3.x | ${ck(result.summary.canBuildCutlass)} | ${result.summary.canBuildCutlass ? 'headers found' : 'needs git clone NVIDIA/cutlass'} |
+
+${result.summary.win32Detected
+  ? `## ⚠️ Architecture Issues\n\n${presetAudit.issues.map(i => `- ${i}`).join('\n')}\n\n**Fix**: all presets must have \`"architecture": "x64"\` and \`"toolset": { "value": "host=x64" }\`.\n`
+  : ''}
+## Recommended Commands
+
+\`\`\`powershell
+# Step 1 — always works (no GPU needed)
+cmake --preset windows-x64-fallback
+cmake --build --preset build-windows-x64-fallback
+
+# Step 2 — if CUDA Toolkit detected
+${result.summary.canBuildCublas ? 'cmake --preset windows-x64-cuda-cublas\ncmake --build --preset build-windows-x64-cuda-cublas' : '# ❌ cuBLAS not found — install CUDA Toolkit first'}
+
+# Step 3 — full production build
+${result.summary.canBuildLibtorch ? 'cmake --preset windows-x64-cuda-libtorch\ncmake --build --preset build-windows-x64-cuda-libtorch\n# OR\ncmake --preset windows-cuda\ncmake --build --preset release' : '# ❌ LibTorch not found — set LIBTORCH_ROOT=' + (result.libtorch.root ?? 'C:/libtorch-.../libtorch')}
+\`\`\`
+
+---
+*Output: \`.tmp/gpu-capabilities-audit.json\` + \`.tmp/gpu-capabilities-audit.md\`*
+*Reference: [docs/native/gpu-primitives-map.md](../../docs/native/gpu-primitives-map.md)*
+`;
+
+fs.writeFileSync(OUT_MD, md);
+
+// ── Console summary ───────────────────────────────────────────────────────
+
+console.log('\n═══ GPU Capabilities Audit ════════════════════════════════════');
+console.log(`  CUDA Runtime    : ${result.cudaRuntime.found ? `✅ v${result.cudaRuntime.toolkitVersion} at ${result.cudaRuntime.root}` : '❌ not found'}`);
+console.log(`  nvcc            : ${result.cudaRuntime.nvccVersion ? '✅ ' + result.cudaRuntime.nvccVersion.split('\n')[0] : '❌ not found'}`);
+console.log(`  cudart lib      : ${result.cudaRuntime.cudartLibFound ? '✅' : '❌'}`);
+console.log(`  cuBLAS          : ${result.cuBLAS.found ? '✅' : '❌'}`);
+console.log(`  cuBLASLt        : ${result.cuBLAS.ltFound ? '✅' : '❌'}`);
+console.log(`  cuDNN           : ${result.cuDNN.found ? `✅ v${result.cuDNN.version}` : `❌ ${result.cuDNN.note}`}`);
+console.log(`  cuVS/CAGRA      : ${result.cuVS.found ? `✅ CAGRA=${result.cuVS.hasCagra} IVF-RaBitQ=${result.cuVS.hasIvfRabitq}` : '❌ not found'}`);
+console.log(`  CUTLASS 3.x     : ${result.cutlass.found ? `✅ ${result.cutlass.root}` : '❌ not found'}`);
+console.log(`  LibTorch        : ${result.libtorch.found ? `✅ ${result.libtorch.root}` : '❌ not found'}`);
+console.log(`  TorchConfig     : ${result.libtorch.torchConfigFound ? '✅' : '❌'}`);
+console.log(`  Python          : ${result.python.version ?? '❌'} [${result.python.source}]`);
+console.log(`  VS Code preset  : ${result.vsCode.cmakePreset ?? '(not set)'}`);
+console.log(`  Preset issues   : ${presetAudit.issues.length === 0 ? '✅ none' : '⚠️  ' + presetAudit.issues.join('; ')}`);
+console.log('───────────────────────────────────────────────────────────────');
+console.log(`  Build fallback  : ✅ always`);
+console.log(`  Build cuda-rt   : ${result.summary.canBuildCudaRuntime ? '✅' : '❌ needs nvcc'}`);
+console.log(`  Build cublas    : ${result.summary.canBuildCublas ? '✅' : '❌ needs CUDA Toolkit cuBLAS'}`);
+console.log(`  Build libtorch  : ${result.summary.canBuildLibtorch ? '✅' : '❌ needs LibTorch + TorchConfig'}`);
+console.log('═══════════════════════════════════════════════════════════════');
+console.log(`\nWritten:\n  ${OUT_JSON}\n  ${OUT_MD}\n`);
