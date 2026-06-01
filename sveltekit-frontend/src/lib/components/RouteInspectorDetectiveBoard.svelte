@@ -124,7 +124,7 @@ route: route.path })
 
 	function openAstGraph() {
 		if (!route) return;
-		window.open(`/phase78/ast?route=${encodeURIComponent(route.path)}`, '_blank');
+		window.open(`/admin/ast-topology?route=${encodeURIComponent(route.path)}`, '_blank');
 	}
 
 	async function runPlaywrightCheck() {

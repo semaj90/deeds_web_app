@@ -82,7 +82,7 @@
 			{ label: 'System Config', desc: 'Application configuration', icon: 'settings', href: '/system-configuration' },
 			{ label: 'Admin Panel', desc: 'Administration dashboard', icon: 'shield', href: '/admin' },
 			{ label: 'Dev Tools', desc: 'Developer utilities', icon: 'code', href: '/admin/dev-tools' },
-			{ label: 'AST Topology', desc: 'Abstract syntax tree viewer', icon: 'network', href: '/ast-topology' },
+			{ label: 'AST Topology', desc: 'Abstract syntax tree viewer', icon: 'network', href: '/admin/ast-topology' },
 			{ label: 'Error Brain', desc: 'Error analysis system', icon: 'bug', href: '/admin/error-brain' },
 			{ label: 'Agentic Errors', desc: 'AI-detected error patterns', icon: 'bot', href: '/agentic-errors' },
 		],

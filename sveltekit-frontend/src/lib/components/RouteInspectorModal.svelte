@@ -42,7 +42,7 @@
 
 	function viewAst() {
 		if (route?.path) {
-			window.location.href = `/ast?route=${encodeURIComponent(route.path)}`;
+			window.open(`/admin/ast-topology?route=${encodeURIComponent(route.path)}`, '_blank');
 		}
 	}
 

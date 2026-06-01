@@ -140,7 +140,7 @@ route: route.route })
 	function openAstGraph() {
 		if (!route) return;
 		// however you're mapping route → AST graph URL
-		window.open(`/ast-graph?route=${encodeURIComponent(route.route)}`, '_blank');
+		window.open(`/admin/ast-topology?route=${encodeURIComponent(route.route)}`, '_blank');
 	}
 
 	async function runPlaywrightCheck() {

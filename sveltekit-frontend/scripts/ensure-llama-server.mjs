@@ -16,6 +16,9 @@ import { fileURLToPath } from 'node:url';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(scriptDir, '..');
+const workspaceRoot = projectRoot.endsWith('sveltekit-frontend')
+  ? path.resolve(projectRoot, '..')
+  : projectRoot;
 
 const HOST = process.env.LLAMA_SERVER_HOST ?? '127.0.0.1';
 const PORT = parseInt(process.env.LLAMA_SERVER_PORT ?? '8090', 10);
@@ -34,19 +37,21 @@ const LLAMA_EXE_CANDIDATES = [
 const MODEL_CANDIDATES = [
   process.env.ROTORQUANT_MODEL_PATH,
   process.env.TURBO_MODEL_PATH,
-  path.join(projectRoot, 'vendor', 'models', 'gemma4-legal.gguf'),
-  path.join(projectRoot, 'vendor', 'models', 'gemma4-rotorquant:latest.gguf'),
+  path.join(workspaceRoot, 'models', 'gemma4-legal-iq4xs-direct.gguf'),
+  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-iq4xs-direct.gguf'),
+  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-iq4xs.gguf'),
+  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-q4_k_m.gguf'),
+  path.join(workspaceRoot, 'vendor', 'models', 'gemma4-legal.gguf'),
+  path.join(workspaceRoot, 'vendor', 'models', 'gemma4-rotorquant:latest.gguf'),
   path.join(projectRoot, 'models', 'gemma4-legal-iq4xs-direct.gguf'),
-  path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-iq4xs-direct.gguf'),
-  path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-iq4xs.gguf'),
-  path.join(projectRoot, 'models', 'gemma4-rotorquant:latest-q4_k_m.gguf'),
 ].filter(Boolean);
 
 const MMPROJ_CANDIDATES = [
   process.env.MMPROJ_PATH,
+  path.join(workspaceRoot, 'models', 'mmproj-F16.gguf'),
+  path.join(workspaceRoot, 'models', 'mmproj-BF16.gguf'),
+  path.join(workspaceRoot, 'vendor', 'models', 'mmproj-gemma4.gguf'),
   path.join(projectRoot, 'models', 'mmproj-F16.gguf'),
-  path.join(projectRoot, 'vendor', 'models', 'mmproj-gemma4.gguf'),
-  path.join(projectRoot, 'models', 'mmproj-BF16.gguf'),
 ].filter(Boolean);
 
 function firstExisting(candidates) {
