@@ -150,9 +150,14 @@ async function main() {
   const tasks = reconciled.map((r) => {
     const id = shortId('MTODO', { section: r.section, line: r.lineNo, text: r.text.slice(0, 80) });
     const firstFile = r.fileStatuses[0]?.foundAt || r.fileStatuses[0]?.ref || '';
+    const featureId = `master-todo.${r.section.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`;
+    const sourceRef = `MASTER-FEATURE-TODO-2026-05-20.md:${r.lineNo}`;
     return {
       taskId: id,
-      featureKey: `master-todo.${r.section.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`,
+      featureKey: featureId,
+      feature_id: featureId,
+      source_ref: sourceRef,
+      sourceRefs: r.fileStatuses.filter(f => f.exists).map(f => f.foundAt).slice(0, 5),
       title: r.text.length > 80 ? r.text.slice(0, 77) + '…' : r.text,
       description: `${r.section}\nLine ${r.lineNo} of MASTER-FEATURE-TODO-2026-05-20.md.\nFiles: ${r.fileStatuses.map(f => (f.exists ? '✅' : '❌') + f.ref).join(', ') || 'none'}\nNPM scripts: ${r.scriptStatuses.map(s => (s.registered ? '✅' : '❌') + s.ref).join(', ') || 'none'}`,
       kanbanStatus: r.inferredStatus,
@@ -186,22 +191,32 @@ async function main() {
 
     if (MERGE && fs.existsSync(KANBAN_TARGET)) {
       const existing = JSON.parse(fs.readFileSync(KANBAN_TARGET, 'utf8'));
-      const existingIds = new Set();
+      const existingIds = new Map();
       for (const col of Object.values(existing.columns || {})) {
-        for (const t of col.tasks || []) existingIds.add(t.taskId);
+        for (let i = 0; i < (col.tasks || []).length; i++) {
+          const t = col.tasks[i];
+          existingIds.set(t.taskId, { col, index: i });
+        }
       }
       let added = 0;
+      let updated = 0;
       for (const t of tasks) {
-        if (existingIds.has(t.taskId)) continue;
+        const existingSlot = existingIds.get(t.taskId);
+        if (existingSlot) {
+          existingSlot.col.tasks[existingSlot.index] = t;
+          updated++;
+          continue;
+        }
         const col = existing.columns[t.kanbanStatus] || (existing.columns[t.kanbanStatus] = { label: t.kanbanStatus, tasks: [] });
         col.tasks.push(t);
+        existingIds.set(t.taskId, { col, index: col.tasks.length - 1 });
         added++;
       }
       existing.totalTasks = (existing.totalTasks || 0) + added;
       existing.generatedAt = new Date().toISOString();
-      existing.lastMasterTodoMerge = { addedTasks: added, mergedAt: new Date().toISOString() };
+      existing.lastMasterTodoMerge = { addedTasks: added, updatedTasks: updated, mergedAt: new Date().toISOString() };
       fs.writeFileSync(KANBAN_TARGET, JSON.stringify(existing, null, 2), 'utf8');
-      console.log(`  ✅ Merged ${added} tasks into ${KANBAN_TARGET}`);
+      console.log(`  ✅ Merged ${added} tasks and updated ${updated} tasks into ${KANBAN_TARGET}`);
     }
 
     const report = {

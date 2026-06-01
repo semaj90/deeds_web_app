@@ -18,12 +18,33 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { computeKarpathyBlend, computeAttentionScore } from '../../sveltekit-frontend/src/lib/server/scoring/authority-scorer.js';
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../../sveltekit-frontend');
 const REPO = resolve(ROOT, '..');
 const esmRequire = createRequire(import.meta.url);
+
+function computeKarpathyBlend(pr, authority, attention) {
+  return (pr * 0.4) + (authority * 0.3) + (attention * 0.3);
+}
+
+function cosineSimilarity(v1, v2) {
+  if (!v1 || !v2 || v1.length !== v2.length || v1.length === 0) return 0;
+  let dot = 0;
+  let norm1 = 0;
+  let norm2 = 0;
+  for (let i = 0; i < v1.length; i++) {
+    dot += v1[i] * v2[i];
+    norm1 += v1[i] * v1[i];
+    norm2 += v2[i] * v2[i];
+  }
+  if (norm1 === 0 || norm2 === 0) return 0;
+  return dot / (Math.sqrt(norm1) * Math.sqrt(norm2));
+}
+
+function computeAttentionScore(vector, queryVector) {
+  const cosine = cosineSimilarity(vector, queryVector);
+  return Math.max(0, Math.min(1, (cosine + 1) / 2));
+}
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);

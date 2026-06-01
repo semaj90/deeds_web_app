@@ -1024,7 +1024,7 @@
 		"redis:config": "redis-cli config get \"*\"",
 		"redis:setup": "node -e \"import('$lib/utils/redis-helper.js').then(m => m.setupRedisFromConfig())\"",
 		"db:init:full": "npm run db:init && npm run db:seed",
-		"db:seed": "npx tsx src/lib/server/db/seed.ts",
+		"db:seed": "npx tsx src/lib/server/features/evidence/db/seed.ts",
 		"db:seed:demo": "npm run db:seed",
 		"test:e2e:demo": "npm run db:seed:demo && playwright test tests/e2e/demo-seed.spec.ts",
 		"db:migrate": "drizzle-kit migrate",

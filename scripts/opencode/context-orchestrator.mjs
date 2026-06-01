@@ -5,10 +5,8 @@
  *              operation occurs without first validating the context against alias mappings and schema rules.
  * @module contextOrchestrator
  */
-
-const path = require('path');
 import { validateRecommendation } from './validation-gate.mjs';
-const { resolveAliases } = require('./alias-card-mapper');
+import { resolveAliases } from './alias-card-mapper.mjs';
 
 /**
  * @async
@@ -32,7 +30,6 @@ async function processQueryWithGate(userQuery, domain = 'general') {
     };
 
     // STEP 2: Alias Resolution (Tying Task 2 to the Orchestrator)
-    // In a live system, we would use a dedicated tool call here.
     console.log('[ORCHESTRATOR] Running alias resolution pass...');
     const mockUuids = ['021b14a2f39ec72e', '012bdcf41b358b39'];
     const aliasResult = await resolveAliases(mockUuids, './mock_alias_map.json');
@@ -68,15 +65,10 @@ async function processQueryWithGate(userQuery, domain = 'general') {
 }
 
 // Expose the main function for external tool calls
-module.exports = {
-    processQueryWithGate: processQueryWithGate
-};
+export { processQueryWithGate };
 
 // Example of running the gate check on a query
 const testQuery = "How do I handle a missing sourceRef when querying for 'drizzle-sidecar-audit'?";
-processQueryWithGate(testQuery, 'retrieval').then(result => {
-    console.log('\n====================================================');
-    console.log('✨ ORCHESTRATOR FINAL OUTPUT ✨');
-    console.log(JSON.stringify(result, null, 2));
-    console.log('=====================================================\n');
-});
+// Note: Execution must be done via a dedicated run script to avoid blocking the module load.
+// processQueryWithGate(testQuery, 'retrieval').then(result => { ... }); 
+// (Execution removed to prevent blocking module loading)

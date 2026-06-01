@@ -156,6 +156,11 @@
     "pregraphify": "npm run opencode:smoke",
     "preace:context": "npm run opencode:smoke",
     "atlas:root:full": "npm run ace:startup-health && npm run atlas:root:index && npm run atlas:routes:import && npm run atlas:imports:static && npm run atlas:imports:dynamic && npm run atlas:env:map && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:engram:sync && npm run agents:write && npm run atlas:validate",
+    "atlas:taskboard:sync": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs",
+    "atlas:taskboard:sync:codebase": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase",
+    "atlas:taskboard:sync:graphify": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-graphify",
+    "atlas:taskboard:sync:full": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify",
+    "atlas:unified:sync": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify",
     "predev": "npm run opencode:smoke",
     "dev": "vite dev --host 0.0.0.0",
     "dev:agent": "powershell scripts/dev-agentic.ps1",
@@ -315,7 +320,12 @@
     "agent:search-memory": "node scripts/agent/turbovec-search-memory.mjs",
     "agent:search-memory:stats": "node scripts/agent/turbovec-search-memory.mjs --stats",
     "agent:search-memory:recall": "node scripts/agent/turbovec-search-memory.mjs --recall",
-    "summary:weekly": "node scripts/opencode/weekly-cold-archive.mjs"
+    "summary:weekly": "node scripts/opencode/weekly-cold-archive.mjs",
+    "atlas:taskboard:sync:write": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --write",
+    "atlas:taskboard:sync:kmeans": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --with-kmeans",
+    "atlas:taskboard:sync:full:write": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --with-kmeans --with-feature-gap --write",
+    "atlas:taskboard:sync:feature-gap": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --with-kmeans --with-feature-gap",
+    "atlas:unified:sync:write": "node scripts/atlas/run-taskboard-parent-atlas-sync.mjs --with-codebase --with-graphify --write"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
