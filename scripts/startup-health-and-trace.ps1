@@ -220,11 +220,30 @@ Add-Check -Name 'neo4j-auth-tx-commit' -Required $true -ScriptBlock {
 Add-Check -Name 'redis' -Required $false -ScriptBlock {
   $redisCli = Get-Command redis-cli -ErrorAction SilentlyContinue
   if ($redisCli) {
-    $pong = & $redisCli.Source -h 127.0.0.1 -p 6379 ping
-    if (-not ($pong -match 'PONG')) {
-      throw "redis-cli returned: $pong"
+    $redisPass = Get-EnvValue -Name 'REDIS_PASSWORD' -DotEnv $dotEnv
+    $redisPassword = $redisPass.value
+    $attempts = @(
+      @{ label = 'noauth'; args = @('-h', '127.0.0.1', '-p', '6379') },
+      @{ label = 'auth'; args = @('-h', '127.0.0.1', '-p', '6379', '-a', $redisPassword, '--no-auth-warning') }
+    ) | Where-Object { $_.label -ne 'auth' -or $redisPassword }
+
+    $lastOutput = $null
+    foreach ($attempt in $attempts) {
+      $cmd = @($redisCli.Source) + $attempt.args + @('ping')
+      $cmdArgs = $cmd[1..($cmd.Count - 1)]
+      $output = & $cmd[0] @cmdArgs 2>&1 | Out-String
+      $lastOutput = $output.Trim()
+      if ($lastOutput -match 'PONG') {
+        return @{ method = 'redis-cli'; pong = 'PONG'; auth_mode = $attempt.label }
+      }
     }
-    return @{ method = 'redis-cli'; pong = $pong }
+
+    return @{
+      method = 'redis-cli'
+      status = 'degraded'
+      auth_mode = if ($redisPassword) { 'auth-or-noauth-mismatch' } else { 'noauth-mismatch' }
+      error = $lastOutput
+    }
   }
 
   Test-TcpPort -HostName '127.0.0.1' -Port 6379 -TimeoutMs 2000
