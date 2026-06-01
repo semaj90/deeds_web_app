@@ -25,6 +25,27 @@ import fs from 'fs/promises';
 import { existsSync, statSync } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { createRequire } from 'module';
+
+const _require = createRequire(import.meta.url);
+
+// Real Ollama embed — falls back to pseudo if server unavailable
+async function ollamaEmbed(text, host = 'http://localhost:11434') {
+  try {
+    const res = await fetch(`${host}/api/embed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'embeddinggemma:latest', input: text }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const j = await res.json();
+    const vec = j.embeddings?.[0] ?? j.embedding;
+    return Array.isArray(vec) && vec.length === 768 ? vec : null;
+  } catch {
+    return null;
+  }
+}
 
 const ROOT = process.cwd();
 const CARDS_DIR   = path.join(ROOT, '.opencode', 'cards');
@@ -214,8 +235,10 @@ async function main() {
   const embCache = await loadEmbeddingCache();
   console.log(`  embeddings loaded: ${embCache.size}`);
 
-  // Embed the query (use pseudo-embed — real embedding wired in next gate)
-  const queryVec = pseudoEmbed(query);
+  // Embed the query: real Ollama embed → pseudo-embed fallback
+  const ollamaVec = await ollamaEmbed(query);
+  const queryVec = ollamaVec ?? pseudoEmbed(query);
+  console.log(`  query embed  : ${ollamaVec ? 'ollama (real)' : 'pseudo (fallback)'}`);
 
   const cardFiles = await fs.readdir(CARDS_DIR).catch(() => []);
   const jsonFiles = cardFiles.filter(f => /\.json$/.test(f));
