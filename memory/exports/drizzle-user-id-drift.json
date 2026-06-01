@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-05-31T23:35:27.552Z",
+  "schemaFilesScanned": 155,
+  "schemaDeclarations": 73,
+  "dbColumnsExamined": 48,
+  "counts": {
+    "drifts": 3,
+    "driftsHigh": 3,
+    "driftsLow": 0,
+    "dbOnlyTables": 2,
+    "declOnlyTables": 15
+  },
+  "drifts": [
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\db\\archived-schemas\\additional-tables.ts",
+      "table": "rag_sessions",
+      "column": "user_id",
+      "declaredType": "uuid",
+      "actualType": "integer",
+      "severity": "high"
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\db\\archived-schemas\\lucia-schema.ts",
+      "table": "sessions",
+      "column": "user_id",
+      "declaredType": "uuid",
+      "actualType": "integer",
+      "severity": "high"
+    },
+    {
+      "file": "sveltekit-frontend\\src\\lib\\server\\db\\archived-schemas\\additional-tables.ts",
+      "table": "user_ai_queries",
+      "column": "user_id",
+      "declaredType": "uuid",
+      "actualType": "integer",
+      "severity": "high"
+    }
+  ],
+  "dbOnly": [
+    {
+      "key": "admin_telemetry.user_id",
+      "dbType": "integer"
+    },
+    {
+      "key": "agent_actions.user_id",
+      "dbType": "integer"
+    }
+  ],
+  "declOnly": [
+    {
+      "key": "case_assignments.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\archived-schemas\\additional-tables.ts"
+      ]
+    },
+    {
+      "key": "search_queries.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\archived-schemas\\vector-schema.ts"
+      ]
+    },
+    {
+      "key": "web_crawl_jobs.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts"
+      ]
+    },
+    {
+      "key": "user_analytics.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts"
+      ]
+    },
+    {
+      "key": "ai_chat_sessions.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ace-web-crawl.ts"
+      ]
+    },
+    {
+      "key": "conversations.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\ai_chat.ts"
+      ]
+    },
+    {
+      "key": "error_feedback.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema\\error_feedback.ts"
+      ]
+    },
+    {
+      "key": "canvas_autosaves.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-canvas-autosaves.ts"
+      ]
+    },
+    {
+      "key": "case_timeline.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-charges.ts"
+      ]
+    },
+    {
+      "key": "shader_user_patterns.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-gpu-cache.ts"
+      ]
+    },
+    {
+      "key": "shader_compilation_queue.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-gpu-cache.ts"
+      ]
+    },
+    {
+      "key": "shader_recommendations_view.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-gpu-cache.ts"
+      ]
+    },
+    {
+      "key": "ingested_documents.uploaded_by",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-ingestion.ts"
+      ]
+    },
+    {
+      "key": "vector_search_logs.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-ingestion.ts"
+      ]
+    },
+    {
+      "key": "user_timeline.user_id",
+      "declarations": [
+        "sveltekit-frontend\\src\\lib\\server\\db\\schema-timeline.ts"
+      ]
+    }
+  ]
+}

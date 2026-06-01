@@ -1,0 +1,950 @@
+{
+  "timestamp": "2026-05-31T23:34:54.214Z",
+  "schemaFilesScanned": 155,
+  "totalColumnDeclarations": 2748,
+  "focusColumns": [
+    "user_id",
+    "uploaded_by"
+  ],
+  "focusDeclarationsCount": 73,
+  "liveDbDistribution": {
+    "user_id": {
+      "integer": 43,
+      "text": 3
+    },
+    "uploaded_by": {
+      "integer": 2
+    }
+  },
+  "drift": {
+    "totalMismatches": 92,
+    "byFile": {
+      "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts": 46,
+      "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts": 3,
+      "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts": 43
+    },
+    "details": [
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "ace_context_cache",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "admin_ai_chat_sessions",
+        "liveType": "text",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "admin_telemetry",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "agent_actions",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "ai_usage_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "analytics_events",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "api_audit_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "audit_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "canvas_states",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "cases",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "chat_messages",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "chat_metadata",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "chunk_hit_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "citation_collections",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "context_timeline",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "diagnosis_events",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "documents",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "email_verification_codes",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "error_suggestion_states",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "evidence",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "evidence_audit_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "legal_analysis_sessions",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "legal_documents",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "llm_outputs",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "llm_synthesis_events",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "panel_activity_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "password_reset_tokens",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "rag_query_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "rag_sessions",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "report_audit_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "research_summaries",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "response_feedback",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "rg_search_runs",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "saved_citation_annotations",
+        "liveType": "text",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "saved_citations",
+        "liveType": "text",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "saved_reports",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "sessions",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "storage_files",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "synthesis_runs",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "themes",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "user_ai_queries",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "user_analytics_events",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "user_embeddings",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "user_interaction_history",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "user_research_tasks",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "yorha_chat_sessions",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+        "line": 28,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "integer",
+        "liveTable": "admin_ai_chat_sessions",
+        "liveType": "text",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+        "line": 28,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "integer",
+        "liveTable": "saved_citation_annotations",
+        "liveType": "text",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+        "line": 28,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "integer",
+        "liveTable": "saved_citations",
+        "liveType": "text",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "ace_context_cache",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "admin_telemetry",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "agent_actions",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "ai_usage_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "analytics_events",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "api_audit_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "audit_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "canvas_states",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "cases",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "chat_messages",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "chat_metadata",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "chunk_hit_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "citation_collections",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "context_timeline",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "diagnosis_events",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "documents",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "email_verification_codes",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "error_suggestion_states",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "evidence",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "evidence_audit_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "legal_analysis_sessions",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "legal_documents",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "llm_outputs",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "llm_synthesis_events",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "panel_activity_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "password_reset_tokens",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "rag_query_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "rag_sessions",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "report_audit_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "research_summaries",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "response_feedback",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "rg_search_runs",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "saved_reports",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "sessions",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "storage_files",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "synthesis_runs",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "themes",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "user_ai_queries",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "user_analytics_events",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "user_embeddings",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "user_interaction_history",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "user_research_tasks",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "yorha_chat_sessions",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      }
+    ]
+  },
+  "recommendation": "Run drizzle-kit introspect to regenerate canonical schema from live DB, then diff vs current schema files."
+}
