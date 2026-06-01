@@ -1,11 +1,11 @@
-import { getRouteClusterPriors, getRouteFeatureMap } from '$lib/server/atlas/route-feature-map.js';
+import { getRouteClusterPriors, getRouteFeatureMap } from '../atlas/route-feature-map.js';
 import {
   normalizeLabels,
   type LabelNormalizationInput,
   type NormalizedLabels,
-} from '$lib/server/labels/normalize-labels.js';
-import { normalizeFeatureLabel, type FeatureLabelKey } from '$lib/server/labels/feature-label-registry.js';
-import { expandNeighbours, fetchAuthorityScores } from '$lib/server/search/neo4j-rerank.js';
+} from '../labels/normalize-labels.js';
+import { normalizeFeatureLabel, type FeatureLabelKey } from '../labels/feature-label-registry.js';
+import { expandNeighbours, fetchAuthorityScores } from '../search/neo4j-rerank.js';
 
 export const SUBGRAPH_V1_VERSION = 'subgraph_v1_seed_neighborhood';
 export const DEFAULT_MAX_SEEDS = 8;

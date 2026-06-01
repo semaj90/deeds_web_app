@@ -571,64 +571,85 @@ const TOOLS = {
   },
 };
 
+// ── Shared dispatch core ───────────────────────────────────────────────────────
+
+const log = (...a) => process.stderr.write('[engram-embed] ' + a.join(' ') + '\n');
+
+async function dispatchRpc(rpc) {
+  const { method, params, id } = rpc;
+
+  if (method === 'initialize') {
+    return { jsonrpc: '2.0', id, result: { protocolVersion: '2024-11-05', capabilities: { tools: {} }, serverInfo: { name: 'engram-embed', version: '2.0.0' } } };
+  }
+
+  if (method === 'notifications/initialized') return null;
+
+  if (method === 'tools/list') {
+    return { jsonrpc: '2.0', id, result: { tools: Object.entries(TOOLS).map(([name, t]) => ({ name, description: t.description, inputSchema: t.inputSchema })) } };
+  }
+
+  if (method === 'tools/call') {
+    const toolName = params?.name;
+    const tool = TOOLS[toolName];
+    if (!tool) return { jsonrpc: '2.0', id, error: { code: -32601, message: `Tool not found: ${toolName}` } };
+    try {
+      const result = await tool.handler(params?.arguments ?? {});
+      return { jsonrpc: '2.0', id, result: { content: [{ type: 'text', text: JSON.stringify(result) }] } };
+    } catch (err) {
+      return { jsonrpc: '2.0', id, error: { code: -32603, message: err.message } };
+    }
+  }
+
+  if (id !== undefined) return { jsonrpc: '2.0', id, error: { code: -32601, message: `Unknown method: ${method}` } };
+  return null;
+}
+
+// ── MCP HTTP transport (type: http) ───────────────────────────────────────────
+// smoke-opencode-mcp-sidecars.mjs and mcp-probe.mjs POST JSON-RPC to /mcp
+
+const httpServer = createServer(async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
+
+  if (req.url === '/health' || req.url === '/healthz') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', server: 'engram-embed-mcp', port: PORT }));
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/mcp') {
+    let body = '';
+    for await (const chunk of req) body += chunk;
+    let rpc;
+    try { rpc = JSON.parse(body); } catch {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid JSON' }));
+      return;
+    }
+    const response = await dispatchRpc(rpc);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(response ? JSON.stringify(response) : '');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'not found' }));
+});
+
 // ── MCP stdio transport (type: local) ─────────────────────────────────────────
 // opencode spawns this as a child process and speaks newline-delimited JSON-RPC
 // over stdin/stdout. stderr is for human-readable logs only.
-
-const log = (...a) => process.stderr.write('[engram-embed] ' + a.join(' ') + '\n');
 
 function send(obj) {
   process.stdout.write(JSON.stringify(obj) + '\n');
 }
 
 async function dispatch(rpc) {
-  const { method, params, id } = rpc;
-
-  if (method === 'initialize') {
-    send({
-      jsonrpc: '2.0', id,
-      result: {
-        protocolVersion: '2024-11-05',
-        capabilities: { tools: {} },
-        serverInfo: { name: 'engram-embed', version: '2.0.0' },
-      },
-    });
-    return;
-  }
-
-  if (method === 'notifications/initialized') return; // no response needed
-
-  if (method === 'tools/list') {
-    send({
-      jsonrpc: '2.0', id,
-      result: {
-        tools: Object.entries(TOOLS).map(([name, t]) => ({
-          name, description: t.description, inputSchema: t.inputSchema,
-        })),
-      },
-    });
-    return;
-  }
-
-  if (method === 'tools/call') {
-    const toolName = params?.name;
-    const tool = TOOLS[toolName];
-    if (!tool) {
-      send({ jsonrpc: '2.0', id, error: { code: -32601, message: `Tool not found: ${toolName}` } });
-      return;
-    }
-    try {
-      const result = await tool.handler(params?.arguments ?? {});
-      send({ jsonrpc: '2.0', id, result: { content: [{ type: 'text', text: JSON.stringify(result) }] } });
-    } catch (err) {
-      send({ jsonrpc: '2.0', id, error: { code: -32603, message: err.message } });
-    }
-    return;
-  }
-
-  if (id !== undefined) {
-    send({ jsonrpc: '2.0', id, error: { code: -32601, message: `Unknown method: ${method}` } });
-  }
+  const response = await dispatchRpc(rpc);
+  if (response) send(response);
 }
 
 // Health-check mode: node engram-embed-mcp.mjs --health
@@ -640,6 +661,9 @@ if (process.argv.includes('--health')) {
 
 log(`ready — embed=${EMBED_MODEL} ollama=${OLLAMA_URL} qdrant=${QDRANT_URL} redis=${REDIS_URL}`);
 log(`tools: ${Object.keys(TOOLS).join(', ')}`);
+log(`HTTP MCP listening on http://127.0.0.1:${PORT}/mcp`);
+
+httpServer.listen(PORT, '127.0.0.1');
 
 // Read newline-delimited JSON-RPC from stdin
 import { createInterface } from 'node:readline';
@@ -656,5 +680,5 @@ rl.on('line', async (line) => {
 });
 
 rl.on('close', () => process.exit(0));
-process.on('SIGTERM', () => process.exit(0));
-process.on('SIGINT',  () => process.exit(0));
+process.on('SIGTERM', () => { httpServer.close(); process.exit(0); });
+process.on('SIGINT',  () => { httpServer.close(); process.exit(0); });

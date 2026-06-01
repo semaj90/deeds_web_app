@@ -7,8 +7,31 @@
 
 import { browser } from '$app/environment';
 
+function isVscodeWebviewContext(): boolean {
+	if (!browser || typeof window === 'undefined') return false;
+
+	const globalWindow = window as Window & {
+		acquireVsCodeApi?: unknown;
+	};
+
+	// VS Code webviews run in an embedded browser context where service worker
+	// registration is commonly rejected with an "invalid state" error.
+	// Skip registration entirely in those contexts so the app can still render
+	// without tripping the extension host/webview lifecycle.
+	const protocol = window.location?.protocol ?? '';
+	return (
+		protocol.startsWith('vscode-webview') ||
+		protocol.startsWith('vscode-resource') ||
+		typeof globalWindow.acquireVsCodeApi === 'function'
+	);
+}
+
 export async function registerServiceWorker() {
 	if (!browser || !('serviceWorker' in navigator)) return;
+	if (isVscodeWebviewContext()) {
+		console.info('SW: Skipping registration in VS Code webview context.');
+		return;
+	}
 
 	try {
 		const registration = await navigator.serviceWorker.register('/sw.js', {

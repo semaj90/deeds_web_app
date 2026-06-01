@@ -298,6 +298,11 @@ async function runIncrementalLane(redis) {
       //           latest synthesis run files, all screenshot captions (24h).
       // Idempotent — same-day re-runs atomically replace.
       runStep('archive llm summaries', 'archive:llm', { required: false, timeout: 60_000 });
+
+      // weekly-cold-archive — rolls up the last 7 nightly summaries into a
+      // durable bundle and mirrors it into the ACE source trail when DATABASE_URL
+      // is available. This remains optional so startup still fail-opens.
+      runStep('archive weekly cold', 'archive:weekly-cold', { required: false, timeout: 90_000 });
     }
 
     // ── Health + smoke — always run regardless of whether files changed ───────

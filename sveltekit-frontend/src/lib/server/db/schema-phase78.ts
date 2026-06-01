@@ -223,7 +223,7 @@ export const errorSuggestionStates = pgTable(
 			.notNull()
 			.references(() => errorSuggestions.id, { onDelete: 'cascade' }),
 		routePath: text('route_path').notNull(),
-		userId: uuid('user_id'),
+		userId: integer('user_id'),
 		state: suggestionStateEnum('state').notNull().default('pending'),
 		createdAt: timestamp('created_at').notNull().defaultNow(),
 		updatedAt: timestamp('updated_at').notNull().defaultNow()

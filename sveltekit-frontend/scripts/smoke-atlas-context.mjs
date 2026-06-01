@@ -25,6 +25,7 @@ const ROOT      = resolve(__dirname, '..');
 
 const MCP_URL    = process.env.MCP_URL    ?? 'http://127.0.0.1:8788/mcp';
 const APP_BASE    = process.env.PUBLIC_APP_URL ?? process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+const SVELTEKIT_BASES = [APP_BASE, 'http://127.0.0.1:5174', 'http://127.0.0.1:4173'].filter((v, i, a) => a.indexOf(v) === i);
 const JSON_OUT   = process.argv.includes('--json');
 const STRICT     = process.argv.includes('--strict');
 

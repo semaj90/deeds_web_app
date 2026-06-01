@@ -274,12 +274,13 @@ async function phase1() {
     info('[dry] docker-compose up -d (full + seaweedfs profiles)');
   }
 
-  // TurboQuant llama-server (uses its own launch script)
-  const turboScript = path.join(projectRoot, 'scripts', 'launch-turboquant.ps1');
-  if (existsSync(turboScript)) {
-    spawnDetached('TurboQuant :8090', 'pwsh', [
-      '-NoProfile', '-ExecutionPolicy', 'Bypass',
-      '-File', turboScript,
+  // TurboQuant llama-server — use the newer ensure wrapper so detached startup
+  // matches the rest of the workspace launch chain.
+  const ensureLlama = path.join(projectRoot, 'scripts', 'ensure-llama-server.mjs');
+  if (existsSync(ensureLlama)) {
+    spawnDetached('TurboQuant :8090', process.execPath, [
+      ensureLlama,
+      '--spawn',
     ]);
   }
 

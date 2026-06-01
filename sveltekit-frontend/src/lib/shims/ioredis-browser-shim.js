@@ -25,6 +25,16 @@ export default class RedisShim {
 		this.initializeOfflineStorage();
 	}
 
+	isEmbeddedWebviewContext() {
+		if (typeof window === 'undefined') return false;
+		const protocol = window.location?.protocol ?? '';
+		return (
+			protocol.startsWith('vscode-webview') ||
+			protocol.startsWith('vscode-resource') ||
+			typeof window.acquireVsCodeApi === 'function'
+		);
+	}
+
 	async initializeOfflineStorage() {
 		try {
 			if (typeof window === 'undefined') {
@@ -35,7 +45,7 @@ export default class RedisShim {
 			localStorage.removeItem('redis-test');
 			this.offlineMode = true;
 
-			if (this.config.useServiceWorker && 'serviceWorker' in navigator) {
+			if (this.config.useServiceWorker && 'serviceWorker' in navigator && !this.isEmbeddedWebviewContext()) {
 				try {
 					await navigator.serviceWorker.register('/sw.js');
 				} catch (_) {
