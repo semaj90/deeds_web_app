@@ -11,7 +11,7 @@
  */
 
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
-import { join, resolve, relative, dirname, basename, extname } from 'path';
+import { join, resolve, dirname, extname, relative } from 'path';
 import { createHash } from 'crypto';
 
 const args = process.argv.slice(2);
@@ -139,33 +139,57 @@ for (const doc of mapResults) {
 
 // Join: resolve import references
 const consolidatedDocs = mapResults.map(doc => {
-  const resolvedStaticImports = doc.staticImports.map(importPath => {
-    const normalized = normalizeImportPath(importPath, doc.filePath);
-    const target = filesByPath.get(normalized);
-    return {
-      path: importPath,
-      normalized,
-      exists: !!target,
-      targetStableKey: target?.stableKey,
-      targetFeature: target?.feature,
-    };
-  });
+  const resolvedStaticImports = doc.staticImports
+    .map(importPath => {
+      const normalized = normalizeImportPath(importPath, doc.filePath);
+      if (!normalized) {
+        return {
+          path: importPath,
+          normalized: null,
+          exists: true,
+          external: true,
+          targetStableKey: null,
+          targetFeature: null,
+        };
+      }
+      const target = filesByPath.get(normalized);
+      return {
+        path: importPath,
+        normalized,
+        exists: !!target,
+        external: false,
+        targetStableKey: target?.stableKey,
+        targetFeature: target?.feature,
+      };
+    });
 
-  const resolvedDynamicImports = doc.dynamicImports.map(importPath => {
-    const normalized = normalizeImportPath(importPath, doc.filePath);
-    const target = filesByPath.get(normalized);
-    return {
-      path: importPath,
-      normalized,
-      exists: !!target,
-      targetStableKey: target?.stableKey,
-      targetFeature: target?.feature,
-    };
-  });
+  const resolvedDynamicImports = doc.dynamicImports
+    .map(importPath => {
+      const normalized = normalizeImportPath(importPath, doc.filePath);
+      if (!normalized) {
+        return {
+          path: importPath,
+          normalized: null,
+          exists: true,
+          external: true,
+          targetStableKey: null,
+          targetFeature: null,
+        };
+      }
+      const target = filesByPath.get(normalized);
+      return {
+        path: importPath,
+        normalized,
+        exists: !!target,
+        external: false,
+        targetStableKey: target?.stableKey,
+        targetFeature: target?.feature,
+      };
+    });
 
   const importErrors = [
-    ...resolvedStaticImports.filter(i => !i.exists),
-    ...resolvedDynamicImports.filter(i => !i.exists),
+    ...resolvedStaticImports.filter(i => !i.exists && !i.external),
+    ...resolvedDynamicImports.filter(i => !i.exists && !i.external),
   ];
 
   return {
@@ -338,16 +362,60 @@ function classifyFeature(filePath) {
 }
 
 function normalizeImportPath(importPath, fromFile) {
-  // Resolve $lib -> src/lib
+  // Only treat workspace-local imports as resolvable targets.
+  // Package/builtin imports are marked external and excluded from dangling-ref counts.
+  let rawAbs = null;
+
   if (importPath.startsWith('$lib')) {
-    return importPath.replace('$lib', 'src/lib') + (importPath.endsWith('.ts') ? '' : '.ts');
+    rawAbs = join(REPO_ROOT, 'sveltekit-frontend', 'src', 'lib', importPath.slice('$lib/'.length));
+  } else if (importPath.startsWith('.')) {
+    const base = dirname(join(REPO_ROOT, 'sveltekit-frontend', fromFile));
+    rawAbs = join(base, importPath);
+  } else if (importPath.startsWith('src/')) {
+    rawAbs = join(REPO_ROOT, 'sveltekit-frontend', importPath);
+  } else {
+    return null;
   }
-  // Relative imports (../../, ./)
-  if (importPath.startsWith('.')) {
-    const base = dirname(fromFile);
-    const resolved = join(base, importPath);
-    return resolved + (importPath.endsWith('.ts') ? '' : '.ts');
+
+  rawAbs = stripKnownImportExtension(rawAbs);
+  const candidates = expandImportCandidates(rawAbs);
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return toRepoRelative(candidate);
   }
-  // Assume src/lib prefix for bare imports
-  return 'src/lib/' + importPath + '.ts';
+  return toRepoRelative(candidates[0]);
+}
+
+function stripKnownImportExtension(absPath) {
+  return absPath.replace(/\.(ts|tsx|js|mjs|cjs|json|svelte)$/i, '');
+}
+
+function expandImportCandidates(rawPath) {
+  // Strip trailing slashes then strip a trailing .js or .mjs extension so that
+  // "foo.js" expands to "foo.ts", "foo.js", etc. rather than "foo.js.ts".
+  let base = rawPath.replace(/[\\/]+$/, '');
+  base = base.replace(/\.(js|mjs)$/, '');
+  const candidates = new Set([
+    base,
+    `${base}.ts`,
+    `${base}.tsx`,
+    `${base}.js`,
+    `${base}.mjs`,
+    join(base, 'index.ts'),
+    join(base, 'index.tsx'),
+    join(base, 'index.js'),
+    join(base, 'index.mjs'),
+    `${base}.svelte`,
+  ]);
+  return [...candidates];
+}
+
+function toRepoRelative(absPath) {
+  // Return path relative to repo root, normalised to backslashes to match
+  // the filePath keys stored in filesByPath (e.g. "src\lib\server\db\client.ts").
+  // Also strip the "sveltekit-frontend\" prefix so $lib imports map correctly.
+  let rel = relative(REPO_ROOT, absPath);
+  if (rel.startsWith('sveltekit-frontend\\') || rel.startsWith('sveltekit-frontend/')) {
+    rel = rel.slice('sveltekit-frontend/'.length);
+  }
+  return rel.replace(/\//g, '\\');
 }

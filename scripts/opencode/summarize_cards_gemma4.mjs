@@ -7,8 +7,13 @@ import { join } from 'path';
 const INDEX = '.opencode/cards/index.json';
 const CARDS_DIR = '.opencode/cards';
 const SUMMARIES_JSONL = '.opencode/cards/summaries.jsonl';
-const GEMMA4_URL = process.env.GEMMA4_URL || process.env.OLLAMA_URL || process.env.TURBOQUANT_URL || process.env.LLM_SERVER_URL;
-const MODEL = process.env.GEMMA4_MODEL || process.env.OLLAMA_MODEL || 'gemma4';
+const GEMMA4_URL =
+  process.env.GEMMA4_URL ||
+  process.env.OLLAMA_URL ||
+  process.env.TURBOQUANT_URL ||
+  process.env.LLM_SERVER_URL ||
+  'http://127.0.0.1:8090/v1';
+const MODEL = process.env.GEMMA4_MODEL || process.env.OLLAMA_MODEL || 'gemma4-tq';
 const CONCURRENCY = Number(process.env.SUMMARY_CONCURRENCY || 1);
 
 function usage(){
@@ -38,19 +43,31 @@ async function readSeen(){
 async function callGemma(prompt){
   if(!GEMMA4_URL) throw new Error('GEMMA4_URL not set');
   const url = GEMMA4_URL.replace(/\/$/, '');
-  const payload = {}
-  // Ollama-style
-  if(url.includes('ollama') || url.includes('v1/chat')){
-    payload.model = MODEL;
-    payload.prompt = prompt;
-  }else{
-    payload.model = MODEL;
-    payload.prompt = prompt;
-  }
-  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const endpoint = url.includes('/chat/completions')
+    ? url
+    : url.endsWith('/v1')
+      ? `${url}/chat/completions`
+      : `${url}/v1/chat/completions`;
+  const payload = {
+    model: MODEL,
+    temperature: 0.2,
+    max_tokens: 1024,
+    messages: [{ role: 'user', content: prompt }],
+  };
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer local' },
+    body: JSON.stringify(payload)
+  });
   if(!res.ok) throw new Error(`LLM request failed: ${res.status} ${res.statusText}`);
   const text = await res.text();
-  try{ return JSON.parse(text); }catch(e){ return { raw: text }; }
+  try{
+    const parsed = JSON.parse(text);
+    const content = parsed?.choices?.[0]?.message?.content;
+    return content ? { raw: parsed, content } : parsed;
+  }catch(e){
+    return { raw: text };
+  }
 }
 
 function buildPrompt(card){
@@ -82,9 +99,24 @@ async function main(){
         console.log('Summarizing', meta.id);
         try{
           const resp = await callGemma(prompt);
-          const summary = resp.summary ?? resp.text ?? resp.output ?? (typeof resp === 'string' ? resp : JSON.stringify(resp));
-          const keywords = resp.keywords ?? resp.kws ?? resp.tags ?? [];
-          const tags = resp.tags ?? [];
+          let summary = '';
+          let keywords = [];
+          let tags = [];
+          if (resp && typeof resp === 'object' && 'content' in resp) {
+            const raw = String(resp.content);
+            try {
+              const parsed = JSON.parse(raw);
+              summary = parsed.summary ?? parsed.text ?? parsed.output ?? raw;
+              keywords = parsed.keywords ?? parsed.kws ?? parsed.tags ?? [];
+              tags = parsed.tags ?? [];
+            } catch {
+              summary = raw;
+            }
+          } else {
+            summary = resp.summary ?? resp.text ?? resp.output ?? (typeof resp === 'string' ? resp : JSON.stringify(resp));
+            keywords = resp.keywords ?? resp.kws ?? resp.tags ?? [];
+            tags = resp.tags ?? [];
+          }
           const out = { card_id: meta.id, sourceRef: card.sourceRef || meta.file, summary: String(summary).trim(), keywords: Array.isArray(keywords)?keywords:[], tags: Array.isArray(tags)?tags:[], mtime: Math.floor(Date.now()/1000) };
           await fs.appendFile(SUMMARIES_JSONL, JSON.stringify(out) + '\n', 'utf8');
           console.log('Wrote summary for', meta.id);

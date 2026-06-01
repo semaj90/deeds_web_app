@@ -1,0 +1,20 @@
+{
+    "021b14a2f39ec72e": {
+        "alias": "drizzle-sidecar-audit",
+        "source_ref": "scripts/atlas/audit-drizzle-sidecars.mjs",
+        "confidence": "high",
+        "evidence": "matched file path + title phrase"
+    },
+    "012bdcf41b358b39": {
+        "alias": "user-profile-service",
+        "source_ref": "services/user-auth.ts",
+        "confidence": "medium",
+        "evidence": "API endpoint match"
+    },
+    "03b09f2d51609f2f": {
+        "alias": "case-theory-model",
+        "source_ref": "src/lib/ai/case-theory.ts",
+        "confidence": "high",
+        "evidence": "Core domain model match"
+    }
+}
