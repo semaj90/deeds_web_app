@@ -11,7 +11,7 @@
  *
  * All IDs are deterministic for stable Playwright tests.
  *
- * Usage: npx tsx src/lib/server/db/seed.ts
+ * Usage: npx tsx src/lib/server/features/evidence/db/seed.ts
  * Or:    npm run db:seed
  */
 
@@ -19,7 +19,7 @@ import bcrypt from 'bcryptjs';
 import { eq, and, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
-import * as schema from './schema-postgres';
+import * as schema from '../../../db/schema-postgres';
 import crypto from 'crypto';
 
 import { ENV } from '$lib/server/env.server.js';

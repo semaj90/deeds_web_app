@@ -153,7 +153,7 @@ export async function analyzeEvidenceGpu(
     );
 
     // Audit log — GPU analysis completed
-    import('$lib/server/audit/evidence-audit.js')
+    import('$lib/server/features/evidence/audit/evidence-audit.js')
       .then(({ logEvidenceAction }) => {
         logEvidenceAction(evidenceId, 'gpu_analyzed', {
           changes: {

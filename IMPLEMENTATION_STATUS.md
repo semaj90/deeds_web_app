@@ -66,6 +66,8 @@
   - current scan: 3,841 files; 1,760 unclassified
   - evidence group and its video-sidecar siblings have been moved into `sveltekit-frontend/src/lib/server/features/evidence/`
   - observability group has been moved into `sveltekit-frontend/src/lib/server/features/observability/`
+  - rag group has been moved into `sveltekit-frontend/src/lib/server/features/rag/`
+  - cases group has been moved into `sveltekit-frontend/src/lib/server/features/cases/`
   - this is the gating step before any schema migration work moves forward
 - [x] Consolidation/schema alignment note exists.
   - `docs/architecture/consolidation-and-schema-alignment.md`

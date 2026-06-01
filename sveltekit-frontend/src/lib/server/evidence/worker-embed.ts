@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { consume } from './rabbitmq.js';
 import { embedText } from './services/embedding.js';
-import { upsertEmbedding } from './services/drizzle-stub.js';
+import { upsertEmbedding } from '$lib/server/features/evidence/services/drizzle-stub.js';
 
 const EMBED_QUEUE = 'evidence.embed';
 

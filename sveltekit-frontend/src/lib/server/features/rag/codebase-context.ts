@@ -23,7 +23,7 @@ import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
-import { rerankWithGemma4 } from './cross-encoder-reranker.js';
+import { rerankWithGemma4 } from '$lib/server/retrieval/cross-encoder-reranker.js';
 import { logRagHitWithTopology } from '$lib/server/indexer/ast-ingest-logger.js';
 import {
   getCachedEmbedding,

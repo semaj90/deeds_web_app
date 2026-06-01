@@ -6,7 +6,7 @@
  */
 
 import { pool } from '$lib/server/db/client';
-import { type HyperRagHit } from './hyperrag-fusion-service';
+import { type HyperRagHit } from '$lib/server/retrieval/hyperrag-fusion-service.js';
 
 export class ColdStorageRetrievalService {
   /**

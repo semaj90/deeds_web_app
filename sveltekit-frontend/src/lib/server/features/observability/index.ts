@@ -12,23 +12,23 @@
  *   - sveltekit-frontend/src/lib/server/analytics
  *   - sveltekit-frontend/src/lib/server/audit
  */
-// From sveltekit-frontend/src/lib/server/analytics/architectural-guard.ts
-export * from '../../analytics/architectural-guard.js';
+// From sveltekit-frontend/src/lib/server/features/observability/architectural-guard.ts
+export * from './architectural-guard.js';
 
-// From sveltekit-frontend/src/lib/server/analytics/codebase-research.ts
-export * from '../../analytics/codebase-research.js';
+// From sveltekit-frontend/src/lib/server/features/observability/codebase-research.ts
+export * from './codebase-research.js';
 
-// From sveltekit-frontend/src/lib/server/analytics/mapreduce-matrix-analysis.ts
-export * from '../../analytics/mapreduce-matrix-analysis.js';
+// From sveltekit-frontend/src/lib/server/features/observability/mapreduce-matrix-analysis.ts
+export * from './mapreduce-matrix-analysis.js';
 
-// From sveltekit-frontend/src/lib/server/analytics/research-cache.ts
-export * from '../../analytics/research-cache.js';
+// From sveltekit-frontend/src/lib/server/features/observability/research-cache.ts
+export * from './research-cache.js';
 
-// From sveltekit-frontend/src/lib/server/analytics/search-analytics.ts
-export * from '../../analytics/search-analytics.js';
+// From sveltekit-frontend/src/lib/server/features/observability/search-analytics.ts
+export * from './search-analytics.js';
 
-// From sveltekit-frontend/src/lib/server/analytics/unified-research-query.ts
-export * from '../../analytics/unified-research-query.js';
+// From sveltekit-frontend/src/lib/server/features/observability/unified-research-query.ts
+export * from './unified-research-query.js';
 
-// From sveltekit-frontend/src/lib/server/audit/api-audit-buffer.ts
-export * from '../../audit/api-audit-buffer.js';
+// From sveltekit-frontend/src/lib/server/features/observability/api-audit-buffer.ts
+export * from './api-audit-buffer.js';

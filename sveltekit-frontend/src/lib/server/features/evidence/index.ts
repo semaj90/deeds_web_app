@@ -15,17 +15,17 @@
  *   - sveltekit-frontend/src/lib/server/evidence/services
  *   - sveltekit-frontend/src/lib/server/evidence/video
  */
-// From sveltekit-frontend/src/lib/server/audit/evidence-audit.ts
-export * from '../../audit/evidence-audit.js';
+// From sveltekit-frontend/src/lib/server/features/evidence/audit/evidence-audit.ts
+export * from './audit/evidence-audit.js';
 
-// From sveltekit-frontend/src/lib/server/db/seed.ts
-export * from '../../db/seed.js';
+// From sveltekit-frontend/src/lib/server/features/evidence/db/seed.ts
+export * from './db/seed.js';
 
-// From sveltekit-frontend/src/lib/server/evidence/batch-entity-storer.ts
-export * from '../../evidence/batch-entity-storer.js';
+// From sveltekit-frontend/src/lib/server/features/evidence/batch-entity-storer.ts
+export * from './batch-entity-storer.js';
 
-// From sveltekit-frontend/src/lib/server/evidence/services/drizzle-stub.ts
-export * from '../../evidence/services/drizzle-stub.js';
+// From sveltekit-frontend/src/lib/server/features/evidence/services/drizzle-stub.ts
+export * from './services/drizzle-stub.js';
 
-// From sveltekit-frontend/src/lib/server/evidence/video/video-ingest-service.ts
-export * from '../../evidence/video/video-ingest-service.js';
+// From sveltekit-frontend/src/lib/server/features/evidence/video/video-ingest-service.ts
+export * from './video/video-ingest-service.js';

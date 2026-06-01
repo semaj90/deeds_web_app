@@ -4,7 +4,7 @@ import { db } from '$lib/server/db/client';
 import { evidence, evidenceVersions } from '$lib/server/db/schema-postgres.js';
 import { and, eq, desc, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { createEvidenceVersion } from '$lib/server/audit/evidence-audit.js';
+import { createEvidenceVersion } from '$lib/server/features/evidence/index.js';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 

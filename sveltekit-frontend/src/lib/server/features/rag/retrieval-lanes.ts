@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import type { Pool } from 'pg';
 import type { Redis } from 'ioredis';
-import { aceTopkKey } from './cache-keys.js';
-import { readLatestQdrantClusterTags, scoreClusterRelevance } from './cluster-tags-cache.js';
+import { aceTopkKey } from '$lib/server/ace/cache-keys.js';
+import { readLatestQdrantClusterTags, scoreClusterRelevance } from '$lib/server/ace/cluster-tags-cache.js';
 
 export type RetrievalLaneName =
   | 'redis_ace'

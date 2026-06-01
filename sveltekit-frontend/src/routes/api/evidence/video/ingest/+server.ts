@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { ingestVideoEvidence } from '$lib/server/evidence/video/video-ingest-service.js';
+import { ingestVideoEvidence } from '$lib/server/features/evidence/index.js';
 
 const videoIngestSchema = z
   .object({

@@ -1,12 +1,12 @@
 import { createHash } from 'node:crypto';
 import type { Redis } from 'ioredis';
 import type { Pool } from 'pg';
-import { lookupErrorFingerprint, extractSymbols, findSimilarErrors } from './error-fingerprint.js';
-import { multiTextRecall, type NgramHit } from './ngram-retrieval.js';
-import { extractFilePaths } from './error-fingerprint.js';
-import { aceTopkKey } from './cache-keys.js';
-import { readLatestQdrantClusterTags, scoreClusterRelevance } from './cluster-tags-cache.js';
-import { scoreCandidate } from '../kb/rerank-weight-loader.js';
+import { lookupErrorFingerprint, extractSymbols, findSimilarErrors } from '$lib/server/ace/error-fingerprint.js';
+import { multiTextRecall, type NgramHit } from '$lib/server/ace/ngram-retrieval.js';
+import { extractFilePaths } from '$lib/server/ace/error-fingerprint.js';
+import { aceTopkKey } from '$lib/server/ace/cache-keys.js';
+import { readLatestQdrantClusterTags, scoreClusterRelevance } from '$lib/server/ace/cluster-tags-cache.js';
+import { scoreCandidate } from '$lib/server/kb/rerank-weight-loader.js';
 
 export interface MultiLaneQuery {
 	text: string;
@@ -288,7 +288,7 @@ async function runDenseLane(query: MultiLaneQuery, embedding: number[] | null): 
 	}
 
 	try {
-		const { qdrant } = await import('../vector/qdrant-manager.js');
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 		if (!embedding) return { lane: 'dense', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
 		const searchResult = await qdrant._denseSearch({
 			query: query.text,
@@ -427,7 +427,7 @@ async function maybeCrossEncoderRerank(
 	if (merged.length === 0 || !queryText.trim()) return null;
 
 	try {
-		const { rerankWithGemma4 } = await import('../retrieval/cross-encoder-reranker.js');
+		const { rerankWithGemma4 } = await import('$lib/server/retrieval/cross-encoder-reranker.js');
 		const candidates = merged.slice(0, opts.topN ?? 40).map((hit) => ({
 			documentId: hit.id,
 			content: hit.text ?? '',
@@ -733,7 +733,7 @@ async function runSummaryLane(query: MultiLaneQuery, embedding: number[] | null)
 	const t0 = Date.now();
 	if (!embedding) return { lane: 'summary', hits: [], latencyMs: 0, cacheHit: false };
 	try {
-		const { qdrant } = await import('../vector/qdrant-manager.js');
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 		const searchResult = await qdrant.hybridSearch({
 			collection: 'summary_lenses_768',
 			query: query.text,
@@ -766,7 +766,7 @@ export async function multiLaneSearch(
 	const t0 = Date.now();
 	const queryHash = qHash(query.text);
 
-	const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
+	const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
 	const embedding = await generateSingleEmbedding(query.text).catch(() => null);
 
 	const [hashResult, sparseResult, graphResult, aceCacheResult, symbolResult, denseResult, topologyResult, wikiResult, errorResult, taskResult, researchResult, webSearchResult, summaryResult] =

@@ -27,7 +27,7 @@ import {
   serializeEvidenceMetadataBase64,
   type EvidenceMetadataProto,
 } from '$lib/server/evidence/proto-serializer.js';
-import { batchStoreEntities } from '$lib/server/evidence/batch-entity-storer.js';
+import { batchStoreEntities } from '$lib/server/features/evidence/index.js';
 import { batchEmbedAndStoreEntities } from '$lib/server/evidence/batch-entity-embedder.js';
 import { summarizeDoclingStructure } from '$lib/server/evidence/docling-structure.js';
 import {
@@ -459,7 +459,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     // 4b. Audit log — chain of custody
-    import('$lib/server/audit/evidence-audit.js')
+    import('$lib/server/features/evidence/audit/evidence-audit.js')
       .then(({ logEvidenceAction }) => {
         logEvidenceAction(evidenceId, 'uploaded', {
           changes: {
