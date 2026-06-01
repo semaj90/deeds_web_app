@@ -919,6 +919,45 @@ async function fetchACPKnowledgeResults(
         }
       }
 
+      // H6: FP16 Karpathy rerank — encode query 768→64, score result paths against
+      // gpu:karpathy:encoded, apply a small boost (max 0.05) to lift semantically
+      // central files. Non-blocking: any failure falls through to plain sort.
+      if (mapped.length > 1 && collection === 'codebase_chunks_768') {
+        try {
+          const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
+          const encodedQuery = await encode768to64(new Float32Array(emb));
+          if (encodedQuery?.length === 64) {
+            const redis = getRedis();
+            const pathsToScore = mapped.map(r => r.path).filter(Boolean);
+            const csvValues = await Promise.all(
+              pathsToScore.map(p => redis.hget('gpu:karpathy:encoded', p).catch(() => null))
+            );
+            const fileVecs: number[][] = [];
+            const fileIdxs: number[] = [];
+            for (let i = 0; i < csvValues.length; i++) {
+              const csv = csvValues[i];
+              if (!csv) continue;
+              const vals = csv.split(',').map(Number);
+              if (vals.length === 64 && !vals.some(Number.isNaN)) {
+                fileVecs.push(vals);
+                fileIdxs.push(i);
+              }
+            }
+            if (fileVecs.length > 0) {
+              const simResult = await batchCosineSimilarityFp16(Array.from(encodedQuery), fileVecs);
+              for (let k = 0; k < fileIdxs.length; k++) {
+                const sim = simResult.scores[k];
+                if (typeof sim === 'number' && Number.isFinite(sim)) {
+                  mapped[fileIdxs[k]].score += Math.min(0.05, sim * 0.05);
+                }
+              }
+            }
+          }
+        } catch {
+          // Non-fatal — fall through to plain sort
+        }
+      }
+
       mapped.sort((a, b) => b.score - a.score);
 
       return {
