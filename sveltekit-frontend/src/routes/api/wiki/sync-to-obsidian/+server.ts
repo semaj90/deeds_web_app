@@ -19,7 +19,7 @@ import { ENV } from '$lib/server/env.server.js';
 import {
   listWikiNotes,
   exportToObsidian,
-} from '$lib/server/indexer/karpathy-wiki.js';
+} from '$lib/server/features/codebase-intel/index.js';
 
 const bodySchema = z.object({
   dryRun: z.boolean().optional().default(false),

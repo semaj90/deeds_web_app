@@ -1,4 +1,4 @@
-import { couchPut, type ResearchNote } from '../indexer/karpathy-wiki.js';
+import { couchPut, type ResearchNote } from '$lib/server/features/codebase-intel/index.js';
 import { generateSingleEmbedding } from '../grpc/embedding-client.js';
 import { qdrant } from '../vector/qdrant-manager.js';
 import { getNeo4jDriver } from '../neo4j-driver.js';

@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { contextualChat } from '$lib/server/llm/contextual-chat.js';
-import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { recordSearchQuery } from '$lib/server/features/observability/index.js';
 import { db } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { executeChain, routeIntent } from '$lib/server/ai/intent-router.js';

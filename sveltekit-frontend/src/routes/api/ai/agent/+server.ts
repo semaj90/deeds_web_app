@@ -24,7 +24,7 @@ import { json }           from '@sveltejs/kit';
 import { z }              from 'zod';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 import { getRedis }       from '$lib/server/redis.js';
-import { recordSearchQuery, type HitPipeline } from '$lib/server/analytics/search-analytics.js';
+import { recordSearchQuery, type HitPipeline } from '$lib/server/features/observability/index.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { RequestHandler } from './$types';
 

@@ -127,6 +127,119 @@ if (synthReport) {
   synthDryRunDetail = ok ? 'Dry-run passed — bounded apply is safe' : 'Dry-run has issues — review before bounded apply';
 }
 
+// ── NEW GATES: Postgres schema preflight ────────────────────────────────────
+
+let postgresSchemaStatus = 'UNKNOWN';
+let postgresSchemaDetail = 'No schema audit report — run: node scripts/promotion/audit-postgres-promotion-schema.mjs';
+const pgSchemaReport = readJson(findReport('.tmp/postgres-promotion-schema-audit.json'));
+if (pgSchemaReport) {
+  const gates = pgSchemaReport.gates ?? {};
+  const pg18 = pgSchemaReport.postgres_version?.includes('18') ?? false;
+  const allGreen = Object.values(gates).every(v => v === true || v === 'ok' || v === 'present');
+  if (allGreen) {
+    postgresSchemaStatus = 'GREEN';
+    postgresSchemaDetail = `Schema audit passed — Postgres ${pgSchemaReport.postgres_version ?? '?'}, all required tables/cols present`;
+  } else {
+    const failed = Object.entries(gates).filter(([, v]) => v !== true && v !== 'ok' && v !== 'present').map(([k]) => k);
+    postgresSchemaStatus = 'YELLOW';
+    postgresSchemaDetail = `Schema gaps: ${failed.join(', ')}`;
+  }
+  if (!pg18 && pgSchemaReport.postgres_version) {
+    postgresSchemaDetail += ` — NOTE: live DB is Postgres ${pgSchemaReport.postgres_version}; project targets Postgres 18 lane`;
+  }
+}
+
+// ── NEW GATES: Drizzle drift audit ───────────────────────────────────────────
+
+let drizzleDriftStatus = 'UNKNOWN';
+let drizzleDriftDetail = 'No Drizzle drift report — run: node scripts/promotion/audit-drizzle-promotion-drift.mjs';
+const driftReport = readJson(findReport('.tmp/drizzle-promotion-drift-audit.json'));
+if (driftReport) {
+  const mustCreate = (driftReport.must_create_before_promotion ?? []);
+  const notInDrizzle = (driftReport.not_in_drizzle_schema ?? []);
+  if (mustCreate.length === 0) {
+    drizzleDriftStatus = 'GREEN';
+    drizzleDriftDetail = `Drizzle schema aligned — ${notInDrizzle.length} DB-only tables (protected by filter)`;
+  } else {
+    drizzleDriftStatus = 'BLOCKED';
+    drizzleDriftDetail = `${mustCreate.length} table(s) must be created before promotion: ${mustCreate.join(', ')}`;
+  }
+}
+
+// ── NEW GATES: alias_id live verification ────────────────────────────────────
+
+let aliasIdVerifiedStatus = 'UNKNOWN';
+let aliasIdVerifiedDetail = 'No live alias_id verification — run: node scripts/promotion/audit-postgres-promotion-schema.mjs';
+if (pgSchemaReport) {
+  const colVerified = pgSchemaReport.alias_id_on_task_semantic_packets === true
+    || pgSchemaReport.gates?.alias_id_verified === true;
+  aliasIdVerifiedStatus = colVerified ? 'GREEN' : 'BLOCKED';
+  aliasIdVerifiedDetail = colVerified
+    ? 'alias_id confirmed in live task_semantic_packets (Postgres 18 lane ready)'
+    : 'alias_id NOT found in task_semantic_packets — apply 20260601_add_alias_and_parent_atlas_indexes.sql first';
+}
+
+// ── NEW GATES: parent_atlas_documents readiness ──────────────────────────────
+
+let parentAtlasDocStatus = 'UNKNOWN';
+let parentAtlasDocDetail = 'No schema audit — run: node scripts/promotion/audit-postgres-promotion-schema.mjs';
+if (pgSchemaReport) {
+  const tableExists = pgSchemaReport.parent_atlas_documents_exists === true
+    || pgSchemaReport.gates?.parent_atlas_documents_exists === true;
+  parentAtlasDocStatus = tableExists ? 'GREEN' : 'BLOCKED';
+  parentAtlasDocDetail = tableExists
+    ? 'parent_atlas_documents table confirmed in live DB'
+    : 'parent_atlas_documents MISSING — apply 20260601_add_alias_and_parent_atlas_indexes.sql (creates table + 8 indexes)';
+}
+if (driftReport) {
+  const mustCreate = (driftReport.must_create_before_promotion ?? []);
+  if (mustCreate.includes('parent_atlas_documents') && parentAtlasDocStatus !== 'GREEN') {
+    parentAtlasDocStatus = 'BLOCKED';
+    parentAtlasDocDetail = 'parent_atlas_documents in must_create list — migration required before promotion';
+  }
+}
+
+// ── NEW GATES: duplicate rels classification ─────────────────────────────────
+
+let dupRelsStatus = 'UNKNOWN';
+let dupRelsDetail = 'No preflight report — run: node sveltekit-frontend/scripts/atlas/current-corpus-promotion-preflight.mjs';
+const preflightReport = readJson(findReport('.tmp/current-corpus-promotion-preflight.json'))
+  ?? readJson(findReport('sveltekit-frontend/.tmp/current-corpus-promotion-preflight.json'))
+  ?? readJson(resolve(ROOT, 'memory', 'agent-runs', 'current-corpus-promotion-preflight.json'));
+if (preflightReport) {
+  const dupCount = preflightReport.stats?.duplicate_rels ?? preflightReport.duplicate_rels_count ?? null;
+  const upsertVerified = preflightReport.upsert_strategy_verified === true
+    || (preflightReport.warnings ?? []).every(w => !w.toLowerCase().includes('duplicate') || w.includes('ON CONFLICT'));
+  if (dupCount === 0) {
+    dupRelsStatus = 'GREEN';
+    dupRelsDetail = 'No duplicate rels — promotion is clean';
+  } else if (dupCount !== null && upsertVerified) {
+    dupRelsStatus = 'GREEN';
+    dupRelsDetail = `${dupCount} duplicate rels present — ON CONFLICT (source_ref, workspace_id) DO UPDATE upsert strategy verified`;
+  } else if (dupCount !== null) {
+    dupRelsStatus = 'YELLOW';
+    dupRelsDetail = `${dupCount} duplicate rels — ON CONFLICT upsert strategy must be confirmed in parent_atlas_documents before apply`;
+  }
+}
+
+// ── NEW GATES: Redis auth configuration ──────────────────────────────────────
+
+let redisAuthStatus = 'UNKNOWN';
+let redisAuthDetail = 'Redis auth not probed — run audit scripts to check connectivity';
+if (pgSchemaReport?.redis_auth_checked !== undefined) {
+  redisAuthStatus = pgSchemaReport.redis_auth_required === false ? 'GREEN' : 'YELLOW';
+  redisAuthDetail = pgSchemaReport.redis_auth_required === false
+    ? 'legal-ai-redis responds to empty-password AUTH (container default)'
+    : 'Redis requires non-empty AUTH — set REDIS_PASSWORD env var before promotion apply';
+}
+// Also check if TS bridge audit has redis info
+const tsBridgeReport = readJson(findReport('.tmp/typescript-promotion-bridge-audit.json'));
+if (tsBridgeReport?.redis_connectivity) {
+  const rc = tsBridgeReport.redis_connectivity;
+  redisAuthStatus = rc.status === 'ok' ? 'GREEN' : 'YELLOW';
+  redisAuthDetail = rc.detail ?? redisAuthDetail;
+}
+
 // ── Build lane summary ────────────────────────────────────────────────────────
 
 const closedLanes = [
@@ -153,6 +266,12 @@ if (aliasIdStatus === 'BLOCKED' || aliasIdStatus === 'UNKNOWN') {
 if (cardValidationStatus !== 'GREEN') {
   blockedLanes.push(`broad promotion apply — pending card validation gate (status: ${cardValidationStatus})`);
 }
+if (parentAtlasDocStatus === 'BLOCKED') {
+  blockedLanes.push(`parent_atlas_documents missing — ${parentAtlasDocDetail}`);
+}
+if (drizzleDriftStatus === 'BLOCKED') {
+  blockedLanes.push(`Drizzle drift — ${drizzleDriftDetail}`);
+}
 
 const missingReports = Object.entries(reportStatus)
   .filter(([, exists]) => !exists)
@@ -166,6 +285,12 @@ if (mcpGuardStatus !== 'GREEN')           boundedApplyBlockers.push('MCP sidecar
 if (cardValidationStatus !== 'GREEN')     boundedApplyBlockers.push('Card validation gate not GREEN');
 if (synthDryRunStatus !== 'GREEN')        boundedApplyBlockers.push('Offline synthesis dry-run not GREEN');
 if (aliasIdStatus === 'BLOCKED')          boundedApplyBlockers.push('alias_id column missing from live schema');
+// New gates
+if (postgresSchemaStatus === 'YELLOW' || postgresSchemaStatus === 'UNKNOWN')
+  boundedApplyBlockers.push('Postgres schema preflight not verified');
+if (drizzleDriftStatus === 'BLOCKED')     boundedApplyBlockers.push('Drizzle drift: must_create_before_promotion is non-empty');
+if (aliasIdVerifiedStatus === 'BLOCKED')  boundedApplyBlockers.push('alias_id not confirmed in live task_semantic_packets');
+if (parentAtlasDocStatus === 'BLOCKED')   boundedApplyBlockers.push('parent_atlas_documents table missing from live DB');
 canRunBoundedApply = boundedApplyBlockers.length === 0;
 
 // ── Next safe queue command ───────────────────────────────────────────────────
@@ -173,6 +298,14 @@ canRunBoundedApply = boundedApplyBlockers.length === 0;
 let nextSafeCommand;
 if (mcpGuardStatus !== 'GREEN') {
   nextSafeCommand = 'npm run mcp:sidecars:audit';
+} else if (postgresSchemaStatus === 'UNKNOWN') {
+  nextSafeCommand = 'node scripts/promotion/audit-postgres-promotion-schema.mjs';
+} else if (drizzleDriftStatus === 'UNKNOWN') {
+  nextSafeCommand = 'node scripts/promotion/audit-drizzle-promotion-drift.mjs';
+} else if (parentAtlasDocStatus === 'BLOCKED') {
+  nextSafeCommand = 'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -f /tmp/20260601_add_alias_and_parent_atlas_indexes.sql  # creates parent_atlas_documents + indexes';
+} else if (aliasIdVerifiedStatus === 'BLOCKED') {
+  nextSafeCommand = 'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -f /tmp/20260601_add_alias_and_parent_atlas_indexes.sql  # adds alias_id column (idempotent)';
 } else if (!reportStatus['knowledge_card_validation']) {
   nextSafeCommand = 'node scripts/promotion/run-promotion-queue.mjs --dry-run --only knowledge-card-validation';
 } else if (!reportStatus['alias_id_preflight']) {
@@ -195,6 +328,13 @@ const result = {
   alias_id_schema: { status: aliasIdStatus, detail: aliasIdDetail },
   card_validation_gate: { status: cardValidationStatus, detail: cardValidationDetail },
   offline_synthesis_dry_run: { status: synthDryRunStatus, detail: synthDryRunDetail },
+  // New schema/index gates
+  postgres_schema_preflight: { status: postgresSchemaStatus, detail: postgresSchemaDetail },
+  drizzle_drift_audit: { status: drizzleDriftStatus, detail: drizzleDriftDetail },
+  alias_id_verified: { status: aliasIdVerifiedStatus, detail: aliasIdVerifiedDetail },
+  parent_atlas_documents_ready: { status: parentAtlasDocStatus, detail: parentAtlasDocDetail },
+  duplicate_rels_classified: { status: dupRelsStatus, detail: dupRelsDetail },
+  redis_auth_configured: { status: redisAuthStatus, detail: redisAuthDetail },
   can_run_bounded_apply: canRunBoundedApply,
   bounded_apply_blockers: boundedApplyBlockers,
   lanes: {

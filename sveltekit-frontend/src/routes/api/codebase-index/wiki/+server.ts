@@ -10,8 +10,8 @@ import {
 	listWikiNotes,
 	getWikiNote,
 	exportToObsidian,
-} from '$lib/server/indexer/karpathy-wiki.js';
-import type { WikiNote } from '$lib/server/indexer/karpathy-wiki.js';
+} from '$lib/server/features/codebase-intel/index.js';
+import type { WikiNote } from '$lib/server/features/codebase-intel/index.js';
 
 /**
  * GET /api/codebase-index/wiki

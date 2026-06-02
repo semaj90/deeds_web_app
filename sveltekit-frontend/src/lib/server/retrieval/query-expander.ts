@@ -15,7 +15,7 @@ import {
 	queryHash,
 	recordSearchQuery,
 	type HitPipeline,
-} from '$lib/server/analytics/search-analytics.js';
+} from '$lib/server/features/observability/index.js';
 
 export interface QueryExpansion {
 	suggestion:     string | null;

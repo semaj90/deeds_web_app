@@ -15,7 +15,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { logCodebaseSearch } from '$lib/server/analytics/event-logger.js';
-import { rerankChunks } from '$lib/server/retrieval/codebase-context.js';
+import { rerankChunks } from '$lib/server/features/rag/index.js';
 
 // Zod schema validates query, candidatePaths, weights, pathBoosts, errorQuery
 const rerankSchema = z.object({

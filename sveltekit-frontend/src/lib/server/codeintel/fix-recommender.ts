@@ -13,7 +13,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
-import { loadCodebaseContext, rerankChunks, type RerankResult } from '$lib/server/retrieval/codebase-context.js';
+import { loadCodebaseContext, rerankChunks, type RerankResult } from '$lib/server/features/rag/index.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types

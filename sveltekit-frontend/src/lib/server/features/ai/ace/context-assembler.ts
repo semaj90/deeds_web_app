@@ -80,7 +80,7 @@ import {
   recordQueryLog,
   queryHash,
   type ChunkHit,
-} from '$lib/server/analytics/search-analytics.js';
+} from '$lib/server/features/observability/index.js';
 import { selectAcePayloads } from '$lib/server/ace/ace-payload-selector.js';
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { embedText, embedTexts } from '$lib/server/embedding/embed.js';
@@ -139,6 +139,9 @@ import {
   setAceContextPackPointer,
   buildAceContextPack,
 } from '$lib/server/cache/ace-context-pack-cache.js';
+import {
+  persistNesChromPacketWithHits,
+} from '$lib/server/features/ai/ace/nes-chrom-packet-service.js';
 import {
   quaternionSimilarity,
   toUnitQuaternion,
@@ -3031,6 +3034,115 @@ export async function assembleACEContext(opts: {
               .insert(intentSynthesis)
               .values(synthRow)
               .catch(() => {});
+          } catch {
+            // non-fatal
+          }
+
+          try {
+            const primaryChunk =
+              (codebaseContext ?? []).find((c: any) => String(c?.filePath ?? '').trim()) ??
+              (directoryKagContext ?? []).find((entry) => String(entry?.dir ?? '').trim());
+            const primarySourceRef = String(
+              (primaryChunk as any)?.filePath ??
+                (primaryChunk as any)?.dir ??
+                ((finalContext as any).sourceRefs?.[0] ?? `ace:query:${qHash}`)
+            ).trim();
+            const packetChunkId = String(
+              (primaryChunk as any)?.filePath ??
+                (primaryChunk as any)?.dir ??
+                `ace:query:${qHash}`
+            ).trim();
+            const packetSourceRefs = Array.from(
+              new Set(
+                [
+                  primarySourceRef,
+                  ...(((finalContext as any).sourceRefs ?? []) as string[]),
+                  ...(codebaseContext ?? [])
+                    .map((c: any) => String(c?.filePath ?? '').trim())
+                    .filter(Boolean),
+                  ...(directoryKagContext ?? [])
+                    .map((entry) => String(entry?.dir ?? '').trim())
+                    .filter(Boolean),
+                ].filter(Boolean)
+              )
+            );
+            const packetHits = [
+              ...((codebaseContext ?? []).slice(0, 12).map((c: any) => ({
+                chunkId: String(c?.filePath ?? packetChunkId),
+                sourceRef: String(c?.filePath ?? packetChunkId),
+                hitType: 'qdrant_chunk',
+                score: typeof c?.score === 'number' ? c.score : null,
+                nodeKey: String(c?.filePath ?? ''),
+                evidence: {
+                  filePath: c?.filePath ?? null,
+                  pageRankScore: c?.pageRankScore ?? null,
+                  authorityScore: c?.graphAuthorityScore ?? null,
+                  clusterId: c?.gpuCluster ?? c?.somCluster ?? null,
+                  encoded64Score: c?.encoded64Score ?? null,
+                  graphProximity: c?.rerankBreakdown?.graph ?? null,
+                },
+                metadata: {
+                  sourceRefs: Array.isArray(c?.sourceRefs) ? c.sourceRefs : packetSourceRefs,
+                },
+              })) ?? []),
+              ...((directoryKagContext ?? []).slice(0, 6).map((entry: any) => ({
+                chunkId: String(entry?.dir ?? packetChunkId),
+                sourceRef: String(entry?.dir ?? packetChunkId),
+                hitType: 'directory_kag',
+                score: typeof entry?.score === 'number' ? entry.score : null,
+                nodeKey: String(entry?.dir ?? ''),
+                evidence: {
+                  summary: entry?.summary ?? null,
+                  tags: Array.isArray(entry?.tags) ? entry.tags : [],
+                  auditScore: entry?.auditScore ?? null,
+                  somBmuRow: entry?.somBmuRow ?? null,
+                  somBmuCol: entry?.somBmuCol ?? null,
+                  scoringMethod: entry?.scoringMethod ?? null,
+                },
+                metadata: { sourceRefs: packetSourceRefs },
+              })) ?? []),
+              ...((communityContext ?? []).slice(0, 3).map((entry: any) => ({
+                chunkId: `community:${entry?.id ?? qHash}`,
+                sourceRef: `community:${entry?.id ?? qHash}`,
+                hitType: 'community',
+                score: typeof entry?.similarity === 'number' ? entry.similarity : null,
+                nodeKey: `community:${entry?.id ?? qHash}`,
+                evidence: {
+                  purpose: entry?.purpose ?? null,
+                  tags: Array.isArray(entry?.tags) ? entry.tags : [],
+                  summary: entry?.summary ?? null,
+                },
+                metadata: { sourceRefs: packetSourceRefs },
+              })) ?? []),
+            ];
+
+            void persistNesChromPacketWithHits(
+              {
+                queryHash: qHash,
+                chunkId: packetChunkId,
+                sourceRef: primarySourceRef,
+                sourceRefs: packetSourceRefs,
+                featureId: 'ace.context.pack',
+                summary:
+                  (finalContext as any).summary ??
+                  packet.contextMarkdown?.slice(0, 500) ??
+                  null,
+                payload: {
+                  aceContextKey: acePlannerState.cacheKey,
+                  contextMarkdown: packet.contextMarkdown?.slice(0, 2000) ?? null,
+                  contextBudgetTokens: packet.tokenBudget?.maxInputTokens ?? null,
+                  estimatedInputTokens: packet.tokenBudget?.estimatedInputTokens ?? null,
+                  chunkIds: (codebaseContext ?? []).map((c: any) => c?.filePath).filter(Boolean),
+                  sourceRefs: packetSourceRefs,
+                  communityCount: (communityContext ?? []).length,
+                  directoryKagCount: (directoryKagContext ?? []).length,
+                },
+                lane: 'ace_context',
+                model: (packet as any).model ?? 'gemma4-rotorquant:latest',
+                tokenBudget: packet.tokenBudget?.estimatedInputTokens ?? null,
+              },
+              packetHits
+            ).catch(() => {});
           } catch {
             // non-fatal
           }

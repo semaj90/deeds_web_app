@@ -9,7 +9,7 @@ import {
   getEmbeddingModelKeepAlive,
   ollamaFetch,
 } from '$lib/server/ollama.js';
-import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
+import { loadCodebaseContext } from '$lib/server/features/rag/index.js';
 import { buildSummaryCardPromptSection, retrieveSummaryCards } from '$lib/server/retrieval/summary-card-retrieval.js';
 
 import { getGraphContext, getCaseGraphNeighborIds, buildGraphShouldFilter, applyGraphAuthorityScoring, getNeo4jMultiHopNeighbors, formatNeo4jContext, type GraphNeighbor } from '$lib/server/retrieval/graph-context.js';

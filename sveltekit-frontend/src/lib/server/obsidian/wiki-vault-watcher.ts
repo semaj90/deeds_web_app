@@ -14,7 +14,7 @@
 import { readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { parseMarkdownWikiNote } from './markdown-wiki-note.js';
-import { couchPut, type WikiNote } from '$lib/server/indexer/karpathy-wiki.js';
+import { couchPut, type WikiNote } from '$lib/server/features/codebase-intel/index.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 

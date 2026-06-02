@@ -3,7 +3,7 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
-import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { recordSearchQuery } from '$lib/server/features/observability/index.js';
 
 const agentChatSchema = z.object({
 	prompt: z.string().max(10000).optional(),

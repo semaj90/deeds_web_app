@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import type {
 	ClusterNote, DirectoryNote, PlaybookNote, ResearchNote, RetrievalNote, WikiNote,
-} from '$lib/server/indexer/karpathy-wiki.js';
+} from '$lib/server/features/codebase-intel/index.js';
 
 export interface ParsedWikiNote {
 	note: WikiNote;

@@ -24,7 +24,7 @@ import {
   type Gemma4StageTimings,
 } from './gemma4-codeintel.js';
 import { retrievalClient, type RetrievedCodebaseChunk } from '../grpc/retrieval-client.js';
-import { searchByCluster, type RankedChunk } from '../retrieval/codebase-context.js';
+import { searchByCluster, type RankedChunk } from '$lib/server/features/rag/index.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

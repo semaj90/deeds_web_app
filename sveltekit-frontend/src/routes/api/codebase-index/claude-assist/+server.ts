@@ -31,7 +31,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { db } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { ASSIST_BUDGETS } from '$lib/server/ai/compact-budgets.js';
-import { rerankChunks } from '$lib/server/retrieval/codebase-context.js';
+import { rerankChunks } from '$lib/server/features/rag/index.js';
 import {
   publishWorkflowEvent,
   publishWorkflowComplete,

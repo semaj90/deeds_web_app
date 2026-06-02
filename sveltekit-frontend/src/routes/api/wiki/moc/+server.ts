@@ -18,7 +18,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { ENV } from '$lib/server/env.server.js';
 import { writeNote } from '$lib/server/integrations/obsidian-client.js';
-import { listWikiNotes } from '$lib/server/indexer/karpathy-wiki.js';
+import { listWikiNotes } from '$lib/server/features/codebase-intel/index.js';
 
 const schema = z.object({
   also: z.array(z.enum(['graphify-docs', 'deep-audit'])).optional(),
