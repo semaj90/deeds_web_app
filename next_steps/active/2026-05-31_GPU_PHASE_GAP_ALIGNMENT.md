@@ -107,9 +107,11 @@ Cross-referencing **9 atlas zones** × **6 phases in Phase Completion Roadmap** 
 - [x] Fix 3 signature mismatches via binding.cc inspection
 - [x] Document graceful-fallback audit (TS layer already handles it)
 
-### Next 1-2 hours (priority order)
-- [ ] **A.** Wire startup-gpu-bridge-probe.mjs into `.vscode/tasks.json` (workspace open task)
-- [ ] **B.** Add G18 audit gate to `scripts/startup-truth.mjs` ("addon must load + report ≥10 live functions")
+### Next 1-2 hours (priority order) — updated 2026-06-02
+- [x] **A.** Wire startup-gpu-bridge-probe.mjs into `.vscode/tasks.json` (workspace open task) — **DONE** (runOn: folderOpen)
+- [x] **B.** Add G18 audit gate to `scripts/startup/startup-truth.mjs` — **DONE** (15 live / 0 stub verified)
+- [x] **B2.** Fix G17 hardcoded localhost violations — **DONE** (YoRHaAIChat.svelte routed to /api/ai/chat + /api/rag/search)
+- [x] **B3.** Promote codebase-graph.json → parent_atlas_documents — **DONE** (5,253/5,253 rows upserted)
 - [ ] **C.** Add VLM lane 6 to `smoke-all-gpu-lanes.mjs` (test mmproj-F16.gguf via Ollama vision call)
 - [ ] **D.** Automate parent-atlas regeneration on drift-snapshot changes (cron via ScheduleWakeup or git-hook)
 
@@ -132,6 +134,17 @@ Cross-referencing **9 atlas zones** × **6 phases in Phase Completion Roadmap** 
 | Probe output | `.tmp/gpu-bridge-probe.json` |
 | This gap-alignment doc | `next_steps/active/2026-05-31_GPU_PHASE_GAP_ALIGNMENT.md` |
 
+## 7. New artifacts (2026-06-02 continuation)
+
+| Artifact | Path | Notes |
+|---|---|---|
+| Startup truth audit (G17+G18) | `scripts/startup/startup-truth.mjs` | G18: 15 live / 0 stub ✅ |
+| normalize-sourcerefs (hardened) | `scripts/atlas/normalize-sourcerefs.mjs` | Conflict detection, safety floor, verbose mode |
+| promote-to-postgres | `scripts/atlas/promote-to-postgres.mjs` | 5,253 rows → parent_atlas_documents ✅ |
+| G17 fix | `src/…/YoRHaAIChat.svelte` | Routed direct-Ollama calls through /api/ai/chat |
+| Dry-run report | `.tmp/promote-to-postgres-dry-run.json` | |
+| Apply report | `.tmp/startup-truth.json` | |
+
 ---
 
-**Bottom line**: there are no missing stubs. The "stub regression" was a probe bug. The native bridge is healthy with CUDA active. The remaining work is wiring (probe → workspace startup, audit gate, VLM smoke), not native code.
+**Bottom line**: GPU bridge healthy (15 live, CUDA active), parent_atlas_documents fully populated (5,253 rows), G18 gate wired, G17 violations fixed. Remaining: VLM smoke lane, parent-atlas regeneration automation, Atlas Phase 6 simulator.

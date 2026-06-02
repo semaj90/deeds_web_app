@@ -10,20 +10,9 @@
   let isLoading = $state(false);
   let chatContainer = $state<HTMLDivElement | null>(null);
 
-  /**
-   * Resolves the Ollama endpoint dynamically.
-   * Provides fallback for Docker and local development.
-   */
-  function getOllamaEndpoint(): string {
-    // Check for explicit global config if available
-    const globalUrl = (globalThis as any)?.__OLLAMA_URL__;
-    if (globalUrl) return globalUrl;
-
-    // Standard local fallback
-    return 'http://localhost:11434';
-  }
-
-  const RAG_SERVICE_URL = 'http://localhost:8093';
+  // Route all inference through SvelteKit API — never call Ollama or RAG services directly from the browser
+  const OLLAMA_API = '/api/ai/chat';
+  const RAG_SERVICE_URL = '/api/rag/search';
 
   $effect(() => {
 
@@ -36,13 +25,12 @@
       // 1. Try RAG Service first
       const ragHealth = await fetch(`${RAG_SERVICE_URL}/health`).catch(() => ({ ok: false }));
 
-      // 2. Try Ollama Service as fallback
-      const ollamaUrl = getOllamaEndpoint();
-      const ollamaHealth = await fetch(`${ollamaUrl}/api/tags`).catch(() => ({ ok: false }));
+      // 2. Try SvelteKit API as health indicator
+      const ollamaHealth = await fetch('/api/health').catch(() => ({ ok: false }));
 
       isConnected = (ragHealth as Response).ok || (ollamaHealth as Response).ok;
 
-      const activeEndpoint = (ragHealth as Response).ok ? 'Enhanced RAG' : 'Ollama Direct';
+      const activeEndpoint = (ragHealth as Response).ok ? 'Enhanced RAG' : 'SvelteKit API';
 
       messages = [{
         id: 'welcome',
@@ -56,7 +44,7 @@
       messages = [{
         id: 'error',
         role: 'assistant',
-        content: `⚠️ **Connection Failed**\n\nNo AI service detected at ${RAG_SERVICE_URL} or ${getOllamaEndpoint()}.\n\nOffline Mode Enabled.`,
+        content: `⚠️ **Connection Failed**\n\nAI services unavailable.\n\nOffline Mode Enabled.`,
         timestamp: new Date().toISOString(),
         type: 'error'
       }];
@@ -98,10 +86,9 @@
     }
 
     try {
-      // Logic for Contextual Chat via Ollama or RAG
-      const ollamaUrl = getOllamaEndpoint();
+      // Route through SvelteKit API — never call Ollama directly from browser
       const payload = {
-        model: 'gemma4-legal:latest', // Per project convention
+        model: 'gemma4-legal:latest',
         messages: messages.map(m => ({
           role: m.role === 'assistant' ? 'assistant' : 'user',
           content: m.content
@@ -109,30 +96,31 @@
         stream: false
       };
 
-      // Try RAG first, fallback to Ollama chat
       let responseText = '';
 
-      const ragResponse = await fetch(`${RAG_SERVICE_URL}/api/chat`, {
+      // Try RAG search first
+      const ragResponse = await fetch(RAG_SERVICE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-message: trimmed, history: messages })
+        body: JSON.stringify({ query: trimmed, limit: 5 })
       }).catch(() => null);
 
       if (ragResponse && ragResponse.ok) {
         const result = await ragResponse.json();
-        responseText = result.response;
-      } else {
-        // FALLBACK: Direct Ollama Contextual Chat
-        const ollamaResponse = await fetch(`${ollamaUrl}/api/chat`, {
+        responseText = result.answer ?? result.response ?? result.results?.[0]?.text ?? '';
+      }
+
+      if (!responseText) {
+        // FALLBACK: SvelteKit AI chat endpoint
+        const chatResponse = await fetch(OLLAMA_API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify(payload)
+          body: JSON.stringify(payload)
         });
 
-        if (ollamaResponse.ok) {
-          const result = await ollamaResponse.json();
-          responseText = result.message.content;
+        if (chatResponse.ok) {
+          const result = await chatResponse.json();
+          responseText = result.message?.content ?? result.response ?? '';
         } else {
           throw new Error('All AI services unresponsive.');
         }
