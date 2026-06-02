@@ -1,0 +1,75 @@
+{
+  "schema": "nes_chrom_packet_recent_hits_report.v1",
+  "generatedAt": "2026-06-01T20:20:19.904Z",
+  "tables": {
+    "packetTable": "nes_chrom_packets",
+    "hitTable": "nes_chrom_kag_dag_hits"
+  },
+  "counts": {
+    "packets": 3,
+    "hits": 3
+  },
+  "coverage": {
+    "sourceRef": 1,
+    "featureId": 1,
+    "parentAtlasCardId": 0,
+    "queryHash": 1,
+    "chunkId": 1
+  },
+  "missing": {
+    "featureId": [],
+    "sourceRef": []
+  },
+  "top": {
+    "sourceRefs": [
+      {
+        "value": "src/lib/components/ui/gaming/index.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/ui/gaming/n64/index.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/ui/index.ts",
+        "count": 1
+      }
+    ],
+    "featureIds": [
+      {
+        "value": "ui",
+        "count": 3
+      }
+    ]
+  },
+  "filters": {
+    "sourceRef": null,
+    "featureId": null,
+    "queryHash": null,
+    "parentAtlasCardId": null,
+    "limit": 3
+  },
+  "inspection": {
+    "writerPath": "sveltekit-frontend/src/lib/server/features/ai/ace/nes-chrom-packet-service.ts",
+    "aceAssemblyHookPath": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+    "readQueryPath": "sveltekit-frontend/src/routes/api/atlas/nes-chrom/+server.ts",
+    "existingReportPaths": [
+      "docs/reports/nes-chrom-packet-kag-dag-map.md",
+      "docs/reports/nes-chrom-packet-recent-hits.{json,md}"
+    ],
+    "chr97VsNesChrom": "separate-but-adjacent lanes: CHR97 is the cartridge fast-path search lane; NES chrom is the durable ACE packet + hit report lane.",
+    "canonicalReportPath": "docs/reports/nes-chrom-packet-kag-dag-map.md + docs/reports/nes-chrom-packet-recent-hits.{json,md}"
+  },
+  "integrity": {
+    "sourceRefPreserved": true,
+    "sourceRefsPreserved": true,
+    "featureIdPreserved": true,
+    "parentAtlasCardIdPreserved": false,
+    "sourceRefFeatureIdReplaySpineIntact": true
+  },
+  "databaseStatus": {
+    "packetTablePresent": true,
+    "hitTablePresent": true,
+    "note": "Both NES chrom tables are present in the current database."
+  }
+}

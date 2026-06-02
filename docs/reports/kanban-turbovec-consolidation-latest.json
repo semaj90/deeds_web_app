@@ -1,0 +1,1812 @@
+{
+  "generatedAt": "2026-06-01T20:22:16.578Z",
+  "inputs": {
+    "boardPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
+    "featureLabelsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
+    "kanbanTasksPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\kanban_tasks.jsonl",
+    "missingTodosPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\missing_feature_todos.jsonl"
+  },
+  "options": {
+    "apply": true,
+    "includeDone": false,
+    "limit": null,
+    "embedBatchSize": 32,
+    "prefilterConcurrency": 8,
+    "topClusters": 5
+  },
+  "summary": {
+    "boardTaskCount": 362,
+    "massInputCount": 2776,
+    "uniqueRecordCount": 2498,
+    "scopedRecordCount": 2478,
+    "embeddedCount": 2478,
+    "groupCount": 1009,
+    "consolidationCandidateGroups": 1004,
+    "highOverlapGroups": 3,
+    "turbovecBackendCounts": {
+      "js": 2478
+    },
+    "libtorchAvailable": true,
+    "libtorchGroupsScored": 1001,
+    "simdjson": {
+      "hits": 138,
+      "misses": 2277,
+      "nativeParses": 1,
+      "fallbackParses": 2276,
+      "totalBytesParsed": 2030748,
+      "nativeTimeMs": 6.125999999999976,
+      "cacheBytes": 3660324,
+      "cacheSize": 2277
+    },
+    "boardUpdated": true
+  },
+  "actions": [
+    "Merge the highest-overlap open groups into one parent kanban item per feature family.",
+    "Keep file-level feature labels as provenance links, not separate board cards.",
+    "Use the board TurboVec annotations as a routing hint for consolidation reviews.",
+    "Review the top open groups first; they are the best candidates for parent-atlas compression."
+  ],
+  "groups": [
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:none",
+      "recordCount": 264,
+      "openCount": 264,
+      "clusterIds": [],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:394",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:753",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:85",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:757",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:27",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:521",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:314",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:291",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:313",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:242",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:371",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:233"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route",
+        "Warm workspace-start plans",
+        "Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field",
+        "Track 1: .env audit + dead-config archival"
+      ],
+      "topFeatureIds": [
+        "feature:todo:1f43005f66837277aa9561cb",
+        "feature:todo:744b000f6653275c4bdb2351",
+        "feature:todo:010af7f91e18b77fb07f1353",
+        "feature:todo:6ce1c20afd9a1c0b0ec43b28",
+        "feature:todo:6fa3a5755e51b8d38b1ccc12"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:394",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:753",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:85",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:757",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:27"
+      ],
+      "statuses": {
+        "BACKLOG": 132,
+        "todo": 132
+      },
+      "backendCounts": {
+        "js": 264
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "skipped",
+        "cohesion": 0,
+        "pairCount": 0
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "master-todo:cluster:none",
+      "recordCount": 106,
+      "openCount": 106,
+      "clusterIds": [],
+      "featureFamilies": [
+        "master-todo"
+      ],
+      "sourceRefs": [
+        "MASTER-FEATURE-TODO-2026-05-20.md:277",
+        "MASTER-FEATURE-TODO-2026-05-20.md:813",
+        "MASTER-FEATURE-TODO-2026-05-20.md:181",
+        "MASTER-FEATURE-TODO-2026-05-20.md:393",
+        "MASTER-FEATURE-TODO-2026-05-20.md:337",
+        "MASTER-FEATURE-TODO-2026-05-20.md:467",
+        "MASTER-FEATURE-TODO-2026-05-20.md:62",
+        "MASTER-FEATURE-TODO-2026-05-20.md:738",
+        "MASTER-FEATURE-TODO-2026-05-20.md:338",
+        "MASTER-FEATURE-TODO-2026-05-20.md:241",
+        "MASTER-FEATURE-TODO-2026-05-20.md:242",
+        "MASTER-FEATURE-TODO-2026-05-20.md:725"
+      ],
+      "topTitles": [
+        "**Track C — Production Gap Remediation** (after DB audit)",
+        "**Remaining Lower-Priority**",
+        "Optional mirror only: export aliases to `.opencode/recommendations.json` + `.…",
+        "Stale feature detection (atlas entry exists, no recent git touch)",
+        "Duplicate system detection (two scripts/routes with overlapping sourceRefs)"
+      ],
+      "topFeatureIds": [
+        "master-todo.unknown"
+      ],
+      "topSourceRefs": [
+        "sveltekit-frontend/src/service-worker.ts",
+        "sveltekit-frontend/src/lib/workers/compute-worker.mjs",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sveltekit-frontend/scripts/atlas/phase-lane-completion.mjs"
+      ],
+      "statuses": {
+        "BACKLOG": 103,
+        "REVIEW": 3
+      },
+      "backendCounts": {
+        "js": 106
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "skipped",
+        "cohesion": 0,
+        "pairCount": 0
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "lib:cluster:none",
+      "recordCount": 83,
+      "openCount": 83,
+      "clusterIds": [],
+      "featureFamilies": [
+        "lib"
+      ],
+      "sourceRefs": [],
+      "topTitles": [
+        "lib › webgpu",
+        "lib › client",
+        "lib › features",
+        "lib › state",
+        "lib › components"
+      ],
+      "topFeatureIds": [],
+      "topSourceRefs": [
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/webgpu/graph-texture-layout.ts#L1",
+        "local:sveltekit-frontend/src/lib/webgpu/N64TextureLODSystem.ts#L1",
+        "local:sveltekit-frontend/src/lib/webgpu/compute-shader-engine.ts#L1",
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/client/ocr-tensor-processor.ts#L1",
+        "local:sveltekit-frontend/src/lib/client/search-client.ts#L1"
+      ],
+      "statuses": {
+        "BACKLOG": 70,
+        "TODO": 13
+      },
+      "backendCounts": {
+        "js": 83
+      },
+      "priorityMax": 3,
+      "libtorch": {
+        "source": "skipped",
+        "cohesion": 0,
+        "pairCount": 0
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcc:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcc"
+      ],
+      "sourceRefs": [
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arccos.csv",
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arccosh.csv"
+      ],
+      "topTitles": [
+        "Label venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcc",
+        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcc"
+      ],
+      "topFeatureIds": [
+        "feature:file:79c848c36db5082af2b2d7fc",
+        "feature:file:8291dc574cf6fd6ea9b17bef"
+      ],
+      "topSourceRefs": [
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arccos.csv",
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arccosh.csv"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "js": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0101,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcs:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcs"
+      ],
+      "sourceRefs": [
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arcsin.csv",
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arcsinh.csv"
+      ],
+      "topTitles": [
+        "Label venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcs",
+        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcs"
+      ],
+      "topFeatureIds": [
+        "feature:file:6c5cb01883c78dbd94ef9af1",
+        "feature:file:d77b99797fe91fc8044ff343"
+      ],
+      "topSourceRefs": [
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arcsin.csv",
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arcsinh.csv"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "js": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0112,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arct:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arct"
+      ],
+      "sourceRefs": [
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arctan.csv",
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arctanh.csv"
+      ],
+      "topTitles": [
+        "Label venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arct",
+        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arct"
+      ],
+      "topFeatureIds": [
+        "feature:file:56576ffd19c4a41b418fd8fa",
+        "feature:file:816b58b94018cf27349ffc59"
+      ],
+      "topSourceRefs": [
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arctan.csv",
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arctanh.csv"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "js": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.029,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-log1:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-log1"
+      ],
+      "sourceRefs": [
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-log10.csv",
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-log1p.csv"
+      ],
+      "topTitles": [
+        "Label venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-log1",
+        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-log1"
+      ],
+      "topFeatureIds": [
+        "feature:file:e8a330b841ae9877b8caaac0",
+        "feature:file:ce9933d259904fbef00f3dac"
+      ],
+      "topSourceRefs": [
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-log10.csv",
+        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-log1p.csv"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "js": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0057,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcco:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcco"
+      ],
+      "sourceRefs": [
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arccos.csv",
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arccosh.csv"
+      ],
+      "topTitles": [
+        "Label venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcco",
+        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcco"
+      ],
+      "topFeatureIds": [
+        "feature:file:40979a760a107b22c769f58b",
+        "feature:file:78785bab1b1e3580f38ac981"
+      ],
+      "topSourceRefs": [
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arccos.csv",
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arccosh.csv"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "js": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0012,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcsi:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcsi"
+      ],
+      "sourceRefs": [
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arcsin.csv",
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arcsinh.csv"
+      ],
+      "topTitles": [
+        "Label venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcsi",
+        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcsi"
+      ],
+      "topFeatureIds": [
+        "feature:file:7e2f897ff78f8caf3174a0fc",
+        "feature:file:7267810277ac5506fe2522bb"
+      ],
+      "topSourceRefs": [
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arcsin.csv",
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arcsinh.csv"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "js": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0145,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcta:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcta"
+      ],
+      "sourceRefs": [
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arctan.csv",
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arctanh.csv"
+      ],
+      "topTitles": [
+        "Label venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcta",
+        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcta"
+      ],
+      "topFeatureIds": [
+        "feature:file:ad6628fea87df699477b5a71",
+        "feature:file:ba37550e9dcbba13ba81ec75"
+      ],
+      "topSourceRefs": [
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arctan.csv",
+        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arctanh.csv"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "js": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0033,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "docs-readme-deeds-labs-archive-svelte-check-output-json:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "docs-readme-deeds-labs-archive-svelte-check-output-json"
+      ],
+      "sourceRefs": [
+        "local:docs_readme/deeds_labs_archive/.svelte-check-output.json",
+        "local:docs_readme/deeds_labs_archive/svelte-check-output.json"
+      ],
+      "topTitles": [
+        "Label docs-readme-deeds-labs-archive-svelte-check-output-json",
+        "docs-readme-deeds-labs-archive-svelte-check-output-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:7650560c5e1e6cbf348dc3c1",
+        "feature:file:183b979e0121b220249efc60"
+      ],
+      "topSourceRefs": [
+        "local:docs_readme/deeds_labs_archive/.svelte-check-output.json",
+        "local:docs_readme/deeds_labs_archive/svelte-check-output.json"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "js": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0218,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "workspace:cluster:none",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [],
+      "featureFamilies": [
+        "workspace"
+      ],
+      "sourceRefs": [],
+      "topTitles": [
+        "workspace › sveltekit-frontend",
+        "workspace › vscode-extension",
+        "workspace › simd-bridge"
+      ],
+      "topFeatureIds": [],
+      "topSourceRefs": [
+        "local:sveltekit-frontend/scripts/__fixtures__/audit-fail.ts#L1",
+        "local:sveltekit-frontend/scripts/__tests__/powershell-scripts.test.ts#L1",
+        "local:sveltekit-frontend/scripts/_check-langextract-usage.mjs#L1",
+        "local:vscode-extension/media/topology-viewer.js#L1",
+        "local:vscode-extension/out/claudePlan.js#L1"
+      ],
+      "statuses": {
+        "TODO": 2,
+        "BACKLOG": 1
+      },
+      "backendCounts": {
+        "js": 3
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0221,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "opencode-recommendations-json:cluster:none",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [],
+      "featureFamilies": [
+        "opencode-recommendations-json"
+      ],
+      "sourceRefs": [
+        ".opencode/recommendations.json"
+      ],
+      "topTitles": [
+        "Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi",
+        "opencode-recommendations-json"
+      ],
+      "topFeatureIds": [
+        "feature:todo:fadfc0e985f4f0e151eaf542"
+      ],
+      "topSourceRefs": [
+        ".opencode/recommendations.json",
+        ".opencode/recommendations-summary.md"
+      ],
+      "statuses": {
+        "BACKLOG": 2,
+        "todo": 1
+      },
+      "backendCounts": {
+        "js": 3
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0011,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "gpu:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "gpu"
+      ],
+      "sourceRefs": [],
+      "topTitles": [
+        "gpu › simd bridge",
+        "gpu › cuda compute"
+      ],
+      "topFeatureIds": [],
+      "topSourceRefs": [
+        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/hot/+server.ts#L1",
+        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/load/+server.ts#L1",
+        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/metrics/+server.ts#L1",
+        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/compute/+server.ts#L1",
+        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/health/+server.ts#L1"
+      ],
+      "statuses": {
+        "TODO": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 3,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0157,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "search:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "search"
+      ],
+      "sourceRefs": [],
+      "topTitles": [
+        "search › hyperrag",
+        "search › qdrant vector"
+      ],
+      "topFeatureIds": [],
+      "topSourceRefs": [
+        "local:sveltekit-frontend/scripts/smoke-hyperrag.mjs#L1",
+        "local:sveltekit-frontend/scripts/smoke/smoke-hyperrag.mjs#L1",
+        "local:sveltekit-frontend/src/routes/api/admin/atlas/hyperrag/+server.ts#L1",
+        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/dev/qdrant/+server.ts#L1",
+        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/+server.ts#L1"
+      ],
+      "statuses": {
+        "TODO": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 3,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.005,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "docs-graph:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "docs-graph"
+      ],
+      "sourceRefs": [
+        "docs/graph/"
+      ],
+      "topTitles": [
+        "Keep this lane tied to the existing graph artifacts in `docs/graph/` rather than inventing a parallel source of truth.",
+        "docs-graph"
+      ],
+      "topFeatureIds": [
+        "feature:todo:1e4c336ba1e2a42f2be25839"
+      ],
+      "topSourceRefs": [
+        "docs/graph/"
+      ],
+      "statuses": {
+        "BACKLOG": 1,
+        "todo": 1
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0433,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "memory-agents-dag-cluster-0-4-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "memory-agents-dag-cluster-0-4-json"
+      ],
+      "sourceRefs": [
+        "local:memory/agents-dag/cluster-0-4.json"
+      ],
+      "topTitles": [
+        "Label memory-agents-dag-cluster-0-4-json",
+        "memory-agents-dag-cluster-0-4-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:7933cc823021551ccebeafa0"
+      ],
+      "topSourceRefs": [
+        "local:memory/agents-dag/cluster-0-4.json",
+        "local:.cache/ace/context-packs/ace_context_local-json-hit_v1.json",
+        "local:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
+        "local:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
+        "local:.cache/cards/7fa8a288f900d5f042365e405126cba1b373fc0f.meta.json"
+      ],
+      "statuses": {
+        "BACKLOG": 1,
+        "todo": 1
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0229,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "ranking:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "ranking"
+      ],
+      "sourceRefs": [],
+      "topTitles": [
+        "ranking › authority score",
+        "ranking › karpathy blend"
+      ],
+      "topFeatureIds": [],
+      "topSourceRefs": [
+        "local:sveltekit-frontend/scripts/authority/build-authority-snapshot.mjs#L1",
+        "local:sveltekit-frontend/src/lib/server/scoring/authority-scorer.ts#L1",
+        "local:sveltekit-frontend/src/lib/server/agents/regen/loaders/karpathy.ts#L1"
+      ],
+      "statuses": {
+        "BACKLOG": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0028,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "scripts-atlas-phase-lane-completion-mjs:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "scripts-atlas-phase-lane-completion-mjs"
+      ],
+      "sourceRefs": [
+        "scripts/atlas/phase-lane-completion.mjs"
+      ],
+      "topTitles": [
+        "Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)",
+        "scripts-atlas-phase-lane-completion-mjs"
+      ],
+      "topFeatureIds": [
+        "feature:todo:9776801fc047158c169943dd"
+      ],
+      "topSourceRefs": [
+        "scripts/atlas/phase-lane-completion.mjs"
+      ],
+      "statuses": {
+        "BACKLOG": 1,
+        "todo": 1
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0575,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "src-lib-server-features-ai-ace-context-assembler-ts:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "src-lib-server-features-ai-ace-context-assembler-ts"
+      ],
+      "sourceRefs": [
+        "src/lib/server/features/ai/ace/context-assembler.ts"
+      ],
+      "topTitles": [
+        "Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite.",
+        "src-lib-server-features-ai-ace-context-assembler-ts"
+      ],
+      "topFeatureIds": [
+        "feature:todo:783118149f85dbce6bf6dd2a"
+      ],
+      "topSourceRefs": [
+        "src/lib/server/features/ai/ace/context-assembler.ts"
+      ],
+      "statuses": {
+        "BACKLOG": 1,
+        "todo": 1
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0111,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "src-service-worker-ts:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "src-service-worker-ts"
+      ],
+      "sourceRefs": [
+        "src/service-worker.ts"
+      ],
+      "topTitles": [
+        "Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productizatio",
+        "src-service-worker-ts"
+      ],
+      "topFeatureIds": [
+        "feature:todo:c32b8055c5900f49a4919f9c"
+      ],
+      "topSourceRefs": [
+        "src/service-worker.ts",
+        "src/lib/workers/compute-worker.mjs"
+      ],
+      "statuses": {
+        "BACKLOG": 1,
+        "todo": 1
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0214,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-ace-context-packs-ace-context-local-json-hit-v1-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-ace-context-packs-ace-context-local-json-hit-v1-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/ace/context-packs/ace_context_local-json-hit_v1.json"
+      ],
+      "topTitles": [
+        "Label cache-ace-context-packs-ace-context-local-json-hit-v1-json",
+        "cache-ace-context-packs-ace-context-local-json-hit-v1-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:4537c26965f6d4abfdcf05ab"
+      ],
+      "topSourceRefs": [
+        "local:.cache/ace/context-packs/ace_context_local-json-hit_v1.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0298,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-ace-context-packs-ace-context-smoke-context-pack-v1-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-ace-context-packs-ace-context-smoke-context-pack-v1-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json"
+      ],
+      "topTitles": [
+        "Label cache-ace-context-packs-ace-context-smoke-context-pack-v1-json",
+        "cache-ace-context-packs-ace-context-smoke-context-pack-v1-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:8679708a6349443ae8066b3b"
+      ],
+      "topSourceRefs": [
+        "local:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0074,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json"
+      ],
+      "topTitles": [
+        "Label cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json",
+        "cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:c01c9263f03bf00e10875001"
+      ],
+      "topSourceRefs": [
+        "local:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0169,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/cards/7fa8a288f900d5f042365e405126cba1b373fc0f.meta.json"
+      ],
+      "topTitles": [
+        "Label cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json",
+        "cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:2c0015cb6265c9ee6c987434"
+      ],
+      "topSourceRefs": [
+        "local:.cache/cards/7fa8a288f900d5f042365e405126cba1b373fc0f.meta.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0005,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/cards/87a3e2aa5036028f81632b720cdf195a73ce8a0e.meta.json"
+      ],
+      "topTitles": [
+        "Label cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json",
+        "cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:2a83e073f935d0e05f13a2a7"
+      ],
+      "topSourceRefs": [
+        "local:.cache/cards/87a3e2aa5036028f81632b720cdf195a73ce8a0e.meta.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0408,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-0aefb06409d30bcc-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-0aefb06409d30bcc-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/0aefb06409d30bcc.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-0aefb06409d30bcc-json",
+        "cache-d9-verifier-0aefb06409d30bcc-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:0fa5e4b1bd7b3ccac492b228"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/0aefb06409d30bcc.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0436,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-18e924c96cf72a44-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-18e924c96cf72a44-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/18e924c96cf72a44.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-18e924c96cf72a44-json",
+        "cache-d9-verifier-18e924c96cf72a44-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:8de80d749291e6c3e2aa2528"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/18e924c96cf72a44.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.002,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-1b1d36c14e179b86-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-1b1d36c14e179b86-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/1b1d36c14e179b86.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-1b1d36c14e179b86-json",
+        "cache-d9-verifier-1b1d36c14e179b86-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:2a28624f3ea31eca1ba4fa8c"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/1b1d36c14e179b86.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0036,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-29367b26ad1e578a-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-29367b26ad1e578a-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/29367b26ad1e578a.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-29367b26ad1e578a-json",
+        "cache-d9-verifier-29367b26ad1e578a-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:7da56c5068c5094bf41dd26f"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/29367b26ad1e578a.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0286,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-294f7266e00b9379-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-294f7266e00b9379-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/294f7266e00b9379.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-294f7266e00b9379-json",
+        "cache-d9-verifier-294f7266e00b9379-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:82af50b4fd72f29850bc36f3"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/294f7266e00b9379.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.019,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-307279f5f1494c7e-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-307279f5f1494c7e-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/307279f5f1494c7e.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-307279f5f1494c7e-json",
+        "cache-d9-verifier-307279f5f1494c7e-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:6a2e9ec981582e7483ab3ade"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/307279f5f1494c7e.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0359,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-39a2eb1d8f1afd09-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-39a2eb1d8f1afd09-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/39a2eb1d8f1afd09.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-39a2eb1d8f1afd09-json",
+        "cache-d9-verifier-39a2eb1d8f1afd09-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:34a54184e7994745a3c84d10"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/39a2eb1d8f1afd09.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0047,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-43b9fc4b89d78538-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-43b9fc4b89d78538-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/43b9fc4b89d78538.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-43b9fc4b89d78538-json",
+        "cache-d9-verifier-43b9fc4b89d78538-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:c06c65f0962cca53168993c7"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/43b9fc4b89d78538.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0352,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-441c62a1acf01e5d-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-441c62a1acf01e5d-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/441c62a1acf01e5d.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-441c62a1acf01e5d-json",
+        "cache-d9-verifier-441c62a1acf01e5d-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:23390b9679b54ecd0d75b9e2"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/441c62a1acf01e5d.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0327,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-53a4d51ab2e58a11-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-53a4d51ab2e58a11-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/53a4d51ab2e58a11.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-53a4d51ab2e58a11-json",
+        "cache-d9-verifier-53a4d51ab2e58a11-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:8693c86d43c2b0d14c8d9dce"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/53a4d51ab2e58a11.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0503,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-5628c7618811c4fd-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-5628c7618811c4fd-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/5628c7618811c4fd.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-5628c7618811c4fd-json",
+        "cache-d9-verifier-5628c7618811c4fd-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:290a6da34f60b17a3804d70e"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/5628c7618811c4fd.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0078,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-5e4a96bb345bd10e-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-5e4a96bb345bd10e-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/5e4a96bb345bd10e.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-5e4a96bb345bd10e-json",
+        "cache-d9-verifier-5e4a96bb345bd10e-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:3521b74db7e778923fd00d16"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/5e4a96bb345bd10e.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0065,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-7530781fb24e4c3a-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-7530781fb24e4c3a-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/7530781fb24e4c3a.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-7530781fb24e4c3a-json",
+        "cache-d9-verifier-7530781fb24e4c3a-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:62e7d8c2f65aceb845d51713"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/7530781fb24e4c3a.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0327,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-78b20ee42936e840-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-78b20ee42936e840-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/78b20ee42936e840.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-78b20ee42936e840-json",
+        "cache-d9-verifier-78b20ee42936e840-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:a80b89d9a2df6e7c0b41afab"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/78b20ee42936e840.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0063,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-79e2ba0f90ee5ebe-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-79e2ba0f90ee5ebe-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/79e2ba0f90ee5ebe.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-79e2ba0f90ee5ebe-json",
+        "cache-d9-verifier-79e2ba0f90ee5ebe-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:19473fa5c8be3362f6bbefa0"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/79e2ba0f90ee5ebe.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.1177,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-87fe7ea09a599e3f-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-87fe7ea09a599e3f-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/87fe7ea09a599e3f.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-87fe7ea09a599e3f-json",
+        "cache-d9-verifier-87fe7ea09a599e3f-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:055439abb00e133b9b96a16b"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/87fe7ea09a599e3f.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0037,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-905270df680aabf7-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-905270df680aabf7-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/905270df680aabf7.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-905270df680aabf7-json",
+        "cache-d9-verifier-905270df680aabf7-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:9a6b4693def4d4a4a1f4f79b"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/905270df680aabf7.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0454,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-92f9dd3a09baf1d3-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-92f9dd3a09baf1d3-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/92f9dd3a09baf1d3.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-92f9dd3a09baf1d3-json",
+        "cache-d9-verifier-92f9dd3a09baf1d3-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:8be9e583141b09f816d6d391"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/92f9dd3a09baf1d3.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0361,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-9e81804cbb551132-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-9e81804cbb551132-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/9e81804cbb551132.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-9e81804cbb551132-json",
+        "cache-d9-verifier-9e81804cbb551132-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:e6647dfab96642db88b2045a"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/9e81804cbb551132.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0237,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-ae5f8718a6ccb862-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-ae5f8718a6ccb862-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/ae5f8718a6ccb862.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-ae5f8718a6ccb862-json",
+        "cache-d9-verifier-ae5f8718a6ccb862-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:26902d9de0525a08833e78b4"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/ae5f8718a6ccb862.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0678,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-aeba5bcc519138f2-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-aeba5bcc519138f2-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/aeba5bcc519138f2.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-aeba5bcc519138f2-json",
+        "cache-d9-verifier-aeba5bcc519138f2-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:8681a70c0ea7b0c615409b20"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/aeba5bcc519138f2.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0251,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "cache-d9-verifier-b222315b079d41a4-json:cluster:none",
+      "recordCount": 2,
+      "openCount": 2,
+      "clusterIds": [],
+      "featureFamilies": [
+        "cache-d9-verifier-b222315b079d41a4-json"
+      ],
+      "sourceRefs": [
+        "local:.cache/d9-verifier/b222315b079d41a4.json"
+      ],
+      "topTitles": [
+        "Label cache-d9-verifier-b222315b079d41a4-json",
+        "cache-d9-verifier-b222315b079d41a4-json"
+      ],
+      "topFeatureIds": [
+        "feature:file:764070b243f5d82aae1891a9"
+      ],
+      "topSourceRefs": [
+        "local:.cache/d9-verifier/b222315b079d41a4.json"
+      ],
+      "statuses": {
+        "todo": 2
+      },
+      "backendCounts": {
+        "js": 2
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0235,
+        "pairCount": 1
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    }
+  ]
+}

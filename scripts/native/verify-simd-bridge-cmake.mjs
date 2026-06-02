@@ -26,10 +26,14 @@ const buildDirArgIdx = args.indexOf('--build-dir');
 const requestedBuildDir = buildDirArgIdx >= 0 && args.length > buildDirArgIdx+1 ? args[buildDirArgIdx+1] : null;
 const presetIdx = args.indexOf('--preset');
 const preset = presetIdx >= 0 && args.length > presetIdx+1 ? args[presetIdx+1] : null;
+const buildPresetIdx = args.indexOf('--build-preset');
+const buildPresetArg =
+  buildPresetIdx >= 0 && args.length > buildPresetIdx + 1 ? args[buildPresetIdx + 1] : null;
 const cudaFlagIdx = args.indexOf('--cuda');
-const cudaFlag = cudaFlagIdx >= 0 && args.length > cudaFlagIdx+1 ? args[cudaFlagIdx+1] : null; // ON/OFF
+const cudaFlag = cudaFlagIdx >= 0 && args.length > cudaFlagIdx + 1 ? args[cudaFlagIdx + 1] : null; // ON/OFF
 const libtorchIdx = args.indexOf('--libtorch');
-const libtorchPath = libtorchIdx >= 0 && args.length > libtorchIdx+1 ? args[libtorchIdx+1] : null;
+const libtorchPath =
+  libtorchIdx >= 0 && args.length > libtorchIdx + 1 ? args[libtorchIdx + 1] : null;
 
 let buildDirUsed = buildDir;
 let clean_failed = false;
@@ -66,34 +70,63 @@ console.log('Using build dir:', buildDirUsed);
 let res;
 if (preset) {
   console.log('Using preset:', preset);
-  // use cmake --preset which will manage generator/toolset/arch
+  // use cmake --preset from srcDir so CMake loads simd-bridge/cpp/CMakePresets.json
   const presetArgs = ['--preset', preset];
   if (libtorchPath) presetArgs.push('--', `-DCMAKE_PREFIX_PATH=${libtorchPath}`);
-  res = run('cmake', presetArgs);
+  res = run('cmake', presetArgs, { cwd: srcDir });
 } else {
   // ensure CMake places outputs into the chosen build dir to avoid touching locked outputs
-  const cmakeArgs = ['-S', srcDir, '-B', buildDirUsed, '-G', 'Visual Studio 17 2022', '-A', 'x64', '-T', 'host=x64', '-DCMAKE_BUILD_TYPE=' + config,
+  const cmakeArgs = [
+    '-S',
+    srcDir,
+    '-B',
+    buildDirUsed,
+    '-G',
+    'Visual Studio 17 2022',
+    '-A',
+    'x64',
+    '-T',
+    'host=x64',
+    '-DCMAKE_BUILD_TYPE=' + config,
     `-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${path.join(buildDirUsed, 'Release')}`,
     `-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${path.join(buildDirUsed, 'Release')}`,
-    `-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${path.join(buildDirUsed, 'Release')}`
+    `-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${path.join(buildDirUsed, 'Release')}`,
   ];
   if (cudaFlag) cmakeArgs.push(`-DSIMD_ENABLE_CUDA=${cudaFlag}`);
-  if (libtorchPath) cmakeArgs.push(`-DSIMD_ENABLE_LIBTORCH=ON`, `-DCMAKE_PREFIX_PATH=${libtorchPath}`);
+  if (libtorchPath)
+    cmakeArgs.push(`-DSIMD_ENABLE_LIBTORCH=ON`, `-DCMAKE_PREFIX_PATH=${libtorchPath}`);
   else cmakeArgs.push(`-DSIMD_ENABLE_LIBTORCH=OFF`);
   res = run('cmake', cmakeArgs);
 }
-let out = { configure_status: res.status, configure_stdout: res.stdout, configure_stderr: res.stderr };
+let out = {
+  configure_status: res.status,
+  configure_stdout: res.stdout,
+  configure_stderr: res.stderr,
+};
 console.log('Configure exit:', res.status);
 
 console.log('\nBuilding (cmake --build):');
-res = run('cmake', ['--build', buildDirUsed, '--config', config, '--', '/m']);
+if (preset) {
+  const buildPreset = buildPresetArg || `build-${preset}`;
+  console.log('Using build preset:', buildPreset);
+  res = run('cmake', ['--build', '--preset', buildPreset], { cwd: srcDir });
+} else {
+  res = run('cmake', ['--build', buildDirUsed, '--config', config, '--', '/m']);
+}
 out.build_status = res.status;
 out.build_stdout = res.stdout;
 out.build_stderr = res.stderr;
 console.log('Build exit:', res.status);
 
 // scan for link errors in stdout/stderr
-const combined = (out.configure_stdout + '\n' + out.configure_stderr + '\n' + out.build_stdout + '\n' + out.build_stderr);
+const combined =
+  out.configure_stdout +
+  '\n' +
+  out.configure_stderr +
+  '\n' +
+  out.build_stdout +
+  '\n' +
+  out.build_stderr;
 const lnk2005 = Array.from(combined.matchAll(/LNK2005:.*?([\w:\.]+)"/g));
 const lnk2019 = Array.from(combined.matchAll(/LNK2019: unresolved external symbol\s+(\S+)/g));
 const unresolved = Array.from(combined.matchAll(/unresolved external symbol\s+"(.*?)"/g));
@@ -113,14 +146,26 @@ const report = {
   libtorch_found: !!libtorch_found,
   fallback_stubs_active: !!fallback_stubs_active,
   cuda_found: !!cuda_found,
-  lnk2005: lnk2005.map(m => m[0]),
-  lnk2019: lnk2019.map(m => m[0]),
-  unresolved_matches: unresolved.map(m => m[1]),
-  duplicate_symbol_errors: lnk2005.map(m => m[0]),
-  unresolved_external_errors: lnk2019.map(m => m[0]),
-  exact_failing_symbols: unresolved.map(m => m[1]),
-  short_stdout: combined.slice(0, 20000)
+  lnk2005: lnk2005.map((m) => m[0]),
+  lnk2019: lnk2019.map((m) => m[0]),
+  unresolved_matches: unresolved.map((m) => m[1]),
+  duplicate_symbol_errors: lnk2005.map((m) => m[0]),
+  unresolved_external_errors: lnk2019.map((m) => m[0]),
+  exact_failing_symbols: unresolved.map((m) => m[1]),
+  short_stdout: combined.slice(0, 20000),
 };
+
+// Improve report fidelity for preset-driven builds.
+if (preset) {
+  const buildDirMatch = combined.match(/Build files have been written to:\s*(.+)/i);
+  if (buildDirMatch && buildDirMatch[1]) {
+    report.build_dir_used = buildDirMatch[1].trim();
+  }
+}
+
+if (!report.fallback_stubs_active) {
+  report.fallback_stubs_active = /Fallback stubs\s*:\s*ON/i.test(combined);
+}
 
 const outJson = path.join(root, '.tmp', 'simd-bridge-cmake-verify.json');
 const outMd = path.join(root, '.tmp', 'simd-bridge-cmake-verify.md');

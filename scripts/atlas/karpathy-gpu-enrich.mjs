@@ -317,7 +317,10 @@ async function fetchEmbeddingsBatch(filePaths) {
         signal: AbortSignal.timeout(15_000),
       });
       if (!res.ok) continue;
-      const data = await res.json();
+      const raw = await res.text();
+      const data = (gpu && typeof gpu.simdJsonParse === 'function')
+        ? JSON.parse(gpu.simdJsonParse(raw))
+        : JSON.parse(raw);
       for (const pt of (data.result?.points ?? [])) {
         const fp = normalizeRepoPath(getPayloadPath(pt.payload));
         if (!fp) continue;
@@ -338,7 +341,23 @@ async function fetchEmbeddingsBatch(filePaths) {
 
 // ── Probe ────────────────────────────────────────────────────────────────────
 
-async function fetchProbeEmbedding(query) {
+const PROBE_CACHE_KEY = 'ace:probe:embed:karpathy';
+
+async function fetchProbeEmbedding(query, redisClient) {
+  // Check Redis cache first — avoids Ollama call on every karpathy run (24h TTL)
+  if (redisClient) {
+    try {
+      const cached = await redisClient.get(PROBE_CACHE_KEY);
+      if (cached) {
+        const arr = JSON.parse(cached);
+        if (Array.isArray(arr) && arr.length > 0) {
+          console.log(`[karpathy] Probe embedding: Redis cache hit (${arr.length}-dim)`);
+          return new Float32Array(arr);
+        }
+      }
+    } catch { /* ignore redis errors */ }
+  }
+
   const sveltekitUrl = process.env.PUBLIC_API_URL ?? 'http://localhost:5173';
   try {
     const res = await fetch(`${sveltekitUrl}/api/embed`, {
@@ -348,8 +367,16 @@ async function fetchProbeEmbedding(query) {
       signal: AbortSignal.timeout(10_000),
     });
     if (res.ok) {
-      const d = await res.json();
-      if (d.embedding) return new Float32Array(d.embedding);
+      const raw = await res.text();
+      const d = (gpu && typeof gpu.simdJsonParse === 'function')
+        ? JSON.parse(gpu.simdJsonParse(raw))
+        : JSON.parse(raw);
+      if (d.embedding) {
+        if (redisClient) {
+          redisClient.set(PROBE_CACHE_KEY, JSON.stringify(Array.from(d.embedding)), 'EX', 86400).catch(() => {});
+        }
+        return new Float32Array(d.embedding);
+      }
     }
   } catch (err) {
     console.warn(`[karpathy] SvelteKit probe failed, attempting direct Ollama fallback: ${err.message}`);
@@ -367,8 +394,17 @@ async function fetchProbeEmbedding(query) {
       signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) throw new Error(`Ollama response error: ${res.status}`);
-    const d = await res.json();
-    return d.embedding ? new Float32Array(d.embedding) : null;
+    const raw = await res.text();
+    const d = (gpu && typeof gpu.simdJsonParse === 'function')
+      ? JSON.parse(gpu.simdJsonParse(raw))
+      : JSON.parse(raw);
+    if (d.embedding) {
+      if (redisClient) {
+        redisClient.set(PROBE_CACHE_KEY, JSON.stringify(Array.from(d.embedding)), 'EX', 86400).catch(() => {});
+      }
+      return new Float32Array(d.embedding);
+    }
+    return null;
   } catch (err) {
     console.warn(`[karpathy] Ollama fallback probe error: ${err.message}`);
     return null;
@@ -529,7 +565,21 @@ async function main() {
     console.warn('[karpathy] No embeddings found in Qdrant.');
   }
 
-  const probe = await fetchProbeEmbedding('risk vulnerability security architecture');
+  // Shared Redis client for probe cache + later score writes
+  let _earlyRedis = null;
+  if (!DRY) {
+    try {
+      _earlyRedis = new Redis(REDIS_URL, {
+        password: REDIS_PASS || undefined,
+        lazyConnect: true, maxRetriesPerRequest: 1,
+        enableOfflineQueue: false, retryStrategy: () => null,
+      });
+      _earlyRedis.on('error', () => {});
+      await _earlyRedis.connect().catch(() => {});
+    } catch { _earlyRedis = null; }
+  }
+
+  const probe = await fetchProbeEmbedding('risk vulnerability security architecture', _earlyRedis);
 
   const attentionCorpus = new Float32Array(candidates.length * (probe?.length ?? 0));
   const attentionDim = probe?.length ?? 0;
@@ -662,7 +712,7 @@ async function main() {
   }
 
   if (!DRY) {
-    const redis = new Redis(REDIS_URL);
+    const redis = _earlyRedis ?? new Redis(REDIS_URL);
     // Write scores as a pipeline for atomicity + set 7-day TTL to match summary
     const pipe = redis.pipeline();
     pipe.del('gpu:karpathy:scores');

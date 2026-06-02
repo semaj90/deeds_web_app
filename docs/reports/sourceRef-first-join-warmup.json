@@ -1,0 +1,105 @@
+{
+  "schema": "sourceRef_first_join_warmup_report.v1",
+  "generatedAt": "2026-06-02T02:22:24.899Z",
+  "mode": "apply",
+  "inputs": {
+    "clusterLimit": 1,
+    "packetLimit": 1,
+    "bifrostModel": "ollama/gemma4-rotorquant:latest",
+    "bifrostModelCandidates": [
+      "ollama/gemma4-rotorquant:latest",
+      "ollama/ibm/granite-docling:258m"
+    ]
+  },
+  "neo4j": {
+    "applied": false,
+    "communities": 0,
+    "totalClusters": 0,
+    "totalMembers": 0,
+    "turboHits": 0,
+    "turboMisses": 0,
+    "note": "Neo4j community expansion is skipped in the plain-Node warmup runner to avoid TS-loader coupling."
+  },
+  "warmup": {
+    "clustersWarmed": 0,
+    "packetsWarmed": 0,
+    "contextsRegistered": 2,
+    "errors": 0
+  },
+  "top": {
+    "featureIds": [
+      {
+        "value": "cluster:19067cadf0",
+        "count": 1
+      }
+    ],
+    "sourceRefs": [
+      {
+        "value": "src/lib/ai/citation-cache.ts",
+        "count": 1
+      }
+    ],
+    "clusterKeys": [
+      {
+        "value": "cluster:gpu:19",
+        "count": 4
+      }
+    ]
+  },
+  "samples": {
+    "clusters": [
+      {
+        "kind": "cluster",
+        "clusterKey": "cluster:gpu:19",
+        "clusterId": 19,
+        "hotness": 0.4105188203145708,
+        "source": "ace:cluster:hot",
+        "fileCount": 4,
+        "topFiles": [
+          "src/lib/server/ai/ollama-client.ts",
+          "src/lib/server/utils/avatar-upload.ts",
+          "src/lib/utils/webgpu-array-utils.ts",
+          "Cluster 19 summary"
+        ],
+        "topTags": [
+          "ts",
+          "src",
+          "lib",
+          "server",
+          "utils"
+        ],
+        "prompt": "Cluster cluster:gpu:19 context\nHotness: 0.4105\nScalar seed: 0.3870\nTags: ts, src, lib, server, utils | Files: src/lib/server/ai/ollama-client.ts, src/lib/server/utils/avatar-upload.ts, src/lib/utils/webgpu-array-utils.ts, Cluster 19 summary | Topo: unclassified, graph-gpu-topology"
+      }
+    ],
+    "packets": [
+      {
+        "kind": "nes_packet",
+        "packetId": "68204553-08fe-433d-be23-d1656522fe03",
+        "packetKey": "nes:cluster:19067cadf0:fb3aec99cf9cad58:2a4fa7fc93cb",
+        "queryHash": "fb3aec99cf9cad5851fb4fc0ef6dcca882a39b996fc995c28149148582ba3791",
+        "chunkId": "2a4fa7fc93cb",
+        "featureId": "cluster:19067cadf0",
+        "sourceRef": "src/lib/ai/citation-cache.ts",
+        "sourceRefs": [
+          "src/lib/ai/citation-cache.ts",
+          "src/lib/ai/client-cache.ts",
+          "src/lib/ai/client-embed.ts",
+          "src/lib/ai/client-llm-synthesis.ts",
+          "src/lib/ai/client-quality.ts",
+          "src/lib/ai/client-router.ts"
+        ],
+        "hitCount": 6,
+        "hitSourceRefs": [
+          "src/lib/ai/citation-cache.ts",
+          "src/lib/ai/client-cache.ts",
+          "src/lib/ai/client-embed.ts",
+          "src/lib/ai/client-llm-synthesis.ts",
+          "src/lib/ai/client-quality.ts",
+          "src/lib/ai/client-router.ts"
+        ],
+        "prompt": "SourceRef-first packet warmup for feature cluster:19067cadf0\nPrimary sourceRef: src/lib/ai/citation-cache.ts\nQuery hash: fb3aec99cf9cad5851fb4fc0ef6dcca882a39b996fc995c28149148582ba3791\nChunk id: 2a4fa7fc93cb\nPacket summary: Create a compact NES/Glyph summary card.  Kind: cluster featureId: cluster:19067cadf0 sourceRef: src/lib/ai/citation-cache.\nPacket sourceRefs: src/lib/ai/citation-cache.ts, src/lib/ai/client-cache.ts, src/lib/ai/client-embed.ts, src/lib/ai/client-llm-synthesis.ts, src/lib/ai/client-quality.ts\nHit sourceRefs: src/lib/ai/citation-cache.ts, src/lib/ai/client-cache.ts, src/lib/ai/client-embed.ts, src/lib/ai/client-llm-synthesis.ts, src/lib/ai/client-quality.ts",
+        "communityCount": 0
+      }
+    ]
+  }
+}

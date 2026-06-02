@@ -75,14 +75,21 @@
     }
   });
 
-  // Initialize and auto-refresh
+  // Initialize on mount
   $effect(() => {
     refreshMetrics();
+  });
 
+  // Separate effect for auto-refresh so toggling doesn't double-register intervals
+  $effect(() => {
     if (autoRefresh) {
       refreshInterval = setInterval(refreshMetrics, 5000);
+    } else {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = undefined;
+      }
     }
-
     return () => {
       if (refreshInterval) clearInterval(refreshInterval);
     };
@@ -226,8 +233,11 @@
   }
 
   async function clearCache() {
-    console.log('Clearing cache...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      await fetch('/api/cache/invalidate', { method: 'POST' });
+    } catch {
+      // best-effort; metrics refresh below reflects current state
+    }
     await refreshMetrics();
   }
 </script>

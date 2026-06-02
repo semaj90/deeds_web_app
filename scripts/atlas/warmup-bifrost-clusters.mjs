@@ -38,7 +38,7 @@ dotenv.config({ path: resolve(FE_ROOT, '.env') });
 const REDIS_URL      = process.env.REDIS_URL      || 'redis://127.0.0.1:6379';
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 const BIFROST_URL    = process.env.BIFROST_URL     || 'http://127.0.0.1:3040';
-const BIFROST_MODEL  = process.env.BIFROST_MODEL   || 'ollama/ibm/granite-docling:258m';
+const BIFROST_MODEL  = normalizeBifrostModel(process.env.BIFROST_MODEL || 'ollama/ibm/granite-docling:258m');
 
 const args      = process.argv.slice(2);
 const DRY_RUN   = args.includes('--dry-run');
@@ -49,6 +49,12 @@ const TTL_IDX   = args.indexOf('--ttl');
 const CACHE_TTL = TTL_IDX !== -1 ? parseInt(args[TTL_IDX + 1], 10) : 3600;
 
 const ENDPOINT = `${BIFROST_URL}/v1/chat/completions`;
+
+function normalizeBifrostModel(model) {
+  const text = String(model || '').trim();
+  if (!text) return 'ollama/ibm/granite-docling:258m';
+  return text.includes('/') ? text : `ollama/${text}`;
+}
 
 async function main() {
   console.log(`[warmup-bifrost] → Bifrost: ${ENDPOINT} | TTL: ${CACHE_TTL}s${DRY_RUN ? ' | DRY RUN' : ''}`);

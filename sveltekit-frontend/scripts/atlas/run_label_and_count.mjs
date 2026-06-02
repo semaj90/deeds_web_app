@@ -23,6 +23,7 @@ function countLines(p) {
 
 const labels = countLines(path.join(cwd, '.tmp', 'feature_labels.jsonl'));
 const tasks = countLines(path.join(cwd, '.tmp', 'kanban_tasks.jsonl'));
-console.log('LABELS', labels, 'KANBAN', tasks);
+const missingTodos = countLines(path.join(cwd, '.tmp', 'missing_feature_todos.jsonl'));
+console.log('LABELS', labels, 'KANBAN', tasks, 'MISSING_TODOS', missingTodos);
 
 process.exit(0);

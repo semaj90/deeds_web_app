@@ -144,8 +144,14 @@ Bullets above are Gemma4-generated; weight them as priors, not commands. Verify 
 
 ### P2.7 — App-side feature-card semantic index
 - **Goal**: expose a read-only server module that can load and query the generated cards for later Gemma4/OpenCode inference.
-- **Fix**: keep the loader pointed at the generated JSONL/report artifacts and avoid adding a second durable store.
+- **Fix**: keep the loader pointed at the generated JSONL/report artifacts first, then fall back to the local DuckDB mirror before the report fallback.
 - **Outcome**: a thin query layer the frontend app can reuse once the offline mirrors are ready.
+
+### P2.15 — DuckDB semantic index fallback
+- **Goal**: let the app-side feature semantic index query `docs/reports/feature-card.duckdb` directly when the JSONL export is absent.
+- **Fix**: keep DuckDB read-only and below JSONL priority; it is a downstream analysis source, not a new authoritative store.
+- **Fix**: add a forced DuckDB smoke so the fallback path is testable even when `memory/exports/feature-map-cards.jsonl` exists.
+- **Outcome**: forced DuckDB smoke passes and the app can still search feature cards when the gitignored JSONL export is missing.
 
 ### P2.8 — Offline feature-card mirror
 - **Goal**: prepare opt-in CouchDB and DuckDB-ready artifacts from the generated feature cards.
@@ -178,16 +184,32 @@ Bullets above are Gemma4-generated; weight them as priors, not commands. Verify 
 - **Fix**: keep the design doc behind the same opt-in CouchDB gate as the doc writes.
 - **Outcome**: a durable CouchDB view layer that matches the feature-card contract and can warm itself after offline mirroring.
 
+### P2.14 — Task Semantic Packet layer
+- **Goal**: promote Kanban tasks into durable semantic packets with Qdrant payload metadata, Postgres mirror rows, and agent pickup queue entries.
+- **Fix**: keep Postgres/Drizzle as the ledger, Qdrant as the searchable payload layer, and Redis as the hot nudge path only.
+- **Outcome**: OpenCode/Gemma4 can claim the next task from a packet bundle that already carries related files, cluster IDs, and a concrete next action.
+
 ### P3.1 — Post-synthesis quality review
 - **Goal**: verify Neo4j authority, summary drift, and Qdrant sourceRefs parity for the stage-2c-500 review run.
 - **Fix**: treat the missing `docs/graph/repo-neo4j-graphrag-report.json` as a blocking gap until the graph projection is refreshed.
 - **Fix**: backfill `codebase_chunks_768` payloads with chunk-level `sourceRefs` derived from `codebase_chunk_index` so atlas and ACE cards can consolidate indexed vs untracked evidence.
 - **Outcome**: a repeatable quality gate before the downstream UI and synthesis phases consume graph-derived evidence.
 
+### P3.2 — Qdrant sourceRefs backfill throughput
+- **Goal**: keep the provenance backfill fast enough to run against the full chunk corpus without timing out.
+- **Fix**: page Qdrant once to build a file-path-to-point-id index, then patch payloads in batches instead of issuing one scroll per file.
+- **Outcome**: a practical refresh path for `sourceRefs` coverage that can be rerun before the phase review gate.
+
+### P3.3 — Repo-only provenance metric
+- **Goal**: separate repo-corpus sourceRefs coverage from mixed collection sample noise in the phase review.
+- **Fix**: report `repoCoverage` from `src/` chunks explicitly and keep the mixed sample as a secondary sanity check.
+- **Outcome**: a stable Phase 3 signal that reflects the actual codebase corpus instead of archived or external points in the same collection.
+
 ### P4.1 — Admin copilot provenance display
 - **Goal**: show Qdrant sourceRefs and Neo4j graph paths in the admin search results and atlas panel.
 - **Fix**: keep provenance visible by default so operators can see where retrieval came from before editing trust or promoting content.
 - **Fix**: surface `graphPaths` alongside `sourceRefs` so the query panel exposes graph-shaped evidence, not just raw chunks.
+- **Status**: `SourceProvenancePanel` now renders the string-path payload from the atlas query; the remaining work is broader cluster/path enrichment, not basic provenance display.
 - **Outcome**: provenance-aware search results that support operator review and trust tuning.
 
 ### P4.2 — Cluster visualization and aliases
@@ -225,6 +247,11 @@ Bullets above are Gemma4-generated; weight them as priors, not commands. Verify 
 - **Goal**: generate concept cards for undocumented local patterns after the reconciliation pass.
 - **Fix**: keep synthetic evidence clearly labeled and downstream-only until it is validated.
 - **Outcome**: a durable set of concept cards that can seed later synthesis and command mapping.
+
+### P5.4 — OpenCode task tuple handoff
+- **Goal**: hand the next semantic packet to OpenCode as an immutable JSON tuple snapshot, while keeping the mutable bundle in memory.
+- **Fix**: preserve the durable Postgres/Qdrant packet rows, then write the claimed packet to `docs/reports/task-semantic-packet-latest.json` for deterministic tool calls.
+- **Outcome**: Gemma4/OpenCode can consume a stable tuple artifact instead of depending on live JS object identity.
 
 ---
 

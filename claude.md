@@ -25,7 +25,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Forms**: sveltekit-superforms v2 + Zod validation
 - **Local Cache**: IndexedDB + Loki.js
 - **Server Cache**: Redis (SSR pages + sessions)
-- **Database**: PostgreSQL 16 + Drizzle ORM 0.44 + pgvector
+- **Database**: PostgreSQL 18.4 + Drizzle ORM 0.44 + pgvector
 - **Vector DB**: Qdrant (GPU-accelerated)
 - **AI Models**: 
     - **Embeddings Lane**: Ollama (`embeddinggemma:latest` via `/api/embed`)
@@ -1411,7 +1411,7 @@ isCudaAvailable() === false
 
 ---
 
-## Drizzle ORM 0.44 (PostgreSQL 16 + pgvector)
+## Drizzle ORM 0.44 (PostgreSQL 18.4 + pgvector)
 
 **Main schema**: `src/lib/server/db/schema-postgres.ts` (70+ tables, 14 enums)
 

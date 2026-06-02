@@ -1,0 +1,110 @@
+{
+  "generatedAt": "2026-06-02T02:18:39.699Z",
+  "inputs": {
+    "vector64": "memory\\exports\\vector64-compression-metrics.json",
+    "somMetrics": "memory\\exports\\som-metrics.json",
+    "cacheEffectiveness": "docs\\reports\\cache-effectiveness-report.json",
+    "autoencoderSomMap": "docs\\reports\\autoencoder-som-map.md",
+    "featureRegistry": "docs\\atlas\\feature-registry.json",
+    "crosswalk": "docs\\reports\\doc-feature-crosswalk-2026-06-01.json",
+    "parentAtlasIndex": "memory\\exports\\parent-atlas\\parent_atlas_index.json"
+  },
+  "summary": {
+    "vector64": {
+      "fromDim": 768,
+      "toDim": 64,
+      "compressionRatio": 91.67,
+      "memorySavingsPercent": 91.67,
+      "avgError": 0.04806,
+      "sampleCount": 5
+    },
+    "somMetrics": {
+      "gridSize": 20,
+      "totalNeurons": 400,
+      "embeddingDim": 64,
+      "iterations": 50,
+      "backendUsed": "gpu-trainSOM",
+      "assignedCards": 9372,
+      "totalCards": 9372,
+      "topologyEdges": 1482,
+      "avgDistance": 0.972488
+    },
+    "cacheEffectiveness": {
+      "totalRunsAnalyzed": 3,
+      "hitRates": {
+        "llm_output": "0.00%",
+        "bifrost_prefix": "0.00%",
+        "centroid": "0.00%",
+        "graph_cache": "0.00%"
+      },
+      "fallbackCount": 0
+    },
+    "featureRegistry": {
+      "total": 4209,
+      "implemented": 4176,
+      "partial": 7,
+      "missing": 26
+    },
+    "crosswalk": {
+      "sourceRefPathmap": 26,
+      "parentAtlasPacketFlow": 311,
+      "neo4jContextualTrees": 617,
+      "qdrantSemanticAnalysis": 343,
+      "redisBitfrostCache": 364,
+      "aeCentroidsTurboVecSOM": 72,
+      "offlineProcessing": 156
+    },
+    "parentAtlasIndex": {
+      "totalEntries": 9374,
+      "totalNodes": 6,
+      "totalReward": 5.94,
+      "uniqueKinds": 2,
+      "uniqueSources": 1380
+    },
+    "notes": [
+      "PyTorch / LibTorch is the numeric lane.",
+      "Qdrant remains the recall/search lane.",
+      "Redis/Bitfrost stores hot centroid and packet pointers.",
+      "SOM / AE outputs are treated as indexed JSON tree surfaces, not schema sources."
+    ],
+    "autoencoderSomMapLines": 154,
+    "somAssignments": {
+      "total": 9372,
+      "uniqueCards": 9372,
+      "uniqueRows": 19,
+      "uniqueCols": 19,
+      "sampleCards": [
+        "000678ef52ca67b0",
+        "00116e85cfe0456e",
+        "0012bc7350ff2a70",
+        "001570455730d2d7",
+        "001f2d08e4459234"
+      ]
+    },
+    "qdrantTags": [
+      "feature:gpu",
+      "feature:som",
+      "feature:centroid",
+      "feature:cluster",
+      "feature:vector64"
+    ]
+  },
+  "activeEntryPoints": [
+    "scripts/atlas/build-all-lanes-parent-atlas.mjs",
+    "scripts/atlas/atlas-parent-indexing.mjs",
+    "scripts/atlas/backfill-som-coordinates.mjs",
+    "scripts/atlas/build-atlas-token-map.mjs",
+    "sveltekit-frontend/src/lib/server/graph/som-topology-pipeline.ts",
+    "sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts",
+    "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/encoded-cluster-prefilter.ts",
+    "docs/reports/autoencoder-som-map.md",
+    "docs/reports/cache-effectiveness-report.json"
+  ],
+  "notes": [
+    "The PyTorch lane is the experimental compression/training boundary.",
+    "Qdrant carries semantic cluster recall and payload tagging.",
+    "Redis/Bitfrost retains hot centroids and cache pointers for offline processing.",
+    "The JSON tree artifacts are navigation surfaces for indexing, not a new source of truth."
+  ]
+}

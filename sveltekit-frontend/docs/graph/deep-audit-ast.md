@@ -1,13 +1,13 @@
 # Deep AST Audit
 
-Generated: 2026-05-31T21:02:23.783Z
-Graph files: 56608
+Generated: 2026-06-01T22:50:56.345Z
+Graph files: 56931
 
 ## Summary
 
 | Gate | Description | Count |
 | :--- | :--- | ---: |
-| D9 | Likely orphans (0 fanIn, no dynImport ref) | 13485 |
+| D9 | Likely orphans (0 fanIn, no dynImport ref) | 13552 |
 
 ---
 
@@ -19,7 +19,7 @@ Graph files: 56608
 >
 > Files listed here are likely unused, but still require `/audit-components` disposition before deletion or archive. Do not bulk-prune — let the skill classify the first 20-30, then archive in batches.
 
-**13485** findings (showing first 30)
+**13552** findings (showing first 30)
 
 - `$lib/utils/file-reader.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
 - `.claude/hooks/posttooluse-audit.mjs:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
@@ -58,7 +58,7 @@ Graph files: 56608
 
 Each skill is a multi-gate agentic pipeline that drills deeper than this AST audit. Run from Claude Code via `/<skill-name>`:
 
-- /audit-components — verify 13485 D9 orphan candidates with 8-gate test (G0 transitive-dep, G0.5 dynamic-import, G1-G8 disposition)
+- /audit-components — verify 13552 D9 orphan candidates with 8-gate test (G0 transitive-dep, G0.5 dynamic-import, G1-G8 disposition)
 - /prune-codebase — full archive flow with G6 route reachability + reverse-dependency chain
 - /deep-audit — full 47-gate sweep covering G1-G47 (compounds D1-D10 with infra, security, RL pipeline)
 - /graphify — refresh codebase-graph.json + glyph_atlas + cluster_summaries; D9 false-positive count drops once new fanIn data lands

@@ -4,6 +4,13 @@ import { engramCards } from '$lib/server/db/schema.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ENV } from '../../../env.server.js';
+import {
+  claimNextAgentPickupTask,
+  getCachedTaskSemanticPacketRecord,
+  traceTaskPacketLifecycle,
+} from '$lib/server/tasks/semantic-packets.js';
+import { writeTaskSemanticPacketSnapshot, buildTaskSemanticPacketTuple } from '$lib/server/tasks/task-semantic-packet-tuple.js';
+import { traceSpan } from '$lib/server/observability/langfuse.js';
 
 // Validates that deterministic source refs point to actual files in the repo
 async function validateSourceRefsExist(sourceRefs: string[]) {
@@ -94,6 +101,51 @@ async function dispatchLocalDeepResearch(args: {
 export function adjustTrustTier(trustTier: number, action: 'promotion' | 'demotion') {
   const delta = action === 'promotion' ? 1 : -1;
   return Math.max(-1, Math.min(2, trustTier + delta));
+}
+
+export async function pickNextSemanticTaskPacket(
+  options: { lane?: string; enqueueIfMissing?: boolean } = {}
+) {
+  const lane = options.lane ?? 'semantic_packet';
+  return traceSpan('pick-next-semantic-task-packet', { lane, enqueueIfMissing: options.enqueueIfMissing ?? true }, async () => {
+    const bundle = await claimNextAgentPickupTask(lane);
+
+    if (!bundle) {
+      await traceTaskPacketLifecycle(0, 'pickup:none', { lane });
+      return null;
+    }
+
+    const semanticPacketTuple = buildTaskSemanticPacketTuple(bundle);
+    const snapshot = await writeTaskSemanticPacketSnapshot(bundle);
+    const cachedPacket = await getCachedTaskSemanticPacketRecord(bundle.taskId);
+
+    await traceTaskPacketLifecycle(bundle.taskId, 'pickup:selected', {
+      queueId: bundle.queueId,
+      packetId: bundle.packetId,
+      featureId: bundle.featureId,
+      clusterId: bundle.clusterId,
+    });
+
+    return {
+      queueId: bundle.queueId,
+      taskId: bundle.taskId,
+      packetId: bundle.packetId,
+      workspaceId: bundle.workspaceId,
+      featureId: bundle.featureId,
+      summary: bundle.summary,
+      nextAction: bundle.nextAction,
+      confidence: bundle.confidence,
+      status: bundle.status,
+      relatedFeatureIds: bundle.relatedFeatureIds,
+      relatedTaskIds: bundle.relatedTaskIds,
+      relatedFilePaths: bundle.relatedFilePaths,
+      clusterId: bundle.clusterId,
+      centroidId: bundle.centroidId,
+      semanticPacketTuple,
+      semanticPacketSnapshotPath: snapshot.jsonPath,
+      cachedTaskSemanticPacket: cachedPacket,
+    };
+  });
 }
 
 export async function injectSummary(rawArgs: unknown) {

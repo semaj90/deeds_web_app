@@ -21,18 +21,38 @@ export interface QdrantCodeResult {
   qdrant_id: string;
 }
 
+export type CodebaseAnnBackend = 'qdrant' | 'cuvs';
+
 let _mgr: QdrantManager | null = null;
 function getManager(): QdrantManager {
   if (!_mgr) _mgr = new QdrantManager(ENV.QDRANT_URL);
   return _mgr;
 }
 
-export async function searchQdrantCode(
+export function getCodebaseAnnBackend(): CodebaseAnnBackend {
+  const raw = (process.env.CODEBASE_ANN_BACKEND ?? 'qdrant').toLowerCase();
+  return raw === 'cuvs' ? 'cuvs' : 'qdrant';
+}
+
+/**
+ * Stable ANN retrieval contract for codebase chunks.
+ *
+ * Current default: Qdrant HNSW.
+ * Future experiment lane: cuVS/CAGRA behind the same result shape.
+ */
+export async function searchCodebaseAnn(
   embedding: number[],
   limit = 30,
   topoClass?: string,
   collection = 'codebase_chunks_768'
 ): Promise<QdrantCodeResult[]> {
+  const backend = getCodebaseAnnBackend();
+  if (backend !== 'qdrant') {
+    // Future seam: route to cuVS-backed ANN worker behind the same contract.
+    // For now, keep the existing Qdrant behavior as the canonical implementation.
+    console.warn(`[searchCodebaseAnn] backend=${backend} not implemented yet; falling back to qdrant`);
+  }
+
   try {
     const mgr = getManager();
     const mustConditions: any[] = [];
@@ -83,4 +103,13 @@ export async function searchQdrantCode(
   } catch {
     return [];
   }
+}
+
+export async function searchQdrantCode(
+  embedding: number[],
+  limit = 30,
+  topoClass?: string,
+  collection = 'codebase_chunks_768'
+): Promise<QdrantCodeResult[]> {
+  return searchCodebaseAnn(embedding, limit, topoClass, collection);
 }

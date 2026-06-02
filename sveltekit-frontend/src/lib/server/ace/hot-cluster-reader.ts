@@ -27,7 +27,24 @@ function parseJsonArray(value: string | undefined | null): string[] {
   if (!value) return [];
   try {
     const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.map((item) => String(item)).filter(Boolean) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          const record = item as Record<string, unknown>;
+          return (
+            (typeof record.tag === 'string' && record.tag.trim().length > 0 ? record.tag.trim() : null) ??
+            (typeof record.label === 'string' && record.label.trim().length > 0 ? record.label.trim() : null) ??
+            (typeof record.value === 'string' && record.value.trim().length > 0 ? record.value.trim() : null) ??
+            (typeof record.name === 'string' && record.name.trim().length > 0 ? record.name.trim() : null) ??
+            (typeof record.id === 'string' && record.id.trim().length > 0 ? record.id.trim() : null)
+          );
+        }
+        const text = String(item ?? '').trim();
+        return text.length > 0 ? text : null;
+      })
+      .filter((value): value is string => Boolean(value));
   } catch {
     return [];
   }

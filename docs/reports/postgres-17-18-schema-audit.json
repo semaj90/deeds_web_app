@@ -1,0 +1,74 @@
+{
+  "postgres_version": "17.6",
+  "extensions": {
+    "btree_gin": "1.3",
+    "pg_trgm": "1.6",
+    "plpgsql": "1.0",
+    "uuid-ossp": "1.1",
+    "vector": "0.8.0"
+  },
+  "live_tables": [
+    {
+      "table": "research_summaries",
+      "row_count": 53,
+      "with_output_meta": 0,
+      "with_source": 53,
+      "with_url": 5,
+      "indexes": ["research_summaries_pkey"]
+    }
+  ],
+  "absent_tables": [
+    "task_semantic_packets",
+    "summary_cards",
+    "glyph_records",
+    "card_source_refs"
+  ],
+  "schema_drift": {
+    "research_summaries": {
+      "live_columns": ["output_meta"],
+      "repo_columns": ["source_ref", "source_refs", "outputMeta"],
+      "planned_indexes": [
+        "source_ref btree",
+        "source_refs gin",
+        "entity_tags gin",
+        "output_meta gin",
+        "pipeline/relevance_score/id",
+        "entity_type/relevance_score/id",
+        "source/relevance_score/id",
+        "user_id/created_at",
+        "query_hash",
+        "embedding hnsw"
+      ]
+    }
+  },
+  "repo_consolidation": {
+    "production_ready": [
+      "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+      "sveltekit-frontend/src/lib/server/features/cases/research-summaries-db.ts",
+      "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+      "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"
+    ],
+    "planned_production": [
+      "task_semantic_packets",
+      "summary_cards",
+      "glyph_records",
+      "card_source_refs",
+      "atlas_*"
+    ],
+    "experimental": [
+      "local-deep-research SQLite boundary",
+      "cuVS/CAGRA swap lane",
+      "legacy backup trees",
+      ".tmp",
+      ".cache"
+    ]
+  },
+  "next_steps": [
+    "Apply additive provenance/index migration",
+    "Backfill provenance on existing research_summaries rows",
+    "Re-run parent atlas from production-ready feature list",
+    "Move archive candidates out of the ship set"
+  ]
+}
+

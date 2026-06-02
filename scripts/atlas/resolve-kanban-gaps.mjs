@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7,6 +8,10 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 const FRONTEND_ROOT = path.join(REPO_ROOT, 'sveltekit-frontend');
 
 const kanbanTasksPath = path.join(FRONTEND_ROOT, '.tmp', 'kanban_tasks.jsonl');
+
+function sha1(input) {
+  return createHash('sha1').update(String(input ?? '')).digest('hex');
+}
 
 function readJsonl(filePath) {
   if (!fs.existsSync(filePath)) return [];
@@ -58,6 +63,7 @@ function main() {
     }
 
     if (task.feature) {
+      updated.feature_id = updated.feature_id || task.feature_id || `feature:${sha1(`${task.title || ''}|${task.file || ''}|${task.notes || ''}`).slice(0, 24)}`;
       return updated; // already has a feature classification
     }
 
@@ -74,6 +80,7 @@ function main() {
 
     repairedCount++;
     updated.feature = matchedFeature;
+    updated.feature_id = updated.feature_id || `feature:${matchedFeature}:${sha1(`${task.title || ''}|${task.file || ''}|${task.notes || ''}`).slice(0, 12)}`;
     return updated;
   });
 

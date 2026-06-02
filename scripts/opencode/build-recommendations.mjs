@@ -35,17 +35,19 @@ const ROOT    = process.cwd();
 const DRY_RUN = process.argv.includes('--dry-run');
 
 const PATHS = {
-  aceIndex:      path.join(ROOT, '.opencode', 'ace-packets', 'index.ndjson'),
-  acePacketsDir: path.join(ROOT, '.opencode', 'ace-packets'),
-  mergedCards:   path.join(ROOT, '.opencode', 'cards', 'summaries.merged.jsonl'),
-  rankReport:    path.join(ROOT, '.tmp', 'retrieval-ranking-report.json'),
-  atlasSeeds:    path.join(ROOT, '.tmp', 'atlas-cartridge-seeds.jsonl'),
-  bifrostSmoke:  path.join(ROOT, '.tmp', 'bifrost-trace-smoke.json'),
-  laneHealth:    path.join(ROOT, '.tmp', 'atlas-lane-health-loop.json'),
-  startupReport: path.join(ROOT, 'reports', 'startup-truth-audit-report.md'),
-  outDir:        path.join(ROOT, '.opencode', 'recommendations'),
-  outJson:       path.join(ROOT, '.opencode', 'recommendations', 'recommendations.json'),
-  outMd:         path.join(ROOT, '.opencode', 'recommendations', 'recommendations.md'),
+  aceIndex:        path.join(ROOT, '.opencode', 'ace-packets', 'index.ndjson'),
+  acePacketsDir:   path.join(ROOT, '.opencode', 'ace-packets'),
+  mergedCards:     path.join(ROOT, '.opencode', 'cards', 'summaries.merged.jsonl'),
+  rankReport:      path.join(ROOT, '.tmp', 'retrieval-ranking-report.json'),
+  atlasSeeds:      path.join(ROOT, '.tmp', 'atlas-cartridge-seeds.jsonl'),
+  bifrostSmoke:    path.join(ROOT, '.tmp', 'bifrost-trace-smoke.json'),
+  laneHealth:      path.join(ROOT, '.tmp', 'atlas-lane-health-loop.json'),
+  startupReport:   path.join(ROOT, 'reports', 'startup-truth-audit-report.md'),
+  featureTodoQueue: path.join(ROOT, '.tmp', 'feature-todo-queue.ndjson'),
+  pathMap:         path.join(ROOT, '.tmp', 'path-map.json'),
+  outDir:          path.join(ROOT, '.opencode', 'recommendations'),
+  outJson:         path.join(ROOT, '.opencode', 'recommendations', 'recommendations.json'),
+  outMd:           path.join(ROOT, '.opencode', 'recommendations', 'recommendations.md'),
 };
 
 // ── Feature clusters ───────────────────────────────────────────────────────────
@@ -245,6 +247,46 @@ function detectMissingSourceRefs(mergedCards) {
   return recs;
 }
 
+/** Import errors: high-priority items from feature_todo_queue / path-map. */
+function detectImportErrors(todoQueue, pathMap) {
+  const recs = [];
+  if (!todoQueue?.length) return recs;
+  const high = todoQueue.filter(t => t.priority === 'high' && (t.type || t.todo_type) === 'missing_imports').slice(0, 6);
+  const featureToCluster = { ui: 'UI Components', rag: 'Retrieval', cache: 'Infrastructure', database: 'Infrastructure', graph: 'Retrieval', llm: 'Retrieval', admin: 'Agent Workflow', auth: 'Infrastructure', vector: 'Retrieval', routes: 'Agent Workflow' };
+  for (const item of high) {
+    const pm = pathMap?.[item.stableKey];
+    recs.push({
+      id: recId('import_error'),
+      type: 'developer_recommendation',
+      cluster: featureToCluster[item.feature] || assignCluster(item.feature || item.filePath || ''),
+      title: `${item.filePath} — ${item.importErrorCount} unresolved imports`,
+      why: `Feature "${item.feature}" barrel/index has ${item.importErrorCount} dangling import refs (mapreduce v4 scan)`,
+      sourceRefs: [item.filePath],
+      action: 'Audit barrel re-exports; remove or fix dangling import paths',
+      next_command: `node scripts/atlas/debug-import-resolve.mjs <import> '${item.filePath}'`,
+      priority: 'high',
+      featureStatus: 'degraded',
+    });
+  }
+  // Unclassified with many imports — need feature labeling
+  const unclassified = todoQueue.filter(t => (t.type || t.todo_type) === 'unclassified_feature' && (t.importCount ?? 0) > 10).slice(0, 4);
+  if (unclassified.length > 0) {
+    recs.push({
+      id: recId('unclassified'),
+      type: 'missing_dependency',
+      cluster: 'Agent Workflow',
+      title: `${unclassified.length} files unclassified with >10 imports`,
+      why: 'Files with many imports but no feature label degrade ACE context quality',
+      sourceRefs: unclassified.map(t => t.filePath),
+      action: 'Add feature labels to mapreduce classification rules',
+      next_command: 'node scripts/atlas/mapreduce-consolidated-index.mjs "--output=.tmp/mapreduce-full-v4.ndjson"',
+      priority: 'medium',
+      featureStatus: 'degraded',
+    });
+  }
+  return recs;
+}
+
 // ── Cluster grouping ───────────────────────────────────────────────────────────
 function groupByCluster(recs) {
   const clusters = {};
@@ -261,11 +303,13 @@ async function main() {
   console.log('\n── Build Recommendations (Phase 11E) ──────────────────────');
 
   // Load all inputs
-  const [aceIndexRows, bifrostSmoke, laneHealth, rankReport] = await Promise.all([
+  const [aceIndexRows, bifrostSmoke, laneHealth, rankReport, featureTodoQueue, pathMap] = await Promise.all([
     readNdjson(PATHS.aceIndex),
     readJson(PATHS.bifrostSmoke),
     readJson(PATHS.laneHealth),
     readJson(PATHS.rankReport),
+    readNdjson(PATHS.featureTodoQueue),
+    readJson(PATHS.pathMap),
   ]);
 
   // Load ace packet detail for duplicate detection
@@ -288,6 +332,7 @@ async function main() {
   console.log(`  atlas seeds   : ${atlasSeeds.length}`);
   console.log(`  merged cards  : ${mergedCards.length}`);
   console.log(`  rank report   : ${rankReport?.ranked?.length ?? 0} entries`);
+  console.log(`  todo queue    : ${featureTodoQueue.length} items (path_map: ${pathMap ? Object.keys(pathMap).length : 0} entries)`);
 
   // Generate all recommendations
   const all = [
@@ -296,6 +341,7 @@ async function main() {
     ...detectTopDevRecs(rankReport),
     ...detectDuplicates(acePackets),
     ...detectMissingSourceRefs(mergedCards),
+    ...detectImportErrors(featureTodoQueue, pathMap),
   ];
 
   // Sort: high → medium → low
@@ -322,6 +368,8 @@ async function main() {
       atlasSeeds: atlasSeeds.length,
       mergedCards: mergedCards.length,
       rankEntries: rankReport?.ranked?.length ?? 0,
+      todoQueueItems: featureTodoQueue.length,
+      pathMapEntries: pathMap ? Object.keys(pathMap).length : 0,
     },
   };
 

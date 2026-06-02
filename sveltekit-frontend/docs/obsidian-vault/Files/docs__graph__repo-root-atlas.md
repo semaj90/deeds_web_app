@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/docs/graph/repo-root-atlas.json"
-last_updated_by_llm: "2026-05-31T20:57:35.121Z"
+last_updated_by_llm: "2026-06-01T22:46:28.142Z"
 ai-first: true
 confidence: "high"
 up: []

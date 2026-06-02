@@ -1,13 +1,13 @@
 # Codebase Feature Mapping & Consolidation Plan
 
-**Date**: 2026-05-29  
-**Scope**: Map all 397 directories to 18 semantic features; consolidate via existing graph data  
-**Status**: Phase 2 Atlas data ready (106,515 CALLS edges); Phase 3-5 planned  
+**Date**: 2026-05-29
+**Scope**: Map all 397 directories to 18 semantic features; consolidate via existing graph data
+**Status**: Phase 2 Atlas data ready (106,515 CALLS edges); Phase 3-5 planned
 
 ---
 
 ## Executive Overview
-
+156k sveltekit-frontend 156,217 Files, 19,755 Folders 15.7 GB
 We have **3,143 source files** organized in **397 directories** across **4 major domains**:
 
 | Domain | Features | Files | LOC | Status |
@@ -346,6 +346,6 @@ ORDER BY call_count DESC;
 
 ---
 
-**Status**: Ready for Day 1 consolidations + Day 2 USES_DB extraction  
-**Decision Gate**: Confirm feature-to-file mapping approach before merging CALLS + USES_DB  
+**Status**: Ready for Day 1 consolidations + Day 2 USES_DB extraction
+**Decision Gate**: Confirm feature-to-file mapping approach before merging CALLS + USES_DB
 **Owner**: Atlas architecture + frontend team

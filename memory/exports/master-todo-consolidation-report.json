@@ -1,18 +1,25 @@
 {
-  "timestamp": "2026-06-01T01:12:24.558Z",
+  "timestamp": "2026-06-02T01:56:28.711Z",
   "sourceDocument": "MASTER-FEATURE-TODO-2026-05-20.md",
-  "openItems": 14,
-  "tasksGenerated": 14,
+  "openItems": 102,
+  "tasksGenerated": 102,
+  "featureLabelTasks": 3312,
+  "missingFeatureTodos": 141,
   "byStatus": {
-    "BACKLOG": 14
+    "BACKLOG": 96,
+    "REVIEW": 6
   },
   "byPriority": {
-    "LOW": 12,
+    "LOW": 100,
     "MEDIUM": 2
   },
   "fileResolution": {
-    "allRefsResolved": 0,
-    "someRefsMissing": 2,
-    "noFileRefs": 12
+    "allRefsResolved": 6,
+    "someRefsMissing": 0,
+    "noFileRefs": 96
+  },
+  "supplementalInputs": {
+    "featureLabelTasksPath": "sveltekit-frontend/.tmp/kanban_tasks.jsonl",
+    "missingFeatureTodosPath": "sveltekit-frontend/.tmp/missing_feature_todos.jsonl"
   }
 }

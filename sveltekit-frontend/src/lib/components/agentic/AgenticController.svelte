@@ -31,9 +31,33 @@
 	relevance: number;
   }
 
+  interface ProposalEvent {
+    id: string;
+    sessionId: string;
+    eventType: string;
+    pipeline: string;
+    summaryId?: string | null;
+    featureId?: string | null;
+    feature_id?: string | null;
+    sourceRef?: string | null;
+    source_ref?: string | null;
+    sourceRefs?: string[];
+    source_refs?: string[];
+    workspaceTaskId?: string | null;
+    workspace_task_id?: string | null;
+    parentAtlasCardId?: string | null;
+    parent_atlas_card_id?: string | null;
+    missingFeatureId?: boolean;
+    warning?: string | null;
+    payload: Record<string, unknown>;
+    createdAt: string;
+  }
+
   let status = $state<AgenticStatus | null>(null);
   let recentErrors = $state<ErrorEmbedding[]>([]);
   let fixSuggestions = $state<FixSuggestion[]>([]);
+  let fixProposal = $state<string>('');
+  let proposalTimeline = $state<ProposalEvent[]>([]);
   let loading = $state<boolean>(false);
   let error = $state<string>('');
   let errorQuery = $state<string>('');
@@ -92,6 +116,7 @@
     if (!errorQuery.trim()) return;
     loading = true;
     fixSuggestions = [];
+    fixProposal = '';
     try {
       const response = await fetch(`/api/v1/agentic?action=fix-suggestions&query=${encodeURIComponent(errorQuery)}`, { signal: AbortSignal.timeout(30_000) });
       if (!response.ok) {
@@ -99,6 +124,8 @@
       }
       const data = await response.json();
       fixSuggestions = data.suggestions || [];
+      fixProposal = data.proposal || '';
+      await fetchProposalTimeline();
     } catch (err: unknown) {
       error = `Fix query failed: ${err instanceof Error ? err.message : String(err)}`;
       console.error('Fix query error:', err);
@@ -107,11 +134,27 @@
     }
   }
 
+  async function fetchProposalTimeline(): Promise<void> {
+    try {
+      const response = await fetch(`/api/v1/agentic?action=timeline&query=${encodeURIComponent(errorQuery)}`, {
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!response.ok) {
+        throw new Error(`Timeline query failed: ${response.status}`);
+      }
+      const data = await response.json();
+      proposalTimeline = Array.isArray(data.events) ? data.events : [];
+    } catch (err: unknown) {
+      console.error('Timeline fetch error:', err);
+      proposalTimeline = [];
+    }
+  }
+
   $effect(() => {
 
     fetchStatus();
     fetchRecentErrors();
-  
+
 });
 </script>
 
@@ -202,6 +245,37 @@
               <span>Success Rate: {(suggestion.successRate * 100).toFixed(0)}%</span>
               <span>Relevance: {(suggestion.relevance * 100).toFixed(0)}%</span>
             </div>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
+
+  {#if fixProposal}
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold text-white mb-2">Proposal</h3>
+      <pre class="bg-panelSoft rounded p-3 text-xs text-sand/80 whitespace-pre-wrap max-h-96 overflow-auto">{fixProposal}</pre>
+    </div>
+  {/if}
+
+  {#if proposalTimeline.length > 0}
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold text-white mb-2">Proposal Timeline</h3>
+      <div class="space-y-2 max-h-72 overflow-y-auto">
+        {#each proposalTimeline as event}
+          <div class="bg-panelSoft rounded p-3">
+            <div class="flex items-center justify-between gap-3">
+              <p class="text-white text-sm font-semibold">{event.eventType}</p>
+              <p class="text-sand/40 text-xs">{new Date(event.createdAt).toLocaleString()}</p>
+            </div>
+            <p class="text-sand/60 text-xs mt-1">{event.sessionId}</p>
+            {#if event.feature_id || event.featureId}
+              <p class="text-xs text-accent mt-2">feature_id: {event.feature_id ?? event.featureId}</p>
+            {/if}
+            {#if event.warning}
+              <p class="text-xs text-warning mt-1">warning: {event.warning}</p>
+            {/if}
+            <pre class="text-xs text-sand/80 whitespace-pre-wrap mt-2">{JSON.stringify(event.payload, null, 2)}</pre>
           </div>
         {/each}
       </div>

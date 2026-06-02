@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-06-01T21:41:58.283Z",
+  "taskId": 1,
+  "dryRun": true,
+  "packet": {
+    "taskId": 1,
+    "packetId": "preview:1",
+    "queueId": null,
+    "qdrantPointId": "preview:qdrant:1",
+    "featureId": null,
+    "clusterId": null,
+    "centroidId": null,
+    "nextAction": "Dry-run preview only; real lifecycle skipped.",
+    "summary": "Dry-run preview only; no LLM, embedding, Qdrant, or Redis writes were performed."
+  }
+}

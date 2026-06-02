@@ -168,7 +168,11 @@ if (NO_QDRANT) {
 
 // ── Pillar 5: ACE fallback contract (static) ────────────────────────────────
 
-const assembler = path.join(ROOT, 'src/lib/server/ace/context-assembler.ts');
+// Canonical path moved to features/ai/ace; keep legacy as fallback
+const assembler =
+  existsSync(path.join(ROOT, 'src/lib/server/features/ai/ace/context-assembler.ts'))
+    ? path.join(ROOT, 'src/lib/server/features/ai/ace/context-assembler.ts')
+    : path.join(ROOT, 'src/lib/server/ace/context-assembler.ts');
 if (!existsSync(assembler)) {
   bad('Pillar 5 — ACE fallback contract', 'context-assembler.ts not found');
 } else {

@@ -1,0 +1,546 @@
+{
+  "schema": "parent_atlas_rg_dump_projection_report.v1",
+  "generatedAt": "2026-06-02T02:01:45.918Z",
+  "inputs": {
+    "organizerPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-rg-dump-organizer.json",
+    "packetNdjsonPath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson"
+  },
+  "outputs": {
+    "cypherPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\parent-atlas-rg-dump-packets.cypher",
+    "qdrantCollection": "parent_atlas_rg_packets_768",
+    "postgresRecordsTable": "parent_atlas_rg_records",
+    "postgresVectorsTable": "parent_atlas_rg_vectors"
+  },
+  "summary": {
+    "packetsProjected": 50,
+    "postgresRowsWritten": 50,
+    "qdrantPointsWritten": 50,
+    "sourceRefAnchors": 600,
+    "featureIds": 2,
+    "applied": true
+  },
+  "qdrant": {
+    "attempted": true,
+    "applied": true,
+    "collection": "parent_atlas_rg_packets_768"
+  },
+  "postgres": {
+    "attempted": true,
+    "applied": true,
+    "rows": 50,
+    "verifiedRows": 50,
+    "table": "parent_atlas_rg_vectors"
+  },
+  "packets": [
+    {
+      "title_id": "rg_turbovec:chunk:0001",
+      "title": "TurboVec raw search transcript chunk 1",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:1",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0002",
+      "title": "TurboVec raw search transcript chunk 2",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:2",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0003",
+      "title": "TurboVec raw search transcript chunk 3",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:3",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0004",
+      "title": "TurboVec raw search transcript chunk 4",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:4",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0005",
+      "title": "TurboVec raw search transcript chunk 5",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:5",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0006",
+      "title": "TurboVec raw search transcript chunk 6",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:6",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0007",
+      "title": "TurboVec raw search transcript chunk 7",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:7",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0008",
+      "title": "TurboVec raw search transcript chunk 8",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:8",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0009",
+      "title": "TurboVec raw search transcript chunk 9",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:9",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0010",
+      "title": "TurboVec raw search transcript chunk 10",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:10",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0011",
+      "title": "TurboVec raw search transcript chunk 11",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:11",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0012",
+      "title": "TurboVec raw search transcript chunk 12",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:12",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0013",
+      "title": "TurboVec raw search transcript chunk 13",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:13",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0014",
+      "title": "TurboVec raw search transcript chunk 14",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:14",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0015",
+      "title": "TurboVec raw search transcript chunk 15",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:15",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0016",
+      "title": "TurboVec raw search transcript chunk 16",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:16",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0017",
+      "title": "TurboVec raw search transcript chunk 17",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:17",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0018",
+      "title": "TurboVec raw search transcript chunk 18",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:18",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0019",
+      "title": "TurboVec raw search transcript chunk 19",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:19",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0020",
+      "title": "TurboVec raw search transcript chunk 20",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:20",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0021",
+      "title": "TurboVec raw search transcript chunk 21",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:21",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0022",
+      "title": "TurboVec raw search transcript chunk 22",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:22",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0023",
+      "title": "TurboVec raw search transcript chunk 23",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:23",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0024",
+      "title": "TurboVec raw search transcript chunk 24",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:24",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0025",
+      "title": "TurboVec raw search transcript chunk 25",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:25",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0026",
+      "title": "TurboVec raw search transcript chunk 26",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:26",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0027",
+      "title": "TurboVec raw search transcript chunk 27",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:27",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0028",
+      "title": "TurboVec raw search transcript chunk 28",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:28",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0029",
+      "title": "TurboVec raw search transcript chunk 29",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:29",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0030",
+      "title": "TurboVec raw search transcript chunk 30",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:30",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0031",
+      "title": "TurboVec raw search transcript chunk 31",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:31",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0032",
+      "title": "TurboVec raw search transcript chunk 32",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:32",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0033",
+      "title": "TurboVec raw search transcript chunk 33",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:33",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0034",
+      "title": "TurboVec raw search transcript chunk 34",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:34",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0035",
+      "title": "TurboVec raw search transcript chunk 35",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:35",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0036",
+      "title": "TurboVec raw search transcript chunk 36",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:36",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0037",
+      "title": "TurboVec raw search transcript chunk 37",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:37",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0038",
+      "title": "TurboVec raw search transcript chunk 38",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:38",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0039",
+      "title": "TurboVec raw search transcript chunk 39",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:39",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0040",
+      "title": "TurboVec raw search transcript chunk 40",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:40",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0041",
+      "title": "TurboVec raw search transcript chunk 41",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:41",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0042",
+      "title": "TurboVec raw search transcript chunk 42",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:42",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0043",
+      "title": "TurboVec raw search transcript chunk 43",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:43",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0044",
+      "title": "TurboVec raw search transcript chunk 44",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:44",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0045",
+      "title": "TurboVec raw search transcript chunk 45",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:45",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0046",
+      "title": "TurboVec raw search transcript chunk 46",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:46",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0047",
+      "title": "TurboVec raw search transcript chunk 47",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:47",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_turbovec:chunk:0048",
+      "title": "TurboVec raw search transcript chunk 48",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "packet_id": "rg_turbovec:48",
+      "dump_id": "rg_turbovec",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_napi:chunk:0001",
+      "title": "N-API bridge raw search transcript chunk 1",
+      "feature_id": "gpu.simd_bridge",
+      "sourceRef": "docs/reports/rg_napi.txt",
+      "packet_id": "rg_napi:1",
+      "dump_id": "rg_napi",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    },
+    {
+      "title_id": "rg_napi:chunk:0002",
+      "title": "N-API bridge raw search transcript chunk 2",
+      "feature_id": "gpu.simd_bridge",
+      "sourceRef": "docs/reports/rg_napi.txt",
+      "packet_id": "rg_napi:2",
+      "dump_id": "rg_napi",
+      "postgresStatus": "written",
+      "qdrantStatus": "written"
+    }
+  ],
+  "topFeatures": [
+    {
+      "key": "search.qdrant_vector",
+      "value": 1
+    },
+    {
+      "key": "gpu.simd_bridge",
+      "value": 1
+    }
+  ]
+}

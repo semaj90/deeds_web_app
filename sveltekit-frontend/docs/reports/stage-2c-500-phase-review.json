@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T15:06:01.403Z",
+  "generatedAt": "2026-06-01T16:50:44.320Z",
   "runId": "stage-2c-500",
   "inputs": {
     "graphDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\graph",
@@ -16,73 +16,73 @@
         "top": [
           {
             "rank": 1,
-            "directory": "`scripts/api-cleanup`",
-            "score": 45,
-            "files": 20,
+            "directory": "`deeds_labs/api-legacy/api/ai`",
+            "score": 42,
+            "files": 84,
             "status": "⚠️"
           },
           {
             "rank": 2,
-            "directory": "`scripts/api-cleanup/reports`",
-            "score": 45,
-            "files": 3,
+            "directory": "`deeds_labs/api-legacy/api/rag`",
+            "score": 43,
+            "files": 6,
             "status": "⚠️"
           },
           {
             "rank": 3,
-            "directory": "`scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z`",
-            "score": 45,
-            "files": 1324,
+            "directory": "`deeds_labs/frontend/sveltekit-frontend-archive/dirs`",
+            "score": 43,
+            "files": 10305,
             "status": "⚠️"
           },
           {
             "rank": 4,
-            "directory": "`sveltekit-frontend/src/routes/.well-known`",
-            "score": 58,
-            "files": 4,
+            "directory": "`deeds_labs/api-legacy/api`",
+            "score": 44,
+            "files": 2,
             "status": "⚠️"
           },
           {
             "rank": 5,
-            "directory": "`.venv/Lib/site-packages/torch`",
-            "score": 65,
-            "files": 3,
+            "directory": "`deeds_labs/api-legacy/api/agents`",
+            "score": 45,
+            "files": 2,
             "status": "⚠️"
           },
           {
             "rank": 6,
-            "directory": "`sveltekit-frontend/src/routes/minio`",
-            "score": 75,
-            "files": 1,
-            "status": "✅"
+            "directory": "`deeds_labs/api-legacy/api/analytics`",
+            "score": 45,
+            "files": 2,
+            "status": "⚠️"
           },
           {
             "rank": 7,
-            "directory": "`docker/langgraph-synthesis/.venv/Lib`",
-            "score": 75,
-            "files": 31,
-            "status": "✅"
+            "directory": "`deeds_labs/api-legacy/api/brain`",
+            "score": 45,
+            "files": 2,
+            "status": "⚠️"
           },
           {
             "rank": 8,
-            "directory": "`sveltekit-frontend/src/lib/components`",
-            "score": 80,
-            "files": 617,
-            "status": "✅"
+            "directory": "`deeds_labs/api-legacy/api/chat-test`",
+            "score": 45,
+            "files": 2,
+            "status": "⚠️"
           },
           {
             "rank": 9,
-            "directory": "`scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z`",
-            "score": 80,
-            "files": 3,
-            "status": "✅"
+            "directory": "`deeds_labs/api-legacy/api/debug`",
+            "score": 45,
+            "files": 2,
+            "status": "⚠️"
           },
           {
             "rank": 10,
-            "directory": "`sveltekit-frontend/src/lib/workers`",
-            "score": 83,
-            "files": 8,
-            "status": "✅"
+            "directory": "`deeds_labs/api-legacy/api/document`",
+            "score": 45,
+            "files": 2,
+            "status": "⚠️"
           }
         ]
       },
@@ -102,22 +102,30 @@
         "ok": true,
         "status": 200,
         "total": 25,
-        "withSourceRefs": 25,
-        "coverage": 1,
+        "withSourceRefs": 11,
+        "coverage": 0.44,
         "sample": [
           {
-            "id": "8303",
-            "filePath": "src/lib/types/evidence.ts",
-            "sourceRefsCount": 1,
-            "hasSourceRefs": true,
+            "id": "119404",
+            "filePath": ".venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_character.py",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
             "hasPagerank": false,
-            "cluster": 19
+            "cluster": null
           },
           {
-            "id": "155706",
-            "filePath": "src/lib/server/retrieval/turbovec-prefilter.ts",
-            "sourceRefsCount": 1,
-            "hasSourceRefs": true,
+            "id": "119984",
+            "filePath": ".venv/Lib/python3.9/site-packages/numpy/_core/overrides.py",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "164541",
+            "filePath": "",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
             "hasPagerank": false,
             "cluster": null
           },
@@ -127,7 +135,7 @@
             "sourceRefsCount": 1,
             "hasSourceRefs": true,
             "hasPagerank": false,
-            "cluster": null
+            "cluster": 1
           },
           {
             "id": "188608",
@@ -146,16 +154,16 @@
             "cluster": null
           },
           {
-            "id": "292522",
-            "filePath": "src/lib/components/monitoring/CacheMonitoringWidget.svelte",
+            "id": "227675",
+            "filePath": "src/lib/server/couchdb/mango-indexes.ts",
             "sourceRefsCount": 1,
             "hasSourceRefs": true,
             "hasPagerank": false,
             "cluster": null
           },
           {
-            "id": "433670",
-            "filePath": "src/routes/(app)/demos/courtroom-sim/LLMS.md",
+            "id": "292522",
+            "filePath": "src/lib/components/monitoring/CacheMonitoringWidget.svelte",
             "sourceRefsCount": 1,
             "hasSourceRefs": true,
             "hasPagerank": false,
@@ -170,20 +178,81 @@
             "cluster": null
           },
           {
-            "id": "506499",
-            "filePath": "src/lib/types/svelte5-api-types.d.ts",
-            "sourceRefsCount": 1,
-            "hasSourceRefs": true,
+            "id": "584992",
+            "filePath": ".venv/Lib/python3.9/site-packages/pip/_vendor/rich/color.py",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
             "hasPagerank": false,
-            "cluster": 4
+            "cluster": null
           },
           {
-            "id": "516801",
-            "filePath": "src/lib/components/cases/ContextualChatModal.svelte",
+            "id": "733463",
+            "filePath": ".venv/Lib/python3.9/site-packages/numpy/_core/tests/test_simd.py",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "909958",
+            "filePath": "src/lib/server/retrieval/centroid-cache.ts",
             "sourceRefsCount": 1,
             "hasSourceRefs": true,
             "hasPagerank": false,
-            "cluster": 2
+            "cluster": null
+          }
+        ],
+        "repoTotal": 12,
+        "repoWithSourceRefs": 11,
+        "repoCoverage": 0.917,
+        "repoSample": [
+          {
+            "id": "174637",
+            "filePath": "src/lib/server/ai/contextual-tools.ts",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": 1
+          },
+          {
+            "id": "188608",
+            "filePath": "src/lib/server/research/reddit-harvester.ts",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "194586",
+            "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "227675",
+            "filePath": "src/lib/server/couchdb/mango-indexes.ts",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "292522",
+            "filePath": "src/lib/components/monitoring/CacheMonitoringWidget.svelte",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "436451",
+            "filePath": "src/lib/components/citations/CitationSaveForm.svelte",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": null
           },
           {
             "id": "909958",
@@ -194,8 +263,40 @@
             "cluster": null
           },
           {
-            "id": "1005499",
-            "filePath": "src/lib/components/ai/LLMS.md",
+            "id": "1080785",
+            "filePath": "src/lib/components/admin/AdminMonitoringDashboard.svelte",
+            "sourceRefsCount": 0,
+            "hasSourceRefs": false,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "1103029",
+            "filePath": "src/lib/components/graph/GraphifyViewer.svelte",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "1116368",
+            "filePath": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "1354889",
+            "filePath": "src/lib/components/legal/EvidenceReportSummary.svelte",
+            "sourceRefsCount": 1,
+            "hasSourceRefs": true,
+            "hasPagerank": false,
+            "cluster": null
+          },
+          {
+            "id": "1401737",
+            "filePath": "src/lib/db/schema/evidence.ts",
             "sourceRefsCount": 1,
             "hasSourceRefs": true,
             "hasPagerank": false,

@@ -3946,6 +3946,10 @@ export const researchSummaries = pgTable('research_summaries', {
   title:          text('title'),
   /** Web URL or MinIO object path */
   url:            text('url'),
+  /** Canonical provenance anchor for joins back to source files / atlas cards */
+  sourceRef:      text('source_ref'),
+  /** All provenance anchors for this summary, stored as a dense join surface */
+  sourceRefs:     text('source_refs').array().notNull().default(sql`'{}'::text[]`),
   /** Qdrant collection name (corpus only) */
   collection:     text('collection'),
   citationLabel:  text('citation_label'),
@@ -3973,11 +3977,14 @@ export const researchSummaries = pgTable('research_summaries', {
    * pagination by manifold region).
    */
   manifold4:      real('manifold4').array(),
+  /** Structured output envelope from deep-research / ACE synthesis */
+  outputMeta:     jsonb('output_meta').notNull().default(sql`'{}'::jsonb`),
   createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => [
   index('rs_pipeline_score_id').on(t.pipeline, t.relevanceScore, t.id),
   index('rs_entity_type_score').on(t.entityType, t.relevanceScore, t.id),
   index('rs_source_score').on(t.source, t.relevanceScore, t.id),
+  index('rs_source_ref').on(t.sourceRef),
   index('rs_user_created').on(t.userId, t.createdAt),
   index('rs_query_hash').on(t.queryHash),
 ]);
@@ -4784,4 +4791,7 @@ export type NewLlmSynthesisEvent = typeof llmSynthesisEvents.$inferInsert;
 // GlyphRecord_DB aliases the canonical glyphRecords table (defined at line ~3748).
 export type GlyphRecord_DB = typeof glyphRecords.$inferSelect;
 export type NewGlyphRecord_DB = typeof glyphRecords.$inferInsert;
+
+
+export * from './schema/nes-chrom-packets.js';
 

@@ -1,10 +1,22 @@
 <script lang="ts">
-  import { slide } from 'svelte/transition';
-  
-  let { hits = [], graphPaths = [] } = $props();
+  type GraphPathItem = string | { path?: string; label?: string; name?: string; nodes?: unknown[]; rels?: unknown[] };
+  type Props = {
+    hits?: Array<Record<string, any>>;
+    graphPaths?: GraphPathItem[];
+  };
 
-  const localHits = $derived(hits.filter(h => !h.signals?.isExternal));
-  const externalHits = $derived(hits.filter(h => h.signals?.isExternal));
+  let { hits = [], graphPaths = [] }: Props = $props();
+
+  const localHits = $derived(hits.filter((h) => !h.signals?.isExternal));
+  const externalHits = $derived(hits.filter((h) => h.signals?.isExternal));
+  const graphPathCount = $derived(graphPaths.length);
+  const graphPathLabels = $derived(
+    graphPaths.slice(0, 3).map((path) => {
+      if (typeof path === 'string') return path;
+      if (!path || typeof path !== 'object') return '—';
+      return path.label ?? path.path ?? path.name ?? `nodes:${path.nodes?.length ?? 0} rels:${path.rels?.length ?? 0}`;
+    })
+  );
 </script>
 
 <div class="space-y-2 font-sans">
@@ -53,9 +65,16 @@
         Topological Impact Path
       </h4>
       <div class="flex items-center gap-1 text-[9px] text-purple-400/80 font-mono italic px-1">
-        <span>{graphPaths[0].nodes?.length || 0} nodes</span>
+        <span>{graphPathCount} paths</span>
         <span class="text-zinc-700">/</span>
-        <span>{graphPaths[0].rels?.length || 0} relationships</span>
+        <span>{graphPaths.slice(0, 3).length} shown</span>
+      </div>
+      <div class="mt-1 space-y-1 px-1">
+        {#each graphPathLabels as pathLabel, index (pathLabel + index)}
+          <div class="text-[10px] text-purple-200/90 font-mono truncate rounded border border-purple-500/10 bg-purple-950/20 px-2 py-1">
+            {pathLabel}
+          </div>
+        {/each}
       </div>
     </div>
   {/if}

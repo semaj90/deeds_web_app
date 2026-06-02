@@ -6,7 +6,10 @@ import fs from 'fs';
 import path from 'path';
 import { Client } from 'pg';
 
-const OUT_DIR = process.env.OUT_DIR || './.tmp/parent_atlas_packets';
+const ONLY_SOURCE_REF_FIRST = process.argv.includes('--only-sourceRef-first');
+const OUT_DIR = process.env.OUT_DIR || (ONLY_SOURCE_REF_FIRST ? './.tmp/parent_atlas_packets/sourceRef-first' : './.tmp/parent_atlas_packets');
+const REPORT_JSON = process.env.REPORT_JSON || (ONLY_SOURCE_REF_FIRST ? './docs/reports/sourceRef-first-parent-atlas-packets.json' : '');
+const REPORT_MD = process.env.REPORT_MD || (ONLY_SOURCE_REF_FIRST ? './docs/reports/sourceRef-first-parent-atlas-packets.md' : '');
 // Allow passing DB URL via env or --db=... arg or as first positional arg
 const argDb = process.argv.find(a => a.startsWith('--db='))?.split('=')[1];
 const DATABASE_URL = process.env.DATABASE_URL || argDb || process.argv[2];
@@ -29,11 +32,12 @@ async function main(){
                       r.payload AS metadata,
                       (v.embedding::text) AS embedding_text,
                       (r.payload->>'clusterId') AS clusterid,
-                      (r.payload->>'somBmuRow')::int AS som_bmu_row,
-                      (r.payload->>'somBmuCol')::int AS som_bmu_col
+                      (r.payload->>'somBmuRow') AS som_bmu_row,
+                      (r.payload->>'somBmuCol') AS som_bmu_col
                FROM parent_atlas_records r
                LEFT JOIN parent_atlas_vectors v ON v.record_id = r.id
-               WHERE (r.payload->>'clusterId') IS NOT NULL OR v.embedding IS NOT NULL
+               WHERE ((r.payload->>'clusterId') IS NOT NULL OR v.embedding IS NOT NULL)
+                 ${ONLY_SOURCE_REF_FIRST ? "AND r.id LIKE 'parent_atlas:sourceRef_first:%'" : ''}
                LIMIT 1000`;
 
   const res = await client.query(sql);
@@ -55,11 +59,11 @@ async function main(){
     // Normalize from metadata if SOM/cluster fields are present in snake_case
     try {
       const meta = row.metadata || {};
-      if (meta.som_bmu_row != null) pkt.somBmuRow = Number(meta.som_bmu_row);
-      else if (meta.somBmuRow != null) pkt.somBmuRow = Number(meta.somBmuRow);
+      const rowValue = meta.som_bmu_row ?? meta.somBmuRow ?? row.som_bmu_row;
+      const colValue = meta.som_bmu_col ?? meta.somBmuCol ?? row.som_bmu_col;
+      if (rowValue != null && Number.isFinite(Number(rowValue))) pkt.somBmuRow = Number(rowValue);
 
-      if (meta.som_bmu_col != null) pkt.somBmuCol = Number(meta.som_bmu_col);
-      else if (meta.somBmuCol != null) pkt.somBmuCol = Number(meta.somBmuCol);
+      if (colValue != null && Number.isFinite(Number(colValue))) pkt.somBmuCol = Number(colValue);
 
       if (meta.clusterId) pkt.clusterId = meta.clusterId;
       else if (meta.cluster_id) pkt.clusterId = meta.cluster_id;
@@ -71,6 +75,41 @@ async function main(){
     const fname = path.join(OUT_DIR, `${safeId}.json`);
     await fs.promises.writeFile(fname, JSON.stringify(pkt, null, 2));
     console.log('Wrote', fname);
+  }
+
+  if (REPORT_JSON) {
+    const report = {
+      generatedAt: new Date().toISOString(),
+      inputs: {
+        databaseUrl: 'DATABASE_URL',
+        onlySourceRefFirst: ONLY_SOURCE_REF_FIRST,
+        outDir: OUT_DIR,
+      },
+      summary: {
+        rows: res.rowCount,
+        filesWritten: res.rowCount,
+      },
+      note: ONLY_SOURCE_REF_FIRST
+        ? 'Exports only sourceRef-first parent atlas rows into a dedicated packet directory.'
+        : 'Exports parent atlas packets for downstream offline pipelines.',
+    };
+    await fs.promises.mkdir(path.dirname(REPORT_JSON), { recursive: true });
+    await fs.promises.writeFile(REPORT_JSON, JSON.stringify(report, null, 2));
+    if (REPORT_MD) {
+      const md = [
+        '# Parent Atlas Packet Export',
+        '',
+        `Generated: ${report.generatedAt}`,
+        `Mode: ${ONLY_SOURCE_REF_FIRST ? 'sourceRef-first only' : 'full export'}`,
+        `Rows: ${report.summary.rows}`,
+        `Files written: ${report.summary.filesWritten}`,
+        `Output dir: ${OUT_DIR}`,
+        '',
+        `- ${report.note}`,
+        '',
+      ].join('\n');
+      await fs.promises.writeFile(REPORT_MD, md);
+    }
   }
 
   await client.end();

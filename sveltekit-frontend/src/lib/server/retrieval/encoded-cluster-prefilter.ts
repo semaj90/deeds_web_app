@@ -10,6 +10,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { encode768to64 } from '../gpu/encode-768-to-64.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { createHash } from 'node:crypto';
 
 // ── Re-export types (backward-compat — callers that import types from here) ───
 
@@ -36,6 +37,7 @@ export {
 import type { PrefilterOptions, PrefilterResult } from './prefilter.types.js';
 import { getCentroids64, getCentroidCacheEntry, CACHE_TTL_MS } from './prefilter.redis.js';
 import { topKClusters, skip, resolveMode } from './prefilter.shadow.js';
+import { setSimilarityResult } from '$lib/server/cache/tensor-similarity-cache.js';
 
 // ── Main prefilter ────────────────────────────────────────────────────────────
 
@@ -66,6 +68,11 @@ export async function encodedClusterPrefilter(
 	}
 
 	try {
+		const queryHash =
+			typeof queryOrEmbedding === 'string'
+				? createHash('sha256').update(queryOrEmbedding).digest('hex').slice(0, 16)
+				: null;
+
 		// 1. Resolve embedding
 		let queryEmbedding: Float32Array;
 		if (typeof queryOrEmbedding === 'string') {
@@ -85,6 +92,22 @@ export async function encodedClusterPrefilter(
 
 		// 4. Score and rank
 		const hits = topKClusters(encodedQuery, centroids, topK);
+
+		// 4b. Warm the Redis similarity cache for future query+cluster lookups.
+		// This is intentionally best-effort: cache warmth should never block A0.
+		if (queryHash) {
+			const now = Date.now();
+			await Promise.allSettled(
+				hits.map((hit) =>
+					setSimilarityResult(queryHash, `cluster:gpu:${hit.id}`, {
+						scores: [hit.score],
+						topKPaths: [`cluster:gpu:${hit.id}`],
+						source: 'gpu',
+						computedAt: now,
+					})
+				)
+			);
+		}
 
 		// Determine centroid source for observability
 		const cached = getCentroidCacheEntry();

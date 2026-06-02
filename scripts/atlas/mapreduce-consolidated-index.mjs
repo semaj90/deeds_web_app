@@ -10,14 +10,23 @@
  *   node scripts/atlas/mapreduce-consolidated-index.mjs --output consolidated.ndjson
  */
 
-import { existsSync, readdirSync, readFileSync, writeFileSync, statSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, statSync, mkdirSync, createWriteStream } from 'fs';
 import { join, resolve, dirname, extname, relative } from 'path';
 import { createHash } from 'crypto';
 
 const args = process.argv.slice(2);
-const limit = parseInt(args.find(a => a.startsWith('--limit='))?.split('=')[1] ?? '10000', 10);
+const limitIndex = args.indexOf('--limit');
+const limit = parseInt(
+  limitIndex >= 0
+    ? args[limitIndex + 1] ?? '10000'
+    : args.find(a => a.startsWith('--limit='))?.split('=')[1] ?? '10000',
+  10
+);
 const dryRun = args.includes('--dry-run');
-const outputFile = args.find(a => a.startsWith('--output='))?.split('=')[1] ?? 'consolidated-index.ndjson';
+const outputIndex = args.indexOf('--output');
+const outputFile = outputIndex >= 0
+  ? args[outputIndex + 1] ?? 'consolidated-index.ndjson'
+  : args.find(a => a.startsWith('--output='))?.split('=')[1] ?? 'consolidated-index.ndjson';
 const verbose = args.includes('--verbose');
 
 const REPO_ROOT = resolve('.');
@@ -276,10 +285,22 @@ if (dryRun) {
   console.log(JSON.stringify(consolidatedDocs[0], null, 2));
 } else {
   // Write as NDJSON (one JSON per line, no file size limit)
-  const ndjsonLines = consolidatedDocs.map(doc => JSON.stringify(doc)).join('\n');
-  writeFileSync(outputFile, ndjsonLines, 'utf-8');
+  mkdirSync(dirname(outputFile), { recursive: true });
+  const stream = createWriteStream(outputFile, { encoding: 'utf-8' });
+  let bytesWritten = 0;
+  for (const doc of consolidatedDocs) {
+    const line = `${JSON.stringify(doc)}\n`;
+    bytesWritten += Buffer.byteLength(line);
+    if (!stream.write(line)) {
+      await new Promise((resolve) => stream.once('drain', resolve));
+    }
+  }
+  await new Promise((resolve, reject) => {
+    stream.end(() => resolve());
+    stream.on('error', reject);
+  });
 
-  const fileSizeMB = (Buffer.byteLength(ndjsonLines) / 1024 / 1024).toFixed(2);
+  const fileSizeMB = (bytesWritten / 1024 / 1024).toFixed(2);
   console.log(`✅ Written to: ${outputFile}`);
   console.log(`   Size: ${fileSizeMB} MB`);
   console.log(`   Format: NDJSON (one JSON per line)`);

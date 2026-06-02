@@ -1,0 +1,640 @@
+{
+  "generatedAt": "2026-06-01T18:09:39.6740050-07:00",
+  "repo": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "gitUnmerged": false,
+  "topLevelBuckets": [
+    {
+      "path": "sveltekit-frontend",
+      "gb": 15.56,
+      "files": 158078
+    },
+    {
+      "path": "models",
+      "gb": 9.74,
+      "files": 130
+    },
+    {
+      "path": "backups",
+      "gb": 8.11,
+      "files": 74
+    },
+    {
+      "path": "docker",
+      "gb": 6.34,
+      "files": 48453
+    },
+    {
+      "path": ".git",
+      "gb": 5.44,
+      "files": 2620
+    },
+    {
+      "path": ".venv-py313-backup",
+      "gb": 5.31,
+      "files": 97636
+    },
+    {
+      "path": "docs",
+      "gb": 4.09,
+      "files": 322
+    },
+    {
+      "path": "node_modules",
+      "gb": 1.56,
+      "files": 143133
+    },
+    {
+      "path": ".tmp",
+      "gb": 1.16,
+      "files": 896
+    },
+    {
+      "path": "claude-mem",
+      "gb": 1.14,
+      "files": 44250
+    },
+    {
+      "path": "simd-bridge",
+      "gb": 1.04,
+      "files": 3405
+    },
+    {
+      "path": "granite-docling-258M",
+      "gb": 0.98,
+      "files": 54
+    },
+    {
+      "path": "deeds_labs",
+      "gb": 0.79,
+      "files": 51201
+    },
+    {
+      "path": ".opencode",
+      "gb": 0.73,
+      "files": 23700
+    },
+    {
+      "path": "scripts",
+      "gb": 0.73,
+      "files": 8019
+    },
+    {
+      "path": "offline-data",
+      "gb": 0.63,
+      "files": 1
+    },
+    {
+      "path": ".cache",
+      "gb": 0.56,
+      "files": 19
+    },
+    {
+      "path": "turbovec",
+      "gb": 0.52,
+      "files": 1433
+    },
+    {
+      "path": "artifacts",
+      "gb": 0.49,
+      "files": 6
+    },
+    {
+      "path": "tools",
+      "gb": 0.48,
+      "files": 12
+    },
+    {
+      "path": ".rag-metrics",
+      "gb": 0.44,
+      "files": 8
+    },
+    {
+      "path": "qdrant-windows",
+      "gb": 0.4,
+      "files": 182
+    },
+    {
+      "path": "storage",
+      "gb": 0.33,
+      "files": 174
+    },
+    {
+      "path": "vendor",
+      "gb": 0.29,
+      "files": 3
+    },
+    {
+      "path": "services",
+      "gb": 0.16,
+      "files": 57
+    },
+    {
+      "path": "logs",
+      "gb": 0.12,
+      "files": 210
+    },
+    {
+      "path": ".python311",
+      "gb": 0.09,
+      "files": 5385
+    },
+    {
+      "path": "onnx",
+      "gb": 0.08,
+      "files": 1
+    },
+    {
+      "path": "memory",
+      "gb": 0.06,
+      "files": 123
+    },
+    {
+      "path": "next_steps",
+      "gb": 0.03,
+      "files": 173
+    },
+    {
+      "path": "vscode-extension",
+      "gb": 0.03,
+      "files": 285
+    },
+    {
+      "path": "lawpdfs",
+      "gb": 0.03,
+      "files": 42
+    },
+    {
+      "path": ".venv",
+      "gb": 0.02,
+      "files": 1497
+    },
+    {
+      "path": "scratch",
+      "gb": 0.01,
+      "files": 49
+    },
+    {
+      "path": "duckdb",
+      "gb": 0.01,
+      "files": 3
+    },
+    {
+      "path": "training-datasets",
+      "gb": 0.01,
+      "files": 4
+    },
+    {
+      "path": "archive",
+      "gb": 0.01,
+      "files": 25
+    },
+    {
+      "path": ".svelte-error-fixes-backup",
+      "gb": 0.01,
+      "files": 692
+    },
+    {
+      "path": ".vs",
+      "gb": 0.01,
+      "files": 5
+    },
+    {
+      "path": "CUsersjamesVideosdeeds-web-app.tmpatlas-cards",
+      "gb": 0.0,
+      "files": 0
+    },
+    {
+      "path": ".roo",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": ".pytest_cache",
+      "gb": 0.0,
+      "files": 5
+    },
+    {
+      "path": ".github",
+      "gb": 0.0,
+      "files": 18
+    },
+    {
+      "path": "sql",
+      "gb": 0.0,
+      "files": 0
+    },
+    {
+      "path": "src",
+      "gb": 0.0,
+      "files": 41
+    },
+    {
+      "path": ".githooks",
+      "gb": 0.0,
+      "files": 5
+    },
+    {
+      "path": "reports",
+      "gb": 0.0,
+      "files": 22
+    },
+    {
+      "path": ".gemini",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": "test-results",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": "tests",
+      "gb": 0.0,
+      "files": 6
+    },
+    {
+      "path": "tmp",
+      "gb": 0.0,
+      "files": 37
+    },
+    {
+      "path": ".error-brain",
+      "gb": 0.0,
+      "files": 85
+    },
+    {
+      "path": ".cline",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": ".claude",
+      "gb": 0.0,
+      "files": 27
+    },
+    {
+      "path": "ssl",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": "redis",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": "python",
+      "gb": 0.0,
+      "files": 6
+    },
+    {
+      "path": "qdrant",
+      "gb": 0.0,
+      "files": 9
+    },
+    {
+      "path": "drizzle",
+      "gb": 0.0,
+      "files": 54
+    },
+    {
+      "path": "audit",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": "infra",
+      "gb": 0.0,
+      "files": 2
+    },
+    {
+      "path": "karpathy-wiki",
+      "gb": 0.0,
+      "files": 2
+    },
+    {
+      "path": "llm",
+      "gb": 0.0,
+      "files": 12
+    },
+    {
+      "path": "$lib",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": ".woodpecker",
+      "gb": 0.0,
+      "files": 3
+    },
+    {
+      "path": "minio",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": "minio-data",
+      "gb": 0.0,
+      "files": 69
+    },
+    {
+      "path": ".vscode",
+      "gb": 0.0,
+      "files": 65
+    },
+    {
+      "path": "nginx",
+      "gb": 0.0,
+      "files": 2
+    },
+    {
+      "path": ".svelte-kit",
+      "gb": 0.0,
+      "files": 9
+    },
+    {
+      "path": "pgvector-precompiled",
+      "gb": 0.0,
+      "files": 48
+    },
+    {
+      "path": "phase13graph_exportgenerator",
+      "gb": 0.0,
+      "files": 10
+    },
+    {
+      "path": "plans",
+      "gb": 0.0,
+      "files": 1
+    },
+    {
+      "path": "proto",
+      "gb": 0.0,
+      "files": 50
+    },
+    {
+      "path": "data",
+      "gb": 0.0,
+      "files": 37
+    },
+    {
+      "path": ".scripts",
+      "gb": 0.0,
+      "files": 8
+    },
+    {
+      "path": "workers",
+      "gb": 0.0,
+      "files": 2
+    }
+  ],
+  "largeFiles": [
+    {
+      "path": "models/gemma4-legal-iq4xs-direct.gguf",
+      "gb": 4.74,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "backups/atlas-2026-05-17T21-21-53-987Z/qdrant/codebase_chunks_10m.snapshot",
+      "gb": 3.97,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "docs/reports/rg_turbovec.txt",
+      "gb": 2.67,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "docs/reports/rg_napi.txt",
+      "gb": 1.36,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/lib/torch_cuda.dll",
+      "gb": 1.32,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "models/embeddinggemma_300m/model.safetensors",
+      "gb": 1.13,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "models/embeddinggemma_300m/.git/lfs/objects/cb/f5/cbf5a78393b6a033e0b8a63a57549964f7ed5c6fbeb4ba0694214f36123f2fd2",
+      "gb": 1.13,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "models/mmproj-F16.gguf",
+      "gb": 0.92,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": ".git/objects/pack/pack-c1d95cc65c6d2b6047862c651939966cb5587b16.pack",
+      "gb": 0.7,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/lib/dnnl.lib",
+      "gb": 0.65,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/lib/cublasLt64_12.dll",
+      "gb": 0.64,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "offline-data/backups/legal_ai_db_backup.dump",
+      "gb": 0.63,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/tmp/codebase_chunks_768-embeddings.ndjson",
+      "gb": 0.59,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "backups/atlas-2026-05-17T21-21-53-987Z/postgres_backup.sql",
+      "gb": 0.58,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "backups/atlas-2026-05-17T17-31-55-315Z/postgres_backup.sql",
+      "gb": 0.58,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "backups/atlas-2026-05-17T17-35-25-824Z/postgres_backup.sql",
+      "gb": 0.58,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "backups/atlas-2026-05-17T21-21-53-987Z/neo4j_data.tar",
+      "gb": 0.55,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "backups/atlas-2026-05-17T17-35-25-824Z/neo4j_data.tar",
+      "gb": 0.55,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "models/gemma3_270m/model.safetensors",
+      "gb": 0.5,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "artifacts/qdrant-volume-exports-2026-04-01/deeds-web-app_qdrant-data-384__ws-e38928570c6f912e.tar.gz",
+      "gb": 0.49,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/lib/cudnn_engines_precompiled64_9.dll",
+      "gb": 0.49,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "granite-docling-258M/model.safetensors",
+      "gb": 0.48,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "granite-docling-258M/.git/lfs/objects/1c/da/1cdad234deb1cde18ee6a586f849057f19851daf1fedce2e40aff791dbe46f61",
+      "gb": 0.48,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": ".venv-py313-backup/Lib/site-packages/torch/lib/cublasLt64_13.dll",
+      "gb": 0.45,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/build/client/gemma3_270m_onnx/gemma3_270m_w8a16.onnx",
+      "gb": 0.41,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "models/gemma3-client-onnx/gemma3_270m_w8a16.onnx",
+      "gb": 0.41,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "models/gemma3-client-onnx/gemma3_client_quantized.onnx",
+      "gb": 0.41,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/build/client/gemma3_270m_onnx/gemma3_client_quantized.onnx",
+      "gb": 0.41,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/static/gemma3_270m_onnx/gemma3_270m_w8a16.onnx",
+      "gb": 0.41,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/static/gemma3_270m_onnx/gemma3_client_quantized.onnx",
+      "gb": 0.41,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/.svelte-kit/output/client/gemma3_270m_onnx/gemma3_client_quantized.onnx",
+      "gb": 0.41,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/.svelte-kit/output/client/gemma3_270m_onnx/gemma3_270m_w8a16.onnx",
+      "gb": 0.41,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": ".cache/cards/09e185c179fb0407eded430b49c8a6a341caa29b.msgpack",
+      "gb": 0.39,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/.cache/cards/87a3e2aa5036028f81632b720cdf195a73ce8a0e.msgpack",
+      "gb": 0.39,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/docs_readme/deeds_labs_archive/svelte-check-errors.json",
+      "gb": 0.39,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/.venv/Lib/python3.9/site-packages/nvidia/nccl/lib/libnccl.so.2",
+      "gb": 0.38,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": ".venv-py313-backup/Lib/site-packages/torch/lib/torch_cuda.dll",
+      "gb": 0.38,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": ".tmp/simd-adaptive-parser.json",
+      "gb": 0.37,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "sveltekit-frontend/tmp/hypergraph/codebase_chunks_768-embeddings.ndjson",
+      "gb": 0.36,
+      "tracked": false,
+      "bucket": "other-large"
+    },
+    {
+      "path": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/lib/cusparse64_12.dll",
+      "gb": 0.36,
+      "tracked": false,
+      "bucket": "other-large"
+    }
+  ],
+  "notes": [
+    "No git unmerged paths were present (git ls-files -u empty).",
+    "This report does not delete or move files.",
+    "The two largest easy-to-spot repo-local dumps are docs/reports/rg_turbovec.txt and docs/reports/rg_napi.txt.",
+    "The rest of the missing space is distributed across models, backups, docker, .git history, venv backups, and generated analysis artifacts."
+  ]
+}

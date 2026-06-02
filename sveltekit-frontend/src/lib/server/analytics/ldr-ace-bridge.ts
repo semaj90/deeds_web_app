@@ -19,6 +19,13 @@ import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 import { searchLdrHistory, startLdrResearch, ldrQuickSummary } from './ldr-client.js';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import {
+  hashQuery as hashAcePacketQuery,
+  buildSemanticProvenanceTuple,
+  redisSetAcePacket,
+  redisSetSemanticProvenanceTuple,
+  type AcePacket,
+} from '$lib/server/cache/ace-packet-cache.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -34,6 +41,81 @@ function fnv1a8(s: string): string {
     h = Math.imul(h, 0x01000193) >>> 0;
   }
   return h.toString(16).padStart(8, '0');
+}
+
+function normalizeSourceRefs(sources: Array<{ title: string; url: string; snippet?: string }>): string[] {
+  return [...new Set(sources.map((src) => src.url.trim()).filter(Boolean))];
+}
+
+function buildLdrAcePacket(
+  query: string,
+  summary: string,
+  sources: Array<{ title: string; url: string; snippet?: string }>,
+  tags: string[],
+  qHash: string,
+): AcePacket {
+  const sourceRefs = normalizeSourceRefs(sources);
+  const promptCacheKey = hashAcePacketQuery(query);
+
+  return {
+    query,
+    cacheSources: ['ldr', 'searxng', 'wikipedia'],
+    sourceRefs,
+    rankedCards: [
+      {
+        id: `ldr:${qHash}`,
+        kind: 'summary',
+        title: sources[0]?.title ?? query,
+        score: 0.88,
+        sourceRefs,
+        summary: summary.slice(0, 800),
+        tags: ['ldr', 'deep_research', 'searxng', ...tags.slice(0, 6)],
+      },
+      ...sources.slice(0, 4).map((src, index) => ({
+        id: `ldr:src:${fnv1a8(src.url)}`,
+        kind: 'source',
+        title: src.title,
+        score: Math.max(0.55, 0.76 - index * 0.04),
+        sourceRefs: [src.url],
+        summary: (src.snippet ?? src.url).slice(0, 500),
+        tags: ['ldr', 'web_source', ...extractLegalTags(src.title).slice(0, 3)],
+      })),
+    ],
+    failureHints: sourceRefs.length
+      ? []
+      : ['LDR returned no source refs; re-run with a larger search window or alternate engine.'],
+    nextActions: sourceRefs.length
+      ? ['reuse cached deep-research summary', 'promote provenance into canonical stores']
+      : ['rerun local-deep-research with alternate engines'],
+    promptCacheKey,
+    degraded: sourceRefs.length === 0,
+  };
+}
+
+async function cacheLdrAcePacket(
+  query: string,
+  summary: string,
+  sources: Array<{ title: string; url: string; snippet?: string }>,
+  tags: string[],
+  qHash: string,
+): Promise<void> {
+  try {
+    const packet = buildLdrAcePacket(query, summary, sources, tags, qHash);
+    const tuple = buildSemanticProvenanceTuple({
+      cacheKey: packet.promptCacheKey,
+      query,
+      queryHash: qHash,
+      featureId: 'deep_research',
+      primarySourceRef: sources[0]?.url ?? null,
+      parentAtlasCardId: null,
+      packet,
+    });
+
+    await redisSetAcePacket(packet.promptCacheKey, packet, ACE_TTL);
+    await redisSetSemanticProvenanceTuple(packet.promptCacheKey, tuple, ACE_TTL);
+  } catch {
+    // non-fatal
+  }
 }
 
 // ── Export pipeline ───────────────────────────────────────────────────────────
@@ -62,6 +144,7 @@ async function exportLdrResultToStorage(
     const { result: embResult, qdrantTags } = await generateEmbeddingsWithTags(texts, PIPELINE);
     const summaryVec = embResult.vectors[0];
     const allTags    = [...new Set([...tags, ...qdrantTags, 'ldr', 'deep_research', 'searxng'])];
+    const sourceRefs = normalizeSourceRefs(sources);
 
     const redis = getRedis();
 
@@ -83,6 +166,7 @@ async function exportLdrResultToStorage(
               source:        'ldr',
               pipeline:      PIPELINE,
               entity_tags:   allTags,
+              source_refs:   sourceRefs,
               url:           sources[0]?.url ?? '',
               title:         sources[0]?.title ?? query,
               sources:       sources.slice(0, 5).map(s => s.url),
@@ -103,6 +187,9 @@ async function exportLdrResultToStorage(
         JSON.stringify({ query, summary, sources, tags: allTags, indexedAt: new Date().toISOString() }),
         'EX', IDX_TTL,
       ).catch(() => {});
+
+      // 4b. Canonical ACE packet cache for assistant reuse
+      await cacheLdrAcePacket(query, summary, sources, allTags, qHash);
     }
 
     // 5. Postgres research_summaries (non-blocking)
@@ -115,14 +202,30 @@ async function exportLdrResultToStorage(
         queryHash:      qHash,
         title:          sources[0]?.title ?? null,
         url:            sources[0]?.url   ?? null,
+        sourceRef:      sources[0]?.url   ?? null,
+        sourceRefs:     sourceRefs,
         collection:     QDRANT_COLLECTION,
-        citationLabel:  null,
-        sectionPath:    null,
+        citationLabel:  sources[0]?.title ?? null,
+        sectionPath:    sourceRefs.join(' | ') || null,
         jurisdiction:   null,
         summary,
         entityTags:     allTags,
         relevanceScore: 0.85,
         userId:         null,
+        outputMeta: {
+          source: 'ldr',
+          query,
+          queryHash: qHash,
+          summary: summary.slice(0, 1000),
+          sourceRefs,
+          citations: sources.slice(0, 5).map((s) => ({
+            title: s.title,
+            url: s.url,
+            snippet: s.snippet ?? null,
+          })),
+          confidence: 0.85,
+          pipeline: PIPELINE,
+        },
       }]).catch(() => {});
     }).catch(() => {});
 
@@ -187,6 +290,13 @@ export async function fetchLdrResearchForAce(
 
     // Cache ACE results
     await redis.set(`ldr:ace:${qHash}`, JSON.stringify(results), 'EX', ACE_TTL).catch(() => {});
+    await cacheLdrAcePacket(
+      ldrResult.query,
+      ldrResult.summary,
+      ldrResult.sources ?? [],
+      extractLegalTags(`${ldrResult.query} ${ldrResult.summary}`),
+      qHash,
+    );
 
     // Export to Qdrant/Postgres (fire-and-forget)
     const tags = extractLegalTags(`${ldrResult.query} ${ldrResult.summary}`);
@@ -201,6 +311,7 @@ export async function fetchLdrResearchForAce(
     if (quickSummary && quickSummary.length > 80) {
       const results = buildAceResults(query, quickSummary, [], qHash, limit);
       await redis.set(`ldr:ace:${qHash}`, JSON.stringify(results), 'EX', ACE_TTL).catch(() => {});
+      await cacheLdrAcePacket(query, quickSummary, [], extractLegalTags(quickSummary), qHash);
       exportLdrResultToStorage(query, quickSummary, [], extractLegalTags(quickSummary)).catch(() => {});
       return results;
     }
@@ -237,6 +348,7 @@ function buildAceResults(
       pipeline:   PIPELINE,
       source:     'ldr',
       sourceUrl:  sources[0]?.url ?? null,
+      sourceRefs: normalizeSourceRefs(sources),
       ldrResult:  true,
     },
   });
@@ -258,6 +370,7 @@ function buildAceResults(
         source:   'ldr_source',
         url:      src.url,
         title:    src.title,
+        sourceRefs: [src.url],
       },
     });
   }

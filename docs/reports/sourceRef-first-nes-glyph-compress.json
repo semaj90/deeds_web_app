@@ -1,0 +1,105 @@
+{
+  "schema": "sourceRef_first_nes_glyph_compress_report.v1",
+  "generatedAt": "2026-06-01T21:27:11.260Z",
+  "mode": "apply",
+  "inputs": {
+    "warmupReport": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-first-join-warmup.json",
+    "clusterLimit": 1,
+    "packetLimit": 1,
+    "bifrostModels": [
+      "ollama/gemma4-rotorquant:latest",
+      "ollama/ibm/granite-docling:258m"
+    ]
+  },
+  "summary": {
+    "selectedItems": 2,
+    "summariesGenerated": 2,
+    "packetsPersisted": 2,
+    "hitsPersisted": 7,
+    "bifrostFallbacks": 2,
+    "errors": 2
+  },
+  "top": {
+    "featureIds": [
+      {
+        "value": "cluster:19067cadf0",
+        "count": 1
+      },
+      {
+        "value": "feature:cache",
+        "count": 1
+      }
+    ],
+    "sourceRefs": [
+      {
+        "value": "src/lib/ai/citation-cache.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-cache.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-embed.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-llm-synthesis.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-quality.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-router.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/cache/cache-service.svelte.ts",
+        "count": 1
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "kind": "cluster",
+      "sourceRef": "src/lib/ai/citation-cache.ts",
+      "sourceRefs": [
+        "src/lib/ai/citation-cache.ts",
+        "src/lib/ai/client-cache.ts",
+        "src/lib/ai/client-embed.ts",
+        "src/lib/ai/client-llm-synthesis.ts",
+        "src/lib/ai/client-quality.ts",
+        "src/lib/ai/client-router.ts"
+      ],
+      "featureId": "cluster:19067cadf0",
+      "queryHash": "fb3aec99cf9cad5851fb4fc0ef6dcca882a39b996fc995c28149148582ba3791",
+      "chunkId": "2a4fa7fc93cb",
+      "summary": "Create a compact NES/Glyph summary card.  Kind: cluster featureId: cluster:19067cadf0 sourceRef: src/lib/ai/citation-cache.",
+      "summaryKey": "nes:cluster:19067cadf0:fb3aec99cf9cad58:2a4fa7fc93cb",
+      "cachedKey": "sourceRef-first:compress:cluster:cluster:19067cadf0:fb3aec99cf9cad58",
+      "persisted": true,
+      "bifrostModel": "ollama/gemma4-rotorquant:latest",
+      "bifrostFallback": true,
+      "hitCount": 6
+    },
+    {
+      "kind": "nes_packet",
+      "sourceRef": "src/lib/cache/cache-service.svelte.ts",
+      "sourceRefs": [
+        "src/lib/cache/cache-service.svelte.ts"
+      ],
+      "featureId": "feature:cache",
+      "queryHash": "71db4b96c7f2c392e3dd4704b5350ce99753924c622de4287a9f2c7df2e9ac77",
+      "chunkId": "4e59778e30e7",
+      "summary": "Create a compact NES/Glyph summary card.  Kind: nes_packet featureId: feature:cache sourceRef: src/lib/cache/cache-service.",
+      "summaryKey": "nes:feature:cache:71db4b96c7f2c392:4e59778e30e7",
+      "cachedKey": "sourceRef-first:compress:nes_packet:feature:cache:71db4b96c7f2c392",
+      "persisted": true,
+      "bifrostModel": "ollama/gemma4-rotorquant:latest",
+      "bifrostFallback": true,
+      "hitCount": 1
+    }
+  ]
+}

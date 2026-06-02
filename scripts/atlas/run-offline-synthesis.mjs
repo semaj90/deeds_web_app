@@ -7,12 +7,14 @@
  * Flow:
  *   1. batch-offline-ingest (bounded slice of the repo)
  *   2. summarize_cards_gemma4 (compact summary artifacts)
- *   3. duckdb:feature-cards:refresh (validate offline mirror)
- *   4. phase-19c-knowledge-consolidation (prepare consolidation payloads)
- *   5. phase-19c-qdrant-index (prepare vector payloads)
- *   6. phase-19c-neo4j-sync (prepare graph payloads)
- *   7. atlas-parent-indexing (apply parent atlas exports)
- *   8. validate-parent-atlas + audit-parent-atlas-consistency
+ *   3. mapreduce-consolidated-index (current corpus metadata join)
+ *   4. offline-synthesis-mapreduce-duckdb (materialize DuckDB mirror)
+ *   5. duckdb:feature-cards:refresh (validate offline mirror)
+ *   6. phase-19c-knowledge-consolidation (prepare consolidation payloads)
+ *   7. phase-19c-qdrant-index (prepare vector payloads)
+ *   8. phase-19c-neo4j-sync (prepare graph payloads)
+ *   9. atlas-parent-indexing (apply parent atlas exports)
+ *   10. validate-parent-atlas + audit-parent-atlas-consistency
  *
  * Usage:
  *   node scripts/atlas/run-offline-synthesis.mjs
@@ -132,6 +134,20 @@ try {
   }
 
   // 3. Validate the offline mirror in DuckDB.
+  const mapreduceOutput = path.join(ROOT, '.tmp', 'offline-synthesis', 'consolidated-index.ndjson');
+  const mapreduceArgs = ['--limit', String(LIMIT), '--output=' + mapreduceOutput];
+  runNodeScript('scripts/atlas/mapreduce-consolidated-index.mjs', mapreduceArgs);
+  mark('mapreduce-consolidated-index', 'ok', { limit: LIMIT, output: mapreduceOutput, apply: APPLY && !DRY_RUN });
+
+  if (APPLY && !DRY_RUN) {
+    runNodeScript('scripts/atlas/materialize-mapreduce-duckdb.mjs', ['--write']);
+    mark('offline-synthesis-mapreduce-duckdb', 'ok');
+  } else {
+    runNodeScript('scripts/atlas/materialize-mapreduce-duckdb.mjs', ['--dry-run']);
+    mark('offline-synthesis-mapreduce-duckdb', 'skipped', { reason: 'dry-run' });
+  }
+
+  // 5. Validate the offline mirror in DuckDB.
   if (APPLY && !DRY_RUN) {
     runNpmScript('duckdb:feature-cards:refresh', [], path.join(ROOT, 'sveltekit-frontend'));
     mark('duckdb-feature-cards-refresh', 'ok');
@@ -139,7 +155,7 @@ try {
     mark('duckdb-feature-cards-refresh', 'skipped', { reason: 'dry-run' });
   }
 
-  // 4. Prepare the phase-19c payloads.
+  // 6. Prepare the phase-19c payloads.
   runNodeScript('scripts/atlas/phase-19c-knowledge-consolidation.mjs', DRY_RUN || !APPLY ? ['--dry-run'] : []);
   mark('phase-19c-knowledge-consolidation', 'ok');
 

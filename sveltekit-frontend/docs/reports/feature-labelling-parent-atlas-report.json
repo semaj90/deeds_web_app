@@ -1,0 +1,366 @@
+{
+  "generatedAt": "2026-06-02T01:13:28.493Z",
+  "source": {
+    "inventoryCandidates": [
+      "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\ingest\\atlas-data-files.jsonl"
+    ],
+    "todoCandidates": [
+      "C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md",
+      "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\architecture\\kanban-parent-atlas-alignment.md"
+    ]
+  },
+  "counts": {
+    "featureLabels": 3312,
+    "kanbanTasks": 3312,
+    "missingTodos": 141,
+    "todoLabels": 141,
+    "inventoryLabels": 3171
+  },
+  "samples": {
+    "todo": [
+      {
+        "task_id": "kanban-5b882548bfd3",
+        "feature_id": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21"
+        ],
+        "title": "**Knowledge Graph Tool Lanes**",
+        "description": "**Knowledge Graph Tool Lanes**",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 21
+      },
+      {
+        "task_id": "kanban-e85ec67be636",
+        "feature_id": "feature:todo:f831f8496459630481b6f126",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:22"
+        ],
+        "title": "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores",
+        "description": "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 22
+      },
+      {
+        "task_id": "kanban-367ef736edbd",
+        "feature_id": "feature:todo:2aed3e03cc66e3e478a5479d",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23"
+        ],
+        "title": "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats",
+        "description": "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 23
+      },
+      {
+        "task_id": "kanban-c94be4b7f14d",
+        "feature_id": "feature:todo:a33b97f7501a9583a2e63c2b",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24"
+        ],
+        "title": "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats",
+        "description": "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 24
+      },
+      {
+        "task_id": "kanban-bd3f0f6d443b",
+        "feature_id": "feature:todo:322cf977b5fa41f902b9321b",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25"
+        ],
+        "title": "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection",
+        "description": "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 25
+      },
+      {
+        "task_id": "kanban-c029e338268b",
+        "feature_id": "feature:todo:4ced48dea132da38f2ab7305",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28"
+        ],
+        "title": "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru",
+        "description": "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of truth",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 28
+      },
+      {
+        "task_id": "kanban-4d2c22a25d3f",
+        "feature_id": "feature:todo:a11f763c236417569484b3e7",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49"
+        ],
+        "title": "Clustering quality cleanup (deferred)",
+        "description": "Clustering quality cleanup (deferred)",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 49
+      },
+      {
+        "task_id": "kanban-4666ceed33f2",
+        "feature_id": "feature:todo:787ff44880ddd6be2d9388ce",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55"
+        ],
+        "title": "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred",
+        "description": "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 55
+      },
+      {
+        "task_id": "kanban-95132d29e580",
+        "feature_id": "feature:todo:7c0dbd56784529c16e1cb60e",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:71"
+        ],
+        "title": "**Track C — Production Gap Remediation** (after DB audit)",
+        "description": "**Track C — Production Gap Remediation** (after DB audit)",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 71
+      },
+      {
+        "task_id": "kanban-c47cc56e809a",
+        "feature_id": "feature:todo:4afa9ddc2a7b74e522364100",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:74"
+        ],
+        "title": "Seed legal canon chunks (legal PDF ingest pipeline)",
+        "description": "Seed legal canon chunks (legal PDF ingest pipeline)",
+        "section": "Karpathy GPU Finish Line - Execution Task",
+        "status": "todo",
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md",
+        "line_number": 74
+      }
+    ],
+    "labels": [
+      {
+        "id": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "feature_id": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:f831f8496459630481b6f126",
+        "feature_id": "feature:todo:f831f8496459630481b6f126",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:22"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:2aed3e03cc66e3e478a5479d",
+        "feature_id": "feature:todo:2aed3e03cc66e3e478a5479d",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:a33b97f7501a9583a2e63c2b",
+        "feature_id": "feature:todo:a33b97f7501a9583a2e63c2b",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:322cf977b5fa41f902b9321b",
+        "feature_id": "feature:todo:322cf977b5fa41f902b9321b",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:4ced48dea132da38f2ab7305",
+        "feature_id": "feature:todo:4ced48dea132da38f2ab7305",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:a11f763c236417569484b3e7",
+        "feature_id": "feature:todo:a11f763c236417569484b3e7",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:787ff44880ddd6be2d9388ce",
+        "feature_id": "feature:todo:787ff44880ddd6be2d9388ce",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:7c0dbd56784529c16e1cb60e",
+        "feature_id": "feature:todo:7c0dbd56784529c16e1cb60e",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:71"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "id": "feature:todo:4afa9ddc2a7b74e522364100",
+        "feature_id": "feature:todo:4afa9ddc2a7b74e522364100",
+        "featureKey": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "feature": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "path": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "source_ref": "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "sourceRefs": [
+          "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:74"
+        ],
+        "label": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "tags": [
+          "Karpathy GPU Finish Line - Execution Task",
+          "todo",
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        ],
+        "source": "../MASTER-FEATURE-TODO-2026-05-20.md"
+      }
+    ]
+  },
+  "note": "Parent Atlas feature labeling now emits todo-derived tasks with feature_id and sourceRefs for replayable joins."
+}

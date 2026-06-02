@@ -4,7 +4,7 @@ path: "docs/phase100/file-consolidation-audit.json"
 aliases: ["file-consolidation-audit.json","docs/phase100/file-consolidation-audit.json"]
 clusterId: -1
 ext: ".json"
-lineCount: 26637
+lineCount: 26917
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/docs/phase100/file-consolidation-audit.json"
-last_updated_by_llm: "2026-05-31T20:57:35.121Z"
+last_updated_by_llm: "2026-06-01T22:46:28.142Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/json","t/json"]
 > JSON data file
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 26637
+lines:: 26917
 ## Summary
 
 JSON data file

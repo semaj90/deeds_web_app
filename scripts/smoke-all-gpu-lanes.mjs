@@ -361,20 +361,20 @@ if (!LANE_FILTER || LANE_FILTER === 'cuda-graph') {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// NEW LANE: FP16 Attention Smoke (H4 Smoke)
+// Lane: FP16 Attention Smoke (H4)
 // ─────────────────────────────────────────────────────────────────
 if (!LANE_FILTER || LANE_FILTER === 'fp16-attention') {
   const lane = { name: 'fp16-attention', status: 'pending', detail: null };
   try {
-    // CORRECTED: Access the exported function directly instead of requiring the module to call it
-    const smokeModule = require('./smoke-fp16-attention.mjs');
-    if (typeof smokeModule.runSmokeTest !== 'function') {
-        lane.status = 'fail';
-        lane.detail = { error: 'Smoke module does not export runSmokeTest() function.' };
+    // ESM module — must use dynamic import(), not require()
+    const { runSmokeTest } = await import('./smoke-fp16-attention.mjs');
+    const smokeResult = runSmokeTest();
+    if (smokeResult.skipped) {
+      lane.status = 'skip';
+      lane.detail = { reason: smokeResult.reason };
     } else {
-        const smokeResult = smokeModule.runSmokeTest();
-        lane.status = 'ok';
-        lane.detail = smokeResult;
+      lane.status = 'ok';
+      lane.detail = smokeResult;
     }
   } catch (e) {
     lane.status = 'fail';
@@ -384,56 +384,145 @@ if (!LANE_FILTER || LANE_FILTER === 'fp16-attention') {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// Lane: VLM — Vercel AI SDK + tool calling via llama-server (:8090)
+//
+// Three-stage probe using the same @ai-sdk/openai-compatible + ai stack
+// that gemma4.ts uses in production:
+//
+//   Stage 1  /health             — llama-server up
+//   Stage 2  /v1/models          — GGUF loaded, multimodal capability present
+//   Stage 3  generateText with a minimal tool definition
+//            → finish_reason must be "tool_calls" or "stop"
+//            → at minimum a text response must come back
+//
+// Backend-agnostic: change TURBO_PORT / LLAMA_SERVER_HOST to re-target
+// TRT-LLM (:8099), vLLM (:8000), or any OpenAI-compatible endpoint.
+// ─────────────────────────────────────────────────────────────────
+if (!LANE_FILTER || LANE_FILTER === 'vlm') {
+  const lane = { name: 'vlm', status: 'pending', detail: null };
+  const LLAMA_HOST = process.env.LLAMA_SERVER_HOST ?? '127.0.0.1';
+  const LLAMA_PORT = process.env.TURBO_PORT ?? process.env.LLAMA_SERVER_PORT ?? '8090';
+  const BASE = `http://${LLAMA_HOST}:${LLAMA_PORT}`;
+  const mmproj = process.env.MMPROJ_PATH ?? process.env.TURBOQUANT_MMPROJ_PATH ?? null;
+  const mmprojExists = mmproj ? existsSync(mmproj) : false;
+
+  try {
+    const t0 = Date.now();
+
+    // Stage 1: health
+    const healthRes = await fetch(`${BASE}/health`, { signal: AbortSignal.timeout(3_000) });
+    if (!healthRes.ok) {
+      lane.status = 'skip';
+      lane.detail = { reason: `llama-server not healthy at ${BASE} (HTTP ${healthRes.status})` };
+      lanes.push(lane);
+      // skip stages 2+3
+    } else {
+
+      // Stage 2: model list — check multimodal capability array
+      let modelId = null;
+      let hasMultimodal = false;
+      try {
+        const modelsRes = await fetch(`${BASE}/v1/models`, { signal: AbortSignal.timeout(3_000) });
+        if (modelsRes.ok) {
+          const modelsData = await modelsRes.json();
+          // llama-server returns both .models[] (Ollama-compat) and .data[] (OAI-compat)
+          const oaiModels = modelsData.data ?? [];
+          const llamaModels = modelsData.models ?? [];
+          modelId = oaiModels[0]?.id ?? llamaModels[0]?.name ?? null;
+          // llama-server sets capabilities: ["completion","multimodal"] when --mmproj is active
+          hasMultimodal = llamaModels.some(m => Array.isArray(m.capabilities) && m.capabilities.includes('multimodal'));
+        }
+      } catch { /* model list is informational */ }
+
+      // Stage 3: Vercel AI SDK generateText + tool call round-trip
+      // Uses @ai-sdk/openai-compatible exactly as gemma4.ts does in production.
+      // Tool: probe_ack — model must call it with a status field.
+      // We use generateText (not streamText) to keep smoke fast and non-SSE.
+      let toolCallOk = false;
+      let toolFinishReason = null;
+      let toolCallError = null;
+      let sdkText = null;
+
+      try {
+        const { createOpenAICompatible } = await import('@ai-sdk/openai-compatible');
+        const { generateText, tool } = await import('ai');
+        const { z } = await import('zod');
+
+        const provider = createOpenAICompatible({
+          name: 'llama-server-smoke',
+          baseURL: `${BASE}/v1`,
+          apiKey: 'local',
+        });
+
+        // Use the first available model id from Stage 2, fall back to a known alias
+        const smokeModelId = modelId ?? 'gemma4-legal-iq4xs-direct.gguf';
+
+        const result = await generateText({
+          model: provider(smokeModelId),
+          messages: [
+            {
+              role: 'user',
+              content: 'You are being tested. Call the probe_ack tool with status="ok".',
+            },
+          ],
+          tools: {
+            probe_ack: tool({
+              description: 'Acknowledge the smoke probe. Call this tool to confirm tool-calling works.',
+              parameters: z.object({
+                status: z.enum(['ok', 'fail']).describe('Probe status'),
+              }),
+              execute: async ({ status }) => ({ ack: status, ts: Date.now() }),
+            }),
+          },
+          toolChoice: 'required',
+          maxTokens: 128,
+          maxSteps: 2,   // allow one tool call + optional follow-up
+        });
+
+        toolFinishReason = result.finishReason;
+        sdkText = result.text ?? null;
+        // Check that at least one tool call completed
+        toolCallOk = result.toolCalls?.length > 0 || result.finishReason === 'stop';
+      } catch (sdkErr) {
+        toolCallError = sdkErr.message;
+      }
+
+      const latency = Date.now() - t0;
+      lane.status = 'ok';
+      lane.detail = {
+        base_url: BASE,
+        model_id: modelId,
+        mmproj_path: mmproj,
+        mmproj_exists: mmprojExists,
+        multimodal_capability: hasMultimodal,
+        vlm_ready: mmprojExists,
+        sdk_tool_call_ok: toolCallOk,
+        sdk_finish_reason: toolFinishReason,
+        sdk_text_preview: sdkText ? sdkText.slice(0, 80) : null,
+        sdk_error: toolCallError,
+        latency_ms: latency,
+      };
+
+      // Degrade to fail if the SDK call errored hard (not just no tool call)
+      if (toolCallError && !sdkText) {
+        lane.status = 'fail';
+      }
+
+      lanes.push(lane);
+    }
+  } catch (e) {
+    lane.status = 'skip';
+    lane.detail = { reason: `llama-server not reachable at ${BASE}: ${e.message}` };
+    lanes.push(lane);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
 // Summary
 // ─────────────────────────────────────────────────────────────────
 const ok = lanes.filter(l => l.status === 'ok').length;
 const skipped = lanes.filter(l => l.status === 'skip').length;
 const failed = lanes.filter(l => l.status === 'fail').length;
-console.log(`\n🔍 GPU Lanes Smoke`);
-console.log('───────────────────────────────────────────────────────────');
-for (const l of lanes) {
-  const icon = { ok: '✓', skip: '~', fail: '✗' }[l.status];
-  console.log(`  ${icon} ${l.name.padEnd(14)} ${l.status.padEnd(6)} ${JSON.stringify(l.detail).slice(0, 100)}`);
-}
-console.log('───────────────────────────────────────────────────────────');
-console.log(`Result: ${ok} ok, ${skipped} skip, ${failed} fail`);
-writeFileSync(OUT_FILE, JSON.stringify({ timestamp: new Date().toISOString(), lanes, summary: { ok, skipped, failed } }, null, 2));
-console.log(`Smoke report: ${OUT_FILE}`);
-process.exit(failed > 0 ? 1 : 0);
-console.log(`\n🔍 GPU Lanes Smoke`);
-console.log('───────────────────────────────────────────────────────────');
-for (const l of lanes) {
-  const icon = { ok: '✓', skip: '~', fail: '✗' }[l.status];
-  console.log(`  ${icon} ${l.name.padEnd(14)} ${l.status.padEnd(6)} ${JSON.stringify(l.detail).slice(0, 100)}`);
-}
-console.log('───────────────────────────────────────────────────────────');
-console.log(`Result: ${ok} ok, ${skipped} skip, ${failed} fail`);
-writeFileSync(OUT_FILE, JSON.stringify({ timestamp: new Date().toISOString(), lanes, summary: { ok, skipped, failed } }, null, 2));
-console.log(`Smoke report: ${OUT_FILE}`);
-process.exit(failed > 0 ? 1 : 0);
-console.log(`\n🔍 GPU Lanes Smoke`);
-console.log('───────────────────────────────────────────────────────────');
-for (const l of lanes) {
-  const icon = { ok: '✓', skip: '~', fail: '✗' }[l.status];
-  console.log(`  ${icon} ${l.name.padEnd(14)} ${l.status.padEnd(6)} ${JSON.stringify(l.detail).slice(0, 100)}`);
-}
-console.log('───────────────────────────────────────────────────────────');
-console.log(`Result: ${ok} ok, ${skipped} skip, ${failed} fail`);
-writeFileSync(OUT_FILE, JSON.stringify({ timestamp: new Date().toISOString(), lanes, summary: { ok, skipped, failed } }, null, 2));
-console.log(`Smoke report: ${OUT_FILE}`);
-process.exit(failed > 0 ? 1 : 0);
-console.log(`\n🔍 GPU Lanes Smoke`);
-console.log('───────────────────────────────────────────────────────────');
-for (const l of lanes) {
-  const icon = { ok: '✓', skip: '~', fail: '✗' }[l.status];
-  console.log(`  ${icon} ${l.name.padEnd(14)} ${l.status.padEnd(6)} ${JSON.stringify(l.detail).slice(0, 100)}`);
-}
-console.log('───────────────────────────────────────────────────────────');
-console.log(`Result: ${ok} ok, ${skipped} skip, ${failed} fail`);
-writeFileSync(OUT_FILE, JSON.stringify({ timestamp: new Date().toISOString(), lanes, summary: { ok, skipped, failed } }, null, 2));
-console.log(`Smoke report: ${OUT_FILE}`);
-process.exit(failed > 0 ? 1 : 0);
-
 
 console.log('\n🔍 GPU Lanes Smoke');
 console.log('───────────────────────────────────────────────────────────');

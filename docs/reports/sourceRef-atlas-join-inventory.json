@@ -1,0 +1,92 @@
+{
+  "generated_at": "2026-06-01T08:25:00.000Z",
+  "goal": "SourceRef-first atlas join inventory",
+  "join_spine": [
+    "file_path",
+    "mapreduce stableKey",
+    "sourceRef",
+    "parent_atlas_card_id",
+    "alias_id",
+    "feature_id"
+  ],
+  "existing_artifacts": {
+    "mapreduce_and_path_map": [
+      ".tmp/mapreduce-full-v4.ndjson",
+      ".tmp/mapreduce-full-v4.ndjson.manifest.json",
+      ".tmp/path-map.json",
+      ".tmp/path-map.ndjson",
+      "scripts/atlas/mapreduce-consolidated-index.mjs",
+      "scripts/atlas/missing-features-review.mjs",
+      "docs/graph/missing-features-path-map.json",
+      "docs/graph/missing-features-path-map.md"
+    ],
+    "duckdb_and_parent_atlas": [
+      ".tmp/ingest/atlas.duckdb",
+      ".tmp/ingest/parent_atlas.parquet",
+      ".tmp/ingest/parent_atlas_full.parquet",
+      ".tmp/ingest/parent_atlas_gpu.ndjson",
+      ".tmp/ingest/parent_atlas_gpu.parquet",
+      ".tmp/parent-atlas-index.json",
+      ".tmp/parent-atlas-validation.json",
+      "memory/exports/parent-atlas/parent_atlas_index.json",
+      "docs/atlas/parent-atlas-data-spine.md",
+      "docs/architecture/offline-synthesis-parent-atlas.md"
+    ],
+    "qdrant_and_cache": [
+      "scripts/atlas/qdrant-path-bridge.mjs",
+      "docs/reports/qdrant-path-bridge-latest.json",
+      "docs/reports/qdrant-path-bridge-latest.md",
+      ".tmp/qdrant-postgres-mirror-reconciliation.json",
+      ".tmp/qdrant-postgres-mirror-reconciliation.md",
+      "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+      "sveltekit-frontend/src/lib/server/cache/redis-semantic-cache.ts",
+      "sveltekit-frontend/src/lib/server/features/rag/codebase-context.ts"
+    ],
+    "neo4j_and_topology": [
+      "sveltekit-frontend/src/lib/server/graph/neo4j-gds.ts",
+      "sveltekit-frontend/src/lib/server/graph/som-topology-pipeline.ts",
+      "sveltekit-frontend/src/lib/server/graph/community-graph.ts",
+      "sveltekit-frontend/src/lib/server/features/rag/codebase-context.ts",
+      "docs/atlas/phase-20-training-readiness.md"
+    ],
+    "retrieval_and_recommendation": [
+      "scripts/ingest/retrieval-pass.mjs",
+      "scripts/ingest/rank-cards.mjs",
+      "scripts/ingest/compress-cards.mjs",
+      "scripts/ingest/rerank-cards.mjs",
+      "scripts/opencode/build-recommendations.mjs",
+      "docs/reports/retrieval-pass-dry-run.md",
+      ".tmp/retrieval-pass-dry-run.json",
+      ".tmp/retrieval-pass-dry-run.ndjson"
+    ],
+    "schema_and_alias": [
+      "sveltekit-frontend/src/lib/server/db/schema/tasks.ts",
+      "sveltekit-frontend/src/lib/server/db/schema/atlas-profile-store.ts",
+      "sveltekit-frontend/src/lib/server/db/schema/index.ts",
+      "sveltekit-frontend/drizzle/manual/20260601_task_semantic_packets_alias_id_and_atlas_profile_gin.sql",
+      ".tmp/alias-id-migration-preflight-report.json",
+      ".tmp/alias-id-migration-preflight-report.md",
+      "docs/reports/alias-id-readiness.json",
+      "docs/reports/alias-id-readiness.md"
+    ],
+    "provenance_and_join_aids": [
+      "docs/graph/missing-features-review-latest.json",
+      "docs/graph/missing-features-review-latest.md",
+      "docs/graph/missing-features-review-latest.svg",
+      ".tmp/atlas-token-map.jsonl",
+      ".tmp/atlas-token-map.md",
+      ".tmp/atlas-retrieval-loop.jsonl",
+      ".tmp/atlas-parent-join-readiness.json",
+      ".tmp/atlas-parent-join-readiness.md",
+      "docs/graph/kanban-board.json",
+      "docs/graph/kanban-parent-atlas-alignment.md"
+    ]
+  },
+  "notes": [
+    "Qdrant point ids are not the join key for atlas cards.",
+    "Use file_path / mapreduce stableKey / sourceRef to bridge into parent-atlas card identity.",
+    "alias_id is present in schema and read-only preflight, but should only be written through bounded promotion paths that preserve provenance.",
+    "PG18 remains a target shape; the repo currently has Postgres 18-friendly SQL sidecars and schema definitions, not a forced live upgrade."
+  ],
+  "next_safe_action": "Generate a dry-run join report that reads these existing artifacts and emits compact sourceRef-prefix clusters plus unmatched rows, without mutating Qdrant, Neo4j, Redis, or Postgres."
+}

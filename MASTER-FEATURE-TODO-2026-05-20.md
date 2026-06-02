@@ -23,6 +23,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
   - [ ] `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats
   - [ ] `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats
   - [ ] `playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection
+  - [x] Hermes planner/tool registry already exposes these lanes; remaining work is OpenCode/Gemma4 exposure and lane productization, not new runtime implementation
   - [x] Register RabbitMQ `media.download` and `media.transcribe` queues in `src/lib/server/queue/rabbitmq-manager-fixed.ts`
   - [ ] Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of truth
 
@@ -186,10 +187,10 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 
 **Next gate** (Phase 11D-B):
 - [x] Replace `pseudoEmbed()` in `rank-cards.mjs` with `POST localhost:11434/api/embed` (embeddinggemma:latest) — real embed with 8s timeout + pseudo fallback; confirmed `ollama (real)` path live (2026-05-31)
-- [ ] Wire Qdrant real search in `retrieval-pass.mjs` (env `QDRANT_URL` already checked)
-- [ ] Wire Neo4j edge expansion (neighbor sourceRefs boost score)
-- [ ] Wire Redis packet cache (TTL 10min, key = sha256(query + budget))
-- [ ] Wire Langfuse trace on rank + compress runs
+- [x] Wire Qdrant real search in `retrieval-pass.mjs` (real Ollama embeddinggemma 768-dim + codebase_chunks_768 ANN) ✅
+- [x] Wire Neo4j edge expansion (IMPORTS/SIMILAR_TOPOLOGY neighbor expansion, graceful fallback) ✅
+- [x] Wire Redis packet cache (TTL 300s, key = ace:retrieval:packet:{queryHash}) ✅
+- [x] Wire Langfuse trace on rank + compress runs (fires when LANGFUSE_SECRET_KEY set) ✅
 
 ---
 
@@ -233,11 +234,11 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] Feature cluster grouping by `sourceRef` prefix
 - [ ] Stale feature detection (atlas entry exists, no recent git touch)
 - [ ] Duplicate system detection (two scripts/routes with overlapping sourceRefs)
-- [ ] Wire Qdrant real search in `scripts/ingest/retrieval-pass.mjs` and feed its hits into recommendation scoring
-- [ ] Wire Neo4j edge expansion (neighbor sourceRefs boost score)
-- [ ] Wire Redis packet cache (TTL 10min, key = sha256(query + budget))
-- [ ] Wire Langfuse trace on rank + compress runs
-- [ ] Fuse retrieval-pass output into recommendation scoring (Qdrant hits + Neo4j neighbor boost + Redis packet cache + Langfuse trace metadata)
+- [x] Wire Qdrant real search in `scripts/ingest/retrieval-pass.mjs` (real embeddinggemma + codebase_chunks_768) ✅
+- [x] Wire Neo4j edge expansion (neighbor sourceRefs boost score, graceful fallback) ✅
+- [x] Wire Redis packet cache (TTL 300s key=ace:retrieval:packet:{queryHash}) ✅
+- [x] Wire Langfuse trace on rank + compress runs ✅
+- [x] Fuse retrieval-pass output into recommendation scoring — `detectImportErrors()` in `build-recommendations.mjs` reads `.tmp/feature-todo-queue.ndjson` + `path-map.json`; 6 high-priority barrel import errors now surface in recommendations ✅
 - [ ] Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still required
 - [ ] Retrieval hook inventory for Phase 11E:
   - `scripts/ingest/retrieval-pass.mjs`
@@ -289,11 +290,11 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] Option 2: ClusterCard schema + Redis/Qdrant wiring + API route
 - [ ] Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field
 - [ ] Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path
-- [ ] Wire Qdrant real search in `scripts/ingest/retrieval-pass.mjs` and feed its hits into recommendation scoring
-- [ ] Wire Neo4j edge expansion so neighbor `sourceRef`s boost score
-- [ ] Wire Redis packet cache with TTL 10min and key `sha256(query + budget)`
-- [ ] Wire Langfuse trace on rank + compress runs
-- [ ] Fuse `retrieval-pass` output into recommendation scoring (`Qdrant` hits + `Neo4j` neighbor boost + `Redis` packet cache + `Langfuse` trace metadata)
+- [x] Wire Qdrant real search in `scripts/ingest/retrieval-pass.mjs` and feed its hits into recommendation scoring ✅
+- [x] Wire Neo4j edge expansion so neighbor `sourceRef`s boost score ✅
+- [x] Wire Redis packet cache with TTL 300s and key `ace:retrieval:packet:{queryHash}` ✅
+- [x] Wire Langfuse trace on rank + compress runs ✅
+- [x] Fuse `retrieval-pass` output into recommendation scoring — `detectImportErrors()` wired, 131 todo-queue items feed into recommendations ✅
 - [ ] Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still required
 - [ ] Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema
 - [ ] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema
@@ -311,8 +312,114 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] Wire `ast-grep` into the directory analysis pipeline for codebase pruning.
 - [ ] Use directory-role analysis plus AST maps to separate missing features from redundant features.
 - [ ] Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically.
-- [ ] Rebuild the parent atlas from the production-ready feature list after archive decisions land.
+- [ ] Chunk the huge ripgrep search dumps (`docs/reports/rg_turbovec.txt`, `docs/reports/rg_napi.txt`) into parent-atlas-ready packets keyed by `title_id`, `feature_id`, and `sourceRef`; treat the raw `.txt` dumps as generated evidence, not source.
+- [ ] Use the Obsidian-vault mirror as a downstream indexing surface only: ingest source files first, then pull the minimum mirror summaries needed to advance `next_steps/active/` and the parent atlas.
+- [ ] Use LangExtract to summarize source files, parent-atlas packets, and selected Obsidian mirror summaries into completion notes before archiving any stale generated tree.
+- [ ] Keep only production-readiness completion notes active (`docs/reports/phase-101-closeout.md`, `docs/reports/phase-102-handoff.md`); archive superseded generated reports, mirror trees, and raw search dumps after their content has been promoted.
+- [x] Rebuild the parent atlas from the production-ready feature list after archive decisions land.
+  - `docs/reports/repo-dirty-tree-classification-2026-06-01.{json,md}`
+  - `docs/reports/doc-feature-crosswalk-2026-06-01.{json,md}`
+  - `docs/reports/repo-archive-move-plan-2026-06-01.{json,md}`
+  - `node scripts/atlas/atlas-parent-indexing.mjs --apply`
+  - bounded refresh run processed 9 lanes with 10,743 nodes and 9,398 edges
 - [ ] Keep the pruning lane offline-only; it should not become a startup dependency.
+- [ ] Audit PostgreSQL 17.6 vs 18 table/index drift and use the result to label canonical production tables vs experimental / archive-only tables.
+- [ ] Keep `research_summaries` as the live canonical research table and finish the additive provenance/index migration before any dump/restore promotion to Postgres 18.
+- [ ] Use the repo consolidation feature map to label ship-path, planned production, experimental, and archive-only files before trimming the repo to source, schemas, scripts, and docs.
+- [ ] Re-run `scripts/atlas/classify-dirty-tree.mjs` before any archive move so the dirty tree is separated into generated artifacts, source changes, large blobs, and submodule dirtiness.
+- [ ] Review `scripts/atlas/plan-archive-moves.mjs` and its report output before any archive operation; summarize promoted content with LangExtract first, then archive stale generated material.
+- [ ] Use `scripts/atlas/doc-feature-crosswalk.mjs` to keep docs aligned to the sourceRef/pathmap spine for Neo4j, Qdrant, Redis, TurboVec, and offline-processing traversals.
+- [ ] Refresh the all-lanes parent atlas build after the crosswalk and archive-plan reports land, then use the active TOC as the traversal entrypoint for codebase indexing.
+
+## NES/Glyph Architecture Notes (SourceRef-First Atlas Join & Cards)
+
+**Goal**: Use `sourceRef` as the canonical bridge across mapreduce, DuckDB, Postgres mirrors, Qdrant payloads, Redis/Bitfrost caches, and Neo4j context trees so offline joins can be compressed into reusable NES/Glyph cards.
+
+**Navigation**: [Parent Atlas Table of Contents](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-table-of-contents.md>)
+
+**Tasks**:
+- [x] Normalize joins on `sourceRef` / `file_path` / mapreduce stableKey only; do not join Qdrant to atlas by Qdrant point id.
+- [x] Prepare PG18-ready atlas chunk tables and JSONB/GiN index definitions for sourceRef-rich card/profile payloads.
+  - `path_map` (3270 rows, indexed by file_path/feature/directory/import_errors) ✅
+  - `feature_todo_queue` (131 rows, indexed by status/priority/enqueued_at) ✅
+- [x] Keep the live `task_semantic_packets.alias_id` path aligned with `feature_id` and `sourceRef` provenance.
+  - `alias_id` column confirmed present in `task_semantic_packets` ✅
+- [x] Wire DuckDB join outputs into Postgres mirror tables for atlas chunks, profile cards, and retrieval events.
+  - `mapreduce-path-join.mjs` produces path-map.json + patches DuckDB card_enriched ✅
+- [x] Wire the NES packet writer through ACE assembly so provenance is cached and indexed as immutable packet tuples in Redis/Bitfrost before compression.
+  - ACE emits NES chrom packets during assembly
+  - the packet path preserves `sourceRef` / `featureId` / `queryHash` provenance
+  - the remaining gap is read/query exposure, not packet emission
+- [x] Add a live read/query route for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash`.
+  - `sveltekit-frontend/src/routes/api/atlas/nes-chrom/+server.ts`
+  - read-only GET route; packet writer stays unchanged
+- [x] Seed a live NES/Glyph packet batch from the missing-features analysis so the read/query lane returns real rows.
+  - `scripts/atlas/backfill-nes-chrom-packets.mjs`
+  - current seeded batch: 25 packets / 25 hits
+- [x] Merge frontend feature-labeling outputs (`sveltekit-frontend/.tmp/kanban_tasks.jsonl`, `sveltekit-frontend/.tmp/missing_feature_todos.jsonl`) into `docs/graph/kanban-board.json` so the Parent Atlas kanban board stays aligned with missing-feature discovery.
+  - `docs/graph/kanban-board.json` now carries merged board tasks plus Turbovec annotations for consolidation reviews.
+- [x] TurboVec-assisted kanban consolidation exists for the mass file ingestion lane.
+  - `npm --prefix sveltekit-frontend run atlas:kanban:consolidate:turbovec`
+  - `sveltekit-frontend/scripts/atlas/kanban-turbovec-consolidation.mts`
+  - `docs/reports/kanban-turbovec-consolidation-latest.json`
+  - `docs/reports/kanban-turbovec-consolidation-latest.md`
+  - batch-parses board / feature-label / missing-todo JSONL via simdjson and uses TurboVec prefilter clusters to group duplicates by feature family
+- [x] Warm Redis / Bitfrost caches from sourceRef-backed ClusterCards and hot atlas joins.
+  - `scripts/atlas/sourceRef-first-join-warmup.mjs`
+  - `scripts/atlas/sourceRef-first-hot-join-warmup.mjs`
+  - `docs/reports/sourceRef-first-join-warmup.{json,md}`
+  - `docs/reports/sourceRef-first-hot-join-warmup.{json,md}`
+  - bounded apply runs now seed Redis / Bitfrost-ready hot joins and register compact packet contexts for the sourceRef-first lane
+- [x] Expand Neo4j context trees from KAG / DAG hits so multi-hop traversals can reuse the same sourceRef spine.
+  - `scripts/atlas/project-sourceRef-context-neo4j.mjs`
+  - `docs/reports/sourceRef-context-neo4j-report.{json,md}`
+  - bounded apply runs now project KAG/DAG packet context into Neo4j with `sourceRef + featureId + queryHash` as the join spine
+- [x] Compress offline join outputs into NES chrom cards with Gemma4 summaries and token-budgeted packets.
+  - runner: `scripts/atlas/sourceRef-first-join-warmup.mjs`
+  - report: `docs/reports/sourceRef-first-join-warmup.{json,md}`
+  - warmup uses `sourceRef + featureId` as the join spine, with a short Bifrost timeout and provider/model fallback candidates so cache seeding stays best-effort instead of blocking the lane
+  - compressor: `scripts/atlas/sourceRef-first-nes-glyph-compress.mjs`
+  - compression report: `docs/reports/sourceRef-first-nes-glyph-compress.{json,md}`
+  - compressed packet JSONL: `.tmp/sourceRef-first-nes-glyph-packets.jsonl`
+  - the compressor turns warmup report samples into reusable NES/Glyph packets, persists them through the existing NES chrom packet service, and reuses the same `sourceRef + featureId + queryHash` spine
+  - hot-join warmup: `scripts/atlas/sourceRef-first-hot-join-warmup.mjs`
+  - hot-join report: `docs/reports/sourceRef-first-hot-join-warmup.{json,md}`
+  - the hot-join warmup reads back from the compressed packet report as the canonical source for Redis / Bitfrost seeding and optional Neo4j context expansion
+  - live apply run has already seeded Redis / Bitfrost-ready cache entries from the compressed packet report, so the canonical hot-join lane is active
+  - the hot-join lane reuses the compressed packet summaries directly and seeds the same cache entries in Redis as Bifrost-ready KAG packets, so it no longer depends on a second summarization pass
+  - parent atlas refresh: `scripts/atlas/sourceRef-first-parent-atlas-refresh.mjs`
+  - refresh report: `docs/reports/sourceRef-first-parent-atlas-refresh.{json,md}`
+  - the refresh step promotes the canonical hot-join report into `parent_atlas_records` and `parent_atlas_vectors` using the same `sourceRef + featureId + queryHash` spine
+  - live apply run has already written parent-atlas refresh rows and vectors, so the sourceRef-first lane now reaches the parent-atlas mirror as well as NES/Glyph packet storage
+  - parent atlas packet export: `scripts/atlas/generate_parent_atlas_packets.mjs --only-sourceRef-first`
+  - packet export report: `docs/reports/sourceRef-first-parent-atlas-packets.{json,md}`
+  - the sourceRef-first packet export writes a dedicated packet directory under `.tmp/parent_atlas_packets/sourceRef-first`
+  - parent atlas job enqueue: `scripts/atlas/enqueue_parent_atlas_jobs.mjs` with `PACKETS_DIR=.tmp/parent_atlas_packets/sourceRef-first`
+  - the sourceRef-first packets are now queued into `parent_atlas_jobs` so the refreshed rows have a downstream processing lane
+  - raw rg transcript organizer: `scripts/atlas/organize-rg-search-transcripts.mjs`
+  - raw rg transcript organizer report: `docs/reports/parent-atlas-rg-dump-organizer.{json,md}`
+  - the organizer streams `docs/reports/rg_turbovec.txt` and `docs/reports/rg_napi.txt` into compact Parent Atlas packet rows with `title_id`, `feature_id`, `sourceRef`, and chunk summaries
+  - raw rg transcript projection: `scripts/atlas/project-parent-atlas-rg-dump-packets.mjs`
+  - raw rg transcript projection report: `docs/reports/parent-atlas-rg-dump-projection.{json,md}`
+  - the projection mirrors the organized rg packets into durable Postgres/Qdrant/Neo4j artifacts while preserving the same `sourceRef + feature_id` replay spine
+  - lean sync runner: `scripts/atlas/run-taskboard-parent-atlas-sync.mjs --source-ref-first-only`
+  - lean sync report: `.tmp/taskboard-parent-atlas-sync.{json,md}`
+  - the lean sourceRef-first sync path now validates the refresh, packet export, enqueue, parent atlas validation, and consistency audit without paying for the full codebase/graphify pass
+- [ ] Formalize the later compute lanes for PyTorch XGBoost reranking, SOM clustering collection, and Neo4j hypergraph merges against the same `sourceRef + feature_id` spine.
+  - `scripts/atlas/pytorch-qdrant-redis-som-index.mjs`
+  - `docs/reports/pytorch-qdrant-redis-som-index-2026-06-01.{json,md}`
+  - evidence: vector64 compression, SOM metrics, cache effectiveness, and the PyTorch/Qdrant/Redis/SOM doc surfaces are now indexed together as a report-backed lane
+- [ ] Keep the Postgres 18 indexing tables, Qdrant multi-query tags, and JSONB card packets aligned so semantic hash lookups stay stable across mirrors.
+- [ ] Add deep_research test coverage for the future LLM orchestration lane before promoting any offline synthesis output into the live stack.
+- [ ] Keep Ollama `embeddinggemma` on the fast path with timeout + fallback, then map the outputs into token transforms before compression.
+- [ ] Keep the lane offline-first and report-only until the join outputs are validated against DuckDB and the parent atlas.
+- [ ] Use the Parent Atlas feature command atlas as the container manifest for later PyTorch / XGBoost / SOM / Neo4j lanes so the same sourceRef spine stays retrievable.
+- [x] Project the Parent Atlas feature command atlas into `parent_atlas_jobs` and a Neo4j Cypher export so the containers become durable indexing packets instead of report-only rows.
+- [x] Mirror the Parent Atlas feature command atlas into Qdrant so the same containers are retrievable by semantic query and payload filters.
+- [x] Mirror the Parent Atlas feature command atlas into Postgres `parent_atlas_vectors` with `embedding_768` so the same containers stay joinable by `sourceRef + feature_id` inside the durable ledger.
+- [x] Add the task semantic packet workflow helper and Redis hot-cache so a Kanban task can be summarized, clustered, enqueued, and replayed as a deterministic packet.
+- [x] Expose the task semantic packet workflow through the MCP tool surface and admin UI so OpenCode/Gemma4 can launch the lifecycle without calling the helper directly.
+- [x] Add a dry-run switch to the workflow CLI so the packet lifecycle can be smoke-tested without hitting live embedding or Qdrant paths.
 - [ ] Preserve the existing `tools:ast-grep`, `index:ast`, `audit:directories`, and `graphify:dependency:audit` entrypoints as the core analysis surface.
 - [ ] Use TurboVec-assisted directory summarization to fill gaps in directories that do not yet have `llms.md` / `agents.md` cards.
 - [ ] Inventory and reconcile directory cards (`llms.md`, `agents.md`, generated summaries) so pruning can operate on the whole repository consistently.
@@ -326,6 +433,9 @@ dependency graph, sourceRefs, startup context, package scripts.
   - `docs/reports/missing-features-review-latest.md`
   - `docs/reports/missing-features-review-latest.svg`
   - deterministic report over mapreduce, registry rows, parent atlas coverage, stale features, duplicate systems, and prefix clusters
+- [x] Parent Atlas table of contents exists.
+  - `docs/atlas/parent-atlas-table-of-contents.md`
+  - navigation index for storage, data spine, agent flow, and active todo spine
 
 ---
 
@@ -338,6 +448,50 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] RG-Atlas Persistence: stabilize directory-level metadata integration and keep it aligned with the atlas graph exports.
 - [ ] Knowledge Base Manager: expose TRACE MCP tools for OpenCode integration.
 - [ ] Keep this lane tied to the existing graph artifacts in `docs/graph/` rather than inventing a parallel source of truth.
+
+## Phase 101C — Local Deep Research / OpenCode / LangGraph Alignment
+
+**Goal**: Make `local-deep-research` a research backend for Gemma4/OpenCode, not a competing assistant stack.
+
+**Reference**: `docs/architecture/local-deep-research-boundary.md`, `docs/architecture/scheduler-gpu-bridge-roadmap.md`
+
+**Tasks**:
+- [ ] Inventory the current `local-deep-research` compose and note the current boundary: local SQLite state on the research side, canonical backend stores in the repo.
+- [ ] Compare the local-deep-research container against the repo's current OpenCode/Gemma4 function-calling path and document the exact role split.
+- [ ] Recreate the `local-deep-research` container for GPU use when needed by bringing it up from the WSL2 GPU override path, then verify the host/container model boundary before promoting it to the checklist.
+- [ ] Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes test-only unless it proves useful as a separate lane.
+- [ ] Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation.
+- [ ] Emit a canonical ACE packet from the LDR bridge with preserved `sourceRefs`, then warm the shared Redis ACE packet cache for OpenCode reuse.
+- [ ] Expose tuple metadata on the exact-match cache read path so front-door hits return the same envelope they store.
+- [ ] Route agentic errors through a read-only proposal flow that launches parallel repair subagents before any patching is considered.
+- [x] Record each proposal run as a `context_timeline.agentic_proposal` event so the repair-thinking path is temporally indexed in the durable ledger, with `sourceRef + feature_id` as the replay/join spine and `clusterId` kept as a routing hint only.
+- [x] Keep regex extraction fallback-only at the proposal boundary so messy logs can recover `feature_id`, `workspace_task_id`, `parent_atlas_card_id`, and `source_ref` without replacing typed provenance.
+- [ ] Promote each proposal run into the engram registry (`memory_registry` + `engram_cards`) so the repair timeline is indexed as reusable memory, not just audit history.
+- [ ] Expose the proposal timeline in the agentic controller UI via the read-only `/api/v1/agentic?action=timeline` path.
+- [x] Wire the Phase 101 parent-atlas packetizer lane (`scripts/atlas/phase101-parent-atlas-packetize.mjs`) as a dry-run-first Gemma/OpenCode tool surface that validates `nes.packet.v1`, prints the cache key, and keeps recommendations read-only or dry-run only.
+  - dry-run verified in the repo shell; the exact grep scanner runs first and falls back to `grep -E` only when the literal pattern yields no lines
+  - apply path remains gated on `LOCAL_OPENAI_BASE_URL`, `LOCAL_OPENAI_API_KEY`, and `LOCAL_GEMMA_MODEL` hydration
+- [x] Emit a parent-atlas feature-labeling report that includes missing todos, `feature_id`, `featureKey`, `source_ref`, and `sourceRefs` so the kanban/atlas sync can consume one replayable task shape.
+- [x] Land the NES chrom packet + KAG DAG hits schema (`nes_chrom_packets`, `nes_chrom_kag_dag_hits`) and the packet persistence helper with `chunk_id`, `sourceRef`, `jsonb`, and `pgvector` joins.
+- [x] Add the read-only NES chrom packet report seam via `scripts/atlas/report-nes-chrom-packet-hits.mjs`, writing `docs/reports/nes-chrom-packet-recent-hits.{json,md}` without creating a second packet store.
+  - current runtime note: the script runs successfully in report-only mode and records that one or both NES chrom relations are absent in the current local database
+- [x] Add the additive `research_summaries.source_ref` / `source_refs` migration and Drizzle schema bridge so local-deep-research provenance can land in durable rows and indexes.
+- [x] Apply the `research_summaries` provenance/index migration to the live 17.6 database and backfill the URL-backed rows.
+- [ ] Keep Qdrant as the default ANN service and treat cuVS/CAGRA as the future WSL2 experiment lane behind the same retrieval contract.
+- [x] Keep the ANN adapter boundary stable in `sveltekit-frontend/src/lib/server/search/qdrant-search.ts` and `src/lib/server/retrieval/orchestrator.ts` so cuVS can swap in later without changing callers.
+- [ ] Keep LangGraph optional as orchestration only; no direct DB/Qdrant writes from graph nodes.
+- [ ] Define the OpenCode-facing bridge so research queries can flow through TRACE MCP / function-caller without bypassing `sourceRef` provenance.
+- [ ] Store docs and large artifacts in SeaweedFS, not in the research container's local SQLite boundary.
+- [ ] Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate.
+- [ ] Keep BM25 and LangExtract as the lexical/provenance enrichment pass before the final recommendation fusion.
+- [ ] Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available.
+- [ ] Emit a short comparison note for Gemma4 vs Hermes vs local-deep-research so the assistant path stays explicit.
+- [ ] Re-run the assistant-path comparison after each boundary change and record the result in `IMPLEMENTATION_STATUS.md`.
+
+**Rules**:
+- Research backend stays read-mostly and sourceRef-preserving.
+- OpenCode remains the user-facing assistant path.
+- GPU acceleration belongs on the model server boundary, not inside the research UI unless explicitly enabled.
 
 ---
 
@@ -670,6 +824,9 @@ This section is the current gap list for the parent-atlas and codebase-indexing 
   - Engram embed sidecar (transport fixed; all sidecars green on 2026-05-31)
   - LangExtract sidecar (transport fixed; all sidecars green on 2026-05-31)
   - graphify / batch helpers that currently time out on large runs
+- [ ] Add a read/query path for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash`
+  - keep the packet writer as-is
+  - surface the existing `docs/reports/nes-chrom-packet-recent-hits.{json,md}` report shape through a live query route or script so the lane is searchable, not write-only
 - [ ] Keep the repo trimmed to source, schemas, scripts, and docs
   - move raw summaries, large exports, and generated atlas artifacts out of the repo
   - archive them to external storage instead of keeping them as long-lived source files
@@ -725,6 +882,7 @@ This lane tracks the native bridge work that moved parsing, CUDA SOM caching, an
   - native addons are built in the multi-stage image and copied into runtime
   - `Dockerfile.sveltekit` now compiles and deploys the optimized C++/Rust addons and runs SvelteKit as a non-root user
 - [x] Valkey / Redis semantic cache wiring
+  - the encoded-cluster prefilter now warms `sim:v1:{sha1(queryHash + ':' + clusterKey)}` entries on successful centroid scoring, so the semantic cache is actually exercised instead of sitting unused
   - `simd_bridge_rs.node` wired into the Bifrost cache manager path
   - `parseFast` is used for cached KAG context extraction
   - SHA-256 cache-key hashing is now the canonical path

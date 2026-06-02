@@ -1736,6 +1736,31 @@
       "detail": "Runs smoke:mcp:opencode-sidecars in startup chain after atlas smoke. Skips cleanly when sidecar ports are not running, otherwise validates TurboVec/Engram/LangExtract tool surfaces and engram memory write/read path. 15-min cooldown stamp: logs/task-output/.opencode-sidecar-smoke-last-run."
     },
     {
+      // G18: GPU bridge probe — verifies tensorrt_bridge.node loads and ≥10 functions are live (not NO_LIBTORCH stubs)
+      "label": "🧪 Startup: GPU Bridge Probe (G18)",
+      "type": "shell",
+      "command": "node scripts/startup-gpu-bridge-probe.mjs 2>&1 | Tee-Object -FilePath logs/task-output/gpu-bridge-probe-startup.log; if ($LASTEXITCODE -eq 0) { Write-Host '🧪 GPU bridge: addon live + CUDA active' } else { Write-Host '⚠️  GPU bridge: running in CPU fallback — check .tmp/gpu-bridge-probe.json' }",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": true,
+      "dependsOn": "🧪 Startup: OpenCode Sidecars Smoke (detached)",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "G18 audit gate: loads tensorrt_bridge.node and checks that ≥10 functions return live results (not NO_LIBTORCH -99 stubs). Writes .tmp/gpu-bridge-probe.json. Exit 0 = CUDA active, exit 1 = CPU-fallback mode. Non-blocking — GPU degradation is a warning, not a blocker."
+    },
+    {
       "label": "🩺 Atlas Smoke: Manual Run (force, foreground)",
       "type": "shell",
       "command": "Remove-Item logs/task-output/.atlas-smoke-last-run -ErrorAction SilentlyContinue; npm run smoke:atlas",

@@ -1,0 +1,88 @@
+{
+  "schema": "sourceRef_first_parent_atlas_refresh_report.v1",
+  "generatedAt": "2026-06-02T01:39:46.735Z",
+  "mode": "dry-run",
+  "inputs": {
+    "hotJoinReport": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-first-hot-join-warmup.json",
+    "limit": null
+  },
+  "summary": {
+    "items": 2,
+    "recordsWritten": 0,
+    "vectorsWritten": 0,
+    "embeddingMode": "ollama-or-fallback",
+    "errors": 0,
+    "applied": false
+  },
+  "top": {
+    "featureIds": [
+      {
+        "value": "cluster:19067cadf0",
+        "count": 1
+      },
+      {
+        "value": "feature:cache",
+        "count": 1
+      }
+    ],
+    "sourceRefs": [
+      {
+        "value": "src/lib/ai/citation-cache.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-cache.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-embed.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-llm-synthesis.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-quality.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/ai/client-router.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/cache/cache-service.svelte.ts",
+        "count": 1
+      }
+    ]
+  },
+  "rows": [
+    {
+      "recordId": "parent_atlas:sourceRef_first:cluster:19067cadf0:fb3aec99cf9cad58",
+      "sourceRef": "src/lib/ai/citation-cache.ts",
+      "featureId": "cluster:19067cadf0",
+      "taskId": "sourceRef-first:cluster:19067cadf0",
+      "title": "NES/Glyph cluster cluster:19067cadf0",
+      "joinSpine": "sourceRef + featureId + queryHash",
+      "cachedKey": "sourceRef-first:compress:cluster:cluster:19067cadf0:fb3aec99cf9cad58"
+    },
+    {
+      "recordId": "parent_atlas:sourceRef_first:feature:cache:71db4b96c7f2c392",
+      "sourceRef": "src/lib/cache/cache-service.svelte.ts",
+      "featureId": "feature:cache",
+      "taskId": "sourceRef-first:feature:cache",
+      "title": "NES/Glyph packet feature:cache",
+      "joinSpine": "sourceRef + featureId + queryHash",
+      "cachedKey": "sourceRef-first:compress:nes_packet:feature:cache:71db4b96c7f2c392"
+    }
+  ],
+  "postgres": {
+    "attempted": true,
+    "applied": false,
+    "rows": 2,
+    "recordsWritten": 0,
+    "vectorsWritten": 0,
+    "tableRecords": "parent_atlas_records",
+    "tableVectors": "parent_atlas_vectors"
+  }
+}

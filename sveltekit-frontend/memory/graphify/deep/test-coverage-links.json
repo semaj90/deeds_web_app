@@ -1128,7 +1128,8 @@
   "sveltekit-frontend/src/lib/server/ai/engram-registry.ts": [
     "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
     "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
-    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts"
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
+    "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts": [
     "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts"
@@ -1143,6 +1144,13 @@
   ],
   "sveltekit-frontend/src/lib/server/ai/request-classifiers.ts": [
     "sveltekit-frontend/src/lib/server/ai/request-classifiers.test.ts"
+  ],
+  "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-timeline.ts": [
+    "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/v1/agentic/+server.ts": [
+    "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
+    "sveltekit-frontend/tests/routes/auto/api/v1/agentic.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.ts": [
     "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts"
@@ -4003,9 +4011,6 @@
   "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/v1/agentic/tool-loop.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/v1/agentic/tool-loop.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/v1/agentic/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/v1/agentic.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/v1/ai/cache-result/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/v1/ai/cache-result.test.ts"

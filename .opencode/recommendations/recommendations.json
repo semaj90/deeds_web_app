@@ -1,26 +1,96 @@
 {
-  "generatedAt": "2026-05-31T20:55:35.498Z",
-  "totalCount": 5,
+  "generatedAt": "2026-06-02T05:26:03.251Z",
+  "totalCount": 12,
   "clusters": {
-    "Legal Workspace": [
+    "UI Components": [
       {
-        "id": "stale_feature_5d95892b",
-        "type": "missing_feature",
-        "cluster": "Legal Workspace",
-        "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
-        "why": "feature not yet implemented",
+        "id": "import_error_2cde1d5d",
+        "type": "developer_recommendation",
+        "cluster": "UI Components",
+        "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
+        "why": "Feature \"ui\" barrel/index has 42 dangling import refs (mapreduce v4 scan)",
         "sourceRefs": [
-          "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L182"
+          "src/lib/components/ui/index.ts"
         ],
-        "action": "rg \"Display extracted text preview\" src docs tests",
-        "next_command": "",
-        "priority": "low",
-        "featureStatus": "missing"
+        "action": "Audit barrel re-exports; remove or fix dangling import paths",
+        "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/index.ts'",
+        "priority": "high",
+        "featureStatus": "degraded"
+      },
+      {
+        "id": "import_error_c793661c",
+        "type": "developer_recommendation",
+        "cluster": "UI Components",
+        "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
+        "why": "Feature \"ui\" barrel/index has 29 dangling import refs (mapreduce v4 scan)",
+        "sourceRefs": [
+          "src/lib/components/ui/gaming/n64/index.ts"
+        ],
+        "action": "Audit barrel re-exports; remove or fix dangling import paths",
+        "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/gaming/n64/index.ts'",
+        "priority": "high",
+        "featureStatus": "degraded"
+      },
+      {
+        "id": "import_error_9e5572ac",
+        "type": "developer_recommendation",
+        "cluster": "UI Components",
+        "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
+        "why": "Feature \"ui\" barrel/index has 18 dangling import refs (mapreduce v4 scan)",
+        "sourceRefs": [
+          "src/lib/components/ui/gaming/index.ts"
+        ],
+        "action": "Audit barrel re-exports; remove or fix dangling import paths",
+        "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/gaming/index.ts'",
+        "priority": "high",
+        "featureStatus": "degraded"
+      },
+      {
+        "id": "import_error_15134c65",
+        "type": "developer_recommendation",
+        "cluster": "UI Components",
+        "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
+        "why": "Feature \"ui\" barrel/index has 12 dangling import refs (mapreduce v4 scan)",
+        "sourceRefs": [
+          "src/lib/components/ui/alert-dialog/index.js"
+        ],
+        "action": "Audit barrel re-exports; remove or fix dangling import paths",
+        "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/alert-dialog/index.js'",
+        "priority": "high",
+        "featureStatus": "degraded"
+      },
+      {
+        "id": "import_error_6a0805bf",
+        "type": "developer_recommendation",
+        "cluster": "UI Components",
+        "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
+        "why": "Feature \"ui\" barrel/index has 11 dangling import refs (mapreduce v4 scan)",
+        "sourceRefs": [
+          "src/lib/components/ui/dialog/index.ts"
+        ],
+        "action": "Audit barrel re-exports; remove or fix dangling import paths",
+        "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/dialog/index.ts'",
+        "priority": "high",
+        "featureStatus": "degraded"
       }
     ],
     "General": [
       {
-        "id": "stale_feature_97e21947",
+        "id": "import_error_b5fad5c8",
+        "type": "developer_recommendation",
+        "cluster": "General",
+        "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
+        "why": "Feature \"unclassified\" barrel/index has 12 dangling import refs (mapreduce v4 scan)",
+        "sourceRefs": [
+          "src/lib/icons/yorha/index.ts"
+        ],
+        "action": "Audit barrel re-exports; remove or fix dangling import paths",
+        "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/icons/yorha/index.ts'",
+        "priority": "high",
+        "featureStatus": "degraded"
+      },
+      {
+        "id": "stale_feature_c846557c",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -34,7 +104,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_b9cda3a9",
+        "id": "stale_feature_e4a37dda",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -48,7 +118,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_2ddeb9ec",
+        "id": "stale_feature_f59259ce",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -62,7 +132,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_e61d7c7b",
+        "id": "stale_feature_56ff4d41",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -75,11 +145,147 @@
         "priority": "low",
         "featureStatus": "missing"
       }
+    ],
+    "Agent Workflow": [
+      {
+        "id": "unclassified_5ed0194a",
+        "type": "missing_dependency",
+        "cluster": "Agent Workflow",
+        "title": "4 files unclassified with >10 imports",
+        "why": "Files with many imports but no feature label degrade ACE context quality",
+        "sourceRefs": [
+          "src/hooks.server.ts",
+          "src/lib/icons/yorha/index.ts",
+          "src/lib/index.ts",
+          "src/lib/server/agent/autonomous-agent.ts"
+        ],
+        "action": "Add feature labels to mapreduce classification rules",
+        "next_command": "node scripts/atlas/mapreduce-consolidated-index.mjs \"--output=.tmp/mapreduce-full-v4.ndjson\"",
+        "priority": "medium",
+        "featureStatus": "degraded"
+      }
+    ],
+    "Legal Workspace": [
+      {
+        "id": "stale_feature_cc8dfa76",
+        "type": "missing_feature",
+        "cluster": "Legal Workspace",
+        "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
+        "why": "feature not yet implemented",
+        "sourceRefs": [
+          "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L182"
+        ],
+        "action": "rg \"Display extracted text preview\" src docs tests",
+        "next_command": "",
+        "priority": "low",
+        "featureStatus": "missing"
+      }
     ]
   },
   "top10": [
     {
-      "id": "stale_feature_5d95892b",
+      "id": "import_error_2cde1d5d",
+      "type": "developer_recommendation",
+      "cluster": "UI Components",
+      "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
+      "why": "Feature \"ui\" barrel/index has 42 dangling import refs (mapreduce v4 scan)",
+      "sourceRefs": [
+        "src/lib/components/ui/index.ts"
+      ],
+      "action": "Audit barrel re-exports; remove or fix dangling import paths",
+      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/index.ts'",
+      "priority": "high",
+      "featureStatus": "degraded"
+    },
+    {
+      "id": "import_error_c793661c",
+      "type": "developer_recommendation",
+      "cluster": "UI Components",
+      "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
+      "why": "Feature \"ui\" barrel/index has 29 dangling import refs (mapreduce v4 scan)",
+      "sourceRefs": [
+        "src/lib/components/ui/gaming/n64/index.ts"
+      ],
+      "action": "Audit barrel re-exports; remove or fix dangling import paths",
+      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/gaming/n64/index.ts'",
+      "priority": "high",
+      "featureStatus": "degraded"
+    },
+    {
+      "id": "import_error_9e5572ac",
+      "type": "developer_recommendation",
+      "cluster": "UI Components",
+      "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
+      "why": "Feature \"ui\" barrel/index has 18 dangling import refs (mapreduce v4 scan)",
+      "sourceRefs": [
+        "src/lib/components/ui/gaming/index.ts"
+      ],
+      "action": "Audit barrel re-exports; remove or fix dangling import paths",
+      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/gaming/index.ts'",
+      "priority": "high",
+      "featureStatus": "degraded"
+    },
+    {
+      "id": "import_error_15134c65",
+      "type": "developer_recommendation",
+      "cluster": "UI Components",
+      "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
+      "why": "Feature \"ui\" barrel/index has 12 dangling import refs (mapreduce v4 scan)",
+      "sourceRefs": [
+        "src/lib/components/ui/alert-dialog/index.js"
+      ],
+      "action": "Audit barrel re-exports; remove or fix dangling import paths",
+      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/alert-dialog/index.js'",
+      "priority": "high",
+      "featureStatus": "degraded"
+    },
+    {
+      "id": "import_error_b5fad5c8",
+      "type": "developer_recommendation",
+      "cluster": "General",
+      "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
+      "why": "Feature \"unclassified\" barrel/index has 12 dangling import refs (mapreduce v4 scan)",
+      "sourceRefs": [
+        "src/lib/icons/yorha/index.ts"
+      ],
+      "action": "Audit barrel re-exports; remove or fix dangling import paths",
+      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/icons/yorha/index.ts'",
+      "priority": "high",
+      "featureStatus": "degraded"
+    },
+    {
+      "id": "import_error_6a0805bf",
+      "type": "developer_recommendation",
+      "cluster": "UI Components",
+      "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
+      "why": "Feature \"ui\" barrel/index has 11 dangling import refs (mapreduce v4 scan)",
+      "sourceRefs": [
+        "src/lib/components/ui/dialog/index.ts"
+      ],
+      "action": "Audit barrel re-exports; remove or fix dangling import paths",
+      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/dialog/index.ts'",
+      "priority": "high",
+      "featureStatus": "degraded"
+    },
+    {
+      "id": "unclassified_5ed0194a",
+      "type": "missing_dependency",
+      "cluster": "Agent Workflow",
+      "title": "4 files unclassified with >10 imports",
+      "why": "Files with many imports but no feature label degrade ACE context quality",
+      "sourceRefs": [
+        "src/hooks.server.ts",
+        "src/lib/icons/yorha/index.ts",
+        "src/lib/index.ts",
+        "src/lib/server/agent/autonomous-agent.ts"
+      ],
+      "action": "Add feature labels to mapreduce classification rules",
+      "next_command": "node scripts/atlas/mapreduce-consolidated-index.mjs \"--output=.tmp/mapreduce-full-v4.ndjson\"",
+      "priority": "medium",
+      "featureStatus": "degraded"
+    },
+    {
+      "id": "stale_feature_cc8dfa76",
       "type": "missing_feature",
       "cluster": "Legal Workspace",
       "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -93,7 +299,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_97e21947",
+      "id": "stale_feature_c846557c",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -107,7 +313,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_b9cda3a9",
+      "id": "stale_feature_e4a37dda",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -119,40 +325,14 @@
       "next_command": "",
       "priority": "low",
       "featureStatus": "missing"
-    },
-    {
-      "id": "stale_feature_2ddeb9ec",
-      "type": "missing_feature",
-      "cluster": "General",
-      "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
-      "why": "feature not yet implemented",
-      "sourceRefs": [
-        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L201"
-      ],
-      "action": "rg \"Identify duplicates from GPU audit\" src docs tests",
-      "next_command": "",
-      "priority": "low",
-      "featureStatus": "missing"
-    },
-    {
-      "id": "stale_feature_e61d7c7b",
-      "type": "missing_feature",
-      "cluster": "General",
-      "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
-      "why": "feature not yet implemented",
-      "sourceRefs": [
-        "local:docs/operator/atlas-production-roadmap.md#L5"
-      ],
-      "action": "rg \"**Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance.\" src docs tests",
-      "next_command": "",
-      "priority": "low",
-      "featureStatus": "missing"
     }
   ],
   "inputs": {
     "acePackets": 1,
     "atlasSeeds": 4173,
     "mergedCards": 3,
-    "rankEntries": 500
+    "rankEntries": 500,
+    "todoQueueItems": 131,
+    "pathMapEntries": 3270
   }
 }

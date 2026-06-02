@@ -1,0 +1,2472 @@
+{
+  "generatedAt": "2026-06-01T20:29:12.187Z",
+  "inputs": {
+    "featureRegistryPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\atlas\\feature-registry.json",
+    "todoPath": "C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md"
+  },
+  "summary": {
+    "registryRows": 4209,
+    "matchedRows": 1300,
+    "laneCount": 6,
+    "sourceRefAnchors": 154
+  },
+  "lanes": [
+    {
+      "laneId": "sourceRef_spine",
+      "title": "SourceRef Spine",
+      "description": "Parent Atlas join spine, NES chrom packets, feature_id joins, and card replay surfaces.",
+      "keywords": [
+        "sourceref",
+        "feature_id",
+        "featureid",
+        "nes chrom",
+        "parent atlas",
+        "replay spine"
+      ],
+      "matchCount": 35,
+      "topMatches": [
+        {
+          "featureKey": "phase_4_admin_copilot_ui_integration",
+          "title": "Phase 4: Admin Copilot UI Integration",
+          "status": "missing",
+          "sourceRefs": [
+            "local:docs/operator/atlas-production-roadmap.md#L10",
+            "local:docs/operator/atlas-production-roadmap.md#L10-sha256:819d5da5790446a2",
+            "local:docs/operator/atlas-production-roadmap.md#L11-sha256:8f09ab641cb51af1",
+            "local:docs/operator/atlas-production-roadmap.md#L12-sha256:ed0a6c4fe6bbbe48"
+          ],
+          "nextQuery": "rg \"**Provenance Display**: Show Qdrant `sourceRefs` and Neo4j graph paths in search results.\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "phase_7_knowledge_base_retrieval_flow",
+          "title": "Phase 7: Knowledge-Base Retrieval Flow",
+          "status": "missing",
+          "sourceRefs": [
+            "local:docs/operator/atlas-production-roadmap.md#L37",
+            "local:docs/operator/atlas-production-roadmap.md#L37-sha256:3e5a348b4ecf3144",
+            "local:docs/operator/atlas-production-roadmap.md#L38-sha256:a4c270afb3a790ab",
+            "local:docs/operator/atlas-production-roadmap.md#L39-sha256:6919bfcf3e4fda72"
+          ],
+          "nextQuery": "rg \"**Multi-Lane Retrieval**: Combine Parent Atlas (Local) + Docs Atlas (External) + Web (Unverified).\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "system_health_benchmark_trends",
+          "title": "📈 System Health & Benchmark Trends",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/workstation-observability-dashboard.md#L5"
+          ],
+          "nextQuery": "rg \"📈 System Health & Benchmark Trends\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "validation_diagnostics_compliance_summary",
+          "title": "🔬 Validation Diagnostics & Compliance Summary",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/real-world-routing-eval.md#L49"
+          ],
+          "nextQuery": "rg \"🔬 Validation Diagnostics & Compliance Summary\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "diagnostic_explanation_of_self_learning_benefit",
+          "title": "🧠 Diagnostic Explanation of self-learning benefit",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/lane-routing-eval.md#L27"
+          ],
+          "nextQuery": "rg \"🧠 Diagnostic Explanation of self-learning benefit\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "1_architectural_overview",
+          "title": "1. Architectural Overview",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/DEPLOYMENT.md#L7"
+          ],
+          "nextQuery": "rg \"1. Architectural Overview\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L7"
+          ],
+          "nextQuery": "rg \"1. Architectural Principles\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "1_codebase_documentation_references",
+          "title": "1. Codebase Documentation References",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/messy-query-routing-eval.md#L5"
+          ],
+          "nextQuery": "rg \"1. Codebase Documentation References\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "3_eval_15_query_routing_harness",
+          "title": "3. Eval: 15-query routing harness",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/OPERATOR_RUNBOOK.md#L187"
+          ],
+          "nextQuery": "rg \"3. Eval: 15-query routing harness\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "5_hot_state_security_backups_restoration",
+          "title": "5. Hot State Security: Backups & Restoration",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/DEPLOYMENT.md#L79"
+          ],
+          "nextQuery": "rg \"5. Hot State Security: Backups & Restoration\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "5_2_hot_state_restoration",
+          "title": "5.2 Hot State Restoration",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/DEPLOYMENT.md#L99"
+          ],
+          "nextQuery": "rg \"5.2 Hot State Restoration\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "benchmark_summary_metrics",
+          "title": "Benchmark Summary Metrics",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/workstation-soak-report.md#L9"
+          ],
+          "nextQuery": "rg \"Benchmark Summary Metrics\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "couchdb_mapreduce_ingestion_parent_atlas_rollups",
+          "title": "CouchDB MapReduce Ingestion — Parent Atlas Rollups",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/graph/repo-couchdb-mapreduce-report.md#L1"
+          ],
+          "nextQuery": "rg \"CouchDB MapReduce Ingestion — Parent Atlas Rollups\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "cycle_execution_log",
+          "title": "Cycle Execution Log",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/workstation-soak-report.md#L18"
+          ],
+          "nextQuery": "rg \"Cycle Execution Log\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "deepseek_engram_architecture_search",
+          "title": "DeepSeek Engram Architecture Search",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/deepseek-engram-architecture-search.md#L14"
+          ],
+          "nextQuery": "rg \"DeepSeek Engram Architecture Search\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "deepseek_engram_architecture_search__root",
+          "title": "deepseek-engram-architecture-search",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/deepseek-engram-architecture-search.md#L1"
+          ],
+          "nextQuery": "rg \"deepseek-engram-architecture-search\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "engram_plugin_memory_support",
+          "title": "Engram Plugin Memory Support",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/engram-plugin-memory-support.md#L11"
+          ],
+          "nextQuery": "rg \"Engram Plugin Memory Support\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "engram_plugin_memory_support__root",
+          "title": "engram-plugin-memory-support",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/engram-plugin-memory-support.md#L1"
+          ],
+          "nextQuery": "rg \"engram-plugin-memory-support\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "investigative_plan_structure",
+          "title": "Investigative Plan Structure:",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L24"
+          ],
+          "nextQuery": "rg \"Investigative Plan Structure:\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        },
+        {
+          "featureKey": "layer_3_perform_10_cycles_of_the_workstation_parent_atlas_soak_test",
+          "title": "Layer 3: Perform 10 cycles of the Workstation Parent Atlas soak test",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/DEPLOYMENT.md#L155"
+          ],
+          "nextQuery": "rg \"Layer 3: Perform 10 cycles of the Workstation Parent Atlas soak test\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "legal_ai_parent_atlas_product_integration",
+          "title": "Legal-AI Parent Atlas Product Integration",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L1"
+          ],
+          "nextQuery": "rg \"Legal-AI Parent Atlas Product Integration\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "neo4j_graphrag_parent_atlas",
+          "title": "Neo4j GraphRAG Parent Atlas",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/neo4j-graphrag-parent-atlas.md#L11"
+          ],
+          "nextQuery": "rg \"Neo4j GraphRAG Parent Atlas\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "neo4j_graphrag_projection_parent_atlas_ingestion",
+          "title": "Neo4j GraphRAG Projection — Parent Atlas Ingestion",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/graph/repo-neo4j-graphrag-report.md#L1"
+          ],
+          "nextQuery": "rg \"Neo4j GraphRAG Projection — Parent Atlas Ingestion\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "neo4j_graphrag_parent_atlas__root",
+          "title": "neo4j-graphrag-parent-atlas",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/neo4j-graphrag-parent-atlas.md#L1"
+          ],
+          "nextQuery": "rg \"neo4j-graphrag-parent-atlas\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "parent atlas"
+          ]
+        },
+        {
+          "featureKey": "opencode_mcp_atlas__root",
+          "title": "opencode-mcp-atlas",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/ai-os/opencode-mcp-atlas.md#L1"
+          ],
+          "nextQuery": "rg \"opencode-mcp-atlas\" src docs tests",
+          "laneScore": 1,
+          "laneMatches": [
+            "sourceref"
+          ]
+        }
+      ],
+      "todoAnchors": [
+        "  `0.35·semantic + 0.20·sourceRef + 0.15·error + 0.10·recency + 0.10·TODO + 0.05·root + 0.05·smoke`",
+        "dependency graph, sourceRefs, startup context, package scripts.",
+        "- Preserve sourceRefs on every recommendation",
+        "| Context Engineering | ACE packets, startup context, patch cards, sourceRefs |",
+        "- Top missing features (sourceRef exists in atlas, not in DB/routes)",
+        "- [ ] Feature cluster grouping by `sourceRef` prefix",
+        "- [ ] Duplicate system detection (two scripts/routes with overlapping sourceRefs)",
+        "- [x] Wire Neo4j edge expansion (neighbor sourceRefs boost score, graceful fallback) ✅",
+        "- [ ] Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path",
+        "- [x] Wire Neo4j edge expansion so neighbor `sourceRef`s boost score ✅",
+        "- [ ] Rebuild the parent atlas from the production-ready feature list after archive decisions land.",
+        "## NES/Glyph Architecture Notes (SourceRef-First Atlas Join & Cards)",
+        "**Goal**: Use `sourceRef` as the canonical bridge across mapreduce, DuckDB, Postgres mirrors, Qdrant payloads, Redis/Bitfrost caches, and Neo4j context trees so offline joins can be compressed into reusable NES/Glyph cards.",
+        "**Navigation**: [Parent Atlas Table of Contents](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-table-of-contents.md>)",
+        "- [x] Normalize joins on `sourceRef` / `file_path` / mapreduce stableKey only; do not join Qdrant to atlas by Qdrant point id.",
+        "- [x] Prepare PG18-ready atlas chunk tables and JSONB/GiN index definitions for sourceRef-rich card/profile payloads.",
+        "- [x] Keep the live `task_semantic_packets.alias_id` path aligned with `feature_id` and `sourceRef` provenance.",
+        "  - ACE emits NES chrom packets during assembly",
+        "  - the packet path preserves `sourceRef` / `featureId` / `queryHash` provenance",
+        "- [x] Add a live read/query route for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash`.",
+        "- [x] Merge frontend feature-labeling outputs (`sveltekit-frontend/.tmp/kanban_tasks.jsonl`, `sveltekit-frontend/.tmp/missing_feature_todos.jsonl`) into `docs/graph/kanban-board.json` so the Parent Atlas kanban board stays aligned with missing-feature discovery.",
+        "- [ ] Warm Redis / Bitfrost caches from sourceRef-backed ClusterCards and hot atlas joins.",
+        "- [ ] Expand Neo4j context trees from KAG / DAG hits so multi-hop traversals can reuse the same sourceRef spine.",
+        "- [ ] Compress offline join outputs into NES chrom cards with Gemma4 summaries and token-budgeted packets."
+      ]
+    },
+    {
+      "laneId": "durable_truth",
+      "title": "Durable Truth",
+      "description": "Postgres 18, JSONB, pgvector, DuckDB mirrors, CouchDB envelopes, and SeaweedFS archives.",
+      "keywords": [
+        "postgres",
+        "pgvector",
+        "jsonb",
+        "duckdb",
+        "couchdb",
+        "seaweedfs",
+        "drizzle"
+      ],
+      "matchCount": 256,
+      "topMatches": [
+        {
+          "featureKey": "2_gpu_audit_storage_postgresql_jsonb_chosen",
+          "title": "2. GPU Audit Storage: PostgreSQL JSONB Chosen",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L238"
+          ],
+          "nextQuery": "rg \"2. GPU Audit Storage: PostgreSQL JSONB Chosen\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "jsonb",
+            "couchdb"
+          ]
+        },
+        {
+          "featureKey": "2_relational_vector_db_architecture",
+          "title": "2. Relational & Vector DB Architecture",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:llm/claude.md#L15"
+          ],
+          "nextQuery": "rg \"2. Relational & Vector DB Architecture\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "pgvector",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "3_source_of_truth",
+          "title": "3. Source of truth",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L27"
+          ],
+          "nextQuery": "rg \"3. Source of truth\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "couchdb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "5_drizzle_postgres",
+          "title": "5. Drizzle + Postgres",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/trace-kag-web-development-guide.md#L23"
+          ],
+          "nextQuery": "rg \"5. Drizzle + Postgres\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "jsonb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "context_summary_report__root",
+          "title": "context_summary_report",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/context_summary_report.md#L1"
+          ],
+          "nextQuery": "rg \"context_summary_report\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "pgvector",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "core_workflows",
+          "title": "Core Workflows",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L134"
+          ],
+          "nextQuery": "rg \"Core Workflows\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "couchdb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "error_analysis_architecture__drizzle_orm",
+          "title": "Drizzle ORM",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/error-analysis-architecture.md#L374"
+          ],
+          "nextQuery": "rg \"Drizzle ORM\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "pgvector",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "subgraph_instruction_programming_kag_ace_topology_todo__goal",
+          "title": "Goal",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L3"
+          ],
+          "nextQuery": "rg \"Goal\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "couchdb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "jsonb_json_parsing_partial",
+          "title": "JSONB / JSON Parsing — Partial",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/typescript-7-release-notes.md#L251"
+          ],
+          "nextQuery": "rg \"JSONB / JSON Parsing — Partial\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "jsonb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "missing_table_medium",
+          "title": "missing_table  (medium)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/drizzle-postgres-contract-report.md#L3353"
+          ],
+          "nextQuery": "rg \"missing_table  (medium)\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "jsonb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "subgraph_instruction_programming_kag_ace_topology__overview",
+          "title": "Overview",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L3"
+          ],
+          "nextQuery": "rg \"Overview\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "couchdb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "phase76_readme__root",
+          "title": "PHASE76_README",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:scripts/PHASE76_README.md#L1"
+          ],
+          "nextQuery": "rg \"PHASE76_README\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "pgvector",
+            "seaweedfs"
+          ]
+        },
+        {
+          "featureKey": "verified_stack_markers",
+          "title": "Verified stack markers",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:llm/llm_inventory.md#L16"
+          ],
+          "nextQuery": "rg \"Verified stack markers\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "postgres",
+            "pgvector",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "execution_stage_6a_h",
+          "title": "Execution (Stage 6A–H)",
+          "status": "partial",
+          "sourceRefs": [
+            "local:docs/operator/atlas-production-roadmap.md#L27",
+            "local:docs/operator/atlas-production-roadmap.md#L27-sha256:55024f03ba0d9101",
+            "local:docs/operator/atlas-production-roadmap.md#L28-sha256:3b25a0e4d7483f02",
+            "local:docs/operator/atlas-production-roadmap.md#L29-sha256:e2e68ad68cd29e37",
+            "local:docs/operator/atlas-production-roadmap.md#L30-sha256:cfd8916957276f26",
+            "local:docs/operator/atlas-production-roadmap.md#L31-sha256:46fb90f49698788f",
+            "local:docs/operator/atlas-production-roadmap.md#L32-sha256:7156775ade67197f",
+            "local:docs/operator/atlas-production-roadmap.md#L33-sha256:383cea946b0d74f9",
+            "local:docs/operator/atlas-production-roadmap.md#L34-sha256:94dbfdd6d927f213"
+          ],
+          "nextQuery": "rg \"**6B: Tier 1 Expansion**: Drizzle, Svelte 5, TypeScript, Node.js, PostgreSQL.\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "layer_1_infrastructure_continuity_deterministic_boot",
+          "title": "🧱 Layer 1: Infrastructure Continuity (Deterministic Boot)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/RESILIENCE.md#L35"
+          ],
+          "nextQuery": "rg \"🧱 Layer 1: Infrastructure Continuity (Deterministic Boot)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "pgvector"
+          ]
+        },
+        {
+          "featureKey": "level_1_infrastructure_continuity_deterministic_boot",
+          "title": "🧱 Level 1 — Infrastructure Continuity (Deterministic Boot)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/resilience-continuity-recommendations.md#L33"
+          ],
+          "nextQuery": "rg \"🧱 Level 1 — Infrastructure Continuity (Deterministic Boot)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "seaweedfs"
+          ]
+        },
+        {
+          "featureKey": "1_postgresql_port_architecture_verified",
+          "title": "1. PostgreSQL Port Architecture Verified",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L233"
+          ],
+          "nextQuery": "rg \"1. PostgreSQL Port Architecture Verified\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "pgvector"
+          ]
+        },
+        {
+          "featureKey": "1_relational_parity_postgres_pgvector",
+          "title": "1. Relational Parity (Postgres + pgvector)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/RESILIENCE.md#L59"
+          ],
+          "nextQuery": "rg \"1. Relational Parity (Postgres + pgvector)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "pgvector"
+          ]
+        },
+        {
+          "featureKey": "2_postgresql_17_jsonb_improvements_querying",
+          "title": "2. PostgreSQL 17 JSONB Improvements & Querying",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/llms/generated/postgres.llms-full.txt#L37"
+          ],
+          "nextQuery": "rg \"2. PostgreSQL 17 JSONB Improvements & Querying\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "jsonb"
+          ]
+        },
+        {
+          "featureKey": "3_high_performance_pgvector_hnsw_indexing",
+          "title": "3. High-Performance pgvector HNSW Indexing",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/llms/generated/postgres.llms-full.txt#L58"
+          ],
+          "nextQuery": "rg \"3. High-Performance pgvector HNSW Indexing\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "pgvector"
+          ]
+        },
+        {
+          "featureKey": "3_version_compatibility_drizzle_0_44",
+          "title": "3. Version Compatibility (Drizzle 0.44)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/drizzle-schema-validation-report.md#L23"
+          ],
+          "nextQuery": "rg \"3. Version Compatibility (Drizzle 0.44)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "jsonb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "4_best_practice_recommendations",
+          "title": "4. Best Practice Recommendations",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/drizzle-schema-validation-report.md#L33"
+          ],
+          "nextQuery": "rg \"4. Best Practice Recommendations\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "jsonb",
+            "drizzle"
+          ]
+        },
+        {
+          "featureKey": "4_check_postgresql_pgvector_works",
+          "title": "4. Check PostgreSQL pgvector (WORKS)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L363"
+          ],
+          "nextQuery": "rg \"4. Check PostgreSQL pgvector (WORKS)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "pgvector"
+          ]
+        },
+        {
+          "featureKey": "5_gpu_audit_operations_new",
+          "title": "5. GPU Audit Operations (NEW)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L151"
+          ],
+          "nextQuery": "rg \"5. GPU Audit Operations (NEW)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "couchdb"
+          ]
+        },
+        {
+          "featureKey": "5_postgresql_mirroring_pgvector",
+          "title": "5. PostgreSQL Mirroring (pgvector)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/KARPATHY_PIPELINE_ARCHITECTURE.md#L94"
+          ],
+          "nextQuery": "rg \"5. PostgreSQL Mirroring (pgvector)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "postgres",
+            "pgvector"
+          ]
+        }
+      ],
+      "todoAnchors": [
+        "  - [ ] `playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection",
+        "  - [x] `playbook_lookup_by_language` — CouchDB karpathy_wiki + top Karpathy file intersection",
+        "- [x] **Track 3 — Drizzle-Zod Schema Barrel**",
+        "  - [x] `drizzle-zod@0.8.3` already installed",
+        "  - [x] Sub-task A3: Domain mapping (schema-postgres.ts → feature areas)",
+        "  - [x] PostgreSQL + Drizzle production patterns",
+        "- [x] Wire atlas seeds as Tier-3 fallback in `fetchCodebaseContext()` — only fires when Qdrant ANN + Postgres FTS both empty",
+        "- Keep JSONB as canonical searchable truth",
+        "- [ ] Audit PostgreSQL 17.6 vs 18 table/index drift and use the result to label canonical production tables vs experimental / archive-only tables.",
+        "- [ ] Keep `research_summaries` as the live canonical research table and finish the additive provenance/index migration before any dump/restore promotion to Postgres 18.",
+        "**Goal**: Use `sourceRef` as the canonical bridge across mapreduce, DuckDB, Postgres mirrors, Qdrant payloads, Redis/Bitfrost caches, and Neo4j context trees so offline joins can be compressed into reusable NES/Glyph cards.",
+        "- [x] Prepare PG18-ready atlas chunk tables and JSONB/GiN index definitions for sourceRef-rich card/profile payloads.",
+        "- [x] Wire DuckDB join outputs into Postgres mirror tables for atlas chunks, profile cards, and retrieval events.",
+        "  - `mapreduce-path-join.mjs` produces path-map.json + patches DuckDB card_enriched ✅",
+        "- [ ] Keep the Postgres 18 indexing tables, Qdrant multi-query tags, and JSONB card packets aligned so semantic hash lookups stay stable across mirrors.",
+        "- [ ] Keep the lane offline-first and report-only until the join outputs are validated against DuckDB and the parent atlas.",
+        "  - quick traversal surface for mapreduce outputs, DuckDB joins, Postgres mirrors, sourceRef-prefix clusters, and archive decisions",
+        "- [x] Land the NES chrom packet + KAG DAG hits schema (`nes_chrom_packets`, `nes_chrom_kag_dag_hits`) and the packet persistence helper with `chunk_id`, `sourceRef`, `jsonb`, and `pgvector` joins.",
+        "- [x] Add the additive `research_summaries.source_ref` / `source_refs` migration and Drizzle schema bridge so local-deep-research provenance can land in durable rows and indexes.",
+        "- [ ] Store docs and large artifacts in SeaweedFS, not in the research container's local SQLite boundary.",
+        "- [ ] Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate.",
+        "  - [x] `playbook_lookup_by_language` — CouchDB karpathy_wiki + top Karpathy file intersection",
+        "- [x] **Track 3 — Drizzle-Zod Schema Barrel**",
+        "  - [x] `drizzle-zod@0.8.3` already installed"
+      ]
+    },
+    {
+      "laneId": "retrieval_memory",
+      "title": "Retrieval Memory",
+      "description": "Qdrant, Redis, Bitfrost, ACE packets, multi-query tags, and semantic search caches.",
+      "keywords": [
+        "qdrant",
+        "redis",
+        "bitfrost",
+        "multi-query",
+        "retrieval",
+        "ace packet",
+        "turbovec"
+      ],
+      "matchCount": 349,
+      "topMatches": [
+        {
+          "featureKey": "the_4_layer_retrieval_stack",
+          "title": "The 4-Layer Retrieval Stack:",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/turbovec-evaluation-plan.md#L8"
+          ],
+          "nextQuery": "rg \"The 4-Layer Retrieval Stack:\" src docs tests",
+          "laneScore": 5,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "bitfrost",
+            "retrieval",
+            "turbovec"
+          ]
+        },
+        {
+          "featureKey": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L7"
+          ],
+          "nextQuery": "rg \"1. Architectural Principles\" src docs tests",
+          "laneScore": 4,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "bitfrost",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "critical_environment_matrix",
+          "title": "Critical Environment Matrix",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/DEPLOYMENT.md#L37"
+          ],
+          "nextQuery": "rg \"Critical Environment Matrix\" src docs tests",
+          "laneScore": 4,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "bitfrost",
+            "ace packet"
+          ]
+        },
+        {
+          "featureKey": "subgraph_instruction_programming_kag_ace_topology_todo__goal",
+          "title": "Goal",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L3"
+          ],
+          "nextQuery": "rg \"Goal\" src docs tests",
+          "laneScore": 4,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval",
+            "turbovec"
+          ]
+        },
+        {
+          "featureKey": "2_storage_caching_matrix",
+          "title": "2. Storage & Caching Matrix",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/KARPATHY_PIPELINE_ARCHITECTURE.md#L33"
+          ],
+          "nextQuery": "rg \"2. Storage & Caching Matrix\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "bitfrost"
+          ]
+        },
+        {
+          "featureKey": "3_poly_storage_layer_mapping",
+          "title": "3. Poly-Storage Layer Mapping",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/llm-synthesis-memory-policy.md#L35"
+          ],
+          "nextQuery": "rg \"3. Poly-Storage Layer Mapping\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "redis",
+            "bitfrost",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "3_3_redis_bitfrost_hot_cache",
+          "title": "3.3 Redis / BitFrost Hot Cache",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/llm-synthesis-memory-policy.md#L59"
+          ],
+          "nextQuery": "rg \"3.3 Redis / BitFrost Hot Cache\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "redis",
+            "bitfrost",
+            "ace packet"
+          ]
+        },
+        {
+          "featureKey": "4_ace_kag_layers",
+          "title": "4. ACE / KAG layers",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L32"
+          ],
+          "nextQuery": "rg \"4. ACE / KAG layers\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "karpathy_llmwiki__ace_kag_retrieval",
+          "title": "ACE / KAG / Retrieval",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:llm/karpathy_llmwiki.md#L40"
+          ],
+          "nextQuery": "rg \"ACE / KAG / Retrieval\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "core_workflows",
+          "title": "Core Workflows",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L134"
+          ],
+          "nextQuery": "rg \"Core Workflows\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "data_roles",
+          "title": "Data Roles",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L142"
+          ],
+          "nextQuery": "rg \"Data Roles\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "model_server_cache_state",
+          "title": "Model Server & Cache State",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/vram-hygiene-smoke-report.md#L15"
+          ],
+          "nextQuery": "rg \"Model Server & Cache State\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "bitfrost"
+          ]
+        },
+        {
+          "featureKey": "subgraph_instruction_programming_kag_ace_topology__overview",
+          "title": "Overview",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L3"
+          ],
+          "nextQuery": "rg \"Overview\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "qdrant_search_contract__root",
+          "title": "qdrant-search-contract",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/qdrant-search-contract.md#L1"
+          ],
+          "nextQuery": "rg \"qdrant-search-contract\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "multi-query",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "retrieval_and_graph_layer",
+          "title": "Retrieval and Graph Layer",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L85"
+          ],
+          "nextQuery": "rg \"Retrieval and Graph Layer\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "retrieval_order_contract",
+          "title": "Retrieval Order Contract",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/error-analysis-architecture.md#L281"
+          ],
+          "nextQuery": "rg \"Retrieval Order Contract\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "server_surface",
+          "title": "Server surface",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/codebase_atlas/feature_map.md#L11"
+          ],
+          "nextQuery": "rg \"Server surface\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "trace_karpathy_runtime_split",
+          "title": "TRACE/Karpathy Runtime Split",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/trace-runtime-split.md#L17"
+          ],
+          "nextQuery": "rg \"TRACE/Karpathy Runtime Split\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "verified_stack_markers",
+          "title": "Verified stack markers",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:llm/llm_inventory.md#L16"
+          ],
+          "nextQuery": "rg \"Verified stack markers\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L38"
+          ],
+          "nextQuery": "rg \"Where each technology fits\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "qdrant",
+            "redis",
+            "retrieval"
+          ]
+        },
+        {
+          "featureKey": "resilience_continuity_recommendations__the_3_layer_continuity_matrix",
+          "title": "💎 The 3-Layer Continuity Matrix",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/resilience-continuity-recommendations.md#L8"
+          ],
+          "nextQuery": "rg \"💎 The 3-Layer Continuity Matrix\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "qdrant",
+            "redis"
+          ]
+        },
+        {
+          "featureKey": "level_2_data_continuity_portable_corruption_free_state",
+          "title": "💾 Level 2 — Data Continuity (Portable, Corruption-Free State)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/resilience-continuity-recommendations.md#L41"
+          ],
+          "nextQuery": "rg \"💾 Level 2 — Data Continuity (Portable, Corruption-Free State)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "qdrant",
+            "redis"
+          ]
+        },
+        {
+          "featureKey": "latency_profile_trends",
+          "title": "📈 Latency Profile Trends",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/turbovec-benchmark-report.md#L28"
+          ],
+          "nextQuery": "rg \"📈 Latency Profile Trends\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "retrieval",
+            "turbovec"
+          ]
+        },
+        {
+          "featureKey": "1_dynamic_4d_topological_math_projection",
+          "title": "📐 1. Dynamic 4D Topological Math Projection",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/HYPERRAG_INTEGRATION.md#L30"
+          ],
+          "nextQuery": "rg \"📐 1. Dynamic 4D Topological Math Projection\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "qdrant",
+            "redis"
+          ]
+        },
+        {
+          "featureKey": "architectural_insights_recall_accuracy",
+          "title": "🧠 Architectural Insights & Recall Accuracy",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/turbovec-benchmark-report.md#L43"
+          ],
+          "nextQuery": "rg \"🧠 Architectural Insights & Recall Accuracy\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "qdrant",
+            "turbovec"
+          ]
+        }
+      ],
+      "todoAnchors": [
+        "- [x] **Phase KG-4**: Ran `npm run graphify:autoencoder:train` to execute the full autoencoder training, backfill Qdrant, encode Redis, and compute centroids.",
+        "  - [ ] `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats",
+        "  - [ ] `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats",
+        "  - [x] `som_topology_stats` — delegates to `gpu:som_topology` (Redis SOM grid/centroid stats)",
+        "  - [x] `language_distribution` — delegates to `gpu:language_distribution` (Qdrant cluster tags)",
+        "  - [ ] Option 2: ClusterCard schema + Redis/Qdrant wiring + API route",
+        "  - [x] Track 10: Compact Cards / CHR97 / NES Retrieval Lane",
+        "  - Redis publish gated behind `--publish` only; dry-run safe",
+        "- [x] Wire atlas seeds as Tier-3 fallback in `fetchCodebaseContext()` — only fires when Qdrant ANN + Postgres FTS both empty",
+        "- [x] `src/lib/server/retrieval/atlas-cartridge-seeds.ts` — read-only server module, mtime-invalidated cache, score cap ≤0.25",
+        "- [x] Verified: retrieval_mode=atlas_seed_for_chr97 ✅, source=parent_atlas ✅, no runtime collection leaks ✅, score cap 0.25 ✅, mtime cache ✅, non-fatal catch ✅",
+        "- [x] Wire simdjson `fastJsonParse` to Bifrost L2 Qdrant semantic cache response hot path (`ollama.ts:909`)",
+        "- Bifrost L2 hot path: Qdrant semantic cache search response (`ollama.ts` line ~909)",
+        "- `qdrant-manager.ts` line 406: Redis-cached string → `fastJsonParse`",
+        "- `npm run bifrost:trace:smoke` — `scripts/smoke/bifrost-trace-smoke.mjs` (L1 Redis + L2 Qdrant + L3 Ollama + fastJsonParse shape, 4/4 pass)",
+        "- `npm run retrieval:turbovec:smoke` — `scripts/smoke/scenario-rerank-smoke.mjs` (existing)",
+        "**Goal**: Turn thousands of cards into a compact, useful ACE packet without overloading context.",
+        "  Output: `.tmp/retrieval-ranking-report.json`",
+        "- [x] Wire Qdrant real search in `retrieval-pass.mjs` (real Ollama embeddinggemma 768-dim + codebase_chunks_768 ANN) ✅",
+        "- [x] Wire Redis packet cache (TTL 300s, key = ace:retrieval:packet:{queryHash}) ✅",
+        "**Inputs**: Graphify feature map, Atlas seeds, retrieval traces, TODO priorities, smoke/build failures,",
+        "- Recommendations are compact — no raw logs, no giant ACE packets",
+        "| Context Engineering | ACE packets, startup context, patch cards, sourceRefs |",
+        "| Retrieval | Qdrant, TurboVec, Graphify, Redis cache |"
+      ]
+    },
+    {
+      "laneId": "graph_topology",
+      "title": "Graph Topology",
+      "description": "Neo4j hypergraph merges, SOM topology, cluster joins, and graph path proofs.",
+      "keywords": [
+        "neo4j",
+        "hypergraph",
+        "som",
+        "pagerank",
+        "topology"
+      ],
+      "matchCount": 272,
+      "topMatches": [
+        {
+          "featureKey": "from_sveltekit_frontend",
+          "title": "From sveltekit-frontend/",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/CODEBASE_INDEXING_PIPELINE.md#L79"
+          ],
+          "nextQuery": "rg \"From sveltekit-frontend/\" src docs tests",
+          "laneScore": 5,
+          "laneMatches": [
+            "neo4j",
+            "hypergraph",
+            "som",
+            "pagerank",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "downstream_consumers",
+          "title": "Downstream Consumers",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/CODEBASE_INDEXING_PIPELINE.md#L206"
+          ],
+          "nextQuery": "rg \"Downstream Consumers\" src docs tests",
+          "laneScore": 4,
+          "laneMatches": [
+            "neo4j",
+            "som",
+            "pagerank",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "karpathy_wiki_pipeline",
+          "title": "Karpathy Wiki Pipeline",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/startup-guide.md#L118"
+          ],
+          "nextQuery": "rg \"Karpathy Wiki Pipeline\" src docs tests",
+          "laneScore": 4,
+          "laneMatches": [
+            "neo4j",
+            "hypergraph",
+            "som",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "16_topological_path_mapping_manifold_synthesis",
+          "title": "16. Topological Path Mapping & Manifold Synthesis",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/trace-kag-web-development-guide.md#L73"
+          ],
+          "nextQuery": "rg \"16. Topological Path Mapping & Manifold Synthesis\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "neo4j",
+            "som",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "3_topological_structural_integrity_neo4j_apoc",
+          "title": "3. Topological Structural Integrity (Neo4j APOC)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/RESILIENCE.md#L66"
+          ],
+          "nextQuery": "rg \"3. Topological Structural Integrity (Neo4j APOC)\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "neo4j",
+            "som",
+            "pagerank"
+          ]
+        },
+        {
+          "featureKey": "4_codeintel_hypergraph",
+          "title": "4. CodeIntel & Hypergraph",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/devtools_rg.md#L64"
+          ],
+          "nextQuery": "rg \"4. CodeIntel & Hypergraph\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "hypergraph",
+            "som",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "mcp_tool_surface",
+          "title": "MCP Tool Surface",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/research/deep-research-topics.md#L152"
+          ],
+          "nextQuery": "rg \"MCP Tool Surface\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "neo4j",
+            "som",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "llms__tier_f_contextual_graph_pytorch_graph",
+          "title": "Tier F — Contextual Graph (pytorch-graph)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/src/lib/server/vector/LLMS.md#L134"
+          ],
+          "nextQuery": "rg \"Tier F — Contextual Graph (pytorch-graph)\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "neo4j",
+            "som",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "phase_3_post_synthesis_quality_review_runid_stage_2c_500",
+          "title": "Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
+          "status": "missing",
+          "sourceRefs": [
+            "local:docs/operator/atlas-production-roadmap.md#L5",
+            "local:docs/operator/atlas-production-roadmap.md#L5-sha256:eb88379315a29cb0",
+            "local:docs/operator/atlas-production-roadmap.md#L6-sha256:90cd5162e3fdeeec",
+            "local:docs/operator/atlas-production-roadmap.md#L7-sha256:b115434892c11605"
+          ],
+          "nextQuery": "rg \"**Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance.\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "pagerank"
+          ]
+        },
+        {
+          "featureKey": "algorithmic_paradigm",
+          "title": "🧠 Algorithmic Paradigm",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/autoencoder-som-map.md#L224"
+          ],
+          "nextQuery": "rg \"🧠 Algorithmic Paradigm\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "som",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "1_codebase_documentation_references",
+          "title": "1. Codebase Documentation References",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/messy-query-routing-eval.md#L5"
+          ],
+          "nextQuery": "rg \"1. Codebase Documentation References\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "1_vector_dimension_policy_projections",
+          "title": "1. Vector Dimension Policy & Projections",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:llm/memory.md#L7"
+          ],
+          "nextQuery": "rg \"1. Vector Dimension Policy & Projections\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "3_concurrency_governance_thread_locks",
+          "title": "3. Concurrency Governance & Thread Locks",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L31"
+          ],
+          "nextQuery": "rg \"3. Concurrency Governance & Thread Locks\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "som",
+            "pagerank"
+          ]
+        },
+        {
+          "featureKey": "3_source_of_truth",
+          "title": "3. Source of truth",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L27"
+          ],
+          "nextQuery": "rg \"3. Source of truth\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "3c_graph_som_topology_analysis",
+          "title": "3C — Graph & SOM Topology Analysis",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:scripts/tests/logs/langgraph-2026-04-19T08-30-34.md#L25"
+          ],
+          "nextQuery": "rg \"3C — Graph & SOM Topology Analysis\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "som",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "4_ace_kag_layers",
+          "title": "4. ACE / KAG layers",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L32"
+          ],
+          "nextQuery": "rg \"4. ACE / KAG layers\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "6_ace_scoring_spine_context_assembly_weights",
+          "title": "6. ACE Scoring Spine (Context Assembly Weights)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/compiler-stack-explainer.md#L209"
+          ],
+          "nextQuery": "rg \"6. ACE Scoring Spine (Context Assembly Weights)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "som"
+          ]
+        },
+        {
+          "featureKey": "active_features_stability_gates",
+          "title": "Active Features & Stability Gates",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/status/feature-tracking-roadmap.md#L6"
+          ],
+          "nextQuery": "rg \"Active Features & Stability Gates\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "hypergraph",
+            "pagerank"
+          ]
+        },
+        {
+          "featureKey": "admin_visualization",
+          "title": "Admin Visualization",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/CODEBASE_INDEXING_PIPELINE.md#L256"
+          ],
+          "nextQuery": "rg \"Admin Visualization\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "atlas_indexing",
+          "title": "Atlas / Indexing",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/codebase_atlas/top_scripts.md#L5"
+          ],
+          "nextQuery": "rg \"Atlas / Indexing\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "hypergraph",
+            "pagerank"
+          ]
+        },
+        {
+          "featureKey": "karpathy_llmwiki__atlas_indexing",
+          "title": "Atlas / Indexing",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:llm/karpathy_llmwiki.md#L18"
+          ],
+          "nextQuery": "rg \"Atlas / Indexing\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "som",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "audit_gates_graph_analytics_som_pagerank",
+          "title": "Audit Gates — Graph Analytics (SOM / PageRank)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/src/lib/server/graph/LLMS.md#L336"
+          ],
+          "nextQuery": "rg \"Audit Gates — Graph Analytics (SOM / PageRank)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "som",
+            "pagerank"
+          ]
+        },
+        {
+          "featureKey": "core_workflows",
+          "title": "Core Workflows",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L134"
+          ],
+          "nextQuery": "rg \"Core Workflows\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "data_roles",
+          "title": "Data Roles",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L142"
+          ],
+          "nextQuery": "rg \"Data Roles\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "neo4j",
+            "topology"
+          ]
+        },
+        {
+          "featureKey": "existing_edges_used",
+          "title": "Existing edges used",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/storage-tier-schema.md#L152"
+          ],
+          "nextQuery": "rg \"Existing edges used\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "som",
+            "topology"
+          ]
+        }
+      ],
+      "todoAnchors": [
+        "  - [ ] `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats",
+        "  - [x] `som_topology_stats` — delegates to `gpu:som_topology` (Redis SOM grid/centroid stats)",
+        "  - [x] D33 (Neo4j health) already passing",
+        "- [x] Wire Neo4j edge expansion (IMPORTS/SIMILAR_TOPOLOGY neighbor expansion, graceful fallback) ✅",
+        "- [x] Wire Neo4j edge expansion (neighbor sourceRefs boost score, graceful fallback) ✅",
+        "  - `sveltekit-frontend/src/lib/server/search/neo4j-rerank.ts`",
+        "- [x] Wire Neo4j edge expansion so neighbor `sourceRef`s boost score ✅",
+        "**Goal**: Use `sourceRef` as the canonical bridge across mapreduce, DuckDB, Postgres mirrors, Qdrant payloads, Redis/Bitfrost caches, and Neo4j context trees so offline joins can be compressed into reusable NES/Glyph cards.",
+        "- [ ] Expand Neo4j context trees from KAG / DAG hits so multi-hop traversals can reuse the same sourceRef spine.",
+        "- [ ] Formalize the later compute lanes for PyTorch XGBoost reranking, SOM clustering collection, and Neo4j hypergraph merges against the same `sourceRef + feature_id` spine.",
+        "- [ ] Use the Parent Atlas feature command atlas as the container manifest for later PyTorch / XGBoost / SOM / Neo4j lanes so the same sourceRef spine stays retrievable.",
+        "  - [x] `som_topology_stats` — delegates to `gpu:som_topology` (Redis SOM grid/centroid stats)",
+        "  - [x] D33 (Neo4j health) already passing",
+        "  - [x] Verified Neo4j auth fallback/recovery path in `scripts/atlas/neo4j-graph-enrich.mjs` (`NEO4J_PASSWORD`/`NEO4J_PASS` + warning on default fallback).",
+        "**Goal**: Map user prompt intent → sourceRefs → featureLabels → acePacketId. Build domain topology graph.",
+        "**Domain topology** (`scripts/graphify/domain-topology.mjs`):",
+        "output: .tmp/domain-topology.json + graphify refresh manifest",
+        "- [x] `scripts/graphify/domain-topology.mjs` — build domain graph from feature labels",
+        "- [x] Add `graphify:feature-labels` and `graphify:domain-topology` npm scripts",
+        "  - Neo4j / SOM topology",
+        "  - RabbitMQ topology MCP",
+        "This lane tracks the native bridge work that moved parsing, CUDA SOM caching, and container alignment off the main JS hot path. Keep it separate from the parent atlas checklist so runtime work and repo-trimming work do not get mixed.",
+        "- [x] CUDA SOM cache integration",
+        "  - `som_cache.cu` builds with `SOM_HAVE_CUDA=1` on Windows/MSVC"
+      ]
+    },
+    {
+      "laneId": "compute_ranking",
+      "title": "Compute Ranking",
+      "description": "PyTorch, LibTorch, XGBoost, CUDA, reranking, clustering, and feature extraction lanes.",
+      "keywords": [
+        "pytorch",
+        "libtorch",
+        "xgboost",
+        "cuda",
+        "rerank",
+        "gradient boosting",
+        "feature extractor",
+        "autoencoder"
+      ],
+      "matchCount": 219,
+      "topMatches": [
+        {
+          "featureKey": "integration_features_to_look_for",
+          "title": "Integration features to look for",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L151"
+          ],
+          "nextQuery": "rg \"Integration features to look for\" src docs tests",
+          "laneScore": 4,
+          "laneMatches": [
+            "libtorch",
+            "cuda",
+            "rerank",
+            "autoencoder"
+          ]
+        },
+        {
+          "featureKey": "12_gpu_rules",
+          "title": "12. GPU Rules",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/trace-kag-web-development-guide.md#L57"
+          ],
+          "nextQuery": "rg \"12. GPU Rules\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "libtorch",
+            "cuda",
+            "rerank"
+          ]
+        },
+        {
+          "featureKey": "phase_12_security_recommendations",
+          "title": "Phase 12 Security Recommendations",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/simd-bridge-memory-audit.md#L454"
+          ],
+          "nextQuery": "rg \"Phase 12 Security Recommendations\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "libtorch",
+            "cuda",
+            "autoencoder"
+          ]
+        },
+        {
+          "featureKey": "the_three_compiler_concepts",
+          "title": "The Three Compiler Concepts",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/compiler-stack-explainer.md#L8"
+          ],
+          "nextQuery": "rg \"The Three Compiler Concepts\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "pytorch",
+            "libtorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "your_libtorch_n_api_bridge",
+          "title": "Your LibTorch N-API Bridge",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/compiler-stack-explainer.md#L68"
+          ],
+          "nextQuery": "rg \"Your LibTorch N-API Bridge\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "pytorch",
+            "libtorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "2_pytorch_libtorch_tensor_compiler_stack",
+          "title": "2. PyTorch / LibTorch (Tensor Compiler Stack)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/compiler-stack-explainer.md#L55"
+          ],
+          "nextQuery": "rg \"2. PyTorch / LibTorch (Tensor Compiler Stack)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "pytorch",
+            "libtorch"
+          ]
+        },
+        {
+          "featureKey": "3_concurrency_governance_thread_locks",
+          "title": "3. Concurrency Governance & Thread Locks",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L31"
+          ],
+          "nextQuery": "rg \"3. Concurrency Governance & Thread Locks\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "cuda",
+            "autoencoder"
+          ]
+        },
+        {
+          "featureKey": "4_libtorch_boundaries",
+          "title": "4. LibTorch Boundaries",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/llm-synthesis-memory-policy.md#L78"
+          ],
+          "nextQuery": "rg \"4. LibTorch Boundaries\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "autoencoder"
+          ]
+        },
+        {
+          "featureKey": "5_multi_lora_sequential_vram_safety_gate",
+          "title": "5. Multi-LoRA Sequential VRAM Safety Gate",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/operator/OPERATOR_RUNBOOK.md#L165"
+          ],
+          "nextQuery": "rg \"5. Multi-LoRA Sequential VRAM Safety Gate\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "cuda",
+            "rerank"
+          ]
+        },
+        {
+          "featureKey": "classification_matrix",
+          "title": "Classification Matrix",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/simd-bridge-memory-audit.md#L14"
+          ],
+          "nextQuery": "rg \"Classification Matrix\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "coordinate_cell_0_0_2_chunks",
+          "title": "Coordinate Cell `(0, 0)` — (2 Chunks)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/autoencoder-som-map.md#L36"
+          ],
+          "nextQuery": "rg \"Coordinate Cell `(0, 0)` — (2 Chunks)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "cuda",
+            "autoencoder"
+          ]
+        },
+        {
+          "featureKey": "coordinate_cell_5_2_1_chunks",
+          "title": "Coordinate Cell `(5, 2)` — (1 Chunks)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/autoencoder-som-map.md#L112"
+          ],
+          "nextQuery": "rg \"Coordinate Cell `(5, 2)` — (1 Chunks)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "cuda",
+            "autoencoder"
+          ]
+        },
+        {
+          "featureKey": "coordinate_cell_7_0_4_chunks",
+          "title": "Coordinate Cell `(7, 0)` — (4 Chunks)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/autoencoder-som-map.md#L68"
+          ],
+          "nextQuery": "rg \"Coordinate Cell `(7, 0)` — (4 Chunks)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "cuda",
+            "autoencoder"
+          ]
+        },
+        {
+          "featureKey": "environment_verified",
+          "title": "Environment Verified",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/tests/GPU_PIPELINE_RUNNER_TEST_RESULTS.md#L115"
+          ],
+          "nextQuery": "rg \"Environment Verified\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "execution_overview",
+          "title": "Execution Overview",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/simd-bridge-memory-audit.md#L3"
+          ],
+          "nextQuery": "rg \"Execution Overview\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "pytorch",
+            "libtorch"
+          ]
+        },
+        {
+          "featureKey": "experimental_libtorch_autoencoder_lane",
+          "title": "Experimental libtorch autoencoder lane",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L100"
+          ],
+          "nextQuery": "rg \"Experimental libtorch autoencoder lane\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "autoencoder"
+          ]
+        },
+        {
+          "featureKey": "finding_10_libtorch_stubs_cc_1_missing_timeout",
+          "title": "Finding #10: libtorch_stubs.cc:1 [MISSING_TIMEOUT]",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/simd-bridge-memory-audit.md#L91"
+          ],
+          "nextQuery": "rg \"Finding #10: libtorch_stubs.cc:1 [MISSING_TIMEOUT]\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "finding_11_libtorch_stubs_cc_1_missing_cpu_fallback",
+          "title": "Finding #11: libtorch_stubs.cc:1 [MISSING_CPU_FALLBACK]",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/simd-bridge-memory-audit.md#L98"
+          ],
+          "nextQuery": "rg \"Finding #11: libtorch_stubs.cc:1 [MISSING_CPU_FALLBACK]\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "gpu_compute_pipeline_server_side",
+          "title": "GPU Compute Pipeline (Server-Side)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/visualization-stack.md#L101"
+          ],
+          "nextQuery": "rg \"GPU Compute Pipeline (Server-Side)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "key_rule",
+          "title": "Key Rule",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/compiler-landscape.md#L115"
+          ],
+          "nextQuery": "rg \"Key Rule\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "pytorch",
+            "libtorch"
+          ]
+        },
+        {
+          "featureKey": "libtorch_2_9_0_cu130",
+          "title": "LibTorch: 2.9.0+cu130",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/KARPATHY_PIPELINE_ARCHITECTURE.md#L123"
+          ],
+          "nextQuery": "rg \"LibTorch: 2.9.0+cu130\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "rerank"
+          ]
+        },
+        {
+          "featureKey": "live_extracts_separate_repos",
+          "title": "Live Extracts (Separate Repos)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/legacy-reference/README.md#L18"
+          ],
+          "nextQuery": "rg \"Live Extracts (Separate Repos)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "libtorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "mega_dataset_expansion__root",
+          "title": "MEGA_DATASET_EXPANSION",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:scripts/unsloth-training/MEGA_DATASET_EXPANSION.md#L1"
+          ],
+          "nextQuery": "rg \"MEGA_DATASET_EXPANSION\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "pytorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "pytorch_torchinductor_triton",
+          "title": "PyTorch / TorchInductor / Triton",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/compiler-landscape.md#L24"
+          ],
+          "nextQuery": "rg \"PyTorch / TorchInductor / Triton\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "pytorch",
+            "cuda"
+          ]
+        },
+        {
+          "featureKey": "pytorch_vs_native_n_api_gpu_bridge",
+          "title": "PyTorch vs Native N-API GPU Bridge",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/compiler-landscape.md#L100"
+          ],
+          "nextQuery": "rg \"PyTorch vs Native N-API GPU Bridge\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "pytorch",
+            "cuda"
+          ]
+        }
+      ],
+      "todoAnchors": [
+        "- [x] **Phase KG-4**: Ran `npm run graphify:autoencoder:train` to execute the full autoencoder training, backfill Qdrant, encode Redis, and compute centroids.",
+        "  - [ ] `attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores",
+        "  - [x] `attention_rank_files` — embed query → attentionScoreGPU via libtorch → top-N from Karpathy scores",
+        "- [x] Option 3: Real XGBoost C API inference & CUDA Graph in tensorrt_bridge",
+        "  - CMake configured, CUDA arch sm_86, LibTorch detected, .node addon built, simdjson vendor, seed freshness",
+        "- [x] Lane health: sm_86 ✅, LibTorch ✅, .node addon ✅, simdjson vendor ✅, seeds fresh ✅",
+        "**Note**: simdjson uses CPU SIMD instructions (AVX2/SSE4.2), not GPU/CUDA. Do not call this \"GPU parsing\".",
+        "- `npm run retrieval:turbovec:smoke` — `scripts/smoke/scenario-rerank-smoke.mjs` (existing)",
+        "- Do not call this GPU acceleration — CUDA parser not in use",
+        "| Performance | simdjson, MessagePack, CUDA/LibTorch, hot/cold docs |",
+        "  - `sveltekit-frontend/src/lib/server/search/neo4j-rerank.ts`",
+        "- [x] Add bounded FP16 attention rerank to `fetchACPKnowledgeResults` for final ACE context weighting on the top retrieved slice.",
+        "**Goal**: Move client-side reranking and caching into the browser where it is safe and useful.",
+        "- [ ] Create `schema-encoder.wgsl` for client-side reranking of documents.",
+        "- [ ] Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema",
+        "- [ ] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema",
+        "- [ ] Formalize the later compute lanes for PyTorch XGBoost reranking, SOM clustering collection, and Neo4j hypergraph merges against the same `sourceRef + feature_id` spine.",
+        "- [ ] Use the Parent Atlas feature command atlas as the container manifest for later PyTorch / XGBoost / SOM / Neo4j lanes so the same sourceRef spine stays retrievable.",
+        "- [ ] Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available.",
+        "- [x] **Phase KG-4**: Ran `npm run graphify:autoencoder:train` to execute the full autoencoder training, backfill Qdrant, encode Redis, and compute centroids.",
+        "  - [x] `attention_rank_files` — embed query → attentionScoreGPU via libtorch → top-N from Karpathy scores",
+        "- [x] Option 3: Real XGBoost C API inference & CUDA Graph in tensorrt_bridge",
+        "  - [x] Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema",
+        "  - [x] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema"
+      ]
+    },
+    {
+      "laneId": "orchestration_future",
+      "title": "Future Orchestration",
+      "description": "OpenCode, Gemma4, deep_research, MCP tools, and LLM orchestration guardrails.",
+      "keywords": [
+        "opencode",
+        "gemma4",
+        "deep_research",
+        "mcp",
+        "llm orchestration"
+      ],
+      "matchCount": 169,
+      "topMatches": [
+        {
+          "featureKey": "expanded_architecture_opencode_ace_graphrag",
+          "title": "Expanded Architecture: OpenCode + ACE + GraphRAG",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L29"
+          ],
+          "nextQuery": "rg \"Expanded Architecture: OpenCode + ACE + GraphRAG\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "opencode",
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "opencode_mcp_atlas__root",
+          "title": "opencode-mcp-atlas",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/ai-os/opencode-mcp-atlas.md#L1"
+          ],
+          "nextQuery": "rg \"opencode-mcp-atlas\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "opencode",
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "three_development_model_lanes_opencode_local_dev",
+          "title": "Three Development Model Lanes (OpenCode / local dev)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/llms/gguf-model-lanes.md#L86"
+          ],
+          "nextQuery": "rg \"Three Development Model Lanes (OpenCode / local dev)\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "opencode",
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "trace_karpathy_performance_lane_deep_research_plan",
+          "title": "TRACE/Karpathy Performance Lane — Deep Research Plan",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/research/deep-research-topics.md#L1"
+          ],
+          "nextQuery": "rg \"TRACE/Karpathy Performance Lane — Deep Research Plan\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "gemma4",
+            "deep_research",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "unified_context_tree",
+          "title": "Unified context tree",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L32"
+          ],
+          "nextQuery": "rg \"Unified context tree\" src docs tests",
+          "laneScore": 3,
+          "laneMatches": [
+            "opencode",
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "10_mcp_tool_boundary",
+          "title": "10. MCP Tool Boundary",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/trace-kag-web-development-guide.md#L51"
+          ],
+          "nextQuery": "rg \"10. MCP Tool Boundary\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "2_data_access_rules_mcp_to_gemma4_trace",
+          "title": "2. Data Access Rules (MCP $\\to$ Gemma4/Trace)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/ARCHITECTURE_GUIDE_V1.md#L17"
+          ],
+          "nextQuery": "rg \"2. Data Access Rules (MCP $\\to$ Gemma4/Trace)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "b_generation_lane_llama_server",
+          "title": "B. Generation Lane (llama-server)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/KARPATHY_PIPELINE_ARCHITECTURE.md#L21"
+          ],
+          "nextQuery": "rg \"B. Generation Lane (llama-server)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "boundary_rule",
+          "title": "Boundary Rule",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/architecture/trace-runtime-split.md#L31"
+          ],
+          "nextQuery": "rg \"Boundary Rule\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "cross_references",
+          "title": "Cross-references",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/setup/hermes/README.md#L150"
+          ],
+          "nextQuery": "rg \"Cross-references\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "gemma4_agentic_tool_calling",
+          "title": "Gemma4 Agentic Tool Calling",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/startup-guide.md#L133"
+          ],
+          "nextQuery": "rg \"Gemma4 Agentic Tool Calling\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "google_agent2agent_a2a_protocol_not_in_tsgo",
+          "title": "Google Agent2Agent (A2A) Protocol — ❌ NOT in tsgo",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/typescript-7-release-notes.md#L294"
+          ],
+          "nextQuery": "rg \"Google Agent2Agent (A2A) Protocol — ❌ NOT in tsgo\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "implementation_order",
+          "title": "Implementation order",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L139"
+          ],
+          "nextQuery": "rg \"Implementation order\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "lane_a",
+          "title": "Lane A",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/llms/gguf-model-lanes.md#L99"
+          ],
+          "nextQuery": "rg \"Lane A\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "opencode",
+            "gemma4"
+          ]
+        },
+        {
+          "featureKey": "lane_b_default",
+          "title": "Lane B (default)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/llms/gguf-model-lanes.md#L102"
+          ],
+          "nextQuery": "rg \"Lane B (default)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "opencode",
+            "gemma4"
+          ]
+        },
+        {
+          "featureKey": "mcp_searchability",
+          "title": "MCP searchability",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/research/deep-research-topics.md#L218"
+          ],
+          "nextQuery": "rg \"MCP searchability\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "openai_context_compaction_integration_plan__root",
+          "title": "openai-context-compaction-integration-plan",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/openai-context-compaction-integration-plan.md#L1"
+          ],
+          "nextQuery": "rg \"openai-context-compaction-integration-plan\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "opencode",
+            "gemma4"
+          ]
+        },
+        {
+          "featureKey": "service_map",
+          "title": "Service Map",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/startup-guide.md#L7"
+          ],
+          "nextQuery": "rg \"Service Map\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "a2a_integration_guide__sources",
+          "title": "Sources",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/a2a-integration-guide.md#L505"
+          ],
+          "nextQuery": "rg \"Sources\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "step_5_feat_agent_wire_gemma4_tool_call_controller_to_typescript_mcp_graph_search_tools",
+          "title": "Step 5 — feat(agent): wire Gemma4 tool-call controller to TypeScript MCP graph/search tools",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/research/deep-research-topics.md#L146"
+          ],
+          "nextQuery": "rg \"Step 5 — feat(agent): wire Gemma4 tool-call controller to TypeScript MCP graph/search tools\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "tool_call_flow",
+          "title": "Tool call flow",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/research/deep-research-topics.md#L165"
+          ],
+          "nextQuery": "rg \"Tool call flow\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "tools",
+          "title": "Tools",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:scripts/analysis_reports/LLMS.md#L26"
+          ],
+          "nextQuery": "rg \"Tools\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "llms__tools",
+          "title": "Tools",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:vscode-extension/src/LLMS.md#L26"
+          ],
+          "nextQuery": "rg \"Tools\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "topological_db_backends_summary",
+          "title": "Topological DB Backends (summary)",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/CODEBASE_INDEXING_PIPELINE.md#L242"
+          ],
+          "nextQuery": "rg \"Topological DB Backends (summary)\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "gemma4",
+            "mcp"
+          ]
+        },
+        {
+          "featureKey": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "status": "implemented",
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L38"
+          ],
+          "nextQuery": "rg \"Where each technology fits\" src docs tests",
+          "laneScore": 2,
+          "laneMatches": [
+            "opencode",
+            "mcp"
+          ]
+        }
+      ],
+      "todoAnchors": [
+        "  - [x] Hermes planner/tool registry already exposes these lanes; remaining work is OpenCode/Gemma4 exposure and lane productization, not new runtime implementation",
+        "- [x] **Track A — Database Analysis + Gemma4 Schema Summary** (subagent 9c8fc59d)",
+        "  - [x] Sub-task A4: gemma4-rotorquant:latest synthesis (natural language summary)",
+        "  - [x] Update `opencode.json` (both root and `sveltekit-frontend/`) model definitions to `\"yorha/yorha-legal\"` to align default and agent lanes to the active 40k context GGUF.",
+        "  - [x] Verified TRACE liveness on `:8788/health` (`200`) and confirmed `GET /mcp -> 406` is expected protocol behavior for streamable HTTP MCP.",
+        "  Output: `.opencode/ace-packet.json`, `.opencode/ace-packet-summary.md`",
+        "| Agent Workflow | OpenCode, smoke tests, patch promotion, TODO tracking |",
+        "- [x] `scripts/opencode/build-recommendations.mjs` — canonical builder; reads ace-packets + atlas seeds + smoke reports, emits `.opencode/recommendations/recommendations.json` and `.opencode/recommendations/recommendations.md`",
+        "- [ ] Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still required",
+        "- [ ] Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still required",
+        "**Hidden roots**: include gitignored workspace roots such as `.opencode/`, `.tmp/`, `.cache/`, `.svelte-kit/`, `.github/`, and `.vscode/` in the traversal surface.",
+        "- [ ] Compress offline join outputs into NES chrom cards with Gemma4 summaries and token-budgeted packets.",
+        "- [ ] Add deep_research test coverage for the future LLM orchestration lane before promoting any offline synthesis output into the live stack.",
+        "**Goal**: Use AGENTS metadata to enrich retrieval payloads and expose TRACE MCP tools for OpenCode.",
+        "- [ ] Knowledge Base Manager: expose TRACE MCP tools for OpenCode integration.",
+        "## Phase 101C — Local Deep Research / OpenCode / LangGraph Alignment",
+        "**Goal**: Make `local-deep-research` a research backend for Gemma4/OpenCode, not a competing assistant stack.",
+        "- [ ] Compare the local-deep-research container against the repo's current OpenCode/Gemma4 function-calling path and document the exact role split.",
+        "- [ ] Emit a canonical ACE packet from the LDR bridge with preserved `sourceRefs`, then warm the shared Redis ACE packet cache for OpenCode reuse.",
+        "- [ ] Define the OpenCode-facing bridge so research queries can flow through TRACE MCP / function-caller without bypassing `sourceRef` provenance.",
+        "- [ ] Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate.",
+        "- [ ] Emit a short comparison note for Gemma4 vs Hermes vs local-deep-research so the assistant path stays explicit.",
+        "- OpenCode remains the user-facing assistant path.",
+        "- [x] **Track A — Database Analysis + Gemma4 Schema Summary** (subagent 9c8fc59d)"
+      ]
+    }
+  ],
+  "topKeywords": [
+    {
+      "key": "the_4_layer_retrieval_stack",
+      "value": 5
+    },
+    {
+      "key": "from_sveltekit_frontend",
+      "value": 5
+    },
+    {
+      "key": "1_architectural_principles",
+      "value": 4
+    },
+    {
+      "key": "subgraph_instruction_programming_kag_ace_topology_todo__goal",
+      "value": 4
+    },
+    {
+      "key": "critical_environment_matrix",
+      "value": 4
+    },
+    {
+      "key": "downstream_consumers",
+      "value": 4
+    },
+    {
+      "key": "karpathy_wiki_pipeline",
+      "value": 4
+    },
+    {
+      "key": "integration_features_to_look_for",
+      "value": 4
+    },
+    {
+      "key": "opencode_mcp_atlas__root",
+      "value": 3
+    },
+    {
+      "key": "2_gpu_audit_storage_postgresql_jsonb_chosen",
+      "value": 3
+    },
+    {
+      "key": "2_relational_vector_db_architecture",
+      "value": 3
+    },
+    {
+      "key": "5_drizzle_postgres",
+      "value": 3
+    }
+  ]
+}

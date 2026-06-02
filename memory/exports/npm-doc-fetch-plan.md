@@ -1,7 +1,7 @@
-# NPM Library Doc-Fetch Plan — 2026-06-01
+# NPM Library Doc-Fetch Plan — 2026-06-02
 
 **Total deps**: 204 across 5 package.json files
-**Usage**: SERVER=45, UNUSED=108, SHARED=47, TEST=2, CLIENT=2
+**Usage**: SERVER=46, UNUSED=107, SHARED=47, TEST=2, CLIENT=2
 
 ## Fetch order for production hardening
 
@@ -166,7 +166,7 @@
 
 ## Untagged but used (audit later)
 
-62 deps. Top 30:
+63 deps. Top 30:
 - `@ast-grep/cli` (SERVER)
 - `@aws-sdk/client-s3` (SERVER)
 - `@babel/parser` (SHARED)
@@ -200,7 +200,7 @@
 
 ## Unused (consider removing)
 
-108 deps had no in-tree imports detected. **Review before removing** — config-only or peer deps may show as UNUSED.
+107 deps had no in-tree imports detected. **Review before removing** — config-only or peer deps may show as UNUSED.
 - `@babel/core`
 - `@babel/generator`
 - `@babel/types`

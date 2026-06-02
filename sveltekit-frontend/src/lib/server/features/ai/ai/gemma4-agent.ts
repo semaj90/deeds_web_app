@@ -674,6 +674,43 @@ const AGENT_TOOLS = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'task_pick_next_semantic_packet',
+      description:
+        'Claim the next ready Kanban task semantic packet and return related files, cluster IDs, and the next action.',
+      parameters: {
+        type: 'object',
+        properties: {
+          lane: {
+            type: 'string',
+            description: 'Pickup lane name (default semantic_packet)',
+          },
+          enqueueIfMissing: {
+            type: 'boolean',
+            description: 'Preserve queue-only selection behavior (default true)',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'task_run_semantic_packet_workflow',
+      description:
+        'Create, enrich, cache, and enqueue a task semantic packet for a Kanban task. ' +
+        'Use this after a task is created or when the packet needs to be refreshed.',
+      parameters: {
+        type: 'object',
+        properties: {
+          taskId: { type: 'number', description: 'Kanban task ID to process' },
+        },
+        required: ['taskId'],
+      },
+    },
+  },
 ] as const;
 
 // ── GEMMA4_ALLOWED_TOOLS — exported allowlist for MCP graph/search tools ──────
@@ -685,6 +722,8 @@ export const GEMMA4_ALLOWED_TOOLS = {
   'context.get_compressed_card': { write: false },
   'context.explain_compression': { write: false },
   'context.refresh_task_toc': { write: false },
+  'task.pick_next_semantic_packet': { write: false },
+  'task.run_semantic_packet_workflow': { write: true, requiresGainValidation: false },
   'topology.same_som_cluster': { write: false },
   'graph.expand_neighborhood': { write: false },
   'graph.shortest_path': { write: false },
@@ -800,6 +839,8 @@ const ALLOWED_TOOLS = {
     'context.get_compressed_card',
     'context.explain_compression',
     'context.refresh_task_toc',
+    'task.pick_next_semantic_packet',
+    'task.run_semantic_packet_workflow',
     // MCP dev-context tool (Step 5B)
     'search.dev_context',
     // B1 new tools: graph expansion, cluster lenses, ACE hit validator
@@ -1715,6 +1756,34 @@ async function dispatchTool(
           hotFiles: files,
           hotSymbols: syms,
           blockedAreas: blocked,
+        }),
+      };
+    }
+
+    if (
+      name === 'task_pick_next_semantic_packet' ||
+      name === 'task.pick_next_semantic_packet'
+    ) {
+      const lane = String(args.lane ?? 'semantic_packet');
+      const enqueueIfMissing = args.enqueueIfMissing !== false;
+      return {
+        tool: name,
+        result: await callTraceMcp('task.pick_next_semantic_packet', {
+          lane,
+          enqueueIfMissing,
+        }),
+      };
+    }
+
+    if (
+      name === 'task_run_semantic_packet_workflow' ||
+      name === 'task.run_semantic_packet_workflow'
+    ) {
+      const taskId = Number(args.taskId ?? 0);
+      return {
+        tool: name,
+        result: await callTraceMcp('task.run_semantic_packet_workflow', {
+          taskId,
         }),
       };
     }

@@ -45,7 +45,7 @@
 	{ id: 'evidence', label: 'EVIDENCE', icon: '📁', route: '/evidenceboard' },
 	{ id: 'persons', label: 'PERSONS OF INTEREST', icon: '👤', route: '/yorha/persons' },
 	{ id: 'analysis', label: 'ANALYSIS', icon: '📊', route: '/yorha/analysis' },
-	{ id: 'search', label: 'GLOBAL SEARCH', icon: '🔎', route: '/yorha/search' },
+	{ id: 'search', label: 'GLOBAL SEARCH', icon: '🔎', route: '/global-search' },
 	{ id: 'terminal', label: 'TERMINAL', icon: '💻', route: '/yorha/terminal' }
   ];
 
@@ -158,7 +158,7 @@
   }
 
   function handleGlobalSearch() {
-    goto('/yorha/search');
+    goto('/global-search');
   }
 
   function getCasePriorityColor(priority: string): string {

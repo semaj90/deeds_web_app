@@ -1,0 +1,308 @@
+{
+  "schema": "parent_atlas_rg_dump_organizer_report.v1",
+  "generatedAt": "2026-06-02T02:01:34.420Z",
+  "inputs": {
+    "dumps": [
+      {
+        "id": "rg_turbovec",
+        "path": "docs/reports/rg_turbovec.txt",
+        "title": "TurboVec raw search transcript"
+      },
+      {
+        "id": "rg_napi",
+        "path": "docs/reports/rg_napi.txt",
+        "title": "N-API bridge raw search transcript"
+      }
+    ],
+    "chunkLines": 20000,
+    "maxSnippets": 8,
+    "maxSourceRefs": 12,
+    "maxTrackedSourceRefs": 20000,
+    "maxPacketsPerInput": null,
+    "packetOutDir": ".tmp/parent_atlas_packets/rg-dumps",
+    "packetOutFile": ".tmp/parent_atlas_packets/rg-dumps/rg-dump-packets.ndjson"
+  },
+  "summary": {
+    "rawBytes": 4331542258,
+    "rawGB": 4.03,
+    "packetsWritten": 50,
+    "parsedLines": 971419,
+    "trackedSourceRefs": 20000,
+    "uniqueFeatureIds": 2
+  },
+  "dumps": [
+    {
+      "id": "rg_turbovec",
+      "path": "docs/reports/rg_turbovec.txt",
+      "bytesGB": 2.67,
+      "lines": 941087,
+      "parsedLines": 939765,
+      "packets": 48,
+      "primaryFeatureId": "search.qdrant_vector",
+      "topSourceRefs": [
+        {
+          "value": "318_26.txt#L34",
+          "count": 2
+        },
+        {
+          "value": "318_26.txt#L75",
+          "count": 2
+        },
+        {
+          "value": "318_26.txt#L115",
+          "count": 2
+        },
+        {
+          "value": "318_26.txt#L116",
+          "count": 2
+        },
+        {
+          "value": "319_26_nextsteps.txt#L16",
+          "count": 2
+        },
+        {
+          "value": "319_26_nextsteps.txt#L207",
+          "count": 2
+        },
+        {
+          "value": "323_26.txt#L88",
+          "count": 2
+        },
+        {
+          "value": "323_26.txt#L96",
+          "count": 2
+        },
+        {
+          "value": "323_26.txt#L119",
+          "count": 2
+        },
+        {
+          "value": "320ragkagdag.txt#L18",
+          "count": 2
+        }
+      ],
+      "topFeatureIds": [
+        {
+          "value": "search.qdrant_vector",
+          "count": 48
+        }
+      ]
+    },
+    {
+      "id": "rg_napi",
+      "path": "docs/reports/rg_napi.txt",
+      "bytesGB": 1.36,
+      "lines": 31668,
+      "parsedLines": 31654,
+      "packets": 2,
+      "primaryFeatureId": "gpu.simd_bridge",
+      "topSourceRefs": [
+        {
+          "value": "32726.txt#L15",
+          "count": 2
+        },
+        {
+          "value": "330_26.txt#L83",
+          "count": 2
+        },
+        {
+          "value": "330_26.txt#L84",
+          "count": 2
+        },
+        {
+          "value": "330_26.txt#L85",
+          "count": 2
+        },
+        {
+          "value": "330_26.txt#L88",
+          "count": 2
+        },
+        {
+          "value": "331_26.txt#L432",
+          "count": 2
+        },
+        {
+          "value": "331_26.txt#L436",
+          "count": 2
+        },
+        {
+          "value": "331_26.txt#L892",
+          "count": 2
+        },
+        {
+          "value": "331_26.txt#L896",
+          "count": 2
+        },
+        {
+          "value": "3_24_26.txt#L117",
+          "count": 2
+        }
+      ],
+      "topFeatureIds": [
+        {
+          "value": "gpu.simd_bridge",
+          "count": 2
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "packet_id": "rg_turbovec:1",
+      "title_id": "rg_turbovec:chunk:0001",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "sourceRefs": [
+        "318_26.txt#L34",
+        "318_26.txt#L75",
+        "318_26.txt#L115",
+        "318_26.txt#L116",
+        "319_26_nextsteps.txt#L16"
+      ]
+    },
+    {
+      "packet_id": "rg_turbovec:2",
+      "title_id": "rg_turbovec:chunk:0002",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "sourceRefs": [
+        "deeds_labs/snapshots/2026-03-15-root/node-scripts/fix_schema.cjs#L195",
+        "deeds_labs/snapshots/2026-03-15-root/node-scripts/fix_schema.cjs#L206",
+        "deeds_labs/snapshots/2026-03-15-root/node-scripts/fix_adapters.cjs#L411",
+        "deeds_labs/snapshots/2026-03-15-root/node-scripts/fix_adapters.cjs#L414",
+        "deeds_labs/snapshots/2026-03-15-root/node-scripts/fix-type-definitions.mjs#L11"
+      ]
+    },
+    {
+      "packet_id": "rg_turbovec:3",
+      "title_id": "rg_turbovec:chunk:0003",
+      "feature_id": "search.qdrant_vector",
+      "sourceRef": "docs/reports/rg_turbovec.txt",
+      "sourceRefs": [
+        "deeds_labs/snapshots/2026-03-10/root-stale/logs/svelte-check-post-phase19-22-chunk-025.json#L2690",
+        "deeds_labs/snapshots/2026-03-10/root-stale/logs/svelte-check-post-phase19-22-chunk-025.json#L2694",
+        "deeds_labs/snapshots/2026-03-10/root-stale/logs/svelte-check-post-phase19-22-chunk-025.json#L2698",
+        "deeds_labs/snapshots/2026-03-10/root-stale/logs/svelte-check-post-phase19-22-chunk-025.json#L2702",
+        "deeds_labs/snapshots/2026-03-10/root-stale/logs/svelte-check-post-phase19-22-chunk-025.json#L2706"
+      ]
+    },
+    {
+      "packet_id": "rg_napi:1",
+      "title_id": "rg_napi:chunk:0001",
+      "feature_id": "gpu.simd_bridge",
+      "sourceRef": "docs/reports/rg_napi.txt",
+      "sourceRefs": [
+        "32726.txt#L15",
+        "330_26.txt#L83",
+        "330_26.txt#L84",
+        "330_26.txt#L85",
+        "330_26.txt#L88"
+      ]
+    },
+    {
+      "packet_id": "rg_napi:2",
+      "title_id": "rg_napi:chunk:0002",
+      "feature_id": "gpu.simd_bridge",
+      "sourceRef": "docs/reports/rg_napi.txt",
+      "sourceRefs": [
+        "sveltekit-frontend/svelte-errors-11.txt#L8418",
+        "sveltekit-frontend/svelte-errors-11.txt#L8419",
+        "sveltekit-frontend/svelte-errors-11.txt#L8420",
+        "sveltekit-frontend/svelte-errors-11.txt#L8421",
+        "sveltekit-frontend/svelte-errors-11.txt#L8422"
+      ]
+    }
+  ],
+  "topSourceRefs": [
+    {
+      "value": "318_26.txt#L34",
+      "count": 2
+    },
+    {
+      "value": "318_26.txt#L75",
+      "count": 2
+    },
+    {
+      "value": "318_26.txt#L115",
+      "count": 2
+    },
+    {
+      "value": "318_26.txt#L116",
+      "count": 2
+    },
+    {
+      "value": "319_26_nextsteps.txt#L16",
+      "count": 2
+    },
+    {
+      "value": "319_26_nextsteps.txt#L207",
+      "count": 2
+    },
+    {
+      "value": "323_26.txt#L88",
+      "count": 2
+    },
+    {
+      "value": "323_26.txt#L96",
+      "count": 2
+    },
+    {
+      "value": "323_26.txt#L119",
+      "count": 2
+    },
+    {
+      "value": "320ragkagdag.txt#L18",
+      "count": 2
+    },
+    {
+      "value": "330_26.txt#L92",
+      "count": 2
+    },
+    {
+      "value": "330_26.txt#L98",
+      "count": 2
+    },
+    {
+      "value": "5326.txt#L162",
+      "count": 2
+    },
+    {
+      "value": "59_26cudagraphdeepresearch.txt#L563",
+      "count": 2
+    },
+    {
+      "value": "59_26cudagraphdeepresearch.txt#L567",
+      "count": 2
+    },
+    {
+      "value": "data/external-docs/chunks/sveltekit.jsonl#L1",
+      "count": 2
+    },
+    {
+      "value": "data/external-docs/chunks/sveltekit.jsonl#L2",
+      "count": 2
+    },
+    {
+      "value": "data/external-docs/chunks/sveltekit.jsonl#L3",
+      "count": 2
+    },
+    {
+      "value": "data/external-docs/chunks/drizzle.jsonl#L1",
+      "count": 2
+    },
+    {
+      "value": "data/external-docs/chunks/drizzle.jsonl#L2",
+      "count": 2
+    }
+  ],
+  "topFeatureIds": [
+    {
+      "value": "search.qdrant_vector",
+      "count": 48
+    },
+    {
+      "value": "gpu.simd_bridge",
+      "count": 2
+    }
+  ]
+}

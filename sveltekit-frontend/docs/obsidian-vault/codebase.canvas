@@ -406,9 +406,9 @@
       "height": 60
     },
     {
-      "id": "docker__langgraph-synthesis__.venv__lib__site-packages__plotly__validators___validators",
+      "id": "memory__exports__parent-atlas__parent_atlas_index",
       "type": "file",
-      "file": "Files/docker__langgraph-synthesis__.venv__lib__site-packages__plotly__validators___validators.md",
+      "file": "Files/memory__exports__parent-atlas__parent_atlas_index.md",
       "x": 4393,
       "y": 249,
       "width": 260,
@@ -424,29 +424,38 @@
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__compute.alpha",
+      "id": "docker__langgraph-synthesis__.venv__lib__site-packages__plotly__validators___validators",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__compute.alpha.md",
+      "file": "Files/docker__langgraph-synthesis__.venv__lib__site-packages__plotly__validators___validators.md",
       "x": 4389,
       "y": 261,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__compute.beta",
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__compute.alpha",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__compute.beta.md",
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__compute.alpha.md",
       "x": 4387,
       "y": 267,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__compute.v1",
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__compute.beta",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__compute.v1.md",
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__compute.beta.md",
       "x": 4385,
       "y": 272,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__compute.v1",
+      "type": "file",
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__compute.v1.md",
+      "x": 4383,
+      "y": 278,
       "width": 260,
       "height": 60
     },
@@ -454,8 +463,8 @@
       "id": "sveltekit-frontend__memory__kb__cards__codebase_graph_cards.rank",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__kb__cards__codebase_graph_cards.rank.md",
-      "x": 4383,
-      "y": 278,
+      "x": 4381,
+      "y": 284,
       "width": 260,
       "height": 60
     },
@@ -463,8 +472,8 @@
       "id": "sveltekit-frontend__docs_readme__deeds_labs_archive__svelte-check-clusters",
       "type": "file",
       "file": "Files/sveltekit-frontend__docs_readme__deeds_labs_archive__svelte-check-clusters.md",
-      "x": 4381,
-      "y": 284,
+      "x": 4378,
+      "y": 290,
       "width": 260,
       "height": 60
     },
@@ -472,8 +481,8 @@
       "id": "sveltekit-frontend__docs_readme__deeds_labs_archive__svelte-check-machine",
       "type": "file",
       "file": "Files/sveltekit-frontend__docs_readme__deeds_labs_archive__svelte-check-machine.md",
-      "x": 4378,
-      "y": 290,
+      "x": 4376,
+      "y": 295,
       "width": 260,
       "height": 60
     },
@@ -481,8 +490,8 @@
       "id": "sveltekit-frontend__tmp__hypergraph__codebase_chunks_768-centroids",
       "type": "file",
       "file": "Files/sveltekit-frontend__tmp__hypergraph__codebase_chunks_768-centroids.md",
-      "x": 4376,
-      "y": 295,
+      "x": 4373,
+      "y": 301,
       "width": 260,
       "height": 60
     },
@@ -490,26 +499,26 @@
       "id": "sveltekit-frontend__tmp__hypergraph-centroids",
       "type": "file",
       "file": "Files/sveltekit-frontend__tmp__hypergraph-centroids.md",
-      "x": 4373,
-      "y": 301,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__aiplatform.v1beta1",
-      "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__aiplatform.v1beta1.md",
       "x": 4370,
       "y": 306,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__.tmp__offline-analysis__fe-graph-deep-audit-ast",
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__aiplatform.v1beta1",
       "type": "file",
-      "file": "Files/sveltekit-frontend__.tmp__offline-analysis__fe-graph-deep-audit-ast.md",
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__aiplatform.v1beta1.md",
       "x": 4368,
       "y": 312,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__docs__graph__deep-audit-ast",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__docs__graph__deep-audit-ast.md",
+      "x": 4365,
+      "y": 317,
       "width": 260,
       "height": 60
     },
@@ -517,8 +526,8 @@
       "id": "sveltekit-frontend__.tmp__offline-analysis__fe-graph-deep-audit-ast",
       "type": "file",
       "file": "Files/sveltekit-frontend__.tmp__offline-analysis__fe-graph-deep-audit-ast.md",
-      "x": 4365,
-      "y": 317,
+      "x": 4362,
+      "y": 323,
       "width": 260,
       "height": 60
     },
@@ -526,8 +535,8 @@
       "id": "memory__exports__som-topology-report",
       "type": "file",
       "file": "Files/memory__exports__som-topology-report.md",
-      "x": 4362,
-      "y": 323,
+      "x": 4359,
+      "y": 328,
       "width": 260,
       "height": 60
     },
@@ -535,8 +544,17 @@
       "id": "memory__exports__som-metrics",
       "type": "file",
       "file": "Files/memory__exports__som-metrics.md",
-      "x": 4359,
-      "y": 328,
+      "x": 4355,
+      "y": 334,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__graphify__gds__ee345bc88602",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__graphify__gds__ee345bc88602.md",
+      "x": 4352,
+      "y": 339,
       "width": 260,
       "height": 60
     },
@@ -544,24 +562,6 @@
       "id": "deeds_labs__snapshots__2026-03-10__bucket-c-stale__.vite-concurrent__deps__bits-ui",
       "type": "file",
       "file": "Files/deeds_labs__snapshots__2026-03-10__bucket-c-stale__.vite-concurrent__deps__bits-ui.md",
-      "x": 4355,
-      "y": 334,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__.tmp__offline-analysis__cluster-topology",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__.tmp__offline-analysis__cluster-topology.md",
-      "x": 4352,
-      "y": 339,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__.tmp__offline-analysis__cluster-topology",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__.tmp__offline-analysis__cluster-topology.md",
       "x": 4349,
       "y": 345,
       "width": 260,
@@ -577,20 +577,38 @@
       "height": 60
     },
     {
-      "id": "scratch__obsidian_vault__.obsidian__plugins__obsidian-local-rest-api__main",
+      "id": "sveltekit-frontend__.tmp__offline-analysis__cluster-topology",
       "type": "file",
-      "file": "Files/scratch__obsidian_vault__.obsidian__plugins__obsidian-local-rest-api__main.md",
+      "file": "Files/sveltekit-frontend__.tmp__offline-analysis__cluster-topology.md",
       "x": 4342,
       "y": 355,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__aiplatform.v1",
+      "id": "sveltekit-frontend__docs__graph__cluster-topology",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__aiplatform.v1.md",
+      "file": "Files/sveltekit-frontend__docs__graph__cluster-topology.md",
       "x": 4338,
       "y": 360,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "scratch__obsidian_vault__.obsidian__plugins__obsidian-local-rest-api__main",
+      "type": "file",
+      "file": "Files/scratch__obsidian_vault__.obsidian__plugins__obsidian-local-rest-api__main.md",
+      "x": 4335,
+      "y": 366,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__aiplatform.v1",
+      "type": "file",
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__aiplatform.v1.md",
+      "x": 4331,
+      "y": 371,
       "width": 260,
       "height": 60
     },
@@ -598,17 +616,8 @@
       "id": "sveltekit-frontend__.tmp__mega-audit__chunk2-report",
       "type": "file",
       "file": "Files/sveltekit-frontend__.tmp__mega-audit__chunk2-report.md",
-      "x": 4335,
-      "y": 366,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__.tmp__mega-audit__route-schema-test-map",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__.tmp__mega-audit__route-schema-test-map.md",
-      "x": 4331,
-      "y": 371,
+      "x": 4327,
+      "y": 376,
       "width": 260,
       "height": 60
     },
@@ -616,8 +625,17 @@
       "id": "sveltekit-frontend__memory__graphify__deep__unresolved-imports",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__deep__unresolved-imports.md",
-      "x": 4327,
-      "y": 376,
+      "x": 4323,
+      "y": 381,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__.tmp__mega-audit__route-schema-test-map",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__.tmp__mega-audit__route-schema-test-map.md",
+      "x": 4319,
+      "y": 386,
       "width": 260,
       "height": 60
     },
@@ -625,24 +643,6 @@
       "id": ".opencode__cards__index",
       "type": "file",
       "file": "Files/.opencode__cards__index.md",
-      "x": 4323,
-      "y": 381,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags.md",
-      "x": 4319,
-      "y": 386,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags.md",
       "x": 4315,
       "y": 391,
       "width": 260,
@@ -1531,45 +1531,45 @@
       "height": 60
     },
     {
-      "id": ".tmp__repairs__tasks.json.report",
+      "id": "sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags",
       "type": "file",
-      "file": "Files/.tmp__repairs__tasks.json.report.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags.md",
       "x": 3678,
       "y": 507,
       "width": 260,
       "height": 60
     },
     {
-      "id": "models__embeddinggemma_300m__tokenizer_config",
+      "id": "sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags",
       "type": "file",
-      "file": "Files/models__embeddinggemma_300m__tokenizer_config.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags.md",
       "x": 3671,
       "y": 504,
       "width": 260,
       "height": 60
     },
     {
-      "id": "models__embeddinggemma_300m__tokenizer_config",
+      "id": "sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags",
       "type": "file",
-      "file": "Files/models__embeddinggemma_300m__tokenizer_config.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-13t06-06-59__qdrant_cluster_tags.md",
       "x": 3665,
       "y": 500,
       "width": 260,
       "height": 60
     },
     {
-      "id": "models__gemma3-client-onnx__tokenizer_config",
+      "id": ".tmp__repairs__tasks.json.report",
       "type": "file",
-      "file": "Files/models__gemma3-client-onnx__tokenizer_config.md",
+      "file": "Files/.tmp__repairs__tasks.json.report.md",
       "x": 3658,
       "y": 497,
       "width": 260,
       "height": 60
     },
     {
-      "id": "models__gemma3_270m__tokenizer_config",
+      "id": "models__embeddinggemma_300m__tokenizer_config",
       "type": "file",
-      "file": "Files/models__gemma3_270m__tokenizer_config.md",
+      "file": "Files/models__embeddinggemma_300m__tokenizer_config.md",
       "x": 3651,
       "y": 493,
       "width": 260,
@@ -1594,11 +1594,38 @@
       "height": 60
     },
     {
+      "id": "models__gemma3_270m__tokenizer_config",
+      "type": "file",
+      "file": "Files/models__gemma3_270m__tokenizer_config.md",
+      "x": 3631,
+      "y": 481,
+      "width": 260,
+      "height": 60
+    },
+    {
       "id": "models__embeddinggemma_300m__tokenizer_config",
       "type": "file",
       "file": "Files/models__embeddinggemma_300m__tokenizer_config.md",
-      "x": 3631,
-      "y": 481,
+      "x": 3625,
+      "y": 477,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "models__gemma3-client-onnx__tokenizer_config",
+      "type": "file",
+      "file": "Files/models__gemma3-client-onnx__tokenizer_config.md",
+      "x": 3618,
+      "y": 473,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "models__embeddinggemma_300m__tokenizer_config",
+      "type": "file",
+      "file": "Files/models__embeddinggemma_300m__tokenizer_config.md",
+      "x": 3612,
+      "y": 469,
       "width": 260,
       "height": 60
     },
@@ -1606,8 +1633,8 @@
       "id": "scripts__memory__graphify__gds__5cabb44eb71f",
       "type": "file",
       "file": "Files/scripts__memory__graphify__gds__5cabb44eb71f.md",
-      "x": 3625,
-      "y": 477,
+      "x": 3606,
+      "y": 465,
       "width": 260,
       "height": 60
     },
@@ -1615,8 +1642,8 @@
       "id": "scripts__memory__graphify__gds__98714cf0f2af",
       "type": "file",
       "file": "Files/scripts__memory__graphify__gds__98714cf0f2af.md",
-      "x": 3618,
-      "y": 473,
+      "x": 3599,
+      "y": 460,
       "width": 260,
       "height": 60
     },
@@ -1624,8 +1651,8 @@
       "id": "scripts__memory__graphify__gds__adb7a6419a31",
       "type": "file",
       "file": "Files/scripts__memory__graphify__gds__adb7a6419a31.md",
-      "x": 3612,
-      "y": 469,
+      "x": 3593,
+      "y": 456,
       "width": 260,
       "height": 60
     },
@@ -1633,8 +1660,8 @@
       "id": "scripts__memory__graphify__gds__adb7a6419a31",
       "type": "file",
       "file": "Files/scripts__memory__graphify__gds__adb7a6419a31.md",
-      "x": 3606,
-      "y": 465,
+      "x": 3587,
+      "y": 451,
       "width": 260,
       "height": 60
     },
@@ -1642,8 +1669,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__326a98796ade",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__326a98796ade.md",
-      "x": 3599,
-      "y": 460,
+      "x": 3581,
+      "y": 447,
       "width": 260,
       "height": 60
     },
@@ -1651,8 +1678,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__85d87aee68bb",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__85d87aee68bb.md",
-      "x": 3593,
-      "y": 456,
+      "x": 3574,
+      "y": 442,
       "width": 260,
       "height": 60
     },
@@ -1660,8 +1687,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__9b37a6ddcc25",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__9b37a6ddcc25.md",
-      "x": 3587,
-      "y": 451,
+      "x": 3568,
+      "y": 437,
       "width": 260,
       "height": 60
     },
@@ -1669,8 +1696,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__9eb06b3d359a",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__9eb06b3d359a.md",
-      "x": 3581,
-      "y": 447,
+      "x": 3562,
+      "y": 432,
       "width": 260,
       "height": 60
     },
@@ -1678,8 +1705,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__ca83f1ee2172",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__ca83f1ee2172.md",
-      "x": 3574,
-      "y": 442,
+      "x": 3556,
+      "y": 427,
       "width": 260,
       "height": 60
     },
@@ -1687,8 +1714,8 @@
       "id": "scripts__memory__graphify__gds__5cabb44eb71f",
       "type": "file",
       "file": "Files/scripts__memory__graphify__gds__5cabb44eb71f.md",
-      "x": 3568,
-      "y": 437,
+      "x": 3550,
+      "y": 422,
       "width": 260,
       "height": 60
     },
@@ -1696,8 +1723,8 @@
       "id": "scripts__memory__graphify__gds__98714cf0f2af",
       "type": "file",
       "file": "Files/scripts__memory__graphify__gds__98714cf0f2af.md",
-      "x": 3562,
-      "y": 432,
+      "x": 3545,
+      "y": 417,
       "width": 260,
       "height": 60
     },
@@ -1705,8 +1732,8 @@
       "id": "scripts__memory__graphify__gds__adb7a6419a31",
       "type": "file",
       "file": "Files/scripts__memory__graphify__gds__adb7a6419a31.md",
-      "x": 3556,
-      "y": 427,
+      "x": 3539,
+      "y": 412,
       "width": 260,
       "height": 60
     },
@@ -1714,8 +1741,8 @@
       "id": "scripts__memory__graphify__gds__adb7a6419a31",
       "type": "file",
       "file": "Files/scripts__memory__graphify__gds__adb7a6419a31.md",
-      "x": 3550,
-      "y": 422,
+      "x": 3533,
+      "y": 406,
       "width": 260,
       "height": 60
     },
@@ -1723,8 +1750,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__dd928f2156f3",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__dd928f2156f3.md",
-      "x": 3545,
-      "y": 417,
+      "x": 3527,
+      "y": 401,
       "width": 260,
       "height": 60
     },
@@ -1732,8 +1759,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__7af6afddf363",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__7af6afddf363.md",
-      "x": 3539,
-      "y": 412,
+      "x": 3522,
+      "y": 396,
       "width": 260,
       "height": 60
     },
@@ -1741,8 +1768,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__957855658f35",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__957855658f35.md",
-      "x": 3533,
-      "y": 406,
+      "x": 3516,
+      "y": 390,
       "width": 260,
       "height": 60
     },
@@ -1750,8 +1777,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__e3d67ac668d6",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__e3d67ac668d6.md",
-      "x": 3527,
-      "y": 401,
+      "x": 3511,
+      "y": 384,
       "width": 260,
       "height": 60
     },
@@ -1759,8 +1786,8 @@
       "id": ".tmp__calls-graph-summary",
       "type": "file",
       "file": "Files/.tmp__calls-graph-summary.md",
-      "x": 3522,
-      "y": 396,
+      "x": 3505,
+      "y": 379,
       "width": 260,
       "height": 60
     },
@@ -1768,33 +1795,6 @@
       "id": "sveltekit-frontend__memory__graphify__gds__542fe2d6d605",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__542fe2d6d605.md",
-      "x": 3516,
-      "y": 390,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags.md",
-      "x": 3511,
-      "y": 384,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags.md",
-      "x": 3505,
-      "y": 379,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags.md",
       "x": 3500,
       "y": 373,
       "width": 260,
@@ -2233,11 +2233,29 @@
       "height": 60
     },
     {
-      "id": "docs__atlas__feature-registry",
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags",
       "type": "file",
-      "file": "Files/docs__atlas__feature-registry.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags.md",
       "x": 3341,
       "y": 17,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags.md",
+      "x": 3341,
+      "y": 8,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__qdrant_cluster_tags.md",
+      "x": 3340,
+      "y": 0,
       "width": 260,
       "height": 60
     },
@@ -2245,8 +2263,17 @@
       "id": "docs__atlas__feature-registry",
       "type": "file",
       "file": "Files/docs__atlas__feature-registry.md",
-      "x": 3341,
-      "y": 8,
+      "x": 3339,
+      "y": -8,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "docs__atlas__feature-registry",
+      "type": "file",
+      "file": "Files/docs__atlas__feature-registry.md",
+      "x": 3339,
+      "y": -17,
       "width": 260,
       "height": 60
     },
@@ -2254,33 +2281,6 @@
       "id": "sveltekit-frontend__.tmp__drizzle-temporal-audit.latest",
       "type": "file",
       "file": "Files/sveltekit-frontend__.tmp__drizzle-temporal-audit.latest.md",
-      "x": 3340,
-      "y": 0,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags.md",
-      "x": 3339,
-      "y": -8,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags.md",
-      "x": 3339,
-      "y": -17,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags.md",
       "x": 3338,
       "y": -25,
       "width": 260,
@@ -2485,11 +2485,38 @@
       "height": 60
     },
     {
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags.md",
+      "x": 3359,
+      "y": -217,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags.md",
+      "x": 3361,
+      "y": -226,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__qdrant_cluster_tags.md",
+      "x": 3363,
+      "y": -234,
+      "width": 260,
+      "height": 60
+    },
+    {
       "id": "sveltekit-frontend__docs_readme__deeds_labs_archive__svelte5-compliance-report",
       "type": "file",
       "file": "Files/sveltekit-frontend__docs_readme__deeds_labs_archive__svelte5-compliance-report.md",
-      "x": 3359,
-      "y": -217,
+      "x": 3365,
+      "y": -242,
       "width": 260,
       "height": 60
     },
@@ -2497,8 +2524,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__38524f9dac39",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__38524f9dac39.md",
-      "x": 3361,
-      "y": -226,
+      "x": 3368,
+      "y": -250,
       "width": 260,
       "height": 60
     },
@@ -2506,8 +2533,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__4e76806822b7",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__4e76806822b7.md",
-      "x": 3363,
-      "y": -234,
+      "x": 3371,
+      "y": -258,
       "width": 260,
       "height": 60
     },
@@ -2515,8 +2542,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__54351abfb865",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__54351abfb865.md",
-      "x": 3365,
-      "y": -242,
+      "x": 3373,
+      "y": -267,
       "width": 260,
       "height": 60
     },
@@ -2524,8 +2551,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__8c1964af195a",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__8c1964af195a.md",
-      "x": 3368,
-      "y": -250,
+      "x": 3376,
+      "y": -275,
       "width": 260,
       "height": 60
     },
@@ -2533,8 +2560,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__a49488bdffd9",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__a49488bdffd9.md",
-      "x": 3371,
-      "y": -258,
+      "x": 3379,
+      "y": -283,
       "width": 260,
       "height": 60
     },
@@ -2542,8 +2569,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__c2162888ad70",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__c2162888ad70.md",
-      "x": 3373,
-      "y": -267,
+      "x": 3382,
+      "y": -291,
       "width": 260,
       "height": 60
     },
@@ -2551,8 +2578,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__dc26a2b48f57",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__dc26a2b48f57.md",
-      "x": 3376,
-      "y": -275,
+      "x": 3385,
+      "y": -299,
       "width": 260,
       "height": 60
     },
@@ -2560,8 +2587,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__dc4dede6380c",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__dc4dede6380c.md",
-      "x": 3379,
-      "y": -283,
+      "x": 3388,
+      "y": -307,
       "width": 260,
       "height": 60
     },
@@ -2569,8 +2596,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__e168de463143",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__e168de463143.md",
-      "x": 3382,
-      "y": -291,
+      "x": 3392,
+      "y": -315,
       "width": 260,
       "height": 60
     },
@@ -2578,8 +2605,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__f6acb97e3829",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__f6acb97e3829.md",
-      "x": 3385,
-      "y": -299,
+      "x": 3395,
+      "y": -323,
       "width": 260,
       "height": 60
     },
@@ -2587,8 +2614,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__6b9b87d56cb4",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__6b9b87d56cb4.md",
-      "x": 3388,
-      "y": -307,
+      "x": 3399,
+      "y": -331,
       "width": 260,
       "height": 60
     },
@@ -2596,8 +2623,8 @@
       "id": "sveltekit-frontend__memory__graphify__gds__b504fdae37e8",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__graphify__gds__b504fdae37e8.md",
-      "x": 3392,
-      "y": -315,
+      "x": 3402,
+      "y": -338,
       "width": 260,
       "height": 60
     },
@@ -2605,8 +2632,8 @@
       "id": "docs__reports__index-gap-memory-report",
       "type": "file",
       "file": "Files/docs__reports__index-gap-memory-report.md",
-      "x": 3395,
-      "y": -323,
+      "x": 3406,
+      "y": -346,
       "width": 260,
       "height": 60
     },
@@ -2614,8 +2641,8 @@
       "id": "sveltekit-frontend__.tmp__offline-analysis__module-cartridges.idx",
       "type": "file",
       "file": "Files/sveltekit-frontend__.tmp__offline-analysis__module-cartridges.idx.md",
-      "x": 3399,
-      "y": -331,
+      "x": 3410,
+      "y": -354,
       "width": 260,
       "height": 60
     },
@@ -2623,8 +2650,8 @@
       "id": "sveltekit-frontend__.tmp__offline-analysis__module-cartridges.idx",
       "type": "file",
       "file": "Files/sveltekit-frontend__.tmp__offline-analysis__module-cartridges.idx.md",
-      "x": 3402,
-      "y": -338,
+      "x": 3414,
+      "y": -362,
       "width": 260,
       "height": 60
     },
@@ -2632,53 +2659,62 @@
       "id": "sveltekit-frontend__docs_readme__deeds_labs_archive__error-analysis-report",
       "type": "file",
       "file": "Files/sveltekit-frontend__docs_readme__deeds_labs_archive__error-analysis-report.md",
-      "x": 3406,
-      "y": -346,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "scripts__memory__graphify__gds__76047e144058",
-      "type": "file",
-      "file": "Files/scripts__memory__graphify__gds__76047e144058.md",
-      "x": 3410,
-      "y": -354,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "scripts__memory__graphify__gds__7c2d269cb33c",
-      "type": "file",
-      "file": "Files/scripts__memory__graphify__gds__7c2d269cb33c.md",
-      "x": 3414,
-      "y": -362,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "scripts__memory__graphify__gds__76047e144058",
-      "type": "file",
-      "file": "Files/scripts__memory__graphify__gds__76047e144058.md",
       "x": 3418,
       "y": -369,
       "width": 260,
       "height": 60
     },
     {
-      "id": "scripts__memory__graphify__gds__7c2d269cb33c",
+      "id": "scripts__memory__graphify__gds__76047e144058",
       "type": "file",
-      "file": "Files/scripts__memory__graphify__gds__7c2d269cb33c.md",
+      "file": "Files/scripts__memory__graphify__gds__76047e144058.md",
       "x": 3422,
       "y": -377,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1alpha",
+      "id": "scripts__memory__graphify__gds__7c2d269cb33c",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1alpha.md",
+      "file": "Files/scripts__memory__graphify__gds__7c2d269cb33c.md",
       "x": 3426,
       "y": -385,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "scripts__memory__graphify__gds__76047e144058",
+      "type": "file",
+      "file": "Files/scripts__memory__graphify__gds__76047e144058.md",
+      "x": 3431,
+      "y": -392,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "scripts__memory__graphify__gds__7c2d269cb33c",
+      "type": "file",
+      "file": "Files/scripts__memory__graphify__gds__7c2d269cb33c.md",
+      "x": 3435,
+      "y": -400,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": ".tmp__path-map",
+      "type": "file",
+      "file": "Files/.tmp__path-map.md",
+      "x": 3440,
+      "y": -407,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1alpha",
+      "type": "file",
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1alpha.md",
+      "x": 3444,
+      "y": -414,
       "width": 260,
       "height": 60
     },
@@ -2686,8 +2722,8 @@
       "id": "sveltekit-frontend__docs_readme__deeds_labs_archive__colon-syntax-corruption-report",
       "type": "file",
       "file": "Files/sveltekit-frontend__docs_readme__deeds_labs_archive__colon-syntax-corruption-report.md",
-      "x": 3431,
-      "y": -392,
+      "x": 3449,
+      "y": -422,
       "width": 260,
       "height": 60
     },
@@ -2695,8 +2731,8 @@
       "id": "sveltekit-frontend__.tmp__drizzle-introspect-v2__meta__0000_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__.tmp__drizzle-introspect-v2__meta__0000_snapshot.md",
-      "x": 3435,
-      "y": -400,
+      "x": 3454,
+      "y": -429,
       "width": 260,
       "height": 60
     },
@@ -2704,8 +2740,8 @@
       "id": ".tmp__drizzle-introspect__meta__0000_snapshot",
       "type": "file",
       "file": "Files/.tmp__drizzle-introspect__meta__0000_snapshot.md",
-      "x": 3440,
-      "y": -407,
+      "x": 3459,
+      "y": -436,
       "width": 260,
       "height": 60
     },
@@ -2713,8 +2749,8 @@
       "id": "sveltekit-frontend__docs_readme__deeds_labs_archive__.svelte-check-output",
       "type": "file",
       "file": "Files/sveltekit-frontend__docs_readme__deeds_labs_archive__.svelte-check-output.md",
-      "x": 3444,
-      "y": -414,
+      "x": 3464,
+      "y": -443,
       "width": 260,
       "height": 60
     },
@@ -2722,8 +2758,8 @@
       "id": "sveltekit-frontend__memory__runs__2026-05-07t16-46-33__graph_nodes",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t16-46-33__graph_nodes.md",
-      "x": 3449,
-      "y": -422,
+      "x": 3469,
+      "y": -450,
       "width": 260,
       "height": 60
     },
@@ -2731,8 +2767,8 @@
       "id": "sveltekit-frontend__memory__runs__2026-05-07t17-03-59__graph_nodes",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t17-03-59__graph_nodes.md",
-      "x": 3454,
-      "y": -429,
+      "x": 3474,
+      "y": -457,
       "width": 260,
       "height": 60
     },
@@ -2740,8 +2776,8 @@
       "id": "sveltekit-frontend__memory__runs__2026-05-07t17-11-51__graph_nodes",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t17-11-51__graph_nodes.md",
-      "x": 3459,
-      "y": -436,
+      "x": 3480,
+      "y": -464,
       "width": 260,
       "height": 60
     },
@@ -2749,8 +2785,8 @@
       "id": "sveltekit-frontend__memory__runs__2026-05-07t18-56-43__graph_nodes",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t18-56-43__graph_nodes.md",
-      "x": 3464,
-      "y": -443,
+      "x": 3485,
+      "y": -471,
       "width": 260,
       "height": 60
     },
@@ -2758,8 +2794,8 @@
       "id": "sveltekit-frontend__memory__runs__2026-05-07t18-56-43__graph_nodes",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t18-56-43__graph_nodes.md",
-      "x": 3469,
-      "y": -450,
+      "x": 3491,
+      "y": -478,
       "width": 260,
       "height": 60
     },
@@ -2767,8 +2803,8 @@
       "id": "sveltekit-frontend__memory__runs__2026-05-07t18-56-43__graph_nodes",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t18-56-43__graph_nodes.md",
-      "x": 3474,
-      "y": -457,
+      "x": 3496,
+      "y": -485,
       "width": 260,
       "height": 60
     },
@@ -2776,8 +2812,8 @@
       "id": ".opencode__ace-packets_stale__packet-7e78d6d5-9ab3-4e36-94bf-e5c18b521b36",
       "type": "file",
       "file": "Files/.opencode__ace-packets_stale__packet-7e78d6d5-9ab3-4e36-94bf-e5c18b521b36.md",
-      "x": 3480,
-      "y": -464,
+      "x": 3502,
+      "y": -492,
       "width": 260,
       "height": 60
     },
@@ -2785,8 +2821,8 @@
       "id": "sveltekit-frontend__memory__runs__2026-05-13t06-06-59__graph_nodes",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__runs__2026-05-13t06-06-59__graph_nodes.md",
-      "x": 3485,
-      "y": -471,
+      "x": 3508,
+      "y": -498,
       "width": 260,
       "height": 60
     },
@@ -2794,42 +2830,6 @@
       "id": "sveltekit-frontend__memory__runs__2026-05-15t21-39-17__graph_nodes",
       "type": "file",
       "file": "Files/sveltekit-frontend__memory__runs__2026-05-15t21-39-17__graph_nodes.md",
-      "x": 3491,
-      "y": -478,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes.md",
-      "x": 3496,
-      "y": -485,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes.md",
-      "x": 3502,
-      "y": -492,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes.md",
-      "x": 3508,
-      "y": -498,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes.md",
       "x": 3514,
       "y": -505,
       "width": 260,
@@ -3079,36 +3079,36 @@
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes.md",
       "x": 3711,
       "y": -657,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes.md",
       "x": 3719,
       "y": -661,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes.md",
       "x": 3727,
       "y": -665,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t00-26-41__graph_nodes.md",
       "x": 3735,
       "y": -669,
       "width": 260,
@@ -3367,36 +3367,36 @@
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes.md",
       "x": 3991,
       "y": -736,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes.md",
       "x": 4000,
       "y": -736,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes.md",
       "x": 4009,
       "y": -737,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-17t16-05-51__graph_nodes.md",
       "x": 4019,
       "y": -737,
       "width": 260,
@@ -3619,36 +3619,36 @@
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes.md",
       "x": 4250,
       "y": -708,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes.md",
       "x": 4259,
       "y": -705,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes.md",
       "x": 4268,
       "y": -703,
       "width": 260,
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
+      "id": "sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-22t01-44-37__graph_nodes.md",
       "x": 4277,
       "y": -700,
       "width": 260,
@@ -3682,20 +3682,65 @@
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__drizzle__meta__0029_snapshot",
+      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__drizzle__meta__0029_snapshot.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
       "x": 4313,
       "y": -687,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1beta",
+      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1beta.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
       "x": 4322,
       "y": -683,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
+      "x": 4330,
+      "y": -680,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
+      "x": 4339,
+      "y": -676,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-30t08-33-59__graph_nodes.md",
+      "x": 4348,
+      "y": -672,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__drizzle__meta__0029_snapshot",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__drizzle__meta__0029_snapshot.md",
+      "x": 4356,
+      "y": -668,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1beta",
+      "type": "file",
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1beta.md",
+      "x": 4365,
+      "y": -664,
       "width": 260,
       "height": 60
     },
@@ -3703,51 +3748,6 @@
       "id": "sveltekit-frontend__drizzle__meta__0028_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0028_snapshot.md",
-      "x": 4330,
-      "y": -680,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
-      "x": 4339,
-      "y": -676,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
-      "x": 4348,
-      "y": -672,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
-      "x": 4356,
-      "y": -668,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
-      "x": 4365,
-      "y": -664,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
       "x": 4374,
       "y": -660,
       "width": 260,
@@ -4114,20 +4114,65 @@
       "height": 60
     },
     {
-      "id": "sveltekit-frontend__drizzle__meta__0027_snapshot",
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
       "type": "file",
-      "file": "Files/sveltekit-frontend__drizzle__meta__0027_snapshot.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
       "x": 4668,
       "y": -401,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__botocore__data__endpoints",
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__botocore__data__endpoints.md",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
       "x": 4674,
       "y": -393,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
+      "x": 4679,
+      "y": -385,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
+      "x": 4684,
+      "y": -376,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t04-07-10__graph_nodes.md",
+      "x": 4689,
+      "y": -368,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "sveltekit-frontend__drizzle__meta__0027_snapshot",
+      "type": "file",
+      "file": "Files/sveltekit-frontend__drizzle__meta__0027_snapshot.md",
+      "x": 4694,
+      "y": -359,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": ".venv-py313-backup__lib__site-packages__botocore__data__endpoints",
+      "type": "file",
+      "file": "Files/.venv-py313-backup__lib__site-packages__botocore__data__endpoints.md",
+      "x": 4699,
+      "y": -351,
       "width": 260,
       "height": 60
     },
@@ -4135,8 +4180,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0026_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0026_snapshot.md",
-      "x": 4679,
-      "y": -385,
+      "x": 4704,
+      "y": -342,
       "width": 260,
       "height": 60
     },
@@ -4144,8 +4189,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0025_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0025_snapshot.md",
-      "x": 4684,
-      "y": -376,
+      "x": 4709,
+      "y": -334,
       "width": 260,
       "height": 60
     },
@@ -4153,8 +4198,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0024_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0024_snapshot.md",
-      "x": 4689,
-      "y": -368,
+      "x": 4713,
+      "y": -325,
       "width": 260,
       "height": 60
     },
@@ -4162,17 +4207,17 @@
       "id": "sveltekit-frontend__.docker-build__package-lock",
       "type": "file",
       "file": "Files/sveltekit-frontend__.docker-build__package-lock.md",
-      "x": 4694,
-      "y": -359,
+      "x": 4718,
+      "y": -316,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1",
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1.md",
-      "x": 4699,
-      "y": -351,
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1.md",
+      "x": 4722,
+      "y": -307,
       "width": 260,
       "height": 60
     },
@@ -4180,8 +4225,8 @@
       "id": "sveltekit-frontend__package-lock",
       "type": "file",
       "file": "Files/sveltekit-frontend__package-lock.md",
-      "x": 4704,
-      "y": -342,
+      "x": 4727,
+      "y": -298,
       "width": 260,
       "height": 60
     },
@@ -4189,8 +4234,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0023_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0023_snapshot.md",
-      "x": 4709,
-      "y": -334,
+      "x": 4731,
+      "y": -289,
       "width": 260,
       "height": 60
     },
@@ -4198,8 +4243,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0022_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0022_snapshot.md",
-      "x": 4713,
-      "y": -325,
+      "x": 4735,
+      "y": -280,
       "width": 260,
       "height": 60
     },
@@ -4207,8 +4252,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0021_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0021_snapshot.md",
-      "x": 4718,
-      "y": -316,
+      "x": 4739,
+      "y": -271,
       "width": 260,
       "height": 60
     },
@@ -4216,8 +4261,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0020_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0020_snapshot.md",
-      "x": 4722,
-      "y": -307,
+      "x": 4742,
+      "y": -262,
       "width": 260,
       "height": 60
     },
@@ -4225,8 +4270,8 @@
       "id": "sveltekit-frontend__docs_readme__deeds_labs_archive__svelte-check-output",
       "type": "file",
       "file": "Files/sveltekit-frontend__docs_readme__deeds_labs_archive__svelte-check-output.md",
-      "x": 4727,
-      "y": -298,
+      "x": 4746,
+      "y": -253,
       "width": 260,
       "height": 60
     },
@@ -4234,8 +4279,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0019_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0019_snapshot.md",
-      "x": 4731,
-      "y": -289,
+      "x": 4750,
+      "y": -244,
       "width": 260,
       "height": 60
     },
@@ -4243,8 +4288,8 @@
       "id": "sveltekit-frontend__drizzle__meta__0018_snapshot",
       "type": "file",
       "file": "Files/sveltekit-frontend__drizzle__meta__0018_snapshot.md",
-      "x": 4735,
-      "y": -280,
+      "x": 4753,
+      "y": -234,
       "width": 260,
       "height": 60
     },
@@ -4252,17 +4297,17 @@
       "id": "docs__phase100__file-consolidation-audit",
       "type": "file",
       "file": "Files/docs__phase100__file-consolidation-audit.md",
-      "x": 4739,
-      "y": -271,
+      "x": 4757,
+      "y": -225,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__dialogflow.v2",
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__dialogflow.v2",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__dialogflow.v2.md",
-      "x": 4742,
-      "y": -262,
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__dialogflow.v2.md",
+      "x": 4760,
+      "y": -216,
       "width": 260,
       "height": 60
     },
@@ -4270,26 +4315,26 @@
       "id": "deeds_labs__projects__legacy-projects__error-analysis__error-patterns",
       "type": "file",
       "file": "Files/deeds_labs__projects__legacy-projects__error-analysis__error-patterns.md",
-      "x": 4746,
-      "y": -253,
+      "x": 4763,
+      "y": -206,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__dialogflow.v2beta1",
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__dialogflow.v2beta1",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__dialogflow.v2beta1.md",
-      "x": 4750,
-      "y": -244,
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__dialogflow.v2beta1.md",
+      "x": 4766,
+      "y": -197,
       "width": 260,
       "height": 60
     },
     {
-      "id": ".venv__lib__site-packages__googleapiclient__discovery_cache__documents__displayvideo.v4",
+      "id": ".venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__displayvideo.v4",
       "type": "file",
-      "file": "Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__displayvideo.v4.md",
-      "x": 4753,
-      "y": -234,
+      "file": "Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__displayvideo.v4.md",
+      "x": 4769,
+      "y": -187,
       "width": 260,
       "height": 60
     },
@@ -4297,51 +4342,6 @@
       "id": ".tmp__repairs__svelte-errors.ndjson.report",
       "type": "file",
       "file": "Files/.tmp__repairs__svelte-errors.ndjson.report.md",
-      "x": 4757,
-      "y": -225,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes.md",
-      "x": 4760,
-      "y": -216,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes.md",
-      "x": 4763,
-      "y": -206,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes.md",
-      "x": 4766,
-      "y": -197,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes.md",
-      "x": 4769,
-      "y": -187,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes",
-      "type": "file",
-      "file": "Files/sveltekit-frontend__memory__runs__2026-05-07t01-05-54__graph_nodes.md",
       "x": 4772,
       "y": -178,
       "width": 260,

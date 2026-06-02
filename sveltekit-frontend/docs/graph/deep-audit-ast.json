@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-31T21:02:23.783Z",
-  "graphFiles": 56608,
+  "generatedAt": "2026-06-01T22:50:56.345Z",
+  "graphFiles": 56931,
   "gates": {
     "D9": {
       "name": "Likely orphans (0 fanIn, no dynImport ref)",
-      "count": 13485,
+      "count": 13552,
       "findings": [
         {
           "file": "$lib/utils/file-reader.ts",
@@ -1627,6 +1627,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": ".tmp/debug-qdrant-index.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": ".tmp/find-high-confidence-candidates.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -1687,62 +1692,67 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/litellm/proxy/swagger/swagger-ui-bundle.js",
+          "file": ".tmp/test-norm.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/matplotlib/backends/web_backend/js/mpl.js",
+          "file": ".venv-py313-backup/Lib/site-packages/litellm/proxy/swagger/swagger-ui-bundle.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/matplotlib/backends/web_backend/js/mpl_tornado.js",
+          "file": ".venv-py313-backup/Lib/site-packages/matplotlib/backends/web_backend/js/mpl.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/matplotlib/backends/web_backend/js/nbagg_mpl.js",
+          "file": ".venv-py313-backup/Lib/site-packages/matplotlib/backends/web_backend/js/mpl_tornado.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/sklearn/utils/_repr_html/estimator.js",
+          "file": ".venv-py313-backup/Lib/site-packages/matplotlib/backends/web_backend/js/nbagg_mpl.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/torch/utils/model_dump/htm.mjs",
+          "file": ".venv-py313-backup/Lib/site-packages/sklearn/utils/_repr_html/estimator.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/torch/utils/model_dump/preact.mjs",
+          "file": ".venv-py313-backup/Lib/site-packages/torch/utils/model_dump/htm.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/urllib3/contrib/emscripten/emscripten_fetch_worker.js",
+          "file": ".venv-py313-backup/Lib/site-packages/torch/utils/model_dump/preact.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/werkzeug/debug/shared/debugger.js",
+          "file": ".venv-py313-backup/Lib/site-packages/urllib3/contrib/emscripten/emscripten_fetch_worker.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/yt_dlp/extractor/youtube/jsc/_builtin/vendor/yt.solver.bun.lib.js",
+          "file": ".venv-py313-backup/Lib/site-packages/werkzeug/debug/shared/debugger.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/yt_dlp/extractor/youtube/jsc/_builtin/vendor/yt.solver.core.js",
+          "file": ".venv-py313-backup/Lib/site-packages/yt_dlp/extractor/youtube/jsc/_builtin/vendor/yt.solver.bun.lib.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/yt_dlp/extractor/youtube/jsc/_builtin/vendor/yt.solver.deno.lib.js",
+          "file": ".venv-py313-backup/Lib/site-packages/yt_dlp/extractor/youtube/jsc/_builtin/vendor/yt.solver.core.js",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": ".venv-py313-backup/Lib/site-packages/yt_dlp/extractor/youtube/jsc/_builtin/vendor/yt.solver.deno.lib.js",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -53942,12 +53952,12 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/torch/utils/model_dump/htm.mjs",
+          "file": ".venv-py313-backup/Lib/site-packages/torch/utils/model_dump/htm.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/torch/utils/model_dump/preact.mjs",
+          "file": ".venv-py313-backup/Lib/site-packages/torch/utils/model_dump/preact.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -54317,6 +54327,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/alias-id-migration-preflight.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/analyze-directory-roles.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -54353,6 +54368,11 @@
         },
         {
           "file": "scripts/atlas/atlas-live-reconciliation-audit.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/atlas-parent-indexing.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -54428,6 +54448,11 @@
         },
         {
           "file": "scripts/atlas/backfill-code-cards.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/backfill-nes-chrom-packets.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -54547,6 +54572,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/check-knowledge-consolidation-claims.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/chr97-emit-kanban-tasks.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -54633,6 +54663,11 @@
         },
         {
           "file": "scripts/atlas/create-qdrant-feature-maps.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/debug-import-resolve.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -55132,6 +55167,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/mapreduce-path-join.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/materialize-gemma-recommendations.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -55142,7 +55182,17 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/mirror-parent-atlas-feature-command-atlas-postgres.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/mirror-parent-atlas-to-postgres.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/missing-features-review.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -55153,6 +55203,16 @@
         },
         {
           "file": "scripts/atlas/normalize-source-ref-id.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/parent-atlas-feature-command-atlas.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/parent-atlas-turbovec-compression-plan.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -55247,6 +55307,16 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/project-parent-atlas-feature-command-atlas-qdrant.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/project-parent-atlas-feature-command-atlas.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/publish-bifrost-invalidation.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -55258,6 +55328,16 @@
         },
         {
           "file": "scripts/atlas/qdrant-cluster-tag-audit.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/qdrant-path-bridge.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -55302,12 +55382,27 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/render-parent-atlas-readable.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/repair-card-source-refs.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/repair-db-all-identities.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
           "file": "scripts/atlas/repair-db-types.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/report-nes-chrom-packet-hits.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -55357,7 +55452,17 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/run-offline-synthesis.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/run-phase19-complete.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/run-taskboard-parent-atlas-sync.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -55433,6 +55538,31 @@
         },
         {
           "file": "scripts/atlas/som-clustering-pipeline.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/sourceRef-first-hot-join-warmup.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/sourceRef-first-join-warmup.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/sourceRef-first-nes-glyph-compress.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/sourceRef-first-parent-atlas-refresh.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/suggest-card-source-refs.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -55558,6 +55688,11 @@
         },
         {
           "file": "scripts/atlas/validate-json-packet-integrity.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/validate-knowledge-cards.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -56402,6 +56537,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/opencode/alias-card-mapper.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/opencode/apply-gemma4-titles.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -56443,6 +56583,11 @@
         },
         {
           "file": "scripts/opencode/build_summaries_from_atlas.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/opencode/context-orchestrator.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -56707,6 +56852,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/opencode/validation-gate.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/operator/backup-atlas-state.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -56798,6 +56948,16 @@
         },
         {
           "file": "scripts/probe-models.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/promotion/report-promotion-status.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/promotion/run-promotion-queue.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -57023,6 +57183,11 @@
         },
         {
           "file": "scripts/smoke-all-gpu-lanes.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/smoke-fp16-attention.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -58192,7 +58357,7 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "sveltekit-frontend/.docker-build/scripts/atlas/build-parent-master-atlas.ts",
+          "file": "sveltekit-frontend/scripts/atlas/build-parent-master-atlas.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -58283,6 +58448,11 @@
         },
         {
           "file": "sveltekit-frontend/.docker-build/scripts/atlas/extract-cluster-aliases.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/atlas/feature-semantic-index-source.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -60158,6 +60328,11 @@
         },
         {
           "file": "sveltekit-frontend/scripts/opencode/test-semantic-cache.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/scripts/opencode/weekly-cold-archive.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -62967,11 +63142,6 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "sveltekit-frontend/src/lib/components/evidence/VlmTagModal.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
           "file": "sveltekit-frontend/src/lib/components/glyph/GlyphAtlasPanel.svelte",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -63182,7 +63352,22 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "sveltekit-frontend/src/lib/server/ai/lane-router.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "sveltekit-frontend/src/lib/server/ai/subagents/directory-analyzer.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/src/lib/server/ai/vlm-plan-parser.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "sveltekit-frontend/src/lib/server/ai/vlm-readiness.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -63442,7 +63627,7 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": "deeds_labs/db-schema-archive/schema-phase78.ts",
+          "file": "sveltekit-frontend/src/lib/server/db/schema-phase78.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -63773,16 +63958,6 @@
         },
         {
           "file": "sveltekit-frontend/src/lib/server/tasks/agent-pickup-worker.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "sveltekit-frontend/src/lib/server/tasks/semantic-packets.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "sveltekit-frontend/src/lib/server/tools/handlers/ldrResearch.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -64132,6 +64307,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "test-simd-both-presets.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "test-sse-cache.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -64477,6 +64657,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/alias-id-migration-preflight.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/analyze-directory-roles.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -64513,6 +64698,11 @@
         },
         {
           "file": "scripts/atlas/atlas-live-reconciliation-audit.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/atlas-parent-indexing.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -64588,6 +64778,11 @@
         },
         {
           "file": "scripts/atlas/backfill-code-cards.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/backfill-nes-chrom-packets.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -64707,6 +64902,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/check-knowledge-consolidation-claims.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/chr97-emit-kanban-tasks.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -64793,6 +64993,11 @@
         },
         {
           "file": "scripts/atlas/create-qdrant-feature-maps.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/debug-import-resolve.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -65292,6 +65497,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/mapreduce-path-join.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/materialize-gemma-recommendations.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -65302,7 +65512,17 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/mirror-parent-atlas-feature-command-atlas-postgres.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/mirror-parent-atlas-to-postgres.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/missing-features-review.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -65313,6 +65533,16 @@
         },
         {
           "file": "scripts/atlas/normalize-source-ref-id.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/parent-atlas-feature-command-atlas.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/parent-atlas-turbovec-compression-plan.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -65407,6 +65637,16 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/project-parent-atlas-feature-command-atlas-qdrant.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/project-parent-atlas-feature-command-atlas.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/publish-bifrost-invalidation.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -65418,6 +65658,16 @@
         },
         {
           "file": "scripts/atlas/qdrant-cluster-tag-audit.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/qdrant-path-bridge.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -65462,12 +65712,27 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/render-parent-atlas-readable.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/repair-card-source-refs.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/repair-db-all-identities.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
           "file": "scripts/atlas/repair-db-types.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/report-nes-chrom-packet-hits.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -65517,7 +65782,17 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/atlas/run-offline-synthesis.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/atlas/run-phase19-complete.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/run-taskboard-parent-atlas-sync.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -65593,6 +65868,31 @@
         },
         {
           "file": "scripts/atlas/som-clustering-pipeline.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/sourceRef-first-hot-join-warmup.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/sourceRef-first-join-warmup.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/sourceRef-first-nes-glyph-compress.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/sourceRef-first-parent-atlas-refresh.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/suggest-card-source-refs.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -65718,6 +66018,11 @@
         },
         {
           "file": "scripts/atlas/validate-json-packet-integrity.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/atlas/validate-knowledge-cards.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -66562,6 +66867,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/opencode/alias-card-mapper.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/opencode/apply-gemma4-titles.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -66603,6 +66913,11 @@
         },
         {
           "file": "scripts/opencode/build_summaries_from_atlas.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/opencode/context-orchestrator.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -66867,6 +67182,11 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
+          "file": "scripts/opencode/validation-gate.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
           "file": "scripts/operator/backup-atlas-state.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
@@ -66958,6 +67278,16 @@
         },
         {
           "file": "scripts/probe-models.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/promotion/report-promotion-status.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/promotion/run-promotion-queue.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -67183,6 +67513,11 @@
         },
         {
           "file": "scripts/smoke-all-gpu-lanes.mjs",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "scripts/smoke-fp16-attention.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -67417,12 +67752,12 @@
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/torch/utils/model_dump/htm.mjs",
+          "file": ".venv-py313-backup/Lib/site-packages/torch/utils/model_dump/htm.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
         {
-          "file": ".venv/Lib/site-packages/torch/utils/model_dump/preact.mjs",
+          "file": ".venv-py313-backup/Lib/site-packages/torch/utils/model_dump/preact.mjs",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },

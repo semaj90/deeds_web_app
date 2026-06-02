@@ -146,70 +146,88 @@ export async function graphExpandNeighborhood({ stableKeys, sourceRefs, maxHops 
   }
 }
 
+/** Chunk size for replaying cached responses as a realistic stream (chars per yield). */
+const CACHE_REPLAY_CHUNK = 32;
+
 /**
- * Streams the Gemma4 response while exposing tools for
- * Engram memory and RotorQuant blended retrieval.
- * Implements the pgvector Semantic Cache interceptor.
+ * Replays a cached full-text response as a character-chunked async generator,
+ * matching the feel of a live stream for clients consuming textStream.
+ * Yields CACHE_REPLAY_CHUNK chars at a time so callers see progressive output
+ * instead of one giant flush.
+ */
+async function* replayCacheAsStream(text: string): AsyncGenerator<string> {
+  for (let i = 0; i < text.length; i += CACHE_REPLAY_CHUNK) {
+    yield text.slice(i, i + CACHE_REPLAY_CHUNK);
+  }
+}
+
+/**
+ * Streams the Gemma4 response via the Vercel AI SDK (streamText) with:
+ *   - 3-tier semantic cache interceptor (exact SHA-256 → Redis vector → pgvector)
+ *   - Cache hits replayed as chunked stream (not one giant flush)
+ *   - Tool calling: engramMemory, rotorQuantSearch, graphExpandNeighborhood
+ *   - Cache write on onFinish (full assembled text after tool rounds complete)
+ *
+ * Backend: llama-server (:8090) via @ai-sdk/openai-compatible (bifrost provider).
+ * Drop-in for TRT-LLM / vLLM: change bifrost baseURL, everything else stays.
  */
 export async function streamGemma4WithTools(prompt: string) {
   const modelName = 'gemma4-offload';
 
-  // 1. & 2. & 3. Check Semantic Cache
+  // 1–3. Semantic cache check (exact → Redis vector → pgvector)
   const cachedResponse = await checkSemanticCache(prompt, modelName, 0.90);
   if (cachedResponse) {
-    // Mimic the streamText result shape for a cache hit
+    console.log(
+      `[Semantic Cache] HIT source=${cachedResponse.source} promptHash=${cachedResponse.promptHash.slice(0, 12)} ` +
+        `tuple=${cachedResponse.provenanceTuple ? 'yes' : 'no'}`
+    );
+    // Replay as chunked stream — clients see progressive output, not one flash
     return {
-      textStream: (async function* () {
-        yield cachedResponse;
-      })()
+      textStream: replayCacheAsStream(cachedResponse.response),
+      cacheHit: cachedResponse,
     };
   }
 
-  // 4. Cache Miss: Invoke Gemma4 via streamText
+  // 4. Cache miss: invoke llama-server via Vercel AI SDK streamText + tool calling
   const result = streamText({
     model: bifrost(modelName) as any,
     prompt,
     tools: {
       engramMemory: tool({
         description: 'Search or store Engram memory.',
-        parameters: z.object({
-          query: z.string()
-        }),
+        parameters: z.object({ query: z.string() }),
         // @ts-ignore
-        execute: async ({ query }) => {
-          return await searchEngramMemory(query);
-        }
+        execute: async ({ query }) => searchEngramMemory(query),
       }),
       rotorQuantSearch: tool({
         description: 'Run RotorQuant blended retrieval (Vector + Graph + Recency) over codebase_chunks_768.',
         parameters: z.object({
           query: z.string(),
-          limit: z.number().default(MAX_RESULTS)
+          limit: z.number().default(MAX_RESULTS),
         }),
         // @ts-ignore
-        execute: async ({ query, limit }) => {
-          return await rotorQuantSearch({ query, limit });
-        }
+        execute: async ({ query, limit }) => rotorQuantSearch({ query, limit }),
       }),
       graphExpandNeighborhood: tool({
         description: 'Expand the semantic graph neighborhood from a set of stable keys or source refs.',
         parameters: z.object({
           stableKeys: z.array(z.string()).optional(),
           sourceRefs: z.array(z.string()).optional(),
-          maxHops: z.number().optional()
+          maxHops: z.number().optional(),
         }),
         // @ts-ignore
-        execute: async (args) => {
-          return await graphExpandNeighborhood(args);
-        }
-      })
+        execute: async (args) => graphExpandNeighborhood(args),
+      }),
     },
     maxSteps: 4,
-    // 5. Save prompt and response to Semantic Cache asynchronously upon completion
+    // 5. Write assembled text to semantic cache after all tool rounds finish
     onFinish: async (event) => {
-      await saveToSemanticCache(prompt, event.text, modelName);
-      console.log(`[Semantic Cache] Saved response for prompt: "${prompt.substring(0, 30)}..."`);
-    }
+      if (event.text) {
+        saveToSemanticCache(prompt, event.text, modelName).catch((err) =>
+          console.warn('[Semantic Cache] Write failed (non-fatal):', err)
+        );
+      }
+    },
   } as any);
 
   return result;

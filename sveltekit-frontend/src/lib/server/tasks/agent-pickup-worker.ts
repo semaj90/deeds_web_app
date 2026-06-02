@@ -11,9 +11,7 @@
  */
 
 import { getRedis } from '$lib/server/redis';
-import { db } from '$lib/server/db/client';
-import { agentPickupQueue } from '../db/schema/tasks';
-import { eq, sql } from 'drizzle-orm';
+import { hydrateAgentPickupTask, markAgentPickupTaskComplete, markAgentPickupTaskFailed } from './semantic-packets';
 
 async function processPayload(payloadStr: string) {
   let payload: any;
@@ -24,42 +22,36 @@ async function processPayload(payloadStr: string) {
     return;
   }
 
-  const { queue_id, task_id, packet_id } = payload;
+  const { queue_id } = payload;
   if (!queue_id) return;
 
-  // mark processing
-  await db
-    .update(agentPickupQueue)
-    .set({ status: 'processing', picked_up_at: new Date(), updated_at: new Date() })
-    .where(eq(agentPickupQueue.id, queue_id))
-    .execute();
-
   try {
-    // TODO: call the real agent runner (OpenCode/Gemma worker). For now simulate work.
-    console.log(`Processing pickup queue ${queue_id} for task ${task_id} packet ${packet_id}`);
-    // Simulate remote work — replace with real call
+    const bundle = await hydrateAgentPickupTask(queue_id);
+    if (!bundle) {
+      console.warn(`Agent pickup queue ${queue_id} had no hydrateable packet`);
+      return;
+    }
+
+    // TODO: call the real agent runner (OpenCode/Gemma worker) with bundle.nextAction,
+    // bundle.relatedFilePaths, bundle.clusterId, bundle.centroidId, and bundle.featureId.
+    console.log(
+      `Processing pickup queue ${queue_id} for task ${bundle.taskId} packet ${bundle.packetId}`
+    );
+
+    // Simulate remote work — replace with real call.
     await new Promise((r) => setTimeout(r, 500));
 
-    // Mark completed
-    await db
-      .update(agentPickupQueue)
-      .set({ status: 'completed', completed_at: new Date(), updated_at: new Date() })
-      .where(eq(agentPickupQueue.id, queue_id))
-      .execute();
+    await markAgentPickupTaskComplete(queue_id, bundle.packetId);
   } catch (err: any) {
     console.error('Worker failed for', queue_id, err?.message || err);
-    // increment attempts and conditionally set status
-    await db
-      .update(agentPickupQueue)
-      .set({
-        attempts: sql`${agentPickupQueue.attempts} + 1`,
-        error: String(err?.message || err),
-        status: sql`CASE WHEN ${agentPickupQueue.attempts} + 1 >= ${agentPickupQueue.max_attempts} THEN 'failed' ELSE 'queued' END`,
-        available_at: sql`now() + interval '30 seconds'`,
-        updated_at: new Date(),
-      })
-      .where(eq(agentPickupQueue.id, queue_id))
-      .execute();
+    try {
+      const bundle = await hydrateAgentPickupTask(queue_id);
+      if (bundle) {
+        await markAgentPickupTaskFailed(queue_id, bundle.packetId, String(err?.message || err));
+      }
+    } catch {
+      // non-fatal
+    }
   }
 }
 

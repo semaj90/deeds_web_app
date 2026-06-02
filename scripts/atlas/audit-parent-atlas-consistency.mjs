@@ -165,7 +165,7 @@ async function main() {
 
   // 2. Qdrant sample points should line up with the Postgres task_semantic_packets mirror by source_ref.
   try {
-    const qdrantSample = await fetch(`${QDRANT_URL}/collections/feature_maps/points/scroll`, {
+    const qdrantSample = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ limit: 20 }),
@@ -174,11 +174,27 @@ async function main() {
       const qdata = await qdrantSample.json();
       const points = qdata.result?.points || [];
       const refs = points
-        .map((p) => p.payload?.source_ref)
+        .flatMap((p) => [
+          p.payload?.source_ref,
+          p.payload?.file_path,
+          p.payload?.sourceRef,
+        ])
         .filter((ref) => typeof ref === 'string' && ref.length > 0);
       if (refs.length > 0) {
         const pgMirror = await pool.query(
-          'SELECT DISTINCT qdrant_point_id FROM task_semantic_packets WHERE qdrant_point_id = ANY($1::text[])',
+          `
+            SELECT DISTINCT source_ref
+            FROM parent_atlas_records
+            WHERE source_ref = ANY($1::text[])
+            UNION
+            SELECT DISTINCT source_ref
+            FROM parent_atlas_vectors
+            WHERE source_ref = ANY($1::text[])
+            UNION
+            SELECT DISTINCT source_ref
+            FROM task_semantic_packets
+            WHERE source_ref = ANY($1::text[])
+          `,
           [refs]
         );
         results.consistency_audits.qdrant_points_matched_pg = pgMirror.rows.length;
@@ -186,6 +202,20 @@ async function main() {
     }
   } catch (e) {
     console.warn('  ⚠️ Qdrant/Postgres source_ref audit failed:', e.message);
+  }
+
+  // 2b. Count Neo4j nodes that actually carry sourceRef metadata in the atlas graph.
+  try {
+    const neoSession = neoDriver.session();
+    const neoRes = await neoSession.run(`
+      MATCH (n)
+      WHERE n.sourceRef IS NOT NULL OR n.source_ref IS NOT NULL
+      RETURN count(n) AS count
+    `);
+    results.consistency_audits.neo4j_source_ref_in_atlas = Number(neoRes.records[0]?.get('count') ?? 0);
+    await neoSession.close();
+  } catch (e) {
+    console.warn('  ⚠️ Neo4j sourceRef atlas audit failed:', e.message);
   }
   // 3. Every Kanban task has a feature_id
   let missingTasksCount = 0;

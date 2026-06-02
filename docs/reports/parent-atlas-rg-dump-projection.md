@@ -1,0 +1,59 @@
+# Parent Atlas RG Dump Projection
+
+- packets: 50
+- postgresRows: 50
+- qdrantPoints: 50
+- sourceRefs: 600
+
+## Top Entries
+
+- rg_turbovec:chunk:0001 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0002 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0003 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0004 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0005 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0006 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0007 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0008 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0009 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0010 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0011 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0012 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0013 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0014 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0015 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0016 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0017 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0018 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0019 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0020 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0021 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0022 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0023 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0024 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0025 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0026 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0027 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0028 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0029 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0030 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0031 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0032 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0033 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0034 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0035 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0036 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0037 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0038 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0039 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0040 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0041 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0042 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0043 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0044 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0045 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0046 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0047 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_turbovec:chunk:0048 → search.qdrant_vector | docs/reports/rg_turbovec.txt | pg=written qdrant=written
+- rg_napi:chunk:0001 → gpu.simd_bridge | docs/reports/rg_napi.txt | pg=written qdrant=written
+- rg_napi:chunk:0002 → gpu.simd_bridge | docs/reports/rg_napi.txt | pg=written qdrant=written

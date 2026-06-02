@@ -1,7 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "turboquant/gemma4-tq",
-  "small_model": "turboquant/gemma4-tq",
+  "model": "turboquant/gemma4-legal.gguf",
+  "small_model": "turboquant/gemma4-legal.gguf",
   "default_agent": "antigravity",
   "shell": "pwsh.exe",
   "provider": {
@@ -26,15 +26,22 @@
         "apiKey": "local"
       },
       "models": {
+        "gemma4-legal.gguf": {
+          "name": "Gemma4 Legal IQ4_XS (merged rotorquant, canonical)",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
         "gemma4-iq4xs": {
-          "name": "Gemma4 Legal 64K",
+          "name": "Gemma4 Legal 64K (alias)",
           "limit": {
             "context": 65536,
             "output": 4096
           }
         },
         "gemma4-tq": {
-          "name": "Gemma4 TurboQuant 64K",
+          "name": "Gemma4 TurboQuant 64K (legacy alias)",
           "limit": {
             "context": 65536,
             "output": 4096
@@ -156,7 +163,7 @@
   "agent": {
     "antigravity": {
       "description": "Minimal MCP-first Gemma4 agent for VS Code/OpenCode.",
-      "model": "gemma4-local/gemma4-local",
+      "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 10,
       "prompt": "Use MCP tools first, but call only what is needed for the current question. Default tool order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Only use gemma4-offload for runtime/model checks. Keep engram, turbovec, and langextract opt-in unless explicitly requested. Do not edit files without approval.",
@@ -204,7 +211,7 @@
     },
     "hermes-ace": {
       "description": "Hermes-ACE local agent using ACE context, MCP tools, and local Gemma4 64K.",
-      "model": "gemma4-local/gemma4-local",
+      "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 12,
       "prompt": "Use MCP tools in this priority order: trace.kag_search or trace.atlas_query, turbovec for cosine ranking and chunk-id scoring, engram for memory, and langextract for citation and entity extraction. Always include chunk_ids and cluster_labels in synthesis context. Do not edit files without explicit approval. Do not mutate live Postgres schema.\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n",
@@ -245,7 +252,7 @@
     },
     "trace-audit": {
       "description": "Read-only TRACE audit agent with compact context tools.",
-      "model": "gemma4-local/gemma4-local",
+      "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 8,
       "prompt": "Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval. Prefer cached compressed cards over raw file expansion. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
@@ -278,7 +285,7 @@
     },
     "audit": {
       "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor.",
-      "model": "gemma4-local/gemma4-local",
+      "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 8,
       "prompt": "You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
@@ -308,7 +315,7 @@
     },
     "gemma4-function-caller": {
       "description": "Gemma4 agent with automatic function-calling for tool dispatch",
-      "model": "gemma4-local/gemma4-local",
+      "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 12,
       "prompt": "You are a function-calling agent. Analyze the user query and automatically select the best tools to use from the available MCP tool set. Always use function calls to accomplish tasks rather than explanations.\n\nTool Selection Strategy:\n1. Semantic queries → trace.kag_search or trace.atlas_query\n2. Graph traversal → graph.expand_neighborhood or graph.shortest_path\n3. Topology analysis → topology.search_near or clusters.get_summary_lenses\n4. Context building → context.build_kv_packet or context.get_compressed_card\n5. Code search → trace.explain_retrieval or codebase.rg_search\n\nFunction-Calling Rules:\n- Call functions immediately when identified\n- Bundle related calls together\n- Don't explain before calling — just call\n- Report results inline after each call\n- Stop after 3 rounds of calls or when the query is fully answered\n- If function returns error, try fallback from the same category\n\nDo not edit files without explicit approval.",

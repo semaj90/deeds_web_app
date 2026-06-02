@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-01T01:14:36.654Z",
+  "timestamp": "2026-06-02T01:59:55.059Z",
   "rubric": {
     "testing": 0.4,
     "architecture": 0.2,
@@ -7,8 +7,8 @@
     "completion": 0.1,
     "clientServer": 0.1
   },
-  "totalTasks": 131,
-  "needsTesting": 98,
+  "totalTasks": 856,
+  "needsTesting": 777,
   "top20": [
     {
       "taskId": "TASK-8F878955",
@@ -49,8 +49,8 @@
       ]
     },
     {
-      "taskId": "TASK-14A07D5F",
-      "title": "api › sveltekit routes",
+      "taskId": "TASK-5E79F750",
+      "title": "analysis › entity extraction",
       "kanbanStatus": "DONE",
       "rankScore": 0.4567,
       "testingScore": 0.667,
@@ -58,8 +58,8 @@
       "recommendedActions": []
     },
     {
-      "taskId": "TASK-5E79F750",
-      "title": "analysis › entity extraction",
+      "taskId": "TASK-14A07D5F",
+      "title": "api › sveltekit routes",
       "kanbanStatus": "DONE",
       "rankScore": 0.4567,
       "testingScore": 0.667,
@@ -76,8 +76,8 @@
       "recommendedActions": []
     },
     {
-      "taskId": "TASK-4D08EB7D",
-      "title": "workspace › scripts",
+      "taskId": "TASK-BE4F5C61",
+      "title": "auth › authentication",
       "kanbanStatus": "DONE",
       "rankScore": 0.4267,
       "testingScore": 0.667,
@@ -85,8 +85,26 @@
       "recommendedActions": []
     },
     {
-      "taskId": "TASK-B5036EE4",
-      "title": "legal › evidence",
+      "taskId": "TASK-D9BE188D",
+      "title": "ace › context assembly",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-E3FA8EA2",
+      "title": "api › mcp tools",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-1548130F",
+      "title": "cache › redis bifrost",
       "kanbanStatus": "DONE",
       "rankScore": 0.4267,
       "testingScore": 0.667,
@@ -105,35 +123,8 @@
       ]
     },
     {
-      "taskId": "TASK-821524A0",
-      "title": "legal › case management",
-      "kanbanStatus": "DONE",
-      "rankScore": 0.4267,
-      "testingScore": 0.667,
-      "architectureScore": 0,
-      "recommendedActions": []
-    },
-    {
-      "taskId": "TASK-CC7CA801",
-      "title": "search › retrieval",
-      "kanbanStatus": "DONE",
-      "rankScore": 0.4267,
-      "testingScore": 0.667,
-      "architectureScore": 0,
-      "recommendedActions": []
-    },
-    {
-      "taskId": "TASK-1548130F",
-      "title": "cache › redis bifrost",
-      "kanbanStatus": "DONE",
-      "rankScore": 0.4267,
-      "testingScore": 0.667,
-      "architectureScore": 0,
-      "recommendedActions": []
-    },
-    {
-      "taskId": "TASK-D9BE188D",
-      "title": "ace › context assembly",
+      "taskId": "TASK-607E4D8F",
+      "title": "gpu › libtorch bridge",
       "kanbanStatus": "DONE",
       "rankScore": 0.4267,
       "testingScore": 0.667,
@@ -150,35 +141,8 @@
       "recommendedActions": []
     },
     {
-      "taskId": "TASK-14D7C5E1",
-      "title": "legal › citations",
-      "kanbanStatus": "DONE",
-      "rankScore": 0.4267,
-      "testingScore": 0.667,
-      "architectureScore": 0,
-      "recommendedActions": []
-    },
-    {
-      "taskId": "TASK-E3FA8EA2",
-      "title": "api › mcp tools",
-      "kanbanStatus": "DONE",
-      "rankScore": 0.4267,
-      "testingScore": 0.667,
-      "architectureScore": 0,
-      "recommendedActions": []
-    },
-    {
-      "taskId": "TASK-607E4D8F",
-      "title": "gpu › libtorch bridge",
-      "kanbanStatus": "DONE",
-      "rankScore": 0.4267,
-      "testingScore": 0.667,
-      "architectureScore": 0,
-      "recommendedActions": []
-    },
-    {
-      "taskId": "TASK-BE4F5C61",
-      "title": "auth › authentication",
+      "taskId": "TASK-ED4354DE",
+      "title": "knowledge › doc ingestion",
       "kanbanStatus": "DONE",
       "rankScore": 0.4267,
       "testingScore": 0.667,
@@ -188,6 +152,42 @@
     {
       "taskId": "TASK-F6A02060",
       "title": "knowledge › wiki notes",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-821524A0",
+      "title": "legal › case management",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-14D7C5E1",
+      "title": "legal › citations",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-B5036EE4",
+      "title": "legal › evidence",
+      "kanbanStatus": "DONE",
+      "rankScore": 0.4267,
+      "testingScore": 0.667,
+      "architectureScore": 0,
+      "recommendedActions": []
+    },
+    {
+      "taskId": "TASK-CC7CA801",
+      "title": "search › retrieval",
       "kanbanStatus": "DONE",
       "rankScore": 0.4267,
       "testingScore": 0.667,

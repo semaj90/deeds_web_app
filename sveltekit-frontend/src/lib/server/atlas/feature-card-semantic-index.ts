@@ -8,6 +8,7 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
 export interface FeatureCardSemanticPayload {
@@ -55,8 +56,15 @@ export interface FeatureCardSemanticQueryResult {
 
 const ROOT = resolve(process.cwd());
 const JSONL_PATH = resolve(ROOT, 'memory', 'exports', 'feature-map-cards.jsonl');
+const DUCKDB_PATH = resolve(ROOT, 'docs', 'reports', 'feature-card.duckdb');
 const REPORT_PATH = resolve(ROOT, 'docs', 'reports', 'feature-card-semantics-report.json');
 const CACHE_TTL_MS = 5 * 60_000;
+const INDEX_SOURCE_OVERRIDE = String(process.env.FEATURE_SEMANTIC_INDEX_SOURCE ?? '').trim().toLowerCase();
+const DUCKDB_CANDIDATES = [
+  process.env.DUCKDB_BIN,
+  'C:\\Users\\james\\AppData\\Local\\Programs\\DuckDB\\duckdb.exe',
+  'duckdb',
+].filter(Boolean);
 
 let cache: {
   loadedAt: number;
@@ -79,6 +87,47 @@ function readJsonl(pathname: string): FeatureCardSemanticEntry[] {
   return raw.split(/\r?\n/).map((line) => JSON.parse(line) as FeatureCardSemanticEntry);
 }
 
+function resolveDuckdbBin(): string | null {
+  for (const candidate of DUCKDB_CANDIDATES) {
+    if (candidate === 'duckdb') return candidate;
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+function readDuckdb(pathname: string): FeatureCardSemanticEntry[] {
+  if (!existsSync(pathname)) return [];
+  const duckdbBin = resolveDuckdbBin();
+  if (!duckdbBin) return [];
+
+  const query = `
+    SELECT id, kind, labels, summary, sourceRefs, payload, score_rank, score_authority, score_recency
+    FROM feature_cards
+    ORDER BY score_rank DESC, score_authority DESC, id;
+  `;
+  const result = spawnSync(duckdbBin, [pathname, '-readonly', '-json', '-c', query], { encoding: 'utf8' });
+  if (result.error || result.status !== 0) return [];
+
+  try {
+    const rows = JSON.parse(result.stdout || '[]') as Array<Record<string, unknown>>;
+    return rows.map((row) => ({
+      id: String(row.id ?? ''),
+      kind: String(row.kind ?? 'feature'),
+      labels: Array.isArray(row.labels) ? row.labels.map((label) => String(label)) : [],
+      summary: String(row.summary ?? ''),
+      sourceRefs: Array.isArray(row.sourceRefs) ? row.sourceRefs.map((ref) => String(ref)) : [],
+      payload: (row.payload && typeof row.payload === 'object' ? row.payload : {}) as FeatureCardSemanticPayload,
+      scores: {
+        rank: Number(row.score_rank ?? 0),
+        authority: Number(row.score_authority ?? 0),
+        recency: Number(row.score_recency ?? 0),
+      },
+    })).filter((card) => Boolean(card.id));
+  } catch {
+    return [];
+  }
+}
+
 function readReportFallback(pathname: string): FeatureCardSemanticEntry[] {
   if (!existsSync(pathname)) return [];
   try {
@@ -91,13 +140,31 @@ function readReportFallback(pathname: string): FeatureCardSemanticEntry[] {
   }
 }
 
+function readCardsForSource(source: 'jsonl' | 'duckdb' | 'report'): FeatureCardSemanticEntry[] {
+  if (source === 'jsonl') return readJsonl(JSONL_PATH);
+  if (source === 'duckdb') return readDuckdb(DUCKDB_PATH);
+  return readReportFallback(REPORT_PATH);
+}
+
 function loadCards(forceReload = false): FeatureCardSemanticEntry[] {
   if (!forceReload && cache && Date.now() - cache.loadedAt < CACHE_TTL_MS) {
     return cache.cards;
   }
 
-  const cards = readJsonl(JSONL_PATH);
-  const resolvedCards = cards.length > 0 ? cards : readReportFallback(REPORT_PATH);
+  const resolvedCards = (() => {
+    if (INDEX_SOURCE_OVERRIDE === 'jsonl') return readCardsForSource('jsonl');
+    if (INDEX_SOURCE_OVERRIDE === 'duckdb') return readCardsForSource('duckdb');
+    if (INDEX_SOURCE_OVERRIDE === 'report') return readCardsForSource('report');
+
+    const cards = readJsonl(JSONL_PATH);
+    if (cards.length > 0) return cards;
+
+    const duckdbCards = readDuckdb(DUCKDB_PATH);
+    if (duckdbCards.length > 0) return duckdbCards;
+
+    return readReportFallback(REPORT_PATH);
+  })();
+
   cache = { loadedAt: Date.now(), cards: resolvedCards };
   return resolvedCards;
 }
@@ -160,10 +227,22 @@ export function searchFeatureSemanticCards(query: string, limit = 12, forceReloa
   };
 }
 
-export function getFeatureSemanticIndexSource(): { path: string; count: number; source: 'jsonl' | 'report' | 'miss' } {
+export function getFeatureSemanticIndexSource(): { path: string; count: number; source: 'jsonl' | 'duckdb' | 'report' | 'miss' } {
   const cards = loadCards();
+  if (INDEX_SOURCE_OVERRIDE === 'jsonl') {
+    return { path: JSONL_PATH, count: cards.length, source: cards.length > 0 ? 'jsonl' : 'miss' };
+  }
+  if (INDEX_SOURCE_OVERRIDE === 'duckdb') {
+    return { path: DUCKDB_PATH, count: cards.length, source: cards.length > 0 ? 'duckdb' : 'miss' };
+  }
+  if (INDEX_SOURCE_OVERRIDE === 'report') {
+    return { path: REPORT_PATH, count: cards.length, source: cards.length > 0 ? 'report' : 'miss' };
+  }
   if (cards.length > 0 && existsSync(JSONL_PATH)) {
     return { path: JSONL_PATH, count: cards.length, source: 'jsonl' };
+  }
+  if (cards.length > 0 && existsSync(DUCKDB_PATH)) {
+    return { path: DUCKDB_PATH, count: cards.length, source: 'duckdb' };
   }
   if (cards.length > 0 && existsSync(REPORT_PATH)) {
     return { path: REPORT_PATH, count: cards.length, source: 'report' };

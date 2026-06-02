@@ -23,12 +23,14 @@ This lane turns the current corpus into structured offline artifacts before prom
 flowchart LR
   A["Bounded batch ingest"] --> B["Gemma4 summarization"]
   B --> C["DuckDB mirror refresh"]
-  C --> D["Phase 19C consolidation payloads"]
-  D --> E["Qdrant / Neo4j sync prep"]
-  E --> F["Parent atlas export"]
-  F --> G["Parent atlas validation"]
-  G --> H["Consistency audit"]
-  H --> I["Engram / NES token remap"]
+  C --> D["MapReduce consolidated index"]
+  D --> E["DuckDB materialization"]
+  E --> F["Phase 19C consolidation payloads"]
+  F --> G["Qdrant / Neo4j sync prep"]
+  G --> H["Parent atlas export"]
+  H --> I["Parent atlas validation"]
+  I --> J["Consistency audit"]
+  J --> K["Engram / NES token remap"]
 ```
 
 ## Entry point
@@ -69,13 +71,15 @@ The orchestrator at `scripts/atlas/run-offline-synthesis.mjs` sequences:
 
 1. `scripts/atlas/batch-offline-ingest.mjs`
 2. `scripts/opencode/summarize_cards_gemma4.mjs`
-3. `npm run duckdb:feature-cards:refresh`
-4. `scripts/atlas/phase-19c-knowledge-consolidation.mjs`
-5. `scripts/atlas/phase-19c-qdrant-index.mjs`
-6. `scripts/atlas/phase-19c-neo4j-sync.mjs`
-7. `scripts/atlas-parent-indexing.mjs`
-8. `scripts/atlas/validate-parent-atlas.mjs`
-9. `scripts/atlas/audit-parent-atlas-consistency.mjs`
+3. `scripts/atlas/mapreduce-consolidated-index.mjs`
+4. `scripts/atlas/materialize-mapreduce-duckdb.mjs`
+5. `npm run duckdb:feature-cards:refresh`
+6. `scripts/atlas/phase-19c-knowledge-consolidation.mjs`
+7. `scripts/atlas/phase-19c-qdrant-index.mjs`
+8. `scripts/atlas/phase-19c-neo4j-sync.mjs`
+9. `scripts/atlas-parent-indexing.mjs`
+10. `scripts/atlas/validate-parent-atlas.mjs`
+11. `scripts/atlas/audit-parent-atlas-consistency.mjs`
 
 ## Storage targets
 
@@ -123,6 +127,10 @@ Use this order when consuming the artifacts:
 
 The runner writes the following artifacts:
 
+- `.tmp/offline-synthesis/consolidated-index.ndjson`
+- `.tmp/offline-synthesis/consolidated-index.ndjson.manifest.json`
+- `docs/reports/offline-synthesis-mapreduce-duckdb-report.json`
+- `docs/reports/offline-synthesis-mapreduce-duckdb-report.md`
 - `.tmp/ingest/lanes/codebase_features.ndjson`
 - `.tmp/ingest/edges/codebase_features_edges.ndjson`
 - `memory/exports/parent-atlas/parent_atlas_index.csv`

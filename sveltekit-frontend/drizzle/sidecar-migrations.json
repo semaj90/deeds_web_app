@@ -190,6 +190,15 @@
       "appliedAt": "2026-05-30",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='task_semantic_packets';\""
+    },
+    {
+      "file": "20260601_task_semantic_packets_v2.sql",
+      "status": "manual_sidecar",
+      "reason": "Expands the task semantic packet mirror with payload metadata, packet links, and queue lane fields.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-06-01",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.task_cluster_links');\""
     }
   ]
 }

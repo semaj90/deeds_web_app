@@ -35,6 +35,41 @@ function buildSourceRefs(relativePath) {
   return [path];
 }
 
+async function buildQdrantPointIndex() {
+  const index = new Map();
+  let offset = null;
+  let guard = 0;
+  while (guard < 200) {
+    guard++;
+    const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        limit: 256,
+        offset,
+        with_payload: true,
+        with_vector: false,
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!res.ok) break;
+    const data = await res.json();
+    const points = Array.isArray(data?.result?.points) ? data.result.points : [];
+    for (const point of points) {
+      const payload = point?.payload ?? {};
+      const filePath = String(payload.file_path ?? payload.relativePath ?? '').trim();
+      if (!filePath || point?.id === null || point?.id === undefined) continue;
+      const ids = index.get(filePath) ?? [];
+      ids.push(point.id);
+      index.set(filePath, ids);
+    }
+    const next = data?.result?.next_page_offset;
+    if (next === null || next === undefined || points.length === 0) break;
+    offset = next;
+  }
+  return index;
+}
+
 async function qdrantCoverageSample(sampleLimit = 25) {
   try {
     const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
@@ -89,6 +124,7 @@ async function main() {
   const pool = new Pool({ connectionString: DATABASE_URL, max: 2 });
   const startedAt = new Date().toISOString();
   const before = await qdrantCoverageSample(limit);
+  const pointIndex = sampleQdrant ? new Map() : await buildQdrantPointIndex();
 
   let attempted = 0;
   let updated = 0;
@@ -136,7 +172,7 @@ async function main() {
     }
   } else {
     try {
-      const { rows } = await pool.query<{ relative_path: string }>(
+      const { rows } = await pool.query(
         `SELECT DISTINCT relative_path
          FROM codebase_chunk_index
          WHERE relative_path IS NOT NULL
@@ -163,17 +199,16 @@ async function main() {
             }
 
             try {
+              const pointIds = pointIndex.get(row.relative_path) ?? [];
+              if (pointIds.length === 0) {
+                skipped++;
+                return;
+              }
               const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  filter: {
-                    should: [
-                      { key: 'relativePath', match: { value: row.relative_path } },
-                      { key: 'file_path', match: { value: row.relative_path } },
-                    ],
-                    minimum_should_match: 1,
-                  },
+                  points: pointIds,
                   payload: {
                     sourceRefs,
                     source_refs: sourceRefs,

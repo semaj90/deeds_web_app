@@ -259,16 +259,16 @@ function persistMemoryRegistry(entry: {
 }
 
 export async function reinforceEngramPath(
-  memoryId: string, 
-  success: boolean, 
-  reward: number = 0.1, 
-  clusterId?: string, 
+  memoryId: string,
+  success: boolean,
+  reward: number = 0.1,
+  clusterId?: string,
   stableKey?: string,
   metrics: { successRate?: number, cacheHitRate?: number, clusterHotness?: number, recency?: number, pathConfidence?: number } = {}
 ) {
   try {
     const redis = getRedis();
-    
+
     // Ranked reinforcement in Redis (Phase 8C)
     // Store: engram:path:{stableKey} and engram:cluster:{clusterId}
     if (redis) {
@@ -279,15 +279,15 @@ export async function reinforceEngramPath(
       const recency = metrics.recency || 1.0; // default to max recency if just called
       const pathConfidence = metrics.pathConfidence || 0.5;
 
-      const engramScore = 
-        (successRate * 0.35) + 
-        (cacheHitRate * 0.20) + 
-        (clusterHotness * 0.20) + 
-        (recency * 0.15) + 
+      const engramScore =
+        (successRate * 0.35) +
+        (cacheHitRate * 0.20) +
+        (clusterHotness * 0.20) +
+        (recency * 0.15) +
         (pathConfidence * 0.10);
 
       const increment = success ? engramScore : -engramScore;
-      
+
       if (clusterId) {
         await redis.zincrby('engram:cluster_ranks', increment, clusterId);
         await redis.set(`engram:cluster:${clusterId}:last_update`, Date.now());
@@ -317,11 +317,229 @@ export async function reinforceEngramPath(
         .update(memoryRegistry)
         .set({ hotness: currentHotness })
         .where(eq(memoryRegistry.memoryId, memoryId));
-        
+
       console.log(`🧠 Engram Reinforcement: ${memoryId} -> ${success ? 'REINFORCED' : 'DECAYED'} (score: ${currentHotness})`);
     }
   } catch (err) {
     console.error(`Failed to reinforce engram path ${memoryId}`, err);
+  }
+}
+
+export async function recordAgenticProposalEngram(input: {
+  sessionId: string;
+  query: string;
+  filePath: string | null;
+  clusterId: number | null;
+  featureId?: string | null;
+  feature_id?: string | null;
+  sourceRef?: string | null;
+  source_ref?: string | null;
+  sourceRefs?: string[];
+  source_refs?: string[];
+  workspaceTaskId?: string | null;
+  workspace_task_id?: string | null;
+  parentAtlasCardId?: string | null;
+  parent_atlas_card_id?: string | null;
+  tupleHash?: string | null;
+  semanticHash?: string | null;
+  missingFeatureId?: boolean;
+  warning?: string | null;
+  observedStates: Record<string, boolean>;
+  laneOrder: string[];
+  suggestionCount: number;
+  proposalSummary: string;
+}): Promise<void> {
+  const memoryId = `agentic-proposal:${input.sessionId}`;
+  const sourceRefs = Array.from(
+    new Set(
+      [
+        ...(input.sourceRefs ?? []),
+        ...(input.source_refs ?? []),
+        input.sourceRef,
+        input.source_ref,
+        input.filePath,
+      ]
+        .map((ref) => String(ref ?? '').trim())
+        .filter(Boolean)
+    )
+  );
+  const featureId = String(input.featureId ?? input.feature_id ?? '').trim() || null;
+  const workspaceTaskId = String(input.workspaceTaskId ?? input.workspace_task_id ?? '').trim() || null;
+  const parentAtlasCardId = String(input.parentAtlasCardId ?? input.parent_atlas_card_id ?? '').trim() || null;
+  const sourceRef = String(input.sourceRef ?? input.source_ref ?? '').trim() || null;
+  await Promise.allSettled([
+    db.insert(contextTimeline).values({
+      userId: null,
+      sessionId: input.sessionId,
+      eventType: 'agentic_proposal',
+      pipeline: 'agentic-fix-proposal',
+      payload: {
+        query: input.query,
+        filePath: input.filePath,
+        clusterId: input.clusterId,
+        featureId,
+        feature_id: featureId,
+        sourceRef,
+        source_ref: sourceRef,
+        sourceRefs,
+        source_refs: sourceRefs,
+        workspaceTaskId,
+        workspace_task_id: workspaceTaskId,
+        parentAtlasCardId,
+        parent_atlas_card_id: parentAtlasCardId,
+        tupleHash: input.tupleHash ?? null,
+        semanticHash: input.semanticHash ?? null,
+        observedStates: input.observedStates,
+        laneOrder: input.laneOrder,
+        suggestionCount: input.suggestionCount,
+        proposalSummary: input.proposalSummary,
+        missingFeatureId: Boolean(input.missingFeatureId),
+        warning: input.warning ?? null,
+        timestamp: new Date().toISOString(),
+      },
+    }),
+  ]);
+
+  const existingMemory = await db
+    .select({ id: memoryRegistry.id })
+    .from(memoryRegistry)
+    .where(eq(memoryRegistry.memoryId, memoryId))
+    .limit(1);
+
+  if (existingMemory.length > 0) {
+    await db
+      .update(memoryRegistry)
+      .set({
+        sourceId: `engram:agentic_proposal:${input.sessionId}`,
+        summaryId: `proposal:${input.sessionId}`,
+        featureFamily: 'agentic_proposal',
+        userIntent: 'repair_proposal',
+        tags: {
+          kind: 'agentic_proposal',
+          pipeline: 'agentic-fix-proposal',
+          featureId,
+          missingFeatureId: Boolean(input.missingFeatureId),
+        },
+        hotness: 0.6,
+        metadata: {
+          query: input.query,
+          filePath: input.filePath,
+          clusterId: input.clusterId,
+          featureId,
+          feature_id: featureId,
+          sourceRef,
+          source_ref: sourceRef,
+          sourceRefs,
+          source_refs: sourceRefs,
+          workspaceTaskId,
+          workspace_task_id: workspaceTaskId,
+          parentAtlasCardId,
+          parent_atlas_card_id: parentAtlasCardId,
+          tupleHash: input.tupleHash ?? null,
+          semanticHash: input.semanticHash ?? null,
+          observedStates: input.observedStates,
+          laneOrder: input.laneOrder,
+          suggestionCount: input.suggestionCount,
+          missingFeatureId: Boolean(input.missingFeatureId),
+          warning: input.warning ?? null,
+        },
+      })
+      .where(eq(memoryRegistry.memoryId, memoryId));
+  } else {
+    await db.insert(memoryRegistry).values({
+      sourceId: `engram:agentic_proposal:${input.sessionId}`,
+      summaryId: `proposal:${input.sessionId}`,
+      memoryId,
+      featureFamily: 'agentic_proposal',
+      userIntent: 'repair_proposal',
+      tags: {
+        kind: 'agentic_proposal',
+        pipeline: 'agentic-fix-proposal',
+        featureId,
+        missingFeatureId: Boolean(input.missingFeatureId),
+      },
+      hotness: 0.6,
+      metadata: {
+        query: input.query,
+        filePath: input.filePath,
+        clusterId: input.clusterId,
+        featureId,
+        feature_id: featureId,
+        sourceRef,
+        source_ref: sourceRef,
+        sourceRefs,
+        source_refs: sourceRefs,
+        workspaceTaskId,
+        workspace_task_id: workspaceTaskId,
+        parentAtlasCardId,
+        parent_atlas_card_id: parentAtlasCardId,
+        tupleHash: input.tupleHash ?? null,
+        semanticHash: input.semanticHash ?? null,
+        observedStates: input.observedStates,
+        laneOrder: input.laneOrder,
+        suggestionCount: input.suggestionCount,
+        missingFeatureId: Boolean(input.missingFeatureId),
+        warning: input.warning ?? null,
+      },
+    });
+  }
+
+  const existingCard = await db
+    .select({ id: engramCards.id })
+    .from(engramCards)
+    .where(eq(engramCards.memoryId, memoryId))
+    .limit(1);
+
+  if (existingCard.length > 0) {
+    await db
+      .update(engramCards)
+      .set({
+        scope: 'global',
+        summary: summarizeText(input.proposalSummary),
+        labels: {
+          kind: 'agentic_proposal',
+          pipeline: 'agentic-fix-proposal',
+          clusterId: input.clusterId,
+          featureId,
+          missingFeatureId: Boolean(input.missingFeatureId),
+        },
+        relatedPaths: sourceRefs,
+        relatedTools: [
+          'langextract_extract_error_facts',
+          'hmm_infer_repair_states',
+          'graphrag_expand_context',
+          'marco_rerank_chunks',
+          'wiki_encyclopedia_search',
+        ],
+        didYouMean: [],
+        sourceRefs,
+        ttlSeconds: 86_400,
+      })
+      .where(eq(engramCards.memoryId, memoryId));
+  } else {
+    await db.insert(engramCards).values({
+      memoryId,
+      scope: 'global',
+      summary: summarizeText(input.proposalSummary),
+      labels: {
+        kind: 'agentic_proposal',
+        pipeline: 'agentic-fix-proposal',
+        clusterId: input.clusterId,
+        featureId,
+        missingFeatureId: Boolean(input.missingFeatureId),
+      },
+      relatedPaths: sourceRefs,
+      relatedTools: [
+        'langextract_extract_error_facts',
+        'hmm_infer_repair_states',
+        'graphrag_expand_context',
+        'marco_rerank_chunks',
+        'wiki_encyclopedia_search',
+      ],
+      didYouMean: [],
+      sourceRefs,
+      ttlSeconds: 86_400,
+    });
   }
 }
 

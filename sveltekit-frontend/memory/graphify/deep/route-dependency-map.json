@@ -2849,6 +2849,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/atlas/nes-chrom/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -5189,6 +5195,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/phase72/check-route/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/phase72/errors/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -5988,6 +6000,24 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/tasks/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/tasks/agent-pickup/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/tasks/packets/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/tasks/packets/workflow/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

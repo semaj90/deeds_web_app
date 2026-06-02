@@ -126,30 +126,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.7326,
-      "avgPr": 4.0503,
-      "totalBlend": 1.7326,
-      "clusterAuthorityScore": 4.0503,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 96.8988,
+      "clusterAuthorityScore": 54.8096,
       "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 96.8988
   },
   {
     "id": 55,
@@ -318,30 +318,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.7326,
-      "avgPr": 4.0503,
-      "totalBlend": 6.9306,
-      "clusterAuthorityScore": 4.0503,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 387.5954,
+      "clusterAuthorityScore": 54.8096,
       "scoredFiles": 4,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 96.8988
   },
   {
     "id": 65,
@@ -409,30 +409,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.7326,
-      "avgPr": 4.0503,
-      "totalBlend": 1.7326,
-      "clusterAuthorityScore": 4.0503,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 96.8988,
+      "clusterAuthorityScore": 54.8096,
       "scoredFiles": 1,
       "totalFiles": 1,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 96.8988
   },
   {
     "id": 76,
@@ -500,30 +500,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.7326,
-      "avgPr": 4.0503,
-      "totalBlend": 1.7326,
-      "clusterAuthorityScore": 4.0503,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 96.8988,
+      "clusterAuthorityScore": 54.8096,
       "scoredFiles": 1,
       "totalFiles": 1,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 96.8988
   },
   {
     "id": 84,
@@ -692,30 +692,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.7326,
-      "avgPr": 4.0503,
-      "totalBlend": 1.7326,
-      "clusterAuthorityScore": 4.0503,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 96.8988,
+      "clusterAuthorityScore": 54.8096,
       "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 96.8988
   },
   {
     "id": 91,
@@ -884,30 +884,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.7326,
-      "avgPr": 4.0503,
-      "totalBlend": 5.1979,
-      "clusterAuthorityScore": 4.0503,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 290.6965,
+      "clusterAuthorityScore": 54.8096,
       "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 96.8988
   },
   {
     "id": 95,
@@ -1076,30 +1076,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.7326,
-      "avgPr": 4.0503,
-      "totalBlend": 1.7326,
-      "clusterAuthorityScore": 4.0503,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 96.8988,
+      "clusterAuthorityScore": 54.8096,
       "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 96.8988
   },
   {
     "id": 13,
@@ -1268,30 +1268,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.7326,
-      "avgPr": 4.0503,
-      "totalBlend": 5.1979,
-      "clusterAuthorityScore": 4.0503,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 290.6965,
+      "clusterAuthorityScore": 54.8096,
       "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.7326
+    "clusterBlend": 96.8988
   },
   {
     "id": 88,
@@ -1460,40 +1460,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.5869,
-      "avgPr": 3.6072,
-      "totalBlend": 7.9344,
-      "clusterAuthorityScore": 3.9173,
-      "scoredFiles": 5,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 96.8988,
+      "avgPr": 54.8096,
+      "totalBlend": 387.5954,
+      "clusterAuthorityScore": 54.8096,
+      "scoredFiles": 4,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/server/db/relations.ts",
-          "pageRank": 1.8346582262300364,
-          "karpathyBlend": 1.0037879059422468
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
-        },
-        {
-          "filePath": "src/lib/server/db/relations.ts",
-          "pageRank": 1.8346582262300364,
-          "karpathyBlend": 1.0037879059422468
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         }
       ]
     },
-    "clusterBlend": 1.6889
+    "clusterBlend": 96.8988
   },
   {
     "id": 53,
@@ -1666,63 +1656,63 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.7326,
-      "maxPr": 4.0503,
-      "avgBlend": 1.3513,
-      "avgPr": 2.9106,
-      "totalBlend": 5.4051,
-      "clusterAuthorityScore": 3.7084,
+      "maxBlend": 96.8988,
+      "maxPr": 54.8096,
+      "avgBlend": 53.2511,
+      "avgPr": 39.4053,
+      "totalBlend": 213.0046,
+      "clusterAuthorityScore": 50.1883,
       "scoredFiles": 4,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         },
         {
-          "filePath": "src/lib/server/db/schema/legal-citations.ts",
-          "pageRank": 1.7821034441546988,
-          "karpathyBlend": 0.9755046339313211
+          "filePath": "src/lib/server/db/schema-chat.ts",
+          "pageRank": 47.054337566285156,
+          "karpathyBlend": 18.827763774072658
         },
         {
-          "filePath": "src/lib/server/db/schema-evidence-crud.ts",
-          "pageRank": 1.759711817574462,
-          "karpathyBlend": 0.9642640694797127
+          "filePath": "src/lib/types/protocol.ts",
+          "pageRank": 0.9477377303240743,
+          "karpathyBlend": 0.3790950921296297
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/db/schema-postgres.ts",
-          "pageRank": 4.050278318145834,
-          "karpathyBlend": 1.7326413272583336
+          "pageRank": 54.80961950352407,
+          "karpathyBlend": 96.8988478014096
         },
         {
-          "filePath": "src/lib/server/db/schema/legal-citations.ts",
-          "pageRank": 1.7821034441546988,
-          "karpathyBlend": 0.9755046339313211
+          "filePath": "src/lib/server/db/schema-chat.ts",
+          "pageRank": 47.054337566285156,
+          "karpathyBlend": 18.827763774072658
         },
         {
-          "filePath": "src/lib/server/db/schema-evidence-crud.ts",
-          "pageRank": 1.759711817574462,
-          "karpathyBlend": 0.9642640694797127
+          "filePath": "src/lib/types/protocol.ts",
+          "pageRank": 0.9477377303240743,
+          "karpathyBlend": 0.3790950921296297
         }
       ]
     },
-    "clusterBlend": 1.6182
+    "clusterBlend": 83.8045
   },
   {
-    "id": 75,
-    "size": 416,
+    "id": 60,
+    "size": 406,
     "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/config` (tag: embedding)",
+    "inferredTopic": "function chunks in `src/lib/server/analytics` (tag: embedding)",
     "topKinds": [
       {
         "kind": "function",
-        "count": 12
+        "count": 5
       },
       {
-        "kind": "const",
+        "kind": "table-def",
         "count": 3
       },
       {
@@ -1733,151 +1723,139 @@
     "topTags": [
       {
         "tag": "embedding",
-        "count": 9
-      },
-      {
-        "tag": "vector",
-        "count": 9
+        "count": 8
       },
       {
         "tag": "redis",
-        "count": 7
+        "count": 6
       },
       {
-        "tag": "rabbitmq",
+        "tag": "vector",
         "count": 5
       },
       {
-        "tag": "ai",
-        "count": 2
+        "tag": "database",
+        "count": 4
+      },
+      {
+        "tag": "schema",
+        "count": 3
       }
     ],
     "topSymbols": [
       {
-        "symbol": "getOllamaEndpoint",
-        "count": 2
-      },
-      {
-        "symbol": "getMinioConfig",
+        "symbol": "recordChunkHits",
         "count": 1
       },
       {
-        "symbol": "CONFIG",
+        "symbol": "chunk_hit_log",
         "count": 1
       },
       {
-        "symbol": "getModelConfig",
+        "symbol": "recordQueryLog",
         "count": 1
       },
       {
-        "symbol": "DATABASE_CONFIG",
+        "symbol": "ace_chunks",
+        "count": 1
+      },
+      {
+        "symbol": "getChunkQualitySignals",
         "count": 1
       }
     ],
     "topDirs": [
       {
-        "dir": "src/lib/config",
-        "count": 6
+        "dir": "src/lib/server/analytics",
+        "count": 4
       },
       {
-        "dir": "src/lib/server",
+        "dir": "src/lib/server/db/schema",
         "count": 2
       },
       {
-        "dir": "src/lib/server/config",
+        "dir": "src/lib/db/schema",
         "count": 1
       }
     ],
     "topPaths": [
       {
-        "path": "src/lib/config/env.server.ts",
+        "path": "src/lib/server/analytics/search-analytics.ts",
         "count": 4
       },
       {
-        "path": "src/lib/server/config/ollama.ts",
+        "path": "src/lib/server/db/schema/search-analytics.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/db/schema/ace-web.ts",
         "count": 1
       },
       {
-        "path": "src/lib/server/ai/ollama-config.ts",
+        "path": "src/lib/server/indexer/karpathy-wiki.ts",
         "count": 1
       },
       {
-        "path": "src/lib/server/config.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/config/database.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/config/redis-config.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/minio.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "path": "src/lib/types/pipeline-v2.ts",
         "count": 1
       }
     ],
     "memberFiles": [
       {
-        "path": "src/lib/server/config/ollama.ts",
+        "path": "src/lib/server/analytics/search-analytics.ts",
         "kind": "function",
-        "symbol": "getOllamaEndpoint",
-        "lineStart": 20,
-        "lineEnd": 26
+        "symbol": "recordChunkHits",
+        "lineStart": 113,
+        "lineEnd": 153
       },
       {
-        "path": "src/lib/config/env.server.ts",
+        "path": "src/lib/server/db/schema/search-analytics.ts",
+        "kind": "table-def",
+        "symbol": "chunk_hit_log",
+        "lineStart": 40,
+        "lineEnd": 56
+      },
+      {
+        "path": "src/lib/server/analytics/search-analytics.ts",
         "kind": "function",
-        "symbol": "getMinioConfig",
-        "lineStart": 112,
-        "lineEnd": 119
+        "symbol": "recordQueryLog",
+        "lineStart": 159,
+        "lineEnd": 193
       },
       {
-        "path": "src/lib/config/env.server.ts",
-        "kind": "const",
-        "symbol": "CONFIG",
-        "lineStart": 255,
-        "lineEnd": 255
+        "path": "src/lib/db/schema/ace-web.ts",
+        "kind": "table-def",
+        "symbol": "ace_chunks",
+        "lineStart": 58,
+        "lineEnd": 92
       },
       {
-        "path": "src/lib/server/ai/ollama-config.ts",
+        "path": "src/lib/server/analytics/search-analytics.ts",
         "kind": "function",
-        "symbol": "getModelConfig",
-        "lineStart": 104,
-        "lineEnd": 106
+        "symbol": "getChunkQualitySignals",
+        "lineStart": 289,
+        "lineEnd": 332
       },
       {
-        "path": "src/lib/server/config.ts",
-        "kind": "const",
-        "symbol": "DATABASE_CONFIG",
-        "lineStart": 146,
-        "lineEnd": 159
-      },
-      {
-        "path": "src/lib/config/database.ts",
+        "path": "src/lib/server/analytics/search-analytics.ts",
         "kind": "function",
-        "symbol": "getPoolConfig",
-        "lineStart": 25,
-        "lineEnd": 48
+        "symbol": "getClusterHeatMap",
+        "lineStart": 257,
+        "lineEnd": 280
       },
       {
-        "path": "src/lib/config/redis-config.ts",
-        "kind": "function",
-        "symbol": "getRedisConfig",
-        "lineStart": 155,
-        "lineEnd": 166
+        "path": "src/lib/server/db/schema/search-analytics.ts",
+        "kind": "table-def",
+        "symbol": "rag_query_log",
+        "lineStart": 88,
+        "lineEnd": 113
       },
       {
-        "path": "src/lib/server/minio.ts",
+        "path": "src/lib/server/indexer/karpathy-wiki.ts",
         "kind": "function",
-        "symbol": "getMinioS3Client",
-        "lineStart": 26,
-        "lineEnd": 38
+        "symbol": "generateClusterNote",
+        "lineStart": 204,
+        "lineEnd": 320
       }
     ],
     "somRow": 0,
@@ -1886,40 +1864,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 1.2964,
-      "maxPr": 2.7145,
-      "avgBlend": 1.1022,
-      "avgPr": 2.3562,
-      "totalBlend": 3.3066,
-      "clusterAuthorityScore": 2.607,
-      "scoredFiles": 3,
+      "maxBlend": 44.5277,
+      "maxPr": 0.7597,
+      "avgBlend": 44.5277,
+      "avgPr": 0.7597,
+      "totalBlend": 178.1109,
+      "clusterAuthorityScore": 0.7597,
+      "scoredFiles": 4,
       "totalFiles": 8,
       "topPrFiles": [
         {
-          "filePath": "src/lib/config/env.server.ts",
-          "pageRank": 2.7145393537960754,
-          "karpathyBlend": 1.2963760760131462
-        },
-        {
-          "filePath": "src/lib/server/minio.ts",
-          "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.7138869260299371
+          "filePath": "src/lib/server/analytics/search-analytics.ts",
+          "pageRank": 0.7597252960689487,
+          "karpathyBlend": 44.527716499565976
         }
       ],
       "topBlendFiles": [
         {
-          "filePath": "src/lib/config/env.server.ts",
-          "pageRank": 2.7145393537960754,
-          "karpathyBlend": 1.2963760760131462
-        },
-        {
-          "filePath": "src/lib/server/minio.ts",
-          "pageRank": 1.6395923150748424,
-          "karpathyBlend": 0.7138869260299371
+          "filePath": "src/lib/server/analytics/search-analytics.ts",
+          "pageRank": 0.7597252960689487,
+          "karpathyBlend": 44.527716499565976
         }
       ]
     },
-    "clusterBlend": 1.2381
+    "clusterBlend": 44.5277
   },
   {
     "id": 94,
@@ -2096,30 +2064,614 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9786,
-      "maxPr": 1.8989,
-      "avgBlend": 0.9786,
-      "avgPr": 1.8989,
-      "totalBlend": 2.9358,
-      "clusterAuthorityScore": 1.8989,
+      "maxBlend": 21.1687,
+      "maxPr": 0.7568,
+      "avgBlend": 21.1687,
+      "avgPr": 0.7568,
+      "totalBlend": 63.5061,
+      "clusterAuthorityScore": 0.7568,
       "scoredFiles": 3,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
-          "pageRank": 1.8989401144504947,
-          "karpathyBlend": 0.978602431855857
+          "pageRank": 0.7568317708250295,
+          "karpathyBlend": 21.168711101884703
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/cache.ts",
-          "pageRank": 1.8989401144504947,
-          "karpathyBlend": 0.978602431855857
+          "pageRank": 0.7568317708250295,
+          "karpathyBlend": 21.168711101884703
         }
       ]
     },
-    "clusterBlend": 0.9786
+    "clusterBlend": 21.1687
+  },
+  {
+    "id": 75,
+    "size": 416,
+    "sampledFor": 16,
+    "inferredTopic": "function chunks in `src/lib/config` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "function",
+        "count": 12
+      },
+      {
+        "kind": "const",
+        "count": 3
+      },
+      {
+        "kind": "type",
+        "count": 1
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 9
+      },
+      {
+        "tag": "vector",
+        "count": 9
+      },
+      {
+        "tag": "redis",
+        "count": 7
+      },
+      {
+        "tag": "rabbitmq",
+        "count": 5
+      },
+      {
+        "tag": "ai",
+        "count": 2
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "getOllamaEndpoint",
+        "count": 2
+      },
+      {
+        "symbol": "getMinioConfig",
+        "count": 1
+      },
+      {
+        "symbol": "CONFIG",
+        "count": 1
+      },
+      {
+        "symbol": "getModelConfig",
+        "count": 1
+      },
+      {
+        "symbol": "DATABASE_CONFIG",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/config",
+        "count": 6
+      },
+      {
+        "dir": "src/lib/server",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/server/config",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/config/env.server.ts",
+        "count": 4
+      },
+      {
+        "path": "src/lib/server/config/ollama.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/ai/ollama-config.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/config.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/config/database.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/config/redis-config.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/minio.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/config/ollama.ts",
+        "kind": "function",
+        "symbol": "getOllamaEndpoint",
+        "lineStart": 20,
+        "lineEnd": 26
+      },
+      {
+        "path": "src/lib/config/env.server.ts",
+        "kind": "function",
+        "symbol": "getMinioConfig",
+        "lineStart": 112,
+        "lineEnd": 119
+      },
+      {
+        "path": "src/lib/config/env.server.ts",
+        "kind": "const",
+        "symbol": "CONFIG",
+        "lineStart": 255,
+        "lineEnd": 255
+      },
+      {
+        "path": "src/lib/server/ai/ollama-config.ts",
+        "kind": "function",
+        "symbol": "getModelConfig",
+        "lineStart": 104,
+        "lineEnd": 106
+      },
+      {
+        "path": "src/lib/server/config.ts",
+        "kind": "const",
+        "symbol": "DATABASE_CONFIG",
+        "lineStart": 146,
+        "lineEnd": 159
+      },
+      {
+        "path": "src/lib/config/database.ts",
+        "kind": "function",
+        "symbol": "getPoolConfig",
+        "lineStart": 25,
+        "lineEnd": 48
+      },
+      {
+        "path": "src/lib/config/redis-config.ts",
+        "kind": "function",
+        "symbol": "getRedisConfig",
+        "lineStart": 155,
+        "lineEnd": 166
+      },
+      {
+        "path": "src/lib/server/minio.ts",
+        "kind": "function",
+        "symbol": "getMinioS3Client",
+        "lineStart": 26,
+        "lineEnd": 38
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 20.0509,
+      "maxPr": 4.3624,
+      "avgBlend": 20.0509,
+      "avgPr": 4.3624,
+      "totalBlend": 40.1018,
+      "clusterAuthorityScore": 4.3624,
+      "scoredFiles": 2,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/config/env.server.ts",
+          "pageRank": 4.362357142857144,
+          "karpathyBlend": 20.050921250697545
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/config/env.server.ts",
+          "pageRank": 4.362357142857144,
+          "karpathyBlend": 20.050921250697545
+        }
+      ]
+    },
+    "clusterBlend": 20.0509
+  },
+  {
+    "id": 22,
+    "size": 86,
+    "sampledFor": 16,
+    "inferredTopic": "function chunks in `src/lib/server/cache` (tag: redis)",
+    "topKinds": [
+      {
+        "kind": "function",
+        "count": 13
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "redis",
+        "count": 11
+      },
+      {
+        "tag": "vector",
+        "count": 10
+      },
+      {
+        "tag": "embedding",
+        "count": 9
+      },
+      {
+        "tag": "cache",
+        "count": 7
+      },
+      {
+        "tag": "rabbitmq",
+        "count": 2
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "invalidateCartridge",
+        "count": 1
+      },
+      {
+        "symbol": "getCachedCartridge",
+        "count": 1
+      },
+      {
+        "symbol": "cacheCartridge",
+        "count": 1
+      },
+      {
+        "symbol": "invalidateGlyphAtlas",
+        "count": 1
+      },
+      {
+        "symbol": "invalidateGpuAnalysis",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server/cache",
+        "count": 7
+      },
+      {
+        "dir": "src/lib/server/cartridge",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/server",
+        "count": 2
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "count": 6
+      },
+      {
+        "path": "src/lib/server/cartridge/glyph-tile-engine.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/components/evidence/board-persistence.svelte.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/glyph-prompt-cache.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/cache-keys.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/cache/report-template-cache.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "kind": "function",
+        "symbol": "invalidateCartridge",
+        "lineStart": 354,
+        "lineEnd": 367
+      },
+      {
+        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "kind": "function",
+        "symbol": "getCachedCartridge",
+        "lineStart": 111,
+        "lineEnd": 125
+      },
+      {
+        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "kind": "function",
+        "symbol": "cacheCartridge",
+        "lineStart": 130,
+        "lineEnd": 148
+      },
+      {
+        "path": "src/lib/server/cartridge/glyph-tile-engine.ts",
+        "kind": "function",
+        "symbol": "invalidateGlyphAtlas",
+        "lineStart": 395,
+        "lineEnd": 402
+      },
+      {
+        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "kind": "function",
+        "symbol": "invalidateGpuAnalysis",
+        "lineStart": 430,
+        "lineEnd": 436
+      },
+      {
+        "path": "src/lib/server/glyph-prompt-cache.ts",
+        "kind": "function",
+        "symbol": "invalidateCase",
+        "lineStart": 237,
+        "lineEnd": 243
+      },
+      {
+        "path": "src/lib/server/cartridge/glyph-tile-engine.ts",
+        "kind": "function",
+        "symbol": "getGlyphTileAtlas",
+        "lineStart": 405,
+        "lineEnd": 407
+      },
+      {
+        "path": "src/lib/server/cache-keys.ts",
+        "kind": "function",
+        "symbol": "getCaseVersion",
+        "lineStart": 241,
+        "lineEnd": 249
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 2.3564,
+      "maxPr": 0.8762,
+      "avgBlend": 2.3564,
+      "avgPr": 0.8762,
+      "totalBlend": 2.3564,
+      "clusterAuthorityScore": 0.8762,
+      "scoredFiles": 1,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/server/cache-keys.ts",
+          "pageRank": 0.8762021115451389,
+          "karpathyBlend": 2.356440927625868
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/server/cache-keys.ts",
+          "pageRank": 0.8762021115451389,
+          "karpathyBlend": 2.356440927625868
+        }
+      ]
+    },
+    "clusterBlend": 2.3564
+  },
+  {
+    "id": 96,
+    "size": 177,
+    "sampledFor": 16,
+    "inferredTopic": "type chunks in `src/lib/server` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "type",
+        "count": 12
+      },
+      {
+        "kind": "const",
+        "count": 2
+      },
+      {
+        "kind": "function",
+        "count": 2
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 6
+      },
+      {
+        "tag": "redis",
+        "count": 5
+      },
+      {
+        "tag": "vector",
+        "count": 4
+      },
+      {
+        "tag": "types",
+        "count": 3
+      },
+      {
+        "tag": "rabbitmq",
+        "count": 2
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "WorkflowEventType",
+        "count": 2
+      },
+      {
+        "symbol": "evidenceKey",
+        "count": 1
+      },
+      {
+        "symbol": "EvidenceWebSocketMessage",
+        "count": 1
+      },
+      {
+        "symbol": "QUEUES",
+        "count": 1
+      },
+      {
+        "symbol": "EvidenceLifecycleEvent",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server",
+        "count": 3
+      },
+      {
+        "dir": "src/lib/types",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/machines",
+        "count": 2
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/cache-keys.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/evidence.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/rabbitmq.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/queue/workflow-publish.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/machines/evidence-lifecycle-machine.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/machines/evidence-analysis-machine.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/evidence-progress.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/evidence/type-detector.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/cache-keys.ts",
+        "kind": "const",
+        "symbol": "evidenceKey",
+        "lineStart": 109,
+        "lineEnd": 121
+      },
+      {
+        "path": "src/lib/types/evidence.ts",
+        "kind": "type",
+        "symbol": "EvidenceWebSocketMessage",
+        "lineStart": 190,
+        "lineEnd": 201
+      },
+      {
+        "path": "src/lib/server/rabbitmq.ts",
+        "kind": "const",
+        "symbol": "QUEUES",
+        "lineStart": 27,
+        "lineEnd": 39
+      },
+      {
+        "path": "src/lib/server/queue/workflow-publish.ts",
+        "kind": "type",
+        "symbol": "WorkflowEventType",
+        "lineStart": 22,
+        "lineEnd": 47
+      },
+      {
+        "path": "src/lib/machines/evidence-lifecycle-machine.ts",
+        "kind": "type",
+        "symbol": "EvidenceLifecycleEvent",
+        "lineStart": 73,
+        "lineEnd": 79
+      },
+      {
+        "path": "src/lib/machines/evidence-analysis-machine.ts",
+        "kind": "type",
+        "symbol": "AnalysisEvent",
+        "lineStart": 66,
+        "lineEnd": 72
+      },
+      {
+        "path": "src/lib/server/evidence-progress.ts",
+        "kind": "type",
+        "symbol": "ProgressStep",
+        "lineStart": 6,
+        "lineEnd": 6
+      },
+      {
+        "path": "src/lib/server/evidence/type-detector.ts",
+        "kind": "function",
+        "symbol": "detectEvidenceType",
+        "lineStart": 70,
+        "lineEnd": 92
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 2.3564,
+      "maxPr": 0.8762,
+      "avgBlend": 2.3564,
+      "avgPr": 0.8762,
+      "totalBlend": 2.3564,
+      "clusterAuthorityScore": 0.8762,
+      "scoredFiles": 1,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/server/cache-keys.ts",
+          "pageRank": 0.8762021115451389,
+          "karpathyBlend": 2.356440927625868
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/server/cache-keys.ts",
+          "pageRank": 0.8762021115451389,
+          "karpathyBlend": 2.356440927625868
+        }
+      ]
+    },
+    "clusterBlend": 2.3564
   },
   {
     "id": 59,
@@ -2252,790 +2804,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.9154,
-      "maxPr": 2.1297,
-      "avgBlend": 0.9154,
-      "avgPr": 2.1297,
-      "totalBlend": 3.6615,
-      "clusterAuthorityScore": 2.1297,
+      "maxBlend": 0.8147,
+      "maxPr": 1.2466,
+      "avgBlend": 0.8147,
+      "avgPr": 1.2466,
+      "totalBlend": 3.2587,
+      "clusterAuthorityScore": 1.2466,
       "scoredFiles": 4,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/observability/inference-log.ts",
-          "pageRank": 2.1297194485430113,
-          "karpathyBlend": 0.9153677794172046
+          "pageRank": 1.2466465813189507,
+          "karpathyBlend": 0.8146782248127364
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/observability/inference-log.ts",
-          "pageRank": 2.1297194485430113,
-          "karpathyBlend": 0.9153677794172046
+          "pageRank": 1.2466465813189507,
+          "karpathyBlend": 0.8146782248127364
         }
       ]
     },
-    "clusterBlend": 0.9154
-  },
-  {
-    "id": 56,
-    "size": 10,
-    "sampledFor": 10,
-    "inferredTopic": "type chunks in `src/lib/server` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "type",
-        "count": 7
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 2
-      },
-      {
-        "tag": "vector",
-        "count": 1
-      },
-      {
-        "tag": "redis",
-        "count": 1
-      },
-      {
-        "tag": "types",
-        "count": 1
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "DoclingResult",
-        "count": 1
-      },
-      {
-        "symbol": "VLMOCRResult",
-        "count": 1
-      },
-      {
-        "symbol": "YoloVLMResult",
-        "count": 1
-      },
-      {
-        "symbol": "OllamaEmbedResult",
-        "count": 1
-      },
-      {
-        "symbol": "EvidenceAnalysisResult",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server",
-        "count": 4
-      },
-      {
-        "dir": "src/lib/server/embeddings",
-        "count": 1
-      },
-      {
-        "dir": "src/lib/types",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/docling.ts",
-        "count": 3
-      },
-      {
-        "path": "src/lib/server/embeddings/ollama.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/evidence.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/shared/types/parser.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/db-shim.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/docling.ts",
-        "kind": "type",
-        "symbol": "DoclingResult",
-        "lineStart": 19,
-        "lineEnd": 24
-      },
-      {
-        "path": "src/lib/server/docling.ts",
-        "kind": "type",
-        "symbol": "VLMOCRResult",
-        "lineStart": 208,
-        "lineEnd": 214
-      },
-      {
-        "path": "src/lib/server/docling.ts",
-        "kind": "type",
-        "symbol": "YoloVLMResult",
-        "lineStart": 216,
-        "lineEnd": 219
-      },
-      {
-        "path": "src/lib/server/embeddings/ollama.ts",
-        "kind": "type",
-        "symbol": "OllamaEmbedResult",
-        "lineStart": 12,
-        "lineEnd": 15
-      },
-      {
-        "path": "src/lib/types/evidence.ts",
-        "kind": "type",
-        "symbol": "EvidenceAnalysisResult",
-        "lineStart": 64,
-        "lineEnd": 73
-      },
-      {
-        "path": "src/lib/shared/types/parser.ts",
-        "kind": "type",
-        "symbol": "LegalDocWASMOutput",
-        "lineStart": 1,
-        "lineEnd": 8
-      },
-      {
-        "path": "src/lib/server/db-shim.ts",
-        "kind": "type",
-        "symbol": "QueryResult",
-        "lineStart": 13,
-        "lineEnd": 13
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.9037,
-      "maxPr": 1.6752,
-      "avgBlend": 0.9037,
-      "avgPr": 1.6752,
-      "totalBlend": 0.9037,
-      "clusterAuthorityScore": 1.6752,
-      "scoredFiles": 1,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.9037193000637296
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.9037193000637296
-        }
-      ]
-    },
-    "clusterBlend": 0.9037
-  },
-  {
-    "id": 86,
-    "size": 680,
-    "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/components/evidence` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "function",
-        "count": 14
-      },
-      {
-        "kind": "const",
-        "count": 2
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 7
-      },
-      {
-        "tag": "server-module",
-        "count": 3
-      },
-      {
-        "tag": "vector",
-        "count": 3
-      },
-      {
-        "tag": "page-component",
-        "count": 2
-      },
-      {
-        "tag": "redis",
-        "count": 2
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "toReaderModel",
-        "count": 1
-      },
-      {
-        "symbol": "runeBatchToGlyphRecords",
-        "count": 1
-      },
-      {
-        "symbol": "createBulkMoveCommand",
-        "count": 1
-      },
-      {
-        "symbol": "legalCorpusViews",
-        "count": 1
-      },
-      {
-        "symbol": "extractLegalMetadata",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/components/evidence",
-        "count": 3
-      },
-      {
-        "dir": "src/lib/types",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/server/cartridge",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/components/evidence/board-history.svelte.ts",
-        "count": 3
-      },
-      {
-        "path": "src/lib/types/legal-corpus-views.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/cartridge/glyph-mappers.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/png-embed-extractor.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/embeddings/ollama.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/shims/worker-threads-browser-shim.js",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/ml/recommendation-glyph.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/data/types.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/types/legal-corpus-views.ts",
-        "kind": "function",
-        "symbol": "toReaderModel",
-        "lineStart": 78,
-        "lineEnd": 80
-      },
-      {
-        "path": "src/lib/server/cartridge/glyph-mappers.ts",
-        "kind": "function",
-        "symbol": "runeBatchToGlyphRecords",
-        "lineStart": 127,
-        "lineEnd": 129
-      },
-      {
-        "path": "src/lib/components/evidence/board-history.svelte.ts",
-        "kind": "function",
-        "symbol": "createBulkMoveCommand",
-        "lineStart": 73,
-        "lineEnd": 82
-      },
-      {
-        "path": "src/lib/types/legal-corpus-views.ts",
-        "kind": "const",
-        "symbol": "legalCorpusViews",
-        "lineStart": 5,
-        "lineEnd": 5
-      },
-      {
-        "path": "src/lib/server/png-embed-extractor.ts",
-        "kind": "const",
-        "symbol": "extractLegalMetadata",
-        "lineStart": 295,
-        "lineEnd": 295
-      },
-      {
-        "path": "src/lib/server/embeddings/ollama.ts",
-        "kind": "function",
-        "symbol": "embeddingDims",
-        "lineStart": 66,
-        "lineEnd": 68
-      },
-      {
-        "path": "src/lib/shims/worker-threads-browser-shim.js",
-        "kind": "function",
-        "symbol": "moveMessagePortToContext",
-        "lineStart": 112,
-        "lineEnd": 112
-      },
-      {
-        "path": "src/lib/server/ml/recommendation-glyph.ts",
-        "kind": "function",
-        "symbol": "toGlyph",
-        "lineStart": 249,
-        "lineEnd": 256
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.9037,
-      "maxPr": 1.6752,
-      "avgBlend": 0.9037,
-      "avgPr": 1.6752,
-      "totalBlend": 0.9037,
-      "clusterAuthorityScore": 1.6752,
-      "scoredFiles": 1,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.9037193000637296
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/embeddings/ollama.ts",
-          "pageRank": 1.675165185138195,
-          "karpathyBlend": 0.9037193000637296
-        }
-      ]
-    },
-    "clusterBlend": 0.9037
-  },
-  {
-    "id": 92,
-    "size": 940,
-    "sampledFor": 16,
-    "inferredTopic": "component chunks in `src/lib/components/evidence` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "component",
-        "count": 14
-      },
-      {
-        "kind": "const",
-        "count": 1
-      },
-      {
-        "kind": "function",
-        "count": 1
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 4
-      },
-      {
-        "tag": "page",
-        "count": 3
-      },
-      {
-        "tag": "component",
-        "count": 3
-      },
-      {
-        "tag": "xstate",
-        "count": 1
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "+page.svelte",
-        "count": 3
-      },
-      {
-        "symbol": "UploadZone.svelte",
-        "count": 2
-      },
-      {
-        "symbol": "POIPhotoUploader.svelte",
-        "count": 1
-      },
-      {
-        "symbol": "UploadProgressCard.svelte",
-        "count": 1
-      },
-      {
-        "symbol": "AIFileUpload.svelte",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/components/evidence",
-        "count": 3
-      },
-      {
-        "dir": "src/lib/components",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/components/yorha/evidence",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/components/yorha/evidence/UploadZone.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/client/ui/POIPhotoUploader.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/routes/(app)/evidence/upload/+page.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/components/evidence/UploadProgressCard.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/components/ui/AIFileUpload.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/components/yorha/evidence/UploadZone.svelte",
-        "kind": "component",
-        "symbol": "UploadZone.svelte",
-        "lineStart": 1,
-        "lineEnd": 205
-      },
-      {
-        "path": "src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte",
-        "kind": "component",
-        "symbol": "UploadZone.svelte",
-        "lineStart": 1,
-        "lineEnd": 205
-      },
-      {
-        "path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
-        "kind": "component",
-        "symbol": "+page.svelte",
-        "lineStart": 1,
-        "lineEnd": 599
-      },
-      {
-        "path": "src/lib/client/ui/POIPhotoUploader.svelte",
-        "kind": "component",
-        "symbol": "POIPhotoUploader.svelte",
-        "lineStart": 1,
-        "lineEnd": 126
-      },
-      {
-        "path": "src/routes/(app)/evidence/upload/+page.svelte",
-        "kind": "component",
-        "symbol": "+page.svelte",
-        "lineStart": 1,
-        "lineEnd": 442
-      },
-      {
-        "path": "src/lib/components/evidence/UploadProgressCard.svelte",
-        "kind": "component",
-        "symbol": "UploadProgressCard.svelte",
-        "lineStart": 1,
-        "lineEnd": 63
-      },
-      {
-        "path": "src/lib/components/ui/AIFileUpload.svelte",
-        "kind": "component",
-        "symbol": "AIFileUpload.svelte",
-        "lineStart": 1,
-        "lineEnd": 642
-      },
-      {
-        "path": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
-        "kind": "component",
-        "symbol": "EvidenceBulkUploadDialog.svelte",
-        "lineStart": 1,
-        "lineEnd": 140
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.8354,
-      "maxPr": 1.6043,
-      "avgBlend": 0.8354,
-      "avgPr": 1.6043,
-      "totalBlend": 0.8354,
-      "clusterAuthorityScore": 1.6043,
-      "scoredFiles": 1,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.6042923723218958,
-          "karpathyBlend": 0.8354393634244506
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/client/ui/POIPhotoUploader.svelte",
-          "pageRank": 1.6042923723218958,
-          "karpathyBlend": 0.8354393634244506
-        }
-      ]
-    },
-    "clusterBlend": 0.8354
-  },
-  {
-    "id": 90,
-    "size": 158,
-    "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/server` (tag: auth)",
-    "topKinds": [
-      {
-        "kind": "function",
-        "count": 9
-      },
-      {
-        "kind": "route-handler",
-        "count": 4
-      },
-      {
-        "kind": "const",
-        "count": 1
-      },
-      {
-        "kind": "unknown",
-        "count": 1
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "auth",
-        "count": 15
-      },
-      {
-        "tag": "api",
-        "count": 4
-      },
-      {
-        "tag": "server",
-        "count": 4
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "POST",
-        "count": 2
-      },
-      {
-        "symbol": "GET",
-        "count": 2
-      },
-      {
-        "symbol": "deleteSessionCookie",
-        "count": 1
-      },
-      {
-        "symbol": "invalidateUserSessions",
-        "count": 1
-      },
-      {
-        "symbol": "getUser",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server",
-        "count": 10
-      },
-      {
-        "dir": "src/routes/api/auth/logout",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/types",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/lucia.ts",
-        "count": 6
-      },
-      {
-        "path": "src/lib/server/auth.ts",
-        "count": 3
-      },
-      {
-        "path": "src/routes/api/auth/logout/+server.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/auth-guard.js",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/auth.d.ts",
-        "count": 1
-      },
-      {
-        "path": "src/routes/api/auth/session/+server.ts",
-        "count": 1
-      },
-      {
-        "path": "src/routes/api/dev/login-demo/+server.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/lucia.ts",
-        "kind": "function",
-        "symbol": "deleteSessionCookie",
-        "lineStart": 136,
-        "lineEnd": 143
-      },
-      {
-        "path": "src/routes/api/auth/logout/+server.ts",
-        "kind": "route-handler",
-        "symbol": "POST",
-        "lineStart": 9,
-        "lineEnd": 39
-      },
-      {
-        "path": "src/routes/api/auth/logout/+server.ts",
-        "kind": "route-handler",
-        "symbol": "GET",
-        "lineStart": 41,
-        "lineEnd": 61
-      },
-      {
-        "path": "src/lib/server/lucia.ts",
-        "kind": "function",
-        "symbol": "invalidateUserSessions",
-        "lineStart": 131,
-        "lineEnd": 134
-      },
-      {
-        "path": "src/lib/server/auth.ts",
-        "kind": "function",
-        "symbol": "getUser",
-        "lineStart": 511,
-        "lineEnd": 547
-      },
-      {
-        "path": "src/lib/server/auth-guard.js",
-        "kind": "function",
-        "symbol": "requireAuthentication",
-        "lineStart": 33,
-        "lineEnd": 44
-      },
-      {
-        "path": "src/lib/server/auth.ts",
-        "kind": "const",
-        "symbol": "auth",
-        "lineStart": 35,
-        "lineEnd": 54
-      },
-      {
-        "path": "src/lib/server/lucia.ts",
-        "kind": "function",
-        "symbol": "invalidateSession",
-        "lineStart": 126,
-        "lineEnd": 129
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0.7787,
-      "maxPr": 1.7783,
-      "avgBlend": 0.7787,
-      "avgPr": 1.7783,
-      "totalBlend": 2.3362,
-      "clusterAuthorityScore": 1.7783,
-      "scoredFiles": 3,
-      "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/server/lucia.ts",
-          "pageRank": 1.7783166924245375,
-          "karpathyBlend": 0.778736676969815
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/server/lucia.ts",
-          "pageRank": 1.7783166924245375,
-          "karpathyBlend": 0.778736676969815
-        }
-      ]
-    },
-    "clusterBlend": 0.7787
+    "clusterBlend": 0.8147
   },
   {
     "id": 20,
@@ -3216,30 +3008,30 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.777,
-      "maxPr": 1.7873,
-      "avgBlend": 0.777,
-      "avgPr": 1.7873,
-      "totalBlend": 0.777,
-      "clusterAuthorityScore": 1.7873,
+      "maxBlend": 0.5701,
+      "maxPr": 1.4103,
+      "avgBlend": 0.5701,
+      "avgPr": 1.4103,
+      "totalBlend": 0.5701,
+      "clusterAuthorityScore": 1.4103,
       "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204415,
-          "karpathyBlend": 0.7769820411681766
+          "pageRank": 1.4103337410093764,
+          "karpathyBlend": 0.570148511052188
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204415,
-          "karpathyBlend": 0.7769820411681766
+          "pageRank": 1.4103337410093764,
+          "karpathyBlend": 0.570148511052188
         }
       ]
     },
-    "clusterBlend": 0.777
+    "clusterBlend": 0.5701
   },
   {
     "id": 57,
@@ -3420,40 +3212,1478 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.777,
-      "maxPr": 1.7873,
-      "avgBlend": 0.7621,
-      "avgPr": 1.7536,
-      "totalBlend": 1.5242,
-      "clusterAuthorityScore": 1.7772,
-      "scoredFiles": 2,
+      "maxBlend": 0.5701,
+      "maxPr": 1.4103,
+      "avgBlend": 0.5701,
+      "avgPr": 1.4103,
+      "totalBlend": 0.5701,
+      "clusterAuthorityScore": 1.4103,
+      "scoredFiles": 1,
       "totalFiles": 8,
       "topPrFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204415,
-          "karpathyBlend": 0.7769820411681766
-        },
-        {
-          "filePath": "src/lib/server/retrieval/context-buffer.ts",
-          "pageRank": 1.7199154807794785,
-          "karpathyBlend": 0.7471861923117915
+          "pageRank": 1.4103337410093764,
+          "karpathyBlend": 0.570148511052188
         }
       ],
       "topBlendFiles": [
         {
           "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
-          "pageRank": 1.7872801029204415,
-          "karpathyBlend": 0.7769820411681766
-        },
-        {
-          "filePath": "src/lib/server/retrieval/context-buffer.ts",
-          "pageRank": 1.7199154807794785,
-          "karpathyBlend": 0.7471861923117915
+          "pageRank": 1.4103337410093764,
+          "karpathyBlend": 0.570148511052188
         }
       ]
     },
-    "clusterBlend": 0.7725
+    "clusterBlend": 0.5701
+  },
+  {
+    "id": 34,
+    "size": 88,
+    "sampledFor": 16,
+    "inferredTopic": "component chunks in `src/routes/(app)/demos/celestial-icons` (tag: page)",
+    "topKinds": [
+      {
+        "kind": "component",
+        "count": 3
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "page",
+        "count": 2
+      },
+      {
+        "tag": "component",
+        "count": 2
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "+page.svelte",
+        "count": 2
+      },
+      {
+        "symbol": "Icon.svelte",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/routes/(app)/demos/celestial-icons",
+        "count": 1
+      },
+      {
+        "dir": "src/routes/(app)/demos/yorha-icons",
+        "count": 1
+      },
+      {
+        "dir": "src/lib/components/ui",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/routes/(app)/demos/yorha-icons/+page.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/components/ui/Icon.svelte",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
+        "kind": "component",
+        "symbol": "+page.svelte",
+        "lineStart": 1,
+        "lineEnd": 526
+      },
+      {
+        "path": "src/routes/(app)/demos/yorha-icons/+page.svelte",
+        "kind": "component",
+        "symbol": "+page.svelte",
+        "lineStart": 1,
+        "lineEnd": 466
+      },
+      {
+        "path": "src/lib/components/ui/Icon.svelte",
+        "kind": "component",
+        "symbol": "Icon.svelte",
+        "lineStart": 1,
+        "lineEnd": 69
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0.4528,
+      "maxPr": 1.117,
+      "avgBlend": 0.4528,
+      "avgPr": 1.117,
+      "totalBlend": 0.4528,
+      "clusterAuthorityScore": 1.117,
+      "scoredFiles": 1,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/components/ui/Icon.svelte",
+          "pageRank": 1.1169812499999998,
+          "karpathyBlend": 0.4527663159179687
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/components/ui/Icon.svelte",
+          "pageRank": 1.1169812499999998,
+          "karpathyBlend": 0.4527663159179687
+        }
+      ]
+    },
+    "clusterBlend": 0.4528
+  },
+  {
+    "id": 73,
+    "size": 476,
+    "sampledFor": 16,
+    "inferredTopic": "function chunks in `src/lib/server/retrieval` (tag: vector)",
+    "topKinds": [
+      {
+        "kind": "function",
+        "count": 14
+      },
+      {
+        "kind": "class",
+        "count": 1
+      },
+      {
+        "kind": "type",
+        "count": 1
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "vector",
+        "count": 10
+      },
+      {
+        "tag": "redis",
+        "count": 9
+      },
+      {
+        "tag": "embedding",
+        "count": 8
+      },
+      {
+        "tag": "rag-pipeline",
+        "count": 5
+      },
+      {
+        "tag": "graph-db",
+        "count": 1
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "legalPageRank",
+        "count": 1
+      },
+      {
+        "symbol": "CitationGraph",
+        "count": 1
+      },
+      {
+        "symbol": "computePageRank",
+        "count": 1
+      },
+      {
+        "symbol": "orderByDependency",
+        "count": 1
+      },
+      {
+        "symbol": "rerankLegalAware",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server/retrieval",
+        "count": 8
+      },
+      {
+        "dir": "src/lib/server/types",
+        "count": 4
+      },
+      {
+        "dir": "src/lib/server/graph",
+        "count": 2
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/types/retrieval.ts",
+        "count": 4
+      },
+      {
+        "path": "src/lib/server/graph/couchdb-pagerank.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/retrieval/document-dag.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/retrieval/legal-pagerank.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/retrieval/citation-graph.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/rag/ranker.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/retrieval/topological-search.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/retrieval/graph-context.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/retrieval/legal-pagerank.ts",
+        "kind": "function",
+        "symbol": "legalPageRank",
+        "lineStart": 80,
+        "lineEnd": 139
+      },
+      {
+        "path": "src/lib/server/retrieval/citation-graph.ts",
+        "kind": "class",
+        "symbol": "CitationGraph",
+        "lineStart": 59,
+        "lineEnd": 388
+      },
+      {
+        "path": "src/lib/server/graph/couchdb-pagerank.ts",
+        "kind": "function",
+        "symbol": "computePageRank",
+        "lineStart": 138,
+        "lineEnd": 198
+      },
+      {
+        "path": "src/lib/server/retrieval/document-dag.ts",
+        "kind": "function",
+        "symbol": "orderByDependency",
+        "lineStart": 160,
+        "lineEnd": 192
+      },
+      {
+        "path": "src/lib/server/rag/ranker.ts",
+        "kind": "function",
+        "symbol": "rerankLegalAware",
+        "lineStart": 20,
+        "lineEnd": 56
+      },
+      {
+        "path": "src/lib/server/retrieval/topological-search.ts",
+        "kind": "function",
+        "symbol": "applyTopologicalBoost",
+        "lineStart": 25,
+        "lineEnd": 86
+      },
+      {
+        "path": "src/lib/server/retrieval/graph-context.ts",
+        "kind": "function",
+        "symbol": "applyGraphAuthorityScoring",
+        "lineStart": 180,
+        "lineEnd": 215
+      },
+      {
+        "path": "src/lib/server/types/retrieval.ts",
+        "kind": "type",
+        "symbol": "RankExplain",
+        "lineStart": 58,
+        "lineEnd": 77
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0.4474,
+      "maxPr": 1.1186,
+      "avgBlend": 0.4474,
+      "avgPr": 1.1186,
+      "totalBlend": 0.4474,
+      "clusterAuthorityScore": 1.1186,
+      "scoredFiles": 1,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/server/types/retrieval.ts",
+          "pageRank": 1.1185656840600753,
+          "karpathyBlend": 0.44742627362403015
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/server/types/retrieval.ts",
+          "pageRank": 1.1185656840600753,
+          "karpathyBlend": 0.44742627362403015
+        }
+      ]
+    },
+    "clusterBlend": 0.4474
+  },
+  {
+    "id": 78,
+    "size": 71,
+    "sampledFor": 16,
+    "inferredTopic": "type chunks in `src/lib/types` (tag: vector)",
+    "topKinds": [
+      {
+        "kind": "type",
+        "count": 12
+      },
+      {
+        "kind": "const",
+        "count": 4
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "vector",
+        "count": 10
+      },
+      {
+        "tag": "embedding",
+        "count": 10
+      },
+      {
+        "tag": "redis",
+        "count": 7
+      },
+      {
+        "tag": "types",
+        "count": 5
+      },
+      {
+        "tag": "server-module",
+        "count": 4
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "BoardSnapshotSchema",
+        "count": 1
+      },
+      {
+        "symbol": "ProtocolBoundary",
+        "count": 1
+      },
+      {
+        "symbol": "LegalCitation",
+        "count": 1
+      },
+      {
+        "symbol": "SessionEdgePayload",
+        "count": 1
+      },
+      {
+        "symbol": "OllamaMessage",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/types",
+        "count": 5
+      },
+      {
+        "dir": "src/lib/schemas",
+        "count": 3
+      },
+      {
+        "dir": "src/lib/server/tools",
+        "count": 3
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/types/protocol.ts",
+        "count": 5
+      },
+      {
+        "path": "src/lib/server/tools/registry.ts",
+        "count": 3
+      },
+      {
+        "path": "src/lib/schemas/board.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/db/schema.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/ai/lang-extract.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/env.server.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/db/jsonb-legal-schema.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/schemas/evidence-upload.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/schemas/board.ts",
+        "kind": "type",
+        "symbol": "BoardSnapshotSchema",
+        "lineStart": 42,
+        "lineEnd": 42
+      },
+      {
+        "path": "src/lib/types/protocol.ts",
+        "kind": "type",
+        "symbol": "ProtocolBoundary",
+        "lineStart": 115,
+        "lineEnd": 115
+      },
+      {
+        "path": "src/lib/server/ai/lang-extract.ts",
+        "kind": "type",
+        "symbol": "LegalCitation",
+        "lineStart": 212,
+        "lineEnd": 212
+      },
+      {
+        "path": "src/lib/types/protocol.ts",
+        "kind": "type",
+        "symbol": "SessionEdgePayload",
+        "lineStart": 131,
+        "lineEnd": 131
+      },
+      {
+        "path": "src/lib/types/protocol.ts",
+        "kind": "type",
+        "symbol": "OllamaMessage",
+        "lineStart": 127,
+        "lineEnd": 127
+      },
+      {
+        "path": "src/lib/types/protocol.ts",
+        "kind": "const",
+        "symbol": "JsonRecordSchema",
+        "lineStart": 20,
+        "lineEnd": 20
+      },
+      {
+        "path": "src/lib/env.server.ts",
+        "kind": "type",
+        "symbol": "Env",
+        "lineStart": 56,
+        "lineEnd": 56
+      },
+      {
+        "path": "src/lib/schemas/board.ts",
+        "kind": "const",
+        "symbol": "boardViewportSchema",
+        "lineStart": 3,
+        "lineEnd": 9
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0.3791,
+      "maxPr": 0.9477,
+      "avgBlend": 0.3791,
+      "avgPr": 0.9477,
+      "totalBlend": 1.5164,
+      "clusterAuthorityScore": 0.9477,
+      "scoredFiles": 4,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/types/protocol.ts",
+          "pageRank": 0.9477377303240743,
+          "karpathyBlend": 0.3790950921296297
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/types/protocol.ts",
+          "pageRank": 0.9477377303240743,
+          "karpathyBlend": 0.3790950921296297
+        }
+      ]
+    },
+    "clusterBlend": 0.3791
+  },
+  {
+    "id": 74,
+    "size": 1122,
+    "sampledFor": 16,
+    "inferredTopic": "type chunks in `src/lib/types` (tag: vector)",
+    "topKinds": [
+      {
+        "kind": "type",
+        "count": 16
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "vector",
+        "count": 4
+      },
+      {
+        "tag": "auth",
+        "count": 4
+      },
+      {
+        "tag": "redis",
+        "count": 3
+      },
+      {
+        "tag": "types",
+        "count": 3
+      },
+      {
+        "tag": "embedding",
+        "count": 3
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "RankedChunk",
+        "count": 1
+      },
+      {
+        "symbol": "KBSearchResult",
+        "count": 1
+      },
+      {
+        "symbol": "RetrievalNote",
+        "count": 1
+      },
+      {
+        "symbol": "HealthStatus",
+        "count": 1
+      },
+      {
+        "symbol": "VisualEffect",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/types",
+        "count": 6
+      },
+      {
+        "dir": "src/lib/machines",
+        "count": 1
+      },
+      {
+        "dir": "src/lib/server/indexer",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/machines/retrieval-machine.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/source-validation.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/indexer/karpathy-wiki.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/api.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/yorha-interface.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/database.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/webgpu/dimensional-tensor-store.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/agent/subagents.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/machines/retrieval-machine.ts",
+        "kind": "type",
+        "symbol": "RankedChunk",
+        "lineStart": 41,
+        "lineEnd": 54
+      },
+      {
+        "path": "src/lib/types/source-validation.ts",
+        "kind": "type",
+        "symbol": "KBSearchResult",
+        "lineStart": 50,
+        "lineEnd": 58
+      },
+      {
+        "path": "src/lib/server/indexer/karpathy-wiki.ts",
+        "kind": "type",
+        "symbol": "RetrievalNote",
+        "lineStart": 53,
+        "lineEnd": 65
+      },
+      {
+        "path": "src/lib/types/api.ts",
+        "kind": "type",
+        "symbol": "HealthStatus",
+        "lineStart": 101,
+        "lineEnd": 106
+      },
+      {
+        "path": "src/lib/types/yorha-interface.ts",
+        "kind": "type",
+        "symbol": "VisualEffect",
+        "lineStart": 179,
+        "lineEnd": 184
+      },
+      {
+        "path": "src/lib/types/database.ts",
+        "kind": "type",
+        "symbol": "DocumentListResult",
+        "lineStart": 220,
+        "lineEnd": 220
+      },
+      {
+        "path": "src/lib/webgpu/dimensional-tensor-store.ts",
+        "kind": "type",
+        "symbol": "TensorDimensions",
+        "lineStart": 16,
+        "lineEnd": 21
+      },
+      {
+        "path": "src/lib/server/agent/subagents.ts",
+        "kind": "type",
+        "symbol": "SubagentName",
+        "lineStart": 20,
+        "lineEnd": 20
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0.3701,
+      "maxPr": 0.9252,
+      "avgBlend": 0.3701,
+      "avgPr": 0.9252,
+      "totalBlend": 0.3701,
+      "clusterAuthorityScore": 0.9252,
+      "scoredFiles": 1,
+      "totalFiles": 8,
+      "topPrFiles": [
+        {
+          "filePath": "src/lib/types/source-validation.ts",
+          "pageRank": 0.9251867187500001,
+          "karpathyBlend": 0.37007468750000005
+        }
+      ],
+      "topBlendFiles": [
+        {
+          "filePath": "src/lib/types/source-validation.ts",
+          "pageRank": 0.9251867187500001,
+          "karpathyBlend": 0.37007468750000005
+        }
+      ]
+    },
+    "clusterBlend": 0.3701
+  },
+  {
+    "id": 56,
+    "size": 10,
+    "sampledFor": 10,
+    "inferredTopic": "type chunks in `src/lib/server` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "type",
+        "count": 7
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 2
+      },
+      {
+        "tag": "vector",
+        "count": 1
+      },
+      {
+        "tag": "redis",
+        "count": 1
+      },
+      {
+        "tag": "types",
+        "count": 1
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "DoclingResult",
+        "count": 1
+      },
+      {
+        "symbol": "VLMOCRResult",
+        "count": 1
+      },
+      {
+        "symbol": "YoloVLMResult",
+        "count": 1
+      },
+      {
+        "symbol": "OllamaEmbedResult",
+        "count": 1
+      },
+      {
+        "symbol": "EvidenceAnalysisResult",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server",
+        "count": 4
+      },
+      {
+        "dir": "src/lib/server/embeddings",
+        "count": 1
+      },
+      {
+        "dir": "src/lib/types",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/docling.ts",
+        "count": 3
+      },
+      {
+        "path": "src/lib/server/embeddings/ollama.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/evidence.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/shared/types/parser.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/db-shim.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/docling.ts",
+        "kind": "type",
+        "symbol": "DoclingResult",
+        "lineStart": 19,
+        "lineEnd": 24
+      },
+      {
+        "path": "src/lib/server/docling.ts",
+        "kind": "type",
+        "symbol": "VLMOCRResult",
+        "lineStart": 208,
+        "lineEnd": 214
+      },
+      {
+        "path": "src/lib/server/docling.ts",
+        "kind": "type",
+        "symbol": "YoloVLMResult",
+        "lineStart": 216,
+        "lineEnd": 219
+      },
+      {
+        "path": "src/lib/server/embeddings/ollama.ts",
+        "kind": "type",
+        "symbol": "OllamaEmbedResult",
+        "lineStart": 12,
+        "lineEnd": 15
+      },
+      {
+        "path": "src/lib/types/evidence.ts",
+        "kind": "type",
+        "symbol": "EvidenceAnalysisResult",
+        "lineStart": 64,
+        "lineEnd": 73
+      },
+      {
+        "path": "src/lib/shared/types/parser.ts",
+        "kind": "type",
+        "symbol": "LegalDocWASMOutput",
+        "lineStart": 1,
+        "lineEnd": 8
+      },
+      {
+        "path": "src/lib/server/db-shim.ts",
+        "kind": "type",
+        "symbol": "QueryResult",
+        "lineStart": 13,
+        "lineEnd": 13
+      },
+      {
+        "path": "",
+        "kind": "",
+        "symbol": "",
+        "lineStart": null,
+        "lineEnd": null
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
+      "totalFiles": 8,
+      "topPrFiles": [],
+      "topBlendFiles": []
+    },
+    "clusterBlend": 0
+  },
+  {
+    "id": 86,
+    "size": 680,
+    "sampledFor": 16,
+    "inferredTopic": "function chunks in `src/lib/components/evidence` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "function",
+        "count": 14
+      },
+      {
+        "kind": "const",
+        "count": 2
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 7
+      },
+      {
+        "tag": "server-module",
+        "count": 3
+      },
+      {
+        "tag": "vector",
+        "count": 3
+      },
+      {
+        "tag": "page-component",
+        "count": 2
+      },
+      {
+        "tag": "redis",
+        "count": 2
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "toReaderModel",
+        "count": 1
+      },
+      {
+        "symbol": "runeBatchToGlyphRecords",
+        "count": 1
+      },
+      {
+        "symbol": "createBulkMoveCommand",
+        "count": 1
+      },
+      {
+        "symbol": "legalCorpusViews",
+        "count": 1
+      },
+      {
+        "symbol": "extractLegalMetadata",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/components/evidence",
+        "count": 3
+      },
+      {
+        "dir": "src/lib/types",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/server/cartridge",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/components/evidence/board-history.svelte.ts",
+        "count": 3
+      },
+      {
+        "path": "src/lib/types/legal-corpus-views.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/cartridge/glyph-mappers.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/png-embed-extractor.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/embeddings/ollama.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/shims/worker-threads-browser-shim.js",
+        "count": 1
+      },
+      {
+        "path": "src/lib/server/ml/recommendation-glyph.ts",
+        "count": 1
+      },
+      {
+        "path": "src/lib/data/types.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/types/legal-corpus-views.ts",
+        "kind": "function",
+        "symbol": "toReaderModel",
+        "lineStart": 78,
+        "lineEnd": 80
+      },
+      {
+        "path": "src/lib/server/cartridge/glyph-mappers.ts",
+        "kind": "function",
+        "symbol": "runeBatchToGlyphRecords",
+        "lineStart": 127,
+        "lineEnd": 129
+      },
+      {
+        "path": "src/lib/components/evidence/board-history.svelte.ts",
+        "kind": "function",
+        "symbol": "createBulkMoveCommand",
+        "lineStart": 73,
+        "lineEnd": 82
+      },
+      {
+        "path": "src/lib/types/legal-corpus-views.ts",
+        "kind": "const",
+        "symbol": "legalCorpusViews",
+        "lineStart": 5,
+        "lineEnd": 5
+      },
+      {
+        "path": "src/lib/server/png-embed-extractor.ts",
+        "kind": "const",
+        "symbol": "extractLegalMetadata",
+        "lineStart": 295,
+        "lineEnd": 295
+      },
+      {
+        "path": "src/lib/server/embeddings/ollama.ts",
+        "kind": "function",
+        "symbol": "embeddingDims",
+        "lineStart": 66,
+        "lineEnd": 68
+      },
+      {
+        "path": "src/lib/shims/worker-threads-browser-shim.js",
+        "kind": "function",
+        "symbol": "moveMessagePortToContext",
+        "lineStart": 112,
+        "lineEnd": 112
+      },
+      {
+        "path": "src/lib/server/ml/recommendation-glyph.ts",
+        "kind": "function",
+        "symbol": "toGlyph",
+        "lineStart": 249,
+        "lineEnd": 256
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
+      "totalFiles": 8,
+      "topPrFiles": [],
+      "topBlendFiles": []
+    },
+    "clusterBlend": 0
+  },
+  {
+    "id": 92,
+    "size": 940,
+    "sampledFor": 16,
+    "inferredTopic": "component chunks in `src/lib/components/evidence` (tag: embedding)",
+    "topKinds": [
+      {
+        "kind": "component",
+        "count": 14
+      },
+      {
+        "kind": "const",
+        "count": 1
+      },
+      {
+        "kind": "function",
+        "count": 1
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "embedding",
+        "count": 4
+      },
+      {
+        "tag": "page",
+        "count": 3
+      },
+      {
+        "tag": "component",
+        "count": 3
+      },
+      {
+        "tag": "xstate",
+        "count": 1
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "+page.svelte",
+        "count": 3
+      },
+      {
+        "symbol": "UploadZone.svelte",
+        "count": 2
+      },
+      {
+        "symbol": "POIPhotoUploader.svelte",
+        "count": 1
+      },
+      {
+        "symbol": "UploadProgressCard.svelte",
+        "count": 1
+      },
+      {
+        "symbol": "AIFileUpload.svelte",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/components/evidence",
+        "count": 3
+      },
+      {
+        "dir": "src/lib/components",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/components/yorha/evidence",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/components/yorha/evidence/UploadZone.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/client/ui/POIPhotoUploader.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/routes/(app)/evidence/upload/+page.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/components/evidence/UploadProgressCard.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/components/ui/AIFileUpload.svelte",
+        "count": 1
+      },
+      {
+        "path": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/components/yorha/evidence/UploadZone.svelte",
+        "kind": "component",
+        "symbol": "UploadZone.svelte",
+        "lineStart": 1,
+        "lineEnd": 205
+      },
+      {
+        "path": "src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte",
+        "kind": "component",
+        "symbol": "UploadZone.svelte",
+        "lineStart": 1,
+        "lineEnd": 205
+      },
+      {
+        "path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+        "kind": "component",
+        "symbol": "+page.svelte",
+        "lineStart": 1,
+        "lineEnd": 599
+      },
+      {
+        "path": "src/lib/client/ui/POIPhotoUploader.svelte",
+        "kind": "component",
+        "symbol": "POIPhotoUploader.svelte",
+        "lineStart": 1,
+        "lineEnd": 126
+      },
+      {
+        "path": "src/routes/(app)/evidence/upload/+page.svelte",
+        "kind": "component",
+        "symbol": "+page.svelte",
+        "lineStart": 1,
+        "lineEnd": 442
+      },
+      {
+        "path": "src/lib/components/evidence/UploadProgressCard.svelte",
+        "kind": "component",
+        "symbol": "UploadProgressCard.svelte",
+        "lineStart": 1,
+        "lineEnd": 63
+      },
+      {
+        "path": "src/lib/components/ui/AIFileUpload.svelte",
+        "kind": "component",
+        "symbol": "AIFileUpload.svelte",
+        "lineStart": 1,
+        "lineEnd": 642
+      },
+      {
+        "path": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
+        "kind": "component",
+        "symbol": "EvidenceBulkUploadDialog.svelte",
+        "lineStart": 1,
+        "lineEnd": 140
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
+      "totalFiles": 8,
+      "topPrFiles": [],
+      "topBlendFiles": []
+    },
+    "clusterBlend": 0
+  },
+  {
+    "id": 90,
+    "size": 158,
+    "sampledFor": 16,
+    "inferredTopic": "function chunks in `src/lib/server` (tag: auth)",
+    "topKinds": [
+      {
+        "kind": "function",
+        "count": 9
+      },
+      {
+        "kind": "route-handler",
+        "count": 4
+      },
+      {
+        "kind": "const",
+        "count": 1
+      },
+      {
+        "kind": "unknown",
+        "count": 1
+      }
+    ],
+    "topTags": [
+      {
+        "tag": "auth",
+        "count": 15
+      },
+      {
+        "tag": "api",
+        "count": 4
+      },
+      {
+        "tag": "server",
+        "count": 4
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "POST",
+        "count": 2
+      },
+      {
+        "symbol": "GET",
+        "count": 2
+      },
+      {
+        "symbol": "deleteSessionCookie",
+        "count": 1
+      },
+      {
+        "symbol": "invalidateUserSessions",
+        "count": 1
+      },
+      {
+        "symbol": "getUser",
+        "count": 1
+      }
+    ],
+    "topDirs": [
+      {
+        "dir": "src/lib/server",
+        "count": 10
+      },
+      {
+        "dir": "src/routes/api/auth/logout",
+        "count": 2
+      },
+      {
+        "dir": "src/lib/types",
+        "count": 1
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "src/lib/server/lucia.ts",
+        "count": 6
+      },
+      {
+        "path": "src/lib/server/auth.ts",
+        "count": 3
+      },
+      {
+        "path": "src/routes/api/auth/logout/+server.ts",
+        "count": 2
+      },
+      {
+        "path": "src/lib/server/auth-guard.js",
+        "count": 1
+      },
+      {
+        "path": "src/lib/types/auth.d.ts",
+        "count": 1
+      },
+      {
+        "path": "src/routes/api/auth/session/+server.ts",
+        "count": 1
+      },
+      {
+        "path": "src/routes/api/dev/login-demo/+server.ts",
+        "count": 1
+      }
+    ],
+    "memberFiles": [
+      {
+        "path": "src/lib/server/lucia.ts",
+        "kind": "function",
+        "symbol": "deleteSessionCookie",
+        "lineStart": 136,
+        "lineEnd": 143
+      },
+      {
+        "path": "src/routes/api/auth/logout/+server.ts",
+        "kind": "route-handler",
+        "symbol": "POST",
+        "lineStart": 9,
+        "lineEnd": 39
+      },
+      {
+        "path": "src/routes/api/auth/logout/+server.ts",
+        "kind": "route-handler",
+        "symbol": "GET",
+        "lineStart": 41,
+        "lineEnd": 61
+      },
+      {
+        "path": "src/lib/server/lucia.ts",
+        "kind": "function",
+        "symbol": "invalidateUserSessions",
+        "lineStart": 131,
+        "lineEnd": 134
+      },
+      {
+        "path": "src/lib/server/auth.ts",
+        "kind": "function",
+        "symbol": "getUser",
+        "lineStart": 511,
+        "lineEnd": 547
+      },
+      {
+        "path": "src/lib/server/auth-guard.js",
+        "kind": "function",
+        "symbol": "requireAuthentication",
+        "lineStart": 33,
+        "lineEnd": 44
+      },
+      {
+        "path": "src/lib/server/auth.ts",
+        "kind": "const",
+        "symbol": "auth",
+        "lineStart": 35,
+        "lineEnd": 54
+      },
+      {
+        "path": "src/lib/server/lucia.ts",
+        "kind": "function",
+        "symbol": "invalidateSession",
+        "lineStart": 126,
+        "lineEnd": 129
+      }
+    ],
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
+    "somGridW": 8,
+    "somGridH": 8,
+    "authority": {
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
+      "totalFiles": 8,
+      "topPrFiles": [],
+      "topBlendFiles": []
+    },
+    "clusterBlend": 0
   },
   {
     "id": 25,
@@ -3626,30 +4856,18 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7423,
-      "maxPr": 1.6816,
-      "avgBlend": 0.7423,
-      "avgPr": 1.6816,
-      "totalBlend": 0.7423,
-      "clusterAuthorityScore": 1.6816,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/routes/api/cache/metrics/+server.ts",
-          "pageRank": 1.681587169392756,
-          "karpathyBlend": 0.7422648677571024
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/routes/api/cache/metrics/+server.ts",
-          "pageRank": 1.681587169392756,
-          "karpathyBlend": 0.7422648677571024
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.7423
+    "clusterBlend": 0
   },
   {
     "id": 36,
@@ -3745,30 +4963,18 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7116,
-      "maxPr": 1.6746,
-      "avgBlend": 0.7116,
-      "avgPr": 1.6746,
-      "totalBlend": 0.7116,
-      "clusterAuthorityScore": 1.6746,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.674647868099066,
-          "karpathyBlend": 0.7115891472396265
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.674647868099066,
-          "karpathyBlend": 0.7115891472396265
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.7116
+    "clusterBlend": 0
   },
   {
     "id": 23,
@@ -3953,30 +5159,18 @@
     "somGridW": 8,
     "somGridH": 8,
     "authority": {
-      "maxBlend": 0.7116,
-      "maxPr": 1.6746,
-      "avgBlend": 0.7116,
-      "avgPr": 1.6746,
-      "totalBlend": 0.7116,
-      "clusterAuthorityScore": 1.6746,
-      "scoredFiles": 1,
+      "maxBlend": 0,
+      "maxPr": 0,
+      "avgBlend": 0,
+      "avgPr": 0,
+      "totalBlend": 0,
+      "clusterAuthorityScore": 0,
+      "scoredFiles": 0,
       "totalFiles": 8,
-      "topPrFiles": [
-        {
-          "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.674647868099066,
-          "karpathyBlend": 0.7115891472396265
-        }
-      ],
-      "topBlendFiles": [
-        {
-          "filePath": "src/lib/webgpu/init.ts",
-          "pageRank": 1.674647868099066,
-          "karpathyBlend": 0.7115891472396265
-        }
-      ]
+      "topPrFiles": [],
+      "topBlendFiles": []
     },
-    "clusterBlend": 0.7116
+    "clusterBlend": 0
   },
   {
     "id": 46,
@@ -4073,182 +5267,6 @@
     "clusterBlend": 0
   },
   {
-    "id": 60,
-    "size": 406,
-    "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/server/analytics` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "function",
-        "count": 5
-      },
-      {
-        "kind": "table-def",
-        "count": 3
-      },
-      {
-        "kind": "type",
-        "count": 1
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 8
-      },
-      {
-        "tag": "redis",
-        "count": 6
-      },
-      {
-        "tag": "vector",
-        "count": 5
-      },
-      {
-        "tag": "database",
-        "count": 4
-      },
-      {
-        "tag": "schema",
-        "count": 3
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "recordChunkHits",
-        "count": 1
-      },
-      {
-        "symbol": "chunk_hit_log",
-        "count": 1
-      },
-      {
-        "symbol": "recordQueryLog",
-        "count": 1
-      },
-      {
-        "symbol": "ace_chunks",
-        "count": 1
-      },
-      {
-        "symbol": "getChunkQualitySignals",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server/analytics",
-        "count": 4
-      },
-      {
-        "dir": "src/lib/server/db/schema",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/db/schema",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "count": 4
-      },
-      {
-        "path": "src/lib/server/db/schema/search-analytics.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/db/schema/ace-web.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/indexer/karpathy-wiki.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/pipeline-v2.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "kind": "function",
-        "symbol": "recordChunkHits",
-        "lineStart": 113,
-        "lineEnd": 153
-      },
-      {
-        "path": "src/lib/server/db/schema/search-analytics.ts",
-        "kind": "table-def",
-        "symbol": "chunk_hit_log",
-        "lineStart": 40,
-        "lineEnd": 56
-      },
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "kind": "function",
-        "symbol": "recordQueryLog",
-        "lineStart": 159,
-        "lineEnd": 193
-      },
-      {
-        "path": "src/lib/db/schema/ace-web.ts",
-        "kind": "table-def",
-        "symbol": "ace_chunks",
-        "lineStart": 58,
-        "lineEnd": 92
-      },
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "kind": "function",
-        "symbol": "getChunkQualitySignals",
-        "lineStart": 289,
-        "lineEnd": 332
-      },
-      {
-        "path": "src/lib/server/analytics/search-analytics.ts",
-        "kind": "function",
-        "symbol": "getClusterHeatMap",
-        "lineStart": 257,
-        "lineEnd": 280
-      },
-      {
-        "path": "src/lib/server/db/schema/search-analytics.ts",
-        "kind": "table-def",
-        "symbol": "rag_query_log",
-        "lineStart": 88,
-        "lineEnd": 113
-      },
-      {
-        "path": "src/lib/server/indexer/karpathy-wiki.ts",
-        "kind": "function",
-        "symbol": "generateClusterNote",
-        "lineStart": 204,
-        "lineEnd": 320
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0,
-      "maxPr": 0,
-      "avgBlend": 0,
-      "avgPr": 0,
-      "totalBlend": 0,
-      "clusterAuthorityScore": 0,
-      "scoredFiles": 0,
-      "totalFiles": 8,
-      "topPrFiles": [],
-      "topBlendFiles": []
-    },
-    "clusterBlend": 0
-  },
-  {
     "id": 14,
     "size": 1,
     "sampledFor": 1,
@@ -4314,366 +5332,6 @@
       "clusterAuthorityScore": 0,
       "scoredFiles": 0,
       "totalFiles": 1,
-      "topPrFiles": [],
-      "topBlendFiles": []
-    },
-    "clusterBlend": 0
-  },
-  {
-    "id": 22,
-    "size": 86,
-    "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/server/cache` (tag: redis)",
-    "topKinds": [
-      {
-        "kind": "function",
-        "count": 13
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "redis",
-        "count": 11
-      },
-      {
-        "tag": "vector",
-        "count": 10
-      },
-      {
-        "tag": "embedding",
-        "count": 9
-      },
-      {
-        "tag": "cache",
-        "count": 7
-      },
-      {
-        "tag": "rabbitmq",
-        "count": 2
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "invalidateCartridge",
-        "count": 1
-      },
-      {
-        "symbol": "getCachedCartridge",
-        "count": 1
-      },
-      {
-        "symbol": "cacheCartridge",
-        "count": 1
-      },
-      {
-        "symbol": "invalidateGlyphAtlas",
-        "count": 1
-      },
-      {
-        "symbol": "invalidateGpuAnalysis",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server/cache",
-        "count": 7
-      },
-      {
-        "dir": "src/lib/server/cartridge",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/server",
-        "count": 2
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
-        "count": 6
-      },
-      {
-        "path": "src/lib/server/cartridge/glyph-tile-engine.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/components/evidence/board-persistence.svelte.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/glyph-prompt-cache.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/cache-keys.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/cache/report-template-cache.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
-        "kind": "function",
-        "symbol": "invalidateCartridge",
-        "lineStart": 354,
-        "lineEnd": 367
-      },
-      {
-        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
-        "kind": "function",
-        "symbol": "getCachedCartridge",
-        "lineStart": 111,
-        "lineEnd": 125
-      },
-      {
-        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
-        "kind": "function",
-        "symbol": "cacheCartridge",
-        "lineStart": 130,
-        "lineEnd": 148
-      },
-      {
-        "path": "src/lib/server/cartridge/glyph-tile-engine.ts",
-        "kind": "function",
-        "symbol": "invalidateGlyphAtlas",
-        "lineStart": 395,
-        "lineEnd": 402
-      },
-      {
-        "path": "src/lib/server/cache/cartridge-tensor-bridge.ts",
-        "kind": "function",
-        "symbol": "invalidateGpuAnalysis",
-        "lineStart": 430,
-        "lineEnd": 436
-      },
-      {
-        "path": "src/lib/server/glyph-prompt-cache.ts",
-        "kind": "function",
-        "symbol": "invalidateCase",
-        "lineStart": 237,
-        "lineEnd": 243
-      },
-      {
-        "path": "src/lib/server/cartridge/glyph-tile-engine.ts",
-        "kind": "function",
-        "symbol": "getGlyphTileAtlas",
-        "lineStart": 405,
-        "lineEnd": 407
-      },
-      {
-        "path": "src/lib/server/cache-keys.ts",
-        "kind": "function",
-        "symbol": "getCaseVersion",
-        "lineStart": 241,
-        "lineEnd": 249
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0,
-      "maxPr": 0,
-      "avgBlend": 0,
-      "avgPr": 0,
-      "totalBlend": 0,
-      "clusterAuthorityScore": 0,
-      "scoredFiles": 0,
-      "totalFiles": 8,
-      "topPrFiles": [],
-      "topBlendFiles": []
-    },
-    "clusterBlend": 0
-  },
-  {
-    "id": 96,
-    "size": 177,
-    "sampledFor": 16,
-    "inferredTopic": "type chunks in `src/lib/server` (tag: embedding)",
-    "topKinds": [
-      {
-        "kind": "type",
-        "count": 12
-      },
-      {
-        "kind": "const",
-        "count": 2
-      },
-      {
-        "kind": "function",
-        "count": 2
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "embedding",
-        "count": 6
-      },
-      {
-        "tag": "redis",
-        "count": 5
-      },
-      {
-        "tag": "vector",
-        "count": 4
-      },
-      {
-        "tag": "types",
-        "count": 3
-      },
-      {
-        "tag": "rabbitmq",
-        "count": 2
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "WorkflowEventType",
-        "count": 2
-      },
-      {
-        "symbol": "evidenceKey",
-        "count": 1
-      },
-      {
-        "symbol": "EvidenceWebSocketMessage",
-        "count": 1
-      },
-      {
-        "symbol": "QUEUES",
-        "count": 1
-      },
-      {
-        "symbol": "EvidenceLifecycleEvent",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server",
-        "count": 3
-      },
-      {
-        "dir": "src/lib/types",
-        "count": 2
-      },
-      {
-        "dir": "src/lib/machines",
-        "count": 2
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/cache-keys.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/evidence.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/rabbitmq.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/queue/workflow-publish.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/machines/evidence-lifecycle-machine.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/machines/evidence-analysis-machine.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/evidence-progress.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/evidence/type-detector.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/cache-keys.ts",
-        "kind": "const",
-        "symbol": "evidenceKey",
-        "lineStart": 109,
-        "lineEnd": 121
-      },
-      {
-        "path": "src/lib/types/evidence.ts",
-        "kind": "type",
-        "symbol": "EvidenceWebSocketMessage",
-        "lineStart": 190,
-        "lineEnd": 201
-      },
-      {
-        "path": "src/lib/server/rabbitmq.ts",
-        "kind": "const",
-        "symbol": "QUEUES",
-        "lineStart": 27,
-        "lineEnd": 39
-      },
-      {
-        "path": "src/lib/server/queue/workflow-publish.ts",
-        "kind": "type",
-        "symbol": "WorkflowEventType",
-        "lineStart": 22,
-        "lineEnd": 47
-      },
-      {
-        "path": "src/lib/machines/evidence-lifecycle-machine.ts",
-        "kind": "type",
-        "symbol": "EvidenceLifecycleEvent",
-        "lineStart": 73,
-        "lineEnd": 79
-      },
-      {
-        "path": "src/lib/machines/evidence-analysis-machine.ts",
-        "kind": "type",
-        "symbol": "AnalysisEvent",
-        "lineStart": 66,
-        "lineEnd": 72
-      },
-      {
-        "path": "src/lib/server/evidence-progress.ts",
-        "kind": "type",
-        "symbol": "ProgressStep",
-        "lineStart": 6,
-        "lineEnd": 6
-      },
-      {
-        "path": "src/lib/server/evidence/type-detector.ts",
-        "kind": "function",
-        "symbol": "detectEvidenceType",
-        "lineStart": 70,
-        "lineEnd": 92
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0,
-      "maxPr": 0,
-      "avgBlend": 0,
-      "avgPr": 0,
-      "totalBlend": 0,
-      "clusterAuthorityScore": 0,
-      "scoredFiles": 0,
-      "totalFiles": 8,
       "topPrFiles": [],
       "topBlendFiles": []
     },
@@ -5097,190 +5755,6 @@
         "symbol": "getLawCitationDetail",
         "lineStart": 179,
         "lineEnd": 372
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0,
-      "maxPr": 0,
-      "avgBlend": 0,
-      "avgPr": 0,
-      "totalBlend": 0,
-      "clusterAuthorityScore": 0,
-      "scoredFiles": 0,
-      "totalFiles": 8,
-      "topPrFiles": [],
-      "topBlendFiles": []
-    },
-    "clusterBlend": 0
-  },
-  {
-    "id": 78,
-    "size": 71,
-    "sampledFor": 16,
-    "inferredTopic": "type chunks in `src/lib/types` (tag: vector)",
-    "topKinds": [
-      {
-        "kind": "type",
-        "count": 12
-      },
-      {
-        "kind": "const",
-        "count": 4
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "vector",
-        "count": 10
-      },
-      {
-        "tag": "embedding",
-        "count": 10
-      },
-      {
-        "tag": "redis",
-        "count": 7
-      },
-      {
-        "tag": "types",
-        "count": 5
-      },
-      {
-        "tag": "server-module",
-        "count": 4
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "BoardSnapshotSchema",
-        "count": 1
-      },
-      {
-        "symbol": "ProtocolBoundary",
-        "count": 1
-      },
-      {
-        "symbol": "LegalCitation",
-        "count": 1
-      },
-      {
-        "symbol": "SessionEdgePayload",
-        "count": 1
-      },
-      {
-        "symbol": "OllamaMessage",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/types",
-        "count": 5
-      },
-      {
-        "dir": "src/lib/schemas",
-        "count": 3
-      },
-      {
-        "dir": "src/lib/server/tools",
-        "count": 3
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/types/protocol.ts",
-        "count": 5
-      },
-      {
-        "path": "src/lib/server/tools/registry.ts",
-        "count": 3
-      },
-      {
-        "path": "src/lib/schemas/board.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/db/schema.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/ai/lang-extract.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/env.server.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/db/jsonb-legal-schema.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/schemas/evidence-upload.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/schemas/board.ts",
-        "kind": "type",
-        "symbol": "BoardSnapshotSchema",
-        "lineStart": 42,
-        "lineEnd": 42
-      },
-      {
-        "path": "src/lib/types/protocol.ts",
-        "kind": "type",
-        "symbol": "ProtocolBoundary",
-        "lineStart": 115,
-        "lineEnd": 115
-      },
-      {
-        "path": "src/lib/server/ai/lang-extract.ts",
-        "kind": "type",
-        "symbol": "LegalCitation",
-        "lineStart": 212,
-        "lineEnd": 212
-      },
-      {
-        "path": "src/lib/types/protocol.ts",
-        "kind": "type",
-        "symbol": "SessionEdgePayload",
-        "lineStart": 131,
-        "lineEnd": 131
-      },
-      {
-        "path": "src/lib/types/protocol.ts",
-        "kind": "type",
-        "symbol": "OllamaMessage",
-        "lineStart": 127,
-        "lineEnd": 127
-      },
-      {
-        "path": "src/lib/types/protocol.ts",
-        "kind": "const",
-        "symbol": "JsonRecordSchema",
-        "lineStart": 20,
-        "lineEnd": 20
-      },
-      {
-        "path": "src/lib/env.server.ts",
-        "kind": "type",
-        "symbol": "Env",
-        "lineStart": 56,
-        "lineEnd": 56
-      },
-      {
-        "path": "src/lib/schemas/board.ts",
-        "kind": "const",
-        "symbol": "boardViewportSchema",
-        "lineStart": 3,
-        "lineEnd": 9
       }
     ],
     "somRow": 0,
@@ -6531,186 +7005,6 @@
     "clusterBlend": 0
   },
   {
-    "id": 74,
-    "size": 1122,
-    "sampledFor": 16,
-    "inferredTopic": "type chunks in `src/lib/types` (tag: vector)",
-    "topKinds": [
-      {
-        "kind": "type",
-        "count": 16
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "vector",
-        "count": 4
-      },
-      {
-        "tag": "auth",
-        "count": 4
-      },
-      {
-        "tag": "redis",
-        "count": 3
-      },
-      {
-        "tag": "types",
-        "count": 3
-      },
-      {
-        "tag": "embedding",
-        "count": 3
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "RankedChunk",
-        "count": 1
-      },
-      {
-        "symbol": "KBSearchResult",
-        "count": 1
-      },
-      {
-        "symbol": "RetrievalNote",
-        "count": 1
-      },
-      {
-        "symbol": "HealthStatus",
-        "count": 1
-      },
-      {
-        "symbol": "VisualEffect",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/types",
-        "count": 6
-      },
-      {
-        "dir": "src/lib/machines",
-        "count": 1
-      },
-      {
-        "dir": "src/lib/server/indexer",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/machines/retrieval-machine.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/source-validation.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/indexer/karpathy-wiki.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/api.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/yorha-interface.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/types/database.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/webgpu/dimensional-tensor-store.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/agent/subagents.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/machines/retrieval-machine.ts",
-        "kind": "type",
-        "symbol": "RankedChunk",
-        "lineStart": 41,
-        "lineEnd": 54
-      },
-      {
-        "path": "src/lib/types/source-validation.ts",
-        "kind": "type",
-        "symbol": "KBSearchResult",
-        "lineStart": 50,
-        "lineEnd": 58
-      },
-      {
-        "path": "src/lib/server/indexer/karpathy-wiki.ts",
-        "kind": "type",
-        "symbol": "RetrievalNote",
-        "lineStart": 53,
-        "lineEnd": 65
-      },
-      {
-        "path": "src/lib/types/api.ts",
-        "kind": "type",
-        "symbol": "HealthStatus",
-        "lineStart": 101,
-        "lineEnd": 106
-      },
-      {
-        "path": "src/lib/types/yorha-interface.ts",
-        "kind": "type",
-        "symbol": "VisualEffect",
-        "lineStart": 179,
-        "lineEnd": 184
-      },
-      {
-        "path": "src/lib/types/database.ts",
-        "kind": "type",
-        "symbol": "DocumentListResult",
-        "lineStart": 220,
-        "lineEnd": 220
-      },
-      {
-        "path": "src/lib/webgpu/dimensional-tensor-store.ts",
-        "kind": "type",
-        "symbol": "TensorDimensions",
-        "lineStart": 16,
-        "lineEnd": 21
-      },
-      {
-        "path": "src/lib/server/agent/subagents.ts",
-        "kind": "type",
-        "symbol": "SubagentName",
-        "lineStart": 20,
-        "lineEnd": 20
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0,
-      "maxPr": 0,
-      "avgBlend": 0,
-      "avgPr": 0,
-      "totalBlend": 0,
-      "clusterAuthorityScore": 0,
-      "scoredFiles": 0,
-      "totalFiles": 8,
-      "topPrFiles": [],
-      "topBlendFiles": []
-    },
-    "clusterBlend": 0
-  },
-  {
     "id": 61,
     "size": 1,
     "sampledFor": 1,
@@ -7740,194 +8034,6 @@
       "clusterAuthorityScore": 0,
       "scoredFiles": 0,
       "totalFiles": 3,
-      "topPrFiles": [],
-      "topBlendFiles": []
-    },
-    "clusterBlend": 0
-  },
-  {
-    "id": 73,
-    "size": 476,
-    "sampledFor": 16,
-    "inferredTopic": "function chunks in `src/lib/server/retrieval` (tag: vector)",
-    "topKinds": [
-      {
-        "kind": "function",
-        "count": 14
-      },
-      {
-        "kind": "class",
-        "count": 1
-      },
-      {
-        "kind": "type",
-        "count": 1
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "vector",
-        "count": 10
-      },
-      {
-        "tag": "redis",
-        "count": 9
-      },
-      {
-        "tag": "embedding",
-        "count": 8
-      },
-      {
-        "tag": "rag-pipeline",
-        "count": 5
-      },
-      {
-        "tag": "graph-db",
-        "count": 1
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "legalPageRank",
-        "count": 1
-      },
-      {
-        "symbol": "CitationGraph",
-        "count": 1
-      },
-      {
-        "symbol": "computePageRank",
-        "count": 1
-      },
-      {
-        "symbol": "orderByDependency",
-        "count": 1
-      },
-      {
-        "symbol": "rerankLegalAware",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/lib/server/retrieval",
-        "count": 8
-      },
-      {
-        "dir": "src/lib/server/types",
-        "count": 4
-      },
-      {
-        "dir": "src/lib/server/graph",
-        "count": 2
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/lib/server/types/retrieval.ts",
-        "count": 4
-      },
-      {
-        "path": "src/lib/server/graph/couchdb-pagerank.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/retrieval/document-dag.ts",
-        "count": 2
-      },
-      {
-        "path": "src/lib/server/retrieval/legal-pagerank.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/retrieval/citation-graph.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/rag/ranker.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/retrieval/topological-search.ts",
-        "count": 1
-      },
-      {
-        "path": "src/lib/server/retrieval/graph-context.ts",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/lib/server/retrieval/legal-pagerank.ts",
-        "kind": "function",
-        "symbol": "legalPageRank",
-        "lineStart": 80,
-        "lineEnd": 139
-      },
-      {
-        "path": "src/lib/server/retrieval/citation-graph.ts",
-        "kind": "class",
-        "symbol": "CitationGraph",
-        "lineStart": 59,
-        "lineEnd": 388
-      },
-      {
-        "path": "src/lib/server/graph/couchdb-pagerank.ts",
-        "kind": "function",
-        "symbol": "computePageRank",
-        "lineStart": 138,
-        "lineEnd": 198
-      },
-      {
-        "path": "src/lib/server/retrieval/document-dag.ts",
-        "kind": "function",
-        "symbol": "orderByDependency",
-        "lineStart": 160,
-        "lineEnd": 192
-      },
-      {
-        "path": "src/lib/server/rag/ranker.ts",
-        "kind": "function",
-        "symbol": "rerankLegalAware",
-        "lineStart": 20,
-        "lineEnd": 56
-      },
-      {
-        "path": "src/lib/server/retrieval/topological-search.ts",
-        "kind": "function",
-        "symbol": "applyTopologicalBoost",
-        "lineStart": 25,
-        "lineEnd": 86
-      },
-      {
-        "path": "src/lib/server/retrieval/graph-context.ts",
-        "kind": "function",
-        "symbol": "applyGraphAuthorityScoring",
-        "lineStart": 180,
-        "lineEnd": 215
-      },
-      {
-        "path": "src/lib/server/types/retrieval.ts",
-        "kind": "type",
-        "symbol": "RankExplain",
-        "lineStart": 58,
-        "lineEnd": 77
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0,
-      "maxPr": 0,
-      "avgBlend": 0,
-      "avgPr": 0,
-      "totalBlend": 0,
-      "clusterAuthorityScore": 0,
-      "scoredFiles": 0,
-      "totalFiles": 8,
       "topPrFiles": [],
       "topBlendFiles": []
     },
@@ -11328,142 +11434,6 @@
       "clusterAuthorityScore": 0,
       "scoredFiles": 0,
       "totalFiles": 1,
-      "topPrFiles": [],
-      "topBlendFiles": []
-    },
-    "clusterBlend": 0
-  },
-  {
-    "id": 34,
-    "size": 88,
-    "sampledFor": 16,
-    "inferredTopic": "component chunks in `src/routes/(app)/demos/celestial-icons` (tag: page)",
-    "topKinds": [
-      {
-        "kind": "component",
-        "count": 3
-      }
-    ],
-    "topTags": [
-      {
-        "tag": "page",
-        "count": 2
-      },
-      {
-        "tag": "component",
-        "count": 2
-      }
-    ],
-    "topSymbols": [
-      {
-        "symbol": "+page.svelte",
-        "count": 2
-      },
-      {
-        "symbol": "Icon.svelte",
-        "count": 1
-      }
-    ],
-    "topDirs": [
-      {
-        "dir": "src/routes/(app)/demos/celestial-icons",
-        "count": 1
-      },
-      {
-        "dir": "src/routes/(app)/demos/yorha-icons",
-        "count": 1
-      },
-      {
-        "dir": "src/lib/components/ui",
-        "count": 1
-      }
-    ],
-    "topPaths": [
-      {
-        "path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/routes/(app)/demos/yorha-icons/+page.svelte",
-        "count": 1
-      },
-      {
-        "path": "src/lib/components/ui/Icon.svelte",
-        "count": 1
-      }
-    ],
-    "memberFiles": [
-      {
-        "path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
-        "kind": "component",
-        "symbol": "+page.svelte",
-        "lineStart": 1,
-        "lineEnd": 526
-      },
-      {
-        "path": "src/routes/(app)/demos/yorha-icons/+page.svelte",
-        "kind": "component",
-        "symbol": "+page.svelte",
-        "lineStart": 1,
-        "lineEnd": 466
-      },
-      {
-        "path": "src/lib/components/ui/Icon.svelte",
-        "kind": "component",
-        "symbol": "Icon.svelte",
-        "lineStart": 1,
-        "lineEnd": 69
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      },
-      {
-        "path": "",
-        "kind": "",
-        "symbol": "",
-        "lineStart": null,
-        "lineEnd": null
-      }
-    ],
-    "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
-    "somGridW": 8,
-    "somGridH": 8,
-    "authority": {
-      "maxBlend": 0,
-      "maxPr": 0,
-      "avgBlend": 0,
-      "avgPr": 0,
-      "totalBlend": 0,
-      "clusterAuthorityScore": 0,
-      "scoredFiles": 0,
-      "totalFiles": 8,
       "topPrFiles": [],
       "topBlendFiles": []
     },

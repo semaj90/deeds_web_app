@@ -15,8 +15,10 @@ const FILES = {
   codebaseGraph: join(GRAPH_DIR, 'codebase-graph.json'),
   traceCommandSuggest: join(ROOT, 'src', 'lib', 'server', 'admin', 'ai-chat-context.ts'),
   atlasAdminUi: join(ROOT, 'src', 'routes', '(app)', 'admin', 'atlas', '+page.svelte'),
-  opencodeSkill: join(ROOT, 'src', 'lib', 'server', 'ai', 'opencode-skill.ts'),
+  opencodeSkill: join(ROOT, 'src', 'lib', 'server', 'features', 'ai', 'ai', 'opencode-skill.ts'),
   featureRegistry: join(ROOT, 'src', 'lib', 'server', 'db', 'schema', 'feature-registry.ts'),
+  traceCommandSuggest: join(ROOT, 'src', 'lib', 'server', 'features', 'ai', 'admin', 'ai-chat-context.ts'),
+  gemma4Agent: join(ROOT, 'src', 'lib', 'server', 'features', 'ai', 'ai', 'gemma4-agent.ts'),
 };
 
 function writeJson(pathname, value) {
@@ -67,9 +69,14 @@ async function qdrantScrollSample() {
     }
     const data = await res.json();
     const points = Array.isArray(data?.result?.points) ? data.result.points : [];
-    return { ok: true, status: res.status, sample: points };
+    const codebasePoints = points.filter((point) => {
+      const payload = point?.payload ?? {};
+      const filePath = normalizeRef(payload.file_path ?? payload.relativePath ?? '');
+      return filePath.startsWith('src/') || filePath.startsWith('sveltekit-frontend/src/');
+    });
+    return { ok: true, status: res.status, sample: points.slice(0, 25), repoSample: codebasePoints.slice(0, 25) };
   } catch (error) {
-    return { ok: false, status: 0, sample: [], error: error instanceof Error ? error.message : String(error) };
+    return { ok: false, status: 0, sample: [], repoSample: [], error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -104,6 +111,7 @@ function summarizeClusterAliases(report) {
 
 function summarizeQdrant(sample) {
   const points = Array.isArray(sample?.sample) ? sample.sample : [];
+  const repoPoints = Array.isArray(sample?.repoSample) ? sample.repoSample : [];
   const refsStats = points.map((point) => {
     const payload = point?.payload ?? {};
     const sourceRefs = Array.isArray(payload.sourceRefs)
@@ -122,6 +130,24 @@ function summarizeQdrant(sample) {
     };
   });
   const withSourceRefs = refsStats.filter((row) => row.hasSourceRefs).length;
+  const repoRefsStats = repoPoints.map((point) => {
+    const payload = point?.payload ?? {};
+    const sourceRefs = Array.isArray(payload.sourceRefs)
+      ? payload.sourceRefs
+      : Array.isArray(payload.source_refs)
+        ? payload.source_refs
+        : [];
+    const pagerank = payload.neo4j_pageRankScore ?? payload.pagerank_score ?? null;
+    return {
+      id: String(point?.id ?? ''),
+      filePath: normalizeRef(payload.file_path ?? payload.relativePath ?? ''),
+      sourceRefsCount: sourceRefs.length,
+      hasSourceRefs: sourceRefs.length > 0,
+      hasPagerank: pagerank !== null && pagerank !== undefined,
+      cluster: payload.neo4j_gpuCluster ?? payload.som_cluster ?? null,
+    };
+  });
+  const repoWithSourceRefs = repoRefsStats.filter((row) => row.hasSourceRefs).length;
   return {
     ok: Boolean(sample?.ok),
     status: sample?.status ?? 0,
@@ -129,6 +155,10 @@ function summarizeQdrant(sample) {
     withSourceRefs,
     coverage: points.length > 0 ? Number((withSourceRefs / points.length).toFixed(3)) : 0,
     sample: refsStats.slice(0, 12),
+    repoTotal: repoPoints.length,
+    repoWithSourceRefs,
+    repoCoverage: repoPoints.length > 0 ? Number((repoWithSourceRefs / repoPoints.length).toFixed(3)) : 0,
+    repoSample: repoRefsStats.slice(0, 12),
     error: sample?.error ?? null,
   };
 }
@@ -173,7 +203,8 @@ async function main() {
       sampleAliases: summarizeClusterAliases(clusterAliases).aliases,
     },
     directEdit: {
-      trustTierHooksPresent: hasText(FILES.traceCommandSuggest, 'trustTier') || hasText(FILES.opencodeSkill, 'trustTier'),
+      trustTierHooksPresent:
+        hasText(FILES.opencodeSkill, 'adjustTrustTier') || hasText(FILES.opencodeSkill, 'trustTier'),
       promotionHooksPresent: hasText(FILES.opencodeSkill, 'promotion') || hasText(FILES.opencodeSkill, 'demotion'),
       note: 'Direct edit remains an implementation lane; current codebase has trust-tier plumbing but no operator UI edit surface in this pass.',
     },
@@ -191,7 +222,10 @@ async function main() {
     },
     commandMapping: {
       commandSuggestHook: hasText(FILES.traceCommandSuggest, 'trace.command_suggest'),
-      allowlistMentions: hasText(FILES.opencodeSkill, 'allowlist') || hasText(FILES.opencodeSkill, 'trustTier'),
+      allowlistMentions:
+        hasText(FILES.gemma4Agent, 'ALLOWED_TOOLS') ||
+        hasText(FILES.gemma4Agent, 'allowlist') ||
+        hasText(FILES.gemma4Agent, 'task_pick_next_semantic_packet'),
     },
     syntheticEvidence: {
       atlasContextFusionPresent: hasText(join(ROOT, 'scripts', 'atlas', 'ace-context-fusion.mjs'), 'sourceRefs'),
@@ -233,6 +267,7 @@ async function main() {
     `- Pagerank report present: ${report.phase3.authorityAudit.pagerankReportPresent ? 'yes' : 'no'}`,
     `- Qdrant sample points: ${report.phase3.embeddingParity.sample.total}`,
     `- Qdrant sourceRefs coverage: ${report.phase3.embeddingParity.sample.coverage}`,
+    `- Qdrant repo-only coverage: ${report.phase3.embeddingParity.sample.repoCoverage}`,
     '',
     '## Phase 4',
     `- Admin atlas UI present: ${report.phase4.provenanceDisplay.adminAtlasUiPresent ? 'yes' : 'no'}`,

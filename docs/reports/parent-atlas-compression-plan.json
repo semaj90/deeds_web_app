@@ -1,0 +1,370 @@
+{
+  "generatedAt": "2026-06-01T16:42:42.874Z",
+  "inputs": {
+    "repoConsolidation": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\repo-consolidation-feature-map.json",
+    "missingFeatures": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\missing-features-review-latest.json",
+    "qdrantBridge": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\qdrant-path-bridge-latest.json",
+    "sourceRefInventory": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-atlas-join-inventory.json",
+    "parentAtlasReport": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\exports\\parent-atlas-report.json",
+    "allLanesParentAtlasReport": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\exports\\all-lanes-parent-atlas-report.json",
+    "vector64Metrics": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\exports\\vector64-compression-metrics.json",
+    "pg18RedisBifrost": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\exports\\pg18-redis-bifrost-stack-report.json",
+    "nextMoves": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\exports\\next-moves-recommendation.json"
+  },
+  "summary": {
+    "parentAtlasCardsLoaded": 9373,
+    "parentAtlasClusters": 396,
+    "canonicalTableCount": 1,
+    "productionReadyCodePathCount": 5,
+    "plannedProductionCount": 11,
+    "experimentalCount": 8,
+    "archiveCandidateCount": 3,
+    "registryPrefixClusterCount": 14,
+    "mapreducePrefixClusterCount": 1089,
+    "duplicateSystemCount": 28,
+    "qdrantPointCount": 50,
+    "qdrantBridgeRows": 36,
+    "qdrantFullMatchCount": 0,
+    "qdrantMapreduceOnlyCount": 12,
+    "qdrantUnmatchedCount": 24,
+    "sourceSpineCount": 6,
+    "vectorCompressionRatio": 91.67,
+    "vectorFromDim": 768,
+    "vectorToDim": 64,
+    "vectorAvgError": 0.04806,
+    "pg18Healthy": true,
+    "redisHealthy": true,
+    "bifrostHealthy": true,
+    "allPass": true,
+    "nextMovesTopCount": 8
+  },
+  "reuseRules": [
+    "Use sourceRef + feature_id as the dedupe spine.",
+    "Use parent_atlas_card_id only after path/file joins are resolved.",
+    "Use Qdrant tags and registry prefix clusters to coalesce near-duplicate summaries.",
+    "Keep TurboVec 64d compression as the packet prefilter, not the canonical store.",
+    "Do not restate archive-only or experimental artifacts in Gemma summary packets."
+  ],
+  "gemmaPacketRecipe": {
+    "maxChunks": 10,
+    "maxSourceRefs": 5,
+    "maxSummaryTokens": 128,
+    "preferredInputs": [
+      "parent atlas feature rows",
+      "repo consolidation feature map",
+      "missing-features review clusters",
+      "qdrant path bridge rows",
+      "vector64 compression metrics"
+    ]
+  },
+  "keepSet": {
+    "productionReadyCodePaths": [
+      "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+      "sveltekit-frontend/src/lib/server/features/cases/research-summaries-db.ts",
+      "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+      "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"
+    ],
+    "canonicalTables": [
+      {
+        "table": "research_summaries",
+        "status": "production",
+        "provenance_fields": [
+          "source_ref",
+          "source_refs"
+        ],
+        "index_fields": [
+          "source_ref",
+          "source_refs",
+          "entity_tags",
+          "output_meta",
+          "embedding"
+        ]
+      }
+    ]
+  },
+  "reportSignals": {
+    "qdrantPrefixCounts": [
+      {
+        "prefix": ".venv/lib/python3.9",
+        "count": 13
+      },
+      {
+        "prefix": "src/lib/server",
+        "count": 12
+      },
+      {
+        "prefix": "src/lib/components",
+        "count": 10
+      },
+      {
+        "prefix": "src/lib/db",
+        "count": 1
+      }
+    ],
+    "registryPrefixClusters": [
+      {
+        "prefix": "src/lib/server/ace",
+        "count": 16,
+        "featureIds": [
+          "ace.packet_flow",
+          "cluster.cards",
+          "karpathy.hot_lane",
+          "memory.address.registry",
+          "semantic.cache.policy"
+        ]
+      },
+      {
+        "prefix": "src/lib/server/atlas",
+        "count": 8,
+        "featureIds": [
+          "ace.packet_flow",
+          "cluster.cards",
+          "codebase.semantic_index",
+          "feature.labeling",
+          "karpathy.hot_lane",
+          "memory.address.registry",
+          "retrieval.spine",
+          "semantic.cache.policy"
+        ]
+      },
+      {
+        "prefix": "src/lib/server/cache",
+        "count": 4,
+        "featureIds": [
+          "ace.packet_flow",
+          "cluster.cards",
+          "memory.address.registry",
+          "semantic.cache.policy"
+        ]
+      },
+      {
+        "prefix": ".cache/ace",
+        "count": 3,
+        "featureIds": [
+          "memory.address.registry",
+          "semantic.cache.policy"
+        ]
+      },
+      {
+        "prefix": "src/lib/server/retrieval",
+        "count": 3,
+        "featureIds": [
+          "retrieval.spine"
+        ]
+      },
+      {
+        "prefix": "scripts/atlas",
+        "count": 2,
+        "featureIds": [
+          "cluster.cards"
+        ]
+      },
+      {
+        "prefix": "src/lib/server/labels",
+        "count": 2,
+        "featureIds": [
+          "feature.labeling"
+        ]
+      },
+      {
+        "prefix": "docs/architecture",
+        "count": 1,
+        "featureIds": [
+          "retrieval.spine"
+        ]
+      }
+    ],
+    "nextMovesTop": [
+      {
+        "taskId": "TASK-8F878955",
+        "title": "memory › episodic",
+        "kanbanStatus": "DONE",
+        "rankScore": 0.7233,
+        "testingScore": 1,
+        "architectureScore": 0.667,
+        "recommendedActions": []
+      },
+      {
+        "taskId": "TASK-58468344",
+        "title": "ai › llm synthesis",
+        "kanbanStatus": "DONE",
+        "rankScore": 0.56,
+        "testingScore": 1,
+        "architectureScore": 0,
+        "recommendedActions": []
+      },
+      {
+        "taskId": "TASK-ED4E47DC",
+        "title": "gpu › som topology",
+        "kanbanStatus": "DONE",
+        "rankScore": 0.5233,
+        "testingScore": 0.667,
+        "architectureScore": 0.333,
+        "recommendedActions": []
+      },
+      {
+        "taskId": "TASK-6931F591",
+        "title": "knowledge › atlas pipeline",
+        "kanbanStatus": "DONE",
+        "rankScore": 0.4933,
+        "testingScore": 0.667,
+        "architectureScore": 0.333,
+        "recommendedActions": [
+          "Run npm run audit:contracts to verify schema alignment"
+        ]
+      },
+      {
+        "taskId": "TASK-14A07D5F",
+        "title": "api › sveltekit routes",
+        "kanbanStatus": "DONE",
+        "rankScore": 0.4567,
+        "testingScore": 0.667,
+        "architectureScore": 0,
+        "recommendedActions": []
+      },
+      {
+        "taskId": "TASK-5E79F750",
+        "title": "analysis › entity extraction",
+        "kanbanStatus": "DONE",
+        "rankScore": 0.4567,
+        "testingScore": 0.667,
+        "architectureScore": 0,
+        "recommendedActions": []
+      },
+      {
+        "taskId": "TASK-5363FC86",
+        "title": "search › hyperrag",
+        "kanbanStatus": "TODO",
+        "rankScore": 0.4333,
+        "testingScore": 0.667,
+        "architectureScore": 0,
+        "recommendedActions": []
+      },
+      {
+        "taskId": "TASK-4D08EB7D",
+        "title": "workspace › scripts",
+        "kanbanStatus": "DONE",
+        "rankScore": 0.4267,
+        "testingScore": 0.667,
+        "architectureScore": 0,
+        "recommendedActions": []
+      }
+    ]
+  },
+  "sourceRefInventory": {
+    "joinSpine": [
+      "file_path",
+      "mapreduce stableKey",
+      "sourceRef",
+      "parent_atlas_card_id",
+      "alias_id",
+      "feature_id"
+    ],
+    "artifactCategories": {
+      "mapreduce_and_path_map": 8,
+      "duckdb_and_parent_atlas": 10,
+      "qdrant_and_cache": 8,
+      "neo4j_and_topology": 5,
+      "retrieval_and_recommendation": 8,
+      "schema_and_alias": 8,
+      "provenance_and_join_aids": 10
+    }
+  },
+  "qdrantBridge": {
+    "summary": {
+      "qdrantPointCount": 50,
+      "bridgeRowCount": 36,
+      "fullMatchCount": 0,
+      "atlasOnlyCount": 0,
+      "mapreduceOnlyCount": 12,
+      "unmatchedCount": 24,
+      "uniqueQdrantPrefixes": 4,
+      "matchedParentAtlasIds": 0
+    },
+    "qdrantPrefixCounts": [
+      {
+        "prefix": ".venv/lib/python3.9",
+        "count": 13
+      },
+      {
+        "prefix": "src/lib/server",
+        "count": 12
+      },
+      {
+        "prefix": "src/lib/components",
+        "count": 10
+      },
+      {
+        "prefix": "src/lib/db",
+        "count": 1
+      }
+    ]
+  },
+  "repoConsolidation": {
+    "purpose": "Prune-ready labeling set for repo consolidation",
+    "canonical_production_tables": [
+      {
+        "table": "research_summaries",
+        "status": "production",
+        "provenance_fields": [
+          "source_ref",
+          "source_refs"
+        ],
+        "index_fields": [
+          "source_ref",
+          "source_refs",
+          "entity_tags",
+          "output_meta",
+          "embedding"
+        ]
+      }
+    ],
+    "production_ready_code_paths": [
+      "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+      "sveltekit-frontend/src/lib/server/features/cases/research-summaries-db.ts",
+      "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+      "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"
+    ],
+    "planned_production": [
+      "task_semantic_packets",
+      "summary_cards",
+      "glyph_records",
+      "card_source_refs",
+      "atlas_profile_cards",
+      "atlas_feature_profiles",
+      "atlas_dependency_edges",
+      "atlas_hot_keyword_clusters",
+      "atlas_retrieval_events",
+      "local-deep-research export/import bridge completion",
+      "Postgres 18 dump/restore promotion"
+    ],
+    "experimental": [
+      "local-deep-research SQLite boundary",
+      "cuVS/CAGRA swap lane",
+      "WSL2 GPU override path when not required",
+      "backup trees",
+      ".tmp",
+      ".cache",
+      ".svelte-kit",
+      "drizzle/archived/"
+    ],
+    "archive_candidates": [
+      "superseded atlas snapshots",
+      "redundant generated reports after promotion",
+      "backup directories and report dumps outside the active toolchain"
+    ],
+    "labeling_rules": [
+      "Ship-path = code that reads/writes canonical live rows",
+      "Planned production = future schema in active development",
+      "Experimental = alternate backends, benchmarks, or local-only state",
+      "Archive = backups/snapshots/duplicates after promotion"
+    ],
+    "next_actions": [
+      "Classify the full repo tree with this map",
+      "Keep only source, schemas, scripts, and docs in the active ship set",
+      "Move archive candidates after atlas and kanban sync land on the production-ready list"
+    ]
+  }
+}

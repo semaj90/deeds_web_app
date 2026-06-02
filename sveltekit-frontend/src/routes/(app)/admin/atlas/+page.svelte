@@ -32,9 +32,36 @@
 		recommendations?: string[];
 	};
 
+	type TaskPacketWorkflowStatus = {
+		mode: 'task' | 'queue' | 'next';
+		taskId: number | null;
+		queueId: string | null;
+		packetId: string | null;
+		task: Record<string, unknown> | null;
+		queue: Record<string, unknown> | null;
+		packet: Record<string, unknown> | null;
+		cached: Record<string, unknown> | null;
+		fileLinks: string[];
+		clusterLinks: Array<Record<string, unknown>>;
+		nextQueuedTask: {
+			queueId: string;
+			taskId: number;
+			packetId: string | null;
+			status: string | null;
+			featureId: string | null;
+			sourceRef: string | null;
+			nextAction: string | null;
+			confidence: number;
+			clusterId: string | null;
+			centroidId: string | null;
+			taskTitle: string | null;
+		} | null;
+	};
+
 	type AtlasPageData = {
 		health: AtlasHealthStatus | null;
 		cacheStats?: AdminCacheStats | null;
+		workflowStatus?: TaskPacketWorkflowStatus | null;
 		chatModel?: string;
 		embedModel?: string;
 		kvProfile?: string;
@@ -46,10 +73,19 @@
 	let health = $state<AtlasHealthStatus | null>(null);
 	let cacheStats = $state<AdminCacheStats | null>(null);
 	let healthLoading = $state(false);
+	let workflowTaskId = $state('');
+	let workflowQueueId = $state('');
+	let workflowStatus = $state<TaskPacketWorkflowStatus | null>(null);
+	let workflowLoading = $state(false);
+	let workflowError = $state('');
+	let workflowAction = $state('idle');
 
 	$effect(() => {
 		health = data.health;
 		cacheStats = data.cacheStats ?? null;
+		workflowStatus = data.workflowStatus ?? workflowStatus;
+		if (data.workflowStatus?.taskId != null) workflowTaskId = String(data.workflowStatus.taskId);
+		if (data.workflowStatus?.queueId) workflowQueueId = data.workflowStatus.queueId;
 	});
 
 	async function refreshHealth() {
@@ -77,6 +113,95 @@
 		blendCosine = 0.45;
 		blendPageRank = 0.20;
 		blendTopology = 0.15;
+	}
+
+	async function refreshWorkflowStatus() {
+		if (workflowLoading) return;
+		workflowLoading = true;
+		workflowError = '';
+		try {
+			const params = new URLSearchParams();
+			if (workflowTaskId.trim()) params.set('taskId', workflowTaskId.trim());
+			if (workflowQueueId.trim()) params.set('queueId', workflowQueueId.trim());
+			const r = await fetch(`/api/tasks/packets/workflow${params.toString() ? `?${params.toString()}` : ''}`);
+			const d = await r.json();
+			if (!r.ok || !d.ok) {
+				workflowError = d.error ?? 'Failed to load workflow status';
+				return;
+			}
+			workflowStatus = d.status ?? null;
+			workflowAction = 'status_refreshed';
+			if (workflowStatus?.taskId != null) workflowTaskId = String(workflowStatus.taskId);
+			if (workflowStatus?.queueId) workflowQueueId = workflowStatus.queueId;
+		} catch (e) {
+			workflowError = String(e);
+		} finally {
+			workflowLoading = false;
+		}
+	}
+
+	async function pickNextTask() {
+		if (workflowLoading) return;
+		workflowLoading = true;
+		workflowError = '';
+		workflowAction = 'claiming';
+		try {
+			const r = await fetch('/api/tasks/packets/workflow', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ action: 'claim' }),
+			});
+			const d = await r.json();
+			if (!r.ok || !d.ok) {
+				workflowError = d.error ?? 'Claim failed';
+				return;
+			}
+			workflowStatus = d.status ?? null;
+			workflowAction = d.claimed ? 'claimed' : 'no_queued_tasks';
+			if (d.claimed?.taskId != null) workflowTaskId = String(d.claimed.taskId);
+			if (d.claimed?.queueId) workflowQueueId = d.claimed.queueId;
+		} catch (e) {
+			workflowError = String(e);
+		} finally {
+			workflowLoading = false;
+		}
+	}
+
+	async function runWorkflow(dryRun = false) {
+		if (!workflowTaskId.trim()) {
+			workflowError = 'Task ID is required';
+			return;
+		}
+		if (workflowLoading) return;
+		workflowLoading = true;
+		workflowError = '';
+		workflowAction = dryRun ? 'dry_run' : 'running';
+		try {
+			const r = await fetch('/api/tasks/packets/workflow', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					taskId: Number(workflowTaskId.trim()),
+					dryRun,
+				}),
+			});
+			const d = await r.json();
+			if (!r.ok || !d.ok) {
+				workflowError = d.error ?? 'Workflow run failed';
+				return;
+			}
+			if (dryRun) {
+				workflowStatus = d.status ?? null;
+				workflowAction = 'dry_run_ready';
+			} else {
+				workflowAction = 'workflow_run';
+				await refreshWorkflowStatus();
+			}
+		} catch (e) {
+			workflowError = String(e);
+		} finally {
+			workflowLoading = false;
+		}
 	}
 
 	// ── Query Panel ───────────────────────────────────────────────────────────
@@ -672,6 +797,121 @@
 				<p class="text-[0.6rem] text-[#5c594c] leading-relaxed">
 					Last sync: {runtime.refreshedAt || 'pending'}
 				</p>
+			</div>
+
+			<!-- Task Packet Workflow -->
+			<div class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/40 space-y-3">
+				<div class="flex items-start justify-between gap-3">
+					<div>
+						<p class="text-[0.68rem] text-[#a39f90] font-bold uppercase tracking-wider">// Task Packet Workflow</p>
+						<p class="mt-1 text-[0.62rem] text-[#5c594c] leading-relaxed">
+							Inspect the next Kanban packet, dry-run the lifecycle, or run the live workflow for a task.
+						</p>
+					</div>
+					<span class={`px-2 py-1 border text-[0.6rem] font-bold uppercase tracking-wider ${workflowLoading ? 'border-[#c8a635] text-[#c8a635]' : 'border-[#5c594c] text-[#a39f90]'}`}>
+						{workflowLoading ? 'SYNCING' : workflowAction.toUpperCase()}
+					</span>
+				</div>
+
+				<div class="grid grid-cols-1 gap-2 text-[0.68rem]">
+					<label class="space-y-1">
+						<span class="text-[#a39f90] font-bold uppercase tracking-wider">TASK_ID</span>
+						<input
+							type="text"
+							bind:value={workflowTaskId}
+							placeholder="1"
+							class="w-full bg-[#1c1b18] border border-[#3f3e37] px-3 py-2 text-xs font-mono text-[#efede4] placeholder-[#5c594c] focus:outline-none focus:border-[#d1cdb8]"
+						/>
+					</label>
+					<label class="space-y-1">
+						<span class="text-[#a39f90] font-bold uppercase tracking-wider">QUEUE_ID</span>
+						<input
+							type="text"
+							bind:value={workflowQueueId}
+							placeholder="optional queue id"
+							class="w-full bg-[#1c1b18] border border-[#3f3e37] px-3 py-2 text-xs font-mono text-[#efede4] placeholder-[#5c594c] focus:outline-none focus:border-[#d1cdb8]"
+						/>
+					</label>
+				</div>
+
+				<div class="grid grid-cols-3 gap-2">
+					<button
+						onclick={pickNextTask}
+						class="px-2.5 py-2 border border-[#5c594c] bg-[#1c1b18] text-[#a39f90] hover:text-[#efede4] hover:border-[#d1cdb8] text-[0.62rem] font-bold uppercase tracking-widest transition-all"
+					>
+						PICK_NEXT
+					</button>
+					<button
+						onclick={refreshWorkflowStatus}
+						class="px-2.5 py-2 border border-[#5c594c] bg-[#1c1b18] text-[#a39f90] hover:text-[#efede4] hover:border-[#d1cdb8] text-[0.62rem] font-bold uppercase tracking-widest transition-all"
+					>
+						REFRESH_STATUS
+					</button>
+					<button
+						onclick={() => runWorkflow(false)}
+						class="px-2.5 py-2 bg-[#d1cdb8] hover:bg-[#efede4] text-[#1c1b18] text-[0.62rem] font-bold uppercase tracking-widest transition-all"
+					>
+						RUN_WORKFLOW
+					</button>
+				</div>
+
+				<div class="grid grid-cols-2 gap-2">
+					<button
+						onclick={() => runWorkflow(true)}
+						class="px-2.5 py-2 border border-[#4a5568] bg-[#1c2030] text-[#8b9dbb] hover:text-[#b8c9e8] hover:border-[#8b9dbb] text-[0.62rem] font-bold uppercase tracking-widest transition-all"
+					>
+						DRY_RUN
+					</button>
+					<button
+						onclick={() => {
+							if (workflowStatus?.nextQueuedTask) {
+								workflowTaskId = String(workflowStatus.nextQueuedTask.taskId);
+								workflowQueueId = workflowStatus.nextQueuedTask.queueId;
+							}
+						}}
+						disabled={!workflowStatus?.nextQueuedTask}
+						class="px-2.5 py-2 border border-[#3f3e37] bg-[#1c1b18] text-[#a39f90] hover:text-[#efede4] hover:border-[#d1cdb8] text-[0.62rem] font-bold uppercase tracking-widest transition-all disabled:opacity-30"
+					>
+						LOAD_NEXT
+					</button>
+				</div>
+
+				{#if workflowError}
+					<div class="p-2.5 border border-[#c25953] bg-[#c25953]/10 text-[#c25953] text-[0.7rem] leading-relaxed">
+						<span class="font-bold">WORKFLOW_ERROR:</span> {workflowError}
+					</div>
+				{/if}
+
+				{#if workflowStatus}
+					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2 space-y-2 text-[0.68rem]">
+						<div class="flex items-center justify-between gap-3">
+							<span class="text-[#a39f90] font-bold uppercase tracking-wider">STATUS</span>
+							<span class="text-[#efede4] font-bold uppercase">{workflowStatus.mode}</span>
+						</div>
+						<div class="grid grid-cols-2 gap-2 text-[#d1cdb8]">
+							<div><span class="text-[#a39f90]">task:</span> {workflowStatus.taskId ?? '—'}</div>
+							<div><span class="text-[#a39f90]">queue:</span> {workflowStatus.queueId ?? '—'}</div>
+							<div><span class="text-[#a39f90]">packet:</span> {workflowStatus.packetId ?? '—'}</div>
+							<div><span class="text-[#a39f90]">cached:</span> {workflowStatus.cached ? 'yes' : 'no'}</div>
+						</div>
+						<div class="space-y-1 text-[#d1cdb8]">
+							<div><span class="text-[#a39f90]">feature:</span> {workflowStatus.packet?.feature_id ?? workflowStatus.cached?.featureId ?? '—'}</div>
+							<div><span class="text-[#a39f90]">source:</span> <span class="break-all">{workflowStatus.packet?.source_ref ?? workflowStatus.cached?.sourceRef ?? '—'}</span></div>
+							<div><span class="text-[#a39f90]">next:</span> {workflowStatus.packet?.next_action ?? workflowStatus.cached?.nextAction ?? '—'}</div>
+							<div><span class="text-[#a39f90]">cluster:</span> {workflowStatus.packet?.cluster_id ?? workflowStatus.cached?.clusterId ?? '—'} · <span class="text-[#a39f90]">centroid:</span> {workflowStatus.packet?.centroid_id ?? workflowStatus.cached?.centroidId ?? '—'}</div>
+						</div>
+						{#if workflowStatus.nextQueuedTask}
+							<div class="border-t border-[#3f3e37] pt-2 space-y-1 text-[#a39f90]">
+								<div class="flex items-center justify-between gap-2">
+									<span class="font-bold uppercase tracking-wider">NEXT_READY</span>
+									<span class="text-[#8c9f7a] font-bold">{workflowStatus.nextQueuedTask.confidence.toFixed(2)}</span>
+								</div>
+								<div class="text-[#d1cdb8] break-all">{workflowStatus.nextQueuedTask.sourceRef ?? '—'}</div>
+								<div class="text-[#d1cdb8]">task {workflowStatus.nextQueuedTask.taskId} · queue {workflowStatus.nextQueuedTask.queueId}</div>
+							</div>
+						{/if}
+					</div>
+				{/if}
 			</div>
 
 			<!-- Query Panel -->

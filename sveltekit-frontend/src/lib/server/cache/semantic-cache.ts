@@ -49,9 +49,23 @@ import { ENV } from '../env.server.js';
 import {
   searchSemanticCache as searchRedisSemanticCache,
   storeSemanticCache as storeRedisSemanticCache,
+  getExactSemanticCacheTuple,
+  storeExactSemanticCacheTuple,
+  buildExactSemanticCacheTuple,
+  type SemanticCacheProvenance,
+  type SemanticCacheTuple,
 } from './redis-semantic-cache.js';
 
 const KARPATHY_ENCODED_TTL_SECONDS = 24 * 60 * 60;
+
+export interface SemanticCacheHit {
+  response: string;
+  source: 'exact' | 'redis-semantic' | 'pgvector';
+  score: number;
+  promptHash: string;
+  model: string;
+  provenanceTuple: SemanticCacheTuple | null;
+}
 
 // In a real scenario, this connects to Ollama embeddinggemma
 export async function generateEmbedding(text: string): Promise<number[]> {
@@ -73,8 +87,15 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
 /**
  * Step 1-3 of the semantic cache flow.
+ *
+ * Returns the cached response together with the provenance envelope so the
+ * caller can reuse the exact same packet metadata it persists.
  */
-export async function checkSemanticCache(prompt: string, modelName: string, threshold = 0.9) {
+export async function checkSemanticCache(
+  prompt: string,
+  modelName: string,
+  threshold = 0.9
+): Promise<SemanticCacheHit | null> {
   const hash = crypto.createHash('sha256').update(prompt).digest('hex');
 
   // 1. Check exact match via hash
@@ -83,7 +104,28 @@ export async function checkSemanticCache(prompt: string, modelName: string, thre
   });
   if (exact) {
     console.log('[Semantic Cache] EXACT HIT:', hash);
-    return exact.responseText;
+    const provenanceTuple =
+      (await getExactSemanticCacheTuple(getRedis(), hash, modelName)) ??
+      buildExactSemanticCacheTuple({
+        promptHash: hash,
+        model: modelName,
+        response: exact.responseText,
+        provenance: {
+          queryHash: hash,
+          featureId: 'semantic.cache.exact',
+          sourceRefs: [hash],
+          primarySourceRef: hash,
+        },
+      });
+
+    return {
+      response: exact.responseText,
+      source: 'exact',
+      score: 1,
+      promptHash: hash,
+      model: modelName,
+      provenanceTuple,
+    };
   }
 
   // 2. Build query embedding once for downstream semantic checks
@@ -94,7 +136,14 @@ export async function checkSemanticCache(prompt: string, modelName: string, thre
     const redisHit = await searchRedisSemanticCache(getRedis(), embedding, modelName, threshold);
     if (redisHit?.response) {
       console.log('[Semantic Cache] REDIS SEMANTIC HIT (score: ' + redisHit.score + ')');
-      return redisHit.response;
+      return {
+        response: redisHit.response,
+        source: 'redis-semantic',
+        score: redisHit.score,
+        promptHash: hash,
+        model: modelName,
+        provenanceTuple: redisHit.tuple ?? null,
+      };
     }
   } catch (err) {
     console.warn('[Semantic Cache] Redis semantic lookup failed (non-fatal):', err);
@@ -119,7 +168,14 @@ export async function checkSemanticCache(prompt: string, modelName: string, thre
 
   if (results.length > 0) {
     console.log('[Semantic Cache] SEMANTIC HIT (score: ' + results[0].similarity + ')');
-    return results[0].responseText;
+    return {
+      response: results[0].responseText,
+      source: 'pgvector',
+      score: Number(results[0].similarity),
+      promptHash: hash,
+      model: modelName,
+      provenanceTuple: null,
+    };
   }
 
   console.log('[Semantic Cache] MISS');
@@ -197,7 +253,25 @@ export async function saveToSemanticCache(prompt: string, response: string, mode
 
   // Phase 2 bridge: keep Redis semantic cache warm on misses.
   try {
-    await storeRedisSemanticCache(getRedis(), embedding, response, modelName);
+    const provenance: SemanticCacheProvenance = {
+      queryHash: hash,
+      featureId: 'semantic.cache.policy',
+      sourceRefs: [hash],
+      primarySourceRef: hash,
+    };
+    await storeRedisSemanticCache(getRedis(), embedding, response, modelName, provenance);
+    await storeExactSemanticCacheTuple(
+      getRedis(),
+      hash,
+      modelName,
+      response,
+      {
+        queryHash: hash,
+        featureId: 'semantic.cache.exact',
+        sourceRefs: [hash],
+        primarySourceRef: hash,
+      }
+    );
   } catch (err) {
     console.warn('[Semantic Cache] Redis semantic store failed (non-fatal):', err);
   }

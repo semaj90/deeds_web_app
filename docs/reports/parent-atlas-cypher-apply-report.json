@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-06-02T02:15:45.671Z",
+  "dryRun": false,
+  "neo4jUri": "bolt://localhost:7687",
+  "files": [
+    {
+      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\parent-atlas-feature-command-atlas.cypher",
+      "statements": 640,
+      "applied": 640,
+      "skipped": false,
+      "missing": false
+    },
+    {
+      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\parent-atlas-rg-dump-packets.cypher",
+      "statements": 1350,
+      "applied": 1350,
+      "skipped": false,
+      "missing": false
+    }
+  ],
+  "statements": 1990,
+  "applied": 1990,
+  "errors": 0
+}

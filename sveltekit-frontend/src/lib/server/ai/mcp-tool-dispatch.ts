@@ -22,7 +22,8 @@ import { engramCards } from '$lib/server/db/schema.js';
 import { desc, eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { runRg } from '../../../../scripts/rg-atlas/run-rg.mjs';
-import { injectSummary } from '$lib/server/ai/opencode-skill.js';
+import { injectSummary, pickNextSemanticTaskPacket } from '$lib/server/ai/opencode-skill.js';
+import { runTaskSemanticPacketLifecycle } from '$lib/server/tasks/semantic-packets.js';
 
 // ── Shared result shape ───────────────────────────────────────────────────────
 
@@ -891,6 +892,39 @@ export async function tool_opencode_inject_summary(args: Record<string, unknown>
   }
 }
 
+/** task.pick_next_semantic_packet — claim the next ready Kanban packet for OpenCode/Gemma4 pickup */
+export async function tool_task_pick_next_semantic_packet(args: {
+  lane?: string;
+  enqueueIfMissing?: boolean;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const result = await pickNextSemanticTaskPacket({
+      lane: args.lane,
+      enqueueIfMissing: args.enqueueIfMissing,
+    });
+    if (!result) {
+      return ok('task.pick_next_semantic_packet', { selected: null }, Date.now() - t0, false);
+    }
+    return ok('task.pick_next_semantic_packet', result, Date.now() - t0, false);
+  } catch (e) {
+    return err('task.pick_next_semantic_packet', String(e), Date.now() - t0);
+  }
+}
+
+/** task.run_semantic_packet_workflow — summarize, attach, and enqueue a Kanban task packet */
+export async function tool_task_run_semantic_packet_workflow(args: {
+  taskId: number;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const result = await runTaskSemanticPacketLifecycle(Number(args.taskId));
+    return ok('task.run_semantic_packet_workflow', result, Date.now() - t0, false);
+  } catch (e) {
+    return err('task.run_semantic_packet_workflow', String(e), Date.now() - t0);
+  }
+}
+
 // ── Dispatch table ────────────────────────────────────────────────────────────
 
 export const TOOL_DISPATCH: Record<
@@ -928,6 +962,10 @@ export const TOOL_DISPATCH: Record<
     tool_context_get_compressed_card(a as Parameters<typeof tool_context_get_compressed_card>[0]),
   'context.explain_compression': (a) =>
     tool_context_explain_compression(a as Parameters<typeof tool_context_explain_compression>[0]),
+  'task.pick_next_semantic_packet': (a) =>
+    tool_task_pick_next_semantic_packet(a as Parameters<typeof tool_task_pick_next_semantic_packet>[0]),
+  'task.run_semantic_packet_workflow': (a) =>
+    tool_task_run_semantic_packet_workflow(a as Parameters<typeof tool_task_run_semantic_packet_workflow>[0]),
   'workspace.timeline': (a) =>
     tool_workspace_timeline(a as Parameters<typeof tool_workspace_timeline>[0]),
   'kb.search_cards': (a) => tool_kb_search_cards(a as Parameters<typeof tool_kb_search_cards>[0]),

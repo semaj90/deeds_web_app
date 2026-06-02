@@ -1,0 +1,227 @@
+{
+  "generatedAt": "2026-06-01T20:32:58.388Z",
+  "inputs": {
+    "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-feature-command-atlas.json",
+    "todoPath": "C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md"
+  },
+  "outputs": {
+    "cypherPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\parent-atlas-feature-command-atlas.cypher",
+    "postgresTable": "parent_atlas_jobs"
+  },
+  "summary": {
+    "lanesProjected": 6,
+    "postgresRowsWritten": 6,
+    "cypherLines": 2102,
+    "sourceRefAnchors": 154,
+    "todoAnchorsMatched": 138
+  },
+  "postgres": {
+    "attempted": true,
+    "applied": true,
+    "rows": 6,
+    "verifiedRows": 6,
+    "table": "parent_atlas_jobs"
+  },
+  "lanes": [
+    {
+      "laneId": "sourceRef_spine",
+      "title": "SourceRef Spine",
+      "featureCount": 25,
+      "matchCount": 35,
+      "semanticHash": "ed05db52e69e4d92",
+      "sourceRefAnchors": 31,
+      "topFeatureKeys": [
+        "phase_4_admin_copilot_ui_integration",
+        "phase_7_knowledge_base_retrieval_flow",
+        "system_health_benchmark_trends",
+        "validation_diagnostics_compliance_summary",
+        "diagnostic_explanation_of_self_learning_benefit",
+        "1_architectural_overview",
+        "1_architectural_principles",
+        "1_codebase_documentation_references"
+      ],
+      "todoAnchors": [
+        "  `0.35·semantic + 0.20·sourceRef + 0.15·error + 0.10·recency + 0.10·TODO + 0.05·root + 0.05·smoke`",
+        "dependency graph, sourceRefs, startup context, package scripts.",
+        "- Preserve sourceRefs on every recommendation",
+        "| Context Engineering | ACE packets, startup context, patch cards, sourceRefs |",
+        "- Top missing features (sourceRef exists in atlas, not in DB/routes)",
+        "- [ ] Feature cluster grouping by `sourceRef` prefix",
+        "- [ ] Duplicate system detection (two scripts/routes with overlapping sourceRefs)",
+        "- [x] Wire Neo4j edge expansion (neighbor sourceRefs boost score, graceful fallback) ✅"
+      ],
+      "postgresStatus": "written"
+    },
+    {
+      "laneId": "durable_truth",
+      "title": "Durable Truth",
+      "featureCount": 25,
+      "matchCount": 256,
+      "semanticHash": "d8d519cb71bef31a",
+      "sourceRefAnchors": 33,
+      "topFeatureKeys": [
+        "2_gpu_audit_storage_postgresql_jsonb_chosen",
+        "2_relational_vector_db_architecture",
+        "3_source_of_truth",
+        "5_drizzle_postgres",
+        "context_summary_report__root",
+        "core_workflows",
+        "error_analysis_architecture__drizzle_orm",
+        "subgraph_instruction_programming_kag_ace_topology_todo__goal"
+      ],
+      "todoAnchors": [
+        "  - [ ] `playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection",
+        "  - [x] `playbook_lookup_by_language` — CouchDB karpathy_wiki + top Karpathy file intersection",
+        "- [x] **Track 3 — Drizzle-Zod Schema Barrel**",
+        "  - [x] `drizzle-zod@0.8.3` already installed",
+        "  - [x] Sub-task A3: Domain mapping (schema-postgres.ts → feature areas)",
+        "  - [x] PostgreSQL + Drizzle production patterns",
+        "- [x] Wire atlas seeds as Tier-3 fallback in `fetchCodebaseContext()` — only fires when Qdrant ANN + Postgres FTS both empty",
+        "- Keep JSONB as canonical searchable truth"
+      ],
+      "postgresStatus": "written"
+    },
+    {
+      "laneId": "retrieval_memory",
+      "title": "Retrieval Memory",
+      "featureCount": 25,
+      "matchCount": 349,
+      "semanticHash": "e0dc524f415fa259",
+      "sourceRefAnchors": 25,
+      "topFeatureKeys": [
+        "the_4_layer_retrieval_stack",
+        "1_architectural_principles",
+        "critical_environment_matrix",
+        "subgraph_instruction_programming_kag_ace_topology_todo__goal",
+        "2_storage_caching_matrix",
+        "3_poly_storage_layer_mapping",
+        "3_3_redis_bitfrost_hot_cache",
+        "4_ace_kag_layers"
+      ],
+      "todoAnchors": [
+        "- [x] **Phase KG-4**: Ran `npm run graphify:autoencoder:train` to execute the full autoencoder training, backfill Qdrant, encode Redis, and compute centroids.",
+        "  - [ ] `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats",
+        "  - [ ] `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats",
+        "  - [x] `som_topology_stats` — delegates to `gpu:som_topology` (Redis SOM grid/centroid stats)",
+        "  - [x] `language_distribution` — delegates to `gpu:language_distribution` (Qdrant cluster tags)",
+        "  - [ ] Option 2: ClusterCard schema + Redis/Qdrant wiring + API route",
+        "  - [x] Track 10: Compact Cards / CHR97 / NES Retrieval Lane",
+        "  - Redis publish gated behind `--publish` only; dry-run safe"
+      ],
+      "postgresStatus": "written"
+    },
+    {
+      "laneId": "graph_topology",
+      "title": "Graph Topology",
+      "featureCount": 25,
+      "matchCount": 272,
+      "semanticHash": "bcd19f063abd8c5b",
+      "sourceRefAnchors": 28,
+      "topFeatureKeys": [
+        "from_sveltekit_frontend",
+        "downstream_consumers",
+        "karpathy_wiki_pipeline",
+        "16_topological_path_mapping_manifold_synthesis",
+        "3_topological_structural_integrity_neo4j_apoc",
+        "4_codeintel_hypergraph",
+        "mcp_tool_surface",
+        "llms__tier_f_contextual_graph_pytorch_graph"
+      ],
+      "todoAnchors": [
+        "  - [ ] `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats",
+        "  - [x] `som_topology_stats` — delegates to `gpu:som_topology` (Redis SOM grid/centroid stats)",
+        "  - [x] D33 (Neo4j health) already passing",
+        "- [x] Wire Neo4j edge expansion (IMPORTS/SIMILAR_TOPOLOGY neighbor expansion, graceful fallback) ✅",
+        "- [x] Wire Neo4j edge expansion (neighbor sourceRefs boost score, graceful fallback) ✅",
+        "  - `sveltekit-frontend/src/lib/server/search/neo4j-rerank.ts`",
+        "- [x] Wire Neo4j edge expansion so neighbor `sourceRef`s boost score ✅",
+        "**Goal**: Use `sourceRef` as the canonical bridge across mapreduce, DuckDB, Postgres mirrors, Qdrant payloads, Redis/Bitfrost caches, and Neo4j context trees so offline joins can be compressed into reusable NES/Glyph cards."
+      ],
+      "postgresStatus": "written"
+    },
+    {
+      "laneId": "compute_ranking",
+      "title": "Compute Ranking",
+      "featureCount": 25,
+      "matchCount": 219,
+      "semanticHash": "9006083067b0bdf9",
+      "sourceRefAnchors": 25,
+      "topFeatureKeys": [
+        "integration_features_to_look_for",
+        "12_gpu_rules",
+        "phase_12_security_recommendations",
+        "the_three_compiler_concepts",
+        "your_libtorch_n_api_bridge",
+        "2_pytorch_libtorch_tensor_compiler_stack",
+        "3_concurrency_governance_thread_locks",
+        "4_libtorch_boundaries"
+      ],
+      "todoAnchors": [
+        "- [x] **Phase KG-4**: Ran `npm run graphify:autoencoder:train` to execute the full autoencoder training, backfill Qdrant, encode Redis, and compute centroids.",
+        "  - [ ] `attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores",
+        "  - [x] `attention_rank_files` — embed query → attentionScoreGPU via libtorch → top-N from Karpathy scores",
+        "- [x] Option 3: Real XGBoost C API inference & CUDA Graph in tensorrt_bridge",
+        "  - CMake configured, CUDA arch sm_86, LibTorch detected, .node addon built, simdjson vendor, seed freshness",
+        "- [x] Lane health: sm_86 ✅, LibTorch ✅, .node addon ✅, simdjson vendor ✅, seeds fresh ✅",
+        "**Note**: simdjson uses CPU SIMD instructions (AVX2/SSE4.2), not GPU/CUDA. Do not call this \"GPU parsing\".",
+        "- `npm run retrieval:turbovec:smoke` — `scripts/smoke/scenario-rerank-smoke.mjs` (existing)"
+      ],
+      "postgresStatus": "written"
+    },
+    {
+      "laneId": "orchestration_future",
+      "title": "Future Orchestration",
+      "featureCount": 25,
+      "matchCount": 169,
+      "semanticHash": "e23a07c58a6d1e9c",
+      "sourceRefAnchors": 25,
+      "topFeatureKeys": [
+        "expanded_architecture_opencode_ace_graphrag",
+        "opencode_mcp_atlas__root",
+        "three_development_model_lanes_opencode_local_dev",
+        "trace_karpathy_performance_lane_deep_research_plan",
+        "unified_context_tree",
+        "10_mcp_tool_boundary",
+        "2_data_access_rules_mcp_to_gemma4_trace",
+        "b_generation_lane_llama_server"
+      ],
+      "todoAnchors": [
+        "  - [x] Hermes planner/tool registry already exposes these lanes; remaining work is OpenCode/Gemma4 exposure and lane productization, not new runtime implementation",
+        "- [x] **Track A — Database Analysis + Gemma4 Schema Summary** (subagent 9c8fc59d)",
+        "  - [x] Sub-task A4: gemma4-rotorquant:latest synthesis (natural language summary)",
+        "  - [x] Update `opencode.json` (both root and `sveltekit-frontend/`) model definitions to `\"yorha/yorha-legal\"` to align default and agent lanes to the active 40k context GGUF.",
+        "  - [x] Verified TRACE liveness on `:8788/health` (`200`) and confirmed `GET /mcp -> 406` is expected protocol behavior for streamable HTTP MCP.",
+        "  Output: `.opencode/ace-packet.json`, `.opencode/ace-packet-summary.md`",
+        "| Agent Workflow | OpenCode, smoke tests, patch promotion, TODO tracking |",
+        "- [x] `scripts/opencode/build-recommendations.mjs` — canonical builder; reads ace-packets + atlas seeds + smoke reports, emits `.opencode/recommendations/recommendations.json` and `.opencode/recommendations/recommendations.md`"
+      ],
+      "postgresStatus": "written"
+    }
+  ],
+  "topLanes": [
+    {
+      "key": "retrieval_memory",
+      "value": 349
+    },
+    {
+      "key": "graph_topology",
+      "value": 272
+    },
+    {
+      "key": "durable_truth",
+      "value": 256
+    },
+    {
+      "key": "compute_ranking",
+      "value": 219
+    },
+    {
+      "key": "orchestration_future",
+      "value": 169
+    },
+    {
+      "key": "sourceRef_spine",
+      "value": 35
+    }
+  ]
+}

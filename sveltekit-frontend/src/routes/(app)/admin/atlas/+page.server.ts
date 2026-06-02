@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 
-export const load: PageServerLoad = async ({ locals, fetch }) => {
+export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!locals.user) throw redirect(303, '/login?redirect=/admin/atlas');
 
 	const healthPromise = fetch('/api/admin/atlas/health')
@@ -17,9 +17,27 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
 	const [health, cacheStats] = await Promise.all([healthPromise, cacheStatsPromise]);
 
+	const workflowTaskId = url.searchParams.get('taskId');
+	const workflowQueueId = url.searchParams.get('queueId');
+	const workflowLane = url.searchParams.get('lane');
+
+	const workflowQuery = new URLSearchParams();
+	if (workflowTaskId) workflowQuery.set('taskId', workflowTaskId);
+	if (workflowQueueId) workflowQuery.set('queueId', workflowQueueId);
+	if (workflowLane) workflowQuery.set('lane', workflowLane);
+
+	const workflowStatusPromise = workflowQuery.toString()
+		? fetch(`/api/tasks/packets/workflow?${workflowQuery.toString()}`)
+				.then(async (r) => (r.ok ? await r.json() : null))
+				.catch(() => null)
+		: Promise.resolve(null);
+
+	const workflowStatus = await workflowStatusPromise;
+
 	return {
 		health,
 		cacheStats,
+		workflowStatus: workflowStatus?.status ?? null,
 		chatModel: ENV.OLLAMA_CHAT_MODEL,
 		embedModel: ENV.OLLAMA_EMBED_MODEL,
 		kvProfile: process.env.TURBO_PROFILE ?? 'stock'

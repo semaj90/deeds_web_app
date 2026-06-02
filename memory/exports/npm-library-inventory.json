@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-01T01:14:36.655Z",
+  "timestamp": "2026-06-02T01:59:55.061Z",
   "totalDeps": 204,
   "packageJsonsScanned": [
     "package.json",
@@ -9,8 +9,8 @@
     ".opencode/package.json"
   ],
   "usageStats": {
-    "SERVER": 45,
-    "UNUSED": 108,
+    "SERVER": 46,
+    "UNUSED": 107,
     "SHARED": 47,
     "TEST": 2,
     "CLIENT": 2
@@ -2461,7 +2461,7 @@
       "sections": [
         "devDependencies"
       ],
-      "usage": "UNUSED",
+      "usage": "SERVER",
       "tag": null
     },
     {

@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 4
 embedding_id: "qdrant://codebase_chunks_768/deeds_labs/snapshots/2026-03-10/bucket-c-stale/.vite-concurrent/deps/lucide-svelte.js"
-last_updated_by_llm: "2026-05-31T20:57:35.121Z"
+last_updated_by_llm: "2026-06-01T22:46:28.142Z"
 ai-first: true
 confidence: "medium"
 up: []

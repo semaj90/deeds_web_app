@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="260" viewBox="0 0 860 260" role="img" aria-label="Parent atlas TurboVec compression plan">
+  <rect width="100%" height="100%" fill="#f8fafc"/>
+  <text x="40" y="38" font-family="Consolas, monospace" font-size="20" fill="#111827">Parent Atlas TurboVec Compression Plan</text>
+  <text x="40" y="60" font-family="Consolas, monospace" font-size="12" fill="#475569">Use sourceRef + feature_id dedupe; keep Gemma packets compact and repeat-free.</text>
+  
+    <g>
+      <polygon points="63.0,73.2 117.0,73.2 144.0,120.0 117.0,166.8 63.0,166.8 36.0,120.0" fill="#1d4ed8" fill-opacity="0.18" stroke="#1d4ed8" stroke-width="3"/>
+      <text x="90" y="112" text-anchor="middle" font-family="Consolas, monospace" font-size="24" fill="#111827">5</text>
+      <text x="90" y="138" text-anchor="middle" font-family="Consolas, monospace" font-size="14" fill="#374151">ship</text>
+    </g>
+
+    <g>
+      <polygon points="263.0,73.2 317.0,73.2 344.0,120.0 317.0,166.8 263.0,166.8 236.0,120.0" fill="#0891b2" fill-opacity="0.18" stroke="#0891b2" stroke-width="3"/>
+      <text x="290" y="112" text-anchor="middle" font-family="Consolas, monospace" font-size="24" fill="#111827">11</text>
+      <text x="290" y="138" text-anchor="middle" font-family="Consolas, monospace" font-size="14" fill="#374151">planned</text>
+    </g>
+
+    <g>
+      <polygon points="463.0,73.2 517.0,73.2 544.0,120.0 517.0,166.8 463.0,166.8 436.0,120.0" fill="#7c3aed" fill-opacity="0.18" stroke="#7c3aed" stroke-width="3"/>
+      <text x="490" y="112" text-anchor="middle" font-family="Consolas, monospace" font-size="24" fill="#111827">8</text>
+      <text x="490" y="138" text-anchor="middle" font-family="Consolas, monospace" font-size="14" fill="#374151">exp</text>
+    </g>
+
+    <g>
+      <polygon points="663.0,73.2 717.0,73.2 744.0,120.0 717.0,166.8 663.0,166.8 636.0,120.0" fill="#dc2626" fill-opacity="0.18" stroke="#dc2626" stroke-width="3"/>
+      <text x="690" y="112" text-anchor="middle" font-family="Consolas, monospace" font-size="24" fill="#111827">3</text>
+      <text x="690" y="138" text-anchor="middle" font-family="Consolas, monospace" font-size="14" fill="#374151">archive</text>
+    </g>
+  <text x="40" y="214" font-family="Consolas, monospace" font-size="12" fill="#475569">Atlas cards: 9373 | clusters: 396 | vector64: 91.67%</text>
+  <text x="40" y="232" font-family="Consolas, monospace" font-size="12" fill="#475569">Qdrant bridge: 36 rows | missing features: 1089 prefix clusters</text>
+</svg>

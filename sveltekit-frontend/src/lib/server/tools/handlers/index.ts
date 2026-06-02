@@ -12,6 +12,7 @@ import './chunkEmbed.js';
 import './langextractBatch.js';
 import './crawlDocs.js';
 import './research.js';
+import './ldrResearch.js';
 
 // Re-export registry
 export { toolRegistry, toolRegistry as getToolDefinitions } from '../registry.js';

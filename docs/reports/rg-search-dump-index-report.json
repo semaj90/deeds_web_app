@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-06-02T02:08:09.553Z",
+  "inputs": [
+    {
+      "file": "docs/reports/rg_turbovec.txt",
+      "lane": "rg_turbovec",
+      "lines": 0,
+      "hits": 0,
+      "packets": 0,
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\rg_turbovec.txt'"
+    },
+    {
+      "file": "docs/reports/rg_napi.txt",
+      "lane": "rg_napi",
+      "lines": 0,
+      "hits": 0,
+      "packets": 0,
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\rg_napi.txt'"
+    }
+  ],
+  "summary": {
+    "totalLines": 0,
+    "parsedHits": 0,
+    "packets": 0,
+    "dryRun": false,
+    "maxLinesPerPacket": 250,
+    "maxPackets": 1
+  },
+  "note": "Large ripgrep dumps are chunked into parent-atlas-ready packets keyed by title_id, feature_id, and sourceRef. The raw .txt dumps remain generated evidence, not the indexed working artifact."
+}

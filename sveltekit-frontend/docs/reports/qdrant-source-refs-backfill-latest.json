@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-05-30T19:52:05.764Z",
-  "startedAt": "2026-05-30T19:52:03.521Z",
-  "dryRun": true,
-  "sampleQdrant": true,
-  "sampleLimit": 10,
+  "generatedAt": "2026-06-01T16:45:34.222Z",
+  "startedAt": "2026-06-01T16:45:27.618Z",
+  "dryRun": false,
+  "sampleQdrant": false,
+  "sampleLimit": 25,
   "qdrantUrl": "http://localhost:6333",
   "collection": "codebase_chunks_768",
-  "attempted": 10,
-  "updated": 0,
-  "skipped": 10,
+  "attempted": 3253,
+  "updated": 1449,
+  "skipped": 1804,
   "qdrantBefore": {
     "ok": true,
     "status": 200,
-    "total": 10,
-    "withSourceRefs": 0,
-    "coverage": 0,
+    "total": 25,
+    "withSourceRefs": 11,
+    "coverage": 0.44,
     "sample": [
       {
         "id": 119404,
@@ -50,6 +50,15 @@
           "domain": "utility",
           "complexity": "medium",
           "indexed_at": "2026-05-27T15:50:54.689Z"
+        }
+      },
+      {
+        "id": 164541,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "deeds_labs/routes-parked-full/api/admin",
+          "summary": "module directory with 8 files, 8 API handlers",
+          "generatedAt": "2026-05-31T04:39:58.300Z"
         }
       },
       {
@@ -90,7 +99,67 @@
             0.2583998
           ],
           "graphAuthorityScore": 0,
-          "glyph_cluster": "unclassified:na"
+          "glyph_cluster": "unclassified:1",
+          "som_cluster": 1,
+          "gpu_cluster": 1,
+          "som_bmu_row": 0,
+          "som_bmu_col": 1,
+          "gpuCluster": 14,
+          "somRow": 2,
+          "somCol": 4,
+          "sourceRefs": [
+            "src/lib/server/ai/contextual-tools.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/ai/contextual-tools.ts"
+          ]
+        }
+      },
+      {
+        "id": 188608,
+        "payload": {
+          "chunk_id": "card:src/lib/server/research/reddit-harvester.ts:19efad6c28a9852c",
+          "sourceRef": "src/lib/server/research/reddit-harvester.ts#chunk-8",
+          "file_path": "src/lib/server/research/reddit-harvester.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "research",
+            "reddit-harvester",
+            "reddit",
+            "harvester"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "19efad6c28a9852c",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "research",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "reddit-harvester.ts",
+          "extension": ".ts",
+          "chunk_index": 8,
+          "total_chunks": 9,
+          "content": "\r\n        return {\r\n          id: sha256Hex(`reddit_post:${d.id}:${body.slice(0, 200)}`),\r\n          source: 'reddit_post' as const,\r\n          url: redditUrl,\r\n          title: d.title,\r\n          body: body.slice(0, 5000),\r\n          subreddit: d.subreddit,\r\n          score: d.score,\r\n          fetched_at: new Date().toISOString(),\r\n        };\r\n      });\r\n\r\n    return { chunks, after: data?.data?.after ?? null };\r\n  } catch (err) {\r\n    console.error('[reddit-harvester] fetch error:', err);\r\n    return { chunks: [], after: null };\r\n  }\r\n}\r\n",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-31T21:10:11.337Z",
+          "graphAuthorityScore": 0.45,
+          "communityId": "community:14020",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "cluster_key": "unclassified:community-14020",
+          "sourceRefs": [
+            "src/lib/server/research/reddit-harvester.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/research/reddit-harvester.ts"
+          ]
         }
       },
       {
@@ -126,7 +195,21 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-29T15:52:22.017Z"
+          "indexed_at": "2026-05-29T15:52:22.017Z",
+          "gpuCluster": 4,
+          "somRow": 0,
+          "somCol": 4,
+          "graphAuthorityScore": 0.45,
+          "communityId": "community:13916",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "cluster_key": "unclassified:community-13916",
+          "sourceRefs": [
+            "src/lib/server/gpu/libtorch-bridge.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/gpu/libtorch-bridge.ts"
+          ]
         }
       },
       {
@@ -157,7 +240,16 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:57:27.770Z"
+          "indexed_at": "2026-05-27T20:57:27.770Z",
+          "gpuCluster": 5,
+          "somRow": 1,
+          "somCol": 0,
+          "sourceRefs": [
+            "src/lib/server/couchdb/mango-indexes.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/couchdb/mango-indexes.ts"
+          ]
         }
       },
       {
@@ -188,7 +280,16 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:55:09.986Z"
+          "indexed_at": "2026-05-27T20:55:09.986Z",
+          "gpuCluster": 6,
+          "somRow": 1,
+          "somCol": 1,
+          "sourceRefs": [
+            "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
+          ]
         }
       },
       {
@@ -219,7 +320,16 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:21.022Z"
+          "indexed_at": "2026-05-27T20:54:21.022Z",
+          "gpuCluster": 17,
+          "somRow": 3,
+          "somCol": 2,
+          "sourceRefs": [
+            "src/lib/components/citations/CitationSaveForm.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/citations/CitationSaveForm.svelte"
+          ]
         }
       },
       {
@@ -259,9 +369,329 @@
         }
       },
       {
+        "id": 909958,
+        "payload": {
+          "chunk_id": "card:src/lib/server/retrieval/centroid-cache.ts:00bbae84258a1b98",
+          "sourceRef": "src/lib/server/retrieval/centroid-cache.ts#chunk-19",
+          "file_path": "src/lib/server/retrieval/centroid-cache.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "retrieval",
+            "centroid-cache",
+            "centroid",
+            "cache"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "00bbae84258a1b98",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "retrieval",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "centroid-cache.ts",
+          "extension": ".ts",
+          "chunk_index": 19,
+          "total_chunks": 29,
+          "content": "}\r\n\r\nexport interface DidYouMeanResult {\r\n  neighbors:           SomNeighbor[];\r\n  reconstructionError: number;\r\n  isNovel:             boolean; // true when error exceeds noveltyThreshold\r\n  errorSource:         'autoencoder-gpu' | 'autoencoder-cpu' | 'cosine-approx';\r\n}\r\n\r\n// ── Autoencoder weight loader ─────────────────────────────────────────────────\r\n\r\n/** Redis key written by the topology projection pipeline after autoencoder training. */\r\nconst DECODER_WEIGHTS_KEY = 'ace:autoencoder:decoder:weights';\r\n\r\ninterface StoredWeights {\r\n  W:         number[];\r\n  b:         number[];\r\n  hidden:    number;\r\n  outputDim: number;\r\n}\r\n\r\n/**\r\n * Load decoder weights from Redis.\r\n * Returns null when the autoencoder hasn't been trained / weights not yet cached.\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-31T21:10:30.555Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/centroid-cache.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/centroid-cache.ts"
+          ]
+        }
+      },
+      {
+        "id": 990761,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "sveltekit-frontend/src/routes/(analysis)@",
+          "summary": "route handler directory with 3 files, 0 API handlers",
+          "generatedAt": "2026-05-31T04:38:41.429Z"
+        }
+      },
+      {
         "id": 999999,
         "payload": {
           "test": true
+        }
+      },
+      {
+        "id": 1080785,
+        "payload": {
+          "chunk_id": "card:src/lib/components/admin/AdminMonitoringDashboard.svelte:b6cbebca14c0fbd1",
+          "sourceRef": "src/lib/components/admin/AdminMonitoringDashboard.svelte#chunk-22",
+          "file_path": "src/lib/components/admin/AdminMonitoringDashboard.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "admin",
+            "adminmonitoringdashboard"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "b6cbebca14c0fbd1",
+          "schema_version": 1,
+          "file_name": "AdminMonitoringDashboard.svelte",
+          "extension": ".svelte",
+          "chunk_index": 22,
+          "total_chunks": 37,
+          "content": "        <div class=\"space-y-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin\">\r\n          {#if stats.timelineEvents}\r\n            {#each stats.timelineEvents as event}\r\n              <div class=\"p-2 rounded-lg bg-zinc-950/40 border border-zinc-800/30 text-[10px] flex items-center justify-between\">\r\n                <div class=\"flex flex-col gap-1\">\r\n                  <div class=\"flex items-center gap-2\">\r\n                    <span class=\"font-bold text-zinc-300 uppercase tracking-tighter\">{event.signal?.replace('_', ' ') ?? 'EVENT'}</span>\r\n                    <span class=\"px-1 py-0.5 rounded-[4px] text-[8px] bg-zinc-800 text-zinc-500 font-mono\">{event.pipeline}</span>\r\n                  </div>\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T20:54:03.120Z"
+        }
+      },
+      {
+        "id": 1103029,
+        "payload": {
+          "chunk_id": "card:src/lib/components/graph/GraphifyViewer.svelte:e5ca07ccec87ca3b",
+          "sourceRef": "src/lib/components/graph/GraphifyViewer.svelte#chunk-64",
+          "file_path": "src/lib/components/graph/GraphifyViewer.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "graph",
+            "graphifyviewer"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "e5ca07ccec87ca3b",
+          "schema_version": 1,
+          "file_name": "GraphifyViewer.svelte",
+          "extension": ".svelte",
+          "chunk_index": 64,
+          "total_chunks": 81,
+          "content": "  .glyph-chips { display: flex; flex-wrap: wrap; gap: 4px; }\r\n  .glyph-chip {\r\n    padding: 1px 6px; border-radius: 3px; font-size: 0.68rem; white-space: nowrap;\r\n    border: 1px solid #234;\r\n  }\r\n  .glyph-chip.som   { background: #0a1a1a; color: #4a8; border-color: #1a3a2a; }\r\n  .glyph-chip.src   { background: #0a0a1a; color: #88f; border-color: #224; }\r\n  .glyph-chip.ace   { background: #0a0a0a; border-color: #333; }\r\n  .glyph-chip.ace-ok   { color: #4d4; border-color: #1a3a1a; background: #0a160a; }\r\n  .glyph-chip.ace-miss { color: #d84; border-color: #3a2a1a; background: #160f0a; }\r\n  .glyph-terms { display: flex; flex-wrap: wrap; gap: 3px; }\r\n  .glyph-term {\r\n    padding: 1px 5px; background: #111a11; border: 1px solid #1a2a1a;\r\n    border-radius: 3px; color: #6a6; font-size: 0.65rem;\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T20:54:35.947Z",
+          "sourceRefs": [
+            "src/lib/components/graph/GraphifyViewer.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/graph/GraphifyViewer.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1116368,
+        "payload": {
+          "chunk_id": "card:src/lib/server/retrieval/cluster-aware-reranker.ts:64239deea55589f4",
+          "sourceRef": "src/lib/server/retrieval/cluster-aware-reranker.ts#chunk-1",
+          "file_path": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "retrieval",
+            "cluster-aware-reranker",
+            "cluster",
+            "aware",
+            "reranker",
+            "redis.js",
+            "bag-cache.js"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "64239deea55589f4",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "retrieval",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "cluster-aware-reranker.ts",
+          "extension": ".ts",
+          "chunk_index": 1,
+          "total_chunks": 7,
+          "content": " *   3. Re-sort descending by adjusted score.\r\n *   4. Optionally inject a 1-line cluster label (\"// cluster 7 — auth/session\")\r\n *      as the first chunk so the LLM has spatial context.\r\n *\r\n * BoW texture integration:\r\n *   When `bowTile` is supplied (from bag-cache.ts / getBowTextureForCluster),\r\n *   the top-5 terms are appended to each in-cluster chunk's content so the\r\n *   reranker's cross-encoder has richer lexical overlap with the query.\r\n *\r\n * Non-fatal — callers wrap in try/catch.\r\n */\r\n\r\nimport { getRedis } from '$lib/server/redis.js';\r\nimport type { BowTextureTile } from '$lib/server/langextract/bag-cache.js';\r\n\r\nexport interface RAGChunkLike {\r\n  content: string;\r\n  score: number;\r\n  source: string;\r\n  gpuCluster?: number;\r\n  somCluster?: number;\r\n}\r\n\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-31T21:10:35.722Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/cluster-aware-reranker.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/cluster-aware-reranker.ts"
+          ]
+        }
+      },
+      {
+        "id": 1116474,
+        "payload": {
+          "chunk_id": "card:.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py:2da0f7259e03acea",
+          "file_path": ".venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py",
+          "file_name": "candidates.py",
+          "extension": ".py",
+          "chunk_index": 5,
+          "total_chunks": 29,
+          "content": "        constraint=template.constraint,\n        hash_options=template.hash_options,\n        config_settings=template.config_settings,\n    )\n    ireq.satisfied_by = dist\n    return ireq\n\n\nclass _InstallRequirementBackedCandidate(Candidate):\n    \"\"\"A candidate backed by an ``InstallRequirement``.\n\n    This represents a package request with the target not being already\n    in the environment, and needs to be fetched and installed. The backing\n    ``InstallRequirement`` is responsible for most of the leg work; this\n    class exposes appropriate information to the resolver.\n\n    :param link: The link passed to the ``InstallRequirement``. The backing\n        ``InstallRequirement`` will use this link to fetch the distribution.",
+          "content_hash": "2da0f7259e03acea",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T15:59:43.437Z"
+        }
+      },
+      {
+        "id": 1167479,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "scripts/tests/screenshots/2026-04-12T23-47-33",
+          "summary": "module directory with 2 files, 0 API handlers",
+          "generatedAt": "2026-05-31T04:37:52.616Z"
+        }
+      },
+      {
+        "id": 1234338,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "deeds_labs/routes-parked-full/register",
+          "summary": "module directory with 2 files, 0 API handlers",
+          "generatedAt": "2026-05-31T04:40:01.580Z"
+        }
+      },
+      {
+        "id": 1323671,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "sveltekit-frontend/src/lib",
+          "summary": "module directory with 6 files, 5 API handlers, 245 Drizzle refs, 13 TODOs",
+          "generatedAt": "2026-05-31T04:39:45.217Z"
+        }
+      },
+      {
+        "id": 1354889,
+        "payload": {
+          "chunk_id": "card:src/lib/components/legal/EvidenceReportSummary.svelte:3b3cdad63482a124",
+          "sourceRef": "src/lib/components/legal/EvidenceReportSummary.svelte#chunk-5",
+          "file_path": "src/lib/components/legal/EvidenceReportSummary.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "legal",
+            "evidencereportsummary"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "3b3cdad63482a124",
+          "schema_version": 1,
+          "file_name": "EvidenceReportSummary.svelte",
+          "extension": ".svelte",
+          "chunk_index": 5,
+          "total_chunks": 26,
+          "content": "\r\n## Legal Implications\r\n- Charges: ${reportData.legalImplications.charges.join(', ')}\r\n- Precedents: ${reportData.legalImplications.precedents.join(', ')}\r\n- Challenge Points: ${reportData.legalImplications.challengePoints.join(', ')}\r\n\r\n## Attachments\r\n${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\\n')}\r\n`.trim();\r\n\r\n\t\tconst blob = new Blob([content], { type: 'text/markdown' });\r\n\t\tconst url = URL.createObjectURL(blob);\r\n\t\tconst a = document.createElement('a');\r\n\t\ta.href = url;\r\n\t\ta.download = `evidence-report-${evidenceId}-${new Date().toISOString().split('T')[0]}.md`;\r\n\t\tdocument.body.appendChild(a);\r\n\t\ta.click();\r\n\t\tdocument.body.removeChild(a);\r\n\t\tURL.revokeObjectURL(url);\r\n\t}\r\n</script>\r\n\r\n<div class=\"evidence-report-summary\">\r\n\t<!-- Report Header -->\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T20:54:45.350Z",
+          "gpuCluster": 17,
+          "somRow": 3,
+          "somCol": 2,
+          "sourceRefs": [
+            "src/lib/components/legal/EvidenceReportSummary.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/legal/EvidenceReportSummary.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1373377,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "deeds_labs/frontend/features-archive/memory",
+          "summary": "module directory with 3 files, 0 API handlers",
+          "generatedAt": "2026-05-31T04:38:27.903Z"
+        }
+      },
+      {
+        "id": 1401737,
+        "payload": {
+          "chunk_id": "card:src/lib/db/schema/evidence.ts:93e380b034f56230",
+          "sourceRef": "src/lib/db/schema/evidence.ts#chunk-4",
+          "file_path": "src/lib/db/schema/evidence.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "schema",
+            "evidence",
+            "db:graph_edges"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "93e380b034f56230",
+          "schema_version": 1,
+          "file_name": "evidence.ts",
+          "extension": ".ts",
+          "chunk_index": 4,
+          "total_chunks": 8,
+          "content": "\ttype: nodeTypeEnum('type').notNull(),\r\n\r\n\t// Position on graph\r\n\tposX: integer('pos_x').notNull(),\r\n\tposY: integer('pos_y').notNull(),\r\n\r\n\t// Reference to actual entity\r\n\tentityId: uuid('entity_id'), // ID of person, evidence, or location\r\n\r\n\tcreatedAt: timestamp('created_at').defaultNow().notNull(),\r\n});\r\n\r\nexport const graphEdges = pgTable('graph_edges', {\r\n\tid: uuid('id').primaryKey().defaultRandom(),\r\n\tcaseId: uuid('case_id').notNull(),\r\n\tfromNodeId: uuid('from_node_id')\r\n\t\t.notNull()\r\n\t\t.references(() => graphNodes.id, { onDelete: 'cascade' }),\r\n\ttoNodeId: uuid('to_node_id')\r\n\t\t.notNull()\r\n\t\t.references(() => graphNodes.id, { onDelete: 'cascade' }),\r\n\tlabel: text('label'),\r\n\tstrength: relationshipStrengthEnum('strength').default('medium'),\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T20:56:36.174Z",
+          "gpuCluster": 19,
+          "somRow": 3,
+          "somCol": 4,
+          "graphAuthorityScore": 0.4,
+          "communityId": "community:13880",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "cluster_key": "unclassified:community-13880",
+          "sourceRefs": [
+            "src/lib/db/schema/evidence.ts"
+          ],
+          "source_refs": [
+            "src/lib/db/schema/evidence.ts"
+          ]
+        }
+      },
+      {
+        "id": 1472131,
+        "payload": {
+          "chunk_id": "card:.venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py:0e84115ff99a0d8b",
+          "file_path": ".venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py",
+          "file_name": "test_format.py",
+          "extension": ".py",
+          "chunk_index": 40,
+          "total_chunks": 64,
+          "content": "# field with '' name\ndt4 = np.dtype({'names': ['a', '', 'b'], 'formats': ['i4']*3})\n# titles\ndt5 = np.dtype({'names': ['a', 'b'], 'formats': ['i4', 'i4'],\n                'offsets': [1, 6], 'titles': ['aa', 'bb']})\n# empty\ndt6 = np.dtype({'names': [], 'formats': [], 'itemsize': 8})\n\n@pytest.mark.parametrize(\"dt\", [dt1, dt2, dt3, dt4, dt5, dt6])\ndef test_load_padded_dtype(tmpdir, dt):\n    arr = np.zeros(3, dt)\n    for i in range(3):\n        arr[i] = i + 5\n    npz_file = os.path.join(tmpdir, 'aligned.npz')\n    np.savez(npz_file, arr=arr)\n    with np.load(npz_file) as npz:\n        arr1 = npz['arr']\n    assert_array_equal(arr, arr1)\n\n\n@pytest.mark.skipif(sys.version_info >= (3, 12), reason=\"see gh-23988\")\n@pytest.mark.xfail(IS_WASM, reason=\"Emscripten NODEFS has a buggy dup\")",
+          "content_hash": "0e84115ff99a0d8b",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T15:40:29.304Z"
         }
       }
     ]
@@ -269,9 +699,9 @@
   "qdrantAfter": {
     "ok": true,
     "status": 200,
-    "total": 10,
-    "withSourceRefs": 0,
-    "coverage": 0,
+    "total": 25,
+    "withSourceRefs": 11,
+    "coverage": 0.44,
     "sample": [
       {
         "id": 119404,
@@ -307,6 +737,15 @@
           "domain": "utility",
           "complexity": "medium",
           "indexed_at": "2026-05-27T15:50:54.689Z"
+        }
+      },
+      {
+        "id": 164541,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "deeds_labs/routes-parked-full/api/admin",
+          "summary": "module directory with 8 files, 8 API handlers",
+          "generatedAt": "2026-05-31T04:39:58.300Z"
         }
       },
       {
@@ -347,7 +786,67 @@
             0.2583998
           ],
           "graphAuthorityScore": 0,
-          "glyph_cluster": "unclassified:na"
+          "glyph_cluster": "unclassified:1",
+          "som_cluster": 1,
+          "gpu_cluster": 1,
+          "som_bmu_row": 0,
+          "som_bmu_col": 1,
+          "gpuCluster": 14,
+          "somRow": 2,
+          "somCol": 4,
+          "sourceRefs": [
+            "src/lib/server/ai/contextual-tools.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/ai/contextual-tools.ts"
+          ]
+        }
+      },
+      {
+        "id": 188608,
+        "payload": {
+          "chunk_id": "card:src/lib/server/research/reddit-harvester.ts:19efad6c28a9852c",
+          "sourceRef": "src/lib/server/research/reddit-harvester.ts#chunk-8",
+          "file_path": "src/lib/server/research/reddit-harvester.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "research",
+            "reddit-harvester",
+            "reddit",
+            "harvester"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "19efad6c28a9852c",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "research",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "reddit-harvester.ts",
+          "extension": ".ts",
+          "chunk_index": 8,
+          "total_chunks": 9,
+          "content": "\r\n        return {\r\n          id: sha256Hex(`reddit_post:${d.id}:${body.slice(0, 200)}`),\r\n          source: 'reddit_post' as const,\r\n          url: redditUrl,\r\n          title: d.title,\r\n          body: body.slice(0, 5000),\r\n          subreddit: d.subreddit,\r\n          score: d.score,\r\n          fetched_at: new Date().toISOString(),\r\n        };\r\n      });\r\n\r\n    return { chunks, after: data?.data?.after ?? null };\r\n  } catch (err) {\r\n    console.error('[reddit-harvester] fetch error:', err);\r\n    return { chunks: [], after: null };\r\n  }\r\n}\r\n",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-31T21:10:11.337Z",
+          "graphAuthorityScore": 0.45,
+          "communityId": "community:14020",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "cluster_key": "unclassified:community-14020",
+          "sourceRefs": [
+            "src/lib/server/research/reddit-harvester.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/research/reddit-harvester.ts"
+          ]
         }
       },
       {
@@ -383,7 +882,21 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-29T15:52:22.017Z"
+          "indexed_at": "2026-05-29T15:52:22.017Z",
+          "gpuCluster": 4,
+          "somRow": 0,
+          "somCol": 4,
+          "graphAuthorityScore": 0.45,
+          "communityId": "community:13916",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "cluster_key": "unclassified:community-13916",
+          "sourceRefs": [
+            "src/lib/server/gpu/libtorch-bridge.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/gpu/libtorch-bridge.ts"
+          ]
         }
       },
       {
@@ -414,7 +927,16 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:57:27.770Z"
+          "indexed_at": "2026-05-27T20:57:27.770Z",
+          "gpuCluster": 5,
+          "somRow": 1,
+          "somCol": 0,
+          "sourceRefs": [
+            "src/lib/server/couchdb/mango-indexes.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/couchdb/mango-indexes.ts"
+          ]
         }
       },
       {
@@ -445,7 +967,16 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:55:09.986Z"
+          "indexed_at": "2026-05-27T20:55:09.986Z",
+          "gpuCluster": 6,
+          "somRow": 1,
+          "somCol": 1,
+          "sourceRefs": [
+            "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
+          ]
         }
       },
       {
@@ -476,7 +1007,16 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:21.022Z"
+          "indexed_at": "2026-05-27T20:54:21.022Z",
+          "gpuCluster": 17,
+          "somRow": 3,
+          "somCol": 2,
+          "sourceRefs": [
+            "src/lib/components/citations/CitationSaveForm.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/citations/CitationSaveForm.svelte"
+          ]
         }
       },
       {
@@ -516,9 +1056,329 @@
         }
       },
       {
+        "id": 909958,
+        "payload": {
+          "chunk_id": "card:src/lib/server/retrieval/centroid-cache.ts:00bbae84258a1b98",
+          "sourceRef": "src/lib/server/retrieval/centroid-cache.ts#chunk-19",
+          "file_path": "src/lib/server/retrieval/centroid-cache.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "retrieval",
+            "centroid-cache",
+            "centroid",
+            "cache"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "00bbae84258a1b98",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "retrieval",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "centroid-cache.ts",
+          "extension": ".ts",
+          "chunk_index": 19,
+          "total_chunks": 29,
+          "content": "}\r\n\r\nexport interface DidYouMeanResult {\r\n  neighbors:           SomNeighbor[];\r\n  reconstructionError: number;\r\n  isNovel:             boolean; // true when error exceeds noveltyThreshold\r\n  errorSource:         'autoencoder-gpu' | 'autoencoder-cpu' | 'cosine-approx';\r\n}\r\n\r\n// ── Autoencoder weight loader ─────────────────────────────────────────────────\r\n\r\n/** Redis key written by the topology projection pipeline after autoencoder training. */\r\nconst DECODER_WEIGHTS_KEY = 'ace:autoencoder:decoder:weights';\r\n\r\ninterface StoredWeights {\r\n  W:         number[];\r\n  b:         number[];\r\n  hidden:    number;\r\n  outputDim: number;\r\n}\r\n\r\n/**\r\n * Load decoder weights from Redis.\r\n * Returns null when the autoencoder hasn't been trained / weights not yet cached.\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-31T21:10:30.555Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/centroid-cache.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/centroid-cache.ts"
+          ]
+        }
+      },
+      {
+        "id": 990761,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "sveltekit-frontend/src/routes/(analysis)@",
+          "summary": "route handler directory with 3 files, 0 API handlers",
+          "generatedAt": "2026-05-31T04:38:41.429Z"
+        }
+      },
+      {
         "id": 999999,
         "payload": {
           "test": true
+        }
+      },
+      {
+        "id": 1080785,
+        "payload": {
+          "chunk_id": "card:src/lib/components/admin/AdminMonitoringDashboard.svelte:b6cbebca14c0fbd1",
+          "sourceRef": "src/lib/components/admin/AdminMonitoringDashboard.svelte#chunk-22",
+          "file_path": "src/lib/components/admin/AdminMonitoringDashboard.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "admin",
+            "adminmonitoringdashboard"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "b6cbebca14c0fbd1",
+          "schema_version": 1,
+          "file_name": "AdminMonitoringDashboard.svelte",
+          "extension": ".svelte",
+          "chunk_index": 22,
+          "total_chunks": 37,
+          "content": "        <div class=\"space-y-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin\">\r\n          {#if stats.timelineEvents}\r\n            {#each stats.timelineEvents as event}\r\n              <div class=\"p-2 rounded-lg bg-zinc-950/40 border border-zinc-800/30 text-[10px] flex items-center justify-between\">\r\n                <div class=\"flex flex-col gap-1\">\r\n                  <div class=\"flex items-center gap-2\">\r\n                    <span class=\"font-bold text-zinc-300 uppercase tracking-tighter\">{event.signal?.replace('_', ' ') ?? 'EVENT'}</span>\r\n                    <span class=\"px-1 py-0.5 rounded-[4px] text-[8px] bg-zinc-800 text-zinc-500 font-mono\">{event.pipeline}</span>\r\n                  </div>\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T20:54:03.120Z"
+        }
+      },
+      {
+        "id": 1103029,
+        "payload": {
+          "chunk_id": "card:src/lib/components/graph/GraphifyViewer.svelte:e5ca07ccec87ca3b",
+          "sourceRef": "src/lib/components/graph/GraphifyViewer.svelte#chunk-64",
+          "file_path": "src/lib/components/graph/GraphifyViewer.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "graph",
+            "graphifyviewer"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "e5ca07ccec87ca3b",
+          "schema_version": 1,
+          "file_name": "GraphifyViewer.svelte",
+          "extension": ".svelte",
+          "chunk_index": 64,
+          "total_chunks": 81,
+          "content": "  .glyph-chips { display: flex; flex-wrap: wrap; gap: 4px; }\r\n  .glyph-chip {\r\n    padding: 1px 6px; border-radius: 3px; font-size: 0.68rem; white-space: nowrap;\r\n    border: 1px solid #234;\r\n  }\r\n  .glyph-chip.som   { background: #0a1a1a; color: #4a8; border-color: #1a3a2a; }\r\n  .glyph-chip.src   { background: #0a0a1a; color: #88f; border-color: #224; }\r\n  .glyph-chip.ace   { background: #0a0a0a; border-color: #333; }\r\n  .glyph-chip.ace-ok   { color: #4d4; border-color: #1a3a1a; background: #0a160a; }\r\n  .glyph-chip.ace-miss { color: #d84; border-color: #3a2a1a; background: #160f0a; }\r\n  .glyph-terms { display: flex; flex-wrap: wrap; gap: 3px; }\r\n  .glyph-term {\r\n    padding: 1px 5px; background: #111a11; border: 1px solid #1a2a1a;\r\n    border-radius: 3px; color: #6a6; font-size: 0.65rem;\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T20:54:35.947Z",
+          "sourceRefs": [
+            "src/lib/components/graph/GraphifyViewer.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/graph/GraphifyViewer.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1116368,
+        "payload": {
+          "chunk_id": "card:src/lib/server/retrieval/cluster-aware-reranker.ts:64239deea55589f4",
+          "sourceRef": "src/lib/server/retrieval/cluster-aware-reranker.ts#chunk-1",
+          "file_path": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "retrieval",
+            "cluster-aware-reranker",
+            "cluster",
+            "aware",
+            "reranker",
+            "redis.js",
+            "bag-cache.js"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "64239deea55589f4",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "retrieval",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "cluster-aware-reranker.ts",
+          "extension": ".ts",
+          "chunk_index": 1,
+          "total_chunks": 7,
+          "content": " *   3. Re-sort descending by adjusted score.\r\n *   4. Optionally inject a 1-line cluster label (\"// cluster 7 — auth/session\")\r\n *      as the first chunk so the LLM has spatial context.\r\n *\r\n * BoW texture integration:\r\n *   When `bowTile` is supplied (from bag-cache.ts / getBowTextureForCluster),\r\n *   the top-5 terms are appended to each in-cluster chunk's content so the\r\n *   reranker's cross-encoder has richer lexical overlap with the query.\r\n *\r\n * Non-fatal — callers wrap in try/catch.\r\n */\r\n\r\nimport { getRedis } from '$lib/server/redis.js';\r\nimport type { BowTextureTile } from '$lib/server/langextract/bag-cache.js';\r\n\r\nexport interface RAGChunkLike {\r\n  content: string;\r\n  score: number;\r\n  source: string;\r\n  gpuCluster?: number;\r\n  somCluster?: number;\r\n}\r\n\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-31T21:10:35.722Z",
+          "sourceRefs": [
+            "src/lib/server/retrieval/cluster-aware-reranker.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/retrieval/cluster-aware-reranker.ts"
+          ]
+        }
+      },
+      {
+        "id": 1116474,
+        "payload": {
+          "chunk_id": "card:.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py:2da0f7259e03acea",
+          "file_path": ".venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py",
+          "file_name": "candidates.py",
+          "extension": ".py",
+          "chunk_index": 5,
+          "total_chunks": 29,
+          "content": "        constraint=template.constraint,\n        hash_options=template.hash_options,\n        config_settings=template.config_settings,\n    )\n    ireq.satisfied_by = dist\n    return ireq\n\n\nclass _InstallRequirementBackedCandidate(Candidate):\n    \"\"\"A candidate backed by an ``InstallRequirement``.\n\n    This represents a package request with the target not being already\n    in the environment, and needs to be fetched and installed. The backing\n    ``InstallRequirement`` is responsible for most of the leg work; this\n    class exposes appropriate information to the resolver.\n\n    :param link: The link passed to the ``InstallRequirement``. The backing\n        ``InstallRequirement`` will use this link to fetch the distribution.",
+          "content_hash": "2da0f7259e03acea",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T15:59:43.437Z"
+        }
+      },
+      {
+        "id": 1167479,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "scripts/tests/screenshots/2026-04-12T23-47-33",
+          "summary": "module directory with 2 files, 0 API handlers",
+          "generatedAt": "2026-05-31T04:37:52.616Z"
+        }
+      },
+      {
+        "id": 1234338,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "deeds_labs/routes-parked-full/register",
+          "summary": "module directory with 2 files, 0 API handlers",
+          "generatedAt": "2026-05-31T04:40:01.580Z"
+        }
+      },
+      {
+        "id": 1323671,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "sveltekit-frontend/src/lib",
+          "summary": "module directory with 6 files, 5 API handlers, 245 Drizzle refs, 13 TODOs",
+          "generatedAt": "2026-05-31T04:39:45.217Z"
+        }
+      },
+      {
+        "id": 1354889,
+        "payload": {
+          "chunk_id": "card:src/lib/components/legal/EvidenceReportSummary.svelte:3b3cdad63482a124",
+          "sourceRef": "src/lib/components/legal/EvidenceReportSummary.svelte#chunk-5",
+          "file_path": "src/lib/components/legal/EvidenceReportSummary.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "legal",
+            "evidencereportsummary"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "3b3cdad63482a124",
+          "schema_version": 1,
+          "file_name": "EvidenceReportSummary.svelte",
+          "extension": ".svelte",
+          "chunk_index": 5,
+          "total_chunks": 26,
+          "content": "\r\n## Legal Implications\r\n- Charges: ${reportData.legalImplications.charges.join(', ')}\r\n- Precedents: ${reportData.legalImplications.precedents.join(', ')}\r\n- Challenge Points: ${reportData.legalImplications.challengePoints.join(', ')}\r\n\r\n## Attachments\r\n${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\\n')}\r\n`.trim();\r\n\r\n\t\tconst blob = new Blob([content], { type: 'text/markdown' });\r\n\t\tconst url = URL.createObjectURL(blob);\r\n\t\tconst a = document.createElement('a');\r\n\t\ta.href = url;\r\n\t\ta.download = `evidence-report-${evidenceId}-${new Date().toISOString().split('T')[0]}.md`;\r\n\t\tdocument.body.appendChild(a);\r\n\t\ta.click();\r\n\t\tdocument.body.removeChild(a);\r\n\t\tURL.revokeObjectURL(url);\r\n\t}\r\n</script>\r\n\r\n<div class=\"evidence-report-summary\">\r\n\t<!-- Report Header -->\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T20:54:45.350Z",
+          "gpuCluster": 17,
+          "somRow": 3,
+          "somCol": 2,
+          "sourceRefs": [
+            "src/lib/components/legal/EvidenceReportSummary.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/legal/EvidenceReportSummary.svelte"
+          ]
+        }
+      },
+      {
+        "id": 1373377,
+        "payload": {
+          "kind": "directory-cluster",
+          "dir": "deeds_labs/frontend/features-archive/memory",
+          "summary": "module directory with 3 files, 0 API handlers",
+          "generatedAt": "2026-05-31T04:38:27.903Z"
+        }
+      },
+      {
+        "id": 1401737,
+        "payload": {
+          "chunk_id": "card:src/lib/db/schema/evidence.ts:93e380b034f56230",
+          "sourceRef": "src/lib/db/schema/evidence.ts#chunk-4",
+          "file_path": "src/lib/db/schema/evidence.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "schema",
+            "evidence",
+            "db:graph_edges"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "93e380b034f56230",
+          "schema_version": 1,
+          "file_name": "evidence.ts",
+          "extension": ".ts",
+          "chunk_index": 4,
+          "total_chunks": 8,
+          "content": "\ttype: nodeTypeEnum('type').notNull(),\r\n\r\n\t// Position on graph\r\n\tposX: integer('pos_x').notNull(),\r\n\tposY: integer('pos_y').notNull(),\r\n\r\n\t// Reference to actual entity\r\n\tentityId: uuid('entity_id'), // ID of person, evidence, or location\r\n\r\n\tcreatedAt: timestamp('created_at').defaultNow().notNull(),\r\n});\r\n\r\nexport const graphEdges = pgTable('graph_edges', {\r\n\tid: uuid('id').primaryKey().defaultRandom(),\r\n\tcaseId: uuid('case_id').notNull(),\r\n\tfromNodeId: uuid('from_node_id')\r\n\t\t.notNull()\r\n\t\t.references(() => graphNodes.id, { onDelete: 'cascade' }),\r\n\ttoNodeId: uuid('to_node_id')\r\n\t\t.notNull()\r\n\t\t.references(() => graphNodes.id, { onDelete: 'cascade' }),\r\n\tlabel: text('label'),\r\n\tstrength: relationshipStrengthEnum('strength').default('medium'),\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T20:56:36.174Z",
+          "gpuCluster": 19,
+          "somRow": 3,
+          "somCol": 4,
+          "graphAuthorityScore": 0.4,
+          "communityId": "community:13880",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "cluster_key": "unclassified:community-13880",
+          "sourceRefs": [
+            "src/lib/db/schema/evidence.ts"
+          ],
+          "source_refs": [
+            "src/lib/db/schema/evidence.ts"
+          ]
+        }
+      },
+      {
+        "id": 1472131,
+        "payload": {
+          "chunk_id": "card:.venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py:0e84115ff99a0d8b",
+          "file_path": ".venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py",
+          "file_name": "test_format.py",
+          "extension": ".py",
+          "chunk_index": 40,
+          "total_chunks": 64,
+          "content": "# field with '' name\ndt4 = np.dtype({'names': ['a', '', 'b'], 'formats': ['i4']*3})\n# titles\ndt5 = np.dtype({'names': ['a', 'b'], 'formats': ['i4', 'i4'],\n                'offsets': [1, 6], 'titles': ['aa', 'bb']})\n# empty\ndt6 = np.dtype({'names': [], 'formats': [], 'itemsize': 8})\n\n@pytest.mark.parametrize(\"dt\", [dt1, dt2, dt3, dt4, dt5, dt6])\ndef test_load_padded_dtype(tmpdir, dt):\n    arr = np.zeros(3, dt)\n    for i in range(3):\n        arr[i] = i + 5\n    npz_file = os.path.join(tmpdir, 'aligned.npz')\n    np.savez(npz_file, arr=arr)\n    with np.load(npz_file) as npz:\n        arr1 = npz['arr']\n    assert_array_equal(arr, arr1)\n\n\n@pytest.mark.skipif(sys.version_info >= (3, 12), reason=\"see gh-23988\")\n@pytest.mark.xfail(IS_WASM, reason=\"Emscripten NODEFS has a buggy dup\")",
+          "content_hash": "0e84115ff99a0d8b",
+          "tags": [],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T15:40:29.304Z"
         }
       }
     ]

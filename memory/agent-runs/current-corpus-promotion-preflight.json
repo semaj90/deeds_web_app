@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-06-02T04:31:41.497Z",
+  "mode": "dry-run",
+  "inputs": {
+    "deepImportGraph": {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\graphify\\deep\\deep-import-graph.json",
+      "exists": true
+    },
+    "deepImportEdges": {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\graphify\\deep\\deep-import-edges.jsonl",
+      "exists": true
+    },
+    "repoRootAtlas": {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\repo-root-atlas.json",
+      "exists": true
+    },
+    "codbaseGraph": {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\codebase-graph.json",
+      "exists": true
+    },
+    "routeAtlas": {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\repo-sveltekit-route-atlas.json",
+      "exists": true
+    },
+    "atlasDataFiles": {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\ingest\\atlas-data-files.md",
+      "exists": true
+    }
+  },
+  "corpus": {
+    "deepImportEdges": {
+      "total": 81136,
+      "resolved": 9149,
+      "internal": 19374,
+      "external": 61762,
+      "dynamic": 4721,
+      "reExport": 1868,
+      "uniqueSourceRefs": 15730,
+      "normMismatches": 0
+    },
+    "codbaseGraph": {
+      "fileCount": 5253,
+      "headerClaimedFileCount": 5253,
+      "routeCount": 1064,
+      "componentCount": 812,
+      "testCount": 169,
+      "withAuth": 1198,
+      "withZod": 1330,
+      "withDrizzle": 776,
+      "sv4Legacy": 0,
+      "ssrUnsafe": 1,
+      "withTodos": 143,
+      "localhostBreakers": 0,
+      "duplicateRels": 0
+    },
+    "routeAtlas": {
+      "routeCount": 250,
+      "withAuth": 206,
+      "withTests": 250,
+      "gapped": 28,
+      "datastores": [
+        "ACE",
+        "Redis",
+        "Qdrant",
+        "Neo4j",
+        "TurboVec"
+      ]
+    },
+    "repoRootAtlas": {
+      "fileCount": 34792,
+      "routeCount": 1075,
+      "apiCount": 5529,
+      "dirCount": 1367,
+      "qdrantCollections": [
+        "codebase_chunks_768",
+        "codebase_chunks_64d",
+        "glyph_atlas",
+        "task_distillates",
+        "docs_chunks",
+        "error_notes"
+      ],
+      "importMapEntries": 50
+    }
+  },
+  "promotionCandidates": {
+    "postgres_parent_atlas": {
+      "count": 2148,
+      "description": "Routes + Svelte components + Drizzle-touching files for parent_atlas_documents table",
+      "estimatedRowBytes": 5155200,
+      "safeToPromote": true,
+      "blocker": null
+    },
+    "qdrant_codebase_chunks": {
+      "count": 1570,
+      "collection": "codebase_chunks_768",
+      "description": "High-fanIn, auth-bearing, and drizzle-touching files — primary ACE retrieval corpus",
+      "requiresEmbedding": true,
+      "embeddingDim": 768,
+      "estimatedOllamaCallsNeeded": 157
+    },
+    "redis_hot_sourcerefs": {
+      "count": 200,
+      "description": "Top-200 files by fanIn for gpu:karpathy:scores hot-path",
+      "keyPattern": "ace:hot:sourceref:{sha8}",
+      "ttlSeconds": 86400,
+      "estimatedMemoryKB": 160
+    },
+    "neo4j_edges": {
+      "importsEdges": 19374,
+      "handlesRouteEdges": 250,
+      "usesDbEdges": 467,
+      "usesToolEdges": 1032,
+      "totalNewEdges": 19624,
+      "description": "IMPORTS + HANDLES_ROUTE edges from deep-import-edges (USES_DB/USES_TOOL already synced by phase3/4)"
+    },
+    "seaweedfs_blobs": {
+      "count": 577,
+      "description": "Test files and large components (>500 lines) for cold blob storage",
+      "estimatedTotalMB": 40766
+    }
+  },
+  "blockers": [],
+  "blockersCount": {
+    "error": 0,
+    "warn": 0,
+    "info": 0
+  },
+  "nextCommands": [
+    "# 1. Close the sourceRef normalization gap (safe, in-place):",
+    "node scripts/atlas/normalize-sourcerefs.mjs --write",
+    "",
+    "# 2. Promote to Postgres parent_atlas_documents (upsert-safe):",
+    "node scripts/atlas/promote-to-postgres.mjs --table parent_atlas_documents --dry-run",
+    "node scripts/atlas/promote-to-postgres.mjs --table parent_atlas_documents",
+    "",
+    "# 3. Embed + upsert qdrant_codebase_chunks (batched, resumable):",
+    "npm run graphify:semantic",
+    "",
+    "# 4. Write Redis hot sourceRef packets:",
+    "node scripts/atlas/load-parent-atlas-to-redis.mjs --hot-sourcerefs-only",
+    "",
+    "# 5. Sync IMPORTS edges to Neo4j (phase5):",
+    "node scripts/atlas/phase5-neo4j-sync.mjs --dry-run",
+    "node scripts/atlas/phase5-neo4j-sync.mjs"
+  ]
+}

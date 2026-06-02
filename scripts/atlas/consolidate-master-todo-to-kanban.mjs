@@ -37,6 +37,8 @@ const MERGE = argv.includes('--merge');
 const MASTER_TODO = path.join(ROOT, 'MASTER-FEATURE-TODO-2026-05-20.md');
 const KANBAN_TARGET = path.join(ROOT, 'docs', 'graph', 'kanban-board.json');
 const SVELTEKIT_PKG = path.join(ROOT, 'sveltekit-frontend', 'package.json');
+const FRONTEND_TMP = path.join(ROOT, 'sveltekit-frontend', '.tmp');
+const OFFLINE_ANALYSIS_BOARD = path.join(ROOT, 'sveltekit-frontend', '.tmp', 'offline-analysis', 'docs-graph-kanban-board.json');
 
 const RECONCILE_OUT = path.join(ROOT, '.tmp', 'master-todo-reconciliation.json');
 const TASKS_NDJSON = path.join(ROOT, '.tmp', 'master-todo-kanban-tasks.jsonl');
@@ -74,6 +76,145 @@ function extractNpmScripts(text) {
   const re2 = /`([a-zA-Z0-9_-]+:[a-zA-Z0-9_:-]+)`/g;
   while ((m = re2.exec(text))) out.add(m[1]);
   return Array.from(out);
+}
+
+function readJsonl(filePath) {
+  if (!fs.existsSync(filePath)) return [];
+  return fs.readFileSync(filePath, 'utf8')
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function normalizeSourceRefs(values) {
+  return Array.from(new Set((Array.isArray(values) ? values : [values]).flatMap((value) => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    return [String(value)];
+  }).filter(Boolean)));
+}
+
+function normalizeBoardTask(task, fallback = {}) {
+  const taskId = String(task.taskId || task.task_id || fallback.taskId || fallback.task_id || '');
+  const featureId = String(task.feature_id || task.featureId || task.feature || task.featureKey || fallback.feature_id || fallback.featureId || '');
+  const featureKey = String(task.featureKey || task.feature_key || fallback.featureKey || featureId || taskId || 'unknown');
+  const feature = String(task.feature || task.feature_name || fallback.feature || featureKey || featureId || '');
+  const sourceRef = String(task.source_ref || task.sourceRef || fallback.source_ref || fallback.sourceRef || '');
+  const sourceRefs = normalizeSourceRefs(task.sourceRefs || task.source_refs || fallback.sourceRefs || fallback.source_refs || (sourceRef ? [sourceRef] : []));
+  const status = String(task.status || fallback.status || 'todo');
+  const kanbanStatus = String(task.kanbanStatus || task.kanban_status || fallback.kanbanStatus || 'BACKLOG').toUpperCase();
+  return {
+    ...fallback,
+    ...task,
+    taskId: taskId || `KANBAN-${featureKey || 'UNKNOWN'}`,
+    feature: feature || undefined,
+    featureId: featureId || undefined,
+    feature_id: featureId || undefined,
+    featureKey,
+    sourceRef,
+    source_ref: sourceRef || undefined,
+    sourceRefs,
+    status,
+    kanbanStatus,
+    priority: task.priority || fallback.priority || 'LOW',
+  };
+}
+
+function createEmptyBoard() {
+  const labels = ['BACKLOG', 'READY', 'IN_PROGRESS', 'BLOCKED', 'REVIEW', 'DONE'];
+  return {
+    generatedAt: new Date().toISOString(),
+    repoName: path.basename(ROOT),
+    totalTasks: 0,
+    usedLlm: false,
+    columns: Object.fromEntries(labels.map((label) => [label, { label, tasks: [] }])),
+  };
+}
+
+function loadBoardSeed() {
+  const candidates = [KANBAN_TARGET, OFFLINE_ANALYSIS_BOARD];
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate)) continue;
+    try {
+      return JSON.parse(fs.readFileSync(candidate, 'utf8'));
+    } catch {
+      continue;
+    }
+  }
+  return createEmptyBoard();
+}
+
+function columnForStatus(status) {
+  const normalized = String(status || '').toUpperCase();
+  if (normalized === 'DONE' || normalized === 'COMPLETED' || normalized === 'SHIPPED') return 'DONE';
+  if (normalized === 'BLOCKED' || normalized === 'ENV_BLOCKED') return 'BLOCKED';
+  if (normalized === 'IN_PROGRESS' || normalized === 'DOING' || normalized === 'RUNNING') return 'IN_PROGRESS';
+  if (normalized === 'READY' || normalized === 'NEXT') return 'READY';
+  if (normalized === 'REVIEW' || normalized === 'RECHECK') return 'REVIEW';
+  return 'BACKLOG';
+}
+
+function upsertTaskIntoBoard(board, task, originLabel = 'task') {
+  const normalized = normalizeBoardTask(task);
+  const columnName = columnForStatus(normalized.kanbanStatus || normalized.status);
+  board.columns[columnName] ||= { label: columnName, tasks: [] };
+  const columns = Object.values(board.columns || {});
+  for (const col of columns) {
+    const tasks = Array.isArray(col.tasks) ? col.tasks : [];
+    const existingIndex = tasks.findIndex((entry) => entry.taskId === normalized.taskId);
+    if (existingIndex !== -1) {
+      const existing = tasks[existingIndex];
+      const mergedSourceRefs = normalizeSourceRefs([...(existing.sourceRefs || []), ...(normalized.sourceRefs || [])]);
+      tasks[existingIndex] = {
+        ...existing,
+        ...normalized,
+        feature: existing.feature || normalized.feature || normalized.featureKey || normalized.feature_id,
+        sourceRefs: mergedSourceRefs,
+        boardSources: normalizeSourceRefs([...(existing.boardSources || []), originLabel]),
+      };
+      return 'updated';
+    }
+  }
+  board.columns[columnName].tasks ||= [];
+  board.columns[columnName].tasks.push({
+    ...normalized,
+    feature: normalized.feature || normalized.featureKey || normalized.feature_id,
+    boardSources: normalizeSourceRefs([originLabel]),
+  });
+  return 'added';
+}
+
+function normalizeBoard(board) {
+  for (const col of Object.values(board.columns || {})) {
+    if (!Array.isArray(col.tasks)) continue;
+    col.tasks = col.tasks.map((task) => {
+      const normalized = normalizeBoardTask(task);
+      return {
+        ...task,
+        ...normalized,
+        feature: normalized.feature || normalized.featureKey || normalized.feature_id,
+      };
+    });
+  }
+  return board;
+}
+
+function sortBoardColumns(board) {
+  for (const col of Object.values(board.columns || {})) {
+    if (!Array.isArray(col.tasks)) continue;
+    col.tasks.sort((a, b) => {
+      const aRank = `${a.priority || ''}|${a.featureKey || ''}|${a.taskId || ''}`;
+      const bRank = `${b.priority || ''}|${b.featureKey || ''}|${b.taskId || ''}`;
+      return aRank.localeCompare(bRank);
+    });
+  }
 }
 
 async function main() {
@@ -156,6 +297,7 @@ async function main() {
       taskId: id,
       featureKey: featureId,
       feature_id: featureId,
+      feature: featureId,
       source_ref: sourceRef,
       sourceRefs: r.fileStatuses.filter(f => f.exists).map(f => f.foundAt).slice(0, 5),
       title: r.text.length > 80 ? r.text.slice(0, 77) + '…' : r.text,
@@ -182,6 +324,13 @@ async function main() {
     };
   });
 
+  const featureLabelTasksPath = path.join(FRONTEND_TMP, 'kanban_tasks.jsonl');
+  const missingFeatureTodosPath = path.join(FRONTEND_TMP, 'missing_feature_todos.jsonl');
+  const featureLabelTasks = readJsonl(featureLabelTasksPath);
+  const missingFeatureTodos = readJsonl(missingFeatureTodosPath);
+  const featureLabelBoardTasks = featureLabelTasks.map((task) => normalizeBoardTask(task, { status: 'todo', kanbanStatus: 'BACKLOG' }));
+  const missingFeatureTodoBoardTasks = missingFeatureTodos.map((task) => normalizeBoardTask(task, { status: 'todo', kanbanStatus: 'BACKLOG' }));
+
   if (APPLY) {
     fs.mkdirSync(path.dirname(RECONCILE_OUT), { recursive: true });
     fs.writeFileSync(RECONCILE_OUT, JSON.stringify(reconciled, null, 2), 'utf8');
@@ -189,34 +338,45 @@ async function main() {
     console.log(`  ✅ Reconcile → ${RECONCILE_OUT}`);
     console.log(`  ✅ Tasks     → ${TASKS_NDJSON}`);
 
-    if (MERGE && fs.existsSync(KANBAN_TARGET)) {
-      const existing = JSON.parse(fs.readFileSync(KANBAN_TARGET, 'utf8'));
-      const existingIds = new Map();
-      for (const col of Object.values(existing.columns || {})) {
-        for (let i = 0; i < (col.tasks || []).length; i++) {
-          const t = col.tasks[i];
-          existingIds.set(t.taskId, { col, index: i });
-        }
-      }
-      let added = 0;
-      let updated = 0;
+    if (MERGE) {
+      const board = loadBoardSeed();
+      const counts = {
+        masterTodo: { added: 0, updated: 0 },
+        featureLabel: { added: 0, updated: 0 },
+        missingFeatureTodo: { added: 0, updated: 0 },
+      };
+
       for (const t of tasks) {
-        const existingSlot = existingIds.get(t.taskId);
-        if (existingSlot) {
-          existingSlot.col.tasks[existingSlot.index] = t;
-          updated++;
-          continue;
-        }
-        const col = existing.columns[t.kanbanStatus] || (existing.columns[t.kanbanStatus] = { label: t.kanbanStatus, tasks: [] });
-        col.tasks.push(t);
-        existingIds.set(t.taskId, { col, index: col.tasks.length - 1 });
-        added++;
+        const result = upsertTaskIntoBoard(board, t, 'master-todo');
+        counts.masterTodo[result] += 1;
       }
-      existing.totalTasks = (existing.totalTasks || 0) + added;
-      existing.generatedAt = new Date().toISOString();
-      existing.lastMasterTodoMerge = { addedTasks: added, updatedTasks: updated, mergedAt: new Date().toISOString() };
-      fs.writeFileSync(KANBAN_TARGET, JSON.stringify(existing, null, 2), 'utf8');
-      console.log(`  ✅ Merged ${added} tasks and updated ${updated} tasks into ${KANBAN_TARGET}`);
+      for (const t of featureLabelBoardTasks) {
+        const result = upsertTaskIntoBoard(board, t, 'feature-label');
+        counts.featureLabel[result] += 1;
+      }
+      for (const t of missingFeatureTodoBoardTasks) {
+        const result = upsertTaskIntoBoard(board, t, 'missing-feature-todo');
+        counts.missingFeatureTodo[result] += 1;
+      }
+
+      normalizeBoard(board);
+      sortBoardColumns(board);
+      const totalTasks = Object.values(board.columns || {}).reduce((sum, col) => sum + ((col.tasks || []).length), 0);
+      board.totalTasks = totalTasks;
+      board.generatedAt = new Date().toISOString();
+      board.lastMasterTodoMerge = {
+        mergedAt: new Date().toISOString(),
+        masterTodo: counts.masterTodo,
+        featureLabel: counts.featureLabel,
+        missingFeatureTodo: counts.missingFeatureTodo,
+        sourceFiles: {
+          featureLabelTasksPath: fs.existsSync(featureLabelTasksPath) ? path.relative(ROOT, featureLabelTasksPath).replace(/\\/g, '/') : null,
+          missingFeatureTodosPath: fs.existsSync(missingFeatureTodosPath) ? path.relative(ROOT, missingFeatureTodosPath).replace(/\\/g, '/') : null,
+        },
+      };
+      fs.mkdirSync(path.dirname(KANBAN_TARGET), { recursive: true });
+      fs.writeFileSync(KANBAN_TARGET, JSON.stringify(board, null, 2), 'utf8');
+      console.log(`  ✅ Merged kanban board into ${KANBAN_TARGET} (totalTasks=${totalTasks})`);
     }
 
     const report = {
@@ -224,12 +384,18 @@ async function main() {
       sourceDocument: 'MASTER-FEATURE-TODO-2026-05-20.md',
       openItems: openItems.length,
       tasksGenerated: tasks.length,
+      featureLabelTasks: featureLabelTasks.length,
+      missingFeatureTodos: missingFeatureTodos.length,
       byStatus: tasks.reduce((acc, t) => ({ ...acc, [t.kanbanStatus]: (acc[t.kanbanStatus] || 0) + 1 }), {}),
       byPriority: tasks.reduce((acc, t) => ({ ...acc, [t.priority]: (acc[t.priority] || 0) + 1 }), {}),
       fileResolution: {
         allRefsResolved: reconciled.filter(r => r.fileStatuses.length > 0 && r.fileStatuses.every(f => f.exists)).length,
         someRefsMissing: reconciled.filter(r => r.fileStatuses.some(f => !f.exists)).length,
         noFileRefs: reconciled.filter(r => r.fileStatuses.length === 0).length,
+      },
+      supplementalInputs: {
+        featureLabelTasksPath: fs.existsSync(featureLabelTasksPath) ? path.relative(ROOT, featureLabelTasksPath).replace(/\\/g, '/') : null,
+        missingFeatureTodosPath: fs.existsSync(missingFeatureTodosPath) ? path.relative(ROOT, missingFeatureTodosPath).replace(/\\/g, '/') : null,
       },
     };
     fs.mkdirSync(path.dirname(REPORT), { recursive: true });

@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-06-02T01:39:50.251Z",
+  "inputs": {
+    "databaseUrl": "DATABASE_URL",
+    "onlySourceRefFirst": true,
+    "outDir": "./.tmp/parent_atlas_packets/sourceRef-first"
+  },
+  "summary": {
+    "rows": 2,
+    "filesWritten": 2
+  },
+  "note": "Exports only sourceRef-first parent atlas rows into a dedicated packet directory."
+}

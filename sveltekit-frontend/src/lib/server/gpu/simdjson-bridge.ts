@@ -40,6 +40,11 @@ function getSimdJsonAddon(): SimdJsonAddon | null {
 	if (loadAttempted) return addon;
 	loadAttempted = true;
 
+	if (process.env.SIMDJSON_DISABLED === '1') {
+		console.info('[simdjson-bridge] Disabled via SIMDJSON_DISABLED=1 — using JSON.parse fallback');
+		return null;
+	}
+
 	const paths = [
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),

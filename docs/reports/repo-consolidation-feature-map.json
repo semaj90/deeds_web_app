@@ -1,0 +1,58 @@
+{
+  "purpose": "Prune-ready labeling set for repo consolidation",
+  "canonical_production_tables": [
+    {
+      "table": "research_summaries",
+      "status": "production",
+      "provenance_fields": ["source_ref", "source_refs"],
+      "index_fields": ["source_ref", "source_refs", "entity_tags", "output_meta", "embedding"]
+    }
+  ],
+  "production_ready_code_paths": [
+    "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+    "sveltekit-frontend/src/lib/server/features/cases/research-summaries-db.ts",
+    "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+    "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+    "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"
+  ],
+  "planned_production": [
+    "task_semantic_packets",
+    "summary_cards",
+    "glyph_records",
+    "card_source_refs",
+    "atlas_profile_cards",
+    "atlas_feature_profiles",
+    "atlas_dependency_edges",
+    "atlas_hot_keyword_clusters",
+    "atlas_retrieval_events",
+    "local-deep-research export/import bridge completion",
+    "Postgres 18 dump/restore promotion"
+  ],
+  "experimental": [
+    "local-deep-research SQLite boundary",
+    "cuVS/CAGRA swap lane",
+    "WSL2 GPU override path when not required",
+    "backup trees",
+    ".tmp",
+    ".cache",
+    ".svelte-kit",
+    "drizzle/archived/"
+  ],
+  "archive_candidates": [
+    "superseded atlas snapshots",
+    "redundant generated reports after promotion",
+    "backup directories and report dumps outside the active toolchain"
+  ],
+  "labeling_rules": [
+    "Ship-path = code that reads/writes canonical live rows",
+    "Planned production = future schema in active development",
+    "Experimental = alternate backends, benchmarks, or local-only state",
+    "Archive = backups/snapshots/duplicates after promotion"
+  ],
+  "next_actions": [
+    "Classify the full repo tree with this map",
+    "Keep only source, schemas, scripts, and docs in the active ship set",
+    "Move archive candidates after atlas and kanban sync land on the production-ready list"
+  ]
+}
+
